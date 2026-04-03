@@ -82,7 +82,7 @@ def validate_file(filepath: Path, logger) -> dict:
     if data_cols:
         has_any = False
         for col in data_cols:
-            if df[col].notna().any() and (df[col].str.strip() != "").any():
+            if df[col].notna().any() and (df[col].astype(str).str.strip() != "").any():
                 has_any = True
                 break
         result["has_data"] = has_any

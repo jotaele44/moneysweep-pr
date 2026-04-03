@@ -52,7 +52,7 @@ def check_file_coverage(filepath: Path) -> dict:
 
     if "fiscal_year" in df.columns:
         fy_raw = pd.to_numeric(df["fiscal_year"], errors="coerce").dropna()
-        result["fiscal_years"] = set(int(y) for y in fy_raw if 1990 <= y <= 2030)
+        result["fiscal_years"] = set(int(y) for y in fy_raw if 2000 <= y <= 2026)
 
     return result
 
@@ -156,12 +156,9 @@ def report_coverage(matrix: dict, logger) -> dict:
     # --- Timeline continuity check ---
     logger.info("")
     gaps = []
-    for i in range(len(COVERAGE_YEARS) - 1):
-        y, yn = COVERAGE_YEARS[i], COVERAGE_YEARS[i + 1]
-        if year_covered[y] and not year_covered[yn]:
-            gaps.append(yn)
-        elif not year_covered[y] and year_covered[yn]:
-            gaps.append(y)
+    if covered_years:
+        min_y, max_y = min(covered_years), max(covered_years)
+        gaps = [y for y in range(min_y, max_y + 1) if not year_covered[y]]
 
     if gaps:
         logger.info(f"Timeline continuity: GAPS found at years: {gaps}")
