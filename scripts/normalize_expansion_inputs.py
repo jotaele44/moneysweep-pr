@@ -123,10 +123,11 @@ def normalize_file(input_path: Path, output_dir: Path, logger) -> dict:
 
     # Convert amount to numeric
     if "obligated_amount" in df.columns:
-        df["obligated_amount"] = pd.to_numeric(
-            df["obligated_amount"].astype(str).str.replace(",", "").str.replace("$", "").str.strip(),
-            errors="coerce",
-        )
+        raw_amounts = df["obligated_amount"].astype(str).str.replace(",", "").str.replace("$", "").str.strip()
+        df["obligated_amount"] = pd.to_numeric(raw_amounts, errors="coerce")
+        coerced = raw_amounts.notna().sum() - df["obligated_amount"].notna().sum()
+        if coerced > 0:
+            logger.warning(f"  {input_path.name}: {coerced} non-numeric amount values coerced to NaN")
 
     # Derive fiscal year
     df["fiscal_year"] = derive_fiscal_year(df["award_date"])

@@ -73,6 +73,7 @@ def print_summary(
     logger: logging.Logger,
     elapsed: float,
     steps: dict,
+    download_count: int,
     validation_result: int,
     normalize_count: int,
     coverage_result: int,
@@ -138,6 +139,11 @@ def print_summary(
         f"  Download instructions: {'OK — see data/staging/expansion/DOWNLOAD_INSTRUCTIONS.md' if steps.get('instructions') else 'FAILED'}"
     )
 
+    if download_count is None:
+        logger.info("  Auto-downloaded:       SKIPPED")
+    else:
+        logger.info(f"  Auto-downloaded:       {download_count}/13 files ready")
+
     if validation_result is None:
         logger.info("  Files validated:       SKIPPED")
     elif validation_result == 0:
@@ -174,19 +180,34 @@ def main() -> int:
         help="Run only steps 1-2 (create dirs + generate instructions), then exit",
     )
     parser.add_argument(
+        "--skip-download",
+        action="store_true",
+        help="Skip step 3 (auto-download)",
+    )
+    parser.add_argument(
+        "--manual-only",
+        action="store_true",
+        help="Alias for --skip-download",
+    )
+    parser.add_argument(
+        "--force-download",
+        action="store_true",
+        help="Re-download even if files already exist",
+    )
+    parser.add_argument(
         "--skip-validation",
         action="store_true",
-        help="Skip step 3 (download validation)",
+        help="Skip step 4 (download validation)",
     )
     parser.add_argument(
         "--skip-normalize",
         action="store_true",
-        help="Skip step 4 (normalization)",
+        help="Skip step 5 (normalization)",
     )
     parser.add_argument(
         "--skip-coverage",
         action="store_true",
-        help="Skip step 5 (coverage validation)",
+        help="Skip step 6 (coverage validation)",
     )
     args = parser.parse_args()
 
@@ -201,6 +222,7 @@ def main() -> int:
 
     start_time = time.time()
     steps = {}
+    download_count = None
     validation_result = None
     normalize_count = None
     coverage_result = None
@@ -216,43 +238,67 @@ def main() -> int:
     # ------------------------------------------------------------------
     # Step 1: Setup directories
     # ------------------------------------------------------------------
-    logger.info("[Step 1/5] Setting up directories...")
+    logger.info("[Step 1/6] Setting up directories...")
     try:
         from scripts.setup_directories import main as setup_dirs
         setup_dirs(root)
         steps["dirs"] = True
-        logger.info("[Step 1/5] Done.\n")
+        logger.info("[Step 1/6] Done.\n")
     except Exception as e:
-        logger.error(f"[Step 1/5] FAILED: {e}")
+        logger.error(f"[Step 1/6] FAILED: {e}")
         steps["dirs"] = False
         return 1
 
     # ------------------------------------------------------------------
     # Step 2: Generate download instructions
     # ------------------------------------------------------------------
-    logger.info("[Step 2/5] Generating download instructions...")
+    logger.info("[Step 2/6] Generating download instructions...")
     try:
         from scripts.download_instructions import main as gen_instructions
         gen_instructions(root)
         steps["instructions"] = True
-        logger.info("[Step 2/5] Done.\n")
+        logger.info("[Step 2/6] Done.\n")
     except Exception as e:
-        logger.error(f"[Step 2/5] FAILED: {e}")
+        logger.error(f"[Step 2/6] FAILED: {e}")
         steps["instructions"] = False
         return 1
 
     if args.only_setup:
         logger.info("--only-setup flag set. Stopping after steps 1-2.")
         elapsed = time.time() - start_time
-        return print_summary(logger, elapsed, steps, None, None, None, root)
+        return print_summary(logger, elapsed, steps, None, None, None, None, root)
 
     # ------------------------------------------------------------------
-    # Step 3: Validate downloads
+    # Step 3: Auto-download datasets
+    # ------------------------------------------------------------------
+    skip_download = args.skip_download or args.manual_only
+    if skip_download:
+        logger.info("[Step 3/6] SKIPPED (--skip-download / --manual-only)\n")
+    else:
+        logger.info("[Step 3/6] Auto-downloading datasets...")
+        try:
+            from scripts.auto_download import download_all, print_download_summary
+            dl_results = download_all(root, force=args.force_download)
+            print_download_summary(dl_results, logger)
+            download_count = sum(1 for r in dl_results if r["status"] in ("OK", "SKIPPED"))
+            steps["download"] = True
+            logger.info(f"[Step 3/6] Done ({download_count} files ready).\n")
+        except ImportError:
+            logger.warning("[Step 3/6] Auto-download unavailable (missing requests/lxml).")
+            logger.warning("  Install: pip install requests lxml")
+            logger.warning("  Or use --manual-only and download files manually.\n")
+            steps["download"] = False
+        except Exception as e:
+            logger.error(f"[Step 3/6] FAILED: {e}")
+            steps["download"] = False
+
+    # ------------------------------------------------------------------
+    # Step 4: Validate downloads
     # ------------------------------------------------------------------
     if args.skip_validation:
-        logger.info("[Step 3/5] SKIPPED (--skip-validation)\n")
+        logger.info("[Step 4/6] SKIPPED (--skip-validation)\n")
     else:
-        logger.info("[Step 3/5] Validating downloaded files...")
+        logger.info("[Step 4/6] Validating downloaded files...")
         try:
             from scripts.validate_downloads import validate_all, print_report
             results = validate_all(root)
@@ -265,58 +311,50 @@ def main() -> int:
                     f"  {len(missing_files)} of {len(DOWNLOAD_MANIFEST)} files not yet downloaded."
                 )
                 logger.info(
-                    "  Follow instructions in: data/staging/expansion/DOWNLOAD_INSTRUCTIONS.md"
+                    "  For remaining files, see: data/staging/expansion/DOWNLOAD_INSTRUCTIONS.md"
                 )
-                logger.info("  Then re-run: python3 run_all.py")
                 logger.info("")
-
-                if len(missing_files) == len(DOWNLOAD_MANIFEST):
-                    logger.info(
-                        "  No files downloaded yet. Pipeline will continue to show what steps remain."
-                    )
-                    validation_result = 1
-                else:
-                    validation_result = 1
+                validation_result = 1
             else:
                 has_fail = any(r["status"] == "FAIL" for r in results)
                 has_warn = any(r["status"] == "WARN" for r in results)
                 validation_result = 1 if has_fail else (2 if has_warn else 0)
 
-            logger.info(f"[Step 3/5] Done (exit: {validation_result}).\n")
+            logger.info(f"[Step 4/6] Done (exit: {validation_result}).\n")
         except Exception as e:
-            logger.error(f"[Step 3/5] FAILED: {e}")
+            logger.error(f"[Step 4/6] FAILED: {e}")
             validation_result = 1
 
     # ------------------------------------------------------------------
-    # Step 4: Normalize
+    # Step 5: Normalize
     # ------------------------------------------------------------------
     if args.skip_normalize:
-        logger.info("[Step 4/5] SKIPPED (--skip-normalize)\n")
+        logger.info("[Step 5/6] SKIPPED (--skip-normalize)\n")
     else:
-        logger.info("[Step 4/5] Normalizing expansion inputs...")
+        logger.info("[Step 5/6] Normalizing expansion inputs...")
         try:
             from scripts.normalize_expansion_inputs import normalize_all, print_report as norm_report
             results = normalize_all(root)
             norm_report(results, logger)
             normalize_count = sum(1 for r in results if r["status"] in ("OK", "WARN"))
-            logger.info(f"[Step 4/5] Done ({normalize_count} files normalized).\n")
+            logger.info(f"[Step 5/6] Done ({normalize_count} files normalized).\n")
         except Exception as e:
-            logger.error(f"[Step 4/5] FAILED: {e}")
+            logger.error(f"[Step 5/6] FAILED: {e}")
             normalize_count = 0
 
     # ------------------------------------------------------------------
-    # Step 5: Validate coverage
+    # Step 6: Validate coverage
     # ------------------------------------------------------------------
     if args.skip_coverage:
-        logger.info("[Step 5/5] SKIPPED (--skip-coverage)\n")
+        logger.info("[Step 6/6] SKIPPED (--skip-coverage)\n")
     else:
-        logger.info("[Step 5/5] Validating expansion coverage...")
+        logger.info("[Step 6/6] Validating expansion coverage...")
         try:
             from scripts.validate_expansion_coverage import main as validate_coverage
             coverage_result = validate_coverage(root)
-            logger.info(f"[Step 5/5] Done (exit: {coverage_result}).\n")
+            logger.info(f"[Step 6/6] Done (exit: {coverage_result}).\n")
         except Exception as e:
-            logger.error(f"[Step 5/5] FAILED: {e}")
+            logger.error(f"[Step 6/6] FAILED: {e}")
             coverage_result = 1
 
     # ------------------------------------------------------------------
@@ -324,7 +362,7 @@ def main() -> int:
     # ------------------------------------------------------------------
     elapsed = time.time() - start_time
     return print_summary(
-        logger, elapsed, steps, validation_result, normalize_count, coverage_result, root
+        logger, elapsed, steps, download_count, validation_result, normalize_count, coverage_result, root
     )
 
 

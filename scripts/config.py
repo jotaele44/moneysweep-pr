@@ -344,18 +344,26 @@ def read_csv_safe(filepath, nrows=None):
     """
     import pandas as pd
 
+    import warnings as _warnings
+
     encodings = ["utf-8-sig", "utf-8", "latin-1", "cp1252"]
     last_err = None
     for enc in encodings:
         try:
-            df = pd.read_csv(
-                filepath,
-                encoding=enc,
-                low_memory=False,
-                dtype=str,
-                nrows=nrows,
-                on_bad_lines="warn",
-            )
+            with _warnings.catch_warnings(record=True) as caught:
+                _warnings.simplefilter("always")
+                df = pd.read_csv(
+                    filepath,
+                    encoding=enc,
+                    low_memory=False,
+                    dtype=str,
+                    nrows=nrows,
+                    on_bad_lines="warn",
+                )
+            if caught:
+                logging.getLogger("csv_reader").warning(
+                    f"{Path(filepath).name}: {len(caught)} parse warning(s) ({enc} encoding)"
+                )
             # Clean column names
             df.columns = [clean_column_name(c) for c in df.columns]
             return df
