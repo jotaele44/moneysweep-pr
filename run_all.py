@@ -421,6 +421,9 @@ def main() -> int:
             logger.info("[Step 7/7] SKIPPED — SAM_API_KEY not set.")
             logger.info("  Set via: export SAM_API_KEY=your_key  or create a .env file.\n")
             enrichment_result = "NO_KEY — skipped"
+        elif dedup_stats is None or dedup_stats.get("master_rows", 0) == 0:
+            logger.info("[Step 7/7] SKIPPED — no master data (download files first)\n")
+            enrichment_result = "SKIPPED — no master data"
         else:
             logger.info("[Step 7/7] Running SAM.gov UEI enrichment...")
             try:

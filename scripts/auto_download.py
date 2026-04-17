@@ -39,6 +39,9 @@ from scripts.config import (
 USASPENDING_BASE = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 FPDS_BASE = "https://www.fpds.gov/ezsearch/fpdsportal"
 
+# USASpending API: earliest supported start_date for spending_by_award
+USASPENDING_MIN_YEAR = 2007
+
 USASPENDING_FIELDS = [
     "Award ID", "Recipient Name", "Recipient State Code",
     "Awarding Agency", "Awarding Sub Agency", "Award Amount",
@@ -46,6 +49,17 @@ USASPENDING_FIELDS = [
     "Place of Performance State Code", "Place of Performance City",
     "Description", "Contract Award Type", "NAICS Code",
     "generated_internal_id",
+]
+
+# All contract award type codes recognized by spending_by_award
+_CONTRACT_TYPE_CODES = [
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+    "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+    "DO", "BPA Call",
+]
+
+_IDV_TYPE_CODES = [
+    "IDV_A", "IDV_B", "IDV_B_A", "IDV_B_B", "IDV_B_C", "IDV_C", "IDV_D", "IDV_E",
 ]
 
 FPDS_NS = {
@@ -117,27 +131,32 @@ def _file_exists_with_data(filepath: Path) -> int:
 # USASpending Downloads
 # ---------------------------------------------------------------------------
 
-def _build_usaspending_payload(entry: dict) -> dict:
-    """Build USASpending API payload from manifest entry."""
+def _build_usaspending_payload(entry: dict) -> tuple:
+    """Build USASpending API payload from manifest entry.
+
+    Returns (payload, effective_start_year) where effective_start_year may be
+    clamped to USASPENDING_MIN_YEAR if the manifest year_start is earlier.
+    """
     filters = entry["filters"]
     ftype = entry["filter_type"]
     year_start = entry["year_start"]
     year_end = entry["year_end"]
 
+    # spending_by_award only supports data from 2007-10-01 onward
+    effective_start = max(year_start, USASPENDING_MIN_YEAR)
+
     payload_filters = {
         "time_period": [
-            {"start_date": f"{year_start}-10-01", "end_date": f"{year_end}-09-30"}
+            {"start_date": f"{effective_start}-10-01", "end_date": f"{year_end}-09-30"}
         ],
     }
 
     if ftype == "idv":
-        payload_filters["award_type_codes"] = [
-            "IDV_A", "IDV_B", "IDV_B_A", "IDV_B_B", "IDV_B_C",
-            "IDV_C", "IDV_D", "IDV_E",
-        ]
+        payload_filters["award_type_codes"] = _IDV_TYPE_CODES
         payload_filters["keywords"] = ["Puerto Rico"]
 
     elif ftype == "dod":
+        payload_filters["award_type_codes"] = _CONTRACT_TYPE_CODES
         payload_filters["agencies"] = [
             {"type": "awarding", "tier": "toptier", "name": "Department of Defense"},
         ]
@@ -145,6 +164,7 @@ def _build_usaspending_payload(entry: dict) -> dict:
         payload_filters["keywords"] = keywords
 
     elif ftype == "reconstruction":
+        payload_filters["award_type_codes"] = _CONTRACT_TYPE_CODES
         agency_names = {
             "FEMA": "Federal Emergency Management Agency",
             "HUD": "Department of Housing and Urban Development",
@@ -160,7 +180,7 @@ def _build_usaspending_payload(entry: dict) -> dict:
         keywords = filters.get("Keywords", ["Puerto Rico"])
         payload_filters["keywords"] = keywords
 
-    return {
+    payload = {
         "filters": payload_filters,
         "fields": USASPENDING_FIELDS,
         "page": 1,
@@ -169,6 +189,7 @@ def _build_usaspending_payload(entry: dict) -> dict:
         "order": "desc",
         "subawards": False,
     }
+    return payload, effective_start
 
 
 def download_usaspending(entry: dict, output_dir: Path, logger, session: requests.Session) -> dict:
@@ -176,7 +197,14 @@ def download_usaspending(entry: dict, output_dir: Path, logger, session: request
     fname = entry["filename"]
     result = {"filename": fname, "rows": 0, "status": "OK", "error": None}
 
-    payload = _build_usaspending_payload(entry)
+    payload, effective_start = _build_usaspending_payload(entry)
+    if effective_start > entry["year_start"]:
+        logger.warning(
+            f"  USASpending API supports data from {USASPENDING_MIN_YEAR}-10-01 only. "
+            f"Clamping start year {entry['year_start']} → {effective_start}. "
+            f"Pre-{USASPENDING_MIN_YEAR} data requires Custom Award Download from usaspending.gov."
+        )
+
     all_results = []
     page = 1
     total_pages = None
@@ -334,13 +362,16 @@ def download_fpds(entry: dict, output_dir: Path, logger, session: requests.Sessi
             logger.error(f"  FPDS request failed at offset {offset}: {e}")
             break
 
-        # Detect HTML error pages (FPDS sometimes returns 200 + HTML on rate-limit)
+        # Detect HTML response — FPDS Atom/XML feed endpoint is defunct
         content_start = resp.content[:500].lower()
         if b"<!doctype" in content_start or b"<html" in content_start:
-            result["status"] = "FAILED"
-            result["error"] = "FPDS returned HTML instead of XML (rate-limited or endpoint changed)"
-            logger.error(f"  FPDS returned an HTML page — possible rate-limit or URL change")
-            logger.info(f"  Response snippet: {resp.content[:300]!r}")
+            result["status"] = "MANUAL"
+            result["error"] = "FPDS Atom API is defunct — manual browser download required"
+            logger.warning(f"  FPDS API returned HTML (Atom feed no longer served)")
+            logger.info(f"  Manual download required:")
+            logger.info(f"    1. Go to https://www.fpds.gov/ezsearch/search.do")
+            logger.info(f"    2. Advanced Search → set filters per DOWNLOAD_INSTRUCTIONS.md")
+            logger.info(f"    3. Export CSV → save to data/staging/expansion/{fname}")
             break
 
         # Parse XML — recover=True tolerates minor malformations (e.g. unescaped &)
