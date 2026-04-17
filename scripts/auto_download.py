@@ -180,6 +180,16 @@ def _build_usaspending_payload(entry: dict) -> tuple:
         keywords = filters.get("Keywords", ["Puerto Rico"])
         payload_filters["keywords"] = keywords
 
+    elif ftype == "direct":
+        # FPDS direct fallback: place of performance = Puerto Rico
+        payload_filters["award_type_codes"] = _CONTRACT_TYPE_CODES
+        payload_filters["place_of_performance_locations"] = [{"state": "PR", "country": "USA"}]
+
+    elif ftype == "vendor":
+        # FPDS vendor fallback: recipient/vendor state = Puerto Rico
+        payload_filters["award_type_codes"] = _CONTRACT_TYPE_CODES
+        payload_filters["recipient_locations"] = [{"state": "PR", "country": "USA"}]
+
     payload = {
         "filters": payload_filters,
         "fields": USASPENDING_FIELDS,
@@ -507,7 +517,17 @@ def download_single(entry: dict, output_dir: Path, logger, session: requests.Ses
             return {"filename": fname, "rows": existing_rows, "status": "SKIPPED", "error": None}
 
     if source == "FPDS":
-        return download_fpds(entry, output_dir, logger, session)
+        result = download_fpds(entry, output_dir, logger, session)
+        # FPDS Atom feed is defunct — fall back to USASpending for post-2007 windows
+        if result["status"] in ("FAILED", "MANUAL"):
+            if entry["year_end"] < USASPENDING_MIN_YEAR:
+                logger.info(f"  Pre-{USASPENDING_MIN_YEAR} range — manual download required (see DOWNLOAD_INSTRUCTIONS.md)")
+                result["status"] = "MANUAL"
+            else:
+                fy_start = max(entry["year_start"], USASPENDING_MIN_YEAR)
+                logger.info(f"  Falling back to USASpending API for FY{fy_start}–{entry['year_end']}...")
+                result = download_usaspending(entry, output_dir, logger, session)
+        return result
     elif source == "USASpending":
         return download_usaspending(entry, output_dir, logger, session)
     elif source == "FSRS":
