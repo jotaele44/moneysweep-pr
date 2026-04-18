@@ -2,7 +2,8 @@
 Automated download of expansion datasets (12/13 automated, 1 manual fallback).
 
 Sources:
-- FPDS (8 files): Atom/XML feed at fpds.gov
+- FPDS (8 files): Atom/XML feed at fpds.gov; when the feed returns HTML (defunct),
+  falls back to USASpending bulk_download (FY2000-2006) or spending_by_award (FY2007+)
 - USASpending (4 files): REST API at api.usaspending.gov (no auth)
 - FSRS (1 file): Manual download required (no public API)
 
