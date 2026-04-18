@@ -217,12 +217,11 @@ def _build_bulk_payload(entry: dict, fy_start: int, fy_end: int) -> dict:
     filters = entry["filters"]
 
     payload_filters: dict = {
-        "time_period": [
-            {
-                "start_date": f"{fy_start - 1}-10-01",
-                "end_date":   f"{fy_end}-09-30",
-            }
-        ],
+        "date_type": "action_date",
+        "date_range": {
+            "start_date": f"{fy_start - 1}-10-01",
+            "end_date":   f"{fy_end}-09-30",
+        },
     }
 
     if ftype == "direct":
