@@ -14,8 +14,10 @@ Usage:
 """
 
 import argparse
+import io
 import sys
 import time
+import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -37,10 +39,15 @@ from scripts.config import (
 # ---------------------------------------------------------------------------
 
 USASPENDING_BASE = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
+USASPENDING_BULK_BASE   = "https://api.usaspending.gov/api/v2/bulk_download/awards/"
+USASPENDING_BULK_STATUS = "https://api.usaspending.gov/api/v2/bulk_download/status/"
 FPDS_BASE = "https://www.fpds.gov/ezsearch/fpdsportal"
 
 # USASpending API: earliest supported start_date for spending_by_award
 USASPENDING_MIN_YEAR = 2007
+
+BULK_POLL_INTERVAL = 15   # seconds between status polls
+BULK_TIMEOUT_SECS  = 600  # 10-minute ceiling for async job completion
 
 USASPENDING_FIELDS = [
     "Award ID", "Recipient Name", "Recipient State Code",
@@ -203,6 +210,66 @@ def _build_usaspending_payload(entry: dict) -> tuple:
     return payload, effective_start
 
 
+def _build_bulk_payload(entry: dict, fy_start: int, fy_end: int) -> dict:
+    """Build a bulk_download/awards/ payload for the given fiscal-year range.
+
+    Fiscal year N runs from (N-1)-10-01 to N-09-30.
+    Supports filter_types: direct, vendor, idv, dod, reconstruction.
+    """
+    ftype = entry["filter_type"]
+    filters = entry["filters"]
+
+    payload_filters: dict = {
+        "time_period": [
+            {
+                "start_date": f"{fy_start - 1}-10-01",
+                "end_date":   f"{fy_end}-09-30",
+            }
+        ],
+    }
+
+    if ftype == "direct":
+        payload_filters["award_type_codes"] = _CONTRACT_TYPE_CODES
+        payload_filters["place_of_performance_locations"] = [{"state": "PR", "country": "USA"}]
+
+    elif ftype == "vendor":
+        payload_filters["award_type_codes"] = _CONTRACT_TYPE_CODES
+        payload_filters["recipient_locations"] = [{"state": "PR", "country": "USA"}]
+
+    elif ftype == "idv":
+        payload_filters["award_type_codes"] = _IDV_TYPE_CODES
+        payload_filters["keywords"] = ["Puerto Rico"]
+
+    elif ftype == "dod":
+        payload_filters["award_type_codes"] = _CONTRACT_TYPE_CODES
+        payload_filters["agencies"] = [
+            {"type": "awarding", "tier": "toptier", "name": "Department of Defense"},
+        ]
+        payload_filters["keywords"] = filters.get("Keywords", ["Puerto Rico"])
+
+    elif ftype == "reconstruction":
+        _agency_map = {
+            "FEMA":  {"tier": "subtier", "name": "Federal Emergency Management Agency"},
+            "HUD":   {"tier": "toptier", "name": "Department of Housing and Urban Development"},
+            "DOT":   {"tier": "toptier", "name": "Department of Transportation"},
+            "USACE": {"tier": "subtier", "name": "U.S. Army Corps of Engineers"},
+            "VA":    {"tier": "toptier", "name": "Department of Veterans Affairs"},
+        }
+        raw_agencies = filters.get("Agencies", [])
+        payload_filters["award_type_codes"] = _CONTRACT_TYPE_CODES
+        payload_filters["agencies"] = [
+            {"type": "awarding", "tier": _agency_map[a]["tier"], "name": _agency_map[a]["name"]}
+            for a in raw_agencies if a in _agency_map
+        ]
+        payload_filters["keywords"] = filters.get("Keywords", ["Puerto Rico"])
+
+    return {
+        "filters": payload_filters,
+        "award_levels": ["prime_awards"],
+        "file_format": "csv",
+    }
+
+
 def download_usaspending(entry: dict, output_dir: Path, logger, session: requests.Session) -> dict:
     """Download a single USASpending dataset via API."""
     fname = entry["filename"]
@@ -285,6 +352,161 @@ def download_usaspending(entry: dict, output_dir: Path, logger, session: request
     result["rows"] = len(df)
     logger.info(f"  Saved {len(df)} rows to {fname}")
 
+    return result
+
+
+# ---------------------------------------------------------------------------
+# USASpending Bulk Download (async, supports FY2000+)
+# ---------------------------------------------------------------------------
+
+def download_usaspending_bulk(
+    entry: dict,
+    output_dir: Path,
+    logger,
+    session: requests.Session,
+    fy_start: int = None,
+    fy_end: int = None,
+) -> dict:
+    """Download via the USASpending bulk_download/awards/ async API.
+
+    Unlike spending_by_award, this endpoint supports data back to FY2000 and
+    works asynchronously: submit a job, poll until finished, download ZIP, extract CSV.
+    """
+    fname = entry["filename"]
+    result = {"filename": fname, "rows": 0, "status": "OK", "error": None}
+
+    fy_s = fy_start if fy_start is not None else entry["year_start"]
+    fy_e = fy_end   if fy_end   is not None else entry["year_end"]
+
+    payload = _build_bulk_payload(entry, fy_s, fy_e)
+    logger.info(
+        f"  Submitting bulk_download for FY{fy_s}-{fy_e} "
+        f"(filter_type={entry['filter_type']})..."
+    )
+
+    # --- Step 1: Submit job ---
+    try:
+        resp = _retry_request(session, "POST", USASPENDING_BULK_BASE, json=payload, timeout=30)
+        job = resp.json()
+    except requests.HTTPError as e:
+        body = e.response.text[:600] if e.response else ""
+        result["status"] = "FAILED"
+        result["error"] = f"bulk_download POST HTTP {getattr(e.response,'status_code','?')}: {body}"
+        logger.error(f"  bulk_download POST failed: {e}")
+        if body:
+            logger.error(f"  Response body: {body}")
+        return result
+    except Exception as e:
+        result["status"] = "FAILED"
+        result["error"] = str(e)
+        logger.error(f"  bulk_download POST failed: {e}")
+        return result
+
+    file_name = job.get("file_name") or job.get("file_url", "")
+    if not file_name:
+        result["status"] = "FAILED"
+        result["error"] = f"bulk_download response missing file_name: {job}"
+        logger.error(result["error"])
+        return result
+
+    logger.info(f"  Job submitted — token: {file_name}")
+
+    # --- Step 2: Poll for completion ---
+    deadline = time.time() + BULK_TIMEOUT_SECS
+    download_url = None
+
+    while time.time() < deadline:
+        time.sleep(BULK_POLL_INTERVAL)
+        try:
+            status_resp = _retry_request(
+                session, "GET", USASPENDING_BULK_STATUS,
+                params={"file_name": file_name}, timeout=15,
+            )
+            status_data = status_resp.json()
+        except Exception as e:
+            logger.warning(f"  Status poll error (will retry): {e}")
+            continue
+
+        state = status_data.get("status", "").lower()
+        logger.info(f"  Job status: {state}")
+
+        if state == "finished":
+            download_url = status_data.get("url") or status_data.get("file_url")
+            break
+        elif state in ("failed", "error"):
+            result["status"] = "FAILED"
+            result["error"] = f"bulk_download job failed: {status_data}"
+            logger.error(result["error"])
+            return result
+
+    if download_url is None:
+        result["status"] = "FAILED"
+        result["error"] = f"bulk_download timed out after {BULK_TIMEOUT_SECS}s"
+        logger.error(result["error"])
+        return result
+
+    logger.info("  Downloading ZIP from presigned URL...")
+
+    # --- Step 3: Download ZIP ---
+    try:
+        zip_resp = session.get(download_url, timeout=120, stream=True)
+        zip_resp.raise_for_status()
+        zip_bytes = zip_resp.content
+    except Exception as e:
+        result["status"] = "FAILED"
+        result["error"] = f"ZIP download failed: {e}"
+        logger.error(result["error"])
+        return result
+
+    # --- Step 4: Extract primary awards CSV from ZIP ---
+    try:
+        with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
+            members = zf.namelist()
+            logger.info(f"  ZIP members: {members}")
+            csv_members = [m for m in members if m.lower().endswith(".csv")]
+            if not csv_members:
+                result["status"] = "FAILED"
+                result["error"] = f"No CSV in ZIP. Members: {members}"
+                logger.error(result["error"])
+                return result
+            # Prefer files that mention "prime" or "award" in the name
+            preferred = next(
+                (m for m in csv_members if "prime" in m.lower() or "award" in m.lower()),
+                None,
+            )
+            if preferred is None:
+                preferred = max(csv_members, key=lambda m: zf.getinfo(m).file_size)
+            logger.info(f"  Extracting: {preferred}")
+            csv_bytes = zf.read(preferred)
+    except zipfile.BadZipFile as e:
+        result["status"] = "FAILED"
+        result["error"] = f"Invalid ZIP: {e}"
+        logger.error(result["error"])
+        return result
+    except Exception as e:
+        result["status"] = "FAILED"
+        result["error"] = f"ZIP extraction failed: {e}"
+        logger.error(result["error"])
+        return result
+
+    # --- Step 5: Save and verify ---
+    output_path = output_dir / fname
+    output_path.write_bytes(csv_bytes)
+
+    try:
+        df_check = read_csv_safe(output_path, nrows=5)
+        if len(df_check) == 0:
+            result["status"] = "EMPTY"
+            logger.warning("  bulk_download CSV is empty after extraction")
+            return result
+        with open(output_path, "r", encoding="utf-8-sig", errors="replace") as f:
+            row_count = max(sum(1 for _ in f) - 1, 0)
+        result["rows"] = row_count
+    except Exception as e:
+        logger.warning(f"  Could not verify row count: {e}")
+        result["rows"] = -1
+
+    logger.info(f"  Saved {result['rows']} rows to {fname}")
     return result
 
 
@@ -515,14 +737,29 @@ def download_single(entry: dict, output_dir: Path, logger, session: requests.Ses
 
     if source == "FPDS":
         result = download_fpds(entry, output_dir, logger, session)
-        # FPDS Atom feed is defunct — fall back to USASpending for post-2007 windows
         if result["status"] in ("FAILED", "MANUAL"):
             if entry["year_end"] < USASPENDING_MIN_YEAR:
-                logger.info(f"  Pre-{USASPENDING_MIN_YEAR} range — manual download required (see DOWNLOAD_INSTRUCTIONS.md)")
-                result["status"] = "MANUAL"
+                # Entire window is pre-2007 (e.g. FY2000-2004): spending_by_award
+                # won't go back this far, so use the async bulk_download API instead.
+                logger.info(
+                    f"  Pre-{USASPENDING_MIN_YEAR} window — "
+                    f"using USASpending bulk_download for FY{entry['year_start']}-{entry['year_end']}..."
+                )
+                result = download_usaspending_bulk(entry, output_dir, logger, session)
+            elif entry["year_start"] < USASPENDING_MIN_YEAR:
+                # Window straddles the 2007 boundary (e.g. FY2005-2008): use
+                # bulk_download for the full range so FY2005-2006 is not silently lost.
+                logger.info(
+                    f"  Window spans pre-{USASPENDING_MIN_YEAR} boundary — "
+                    f"using bulk_download for full FY{entry['year_start']}-{entry['year_end']}..."
+                )
+                result = download_usaspending_bulk(entry, output_dir, logger, session)
             else:
-                fy_start = max(entry["year_start"], USASPENDING_MIN_YEAR)
-                logger.info(f"  Falling back to USASpending API for FY{fy_start}–{entry['year_end']}...")
+                # Fully post-2007 (e.g. FY2009-2016): use the fast paginated API.
+                logger.info(
+                    f"  Falling back to USASpending spending_by_award "
+                    f"for FY{entry['year_start']}-{entry['year_end']}..."
+                )
                 result = download_usaspending(entry, output_dir, logger, session)
         return result
     elif source == "USASpending":
