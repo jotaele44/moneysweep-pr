@@ -59,12 +59,8 @@ USASPENDING_FIELDS = [
     "generated_internal_id",
 ]
 
-# All contract award type codes recognized by spending_by_award
-_CONTRACT_TYPE_CODES = [
-    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
-    "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
-    "DO", "BPA Call",
-]
+# Contract award type codes accepted by USASpending (A=BPA, B=Purchase Order, C=Delivery Order, D=Definitive Contract)
+_CONTRACT_TYPE_CODES = ["A", "B", "C", "D"]
 
 _IDV_TYPE_CODES = [
     "IDV_A", "IDV_B", "IDV_B_A", "IDV_B_B", "IDV_B_C", "IDV_C", "IDV_D", "IDV_E",
