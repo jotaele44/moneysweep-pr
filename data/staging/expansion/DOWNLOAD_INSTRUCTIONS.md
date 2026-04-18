@@ -3,8 +3,12 @@
 This document provides step-by-step instructions for downloading all 13
 expansion datasets from federal procurement data sources.
 
-**CONSTRAINTS**:
-- NO API calls — all downloads are manual/browser-based
+> **Note**: `auto_download.py` automates 12/13 files via USASpending APIs
+> (bulk_download for FY2000-2006, spending_by_award for FY2007+).
+> These instructions apply to the 1 remaining manual file (FSRS) or as a
+> fallback if automated downloads fail.
+
+**Manual download constraints** (FSRS and fallback only):
 - Format: **CSV**
 - Fields: **ALL available** (do not filter columns)
 - Compression: **NONE**
