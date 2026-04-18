@@ -25,11 +25,12 @@ import os
 import re
 import sys
 import time
-import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime
 from pathlib import Path
+
+import requests as _requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -96,18 +97,14 @@ def vendor_hash(name: str) -> str:
 # API calls
 # ---------------------------------------------------------------------------
 
-def sam_call(params: dict, api_key: str, timeout: int = 7):
+def sam_call(params: dict, api_key: str, timeout: tuple = (5, 7)):
     """GET SAM.gov entity-information API. Returns parsed JSON or None."""
-    full_params = {"api_key": api_key}
-    full_params.update(params)
-    url = f"{SAM_BASE_URL}?{urllib.parse.urlencode(full_params)}"
-    req = urllib.request.Request(url, headers={"Accept": "application/json"})
+    full_params = {"api_key": api_key, **params}
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            if resp.status == 200:
-                return json.loads(resp.read().decode())
-    except urllib.error.HTTPError as e:
-        if e.code == 429:
+        resp = _requests.get(SAM_BASE_URL, params=full_params, timeout=timeout)
+        if resp.status_code == 200:
+            return resp.json()
+        if resp.status_code == 429:
             time.sleep(10)
     except Exception:
         pass
