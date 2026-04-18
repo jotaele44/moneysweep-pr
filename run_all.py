@@ -283,28 +283,28 @@ def main() -> int:
     # ------------------------------------------------------------------
     # Step 1: Setup directories
     # ------------------------------------------------------------------
-    logger.info("[Step 1/7] Setting up directories...")
+    logger.info("[Step 1/10] Setting up directories...")
     try:
         from scripts.setup_directories import main as setup_dirs
         setup_dirs(root)
         steps["dirs"] = True
-        logger.info("[Step 1/7] Done.\n")
+        logger.info("[Step 1/10] Done.\n")
     except Exception as e:
-        logger.error(f"[Step 1/7] FAILED: {e}")
+        logger.error(f"[Step 1/10] FAILED: {e}")
         steps["dirs"] = False
         return 1
 
     # ------------------------------------------------------------------
     # Step 2: Generate download instructions
     # ------------------------------------------------------------------
-    logger.info("[Step 2/7] Generating download instructions...")
+    logger.info("[Step 2/10] Generating download instructions...")
     try:
         from scripts.download_instructions import main as gen_instructions
         gen_instructions(root)
         steps["instructions"] = True
-        logger.info("[Step 2/7] Done.\n")
+        logger.info("[Step 2/10] Done.\n")
     except Exception as e:
-        logger.error(f"[Step 2/7] FAILED: {e}")
+        logger.error(f"[Step 2/10] FAILED: {e}")
         steps["instructions"] = False
         return 1
 
@@ -319,32 +319,32 @@ def main() -> int:
     # ------------------------------------------------------------------
     skip_download = args.skip_download or args.manual_only
     if skip_download:
-        logger.info("[Step 3/7] SKIPPED (--skip-download / --manual-only)\n")
+        logger.info("[Step 3/10] SKIPPED (--skip-download / --manual-only)\n")
     else:
-        logger.info("[Step 3/7] Auto-downloading datasets...")
+        logger.info("[Step 3/10] Auto-downloading datasets...")
         try:
             from scripts.auto_download import download_all, print_download_summary
             dl_results = download_all(root, force=args.force_download)
             print_download_summary(dl_results, logger)
             download_count = sum(1 for r in dl_results if r["status"] in ("OK", "SKIPPED"))
             steps["download"] = True
-            logger.info(f"[Step 3/7] Done ({download_count} files ready).\n")
+            logger.info(f"[Step 3/10] Done ({download_count} files ready).\n")
         except ImportError:
-            logger.warning("[Step 3/7] Auto-download unavailable (missing requests/lxml).")
+            logger.warning("[Step 3/10] Auto-download unavailable (missing requests/lxml).")
             logger.warning("  Install: pip install requests lxml")
             logger.warning("  Or use --manual-only and download files manually.\n")
             steps["download"] = False
         except Exception as e:
-            logger.error(f"[Step 3/7] FAILED: {e}")
+            logger.error(f"[Step 3/10] FAILED: {e}")
             steps["download"] = False
 
     # ------------------------------------------------------------------
     # Step 4: Validate downloads
     # ------------------------------------------------------------------
     if args.skip_validation:
-        logger.info("[Step 4/7] SKIPPED (--skip-validation)\n")
+        logger.info("[Step 4/10] SKIPPED (--skip-validation)\n")
     else:
-        logger.info("[Step 4/7] Validating downloaded files...")
+        logger.info("[Step 4/10] Validating downloaded files...")
         try:
             from scripts.validate_downloads import validate_all, print_report
             results = validate_all(root)
@@ -366,26 +366,26 @@ def main() -> int:
                 has_warn = any(r["status"] == "WARN" for r in results)
                 validation_result = 1 if has_fail else (2 if has_warn else 0)
 
-            logger.info(f"[Step 4/7] Done (exit: {validation_result}).\n")
+            logger.info(f"[Step 4/10] Done (exit: {validation_result}).\n")
         except Exception as e:
-            logger.error(f"[Step 4/7] FAILED: {e}")
+            logger.error(f"[Step 4/10] FAILED: {e}")
             validation_result = 1
 
     # ------------------------------------------------------------------
     # Step 5: Normalize
     # ------------------------------------------------------------------
     if args.skip_normalize:
-        logger.info("[Step 5/7] SKIPPED (--skip-normalize)\n")
+        logger.info("[Step 5/10] SKIPPED (--skip-normalize)\n")
     else:
-        logger.info("[Step 5/7] Normalizing expansion inputs...")
+        logger.info("[Step 5/10] Normalizing expansion inputs...")
         try:
             from scripts.normalize_expansion_inputs import normalize_all, print_report as norm_report
             results = normalize_all(root)
             norm_report(results, logger)
             normalize_count = sum(1 for r in results if r["status"] in ("OK", "WARN"))
-            logger.info(f"[Step 5/7] Done ({normalize_count} files normalized).\n")
+            logger.info(f"[Step 5/10] Done ({normalize_count} files normalized).\n")
         except Exception as e:
-            logger.error(f"[Step 5/7] FAILED: {e}")
+            logger.error(f"[Step 5/10] FAILED: {e}")
             normalize_count = 0
 
     # ------------------------------------------------------------------
@@ -413,22 +413,22 @@ def main() -> int:
     # Step 6: Validate coverage
     # ------------------------------------------------------------------
     if args.skip_coverage:
-        logger.info("[Step 6/7] SKIPPED (--skip-coverage)\n")
+        logger.info("[Step 6/10] SKIPPED (--skip-coverage)\n")
     else:
-        logger.info("[Step 6/7] Validating expansion coverage...")
+        logger.info("[Step 6/10] Validating expansion coverage...")
         try:
             from scripts.validate_expansion_coverage import main as validate_coverage
             coverage_result = validate_coverage(root)
-            logger.info(f"[Step 6/7] Done (exit: {coverage_result}).\n")
+            logger.info(f"[Step 6/10] Done (exit: {coverage_result}).\n")
         except Exception as e:
-            logger.error(f"[Step 6/7] FAILED: {e}")
+            logger.error(f"[Step 6/10] FAILED: {e}")
             coverage_result = 1
 
     # ------------------------------------------------------------------
     # Step 7: SAM.gov UEI enrichment
     # ------------------------------------------------------------------
     if args.skip_enrichment:
-        logger.info("[Step 7/7] SKIPPED (--skip-enrichment)\n")
+        logger.info("[Step 7/10] SKIPPED (--skip-enrichment)\n")
     else:
         import os as _os
         from scripts.config import _load_dotenv, PROJECT_ROOT as _root
@@ -437,14 +437,14 @@ def main() -> int:
             or _load_dotenv(_root / ".env").get("SAM_API_KEY", "").strip()
         )
         if not has_key:
-            logger.info("[Step 7/7] SKIPPED — SAM_API_KEY not set.")
+            logger.info("[Step 7/10] SKIPPED — SAM_API_KEY not set.")
             logger.info("  Set via: export SAM_API_KEY=your_key  or create a .env file.\n")
             enrichment_result = "NO_KEY — skipped"
         elif dedup_stats is None or dedup_stats.get("master_rows", 0) == 0:
-            logger.info("[Step 7/7] SKIPPED — no master data (download files first)\n")
+            logger.info("[Step 7/10] SKIPPED — no master data (download files first)\n")
             enrichment_result = "SKIPPED — no master data"
         else:
-            logger.info("[Step 7/7] Running SAM.gov UEI enrichment...")
+            logger.info("[Step 7/10] Running SAM.gov UEI enrichment...")
             try:
                 from scripts.sam_enrichment import run as run_enrichment
                 summary = run_enrichment(root=root)
@@ -453,9 +453,9 @@ def main() -> int:
                     f"({summary.get('coverage_pct', 0):.1f}%) — "
                     f"{'PASS' if summary.get('coverage_gate_pass') else 'BELOW GATE'}"
                 )
-                logger.info(f"[Step 7/7] Done.\n")
+                logger.info(f"[Step 7/10] Done.\n")
             except Exception as e:
-                logger.error(f"[Step 7/7] FAILED: {e}")
+                logger.error(f"[Step 7/10] FAILED: {e}")
                 enrichment_result = f"FAILED: {e}"
 
     # ------------------------------------------------------------------
