@@ -226,11 +226,13 @@ def _build_bulk_payload(entry: dict, fy_start: int, fy_end: int) -> dict:
 
     if ftype == "direct":
         payload_filters["award_type_codes"] = _CONTRACT_TYPE_CODES
-        payload_filters["place_of_performance_locations"] = [{"state": "PR", "country": "USA"}]
+        payload_filters["agencies"] = []  # empty = all agencies (required field)
+        payload_filters["place_of_performance_locations"] = [{"country": "USA", "state": "PR"}]
 
     elif ftype == "vendor":
         payload_filters["award_type_codes"] = _CONTRACT_TYPE_CODES
-        payload_filters["recipient_locations"] = [{"state": "PR", "country": "USA"}]
+        payload_filters["agencies"] = []  # empty = all agencies (required field)
+        payload_filters["recipient_locations"] = [{"country": "USA", "state": "PR"}]
 
     elif ftype == "idv":
         payload_filters["award_type_codes"] = _IDV_TYPE_CODES
@@ -381,16 +383,17 @@ def download_usaspending_bulk(
     )
 
     # --- Step 1: Submit job ---
+    import json as _json
+    logger.debug(f"  bulk_download payload: {_json.dumps(payload, indent=2)}")
     try:
         resp = _retry_request(session, "POST", USASPENDING_BULK_BASE, json=payload, timeout=30)
         job = resp.json()
     except requests.HTTPError as e:
-        body = e.response.text[:600] if e.response else ""
+        body = e.response.text[:800] if e.response is not None else ""
         result["status"] = "FAILED"
         result["error"] = f"bulk_download POST HTTP {getattr(e.response,'status_code','?')}: {body}"
         logger.error(f"  bulk_download POST failed: {e}")
-        if body:
-            logger.error(f"  Response body: {body}")
+        logger.error(f"  Response body: {body!r}")
         return result
     except Exception as e:
         result["status"] = "FAILED"
