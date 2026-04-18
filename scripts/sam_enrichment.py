@@ -50,8 +50,8 @@ USAS_BASE_URL = "https://api.usaspending.gov/api/v2/recipient/search/"
 
 BATCH_SIZE = 25
 RATE_DELAY = 0.4
-RETRY_MAX = 3
-RETRY_DELAY = 2.0
+RETRY_MAX = 2        # was 3 — reduces timeout waste on failed lookups
+RETRY_DELAY = 1.0    # was 2.0
 MATCH_THRESHOLD = 0.85
 COVERAGE_GATE = 0.60
 
@@ -96,7 +96,7 @@ def vendor_hash(name: str) -> str:
 # API calls
 # ---------------------------------------------------------------------------
 
-def sam_call(params: dict, api_key: str, timeout: int = 12):
+def sam_call(params: dict, api_key: str, timeout: int = 7):
     """GET SAM.gov entity-information API. Returns parsed JSON or None."""
     full_params = {"api_key": api_key}
     full_params.update(params)
@@ -187,7 +187,7 @@ def usaspending_lookup(vendor_name: str) -> dict | None:
         method="POST",
     )
     try:
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=6) as resp:
             if resp.status != 200:
                 return None
             data = json.loads(resp.read().decode())
