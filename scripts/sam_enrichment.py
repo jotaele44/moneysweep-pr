@@ -153,6 +153,7 @@ def sam_lookup_by_name(vendor_name: str, api_key: str) -> dict | None:
         if best and best_score >= MATCH_THRESHOLD:
             reg = best.get("entityRegistration", {})
             core = best.get("coreData", {})
+            parent = best.get("parentEntityInfo", {})
             return {
                 "uei": reg.get("ueiSAM", ""),
                 "cage": reg.get("cageCode", ""),
@@ -162,6 +163,8 @@ def sam_lookup_by_name(vendor_name: str, api_key: str) -> dict | None:
                 "status": reg.get("registrationStatus", ""),
                 "expiry": reg.get("registrationExpirationDate", ""),
                 "state": core.get("physicalAddress", {}).get("stateOrProvinceCode", ""),
+                "parent_uei": parent.get("ueiSAM", ""),
+                "parent_name": parent.get("legalBusinessName", ""),
             }
 
     return None
@@ -306,6 +309,7 @@ def write_index(results: dict, output_dir: Path) -> None:
     fieldnames = [
         "vendor_name", "normalized_name", "uei", "cage", "duns",
         "sam_name", "match_score", "status", "expiry", "state",
+        "parent_uei", "parent_name",
         "source", "resolved_at",
     ]
     index_path = output_dir / "vendor_uei_index.csv"
@@ -338,7 +342,7 @@ def merge_into_master(results: dict, root: Path, output_dir: Path, logger) -> No
         fieldnames = reader.fieldnames or []
         rows = list(reader)
 
-    for col in ("recipient_uei", "recipient_cage", "recipient_duns"):
+    for col in ("recipient_uei", "recipient_cage", "recipient_duns", "parent_uei", "parent_name"):
         if col not in fieldnames:
             fieldnames.append(col)
 
@@ -352,6 +356,8 @@ def merge_into_master(results: dict, root: Path, output_dir: Path, logger) -> No
             row["recipient_uei"] = match.get("uei", "")
             row["recipient_cage"] = match.get("cage", "")
             row["recipient_duns"] = match.get("duns", "")
+            row["parent_uei"] = match.get("parent_uei", "")
+            row["parent_name"] = match.get("parent_name", "")
             patched += 1
 
     out_path = output_dir / "master_enriched.csv"
@@ -482,6 +488,7 @@ def run(root: Path = None, resume: bool = False, dry_run: bool = False, top_n: i
                 "uei": "", "cage": "", "duns": "",
                 "sam_name": "", "match_score": 0,
                 "status": "UNRESOLVED",
+                "parent_uei": "", "parent_name": "",
                 "source": "NONE",
                 "resolved_at": datetime.now().isoformat(),
             }

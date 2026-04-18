@@ -7,6 +7,10 @@ Usage:
   python3 run_all.py --skip-validation
   python3 run_all.py --skip-normalize
   python3 run_all.py --skip-coverage
+  python3 run_all.py --skip-enrichment
+  python3 run_all.py --skip-entity-resolution
+  python3 run_all.py --skip-dominance
+  python3 run_all.py --skip-graph
 """
 
 import argparse
@@ -233,6 +237,21 @@ def main() -> int:
         action="store_true",
         help="Skip step 7 (SAM.gov UEI enrichment)",
     )
+    parser.add_argument(
+        "--skip-entity-resolution",
+        action="store_true",
+        help="Skip step 8 (entity resolution — top 100 vendors → parent entity)",
+    )
+    parser.add_argument(
+        "--skip-dominance",
+        action="store_true",
+        help="Skip step 9 (dominance analysis — HHI, market share, trends)",
+    )
+    parser.add_argument(
+        "--skip-graph",
+        action="store_true",
+        help="Skip step 10 (network graph — vendor-agency GraphML export)",
+    )
     args = parser.parse_args()
 
     root = PROJECT_ROOT
@@ -438,6 +457,63 @@ def main() -> int:
             except Exception as e:
                 logger.error(f"[Step 7/7] FAILED: {e}")
                 enrichment_result = f"FAILED: {e}"
+
+    # ------------------------------------------------------------------
+    # Step 8: Entity resolution (top 100 vendors → parent entity)
+    # ------------------------------------------------------------------
+    master_ready = dedup_stats is not None and dedup_stats.get("master_rows", 0) > 0
+    if args.skip_entity_resolution:
+        logger.info("[Step 8/10] SKIPPED (--skip-entity-resolution)\n")
+    elif not master_ready:
+        logger.info("[Step 8/10] SKIPPED — no master data yet\n")
+    else:
+        logger.info("[Step 8/10] Resolving top 100 vendor entities...")
+        try:
+            from scripts.entity_resolution import run as run_entity
+            run_entity(root=root)
+            logger.info("[Step 8/10] Done.\n")
+        except Exception as e:
+            logger.error(f"[Step 8/10] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 9: Dominance analysis
+    # ------------------------------------------------------------------
+    if args.skip_dominance:
+        logger.info("[Step 9/10] SKIPPED (--skip-dominance)\n")
+    elif not master_ready:
+        logger.info("[Step 9/10] SKIPPED — no master data yet\n")
+    else:
+        logger.info("[Step 9/10] Computing dominance metrics...")
+        try:
+            from scripts.dominance_analysis import run as run_dominance
+            summary_d = run_dominance(root=root)
+            logger.info(
+                f"[Step 9/10] Done — top vendor: {summary_d.get('top_vendor', '?')}, "
+                f"${summary_d.get('top_vendor_obligation', 0):,.0f}\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 9/10] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 10: Network graph
+    # ------------------------------------------------------------------
+    if args.skip_graph:
+        logger.info("[Step 10/10] SKIPPED (--skip-graph)\n")
+    elif not master_ready:
+        logger.info("[Step 10/10] SKIPPED — no master data yet\n")
+    else:
+        logger.info("[Step 10/10] Building network graph...")
+        try:
+            from scripts.network_graph import run as run_graph
+            summary_g = run_graph(root=root)
+            logger.info(
+                f"[Step 10/10] Done — {summary_g.get('total_nodes', 0)} nodes, "
+                f"{summary_g.get('total_edges', 0)} edges → network.graphml\n"
+            )
+        except ImportError:
+            logger.info("[Step 10/10] SKIPPED — networkx not installed (pip install networkx)\n")
+        except Exception as e:
+            logger.error(f"[Step 10/10] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Final summary

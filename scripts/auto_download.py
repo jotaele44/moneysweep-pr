@@ -738,23 +738,21 @@ def download_single(entry: dict, output_dir: Path, logger, session: requests.Ses
         result = download_fpds(entry, output_dir, logger, session)
         if result["status"] in ("FAILED", "MANUAL"):
             if entry["year_end"] < USASPENDING_MIN_YEAR:
-                # Entire window is pre-2007 (e.g. FY2000-2004): spending_by_award
-                # won't go back this far, so use the async bulk_download API instead.
-                logger.info(
-                    f"  Pre-{USASPENDING_MIN_YEAR} window — "
-                    f"using USASpending bulk_download for FY{entry['year_start']}-{entry['year_end']}..."
+                # Entire window is pre-2007 (e.g. FY2000-2004): no USASpending API
+                # covers this range. Manual FPDS download required.
+                result["status"] = "MANUAL"
+                result["error"] = (
+                    f"No API source covers FY{entry['year_start']}-{entry['year_end']}. "
+                    f"USASpending minimum is FY{USASPENDING_MIN_YEAR}. "
+                    f"See DOWNLOAD_INSTRUCTIONS.md for manual FPDS steps."
                 )
-                result = download_usaspending_bulk(entry, output_dir, logger, session)
-            elif entry["year_start"] < USASPENDING_MIN_YEAR:
-                # Window straddles the 2007 boundary (e.g. FY2005-2008): use
-                # bulk_download for the full range so FY2005-2006 is not silently lost.
                 logger.info(
-                    f"  Window spans pre-{USASPENDING_MIN_YEAR} boundary — "
-                    f"using bulk_download for full FY{entry['year_start']}-{entry['year_end']}..."
+                    f"  FY{entry['year_start']}-{entry['year_end']} pre-dates all APIs — "
+                    f"manual FPDS download required."
                 )
-                result = download_usaspending_bulk(entry, output_dir, logger, session)
             else:
-                # Fully post-2007 (e.g. FY2009-2016): use the fast paginated API.
+                # Window straddles 2007 or is fully post-2007: spending_by_award
+                # (start clamped to USASPENDING_MIN_YEAR if needed).
                 logger.info(
                     f"  Falling back to USASpending spending_by_award "
                     f"for FY{entry['year_start']}-{entry['year_end']}..."
