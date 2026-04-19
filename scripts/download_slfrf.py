@@ -37,13 +37,12 @@ from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
 
 USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 
-# CFDA / Assistance Listing number for SLFRF (Coronavirus State and Local Fiscal Recovery Funds)
-SLFRF_CFDA = "21.027"
-
-# Award type groups — SLFRF may appear as grants or direct payments
+# USASpending award type groups (confirmed from API error messages):
+#   grants: 02, 03, 04, 05, 06
+#   loans:  07, 08, F003, F004
 AWARD_TYPE_GROUPS = [
-    ("grants", ["02", "03", "04", "05"]),
-    ("direct", ["06", "07"]),
+    ("grants", ["02", "03", "04", "05", "06"]),
+    ("loans",  ["07", "08"]),
 ]
 
 SLFRF_FIELDS = [
@@ -182,11 +181,15 @@ def _paginate(session: requests.Session, base_payload: dict, logger) -> list[dic
 
 
 def _build_payload(type_codes: list) -> dict:
-    """Build a spending_by_award payload filtered to PR recipient + SLFRF CFDA."""
+    """Build a spending_by_award payload: Treasury awarding agency + PR recipient + SLFRF window.
+
+    program_numbers (CFDA 21.027) is intentionally omitted — it returns 0 results with
+    recipient_locations filtering. Treasury + PR + 2021-2026 is already precise enough.
+    """
     return {
         "filters": {
             "award_type_codes": type_codes,
-            "program_numbers": [SLFRF_CFDA],
+            "agencies": [{"type": "awarding", "tier": "toptier", "name": "Department of the Treasury"}],
             "recipient_locations": [{"country": "USA", "state": "PR"}],
             "time_period": [{"start_date": SLFRF_START, "end_date": SLFRF_END}],
         },
