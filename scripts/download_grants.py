@@ -1,20 +1,25 @@
 """
-Download federal grants to/in Puerto Rico from USASpending spending_by_award API.
+Download all non-contract federal awards to/in Puerto Rico from USASpending.
 
-Award type codes: 02=Block Grant, 03=Formula Grant, 04=Project Grant,
-                  05=Cooperative Agreement.
+Covers ALL awarding agencies (no agency filter) across three award type groups:
+  grants  (02-05): block grants, formula grants, project grants, cooperative agreements
+  direct  (06):    direct payments (specified use)
+  loans   (07-08): direct and guaranteed loans
 
-Two filter passes per time window:
-  - place_of_performance_locations: work performed in PR
-  - recipient_locations: PR-based grantees performing work elsewhere
+Three passes per time window:
+  grants_pop       — place of performance = PR, types 02-05
+  grants_recipient — recipient located in PR, types 02-05
+  direct_recipient — recipient located in PR, type 06
+  loans_recipient  — recipient located in PR, types 07-08
 
-Time windows:
-  FY2000-2009, FY2010-2017, FY2018-2022, FY2023-2025
+Time windows: FY2000-2009, FY2010-2017, FY2018-2022, FY2023-2025
 
 Output:
-  data/staging/raw/grants/grants_pop_<start>f<end>.csv      (raw per-window)
-  data/staging/raw/grants/grants_recipient_<start>f<end>.csv
-  data/staging/processed/pr_grants_master.csv               (deduplicated master)
+  data/staging/raw/grants/grants_pop_<label>.csv
+  data/staging/raw/grants/grants_recipient_<label>.csv
+  data/staging/raw/grants/direct_recipient_<label>.csv
+  data/staging/raw/grants/loans_recipient_<label>.csv
+  data/staging/processed/pr_grants_master.csv
 
 Usage:
   python3 scripts/download_grants.py                  # full run
@@ -40,9 +45,15 @@ from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
 
 USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 
-GRANT_TYPE_CODES = ["02", "03", "04", "05"]
+# (file_prefix, award_type_codes, filter_types)
+# USASpending enforces strict type-group isolation: grants(02-05), direct(06), loans(07-08)
+PASSES = [
+    ("grants",  ["02", "03", "04", "05"], ["pop", "recipient"]),
+    ("direct",  ["06"],                   ["recipient"]),
+    ("loans",   ["07", "08"],             ["recipient"]),
+]
 
-GRANT_FIELDS = [
+FIELDS = [
     "Award ID",
     "Recipient Name",
     "recipient_uei",
@@ -185,29 +196,26 @@ def _paginate(session: requests.Session, base_payload: dict, logger) -> list[dic
     return all_results
 
 
-def _build_payload(filter_type: str, window: dict) -> dict:
-    """Build a spending_by_award payload for a given filter type and time window."""
+def _build_payload(type_codes: list, filter_type: str, window: dict) -> dict:
+    """Build a spending_by_award payload for a given pass, filter type, and time window."""
     time_period = [{"start_date": window["start_date"], "end_date": window["end_date"]}]
+    is_loan = any(c in ["07", "08"] for c in type_codes)
 
     if filter_type == "pop":
-        location_filter = {
-            "award_type_codes": GRANT_TYPE_CODES,
-            "place_of_performance_locations": [{"country": "USA", "state": "PR"}],
-            "time_period": time_period,
-        }
-    else:  # recipient
-        location_filter = {
-            "award_type_codes": GRANT_TYPE_CODES,
-            "recipient_locations": [{"country": "USA", "state": "PR"}],
-            "time_period": time_period,
-        }
+        location = {"place_of_performance_locations": [{"country": "USA", "state": "PR"}]}
+    else:
+        location = {"recipient_locations": [{"country": "USA", "state": "PR"}]}
 
     return {
-        "filters": location_filter,
-        "fields": GRANT_FIELDS,
+        "filters": {
+            "award_type_codes": type_codes,
+            "time_period": time_period,
+            **location,
+        },
+        "fields": FIELDS,
         "page": 1,
         "limit": 100,
-        "sort": "Award Amount",
+        "sort": "Award ID" if is_loan else "Award Amount",
         "order": "desc",
         "subawards": False,
     }
@@ -220,7 +228,6 @@ def _results_to_df(results: list[dict], source_file: str) -> pd.DataFrame:
 
     df = pd.json_normalize(results)
 
-    # Field mapping: API name → master column name
     rename_map = {
         "Award ID": "award_id",
         "Recipient Name": "recipient_name",
@@ -236,7 +243,6 @@ def _results_to_df(results: list[dict], source_file: str) -> pd.DataFrame:
     }
     df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
 
-    # Derive fiscal_year
     if "award_date" in df.columns:
         df["fiscal_year"] = df["award_date"].apply(_derive_fiscal_year)
     else:
@@ -245,7 +251,6 @@ def _results_to_df(results: list[dict], source_file: str) -> pd.DataFrame:
     df["source_file"] = source_file
     df["source_dataset"] = "grants"
 
-    # Ensure all master columns are present
     for col in MASTER_COLUMNS:
         if col not in df.columns:
             df[col] = ""
@@ -275,40 +280,43 @@ def download_window(
     force: bool,
     logger,
 ) -> dict:
-    """Download both filter types for one time window. Returns per-window stats."""
+    """Download all passes for one time window. Returns per-window stats."""
     label = window["label"]
-    stats = {"window": label, "pop_rows": 0, "recipient_rows": 0, "errors": []}
+    stats = {"window": label, "total_rows": 0, "errors": []}
 
-    for filter_type in ("pop", "recipient"):
-        fname = f"grants_{filter_type}_{label}.csv"
-        fpath = raw_dir / fname
+    for prefix, type_codes, filter_types in PASSES:
+        for filter_type in filter_types:
+            fname = f"{prefix}_{filter_type}_{label}.csv"
+            fpath = raw_dir / fname
+            stat_key = f"{prefix}_{filter_type}_rows"
+            stats[stat_key] = 0
 
-        if not force and _file_has_data(fpath):
-            try:
-                existing = pd.read_csv(fpath, dtype=str, low_memory=False)
-                rows = len(existing)
-            except Exception:
-                rows = 0
-            logger.info(f"  Skipping {fname} (exists, {rows} rows)")
-            stats[f"{filter_type}_rows"] = rows
-            continue
+            if not force and _file_has_data(fpath):
+                try:
+                    rows = len(pd.read_csv(fpath, dtype=str, low_memory=False))
+                except Exception:
+                    rows = 0
+                logger.info(f"  Skipping {fname} (exists, {rows} rows)")
+                stats[stat_key] = rows
+                stats["total_rows"] += rows
+                continue
 
-        logger.info(f"  Fetching {fname} ({window['start_date']} to {window['end_date']}, filter={filter_type})")
-        payload = _build_payload(filter_type, window)
-        results = _paginate(session, payload, logger)
+            logger.info(f"  Fetching {fname} ({window['start_date']} to {window['end_date']})")
+            payload = _build_payload(type_codes, filter_type, window)
+            results = _paginate(session, payload, logger)
 
-        if not results:
-            logger.warning(f"  No results for {fname}")
-            stats["errors"].append(f"{fname}: no results")
-            # Write empty file so downstream processing can still proceed
-            pd.DataFrame(columns=MASTER_COLUMNS).to_csv(fpath, index=False, encoding="utf-8")
-            continue
+            if not results:
+                logger.warning(f"  No results for {fname}")
+                stats["errors"].append(f"{fname}: no results")
+                pd.DataFrame(columns=MASTER_COLUMNS).to_csv(fpath, index=False, encoding="utf-8")
+                continue
 
-        df = _results_to_df(results, fname)
-        raw_dir.mkdir(parents=True, exist_ok=True)
-        df.to_csv(fpath, index=False, encoding="utf-8")
-        stats[f"{filter_type}_rows"] = len(df)
-        logger.info(f"  Saved {len(df)} rows → {fname}")
+            df = _results_to_df(results, fname)
+            raw_dir.mkdir(parents=True, exist_ok=True)
+            df.to_csv(fpath, index=False, encoding="utf-8")
+            stats[stat_key] = len(df)
+            stats["total_rows"] += len(df)
+            logger.info(f"  Saved {len(df)} rows → {fname}")
 
     return stats
 
@@ -318,8 +326,8 @@ def download_window(
 # ---------------------------------------------------------------------------
 
 def build_master(raw_dir: Path, master_path: Path, logger) -> int:
-    """Concatenate all raw grant CSVs, deduplicate by award_id, write master."""
-    files = sorted(raw_dir.glob("grants_*.csv"))
+    """Concatenate all raw grant/direct/loan CSVs, deduplicate by award_id, write master."""
+    files = sorted(raw_dir.glob("*.csv"))
     if not files:
         logger.warning("  No raw grant files found — master not written")
         return 0
@@ -373,7 +381,7 @@ def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
     raw_dir.mkdir(parents=True, exist_ok=True)
 
     logger = setup_logging("download_grants")
-    logger.info("Starting PR grants download...")
+    logger.info("Starting PR all-agency awards download (grants + direct + loans)...")
 
     windows = TIME_WINDOWS
     if fy_start is not None:
@@ -383,8 +391,7 @@ def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
 
     session = _session()
     all_errors = []
-    total_pop_rows = 0
-    total_recipient_rows = 0
+    total_raw_rows = 0
     window_stats = []
 
     for window in windows:
@@ -393,15 +400,9 @@ def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
             stats = download_window(session, window, raw_dir, force, logger)
         except Exception as e:
             logger.error(f"  Unexpected error on window {window['label']}: {e}")
-            stats = {
-                "window": window["label"],
-                "pop_rows": 0,
-                "recipient_rows": 0,
-                "errors": [str(e)],
-            }
+            stats = {"window": window["label"], "total_rows": 0, "errors": [str(e)]}
 
-        total_pop_rows += stats["pop_rows"]
-        total_recipient_rows += stats["recipient_rows"]
+        total_raw_rows += stats.get("total_rows", 0)
         all_errors.extend(stats["errors"])
         window_stats.append(stats)
         logger.info("")
@@ -412,8 +413,7 @@ def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
     master_rows = build_master(raw_dir, master_path, logger)
 
     summary = {
-        "raw_pop_rows": total_pop_rows,
-        "raw_recipient_rows": total_recipient_rows,
+        "raw_rows": total_raw_rows,
         "master_rows": master_rows,
         "master_path": str(master_path),
         "raw_dir": str(raw_dir),
@@ -424,10 +424,9 @@ def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
     logger.info("=" * 60)
     logger.info("GRANTS DOWNLOAD SUMMARY")
     logger.info("=" * 60)
-    logger.info(f"  PoP rows (raw):       {total_pop_rows:,}")
-    logger.info(f"  Recipient rows (raw): {total_recipient_rows:,}")
-    logger.info(f"  Master rows:          {master_rows:,}")
-    logger.info(f"  Errors:               {len(all_errors)}")
+    logger.info(f"  Raw rows:    {total_raw_rows:,}")
+    logger.info(f"  Master rows: {master_rows:,}")
+    logger.info(f"  Errors:      {len(all_errors)}")
     if all_errors:
         for err in all_errors:
             logger.warning(f"    {err}")
@@ -454,11 +453,10 @@ def main() -> int:
 
     summary = _run(force=args.force, fy_start=args.fy_start)
 
-    print(f"\nGrants download complete.")
-    print(f"  PoP rows:       {summary['raw_pop_rows']:,}")
-    print(f"  Recipient rows: {summary['raw_recipient_rows']:,}")
-    print(f"  Master rows:    {summary['master_rows']:,}")
-    print(f"  Master path:    {summary['master_path']}")
+    print(f"\nGrants/direct/loans download complete.")
+    print(f"  Raw rows:    {summary['raw_rows']:,}")
+    print(f"  Master rows: {summary['master_rows']:,}")
+    print(f"  Master path: {summary['master_path']}")
     if summary["errors"]:
         print(f"  Errors ({len(summary['errors'])}):")
         for err in summary["errors"]:
