@@ -55,6 +55,9 @@ NEW_MASTERS = [
     ("pr_sba_loans_master.csv", "sba_loans"),
     ("pr_slfrf_master.csv",     "slfrf"),
     ("pr_cdbg_dr_master.csv",   "cdbg_dr"),
+    ("pr_dot_master.csv",       "dot"),
+    ("pr_usda_master.csv",      "usda"),
+    ("pr_doe_master.csv",       "doe"),
 ]
 
 # ---------------------------------------------------------------------------
