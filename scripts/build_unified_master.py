@@ -19,7 +19,6 @@ from scripts.config import PROJECT_ROOT, PROCESSED_DIR, setup_logging
 import pandas as pd
 import argparse
 import json
-import logging
 
 
 # ---------------------------------------------------------------------------
@@ -109,7 +108,7 @@ def run(root=None) -> dict:
 
     root = Path(root)
     processed_dir = root / "data" / "staging" / "processed"
-    logger = logging.getLogger("build_unified_master")
+    logger = setup_logging("build_unified_master", log_dir=root / "data" / "logs")
 
     frames = []
 

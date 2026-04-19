@@ -534,6 +534,96 @@ def main() -> int:
             logger.error(f"[Step 10/16] FAILED: {e}")
 
     # ------------------------------------------------------------------
+    # Step 11: Download grants
+    # ------------------------------------------------------------------
+    if args.skip_grants:
+        logger.info("[Step 11/16] SKIPPED (--skip-grants)\n")
+    else:
+        logger.info("[Step 11/16] Downloading federal grants (USASpending)...")
+        try:
+            from scripts.download_grants import run as run_grants
+            g = run_grants(root=root)
+            logger.info(f"[Step 11/16] Done — {g.get('total_rows', 0):,} grant records\n")
+        except Exception as e:
+            logger.error(f"[Step 11/16] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 12: Download subawards
+    # ------------------------------------------------------------------
+    if args.skip_subawards:
+        logger.info("[Step 12/16] SKIPPED (--skip-subawards)\n")
+    else:
+        logger.info("[Step 12/16] Downloading subawards (USASpending)...")
+        try:
+            from scripts.download_subawards import run as run_subawards
+            s = run_subawards(root=root)
+            logger.info(f"[Step 12/16] Done — {s.get('total_rows', 0):,} subaward records\n")
+        except Exception as e:
+            logger.error(f"[Step 12/16] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 13: Download FEMA data
+    # ------------------------------------------------------------------
+    if args.skip_fema:
+        logger.info("[Step 13/16] SKIPPED (--skip-fema)\n")
+    else:
+        logger.info("[Step 13/16] Downloading FEMA Public Assistance + HMGP...")
+        try:
+            from scripts.download_fema import run as run_fema
+            f = run_fema(root=root)
+            logger.info(f"[Step 13/16] Done — PA: {f.get('pa_rows', 0):,}, HMGP: {f.get('hmgp_rows', 0):,}\n")
+        except Exception as e:
+            logger.error(f"[Step 13/16] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 14: Download research grants
+    # ------------------------------------------------------------------
+    if args.skip_research:
+        logger.info("[Step 14/16] SKIPPED (--skip-research)\n")
+    else:
+        logger.info("[Step 14/16] Downloading NIH + NSF research grants...")
+        try:
+            from scripts.download_research import run as run_research
+            r = run_research(root=root)
+            logger.info(f"[Step 14/16] Done — NIH: {r.get('nih_rows', 0):,}, NSF: {r.get('nsf_rows', 0):,}\n")
+        except Exception as e:
+            logger.error(f"[Step 14/16] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15: Bulk downloads (SBA, SLFRF, CDBG-DR)
+    # ------------------------------------------------------------------
+    if args.skip_bulk_downloads:
+        logger.info("[Step 15/16] SKIPPED (--skip-bulk-downloads)\n")
+    else:
+        logger.info("[Step 15/16] Downloading SBA loans, SLFRF, CDBG-DR...")
+        for name, mod in [("SBA", "download_sba"), ("SLFRF", "download_slfrf"), ("CDBG-DR", "download_cdbg_dr")]:
+            try:
+                import importlib
+                m = importlib.import_module(f"scripts.{mod}")
+                result = m.run(root=root)
+                logger.info(f"  {name}: {result.get('rows', result.get('total_rows', 0)):,} rows")
+            except Exception as e:
+                logger.error(f"  {name} FAILED: {e}")
+        logger.info("[Step 15/16] Done.\n")
+
+    # ------------------------------------------------------------------
+    # Step 16: Build unified master
+    # ------------------------------------------------------------------
+    if args.skip_unified_master:
+        logger.info("[Step 16/16] SKIPPED (--skip-unified-master)\n")
+    else:
+        logger.info("[Step 16/16] Building unified awards master (all datasets)...")
+        try:
+            from scripts.build_unified_master import run as run_unified
+            u = run_unified(root=root)
+            logger.info(
+                f"[Step 16/16] Done — {u.get('total_rows', 0):,} total rows across "
+                f"{len(u.get('by_dataset', {}))} datasets → pr_all_awards_master.csv\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 16/16] FAILED: {e}")
+
+    # ------------------------------------------------------------------
     # Final summary
     # ------------------------------------------------------------------
     elapsed = time.time() - start_time
