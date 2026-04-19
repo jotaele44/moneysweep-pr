@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts.config import PROJECT_ROOT, PROCESSED_DIR, setup_logging
 
 import requests
+import urllib.parse
 import pandas as pd
 import time
 import argparse
@@ -108,10 +109,13 @@ def _get_with_retry(url: str, logger) -> dict | None:
     return None
 
 
-def _paginate(endpoint: str, data_key: str, params: dict, logger) -> list[dict]:
+def _paginate(endpoint: str, data_key: str, params: dict, logger,
+              simple_params: dict | None = None) -> list[dict]:
     """
     Paginate through an OpenFEMA endpoint using $top/$skip.
     Builds raw URL strings so OData $ operators are not percent-encoded.
+    simple_params: plain key=value pairs appended without OData syntax (for
+    datasets whose fields are not OData-filterable, e.g. PA v4 state field).
     Returns a flat list of all record dicts.
     """
     records = []
@@ -127,6 +131,9 @@ def _paginate(endpoint: str, data_key: str, params: dict, logger) -> list[dict]:
             raw_url += f"&$filter={filter_clause}"
         if orderby_clause:
             raw_url += f"&$orderby={orderby_clause}"
+        if simple_params:
+            for k, v in simple_params.items():
+                raw_url += f"&{urllib.parse.quote(str(k), safe='')}={urllib.parse.quote(str(v), safe='')}"
 
         logger.info("  Fetching %s (skip=%d, top=%d)...", endpoint.split("/")[-1], skip, PAGE_SIZE)
 
@@ -183,15 +190,17 @@ def _derive_fiscal_year(date_str) -> int | None:
 # ---------------------------------------------------------------------------
 
 def _fetch_pa_records(logger) -> list[dict]:
-    """Fetch all PA records for Puerto Rico from the OpenFEMA API."""
-    # Try stateCode='PR' first; fall back to state='Puerto Rico'
-    for filter_expr in ("stateCode eq 'PR'", "state eq 'Puerto Rico'"):
-        logger.info("  Trying PA filter: %s", filter_expr)
-        params = {"$filter": filter_expr}
-        records = _paginate(PA_ENDPOINT, PA_DATA_KEY, params, logger)
+    """
+    Fetch all PA records for Puerto Rico.
+    PA v4 dataset has no OData-filterable state field; use simple key=value query params.
+    """
+    for state_val in ("Puerto Rico", "PR"):
+        logger.info("  Trying PA simple filter: state=%s", state_val)
+        records = _paginate(PA_ENDPOINT, PA_DATA_KEY, {}, logger,
+                            simple_params={"state": state_val})
         if records:
             return records
-        logger.info("  No records with filter '%s', trying next...", filter_expr)
+        logger.info("  No records for state=%s, trying next...", state_val)
     return []
 
 
