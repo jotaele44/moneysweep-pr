@@ -36,8 +36,9 @@ from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
 
 USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 
-# Grants + contracts
-SUBAWARD_TYPE_CODES = ["02", "03", "04", "05", "A", "B", "C", "D"]
+# Must be queried in separate passes — API rejects mixing grant and procurement codes
+GRANT_TYPE_CODES = ["02", "03", "04", "05"]
+CONTRACT_TYPE_CODES = ["A", "B", "C", "D"]
 
 SUBAWARD_FIELDS = [
     "Sub-Award ID",
@@ -53,7 +54,7 @@ SUBAWARD_FIELDS = [
 
 # Four time windows (calendar start of FY → end of FY)
 TIME_WINDOWS = [
-    {"label": "2000f2009", "start_date": "2000-10-01", "end_date": "2009-09-30", "fy_start": 2000},
+    {"label": "2000f2009", "start_date": "2007-10-01", "end_date": "2009-09-30", "fy_start": 2000},
     {"label": "2010f2017", "start_date": "2010-10-01", "end_date": "2017-09-30", "fy_start": 2010},
     {"label": "2018f2022", "start_date": "2018-10-01", "end_date": "2022-09-30", "fy_start": 2018},
     {"label": "2023f2025", "start_date": "2023-10-01", "end_date": "2025-09-30", "fy_start": 2023},
@@ -182,31 +183,15 @@ def _paginate(session: requests.Session, base_payload: dict, logger) -> list[dic
     return all_results
 
 
-def _build_payload(window: dict) -> dict:
-    """Build a spending_by_award subawards payload for the given time window."""
+def _build_payload(window: dict, type_codes: list) -> dict:
+    """Build a spending_by_award subawards payload for the given time window and type group."""
     return {
         "filters": {
-            "award_type_codes": SUBAWARD_TYPE_CODES,
+            "award_type_codes": type_codes,
             "place_of_performance_locations": [{"country": "USA", "state": "PR"}],
             "time_period": [{"start_date": window["start_date"], "end_date": window["end_date"]}],
         },
         "fields": SUBAWARD_FIELDS,
-        "page": 1,
-        "limit": 100,
-        "sort": "Sub-Award Amount",
-        "order": "desc",
-        "subawards": True,
-    }
-
-
-def _build_payload_no_fields(window: dict) -> dict:
-    """Fallback payload without explicit fields list (API returns all fields)."""
-    return {
-        "filters": {
-            "award_type_codes": SUBAWARD_TYPE_CODES,
-            "place_of_performance_locations": [{"country": "USA", "state": "PR"}],
-            "time_period": [{"start_date": window["start_date"], "end_date": window["end_date"]}],
-        },
         "page": 1,
         "limit": 100,
         "sort": "Sub-Award Amount",
@@ -276,46 +261,45 @@ def download_window(
     force: bool,
     logger,
 ) -> dict:
-    """Download subawards for one time window. Returns per-window stats."""
+    """Download subawards for one time window (two passes: grants then contracts)."""
     label = window["label"]
-    fname = f"subawards_{label}.csv"
-    fpath = raw_dir / fname
-    stats = {"window": label, "rows": 0, "errors": []}
+    stats = {"window": label, "grant_rows": 0, "contract_rows": 0, "errors": []}
 
-    if not force and _file_has_data(fpath):
-        try:
-            existing = pd.read_csv(fpath, dtype=str, low_memory=False)
-            rows = len(existing)
-        except Exception:
-            rows = 0
-        logger.info(f"  Skipping {fname} (exists, {rows} rows)")
-        stats["rows"] = rows
-        return stats
+    for type_group, type_codes in [
+        ("grants", GRANT_TYPE_CODES),
+        ("contracts", CONTRACT_TYPE_CODES),
+    ]:
+        fname = f"subawards_{type_group}_{label}.csv"
+        fpath = raw_dir / fname
 
-    logger.info(f"  Fetching {fname} ({window['start_date']} to {window['end_date']})")
+        if not force and _file_has_data(fpath):
+            try:
+                existing = pd.read_csv(fpath, dtype=str, low_memory=False)
+                rows = len(existing)
+            except Exception:
+                rows = 0
+            logger.info(f"  Skipping {fname} (exists, {rows} rows)")
+            stats[f"{type_group}_rows"] = rows
+            continue
 
-    # Try with explicit fields first
-    payload = _build_payload(window)
-    results = _paginate(session, payload, logger)
+        logger.info(
+            f"  Fetching {fname} ({window['start_date']} to {window['end_date']}, type={type_group})"
+        )
+        payload = _build_payload(window, type_codes)
+        results = _paginate(session, payload, logger)
 
-    # If no results and fields may have caused a 4xx earlier, retry without fields
-    if not results:
-        logger.info(f"  Retrying {fname} without explicit fields list")
-        payload_fallback = _build_payload_no_fields(window)
-        results = _paginate(session, payload_fallback, logger)
+        if not results:
+            logger.warning(f"  No results for {fname}")
+            stats["errors"].append(f"{fname}: no results")
+            pd.DataFrame(columns=MASTER_COLUMNS).to_csv(fpath, index=False, encoding="utf-8")
+            continue
 
-    if not results:
-        logger.warning(f"  No results for {fname}")
-        stats["errors"].append(f"{fname}: no results")
-        # Write empty file so downstream processing can still proceed
-        pd.DataFrame(columns=MASTER_COLUMNS).to_csv(fpath, index=False, encoding="utf-8")
-        return stats
+        df = _results_to_df(results, fname)
+        raw_dir.mkdir(parents=True, exist_ok=True)
+        df.to_csv(fpath, index=False, encoding="utf-8")
+        stats[f"{type_group}_rows"] = len(df)
+        logger.info(f"  Saved {len(df)} rows → {fname}")
 
-    df = _results_to_df(results, fname)
-    raw_dir.mkdir(parents=True, exist_ok=True)
-    df.to_csv(fpath, index=False, encoding="utf-8")
-    stats["rows"] = len(df)
-    logger.info(f"  Saved {len(df)} rows → {fname}")
     return stats
 
 
@@ -398,9 +382,9 @@ def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
             stats = download_window(session, window, raw_dir, force, logger)
         except Exception as e:
             logger.error(f"  Unexpected error on window {window['label']}: {e}")
-            stats = {"window": window["label"], "rows": 0, "errors": [str(e)]}
+            stats = {"window": window["label"], "grant_rows": 0, "contract_rows": 0, "errors": [str(e)]}
 
-        total_rows += stats["rows"]
+        total_rows += stats.get("grant_rows", 0) + stats.get("contract_rows", 0)
         all_errors.extend(stats["errors"])
         window_stats.append(stats)
         logger.info("")
