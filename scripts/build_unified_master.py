@@ -59,6 +59,7 @@ NEW_MASTERS = [
     ("pr_usda_master.csv",      "usda"),
     ("pr_doe_master.csv",       "doe"),
     ("pr_hud_master.csv",       "hud"),
+    ("pr_sbir_master.csv",      "sbir"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -235,6 +236,15 @@ def run(root=None) -> dict:
     removed = before_dedup - after_dedup
     if removed:
         logger.info(f"  Deduplication: removed {removed:,} within-dataset duplicates ({after_dedup:,} rows remain)")
+
+    # ------------------------------------------------------------------
+    # 5a. Global award_id dedup across all datasets
+    # ------------------------------------------------------------------
+    before_global = len(unified)
+    unified = unified.drop_duplicates(subset=["award_id"], keep="first")
+    removed_global = before_global - len(unified)
+    if removed_global:
+        logger.info(f"  Global dedup: removed {removed_global:,} cross-dataset duplicate award_ids ({len(unified):,} rows remain)")
 
     # ------------------------------------------------------------------
     # 6. Standardize pop_state
