@@ -164,8 +164,9 @@ def _paginate(endpoint: str, data_key: str, params: dict, logger,
 
         skip += PAGE_SIZE
 
-        # Stop if we've collected all records
-        if total is not None and skip >= total:
+        # Some OpenFEMA endpoints return count=0 in metadata even when data exists;
+        # only trust total when it's a positive number, otherwise rely on empty-page detection.
+        if total is not None and total > 0 and skip >= total:
             break
 
         time.sleep(SLEEP_BETWEEN_PAGES)
