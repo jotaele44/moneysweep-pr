@@ -33,11 +33,16 @@ FEMA_BASE = "https://www.fema.gov/api/open/v2/"
 PA_ENDPOINT = FEMA_BASE + "PublicAssistanceFundedProjectsDetails"
 PA_DATA_KEY = "PublicAssistanceFundedProjectsDetails"
 
+DISASTER_SUMMARIES_ENDPOINT = FEMA_BASE + "DisasterDeclarationsSummaries"
+DISASTER_SUMMARIES_DATA_KEY = "DisasterDeclarationsSummaries"
+
 HMGP_ENDPOINT = FEMA_BASE + "HazardMitigationGrantProgramDisasterSummaries"
 HMGP_DATA_KEY = "HazardMitigationGrantProgramDisasterSummaries"
 
 HMA_ENDPOINT = FEMA_BASE + "HmaSubapplications"
 HMA_DATA_KEY = "HmaSubapplications"
+
+PA_DISASTER_BATCH = 15  # disaster numbers per OData OR-filter batch
 
 PAGE_SIZE = 1000
 SLEEP_BETWEEN_PAGES = 0.5
@@ -189,19 +194,46 @@ def _derive_fiscal_year(date_str) -> int | None:
 # Public Assistance Funded Projects
 # ---------------------------------------------------------------------------
 
+def _get_pr_disaster_numbers(logger) -> list[int]:
+    """
+    Fetch all FEMA disaster numbers for Puerto Rico using DisasterDeclarationsSummaries,
+    which has a filterable state field (2-letter code).
+    """
+    logger.info("  Fetching PR disaster numbers from DisasterDeclarationsSummaries...")
+    records = _paginate(
+        DISASTER_SUMMARIES_ENDPOINT,
+        DISASTER_SUMMARIES_DATA_KEY,
+        {"$filter": "state eq 'PR'"},
+        logger,
+    )
+    nums = sorted({int(r["disasterNumber"]) for r in records if r.get("disasterNumber")})
+    logger.info("  Found %d unique PR disaster numbers", len(nums))
+    return nums
+
+
 def _fetch_pa_records(logger) -> list[dict]:
     """
-    Fetch all PA records for Puerto Rico.
-    PA v4 dataset has no OData-filterable state field; use simple key=value query params.
+    Fetch PA records for Puerto Rico.
+    PA v4 has no filterable state field; instead:
+      1. Get PR disaster numbers from DisasterDeclarationsSummaries
+      2. Query PA in batches using disasterNumber eq N1 or N2 ...
     """
-    for state_val in ("Puerto Rico", "PR"):
-        logger.info("  Trying PA simple filter: state=%s", state_val)
-        records = _paginate(PA_ENDPOINT, PA_DATA_KEY, {}, logger,
-                            simple_params={"state": state_val})
-        if records:
-            return records
-        logger.info("  No records for state=%s, trying next...", state_val)
-    return []
+    disaster_nums = _get_pr_disaster_numbers(logger)
+    if not disaster_nums:
+        logger.warning("  No PR disaster numbers found — cannot filter PA records.")
+        return []
+
+    all_records = []
+    total_batches = (len(disaster_nums) + PA_DISASTER_BATCH - 1) // PA_DISASTER_BATCH
+    for i, batch_start in enumerate(range(0, len(disaster_nums), PA_DISASTER_BATCH), 1):
+        batch = disaster_nums[batch_start: batch_start + PA_DISASTER_BATCH]
+        filter_expr = " or ".join(f"disasterNumber eq {n}" for n in batch)
+        logger.info("  PA batch %d/%d: disaster numbers %s...", i, total_batches, batch[:3])
+        records = _paginate(PA_ENDPOINT, PA_DATA_KEY, {"$filter": filter_expr}, logger)
+        all_records.extend(records)
+
+    logger.info("  PA total: %d records across %d batches", len(all_records), total_batches)
+    return all_records
 
 
 def _normalize_pa(records: list[dict], source_file: str) -> pd.DataFrame:
