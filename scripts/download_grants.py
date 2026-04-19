@@ -294,6 +294,8 @@ def _extract_csv(zip_path: Path, logger) -> pd.DataFrame:
                     )
                     frames.append(df)
                     logger.info(f"  {name}: {len(df):,} rows, {len(df.columns)} cols")
+                    # Log actual column names on first file to diagnose BULK_RENAME mapping
+                    logger.info(f"  Columns: {list(df.columns)}")
             return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
     except Exception as e:
         logger.error(f"  ZIP extraction failed: {e}")
@@ -305,7 +307,14 @@ def _normalize_bulk_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
     if df.empty:
         return pd.DataFrame(columns=MASTER_COLUMNS)
 
-    # Apply rename map for known columns
+    # Apply rename map for known columns; warn about any missing expected fields
+    matched   = {k for k in BULK_RENAME if k in df.columns}
+    unmatched = set(BULK_RENAME) - matched
+    if unmatched:
+        import logging
+        logging.getLogger("download_grants").warning(
+            f"  BULK_RENAME: {len(unmatched)} expected columns not found: {sorted(unmatched)}"
+        )
     df = df.rename(columns={k: v for k, v in BULK_RENAME.items() if k in df.columns})
 
     # award_id: prefer award_id_fain (already renamed above); if empty, use award_unique_key
