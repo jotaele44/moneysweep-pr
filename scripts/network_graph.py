@@ -54,7 +54,7 @@ def load_hierarchy(root: Path) -> pd.DataFrame | None:
     path = root / "data" / "staging" / "processed" / "enrichment" / "entity_hierarchy.csv"
     if not path.exists():
         return None
-    return pd.read_csv(path, dtype=str, low_memory=False)
+    return pd.read_csv(path, dtype=str, low_memory=False, keep_default_na=False)
 
 
 def build_graph(df: pd.DataFrame, hierarchy: pd.DataFrame | None, min_obligation: float) -> nx.DiGraph:

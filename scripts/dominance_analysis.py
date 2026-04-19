@@ -48,8 +48,7 @@ def load_hierarchy(root: Path) -> pd.DataFrame | None:
     path = root / "data" / "staging" / "processed" / "enrichment" / "entity_hierarchy.csv"
     if not path.exists():
         return None
-    df = pd.read_csv(path, dtype=str, low_memory=False)
-    df["total_obligation"] = pd.to_numeric(df.get("total_obligation"), errors="coerce").fillna(0)
+    df = pd.read_csv(path, dtype=str, low_memory=False, keep_default_na=False)
     return df
 
 
