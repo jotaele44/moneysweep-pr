@@ -178,6 +178,9 @@ def _build_payload(type_codes: list, filter_type: str, window: dict) -> dict:
         location = {"place_of_performance_locations": [{"country": "USA", "state": "PR"}]}
     else:
         location = {"recipient_locations": [{"country": "USA", "state": "PR"}]}
+    # Loan award group (07-08) rejects "Award Amount" as sort — use "Award ID" instead
+    is_loan = any(c in ["07", "08"] for c in type_codes)
+    sort_field = "Award ID" if is_loan else "Award Amount"
     return {
         "filters": {
             "award_type_codes": type_codes,
@@ -188,7 +191,7 @@ def _build_payload(type_codes: list, filter_type: str, window: dict) -> dict:
         "fields": FIELDS,
         "page": 1,
         "limit": 100,
-        "sort": "Award Amount",
+        "sort": sort_field,
         "order": "desc",
         "subawards": False,
     }
