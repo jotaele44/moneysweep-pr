@@ -94,6 +94,9 @@ def _get_with_retry(url: str, logger) -> dict | None:
                 else:
                     logger.error("Retry failed with HTTP %s, skipping page.", resp.status_code)
                     return None
+            if resp.status_code == 400:
+                logger.error("HTTP 400 — body: %s", resp.text[:800])
+                return None
             resp.raise_for_status()
             return resp.json()
         except requests.RequestException as exc:
@@ -181,11 +184,15 @@ def _derive_fiscal_year(date_str) -> int | None:
 
 def _fetch_pa_records(logger) -> list[dict]:
     """Fetch all PA records for Puerto Rico from the OpenFEMA API."""
-    params = {
-        "$filter": "state eq 'Puerto Rico'",
-        "$orderby": "projectAmount desc",
-    }
-    return _paginate(PA_ENDPOINT, PA_DATA_KEY, params, logger)
+    # Try stateCode='PR' first; fall back to state='Puerto Rico'
+    for filter_expr in ("stateCode eq 'PR'", "state eq 'Puerto Rico'"):
+        logger.info("  Trying PA filter: %s", filter_expr)
+        params = {"$filter": filter_expr}
+        records = _paginate(PA_ENDPOINT, PA_DATA_KEY, params, logger)
+        if records:
+            return records
+        logger.info("  No records with filter '%s', trying next...", filter_expr)
+    return []
 
 
 def _normalize_pa(records: list[dict], source_file: str) -> pd.DataFrame:
@@ -275,36 +282,33 @@ def _fetch_hmgp_records(logger) -> tuple[list[dict], str]:
     """
     # --- Attempt 1: HazardMitigationGrantProgramDisasterSummaries ---
     logger.info("Trying HazardMitigationGrantProgramDisasterSummaries endpoint...")
-    params = {
-        "$filter": "stateName eq 'Puerto Rico'",
-    }
-    records = _paginate(HMGP_ENDPOINT, HMGP_DATA_KEY, params, logger)
-
-    if records:
-        logger.info("HMGP disaster summaries returned %d records.", len(records))
-        return records, "hmgp_summaries"
-
-    logger.info("HMGP disaster summaries empty; trying 'PR' filter variant...")
-    params_pr = {"$filter": "stateName eq 'PR'"}
-    records = _paginate(HMGP_ENDPOINT, HMGP_DATA_KEY, params_pr, logger)
-    if records:
-        logger.info("HMGP disaster summaries (PR) returned %d records.", len(records))
-        return records, "hmgp_summaries"
+    for filter_expr in (
+        "stateName eq 'Puerto Rico'",
+        "stateName eq 'PR'",
+        "state eq 'Puerto Rico'",
+        "state eq 'PR'",
+        "stateCode eq 'PR'",
+    ):
+        logger.info("  Filter: %s", filter_expr)
+        records = _paginate(HMGP_ENDPOINT, HMGP_DATA_KEY, {"$filter": filter_expr}, logger)
+        if records:
+            logger.info("HMGP disaster summaries returned %d records.", len(records))
+            return records, "hmgp_summaries"
 
     # --- Attempt 2: HmaSubapplications ---
     logger.info("Falling back to HmaSubapplications endpoint...")
-    hma_params = {"$filter": "stateName eq 'Puerto Rico'"}
-    records = _paginate(HMA_ENDPOINT, HMA_DATA_KEY, hma_params, logger)
-    if records:
-        logger.info("HmaSubapplications returned %d records.", len(records))
-        return records, "hma_subapplications"
-
-    logger.info("Trying HmaSubapplications with 'PR'...")
-    hma_params_pr = {"$filter": "stateName eq 'PR'"}
-    records = _paginate(HMA_ENDPOINT, HMA_DATA_KEY, hma_params_pr, logger)
-    if records:
-        logger.info("HmaSubapplications (PR) returned %d records.", len(records))
-        return records, "hma_subapplications"
+    for filter_expr in (
+        "stateName eq 'Puerto Rico'",
+        "stateName eq 'PR'",
+        "state eq 'Puerto Rico'",
+        "state eq 'PR'",
+        "stateCode eq 'PR'",
+    ):
+        logger.info("  Filter: %s", filter_expr)
+        records = _paginate(HMA_ENDPOINT, HMA_DATA_KEY, {"$filter": filter_expr}, logger)
+        if records:
+            logger.info("HmaSubapplications returned %d records.", len(records))
+            return records, "hma_subapplications"
 
     logger.warning("All HMGP/HMA endpoints returned no records.")
     return [], "none"

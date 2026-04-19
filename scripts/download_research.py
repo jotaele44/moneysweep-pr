@@ -331,7 +331,11 @@ def download_nsf(root: Path, force: bool, logger) -> pd.DataFrame:
 
         # awards_raw may be None, a list, or a single dict
         if awards_raw is None:
-            logger.info(f"NSF: 'award' key missing on page {page_num}, stopping pagination.")
+            logger.warning(
+                f"NSF: 'award' key missing on page {page_num}. "
+                f"Response keys: {list(response_body.keys())}  "
+                f"Raw snippet: {str(data)[:400]}"
+            )
             break
         if isinstance(awards_raw, dict):
             # Single result returned as dict instead of list
