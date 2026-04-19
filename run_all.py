@@ -1,9 +1,9 @@
 """
-Full pipeline orchestrator — Puerto Rico Federal Contracts Data Pipeline (Section 9).
+Full pipeline orchestrator — Puerto Rico Federal Contracts Data Pipeline.
 
 Usage:
-  python3 run_all.py                  # Run all steps
-  python3 run_all.py --only-setup     # Steps 1-2 only (dirs + instructions)
+  python3 run_all.py                    # Run all steps
+  python3 run_all.py --only-setup       # Steps 1-2 only (dirs + instructions)
   python3 run_all.py --skip-validation
   python3 run_all.py --skip-normalize
   python3 run_all.py --skip-coverage
@@ -11,6 +11,12 @@ Usage:
   python3 run_all.py --skip-entity-resolution
   python3 run_all.py --skip-dominance
   python3 run_all.py --skip-graph
+  python3 run_all.py --skip-grants
+  python3 run_all.py --skip-subawards
+  python3 run_all.py --skip-fema
+  python3 run_all.py --skip-research
+  python3 run_all.py --skip-bulk-downloads
+  python3 run_all.py --skip-unified-master
 """
 
 import argparse
@@ -252,6 +258,18 @@ def main() -> int:
         action="store_true",
         help="Skip step 10 (network graph — vendor-agency GraphML export)",
     )
+    parser.add_argument("--skip-grants", action="store_true",
+                        help="Skip step 11 (download federal grants from USASpending)")
+    parser.add_argument("--skip-subawards", action="store_true",
+                        help="Skip step 12 (download subawards from USASpending)")
+    parser.add_argument("--skip-fema", action="store_true",
+                        help="Skip step 13 (download FEMA Public Assistance + HMGP)")
+    parser.add_argument("--skip-research", action="store_true",
+                        help="Skip step 14 (download NIH + NSF research grants)")
+    parser.add_argument("--skip-bulk-downloads", action="store_true",
+                        help="Skip step 15 (download SBA loans, SLFRF, CDBG-DR)")
+    parser.add_argument("--skip-unified-master", action="store_true",
+                        help="Skip step 16 (build unified awards master across all datasets)")
     args = parser.parse_args()
 
     root = PROJECT_ROOT
@@ -283,28 +301,28 @@ def main() -> int:
     # ------------------------------------------------------------------
     # Step 1: Setup directories
     # ------------------------------------------------------------------
-    logger.info("[Step 1/10] Setting up directories...")
+    logger.info("[Step 1/16] Setting up directories...")
     try:
         from scripts.setup_directories import main as setup_dirs
         setup_dirs(root)
         steps["dirs"] = True
-        logger.info("[Step 1/10] Done.\n")
+        logger.info("[Step 1/16] Done.\n")
     except Exception as e:
-        logger.error(f"[Step 1/10] FAILED: {e}")
+        logger.error(f"[Step 1/16] FAILED: {e}")
         steps["dirs"] = False
         return 1
 
     # ------------------------------------------------------------------
     # Step 2: Generate download instructions
     # ------------------------------------------------------------------
-    logger.info("[Step 2/10] Generating download instructions...")
+    logger.info("[Step 2/16] Generating download instructions...")
     try:
         from scripts.download_instructions import main as gen_instructions
         gen_instructions(root)
         steps["instructions"] = True
-        logger.info("[Step 2/10] Done.\n")
+        logger.info("[Step 2/16] Done.\n")
     except Exception as e:
-        logger.error(f"[Step 2/10] FAILED: {e}")
+        logger.error(f"[Step 2/16] FAILED: {e}")
         steps["instructions"] = False
         return 1
 
@@ -319,32 +337,32 @@ def main() -> int:
     # ------------------------------------------------------------------
     skip_download = args.skip_download or args.manual_only
     if skip_download:
-        logger.info("[Step 3/10] SKIPPED (--skip-download / --manual-only)\n")
+        logger.info("[Step 3/16] SKIPPED (--skip-download / --manual-only)\n")
     else:
-        logger.info("[Step 3/10] Auto-downloading datasets...")
+        logger.info("[Step 3/16] Auto-downloading datasets...")
         try:
             from scripts.auto_download import download_all, print_download_summary
             dl_results = download_all(root, force=args.force_download)
             print_download_summary(dl_results, logger)
             download_count = sum(1 for r in dl_results if r["status"] in ("OK", "SKIPPED"))
             steps["download"] = True
-            logger.info(f"[Step 3/10] Done ({download_count} files ready).\n")
+            logger.info(f"[Step 3/16] Done ({download_count} files ready).\n")
         except ImportError:
-            logger.warning("[Step 3/10] Auto-download unavailable (missing requests/lxml).")
+            logger.warning("[Step 3/16] Auto-download unavailable (missing requests/lxml).")
             logger.warning("  Install: pip install requests lxml")
             logger.warning("  Or use --manual-only and download files manually.\n")
             steps["download"] = False
         except Exception as e:
-            logger.error(f"[Step 3/10] FAILED: {e}")
+            logger.error(f"[Step 3/16] FAILED: {e}")
             steps["download"] = False
 
     # ------------------------------------------------------------------
     # Step 4: Validate downloads
     # ------------------------------------------------------------------
     if args.skip_validation:
-        logger.info("[Step 4/10] SKIPPED (--skip-validation)\n")
+        logger.info("[Step 4/16] SKIPPED (--skip-validation)\n")
     else:
-        logger.info("[Step 4/10] Validating downloaded files...")
+        logger.info("[Step 4/16] Validating downloaded files...")
         try:
             from scripts.validate_downloads import validate_all, print_report
             results = validate_all(root)
@@ -366,69 +384,69 @@ def main() -> int:
                 has_warn = any(r["status"] == "WARN" for r in results)
                 validation_result = 1 if has_fail else (2 if has_warn else 0)
 
-            logger.info(f"[Step 4/10] Done (exit: {validation_result}).\n")
+            logger.info(f"[Step 4/16] Done (exit: {validation_result}).\n")
         except Exception as e:
-            logger.error(f"[Step 4/10] FAILED: {e}")
+            logger.error(f"[Step 4/16] FAILED: {e}")
             validation_result = 1
 
     # ------------------------------------------------------------------
     # Step 5: Normalize
     # ------------------------------------------------------------------
     if args.skip_normalize:
-        logger.info("[Step 5/10] SKIPPED (--skip-normalize)\n")
+        logger.info("[Step 5/16] SKIPPED (--skip-normalize)\n")
     else:
-        logger.info("[Step 5/10] Normalizing expansion inputs...")
+        logger.info("[Step 5/16] Normalizing expansion inputs...")
         try:
             from scripts.normalize_expansion_inputs import normalize_all, print_report as norm_report
             results = normalize_all(root)
             norm_report(results, logger)
             normalize_count = sum(1 for r in results if r["status"] in ("OK", "WARN"))
-            logger.info(f"[Step 5/10] Done ({normalize_count} files normalized).\n")
+            logger.info(f"[Step 5/16] Done ({normalize_count} files normalized).\n")
         except Exception as e:
-            logger.error(f"[Step 5/10] FAILED: {e}")
+            logger.error(f"[Step 5/16] FAILED: {e}")
             normalize_count = 0
 
     # ------------------------------------------------------------------
     # Step 5.5: Cross-file deduplication + master build
     # ------------------------------------------------------------------
     if args.skip_dedup:
-        logger.info("[Step 5.5/7] SKIPPED (--skip-dedup)\n")
+        logger.info("[Step 5.5/16] SKIPPED (--skip-dedup)\n")
     else:
-        logger.info("[Step 5.5/7] Building deduplicated master...")
+        logger.info("[Step 5.5/16] Building deduplicated master...")
         try:
             from scripts.deduplicate_master import main as build_master
             dedup_stats = build_master(root)
             if dedup_stats["master_rows"] > 0:
                 logger.info(
-                    f"[Step 5.5/7] Done — {dedup_stats['master_rows']:,} rows, "
+                    f"[Step 5.5/16] Done — {dedup_stats['master_rows']:,} rows, "
                     f"{dedup_stats['duplicates_removed']:,} cross-file dupes removed.\n"
                 )
             else:
-                logger.info("[Step 5.5/7] Done (no normalized files found yet).\n")
+                logger.info("[Step 5.5/16] Done (no normalized files found yet).\n")
         except Exception as e:
-            logger.error(f"[Step 5.5/7] FAILED: {e}")
+            logger.error(f"[Step 5.5/16] FAILED: {e}")
             dedup_stats = None
 
     # ------------------------------------------------------------------
     # Step 6: Validate coverage
     # ------------------------------------------------------------------
     if args.skip_coverage:
-        logger.info("[Step 6/10] SKIPPED (--skip-coverage)\n")
+        logger.info("[Step 6/16] SKIPPED (--skip-coverage)\n")
     else:
-        logger.info("[Step 6/10] Validating expansion coverage...")
+        logger.info("[Step 6/16] Validating expansion coverage...")
         try:
             from scripts.validate_expansion_coverage import main as validate_coverage
             coverage_result = validate_coverage(root)
-            logger.info(f"[Step 6/10] Done (exit: {coverage_result}).\n")
+            logger.info(f"[Step 6/16] Done (exit: {coverage_result}).\n")
         except Exception as e:
-            logger.error(f"[Step 6/10] FAILED: {e}")
+            logger.error(f"[Step 6/16] FAILED: {e}")
             coverage_result = 1
 
     # ------------------------------------------------------------------
     # Step 7: SAM.gov UEI enrichment
     # ------------------------------------------------------------------
     if args.skip_enrichment:
-        logger.info("[Step 7/10] SKIPPED (--skip-enrichment)\n")
+        logger.info("[Step 7/16] SKIPPED (--skip-enrichment)\n")
     else:
         import os as _os
         from scripts.config import _load_dotenv, PROJECT_ROOT as _root
@@ -437,14 +455,14 @@ def main() -> int:
             or _load_dotenv(_root / ".env").get("SAM_API_KEY", "").strip()
         )
         if not has_key:
-            logger.info("[Step 7/10] SKIPPED — SAM_API_KEY not set.")
+            logger.info("[Step 7/16] SKIPPED — SAM_API_KEY not set.")
             logger.info("  Set via: export SAM_API_KEY=your_key  or create a .env file.\n")
             enrichment_result = "NO_KEY — skipped"
         elif dedup_stats is None or dedup_stats.get("master_rows", 0) == 0:
-            logger.info("[Step 7/10] SKIPPED — no master data (download files first)\n")
+            logger.info("[Step 7/16] SKIPPED — no master data (download files first)\n")
             enrichment_result = "SKIPPED — no master data"
         else:
-            logger.info("[Step 7/10] Running SAM.gov UEI enrichment...")
+            logger.info("[Step 7/16] Running SAM.gov UEI enrichment...")
             try:
                 from scripts.sam_enrichment import run as run_enrichment
                 summary = run_enrichment(root=root)
@@ -453,9 +471,9 @@ def main() -> int:
                     f"({summary.get('coverage_pct', 0):.1f}%) — "
                     f"{'PASS' if summary.get('coverage_gate_pass') else 'BELOW GATE'}"
                 )
-                logger.info(f"[Step 7/10] Done.\n")
+                logger.info(f"[Step 7/16] Done.\n")
             except Exception as e:
-                logger.error(f"[Step 7/10] FAILED: {e}")
+                logger.error(f"[Step 7/16] FAILED: {e}")
                 enrichment_result = f"FAILED: {e}"
 
     # ------------------------------------------------------------------
@@ -463,57 +481,57 @@ def main() -> int:
     # ------------------------------------------------------------------
     master_ready = dedup_stats is not None and dedup_stats.get("master_rows", 0) > 0
     if args.skip_entity_resolution:
-        logger.info("[Step 8/10] SKIPPED (--skip-entity-resolution)\n")
+        logger.info("[Step 8/16] SKIPPED (--skip-entity-resolution)\n")
     elif not master_ready:
-        logger.info("[Step 8/10] SKIPPED — no master data yet\n")
+        logger.info("[Step 8/16] SKIPPED — no master data yet\n")
     else:
-        logger.info("[Step 8/10] Resolving top 100 vendor entities...")
+        logger.info("[Step 8/16] Resolving top 100 vendor entities...")
         try:
             from scripts.entity_resolution import run as run_entity
             run_entity(root=root)
-            logger.info("[Step 8/10] Done.\n")
+            logger.info("[Step 8/16] Done.\n")
         except Exception as e:
-            logger.error(f"[Step 8/10] FAILED: {e}")
+            logger.error(f"[Step 8/16] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 9: Dominance analysis
     # ------------------------------------------------------------------
     if args.skip_dominance:
-        logger.info("[Step 9/10] SKIPPED (--skip-dominance)\n")
+        logger.info("[Step 9/16] SKIPPED (--skip-dominance)\n")
     elif not master_ready:
-        logger.info("[Step 9/10] SKIPPED — no master data yet\n")
+        logger.info("[Step 9/16] SKIPPED — no master data yet\n")
     else:
-        logger.info("[Step 9/10] Computing dominance metrics...")
+        logger.info("[Step 9/16] Computing dominance metrics...")
         try:
             from scripts.dominance_analysis import run as run_dominance
             summary_d = run_dominance(root=root)
             logger.info(
-                f"[Step 9/10] Done — top vendor: {summary_d.get('top_vendor', '?')}, "
+                f"[Step 9/16] Done — top vendor: {summary_d.get('top_vendor', '?')}, "
                 f"${summary_d.get('top_vendor_obligation', 0):,.0f}\n"
             )
         except Exception as e:
-            logger.error(f"[Step 9/10] FAILED: {e}")
+            logger.error(f"[Step 9/16] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 10: Network graph
     # ------------------------------------------------------------------
     if args.skip_graph:
-        logger.info("[Step 10/10] SKIPPED (--skip-graph)\n")
+        logger.info("[Step 10/16] SKIPPED (--skip-graph)\n")
     elif not master_ready:
-        logger.info("[Step 10/10] SKIPPED — no master data yet\n")
+        logger.info("[Step 10/16] SKIPPED — no master data yet\n")
     else:
-        logger.info("[Step 10/10] Building network graph...")
+        logger.info("[Step 10/16] Building network graph...")
         try:
             from scripts.network_graph import run as run_graph
             summary_g = run_graph(root=root)
             logger.info(
-                f"[Step 10/10] Done — {summary_g.get('total_nodes', 0)} nodes, "
+                f"[Step 10/16] Done — {summary_g.get('total_nodes', 0)} nodes, "
                 f"{summary_g.get('total_edges', 0)} edges → network.graphml\n"
             )
         except ImportError:
-            logger.info("[Step 10/10] SKIPPED — networkx not installed (pip install networkx)\n")
+            logger.info("[Step 10/16] SKIPPED — networkx not installed (pip install networkx)\n")
         except Exception as e:
-            logger.error(f"[Step 10/10] FAILED: {e}")
+            logger.error(f"[Step 10/16] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Final summary

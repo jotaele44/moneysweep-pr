@@ -21,11 +21,54 @@ PROCESSED_DIR = STAGING_DIR / "processed"
 RAW_DIR = DATA_DIR / "raw"
 LOGS_DIR = DATA_DIR / "logs"
 
-ALL_DIRS = [DATA_DIR, STAGING_DIR, EXPANSION_DIR, PROCESSED_DIR, RAW_DIR, LOGS_DIR]
-
 # Consolidated master and enrichment outputs
 MASTER_PATH = PROCESSED_DIR / "pr_contracts_master.csv"
 ENRICHMENT_OUTPUT_DIR = PROCESSED_DIR / "enrichment"
+
+# ---------------------------------------------------------------------------
+# Expanded dataset directories (raw + processed masters)
+# ---------------------------------------------------------------------------
+
+RAW_GRANTS_DIR = DATA_DIR / "raw" / "grants"
+RAW_SUBAWARDS_DIR = DATA_DIR / "raw" / "subawards"
+RAW_FEMA_PA_DIR = DATA_DIR / "raw" / "fema_pa"
+RAW_FEMA_HMGP_DIR = DATA_DIR / "raw" / "fema_hmgp"
+RAW_RESEARCH_DIR = DATA_DIR / "raw" / "research"
+RAW_SBA_DIR = DATA_DIR / "raw" / "sba"
+RAW_SLFRF_DIR = DATA_DIR / "raw" / "slfrf"
+RAW_CDBG_DR_DIR = DATA_DIR / "raw" / "cdbg_dr"
+
+EXPANDED_RAW_DIRS = [
+    RAW_GRANTS_DIR, RAW_SUBAWARDS_DIR, RAW_FEMA_PA_DIR,
+    RAW_FEMA_HMGP_DIR, RAW_RESEARCH_DIR, RAW_SBA_DIR,
+    RAW_SLFRF_DIR, RAW_CDBG_DR_DIR,
+]
+
+# Dataset master paths
+GRANTS_MASTER_PATH = PROCESSED_DIR / "pr_grants_master.csv"
+SUBAWARDS_MASTER_PATH = PROCESSED_DIR / "pr_subawards_master.csv"
+FEMA_PA_MASTER_PATH = PROCESSED_DIR / "pr_fema_pa_master.csv"
+FEMA_HMGP_MASTER_PATH = PROCESSED_DIR / "pr_fema_hmgp_master.csv"
+RESEARCH_MASTER_PATH = PROCESSED_DIR / "pr_research_master.csv"
+SBA_MASTER_PATH = PROCESSED_DIR / "pr_sba_loans_master.csv"
+SLFRF_MASTER_PATH = PROCESSED_DIR / "pr_slfrf_master.csv"
+CDBG_DR_MASTER_PATH = PROCESSED_DIR / "pr_cdbg_dr_master.csv"
+UNIFIED_MASTER_PATH = PROCESSED_DIR / "pr_all_awards_master.csv"
+
+ALL_DATASET_MASTERS = [
+    GRANTS_MASTER_PATH, SUBAWARDS_MASTER_PATH, FEMA_PA_MASTER_PATH,
+    FEMA_HMGP_MASTER_PATH, RESEARCH_MASTER_PATH, SBA_MASTER_PATH,
+    SLFRF_MASTER_PATH, CDBG_DR_MASTER_PATH,
+]
+
+CANONICAL_COLUMNS = [
+    "award_id", "recipient_name", "recipient_uei", "awarding_agency",
+    "awarding_sub_agency", "obligated_amount", "award_date", "fiscal_year",
+    "pop_state", "pop_county", "description", "source_file",
+    "source_dataset", "award_category",
+]
+
+ALL_DIRS = [DATA_DIR, STAGING_DIR, EXPANSION_DIR, PROCESSED_DIR, RAW_DIR, LOGS_DIR] + EXPANDED_RAW_DIRS
 
 # ---------------------------------------------------------------------------
 # Download manifest — the 13 expected expansion files
