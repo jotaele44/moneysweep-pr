@@ -294,7 +294,7 @@ def download_nsf(root: Path, force: bool, logger) -> pd.DataFrame:
     while True:
         page_num += 1
         params = {
-            "stateCode": "PR",
+            "awardeeStateCode": "PR",
             "printFields": (
                 "id,agency,awardeeName,awardeeCity,awardeeStateCode,"
                 "title,fundsObligatedAmt,date,startDate,expDate,"
