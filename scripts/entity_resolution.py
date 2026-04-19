@@ -70,7 +70,9 @@ def _http_get(url: str, timeout: int = 12) -> dict | None:
 def search_recipient(vendor_name: str) -> dict | None:
     """Search USASpending for a recipient. Returns best match or None."""
     norm = normalize_vendor(vendor_name)
-    payload = {"search_text": norm, "order": "desc", "sort": "amount", "limit": 5}
+    # Use the original name for search (better results than normalized),
+    # but compare using normalized names for scoring.
+    payload = {"search_text": vendor_name, "order": "desc", "sort": "amount", "limit": 5}
     data = _http_post(USAS_RECIPIENT_SEARCH, payload)
     if not data:
         return None
@@ -265,10 +267,15 @@ def run(root: Path = None, top_n: int = TOP_N_DEFAULT, resume: bool = False) -> 
     logger.info(f"  Loaded {len(vendors)} vendors, {len(sam_index)} SAM index entries")
 
     rows = []
+    resolved_count = 0
     for rank, vendor in enumerate(vendors, 1):
         vendor["_rank"] = rank
-        resolved = resolve_vendor(vendor, sam_index, cache, logger)
-        rows.append(resolved)
+        result = resolve_vendor(vendor, sam_index, cache, logger)
+        rows.append(result)
+        if result.get("parent_uei") or result.get("parent_name"):
+            resolved_count += 1
+        if rank % 25 == 0:
+            logger.info(f"  [PROGRESS] {rank}/{len(vendors)} processed, {resolved_count} with parent entity")
 
     # Save cache
     cache_path.write_text(json.dumps(cache, indent=2), encoding="utf-8")
@@ -284,7 +291,6 @@ def run(root: Path = None, top_n: int = TOP_N_DEFAULT, resume: bool = False) -> 
         w.writeheader()
         w.writerows(rows)
 
-    resolved_count = sum(1 for r in rows if r["parent_uei"] or r["parent_name"])
     logger.info(
         f"\nEntity hierarchy written: {out_path}\n"
         f"  {resolved_count}/{len(rows)} vendors resolved to parent entity"
