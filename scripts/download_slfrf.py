@@ -306,7 +306,7 @@ def _run(root: Path = None, force: bool = False) -> dict:
             total_raw_rows += rows
             continue
 
-        logger.info(f"  Fetching {fname} (type_group={group_label}, CFDA={SLFRF_CFDA})")
+        logger.info(f"  Fetching {fname} (type_group={group_label})")
         payload = _build_payload(type_codes)
         results = _paginate(session, payload, logger)
 
