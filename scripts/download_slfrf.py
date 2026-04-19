@@ -196,7 +196,7 @@ def _build_payload(type_codes: list) -> dict:
         "fields": SLFRF_FIELDS,
         "page": 1,
         "limit": 100,
-        "sort": "Award Amount",
+        "sort": "Award ID" if any(c in ["07", "08"] for c in type_codes) else "Award Amount",
         "order": "desc",
         "subawards": False,
     }
