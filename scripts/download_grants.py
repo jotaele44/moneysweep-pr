@@ -50,8 +50,21 @@ from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
 BULK_DOWNLOAD_URL = "https://api.usaspending.gov/api/v2/bulk_download/awards/"
 BULK_STATUS_URL   = "https://api.usaspending.gov/api/v2/bulk_download/status/"
 
-# Single full history range — no windowing needed with bulk download
-FULL_DATE_RANGE = {"start_date": "2000-10-01", "end_date": "2025-09-30"}
+# API constraint: date_range must be within one year (≤ 365/366 days per job).
+# We use one job per fiscal year (Oct 1 → Sep 30).
+START_FY = 2000   # FY2000 = Oct 1999 - Sep 2000
+END_FY   = 2025   # FY2025 = Oct 2024 - Sep 2025
+
+def _fy_windows(start_fy: int = START_FY, end_fy: int = END_FY) -> list[dict]:
+    """Generate one dict per fiscal year: {label, start_date, end_date}."""
+    return [
+        {
+            "label":      str(fy),
+            "start_date": f"{fy - 1}-10-01",
+            "end_date":   f"{fy}-09-30",
+        }
+        for fy in range(start_fy, end_fy + 1)
+    ]
 
 POLL_INTERVAL_S = 15
 MAX_POLL_S      = 1800  # 30 minutes
@@ -142,8 +155,8 @@ def _file_has_data(filepath: Path) -> bool:
 # Bulk download network layer
 # ---------------------------------------------------------------------------
 
-def _build_bulk_payload(type_codes: list, filter_type: str) -> dict:
-    """Build a bulk_download/awards/ request body for one pass."""
+def _build_bulk_payload(type_codes: list, filter_type: str, window: dict) -> dict:
+    """Build a bulk_download/awards/ request body for one pass + FY window."""
     if filter_type == "pop":
         location = {
             "place_of_performance_scope": "domestic",
@@ -158,7 +171,7 @@ def _build_bulk_payload(type_codes: list, filter_type: str) -> dict:
         "filters": {
             "award_type_codes": type_codes,
             "date_type": "action_date",
-            "date_range": FULL_DATE_RANGE,
+            "date_range": {"start_date": window["start_date"], "end_date": window["end_date"]},
             **location,
         },
         "columns": [],
@@ -322,6 +335,72 @@ def _normalize_bulk_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
 # Per-pass downloader
 # ---------------------------------------------------------------------------
 
+def _run_one_window(
+    session: requests.Session,
+    prefix: str,
+    type_codes: list,
+    filter_type: str,
+    window: dict,
+    raw_dir: Path,
+    force: bool,
+    logger,
+) -> dict:
+    """Submit, poll, download, and extract one FY window for one pass."""
+    fy     = window["label"]
+    fname  = f"{prefix}_fy{fy}.csv"
+    csv_path = raw_dir / fname
+    zip_path = raw_dir / f"{prefix}_fy{fy}.zip"
+    result = {"fy": fy, "rows": 0, "error": None}
+
+    if not force and _file_has_data(csv_path):
+        try:
+            rows = len(pd.read_csv(csv_path, dtype=str, low_memory=False))
+        except Exception:
+            rows = 0
+        logger.info(f"    Skipping {fname} (exists, {rows:,} rows)")
+        result["rows"] = rows
+        return result
+
+    payload = _build_bulk_payload(type_codes, filter_type, window)
+    job = _submit_bulk_job(session, payload, logger)
+    if job is None:
+        result["error"] = "job submission failed"
+        return result
+
+    file_name = job.get("file_name") or job.get("file_url", "").split("/")[-1]
+    status    = job.get("status", "")
+    file_url  = job.get("file_url") or job.get("download_url")
+
+    if status != "finished" or not file_url:
+        file_url = _poll_job(session, file_name, logger)
+
+    if not file_url:
+        result["error"] = "job did not complete"
+        return result
+
+    if not _download_zip(session, file_url, zip_path, logger):
+        result["error"] = "ZIP download failed"
+        return result
+
+    df = _extract_csv(zip_path, logger)
+    try:
+        zip_path.unlink()
+    except Exception:
+        pass
+
+    if df.empty:
+        # Empty is valid (no awards for PR in that FY) — write header-only CSV
+        pd.DataFrame(columns=MASTER_COLUMNS).to_csv(csv_path, index=False, encoding="utf-8")
+        return result
+
+    df_master = _normalize_bulk_df(df, fname)
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    df_master.to_csv(csv_path, index=False, encoding="utf-8")
+    result["rows"] = len(df_master)
+    logger.info(f"    FY{fy}: {len(df_master):,} rows → {fname}")
+    return result
+
+
 def download_pass(
     session: requests.Session,
     prefix: str,
@@ -330,63 +409,26 @@ def download_pass(
     raw_dir: Path,
     force: bool,
     logger,
+    fy_start: int | None = None,
 ) -> dict:
-    """Run one bulk download pass end-to-end. Returns stats dict."""
-    csv_path = raw_dir / f"{prefix}.csv"
-    zip_path = raw_dir / f"{prefix}.zip"
-    stats = {"prefix": prefix, "rows": 0, "error": None}
+    """Run all FY windows for one pass. Returns aggregate stats dict."""
+    windows = _fy_windows()
+    if fy_start is not None:
+        windows = [w for w in windows if int(w["label"]) >= fy_start]
 
-    if not force and _file_has_data(csv_path):
-        try:
-            rows = len(pd.read_csv(csv_path, dtype=str, low_memory=False))
-        except Exception:
-            rows = 0
-        logger.info(f"  Skipping {csv_path.name} (exists, {rows:,} rows)")
-        stats["rows"] = rows
-        return stats
+    stats = {"prefix": prefix, "rows": 0, "errors": []}
+    logger.info(f"  [{prefix}] Running {len(windows)} FY windows (filter={filter_type})")
 
-    logger.info(f"  [{prefix}] Submitting bulk download job...")
-    payload = _build_bulk_payload(type_codes, filter_type)
-    job = _submit_bulk_job(session, payload, logger)
-    if job is None:
-        stats["error"] = "job submission failed"
-        return stats
+    for window in windows:
+        result = _run_one_window(
+            session, prefix, type_codes, filter_type,
+            window, raw_dir, force, logger,
+        )
+        stats["rows"] += result["rows"]
+        if result["error"]:
+            stats["errors"].append(f"FY{result['fy']}: {result['error']}")
 
-    file_name = job.get("file_name") or job.get("file_url", "").split("/")[-1]
-    status    = job.get("status", "")
-    file_url  = job.get("file_url") or job.get("download_url")
-
-    logger.info(f"  [{prefix}] Job submitted: file_name={file_name}, initial status={status}")
-
-    if status != "finished" or not file_url:
-        logger.info(f"  [{prefix}] Polling for completion (max {MAX_POLL_S // 60} min)...")
-        file_url = _poll_job(session, file_name, logger)
-
-    if not file_url:
-        stats["error"] = "job did not complete"
-        return stats
-
-    if not _download_zip(session, file_url, zip_path, logger):
-        stats["error"] = "ZIP download failed"
-        return stats
-
-    df = _extract_csv(zip_path, logger)
-    if df.empty:
-        stats["error"] = "no data in ZIP"
-        return stats
-
-    df_master = _normalize_bulk_df(df, csv_path.name)
-    raw_dir.mkdir(parents=True, exist_ok=True)
-    df_master.to_csv(csv_path, index=False, encoding="utf-8")
-
-    # Clean up ZIP to save space
-    try:
-        zip_path.unlink()
-    except Exception:
-        pass
-
-    stats["rows"] = len(df_master)
-    logger.info(f"  [{prefix}] Saved {len(df_master):,} rows → {csv_path.name}")
+    logger.info(f"  [{prefix}] Total: {stats['rows']:,} rows, {len(stats['errors'])} errors")
     return stats
 
 
@@ -435,13 +477,14 @@ def build_master(raw_dir: Path, master_path: Path, logger) -> int:
 
 def run(root: Path = None) -> dict:
     """Main entry point (no --force). Returns summary dict."""
-    return _run(root=root, force=False, only_pass=None)
+    return _run(root=root, force=False, only_pass=None, fy_start=None)
 
 
 def _run(
     root: Path = None,
     force: bool = False,
     only_pass: str | None = None,
+    fy_start: int | None = None,
 ) -> dict:
     if root is None:
         root = PROJECT_ROOT
@@ -451,32 +494,34 @@ def _run(
     raw_dir.mkdir(parents=True, exist_ok=True)
 
     logger = setup_logging("download_grants")
-    logger.info("Starting PR all-agency awards bulk download (grants + direct + loans)...")
-    logger.info(f"  Date range: {FULL_DATE_RANGE['start_date']} → {FULL_DATE_RANGE['end_date']}")
+    fy_range = f"FY{fy_start or START_FY}–FY{END_FY}"
+    logger.info(f"Starting PR all-agency awards bulk download ({fy_range})...")
 
     passes = PASSES
     if only_pass:
         passes = [(p, t, f) for p, t, f in PASSES if p == only_pass]
         if not passes:
-            logger.error(f"  Unknown pass '{only_pass}'. Valid: {[p for p,_,_ in PASSES]}")
+            logger.error(f"  Unknown pass '{only_pass}'. Valid: {[p for p, _, _ in PASSES]}")
             return {"raw_rows": 0, "master_rows": 0, "errors": [f"unknown pass: {only_pass}"]}
 
     session = _session()
-    all_errors  = []
-    total_rows  = 0
-    pass_stats  = []
+    all_errors = []
+    total_rows = 0
+    pass_stats = []
 
     for prefix, type_codes, filter_type in passes:
         logger.info(f"\n[Pass: {prefix}] types={type_codes}, filter={filter_type}")
         try:
-            stats = download_pass(session, prefix, type_codes, filter_type, raw_dir, force, logger)
+            stats = download_pass(
+                session, prefix, type_codes, filter_type,
+                raw_dir, force, logger, fy_start=fy_start,
+            )
         except Exception as e:
             logger.error(f"  Unexpected error on {prefix}: {e}")
-            stats = {"prefix": prefix, "rows": 0, "error": str(e)}
+            stats = {"prefix": prefix, "rows": 0, "errors": [str(e)]}
 
         total_rows += stats["rows"]
-        if stats.get("error"):
-            all_errors.append(f"{prefix}: {stats['error']}")
+        all_errors.extend(stats.get("errors", []))
         pass_stats.append(stats)
 
     session.close()
@@ -518,11 +563,17 @@ def main() -> int:
         "--pass",
         dest="only_pass",
         metavar="PASS",
-        help=f"Run only one pass. Choices: {[p for p,_,_ in PASSES]}",
+        help=f"Run only one pass. Choices: {[p for p, _, _ in PASSES]}",
+    )
+    parser.add_argument(
+        "--fy-start",
+        type=int,
+        metavar="YEAR",
+        help=f"Only download FY >= YEAR (e.g. 2020). Default: {START_FY}",
     )
     args = parser.parse_args()
 
-    summary = _run(force=args.force, only_pass=args.only_pass)
+    summary = _run(force=args.force, only_pass=args.only_pass, fy_start=args.fy_start)
 
     print(f"\nGrants bulk download complete.")
     print(f"  Raw rows:    {summary['raw_rows']:,}")
