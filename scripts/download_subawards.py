@@ -384,7 +384,7 @@ def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
             logger.error(f"  Unexpected error on window {window['label']}: {e}")
             stats = {"window": window["label"], "grant_rows": 0, "contract_rows": 0, "errors": [str(e)]}
 
-        total_rows += stats.get("grant_rows", 0) + stats.get("contract_rows", 0)
+        total_rows += stats.get("grants_rows", 0) + stats.get("contracts_rows", 0)
         all_errors.extend(stats["errors"])
         window_stats.append(stats)
         logger.info("")
