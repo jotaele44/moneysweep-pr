@@ -75,14 +75,14 @@ MASTER_COLUMNS = [
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _get_with_retry(url: str, params: dict, logger) -> dict | None:
+def _get_with_retry(url: str, logger) -> dict | None:
     """
-    GET the given URL with params, retry once on 429/503.
-    Returns parsed JSON dict or None on failure.
+    GET the given pre-built URL (OData params already in the URL string),
+    retry once on 429/503. Returns parsed JSON dict or None on failure.
     """
     for attempt in (1, 2):
         try:
-            resp = requests.get(url, params=params, timeout=60)
+            resp = requests.get(url, timeout=60)
             if resp.status_code in (429, 503):
                 logger.warning(
                     "HTTP %s from %s (attempt %d), sleeping %ds then retrying...",
@@ -108,6 +108,7 @@ def _get_with_retry(url: str, params: dict, logger) -> dict | None:
 def _paginate(endpoint: str, data_key: str, params: dict, logger) -> list[dict]:
     """
     Paginate through an OpenFEMA endpoint using $top/$skip.
+    Builds raw URL strings so OData $ operators are not percent-encoded.
     Returns a flat list of all record dicts.
     """
     records = []
@@ -115,13 +116,18 @@ def _paginate(endpoint: str, data_key: str, params: dict, logger) -> list[dict]:
     total = None
 
     while True:
-        page_params = dict(params)
-        page_params["$top"] = PAGE_SIZE
-        page_params["$skip"] = skip
+        # Build URL manually — requests.get(params=...) encodes $ → %24 which FEMA rejects
+        raw_url = f"{endpoint}?$top={PAGE_SIZE}&$skip={skip}"
+        filter_clause = params.get("$filter", "")
+        orderby_clause = params.get("$orderby", "")
+        if filter_clause:
+            raw_url += f"&$filter={filter_clause}"
+        if orderby_clause:
+            raw_url += f"&$orderby={orderby_clause}"
 
         logger.info("  Fetching %s (skip=%d, top=%d)...", endpoint.split("/")[-1], skip, PAGE_SIZE)
 
-        data = _get_with_retry(endpoint, page_params, logger)
+        data = _get_with_retry(raw_url, logger)
         if data is None:
             logger.warning("  Got no data at skip=%d; stopping pagination.", skip)
             break

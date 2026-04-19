@@ -323,7 +323,7 @@ def download_nsf(root: Path, force: bool, logger) -> pd.DataFrame:
 
         response_body = data.get("response", {})
         status = response_body.get("@status", "")
-        if status != "OK":
+        if status and status != "OK":
             logger.warning(f"NSF: non-OK status '{status}' on page {page_num}, stopping.")
             break
 

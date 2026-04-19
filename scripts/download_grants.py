@@ -58,7 +58,7 @@ GRANT_FIELDS = [
 
 # Four time windows (calendar start of FY → end of FY)
 TIME_WINDOWS = [
-    {"label": "2000f2009", "start_date": "2000-10-01", "end_date": "2009-09-30", "fy_start": 2000},
+    {"label": "2000f2009", "start_date": "2007-10-01", "end_date": "2009-09-30", "fy_start": 2000},
     {"label": "2010f2017", "start_date": "2010-10-01", "end_date": "2017-09-30", "fy_start": 2010},
     {"label": "2018f2022", "start_date": "2018-10-01", "end_date": "2022-09-30", "fy_start": 2018},
     {"label": "2023f2025", "start_date": "2023-10-01", "end_date": "2025-09-30", "fy_start": 2023},
@@ -207,7 +207,7 @@ def _build_payload(filter_type: str, window: dict) -> dict:
         "fields": GRANT_FIELDS,
         "page": 1,
         "limit": 100,
-        "sort": "Total Obligation",
+        "sort": "Award Amount",
         "order": "desc",
         "subawards": False,
     }
