@@ -81,7 +81,9 @@ def search_recipient(vendor_name: str) -> dict | None:
         return None
     best, best_score = None, 0.0
     for r in results:
-        score = name_similarity(norm, normalize_vendor(r.get("recipient_name", "")))
+        # USASpending recipient/search returns "name" (not "recipient_name")
+        result_name = r.get("name") or r.get("recipient_name", "")
+        score = name_similarity(norm, normalize_vendor(result_name))
         if score > best_score:
             best_score, best = score, r
     if best and best_score >= MATCH_THRESHOLD:
