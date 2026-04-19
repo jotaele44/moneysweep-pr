@@ -304,7 +304,7 @@ def load_targets(root: Path) -> list[dict]:
 
 def write_index(results: dict, output_dir: Path) -> None:
     fieldnames = [
-        "vendor_name", "normalized_name", "uei", "cage", "duns",
+        "vendor_name", "normalized_name", "total_value", "uei", "cage", "duns",
         "sam_name", "match_score", "status", "expiry", "state",
         "parent_uei", "parent_name",
         "source", "resolved_at",
