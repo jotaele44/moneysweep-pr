@@ -232,7 +232,7 @@ def _download_csv_url(
     label: str,
     logger,
 ) -> pd.DataFrame | None:
-    """Stream-download a CSV from url, save to raw_path. Returns DataFrame or None."""
+    """Stream-download from url. Handles CSV and Excel (.xlsx/.xls) formats."""
     logger.info(f"  Trying {label}: {url}")
     try:
         resp = session.get(url, timeout=180, stream=True)
@@ -240,12 +240,22 @@ def _download_csv_url(
             logger.warning(f"  {label} returned HTTP {resp.status_code}")
             return None
         raw_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(raw_path, "wb") as f:
+
+        # Preserve the original file extension so we can parse correctly
+        url_suffix = Path(url.split("?")[0]).suffix.lower()
+        dl_path = raw_path.with_suffix(url_suffix) if url_suffix in (".xlsx", ".xls") else raw_path
+
+        with open(dl_path, "wb") as f:
             for chunk in resp.iter_content(chunk_size=65536):
                 if chunk:
                     f.write(chunk)
-        df = pd.read_csv(raw_path, dtype=str, low_memory=False, encoding="utf-8-sig")
-        logger.info(f"  {label}: {len(df):,} rows")
+
+        if url_suffix in (".xlsx", ".xls"):
+            df = pd.read_excel(dl_path, dtype=str)
+            logger.info(f"  {label}: {len(df):,} rows (Excel)")
+        else:
+            df = pd.read_csv(dl_path, dtype=str, low_memory=False, encoding="utf-8-sig")
+            logger.info(f"  {label}: {len(df):,} rows")
         return df
     except Exception as e:
         logger.warning(f"  {label} failed: {e}")
