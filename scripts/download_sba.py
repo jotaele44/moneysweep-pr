@@ -32,13 +32,21 @@ from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
 # ---------------------------------------------------------------------------
 
 CKAN_PACKAGE_URL = "https://data.sba.gov/api/3/action/package_show"
+CKAN_SEARCH_URL = "https://data.sba.gov/api/3/action/package_search"
 CKAN_DATASTORE_URL = "https://data.sba.gov/api/3/action/datastore_search"
 CKAN_DUMP_URL_TEMPLATE = (
     "https://data.sba.gov/datastore/dump/{resource_id}"
     "?bom=true&filters=%7B%22State%22%3A%22PR%22%7D"
 )
 
-PACKAGE_ID = "disaster-loan-data"
+# Try multiple package IDs in order — SBA periodically reorganizes their data portal
+PACKAGE_IDS = [
+    "disaster-loan-data",
+    "sba-disaster-loan-data",
+    "disaster-loans",
+    "sba-disaster-loans",
+    "fema-disaster-loans",
+]
 PAGE_SIZE = 1000
 PAGE_SLEEP = 0.3
 MAX_RETRIES = 3
@@ -116,41 +124,58 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
     return None
 
 
-def _find_resource_id(session: requests.Session, logger) -> str | None:
-    """
-    Call CKAN package_show and return the resource ID for the disaster loan CSV.
-    Prefers a resource whose name contains 'Business'; otherwise takes the first CSV.
-    """
-    logger.info(f"  Fetching CKAN package metadata: {PACKAGE_ID}")
-    data = _get(session, CKAN_PACKAGE_URL, {"id": PACKAGE_ID}, logger)
-    if not data:
-        logger.warning("  CKAN package_show returned no data")
-        return None
-
-    if not data.get("success"):
-        logger.warning(f"  CKAN package_show success=False: {data.get('error')}")
-        return None
-
-    resources = data.get("result", {}).get("resources", [])
-    if not resources:
-        logger.warning("  No resources found in CKAN package")
-        return None
-
+def _pick_resource(resources: list, logger) -> str | None:
+    """Return the best CSV resource ID from a list of CKAN resources."""
     csv_resources = [r for r in resources if r.get("format", "").upper() == "CSV"]
     if not csv_resources:
-        logger.warning("  No CSV resources found — trying all resources")
         csv_resources = resources
-
-    # Prefer resource with 'Business' in the name
+    if not csv_resources:
+        return None
     for r in csv_resources:
         if "business" in r.get("name", "").lower():
             logger.info(f"  Selected resource '{r['name']}' (id={r['id']})")
             return r["id"]
-
-    # Fall back to the first CSV resource
     r = csv_resources[0]
     logger.info(f"  Selected first CSV resource '{r.get('name', '')}' (id={r['id']})")
     return r["id"]
+
+
+def _find_resource_id(session: requests.Session, logger) -> str | None:
+    """
+    Find the CKAN resource ID for SBA disaster loan data.
+
+    Strategy:
+    1. Try each known package ID via package_show.
+    2. If all fail, search CKAN for "disaster loan" packages.
+    """
+    # Pass 1: try known package IDs
+    for pkg_id in PACKAGE_IDS:
+        logger.info(f"  Trying CKAN package: {pkg_id}")
+        data = _get(session, CKAN_PACKAGE_URL, {"id": pkg_id}, logger)
+        if not data or not data.get("success"):
+            continue
+        resources = data.get("result", {}).get("resources", [])
+        if not resources:
+            continue
+        rid = _pick_resource(resources, logger)
+        if rid:
+            return rid
+
+    # Pass 2: CKAN full-text search
+    logger.info("  All known package IDs failed — trying CKAN package_search")
+    data = _get(session, CKAN_SEARCH_URL, {"q": "disaster loan", "rows": 10}, logger)
+    if data and data.get("success"):
+        for pkg in data.get("result", {}).get("results", []):
+            name = pkg.get("name", "").lower()
+            if "disaster" in name and "loan" in name:
+                resources = pkg.get("resources", [])
+                rid = _pick_resource(resources, logger)
+                if rid:
+                    logger.info(f"  Found via search: package '{pkg.get('name')}' resource {rid}")
+                    return rid
+
+    logger.warning("  Could not discover resource ID via CKAN package_show or search")
+    return None
 
 
 def _paginate_datastore(
