@@ -124,31 +124,30 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
     return None
 
 
-def _pick_resource(resources: list, logger) -> str | None:
-    """Return the best CSV resource ID from a list of CKAN resources."""
+def _pick_resource(resources: list, logger) -> tuple[str | None, str | None]:
+    """Return (resource_id, resource_url) for the best CSV resource, or (None, None)."""
     csv_resources = [r for r in resources if r.get("format", "").upper() == "CSV"]
     if not csv_resources:
         csv_resources = resources
     if not csv_resources:
-        return None
+        return None, None
     for r in csv_resources:
         if "business" in r.get("name", "").lower():
             logger.info(f"  Selected resource '{r['name']}' (id={r['id']})")
-            return r["id"]
+            return r["id"], r.get("url", "")
     r = csv_resources[0]
     logger.info(f"  Selected first CSV resource '{r.get('name', '')}' (id={r['id']})")
-    return r["id"]
+    return r["id"], r.get("url", "")
 
 
-def _find_resource_id(session: requests.Session, logger) -> str | None:
+def _find_resource(session: requests.Session, logger) -> tuple[str | None, str | None]:
     """
-    Find the CKAN resource ID for SBA disaster loan data.
+    Find (resource_id, resource_url) for SBA disaster loan data.
 
     Strategy:
     1. Try each known package ID via package_show.
     2. If all fail, search CKAN for "disaster loan" packages.
     """
-    # Pass 1: try known package IDs
     for pkg_id in PACKAGE_IDS:
         logger.info(f"  Trying CKAN package: {pkg_id}")
         data = _get(session, CKAN_PACKAGE_URL, {"id": pkg_id}, logger)
@@ -157,25 +156,23 @@ def _find_resource_id(session: requests.Session, logger) -> str | None:
         resources = data.get("result", {}).get("resources", [])
         if not resources:
             continue
-        rid = _pick_resource(resources, logger)
+        rid, rurl = _pick_resource(resources, logger)
         if rid:
-            return rid
+            return rid, rurl
 
-    # Pass 2: CKAN full-text search
     logger.info("  All known package IDs failed — trying CKAN package_search")
     data = _get(session, CKAN_SEARCH_URL, {"q": "disaster loan", "rows": 10}, logger)
     if data and data.get("success"):
         for pkg in data.get("result", {}).get("results", []):
             name = pkg.get("name", "").lower()
             if "disaster" in name and "loan" in name:
-                resources = pkg.get("resources", [])
-                rid = _pick_resource(resources, logger)
+                rid, rurl = _pick_resource(pkg.get("resources", []), logger)
                 if rid:
                     logger.info(f"  Found via search: package '{pkg.get('name')}' resource {rid}")
-                    return rid
+                    return rid, rurl
 
-    logger.warning("  Could not discover resource ID via CKAN package_show or search")
-    return None
+    logger.warning("  Could not discover resource via CKAN package_show or search")
+    return None, None
 
 
 def _paginate_datastore(
@@ -228,29 +225,30 @@ def _paginate_datastore(
     return all_records
 
 
-def _try_direct_csv(
+def _download_csv_url(
     session: requests.Session,
-    resource_id: str,
+    url: str,
     raw_path: Path,
+    label: str,
     logger,
 ) -> pd.DataFrame | None:
-    """Attempt direct CSV dump download. Returns DataFrame or None."""
-    url = CKAN_DUMP_URL_TEMPLATE.format(resource_id=resource_id)
-    logger.warning(f"  Trying direct CSV dump: {url}")
+    """Stream-download a CSV from url, save to raw_path. Returns DataFrame or None."""
+    logger.info(f"  Trying {label}: {url}")
     try:
-        resp = session.get(url, timeout=120, stream=True)
+        resp = session.get(url, timeout=180, stream=True)
         if resp.status_code != 200:
-            logger.warning(f"  Direct dump returned HTTP {resp.status_code}")
+            logger.warning(f"  {label} returned HTTP {resp.status_code}")
             return None
         raw_path.parent.mkdir(parents=True, exist_ok=True)
         with open(raw_path, "wb") as f:
             for chunk in resp.iter_content(chunk_size=65536):
-                f.write(chunk)
+                if chunk:
+                    f.write(chunk)
         df = pd.read_csv(raw_path, dtype=str, low_memory=False, encoding="utf-8-sig")
-        logger.info(f"  Direct CSV dump: {len(df):,} rows")
+        logger.info(f"  {label}: {len(df):,} rows")
         return df
     except Exception as e:
-        logger.warning(f"  Direct CSV dump failed: {e}")
+        logger.warning(f"  {label} failed: {e}")
         return None
 
 
@@ -358,26 +356,32 @@ def _run(root: Path = None, force: bool = False) -> dict:
             df_raw = pd.DataFrame()
     else:
         # ------------------------------------------------------------------
-        # Step 1: Discover resource ID
+        # Step 1: Discover resource ID and URL
         # ------------------------------------------------------------------
         session = _session()
-        resource_id = _find_resource_id(session, logger)
+        resource_id, resource_url = _find_resource(session, logger)
 
         df_raw = None
 
         if resource_id:
-            # Step 2: Paginate CKAN datastore
-            logger.info("  Paginating CKAN datastore (State=PR)...")
-            records = _paginate_datastore(session, resource_id, logger)
+            # Step 2a: Try direct download from the resource's own URL (bypasses datastore)
+            if resource_url and resource_url.startswith("http"):
+                df_raw = _download_csv_url(session, resource_url, raw_path, "resource URL", logger)
 
-            if records:
-                df_raw = pd.DataFrame(records).drop(columns=["_id"], errors="ignore")
-                raw_dir.mkdir(parents=True, exist_ok=True)
-                df_raw.to_csv(raw_path, index=False, encoding="utf-8")
-                logger.info(f"  Saved {len(df_raw):,} raw rows → {raw_path.name}")
-            else:
-                logger.warning("  Datastore returned 0 records — trying direct CSV dump")
-                df_raw = _try_direct_csv(session, resource_id, raw_path, logger)
+            # Step 2b: Fall back to CKAN datastore API
+            if df_raw is None or len(df_raw) == 0:
+                logger.info("  Paginating CKAN datastore (State=PR)...")
+                records = _paginate_datastore(session, resource_id, logger)
+                if records:
+                    df_raw = pd.DataFrame(records).drop(columns=["_id"], errors="ignore")
+                    raw_dir.mkdir(parents=True, exist_ok=True)
+                    df_raw.to_csv(raw_path, index=False, encoding="utf-8")
+                    logger.info(f"  Saved {len(df_raw):,} raw rows → {raw_path.name}")
+
+            # Step 2c: Fall back to CKAN dump endpoint
+            if df_raw is None or len(df_raw) == 0:
+                dump_url = CKAN_DUMP_URL_TEMPLATE.format(resource_id=resource_id)
+                df_raw = _download_csv_url(session, dump_url, raw_path, "CKAN dump", logger)
 
         else:
             logger.warning("  Could not determine resource ID — skipping CKAN steps")
