@@ -40,11 +40,10 @@ USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 # USASpending award type groups (confirmed from API 422 errors):
 #   grants:          02, 03, 04, 05
 #   direct_payments: 06             ← separate group from grants
-#   loans:           07, 08, F003, F004
+#   loans:           07, 08, F003, F004  (SLFRF to PR uses grants/direct only)
 AWARD_TYPE_GROUPS = [
     ("grants",          ["02", "03", "04", "05"]),
     ("direct_payments", ["06"]),
-    ("loans",           ["07", "08"]),
 ]
 
 SLFRF_FIELDS = [

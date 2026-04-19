@@ -225,6 +225,52 @@ def _paginate_datastore(
     return all_records
 
 
+def _read_excel_best_sheet(path: Path, logger) -> pd.DataFrame:
+    """
+    Read an SBA Excel file robustly: iterate sheets, skip metadata header rows,
+    and return the largest data-bearing DataFrame found.
+
+    SBA disaster loan Excels often have 1-2 title/subtitle rows above the real
+    column headers, and may spread data across multiple sheets.
+    """
+    xl = pd.ExcelFile(path)
+    logger.info(f"  Excel sheets: {xl.sheet_names}")
+
+    state_cols = {"State", "state", "BorrowerState", "BORROWERSTATE",
+                  "Borrower State", "State Code", "StateCode"}
+    best: pd.DataFrame = pd.DataFrame()
+
+    for sheet in xl.sheet_names:
+        for skip in (0, 1, 2, 3):
+            try:
+                df = xl.parse(sheet, header=skip, dtype=str)
+                if df.empty:
+                    continue
+                # Accept sheet if any expected state column is present
+                if state_cols & set(df.columns):
+                    logger.info(
+                        f"  Sheet '{sheet}' header=skip({skip}): "
+                        f"{len(df):,} rows, cols={list(df.columns[:6])}"
+                    )
+                    if len(df) > len(best):
+                        best = df
+                    break
+            except Exception:
+                continue
+
+    if best.empty:
+        # Last resort: just read the first sheet as-is and log columns
+        try:
+            best = xl.parse(xl.sheet_names[0], dtype=str)
+            logger.warning(f"  Fallback first sheet: {len(best):,} rows, cols={list(best.columns[:8])}")
+        except Exception as e:
+            logger.warning(f"  Could not read any sheet: {e}")
+    else:
+        logger.info(f"  Best sheet: {len(best):,} rows")
+
+    return best
+
+
 def _download_csv_url(
     session: requests.Session,
     url: str,
@@ -251,8 +297,7 @@ def _download_csv_url(
                     f.write(chunk)
 
         if url_suffix in (".xlsx", ".xls"):
-            df = pd.read_excel(dl_path, dtype=str)
-            logger.info(f"  {label}: {len(df):,} rows (Excel)")
+            df = _read_excel_best_sheet(dl_path, logger)
         else:
             df = pd.read_csv(dl_path, dtype=str, low_memory=False, encoding="utf-8-sig")
             logger.info(f"  {label}: {len(df):,} rows")
