@@ -1,35 +1,39 @@
 """
-Download all non-contract federal awards to/in Puerto Rico from USASpending.
+Download all non-contract federal awards to/in Puerto Rico via USASpending bulk download.
+
+Uses /api/v2/bulk_download/awards/ which has NO record limit (unlike spending_by_award
+which silently caps at 10,000 records). Each pass submits an async job, polls until
+the ZIP is ready, downloads it, and extracts the CSV.
 
 Covers ALL awarding agencies (no agency filter) across three award type groups:
   grants  (02-05): block grants, formula grants, project grants, cooperative agreements
   direct  (06):    direct payments (specified use)
   loans   (07-08): direct and guaranteed loans
 
-Three passes per time window:
+Four passes (single full date range — no time-window splitting needed):
   grants_pop       — place of performance = PR, types 02-05
   grants_recipient — recipient located in PR, types 02-05
   direct_recipient — recipient located in PR, type 06
   loans_recipient  — recipient located in PR, types 07-08
 
-Time windows: FY2000-2009, FY2010-2017, FY2018-2022, FY2023-2025
-
 Output:
-  data/staging/raw/grants/grants_pop_<label>.csv
-  data/staging/raw/grants/grants_recipient_<label>.csv
-  data/staging/raw/grants/direct_recipient_<label>.csv
-  data/staging/raw/grants/loans_recipient_<label>.csv
+  data/staging/raw/grants/grants_pop.csv
+  data/staging/raw/grants/grants_recipient.csv
+  data/staging/raw/grants/direct_recipient.csv
+  data/staging/raw/grants/loans_recipient.csv
   data/staging/processed/pr_grants_master.csv
 
 Usage:
-  python3 scripts/download_grants.py                  # full run
-  python3 scripts/download_grants.py --force          # re-download existing
-  python3 scripts/download_grants.py --fy-start 2017  # only FY2017+
+  python3 scripts/download_grants.py                   # full run
+  python3 scripts/download_grants.py --force           # re-download existing
+  python3 scripts/download_grants.py --pass grants_pop # single pass only
 """
 
 import argparse
+import io
 import sys
 import time
+import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -43,37 +47,41 @@ from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
 # Constants
 # ---------------------------------------------------------------------------
 
-USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
+BULK_DOWNLOAD_URL = "https://api.usaspending.gov/api/v2/bulk_download/awards/"
+BULK_STATUS_URL   = "https://api.usaspending.gov/api/v2/bulk_download/status/"
 
-# (file_prefix, award_type_codes, filter_types)
+# Single full history range — no windowing needed with bulk download
+FULL_DATE_RANGE = {"start_date": "2000-10-01", "end_date": "2025-09-30"}
+
+POLL_INTERVAL_S = 15
+MAX_POLL_S      = 1800  # 30 minutes
+
+MAX_RETRIES    = 3
+RETRY_BACKOFF  = [2, 4, 8]
+
+# (output_prefix, award_type_codes, filter_type)
 # USASpending enforces strict type-group isolation: grants(02-05), direct(06), loans(07-08)
 PASSES = [
-    ("grants",  ["02", "03", "04", "05"], ["pop", "recipient"]),
-    ("direct",  ["06"],                   ["recipient"]),
-    ("loans",   ["07", "08"],             ["recipient"]),
+    ("grants_pop",       ["02", "03", "04", "05"], "pop"),
+    ("grants_recipient", ["02", "03", "04", "05"], "recipient"),
+    ("direct_recipient", ["06"],                   "recipient"),
+    ("loans_recipient",  ["07", "08"],             "recipient"),
 ]
 
-FIELDS = [
-    "Award ID",
-    "Recipient Name",
-    "recipient_uei",
-    "Awarding Agency",
-    "Awarding Sub Agency",
-    "Award Amount",
-    "Start Date",
-    "Award Type",
-    "Place of Performance State Code",
-    "Place of Performance County Name",
-    "Description",
-]
-
-# Four time windows (calendar start of FY → end of FY)
-TIME_WINDOWS = [
-    {"label": "2000f2009", "start_date": "2007-10-01", "end_date": "2009-09-30", "fy_start": 2000},
-    {"label": "2010f2017", "start_date": "2010-10-01", "end_date": "2017-09-30", "fy_start": 2010},
-    {"label": "2018f2022", "start_date": "2018-10-01", "end_date": "2022-09-30", "fy_start": 2018},
-    {"label": "2023f2025", "start_date": "2023-10-01", "end_date": "2025-09-30", "fy_start": 2023},
-]
+# Bulk download CSVs use snake_case column names (different from spending_by_award fields)
+BULK_RENAME = {
+    "award_id_fain":                              "award_id",
+    "recipient_name":                             "recipient_name",
+    "recipient_uei":                              "recipient_uei",
+    "awarding_agency_name":                       "awarding_agency",
+    "awarding_sub_agency_name":                   "awarding_sub_agency",
+    "total_obligated_amount":                     "obligated_amount",
+    "period_of_performance_start_date":           "award_date",
+    "primary_place_of_performance_state_code":    "pop_state",
+    "primary_place_of_performance_county_name":   "pop_county",
+    "award_description":                          "description",
+    "assistance_type_description":                "award_category",
+}
 
 MASTER_COLUMNS = [
     "award_id",
@@ -92,11 +100,6 @@ MASTER_COLUMNS = [
     "award_category",
 ]
 
-MAX_RETRIES = 3
-RETRY_BACKOFF = [2, 4, 8]
-PAGE_SLEEP = 0.3
-RATE_LIMIT_SLEEP = 30
-
 
 # ---------------------------------------------------------------------------
 # Session
@@ -109,7 +112,7 @@ def _session() -> requests.Session:
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Helpers (unchanged)
 # ---------------------------------------------------------------------------
 
 def _derive_fiscal_year(date_str) -> str:
@@ -125,130 +128,187 @@ def _derive_fiscal_year(date_str) -> str:
         return ""
 
 
-def _fetch_page(session: requests.Session, payload: dict, logger) -> dict | None:
-    """POST one page to the API with retry/backoff. Returns parsed JSON or None."""
-    last_err = None
-    for attempt in range(MAX_RETRIES):
-        try:
-            resp = session.post(USASPENDING_URL, json=payload, timeout=30)
-
-            if resp.status_code == 429:
-                logger.warning(f"  Rate limited (429) — sleeping {RATE_LIMIT_SLEEP}s then retrying once")
-                time.sleep(RATE_LIMIT_SLEEP)
-                resp = session.post(USASPENDING_URL, json=payload, timeout=30)
-
-            if 400 <= resp.status_code < 500:
-                logger.error(f"  HTTP {resp.status_code} (client error) — skipping: {resp.text[:300]}")
-                return None
-
-            resp.raise_for_status()
-            return resp.json()
-
-        except requests.HTTPError as e:
-            status = e.response.status_code if e.response is not None else 0
-            if 400 <= status < 500:
-                logger.error(f"  HTTP {status} (client error) — skipping: {e}")
-                return None
-            last_err = e
-        except requests.RequestException as e:
-            last_err = e
-
-        if attempt < MAX_RETRIES - 1:
-            wait = RETRY_BACKOFF[attempt]
-            logger.warning(f"  Attempt {attempt + 1} failed ({last_err}) — retrying in {wait}s")
-            time.sleep(wait)
-
-    logger.error(f"  All {MAX_RETRIES} attempts failed: {last_err}")
-    return None
+def _file_has_data(filepath: Path) -> bool:
+    """Return True if file exists and has at least one data row."""
+    if not filepath.exists():
+        return False
+    try:
+        return len(pd.read_csv(filepath, dtype=str, nrows=2, low_memory=False)) > 0
+    except Exception:
+        return False
 
 
-def _paginate(session: requests.Session, base_payload: dict, logger) -> list[dict]:
-    """Paginate through all results for a given payload. Returns list of raw result dicts."""
-    all_results = []
-    page = 1
+# ---------------------------------------------------------------------------
+# Bulk download network layer
+# ---------------------------------------------------------------------------
 
-    while True:
-        payload = dict(base_payload)
-        payload["page"] = page
-
-        data = _fetch_page(session, payload, logger)
-        if data is None:
-            break
-
-        results = data.get("results", [])
-        if not results:
-            break
-
-        all_results.extend(results)
-
-        page_meta = data.get("page_metadata", {})
-        has_next = page_meta.get("has_next_page", False)
-
-        if page % 10 == 0:
-            logger.info(f"    Page {page} ({len(all_results)} records so far)")
-
-        if not has_next:
-            break
-
-        page += 1
-        time.sleep(PAGE_SLEEP)
-
-    return all_results
-
-
-def _build_payload(type_codes: list, filter_type: str, window: dict) -> dict:
-    """Build a spending_by_award payload for a given pass, filter type, and time window."""
-    time_period = [{"start_date": window["start_date"], "end_date": window["end_date"]}]
-    is_loan = any(c in ["07", "08"] for c in type_codes)
-
+def _build_bulk_payload(type_codes: list, filter_type: str) -> dict:
+    """Build a bulk_download/awards/ request body for one pass."""
     if filter_type == "pop":
-        location = {"place_of_performance_locations": [{"country": "USA", "state": "PR"}]}
+        location = {
+            "place_of_performance_scope": "domestic",
+            "place_of_performance_locations": [{"country": "USA", "state": "PR"}],
+        }
     else:
-        location = {"recipient_locations": [{"country": "USA", "state": "PR"}]}
-
+        location = {
+            "recipient_scope": "domestic",
+            "recipient_locations": [{"country": "USA", "state": "PR"}],
+        }
     return {
         "filters": {
             "award_type_codes": type_codes,
-            "time_period": time_period,
+            "date_type": "action_date",
+            "date_range": FULL_DATE_RANGE,
             **location,
         },
-        "fields": FIELDS,
-        "page": 1,
-        "limit": 100,
-        "sort": "Award ID" if is_loan else "Award Amount",
-        "order": "desc",
-        "subawards": False,
+        "columns": [],
+        "file_format": "csv",
     }
 
 
-def _results_to_df(results: list[dict], source_file: str) -> pd.DataFrame:
-    """Convert raw API results to a DataFrame with canonical master columns."""
-    if not results:
+def _submit_bulk_job(
+    session: requests.Session,
+    payload: dict,
+    logger,
+) -> dict | None:
+    """POST to bulk_download/awards/. Returns the response dict or None on error."""
+    last_err = None
+    for attempt in range(MAX_RETRIES):
+        try:
+            resp = session.post(BULK_DOWNLOAD_URL, json=payload, timeout=60)
+            if 400 <= resp.status_code < 500:
+                logger.error(f"  Job submission HTTP {resp.status_code}: {resp.text[:300]}")
+                return None
+            resp.raise_for_status()
+            return resp.json()
+        except requests.RequestException as e:
+            last_err = e
+        if attempt < MAX_RETRIES - 1:
+            wait = RETRY_BACKOFF[attempt]
+            logger.warning(f"  Submission attempt {attempt + 1} failed ({last_err}) — retrying in {wait}s")
+            time.sleep(wait)
+    logger.error(f"  Job submission failed after {MAX_RETRIES} attempts: {last_err}")
+    return None
+
+
+def _poll_job(
+    session: requests.Session,
+    file_name: str,
+    logger,
+    timeout_s: int = MAX_POLL_S,
+) -> str | None:
+    """Poll the bulk download status endpoint until finished. Returns file_url or None."""
+    deadline = time.time() + timeout_s
+    elapsed = 0
+    while time.time() < deadline:
+        try:
+            resp = session.get(
+                BULK_STATUS_URL,
+                params={"file_name": file_name},
+                timeout=30,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+        except requests.RequestException as e:
+            logger.warning(f"  Poll error ({e}) — retrying in {POLL_INTERVAL_S}s")
+            time.sleep(POLL_INTERVAL_S)
+            elapsed += POLL_INTERVAL_S
+            continue
+
+        status = data.get("status", "")
+        total_rows = data.get("total_rows")
+
+        if status == "finished":
+            file_url = data.get("file_url") or data.get("download_url")
+            rows_msg = f", {total_rows:,} rows" if total_rows else ""
+            logger.info(f"  Job finished after {elapsed}s{rows_msg}")
+            return file_url
+
+        if status == "failed":
+            logger.error(f"  Job failed: {data.get('message', 'no message')}")
+            return None
+
+        if elapsed % 60 == 0 and elapsed > 0:
+            logger.info(f"  Still waiting... ({elapsed}s elapsed, status={status})")
+
+        time.sleep(POLL_INTERVAL_S)
+        elapsed += POLL_INTERVAL_S
+
+    logger.error(f"  Job timed out after {timeout_s}s")
+    return None
+
+
+def _download_zip(
+    session: requests.Session,
+    file_url: str,
+    zip_path: Path,
+    logger,
+) -> bool:
+    """Stream-download the bulk ZIP file to disk. Returns True on success."""
+    logger.info(f"  Downloading ZIP...")
+    try:
+        resp = session.get(file_url, timeout=300, stream=True)
+        resp.raise_for_status()
+        zip_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(zip_path, "wb") as fh:
+            for chunk in resp.iter_content(chunk_size=1 << 16):
+                if chunk:
+                    fh.write(chunk)
+        size_mb = zip_path.stat().st_size / (1024 * 1024)
+        logger.info(f"  ZIP saved: {zip_path.name} ({size_mb:.1f} MB)")
+        return True
+    except Exception as e:
+        logger.error(f"  ZIP download failed: {e}")
+        return False
+
+
+def _extract_csv(zip_path: Path, logger) -> pd.DataFrame:
+    """Open ZIP, read all CSVs inside, concatenate into one DataFrame."""
+    try:
+        with zipfile.ZipFile(zip_path) as zf:
+            csv_names = [n for n in zf.namelist() if n.lower().endswith(".csv")]
+            if not csv_names:
+                logger.warning(f"  No CSV files found in {zip_path.name}")
+                return pd.DataFrame()
+            frames = []
+            for name in csv_names:
+                logger.info(f"  Extracting {name}")
+                with zf.open(name) as f:
+                    df = pd.read_csv(
+                        io.TextIOWrapper(f, encoding="utf-8-sig"),
+                        dtype=str,
+                        low_memory=False,
+                    )
+                    frames.append(df)
+                    logger.info(f"  {name}: {len(df):,} rows, {len(df.columns)} cols")
+            return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+    except Exception as e:
+        logger.error(f"  ZIP extraction failed: {e}")
+        return pd.DataFrame()
+
+
+def _normalize_bulk_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
+    """Map bulk download CSV columns to canonical MASTER_COLUMNS schema."""
+    if df.empty:
         return pd.DataFrame(columns=MASTER_COLUMNS)
 
-    df = pd.json_normalize(results)
+    # Apply rename map for known columns
+    df = df.rename(columns={k: v for k, v in BULK_RENAME.items() if k in df.columns})
 
-    rename_map = {
-        "Award ID": "award_id",
-        "Recipient Name": "recipient_name",
-        "recipient_uei": "recipient_uei",
-        "Awarding Agency": "awarding_agency",
-        "Awarding Sub Agency": "awarding_sub_agency",
-        "Award Amount": "obligated_amount",
-        "Start Date": "award_date",
-        "Award Type": "award_category",
-        "Place of Performance State Code": "pop_state",
-        "Place of Performance County Name": "pop_county",
-        "Description": "description",
-    }
-    df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
+    # award_id: prefer award_id_fain (already renamed above); if empty, use award_unique_key
+    if "award_id" in df.columns and "award_unique_key" in df.columns:
+        empty_mask = df["award_id"].isna() | (df["award_id"].str.strip() == "")
+        df.loc[empty_mask, "award_id"] = df.loc[empty_mask, "award_unique_key"]
+    elif "award_unique_key" in df.columns:
+        df["award_id"] = df["award_unique_key"]
 
+    # Derive fiscal_year
     if "award_date" in df.columns:
         df["fiscal_year"] = df["award_date"].apply(_derive_fiscal_year)
     else:
         df["fiscal_year"] = ""
 
-    df["source_file"] = source_file
+    df["source_file"]    = source_file
     df["source_dataset"] = "grants"
 
     for col in MASTER_COLUMNS:
@@ -258,75 +318,84 @@ def _results_to_df(results: list[dict], source_file: str) -> pd.DataFrame:
     return df[MASTER_COLUMNS]
 
 
-def _file_has_data(filepath: Path) -> bool:
-    """Return True if file exists and has at least one data row."""
-    if not filepath.exists():
-        return False
-    try:
-        df = pd.read_csv(filepath, dtype=str, nrows=2, low_memory=False)
-        return len(df) > 0
-    except Exception:
-        return False
-
-
 # ---------------------------------------------------------------------------
-# Core download logic
+# Per-pass downloader
 # ---------------------------------------------------------------------------
 
-def download_window(
+def download_pass(
     session: requests.Session,
-    window: dict,
+    prefix: str,
+    type_codes: list,
+    filter_type: str,
     raw_dir: Path,
     force: bool,
     logger,
 ) -> dict:
-    """Download all passes for one time window. Returns per-window stats."""
-    label = window["label"]
-    stats = {"window": label, "total_rows": 0, "errors": []}
+    """Run one bulk download pass end-to-end. Returns stats dict."""
+    csv_path = raw_dir / f"{prefix}.csv"
+    zip_path = raw_dir / f"{prefix}.zip"
+    stats = {"prefix": prefix, "rows": 0, "error": None}
 
-    for prefix, type_codes, filter_types in PASSES:
-        for filter_type in filter_types:
-            fname = f"{prefix}_{filter_type}_{label}.csv"
-            fpath = raw_dir / fname
-            stat_key = f"{prefix}_{filter_type}_rows"
-            stats[stat_key] = 0
+    if not force and _file_has_data(csv_path):
+        try:
+            rows = len(pd.read_csv(csv_path, dtype=str, low_memory=False))
+        except Exception:
+            rows = 0
+        logger.info(f"  Skipping {csv_path.name} (exists, {rows:,} rows)")
+        stats["rows"] = rows
+        return stats
 
-            if not force and _file_has_data(fpath):
-                try:
-                    rows = len(pd.read_csv(fpath, dtype=str, low_memory=False))
-                except Exception:
-                    rows = 0
-                logger.info(f"  Skipping {fname} (exists, {rows} rows)")
-                stats[stat_key] = rows
-                stats["total_rows"] += rows
-                continue
+    logger.info(f"  [{prefix}] Submitting bulk download job...")
+    payload = _build_bulk_payload(type_codes, filter_type)
+    job = _submit_bulk_job(session, payload, logger)
+    if job is None:
+        stats["error"] = "job submission failed"
+        return stats
 
-            logger.info(f"  Fetching {fname} ({window['start_date']} to {window['end_date']})")
-            payload = _build_payload(type_codes, filter_type, window)
-            results = _paginate(session, payload, logger)
+    file_name = job.get("file_name") or job.get("file_url", "").split("/")[-1]
+    status    = job.get("status", "")
+    file_url  = job.get("file_url") or job.get("download_url")
 
-            if not results:
-                logger.warning(f"  No results for {fname}")
-                stats["errors"].append(f"{fname}: no results")
-                pd.DataFrame(columns=MASTER_COLUMNS).to_csv(fpath, index=False, encoding="utf-8")
-                continue
+    logger.info(f"  [{prefix}] Job submitted: file_name={file_name}, initial status={status}")
 
-            df = _results_to_df(results, fname)
-            raw_dir.mkdir(parents=True, exist_ok=True)
-            df.to_csv(fpath, index=False, encoding="utf-8")
-            stats[stat_key] = len(df)
-            stats["total_rows"] += len(df)
-            logger.info(f"  Saved {len(df)} rows → {fname}")
+    if status != "finished" or not file_url:
+        logger.info(f"  [{prefix}] Polling for completion (max {MAX_POLL_S // 60} min)...")
+        file_url = _poll_job(session, file_name, logger)
 
+    if not file_url:
+        stats["error"] = "job did not complete"
+        return stats
+
+    if not _download_zip(session, file_url, zip_path, logger):
+        stats["error"] = "ZIP download failed"
+        return stats
+
+    df = _extract_csv(zip_path, logger)
+    if df.empty:
+        stats["error"] = "no data in ZIP"
+        return stats
+
+    df_master = _normalize_bulk_df(df, csv_path.name)
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    df_master.to_csv(csv_path, index=False, encoding="utf-8")
+
+    # Clean up ZIP to save space
+    try:
+        zip_path.unlink()
+    except Exception:
+        pass
+
+    stats["rows"] = len(df_master)
+    logger.info(f"  [{prefix}] Saved {len(df_master):,} rows → {csv_path.name}")
     return stats
 
 
 # ---------------------------------------------------------------------------
-# Master build
+# Master build (unchanged)
 # ---------------------------------------------------------------------------
 
 def build_master(raw_dir: Path, master_path: Path, logger) -> int:
-    """Concatenate all raw grant/direct/loan CSVs, deduplicate by award_id, write master."""
+    """Concatenate all raw CSVs, deduplicate by award_id, write master."""
     files = sorted(raw_dir.glob("*.csv"))
     if not files:
         logger.warning("  No raw grant files found — master not written")
@@ -337,7 +406,6 @@ def build_master(raw_dir: Path, master_path: Path, logger) -> int:
         try:
             df = pd.read_csv(f, dtype=str, low_memory=False)
             frames.append(df)
-            logger.debug(f"  Loaded {f.name}: {len(df)} rows")
         except Exception as e:
             logger.warning(f"  Skipping {f.name}: {e}")
 
@@ -366,94 +434,97 @@ def build_master(raw_dir: Path, master_path: Path, logger) -> int:
 # ---------------------------------------------------------------------------
 
 def run(root: Path = None) -> dict:
-    """Main entry point. Returns summary dict."""
-    return _run(root=root, force=False, fy_start=None)
+    """Main entry point (no --force). Returns summary dict."""
+    return _run(root=root, force=False, only_pass=None)
 
 
-def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
-    """Internal runner used by both run() and main()."""
+def _run(
+    root: Path = None,
+    force: bool = False,
+    only_pass: str | None = None,
+) -> dict:
     if root is None:
         root = PROJECT_ROOT
 
-    raw_dir = root / "data" / "staging" / "raw" / "grants"
+    raw_dir     = root / "data" / "staging" / "raw" / "grants"
     master_path = root / "data" / "staging" / "processed" / "pr_grants_master.csv"
-
     raw_dir.mkdir(parents=True, exist_ok=True)
 
     logger = setup_logging("download_grants")
-    logger.info("Starting PR all-agency awards download (grants + direct + loans)...")
+    logger.info("Starting PR all-agency awards bulk download (grants + direct + loans)...")
+    logger.info(f"  Date range: {FULL_DATE_RANGE['start_date']} → {FULL_DATE_RANGE['end_date']}")
 
-    windows = TIME_WINDOWS
-    if fy_start is not None:
-        windows = [w for w in TIME_WINDOWS if w["fy_start"] >= fy_start]
-        if not windows:
-            logger.warning(f"  No time windows with fy_start >= {fy_start}")
+    passes = PASSES
+    if only_pass:
+        passes = [(p, t, f) for p, t, f in PASSES if p == only_pass]
+        if not passes:
+            logger.error(f"  Unknown pass '{only_pass}'. Valid: {[p for p,_,_ in PASSES]}")
+            return {"raw_rows": 0, "master_rows": 0, "errors": [f"unknown pass: {only_pass}"]}
 
     session = _session()
-    all_errors = []
-    total_raw_rows = 0
-    window_stats = []
+    all_errors  = []
+    total_rows  = 0
+    pass_stats  = []
 
-    for window in windows:
-        logger.info(f"[Window {window['label']}] {window['start_date']} to {window['end_date']}")
+    for prefix, type_codes, filter_type in passes:
+        logger.info(f"\n[Pass: {prefix}] types={type_codes}, filter={filter_type}")
         try:
-            stats = download_window(session, window, raw_dir, force, logger)
+            stats = download_pass(session, prefix, type_codes, filter_type, raw_dir, force, logger)
         except Exception as e:
-            logger.error(f"  Unexpected error on window {window['label']}: {e}")
-            stats = {"window": window["label"], "total_rows": 0, "errors": [str(e)]}
+            logger.error(f"  Unexpected error on {prefix}: {e}")
+            stats = {"prefix": prefix, "rows": 0, "error": str(e)}
 
-        total_raw_rows += stats.get("total_rows", 0)
-        all_errors.extend(stats["errors"])
-        window_stats.append(stats)
-        logger.info("")
+        total_rows += stats["rows"]
+        if stats.get("error"):
+            all_errors.append(f"{prefix}: {stats['error']}")
+        pass_stats.append(stats)
 
     session.close()
 
-    logger.info("Building grants master...")
+    logger.info("\nBuilding grants master...")
     master_rows = build_master(raw_dir, master_path, logger)
 
     summary = {
-        "raw_rows": total_raw_rows,
+        "raw_rows":    total_rows,
         "master_rows": master_rows,
         "master_path": str(master_path),
-        "raw_dir": str(raw_dir),
-        "errors": all_errors,
-        "windows": window_stats,
+        "raw_dir":     str(raw_dir),
+        "errors":      all_errors,
+        "passes":      pass_stats,
     }
 
     logger.info("=" * 60)
-    logger.info("GRANTS DOWNLOAD SUMMARY")
+    logger.info("GRANTS BULK DOWNLOAD SUMMARY")
     logger.info("=" * 60)
-    logger.info(f"  Raw rows:    {total_raw_rows:,}")
+    logger.info(f"  Raw rows:    {total_rows:,}")
     logger.info(f"  Master rows: {master_rows:,}")
     logger.info(f"  Errors:      {len(all_errors)}")
-    if all_errors:
-        for err in all_errors:
-            logger.warning(f"    {err}")
+    for err in all_errors:
+        logger.warning(f"    {err}")
 
     return summary
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Download federal grants to/in Puerto Rico from USASpending"
+        description="Download all non-contract PR federal awards via USASpending bulk download"
     )
     parser.add_argument(
         "--force",
         action="store_true",
-        help="Re-download existing raw files",
+        help="Re-download even if raw CSV already exists",
     )
     parser.add_argument(
-        "--fy-start",
-        type=int,
-        metavar="YEAR",
-        help="Only download windows with fy_start >= YEAR (e.g. 2017)",
+        "--pass",
+        dest="only_pass",
+        metavar="PASS",
+        help=f"Run only one pass. Choices: {[p for p,_,_ in PASSES]}",
     )
     args = parser.parse_args()
 
-    summary = _run(force=args.force, fy_start=args.fy_start)
+    summary = _run(force=args.force, only_pass=args.only_pass)
 
-    print(f"\nGrants/direct/loans download complete.")
+    print(f"\nGrants bulk download complete.")
     print(f"  Raw rows:    {summary['raw_rows']:,}")
     print(f"  Master rows: {summary['master_rows']:,}")
     print(f"  Master path: {summary['master_path']}")
