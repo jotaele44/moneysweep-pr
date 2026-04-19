@@ -1,20 +1,22 @@
 """
-Download Treasury SLFRF (State and Local Fiscal Recovery Funds / ARPA) data for Puerto Rico.
+Download Treasury SLFRF (State and Local Fiscal Recovery Funds / ARPA) data for Puerto Rico
+via USASpending spending_by_award API, filtered to Assistance Listing 21.027.
 
 Puerto Rico received ~$4.1B from the American Rescue Plan Act SLFRF program.
+This replaces the previous Treasury XLSX download approach (URLs now 404).
 
-Approach:
-  1. Attempt to download the Treasury SLFRF public recipient compliance Excel file.
-  2. Parse the Puerto Rico sheet or filter rows for Puerto Rico.
-  3. If download fails, write an empty master with headers and log instructions.
+Two award type passes per run:
+  grants  (02-05): block grants, formula grants, project grants, cooperative agreements
+  direct  (06-07): direct payments for specified and unrestricted use
 
 Output:
-  data/staging/raw/slfrf/slfrf_raw.xlsx           (downloaded Excel file)
-  data/staging/processed/pr_slfrf_master.csv       (canonical master)
+  data/staging/raw/slfrf/slfrf_grants.csv             (raw grants pass)
+  data/staging/raw/slfrf/slfrf_direct.csv             (raw direct payments pass)
+  data/staging/processed/pr_slfrf_master.csv           (deduplicated master)
 
 Usage:
   python3 scripts/download_slfrf.py            # full run
-  python3 scripts/download_slfrf.py --force    # re-download even if file exists
+  python3 scripts/download_slfrf.py --force    # re-download even if files exist
 """
 
 import argparse
@@ -33,22 +35,34 @@ from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
 # Constants
 # ---------------------------------------------------------------------------
 
-SLFRF_DOWNLOAD_URLS = [
-    "https://home.treasury.gov/system/files/136/SLFRF_Recipient_Compliance_and_Performance_Report_Data.xlsx",
-    "https://home.treasury.gov/system/files/136/SLFRF-Recipient-Compliance-and-Reporting-Guidance.xlsx",
+USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
+
+# CFDA / Assistance Listing number for SLFRF (Coronavirus State and Local Fiscal Recovery Funds)
+SLFRF_CFDA = "21.027"
+
+# Award type groups — SLFRF may appear as grants or direct payments
+AWARD_TYPE_GROUPS = [
+    ("grants", ["02", "03", "04", "05"]),
+    ("direct", ["06", "07"]),
 ]
 
-MANUAL_DOWNLOAD_URL = (
-    "https://home.treasury.gov/policy-issues/coronavirus/assistance-for-state-local-and-tribal-governments"
-    "/state-and-local-fiscal-recovery-funds/public-data"
-)
+SLFRF_FIELDS = [
+    "Award ID",
+    "Recipient Name",
+    "recipient_uei",
+    "Awarding Agency",
+    "Awarding Sub Agency",
+    "Award Amount",
+    "Start Date",
+    "Award Type",
+    "Place of Performance State Code",
+    "Place of Performance County Name",
+    "Description",
+]
 
-MANUAL_DOWNLOAD_MSG = (
-    f"SLFRF data requires manual download from {MANUAL_DOWNLOAD_URL} "
-    "— Download the 'Recipient Payments' Excel and save to data/staging/raw/slfrf/"
-)
-
-PR_STATE_VALUES = {"pr", "puerto rico", "72"}
+# ARP signed March 11, 2021; SLFRF funds available through FY2026
+SLFRF_START = "2021-03-11"
+SLFRF_END = "2026-09-30"
 
 MASTER_COLUMNS = [
     "award_id",
@@ -69,6 +83,8 @@ MASTER_COLUMNS = [
 
 MAX_RETRIES = 3
 RETRY_BACKOFF = [2, 4, 8]
+PAGE_SLEEP = 0.3
+RATE_LIMIT_SLEEP = 30
 
 
 # ---------------------------------------------------------------------------
@@ -77,7 +93,7 @@ RETRY_BACKOFF = [2, 4, 8]
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({"User-Agent": "ContractSweeper/1.0"})
+    s.headers.update({"User-Agent": "ContractSweeper/1.0", "Accept": "application/json"})
     return s
 
 
@@ -99,202 +115,151 @@ def _derive_fiscal_year(date_str) -> str:
 
 
 def _file_has_data(filepath: Path) -> bool:
-    """Return True if file exists and has a non-zero size."""
-    return filepath.exists() and filepath.stat().st_size > 0
-
-
-# ---------------------------------------------------------------------------
-# Download
-# ---------------------------------------------------------------------------
-
-def _download_excel(raw_path: Path, logger) -> bool:
-    """
-    Try each known URL in order. Stream-write to raw_path on success.
-    Returns True if download succeeded, False otherwise.
-    """
-    session = _session()
-    for url in SLFRF_DOWNLOAD_URLS:
-        logger.info(f"  Trying SLFRF download: {url}")
-        last_err = None
-        for attempt in range(MAX_RETRIES):
-            try:
-                resp = session.get(url, stream=True, timeout=120)
-                if resp.status_code == 200:
-                    raw_path.parent.mkdir(parents=True, exist_ok=True)
-                    with open(raw_path, "wb") as f:
-                        for chunk in resp.iter_content(chunk_size=65536):
-                            if chunk:
-                                f.write(chunk)
-                    logger.info(f"  Downloaded {raw_path.stat().st_size:,} bytes → {raw_path.name}")
-                    session.close()
-                    return True
-                else:
-                    logger.warning(f"  HTTP {resp.status_code} from {url}")
-                    break  # No point retrying a 4xx
-            except requests.RequestException as e:
-                last_err = e
-                if attempt < MAX_RETRIES - 1:
-                    wait = RETRY_BACKOFF[attempt]
-                    logger.warning(f"  Attempt {attempt + 1} failed ({e}) — retrying in {wait}s")
-                    time.sleep(wait)
-        if last_err:
-            logger.warning(f"  All attempts failed for {url}: {last_err}")
-
-    session.close()
-    return False
-
-
-# ---------------------------------------------------------------------------
-# Parsing
-# ---------------------------------------------------------------------------
-
-def _is_pr_row(value) -> bool:
-    """Return True if a state/recipient field looks like Puerto Rico."""
-    if value is None or (isinstance(value, float) and pd.isna(value)):
+    """Return True if file exists and has at least one data row."""
+    if not filepath.exists():
         return False
-    return str(value).strip().lower() in PR_STATE_VALUES
+    try:
+        df = pd.read_csv(filepath, dtype=str, nrows=2, low_memory=False)
+        return len(df) > 0
+    except Exception:
+        return False
 
 
-def _find_pr_sheet(xl: pd.ExcelFile, logger) -> str | None:
-    """
-    Return a sheet name that likely contains Puerto Rico data.
-    Prefers exact 'Puerto Rico' match, then case-insensitive partial match.
-    """
-    for sheet in xl.sheet_names:
-        if sheet.strip().lower() == "puerto rico":
-            logger.info(f"  Found 'Puerto Rico' sheet: '{sheet}'")
-            return sheet
-    for sheet in xl.sheet_names:
-        if "puerto" in sheet.lower() or "rico" in sheet.lower():
-            logger.info(f"  Found partial PR sheet match: '{sheet}'")
-            return sheet
+def _fetch_page(session: requests.Session, payload: dict, logger) -> dict | None:
+    """POST one page to the API with retry/backoff. Returns parsed JSON or None."""
+    last_err = None
+    for attempt in range(MAX_RETRIES):
+        try:
+            resp = session.post(USASPENDING_URL, json=payload, timeout=30)
+            if resp.status_code == 429:
+                logger.warning(f"  Rate limited (429) — sleeping {RATE_LIMIT_SLEEP}s then retrying once")
+                time.sleep(RATE_LIMIT_SLEEP)
+                resp = session.post(USASPENDING_URL, json=payload, timeout=30)
+            if 400 <= resp.status_code < 500:
+                logger.error(f"  HTTP {resp.status_code} (client error) — skipping: {resp.text[:300]}")
+                return None
+            resp.raise_for_status()
+            return resp.json()
+        except requests.HTTPError as e:
+            status = e.response.status_code if e.response is not None else 0
+            if 400 <= status < 500:
+                logger.error(f"  HTTP {status} (client error) — skipping: {e}")
+                return None
+            last_err = e
+        except requests.RequestException as e:
+            last_err = e
+        if attempt < MAX_RETRIES - 1:
+            wait = RETRY_BACKOFF[attempt]
+            logger.warning(f"  Attempt {attempt + 1} failed ({last_err}) — retrying in {wait}s")
+            time.sleep(wait)
+    logger.error(f"  All {MAX_RETRIES} attempts failed: {last_err}")
     return None
 
 
-def _col(df: pd.DataFrame, *candidates) -> pd.Series:
-    """Return first matching column Series, or empty string Series."""
-    for c in candidates:
-        if c in df.columns:
-            return df[c]
-    return pd.Series("", index=df.index)
+def _paginate(session: requests.Session, base_payload: dict, logger) -> list[dict]:
+    """Paginate through all results. Returns list of raw result dicts."""
+    all_results = []
+    page = 1
+    while True:
+        payload = dict(base_payload)
+        payload["page"] = page
+        data = _fetch_page(session, payload, logger)
+        if data is None:
+            break
+        results = data.get("results", [])
+        if not results:
+            break
+        all_results.extend(results)
+        page_meta = data.get("page_metadata", {})
+        has_next = page_meta.get("has_next_page", False)
+        if page % 10 == 0:
+            logger.info(f"    Page {page} ({len(all_results)} records so far)")
+        if not has_next:
+            break
+        page += 1
+        time.sleep(PAGE_SLEEP)
+    return all_results
 
 
-def _parse_excel(raw_path: Path, logger) -> pd.DataFrame:
-    """
-    Read the SLFRF Excel, find Puerto Rico data, and return a canonical master DataFrame.
-    """
-    try:
-        import openpyxl  # noqa: F401
-    except ImportError:
-        logger.error("openpyxl is not installed — run: pip install openpyxl")
+def _build_payload(type_codes: list) -> dict:
+    """Build a spending_by_award payload filtered to PR recipient + SLFRF CFDA."""
+    return {
+        "filters": {
+            "award_type_codes": type_codes,
+            "program_numbers": [SLFRF_CFDA],
+            "recipient_locations": [{"country": "USA", "state": "PR"}],
+            "time_period": [{"start_date": SLFRF_START, "end_date": SLFRF_END}],
+        },
+        "fields": SLFRF_FIELDS,
+        "page": 1,
+        "limit": 100,
+        "sort": "Award Amount",
+        "order": "desc",
+        "subawards": False,
+    }
+
+
+def _results_to_df(results: list[dict], source_file: str) -> pd.DataFrame:
+    """Convert raw API results to canonical master columns."""
+    if not results:
         return pd.DataFrame(columns=MASTER_COLUMNS)
+    df = pd.json_normalize(results)
+    rename_map = {
+        "Award ID": "award_id",
+        "Recipient Name": "recipient_name",
+        "recipient_uei": "recipient_uei",
+        "Awarding Agency": "awarding_agency",
+        "Awarding Sub Agency": "awarding_sub_agency",
+        "Award Amount": "obligated_amount",
+        "Start Date": "award_date",
+        "Award Type": "award_category",
+        "Place of Performance State Code": "pop_state",
+        "Place of Performance County Name": "pop_county",
+        "Description": "description",
+    }
+    df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
+    if "award_date" in df.columns:
+        df["fiscal_year"] = df["award_date"].apply(_derive_fiscal_year)
+    else:
+        df["fiscal_year"] = ""
+    df["source_file"] = source_file
+    df["source_dataset"] = "slfrf"
+    for col in MASTER_COLUMNS:
+        if col not in df.columns:
+            df[col] = ""
+    return df[MASTER_COLUMNS]
 
-    logger.info(f"  Reading Excel: {raw_path.name}")
-    try:
-        xl = pd.ExcelFile(raw_path, engine="openpyxl")
-    except Exception as e:
-        logger.error(f"  Failed to open Excel file: {e}")
-        return pd.DataFrame(columns=MASTER_COLUMNS)
 
-    logger.info(f"  Sheets found: {xl.sheet_names}")
+# ---------------------------------------------------------------------------
+# Master build
+# ---------------------------------------------------------------------------
 
-    # Strategy 1: dedicated Puerto Rico sheet
-    pr_sheet = _find_pr_sheet(xl, logger)
-    if pr_sheet:
+def build_master(raw_dir: Path, master_path: Path, logger) -> int:
+    """Concatenate raw SLFRF files, deduplicate by award_id, write master."""
+    files = sorted(raw_dir.glob("slfrf_*.csv"))
+    if not files:
+        logger.warning("  No raw SLFRF files found — master not written")
+        return 0
+    frames = []
+    for f in files:
         try:
-            df = xl.parse(pr_sheet, dtype=str)
-            logger.info(f"  Read {len(df):,} rows from sheet '{pr_sheet}'")
-            return _normalize_slfrf(df, raw_path.name, logger)
+            df = pd.read_csv(f, dtype=str, low_memory=False)
+            frames.append(df)
         except Exception as e:
-            logger.warning(f"  Failed to parse sheet '{pr_sheet}': {e}")
-
-    # Strategy 2: scan all sheets for rows mentioning Puerto Rico
-    all_frames = []
-    state_candidates = [
-        "State", "state", "Recipient State", "recipient_state",
-        "State Name", "State Code", "Recipient Name",
-    ]
-
-    for sheet in xl.sheet_names:
-        try:
-            df = xl.parse(sheet, dtype=str)
-            if df.empty:
-                continue
-            # Find a column that might contain state info
-            for col_name in state_candidates:
-                if col_name in df.columns:
-                    mask = df[col_name].apply(_is_pr_row)
-                    pr_rows = df[mask]
-                    if len(pr_rows) > 0:
-                        logger.info(
-                            f"  Sheet '{sheet}': found {len(pr_rows):,} PR rows via column '{col_name}'"
-                        )
-                        all_frames.append(pr_rows)
-                    break
-        except Exception as e:
-            logger.warning(f"  Could not parse sheet '{sheet}': {e}")
-
-    if all_frames:
-        combined = pd.concat(all_frames, ignore_index=True)
-        logger.info(f"  Total PR rows across all sheets: {len(combined):,}")
-        return _normalize_slfrf(combined, raw_path.name, logger)
-
-    logger.warning(
-        "  No Puerto Rico rows found in any sheet. "
-        "The file may not contain recipient-level data or may use a different format."
-    )
-    return pd.DataFrame(columns=MASTER_COLUMNS)
-
-
-def _normalize_slfrf(df: pd.DataFrame, source_file: str, logger) -> pd.DataFrame:
-    """Map raw SLFRF DataFrame rows to canonical master columns."""
-    if df.empty:
-        return pd.DataFrame(columns=MASTER_COLUMNS)
-
-    rows = []
-    for i, row in df.iterrows():
-        recipient_name = (
-            _col(df, "Recipient Name", "Recipient", "recipient_name",
-                 "Entity Name", "Subrecipient Name").iloc[0]
-            if len(df) == 1
-            else row.get("Recipient Name", row.get("Recipient", row.get("recipient_name",
-                row.get("Entity Name", row.get("Subrecipient Name", "")))))
-        )
-        description = (
-            row.get("Project Name", row.get("Expenditure Category",
-            row.get("Project Description", row.get("Category", ""))))
-        )
-        obligated_amount = (
-            row.get("Amount Obligated", row.get("Amount Expended",
-            row.get("Total Obligation", row.get("Federal Funding Amount",
-            row.get("Total Expenditures", "")))))
-        )
-        award_date = (
-            row.get("Reporting Period", row.get("Period of Performance",
-            row.get("Date", row.get("Report Date", ""))))
-        )
-        award_id = f"SLFRF-{i}"
-
-        rows.append({
-            "award_id": award_id,
-            "recipient_name": str(recipient_name).strip() if recipient_name else "",
-            "recipient_uei": str(row.get("UEI", row.get("SAM UEI", ""))).strip(),
-            "awarding_agency": "Department of the Treasury",
-            "awarding_sub_agency": "",
-            "obligated_amount": str(obligated_amount).strip() if obligated_amount else "",
-            "award_date": str(award_date).strip() if award_date else "",
-            "fiscal_year": _derive_fiscal_year(award_date),
-            "pop_state": "PR",
-            "pop_county": str(row.get("County", row.get("Municipality", ""))).strip(),
-            "description": str(description).strip() if description else "",
-            "source_file": source_file,
-            "source_dataset": "slfrf",
-            "award_category": "direct_payment",
-        })
-
-    master = pd.DataFrame(rows, columns=MASTER_COLUMNS)
-    logger.info(f"  Normalized {len(master):,} SLFRF rows for Puerto Rico")
-    return master
+            logger.warning(f"  Skipping {f.name}: {e}")
+    if not frames:
+        return 0
+    combined = pd.concat(frames, ignore_index=True)
+    before = len(combined)
+    if "award_id" in combined.columns:
+        combined = combined.drop_duplicates(subset=["award_id"], keep="first")
+        removed = before - len(combined)
+        if removed:
+            logger.info(f"  Removed {removed:,} duplicate award_id rows")
+    master_path.parent.mkdir(parents=True, exist_ok=True)
+    combined.to_csv(master_path, index=False, encoding="utf-8")
+    logger.info(f"  Master written: {len(combined):,} rows → {master_path.name}")
+    return len(combined)
 
 
 # ---------------------------------------------------------------------------
@@ -312,80 +277,96 @@ def _run(root: Path = None, force: bool = False) -> dict:
         root = PROJECT_ROOT
 
     raw_dir = root / "data" / "staging" / "raw" / "slfrf"
-    raw_path = raw_dir / "slfrf_raw.xlsx"
     master_path = root / "data" / "staging" / "processed" / "pr_slfrf_master.csv"
 
     raw_dir.mkdir(parents=True, exist_ok=True)
     master_path.parent.mkdir(parents=True, exist_ok=True)
 
     logger = setup_logging("download_slfrf")
-    logger.info("Starting SLFRF download for Puerto Rico...")
+    logger.info("Starting SLFRF download for Puerto Rico (USASpending CFDA 21.027)...")
 
-    # ------------------------------------------------------------------
-    # Skip download if file already exists and not forcing
-    # ------------------------------------------------------------------
-    downloaded_ok = False
-    if not force and _file_has_data(raw_path):
-        logger.info(f"  Raw file already exists ({raw_path.name}) — using existing file")
-        downloaded_ok = True
-    else:
-        downloaded_ok = _download_excel(raw_path, logger)
+    session = _session()
+    all_errors = []
+    total_raw_rows = 0
 
-    # ------------------------------------------------------------------
-    # Parse or emit manual-download notice
-    # ------------------------------------------------------------------
-    if downloaded_ok and _file_has_data(raw_path):
-        master = _parse_excel(raw_path, logger)
-    else:
-        logger.warning(MANUAL_DOWNLOAD_MSG)
-        master = pd.DataFrame(columns=MASTER_COLUMNS)
+    for group_label, type_codes in AWARD_TYPE_GROUPS:
+        fname = f"slfrf_{group_label}.csv"
+        fpath = raw_dir / fname
 
-    # ------------------------------------------------------------------
-    # Write master (always — even if empty — so downstream doesn't fail)
-    # ------------------------------------------------------------------
-    master.to_csv(master_path, index=False, encoding="utf-8")
-    logger.info(f"  Master written: {len(master):,} rows → {master_path.name}")
+        if not force and _file_has_data(fpath):
+            try:
+                existing = pd.read_csv(fpath, dtype=str, low_memory=False)
+                rows = len(existing)
+            except Exception:
+                rows = 0
+            logger.info(f"  Skipping {fname} (exists, {rows} rows)")
+            total_raw_rows += rows
+            continue
 
-    status = "OK" if len(master) > 0 else "MANUAL_DOWNLOAD_REQUIRED"
+        logger.info(f"  Fetching {fname} (type_group={group_label}, CFDA={SLFRF_CFDA})")
+        payload = _build_payload(type_codes)
+        results = _paginate(session, payload, logger)
 
-    summary: dict = {
-        "rows": len(master),
+        if not results:
+            logger.warning(f"  No results for {fname}")
+            all_errors.append(f"{fname}: no results")
+            pd.DataFrame(columns=MASTER_COLUMNS).to_csv(fpath, index=False, encoding="utf-8")
+            continue
+
+        df = _results_to_df(results, fname)
+        df.to_csv(fpath, index=False, encoding="utf-8")
+        total_raw_rows += len(df)
+        logger.info(f"  Saved {len(df)} rows → {fname}")
+
+    session.close()
+
+    logger.info("Building SLFRF master...")
+    master_rows = build_master(raw_dir, master_path, logger)
+
+    summary = {
+        "rows": master_rows,
+        "raw_rows": total_raw_rows,
         "master_path": str(master_path),
-        "raw_path": str(raw_path),
-        "status": status,
+        "raw_dir": str(raw_dir),
+        "errors": all_errors,
+        "status": "OK" if master_rows > 0 else "EMPTY",
     }
-    if status == "MANUAL_DOWNLOAD_REQUIRED":
-        summary["instructions"] = MANUAL_DOWNLOAD_MSG
 
     logger.info("=" * 60)
     logger.info("SLFRF DOWNLOAD SUMMARY")
     logger.info("=" * 60)
-    logger.info(f"  Master rows: {summary['rows']:,}")
-    logger.info(f"  Status:      {summary['status']}")
+    logger.info(f"  Raw rows:    {total_raw_rows:,}")
+    logger.info(f"  Master rows: {master_rows:,}")
+    logger.info(f"  Errors:      {len(all_errors)}")
+    if all_errors:
+        for err in all_errors:
+            logger.warning(f"    {err}")
 
     return summary
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Download Treasury SLFRF data for Puerto Rico"
+        description="Download Treasury SLFRF data for Puerto Rico via USASpending"
     )
     parser.add_argument(
         "--force",
         action="store_true",
-        help="Re-download even if raw file already exists",
+        help="Re-download even if raw files already exist",
     )
     args = parser.parse_args()
-
     summary = _run(force=args.force)
-
     print("\nSLFRF download complete.")
+    print(f"  Raw rows:    {summary['raw_rows']:,}")
     print(f"  Master rows: {summary['rows']:,}")
     print(f"  Master path: {summary['master_path']}")
     print(f"  Status:      {summary['status']}")
-    if "instructions" in summary:
-        print(f"\n  NOTE: {summary['instructions']}")
-    return 0 if summary["status"] == "OK" else 1
+    if summary["errors"]:
+        print(f"  Errors ({len(summary['errors'])}):")
+        for err in summary["errors"]:
+            print(f"    {err}")
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
