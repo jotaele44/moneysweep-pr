@@ -72,13 +72,13 @@ MAX_POLL_S      = 1800  # 30 minutes
 MAX_RETRIES    = 3
 RETRY_BACKOFF  = [2, 4, 8]
 
-# (output_prefix, award_type_codes, filter_type)
-# USASpending enforces strict type-group isolation: grants(02-05), direct(06), loans(07-08)
+# (output_prefix, prime_award_types, filter_type)
+# bulk_download uses category names, not numeric codes
 PASSES = [
-    ("grants_pop",       ["02", "03", "04", "05"], "pop"),
-    ("grants_recipient", ["02", "03", "04", "05"], "recipient"),
-    ("direct_recipient", ["06"],                   "recipient"),
-    ("loans_recipient",  ["07", "08"],             "recipient"),
+    ("grants_pop",       ["grants"],          "pop"),
+    ("grants_recipient", ["grants"],          "recipient"),
+    ("direct_recipient", ["direct_payments"], "recipient"),
+    ("loans_recipient",  ["loans"],           "recipient"),
 ]
 
 # Bulk download CSVs use snake_case column names (different from spending_by_award fields)
@@ -155,7 +155,7 @@ def _file_has_data(filepath: Path) -> bool:
 # Bulk download network layer
 # ---------------------------------------------------------------------------
 
-def _build_bulk_payload(type_codes: list, filter_type: str, window: dict) -> dict:
+def _build_bulk_payload(prime_award_types: list, filter_type: str, window: dict) -> dict:
     """Build a bulk_download/awards/ request body for one pass + FY window."""
     if filter_type == "pop":
         location = {
@@ -169,7 +169,7 @@ def _build_bulk_payload(type_codes: list, filter_type: str, window: dict) -> dic
         }
     return {
         "filters": {
-            "award_type_codes": type_codes,
+            "prime_award_types": prime_award_types,
             "date_type": "action_date",
             "date_range": {"start_date": window["start_date"], "end_date": window["end_date"]},
             **location,
@@ -419,7 +419,9 @@ def download_pass(
     stats = {"prefix": prefix, "rows": 0, "errors": []}
     logger.info(f"  [{prefix}] Running {len(windows)} FY windows (filter={filter_type})")
 
-    for window in windows:
+    for i, window in enumerate(windows):
+        if i > 0:
+            time.sleep(2)  # avoid overwhelming the API between jobs
         result = _run_one_window(
             session, prefix, type_codes, filter_type,
             window, raw_dir, force, logger,
