@@ -72,8 +72,8 @@ MAX_POLL_S      = 1800  # 30 minutes
 MAX_RETRIES    = 3
 RETRY_BACKOFF  = [30, 60, 120]  # generous backoff — USASpending drops connections when flooded
 
-CIRCUIT_BREAKER_THRESHOLD = 3    # consecutive failures before pausing
-CIRCUIT_BREAKER_SLEEP_S   = 900  # 15 minutes — enough for API to drain its backlog
+CIRCUIT_BREAKER_THRESHOLD = 3     # consecutive failures before pausing
+CIRCUIT_BREAKER_SLEEP_S   = 2700  # 45 minutes — full USASpending rate-limit reset window
 
 # (output_prefix, prime_award_types numeric codes, filter_type)
 # bulk_download uses prime_award_types with the same numeric codes as spending_by_award
