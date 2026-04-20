@@ -260,7 +260,7 @@ def _download_zip(
     """Stream-download the bulk ZIP file to disk. Returns True on success."""
     logger.info(f"  Downloading ZIP...")
     try:
-        resp = session.get(file_url, timeout=300, stream=True)
+        resp = session.get(file_url, timeout=(30, 1800), stream=True)
         resp.raise_for_status()
         zip_path.parent.mkdir(parents=True, exist_ok=True)
         with open(zip_path, "wb") as fh:
@@ -387,8 +387,17 @@ def _run_one_window(
         result["error"] = "job did not complete"
         return result
 
-    if not _download_zip(session, file_url, zip_path, logger):
-        result["error"] = "ZIP download failed"
+    zip_ok = False
+    for attempt in range(MAX_RETRIES):
+        if _download_zip(session, file_url, zip_path, logger):
+            zip_ok = True
+            break
+        if attempt < MAX_RETRIES - 1:
+            wait = RETRY_BACKOFF[attempt]
+            logger.warning(f"  ZIP download attempt {attempt + 1} failed — retrying in {wait}s")
+            time.sleep(wait)
+    if not zip_ok:
+        result["error"] = "ZIP download failed after 3 attempts"
         return result
 
     df = _extract_csv(zip_path, logger)
