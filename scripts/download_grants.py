@@ -90,9 +90,9 @@ BULK_RENAME = {
     "awarding_sub_agency_name":                   "awarding_sub_agency",
     "total_obligated_amount":                     "obligated_amount",
     "period_of_performance_start_date":           "award_date",
-    "primary_place_of_performance_state_code":    "pop_state",
+    "primary_place_of_performance_state_name":    "pop_state",
     "primary_place_of_performance_county_name":   "pop_county",
-    "award_description":                          "description",
+    "transaction_description":                    "description",
     "assistance_type_description":                "award_category",
 }
 
@@ -317,15 +317,19 @@ def _normalize_bulk_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
         )
     df = df.rename(columns={k: v for k, v in BULK_RENAME.items() if k in df.columns})
 
-    # award_id: prefer award_id_fain (already renamed above); if empty, use award_unique_key
-    if "award_id" in df.columns and "award_unique_key" in df.columns:
+    # award_id: prefer award_id_fain (already renamed above); fallback to assistance_award_unique_key
+    _fallback_key = "assistance_award_unique_key"
+    if "award_id" in df.columns:
         empty_mask = df["award_id"].isna() | (df["award_id"].str.strip() == "")
-        df.loc[empty_mask, "award_id"] = df.loc[empty_mask, "award_unique_key"]
-    elif "award_unique_key" in df.columns:
-        df["award_id"] = df["award_unique_key"]
+        if empty_mask.any() and _fallback_key in df.columns:
+            df.loc[empty_mask, "award_id"] = df.loc[empty_mask, _fallback_key]
+    elif _fallback_key in df.columns:
+        df["award_id"] = df[_fallback_key]
 
-    # Derive fiscal_year
-    if "award_date" in df.columns:
+    # fiscal_year: use authoritative field from USASpending; derive as fallback
+    if "action_date_fiscal_year" in df.columns:
+        df["fiscal_year"] = df["action_date_fiscal_year"].astype(str).str.strip()
+    elif "award_date" in df.columns:
         df["fiscal_year"] = df["award_date"].apply(_derive_fiscal_year)
     else:
         df["fiscal_year"] = ""
@@ -529,7 +533,10 @@ def _run(
     total_rows = 0
     pass_stats = []
 
-    for prefix, type_codes, filter_type in passes:
+    for i, (prefix, type_codes, filter_type) in enumerate(passes):
+        if i > 0:
+            logger.info("  Sleeping 5 min between passes to let API recover...")
+            time.sleep(300)
         logger.info(f"\n[Pass: {prefix}] types={type_codes}, filter={filter_type}")
         try:
             stats = download_pass(
