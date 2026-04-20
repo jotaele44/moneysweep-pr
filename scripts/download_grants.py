@@ -72,6 +72,9 @@ MAX_POLL_S      = 1800  # 30 minutes
 MAX_RETRIES    = 3
 RETRY_BACKOFF  = [30, 60, 120]  # generous backoff — USASpending drops connections when flooded
 
+CIRCUIT_BREAKER_THRESHOLD = 3    # consecutive failures before pausing
+CIRCUIT_BREAKER_SLEEP_S   = 900  # 15 minutes — enough for API to drain its backlog
+
 # (output_prefix, prime_award_types numeric codes, filter_type)
 # bulk_download uses prime_award_types with the same numeric codes as spending_by_award
 PASSES = [
@@ -441,16 +444,30 @@ def download_pass(
     stats = {"prefix": prefix, "rows": 0, "errors": []}
     logger.info(f"  [{prefix}] Running {len(windows)} FY windows (filter={filter_type})")
 
+    consecutive_failures = 0
+
     for i, window in enumerate(windows):
         if i > 0:
             time.sleep(10)  # avoid overwhelming the API between jobs
+
+        if consecutive_failures >= CIRCUIT_BREAKER_THRESHOLD:
+            logger.warning(
+                f"  [{prefix}] {consecutive_failures} consecutive failures — "
+                f"sleeping {CIRCUIT_BREAKER_SLEEP_S // 60} min to let API recover..."
+            )
+            time.sleep(CIRCUIT_BREAKER_SLEEP_S)
+            consecutive_failures = 0
+
         result = _run_one_window(
             session, prefix, type_codes, filter_type,
             window, raw_dir, force, logger,
         )
         stats["rows"] += result["rows"]
         if result["error"]:
+            consecutive_failures += 1
             stats["errors"].append(f"FY{result['fy']}: {result['error']}")
+        else:
+            consecutive_failures = 0
 
     logger.info(f"  [{prefix}] Total: {stats['rows']:,} rows, {len(stats['errors'])} errors")
     return stats
