@@ -72,13 +72,13 @@ MAX_POLL_S      = 1800  # 30 minutes
 MAX_RETRIES    = 3
 RETRY_BACKOFF  = [2, 4, 8]
 
-# (output_prefix, prime_award_types, filter_type)
-# bulk_download uses category names, not numeric codes
+# (output_prefix, prime_award_types numeric codes, filter_type)
+# bulk_download uses prime_award_types with the same numeric codes as spending_by_award
 PASSES = [
-    ("grants_pop",       ["grants"],          "pop"),
-    ("grants_recipient", ["grants"],          "recipient"),
-    ("direct_recipient", ["direct_payments"], "recipient"),
-    ("loans_recipient",  ["loans"],           "recipient"),
+    ("grants_pop",       ["02", "03", "04", "05"], "pop"),
+    ("grants_recipient", ["02", "03", "04", "05"], "recipient"),
+    ("direct_recipient", ["06"],                   "recipient"),
+    ("loans_recipient",  ["07", "08"],             "recipient"),
 ]
 
 # Bulk download CSVs use snake_case column names (different from spending_by_award fields)
