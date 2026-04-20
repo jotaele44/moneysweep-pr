@@ -70,7 +70,7 @@ POLL_INTERVAL_S = 15
 MAX_POLL_S      = 1800  # 30 minutes
 
 MAX_RETRIES    = 3
-RETRY_BACKOFF  = [2, 4, 8]
+RETRY_BACKOFF  = [30, 60, 120]  # generous backoff — USASpending drops connections when flooded
 
 # (output_prefix, prime_award_types numeric codes, filter_type)
 # bulk_download uses prime_award_types with the same numeric codes as spending_by_award
@@ -439,7 +439,7 @@ def download_pass(
 
     for i, window in enumerate(windows):
         if i > 0:
-            time.sleep(2)  # avoid overwhelming the API between jobs
+            time.sleep(10)  # avoid overwhelming the API between jobs
         result = _run_one_window(
             session, prefix, type_codes, filter_type,
             window, raw_dir, force, logger,
