@@ -325,9 +325,25 @@ def _records_to_df(records: list[dict], source_file: str) -> pd.DataFrame:
                 return df[c]
         return pd.Series("", index=df.index)
 
-    state_series = col(df, "State", "state", "BorrowerState")
-    mask = state_series.str.strip().str.upper().isin({"PR", "PUERTO RICO", "72"})
-    df = df[mask].copy()
+    import logging as _logging
+    _log = _logging.getLogger("download_sba")
+    _log.info(f"  Raw columns ({len(df.columns)}): {list(df.columns[:12])}")
+
+    # Try to find a state column; if none found keep all rows (CKAN already pre-filtered to PR)
+    state_col_found = next(
+        (c for c in ("State", "state", "BorrowerState", "BORROWERSTATE",
+                     "Borrower State", "StateCode", "State Code")
+         if c in df.columns),
+        None,
+    )
+    if state_col_found:
+        state_series = df[state_col_found].fillna("").str.strip().str.upper()
+        _log.info(f"  State column '{state_col_found}' unique values (top 10): {sorted(state_series.unique())[:10]}")
+        mask = state_series.isin({"PR", "PUERTO RICO", "72"})
+        df = df[mask].copy()
+        _log.info(f"  After PR filter: {len(df):,} rows")
+    else:
+        _log.warning("  No state column found — keeping all rows (assuming CKAN pre-filtered to PR)")
 
     if df.empty:
         return pd.DataFrame(columns=MASTER_COLUMNS)
