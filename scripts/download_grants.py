@@ -189,7 +189,7 @@ def _submit_bulk_job(
     for attempt in range(MAX_RETRIES):
         try:
             resp = session.post(BULK_DOWNLOAD_URL, json=payload, timeout=60)
-            if 400 <= resp.status_code < 500:
+            if 400 <= resp.status_code < 600:
                 logger.error(f"  Job submission HTTP {resp.status_code}: {resp.text[:300]}")
                 return None
             resp.raise_for_status()
@@ -535,8 +535,8 @@ def _run(
 
     for i, (prefix, type_codes, filter_type) in enumerate(passes):
         if i > 0:
-            logger.info("  Sleeping 5 min between passes to let API recover...")
-            time.sleep(300)
+            logger.info("  Sleeping 10 min between passes to let API recover...")
+            time.sleep(600)
         logger.info(f"\n[Pass: {prefix}] types={type_codes}, filter={filter_type}")
         try:
             stats = download_pass(
