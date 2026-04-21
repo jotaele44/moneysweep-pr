@@ -145,11 +145,12 @@ def _derive_fiscal_year(date_str) -> str:
 
 
 def _file_has_data(filepath: Path) -> bool:
-    """Return True if file exists and has at least one data row."""
+    """Return True if file exists and is a readable CSV (including header-only / 0-row results)."""
     if not filepath.exists():
         return False
     try:
-        return len(pd.read_csv(filepath, dtype=str, nrows=2, low_memory=False)) > 0
+        pd.read_csv(filepath, dtype=str, nrows=0, low_memory=False)
+        return True
     except Exception:
         return False
 
