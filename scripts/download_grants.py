@@ -365,7 +365,7 @@ def _run_one_window(
     fname  = f"{prefix}_fy{fy}.csv"
     csv_path = raw_dir / fname
     zip_path = raw_dir / f"{prefix}_fy{fy}.zip"
-    result = {"fy": fy, "rows": 0, "error": None}
+    result = {"fy": fy, "rows": 0, "error": None, "skipped": False}
 
     if not force and _file_has_data(csv_path):
         try:
@@ -374,6 +374,7 @@ def _run_one_window(
             rows = 0
         logger.info(f"    Skipping {fname} (exists, {rows:,} rows)")
         result["rows"] = rows
+        result["skipped"] = True
         return result
 
     payload = _build_bulk_payload(type_codes, filter_type, window)
@@ -444,10 +445,11 @@ def download_pass(
     logger.info(f"  [{prefix}] Running {len(windows)} FY windows (filter={filter_type})")
 
     consecutive_failures = 0
+    prev_was_api_call = False
 
     for i, window in enumerate(windows):
-        if i > 0:
-            time.sleep(10)  # avoid overwhelming the API between jobs
+        if i > 0 and prev_was_api_call:
+            time.sleep(10)  # only throttle between real API submissions
 
         if consecutive_failures >= CIRCUIT_BREAKER_THRESHOLD:
             logger.warning(
@@ -462,10 +464,11 @@ def download_pass(
             window, raw_dir, force, logger,
         )
         stats["rows"] += result["rows"]
+        prev_was_api_call = not result.get("skipped", False)
         if result["error"]:
             consecutive_failures += 1
             stats["errors"].append(f"FY{result['fy']}: {result['error']}")
-        else:
+        elif not result.get("skipped"):
             consecutive_failures = 0
 
     logger.info(f"  [{prefix}] Total: {stats['rows']:,} rows, {len(stats['errors'])} errors")
