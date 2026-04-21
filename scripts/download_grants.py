@@ -297,8 +297,6 @@ def _extract_csv(zip_path: Path, logger) -> pd.DataFrame:
                     )
                     frames.append(df)
                     logger.info(f"  {name}: {len(df):,} rows, {len(df.columns)} cols")
-                    # Log actual column names on first file to diagnose BULK_RENAME mapping
-                    logger.info(f"  Columns: {list(df.columns)}")
             return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
     except Exception as e:
         logger.error(f"  ZIP extraction failed: {e}")

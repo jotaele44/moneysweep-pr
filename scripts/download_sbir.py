@@ -113,12 +113,12 @@ def _paginate(session: requests.Session, logger) -> list[dict]:
     """
     all_records = []
 
-    for base_url, count_field, data_field, start_param in [
-        (SBIR_API_URL,    "totalCount", "data",    "start"),
-        (SBIR_SEARCH_URL, "total",      "results", "start"),
+    for base_url, count_field, data_field, start_param, size_param, state_param in [
+        (SBIR_API_URL,    "totalCount", "data",    "start", "rows",  "state"),
+        (SBIR_SEARCH_URL, "total",      "results", "start", "count", "firm_state"),
     ]:
         logger.info(f"  Trying endpoint: {base_url}")
-        params = {"firm_state": "PR", "count": PAGE_SIZE, "start": 0}
+        params = {state_param: "PR", size_param: PAGE_SIZE, "start": 0}
         data = _get(session, base_url, params, logger)
         if data is None:
             continue
