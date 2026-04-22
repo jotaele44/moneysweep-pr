@@ -33,7 +33,7 @@ USAS_RECIPIENT_SEARCH = "https://api.usaspending.gov/api/v2/recipient/search/"
 USAS_RECIPIENT_DETAIL = "https://api.usaspending.gov/api/v2/recipient/{hash_or_id}/"
 RATE_DELAY = 0.3
 MATCH_THRESHOLD = 0.75
-TOP_N_DEFAULT = 100
+TOP_N_DEFAULT = 10_000  # analyze all significant entities, not just top 100
 
 
 # ---------------------------------------------------------------------------

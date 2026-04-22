@@ -147,7 +147,7 @@ def _discover_pr_filers(session: requests.Session, logger) -> list[dict]:
         "forms":    "10-K",
         "dateRange": "custom",
         "startdt":  "2018-01-01",
-        "enddt":    "2024-12-31",
+        "enddt":    __import__("datetime").date.today().strftime("%Y-%m-%d"),
     }
     data = _get(session, url, params, logger)
     if not data:
@@ -156,7 +156,7 @@ def _discover_pr_filers(session: requests.Session, logger) -> list[dict]:
     hits  = data.get("hits", {}).get("hits", [])
     known_ciks = {e["cik"] for e in PR_DOMICILED + PR_SIGNIFICANT}
     discovered = []
-    for hit in hits[:50]:   # cap at 50 to avoid noise
+    for hit in hits:
         src = hit.get("_source", {})
         cik = str(src.get("entity_id", "")).zfill(10)
         if cik and cik not in known_ciks:
