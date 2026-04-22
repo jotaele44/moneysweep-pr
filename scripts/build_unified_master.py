@@ -63,6 +63,32 @@ NEW_MASTERS = [
 ]
 
 # ---------------------------------------------------------------------------
+# Expansion contracts (IDV, DoD corridor, reconstruction) from auto_download.py
+# These live in data/staging/expansion/ and use USASpending spending_by_award
+# column names rather than the canonical schema.
+# ---------------------------------------------------------------------------
+
+EXPANSION_FILES = [
+    "expansion_idv_indirect_pr.csv",
+    "expansion_dod_upr_2001_2015.csv",
+    "expansion_dod_upr_2016_2025.csv",
+    "expansion_reconstruction_2017_2025.csv",
+]
+
+EXPANSION_RENAME = {
+    "Award ID":                        "award_id",
+    "Recipient Name":                  "recipient_name",
+    "Awarding Agency":                 "awarding_agency",
+    "Awarding Sub Agency":             "awarding_sub_agency",
+    "Total Obligation":                "obligated_amount",
+    "Start Date":                      "award_date",
+    "Place of Performance State Code": "pop_state",
+    "Place of Performance City":       "pop_county",
+    "Description":                     "description",
+    "generated_internal_id":           "_fallback_id",
+}
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
@@ -207,6 +233,38 @@ def run(root=None) -> dict:
             frames.append(df_new)
         except Exception as exc:
             logger.error(f"  Failed to read {filename}: {exc} — skipping")
+
+    # ------------------------------------------------------------------
+    # 3b. Read expansion contracts (IDV, DoD, reconstruction)
+    # ------------------------------------------------------------------
+    expansion_dir = root / "data" / "staging" / "expansion"
+    for fname in EXPANSION_FILES:
+        fpath = expansion_dir / fname
+        if not fpath.exists():
+            logger.info(f"  {fname} not found — run auto_download.py --only=usaspending")
+            continue
+        try:
+            df_exp = pd.read_csv(fpath, dtype=str, low_memory=False)
+            if df_exp.empty:
+                logger.info(f"  {fname}: empty")
+                continue
+            df_exp = df_exp.rename(columns={k: v for k, v in EXPANSION_RENAME.items() if k in df_exp.columns})
+            # award_id: prefer Award ID rename; fall back to generated_internal_id
+            if "award_id" not in df_exp.columns or df_exp["award_id"].isna().all():
+                if "_fallback_id" in df_exp.columns:
+                    df_exp["award_id"] = df_exp["_fallback_id"]
+            df_exp.pop("_fallback_id", None)
+            df_exp["source_file"]    = fname
+            df_exp["source_dataset"] = "contracts"
+            df_exp["award_category"] = "contract"
+            for col in CANONICAL_COLUMNS:
+                if col not in df_exp.columns:
+                    df_exp[col] = ""
+            df_exp = df_exp[CANONICAL_COLUMNS]
+            logger.info(f"  {fname}: {len(df_exp):,} rows")
+            frames.append(df_exp)
+        except Exception as exc:
+            logger.error(f"  Failed to read {fname}: {exc} — skipping")
 
     # ------------------------------------------------------------------
     # 4. Concatenate all frames
