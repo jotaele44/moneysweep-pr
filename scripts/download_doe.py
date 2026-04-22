@@ -9,7 +9,7 @@ Two filter passes per time window:
   - place_of_performance_locations: work performed in PR
   - recipient_locations: PR-based recipients
 
-Time windows: FY2000-2009, FY2010-2017, FY2018-2022, FY2023-2025
+Time windows: FY2000-2009, FY2010-2017, FY2018-2022, FY2023-2026
 
 Output:
   data/staging/raw/doe/doe_pop_<label>.csv
@@ -61,7 +61,7 @@ TIME_WINDOWS = [
     {"label": "2000f2009", "start_date": "2007-10-01", "end_date": "2009-09-30", "fy_start": 2000},
     {"label": "2010f2017", "start_date": "2010-10-01", "end_date": "2017-09-30", "fy_start": 2010},
     {"label": "2018f2022", "start_date": "2018-10-01", "end_date": "2022-09-30", "fy_start": 2018},
-    {"label": "2023f2025", "start_date": "2023-10-01", "end_date": "2025-09-30", "fy_start": 2023},
+    {"label": "2023f2026", "start_date": "2023-10-01", "end_date": "2026-09-30", "fy_start": 2023},
 ]
 
 MASTER_COLUMNS = [

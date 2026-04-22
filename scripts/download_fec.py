@@ -44,7 +44,12 @@ RETRY_BACKOFF  = [5, 15, 30]
 
 # Election cycles covered (FEC uses even years: the cycle ending that year)
 START_CYCLE = 2000
-END_CYCLE   = 2024
+# FEC cycles are even years; dynamically include the current cycle
+def _current_fec_cycle() -> int:
+    from datetime import date
+    y = date.today().year
+    return y if y % 2 == 0 else y + 1
+END_CYCLE = _current_fec_cycle()
 
 OUTPUT_COLUMNS = [
     "cycle",

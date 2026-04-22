@@ -40,7 +40,7 @@ PER_PAGE      = 100          # max per request
 PAGE_SLEEP    = 0.5
 MAX_RETRIES   = 3
 RETRY_BACKOFF = [5, 15, 30]
-MAX_PAGES     = 200          # safety cap (~20 000 companies)
+MAX_PAGES     = 2000         # safety cap; PR registry unlikely to exceed 200k companies
 
 COMPANY_COLUMNS = [
     "company_number", "name", "jurisdiction_code", "company_type",

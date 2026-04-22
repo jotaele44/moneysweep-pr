@@ -11,7 +11,7 @@ Three filter passes per time window:
   - loans recipient  (07-08): USDA direct/guaranteed loans to PR recipients
     (loans use recipient_locations only — PoP is often administrative)
 
-Time windows: FY2000-2009, FY2010-2017, FY2018-2022, FY2023-2025
+Time windows: FY2000-2009, FY2010-2017, FY2018-2022, FY2023-2026
 
 Output:
   data/staging/raw/usda/usda_grants_pop_<label>.csv
@@ -67,7 +67,7 @@ TIME_WINDOWS = [
     {"label": "2000f2009", "start_date": "2007-10-01", "end_date": "2009-09-30", "fy_start": 2000},
     {"label": "2010f2017", "start_date": "2010-10-01", "end_date": "2017-09-30", "fy_start": 2010},
     {"label": "2018f2022", "start_date": "2018-10-01", "end_date": "2022-09-30", "fy_start": 2018},
-    {"label": "2023f2025", "start_date": "2023-10-01", "end_date": "2025-09-30", "fy_start": 2023},
+    {"label": "2023f2026", "start_date": "2023-10-01", "end_date": "2026-09-30", "fy_start": 2023},
 ]
 
 # (file_prefix, award_type_codes, filter_type, location_key)

@@ -153,7 +153,7 @@ def download_nih(root: Path, force: bool, logger) -> pd.DataFrame:
             "criteria": {
                 "org_states": ["PR"],
                 "date_start": "2000-01-01",
-                "date_end": "2025-12-31",
+                "date_end": __import__("datetime").date.today().strftime("%Y-%m-%d"),
             },
             "include_fields": [
                 "ApplId",
@@ -302,7 +302,7 @@ def download_nsf(root: Path, force: bool, logger) -> pd.DataFrame:
             ),
             "offset": offset,
             "dateStart": "01/01/2000",
-            "dateEnd": "12/31/2025",
+            "dateEnd": __import__("datetime").date.today().strftime("%m/%d/%Y"),
         }
 
         try:

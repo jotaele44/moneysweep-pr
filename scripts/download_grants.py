@@ -53,7 +53,12 @@ BULK_STATUS_URL   = "https://api.usaspending.gov/api/v2/bulk_download/status/"
 # API constraint: date_range must be within one year (≤ 365/366 days per job).
 # We use one job per fiscal year (Oct 1 → Sep 30).
 START_FY = 2000   # FY2000 = Oct 1999 - Sep 2000
-END_FY   = 2025   # FY2025 = Oct 2024 - Sep 2025
+# Dynamically track the current fiscal year so new data is always included
+def _current_fy() -> int:
+    from datetime import date
+    d = date.today()
+    return d.year + 1 if d.month >= 10 else d.year
+END_FY = _current_fy()
 
 def _fy_windows(start_fy: int = START_FY, end_fy: int = END_FY) -> list[dict]:
     """Generate one dict per fiscal year: {label, start_date, end_date}."""
