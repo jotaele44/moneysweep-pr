@@ -1,9 +1,81 @@
 {
-  "total_rows": 0,
-  "total_obligation_usd": 0.0,
-  "by_dataset": {},
-  "by_fiscal_year": {},
-  "unique_recipients": 0,
+  "total_rows": 4503,
+  "total_obligation_usd": 63866298263.11,
+  "by_dataset": {
+    "doe": {
+      "rows": 450,
+      "total_obligation": 5635436257.93
+    },
+    "dot": {
+      "rows": 450,
+      "total_obligation": 6178924478.059999
+    },
+    "fema_hmgp": {
+      "rows": 127,
+      "total_obligation": 1399503487.7099996
+    },
+    "fema_pa": {
+      "rows": 276,
+      "total_obligation": 4306681428.41
+    },
+    "grants": {
+      "rows": 800,
+      "total_obligation": 12277993904.529999
+    },
+    "hud": {
+      "rows": 450,
+      "total_obligation": 5454984735.0
+    },
+    "sba_loans": {
+      "rows": 300,
+      "total_obligation": 3388146539.29
+    },
+    "sbir": {
+      "rows": 400,
+      "total_obligation": 5624805605.26
+    },
+    "slfrf": {
+      "rows": 200,
+      "total_obligation": 2923835941.1899996
+    },
+    "subawards": {
+      "rows": 600,
+      "total_obligation": 9104580307.33
+    },
+    "usda": {
+      "rows": 450,
+      "total_obligation": 7571405578.4
+    }
+  },
+  "by_fiscal_year": {
+    "2000": 66,
+    "2001": 71,
+    "2002": 81,
+    "2003": 76,
+    "2004": 70,
+    "2005": 78,
+    "2006": 67,
+    "2007": 65,
+    "2008": 61,
+    "2009": 66,
+    "2010": 161,
+    "2011": 168,
+    "2012": 183,
+    "2013": 173,
+    "2014": 167,
+    "2015": 161,
+    "2016": 193,
+    "2017": 168,
+    "2018": 255,
+    "2019": 259,
+    "2020": 261,
+    "2021": 231,
+    "2022": 268,
+    "2023": 387,
+    "2024": 389,
+    "2025": 378
+  },
+  "unique_recipients": 18,
   "outputs": {
     "unified_master": "/home/user/Contract-Sweeper/data/staging/processed/pr_all_awards_master.csv"
   }
