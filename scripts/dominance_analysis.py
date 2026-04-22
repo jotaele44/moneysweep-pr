@@ -31,15 +31,23 @@ TOP_N_DEFAULT = 25
 def load_master(root: Path) -> pd.DataFrame:
     """Load enriched master (preferred) or plain master."""
     enriched = root / "data" / "staging" / "processed" / "enrichment" / "master_enriched.csv"
-    plain = root / "data" / "staging" / "processed" / "pr_contracts_master.csv"
-    path = enriched if enriched.exists() else plain
+    plain    = root / "data" / "staging" / "processed" / "pr_contracts_master.csv"
+    unified  = root / "data" / "staging" / "processed" / "pr_all_awards_master.csv"
+    path = enriched if enriched.exists() else (plain if plain.exists() else unified)
     if not path.exists():
         raise FileNotFoundError(f"No master CSV at {path}")
     df = pd.read_csv(path, dtype=str, low_memory=False)
     df["obligated_amount"] = pd.to_numeric(df.get("obligated_amount"), errors="coerce").fillna(0)
     df["fiscal_year"] = pd.to_numeric(df.get("fiscal_year"), errors="coerce")
-    df["vendor_name"] = df.get("vendor_name", pd.Series(dtype=str)).fillna("").str.strip()
-    df["agency_name"] = df.get("agency_name", pd.Series(dtype=str)).fillna("UNKNOWN").str.strip()
+    # Support both old (vendor_name/agency_name) and unified (recipient_name/awarding_agency) schemas
+    if "vendor_name" not in df.columns:
+        df["vendor_name"] = df.get("recipient_name", pd.Series(dtype=str)).fillna("").str.strip()
+    else:
+        df["vendor_name"] = df["vendor_name"].fillna("").str.strip()
+    if "agency_name" not in df.columns:
+        df["agency_name"] = df.get("awarding_agency", pd.Series(dtype=str)).fillna("UNKNOWN").str.strip()
+    else:
+        df["agency_name"] = df["agency_name"].fillna("UNKNOWN").str.strip()
     return df
 
 
