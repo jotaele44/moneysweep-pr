@@ -626,8 +626,13 @@ def main() -> int:
     if args.skip_bulk_downloads:
         logger.info("[Step 15/25] SKIPPED (--skip-bulk-downloads)\n")
     else:
-        logger.info("[Step 15/25] Downloading SBA loans, SLFRF, CDBG-DR...")
-        for name, mod in [("SBA", "download_sba"), ("SLFRF", "download_slfrf"), ("CDBG-DR", "download_cdbg_dr")]:
+        logger.info("[Step 15/25] Downloading SBA loans, SLFRF, CDBG-DR, SBIR...")
+        for name, mod in [
+            ("SBA",     "download_sba"),
+            ("SLFRF",   "download_slfrf"),
+            ("CDBG-DR", "download_cdbg_dr"),
+            ("SBIR",    "download_sbir"),
+        ]:
             try:
                 import importlib
                 m = importlib.import_module(f"scripts.{mod}")

@@ -175,6 +175,22 @@ def run(root: Path = None, min_obligation: float = MIN_OBLIGATION_DEFAULT, top_n
     nx.write_graphml(G, str(graphml_path))
     logger.info(f"  GraphML written: {graphml_path.name}")
 
+    # Flat CSV export of all edges for tabular analysis
+    edge_rows = []
+    for u, v, data in G.edges(data=True):
+        edge_rows.append({
+            "source_entity":    u,
+            "target":           v,
+            "total_obligation": data.get("weight", 0),
+            "contract_count":   data.get("contract_count", 0),
+            "fy_min":           data.get("fy_min", ""),
+            "fy_max":           data.get("fy_max", ""),
+            "edge_type":        data.get("edge_type", ""),
+        })
+    edges_path = graph_dir / "entity_edges.csv"
+    pd.DataFrame(edge_rows).to_csv(edges_path, index=False, encoding="utf-8")
+    logger.info(f"  Entity edges: {edges_path.name} ({len(edge_rows):,} edges)")
+
     # Top nodes by PageRank
     if metrics:
         top = sorted(metrics.values(), key=lambda x: x["pagerank"], reverse=True)[:top_nodes]
@@ -206,6 +222,7 @@ def run(root: Path = None, min_obligation: float = MIN_OBLIGATION_DEFAULT, top_n
         "outputs": {
             "graphml": str(graphml_path),
             "top_nodes": str(graph_dir / "top_nodes.csv"),
+            "entity_edges": str(edges_path),
             "summary": str(graph_dir / "network_summary.json"),
         }
     }

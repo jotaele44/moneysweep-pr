@@ -68,6 +68,26 @@ CANONICAL_COLUMNS = [
     "source_dataset", "award_category",
 ]
 
+# Source priority for deterministic deduplication (lower = higher priority)
+SOURCE_PRIORITY = {
+    "contracts": 1, "grants": 1, "subawards": 1,
+    "fema_pa": 1, "fema_hmgp": 1, "research": 1,
+    "sba_loans": 1, "slfrf": 1, "cdbg_dr": 1,
+    "dot": 1, "usda": 1, "doe": 1, "hud": 1,
+    "sbir": 2,
+}
+EXPANSION_PRIORITY = 3  # expansion/ files (IDV, DoD, reconstruction)
+
+REQUIRED_MASTER_COLUMNS = [
+    "award_id", "recipient_name", "obligated_amount",
+    "award_date", "source_dataset", "award_category",
+]
+NULL_THRESHOLDS = {
+    "award_id":         0.00,
+    "recipient_name":   0.05,
+    "obligated_amount": 0.20,
+}
+
 ALL_DIRS = [DATA_DIR, STAGING_DIR, EXPANSION_DIR, PROCESSED_DIR, RAW_DIR, LOGS_DIR] + EXPANDED_RAW_DIRS
 
 # ---------------------------------------------------------------------------

@@ -12,10 +12,14 @@ Usage:
   python3 scripts/build_unified_master.py --force  # rebuild even if exists
 """
 
+import re
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from scripts.config import PROJECT_ROOT, PROCESSED_DIR, setup_logging
+from scripts.config import (
+    PROJECT_ROOT, PROCESSED_DIR, setup_logging,
+    SOURCE_PRIORITY, EXPANSION_PRIORITY, REQUIRED_MASTER_COLUMNS, NULL_THRESHOLDS,
+)
 import pandas as pd
 import argparse
 import json
@@ -28,6 +32,7 @@ import json
 CANONICAL_COLUMNS = [
     "award_id",
     "recipient_name",
+    "recipient_name_normalized",
     "recipient_uei",
     "awarding_agency",
     "awarding_sub_agency",
@@ -91,6 +96,18 @@ EXPANSION_RENAME = {
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+_STRIP_RE = re.compile(r"[^\w\s]")
+_SPACE_RE = re.compile(r"\s+")
+
+
+def _normalize_name(name: str) -> str:
+    if not name or pd.isna(name):
+        return ""
+    n = str(name).upper()
+    n = _STRIP_RE.sub(" ", n)
+    return _SPACE_RE.sub(" ", n).strip()
+
 
 _POP_STATE_MAP = {
     "puerto rico": "PR",
@@ -296,13 +313,21 @@ def run(root=None) -> dict:
         logger.info(f"  Deduplication: removed {removed:,} within-dataset duplicates ({after_dedup:,} rows remain)")
 
     # ------------------------------------------------------------------
-    # 5a. Global award_id dedup across all datasets
+    # 5a. Global award_id dedup — priority-based (lower number wins)
     # ------------------------------------------------------------------
+    unified["_priority"] = unified["source_dataset"].map(SOURCE_PRIORITY).fillna(EXPANSION_PRIORITY).astype(int)
+    unified = unified.sort_values(["award_id", "_priority"], na_position="last")
     before_global = len(unified)
     unified = unified.drop_duplicates(subset=["award_id"], keep="first")
+    unified = unified.drop(columns=["_priority"])
     removed_global = before_global - len(unified)
     if removed_global:
-        logger.info(f"  Global dedup: removed {removed_global:,} cross-dataset duplicate award_ids ({len(unified):,} rows remain)")
+        logger.info(f"  Priority dedup: removed {removed_global:,} lower-priority duplicates ({len(unified):,} rows remain)")
+
+    # ------------------------------------------------------------------
+    # 5b. Compute recipient_name_normalized
+    # ------------------------------------------------------------------
+    unified["recipient_name_normalized"] = unified["recipient_name"].apply(_normalize_name)
 
     # ------------------------------------------------------------------
     # 6. Standardize pop_state
@@ -319,10 +344,79 @@ def run(root=None) -> dict:
         logger.info(f"  Derived fiscal_year for {missing_fy_mask.sum():,} rows")
 
     # ------------------------------------------------------------------
+    # 7b. Validation gates
+    # ------------------------------------------------------------------
+    output_path = processed_dir / "pr_all_awards_master.csv"
+
+    # Schema drift: hard fail if required columns missing
+    missing_cols = [c for c in REQUIRED_MASTER_COLUMNS if c not in unified.columns]
+    if missing_cols:
+        raise RuntimeError(f"Schema drift — required columns missing: {missing_cols}")
+
+    # Null thresholds: soft warning
+    for col, max_null in NULL_THRESHOLDS.items():
+        if col in unified.columns:
+            null_rate = unified[col].isna().mean()
+            if null_rate > max_null:
+                logger.warning(
+                    f"  VALIDATION: {col} null rate {null_rate:.1%} exceeds "
+                    f"{max_null:.0%} threshold"
+                )
+
+    # Uniqueness assertion on non-empty award_ids
+    n_nonempty = unified[unified["award_id"].notna() & (unified["award_id"] != "")].copy()
+    n_unique = n_nonempty["award_id"].nunique()
+    n_deduped = len(n_nonempty)
+    if n_unique != n_deduped:
+        dup_count = n_deduped - n_unique
+        logger.error(
+            f"  ASSERTION: {dup_count:,} non-empty award_ids still duplicated "
+            f"({n_unique:,} unique / {n_deduped:,} non-empty rows)"
+        )
+        top_dups = (
+            n_nonempty[n_nonempty["award_id"].duplicated(keep=False)]
+            ["award_id"].value_counts().head(5)
+        )
+        logger.error(f"  Top duplicate IDs: {top_dups.to_dict()}")
+    else:
+        logger.info(f"  Uniqueness check PASSED: {n_unique:,} unique non-empty award_ids")
+
+    # Volume growth check: warn if new master is <80% of previous
+    if output_path.exists():
+        try:
+            with open(output_path) as _f:
+                prev_rows = sum(1 for _ in _f) - 1
+            if prev_rows > 0:
+                pct_change = (len(unified) - prev_rows) / prev_rows * 100
+                if len(unified) < prev_rows * 0.80:
+                    logger.error(
+                        f"  VOLUME CHECK FAILED: {len(unified):,} rows is "
+                        f"{pct_change:.1f}% vs previous {prev_rows:,} rows"
+                    )
+                else:
+                    logger.info(
+                        f"  Volume change: {len(unified):,} rows ({pct_change:+.1f}% "
+                        f"vs previous {prev_rows:,})"
+                    )
+        except Exception:
+            pass
+
+    # Fiscal year gap detection
+    fy_present = set(
+        str(int(float(y))) for y in unified["fiscal_year"].dropna()
+        if str(y).strip() not in ("", "nan")
+    )
+    fy_expected = set(str(y) for y in range(2000, 2026))
+    fy_gaps = sorted(fy_expected - fy_present)
+    if fy_gaps:
+        logger.warning(f"  Fiscal year gaps detected: {fy_gaps}")
+    else:
+        logger.info("  Fiscal year coverage 2000-2025: complete")
+
+    # ------------------------------------------------------------------
     # 8. Write unified master CSV
     # ------------------------------------------------------------------
     processed_dir.mkdir(parents=True, exist_ok=True)
-    output_path = processed_dir / "pr_all_awards_master.csv"
     unified.to_csv(output_path, index=False, encoding="utf-8")
     logger.info(f"  Written: {output_path} ({len(unified):,} rows)")
 
@@ -369,6 +463,44 @@ def run(root=None) -> dict:
     with open(summary_path, "w", encoding="utf-8") as fh:
         json.dump(summary, fh, indent=2)
     logger.info(f"  Written: {summary_path}")
+
+    # ------------------------------------------------------------------
+    # 10b. Write entity_master.csv — one row per unique normalized entity
+    # ------------------------------------------------------------------
+    unified["_amount_num2"] = pd.to_numeric(unified["obligated_amount"], errors="coerce").fillna(0.0)
+
+    def _yr_range(series):
+        vals = pd.to_numeric(series, errors="coerce").dropna()
+        if vals.empty:
+            return ""
+        lo, hi = int(vals.min()), int(vals.max())
+        return str(lo) if lo == hi else f"{lo}-{hi}"
+
+    entity_master = (
+        unified[unified["recipient_name_normalized"] != ""]
+        .groupby("recipient_name_normalized")
+        .agg(
+            canonical_name    = ("recipient_name",     "first"),
+            recipient_uei     = ("recipient_uei",      "first"),
+            total_obligated   = ("_amount_num2",       "sum"),
+            award_count       = ("award_id",           "nunique"),
+            source_datasets   = ("source_dataset",     lambda x: "|".join(sorted(x.dropna().unique()))),
+            awarding_agencies = ("awarding_agency",    lambda x: "|".join(sorted(x.dropna().unique())[:5])),
+            first_award_date  = ("award_date",         "min"),
+            last_award_date   = ("award_date",         "max"),
+            fiscal_year_range = ("fiscal_year",        _yr_range),
+        )
+        .reset_index()
+        .rename(columns={"recipient_name_normalized": "entity_key"})
+        .sort_values("total_obligated", ascending=False)
+        .reset_index(drop=True)
+    )
+    entity_master_path = processed_dir / "entity_master.csv"
+    entity_master.to_csv(entity_master_path, index=False, encoding="utf-8")
+    logger.info(f"  Entity master: {entity_master_path.name} ({len(entity_master):,} unique entities)")
+
+    summary["outputs"]["entity_master"] = str(entity_master_path)
+    unified.drop(columns=["_amount_num2"], inplace=True, errors="ignore")
 
     # Clean up temporary column
     unified.drop(columns=["_amount_num"], inplace=True, errors="ignore")
