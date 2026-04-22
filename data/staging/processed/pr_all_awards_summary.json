@@ -1,0 +1,10 @@
+{
+  "total_rows": 0,
+  "total_obligation_usd": 0.0,
+  "by_dataset": {},
+  "by_fiscal_year": {},
+  "unique_recipients": 0,
+  "outputs": {
+    "unified_master": "/home/user/Contract-Sweeper/data/staging/processed/pr_all_awards_master.csv"
+  }
+}
