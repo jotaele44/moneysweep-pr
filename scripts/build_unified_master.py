@@ -99,6 +99,11 @@ EXPANSION_RENAME = {
 
 _STRIP_RE = re.compile(r"[^\w\s]")
 _SPACE_RE = re.compile(r"\s+")
+_NAME_SUFFIXES = {
+    "INC", "LLC", "LLP", "CORP", "CO", "LTD", "LP", "PC",
+    "PLLC", "DBA", "THE", "AND", "OF", "SA", "SRL",
+    "HOSPITAL", "HEALTH", "CENTER", "CENTRE",
+}
 
 
 def _normalize_name(name: str) -> str:
@@ -106,7 +111,11 @@ def _normalize_name(name: str) -> str:
         return ""
     n = str(name).upper()
     n = _STRIP_RE.sub(" ", n)
-    return _SPACE_RE.sub(" ", n).strip()
+    n = _SPACE_RE.sub(" ", n).strip()
+    tokens = n.split()
+    while tokens and tokens[-1] in _NAME_SUFFIXES:
+        tokens.pop()
+    return " ".join(tokens)
 
 
 _POP_STATE_MAP = {
