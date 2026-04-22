@@ -1,0 +1,27 @@
+node,node_type,degree,in_degree,out_degree,pagerank,betweenness
+Caribbean Data Services Inc,vendor,8,0,8,0.0,0.0
+Department of Agriculture,agency,18,18,0,0.0,0.206667
+Department of Defense,agency,18,18,0,0.0,0.166667
+Department of Energy,agency,18,18,0,0.0,0.086667
+Department of Health and Human Services,agency,18,18,0,0.0,0.09
+Department of Housing and Urban Development,agency,18,18,0,0.0,0.03
+Department of Transportation,agency,18,18,0,0.0,0.02
+Federal Emergency Management Agency,agency,18,18,0,0.0,0.0
+Small Business Administration,agency,18,18,0,0.0,0.12
+Centro Medico Del Turabo Inc,vendor,8,0,8,0.0,0.0
+Corporacion Del Fondo Del Seguro Del Estado,vendor,8,0,8,0.0,0.0
+Crowley Maritime Corp,vendor,8,0,8,0.0,0.003333
+First Bancorp Puerto Rico,vendor,8,0,8,0.0,0.006667
+Hewlett Packard Puerto Rico LLC,vendor,8,0,8,0.0,0.006667
+Hospital Damas Inc,vendor,8,0,8,0.0,0.0
+Interamerican University of Puerto Rico Inc,vendor,8,0,8,0.0,0.003333
+Microsoft Puerto Rico Inc,vendor,8,0,8,0.0,0.013333
+Municipality of Bayamon,vendor,8,0,8,0.0,0.016667
+Municipality of San Juan,vendor,8,0,8,0.0,0.0
+Municipio de Ponce,vendor,8,0,8,0.0,0.003333
+Popular Inc,vendor,8,0,8,0.0,0.0
+Puerto Rico Aqueduct And Sewer Authority,vendor,8,0,8,0.0,0.006667
+Puerto Rico Electric Power Authority,vendor,8,0,8,0.0,0.136667
+Puerto Rico Industrial Development Company,vendor,8,0,8,0.0,0.076667
+Triple-S Management Corp,vendor,8,0,8,0.0,0.03
+University of Puerto Rico,vendor,8,0,8,0.0,0.0

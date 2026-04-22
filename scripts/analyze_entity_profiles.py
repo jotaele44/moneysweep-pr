@@ -289,17 +289,25 @@ def build_profiles(root: Path = None) -> dict:
     # ------------------------------------------------------------------
     # Summary
     # ------------------------------------------------------------------
-    np_matched   = int(merged.get("is_nonprofit",        pd.Series([False]*len(merged))).sum())
-    med_matched  = int(merged.get("is_medicare_provider", pd.Series([False]*len(merged))).sum())
-    bank_matched = int(merged.get("is_fdic_bank",         pd.Series([False]*len(merged))).sum())
-    multi_match  = int(((merged.get("is_nonprofit", False).astype(int) +
-                         merged.get("is_medicare_provider", False).astype(int) +
-                         merged.get("is_fdic_bank", False).astype(int)) >= 2).sum())
+    def _flag_col(name):
+        col = merged.get(name)
+        if col is None or not isinstance(col, pd.Series):
+            return pd.Series([False] * len(merged), index=merged.index, dtype=bool)
+        return col.fillna(False).astype(bool)
+
+    flag_np   = _flag_col("is_nonprofit")
+    flag_med  = _flag_col("is_medicare_provider")
+    flag_bank = _flag_col("is_fdic_bank")
+
+    np_matched   = int(flag_np.sum())
+    med_matched  = int(flag_med.sum())
+    bank_matched = int(flag_bank.sum())
+    multi_match  = int(((flag_np.astype(int) + flag_med.astype(int) + flag_bank.astype(int)) >= 2).sum())
 
     total_awards = float(merged["total_awards_obligated"].sum())
-    np_awards    = float(pd.to_numeric(merged[merged.get("is_nonprofit", False) == True]["total_awards_obligated"],
+    np_awards    = float(pd.to_numeric(merged.loc[flag_np, "total_awards_obligated"],
                                        errors="coerce").sum()) if np_matched else 0
-    med_awards   = float(pd.to_numeric(merged[merged.get("is_medicare_provider", False) == True]["total_awards_obligated"],
+    med_awards   = float(pd.to_numeric(merged.loc[flag_med, "total_awards_obligated"],
                                        errors="coerce").sum()) if med_matched else 0
 
     logger.info("=" * 60)
@@ -315,9 +323,9 @@ def build_profiles(root: Path = None) -> dict:
     logger.info(f"\n  Top 10 by awards — with supplementary source flags:")
     for _, row in merged.head(10).iterrows():
         flags = []
-        if row.get("is_nonprofit"):        flags.append("990")
-        if row.get("is_medicare_provider"): flags.append("CMS")
-        if row.get("is_fdic_bank"):         flags.append("FDIC")
+        if row.get("is_nonprofit")  is True or row.get("is_nonprofit")  == True:  flags.append("990")
+        if row.get("is_medicare_provider") is True or row.get("is_medicare_provider") == True: flags.append("CMS")
+        if row.get("is_fdic_bank") is True or row.get("is_fdic_bank") == True: flags.append("FDIC")
         flag_str = "[" + "|".join(flags) + "]" if flags else ""
         name  = str(row["recipient_name"])[:50]
         award = float(row["total_awards_obligated"])

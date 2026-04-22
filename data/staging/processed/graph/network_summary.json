@@ -1,0 +1,15 @@
+{
+  "total_nodes": 26,
+  "total_edges": 144,
+  "vendor_nodes": 18,
+  "agency_nodes": 8,
+  "parent_entity_nodes": 0,
+  "top_node_by_pagerank": "Caribbean Data Services Inc",
+  "top_node_type": "vendor",
+  "outputs": {
+    "graphml": "/home/user/Contract-Sweeper/data/staging/processed/graph/network.graphml",
+    "top_nodes": "/home/user/Contract-Sweeper/data/staging/processed/graph/top_nodes.csv",
+    "entity_edges": "/home/user/Contract-Sweeper/data/staging/processed/graph/entity_edges.csv",
+    "summary": "/home/user/Contract-Sweeper/data/staging/processed/graph/network_summary.json"
+  }
+}
