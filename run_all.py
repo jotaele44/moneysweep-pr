@@ -276,7 +276,7 @@ def main() -> int:
     parser.add_argument("--skip-research", action="store_true",
                         help="Skip step 14 (download NIH + NSF research grants)")
     parser.add_argument("--skip-bulk-downloads", action="store_true",
-                        help="Skip step 15 (download SBA loans, SLFRF, CDBG-DR)")
+                        help="Skip step 15 (download SBA loans, SLFRF, CDBG-DR, SBIR)")
     parser.add_argument("--skip-unified-master", action="store_true",
                         help="Skip step 16 (build unified awards master across all datasets)")
     parser.add_argument("--skip-fec", action="store_true",
