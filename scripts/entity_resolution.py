@@ -107,7 +107,8 @@ def load_vendor_rankings(root: Path, top_n: int) -> list[dict]:
     # Prefer master_enriched (has UEI already)
     enriched = root / "data" / "staging" / "processed" / "enrichment" / "master_enriched.csv"
     master = root / "data" / "staging" / "processed" / "pr_contracts_master.csv"
-    source_path = enriched if enriched.exists() else master
+    unified = root / "data" / "staging" / "processed" / "pr_all_awards_master.csv"
+    source_path = enriched if enriched.exists() else (master if master.exists() else unified)
 
     if not source_path.exists():
         raise FileNotFoundError(f"No master CSV found at {source_path}")
@@ -115,7 +116,8 @@ def load_vendor_rankings(root: Path, top_n: int) -> list[dict]:
     vendor_totals: dict[str, dict] = {}
     with open(source_path, encoding="utf-8-sig") as f:
         for row in csv.DictReader(f):
-            vn = (row.get("vendor_name") or "").strip()
+            # Support both old (vendor_name) and unified (recipient_name) schemas
+            vn = (row.get("vendor_name") or row.get("recipient_name") or "").strip()
             if not vn:
                 continue
             try:

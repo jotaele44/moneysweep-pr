@@ -1,0 +1,203 @@
+{
+  "prime_count": 18,
+  "sub_count": 18,
+  "pair_count": 268,
+  "sub_only_count": 0,
+  "total_sub_flow": 9104580307.33,
+  "top_primes": [
+    {
+      "prime_recipient": "Centro Medico Del Turabo Inc",
+      "total_flow": 881089379.83,
+      "sub_count": 18
+    },
+    {
+      "prime_recipient": "Puerto Rico Aqueduct And Sewer Authority",
+      "total_flow": 731409934.0600001,
+      "sub_count": 15
+    },
+    {
+      "prime_recipient": "Municipality of Bayamon",
+      "total_flow": 693120535.9,
+      "sub_count": 13
+    },
+    {
+      "prime_recipient": "Corporacion Del Fondo Del Seguro Del Estado",
+      "total_flow": 622769406.59,
+      "sub_count": 17
+    },
+    {
+      "prime_recipient": "Caribbean Data Services Inc",
+      "total_flow": 572409122.95,
+      "sub_count": 12
+    },
+    {
+      "prime_recipient": "Hospital Damas Inc",
+      "total_flow": 542734765.11,
+      "sub_count": 17
+    },
+    {
+      "prime_recipient": "Puerto Rico Electric Power Authority",
+      "total_flow": 526632668.68,
+      "sub_count": 15
+    },
+    {
+      "prime_recipient": "First Bancorp Puerto Rico",
+      "total_flow": 493226832.98,
+      "sub_count": 15
+    },
+    {
+      "prime_recipient": "Popular Inc",
+      "total_flow": 486189321.22999996,
+      "sub_count": 14
+    },
+    {
+      "prime_recipient": "Interamerican University of Puerto Rico Inc",
+      "total_flow": 462023312.37,
+      "sub_count": 14
+    }
+  ],
+  "top_subs": [
+    {
+      "sub_recipient": "Caribbean Data Services Inc",
+      "total_flow": 877295007.8299999,
+      "prime_count": 16
+    },
+    {
+      "sub_recipient": "Hospital Damas Inc",
+      "total_flow": 817655335.39,
+      "prime_count": 17
+    },
+    {
+      "sub_recipient": "Municipio de Ponce",
+      "total_flow": 760986679.44,
+      "prime_count": 16
+    },
+    {
+      "sub_recipient": "Hewlett Packard Puerto Rico LLC",
+      "total_flow": 697277122.77,
+      "prime_count": 16
+    },
+    {
+      "sub_recipient": "Crowley Maritime Corp",
+      "total_flow": 662649636.41,
+      "prime_count": 15
+    },
+    {
+      "sub_recipient": "Microsoft Puerto Rico Inc",
+      "total_flow": 596978934.9300001,
+      "prime_count": 17
+    },
+    {
+      "sub_recipient": "Interamerican University of Puerto Rico Inc",
+      "total_flow": 550282265.53,
+      "prime_count": 11
+    },
+    {
+      "sub_recipient": "Municipality of San Juan",
+      "total_flow": 496547640.94,
+      "prime_count": 16
+    },
+    {
+      "sub_recipient": "Centro Medico Del Turabo Inc",
+      "total_flow": 484794872.36,
+      "prime_count": 16
+    },
+    {
+      "sub_recipient": "Puerto Rico Aqueduct And Sewer Authority",
+      "total_flow": 469363266.47999996,
+      "prime_count": 16
+    }
+  ],
+  "top_pairs": [
+    {
+      "prime_recipient": "Centro Medico Del Turabo Inc",
+      "sub_recipient": "Interamerican University of Puerto Rico Inc",
+      "total_flow": 246309495.42000002,
+      "contract_count": 6,
+      "awarding_agencies": "Department of Defense|Department of Energy|Department of Housing and Urban Development",
+      "prime_award_ids": "PRIME-SUB-2016-00000940|PRIME-SUB-2016-00001282|PRIME-SUB-2017-00001146|PRIME-SUB-2018-00001356|PRIME-SUB-2023-00001318",
+      "fiscal_year_range": "2016-2024"
+    },
+    {
+      "prime_recipient": "Municipio de Ponce",
+      "sub_recipient": "Hewlett Packard Puerto Rico LLC",
+      "total_flow": 191173656.29,
+      "contract_count": 5,
+      "awarding_agencies": "Department of Defense|Department of Health and Human Services|Department of Housing and Urban Development",
+      "prime_award_ids": "PRIME-SUB-2018-00001372|PRIME-SUB-2022-00000916|PRIME-SUB-2023-00001038|PRIME-SUB-2023-00001456|PRIME-SUB-2025-00001186",
+      "fiscal_year_range": "2018-2025"
+    },
+    {
+      "prime_recipient": "Puerto Rico Aqueduct And Sewer Authority",
+      "sub_recipient": "Puerto Rico Aqueduct And Sewer Authority",
+      "total_flow": 174162152.76,
+      "contract_count": 4,
+      "awarding_agencies": "Department of Housing and Urban Development|Federal Emergency Management Agency|Small Business Administration",
+      "prime_award_ids": "PRIME-SUB-2020-00000932|PRIME-SUB-2023-00001360|PRIME-SUB-2025-00001126|PRIME-SUB-2025-00001148",
+      "fiscal_year_range": "2020-2025"
+    },
+    {
+      "prime_recipient": "Popular Inc",
+      "sub_recipient": "Hospital Damas Inc",
+      "total_flow": 170833359.67,
+      "contract_count": 5,
+      "awarding_agencies": "Department of Defense|Department of Energy|Department of Housing and Urban Development",
+      "prime_award_ids": "PRIME-SUB-2014-00000862|PRIME-SUB-2019-00001300|PRIME-SUB-2023-00001434|PRIME-SUB-2024-00001172|PRIME-SUB-2024-00001488",
+      "fiscal_year_range": "2014-2024"
+    },
+    {
+      "prime_recipient": "Crowley Maritime Corp",
+      "sub_recipient": "Caribbean Data Services Inc",
+      "total_flow": 166500535.64999998,
+      "contract_count": 5,
+      "awarding_agencies": "Department of Agriculture|Department of Energy|Department of Transportation",
+      "prime_award_ids": "PRIME-SUB-2012-00000952|PRIME-SUB-2021-00001380|PRIME-SUB-2022-00001060|PRIME-SUB-2023-00001076|PRIME-SUB-2024-00001096",
+      "fiscal_year_range": "2012-2024"
+    },
+    {
+      "prime_recipient": "Puerto Rico Aqueduct And Sewer Authority",
+      "sub_recipient": "First Bancorp Puerto Rico",
+      "total_flow": 162995655.31,
+      "contract_count": 3,
+      "awarding_agencies": "Department of Defense|Department of Energy|Department of Housing and Urban Development",
+      "prime_award_ids": "PRIME-SUB-2018-00001054|PRIME-SUB-2025-00001028|PRIME-SUB-2025-00001052",
+      "fiscal_year_range": "2018-2025"
+    },
+    {
+      "prime_recipient": "Interamerican University of Puerto Rico Inc",
+      "sub_recipient": "Microsoft Puerto Rico Inc",
+      "total_flow": 159065867.79000002,
+      "contract_count": 3,
+      "awarding_agencies": "Department of Energy|Department of Transportation|Small Business Administration",
+      "prime_award_ids": "PRIME-SUB-2023-00001006|PRIME-SUB-2024-00001056|PRIME-SUB-2024-00001490",
+      "fiscal_year_range": "2023-2024"
+    },
+    {
+      "prime_recipient": "Hewlett Packard Puerto Rico LLC",
+      "sub_recipient": "Interamerican University of Puerto Rico Inc",
+      "total_flow": 158740770.51,
+      "contract_count": 3,
+      "awarding_agencies": "Department of Agriculture|Department of Defense|Small Business Administration",
+      "prime_award_ids": "PRIME-SUB-2018-00001272|PRIME-SUB-2023-00001496|PRIME-SUB-2024-00001398",
+      "fiscal_year_range": "2018-2024"
+    },
+    {
+      "prime_recipient": "Puerto Rico Aqueduct And Sewer Authority",
+      "sub_recipient": "Crowley Maritime Corp",
+      "total_flow": 157305635.55,
+      "contract_count": 4,
+      "awarding_agencies": "Department of Energy|Department of Housing and Urban Development|Department of Transportation",
+      "prime_award_ids": "PRIME-SUB-2010-00000830|PRIME-SUB-2014-00000916|PRIME-SUB-2022-00001282|PRIME-SUB-2023-00001454",
+      "fiscal_year_range": "2010-2023"
+    },
+    {
+      "prime_recipient": "Centro Medico Del Turabo Inc",
+      "sub_recipient": "Triple-S Management Corp",
+      "total_flow": 153546261.87,
+      "contract_count": 4,
+      "awarding_agencies": "Department of Defense|Department of Housing and Urban Development|Department of Transportation",
+      "prime_award_ids": "PRIME-SUB-2017-00000810|PRIME-SUB-2021-00001078|PRIME-SUB-2023-00001324|PRIME-SUB-2024-00001164",
+      "fiscal_year_range": "2017-2024"
+    }
+  ]
+}

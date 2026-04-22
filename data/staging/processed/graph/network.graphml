@@ -1,0 +1,1121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d6" for="edge" attr.name="edge_type" attr.type="string"/>
+<key id="d5" for="edge" attr.name="fy_max" attr.type="long"/>
+<key id="d4" for="edge" attr.name="fy_min" attr.type="long"/>
+<key id="d3" for="edge" attr.name="contract_count" attr.type="long"/>
+<key id="d2" for="edge" attr.name="weight" attr.type="double"/>
+<key id="d1" for="node" attr.name="label" attr.type="string"/>
+<key id="d0" for="node" attr.name="node_type" attr.type="string"/>
+<graph edgedefault="directed"><node id="Caribbean Data Services Inc">
+  <data key="d0">vendor</data>
+  <data key="d1">Caribbean Data Services Inc</data>
+</node>
+<node id="Department of Agriculture">
+  <data key="d0">agency</data>
+  <data key="d1">Department of Agriculture</data>
+</node>
+<node id="Department of Defense">
+  <data key="d0">agency</data>
+  <data key="d1">Department of Defense</data>
+</node>
+<node id="Department of Energy">
+  <data key="d0">agency</data>
+  <data key="d1">Department of Energy</data>
+</node>
+<node id="Department of Health and Human Services">
+  <data key="d0">agency</data>
+  <data key="d1">Department of Health and Human Services</data>
+</node>
+<node id="Department of Housing and Urban Development">
+  <data key="d0">agency</data>
+  <data key="d1">Department of Housing and Urban Development</data>
+</node>
+<node id="Department of Transportation">
+  <data key="d0">agency</data>
+  <data key="d1">Department of Transportation</data>
+</node>
+<node id="Federal Emergency Management Agency">
+  <data key="d0">agency</data>
+  <data key="d1">Federal Emergency Management Agency</data>
+</node>
+<node id="Small Business Administration">
+  <data key="d0">agency</data>
+  <data key="d1">Small Business Administration</data>
+</node>
+<node id="Centro Medico Del Turabo Inc">
+  <data key="d0">vendor</data>
+  <data key="d1">Centro Medico Del Turabo Inc</data>
+</node>
+<node id="Corporacion Del Fondo Del Seguro Del Estado">
+  <data key="d0">vendor</data>
+  <data key="d1">Corporacion Del Fondo Del Seguro Del Estado</data>
+</node>
+<node id="Crowley Maritime Corp">
+  <data key="d0">vendor</data>
+  <data key="d1">Crowley Maritime Corp</data>
+</node>
+<node id="First Bancorp Puerto Rico">
+  <data key="d0">vendor</data>
+  <data key="d1">First Bancorp Puerto Rico</data>
+</node>
+<node id="Hewlett Packard Puerto Rico LLC">
+  <data key="d0">vendor</data>
+  <data key="d1">Hewlett Packard Puerto Rico LLC</data>
+</node>
+<node id="Hospital Damas Inc">
+  <data key="d0">vendor</data>
+  <data key="d1">Hospital Damas Inc</data>
+</node>
+<node id="Interamerican University of Puerto Rico Inc">
+  <data key="d0">vendor</data>
+  <data key="d1">Interamerican University of Puerto Rico Inc</data>
+</node>
+<node id="Microsoft Puerto Rico Inc">
+  <data key="d0">vendor</data>
+  <data key="d1">Microsoft Puerto Rico Inc</data>
+</node>
+<node id="Municipality of Bayamon">
+  <data key="d0">vendor</data>
+  <data key="d1">Municipality of Bayamon</data>
+</node>
+<node id="Municipality of San Juan">
+  <data key="d0">vendor</data>
+  <data key="d1">Municipality of San Juan</data>
+</node>
+<node id="Municipio de Ponce">
+  <data key="d0">vendor</data>
+  <data key="d1">Municipio de Ponce</data>
+</node>
+<node id="Popular Inc">
+  <data key="d0">vendor</data>
+  <data key="d1">Popular Inc</data>
+</node>
+<node id="Puerto Rico Aqueduct And Sewer Authority">
+  <data key="d0">vendor</data>
+  <data key="d1">Puerto Rico Aqueduct And Sewer Authority</data>
+</node>
+<node id="Puerto Rico Electric Power Authority">
+  <data key="d0">vendor</data>
+  <data key="d1">Puerto Rico Electric Power Authority</data>
+</node>
+<node id="Puerto Rico Industrial Development Company">
+  <data key="d0">vendor</data>
+  <data key="d1">Puerto Rico Industrial Development Company</data>
+</node>
+<node id="Triple-S Management Corp">
+  <data key="d0">vendor</data>
+  <data key="d1">Triple-S Management Corp</data>
+</node>
+<node id="University of Puerto Rico">
+  <data key="d0">vendor</data>
+  <data key="d1">University of Puerto Rico</data>
+</node>
+<edge source="Caribbean Data Services Inc" target="Department of Agriculture">
+  <data key="d2">454545017.24</data>
+  <data key="d3">41</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Caribbean Data Services Inc" target="Department of Defense">
+  <data key="d2">337729027.09</data>
+  <data key="d3">37</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Caribbean Data Services Inc" target="Department of Energy">
+  <data key="d2">379350319.31</data>
+  <data key="d3">26</data>
+  <data key="d4">2010</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Caribbean Data Services Inc" target="Department of Health and Human Services">
+  <data key="d2">563063966.84</data>
+  <data key="d3">34</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Caribbean Data Services Inc" target="Department of Housing and Urban Development">
+  <data key="d2">606068825.47</data>
+  <data key="d3">28</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Caribbean Data Services Inc" target="Department of Transportation">
+  <data key="d2">338223813.73</data>
+  <data key="d3">25</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Caribbean Data Services Inc" target="Federal Emergency Management Agency">
+  <data key="d2">808307725.87</data>
+  <data key="d3">48</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Caribbean Data Services Inc" target="Small Business Administration">
+  <data key="d2">408106899.85</data>
+  <data key="d3">38</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Centro Medico Del Turabo Inc" target="Department of Agriculture">
+  <data key="d2">277836662.65</data>
+  <data key="d3">24</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Centro Medico Del Turabo Inc" target="Department of Defense">
+  <data key="d2">453721838.94</data>
+  <data key="d3">34</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Centro Medico Del Turabo Inc" target="Department of Energy">
+  <data key="d2">551217992.91</data>
+  <data key="d3">28</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Centro Medico Del Turabo Inc" target="Department of Health and Human Services">
+  <data key="d2">485300329.51</data>
+  <data key="d3">31</data>
+  <data key="d4">2003</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Centro Medico Del Turabo Inc" target="Department of Housing and Urban Development">
+  <data key="d2">278726201.06</data>
+  <data key="d3">25</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Centro Medico Del Turabo Inc" target="Department of Transportation">
+  <data key="d2">292617487.59</data>
+  <data key="d3">25</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Centro Medico Del Turabo Inc" target="Federal Emergency Management Agency">
+  <data key="d2">685771668.94</data>
+  <data key="d3">51</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Centro Medico Del Turabo Inc" target="Small Business Administration">
+  <data key="d2">331402462.51</data>
+  <data key="d3">27</data>
+  <data key="d4">2002</data>
+  <data key="d5">2024</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Corporacion Del Fondo Del Seguro Del Estado" target="Department of Agriculture">
+  <data key="d2">313077400.48</data>
+  <data key="d3">29</data>
+  <data key="d4">2003</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Corporacion Del Fondo Del Seguro Del Estado" target="Department of Defense">
+  <data key="d2">170579123.77</data>
+  <data key="d3">33</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Corporacion Del Fondo Del Seguro Del Estado" target="Department of Energy">
+  <data key="d2">442520289.13</data>
+  <data key="d3">33</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Corporacion Del Fondo Del Seguro Del Estado" target="Department of Health and Human Services">
+  <data key="d2">438328672.26</data>
+  <data key="d3">30</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Corporacion Del Fondo Del Seguro Del Estado" target="Department of Housing and Urban Development">
+  <data key="d2">538672093.19</data>
+  <data key="d3">42</data>
+  <data key="d4">2003</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Corporacion Del Fondo Del Seguro Del Estado" target="Department of Transportation">
+  <data key="d2">365598145.27</data>
+  <data key="d3">29</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Corporacion Del Fondo Del Seguro Del Estado" target="Federal Emergency Management Agency">
+  <data key="d2">686375361.81</data>
+  <data key="d3">48</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Corporacion Del Fondo Del Seguro Del Estado" target="Small Business Administration">
+  <data key="d2">308832254.29</data>
+  <data key="d3">21</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Crowley Maritime Corp" target="Department of Agriculture">
+  <data key="d2">124828862.81</data>
+  <data key="d3">23</data>
+  <data key="d4">2004</data>
+  <data key="d5">2024</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Crowley Maritime Corp" target="Department of Defense">
+  <data key="d2">303095778.25</data>
+  <data key="d3">28</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Crowley Maritime Corp" target="Department of Energy">
+  <data key="d2">644289869.94</data>
+  <data key="d3">31</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Crowley Maritime Corp" target="Department of Health and Human Services">
+  <data key="d2">660599989.88</data>
+  <data key="d3">35</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Crowley Maritime Corp" target="Department of Housing and Urban Development">
+  <data key="d2">355657791.56</data>
+  <data key="d3">31</data>
+  <data key="d4">2003</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Crowley Maritime Corp" target="Department of Transportation">
+  <data key="d2">693006209.47</data>
+  <data key="d3">32</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Crowley Maritime Corp" target="Federal Emergency Management Agency">
+  <data key="d2">693658478.59</data>
+  <data key="d3">43</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Crowley Maritime Corp" target="Small Business Administration">
+  <data key="d2">510991220.62</data>
+  <data key="d3">27</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="First Bancorp Puerto Rico" target="Department of Agriculture">
+  <data key="d2">255282638.91</data>
+  <data key="d3">29</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="First Bancorp Puerto Rico" target="Department of Defense">
+  <data key="d2">501382932.78</data>
+  <data key="d3">28</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="First Bancorp Puerto Rico" target="Department of Energy">
+  <data key="d2">198375122.36</data>
+  <data key="d3">29</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="First Bancorp Puerto Rico" target="Department of Health and Human Services">
+  <data key="d2">539334395.94</data>
+  <data key="d3">14</data>
+  <data key="d4">2002</data>
+  <data key="d5">2024</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="First Bancorp Puerto Rico" target="Department of Housing and Urban Development">
+  <data key="d2">405722931.81</data>
+  <data key="d3">21</data>
+  <data key="d4">2003</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="First Bancorp Puerto Rico" target="Department of Transportation">
+  <data key="d2">464418475.78</data>
+  <data key="d3">32</data>
+  <data key="d4">2008</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="First Bancorp Puerto Rico" target="Federal Emergency Management Agency">
+  <data key="d2">920377329.74</data>
+  <data key="d3">46</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="First Bancorp Puerto Rico" target="Small Business Administration">
+  <data key="d2">329513617.39</data>
+  <data key="d3">24</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hewlett Packard Puerto Rico LLC" target="Department of Agriculture">
+  <data key="d2">361466820.4</data>
+  <data key="d3">36</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hewlett Packard Puerto Rico LLC" target="Department of Defense">
+  <data key="d2">348090603.37</data>
+  <data key="d3">31</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hewlett Packard Puerto Rico LLC" target="Department of Energy">
+  <data key="d2">316162399.34</data>
+  <data key="d3">30</data>
+  <data key="d4">2008</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hewlett Packard Puerto Rico LLC" target="Department of Health and Human Services">
+  <data key="d2">198104396.37</data>
+  <data key="d3">27</data>
+  <data key="d4">2008</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hewlett Packard Puerto Rico LLC" target="Department of Housing and Urban Development">
+  <data key="d2">183343965.83</data>
+  <data key="d3">28</data>
+  <data key="d4">2003</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hewlett Packard Puerto Rico LLC" target="Department of Transportation">
+  <data key="d2">429161536.43</data>
+  <data key="d3">24</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hewlett Packard Puerto Rico LLC" target="Federal Emergency Management Agency">
+  <data key="d2">596162028.65</data>
+  <data key="d3">41</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hewlett Packard Puerto Rico LLC" target="Small Business Administration">
+  <data key="d2">823743382.43</data>
+  <data key="d3">43</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hospital Damas Inc" target="Department of Agriculture">
+  <data key="d2">492036524.22</data>
+  <data key="d3">24</data>
+  <data key="d4">2000</data>
+  <data key="d5">2024</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hospital Damas Inc" target="Department of Defense">
+  <data key="d2">501226513.57</data>
+  <data key="d3">31</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hospital Damas Inc" target="Department of Energy">
+  <data key="d2">216190403.34</data>
+  <data key="d3">24</data>
+  <data key="d4">2011</data>
+  <data key="d5">2024</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hospital Damas Inc" target="Department of Health and Human Services">
+  <data key="d2">393046995.87</data>
+  <data key="d3">31</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hospital Damas Inc" target="Department of Housing and Urban Development">
+  <data key="d2">493041427.8</data>
+  <data key="d3">29</data>
+  <data key="d4">2006</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hospital Damas Inc" target="Department of Transportation">
+  <data key="d2">527278491.86</data>
+  <data key="d3">26</data>
+  <data key="d4">2005</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hospital Damas Inc" target="Federal Emergency Management Agency">
+  <data key="d2">1258039016.0</data>
+  <data key="d3">58</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Hospital Damas Inc" target="Small Business Administration">
+  <data key="d2">673424377.59</data>
+  <data key="d3">29</data>
+  <data key="d4">2007</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Interamerican University of Puerto Rico Inc" target="Department of Agriculture">
+  <data key="d2">382020033.66</data>
+  <data key="d3">27</data>
+  <data key="d4">2003</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Interamerican University of Puerto Rico Inc" target="Department of Defense">
+  <data key="d2">376322497.15</data>
+  <data key="d3">32</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Interamerican University of Puerto Rico Inc" target="Department of Energy">
+  <data key="d2">525812773.29</data>
+  <data key="d3">32</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Interamerican University of Puerto Rico Inc" target="Department of Health and Human Services">
+  <data key="d2">330740254.01</data>
+  <data key="d3">23</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Interamerican University of Puerto Rico Inc" target="Department of Housing and Urban Development">
+  <data key="d2">250108264.71</data>
+  <data key="d3">20</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Interamerican University of Puerto Rico Inc" target="Department of Transportation">
+  <data key="d2">204140336.04</data>
+  <data key="d3">30</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Interamerican University of Puerto Rico Inc" target="Federal Emergency Management Agency">
+  <data key="d2">983847756.19</data>
+  <data key="d3">44</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Interamerican University of Puerto Rico Inc" target="Small Business Administration">
+  <data key="d2">436925201.44</data>
+  <data key="d3">31</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Microsoft Puerto Rico Inc" target="Department of Agriculture">
+  <data key="d2">407787216.57</data>
+  <data key="d3">35</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Microsoft Puerto Rico Inc" target="Department of Defense">
+  <data key="d2">196929285.41</data>
+  <data key="d3">28</data>
+  <data key="d4">2003</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Microsoft Puerto Rico Inc" target="Department of Energy">
+  <data key="d2">282083261.57</data>
+  <data key="d3">24</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Microsoft Puerto Rico Inc" target="Department of Health and Human Services">
+  <data key="d2">420648788.86</data>
+  <data key="d3">23</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Microsoft Puerto Rico Inc" target="Department of Housing and Urban Development">
+  <data key="d2">304109648.25</data>
+  <data key="d3">25</data>
+  <data key="d4">2004</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Microsoft Puerto Rico Inc" target="Department of Transportation">
+  <data key="d2">702827800.55</data>
+  <data key="d3">36</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Microsoft Puerto Rico Inc" target="Federal Emergency Management Agency">
+  <data key="d2">844355406.44</data>
+  <data key="d3">63</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Microsoft Puerto Rico Inc" target="Small Business Administration">
+  <data key="d2">385751507.19</data>
+  <data key="d3">23</data>
+  <data key="d4">2007</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of Bayamon" target="Department of Agriculture">
+  <data key="d2">192873008.6</data>
+  <data key="d3">23</data>
+  <data key="d4">2005</data>
+  <data key="d5">2024</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of Bayamon" target="Department of Defense">
+  <data key="d2">204690381.37</data>
+  <data key="d3">19</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of Bayamon" target="Department of Energy">
+  <data key="d2">497092082.54</data>
+  <data key="d3">28</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of Bayamon" target="Department of Health and Human Services">
+  <data key="d2">137001672.12</data>
+  <data key="d3">21</data>
+  <data key="d4">2005</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of Bayamon" target="Department of Housing and Urban Development">
+  <data key="d2">301293203.61</data>
+  <data key="d3">22</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of Bayamon" target="Department of Transportation">
+  <data key="d2">497642310.41</data>
+  <data key="d3">28</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of Bayamon" target="Federal Emergency Management Agency">
+  <data key="d2">569239515.1</data>
+  <data key="d3">42</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of Bayamon" target="Small Business Administration">
+  <data key="d2">473924205.49</data>
+  <data key="d3">34</data>
+  <data key="d4">2003</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of San Juan" target="Department of Agriculture">
+  <data key="d2">584548368.08</data>
+  <data key="d3">34</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of San Juan" target="Department of Defense">
+  <data key="d2">515135648.26</data>
+  <data key="d3">31</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of San Juan" target="Department of Energy">
+  <data key="d2">444140309.26</data>
+  <data key="d3">28</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of San Juan" target="Department of Health and Human Services">
+  <data key="d2">642977004.3</data>
+  <data key="d3">36</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of San Juan" target="Department of Housing and Urban Development">
+  <data key="d2">962603984.05</data>
+  <data key="d3">36</data>
+  <data key="d4">2004</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of San Juan" target="Department of Transportation">
+  <data key="d2">517159085.26</data>
+  <data key="d3">28</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of San Juan" target="Federal Emergency Management Agency">
+  <data key="d2">506010038.14</data>
+  <data key="d3">70</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipality of San Juan" target="Small Business Administration">
+  <data key="d2">280481454.01</data>
+  <data key="d3">19</data>
+  <data key="d4">2004</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipio de Ponce" target="Department of Agriculture">
+  <data key="d2">406460566.58</data>
+  <data key="d3">30</data>
+  <data key="d4">2010</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipio de Ponce" target="Department of Defense">
+  <data key="d2">529311622.4</data>
+  <data key="d3">39</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipio de Ponce" target="Department of Energy">
+  <data key="d2">201433952.53</data>
+  <data key="d3">31</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipio de Ponce" target="Department of Health and Human Services">
+  <data key="d2">636952984.19</data>
+  <data key="d3">33</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipio de Ponce" target="Department of Housing and Urban Development">
+  <data key="d2">402994194.89</data>
+  <data key="d3">20</data>
+  <data key="d4">2003</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipio de Ponce" target="Department of Transportation">
+  <data key="d2">284186867.84</data>
+  <data key="d3">25</data>
+  <data key="d4">2005</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipio de Ponce" target="Federal Emergency Management Agency">
+  <data key="d2">826521499.13</data>
+  <data key="d3">49</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Municipio de Ponce" target="Small Business Administration">
+  <data key="d2">445026178.95</data>
+  <data key="d3">28</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Popular Inc" target="Department of Agriculture">
+  <data key="d2">360658903.83</data>
+  <data key="d3">29</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Popular Inc" target="Department of Defense">
+  <data key="d2">242493016.84</data>
+  <data key="d3">27</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Popular Inc" target="Department of Energy">
+  <data key="d2">531000381.39</data>
+  <data key="d3">31</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Popular Inc" target="Department of Health and Human Services">
+  <data key="d2">424881152.39</data>
+  <data key="d3">24</data>
+  <data key="d4">2006</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Popular Inc" target="Department of Housing and Urban Development">
+  <data key="d2">349838137.39</data>
+  <data key="d3">23</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Popular Inc" target="Department of Transportation">
+  <data key="d2">429262816.44</data>
+  <data key="d3">33</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Popular Inc" target="Federal Emergency Management Agency">
+  <data key="d2">642958431.58</data>
+  <data key="d3">48</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Popular Inc" target="Small Business Administration">
+  <data key="d2">408457792.97</data>
+  <data key="d3">31</data>
+  <data key="d4">2006</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Aqueduct And Sewer Authority" target="Department of Agriculture">
+  <data key="d2">350589952.91</data>
+  <data key="d3">25</data>
+  <data key="d4">2008</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Aqueduct And Sewer Authority" target="Department of Defense">
+  <data key="d2">516971832.73</data>
+  <data key="d3">29</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Aqueduct And Sewer Authority" target="Department of Energy">
+  <data key="d2">674662612.78</data>
+  <data key="d3">38</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Aqueduct And Sewer Authority" target="Department of Health and Human Services">
+  <data key="d2">418875720.87</data>
+  <data key="d3">46</data>
+  <data key="d4">2003</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Aqueduct And Sewer Authority" target="Department of Housing and Urban Development">
+  <data key="d2">317786059.02</data>
+  <data key="d3">38</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Aqueduct And Sewer Authority" target="Department of Transportation">
+  <data key="d2">575373790.41</data>
+  <data key="d3">30</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Aqueduct And Sewer Authority" target="Federal Emergency Management Agency">
+  <data key="d2">730048100.95</data>
+  <data key="d3">58</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Aqueduct And Sewer Authority" target="Small Business Administration">
+  <data key="d2">187755719.68</data>
+  <data key="d3">24</data>
+  <data key="d4">2002</data>
+  <data key="d5">2024</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Electric Power Authority" target="Department of Agriculture">
+  <data key="d2">71384199.1</data>
+  <data key="d3">21</data>
+  <data key="d4">2004</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Electric Power Authority" target="Department of Defense">
+  <data key="d2">28621466.41</data>
+  <data key="d3">18</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Electric Power Authority" target="Department of Energy">
+  <data key="d2">546012343.71</data>
+  <data key="d3">39</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Electric Power Authority" target="Department of Health and Human Services">
+  <data key="d2">449682914.44</data>
+  <data key="d3">22</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Electric Power Authority" target="Department of Housing and Urban Development">
+  <data key="d2">537179921.18</data>
+  <data key="d3">34</data>
+  <data key="d4">2004</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Electric Power Authority" target="Department of Transportation">
+  <data key="d2">262722317.09</data>
+  <data key="d3">22</data>
+  <data key="d4">2006</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Electric Power Authority" target="Federal Emergency Management Agency">
+  <data key="d2">469159456.33</data>
+  <data key="d3">48</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Electric Power Authority" target="Small Business Administration">
+  <data key="d2">548398973.73</data>
+  <data key="d3">35</data>
+  <data key="d4">2006</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Industrial Development Company" target="Department of Agriculture">
+  <data key="d2">226350295.33</data>
+  <data key="d3">21</data>
+  <data key="d4">2010</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Industrial Development Company" target="Department of Defense">
+  <data key="d2">620082910.88</data>
+  <data key="d3">34</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Industrial Development Company" target="Department of Energy">
+  <data key="d2">637764808.07</data>
+  <data key="d3">30</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Industrial Development Company" target="Department of Health and Human Services">
+  <data key="d2">132845695.55</data>
+  <data key="d3">22</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Industrial Development Company" target="Department of Housing and Urban Development">
+  <data key="d2">475194700.73</data>
+  <data key="d3">25</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Industrial Development Company" target="Department of Transportation">
+  <data key="d2">340869457.3</data>
+  <data key="d3">27</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Industrial Development Company" target="Federal Emergency Management Agency">
+  <data key="d2">575600749.32</data>
+  <data key="d3">46</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Puerto Rico Industrial Development Company" target="Small Business Administration">
+  <data key="d2">76719872.76</data>
+  <data key="d3">12</data>
+  <data key="d4">2001</data>
+  <data key="d5">2024</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Triple-S Management Corp" target="Department of Agriculture">
+  <data key="d2">479933743.64</data>
+  <data key="d3">37</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Triple-S Management Corp" target="Department of Defense">
+  <data key="d2">430930238.34</data>
+  <data key="d3">31</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Triple-S Management Corp" target="Department of Energy">
+  <data key="d2">108747810.45</data>
+  <data key="d3">23</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Triple-S Management Corp" target="Department of Health and Human Services">
+  <data key="d2">155048488.91</data>
+  <data key="d3">17</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Triple-S Management Corp" target="Department of Housing and Urban Development">
+  <data key="d2">349472921.99</data>
+  <data key="d3">35</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Triple-S Management Corp" target="Department of Transportation">
+  <data key="d2">498994983.96</data>
+  <data key="d3">29</data>
+  <data key="d4">2003</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Triple-S Management Corp" target="Federal Emergency Management Agency">
+  <data key="d2">684085345.01</data>
+  <data key="d3">51</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="Triple-S Management Corp" target="Small Business Administration">
+  <data key="d2">538684266.87</data>
+  <data key="d3">28</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="University of Puerto Rico" target="Department of Agriculture">
+  <data key="d2">150262339.36</data>
+  <data key="d3">23</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="University of Puerto Rico" target="Department of Defense">
+  <data key="d2">443821894.63</data>
+  <data key="d3">29</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="University of Puerto Rico" target="Department of Energy">
+  <data key="d2">576490590.7</data>
+  <data key="d3">32</data>
+  <data key="d4">2002</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="University of Puerto Rico" target="Department of Health and Human Services">
+  <data key="d2">316454550.79</data>
+  <data key="d3">23</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="University of Puerto Rico" target="Department of Housing and Urban Development">
+  <data key="d2">463603275.56</data>
+  <data key="d3">30</data>
+  <data key="d4">2004</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="University of Puerto Rico" target="Department of Transportation">
+  <data key="d2">354684889.35</data>
+  <data key="d3">25</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="University of Puerto Rico" target="Federal Emergency Management Agency">
+  <data key="d2">757228097.39</data>
+  <data key="d3">48</data>
+  <data key="d4">2000</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+<edge source="University of Puerto Rico" target="Small Business Administration">
+  <data key="d2">376512045.0</data>
+  <data key="d3">30</data>
+  <data key="d4">2001</data>
+  <data key="d5">2025</data>
+  <data key="d6">award</data>
+</edge>
+</graph></graphml>
