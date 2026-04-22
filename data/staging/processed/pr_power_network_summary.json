@@ -1,10 +1,12 @@
 {
   "total_entities": 18,
-  "total_awards_usd": 63866298263.10999,
-  "multi_source_count": 0,
-  "full_loop_count": 0,
+  "total_awards_usd": 63866298263.11,
+  "multi_source_count": 14,
+  "full_loop_count": 14,
   "sources_included": [
-    "awards"
+    "awards",
+    "fec",
+    "lda"
   ],
   "score_weights": {
     "awards": 0.35,
@@ -18,55 +20,173 @@
     {
       "rank": 1,
       "name": "Hospital Damas Inc",
-      "influence_score": 38.0,
+      "influence_score": 68.0,
       "awards_total": 4554283750.25,
-      "source_presence": 1,
+      "source_presence": 3,
       "sources": [
-        "awards"
+        "awards",
+        "fec",
+        "lda"
       ]
     },
     {
       "rank": 2,
       "name": "Municipality of San Juan",
-      "influence_score": 35.89,
+      "influence_score": 64.57,
       "awards_total": 4453055891.36,
-      "source_presence": 1,
+      "source_presence": 3,
       "sources": [
-        "awards"
+        "awards",
+        "fec",
+        "lda"
       ]
     },
     {
       "rank": 3,
       "name": "Crowley Maritime Corp",
-      "influence_score": 26.17,
+      "influence_score": 55.8,
       "awards_total": 3986128201.12,
-      "source_presence": 1,
+      "source_presence": 3,
       "sources": [
-        "awards"
+        "awards",
+        "fec",
+        "lda"
       ]
     },
     {
       "rank": 4,
       "name": "Caribbean Data Services Inc",
-      "influence_score": 24.28,
+      "influence_score": 52.78,
       "awards_total": 3895395595.4,
-      "source_presence": 1,
+      "source_presence": 3,
       "sources": [
-        "awards"
+        "awards",
+        "fec",
+        "lda"
       ]
     },
     {
       "rank": 5,
       "name": "Puerto Rico Aqueduct And Sewer Authority",
-      "influence_score": 21.71,
+      "influence_score": 52.01,
       "awards_total": 3772063789.35,
-      "source_presence": 1,
+      "source_presence": 3,
       "sources": [
-        "awards"
+        "awards",
+        "fec",
+        "lda"
       ]
     },
     {
       "rank": 6,
+      "name": "Microsoft Puerto Rico Inc",
+      "influence_score": 46.0,
+      "awards_total": 3544492914.84,
+      "source_presence": 3,
+      "sources": [
+        "awards",
+        "fec",
+        "lda"
+      ]
+    },
+    {
+      "rank": 7,
+      "name": "Interamerican University of Puerto Rico Inc",
+      "influence_score": 43.72,
+      "awards_total": 3489917116.49,
+      "source_presence": 3,
+      "sources": [
+        "awards",
+        "fec",
+        "lda"
+      ]
+    },
+    {
+      "rank": 8,
+      "name": "First Bancorp Puerto Rico",
+      "influence_score": 43.68,
+      "awards_total": 3614407444.71,
+      "source_presence": 3,
+      "sources": [
+        "awards",
+        "fec",
+        "lda"
+      ]
+    },
+    {
+      "rank": 9,
+      "name": "Centro Medico Del Turabo Inc",
+      "influence_score": 39.33,
+      "awards_total": 3356594644.11,
+      "source_presence": 3,
+      "sources": [
+        "awards",
+        "fec",
+        "lda"
+      ]
+    },
+    {
+      "rank": 10,
+      "name": "University of Puerto Rico",
+      "influence_score": 38.98,
+      "awards_total": 3439057682.78,
+      "source_presence": 3,
+      "sources": [
+        "awards",
+        "fec",
+        "lda"
+      ]
+    },
+    {
+      "rank": 11,
+      "name": "Popular Inc",
+      "influence_score": 38.2,
+      "awards_total": 3389550632.83,
+      "source_presence": 3,
+      "sources": [
+        "awards",
+        "fec",
+        "lda"
+      ]
+    },
+    {
+      "rank": 12,
+      "name": "Triple-S Management Corp",
+      "influence_score": 35.46,
+      "awards_total": 3245897799.17,
+      "source_presence": 3,
+      "sources": [
+        "awards",
+        "fec",
+        "lda"
+      ]
+    },
+    {
+      "rank": 13,
+      "name": "Hewlett Packard Puerto Rico LLC",
+      "influence_score": 30.92,
+      "awards_total": 3256235132.82,
+      "source_presence": 3,
+      "sources": [
+        "awards",
+        "fec",
+        "lda"
+      ]
+    },
+    {
+      "rank": 14,
+      "name": "Puerto Rico Electric Power Authority",
+      "influence_score": 30.76,
+      "awards_total": 2913161591.9900002,
+      "source_presence": 3,
+      "sources": [
+        "awards",
+        "fec",
+        "lda"
+      ]
+    },
+    {
+      "rank": 15,
       "name": "Municipio de Ponce",
       "influence_score": 20.89,
       "awards_total": 3732887866.51,
@@ -76,67 +196,7 @@
       ]
     },
     {
-      "rank": 7,
-      "name": "First Bancorp Puerto Rico",
-      "influence_score": 18.43,
-      "awards_total": 3614407444.71,
-      "source_presence": 1,
-      "sources": [
-        "awards"
-      ]
-    },
-    {
-      "rank": 8,
-      "name": "Microsoft Puerto Rico Inc",
-      "influence_score": 16.97,
-      "awards_total": 3544492914.84,
-      "source_presence": 1,
-      "sources": [
-        "awards"
-      ]
-    },
-    {
-      "rank": 9,
-      "name": "Interamerican University of Puerto Rico Inc",
-      "influence_score": 15.83,
-      "awards_total": 3489917116.49,
-      "source_presence": 1,
-      "sources": [
-        "awards"
-      ]
-    },
-    {
-      "rank": 10,
-      "name": "University of Puerto Rico",
-      "influence_score": 14.77,
-      "awards_total": 3439057682.78,
-      "source_presence": 1,
-      "sources": [
-        "awards"
-      ]
-    },
-    {
-      "rank": 11,
-      "name": "Popular Inc",
-      "influence_score": 13.74,
-      "awards_total": 3389550632.83,
-      "source_presence": 1,
-      "sources": [
-        "awards"
-      ]
-    },
-    {
-      "rank": 12,
-      "name": "Centro Medico Del Turabo Inc",
-      "influence_score": 13.06,
-      "awards_total": 3356594644.11,
-      "source_presence": 1,
-      "sources": [
-        "awards"
-      ]
-    },
-    {
-      "rank": 13,
+      "rank": 16,
       "name": "Corporacion Del Fondo Del Seguro Del Estado",
       "influence_score": 11.13,
       "awards_total": 3263983340.2,
@@ -146,40 +206,10 @@
       ]
     },
     {
-      "rank": 14,
-      "name": "Hewlett Packard Puerto Rico LLC",
-      "influence_score": 10.97,
-      "awards_total": 3256235132.82,
-      "source_presence": 1,
-      "sources": [
-        "awards"
-      ]
-    },
-    {
-      "rank": 15,
-      "name": "Triple-S Management Corp",
-      "influence_score": 10.75,
-      "awards_total": 3245897799.17,
-      "source_presence": 1,
-      "sources": [
-        "awards"
-      ]
-    },
-    {
-      "rank": 16,
+      "rank": 17,
       "name": "Puerto Rico Industrial Development Company",
       "influence_score": 7.41,
       "awards_total": 3085428489.94,
-      "source_presence": 1,
-      "sources": [
-        "awards"
-      ]
-    },
-    {
-      "rank": 17,
-      "name": "Puerto Rico Electric Power Authority",
-      "influence_score": 3.82,
-      "awards_total": 2913161591.9900002,
       "source_presence": 1,
       "sources": [
         "awards"
