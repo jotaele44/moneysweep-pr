@@ -156,6 +156,8 @@ def _discover_open_payments_datasets(session: requests.Session, logger) -> list[
 
     uuids = []
     for item in data:
+        if not isinstance(item, dict):
+            continue
         title = (item.get("title") or "").lower()
         tags  = [t.get("data", "").lower() for t in (item.get("keyword") or [])]
         # Target: general payment datasets (not research/ownership)

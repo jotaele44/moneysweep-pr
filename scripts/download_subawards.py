@@ -6,7 +6,7 @@ Uses the same spending_by_award endpoint as other downloads but with
 subawards=true. Award type codes cover both grants (02-05) and contracts (A-D).
 
 Time windows:
-  FY2000-2009, FY2010-2017, FY2018-2022, FY2023-2025
+  FY2000-2009, FY2010-2017, FY2018-2022, FY2023-2026
 
 Output:
   data/staging/raw/subawards/subawards_<start>f<end>.csv  (raw per-window)
@@ -57,7 +57,7 @@ TIME_WINDOWS = [
     {"label": "2000f2009", "start_date": "2007-10-01", "end_date": "2009-09-30", "fy_start": 2000},
     {"label": "2010f2017", "start_date": "2010-10-01", "end_date": "2017-09-30", "fy_start": 2010},
     {"label": "2018f2022", "start_date": "2018-10-01", "end_date": "2022-09-30", "fy_start": 2018},
-    {"label": "2023f2025", "start_date": "2023-10-01", "end_date": "2025-09-30", "fy_start": 2023},
+    {"label": "2023f2026", "start_date": "2023-10-01", "end_date": "2026-09-30", "fy_start": 2023},
 ]
 
 MASTER_COLUMNS = [
@@ -384,7 +384,7 @@ def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
             logger.error(f"  Unexpected error on window {window['label']}: {e}")
             stats = {"window": window["label"], "grant_rows": 0, "contract_rows": 0, "errors": [str(e)]}
 
-        total_rows += stats.get("grants_rows", 0) + stats.get("contracts_rows", 0)
+        total_rows += stats.get("grant_rows", 0) + stats.get("contract_rows", 0)
         all_errors.extend(stats["errors"])
         window_stats.append(stats)
         logger.info("")

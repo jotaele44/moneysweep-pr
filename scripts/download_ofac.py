@@ -93,10 +93,21 @@ def _parse_sdn_xml(content: bytes, logger) -> pd.DataFrame:
     logger.info("  Parsing SDN XML...")
     NS = "http://tempuri.org/sdnList.xsd"
 
+    try:
+        root = ET.fromstring(content)
+    except ET.ParseError as exc:
+        logger.error(f"  XML parse error: {exc}")
+        return pd.DataFrame(columns=SDN_COLUMNS)
+
+    # Detect the actual namespace from the root element tag (robust against NS changes)
+    _actual_ns = root.tag.split("}")[0][1:] if root.tag.startswith("{") else ""
+
     def _find(el, tag):
         result = el.find(tag)
         if result is None:
             result = el.find(f"{{{NS}}}{tag}")
+        if result is None and _actual_ns and _actual_ns != NS:
+            result = el.find(f"{{{_actual_ns}}}{tag}")
         return result
 
     def _findall(el, path):
@@ -107,21 +118,25 @@ def _parse_sdn_xml(content: bytes, logger) -> pd.DataFrame:
         )
         if not results:
             results = el.findall(ns_path)
+        if not results and _actual_ns and _actual_ns != NS:
+            ns_path2 = "/".join(
+                f"{{{_actual_ns}}}{p}" if not p.startswith("{") else p
+                for p in path.split("/")
+            )
+            results = el.findall(ns_path2)
         return results
 
     def _text(el, tag):
         child = _find(el, tag)
         return child.text.strip() if child is not None and child.text else ""
 
-    try:
-        root = ET.fromstring(content)
-    except ET.ParseError as exc:
-        logger.error(f"  XML parse error: {exc}")
-        return pd.DataFrame(columns=SDN_COLUMNS)
-
     entries = root.findall(".//sdnEntry")
     if not entries:
         entries = root.findall(f".//{{{NS}}}sdnEntry")
+    if not entries and _actual_ns and _actual_ns != NS:
+        entries = root.findall(f".//{{{_actual_ns}}}sdnEntry")
+        if entries:
+            logger.info(f"  Found {len(entries):,} entries using detected namespace: {_actual_ns}")
 
     rows = []
     for entry in entries:
@@ -131,7 +146,11 @@ def _parse_sdn_xml(content: bytes, logger) -> pd.DataFrame:
         name     = f"{last}, {first}".strip(", ") if first else last
         sdn_type = _text(entry, "sdnType")
 
-        prog_els = entry.findall(".//program") or entry.findall(f".//{{{NS}}}program")
+        prog_els = (
+            entry.findall(".//program")
+            or entry.findall(f".//{{{NS}}}program")
+            or (entry.findall(f".//{{{_actual_ns}}}program") if _actual_ns and _actual_ns != NS else [])
+        )
         programs = "|".join(sorted({p.text.strip() for p in prog_els if p.text}))
 
         aka_els = (
@@ -139,6 +158,11 @@ def _parse_sdn_xml(content: bytes, logger) -> pd.DataFrame:
             + entry.findall(f".//{{{NS}}}aka/{{{NS}}}lastName")
             + entry.findall(f".//{{{NS}}}aka/{{{NS}}}firstName")
         )
+        if not aka_els and _actual_ns and _actual_ns != NS:
+            aka_els = (
+                entry.findall(f".//{{{_actual_ns}}}aka/{{{_actual_ns}}}lastName")
+                + entry.findall(f".//{{{_actual_ns}}}aka/{{{_actual_ns}}}firstName")
+            )
         akas = "|".join(sorted({el.text.strip() for el in aka_els if el.text}))
 
         rows.append({"uid": uid, "name": name, "sdn_type": sdn_type,

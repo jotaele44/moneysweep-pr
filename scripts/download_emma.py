@@ -29,6 +29,13 @@ from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
 
 EMMA_BASE     = "https://emma.msrb.org"
 PAGE_SIZE     = 100
+
+# Fallback endpoint list — tried in order until one returns data
+EMMA_SECURITY_ENDPOINTS = [
+    "/api/Security/GetSecurities",
+    "/api/Security/SearchSecurities",
+    "/api/market/securities",
+]
 PAGE_SLEEP    = 0.5
 MAX_RETRIES   = 3
 RETRY_BACKOFF = [5, 15, 30]
@@ -99,46 +106,56 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
 def _fetch_pr_securities(session: requests.Session, logger) -> list[dict]:
     """
     Query EMMA API for all PR-state municipal securities.
-    EMMA REST endpoint: GET /api/Security/GetSecurities
-    Filters by issuerState=PR, paginated via page/pageSize.
+    Tries multiple endpoint paths in order until one returns data.
     """
-    url  = f"{EMMA_BASE}/api/Security/GetSecurities"
-    page = 1
     all_records: list[dict] = []
 
-    while True:
-        params = {
-            "issuerState": "PR",
-            "page":        page,
-            "pageSize":    PAGE_SIZE,
-        }
-        data = _get(session, url, params, logger)
-        if data is None:
-            break
+    for endpoint in EMMA_SECURITY_ENDPOINTS:
+        url  = f"{EMMA_BASE}{endpoint}"
+        page = 1
+        endpoint_records: list[dict] = []
 
-        # Handle both list and dict response shapes
-        if isinstance(data, list):
-            items = data
-            has_more = len(items) == PAGE_SIZE
+        logger.info(f"  Trying EMMA endpoint: {endpoint}")
+        while True:
+            params = {
+                "issuerState": "PR",
+                "page":        page,
+                "pageSize":    PAGE_SIZE,
+            }
+            data = _get(session, url, params, logger)
+            if data is None:
+                break
+
+            # Handle both list and dict response shapes
+            if isinstance(data, list):
+                items = data
+                has_more = len(items) == PAGE_SIZE
+            else:
+                items    = data.get("results") or data.get("data") or data.get("items") or []
+                total    = data.get("totalCount") or data.get("total") or 0
+                has_more = (page * PAGE_SIZE) < total
+
+            if not items:
+                break
+
+            endpoint_records.extend(items)
+            if page == 1:
+                total_hint = data.get("totalCount") or data.get("total") if isinstance(data, dict) else "?"
+                logger.info(f"  EMMA securities: {total_hint} total, fetching...")
+
+            if not has_more:
+                break
+
+            page += 1
+            if page % 10 == 0:
+                logger.info(f"    Page {page} ({len(endpoint_records):,} records so far)")
+
+        if endpoint_records:
+            all_records = endpoint_records
+            logger.info(f"  EMMA endpoint {endpoint}: {len(all_records):,} securities retrieved")
+            break
         else:
-            items    = data.get("results") or data.get("data") or data.get("items") or []
-            total    = data.get("totalCount") or data.get("total") or 0
-            has_more = (page * PAGE_SIZE) < total
-
-        if not items:
-            break
-
-        all_records.extend(items)
-        if page == 1:
-            total_hint = data.get("totalCount") or data.get("total") if isinstance(data, dict) else "?"
-            logger.info(f"  EMMA securities: {total_hint} total, fetching...")
-
-        if not has_more:
-            break
-
-        page += 1
-        if page % 10 == 0:
-            logger.info(f"    Page {page} ({len(all_records):,} records so far)")
+            logger.warning(f"  EMMA endpoint {endpoint} returned no data — trying next")
 
     return all_records
 

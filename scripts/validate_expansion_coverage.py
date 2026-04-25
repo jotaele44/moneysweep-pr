@@ -74,19 +74,19 @@ def build_coverage_matrix(root: Path) -> dict:
 
 
 def check_2007_gap(matrix: dict) -> bool:
-    """Returns True if 2007 is OK.
+    """Returns True if 2007 is covered by all critical files.
 
-    Only fails if a critical file EXISTS but does not contain 2007.
-    If the file is absent (download failed/manual), skip — the year may be
-    covered by another source (e.g. FY2009-2016 files contain records going
-    back to 2000-2001).
+    Returns False if any critical file is absent from the matrix,
+    recorded as not existing, or present but missing 2007 data.
     """
     for fname in CRITICAL_2007_FILES:
-        info = matrix.get(fname, {})
-        if not info["exists"]:  # absent file — don't penalise
-            continue
+        info = matrix.get(fname)
+        if info is None:
+            return False  # file not tracked at all
+        if "exists" in info and not info["exists"]:
+            return False  # file recorded as absent on disk
         if 2007 not in info.get("fiscal_years", set()):
-            return False  # file present but 2007 is genuinely missing
+            return False  # file present but 2007 data missing
     return True
 
 

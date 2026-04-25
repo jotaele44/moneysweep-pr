@@ -247,9 +247,12 @@ def load_targets(root: Path) -> list[dict]:
     Derive vendor targets from the master CSV.
     Aggregates by vendor_name: total obligated_amount and record count.
     Falls back to reading the master directly if vendor_targets.csv doesn't exist.
+    Prefers pr_contracts_master.csv (vendor_name column); falls back to
+    pr_all_awards_master.csv (recipient_name column).
     """
     targets_path = root / "data" / "staging" / "processed" / "vendor_targets.csv"
     master_path = root / "data" / "staging" / "processed" / "pr_contracts_master.csv"
+    unified_path = root / "data" / "staging" / "processed" / "pr_all_awards_master.csv"
 
     if targets_path.exists():
         with open(targets_path) as f:
@@ -263,17 +266,26 @@ def load_targets(root: Path) -> list[dict]:
             for r in rows if r.get("vendor_name", "").strip()
         ]
 
-    if not master_path.exists():
+    # Determine which master to use and what the name column is called
+    if master_path.exists():
+        read_path = master_path
+        name_col = "vendor_name"
+    elif unified_path.exists():
+        read_path = unified_path
+        name_col = "recipient_name"
+    else:
         raise FileNotFoundError(
-            f"Master file not found at {master_path}. "
-            "Run: python3 scripts/deduplicate_master.py"
+            f"No master file found. Expected one of:\n"
+            f"  {master_path}\n"
+            f"  {unified_path}\n"
+            "Run: python3 scripts/build_unified_master.py"
         )
 
     # Aggregate from master
     vendor_totals: dict[str, dict] = {}
-    with open(master_path) as f:
+    with open(read_path) as f:
         for row in csv.DictReader(f):
-            vn = row.get("vendor_name", "").strip()
+            vn = row.get(name_col, "").strip()
             if not vn:
                 continue
             try:
