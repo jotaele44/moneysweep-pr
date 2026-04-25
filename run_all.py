@@ -287,6 +287,8 @@ def main() -> int:
                         help="Skip step 17 (download FEC Schedule A contributions from PR)")
     parser.add_argument("--skip-lda", action="store_true",
                         help="Skip step 18 (download LDA lobbying filings for PR)")
+    parser.add_argument("--skip-lda-enrich", action="store_true",
+                        help="Skip step 18b (LDA enrichment of award recipients by client name)")
     parser.add_argument("--skip-crossref", action="store_true",
                         help="Skip step 19 (FEC + lobbying cross-reference analyses)")
     parser.add_argument("--lda-api-key", dest="lda_api_key", default=None,
@@ -588,7 +590,7 @@ def main() -> int:
         try:
             from scripts.download_grants import run as run_grants
             g = run_grants(root=root)
-            logger.info(f"[Step 11/29] Done — {g.get('total_rows', 0):,} grant records\n")
+            logger.info(f"[Step 11/29] Done — {g.get('master_rows', g.get('total_rows', 0)):,} grant records\n")
         except Exception as e:
             logger.error(f"[Step 11/29] FAILED: {e}")
 
@@ -602,7 +604,7 @@ def main() -> int:
         try:
             from scripts.download_subawards import run as run_subawards
             s = run_subawards(root=root)
-            logger.info(f"[Step 12/29] Done — {s.get('total_rows', 0):,} subaward records\n")
+            logger.info(f"[Step 12/29] Done — {s.get('master_rows', s.get('total_rows', 0)):,} subaward records\n")
         except Exception as e:
             logger.error(f"[Step 12/29] FAILED: {e}")
 
@@ -700,6 +702,24 @@ def main() -> int:
             logger.info(f"[Step 18/29] Done — {lda_result.get('rows', 0):,} filings\n")
         except Exception as e:
             logger.error(f"[Step 18/29] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 18b: LDA entity enrichment (award recipients → lobbying lookup)
+    # ------------------------------------------------------------------
+    if args.skip_lda_enrich:
+        logger.info("[Step 18b/29] SKIPPED (--skip-lda-enrich)\n")
+    else:
+        logger.info("[Step 18b/29] Enriching award recipients with LDA lobbying data...")
+        try:
+            from scripts.lda_enrich import run as run_lda_enrich
+            enrich_result = run_lda_enrich(root=root, api_key=args.lda_api_key)
+            logger.info(
+                f"[Step 18b/29] Done — {enrich_result.get('entities_queried', 0):,} queried, "
+                f"{enrich_result.get('entities_matched', 0):,} with LDA filings, "
+                f"${enrich_result.get('total_spend', 0):,.0f} lobbying spend\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 18b/29] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 19: Cross-reference analyses (FEC + lobbying)

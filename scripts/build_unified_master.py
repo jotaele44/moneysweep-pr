@@ -279,7 +279,7 @@ def run(root=None) -> dict:
             if "award_id" not in df_exp.columns or df_exp["award_id"].isna().all():
                 if "_fallback_id" in df_exp.columns:
                     df_exp["award_id"] = df_exp["_fallback_id"]
-            df_exp.pop("_fallback_id", None)
+            df_exp.drop(columns=["_fallback_id"], inplace=True, errors="ignore")
             df_exp["source_file"]    = fname
             df_exp["source_dataset"] = "contracts"
             df_exp["award_category"] = "contract"
@@ -495,8 +495,8 @@ def run(root=None) -> dict:
             award_count       = ("award_id",           "nunique"),
             source_datasets   = ("source_dataset",     lambda x: "|".join(sorted(x.dropna().unique()))),
             awarding_agencies = ("awarding_agency",    lambda x: "|".join(sorted(x.dropna().unique())[:5])),
-            first_award_date  = ("award_date",         "min"),
-            last_award_date   = ("award_date",         "max"),
+            first_award_date  = ("award_date",         lambda x: x.dropna().min() if x.notna().any() else ""),
+            last_award_date   = ("award_date",         lambda x: x.dropna().max() if x.notna().any() else ""),
             fiscal_year_range = ("fiscal_year",        _yr_range),
         )
         .reset_index()
