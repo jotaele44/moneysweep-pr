@@ -500,19 +500,54 @@ def _load_dotenv(path: Path) -> dict:
     return out
 
 
-def get_sam_api_key() -> str:
-    """Return SAM.gov API key from SAM_API_KEY env var or .env file. Raises if missing."""
+def _get_api_key(env_var: str, label: str, signup_url: str) -> str:
+    """Generic: read API key from env var or .env file. Raises with helpful message if absent."""
     import os
-    key = os.environ.get("SAM_API_KEY", "").strip()
+    key = os.environ.get(env_var, "").strip()
     if key:
         return key
     parsed = _load_dotenv(PROJECT_ROOT / ".env")
-    key = parsed.get("SAM_API_KEY", "").strip()
+    key = parsed.get(env_var, "").strip()
     if key:
         return key
     raise RuntimeError(
-        "SAM_API_KEY not found. Set it one of two ways:\n"
-        "  1. export SAM_API_KEY=your_key_here\n"
-        f"  2. Create {PROJECT_ROOT / '.env'} containing: SAM_API_KEY=your_key_here\n"
-        "Get a free key at https://sam.gov/data-services"
+        f"{env_var} not found. Set it one of two ways:\n"
+        f"  1. export {env_var}=your_key_here\n"
+        f"  2. Add to {PROJECT_ROOT / '.env'}: {env_var}=your_key_here\n"
+        f"Get a key at {signup_url}"
     )
+
+
+def get_sam_api_key() -> str:
+    """Return SAM.gov API key from SAM_API_KEY env var or .env file."""
+    return _get_api_key("SAM_API_KEY", "SAM.gov", "https://sam.gov/data-services")
+
+
+def get_lda_api_key() -> str | None:
+    """Return Senate LDA API key from LDA_API_KEY env var or .env file. Returns None if absent."""
+    import os
+    key = os.environ.get("LDA_API_KEY", "").strip()
+    if key:
+        return key
+    parsed = _load_dotenv(PROJECT_ROOT / ".env")
+    return parsed.get("LDA_API_KEY", "").strip() or None
+
+
+def get_fec_api_key() -> str:
+    """Return FEC API key from FEC_API_KEY env var or .env file. Falls back to DEMO_KEY."""
+    import os
+    key = os.environ.get("FEC_API_KEY", "").strip()
+    if key:
+        return key
+    parsed = _load_dotenv(PROJECT_ROOT / ".env")
+    return parsed.get("FEC_API_KEY", "").strip() or "DEMO_KEY"
+
+
+def get_opencorporates_api_key() -> str | None:
+    """Return OpenCorporates token from env var or .env file. Returns None if absent."""
+    import os
+    key = os.environ.get("OPENCORPORATES_API_TOKEN", "").strip()
+    if key:
+        return key
+    parsed = _load_dotenv(PROJECT_ROOT / ".env")
+    return parsed.get("OPENCORPORATES_API_TOKEN", "").strip() or None

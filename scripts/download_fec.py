@@ -195,7 +195,8 @@ def _run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
 
     # Resolve API key
     if not api_key:
-        api_key = os.environ.get("FEC_API_KEY", "DEMO_KEY")
+        from scripts.config import get_fec_api_key
+        api_key = get_fec_api_key()
     is_demo = api_key == "DEMO_KEY"
     sleep_s = PAGE_SLEEP_DEMO if is_demo else PAGE_SLEEP_KEY
     if is_demo:

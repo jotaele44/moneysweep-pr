@@ -241,7 +241,8 @@ def run(root: Path = None, api_key: str | None = None,
 
     # Resolve API key
     if not api_key:
-        api_key = os.environ.get("LDA_API_KEY", "").strip() or None
+        from scripts.config import get_lda_api_key
+        api_key = get_lda_api_key()
     if not api_key:
         logger.warning("  LDA_API_KEY not set — queries will use unauthenticated rate limits")
 
