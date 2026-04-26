@@ -208,7 +208,8 @@ def run(root: Path = None, force: bool = False, api_token: str | None = None) ->
     if root is None:
         root = PROJECT_ROOT
     if api_token is None:
-        api_token = os.getenv("OPENCORPORATES_API_TOKEN")
+        from scripts.config import get_opencorporates_api_key
+        api_token = get_opencorporates_api_key()
 
     root    = Path(root)
     raw_dir = root / "data" / "staging" / "raw" / "opencorporates"
