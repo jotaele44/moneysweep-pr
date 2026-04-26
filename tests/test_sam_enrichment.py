@@ -47,9 +47,11 @@ class TestNameSimilarity:
     def test_disjoint(self):
         assert name_similarity("FOO", "BAR") == 0.0
 
-    def test_jaccard_partial(self):
-        # tokens A={FOO,BAR}, B={FOO,BAZ} -> intersect=1, union=3 -> 1/3
-        assert name_similarity("FOO BAR", "FOO BAZ") == pytest.approx(1 / 3)
+    def test_partial_overlap_above_jaccard_floor(self):
+        # Hybrid returns max(jaccard, rapidfuzz); must be >= pure Jaccard (1/3)
+        score = name_similarity("FOO BAR", "FOO BAZ")
+        assert score >= 1 / 3
+        assert score <= 1.0
 
     def test_empty_returns_zero(self):
         assert name_similarity("", "FOO") == 0.0
