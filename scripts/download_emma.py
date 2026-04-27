@@ -299,7 +299,10 @@ def _records_to_bonds_df(records: list[dict]) -> pd.DataFrame:
     df = pd.json_normalize(records)
     df = df.rename(columns={k: v for k, v in _RENAME_MAP.items() if k in df.columns})
 
-    df["issuer_state"] = df.get("issuer_state", pd.Series(dtype=str)).fillna("PR")
+    if "issuer_state" in df.columns:
+        df["issuer_state"] = df["issuer_state"].fillna("PR")
+    else:
+        df["issuer_state"] = "PR"
 
     # Populate normalized columns
     for raw_col, norm_col in [("issuer_name", "issuer_normalized"),
