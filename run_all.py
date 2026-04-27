@@ -37,6 +37,8 @@ Usage:
   python3 run_all.py --skip-municipal
   python3 run_all.py --skip-usace
   python3 run_all.py --skip-eqb
+  python3 run_all.py --skip-msrb-trades
+  python3 run_all.py --skip-bond-flow
   python3 run_all.py --skip-delivery
 """
 
@@ -339,6 +341,10 @@ def main() -> int:
                         help="Skip step 26b (USACE Section 404/10 permit data for PR)")
     parser.add_argument("--skip-eqb", action="store_true",
                         help="Skip step 26c (PR EQB environmental permit data via EPA ECHO)")
+    parser.add_argument("--skip-msrb-trades", action="store_true",
+                        help="Skip step 26d (MSRB RTRS secondary market trade data for PR CUSIPs)")
+    parser.add_argument("--skip-bond-flow", action="store_true",
+                        help="Skip step 26e (bond flow cross-reference: underwriters/dealers vs entity_master)")
     parser.add_argument("--skip-delivery", action="store_true",
                         help="Skip step 29b (contractor project delivery scorecard)")
     args = parser.parse_args()
@@ -969,6 +975,40 @@ def main() -> int:
             )
         except Exception as e:
             logger.error(f"[Step 26/29] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26d: MSRB RTRS secondary market trade data for PR CUSIPs
+    # ------------------------------------------------------------------
+    if args.skip_msrb_trades:
+        logger.info("[Step 26d] SKIPPED (--skip-msrb-trades)\n")
+    else:
+        logger.info("[Step 26d] Downloading MSRB RTRS trade data for PR CUSIPs...")
+        try:
+            from scripts.download_msrb_trades import run as run_msrb_trades
+            msrb_result = run_msrb_trades(root=root)
+            logger.info(
+                f"[Step 26d] Done — {msrb_result.get('rows', 0):,} trades, "
+                f"{msrb_result.get('unique_dealers', 0):,} dealers\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 26d] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26e: Bond flow cross-reference (underwriters/dealers vs entity_master)
+    # ------------------------------------------------------------------
+    if args.skip_bond_flow:
+        logger.info("[Step 26e] SKIPPED (--skip-bond-flow)\n")
+    else:
+        logger.info("[Step 26e] Cross-referencing bond market participants with entity master...")
+        try:
+            from scripts.analyze_bond_flow import run as run_bond_flow
+            bf_result = run_bond_flow(root=root)
+            logger.info(
+                f"[Step 26e] Done — {bf_result.get('rows', 0):,} entities, "
+                f"{bf_result.get('dual_role_count', 0):,} dual-role (contractor + bond market)\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 26e] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 26b: USACE Section 404/10 permits for PR

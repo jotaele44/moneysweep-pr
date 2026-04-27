@@ -46,11 +46,12 @@ from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
 # ---------------------------------------------------------------------------
 
 WEIGHTS = {
-    "awards":    0.35,
-    "fec":       0.15,
-    "lobbying":  0.15,
-    "nonprofit": 0.10,
-    "medicare":  0.10,
+    "awards":    0.32,
+    "fec":       0.13,
+    "lobbying":  0.13,
+    "nonprofit": 0.08,
+    "medicare":  0.08,
+    "bonds":     0.11,
     "presence":  0.15,
 }
 assert abs(sum(WEIGHTS.values()) - 1.0) < 1e-9, "Weights must sum to 1"
@@ -268,23 +269,47 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
     else:
         merged["cms_medicare_payment"] = 0.0
 
+    # ------------------------------------------------------------------
+    # Axis 7: Bond market presence (underwriting + issuance + dealer vol)
+    # ------------------------------------------------------------------
+    df_bond_flow = _load(pdir / "pr_bond_flow.csv", logger)
+    if df_bond_flow is not None and not df_bond_flow.empty:
+        df_bond_flow["norm_key"] = df_bond_flow["entity_key"].apply(_normalize)
+        for col in ["bonds_underwritten_par", "bonds_issued_par", "dealer_volume_par"]:
+            df_bond_flow[col] = pd.to_numeric(
+                df_bond_flow.get(col, pd.Series(dtype=str)), errors="coerce"
+            ).fillna(0)
+        df_bond_flow["bond_total_par"] = (
+            df_bond_flow["bonds_underwritten_par"]
+            + df_bond_flow["bonds_issued_par"]
+            + df_bond_flow["dealer_volume_par"] * 0.1
+        )
+        merged = merged.merge(
+            df_bond_flow[["norm_key", "bond_total_par"]],
+            on="norm_key", how="left",
+        )
+        sources_present.add("bonds")
+    else:
+        merged["bond_total_par"] = 0.0
+
     # Fill numeric NaN
     for col in ["fec_total_contributions", "lda_lobbying_total",
-                "np_revenue", "cms_medicare_payment"]:
+                "np_revenue", "cms_medicare_payment", "bond_total_par"]:
         if col in merged.columns:
             merged[col] = pd.to_numeric(merged[col], errors="coerce").fillna(0.0)
         else:
             merged[col] = 0.0
 
     # ------------------------------------------------------------------
-    # Cross-source presence score (0–5 = number of datasets entity appears in)
+    # Cross-source presence score (0–6 = number of datasets entity appears in)
     # ------------------------------------------------------------------
     merged["source_presence"] = (
         (merged["awards_total"] > 0).astype(int) +
         (merged.get("fec_total_contributions", pd.Series([0]*len(merged))).fillna(0) > 0).astype(int) +
         (merged.get("lda_lobbying_total",       pd.Series([0]*len(merged))).fillna(0) > 0).astype(int) +
         (merged.get("np_revenue",               pd.Series([0]*len(merged))).fillna(0) > 0).astype(int) +
-        (merged.get("cms_medicare_payment",     pd.Series([0]*len(merged))).fillna(0) > 0).astype(int)
+        (merged.get("cms_medicare_payment",     pd.Series([0]*len(merged))).fillna(0) > 0).astype(int) +
+        (merged.get("bond_total_par",           pd.Series([0]*len(merged))).fillna(0) > 0).astype(int)
     )
 
     # ------------------------------------------------------------------
@@ -295,7 +320,8 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
     merged["score_lobbying"]  = _minmax(merged.get("lda_lobbying_total", pd.Series([0]*len(merged))).fillna(0))
     merged["score_nonprofit"] = _minmax(merged.get("np_revenue", pd.Series([0]*len(merged))).fillna(0))
     merged["score_medicare"]  = _minmax(merged.get("cms_medicare_payment", pd.Series([0]*len(merged))).fillna(0))
-    merged["score_presence"]  = merged["source_presence"] / 5 * 100
+    merged["score_bonds"]     = _minmax(merged.get("bond_total_par", pd.Series([0]*len(merged))).fillna(0))
+    merged["score_presence"]  = merged["source_presence"] / 6 * 100
 
     merged["influence_score"] = (
         merged["score_awards"]    * WEIGHTS["awards"] +
@@ -303,6 +329,7 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
         merged["score_lobbying"]  * WEIGHTS["lobbying"] +
         merged["score_nonprofit"] * WEIGHTS["nonprofit"] +
         merged["score_medicare"]  * WEIGHTS["medicare"] +
+        merged["score_bonds"]     * WEIGHTS["bonds"] +
         merged["score_presence"]  * WEIGHTS["presence"]
     ).round(2)
 
@@ -327,11 +354,12 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
             "source_presence": int(row["source_presence"]),
             "sources":         [],
         }
-        if row["awards_total"] > 0:           entry["sources"].append("awards")
-        if row.get("fec_total_contributions", 0) > 0: entry["sources"].append("fec")
-        if row.get("lda_lobbying_total", 0) > 0:      entry["sources"].append("lda")
-        if row.get("np_revenue", 0) > 0:              entry["sources"].append("nonprofit_990")
-        if row.get("cms_medicare_payment", 0) > 0:    entry["sources"].append("medicare")
+        if row["awards_total"] > 0:                    entry["sources"].append("awards")
+        if row.get("fec_total_contributions", 0) > 0:  entry["sources"].append("fec")
+        if row.get("lda_lobbying_total", 0) > 0:       entry["sources"].append("lda")
+        if row.get("np_revenue", 0) > 0:               entry["sources"].append("nonprofit_990")
+        if row.get("cms_medicare_payment", 0) > 0:     entry["sources"].append("medicare")
+        if row.get("bond_total_par", 0) > 0:           entry["sources"].append("bonds")
         top_entities.append(entry)
 
     total_awards_val = float(merged["awards_total"].sum())
@@ -380,13 +408,14 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
         if row.get("lda_lobbying_total", 0) > 0:      sources.append("L")
         if row.get("np_revenue", 0) > 0:              sources.append("N")
         if row.get("cms_medicare_payment", 0) > 0:    sources.append("M")
+        if row.get("bond_total_par", 0) > 0:          sources.append("B")
         src_str = "".join(sources) or "·"
         logger.info(
             f"  {int(row['rank']):<5} {row['influence_score']:>6.1f}  "
             f"{str(row['canonical_name'])[:52]:<52}  "
             f"${float(row['awards_total']):>13,.0f}  {src_str}"
         )
-    logger.info("  (F=FEC  L=Lobbying  N=Nonprofit  M=Medicare)")
+    logger.info("  (F=FEC  L=Lobbying  N=Nonprofit  M=Medicare  B=Bonds)")
 
     return {
         "rows":           len(merged),
