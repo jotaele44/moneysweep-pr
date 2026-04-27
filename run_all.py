@@ -30,6 +30,14 @@ Usage:
   python3 run_all.py --skip-ofac
   python3 run_all.py --skip-opencorporates
   python3 run_all.py --skip-prime-sub
+  python3 run_all.py --skip-sf133
+  python3 run_all.py --skip-cor3
+  python3 run_all.py --skip-compras
+  python3 run_all.py --skip-rfp-lobby
+  python3 run_all.py --skip-municipal
+  python3 run_all.py --skip-usace
+  python3 run_all.py --skip-eqb
+  python3 run_all.py --skip-delivery
 """
 
 import argparse
@@ -317,6 +325,22 @@ def main() -> int:
                         help="Skip step 29 (prime-to-subcontractor relationship analysis)")
     parser.add_argument("--oc-api-token", dest="oc_api_token", default=None,
                         help="OpenCorporates API token (default: OPENCORPORATES_API_TOKEN env var)")
+    parser.add_argument("--skip-sf133", action="store_true",
+                        help="Skip step 6b (SF-133 federal budget execution from USASpending)")
+    parser.add_argument("--skip-cor3", action="store_true",
+                        help="Skip step 15b (COR3 PR recovery project tracker)")
+    parser.add_argument("--skip-compras", action="store_true",
+                        help="Skip step 15c (Compras PR procurement RFPs and awards)")
+    parser.add_argument("--skip-rfp-lobby", action="store_true",
+                        help="Skip step 18c (RFP × LDA lobbying cross-reference)")
+    parser.add_argument("--skip-municipal", action="store_true",
+                        help="Skip step 25b (PR municipal federal spending by geography)")
+    parser.add_argument("--skip-usace", action="store_true",
+                        help="Skip step 26b (USACE Section 404/10 permit data for PR)")
+    parser.add_argument("--skip-eqb", action="store_true",
+                        help="Skip step 26c (PR EQB environmental permit data via EPA ECHO)")
+    parser.add_argument("--skip-delivery", action="store_true",
+                        help="Skip step 29b (contractor project delivery scorecard)")
     args = parser.parse_args()
 
     root = PROJECT_ROOT
@@ -490,6 +514,23 @@ def main() -> int:
             coverage_result = 1
 
     # ------------------------------------------------------------------
+    # Step 6b: SF-133 federal budget execution
+    # ------------------------------------------------------------------
+    if args.skip_sf133:
+        logger.info("[Step 6b] SKIPPED (--skip-sf133)\n")
+    else:
+        logger.info("[Step 6b] Downloading SF-133 federal budget execution (USASpending)...")
+        try:
+            from scripts.download_sf133 import run as run_sf133
+            sf_result = run_sf133(root=root)
+            logger.info(
+                f"[Step 6b] Done — {sf_result.get('rows', 0):,} account rows, "
+                f"avg obligation rate {sf_result.get('avg_obligation_rate', 0):.1%}\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 6b] FAILED: {e}")
+
+    # ------------------------------------------------------------------
     # Step 7: SAM.gov UEI enrichment
     # ------------------------------------------------------------------
     if args.skip_enrichment:
@@ -659,6 +700,40 @@ def main() -> int:
         logger.info("[Step 15/29] Done.\n")
 
     # ------------------------------------------------------------------
+    # Step 15b: COR3 PR recovery project tracker
+    # ------------------------------------------------------------------
+    if args.skip_cor3:
+        logger.info("[Step 15b] SKIPPED (--skip-cor3)\n")
+    else:
+        logger.info("[Step 15b] Downloading COR3 PR recovery project data...")
+        try:
+            from scripts.download_cor3 import run as run_cor3
+            cor3_result = run_cor3(root=root)
+            logger.info(
+                f"[Step 15b] Done — {cor3_result.get('rows', 0):,} projects, "
+                f"avg disbursement rate {cor3_result.get('avg_disbursement_rate', 0):.1%}\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 15b] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15c: Compras PR procurement RFPs and awards
+    # ------------------------------------------------------------------
+    if args.skip_compras:
+        logger.info("[Step 15c] SKIPPED (--skip-compras)\n")
+    else:
+        logger.info("[Step 15c] Downloading Compras PR procurement data...")
+        try:
+            from scripts.download_compras import run as run_compras
+            compras_result = run_compras(root=root)
+            logger.info(
+                f"[Step 15c] Done — {compras_result.get('rfp_rows', 0):,} RFPs, "
+                f"{compras_result.get('award_rows', 0):,} awards\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 15c] FAILED: {e}")
+
+    # ------------------------------------------------------------------
     # Step 16: Build unified master
     # ------------------------------------------------------------------
     if args.skip_unified_master:
@@ -720,6 +795,23 @@ def main() -> int:
             )
         except Exception as e:
             logger.error(f"[Step 18b/29] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 18c: RFP × LDA lobbying cross-reference
+    # ------------------------------------------------------------------
+    if args.skip_rfp_lobby:
+        logger.info("[Step 18c] SKIPPED (--skip-rfp-lobby)\n")
+    else:
+        logger.info("[Step 18c] Cross-referencing RFPs with LDA lobbying filings...")
+        try:
+            from scripts.analyze_rfp_lobby import run as run_rfp_lobby
+            rfp_result = run_rfp_lobby(root=root)
+            logger.info(
+                f"[Step 18c] Done — {rfp_result.get('rows', 0):,} RFPs, "
+                f"{rfp_result.get('flagged_rfps', 0):,} with prior lobbying\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 18c] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 19: Cross-reference analyses (FEC + lobbying)
@@ -844,6 +936,23 @@ def main() -> int:
             logger.error(f"[Step 25/29] FAILED: {e}")
 
     # ------------------------------------------------------------------
+    # Step 25b: PR municipal federal spending by geography
+    # ------------------------------------------------------------------
+    if args.skip_municipal:
+        logger.info("[Step 25b] SKIPPED (--skip-municipal)\n")
+    else:
+        logger.info("[Step 25b] Downloading PR municipal federal spending data...")
+        try:
+            from scripts.download_municipal import run as run_municipal
+            muni_result = run_municipal(root=root)
+            logger.info(
+                f"[Step 25b] Done — {muni_result.get('rows', 0):,} municipality-year rows, "
+                f"{muni_result.get('municipalities', 0):,} municipalities\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 25b] FAILED: {e}")
+
+    # ------------------------------------------------------------------
     # Step 26: MSRB EMMA municipal bond data
     # ------------------------------------------------------------------
     if args.skip_emma:
@@ -860,6 +969,39 @@ def main() -> int:
             )
         except Exception as e:
             logger.error(f"[Step 26/29] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26b: USACE Section 404/10 permits for PR
+    # ------------------------------------------------------------------
+    if args.skip_usace:
+        logger.info("[Step 26b] SKIPPED (--skip-usace)\n")
+    else:
+        logger.info("[Step 26b] Downloading USACE permit data for PR (EPA ECHO)...")
+        try:
+            from scripts.download_usace_permits import run as run_usace
+            usace_result = run_usace(root=root)
+            logger.info(
+                f"[Step 26b] Done — {usace_result.get('rows', 0):,} permits\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 26b] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26c: PR EQB environmental permits via EPA ECHO
+    # ------------------------------------------------------------------
+    if args.skip_eqb:
+        logger.info("[Step 26c] SKIPPED (--skip-eqb)\n")
+    else:
+        logger.info("[Step 26c] Downloading PR EQB environmental permit data (EPA ECHO)...")
+        try:
+            from scripts.download_eqb import run as run_eqb
+            eqb_result = run_eqb(root=root)
+            logger.info(
+                f"[Step 26c] Done — {eqb_result.get('rows', 0):,} facilities, "
+                f"{eqb_result.get('with_violations', 0):,} with violations\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 26c] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 27: OFAC SDN sanctions crossref
@@ -913,6 +1055,23 @@ def main() -> int:
             )
         except Exception as e:
             logger.error(f"[Step 29/29] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 29b: Contractor project delivery scorecard
+    # ------------------------------------------------------------------
+    if args.skip_delivery:
+        logger.info("[Step 29b] SKIPPED (--skip-delivery)\n")
+    else:
+        logger.info("[Step 29b] Scoring contractor project delivery performance...")
+        try:
+            from scripts.analyze_project_delivery import run as run_delivery
+            delivery_result = run_delivery(root=root)
+            logger.info(
+                f"[Step 29b] Done — {delivery_result.get('rows', 0):,} entities scored, "
+                f"{delivery_result.get('high_risk_count', 0):,} high-risk\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 29b] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Final summary
