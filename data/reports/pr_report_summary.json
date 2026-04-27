@@ -1,0 +1,180 @@
+{
+  "generated_at": "2026-04-27 08:17 UTC",
+  "data_layers": 3,
+  "awards": {
+    "total_obligated": 63866298263.10999,
+    "unique_entities": 18,
+    "top10_share": 0.6025,
+    "top_entities": [
+      {
+        "name": "Hospital Damas Inc",
+        "obligated": 4554283750.25
+      },
+      {
+        "name": "Municipality of San Juan",
+        "obligated": 4453055891.36
+      },
+      {
+        "name": "Crowley Maritime Corp",
+        "obligated": 3986128201.12
+      },
+      {
+        "name": "Caribbean Data Services Inc",
+        "obligated": 3895395595.4
+      },
+      {
+        "name": "Puerto Rico Aqueduct And Sewer Authority",
+        "obligated": 3772063789.35
+      },
+      {
+        "name": "Municipio de Ponce",
+        "obligated": 3732887866.51
+      },
+      {
+        "name": "First Bancorp Puerto Rico",
+        "obligated": 3614407444.71
+      },
+      {
+        "name": "Microsoft Puerto Rico Inc",
+        "obligated": 3544492914.84
+      },
+      {
+        "name": "Interamerican University of Puerto Rico Inc",
+        "obligated": 3489917116.49
+      },
+      {
+        "name": "University of Puerto Rico",
+        "obligated": 3439057682.78
+      }
+    ]
+  },
+  "power_network": {
+    "total_ranked": 18,
+    "full_loop_count": 14,
+    "bond_actors_count": 0,
+    "top_entities": [
+      {
+        "rank": 1,
+        "name": "Hospital Damas Inc",
+        "score": 68.0,
+        "awards": 4554283750.25
+      },
+      {
+        "rank": 2,
+        "name": "Municipality of San Juan",
+        "score": 64.57,
+        "awards": 4453055891.36
+      },
+      {
+        "rank": 3,
+        "name": "Crowley Maritime Corp",
+        "score": 55.8,
+        "awards": 3986128201.12
+      },
+      {
+        "rank": 4,
+        "name": "Caribbean Data Services Inc",
+        "score": 52.78,
+        "awards": 3895395595.4
+      },
+      {
+        "rank": 5,
+        "name": "Puerto Rico Aqueduct And Sewer Authority",
+        "score": 52.01,
+        "awards": 3772063789.35
+      },
+      {
+        "rank": 6,
+        "name": "Microsoft Puerto Rico Inc",
+        "score": 46.0,
+        "awards": 3544492914.84
+      },
+      {
+        "rank": 7,
+        "name": "Interamerican University of Puerto Rico Inc",
+        "score": 43.72,
+        "awards": 3489917116.49
+      },
+      {
+        "rank": 8,
+        "name": "First Bancorp Puerto Rico",
+        "score": 43.68,
+        "awards": 3614407444.71
+      },
+      {
+        "rank": 9,
+        "name": "Centro Medico Del Turabo Inc",
+        "score": 39.33,
+        "awards": 3356594644.11
+      },
+      {
+        "rank": 10,
+        "name": "University of Puerto Rico",
+        "score": 38.98,
+        "awards": 3439057682.78
+      }
+    ]
+  },
+  "prime_sub": {
+    "total_flow": 9104580307.33,
+    "unique_primes": 18,
+    "unique_subs": 18,
+    "top_pairs": [
+      {
+        "prime": "Centro Medico Del Turabo Inc",
+        "sub": "Interamerican University of Puerto Rico Inc",
+        "flow": 246309495.42
+      },
+      {
+        "prime": "Municipio de Ponce",
+        "sub": "Hewlett Packard Puerto Rico LLC",
+        "flow": 191173656.29
+      },
+      {
+        "prime": "Puerto Rico Aqueduct And Sewer Authority",
+        "sub": "Puerto Rico Aqueduct And Sewer Authority",
+        "flow": 174162152.76
+      },
+      {
+        "prime": "Popular Inc",
+        "sub": "Hospital Damas Inc",
+        "flow": 170833359.67
+      },
+      {
+        "prime": "Crowley Maritime Corp",
+        "sub": "Caribbean Data Services Inc",
+        "flow": 166500535.64999998
+      },
+      {
+        "prime": "Puerto Rico Aqueduct And Sewer Authority",
+        "sub": "First Bancorp Puerto Rico",
+        "flow": 162995655.31
+      },
+      {
+        "prime": "Interamerican University of Puerto Rico Inc",
+        "sub": "Microsoft Puerto Rico Inc",
+        "flow": 159065867.79000002
+      },
+      {
+        "prime": "Hewlett Packard Puerto Rico LLC",
+        "sub": "Interamerican University of Puerto Rico Inc",
+        "flow": 158740770.51
+      },
+      {
+        "prime": "Puerto Rico Aqueduct And Sewer Authority",
+        "sub": "Crowley Maritime Corp",
+        "flow": 157305635.55
+      },
+      {
+        "prime": "Centro Medico Del Turabo Inc",
+        "sub": "Triple-S Management Corp",
+        "flow": 153546261.87
+      }
+    ]
+  },
+  "delivery": {},
+  "rfp_lobby": {},
+  "bond_flow": {},
+  "ofac": {},
+  "sf133": {}
+}

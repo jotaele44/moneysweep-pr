@@ -40,6 +40,7 @@ Usage:
   python3 run_all.py --skip-msrb-trades
   python3 run_all.py --skip-bond-flow
   python3 run_all.py --skip-delivery
+  python3 run_all.py --skip-report
 """
 
 import argparse
@@ -347,6 +348,8 @@ def main() -> int:
                         help="Skip step 26e (bond flow cross-reference: underwriters/dealers vs entity_master)")
     parser.add_argument("--skip-delivery", action="store_true",
                         help="Skip step 29b (contractor project delivery scorecard)")
+    parser.add_argument("--skip-report", action="store_true",
+                        help="Skip step 30 (generate investigative report from all outputs)")
     args = parser.parse_args()
 
     root = PROJECT_ROOT
@@ -1112,6 +1115,23 @@ def main() -> int:
             )
         except Exception as e:
             logger.error(f"[Step 29b] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 30: Generate investigative report
+    # ------------------------------------------------------------------
+    if args.skip_report:
+        logger.info("[Step 30] SKIPPED (--skip-report)\n")
+    else:
+        logger.info("[Step 30] Generating investigative report from all pipeline outputs...")
+        try:
+            from scripts.generate_report import run as run_report
+            rpt = run_report(root=root, force=True)
+            logger.info(
+                f"[Step 30] Done — {rpt.get('data_layers', 0)}/8 data layers → "
+                f"{rpt.get('report_path', '')}\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 30] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Final summary
