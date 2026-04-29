@@ -218,3 +218,19 @@ python3 -m pytest tests/test_config.py -v
 # Run with coverage (requires pytest-cov)
 python3 -m pytest tests/ --cov=scripts --cov-report=term-missing
 ```
+
+## Celestial Anomaly Detector (New)
+
+For high-volume astrophotography review, use:
+
+```bash
+python3 scripts/celestial_anomaly_detector.py /path/to/media \
+  --output data/staging/processed/celestial_anomalies \
+  --frame-step 3 --threshold 2.8 --top 1000
+```
+
+What it does:
+- Scans images and videos (`.png`, `.jpg`, `.tif`, `.mp4`, `.mov`, `.mkv`, etc.).
+- Extracts per-frame metrics (brightness shifts, motion, edge-density, hot-pixel ratio).
+- Computes robust z-scores and a composite anomaly score.
+- Exports ranked results to `anomalies.csv` and `anomalies.json`.
