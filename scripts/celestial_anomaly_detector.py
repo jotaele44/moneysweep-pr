@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable, List, Optional, Sequence, Tuple
@@ -235,9 +236,11 @@ def main() -> int:
     summary = {
         "files_scanned": len(files),
         "files_failed": len(failed_files),
+        "failed_file_paths": failed_files,
         "anomalies_written": len(all_anomalies),
         "threshold": args.threshold,
         "frame_step": args.frame_step,
+        "generated_at_epoch": time.time(),
     }
     (args.output / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
 

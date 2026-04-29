@@ -20,6 +20,11 @@ def test_collect_media_files_filters_supported_extensions(tmp_path: Path):
     assert names == ["a.jpg", "b.mp4"]
 
 
+def test_collect_media_files_missing_path_returns_empty(tmp_path: Path):
+    files = collect_media_files(tmp_path / "not_there")
+    assert files == []
+
+
 def test_robust_z_scores_handles_constant_vector():
     z = robust_z_scores(np.array([10.0, 10.0, 10.0]))
     assert np.allclose(z, np.zeros(3))
