@@ -63,8 +63,14 @@ NEW_MASTERS = [
     ("pr_dot_master.csv",       "dot"),
     ("pr_usda_master.csv",      "usda"),
     ("pr_doe_master.csv",       "doe"),
-    ("pr_hud_master.csv",       "hud"),
-    ("pr_sbir_master.csv",      "sbir"),
+    ("pr_hud_master.csv",          "hud"),
+    ("pr_sbir_master.csv",         "sbir"),
+    ("pr_ed_master.csv",           "ed"),
+    ("pr_hhs_master.csv",          "hhs"),
+    ("pr_doj_grants_master.csv",   "doj_grants"),
+    ("pr_oia_master.csv",          "oia"),
+    ("pr_haf_spending.csv",        "haf"),
+    ("pr_exim_master.csv",         "exim"),
 ]
 
 # ---------------------------------------------------------------------------

@@ -41,6 +41,21 @@ Usage:
   python3 run_all.py --skip-bond-flow
   python3 run_all.py --skip-delivery
   python3 run_all.py --skip-report
+  python3 run_all.py --skip-ed
+  python3 run_all.py --skip-hhs
+  python3 run_all.py --skip-doj-grants
+  python3 run_all.py --skip-oia
+  python3 run_all.py --skip-haf
+  python3 run_all.py --skip-exim
+  python3 run_all.py --skip-earmarks
+  python3 run_all.py --skip-nfip
+  python3 run_all.py --skip-lihtc
+  python3 run_all.py --skip-nmtc
+  python3 run_all.py --skip-act60
+  python3 run_all.py --skip-rum-coverover
+  python3 run_all.py --skip-fhlb
+  python3 run_all.py --skip-prepa
+  python3 run_all.py --skip-promesa
 """
 
 import argparse
@@ -350,6 +365,36 @@ def main() -> int:
                         help="Skip step 29b (contractor project delivery scorecard)")
     parser.add_argument("--skip-report", action="store_true",
                         help="Skip step 30 (generate investigative report from all outputs)")
+    parser.add_argument("--skip-ed", action="store_true",
+                        help="Skip step 6c (Department of Education grants)")
+    parser.add_argument("--skip-hhs", action="store_true",
+                        help="Skip step 6d (HHS HRSA + ACF grants)")
+    parser.add_argument("--skip-doj-grants", action="store_true",
+                        help="Skip step 6e (Department of Justice grants)")
+    parser.add_argument("--skip-oia", action="store_true",
+                        help="Skip step 6f (Office of Insular Affairs grants)")
+    parser.add_argument("--skip-haf", action="store_true",
+                        help="Skip step 6g (Homeowner Assistance Fund)")
+    parser.add_argument("--skip-exim", action="store_true",
+                        help="Skip step 6h (Ex-Im Bank loans)")
+    parser.add_argument("--skip-earmarks", action="store_true",
+                        help="Skip step 6i (congressional earmarks)")
+    parser.add_argument("--skip-nfip", action="store_true",
+                        help="Skip step 26f (NFIP flood insurance claims)")
+    parser.add_argument("--skip-lihtc", action="store_true",
+                        help="Skip step 26g (LIHTC low-income housing tax credits)")
+    parser.add_argument("--skip-nmtc", action="store_true",
+                        help="Skip step 26h (NMTC new markets tax credits)")
+    parser.add_argument("--skip-act60", action="store_true",
+                        help="Skip step 26i (PR Act 60 tax incentive decrees)")
+    parser.add_argument("--skip-rum-coverover", action="store_true",
+                        help="Skip step 26j (PR Rum Cover-Over federal excise tax transfers)")
+    parser.add_argument("--skip-fhlb", action="store_true",
+                        help="Skip step 26k (FHLB advances to PR member banks)")
+    parser.add_argument("--skip-prepa", action="store_true",
+                        help="Skip step 26l (PREPA / Luma / Genera major contracts)")
+    parser.add_argument("--skip-promesa", action="store_true",
+                        help="Skip step 26m (PROMESA Title III creditor data)")
     args = parser.parse_args()
 
     root = PROJECT_ROOT
@@ -538,6 +583,104 @@ def main() -> int:
             )
         except Exception as e:
             logger.error(f"[Step 6b] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6c: Department of Education grants
+    # ------------------------------------------------------------------
+    if args.skip_ed:
+        logger.info("[Step 6c] SKIPPED (--skip-ed)\n")
+    else:
+        logger.info("[Step 6c] Downloading Department of Education grants for PR...")
+        try:
+            from scripts.download_ed import run as run_ed
+            ed_result = run_ed(root=root)
+            logger.info(f"[Step 6c] Done — {ed_result.get('master_rows', 0):,} ED grant rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6c] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6d: HHS (HRSA + ACF) grants
+    # ------------------------------------------------------------------
+    if args.skip_hhs:
+        logger.info("[Step 6d] SKIPPED (--skip-hhs)\n")
+    else:
+        logger.info("[Step 6d] Downloading HHS (HRSA + ACF) grants for PR...")
+        try:
+            from scripts.download_hhs import run as run_hhs
+            hhs_result = run_hhs(root=root)
+            logger.info(f"[Step 6d] Done — {hhs_result.get('master_rows', 0):,} HHS grant rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6d] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6e: DOJ grants
+    # ------------------------------------------------------------------
+    if args.skip_doj_grants:
+        logger.info("[Step 6e] SKIPPED (--skip-doj-grants)\n")
+    else:
+        logger.info("[Step 6e] Downloading DOJ grants for PR...")
+        try:
+            from scripts.download_doj_grants import run as run_doj
+            doj_result = run_doj(root=root)
+            logger.info(f"[Step 6e] Done — {doj_result.get('master_rows', 0):,} DOJ grant rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6e] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6f: Office of Insular Affairs grants
+    # ------------------------------------------------------------------
+    if args.skip_oia:
+        logger.info("[Step 6f] SKIPPED (--skip-oia)\n")
+    else:
+        logger.info("[Step 6f] Downloading OIA grants for PR...")
+        try:
+            from scripts.download_oia import run as run_oia
+            oia_result = run_oia(root=root)
+            logger.info(f"[Step 6f] Done — {oia_result.get('master_rows', 0):,} OIA grant rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6f] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6g: Homeowner Assistance Fund
+    # ------------------------------------------------------------------
+    if args.skip_haf:
+        logger.info("[Step 6g] SKIPPED (--skip-haf)\n")
+    else:
+        logger.info("[Step 6g] Downloading HAF (Homeowner Assistance Fund) for PR...")
+        try:
+            from scripts.download_haf import run as run_haf
+            haf_result = run_haf(root=root)
+            logger.info(f"[Step 6g] Done — {haf_result.get('master_rows', 0):,} HAF rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6g] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6h: Ex-Im Bank loans
+    # ------------------------------------------------------------------
+    if args.skip_exim:
+        logger.info("[Step 6h] SKIPPED (--skip-exim)\n")
+    else:
+        logger.info("[Step 6h] Downloading Ex-Im Bank data for PR...")
+        try:
+            from scripts.download_exim import run as run_exim
+            exim_result = run_exim(root=root)
+            logger.info(f"[Step 6h] Done — {exim_result.get('master_rows', 0):,} Ex-Im rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6h] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6i: Congressional earmarks
+    # ------------------------------------------------------------------
+    if args.skip_earmarks:
+        logger.info("[Step 6i] SKIPPED (--skip-earmarks)\n")
+    else:
+        logger.info("[Step 6i] Downloading congressional earmarks for PR...")
+        try:
+            from scripts.download_earmarks import run as run_earmarks
+            earmarks_result = run_earmarks(root=root)
+            logger.info(f"[Step 6i] Done — {earmarks_result.get('rows', 0):,} earmark records\n")
+        except Exception as e:
+            logger.error(f"[Step 6i] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 7: SAM.gov UEI enrichment
@@ -1012,6 +1155,118 @@ def main() -> int:
             )
         except Exception as e:
             logger.error(f"[Step 26e] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26f: NFIP flood insurance claims for PR
+    # ------------------------------------------------------------------
+    if args.skip_nfip:
+        logger.info("[Step 26f] SKIPPED (--skip-nfip)\n")
+    else:
+        logger.info("[Step 26f] Downloading NFIP flood insurance claims for PR (OpenFEMA)...")
+        try:
+            from scripts.download_nfip import run as run_nfip
+            nfip_result = run_nfip(root=root)
+            logger.info(f"[Step 26f] Done — {nfip_result.get('rows', 0):,} claim records\n")
+        except Exception as e:
+            logger.error(f"[Step 26f] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26g: LIHTC low-income housing tax credit projects
+    # ------------------------------------------------------------------
+    if args.skip_lihtc:
+        logger.info("[Step 26g] SKIPPED (--skip-lihtc)\n")
+    else:
+        logger.info("[Step 26g] Downloading LIHTC project data for PR (HUD User)...")
+        try:
+            from scripts.download_lihtc import run as run_lihtc
+            lihtc_result = run_lihtc(root=root)
+            logger.info(f"[Step 26g] Done — {lihtc_result.get('rows', 0):,} LIHTC projects\n")
+        except Exception as e:
+            logger.error(f"[Step 26g] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26h: NMTC new markets tax credit allocatees
+    # ------------------------------------------------------------------
+    if args.skip_nmtc:
+        logger.info("[Step 26h] SKIPPED (--skip-nmtc)\n")
+    else:
+        logger.info("[Step 26h] Downloading NMTC allocatee data for PR (CDFI Fund)...")
+        try:
+            from scripts.download_nmtc import run as run_nmtc
+            nmtc_result = run_nmtc(root=root)
+            logger.info(f"[Step 26h] Done — {nmtc_result.get('rows', 0):,} NMTC allocatees\n")
+        except Exception as e:
+            logger.error(f"[Step 26h] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26i: PR Act 60 tax incentive decrees
+    # ------------------------------------------------------------------
+    if args.skip_act60:
+        logger.info("[Step 26i] SKIPPED (--skip-act60)\n")
+    else:
+        logger.info("[Step 26i] Downloading Act 60 decree data for PR...")
+        try:
+            from scripts.download_act60 import run as run_act60
+            act60_result = run_act60(root=root)
+            logger.info(f"[Step 26i] Done — {act60_result.get('rows', 0):,} decrees\n")
+        except Exception as e:
+            logger.error(f"[Step 26i] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26j: PR Rum Cover-Over (federal excise tax transfers)
+    # ------------------------------------------------------------------
+    if args.skip_rum_coverover:
+        logger.info("[Step 26j] SKIPPED (--skip-rum-coverover)\n")
+    else:
+        logger.info("[Step 26j] Downloading Rum Cover-Over data for PR...")
+        try:
+            from scripts.download_rum_coverover import run as run_rum
+            rum_result = run_rum(root=root)
+            logger.info(f"[Step 26j] Done — {rum_result.get('rows', 0):,} fiscal year rows\n")
+        except Exception as e:
+            logger.error(f"[Step 26j] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26k: FHLB advances to PR member banks
+    # ------------------------------------------------------------------
+    if args.skip_fhlb:
+        logger.info("[Step 26k] SKIPPED (--skip-fhlb)\n")
+    else:
+        logger.info("[Step 26k] Downloading FHLB advance data for PR banks (FDIC SDI)...")
+        try:
+            from scripts.download_fhlb import run as run_fhlb
+            fhlb_result = run_fhlb(root=root)
+            logger.info(f"[Step 26k] Done — {fhlb_result.get('rows', 0):,} advance records\n")
+        except Exception as e:
+            logger.error(f"[Step 26k] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26l: PREPA / Luma / Genera major contracts
+    # ------------------------------------------------------------------
+    if args.skip_prepa:
+        logger.info("[Step 26l] SKIPPED (--skip-prepa)\n")
+    else:
+        logger.info("[Step 26l] Downloading PREPA / Luma / Genera contract data...")
+        try:
+            from scripts.download_prepa_contracts import run as run_prepa
+            prepa_result = run_prepa(root=root)
+            logger.info(f"[Step 26l] Done — {prepa_result.get('rows', 0):,} contracts\n")
+        except Exception as e:
+            logger.error(f"[Step 26l] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26m: PROMESA Title III creditor data
+    # ------------------------------------------------------------------
+    if args.skip_promesa:
+        logger.info("[Step 26m] SKIPPED (--skip-promesa)\n")
+    else:
+        logger.info("[Step 26m] Downloading PROMESA Title III creditor data...")
+        try:
+            from scripts.download_promesa_creditors import run as run_promesa
+            promesa_result = run_promesa(root=root)
+            logger.info(f"[Step 26m] Done — {promesa_result.get('rows', 0):,} creditor records\n")
+        except Exception as e:
+            logger.error(f"[Step 26m] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 26b: USACE Section 404/10 permits for PR
