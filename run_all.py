@@ -56,6 +56,11 @@ Usage:
   python3 run_all.py --skip-fhlb
   python3 run_all.py --skip-prepa
   python3 run_all.py --skip-promesa
+  python3 run_all.py --skip-report-builder
+  python3 run_all.py --skip-cabilderos
+  python3 run_all.py --skip-contralor
+  python3 run_all.py --skip-active-contractors
+  python3 run_all.py --skip-prasa
 """
 
 import argparse
@@ -395,6 +400,16 @@ def main() -> int:
                         help="Skip step 26l (PREPA / Luma / Genera major contracts)")
     parser.add_argument("--skip-promesa", action="store_true",
                         help="Skip step 26m (PROMESA Title III creditor data)")
+    parser.add_argument("--skip-report-builder", action="store_true",
+                        help="Skip step 6j (ingest FPDS Report Builder Excel files FY2018-FY2024)")
+    parser.add_argument("--skip-cabilderos", action="store_true",
+                        help="Skip step 26n (ingest PR Cabilderos state lobbyist registry)")
+    parser.add_argument("--skip-contralor", action="store_true",
+                        help="Skip step 26o (ingest PR Contralor audit data)")
+    parser.add_argument("--skip-active-contractors", action="store_true",
+                        help="Skip step 26p (ingest PR Active Contractor Listing)")
+    parser.add_argument("--skip-prasa", action="store_true",
+                        help="Skip step 26q (ingest PRASA contract data)")
     args = parser.parse_args()
 
     root = PROJECT_ROOT
@@ -681,6 +696,20 @@ def main() -> int:
             logger.info(f"[Step 6i] Done — {earmarks_result.get('rows', 0):,} earmark records\n")
         except Exception as e:
             logger.error(f"[Step 6i] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6j: FPDS Report Builder Excel ingestion (FY2018-FY2024)
+    # ------------------------------------------------------------------
+    if args.skip_report_builder:
+        logger.info("[Step 6j] SKIPPED (--skip-report-builder)\n")
+    else:
+        logger.info("[Step 6j] Ingesting FPDS Report Builder Excel files (FY2018–FY2024)...")
+        try:
+            from scripts.ingest_report_builder import run as run_report_builder
+            rb_result = run_report_builder(root=root)
+            logger.info(f"[Step 6j] Done — {rb_result.get('rows', 0):,} PR contract rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6j] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 7: SAM.gov UEI enrichment
@@ -1267,6 +1296,62 @@ def main() -> int:
             logger.info(f"[Step 26m] Done — {promesa_result.get('rows', 0):,} creditor records\n")
         except Exception as e:
             logger.error(f"[Step 26m] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26n: PR Cabilderos (state-level lobbyist registry)
+    # ------------------------------------------------------------------
+    if args.skip_cabilderos:
+        logger.info("[Step 26n] SKIPPED (--skip-cabilderos)\n")
+    else:
+        logger.info("[Step 26n] Ingesting PR Cabilderos (state lobbyist registry)...")
+        try:
+            from scripts.ingest_cabilderos import run as run_cabilderos
+            cab_result = run_cabilderos(root=root)
+            logger.info(f"[Step 26n] Done — {cab_result.get('rows', 0):,} cabildero records\n")
+        except Exception as e:
+            logger.error(f"[Step 26n] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26o: PR Contralor audit data
+    # ------------------------------------------------------------------
+    if args.skip_contralor:
+        logger.info("[Step 26o] SKIPPED (--skip-contralor)\n")
+    else:
+        logger.info("[Step 26o] Ingesting PR Contralor (Comptroller's Office) audit data...")
+        try:
+            from scripts.ingest_contralor import run as run_contralor
+            cont_result = run_contralor(root=root)
+            logger.info(f"[Step 26o] Done — {cont_result.get('rows', 0):,} audit records\n")
+        except Exception as e:
+            logger.error(f"[Step 26o] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26p: PR Active Contractor Listing
+    # ------------------------------------------------------------------
+    if args.skip_active_contractors:
+        logger.info("[Step 26p] SKIPPED (--skip-active-contractors)\n")
+    else:
+        logger.info("[Step 26p] Ingesting PR Active Contractor Listing...")
+        try:
+            from scripts.ingest_active_contractors import run as run_active_contractors
+            ac_result = run_active_contractors(root=root)
+            logger.info(f"[Step 26p] Done — {ac_result.get('rows', 0):,} contractor records\n")
+        except Exception as e:
+            logger.error(f"[Step 26p] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26q: PRASA contract data
+    # ------------------------------------------------------------------
+    if args.skip_prasa:
+        logger.info("[Step 26q] SKIPPED (--skip-prasa)\n")
+    else:
+        logger.info("[Step 26q] Ingesting PRASA (Aqueduct & Sewer Authority) contract data...")
+        try:
+            from scripts.ingest_prasa import run as run_prasa
+            prasa_result = run_prasa(root=root)
+            logger.info(f"[Step 26q] Done — {prasa_result.get('rows', 0):,} PRASA contracts\n")
+        except Exception as e:
+            logger.error(f"[Step 26q] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 26b: USACE Section 404/10 permits for PR

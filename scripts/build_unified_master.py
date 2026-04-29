@@ -69,8 +69,9 @@ NEW_MASTERS = [
     ("pr_hhs_master.csv",          "hhs"),
     ("pr_doj_grants_master.csv",   "doj_grants"),
     ("pr_oia_master.csv",          "oia"),
-    ("pr_haf_spending.csv",        "haf"),
+    ("pr_haf_spending.csv",         "haf"),
     ("pr_exim_master.csv",         "exim"),
+    ("pr_report_builder_master.csv", "report_builder"),
 ]
 
 # ---------------------------------------------------------------------------
