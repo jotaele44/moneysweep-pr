@@ -25,3 +25,8 @@ data/staging/processed/enrichment/
 !data/**/.gitkeep
 !data/staging/expansion/DOWNLOAD_INSTRUCTIONS.md
 !data/staging/expansion/manifest.json
+/coverage.xml
+.coverage
+/data/raw/SAM/*.dat
+.claude/
+data/.DS_Store
