@@ -7,6 +7,10 @@ on:
         description: "Type 'YES' (case-insensitive) to confirm fetch"
         required: true
         default: "no"
+      confirm_secondary:
+        description: "Type 'FETCH' (case-insensitive) to allow actual downloads"
+        required: true
+        default: "no"
 
 jobs:
   fetch_highergov:
