@@ -1,6 +1,8 @@
 # Contract-Sweeper
 
-![Tests](https://github.com/jotaele44/contract-sweeper/actions/workflows/tests.yml/badge.svg)
+![Tests](https://github.com/jotaele44/contract-sweeper/actions/workflows/tests.yml/badge.svg) [![codecov](https://codecov.io/gh/jotaele44/contract-sweeper/branch/main/graph/badge.svg)](https://codecov.io/gh/jotaele44/contract-sweeper)
+
+Coverage reports are uploaded to Codecov by CI. If this repository is private, add a CODECOV_TOKEN secret in Settings → Secrets to enable uploads.
 
 Puerto Rico Federal Contracts Data Pipeline — automated acquisition, validation,
 normalization, and coverage analysis of federal procurement data (FY 2000–2025).
