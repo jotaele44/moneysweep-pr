@@ -392,6 +392,27 @@ def main() -> int:
             dl_results = download_all(root, force=args.force_download)
             print_download_summary(dl_results, logger)
             download_count = sum(1 for r in dl_results if r["status"] in ("OK", "SKIPPED"))
+            # Attempt HigherGov API fetch if HIGHERGOV_API_KEY is available (falls back to .env)
+            try:
+                import os as _os
+                from scripts.config import _load_dotenv, PROJECT_ROOT as _root
+                hg_key = _os.environ.get("HIGHERGOV_API_KEY", "").strip() or _load_dotenv(_root / ".env").get("HIGHERGOV_API_KEY", "").strip()
+                if hg_key:
+                    logger.info("[Step 3.1] HIGHERGOV_API_KEY found — fetching HigherGov exports...")
+                    try:
+                        from scripts.fetch_highergov_api import main as _fetch_hg
+                        res = _fetch_hg()
+                        if res == 0:
+                            logger.info("[Step 3.1] HigherGov fetch completed successfully.")
+                        else:
+                            logger.warning(f"[Step 3.1] HigherGov fetch exited with code {res}.")
+                    except Exception as e:
+                        logger.error(f"[Step 3.1] HigherGov fetch failed: {e}")
+                else:
+                    logger.info("[Step 3.1] HIGHERGOV_API_KEY not set — skipping HigherGov fetch.")
+            except Exception:
+                logger.debug("Failed to run HigherGov fetch pre-check; continuing.")
+
             steps["download"] = True
             logger.info(f"[Step 3/29] Done ({download_count} files ready).\n")
         except ImportError:
