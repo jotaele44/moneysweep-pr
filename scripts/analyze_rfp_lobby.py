@@ -65,7 +65,7 @@ def _load_csv(path: Path, label: str, logger) -> pd.DataFrame | None:
 # ---------------------------------------------------------------------------
 
 def _parse_dates(df: pd.DataFrame, col: str) -> pd.Series:
-    return pd.to_datetime(df[col], errors="coerce")
+    return pd.to_datetime(df[col], errors="coerce", format="mixed")
 
 
 def _match_vendor_to_lda(vendor_norm: str, lda_df: pd.DataFrame) -> pd.DataFrame:
