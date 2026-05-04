@@ -16,6 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from scripts.parquet_utils import pq_read, pq_write
 from scripts.config import PROJECT_ROOT, setup_logging
 from scripts.build_unified_master import _normalize_name
 
@@ -263,7 +264,7 @@ def run(root=None, force=False) -> dict:
     if out_path.exists() and not force:
         logger.info("Output already exists and --force not set: %s", out_path)
         try:
-            existing = pd.read_parquet(out_path, engine="pyarrow")
+            existing = pq_read(out_path)
             return {"rows": len(existing), "path": str(out_path), "status": "CACHED"}
         except Exception as exc:
             logger.warning("Could not read cached file (%s); re-downloading.", exc)
@@ -292,7 +293,7 @@ def run(root=None, force=False) -> dict:
             "  Download CSV and place in data/raw/fema_pa/"
         )
         empty_df = pd.DataFrame(columns=PA_V2_COLUMNS)
-        empty_df.to_parquet(out_path, index=False, engine="pyarrow")
+        pq_write(empty_df, out_path)
         return {"rows": 0, "path": str(out_path), "status": "EMPTY"}
 
     # Build applicant enrichment lookup: applicantId → applicant_name
@@ -314,7 +315,7 @@ def run(root=None, force=False) -> dict:
         mapped.append(row)
 
     df = pd.DataFrame(mapped, columns=PA_V2_COLUMNS)
-    df.to_parquet(out_path, index=False, engine="pyarrow")
+    pq_write(df, out_path)
     logger.info("Saved %d PA v2 records to %s", len(df), out_path)
     return {"rows": len(df), "path": str(out_path), "status": "OK"}
 

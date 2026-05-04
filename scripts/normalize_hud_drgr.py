@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 
 from scripts.build_unified_master import _normalize_name
+from scripts.parquet_utils import pq_read, pq_write
 from scripts.config import PROJECT_ROOT, setup_logging
 
 NORMALIZED_DIR = PROJECT_ROOT / "data" / "normalized"
@@ -51,7 +52,7 @@ def _load(path, logger):
         logger.warning(f"  Missing: {path.name}")
         return pd.DataFrame()
     try:
-        df = pd.read_parquet(path, engine="pyarrow")
+        df = pq_read(path)
         logger.info(f"  Loaded {len(df):,} rows from {path.name}")
         return df
     except Exception as e:
@@ -176,7 +177,7 @@ def run(root=None, force=False):
     logger = setup_logging("normalize_hud_drgr")
 
     if not force and project_path.exists() and org_path.exists():
-        p_rows = len(pd.read_parquet(project_path, engine="pyarrow"))
+        p_rows = len(pq_read(project_path))
         logger.info(f"  hud_drgr_projects.parquet exists ({p_rows:,} rows) — skipping.")
         return {"project_rows": p_rows, "org_rows": 0, "status": "CACHED"}
 
@@ -199,11 +200,11 @@ def run(root=None, force=False):
             logger.warning(f"  {overdrawn.sum()} activities have amount_drawn > total_budget")
 
     df_projects = _build_projects(df_grants, df_appropriations, df_activities, logger)
-    df_projects.to_parquet(project_path, index=False, engine="pyarrow")
+    pq_write(df_projects, project_path)
     logger.info(f"  Projects → {project_path.name}")
 
     df_orgs = _build_responsible_orgs(df_activities, logger)
-    df_orgs.to_parquet(org_path, index=False, engine="pyarrow")
+    pq_write(df_orgs, org_path)
     logger.info(f"  Responsible orgs → {org_path.name}")
 
     return {"project_rows": len(df_projects), "org_rows": len(df_orgs), "status": "OK"}

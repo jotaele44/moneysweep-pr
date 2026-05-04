@@ -29,6 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
+from scripts.parquet_utils import pq_read, pq_write
 from scripts.config import PROJECT_ROOT, setup_logging
 from scripts.build_unified_master import _normalize_name
 
@@ -438,7 +439,7 @@ def run(root=None, force=False) -> dict:
     if out_path.exists() and not force:
         logger.info(f"Cached output found: {out_path}  (use --force to refresh)")
         try:
-            df = pd.read_parquet(out_path, engine="pyarrow")
+            df = pq_read(out_path)
             return {"rows": len(df), "path": str(out_path), "status": "CACHED"}
         except Exception:
             pass  # re-download if unreadable
@@ -484,7 +485,7 @@ def run(root=None, force=False) -> dict:
         )
         df = _empty_df()
 
-    df.to_parquet(out_path, index=False, engine="pyarrow")
+    pq_write(df, out_path)
     logger.info(f"Wrote {len(df)} rows -> {out_path}  [status={status}]")
 
     return {"rows": len(df), "path": str(out_path), "status": status}

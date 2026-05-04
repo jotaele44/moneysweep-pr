@@ -24,6 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 
 from scripts.build_unified_master import _normalize_name
+from scripts.parquet_utils import pq_read, pq_write
 from scripts.config import PROJECT_ROOT, setup_logging
 
 NORMALIZED_DIR = PROJECT_ROOT / "data" / "normalized"
@@ -199,7 +200,7 @@ def run(root=None, force=False):
     logger = setup_logging("ingest_hud_drgr_exports")
 
     if not force and all(p.exists() for p in [activity_path, drawdown_path, appropriation_path]):
-        a_rows = len(pd.read_parquet(activity_path, engine="pyarrow"))
+        a_rows = len(pq_read(activity_path))
         logger.info(f"  HUD DRGR exports: {a_rows:,} activities — skipping (use --force).")
         return {"activity_rows": a_rows, "drawdown_rows": 0, "appropriation_rows": 0, "status": "CACHED"}
 
@@ -229,11 +230,11 @@ def run(root=None, force=False):
     def _save(dfs, columns, path, label):
         if dfs:
             combined = pd.concat(dfs, ignore_index=True)
-            combined.to_parquet(path, index=False, engine="pyarrow")
+            pq_write(combined, path)
             n = len(combined)
         else:
             logger.warning(f"  No {label} data found — writing empty parquet")
-            pd.DataFrame(columns=columns).to_parquet(path, index=False, engine="pyarrow")
+            pq_write(pd.DataFrame(columns=columns), path)
             n = 0
         logger.info(f"  {label}: {n:,} rows → {path.name}")
         return n

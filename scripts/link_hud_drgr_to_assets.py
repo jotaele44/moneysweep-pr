@@ -23,6 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
 
+from scripts.parquet_utils import pq_read, pq_write
 from scripts.config import PROJECT_ROOT, setup_logging
 
 LINKED_DIR = PROJECT_ROOT / "data" / "linked"
@@ -113,7 +114,7 @@ def run(root=None, force=False):
         return {"linkage_rows": 0, "municipalities_matched": 0, "status": "EMPTY"}
 
     try:
-        df_activities = pd.read_parquet(activity_path, engine="pyarrow")
+        df_activities = pq_read(activity_path)
         logger.info(f"  Loaded {len(df_activities):,} activities")
     except Exception as e:
         logger.warning(f"  Failed to read activities: {e}")

@@ -15,6 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from scripts.parquet_utils import pq_read, pq_write
 from scripts.config import PROJECT_ROOT, setup_logging
 from scripts.build_unified_master import _normalize_name
 
@@ -196,7 +197,7 @@ def run(root=None, force=False) -> dict:
     if out_path.exists() and not force:
         logger.info("Output already exists and --force not set: %s", out_path)
         try:
-            existing = pd.read_parquet(out_path, engine="pyarrow")
+            existing = pq_read(out_path)
             return {"rows": len(existing), "path": str(out_path), "status": "CACHED"}
         except Exception as exc:
             logger.warning("Could not read cached file (%s); re-ingesting.", exc)
@@ -237,7 +238,7 @@ def run(root=None, force=False) -> dict:
             [str(d) for d in search_dirs],
         )
         empty_df = pd.DataFrame(columns=PORTAL_COLUMNS)
-        empty_df.to_parquet(out_path, index=False, engine="pyarrow")
+        pq_write(empty_df, out_path)
         return {"rows": 0, "path": str(out_path), "status": "EMPTY"}
 
     logger.info("Processing %d portal export file(s).", len(pw_files))
@@ -255,7 +256,7 @@ def run(root=None, force=False) -> dict:
     if not all_frames:
         logger.warning("All portal export files were empty or unreadable. Writing empty parquet.")
         empty_df = pd.DataFrame(columns=PORTAL_COLUMNS)
-        empty_df.to_parquet(out_path, index=False, engine="pyarrow")
+        pq_write(empty_df, out_path)
         return {"rows": 0, "path": str(out_path), "status": "EMPTY"}
 
     combined = pd.concat(all_frames, ignore_index=True)
@@ -276,7 +277,7 @@ def run(root=None, force=False) -> dict:
         before_dedup, len(combined), before_dedup - len(combined),
     )
 
-    combined.to_parquet(out_path, index=False, engine="pyarrow")
+    pq_write(combined, out_path)
     logger.info("Saved %d portal PW records to %s", len(combined), out_path)
     return {"rows": len(combined), "path": str(out_path), "status": "OK"}
 

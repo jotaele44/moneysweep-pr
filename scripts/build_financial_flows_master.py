@@ -39,6 +39,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 
 from scripts.build_unified_master import _normalize_name
+from scripts.parquet_utils import pq_read, pq_write
 from scripts.config import PROJECT_ROOT, setup_logging
 
 NORMALIZED_DIR = PROJECT_ROOT / "data" / "normalized"
@@ -64,7 +65,7 @@ def _load_parquet(path, logger):
     if not path.exists():
         return pd.DataFrame()
     try:
-        df = pd.read_parquet(path, engine="pyarrow")
+        df = pq_read(path)
         logger.info(f"  Loaded {len(df):,} rows from {path.name}")
         return df
     except Exception as e:
@@ -287,7 +288,7 @@ def run(root=None, force=False):
     logger = setup_logging("build_financial_flows_master")
 
     if out_path.exists() and not force:
-        rows = len(pd.read_parquet(out_path, engine="pyarrow"))
+        rows = len(pq_read(out_path))
         logger.info(f"  financial_flows_master.parquet exists ({rows:,} rows) — skipping.")
         return {"rows": rows, "status": "CACHED"}
 
@@ -318,7 +319,7 @@ def run(root=None, force=False):
         logger.warning("  No upstream data found — writing empty financial_flows_master")
         df_out = pd.DataFrame(columns=FLOW_COLUMNS)
 
-    df_out.to_parquet(out_path, index=False, engine="pyarrow")
+    pq_write(df_out, out_path)
 
     total_amount = pd.to_numeric(df_out["amount"], errors="coerce").fillna(0).sum()
     flow_types = df_out["flow_type"].value_counts().to_dict() if not df_out.empty else {}
