@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-27 08:17 UTC",
+  "generated_at": "2026-05-04 07:05 UTC",
   "data_layers": 3,
   "awards": {
     "total_obligated": 63866298263.10999,
@@ -56,61 +56,61 @@
       {
         "rank": 1,
         "name": "Hospital Damas Inc",
-        "score": 68.0,
+        "score": 56.37,
         "awards": 4554283750.25
       },
       {
         "rank": 2,
         "name": "Municipality of San Juan",
-        "score": 64.57,
+        "score": 53.42,
         "awards": 4453055891.36
       },
       {
         "rank": 3,
         "name": "Crowley Maritime Corp",
-        "score": 55.8,
+        "score": 45.91,
         "awards": 3986128201.12
       },
       {
         "rank": 4,
         "name": "Caribbean Data Services Inc",
-        "score": 52.78,
+        "score": 43.31,
         "awards": 3895395595.4
       },
       {
         "rank": 5,
         "name": "Puerto Rico Aqueduct And Sewer Authority",
-        "score": 52.01,
+        "score": 42.67,
         "awards": 3772063789.35
       },
       {
         "rank": 6,
         "name": "Microsoft Puerto Rico Inc",
-        "score": 46.0,
+        "score": 37.51,
         "awards": 3544492914.84
       },
       {
         "rank": 7,
         "name": "Interamerican University of Puerto Rico Inc",
-        "score": 43.72,
+        "score": 35.54,
         "awards": 3489917116.49
       },
       {
         "rank": 8,
         "name": "First Bancorp Puerto Rico",
-        "score": 43.68,
+        "score": 35.48,
         "awards": 3614407444.71
       },
       {
         "rank": 9,
         "name": "Centro Medico Del Turabo Inc",
-        "score": 39.33,
+        "score": 31.76,
         "awards": 3356594644.11
       },
       {
         "rank": 10,
         "name": "University of Puerto Rico",
-        "score": 38.98,
+        "score": 31.44,
         "awards": 3439057682.78
       }
     ]
@@ -176,5 +176,7 @@
   "rfp_lobby": {},
   "bond_flow": {},
   "ofac": {},
-  "sf133": {}
+  "sf133": {},
+  "tax_incentive": {},
+  "promesa": {}
 }
