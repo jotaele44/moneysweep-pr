@@ -10,7 +10,7 @@ are clearly marked as "pending data" rather than crashing.
 
 Core investigative questions answered:
   1. Federal money concentration — who receives the most, from which agencies?
-  2. Top influence actors — 7-axis power network ranking
+  2. Top influence actors — 8-axis power network ranking
   3. Prime-to-subcontractor flows — who controls the subcontracting layer?
   4. Full-loop entities — awards + FEC contributions + LDA lobbying simultaneously
   5. High-risk delivery — contractors with low FEMA completion / EQB violations
@@ -18,6 +18,8 @@ Core investigative questions answered:
   7. Dual-role bond actors — federal contractors who also underwrite PR bonds
   8. OFAC sanctions matches — award recipients on the SDN list
   9. SF-133 obligation gaps — federal money sitting unspent by agency
+ 10. Tax incentive double-dipping — Act 60 / LIHTC beneficiaries + federal awards
+ 11. PROMESA creditor influence — bond creditors with FEC + lobbying activity
 
 Usage:
   python3 scripts/generate_report.py
@@ -423,6 +425,156 @@ def _section_sf133(sf_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
     return "\n".join(lines) + "\n", summary
 
 
+def _section_tax_incentive(act60_df: pd.DataFrame, lihtc_df: pd.DataFrame,
+                            entity_df: pd.DataFrame, net_df: pd.DataFrame,
+                            top_n: int) -> tuple[str, dict]:
+    if act60_df.empty and lihtc_df.empty:
+        return _pending("PR tax incentive dual-benefit analysis (Act 60 + LIHTC)"), {}
+
+    import re as _re
+    _strip = _re.compile(r"[^\w\s]")
+    _space = _re.compile(r"\s+")
+    _sfx = {"INC","LLC","CORP","LTD","CO","LP","LLP","CSP","SE"}
+
+    def _norm(name):
+        if not name or pd.isna(name):
+            return ""
+        n = str(name).upper()
+        n = _strip.sub(" ", n)
+        n = _space.sub(" ", n).strip()
+        toks = n.split()
+        while toks and toks[-1] in _sfx:
+            toks.pop()
+        return " ".join(toks)
+
+    rows = []
+    if not act60_df.empty and "entity_name" in act60_df.columns:
+        for _, r in act60_df.iterrows():
+            rows.append({
+                "entity_name": str(r.get("entity_name", "")),
+                "norm_key":    _norm(str(r.get("entity_normalized", r.get("entity_name", "")))),
+                "source":      "Act 60",
+                "decree_type": str(r.get("decree_type", "")),
+                "amount":      _num(act60_df, "allocation_amount")[r.name] if "allocation_amount" in act60_df.columns else 0,
+            })
+    if not lihtc_df.empty:
+        for _, r in lihtc_df.iterrows():
+            nm = str(r.get("dev_nm", r.get("proj_own_nm", "")))
+            rows.append({
+                "entity_name": nm,
+                "norm_key":    _norm(str(r.get("dev_nm_normalized", nm))),
+                "source":      "LIHTC",
+                "decree_type": "Low-Income Housing Tax Credit",
+                "amount":      float(r.get("allocamt", 0) or 0),
+            })
+
+    if not rows:
+        return _pending("PR tax incentive dual-benefit analysis (Act 60 + LIHTC)"), {}
+
+    ti_df = pd.DataFrame(rows)
+
+    # cross-ref with federal awards
+    dual = []
+    if not entity_df.empty and "canonical_name_normalized" in entity_df.columns:
+        entity_norms = set(entity_df["canonical_name_normalized"].dropna().apply(_norm))
+        dual_keys = set(ti_df["norm_key"]) & entity_norms
+        ti_df["is_dual"] = ti_df["norm_key"].isin(dual_keys)
+        dual = ti_df[ti_df["is_dual"]].copy()
+
+    dual_count = len(dual["norm_key"].unique()) if not dual.empty and "norm_key" in dual.columns else 0
+
+    lines = [
+        f"**Tax incentive records:** {len(ti_df):,}  ",
+        f"**Dual-benefit entities (tax incentive AND federal awards):** {dual_count:,}  \n",
+        "Entities receiving PR government tax incentive decrees (Act 60/20/22) or "
+        "LIHTC housing tax credits while simultaneously receiving federal contracts "
+        "represent the deepest concentration of government-subsidized benefit.\n",
+        "| Entity | Incentive Type | Decree Type | Amount |",
+        "|--------|---------------|-------------|--------|",
+    ]
+    display = dual.head(top_n) if not dual.empty else ti_df.head(top_n)
+    for _, row in display.iterrows():
+        lines.append(
+            f"| {str(row.get('entity_name',''))[:45]} "
+            f"| {row.get('source','')}"
+            f"| {str(row.get('decree_type',''))[:35]} "
+            f"| {_fmt_usd(row.get('amount', 0))} |"
+        )
+
+    summary = {
+        "total_records": len(ti_df),
+        "dual_benefit_count": dual_count,
+    }
+    return "\n".join(lines) + "\n", summary
+
+
+def _section_promesa(promesa_df: pd.DataFrame, fec_df: pd.DataFrame,
+                     lda_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
+    if promesa_df.empty:
+        return _pending("PROMESA Title III creditor influence analysis"), {}
+
+    promesa_df = promesa_df.copy()
+
+    fec_names = set()
+    if not fec_df.empty and "contributor_name" in fec_df.columns:
+        fec_names = set(fec_df["contributor_name"].dropna().str.upper())
+
+    lda_names = set()
+    if not lda_df.empty:
+        for col in ("registrant_name", "client_name"):
+            if col in lda_df.columns:
+                lda_names |= set(lda_df[col].dropna().str.upper())
+
+    def _flag(name, name_set):
+        if not name or not name_set:
+            return False
+        n = str(name).upper()
+        return any(n[:15] in x or x[:15] in n for x in name_set)
+
+    promesa_df["fec_flag"] = promesa_df.get("creditor_name", pd.Series(dtype=str)).apply(
+        lambda x: _flag(x, fec_names))
+    promesa_df["lda_flag"] = promesa_df.get("creditor_name", pd.Series(dtype=str)).apply(
+        lambda x: _flag(x, lda_names))
+    promesa_df["influence_flag"] = promesa_df["fec_flag"] | promesa_df["lda_flag"]
+
+    influenced = promesa_df[promesa_df["influence_flag"]]
+
+    total_claim = _num(promesa_df, "claim_amount_original").sum()
+    total_recovery = _num(promesa_df, "recovery_amount").sum()
+
+    lines = [
+        f"**PROMESA Title III creditors:** {len(promesa_df):,}  ",
+        f"**Total claims:** {_fmt_usd(total_claim)}  ",
+        f"**Total recovery:** {_fmt_usd(total_recovery)}  ",
+        f"**Creditors with FEC/LDA political activity:** {len(influenced):,}  \n",
+        "Bond creditors who simultaneously engaged in federal political contributions "
+        "or lobbying represent entities that shaped both the PROMESA legislation and "
+        "the plan of adjustment that determined their own recovery rates.\n",
+        "| Creditor | Type | Bond Series | Claim | Recovery Rate | FEC | LDA |",
+        "|---------|------|------------|-------|--------------|-----|-----|",
+    ]
+    display = promesa_df.sort_values("influence_flag", ascending=False).head(top_n)
+    for _, row in display.iterrows():
+        claim = _num(promesa_df, "claim_amount_original")[row.name] if "claim_amount_original" in promesa_df.columns else 0
+        rate  = _num(promesa_df, "recovery_rate")[row.name] if "recovery_rate" in promesa_df.columns else 0
+        lines.append(
+            f"| {str(row.get('creditor_name',''))[:40]} "
+            f"| {str(row.get('creditor_type',''))[:12]} "
+            f"| {str(row.get('bond_series',''))[:15]} "
+            f"| {_fmt_usd(claim)} "
+            f"| {float(rate):.1%} "
+            f"| {'✅' if row.get('fec_flag') else '—'} "
+            f"| {'✅' if row.get('lda_flag') else '—'} |"
+        )
+
+    summary = {
+        "total_creditors": len(promesa_df),
+        "total_claims_usd": float(total_claim),
+        "politically_active": len(influenced),
+    }
+    return "\n".join(lines) + "\n", summary
+
+
 # ---------------------------------------------------------------------------
 # Core
 # ---------------------------------------------------------------------------
@@ -451,6 +603,11 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
     bond_df     = _load(proc / "pr_bond_flow.csv",              "bond_flow",           logger)
     ofac_df     = _load(proc / "pr_ofac_matches.csv",           "ofac_matches",        logger)
     sf133_df    = _load(proc / "pr_sf133_budget_execution.csv", "sf133",               logger)
+    act60_df    = _load(proc / "pr_act60_decrees.csv",          "act60",               logger)
+    lihtc_df    = _load(proc / "pr_lihtc_projects.csv",         "lihtc",               logger)
+    promesa_df  = _load(proc / "pr_promesa_creditors.csv",      "promesa_creditors",   logger)
+    fec_df      = _load(proc / "pr_fec_contributions.csv",      "fec_contributions",   logger)
+    lda_df      = _load(proc / "pr_lda_filings.csv",            "lda_filings",         logger)
 
     # Build each section
     s_awards,   j_awards   = _section_awards(entity_df, top_n)
@@ -461,19 +618,23 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
     s_bond,     j_bond     = _section_bond_flow(bond_df, top_n)
     s_ofac,     j_ofac     = _section_ofac(ofac_df)
     s_sf133,    j_sf133    = _section_sf133(sf133_df, top_n)
+    s_taxinc,   j_taxinc   = _section_tax_incentive(act60_df, lihtc_df, entity_df, net_df, top_n)
+    s_promesa,  j_promesa  = _section_promesa(promesa_df, fec_df, lda_df, top_n)
 
     generated_at = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
     data_layers = sum([
         not entity_df.empty, not net_df.empty, not ps_df.empty,
         not delivery_df.empty, not rfp_df.empty, not bond_df.empty,
         not ofac_df.empty, not sf133_df.empty,
+        not act60_df.empty or not lihtc_df.empty,
+        not promesa_df.empty,
     ])
 
     # Assemble markdown report
     report = f"""# Puerto Rico Federal Contract Ecosystem — Investigative Report
 
 *Generated: {generated_at}*
-*Data layers populated: {data_layers}/8 — sections marked "pending" require a Mac pipeline run.*
+*Data layers populated: {data_layers}/10 — sections marked "pending" require a Mac pipeline run.*
 
 ---
 
@@ -517,18 +678,30 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
 {s_sf133}
 ---
 
+## 9. PR Tax Incentive Double-Dipping
+
+{s_taxinc}
+---
+
+## 10. PROMESA Creditor Influence
+
+{s_promesa}
+---
+
 ## Data Coverage
 
 | Layer | Status |
 |-------|--------|
 | Federal awards master | {'✅' if not entity_df.empty else '⏳ pending Mac run'} |
-| Power network (7-axis) | {'✅' if not net_df.empty else '⏳ pending Mac run'} |
+| Power network (8-axis) | {'✅' if not net_df.empty else '⏳ pending Mac run'} |
 | Prime-sub relationships | {'✅' if not ps_df.empty else '⏳ pending Mac run'} |
 | Delivery scorecard | {'✅' if not delivery_df.empty else '⏳ pending Mac run'} |
 | RFP-lobby crossref | {'✅' if not rfp_df.empty else '⏳ pending Mac run'} |
 | Bond financial flow | {'✅' if not bond_df.empty else '⏳ pending Mac run'} |
 | OFAC sanctions | {'✅' if not ofac_df.empty else '⏳ pending Mac run'} |
 | SF-133 budget execution | {'✅' if not sf133_df.empty else '⏳ pending Mac run'} |
+| Tax incentive (Act 60 / LIHTC) | {'✅' if not act60_df.empty or not lihtc_df.empty else '⏳ pending Mac run'} |
+| PROMESA creditors | {'✅' if not promesa_df.empty else '⏳ pending Mac run'} |
 
 *To populate all layers: `python3 run_all.py --skip-download` from a machine with unrestricted network access.*
 """
@@ -547,11 +720,13 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
         "bond_flow":       j_bond,
         "ofac":            j_ofac,
         "sf133":           j_sf133,
+        "tax_incentive":   j_taxinc,
+        "promesa":         j_promesa,
     }
     summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
     logger.info(f"  Written: {summary_path.name}")
 
-    logger.info(f"  Report complete — {data_layers}/8 data layers populated")
+    logger.info(f"  Report complete — {data_layers}/10 data layers populated")
 
     return {
         "status":       "OK",
@@ -579,7 +754,7 @@ def main() -> int:
         print(f"\nReport: {result.get('report_path','')}")
         print(f"Summary: {result.get('summary_path','')}")
         if result.get("data_layers") is not None:
-            print(f"Data layers: {result['data_layers']}/8")
+            print(f"Data layers: {result['data_layers']}/10")
     return 0 if result.get("status") in ("OK", "CACHED") else 1
 
 

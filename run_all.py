@@ -1152,6 +1152,39 @@ def main() -> int:
             logger.error(f"[Step 26/29] FAILED: {e}")
 
     # ------------------------------------------------------------------
+    # Step 26b: USACE Section 404/10 permits for PR
+    # ------------------------------------------------------------------
+    if args.skip_usace:
+        logger.info("[Step 26b] SKIPPED (--skip-usace)\n")
+    else:
+        logger.info("[Step 26b] Downloading USACE permit data for PR (EPA ECHO)...")
+        try:
+            from scripts.download_usace_permits import run as run_usace
+            usace_result = run_usace(root=root)
+            logger.info(
+                f"[Step 26b] Done — {usace_result.get('rows', 0):,} permits\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 26b] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26c: PR EQB environmental permits via EPA ECHO
+    # ------------------------------------------------------------------
+    if args.skip_eqb:
+        logger.info("[Step 26c] SKIPPED (--skip-eqb)\n")
+    else:
+        logger.info("[Step 26c] Downloading PR EQB environmental permit data (EPA ECHO)...")
+        try:
+            from scripts.download_eqb import run as run_eqb
+            eqb_result = run_eqb(root=root)
+            logger.info(
+                f"[Step 26c] Done — {eqb_result.get('rows', 0):,} facilities, "
+                f"{eqb_result.get('with_violations', 0):,} with violations\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 26c] FAILED: {e}")
+
+    # ------------------------------------------------------------------
     # Step 26d: MSRB RTRS secondary market trade data for PR CUSIPs
     # ------------------------------------------------------------------
     if args.skip_msrb_trades:
@@ -1352,39 +1385,6 @@ def main() -> int:
             logger.info(f"[Step 26q] Done — {prasa_result.get('rows', 0):,} PRASA contracts\n")
         except Exception as e:
             logger.error(f"[Step 26q] FAILED: {e}")
-
-    # ------------------------------------------------------------------
-    # Step 26b: USACE Section 404/10 permits for PR
-    # ------------------------------------------------------------------
-    if args.skip_usace:
-        logger.info("[Step 26b] SKIPPED (--skip-usace)\n")
-    else:
-        logger.info("[Step 26b] Downloading USACE permit data for PR (EPA ECHO)...")
-        try:
-            from scripts.download_usace_permits import run as run_usace
-            usace_result = run_usace(root=root)
-            logger.info(
-                f"[Step 26b] Done — {usace_result.get('rows', 0):,} permits\n"
-            )
-        except Exception as e:
-            logger.error(f"[Step 26b] FAILED: {e}")
-
-    # ------------------------------------------------------------------
-    # Step 26c: PR EQB environmental permits via EPA ECHO
-    # ------------------------------------------------------------------
-    if args.skip_eqb:
-        logger.info("[Step 26c] SKIPPED (--skip-eqb)\n")
-    else:
-        logger.info("[Step 26c] Downloading PR EQB environmental permit data (EPA ECHO)...")
-        try:
-            from scripts.download_eqb import run as run_eqb
-            eqb_result = run_eqb(root=root)
-            logger.info(
-                f"[Step 26c] Done — {eqb_result.get('rows', 0):,} facilities, "
-                f"{eqb_result.get('with_violations', 0):,} with violations\n"
-            )
-        except Exception as e:
-            logger.error(f"[Step 26c] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 27: OFAC SDN sanctions crossref

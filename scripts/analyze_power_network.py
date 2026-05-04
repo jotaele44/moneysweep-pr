@@ -5,14 +5,16 @@ Combines every data source in the pipeline to produce a single ranked
 entity list showing which organizations sit at the center of PR's
 federal financial ecosystem.
 
-Scoring model — six axes, each normalized 0-100 then weighted:
+Scoring model — eight axes, each normalized 0-100 then weighted:
 
-  1. Federal awards received         (weight 0.35) — contracts + grants + loans
-  2. FEC campaign contributions      (weight 0.15) — donations to federal candidates
-  3. Lobbying expenditure            (weight 0.15) — LDA client expenses + registrant income
-  4. Nonprofit financial size        (weight 0.10) — 990 total revenue
-  5. Medicare/CMS payments received  (weight 0.10) — federal healthcare reimbursements
-  6. Cross-source presence           (weight 0.15) — bonus for appearing in multiple datasets
+  1. Federal awards received         (weight 0.30) — contracts + grants + loans
+  2. FEC campaign contributions      (weight 0.13) — donations to federal candidates
+  3. Lobbying expenditure            (weight 0.13) — LDA client expenses + registrant income
+  4. Nonprofit financial size        (weight 0.08) — 990 total revenue
+  5. Medicare/CMS payments received  (weight 0.08) — federal healthcare reimbursements
+  6. Bond market presence            (weight 0.11) — underwriting + issuance + dealer volume
+  7. Tax incentive dual-benefit      (weight 0.04) — Act 60 decrees + LIHTC allocations
+  8. Cross-source presence           (weight 0.13) — bonus for appearing in multiple datasets
 
 Output:
   data/staging/processed/pr_power_network.csv
@@ -46,13 +48,14 @@ from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
 # ---------------------------------------------------------------------------
 
 WEIGHTS = {
-    "awards":    0.32,
-    "fec":       0.13,
-    "lobbying":  0.13,
-    "nonprofit": 0.08,
-    "medicare":  0.08,
-    "bonds":     0.11,
-    "presence":  0.15,
+    "awards":        0.30,
+    "fec":           0.13,
+    "lobbying":      0.13,
+    "nonprofit":     0.08,
+    "medicare":      0.08,
+    "bonds":         0.11,
+    "tax_incentive": 0.04,
+    "presence":      0.13,
 }
 assert abs(sum(WEIGHTS.values()) - 1.0) < 1e-9, "Weights must sum to 1"
 
@@ -292,16 +295,48 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
     else:
         merged["bond_total_par"] = 0.0
 
+    # ------------------------------------------------------------------
+    # Axis 8: Tax incentive dual-benefit (Act 60 decrees + LIHTC allocations)
+    # ------------------------------------------------------------------
+    df_act60 = _load(pdir / "pr_act60_decrees.csv", logger)
+    df_lihtc = _load(pdir / "pr_lihtc_projects.csv", logger)
+
+    merged["tax_incentive_total"] = 0.0
+
+    if df_act60 is not None and not df_act60.empty and "entity_normalized" in df_act60.columns:
+        df_act60["norm_key"] = df_act60["entity_normalized"].apply(_normalize)
+        amt_col = next((c for c in ("allocation_amount", "decree_value", "amount") if c in df_act60.columns), None)
+        if amt_col:
+            df_act60[amt_col] = pd.to_numeric(df_act60[amt_col], errors="coerce").fillna(0)
+            act60_agg = df_act60.groupby("norm_key")[amt_col].sum().reset_index()
+            act60_agg.columns = ["norm_key", "act60_amount"]
+        else:
+            act60_agg = df_act60.groupby("norm_key").size().reset_index(name="act60_amount")
+        merged = merged.merge(act60_agg, on="norm_key", how="left")
+        merged["tax_incentive_total"] += merged["act60_amount"].fillna(0)
+        sources_present.add("tax_incentive")
+
+    if df_lihtc is not None and not df_lihtc.empty:
+        name_col = next((c for c in ("dev_nm_normalized", "proj_own_nm_normalized", "gen_contractor_nm_normalized") if c in df_lihtc.columns), None)
+        if name_col and "allocamt" in df_lihtc.columns:
+            df_lihtc["norm_key"] = df_lihtc[name_col].apply(_normalize)
+            df_lihtc["allocamt"] = pd.to_numeric(df_lihtc["allocamt"], errors="coerce").fillna(0)
+            lihtc_agg = df_lihtc.groupby("norm_key")["allocamt"].sum().reset_index()
+            lihtc_agg.columns = ["norm_key", "lihtc_allocamt"]
+            merged = merged.merge(lihtc_agg, on="norm_key", how="left")
+            merged["tax_incentive_total"] += merged["lihtc_allocamt"].fillna(0)
+            sources_present.add("tax_incentive")
+
     # Fill numeric NaN
     for col in ["fec_total_contributions", "lda_lobbying_total",
-                "np_revenue", "cms_medicare_payment", "bond_total_par"]:
+                "np_revenue", "cms_medicare_payment", "bond_total_par", "tax_incentive_total"]:
         if col in merged.columns:
             merged[col] = pd.to_numeric(merged[col], errors="coerce").fillna(0.0)
         else:
             merged[col] = 0.0
 
     # ------------------------------------------------------------------
-    # Cross-source presence score (0–6 = number of datasets entity appears in)
+    # Cross-source presence score (0–7 = number of datasets entity appears in)
     # ------------------------------------------------------------------
     merged["source_presence"] = (
         (merged["awards_total"] > 0).astype(int) +
@@ -309,28 +344,31 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
         (merged.get("lda_lobbying_total",       pd.Series([0]*len(merged))).fillna(0) > 0).astype(int) +
         (merged.get("np_revenue",               pd.Series([0]*len(merged))).fillna(0) > 0).astype(int) +
         (merged.get("cms_medicare_payment",     pd.Series([0]*len(merged))).fillna(0) > 0).astype(int) +
-        (merged.get("bond_total_par",           pd.Series([0]*len(merged))).fillna(0) > 0).astype(int)
+        (merged.get("bond_total_par",           pd.Series([0]*len(merged))).fillna(0) > 0).astype(int) +
+        (merged.get("tax_incentive_total",      pd.Series([0]*len(merged))).fillna(0) > 0).astype(int)
     )
 
     # ------------------------------------------------------------------
     # Normalize each axis and compute composite score
     # ------------------------------------------------------------------
-    merged["score_awards"]    = _minmax(merged["awards_total"])
-    merged["score_fec"]       = _minmax(merged.get("fec_total_contributions", pd.Series([0]*len(merged))).fillna(0))
-    merged["score_lobbying"]  = _minmax(merged.get("lda_lobbying_total", pd.Series([0]*len(merged))).fillna(0))
-    merged["score_nonprofit"] = _minmax(merged.get("np_revenue", pd.Series([0]*len(merged))).fillna(0))
-    merged["score_medicare"]  = _minmax(merged.get("cms_medicare_payment", pd.Series([0]*len(merged))).fillna(0))
-    merged["score_bonds"]     = _minmax(merged.get("bond_total_par", pd.Series([0]*len(merged))).fillna(0))
-    merged["score_presence"]  = merged["source_presence"] / 6 * 100
+    merged["score_awards"]        = _minmax(merged["awards_total"])
+    merged["score_fec"]           = _minmax(merged.get("fec_total_contributions", pd.Series([0]*len(merged))).fillna(0))
+    merged["score_lobbying"]      = _minmax(merged.get("lda_lobbying_total", pd.Series([0]*len(merged))).fillna(0))
+    merged["score_nonprofit"]     = _minmax(merged.get("np_revenue", pd.Series([0]*len(merged))).fillna(0))
+    merged["score_medicare"]      = _minmax(merged.get("cms_medicare_payment", pd.Series([0]*len(merged))).fillna(0))
+    merged["score_bonds"]         = _minmax(merged.get("bond_total_par", pd.Series([0]*len(merged))).fillna(0))
+    merged["score_tax_incentive"] = _minmax(merged.get("tax_incentive_total", pd.Series([0]*len(merged))).fillna(0))
+    merged["score_presence"]      = merged["source_presence"] / 7 * 100
 
     merged["influence_score"] = (
-        merged["score_awards"]    * WEIGHTS["awards"] +
-        merged["score_fec"]       * WEIGHTS["fec"] +
-        merged["score_lobbying"]  * WEIGHTS["lobbying"] +
-        merged["score_nonprofit"] * WEIGHTS["nonprofit"] +
-        merged["score_medicare"]  * WEIGHTS["medicare"] +
-        merged["score_bonds"]     * WEIGHTS["bonds"] +
-        merged["score_presence"]  * WEIGHTS["presence"]
+        merged["score_awards"]        * WEIGHTS["awards"] +
+        merged["score_fec"]           * WEIGHTS["fec"] +
+        merged["score_lobbying"]      * WEIGHTS["lobbying"] +
+        merged["score_nonprofit"]     * WEIGHTS["nonprofit"] +
+        merged["score_medicare"]      * WEIGHTS["medicare"] +
+        merged["score_bonds"]         * WEIGHTS["bonds"] +
+        merged["score_tax_incentive"] * WEIGHTS["tax_incentive"] +
+        merged["score_presence"]      * WEIGHTS["presence"]
     ).round(2)
 
     merged = merged.sort_values("influence_score", ascending=False).reset_index(drop=True)
@@ -354,12 +392,13 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
             "source_presence": int(row["source_presence"]),
             "sources":         [],
         }
-        if row["awards_total"] > 0:                    entry["sources"].append("awards")
-        if row.get("fec_total_contributions", 0) > 0:  entry["sources"].append("fec")
-        if row.get("lda_lobbying_total", 0) > 0:       entry["sources"].append("lda")
-        if row.get("np_revenue", 0) > 0:               entry["sources"].append("nonprofit_990")
-        if row.get("cms_medicare_payment", 0) > 0:     entry["sources"].append("medicare")
-        if row.get("bond_total_par", 0) > 0:           entry["sources"].append("bonds")
+        if row["awards_total"] > 0:                       entry["sources"].append("awards")
+        if row.get("fec_total_contributions", 0) > 0:   entry["sources"].append("fec")
+        if row.get("lda_lobbying_total", 0) > 0:        entry["sources"].append("lda")
+        if row.get("np_revenue", 0) > 0:                entry["sources"].append("nonprofit_990")
+        if row.get("cms_medicare_payment", 0) > 0:      entry["sources"].append("medicare")
+        if row.get("bond_total_par", 0) > 0:            entry["sources"].append("bonds")
+        if row.get("tax_incentive_total", 0) > 0:       entry["sources"].append("tax_incentive")
         top_entities.append(entry)
 
     total_awards_val = float(merged["awards_total"].sum())
