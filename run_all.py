@@ -409,7 +409,34 @@ def main() -> int:
     parser.add_argument("--skip-active-contractors", action="store_true",
                         help="Skip step 26p (ingest PR Active Contractor Listing)")
     parser.add_argument("--skip-prasa", action="store_true",
-                        help="Skip step 26q (ingest PRASA contract data)")
+                        help="Skip step 26q (PRASA contract data — fetch then manual fallback)")
+    # FEMA PA backbone (Phase 3)
+    parser.add_argument("--skip-fema-pa-projects", action="store_true",
+                        help="Skip step 15d (OpenFEMA PA v2 projects for PR)")
+    parser.add_argument("--skip-fema-pa-portal", action="store_true",
+                        help="Skip step 15e (FEMA PA portal 178-PW export ingest)")
+    parser.add_argument("--skip-fema-pa-linkage", action="store_true",
+                        help="Skip step 15f (FEMA PA PW linkage to contracts/entities)")
+    parser.add_argument("--skip-fema-pa-validation", action="store_true",
+                        help="Skip step 15g (FEMA PA coverage and gap validation)")
+    # HUD DRGR backbone (Phase 4)
+    parser.add_argument("--skip-drgr-public", action="store_true",
+                        help="Skip step 15h (HUD DRGR public downloads)")
+    parser.add_argument("--skip-drgr-exports", action="store_true",
+                        help="Skip step 15i (HUD DRGR authorized local exports)")
+    parser.add_argument("--skip-drgr-normalize", action="store_true",
+                        help="Skip step 15j (HUD DRGR normalize grants/activities/drawdowns)")
+    parser.add_argument("--skip-drgr-linkage", action="store_true",
+                        help="Skip step 15k (HUD DRGR responsible org → contract linkage)")
+    parser.add_argument("--skip-drgr-assets", action="store_true",
+                        help="Skip step 15l (HUD DRGR activity → asset/municipality linkage)")
+    parser.add_argument("--skip-drgr-validation", action="store_true",
+                        help="Skip step 15m (HUD DRGR coverage and entity-resolution report)")
+    parser.add_argument("--skip-drgr-amounts", action="store_true",
+                        help="Skip step 15n (HUD DRGR budget/drawdown amount reconciliation)")
+    # Financial flows master (Phase 11)
+    parser.add_argument("--skip-financial-flows", action="store_true",
+                        help="Skip step 15o (build financial_flows_master.parquet)")
     args = parser.parse_args()
 
     root = PROJECT_ROOT
@@ -915,6 +942,203 @@ def main() -> int:
             logger.error(f"[Step 15c] FAILED: {e}")
 
     # ------------------------------------------------------------------
+    # Step 15d: OpenFEMA PA v2 projects (FEMA PA backbone — Phase 3)
+    # ------------------------------------------------------------------
+    if args.skip_fema_pa_projects:
+        logger.info("[Step 15d] SKIPPED (--skip-fema-pa-projects)\n")
+    else:
+        logger.info("[Step 15d] Downloading OpenFEMA PA v2 projects for PR...")
+        try:
+            from scripts.download_openfema_pa_projects import run as run_openfema_pa
+            pa_v2_result = run_openfema_pa(root=root)
+            logger.info(f"[Step 15d] Done — {pa_v2_result.get('rows', 0):,} PA v2 rows\n")
+        except Exception as e:
+            logger.error(f"[Step 15d] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15e: FEMA PA portal 178-PW export ingest
+    # ------------------------------------------------------------------
+    if args.skip_fema_pa_portal:
+        logger.info("[Step 15e] SKIPPED (--skip-fema-pa-portal)\n")
+    else:
+        logger.info("[Step 15e] Ingesting FEMA PA portal 178-PW export files...")
+        try:
+            from scripts.ingest_fema_pa_portal_exports import run as run_fema_pa_portal
+            portal_result = run_fema_pa_portal(root=root)
+            logger.info(f"[Step 15e] Done — {portal_result.get('rows', 0):,} portal PW rows\n")
+        except Exception as e:
+            logger.error(f"[Step 15e] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15f: FEMA PA PW linkage to contracts/entities/COR3
+    # ------------------------------------------------------------------
+    if args.skip_fema_pa_linkage:
+        logger.info("[Step 15f] SKIPPED (--skip-fema-pa-linkage)\n")
+    else:
+        logger.info("[Step 15f] Linking FEMA PA PWs to contracts and entities...")
+        try:
+            from scripts.link_fema_pa_to_contracts import run as run_fema_pa_linkage
+            link_result = run_fema_pa_linkage(root=root)
+            logger.info(
+                f"[Step 15f] Done — {link_result.get('linkage_rows', 0):,} linkage rows, "
+                f"{link_result.get('matched_pct', 0):.1f}% matched\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 15f] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15g: FEMA PA coverage validation
+    # ------------------------------------------------------------------
+    if args.skip_fema_pa_validation:
+        logger.info("[Step 15g] SKIPPED (--skip-fema-pa-validation)\n")
+    else:
+        logger.info("[Step 15g] Validating FEMA PA coverage (178-PW check, v1/v2 diff, gaps)...")
+        try:
+            from scripts.validate_fema_pa_coverage import run as run_fema_pa_val
+            val_result = run_fema_pa_val(root=root)
+            logger.info(
+                f"[Step 15g] Done — {val_result.get('pw_coverage', 0)}/{val_result.get('pw_target', 178)} PWs, "
+                f"{val_result.get('gap_count', 0)} gaps, "
+                f"{val_result.get('high_value_unresolved', 0)} high-value unresolved\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 15g] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15h: HUD DRGR public downloads (Phase 4)
+    # ------------------------------------------------------------------
+    if args.skip_drgr_public:
+        logger.info("[Step 15h] SKIPPED (--skip-drgr-public)\n")
+    else:
+        logger.info("[Step 15h] Downloading HUD DRGR public financial reports...")
+        try:
+            from scripts.download_hud_drgr_public import run as run_drgr_public
+            drgr_pub = run_drgr_public(root=root)
+            logger.info(f"[Step 15h] Done — {drgr_pub.get('rows', 0):,} HUD DRGR grant rows\n")
+        except Exception as e:
+            logger.error(f"[Step 15h] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15i: HUD DRGR authorized local exports
+    # ------------------------------------------------------------------
+    if args.skip_drgr_exports:
+        logger.info("[Step 15i] SKIPPED (--skip-drgr-exports)\n")
+    else:
+        logger.info("[Step 15i] Ingesting HUD DRGR authorized local export files...")
+        try:
+            from scripts.ingest_hud_drgr_exports import run as run_drgr_exports
+            drgr_exp = run_drgr_exports(root=root)
+            logger.info(
+                f"[Step 15i] Done — {drgr_exp.get('activity_rows', 0):,} activities, "
+                f"{drgr_exp.get('drawdown_rows', 0):,} drawdowns\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 15i] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15j: HUD DRGR normalize
+    # ------------------------------------------------------------------
+    if args.skip_drgr_normalize:
+        logger.info("[Step 15j] SKIPPED (--skip-drgr-normalize)\n")
+    else:
+        logger.info("[Step 15j] Normalizing HUD DRGR grants/projects/activities...")
+        try:
+            from scripts.normalize_hud_drgr import run as run_drgr_norm
+            drgr_norm = run_drgr_norm(root=root)
+            logger.info(
+                f"[Step 15j] Done — {drgr_norm.get('project_rows', 0):,} projects, "
+                f"{drgr_norm.get('org_rows', 0):,} responsible orgs\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 15j] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15k: HUD DRGR responsible org → contract linkage
+    # ------------------------------------------------------------------
+    if args.skip_drgr_linkage:
+        logger.info("[Step 15k] SKIPPED (--skip-drgr-linkage)\n")
+    else:
+        logger.info("[Step 15k] Linking HUD DRGR responsible orgs to contracts/entities...")
+        try:
+            from scripts.link_hud_drgr_to_contracts import run as run_drgr_link
+            drgr_link = run_drgr_link(root=root)
+            logger.info(
+                f"[Step 15k] Done — {drgr_link.get('linkage_rows', 0):,} rows, "
+                f"{drgr_link.get('matched_pct', 0):.1f}% matched\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 15k] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15l: HUD DRGR activity → asset/municipality linkage
+    # ------------------------------------------------------------------
+    if args.skip_drgr_assets:
+        logger.info("[Step 15l] SKIPPED (--skip-drgr-assets)\n")
+    else:
+        logger.info("[Step 15l] Linking HUD DRGR activities to assets and municipalities...")
+        try:
+            from scripts.link_hud_drgr_to_assets import run as run_drgr_assets
+            drgr_assets = run_drgr_assets(root=root)
+            logger.info(
+                f"[Step 15l] Done — {drgr_assets.get('linkage_rows', 0):,} rows, "
+                f"{drgr_assets.get('municipalities_matched', 0)} municipalities\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 15l] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15m: HUD DRGR coverage validation
+    # ------------------------------------------------------------------
+    if args.skip_drgr_validation:
+        logger.info("[Step 15m] SKIPPED (--skip-drgr-validation)\n")
+    else:
+        logger.info("[Step 15m] Validating HUD DRGR coverage and entity resolution...")
+        try:
+            from scripts.validate_hud_drgr_coverage import run as run_drgr_val
+            drgr_val = run_drgr_val(root=root)
+            logger.info(
+                f"[Step 15m] Done — {drgr_val.get('resolved_pct', 0):.1f}% resolved, "
+                f"{drgr_val.get('unlinked_count', 0)} unlinked, "
+                f"{'PASS' if drgr_val.get('coverage_pass') else 'FAIL'}\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 15m] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15n: HUD DRGR amount reconciliation
+    # ------------------------------------------------------------------
+    if args.skip_drgr_amounts:
+        logger.info("[Step 15n] SKIPPED (--skip-drgr-amounts)\n")
+    else:
+        logger.info("[Step 15n] Reconciling HUD DRGR budget/drawdown amounts...")
+        try:
+            from scripts.validate_hud_drgr_amounts import run as run_drgr_amounts
+            drgr_amts = run_drgr_amounts(root=root)
+            logger.info(
+                f"[Step 15n] Done — {drgr_amts.get('checked', 0):,} checks, "
+                f"{drgr_amts.get('flagged', 0)} flagged ({drgr_amts.get('flag_pct', 0):.1f}%)\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 15n] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15o: Build financial flows master (Phase 11 synthesis)
+    # ------------------------------------------------------------------
+    if args.skip_financial_flows:
+        logger.info("[Step 15o] SKIPPED (--skip-financial-flows)\n")
+    else:
+        logger.info("[Step 15o] Building financial_flows_master.parquet (all upstream flows)...")
+        try:
+            from scripts.build_financial_flows_master import run as run_financial_flows
+            ff_result = run_financial_flows(root=root)
+            logger.info(
+                f"[Step 15o] Done — {ff_result.get('rows', 0):,} flow rows, "
+                f"${ff_result.get('total_amount', 0):,.0f} total\n"
+            )
+        except Exception as e:
+            logger.error(f"[Step 15o] FAILED: {e}")
+
+    # ------------------------------------------------------------------
     # Step 16: Build unified master
     # ------------------------------------------------------------------
     if args.skip_unified_master:
@@ -1331,57 +1555,71 @@ def main() -> int:
             logger.error(f"[Step 26m] FAILED: {e}")
 
     # ------------------------------------------------------------------
-    # Step 26n: PR Cabilderos (state-level lobbyist registry)
+    # Step 26n: PR Cabilderos — ingest manual files, then fetch if empty
     # ------------------------------------------------------------------
     if args.skip_cabilderos:
         logger.info("[Step 26n] SKIPPED (--skip-cabilderos)\n")
     else:
-        logger.info("[Step 26n] Ingesting PR Cabilderos (state lobbyist registry)...")
+        logger.info("[Step 26n] Cabilderos — manual ingest then fetch from registrodecabilderos.pr.gov...")
         try:
-            from scripts.ingest_cabilderos import run as run_cabilderos
-            cab_result = run_cabilderos(root=root)
+            from scripts.ingest_cabilderos import run as run_ingest_cabilderos
+            cab_result = run_ingest_cabilderos(root=root)
+            if cab_result.get("rows", 0) == 0:
+                from scripts.download_cabilderos import run as run_download_cabilderos
+                cab_result = run_download_cabilderos(root=root, force=True)
             logger.info(f"[Step 26n] Done — {cab_result.get('rows', 0):,} cabildero records\n")
         except Exception as e:
             logger.error(f"[Step 26n] FAILED: {e}")
 
     # ------------------------------------------------------------------
-    # Step 26o: PR Contralor audit data
+    # Step 26o: PR Contralor — ingest manual files, then fetch if empty
     # ------------------------------------------------------------------
     if args.skip_contralor:
         logger.info("[Step 26o] SKIPPED (--skip-contralor)\n")
     else:
-        logger.info("[Step 26o] Ingesting PR Contralor (Comptroller's Office) audit data...")
+        logger.info("[Step 26o] Contralor — manual ingest then fetch from iapconsulta.ocpr.gov.pr...")
         try:
-            from scripts.ingest_contralor import run as run_contralor
-            cont_result = run_contralor(root=root)
-            logger.info(f"[Step 26o] Done — {cont_result.get('rows', 0):,} audit records\n")
+            from scripts.ingest_contralor import run as run_ingest_contralor
+            cont_result = run_ingest_contralor(root=root)
+            if cont_result.get("rows", 0) == 0:
+                from scripts.download_contralor import run as run_download_contralor
+                cont_result = run_download_contralor(root=root, force=True)
+            logger.info(
+                f"[Step 26o] Done — {cont_result.get('rows', cont_result.get('audit_rows', 0)):,} Contralor records\n"
+            )
         except Exception as e:
             logger.error(f"[Step 26o] FAILED: {e}")
 
     # ------------------------------------------------------------------
-    # Step 26p: PR Active Contractor Listing
+    # Step 26p: PR Active Contractor Listing — ingest then fetch if empty
     # ------------------------------------------------------------------
     if args.skip_active_contractors:
         logger.info("[Step 26p] SKIPPED (--skip-active-contractors)\n")
     else:
-        logger.info("[Step 26p] Ingesting PR Active Contractor Listing...")
+        logger.info("[Step 26p] Active Contractors — manual ingest then fetch from asg.pr.gov...")
         try:
-            from scripts.ingest_active_contractors import run as run_active_contractors
-            ac_result = run_active_contractors(root=root)
+            from scripts.ingest_active_contractors import run as run_ingest_ac
+            ac_result = run_ingest_ac(root=root)
+            if ac_result.get("rows", 0) == 0:
+                from scripts.download_active_contractors import run as run_download_ac
+                ac_result = run_download_ac(root=root, force=True)
             logger.info(f"[Step 26p] Done — {ac_result.get('rows', 0):,} contractor records\n")
         except Exception as e:
             logger.error(f"[Step 26p] FAILED: {e}")
 
     # ------------------------------------------------------------------
-    # Step 26q: PRASA contract data
+    # Step 26q: PRASA contract data — ingest manual files, then fetch
     # ------------------------------------------------------------------
     if args.skip_prasa:
         logger.info("[Step 26q] SKIPPED (--skip-prasa)\n")
     else:
-        logger.info("[Step 26q] Ingesting PRASA (Aqueduct & Sewer Authority) contract data...")
+        logger.info("[Step 26q] PRASA — manual ingest then fetch from acueductos.pr.gov...")
         try:
-            from scripts.ingest_prasa import run as run_prasa
-            prasa_result = run_prasa(root=root)
+            from scripts.ingest_prasa import run as run_ingest_prasa
+            prasa_result = run_ingest_prasa(root=root)
+            if prasa_result.get("rows", 0) == 0:
+                from scripts.download_prasa import run as run_download_prasa
+                prasa_result = run_download_prasa(root=root, force=True)
             logger.info(f"[Step 26q] Done — {prasa_result.get('rows', 0):,} PRASA contracts\n")
         except Exception as e:
             logger.error(f"[Step 26q] FAILED: {e}")
