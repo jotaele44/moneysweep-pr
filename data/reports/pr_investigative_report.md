@@ -1,7 +1,7 @@
 # Puerto Rico Federal Contract Ecosystem — Investigative Report
 
-*Generated: 2026-04-27 08:17 UTC*
-*Data layers populated: 3/8 — sections marked "pending" require a Mac pipeline run.*
+*Generated: 2026-05-04 07:05 UTC*
+*Data layers populated: 3/10 — sections marked "pending" require a Mac pipeline run.*
 
 ---
 
@@ -42,24 +42,24 @@
 
 | Rank | Entity | Score | Awards | Sources | Bond Par |
 |------|--------|-------|--------|---------|----------|
-| 1 | Hospital Damas Inc | 68.0 | $4.55B | FEC, LDA | $0 |
-| 2 | Municipality of San Juan | 64.6 | $4.45B | FEC, LDA | $0 |
-| 3 | Crowley Maritime Corp | 55.8 | $3.99B | FEC, LDA | $0 |
-| 4 | Caribbean Data Services Inc | 52.8 | $3.90B | FEC, LDA | $0 |
-| 5 | Puerto Rico Aqueduct And Sewer Authority | 52.0 | $3.77B | FEC, LDA | $0 |
-| 6 | Microsoft Puerto Rico Inc | 46.0 | $3.54B | FEC, LDA | $0 |
-| 7 | Interamerican University of Puerto Rico Inc | 43.7 | $3.49B | FEC, LDA | $0 |
-| 8 | First Bancorp Puerto Rico | 43.7 | $3.61B | FEC, LDA | $0 |
-| 9 | Centro Medico Del Turabo Inc | 39.3 | $3.36B | FEC, LDA | $0 |
-| 10 | University of Puerto Rico | 39.0 | $3.44B | FEC, LDA | $0 |
-| 11 | Popular Inc | 38.2 | $3.39B | FEC, LDA | $0 |
-| 12 | Triple-S Management Corp | 35.5 | $3.25B | FEC, LDA | $0 |
-| 13 | Hewlett Packard Puerto Rico LLC | 30.9 | $3.26B | FEC, LDA | $0 |
-| 14 | Puerto Rico Electric Power Authority | 30.8 | $2.91B | FEC, LDA | $0 |
-| 15 | Municipio de Ponce | 20.9 | $3.73B | — | $0 |
-| 16 | Corporacion Del Fondo Del Seguro Del Estado | 11.1 | $3.26B | — | $0 |
-| 17 | Puerto Rico Industrial Development Company | 7.4 | $3.09B | — | $0 |
-| 18 | Municipality of Bayamon | 3.0 | $2.87B | — | $0 |
+| 1 | Hospital Damas Inc | 56.4 | $4.55B | FEC, LDA | $0 |
+| 2 | Municipality of San Juan | 53.4 | $4.45B | FEC, LDA | $0 |
+| 3 | Crowley Maritime Corp | 45.9 | $3.99B | FEC, LDA | $0 |
+| 4 | Caribbean Data Services Inc | 43.3 | $3.90B | FEC, LDA | $0 |
+| 5 | Puerto Rico Aqueduct And Sewer Authority | 42.7 | $3.77B | FEC, LDA | $0 |
+| 6 | Microsoft Puerto Rico Inc | 37.5 | $3.54B | FEC, LDA | $0 |
+| 7 | Interamerican University of Puerto Rico Inc | 35.5 | $3.49B | FEC, LDA | $0 |
+| 8 | First Bancorp Puerto Rico | 35.5 | $3.61B | FEC, LDA | $0 |
+| 9 | Centro Medico Del Turabo Inc | 31.8 | $3.36B | FEC, LDA | $0 |
+| 10 | University of Puerto Rico | 31.4 | $3.44B | FEC, LDA | $0 |
+| 11 | Popular Inc | 30.8 | $3.39B | FEC, LDA | $0 |
+| 12 | Triple-S Management Corp | 28.4 | $3.25B | FEC, LDA | $0 |
+| 13 | Hewlett Packard Puerto Rico LLC | 24.5 | $3.26B | FEC, LDA | $0 |
+| 14 | Puerto Rico Electric Power Authority | 24.4 | $2.91B | FEC, LDA | $0 |
+| 15 | Municipio de Ponce | 17.2 | $3.73B | — | $0 |
+| 16 | Corporacion Del Fondo Del Seguro Del Estado | 8.8 | $3.26B | — | $0 |
+| 17 | Puerto Rico Industrial Development Company | 5.6 | $3.09B | — | $0 |
+| 18 | Municipality of Bayamon | 1.9 | $2.87B | — | $0 |
 
 **Full-loop entities (awards + FEC contributions + LDA lobbying):**
 
@@ -139,17 +139,31 @@
 
 ---
 
+## 9. PR Tax Incentive Double-Dipping
+
+*PR tax incentive dual-benefit analysis (Act 60 + LIHTC) — data pending; run pipeline from Mac to populate.*
+
+---
+
+## 10. PROMESA Creditor Influence
+
+*PROMESA Title III creditor influence analysis — data pending; run pipeline from Mac to populate.*
+
+---
+
 ## Data Coverage
 
 | Layer | Status |
 |-------|--------|
 | Federal awards master | ✅ |
-| Power network (7-axis) | ✅ |
+| Power network (8-axis) | ✅ |
 | Prime-sub relationships | ✅ |
 | Delivery scorecard | ⏳ pending Mac run |
 | RFP-lobby crossref | ⏳ pending Mac run |
 | Bond financial flow | ⏳ pending Mac run |
 | OFAC sanctions | ⏳ pending Mac run |
 | SF-133 budget execution | ⏳ pending Mac run |
+| Tax incentive (Act 60 / LIHTC) | ⏳ pending Mac run |
+| PROMESA creditors | ⏳ pending Mac run |
 
 *To populate all layers: `python3 run_all.py --skip-download` from a machine with unrestricted network access.*
