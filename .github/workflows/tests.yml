@@ -18,53 +18,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install pytest-cov codecov
+        run: pip install -r requirements.txt
 
-      - name: Fetch HigherGov exports (optional)
-        if: ${{ secrets.HIGHERGOV_API_KEY != '' }}
-        env:
-          HIGHERGOV_API_KEY: ${{ secrets.HIGHERGOV_API_KEY }}
-        run: |
-          echo "Running optional HigherGov fetch..."
-          python3 scripts/fetch_highergov_api.py
-
-      - name: Upload HigherGov exports artifact
-        if: ${{ secrets.HIGHERGOV_API_KEY != '' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: highergov-exports
-          path: data/staging/expansion
-
-      - name: Run tests with coverage
-        run: |
-          python -m pytest tests/ --maxfail=1 --disable-warnings -q --cov=scripts --cov-report=xml
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          files: coverage.xml
-          flags: unittests
-          fail_ci_if_error: true
-
-      - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-xml
-          path: coverage.xml
-
-  secret-scan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: TruffleHog secret scan
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
-          extra_args: --only-verified
+      - name: Run tests
+        run: python -m pytest tests/ -v

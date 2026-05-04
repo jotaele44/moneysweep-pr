@@ -70,22 +70,48 @@ STRIP_SUFFIXES = [
 # Normalization helpers
 # ---------------------------------------------------------------------------
 
+_SUFFIX_EXPANSIONS = {
+    r"\bINCORPORATED\b": "INC",
+    r"\bCORPORATION\b":  "CORP",
+    r"\bCOMPANY\b":      "CO",
+    r"\bLIMITED\b":      "LTD",
+    r"\bAUTHORITY\b":    "AUTH",
+}
+
+
 def normalize_vendor(name: str) -> str:
-    """Canonical normalization: upper, strip punctuation, remove legal suffixes."""
+    """Canonical normalization: upper, strip punctuation, expand then strip legal suffixes."""
     n = str(name).upper().strip()
     n = re.sub(r"[,.\-/&'()]", " ", n)
+    # Expand verbose forms before stripping so both map to the same root
+    for pat, repl in _SUFFIX_EXPANSIONS.items():
+        n = re.sub(pat, repl, n, flags=re.IGNORECASE)
     for pat in STRIP_SUFFIXES:
         n = re.sub(pat, " ", n, flags=re.IGNORECASE)
     return re.sub(r"\s+", " ", n).strip()
 
 
 def name_similarity(a: str, b: str) -> float:
-    """Token-set Jaccard similarity between two normalized strings."""
+    """
+    Hybrid similarity: Jaccard token-set + rapidfuzz token_set_ratio.
+    rapidfuzz handles abbreviations and short names that Jaccard misses
+    (e.g. "PRASA" vs "PUERTO RICO AQUEDUCT AND SEWER").
+    Returns the higher of the two scores, capped at 1.0.
+    """
     ta = set(a.split())
     tb = set(b.split())
     if not ta or not tb:
         return 0.0
-    return len(ta & tb) / len(ta | tb)
+    jaccard = len(ta & tb) / len(ta | tb)
+
+    try:
+        from rapidfuzz import fuzz
+        # token_set_ratio handles subset/superset matches well (returns 0-100)
+        fuzzy = fuzz.token_set_ratio(a, b) / 100.0
+    except ImportError:
+        fuzzy = 0.0
+
+    return max(jaccard, fuzzy)
 
 
 def vendor_hash(name: str) -> str:

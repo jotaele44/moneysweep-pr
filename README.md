@@ -1,8 +1,6 @@
 # Contract-Sweeper
 
-![Tests](https://github.com/jotaele44/contract-sweeper/actions/workflows/tests.yml/badge.svg) [![codecov](https://codecov.io/gh/jotaele44/contract-sweeper/branch/main/graph/badge.svg)](https://codecov.io/gh/jotaele44/contract-sweeper)
-
-Coverage reports are uploaded to Codecov by CI. If this repository is private, add a CODECOV_TOKEN secret in Settings → Secrets to enable uploads.
+![Tests](https://github.com/jotaele44/contract-sweeper/actions/workflows/tests.yml/badge.svg)
 
 Puerto Rico Federal Contracts Data Pipeline — automated acquisition, validation,
 normalization, and coverage analysis of federal procurement data (FY 2000–2025).
@@ -173,12 +171,6 @@ export SAM_API_KEY=your_key_here
 # Option B — .env file (gitignored, never committed)
 cp .env.example .env
 # edit .env and replace placeholder with real key
-
-# HigherGov API key (optional)
-# Option A — environment variable
-export HIGHERGOV_API_KEY=your_highergov_key_here
-# Option B — add to .env
-# Add a line to .env: HIGHERGOV_API_KEY=your_highergov_key_here
 ```
 
 **Running:**

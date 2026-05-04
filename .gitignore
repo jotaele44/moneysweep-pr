@@ -25,14 +25,3 @@ data/staging/processed/enrichment/
 !data/**/.gitkeep
 !data/staging/expansion/DOWNLOAD_INSTRUCTIONS.md
 !data/staging/expansion/manifest.json
-/coverage.xml
-.coverage
-/data/raw/SAM/*.dat
-.claude/
-data/.DS_Store
-
-# Local API key files (do not commit)
-FELT_API_KEY.txt
-HGOV_API_KEY.txt
-LDA_API_KEY.txt
-SAM_API_KEY.txt

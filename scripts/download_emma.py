@@ -26,6 +26,7 @@ import pandas as pd
 import requests
 
 from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.build_unified_master import _normalize_name
 
 EMMA_BASE     = "https://emma.msrb.org"
 PAGE_SIZE     = 100
@@ -59,13 +60,14 @@ PR_SEED_ISSUERS = [
 ]
 
 BOND_COLUMNS = [
-    "cusip", "issuer_name", "issuer_state", "description",
+    "cusip", "issuer_name", "issuer_normalized", "issuer_state", "description",
     "issue_date", "maturity_date", "par_amount", "coupon_rate",
     "sale_type", "tax_status", "use_of_proceeds",
+    "underwriter_name", "underwriter_normalized",
 ]
 
 UNDERWRITER_COLUMNS = [
-    "underwriter_name", "total_par_amount", "deal_count",
+    "underwriter_name", "underwriter_normalized", "total_par_amount", "deal_count",
     "issuer_count", "first_issue_date", "last_issue_date",
 ]
 
@@ -189,9 +191,25 @@ def _records_to_bonds_df(records: list[dict]) -> pd.DataFrame:
         "TaxStatus":               "tax_status",
         "useOfProceeds":           "use_of_proceeds",
         "UseOfProceeds":           "use_of_proceeds",
+        "syndicateManager":        "underwriter_name",
+        "SyndicateManager":        "underwriter_name",
+        "underwriterName":         "underwriter_name",
+        "UnderwriterName":         "underwriter_name",
     }
     df = df.rename(columns={k: v for k, v in rename.items() if k in df.columns})
-    df["issuer_state"] = df.get("issuer_state", pd.Series(dtype=str)).fillna("PR")
+
+    if "issuer_state" not in df.columns or df["issuer_state"].isna().all():
+        df["issuer_state"] = "PR"
+    else:
+        df["issuer_state"] = df["issuer_state"].fillna("PR")
+
+    if "issuer_name" not in df.columns:
+        df["issuer_name"] = ""
+    df["issuer_normalized"] = df["issuer_name"].apply(lambda x: _normalize_name(str(x or "")))
+
+    if "underwriter_name" not in df.columns:
+        df["underwriter_name"] = ""
+    df["underwriter_normalized"] = df["underwriter_name"].apply(lambda x: _normalize_name(str(x or "")))
 
     for col in BOND_COLUMNS:
         if col not in df.columns:
@@ -201,29 +219,64 @@ def _records_to_bonds_df(records: list[dict]) -> pd.DataFrame:
 
 
 def _build_underwriter_df(df_bonds: pd.DataFrame) -> pd.DataFrame:
-    if df_bonds.empty or "use_of_proceeds" not in df_bonds.columns:
+    return _build_underwriter_df_from_bonds(df_bonds)
+
+
+def _build_underwriter_df_from_bonds(df_bonds: pd.DataFrame) -> pd.DataFrame:
+    if df_bonds.empty or "underwriter_name" not in df_bonds.columns:
         return pd.DataFrame(columns=UNDERWRITER_COLUMNS)
 
-    # Extract underwriter from use_of_proceeds field if present, else issuer_name
-    # (EMMA does not always expose underwriter at security level; use issuer as proxy)
-    if "underwriter_name" not in df_bonds.columns:
-        return pd.DataFrame(columns=UNDERWRITER_COLUMNS)
-
+    df_bonds = df_bonds.copy()
     df_bonds["_par"] = pd.to_numeric(df_bonds["par_amount"], errors="coerce").fillna(0)
+    issuer_col = "issuer_normalized" if "issuer_normalized" in df_bonds.columns else "issuer_name"
+    valid = df_bonds[df_bonds["underwriter_name"].notna() & (df_bonds["underwriter_name"] != "")]
+    if valid.empty:
+        return pd.DataFrame(columns=UNDERWRITER_COLUMNS)
+
     agg = (
-        df_bonds[df_bonds["underwriter_name"].notna() & (df_bonds["underwriter_name"] != "")]
-        .groupby("underwriter_name")
+        valid
+        .groupby(["underwriter_name", "underwriter_normalized"], dropna=False)
         .agg(
-            total_par_amount = ("_par",         "sum"),
-            deal_count       = ("cusip",        "nunique"),
-            issuer_count     = ("issuer_name",  "nunique"),
-            first_issue_date = ("issue_date",   "min"),
-            last_issue_date  = ("issue_date",   "max"),
+            total_par_amount = ("_par",       "sum"),
+            deal_count       = ("cusip",      "nunique"),
+            issuer_count     = (issuer_col,   "nunique"),
+            first_issue_date = ("issue_date", "min"),
+            last_issue_date  = ("issue_date", "max"),
         )
         .reset_index()
         .sort_values("total_par_amount", ascending=False)
     )
+    for col in UNDERWRITER_COLUMNS:
+        if col not in agg.columns:
+            agg[col] = ""
     return agg[UNDERWRITER_COLUMNS]
+
+
+def _records_to_underwriter_df(records: list[dict]) -> pd.DataFrame:
+    """Map stats-style underwriter records (underwriterName, totalParAmount, …) to UNDERWRITER_COLUMNS."""
+    if not records:
+        return pd.DataFrame(columns=UNDERWRITER_COLUMNS)
+    rows = []
+    for r in records:
+        name = str(r.get("underwriterName") or r.get("underwriter_name") or "").strip()
+        if not name:
+            continue
+        rows.append({
+            "underwriter_name":       name,
+            "underwriter_normalized": _normalize_name(name),
+            "total_par_amount":       float(pd.to_numeric(r.get("totalParAmount") or r.get("total_par_amount") or 0, errors="coerce") or 0),
+            "deal_count":             int(pd.to_numeric(r.get("dealCount") or r.get("deal_count") or 0, errors="coerce") or 0),
+            "issuer_count":           int(pd.to_numeric(r.get("issuerCount") or r.get("issuer_count") or 0, errors="coerce") or 0),
+            "first_issue_date":       str(r.get("firstIssueDate") or r.get("first_issue_date") or ""),
+            "last_issue_date":        str(r.get("lastIssueDate") or r.get("last_issue_date") or ""),
+        })
+    if not rows:
+        return pd.DataFrame(columns=UNDERWRITER_COLUMNS)
+    return (
+        pd.DataFrame(rows, columns=UNDERWRITER_COLUMNS)
+        .sort_values("total_par_amount", ascending=False)
+        .reset_index(drop=True)
+    )
 
 
 # ---------------------------------------------------------------------------
