@@ -75,6 +75,7 @@ COL_MAP = {
     "election_type":                ["election_type", "election type", "form_type"],
     "memo_text":                    ["memo_text", "memo text", "memo_cd", "memo"],
     "is_individual":                ["entity_type", "entity type"],
+    "_transaction_id":              ["transaction_id", "sub_id", "image_number"],
 }
 
 
@@ -105,6 +106,7 @@ def _map_col(df: pd.DataFrame, candidates: list[str]):
 
 def _parse_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
     """Map a raw FEC export DataFrame to the canonical OUTPUT_COLUMNS schema."""
+    df_lower = {c.lower().strip(): c for c in df.columns}
     out = {}
     for target, candidates in COL_MAP.items():
         src_col = _map_col(df, candidates)
@@ -115,15 +117,41 @@ def _parse_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
 
     out_df = pd.DataFrame(out)
 
+    # Handle efiling split-name format: first + middle + last → contributor_name
+    if out_df["contributor_name"].eq("").all():
+        first_col  = df_lower.get("contributor_first_name")
+        middle_col = df_lower.get("contributor_middle_name")
+        last_col   = df_lower.get("contributor_last_name")
+        if first_col or last_col:
+            parts = []
+            if first_col:
+                parts.append(df[first_col].fillna("").str.strip())
+            if middle_col:
+                parts.append(df[middle_col].fillna("").str.strip())
+            if last_col:
+                parts.append(df[last_col].fillna("").str.strip())
+            out_df["contributor_name"] = (
+                pd.concat(parts, axis=1)
+                .apply(lambda r: " ".join(p for p in r if p), axis=1)
+                .str.strip()
+            )
+
     # Normalize is_individual: "IND" → True, else False
     if _map_col(df, ["entity_type", "entity type"]) is not None:
         out_df["is_individual"] = out_df["is_individual"].str.upper().str.strip() == "IND"
     else:
         out_df["is_individual"] = False
 
-    # Derive cycle if missing
+    # Derive cycle if missing (efiling exports rarely include two_year_transaction_period)
     if out_df["cycle"].eq("").all() or out_df["cycle"].isna().all():
         out_df["cycle"] = out_df["contribution_receipt_date"].apply(_derive_fiscal_year)
+
+    # Derive report_year from date if missing
+    if out_df["report_year"].eq("").all() or out_df["report_year"].isna().all():
+        out_df["report_year"] = out_df["contribution_receipt_date"].apply(
+            lambda d: str(pd.to_datetime(d, errors="coerce").year)
+            if pd.notna(pd.to_datetime(d, errors="coerce")) else ""
+        )
 
     # Filter to PR only (in case the export covers other states)
     state_col = _map_col(df, ["contributor_state", "contributor state", "state"])
@@ -131,11 +159,11 @@ def _parse_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
         pr_mask = df[state_col].str.upper().str.strip().isin(["PR", "PUERTO RICO"])
         out_df = out_df[pr_mask.values]
 
-    for col in OUTPUT_COLUMNS:
+    for col in OUTPUT_COLUMNS + ["_transaction_id"]:
         if col not in out_df.columns:
             out_df[col] = ""
 
-    return out_df[OUTPUT_COLUMNS]
+    return out_df[OUTPUT_COLUMNS + ["_transaction_id"]]
 
 
 def run(root: Path = None, force: bool = False) -> dict:
@@ -182,17 +210,21 @@ def run(root: Path = None, force: bool = False) -> dict:
 
     combined = pd.concat(frames, ignore_index=True)
 
-    # Deduplicate on the same key as download_fec.py
+    # Deduplicate — prefer transaction_id if present, otherwise use composite key
     before = len(combined)
-    combined = combined.drop_duplicates(
-        subset=["contributor_name", "committee_id",
-                "contribution_receipt_date", "contribution_receipt_amount"],
-        keep="first",
-    )
+    if "_transaction_id" in combined.columns and not combined["_transaction_id"].eq("").all():
+        combined = combined.drop_duplicates(subset=["_transaction_id"], keep="first")
+    else:
+        combined = combined.drop_duplicates(
+            subset=["contributor_name", "committee_id",
+                    "contribution_receipt_date", "contribution_receipt_amount"],
+            keep="first",
+        )
     removed = before - len(combined)
     if removed:
         logger.info(f"  Removed {removed:,} duplicate rows")
 
+    combined = combined[[c for c in OUTPUT_COLUMNS if c in combined.columns]]
     combined.to_csv(out_path, index=False, encoding="utf-8")
     logger.info(f"  Written: {out_path.name} ({len(combined):,} rows)")
     return {"rows": len(combined), "path": str(out_path), "status": "OK"}
