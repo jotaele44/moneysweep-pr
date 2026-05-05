@@ -1188,16 +1188,25 @@ def main() -> int:
             logger.error(f"[Step 15a] FAILED: {e}")
 
     # ------------------------------------------------------------------
-    # Step 15b: COR3 PR recovery project tracker
+    # Step 15b: COR3 PR recovery project tracker (ingest local exports first)
     # ------------------------------------------------------------------
     if args.skip_cor3:
         logger.info("[Step 15b] SKIPPED (--skip-cor3)\n")
     else:
-        logger.info("[Step 15b] Downloading COR3 PR recovery project data...")
+        logger.info("[Step 15b] COR3 PR recovery project data (ingest-first / API-fallback)...")
         try:
-            from scripts.download_cor3 import run as run_cor3
-            result = run_cor3(root=root)
-            logger.info(f"[Step 15b] Done — {result.get('rows', 0):,} rows\n")
+            _cor3_result = {"rows": 0}
+            try:
+                from scripts.ingest_cor3 import run as ingest_cor3
+                _cor3_result = ingest_cor3(root=root)
+                if _cor3_result.get("rows", 0) > 0:
+                    logger.info(f"[Step 15b] Ingest done — {_cor3_result['rows']:,} rows from local Excel\n")
+            except Exception as _ingest_err:
+                logger.warning(f"[Step 15b] Local ingest failed ({_ingest_err}) — falling back to API")
+            if _cor3_result.get("rows", 0) == 0:
+                from scripts.download_cor3 import run as run_cor3
+                _cor3_result = run_cor3(root=root)
+                logger.info(f"[Step 15b] API done — {_cor3_result.get('rows', 0):,} rows\n")
         except Exception as e:
             logger.error(f"[Step 15b] FAILED: {e}")
 
