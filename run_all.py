@@ -488,10 +488,29 @@ def main() -> int:
                         help="Skip step 21d (Medicare Part A + Part D for PR)")
     parser.add_argument("--skip-va", action="store_true",
                         help="Skip step 21e (VA benefits + VAMC contracts for PR)")
+    parser.add_argument("--skip-snap-nap", action="store_true",
+                        help="Skip step 21f (USDA FNS NAP nutrition assistance block grant)")
     parser.add_argument("--skip-aafaf", action="store_true",
                         help="Skip step 25c (AAFAF PR government budget execution)")
     parser.add_argument("--skip-pr-pensions", action="store_true",
                         help="Skip step 25d (PR pension funds ERS/TRS/JRS)")
+    # Tier 2 — Federal agency gaps + enforcement + compliance
+    parser.add_argument("--skip-epa", action="store_true",
+                        help="Skip step 6k (EPA grants for PR via USASpending)")
+    parser.add_argument("--skip-usace-civil", action="store_true",
+                        help="Skip step 6l (USACE civil works contracts for PR)")
+    parser.add_argument("--skip-nih", action="store_true",
+                        help="Skip step 6m (NIH research grants via NIH Reporter API)")
+    parser.add_argument("--skip-fcc", action="store_true",
+                        help="Skip step 26r (FCC USF E-Rate/broadband/rural-health subsidies)")
+    parser.add_argument("--skip-dol", action="store_true",
+                        help="Skip step 26s (DOL WHD + OSHA enforcement data for PR)")
+    parser.add_argument("--skip-sec-holdings", action="store_true",
+                        help="Skip step 26t (SEC 13F/N-PORT PR bond holdings)")
+    parser.add_argument("--skip-gao-ig", action="store_true",
+                        help="Skip step 26u (GAO + HUD/FEMA/HHS IG audit reports)")
+    parser.add_argument("--skip-p3", action="store_true",
+                        help="Skip step 26v (PR P3 Authority public-private partnership contracts)")
     args = parser.parse_args()
 
     root = PROJECT_ROOT
@@ -921,6 +940,48 @@ def main() -> int:
             logger.info(f"[Step 6j] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
             logger.error(f"[Step 6j] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6k: EPA grants for PR (USASpending)
+    # ------------------------------------------------------------------
+    if args.skip_epa:
+        logger.info("[Step 6k] SKIPPED (--skip-epa)\n")
+    else:
+        logger.info("[Step 6k] Downloading EPA grants and cooperative agreements for PR...")
+        try:
+            from scripts.download_epa import run as run_epa
+            result = run_epa(root=root)
+            logger.info(f"[Step 6k] Done — {result.get('rows', result.get('master_rows', 0)):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6k] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6l: USACE civil works contracts for PR (USASpending)
+    # ------------------------------------------------------------------
+    if args.skip_usace_civil:
+        logger.info("[Step 6l] SKIPPED (--skip-usace-civil)\n")
+    else:
+        logger.info("[Step 6l] Downloading USACE civil works contracts and grants for PR...")
+        try:
+            from scripts.download_usace_civil import run as run_usace_civil
+            result = run_usace_civil(root=root)
+            logger.info(f"[Step 6l] Done — {result.get('rows', result.get('master_rows', 0)):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6l] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6m: NIH research grants to PR (NIH Reporter API)
+    # ------------------------------------------------------------------
+    if args.skip_nih:
+        logger.info("[Step 6m] SKIPPED (--skip-nih)\n")
+    else:
+        logger.info("[Step 6m] Downloading NIH research grants to PR institutions...")
+        try:
+            from scripts.download_nih import run as run_nih
+            result = run_nih(root=root)
+            logger.info(f"[Step 6m] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6m] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 7: SAM.gov UEI enrichment
@@ -1491,6 +1552,20 @@ def main() -> int:
             logger.error(f"[Step 21e] FAILED: {e}")
 
     # ------------------------------------------------------------------
+    # Step 21f: USDA FNS NAP nutrition assistance block grant
+    # ------------------------------------------------------------------
+    if args.skip_snap_nap:
+        logger.info("[Step 21f] SKIPPED (--skip-snap-nap)\n")
+    else:
+        logger.info("[Step 21f] Downloading USDA FNS NAP nutrition assistance data for PR...")
+        try:
+            from scripts.download_snap_nap import run as run_snap_nap
+            result = run_snap_nap(root=root)
+            logger.info(f"[Step 21f] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 21f] FAILED: {e}")
+
+    # ------------------------------------------------------------------
     # Step 22: FDIC bank data
     # ------------------------------------------------------------------
     if args.skip_fdic:
@@ -1873,6 +1948,76 @@ def main() -> int:
             except Exception as e:
                 logger.error(f"[Step 26q] download_prasa FAILED: {e}")
         logger.info(f"[Step 26q] Done — {_prasa_result.get('rows', 0):,} PRASA contract records\n")
+
+    # ------------------------------------------------------------------
+    # Step 26r: FCC USF broadband / E-Rate / Rural Health Care subsidies
+    # ------------------------------------------------------------------
+    if args.skip_fcc:
+        logger.info("[Step 26r] SKIPPED (--skip-fcc)\n")
+    else:
+        logger.info("[Step 26r] Downloading FCC USF (E-Rate, Rural Health Care, High Cost) data for PR...")
+        try:
+            from scripts.download_fcc import run as run_fcc
+            result = run_fcc(root=root)
+            logger.info(f"[Step 26r] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 26r] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26s: DOL WHD + OSHA enforcement data
+    # ------------------------------------------------------------------
+    if args.skip_dol:
+        logger.info("[Step 26s] SKIPPED (--skip-dol)\n")
+    else:
+        logger.info("[Step 26s] Downloading DOL wage-hour and OSHA enforcement data for PR...")
+        try:
+            from scripts.download_dol import run as run_dol
+            result = run_dol(root=root)
+            logger.info(f"[Step 26s] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 26s] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26t: SEC 13F / N-PORT PR bond holdings
+    # ------------------------------------------------------------------
+    if args.skip_sec_holdings:
+        logger.info("[Step 26t] SKIPPED (--skip-sec-holdings)\n")
+    else:
+        logger.info("[Step 26t] Downloading SEC 13F/N-PORT institutional PR bond holdings...")
+        try:
+            from scripts.download_sec_holdings import run as run_sec_holdings
+            result = run_sec_holdings(root=root)
+            logger.info(f"[Step 26t] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 26t] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26u: GAO + HUD/FEMA/HHS IG audit reports covering PR
+    # ------------------------------------------------------------------
+    if args.skip_gao_ig:
+        logger.info("[Step 26u] SKIPPED (--skip-gao-ig)\n")
+    else:
+        logger.info("[Step 26u] Downloading GAO and Inspector General audit reports covering PR...")
+        try:
+            from scripts.download_gao_ig import run as run_gao_ig
+            result = run_gao_ig(root=root)
+            logger.info(f"[Step 26u] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 26u] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26v: PR P3 Authority public-private partnership contracts
+    # ------------------------------------------------------------------
+    if args.skip_p3:
+        logger.info("[Step 26v] SKIPPED (--skip-p3)\n")
+    else:
+        logger.info("[Step 26v] Downloading PR P3 Authority public-private partnership contracts...")
+        try:
+            from scripts.download_p3 import run as run_p3
+            result = run_p3(root=root)
+            logger.info(f"[Step 26v] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 26v] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 27: OFAC SDN sanctions crossref
