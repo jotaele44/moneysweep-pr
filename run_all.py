@@ -833,16 +833,25 @@ def main() -> int:
             coverage_result = 1
 
     # ------------------------------------------------------------------
-    # Step 6b: SF-133 budget execution data
+    # Step 6b: SF-133 budget execution + Follow the Money data (ingest-first)
     # ------------------------------------------------------------------
     if args.skip_sf133:
         logger.info("[Step 6b] SKIPPED (--skip-sf133)\n")
     else:
-        logger.info("[Step 6b] Downloading SF-133 budget execution data...")
+        logger.info("[Step 6b] SF-133 budget execution (ingest-first / API-fallback)...")
         try:
-            from scripts.download_sf133 import run as run_sf133
-            result = run_sf133(root=root)
-            logger.info(f"[Step 6b] Done — {result.get('rows', 0):,} rows\n")
+            _sf133_result = {"rows": 0}
+            try:
+                from scripts.ingest_follow_the_money import run as ingest_ftm
+                _sf133_result = ingest_ftm(root=root)
+                if _sf133_result.get("rows", 0) > 0:
+                    logger.info(f"[Step 6b] Follow the Money ingest done — {_sf133_result['rows']:,} SF-133 rows\n")
+            except Exception as _ftm_err:
+                logger.warning(f"[Step 6b] Follow the Money ingest failed ({_ftm_err}) — falling back to API")
+            if _sf133_result.get("rows", 0) == 0:
+                from scripts.download_sf133 import run as run_sf133
+                _sf133_result = run_sf133(root=root)
+                logger.info(f"[Step 6b] API done — {_sf133_result.get('rows', 0):,} rows\n")
         except Exception as e:
             logger.error(f"[Step 6b] FAILED: {e}")
 
@@ -1092,16 +1101,24 @@ def main() -> int:
             logger.error(f"[Step 10/29] FAILED: {e}")
 
     # ------------------------------------------------------------------
-    # Step 11: Download grants
+    # Step 11: Grants.gov XML ingest (local) + USASpending grants API fallback
     # ------------------------------------------------------------------
     if args.skip_grants:
         logger.info("[Step 11/29] SKIPPED (--skip-grants)\n")
     else:
-        logger.info("[Step 11/29] Downloading federal grants (USASpending)...")
+        logger.info("[Step 11/29] Grants (Grants.gov XML ingest-first / USASpending API fallback)...")
         try:
+            _grants_xml_result = {"rows": 0}
+            try:
+                from scripts.ingest_grants import run as ingest_grants_xml
+                _grants_xml_result = ingest_grants_xml(root=root)
+                if _grants_xml_result.get("rows", 0) > 0:
+                    logger.info(f"[Step 11/29] Grants.gov XML ingest done — {_grants_xml_result['rows']:,} opportunities\n")
+            except Exception as _gx_err:
+                logger.warning(f"[Step 11/29] Grants XML ingest failed ({_gx_err}) — falling back to USASpending API")
             from scripts.download_grants import run as run_grants
             g = run_grants(root=root)
-            logger.info(f"[Step 11/29] Done — {g.get('master_rows', g.get('total_rows', 0)):,} grant records\n")
+            logger.info(f"[Step 11/29] USASpending grants done — {g.get('master_rows', g.get('total_rows', 0)):,} award records\n")
         except Exception as e:
             logger.error(f"[Step 11/29] FAILED: {e}")
 
