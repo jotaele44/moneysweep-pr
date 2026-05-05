@@ -1,35 +1,101 @@
 """
-Full pipeline orchestrator — Puerto Rico Federal Contracts Data Pipeline.
+Full pipeline orchestrator — Puerto Rico Federal Contracts Data Pipeline (~65 steps).
 
 Usage:
   python3 run_all.py                    # Run all steps
   python3 run_all.py --only-setup       # Steps 1-2 only (dirs + instructions)
-  python3 run_all.py --skip-validation
-  python3 run_all.py --skip-normalize
-  python3 run_all.py --skip-coverage
-  python3 run_all.py --skip-enrichment
-  python3 run_all.py --skip-entity-resolution
-  python3 run_all.py --skip-dominance
-  python3 run_all.py --skip-graph
-  python3 run_all.py --skip-grants
-  python3 run_all.py --skip-subawards
-  python3 run_all.py --skip-fema
-  python3 run_all.py --skip-research
-  python3 run_all.py --skip-bulk-downloads
-  python3 run_all.py --skip-unified-master
-  python3 run_all.py --skip-fec
-  python3 run_all.py --skip-lda
-  python3 run_all.py --skip-crossref
-  python3 run_all.py --skip-nonprofits
-  python3 run_all.py --skip-cms
-  python3 run_all.py --skip-fdic
-  python3 run_all.py --skip-entity-profiles
-  python3 run_all.py --skip-sec
-  python3 run_all.py --skip-power-network
-  python3 run_all.py --skip-emma
-  python3 run_all.py --skip-ofac
-  python3 run_all.py --skip-opencorporates
-  python3 run_all.py --skip-prime-sub
+
+Core pipeline flags:
+  --skip-validation          Step 4   download validation
+  --skip-normalize           Step 5   normalization
+  --skip-coverage            Step 6   coverage validation
+  --skip-dedup               Step 5.5 cross-file dedup + master build
+  --skip-enrichment          Step 7   SAM.gov UEI enrichment
+  --skip-entity-resolution   Step 8   top-100 vendor entity resolution
+  --skip-dominance           Step 9   HHI / market share dominance
+  --skip-graph               Step 10  network graph export
+  --skip-grants              Step 11  USASpending federal grants
+  --skip-subawards           Step 12  USASpending subawards
+  --skip-fema                Step 13  FEMA PA + HMGP
+  --skip-research            Step 14  NIH + NSF research grants
+  --skip-bulk-downloads      Step 15  SBA / SLFRF / CDBG-DR / SBIR / DOE / DOT / USDA / HUD-CPD
+  --skip-unified-master      Step 16  unified awards master
+  --skip-fec                 Step 17  FEC Schedule A contributions
+  --skip-lda                 Step 18  LDA lobbying filings
+  --skip-lda-enrich          Step 18b LDA entity enrichment
+  --skip-crossref            Step 19  FEC + lobbying crossref
+  --skip-nonprofits          Step 20  IRS 990 nonprofits
+  --skip-cms                 Step 21  CMS Open Payments + Medicare
+  --skip-fdic                Step 22  FDIC bank data
+  --skip-entity-profiles     Step 23  entity profiles crossref
+  --skip-sec                 Step 24  SEC EDGAR financials
+  --skip-power-network       Step 25  integrated power/influence network
+  --skip-emma                Step 26  MSRB EMMA municipal bonds
+  --skip-ofac                Step 27  OFAC SDN sanctions crossref
+  --skip-opencorporates      Step 28  OpenCorporates PR registry
+  --skip-prime-sub           Step 29  prime-to-sub relationships
+
+Supplemental federal downloads (steps 6b–6j):
+  --skip-sf133               Step 6b  SF-133 budget execution
+  --skip-ed                  Step 6c  Dept of Education grants
+  --skip-hhs                 Step 6d  HHS/HRSA/ACF grants
+  --skip-doj-grants          Step 6e  DOJ grants
+  --skip-oia                 Step 6f  Office of Insular Affairs grants
+  --skip-haf                 Step 6g  Homeowner Assistance Fund
+  --skip-exim                Step 6h  Ex-Im Bank
+  --skip-earmarks            Step 6i  Congressional earmarks
+  --skip-report-builder      Step 6j  FPDS Report Builder FY2018-2024
+
+Step 15 sequential additions:
+  --skip-fsrs                Step 15a FSRS prime-to-sub reporting
+  --skip-cor3                Step 15b COR3 PR recovery project tracker
+  --skip-compras             Step 15c comprashpr.com RFP/award scrape
+
+FEMA PA financial backbone (steps 15d–15g):
+  --skip-fema-pa-projects    Step 15d OpenFEMA PA v2 projects
+  --skip-fema-pa-portal      Step 15e FEMA PA portal 178-PW ingest
+  --skip-fema-pa-linkage     Step 15f FEMA PA PW → contracts/assets linkage
+  --skip-fema-pa-validation  Step 15g FEMA PA coverage validation
+
+HUD DRGR financial backbone (steps 15h–15n):
+  --skip-drgr-public         Step 15h HUD DRGR public report download
+  --skip-drgr-exports        Step 15i HUD DRGR authorized export ingest
+  --skip-drgr-normalize      Step 15j normalize DRGR grants/projects/activities
+  --skip-drgr-linkage        Step 15k DRGR responsible orgs → contracts
+  --skip-drgr-assets         Step 15l DRGR activities → assets/municipalities
+  --skip-drgr-validation     Step 15m DRGR coverage + entity-resolution report
+  --skip-drgr-amounts        Step 15n DRGR budget/drawdown reconciliation
+
+Financial flows master (step 15o):
+  --skip-financial-flows     Step 15o build financial_flows_master.parquet
+
+RFP-lobby crossref (step 17b):
+  --skip-rfp-lobby           Step 17b RFP timing vs LDA lobbying
+
+Municipal finance (step 25b):
+  --skip-municipal           Step 25b PR municipal fiscal health
+
+Bond market + PR-specific sources (steps 26b–26q):
+  --skip-msrb-trades         Step 26b MSRB RTRS secondary market trades
+  --skip-bond-flow           Step 26c bond flow entity crossref
+  --skip-usace               Step 26d USACE Section 404/10 permits
+  --skip-eqb                 Step 26e PR EQB / EPA ICIS permits
+  --skip-nfip                Step 26f NFIP flood insurance claims
+  --skip-lihtc               Step 26g LIHTC housing tax credit projects
+  --skip-nmtc                Step 26h NMTC new markets tax credits
+  --skip-act60               Step 26i PR Act 60 tax incentive decrees
+  --skip-rum-coverover       Step 26j rum cover-over revenue
+  --skip-fhlb                Step 26k FHLB advances to PR banks
+  --skip-prepa               Step 26l PREPA/Luma/Genera contracts
+  --skip-promesa             Step 26m PROMESA Title III creditors
+  --skip-cabilderos          Step 26n PR cabilderos (state lobbyists)
+  --skip-contralor           Step 26o PR Comptroller audit/contract data
+  --skip-active-contractors  Step 26p PR active contractor registry
+  --skip-prasa               Step 26q PRASA contracts
+
+Project delivery + final report:
+  --skip-delivery            Step 28b contractor delivery scorecard
+  --skip-report              Step 30  generate PR investigation report
 """
 
 import argparse
@@ -317,6 +383,102 @@ def main() -> int:
                         help="Skip step 29 (prime-to-subcontractor relationship analysis)")
     parser.add_argument("--oc-api-token", dest="oc_api_token", default=None,
                         help="OpenCorporates API token (default: OPENCORPORATES_API_TOKEN env var)")
+    # Insertion A — supplemental federal downloads + Report Builder
+    parser.add_argument("--skip-sf133", action="store_true",
+                        help="Skip step 6b (SF-133 budget execution data)")
+    parser.add_argument("--skip-ed", action="store_true",
+                        help="Skip step 6c (Dept of Education grants)")
+    parser.add_argument("--skip-hhs", action="store_true",
+                        help="Skip step 6d (HHS/HRSA/ACF grants)")
+    parser.add_argument("--skip-doj-grants", action="store_true",
+                        help="Skip step 6e (DOJ grants)")
+    parser.add_argument("--skip-oia", action="store_true",
+                        help="Skip step 6f (Office of Insular Affairs grants)")
+    parser.add_argument("--skip-haf", action="store_true",
+                        help="Skip step 6g (Homeowner Assistance Fund)")
+    parser.add_argument("--skip-exim", action="store_true",
+                        help="Skip step 6h (Ex-Im Bank loans/guarantees)")
+    parser.add_argument("--skip-earmarks", action="store_true",
+                        help="Skip step 6i (Congressional earmarks)")
+    parser.add_argument("--skip-report-builder", action="store_true",
+                        help="Skip step 6j (FPDS Report Builder FY2018-2024 ingestion)")
+    # Insertion B — step 15 sequential additions
+    parser.add_argument("--skip-fsrs", action="store_true",
+                        help="Skip step 15a (FSRS prime-to-sub reporting)")
+    parser.add_argument("--skip-cor3", action="store_true",
+                        help="Skip step 15b (COR3 PR recovery project tracker)")
+    parser.add_argument("--skip-compras", action="store_true",
+                        help="Skip step 15c (comprashpr.com RFP/award scrape)")
+    # Insertion C — FEMA PA backbone + HUD DRGR backbone + financial flows
+    parser.add_argument("--skip-fema-pa-projects", action="store_true",
+                        help="Skip step 15d (OpenFEMA PA v2 projects for PR)")
+    parser.add_argument("--skip-fema-pa-portal", action="store_true",
+                        help="Skip step 15e (FEMA PA portal 178-PW export ingest)")
+    parser.add_argument("--skip-fema-pa-linkage", action="store_true",
+                        help="Skip step 15f (link FEMA PA PWs to contracts/assets)")
+    parser.add_argument("--skip-fema-pa-validation", action="store_true",
+                        help="Skip step 15g (validate FEMA PA coverage + v1/v2 diff)")
+    parser.add_argument("--skip-drgr-public", action="store_true",
+                        help="Skip step 15h (HUD DRGR public financial report download)")
+    parser.add_argument("--skip-drgr-exports", action="store_true",
+                        help="Skip step 15i (HUD DRGR authorized local export ingest)")
+    parser.add_argument("--skip-drgr-normalize", action="store_true",
+                        help="Skip step 15j (normalize HUD DRGR grants/projects/activities)")
+    parser.add_argument("--skip-drgr-linkage", action="store_true",
+                        help="Skip step 15k (link DRGR responsible orgs to contracts)")
+    parser.add_argument("--skip-drgr-assets", action="store_true",
+                        help="Skip step 15l (link DRGR activities to assets/municipalities)")
+    parser.add_argument("--skip-drgr-validation", action="store_true",
+                        help="Skip step 15m (HUD DRGR coverage and entity-resolution report)")
+    parser.add_argument("--skip-drgr-amounts", action="store_true",
+                        help="Skip step 15n (HUD DRGR budget/drawdown/obligation reconciliation)")
+    parser.add_argument("--skip-financial-flows", action="store_true",
+                        help="Skip step 15o (build financial flows master parquet)")
+    # Insertion D — RFP-lobby crossref
+    parser.add_argument("--skip-rfp-lobby", action="store_true",
+                        help="Skip step 17b (analyze RFP timing vs LDA lobbying)")
+    # Insertion E — PR municipal finance
+    parser.add_argument("--skip-municipal", action="store_true",
+                        help="Skip step 25b (PR municipal fiscal health data)")
+    # Insertion F — bond market + PR-specific sources
+    parser.add_argument("--skip-msrb-trades", action="store_true",
+                        help="Skip step 26b (MSRB RTRS secondary market trade data)")
+    parser.add_argument("--skip-bond-flow", action="store_true",
+                        help="Skip step 26c (bond flow: underwriters/dealers vs entity crossref)")
+    parser.add_argument("--skip-usace", action="store_true",
+                        help="Skip step 26d (USACE Section 404/10 permit data)")
+    parser.add_argument("--skip-eqb", action="store_true",
+                        help="Skip step 26e (PR EQB / EPA ICIS environmental permits)")
+    parser.add_argument("--skip-nfip", action="store_true",
+                        help="Skip step 26f (NFIP flood insurance claims for PR)")
+    parser.add_argument("--skip-lihtc", action="store_true",
+                        help="Skip step 26g (LIHTC low-income housing tax credit projects)")
+    parser.add_argument("--skip-nmtc", action="store_true",
+                        help="Skip step 26h (NMTC new markets tax credit allocations)")
+    parser.add_argument("--skip-act60", action="store_true",
+                        help="Skip step 26i (PR Act 60 tax incentive decrees)")
+    parser.add_argument("--skip-rum-coverover", action="store_true",
+                        help="Skip step 26j (rum cover-over excise tax revenue)")
+    parser.add_argument("--skip-fhlb", action="store_true",
+                        help="Skip step 26k (FHLB advances to PR banks)")
+    parser.add_argument("--skip-prepa", action="store_true",
+                        help="Skip step 26l (PREPA/Luma/Genera contract data)")
+    parser.add_argument("--skip-promesa", action="store_true",
+                        help="Skip step 26m (PROMESA Title III creditor data)")
+    parser.add_argument("--skip-cabilderos", action="store_true",
+                        help="Skip step 26n (PR state lobbyist registry — cabilderos)")
+    parser.add_argument("--skip-contralor", action="store_true",
+                        help="Skip step 26o (PR Comptroller audit/contract data)")
+    parser.add_argument("--skip-active-contractors", action="store_true",
+                        help="Skip step 26p (PR active contractor registry)")
+    parser.add_argument("--skip-prasa", action="store_true",
+                        help="Skip step 26q (PRASA aqueduct/sewer authority contracts)")
+    # Insertion G — project delivery scorecard
+    parser.add_argument("--skip-delivery", action="store_true",
+                        help="Skip step 28b (contractor project delivery scorecard)")
+    # Insertion H — final report
+    parser.add_argument("--skip-report", action="store_true",
+                        help="Skip step 30 (generate PR investigation report)")
     args = parser.parse_args()
 
     root = PROJECT_ROOT
@@ -622,6 +784,132 @@ def main() -> int:
             coverage_result = 1
 
     # ------------------------------------------------------------------
+    # Step 6b: SF-133 budget execution data
+    # ------------------------------------------------------------------
+    if args.skip_sf133:
+        logger.info("[Step 6b] SKIPPED (--skip-sf133)\n")
+    else:
+        logger.info("[Step 6b] Downloading SF-133 budget execution data...")
+        try:
+            from scripts.download_sf133 import run as run_sf133
+            result = run_sf133(root=root)
+            logger.info(f"[Step 6b] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6b] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6c: Department of Education grants
+    # ------------------------------------------------------------------
+    if args.skip_ed:
+        logger.info("[Step 6c] SKIPPED (--skip-ed)\n")
+    else:
+        logger.info("[Step 6c] Downloading Dept of Education grants for PR...")
+        try:
+            from scripts.download_ed import run as run_ed
+            result = run_ed(root=root)
+            logger.info(f"[Step 6c] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6c] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6d: HHS / HRSA / ACF grants
+    # ------------------------------------------------------------------
+    if args.skip_hhs:
+        logger.info("[Step 6d] SKIPPED (--skip-hhs)\n")
+    else:
+        logger.info("[Step 6d] Downloading HHS/HRSA/ACF grants for PR...")
+        try:
+            from scripts.download_hhs import run as run_hhs
+            result = run_hhs(root=root)
+            logger.info(f"[Step 6d] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6d] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6e: DOJ grants
+    # ------------------------------------------------------------------
+    if args.skip_doj_grants:
+        logger.info("[Step 6e] SKIPPED (--skip-doj-grants)\n")
+    else:
+        logger.info("[Step 6e] Downloading DOJ grants for PR...")
+        try:
+            from scripts.download_doj_grants import run as run_doj_grants
+            result = run_doj_grants(root=root)
+            logger.info(f"[Step 6e] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6e] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6f: Office of Insular Affairs grants
+    # ------------------------------------------------------------------
+    if args.skip_oia:
+        logger.info("[Step 6f] SKIPPED (--skip-oia)\n")
+    else:
+        logger.info("[Step 6f] Downloading OIA grants for PR...")
+        try:
+            from scripts.download_oia import run as run_oia
+            result = run_oia(root=root)
+            logger.info(f"[Step 6f] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6f] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6g: Homeowner Assistance Fund
+    # ------------------------------------------------------------------
+    if args.skip_haf:
+        logger.info("[Step 6g] SKIPPED (--skip-haf)\n")
+    else:
+        logger.info("[Step 6g] Downloading Homeowner Assistance Fund data for PR...")
+        try:
+            from scripts.download_haf import run as run_haf
+            result = run_haf(root=root)
+            logger.info(f"[Step 6g] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6g] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6h: Ex-Im Bank
+    # ------------------------------------------------------------------
+    if args.skip_exim:
+        logger.info("[Step 6h] SKIPPED (--skip-exim)\n")
+    else:
+        logger.info("[Step 6h] Downloading Ex-Im Bank loans/guarantees for PR...")
+        try:
+            from scripts.download_exim import run as run_exim
+            result = run_exim(root=root)
+            logger.info(f"[Step 6h] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6h] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6i: Congressional earmarks
+    # ------------------------------------------------------------------
+    if args.skip_earmarks:
+        logger.info("[Step 6i] SKIPPED (--skip-earmarks)\n")
+    else:
+        logger.info("[Step 6i] Downloading congressional earmarks for PR...")
+        try:
+            from scripts.download_earmarks import run as run_earmarks
+            result = run_earmarks(root=root)
+            logger.info(f"[Step 6i] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6i] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6j: FPDS Report Builder ingestion (FY2018-2024)
+    # ------------------------------------------------------------------
+    if args.skip_report_builder:
+        logger.info("[Step 6j] SKIPPED (--skip-report-builder)\n")
+    else:
+        logger.info("[Step 6j] Ingesting FPDS Report Builder files (FY2018-2024)...")
+        try:
+            from scripts.ingest_report_builder import run as run_report_builder
+            result = run_report_builder(root=root)
+            logger.info(f"[Step 6j] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6j] FAILED: {e}")
+
+    # ------------------------------------------------------------------
     # Step 7: SAM.gov UEI enrichment
     # ------------------------------------------------------------------
     if args.skip_enrichment:
@@ -774,12 +1062,16 @@ def main() -> int:
     if args.skip_bulk_downloads:
         logger.info("[Step 15/29] SKIPPED (--skip-bulk-downloads)\n")
     else:
-        logger.info("[Step 15/29] Downloading SBA loans, SLFRF, CDBG-DR, SBIR...")
+        logger.info("[Step 15/29] Downloading SBA loans, SLFRF, CDBG-DR, SBIR, DOE, DOT, USDA, HUD-CPD...")
         for name, mod in [
             ("SBA",     "download_sba"),
             ("SLFRF",   "download_slfrf"),
             ("CDBG-DR", "download_cdbg_dr"),
             ("SBIR",    "download_sbir"),
+            ("DOE",     "download_doe"),
+            ("DOT",     "download_dot"),
+            ("USDA",    "download_usda"),
+            ("HUD-CPD", "download_hud"),
         ]:
             try:
                 import importlib
@@ -789,6 +1081,217 @@ def main() -> int:
             except Exception as e:
                 logger.error(f"  {name} FAILED: {e}")
         logger.info("[Step 15/29] Done.\n")
+
+    # ------------------------------------------------------------------
+    # Step 15a: FSRS prime-to-sub reporting
+    # ------------------------------------------------------------------
+    if args.skip_fsrs:
+        logger.info("[Step 15a] SKIPPED (--skip-fsrs)\n")
+    else:
+        logger.info("[Step 15a] Downloading FSRS prime-to-sub reporting data...")
+        try:
+            from scripts.download_fsrs import run as run_fsrs
+            result = run_fsrs(root=root)
+            logger.info(f"[Step 15a] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 15a] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15b: COR3 PR recovery project tracker
+    # ------------------------------------------------------------------
+    if args.skip_cor3:
+        logger.info("[Step 15b] SKIPPED (--skip-cor3)\n")
+    else:
+        logger.info("[Step 15b] Downloading COR3 PR recovery project data...")
+        try:
+            from scripts.download_cor3 import run as run_cor3
+            result = run_cor3(root=root)
+            logger.info(f"[Step 15b] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 15b] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15c: PR Compras RFP/award scrape
+    # ------------------------------------------------------------------
+    if args.skip_compras:
+        logger.info("[Step 15c] SKIPPED (--skip-compras)\n")
+    else:
+        logger.info("[Step 15c] Scraping comprashpr.com RFPs and contract awards...")
+        try:
+            from scripts.download_compras import run as run_compras
+            result = run_compras(root=root)
+            logger.info(f"[Step 15c] Done — {result.get('rows', result.get('award_rows', 0)):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 15c] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15d: OpenFEMA PA v2 projects for PR
+    # ------------------------------------------------------------------
+    if args.skip_fema_pa_projects:
+        logger.info("[Step 15d] SKIPPED (--skip-fema-pa-projects)\n")
+    else:
+        logger.info("[Step 15d] Downloading OpenFEMA PA v2 project records for PR...")
+        try:
+            from scripts.download_openfema_pa_projects import run as run_fema_pa_proj
+            result = run_fema_pa_proj(root=root)
+            logger.info(f"[Step 15d] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 15d] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15e: FEMA PA portal 178-PW export ingest
+    # ------------------------------------------------------------------
+    if args.skip_fema_pa_portal:
+        logger.info("[Step 15e] SKIPPED (--skip-fema-pa-portal)\n")
+    else:
+        logger.info("[Step 15e] Ingesting FEMA PA portal 178-PW authorized export...")
+        try:
+            from scripts.ingest_fema_pa_portal_exports import run as run_fema_pa_portal
+            result = run_fema_pa_portal(root=root)
+            logger.info(f"[Step 15e] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 15e] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15f: Link FEMA PA PWs to contracts/assets
+    # ------------------------------------------------------------------
+    if args.skip_fema_pa_linkage:
+        logger.info("[Step 15f] SKIPPED (--skip-fema-pa-linkage)\n")
+    else:
+        logger.info("[Step 15f] Linking FEMA PA project worksheets to contracts and assets...")
+        try:
+            from scripts.link_fema_pa_to_contracts import run as run_fema_pa_link
+            result = run_fema_pa_link(root=root)
+            logger.info(f"[Step 15f] Done — {result.get('linkage_rows', 0):,} linkage rows\n")
+        except Exception as e:
+            logger.error(f"[Step 15f] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15g: Validate FEMA PA coverage
+    # ------------------------------------------------------------------
+    if args.skip_fema_pa_validation:
+        logger.info("[Step 15g] SKIPPED (--skip-fema-pa-validation)\n")
+    else:
+        logger.info("[Step 15g] Validating FEMA PA coverage and v1/v2 diff...")
+        try:
+            from scripts.validate_fema_pa_coverage import run as run_fema_pa_val
+            result = run_fema_pa_val(root=root)
+            logger.info(f"[Step 15g] Done — status: {result.get('status', '?')}\n")
+        except Exception as e:
+            logger.error(f"[Step 15g] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15h: HUD DRGR public financial report download
+    # ------------------------------------------------------------------
+    if args.skip_drgr_public:
+        logger.info("[Step 15h] SKIPPED (--skip-drgr-public)\n")
+    else:
+        logger.info("[Step 15h] Downloading HUD DRGR public financial reports...")
+        try:
+            from scripts.download_hud_drgr_public import run as run_drgr_pub
+            result = run_drgr_pub(root=root)
+            logger.info(f"[Step 15h] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 15h] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15i: HUD DRGR authorized local export ingest
+    # ------------------------------------------------------------------
+    if args.skip_drgr_exports:
+        logger.info("[Step 15i] SKIPPED (--skip-drgr-exports)\n")
+    else:
+        logger.info("[Step 15i] Ingesting authorized HUD DRGR local export files...")
+        try:
+            from scripts.ingest_hud_drgr_exports import run as run_drgr_ingest
+            result = run_drgr_ingest(root=root)
+            logger.info(f"[Step 15i] Done — {result.get('activity_rows', result.get('rows', 0)):,} activity rows\n")
+        except Exception as e:
+            logger.error(f"[Step 15i] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15j: Normalize HUD DRGR grants/projects/activities
+    # ------------------------------------------------------------------
+    if args.skip_drgr_normalize:
+        logger.info("[Step 15j] SKIPPED (--skip-drgr-normalize)\n")
+    else:
+        logger.info("[Step 15j] Normalizing HUD DRGR grants, projects, and activities...")
+        try:
+            from scripts.normalize_hud_drgr import run as run_drgr_norm
+            result = run_drgr_norm(root=root)
+            logger.info(f"[Step 15j] Done — {result.get('project_rows', 0):,} projects, {result.get('org_rows', 0):,} orgs\n")
+        except Exception as e:
+            logger.error(f"[Step 15j] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15k: Link DRGR responsible orgs to contracts
+    # ------------------------------------------------------------------
+    if args.skip_drgr_linkage:
+        logger.info("[Step 15k] SKIPPED (--skip-drgr-linkage)\n")
+    else:
+        logger.info("[Step 15k] Linking HUD DRGR responsible orgs to contract entities...")
+        try:
+            from scripts.link_hud_drgr_to_contracts import run as run_drgr_link
+            result = run_drgr_link(root=root)
+            logger.info(f"[Step 15k] Done — {result.get('linkage_rows', 0):,} linkage rows\n")
+        except Exception as e:
+            logger.error(f"[Step 15k] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15l: Link DRGR activities to assets/municipalities
+    # ------------------------------------------------------------------
+    if args.skip_drgr_assets:
+        logger.info("[Step 15l] SKIPPED (--skip-drgr-assets)\n")
+    else:
+        logger.info("[Step 15l] Linking HUD DRGR activities to physical assets and municipalities...")
+        try:
+            from scripts.link_hud_drgr_to_assets import run as run_drgr_assets
+            result = run_drgr_assets(root=root)
+            logger.info(f"[Step 15l] Done — {result.get('linkage_rows', 0):,} rows, "
+                        f"{result.get('municipalities_matched', 0):,} municipalities\n")
+        except Exception as e:
+            logger.error(f"[Step 15l] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15m: HUD DRGR coverage and entity-resolution report
+    # ------------------------------------------------------------------
+    if args.skip_drgr_validation:
+        logger.info("[Step 15m] SKIPPED (--skip-drgr-validation)\n")
+    else:
+        logger.info("[Step 15m] Running HUD DRGR coverage and entity-resolution validation...")
+        try:
+            from scripts.validate_hud_drgr_coverage import run as run_drgr_cov
+            result = run_drgr_cov(root=root)
+            logger.info(f"[Step 15m] Done — status: {result.get('status', '?')}\n")
+        except Exception as e:
+            logger.error(f"[Step 15m] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15n: HUD DRGR budget/drawdown/obligation reconciliation
+    # ------------------------------------------------------------------
+    if args.skip_drgr_amounts:
+        logger.info("[Step 15n] SKIPPED (--skip-drgr-amounts)\n")
+    else:
+        logger.info("[Step 15n] Reconciling HUD DRGR budget, drawdown, and obligation amounts...")
+        try:
+            from scripts.validate_hud_drgr_amounts import run as run_drgr_amts
+            result = run_drgr_amts(root=root)
+            logger.info(f"[Step 15n] Done — status: {result.get('status', '?')}\n")
+        except Exception as e:
+            logger.error(f"[Step 15n] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 15o: Build financial flows master
+    # ------------------------------------------------------------------
+    if args.skip_financial_flows:
+        logger.info("[Step 15o] SKIPPED (--skip-financial-flows)\n")
+    else:
+        logger.info("[Step 15o] Building financial flows master (FEMA + HUD + procurement)...")
+        try:
+            from scripts.build_financial_flows_master import run as run_fin_flows
+            result = run_fin_flows(root=root)
+            logger.info(f"[Step 15o] Done — {result.get('rows', 0):,} flow records\n")
+        except Exception as e:
+            logger.error(f"[Step 15o] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 16: Build unified master
@@ -820,6 +1323,20 @@ def main() -> int:
             logger.info(f"[Step 17/29] Done — {fec_result.get('rows', 0):,} contribution records\n")
         except Exception as e:
             logger.error(f"[Step 17/29] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 17b: Analyze RFP timing vs LDA lobbying
+    # ------------------------------------------------------------------
+    if args.skip_rfp_lobby:
+        logger.info("[Step 17b] SKIPPED (--skip-rfp-lobby)\n")
+    else:
+        logger.info("[Step 17b] Analyzing PR procurement RFP timing vs LDA lobbying...")
+        try:
+            from scripts.analyze_rfp_lobby import run as run_rfp_lobby
+            result = run_rfp_lobby(root=root)
+            logger.info(f"[Step 17b] Done — {result.get('rows', 0):,} RFP-lobby crossref rows\n")
+        except Exception as e:
+            logger.error(f"[Step 17b] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 18: Download LDA lobbying filings
@@ -976,6 +1493,20 @@ def main() -> int:
             logger.error(f"[Step 25/29] FAILED: {e}")
 
     # ------------------------------------------------------------------
+    # Step 25b: PR municipal fiscal health data
+    # ------------------------------------------------------------------
+    if args.skip_municipal:
+        logger.info("[Step 25b] SKIPPED (--skip-municipal)\n")
+    else:
+        logger.info("[Step 25b] Downloading PR municipal fiscal health data...")
+        try:
+            from scripts.download_municipal import run as run_municipal
+            result = run_municipal(root=root)
+            logger.info(f"[Step 25b] Done — {result.get('rows', 0):,} municipality rows\n")
+        except Exception as e:
+            logger.error(f"[Step 25b] FAILED: {e}")
+
+    # ------------------------------------------------------------------
     # Step 26: MSRB EMMA municipal bond data
     # ------------------------------------------------------------------
     if args.skip_emma:
@@ -992,6 +1523,259 @@ def main() -> int:
             )
         except Exception as e:
             logger.error(f"[Step 26/29] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26b: MSRB RTRS secondary market trade data
+    # ------------------------------------------------------------------
+    if args.skip_msrb_trades:
+        logger.info("[Step 26b] SKIPPED (--skip-msrb-trades)\n")
+    else:
+        logger.info("[Step 26b] Downloading MSRB RTRS secondary market trade data for PR CUSIPs...")
+        try:
+            from scripts.download_msrb_trades import run as run_msrb_trades
+            result = run_msrb_trades(root=root)
+            logger.info(f"[Step 26b] Done — {result.get('rows', 0):,} trade records\n")
+        except Exception as e:
+            logger.error(f"[Step 26b] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26c: Bond flow crossref (underwriters/dealers vs entity master)
+    # ------------------------------------------------------------------
+    if args.skip_bond_flow:
+        logger.info("[Step 26c] SKIPPED (--skip-bond-flow)\n")
+    else:
+        logger.info("[Step 26c] Analyzing bond flow: underwriters and dealers vs entity master...")
+        try:
+            from scripts.analyze_bond_flow import run as run_bond_flow
+            result = run_bond_flow(root=root)
+            logger.info(f"[Step 26c] Done — {result.get('rows', 0):,} entities, "
+                        f"{result.get('dual_role', 0):,} dual-role (bond + federal)\n")
+        except Exception as e:
+            logger.error(f"[Step 26c] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26d: USACE Section 404/10 permit data
+    # ------------------------------------------------------------------
+    if args.skip_usace:
+        logger.info("[Step 26d] SKIPPED (--skip-usace)\n")
+    else:
+        logger.info("[Step 26d] Downloading USACE Section 404/10 permit data for PR...")
+        try:
+            from scripts.download_usace_permits import run as run_usace
+            result = run_usace(root=root)
+            logger.info(f"[Step 26d] Done — {result.get('rows', 0):,} permits\n")
+        except Exception as e:
+            logger.error(f"[Step 26d] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26e: PR EQB / EPA ICIS environmental permits
+    # ------------------------------------------------------------------
+    if args.skip_eqb:
+        logger.info("[Step 26e] SKIPPED (--skip-eqb)\n")
+    else:
+        logger.info("[Step 26e] Downloading PR EQB / EPA ICIS environmental permit data...")
+        try:
+            from scripts.download_eqb import run as run_eqb
+            result = run_eqb(root=root)
+            logger.info(f"[Step 26e] Done — {result.get('rows', 0):,} permit records\n")
+        except Exception as e:
+            logger.error(f"[Step 26e] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26f: NFIP flood insurance claims
+    # ------------------------------------------------------------------
+    if args.skip_nfip:
+        logger.info("[Step 26f] SKIPPED (--skip-nfip)\n")
+    else:
+        logger.info("[Step 26f] Downloading NFIP flood insurance claims for PR...")
+        try:
+            from scripts.download_nfip import run as run_nfip
+            result = run_nfip(root=root)
+            logger.info(f"[Step 26f] Done — {result.get('rows', 0):,} claims\n")
+        except Exception as e:
+            logger.error(f"[Step 26f] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26g: LIHTC low-income housing tax credit projects
+    # ------------------------------------------------------------------
+    if args.skip_lihtc:
+        logger.info("[Step 26g] SKIPPED (--skip-lihtc)\n")
+    else:
+        logger.info("[Step 26g] Downloading LIHTC low-income housing tax credit data for PR...")
+        try:
+            from scripts.download_lihtc import run as run_lihtc
+            result = run_lihtc(root=root)
+            logger.info(f"[Step 26g] Done — {result.get('rows', 0):,} LIHTC projects\n")
+        except Exception as e:
+            logger.error(f"[Step 26g] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26h: NMTC new markets tax credit allocations
+    # ------------------------------------------------------------------
+    if args.skip_nmtc:
+        logger.info("[Step 26h] SKIPPED (--skip-nmtc)\n")
+    else:
+        logger.info("[Step 26h] Downloading NMTC new markets tax credit allocations for PR...")
+        try:
+            from scripts.download_nmtc import run as run_nmtc
+            result = run_nmtc(root=root)
+            logger.info(f"[Step 26h] Done — {result.get('rows', 0):,} NMTC allocations\n")
+        except Exception as e:
+            logger.error(f"[Step 26h] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26i: PR Act 60 tax incentive decrees
+    # ------------------------------------------------------------------
+    if args.skip_act60:
+        logger.info("[Step 26i] SKIPPED (--skip-act60)\n")
+    else:
+        logger.info("[Step 26i] Downloading PR Act 60 tax incentive decree data...")
+        try:
+            from scripts.download_act60 import run as run_act60
+            result = run_act60(root=root)
+            logger.info(f"[Step 26i] Done — {result.get('rows', 0):,} decrees\n")
+        except Exception as e:
+            logger.error(f"[Step 26i] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26j: Rum cover-over excise tax revenue
+    # ------------------------------------------------------------------
+    if args.skip_rum_coverover:
+        logger.info("[Step 26j] SKIPPED (--skip-rum-coverover)\n")
+    else:
+        logger.info("[Step 26j] Downloading rum cover-over excise tax revenue data...")
+        try:
+            from scripts.download_rum_coverover import run as run_rum
+            result = run_rum(root=root)
+            logger.info(f"[Step 26j] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 26j] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26k: FHLB advances to PR banks
+    # ------------------------------------------------------------------
+    if args.skip_fhlb:
+        logger.info("[Step 26k] SKIPPED (--skip-fhlb)\n")
+    else:
+        logger.info("[Step 26k] Downloading FHLB advances to PR financial institutions...")
+        try:
+            from scripts.download_fhlb import run as run_fhlb
+            result = run_fhlb(root=root)
+            logger.info(f"[Step 26k] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 26k] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26l: PREPA / Luma / Genera contract data
+    # ------------------------------------------------------------------
+    if args.skip_prepa:
+        logger.info("[Step 26l] SKIPPED (--skip-prepa)\n")
+    else:
+        logger.info("[Step 26l] Downloading PREPA/Luma/Genera contract data...")
+        try:
+            from scripts.download_prepa_contracts import run as run_prepa
+            result = run_prepa(root=root)
+            logger.info(f"[Step 26l] Done — {result.get('rows', 0):,} contracts\n")
+        except Exception as e:
+            logger.error(f"[Step 26l] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26m: PROMESA Title III creditor data
+    # ------------------------------------------------------------------
+    if args.skip_promesa:
+        logger.info("[Step 26m] SKIPPED (--skip-promesa)\n")
+    else:
+        logger.info("[Step 26m] Downloading PROMESA Title III creditor and recovery data...")
+        try:
+            from scripts.download_promesa_creditors import run as run_promesa
+            result = run_promesa(root=root)
+            logger.info(f"[Step 26m] Done — {result.get('rows', 0):,} creditor records\n")
+        except Exception as e:
+            logger.error(f"[Step 26m] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26n: PR cabilderos (state lobbyist registry) — ingest-first/fetch-fallback
+    # ------------------------------------------------------------------
+    if args.skip_cabilderos:
+        logger.info("[Step 26n] SKIPPED (--skip-cabilderos)\n")
+    else:
+        logger.info("[Step 26n] Loading PR cabilderos (state lobbyist registry)...")
+        _cab_result = {"rows": 0}
+        try:
+            from scripts.ingest_cabilderos import run as run_ingest_cab
+            _cab_result = run_ingest_cab(root=root)
+        except Exception as e:
+            logger.warning(f"[Step 26n] ingest_cabilderos failed: {e}")
+        if _cab_result.get("rows", 0) == 0:
+            try:
+                from scripts.download_cabilderos import run as run_fetch_cab
+                _cab_result = run_fetch_cab(root=root)
+            except Exception as e:
+                logger.error(f"[Step 26n] download_cabilderos FAILED: {e}")
+        logger.info(f"[Step 26n] Done — {_cab_result.get('rows', 0):,} cabildero records\n")
+
+    # ------------------------------------------------------------------
+    # Step 26o: PR Contralor audit/contract data — ingest-first/fetch-fallback
+    # ------------------------------------------------------------------
+    if args.skip_contralor:
+        logger.info("[Step 26o] SKIPPED (--skip-contralor)\n")
+    else:
+        logger.info("[Step 26o] Loading PR Comptroller audit and contract data...")
+        _con_result = {"rows": 0}
+        try:
+            from scripts.ingest_contralor import run as run_ingest_con
+            _con_result = run_ingest_con(root=root)
+        except Exception as e:
+            logger.warning(f"[Step 26o] ingest_contralor failed: {e}")
+        if _con_result.get("rows", 0) == 0:
+            try:
+                from scripts.download_contralor import run as run_fetch_con
+                _con_result = run_fetch_con(root=root)
+            except Exception as e:
+                logger.error(f"[Step 26o] download_contralor FAILED: {e}")
+        logger.info(f"[Step 26o] Done — {_con_result.get('rows', 0):,} audit/contract records\n")
+
+    # ------------------------------------------------------------------
+    # Step 26p: PR active contractor registry — ingest-first/fetch-fallback
+    # ------------------------------------------------------------------
+    if args.skip_active_contractors:
+        logger.info("[Step 26p] SKIPPED (--skip-active-contractors)\n")
+    else:
+        logger.info("[Step 26p] Loading PR active contractor registry...")
+        _ac_result = {"rows": 0}
+        try:
+            from scripts.ingest_active_contractors import run as run_ingest_ac
+            _ac_result = run_ingest_ac(root=root)
+        except Exception as e:
+            logger.warning(f"[Step 26p] ingest_active_contractors failed: {e}")
+        if _ac_result.get("rows", 0) == 0:
+            try:
+                from scripts.download_active_contractors import run as run_fetch_ac
+                _ac_result = run_fetch_ac(root=root)
+            except Exception as e:
+                logger.error(f"[Step 26p] download_active_contractors FAILED: {e}")
+        logger.info(f"[Step 26p] Done — {_ac_result.get('rows', 0):,} contractor records\n")
+
+    # ------------------------------------------------------------------
+    # Step 26q: PRASA contracts — ingest-first/fetch-fallback
+    # ------------------------------------------------------------------
+    if args.skip_prasa:
+        logger.info("[Step 26q] SKIPPED (--skip-prasa)\n")
+    else:
+        logger.info("[Step 26q] Loading PRASA aqueduct/sewer authority contract data...")
+        _prasa_result = {"rows": 0}
+        try:
+            from scripts.ingest_prasa import run as run_ingest_prasa
+            _prasa_result = run_ingest_prasa(root=root)
+        except Exception as e:
+            logger.warning(f"[Step 26q] ingest_prasa failed: {e}")
+        if _prasa_result.get("rows", 0) == 0:
+            try:
+                from scripts.download_prasa import run as run_fetch_prasa
+                _prasa_result = run_fetch_prasa(root=root)
+            except Exception as e:
+                logger.error(f"[Step 26q] download_prasa FAILED: {e}")
+        logger.info(f"[Step 26q] Done — {_prasa_result.get('rows', 0):,} PRASA contract records\n")
 
     # ------------------------------------------------------------------
     # Step 27: OFAC SDN sanctions crossref
@@ -1028,6 +1812,20 @@ def main() -> int:
             logger.error(f"[Step 28/29] FAILED: {e}")
 
     # ------------------------------------------------------------------
+    # Step 28b: Contractor project delivery scorecard
+    # ------------------------------------------------------------------
+    if args.skip_delivery:
+        logger.info("[Step 28b] SKIPPED (--skip-delivery)\n")
+    else:
+        logger.info("[Step 28b] Building contractor project delivery scorecard...")
+        try:
+            from scripts.analyze_project_delivery import run as run_delivery
+            result = run_delivery(root=root)
+            logger.info(f"[Step 28b] Done — {result.get('rows', 0):,} entities scored\n")
+        except Exception as e:
+            logger.error(f"[Step 28b] FAILED: {e}")
+
+    # ------------------------------------------------------------------
     # Step 29: Prime-to-subcontractor relationship analysis
     # ------------------------------------------------------------------
     if args.skip_prime_sub:
@@ -1045,6 +1843,20 @@ def main() -> int:
             )
         except Exception as e:
             logger.error(f"[Step 29/29] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 30: Generate PR investigation report
+    # ------------------------------------------------------------------
+    if args.skip_report:
+        logger.info("[Step 30] SKIPPED (--skip-report)\n")
+    else:
+        logger.info("[Step 30] Generating PR investigation report...")
+        try:
+            from scripts.generate_report import run as run_report
+            result = run_report(root=root)
+            logger.info(f"[Step 30] Done — report written to {result.get('path', 'data/output/')}\n")
+        except Exception as e:
+            logger.error(f"[Step 30] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Final summary
