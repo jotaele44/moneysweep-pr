@@ -479,6 +479,19 @@ def main() -> int:
     # Insertion H — final report
     parser.add_argument("--skip-report", action="store_true",
                         help="Skip step 30 (generate PR investigation report)")
+    # Tier 1 — federal entitlements + PR government financials
+    parser.add_argument("--skip-medicaid-fmap", action="store_true",
+                        help="Skip step 21b (Medicaid FMAP rates + CMS-64 PR expenditure)")
+    parser.add_argument("--skip-ssa", action="store_true",
+                        help="Skip step 21c (SSA OASDI/SSI/SSDI benefit data for PR)")
+    parser.add_argument("--skip-medicare-parts", action="store_true",
+                        help="Skip step 21d (Medicare Part A + Part D for PR)")
+    parser.add_argument("--skip-va", action="store_true",
+                        help="Skip step 21e (VA benefits + VAMC contracts for PR)")
+    parser.add_argument("--skip-aafaf", action="store_true",
+                        help="Skip step 25c (AAFAF PR government budget execution)")
+    parser.add_argument("--skip-pr-pensions", action="store_true",
+                        help="Skip step 25d (PR pension funds ERS/TRS/JRS)")
     args = parser.parse_args()
 
     root = PROJECT_ROOT
@@ -1422,6 +1435,62 @@ def main() -> int:
             logger.error(f"[Step 21/29] FAILED: {e}")
 
     # ------------------------------------------------------------------
+    # Step 21b: Medicaid FMAP rates + CMS-64 PR expenditure
+    # ------------------------------------------------------------------
+    if args.skip_medicaid_fmap:
+        logger.info("[Step 21b] SKIPPED (--skip-medicaid-fmap)\n")
+    else:
+        logger.info("[Step 21b] Downloading Medicaid FMAP rates and PR CMS-64 expenditure data...")
+        try:
+            from scripts.download_medicaid_fmap import run as run_medicaid_fmap
+            result = run_medicaid_fmap(root=root)
+            logger.info(f"[Step 21b] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 21b] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 21c: SSA OASDI/SSI/SSDI benefit data
+    # ------------------------------------------------------------------
+    if args.skip_ssa:
+        logger.info("[Step 21c] SKIPPED (--skip-ssa)\n")
+    else:
+        logger.info("[Step 21c] Downloading SSA OASDI/SSI/SSDI benefit data for PR...")
+        try:
+            from scripts.download_ssa import run as run_ssa
+            result = run_ssa(root=root)
+            logger.info(f"[Step 21c] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 21c] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 21d: Medicare Part A + Part D
+    # ------------------------------------------------------------------
+    if args.skip_medicare_parts:
+        logger.info("[Step 21d] SKIPPED (--skip-medicare-parts)\n")
+    else:
+        logger.info("[Step 21d] Downloading Medicare Part A and Part D data for PR...")
+        try:
+            from scripts.download_medicare_parts import run as run_medicare_parts
+            result = run_medicare_parts(root=root)
+            logger.info(f"[Step 21d] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 21d] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 21e: VA benefits + VAMC contracts
+    # ------------------------------------------------------------------
+    if args.skip_va:
+        logger.info("[Step 21e] SKIPPED (--skip-va)\n")
+    else:
+        logger.info("[Step 21e] Downloading VA benefit payments and VAMC contract data for PR...")
+        try:
+            from scripts.download_va import run as run_va
+            result = run_va(root=root)
+            logger.info(f"[Step 21e] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 21e] FAILED: {e}")
+
+    # ------------------------------------------------------------------
     # Step 22: FDIC bank data
     # ------------------------------------------------------------------
     if args.skip_fdic:
@@ -1505,6 +1574,34 @@ def main() -> int:
             logger.info(f"[Step 25b] Done — {result.get('rows', 0):,} municipality rows\n")
         except Exception as e:
             logger.error(f"[Step 25b] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 25c: AAFAF PR government budget execution
+    # ------------------------------------------------------------------
+    if args.skip_aafaf:
+        logger.info("[Step 25c] SKIPPED (--skip-aafaf)\n")
+    else:
+        logger.info("[Step 25c] Downloading AAFAF PR government budget execution data...")
+        try:
+            from scripts.download_aafaf import run as run_aafaf
+            result = run_aafaf(root=root)
+            logger.info(f"[Step 25c] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 25c] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 25d: PR pension funds (ERS, TRS, JRS)
+    # ------------------------------------------------------------------
+    if args.skip_pr_pensions:
+        logger.info("[Step 25d] SKIPPED (--skip-pr-pensions)\n")
+    else:
+        logger.info("[Step 25d] Downloading PR pension fund data (ERS/TRS/JRS)...")
+        try:
+            from scripts.download_pr_pensions import run as run_pr_pensions
+            result = run_pr_pensions(root=root)
+            logger.info(f"[Step 25d] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 25d] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 26: MSRB EMMA municipal bond data
