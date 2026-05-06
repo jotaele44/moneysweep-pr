@@ -23,10 +23,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
-import requests
 
 from scripts.build_unified_master import _normalize_name
 from scripts.config import PROJECT_ROOT, PROCESSED_DIR, setup_logging
+from scripts.web_fetch import (
+    extract_json_from_html_page,
+    fetch_paginated_json,
+    session_with_headers,
+)
 
 RAW_DIRS = [
     PROJECT_ROOT / "data" / "raw" / "PRASA",
@@ -70,61 +74,34 @@ COL_MAP = {
 
 
 def _session():
-    s = requests.Session()
-    s.headers.update({
+    return session_with_headers({
         "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0; PR procurement research)",
-        "Accept": "application/json, text/html, */*",
-        "Accept-Language": "es-PR,es;q=0.9,en;q=0.8",
         "Referer": "https://acueductos.pr.gov/",
     })
-    return s
-
-
-def _get(session, url, params, logger):
-    for attempt in range(MAX_RETRIES):
-        try:
-            resp = session.get(url, params=params, timeout=30)
-            time.sleep(REQUEST_SLEEP)
-            if resp.status_code == 429:
-                time.sleep(30)
-                continue
-            return resp
-        except requests.RequestException as exc:
-            if attempt < MAX_RETRIES - 1:
-                time.sleep(RETRY_BACKOFF[attempt])
-            else:
-                logger.error(f"  Request failed: {exc}")
-    return None
 
 
 def _try_json_endpoint(session, url, logger):
-    all_records = []
-    page = 1
-    while True:
-        resp = _get(session, url, {"page": page, "per_page": PAGE_SIZE, "limit": PAGE_SIZE}, logger)
-        if resp is None or resp.status_code >= 400:
-            return []
-        try:
-            data = resp.json()
-        except Exception:
-            return []
-        if isinstance(data, list):
-            all_records.extend(data)
-            if len(data) < PAGE_SIZE:
-                break
-            page += 1
-        elif isinstance(data, dict):
-            records = data.get("data", data.get("results", data.get("items", data.get("contracts", []))))
-            if isinstance(records, list):
-                all_records.extend(records)
-                if len(records) < PAGE_SIZE:
-                    break
-                page += 1
-            else:
-                break
-        else:
-            break
-    return all_records
+    records = fetch_paginated_json(
+        session,
+        url,
+        params={"limit": PAGE_SIZE},
+        page_param="page",
+        page_size_param="per_page",
+        page_size=PAGE_SIZE,
+        max_pages=100,
+        logger=logger,
+        items_keys=["data", "results", "items", "contracts"],
+    )
+    if records:
+        return records
+
+    # If the endpoint returns HTML, attempt to extract embedded JSON from the page.
+    embedded = extract_json_from_html_page(session, url, logger=logger)
+    if isinstance(embedded, list):
+        return embedded
+    if isinstance(embedded, dict):
+        return embedded.get("data") or embedded.get("results") or embedded.get("items") or embedded.get("contracts") or []
+    return []
 
 
 def _map_col(df_cols, candidates):
@@ -213,17 +190,10 @@ def run(root=None, force=False):
         logger.info(f"  pr_prasa_contracts.csv exists ({rows:,} rows) — skipping.")
         return {"status": "CACHED", "rows": rows}
 
-    # 1. Manual files
-    df = _try_manual_files(logger)
-    if not df.empty:
-        df.to_csv(out_path, index=False, encoding="utf-8")
-        logger.info(f"  PRASA (manual): {len(df):,} rows")
-        return {"status": "OK", "rows": len(df)}
-
-    # 2. API endpoints
+    # 1. Remote API and portal fetch
     session = _session()
     for url in PRASA_ENDPOINTS:
-        logger.info(f"  Trying: {url}")
+        logger.info(f"  Trying remote PRASA endpoint: {url}")
         records = _try_json_endpoint(session, url, logger)
         if records:
             logger.info(f"  Found {len(records):,} PRASA records at {url}")
@@ -231,11 +201,18 @@ def run(root=None, force=False):
             df.to_csv(out_path, index=False, encoding="utf-8")
             return {"status": "OK", "rows": len(df)}
 
-    # 3. Compras fallback
+    # 2. Compras fallback via purchase portal filter
     df = _try_compras_fallback(root, logger)
     if not df.empty:
         df.to_csv(out_path, index=False, encoding="utf-8")
         logger.info(f"  PRASA (compras fallback): {len(df):,} rows")
+        return {"status": "OK", "rows": len(df)}
+
+    # 3. Manual files as last resort
+    df = _try_manual_files(logger)
+    if not df.empty:
+        df.to_csv(out_path, index=False, encoding="utf-8")
+        logger.info(f"  PRASA (manual): {len(df):,} rows")
         return {"status": "OK", "rows": len(df)}
 
     # 4. Graceful empty

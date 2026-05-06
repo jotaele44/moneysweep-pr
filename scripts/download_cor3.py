@@ -26,8 +26,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
 from scripts.build_unified_master import _normalize_name
+from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.web_fetch import (
+    extract_json_from_html_page,
+    fetch_paginated_json,
+    session_with_headers,
+)
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -68,66 +73,40 @@ OUTPUT_COLUMNS = [
 # ---------------------------------------------------------------------------
 
 def _session() -> requests.Session:
-    s = requests.Session()
-    s.headers.update({
+    return session_with_headers({
         "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0; PR recovery research)",
-        "Accept": "application/json, text/html, */*",
-        "Accept-Language": "en-US,en;q=0.9,es;q=0.8",
         "Referer": COR3_BASE + "/en/transparencia",
     })
-    return s
-
-
-def _get(session, url, params, logger) -> requests.Response | None:
-    for attempt in range(MAX_RETRIES):
-        try:
-            resp = session.get(url, params=params, timeout=30)
-            if resp.status_code == 429:
-                time.sleep(30)
-                continue
-            time.sleep(PAGE_SLEEP)
-            return resp
-        except requests.RequestException as exc:
-            if attempt < MAX_RETRIES - 1:
-                time.sleep(RETRY_BACKOFF[attempt])
-            else:
-                logger.error(f"  Request failed: {exc}")
-    return None
 
 
 # ---------------------------------------------------------------------------
 # Try API endpoints
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 
 def _try_json_endpoint(session, endpoint, logger) -> list[dict]:
     """Attempt to fetch JSON project list from a COR3 API endpoint."""
     url = COR3_BASE + endpoint
-    all_records = []
-    page = 1
-    while True:
-        resp = _get(session, url, {"page": page, "per_page": PAGE_SIZE, "limit": PAGE_SIZE}, logger)
-        if resp is None or resp.status_code >= 400:
-            break
-        try:
-            data = resp.json()
-        except (ValueError, requests.exceptions.JSONDecodeError):
-            break
-        # Handle list or paginated dict
-        if isinstance(data, list):
-            all_records.extend(data)
-            break
-        elif isinstance(data, dict):
-            items = (
-                data.get("data") or data.get("results") or
-                data.get("projects") or data.get("items") or []
-            )
-            all_records.extend(items)
-            if len(items) < PAGE_SIZE or not data.get("next"):
-                break
-            page += 1
-        else:
-            break
-    return all_records
+    records = fetch_paginated_json(
+        session,
+        url,
+        params={"limit": PAGE_SIZE},
+        page_param="page",
+        page_size_param="per_page",
+        page_size=PAGE_SIZE,
+        max_pages=100,
+        logger=logger,
+        items_keys=["data", "results", "projects", "items"],
+    )
+    if records:
+        return records
+
+    embedded = extract_json_from_html_page(session, url, logger=logger)
+    if isinstance(embedded, list):
+        return embedded
+    if isinstance(embedded, dict):
+        return embedded.get("data") or embedded.get("results") or embedded.get("projects") or embedded.get("items") or []
+    return []
 
 
 def _try_csv_export(session, path, logger) -> list[dict]:
@@ -207,7 +186,7 @@ def run(root: Path = None, force: bool = False) -> dict:
     session = _session()
     raw_records: list[dict] = []
 
-    # Try JSON API endpoints
+    # Try JSON API endpoints first
     for endpoint in COR3_ENDPOINTS:
         logger.info(f"  Trying COR3 endpoint: {endpoint}")
         records = _try_json_endpoint(session, endpoint, logger)
