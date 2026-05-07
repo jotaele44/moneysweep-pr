@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -33,12 +33,21 @@ class IngestionContext:
     source_id: str
     run_id: str
     output_dir: Path
+    project_root: Path | None = None
+    manifest_dir: Path | None = None
+    cache_dir: Path | None = None
+    state_dir: Path | None = None
     cache_enabled: bool = True
     resume_enabled: bool = True
+    resume_token: str | None = None
     retry_policy: RetryPolicy = RetryPolicy()
     pagination_policy: PaginationPolicy = PaginationPolicy()
     window_start: date | None = None
     window_end: date | None = None
+
+    def with_resume_token(self, token: str | None) -> "IngestionContext":
+        """Return a copy of this context with an updated resume token."""
+        return replace(self, resume_token=token)
 
 
 class IngestionSource(ABC):

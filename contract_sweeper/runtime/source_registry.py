@@ -8,6 +8,16 @@ from typing import Any
 
 import yaml
 
+REQUIRED_SUPPORT_KEYS = (
+    "pagination",
+    "retry_backoff",
+    "resume",
+    "cache",
+    "time_window_splitting",
+    "manifest",
+    "completeness_logging",
+)
+
 
 @dataclass(frozen=True)
 class SourceDefinition:
@@ -15,8 +25,12 @@ class SourceDefinition:
 
     source_id: str
     enabled: bool
+    priority: int
     module: str
+    entrypoint: str
     description: str
+    output_paths: list[str]
+    required_fields: list[str]
     supports: dict[str, Any]
 
 
@@ -65,6 +79,8 @@ def load_source_registry(path: Path) -> SourceRegistry:
 
         source_id = str(item.get("id", "")).strip()
         module = str(item.get("module", "")).strip()
+        priority = int(item.get("priority", 999))
+        entrypoint = str(item.get("entrypoint", "run")).strip() or "run"
         if not source_id:
             raise SourceRegistryError(f"source_registry.sources[{idx}].id is required")
         if not module:
@@ -74,12 +90,31 @@ def load_source_registry(path: Path) -> SourceRegistry:
         if not isinstance(supports, dict):
             raise SourceRegistryError(f"source_registry.sources[{idx}].supports must be a mapping")
 
+        missing_support_keys = [k for k in REQUIRED_SUPPORT_KEYS if k not in supports]
+        if missing_support_keys:
+            keys = ", ".join(missing_support_keys)
+            raise SourceRegistryError(
+                f"source_registry.sources[{idx}].supports missing required keys: {keys}"
+            )
+
+        output_paths_raw = item.get("output_paths", [])
+        if not isinstance(output_paths_raw, list) or not all(isinstance(p, str) for p in output_paths_raw):
+            raise SourceRegistryError(f"source_registry.sources[{idx}].output_paths must be a list of strings")
+
+        required_fields_raw = item.get("required_fields", [])
+        if not isinstance(required_fields_raw, list) or not all(isinstance(p, str) for p in required_fields_raw):
+            raise SourceRegistryError(f"source_registry.sources[{idx}].required_fields must be a list of strings")
+
         sources.append(
             SourceDefinition(
                 source_id=source_id,
                 enabled=bool(item.get("enabled", True)),
+                priority=priority,
                 module=module,
+                entrypoint=entrypoint,
                 description=str(item.get("description", "")).strip(),
+                output_paths=[p.strip() for p in output_paths_raw if p.strip()],
+                required_fields=[p.strip() for p in required_fields_raw if p.strip()],
                 supports=supports,
             )
         )

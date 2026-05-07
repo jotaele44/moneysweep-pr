@@ -4,6 +4,7 @@ __pycache__/
 *.pyo
 .venv/
 venv/
+.DS_Store
 
 # Secrets — NEVER commit
 .env

@@ -14,4 +14,290 @@ defaults:
     enabled: true
   completeness:
     min_row_coverage: 0.95
-sources: []
+sources:
+  - id: usaspending_awards
+    enabled: true
+    priority: 1
+    module: scripts.download_grants
+    entrypoint: run
+    description: USASpending non-contract federal awards for Puerto Rico
+    output_paths:
+      - data/staging/processed/pr_grants_master.csv
+    required_fields:
+      - award_id
+      - recipient_name
+      - obligated_amount
+      - source_dataset
+    supports:
+      pagination: true
+      retry_backoff: true
+      resume: true
+      cache: true
+      time_window_splitting: true
+      manifest: true
+      completeness_logging: true
+
+  - id: sam_entity_resolution
+    enabled: true
+    priority: 2
+    module: scripts.sam_enrichment
+    entrypoint: run
+    description: SAM UEI enrichment and parent entity mapping
+    output_paths:
+      - data/staging/processed/enrichment/vendor_uei_index.csv
+    required_fields:
+      - vendor_name
+      - uei
+      - source
+      - status
+    supports:
+      pagination: true
+      retry_backoff: true
+      resume: true
+      cache: true
+      time_window_splitting: true
+      manifest: true
+      completeness_logging: true
+
+  - id: fema_openfema
+    enabled: true
+    priority: 3
+    module: scripts.download_fema
+    entrypoint: run
+    description: OpenFEMA Public Assistance and HMGP recovery datasets
+    output_paths:
+      - data/staging/processed/pr_fema_pa_master.csv
+      - data/staging/processed/pr_fema_hmgp_master.csv
+    required_fields:
+      - award_id
+      - recipient_name
+      - obligated_amount
+      - award_date
+    supports:
+      pagination: true
+      retry_backoff: true
+      resume: true
+      cache: true
+      time_window_splitting: true
+      manifest: true
+      completeness_logging: true
+
+  - id: fsrs_subawards
+    enabled: true
+    priority: 4
+    module: scripts.download_subawards
+    entrypoint: run
+    description: USASpending subaward records for Puerto Rico execution chain depth
+    output_paths:
+      - data/staging/processed/pr_subawards_master.csv
+    required_fields:
+      - award_id
+      - prime_award_id
+      - recipient_name
+      - obligated_amount
+    supports:
+      pagination: true
+      retry_backoff: true
+      resume: true
+      cache: true
+      time_window_splitting: true
+      manifest: true
+      completeness_logging: true
+
+  - id: fsrs_manual_export
+    enabled: true
+    priority: 4
+    module: scripts.download_fsrs
+    entrypoint: download_fsrs_subcontracts
+    description: FSRS manual/automated subcontract export support
+    output_paths:
+      - data/staging/expansion/expansion_subcontracts_pr.csv
+    required_fields:
+      - Prime Award ID
+      - Sub-Awardee Name
+      - Sub-Award Amount
+    supports:
+      pagination: true
+      retry_backoff: true
+      resume: true
+      cache: true
+      time_window_splitting: true
+      manifest: true
+      completeness_logging: true
+
+  - id: prasa_aaa
+    enabled: true
+    priority: 5
+    module: scripts.ingest_prasa
+    entrypoint: run
+    description: PRASA procurement ingest for water infrastructure control
+    output_paths:
+      - data/staging/processed/pr_prasa_contracts.csv
+    required_fields:
+      - award_id
+      - recipient_name
+      - obligated_amount
+      - award_date
+    supports:
+      pagination: true
+      retry_backoff: true
+      resume: true
+      cache: true
+      time_window_splitting: true
+      manifest: true
+      completeness_logging: true
+
+  - id: cor3_projects
+    enabled: true
+    priority: 6
+    module: scripts.ingest_cor3
+    entrypoint: run
+    description: COR3 recovery project mappings
+    output_paths:
+      - data/staging/processed/pr_cor3_projects.csv
+    required_fields:
+      - project_id
+      - project_title
+      - obligated_amount
+      - source_dataset
+    supports:
+      pagination: true
+      retry_backoff: true
+      resume: true
+      cache: true
+      time_window_splitting: true
+      manifest: true
+      completeness_logging: true
+
+  - id: prepa_luma_genera
+    enabled: true
+    priority: 7
+    module: scripts.download_prepa_contracts
+    entrypoint: run
+    description: PREPA/LUMA/GENERA grid control contract records
+    output_paths:
+      - data/staging/processed/pr_prepa_contracts.csv
+    required_fields:
+      - award_id
+      - recipient_name
+      - obligated_amount
+      - award_date
+    supports:
+      pagination: true
+      retry_backoff: true
+      resume: true
+      cache: true
+      time_window_splitting: true
+      manifest: true
+      completeness_logging: true
+
+  - id: hud_drgr_cdbg
+    enabled: true
+    priority: 8
+    module: scripts.download_cdbg_dr
+    entrypoint: run
+    description: HUD DRGR/CDBG recovery finance records
+    output_paths:
+      - data/staging/processed/pr_cdbg_dr_master.csv
+    required_fields:
+      - award_id
+      - recipient_name
+      - obligated_amount
+      - source_dataset
+    supports:
+      pagination: true
+      retry_backoff: true
+      resume: true
+      cache: true
+      time_window_splitting: true
+      manifest: true
+      completeness_logging: true
+
+  - id: lda_cabilderos
+    enabled: true
+    priority: 9
+    module: scripts.ingest_cabilderos
+    entrypoint: run
+    description: LDA and PR cabilderos influence-layer disclosures
+    output_paths:
+      - data/staging/processed/pr_cabilderos.csv
+    required_fields:
+      - vendor_name
+      - filing_date
+      - source_dataset
+      - source_file
+    supports:
+      pagination: true
+      retry_backoff: true
+      resume: true
+      cache: true
+      time_window_splitting: true
+      manifest: true
+      completeness_logging: true
+
+  - id: msrb_emma_bonds
+    enabled: true
+    priority: 10
+    module: scripts.download_emma
+    entrypoint: run
+    description: MSRB EMMA bond and underwriter financing-layer records
+    output_paths:
+      - data/staging/processed/pr_emma_bonds.csv
+      - data/staging/processed/pr_emma_underwriters.csv
+    required_fields:
+      - award_id
+      - obligated_amount
+      - source_dataset
+      - award_category
+    supports:
+      pagination: true
+      retry_backoff: true
+      resume: true
+      cache: true
+      time_window_splitting: true
+      manifest: true
+      completeness_logging: true
+
+  - id: ogpe_permits
+    enabled: true
+    priority: 11
+    module: scripts.download_eqb
+    entrypoint: run
+    description: OGPe/EQB permit records for asset linkage
+    output_paths:
+      - data/staging/processed/pr_eqb_permits.csv
+    required_fields:
+      - award_id
+      - recipient_name
+      - award_date
+      - source_dataset
+    supports:
+      pagination: true
+      retry_backoff: true
+      resume: true
+      cache: true
+      time_window_splitting: true
+      manifest: true
+      completeness_logging: true
+
+  - id: municipal_contracts
+    enabled: true
+    priority: 12
+    module: scripts.download_municipal
+    entrypoint: run
+    description: Municipal contracts execution-layer records
+    output_paths:
+      - data/staging/processed/pr_municipal_finance.csv
+    required_fields:
+      - award_id
+      - recipient_name
+      - obligated_amount
+      - source_dataset
+    supports:
+      pagination: true
+      retry_backoff: true
+      resume: true
+      cache: true
+      time_window_splitting: true
+      manifest: true
+      completeness_logging: true
