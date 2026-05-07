@@ -1,3 +1,3 @@
 """Contract Sweeper core package."""
 
-__all__ = ["runtime", "normalization", "resolution", "linkage", "flows"]
+__all__ = ["runtime", "normalization", "resolution", "linkage", "flows", "risk"]

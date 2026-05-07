@@ -81,3 +81,58 @@ datasets:
       - agency
       - flow_date
       - evidence_path
+  - name: risk_alerts_master
+    format: csv
+    required_fields:
+      - alert_id
+      - alert_type
+      - indicator_label
+      - entity_id
+      - project_id
+      - source_system
+      - risk_score
+      - probabilistic_assessment
+    optional_fields:
+      - award_id
+      - funding_source
+      - municipality
+      - asset_id
+      - link_confidence
+      - amount
+      - source_date
+      - evidence_path
+      - recommended_review_action
+  - name: risk_review_queue
+    format: csv
+    required_fields:
+      - alert_id
+      - alert_type
+      - entity_id
+      - review_reason
+      - risk_score
+      - link_confidence
+    optional_fields:
+      - project_id
+      - award_id
+      - amount
+      - evidence_path
+  - name: entity_behavior_history
+    format: parquet
+    required_fields:
+      - entity_id
+      - total_amount
+      - flow_count
+      - project_count
+      - avg_link_confidence
+      - differential_change_ratio
+    optional_fields:
+      - asset_count
+      - source_system_count
+      - max_single_flow_amount
+      - latest_flow_date
+  - name: high_risk_projects
+    format: geojson
+    required_fields:
+      - type
+      - features
+    optional_fields: []

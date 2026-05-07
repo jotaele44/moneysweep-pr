@@ -4,7 +4,7 @@ Date: 2026-05-07
 
 ## Executive Status
 
-The repository now has committed phase branches for Phases 1 through 6. Phase 0 exists as a branch but was not completed as a committed audit artifact gate in this run. Phases 7 through 9 remain pending.
+The repository now has committed phase branches for Phases 1 through 6 and an implemented Phase 7 branch in this worktree. Phase 0 exists as a branch but was not completed as a committed audit artifact gate in this run. Phases 8 through 9 remain pending.
 
 ## Phase Matrix
 
@@ -16,8 +16,8 @@ The repository now has committed phase branches for Phases 1 through 6. Phase 0 
 | 3 Normalization | `codex/phase-3-normalization` | `a7c468b` | Complete | Canonical contracts schema outputs and tests passed. |
 | 4 Entity resolution | `codex/phase-4-entity-resolution` | `c5684ac` | Complete | Parent UEI collapse, alias registry, and review queue tests passed. |
 | 5 Chain linkage | `codex/phase-5-chain-linkage` | `ffeb943` | Complete | Execution chain and per-asset linkage tests passed. |
-| 6 Financial flows | `codex/phase-6-financial-flows` | Pending commit hash | Complete in this worktree | Financial flow builder and full regression tests passed. |
-| 7 Risk signal engine | `codex/phase-7-risk-signal-engine` | Not created | Pending | Correctly deferred until after resolution and chain linkage. |
+| 6 Financial flows | `codex/phase-6-financial-flows` | `34b487b` | Complete | Financial flow builder and full regression tests passed. |
+| 7 Risk signal engine | `codex/phase-7-risk-signal-engine` | Pending commit hash | Complete in this worktree | Probabilistic risk alert builder, review queue, GeoJSON output, local-only notifier guard, and regression tests passed. |
 | 8 Graph layer | `codex/phase-8-graph-layer` | Not created | Pending | Must wait for validation and risk layer. |
 | 9 Reporting/gap analysis | `codex/phase-9-reporting-gap-analysis` | Not created | Pending | Final reproducible export not yet built. |
 
@@ -62,13 +62,22 @@ Phase 6 adds:
 - `financial_flows_master.csv`
 - `financial_flows_summary.json`
 
+Phase 7 adds:
+
+- `risk_alerts_master.csv`
+- `high_risk_projects.geojson`
+- `entity_behavior_history.parquet`
+- `risk_review_queue.csv`
+- `risk_signal_summary.json`
+
 ## Gate Risks
 
 - Phase 0 should be redone or completed before broad production ingestion, because duplicate module and hardcoded-secret inventory was not committed.
 - Phase 6 is implemented against the Phase 5 chain output, not all legacy upstream files. That is the right dependency direction for the current architecture, but legacy financial source parity still needs validation.
+- Phase 7 uses normalized, resolved, linked, and financial-flow inputs. It intentionally does not emit definitive findings; it emits review indicators only.
 - Entity match target `>=95%` and cross-layer linkage target `>=90%` are implemented as measurable summaries, but real dataset pass/fail depends on running with live/source data.
 - High-value unresolved entities can now be quantified, but real value is data-dependent.
 
 ## Recommended Next Move
 
-Commit Phase 6, then proceed to Phase 7 risk signal engine. The risk engine should consume `contracts_master`, `entities_resolved`, `execution_chain_master`, and `financial_flows_master`, and every alert label should stay probabilistic.
+Commit Phase 7, then proceed to Phase 8 graph layer only after validating that the risk outputs and upstream linkage gates are acceptable for the target dataset.

@@ -14,6 +14,7 @@ venv/
 data/staging/expansion/*.csv
 data/staging/processed/*.csv
 data/staging/processed/*.parquet
+data/staging/processed/*.geojson
 data/staging/normalized/*.csv
 data/staging/raw/**/*.csv
 data/raw/*.csv
@@ -22,6 +23,7 @@ data/staging/processed/alias_registry.json
 data/reports/entity_resolution_summary.json
 data/reports/execution_chain_summary.json
 data/reports/financial_flows_summary.json
+data/reports/risk_signal_summary.json
 
 # Logs
 data/logs/*.log

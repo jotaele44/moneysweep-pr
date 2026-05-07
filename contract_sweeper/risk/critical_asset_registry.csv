@@ -1,0 +1,6 @@
+asset_category,asset_keyword,criticality,notes
+water,water,high,Water infrastructure and treatment assets
+water,wastewater,high,Wastewater and sewer assets
+energy,power,high,Electric grid and generation assets
+health,hospital,high,Health system assets
+transport,bridge,medium,Transportation choke points

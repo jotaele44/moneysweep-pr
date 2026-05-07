@@ -1,0 +1,17 @@
+procurement_pressure:
+  - emergency
+  - urgent
+  - expedited
+  - sole source
+  - single source
+influence_overlap:
+  - lobbying
+  - lobbyist
+  - cabildero
+  - consultant
+asset_exposure:
+  - water
+  - power
+  - hospital
+  - bridge
+  - wastewater

@@ -1,0 +1,6 @@
+high_value_threshold: 1000000
+low_confidence_threshold: 0.75
+high_risk_score_threshold: 0.7
+concentration_share_threshold: 0.6
+differential_change_multiplier: 2.0
+review_threshold: 0.65
