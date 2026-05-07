@@ -17,7 +17,7 @@ The repository now has committed phase branches for Phases 1 through 6 and an im
 | 4 Entity resolution | `codex/phase-4-entity-resolution` | `c5684ac` | Complete | Parent UEI collapse, alias registry, and review queue tests passed. |
 | 5 Chain linkage | `codex/phase-5-chain-linkage` | `ffeb943` | Complete | Execution chain and per-asset linkage tests passed. |
 | 6 Financial flows | `codex/phase-6-financial-flows` | `34b487b` | Complete | Financial flow builder and full regression tests passed. |
-| 7 Risk signal engine | `codex/phase-7-risk-signal-engine` | Pending commit hash | Complete in this worktree | Probabilistic risk alert builder, review queue, GeoJSON output, local-only notifier guard, and regression tests passed. |
+| 7 Risk signal engine | `codex/phase-7-risk-signal-engine` | `243efea` | Complete | Probabilistic risk alert builder, review queue, GeoJSON output, local-only notifier guard, and regression tests passed. |
 | 8 Graph layer | `codex/phase-8-graph-layer` | Not created | Pending | Must wait for validation and risk layer. |
 | 9 Reporting/gap analysis | `codex/phase-9-reporting-gap-analysis` | Not created | Pending | Final reproducible export not yet built. |
 
