@@ -30,6 +30,7 @@ from scripts.config import PROJECT_ROOT, setup_logging
 NORMALIZED_DIR = PROJECT_ROOT / "data" / "normalized"
 
 RAW_DIRS = [
+    PROJECT_ROOT / "data" / "raw",               # catches root-level files e.g. "HUD DRGR (all PR grantees).xls"
     PROJECT_ROOT / "data" / "raw" / "HUD DRGR",
     PROJECT_ROOT / "data" / "raw" / "HUD",
     PROJECT_ROOT / "data" / "raw" / "hud_drgr",

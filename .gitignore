@@ -25,3 +25,4 @@ data/staging/processed/enrichment/
 !data/**/.gitkeep
 !data/staging/expansion/DOWNLOAD_INSTRUCTIONS.md
 !data/staging/expansion/manifest.json
+data/raw/Grants/*.xml

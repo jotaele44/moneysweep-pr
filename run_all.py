@@ -488,10 +488,46 @@ def main() -> int:
                         help="Skip step 21d (Medicare Part A + Part D for PR)")
     parser.add_argument("--skip-va", action="store_true",
                         help="Skip step 21e (VA benefits + VAMC contracts for PR)")
+    parser.add_argument("--skip-snap-nap", action="store_true",
+                        help="Skip step 21f (USDA FNS NAP nutrition assistance block grant)")
     parser.add_argument("--skip-aafaf", action="store_true",
                         help="Skip step 25c (AAFAF PR government budget execution)")
     parser.add_argument("--skip-pr-pensions", action="store_true",
                         help="Skip step 25d (PR pension funds ERS/TRS/JRS)")
+    # Tier 2 — Federal agency gaps + enforcement + compliance
+    parser.add_argument("--skip-epa", action="store_true",
+                        help="Skip step 6k (EPA grants for PR via USASpending)")
+    parser.add_argument("--skip-usace-civil", action="store_true",
+                        help="Skip step 6l (USACE civil works contracts for PR)")
+    parser.add_argument("--skip-nih", action="store_true",
+                        help="Skip step 6m (NIH research grants via NIH Reporter API)")
+    parser.add_argument("--skip-fcc", action="store_true",
+                        help="Skip step 26r (FCC USF E-Rate/broadband/rural-health subsidies)")
+    parser.add_argument("--skip-dol", action="store_true",
+                        help="Skip step 26s (DOL WHD + OSHA enforcement data for PR)")
+    parser.add_argument("--skip-sec-holdings", action="store_true",
+                        help="Skip step 26t (SEC 13F/N-PORT PR bond holdings)")
+    parser.add_argument("--skip-gao-ig", action="store_true",
+                        help="Skip step 26u (GAO + HUD/FEMA/HHS IG audit reports)")
+    parser.add_argument("--skip-p3", action="store_true",
+                        help="Skip step 26v (PR P3 Authority public-private partnership contracts)")
+    # Tier 3 — Remaining coverage gaps
+    parser.add_argument("--skip-medicare-advantage", action="store_true",
+                        help="Skip step 21g (CMS Medicare Advantage plan payments for PR)")
+    parser.add_argument("--skip-chip", action="store_true",
+                        help="Skip step 21h (CMS CHIP children's health insurance for PR)")
+    parser.add_argument("--skip-wic", action="store_true",
+                        help="Skip step 21i (USDA WIC women/infants/children nutrition for PR)")
+    parser.add_argument("--skip-wioa", action="store_true",
+                        help="Skip step 21j (DOL WIOA workforce development grants for PR)")
+    parser.add_argument("--skip-hud-hcv", action="store_true",
+                        help="Skip step 21k (HUD Section 8 / Housing Choice Voucher for PR)")
+    parser.add_argument("--skip-ncua", action="store_true",
+                        help="Skip step 22b (NCUA credit union call report data for PR)")
+    parser.add_argument("--skip-hacienda", action="store_true",
+                        help="Skip step 25e (PR Hacienda monthly tax revenues)")
+    parser.add_argument("--skip-cofina", action="store_true",
+                        help="Skip step 25f (COFINA SUT revenue bond allocation)")
     args = parser.parse_args()
 
     root = PROJECT_ROOT
@@ -797,16 +833,25 @@ def main() -> int:
             coverage_result = 1
 
     # ------------------------------------------------------------------
-    # Step 6b: SF-133 budget execution data
+    # Step 6b: SF-133 budget execution + Follow the Money data (ingest-first)
     # ------------------------------------------------------------------
     if args.skip_sf133:
         logger.info("[Step 6b] SKIPPED (--skip-sf133)\n")
     else:
-        logger.info("[Step 6b] Downloading SF-133 budget execution data...")
+        logger.info("[Step 6b] SF-133 budget execution (ingest-first / API-fallback)...")
         try:
-            from scripts.download_sf133 import run as run_sf133
-            result = run_sf133(root=root)
-            logger.info(f"[Step 6b] Done — {result.get('rows', 0):,} rows\n")
+            _sf133_result = {"rows": 0}
+            try:
+                from scripts.ingest_follow_the_money import run as ingest_ftm
+                _sf133_result = ingest_ftm(root=root)
+                if _sf133_result.get("rows", 0) > 0:
+                    logger.info(f"[Step 6b] Follow the Money ingest done — {_sf133_result['rows']:,} SF-133 rows\n")
+            except Exception as _ftm_err:
+                logger.warning(f"[Step 6b] Follow the Money ingest failed ({_ftm_err}) — falling back to API")
+            if _sf133_result.get("rows", 0) == 0:
+                from scripts.download_sf133 import run as run_sf133
+                _sf133_result = run_sf133(root=root)
+                logger.info(f"[Step 6b] API done — {_sf133_result.get('rows', 0):,} rows\n")
         except Exception as e:
             logger.error(f"[Step 6b] FAILED: {e}")
 
@@ -923,6 +968,48 @@ def main() -> int:
             logger.error(f"[Step 6j] FAILED: {e}")
 
     # ------------------------------------------------------------------
+    # Step 6k: EPA grants for PR (USASpending)
+    # ------------------------------------------------------------------
+    if args.skip_epa:
+        logger.info("[Step 6k] SKIPPED (--skip-epa)\n")
+    else:
+        logger.info("[Step 6k] Downloading EPA grants and cooperative agreements for PR...")
+        try:
+            from scripts.download_epa import run as run_epa
+            result = run_epa(root=root)
+            logger.info(f"[Step 6k] Done — {result.get('rows', result.get('master_rows', 0)):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6k] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6l: USACE civil works contracts for PR (USASpending)
+    # ------------------------------------------------------------------
+    if args.skip_usace_civil:
+        logger.info("[Step 6l] SKIPPED (--skip-usace-civil)\n")
+    else:
+        logger.info("[Step 6l] Downloading USACE civil works contracts and grants for PR...")
+        try:
+            from scripts.download_usace_civil import run as run_usace_civil
+            result = run_usace_civil(root=root)
+            logger.info(f"[Step 6l] Done — {result.get('rows', result.get('master_rows', 0)):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6l] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 6m: NIH research grants to PR (NIH Reporter API)
+    # ------------------------------------------------------------------
+    if args.skip_nih:
+        logger.info("[Step 6m] SKIPPED (--skip-nih)\n")
+    else:
+        logger.info("[Step 6m] Downloading NIH research grants to PR institutions...")
+        try:
+            from scripts.download_nih import run as run_nih
+            result = run_nih(root=root)
+            logger.info(f"[Step 6m] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 6m] FAILED: {e}")
+
+    # ------------------------------------------------------------------
     # Step 7: SAM.gov UEI enrichment
     # ------------------------------------------------------------------
     if args.skip_enrichment:
@@ -1014,16 +1101,24 @@ def main() -> int:
             logger.error(f"[Step 10/29] FAILED: {e}")
 
     # ------------------------------------------------------------------
-    # Step 11: Download grants
+    # Step 11: Grants.gov XML ingest (local) + USASpending grants API fallback
     # ------------------------------------------------------------------
     if args.skip_grants:
         logger.info("[Step 11/29] SKIPPED (--skip-grants)\n")
     else:
-        logger.info("[Step 11/29] Downloading federal grants (USASpending)...")
+        logger.info("[Step 11/29] Grants (Grants.gov XML ingest-first / USASpending API fallback)...")
         try:
+            _grants_xml_result = {"rows": 0}
+            try:
+                from scripts.ingest_grants import run as ingest_grants_xml
+                _grants_xml_result = ingest_grants_xml(root=root)
+                if _grants_xml_result.get("rows", 0) > 0:
+                    logger.info(f"[Step 11/29] Grants.gov XML ingest done — {_grants_xml_result['rows']:,} opportunities\n")
+            except Exception as _gx_err:
+                logger.warning(f"[Step 11/29] Grants XML ingest failed ({_gx_err}) — falling back to USASpending API")
             from scripts.download_grants import run as run_grants
             g = run_grants(root=root)
-            logger.info(f"[Step 11/29] Done — {g.get('master_rows', g.get('total_rows', 0)):,} grant records\n")
+            logger.info(f"[Step 11/29] USASpending grants done — {g.get('master_rows', g.get('total_rows', 0)):,} award records\n")
         except Exception as e:
             logger.error(f"[Step 11/29] FAILED: {e}")
 
@@ -1110,16 +1205,25 @@ def main() -> int:
             logger.error(f"[Step 15a] FAILED: {e}")
 
     # ------------------------------------------------------------------
-    # Step 15b: COR3 PR recovery project tracker
+    # Step 15b: COR3 PR recovery project tracker (ingest local exports first)
     # ------------------------------------------------------------------
     if args.skip_cor3:
         logger.info("[Step 15b] SKIPPED (--skip-cor3)\n")
     else:
-        logger.info("[Step 15b] Downloading COR3 PR recovery project data...")
+        logger.info("[Step 15b] COR3 PR recovery project data (ingest-first / API-fallback)...")
         try:
-            from scripts.download_cor3 import run as run_cor3
-            result = run_cor3(root=root)
-            logger.info(f"[Step 15b] Done — {result.get('rows', 0):,} rows\n")
+            _cor3_result = {"rows": 0}
+            try:
+                from scripts.ingest_cor3 import run as ingest_cor3
+                _cor3_result = ingest_cor3(root=root)
+                if _cor3_result.get("rows", 0) > 0:
+                    logger.info(f"[Step 15b] Ingest done — {_cor3_result['rows']:,} rows from local Excel\n")
+            except Exception as _ingest_err:
+                logger.warning(f"[Step 15b] Local ingest failed ({_ingest_err}) — falling back to API")
+            if _cor3_result.get("rows", 0) == 0:
+                from scripts.download_cor3 import run as run_cor3
+                _cor3_result = run_cor3(root=root)
+                logger.info(f"[Step 15b] API done — {_cor3_result.get('rows', 0):,} rows\n")
         except Exception as e:
             logger.error(f"[Step 15b] FAILED: {e}")
 
@@ -1324,16 +1428,34 @@ def main() -> int:
             logger.error(f"[Step 16/29] FAILED: {e}")
 
     # ------------------------------------------------------------------
-    # Step 17: Download FEC contributions
+    # Step 17: FEC contributions — ingest manual export first, then API fallback
     # ------------------------------------------------------------------
     if args.skip_fec:
         logger.info("[Step 17/29] SKIPPED (--skip-fec)\n")
     else:
-        logger.info("[Step 17/29] Downloading FEC Schedule A contributions from PR...")
+        logger.info("[Step 17/29] Loading FEC Schedule A contributions for PR...")
         try:
-            from scripts.download_fec import run as run_fec
-            fec_result = run_fec(root=root, api_key=args.fec_api_key)
-            logger.info(f"[Step 17/29] Done — {fec_result.get('rows', 0):,} contribution records\n")
+            fec_result = {"rows": 0}
+            # Try manual export from data/raw/FEC/ first
+            try:
+                from scripts.ingest_fec import run as ingest_fec
+                fec_result = ingest_fec(root=root)
+                if fec_result.get("rows", 0) > 0:
+                    logger.info(
+                        f"[Step 17/29] Ingest done — {fec_result['rows']:,} rows "
+                        f"from exported CSV(s)\n"
+                    )
+            except Exception as ingest_err:
+                logger.warning(f"[Step 17/29] Ingest failed ({ingest_err}) — falling back to API")
+
+            # Fall back to API download if ingest produced nothing
+            if fec_result.get("rows", 0) == 0:
+                logger.info("[Step 17/29] No export data — downloading via FEC API...")
+                from scripts.download_fec import run as run_fec
+                fec_result = run_fec(root=root, api_key=args.fec_api_key)
+                logger.info(
+                    f"[Step 17/29] API done — {fec_result.get('rows', 0):,} contribution records\n"
+                )
         except Exception as e:
             logger.error(f"[Step 17/29] FAILED: {e}")
 
@@ -1491,6 +1613,90 @@ def main() -> int:
             logger.error(f"[Step 21e] FAILED: {e}")
 
     # ------------------------------------------------------------------
+    # Step 21f: USDA FNS NAP nutrition assistance block grant
+    # ------------------------------------------------------------------
+    if args.skip_snap_nap:
+        logger.info("[Step 21f] SKIPPED (--skip-snap-nap)\n")
+    else:
+        logger.info("[Step 21f] Downloading USDA FNS NAP nutrition assistance data for PR...")
+        try:
+            from scripts.download_snap_nap import run as run_snap_nap
+            result = run_snap_nap(root=root)
+            logger.info(f"[Step 21f] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 21f] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 21g: CMS Medicare Advantage plan payments
+    # ------------------------------------------------------------------
+    if args.skip_medicare_advantage:
+        logger.info("[Step 21g] SKIPPED (--skip-medicare-advantage)\n")
+    else:
+        logger.info("[Step 21g] Downloading CMS Medicare Advantage plan payment data for PR...")
+        try:
+            from scripts.download_medicare_advantage import run as run_medicare_advantage
+            result = run_medicare_advantage(root=root)
+            logger.info(f"[Step 21g] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 21g] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 21h: CMS CHIP children's health insurance
+    # ------------------------------------------------------------------
+    if args.skip_chip:
+        logger.info("[Step 21h] SKIPPED (--skip-chip)\n")
+    else:
+        logger.info("[Step 21h] Downloading CMS CHIP children's health insurance data for PR...")
+        try:
+            from scripts.download_chip import run as run_chip
+            result = run_chip(root=root)
+            logger.info(f"[Step 21h] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 21h] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 21i: USDA WIC women/infants/children nutrition
+    # ------------------------------------------------------------------
+    if args.skip_wic:
+        logger.info("[Step 21i] SKIPPED (--skip-wic)\n")
+    else:
+        logger.info("[Step 21i] Downloading USDA WIC nutrition program data for PR...")
+        try:
+            from scripts.download_wic import run as run_wic
+            result = run_wic(root=root)
+            logger.info(f"[Step 21i] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 21i] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 21j: DOL WIOA workforce development grants
+    # ------------------------------------------------------------------
+    if args.skip_wioa:
+        logger.info("[Step 21j] SKIPPED (--skip-wioa)\n")
+    else:
+        logger.info("[Step 21j] Downloading DOL WIOA workforce development grants for PR...")
+        try:
+            from scripts.download_wioa import run as run_wioa
+            result = run_wioa(root=root)
+            logger.info(f"[Step 21j] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 21j] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 21k: HUD Section 8 / Housing Choice Voucher
+    # ------------------------------------------------------------------
+    if args.skip_hud_hcv:
+        logger.info("[Step 21k] SKIPPED (--skip-hud-hcv)\n")
+    else:
+        logger.info("[Step 21k] Downloading HUD Section 8 / Housing Choice Voucher data for PR...")
+        try:
+            from scripts.download_hud_hcv import run as run_hud_hcv
+            result = run_hud_hcv(root=root)
+            logger.info(f"[Step 21k] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 21k] FAILED: {e}")
+
+    # ------------------------------------------------------------------
     # Step 22: FDIC bank data
     # ------------------------------------------------------------------
     if args.skip_fdic:
@@ -1506,6 +1712,20 @@ def main() -> int:
             )
         except Exception as e:
             logger.error(f"[Step 22/29] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 22b: NCUA credit union call report data
+    # ------------------------------------------------------------------
+    if args.skip_ncua:
+        logger.info("[Step 22b] SKIPPED (--skip-ncua)\n")
+    else:
+        logger.info("[Step 22b] Downloading NCUA credit union call report data for PR...")
+        try:
+            from scripts.download_ncua import run as run_ncua
+            result = run_ncua(root=root)
+            logger.info(f"[Step 22b] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 22b] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 23: Entity profiles cross-reference
@@ -1602,6 +1822,34 @@ def main() -> int:
             logger.info(f"[Step 25d] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
             logger.error(f"[Step 25d] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 25e: PR Hacienda monthly tax revenues
+    # ------------------------------------------------------------------
+    if args.skip_hacienda:
+        logger.info("[Step 25e] SKIPPED (--skip-hacienda)\n")
+    else:
+        logger.info("[Step 25e] Downloading PR Hacienda monthly tax revenue data...")
+        try:
+            from scripts.download_hacienda import run as run_hacienda
+            result = run_hacienda(root=root)
+            logger.info(f"[Step 25e] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 25e] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 25f: COFINA SUT revenue bond allocation
+    # ------------------------------------------------------------------
+    if args.skip_cofina:
+        logger.info("[Step 25f] SKIPPED (--skip-cofina)\n")
+    else:
+        logger.info("[Step 25f] Downloading COFINA SUT revenue bond allocation data...")
+        try:
+            from scripts.download_cofina import run as run_cofina
+            result = run_cofina(root=root)
+            logger.info(f"[Step 25f] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 25f] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 26: MSRB EMMA municipal bond data
@@ -1873,6 +2121,76 @@ def main() -> int:
             except Exception as e:
                 logger.error(f"[Step 26q] download_prasa FAILED: {e}")
         logger.info(f"[Step 26q] Done — {_prasa_result.get('rows', 0):,} PRASA contract records\n")
+
+    # ------------------------------------------------------------------
+    # Step 26r: FCC USF broadband / E-Rate / Rural Health Care subsidies
+    # ------------------------------------------------------------------
+    if args.skip_fcc:
+        logger.info("[Step 26r] SKIPPED (--skip-fcc)\n")
+    else:
+        logger.info("[Step 26r] Downloading FCC USF (E-Rate, Rural Health Care, High Cost) data for PR...")
+        try:
+            from scripts.download_fcc import run as run_fcc
+            result = run_fcc(root=root)
+            logger.info(f"[Step 26r] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 26r] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26s: DOL WHD + OSHA enforcement data
+    # ------------------------------------------------------------------
+    if args.skip_dol:
+        logger.info("[Step 26s] SKIPPED (--skip-dol)\n")
+    else:
+        logger.info("[Step 26s] Downloading DOL wage-hour and OSHA enforcement data for PR...")
+        try:
+            from scripts.download_dol import run as run_dol
+            result = run_dol(root=root)
+            logger.info(f"[Step 26s] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 26s] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26t: SEC 13F / N-PORT PR bond holdings
+    # ------------------------------------------------------------------
+    if args.skip_sec_holdings:
+        logger.info("[Step 26t] SKIPPED (--skip-sec-holdings)\n")
+    else:
+        logger.info("[Step 26t] Downloading SEC 13F/N-PORT institutional PR bond holdings...")
+        try:
+            from scripts.download_sec_holdings import run as run_sec_holdings
+            result = run_sec_holdings(root=root)
+            logger.info(f"[Step 26t] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 26t] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26u: GAO + HUD/FEMA/HHS IG audit reports covering PR
+    # ------------------------------------------------------------------
+    if args.skip_gao_ig:
+        logger.info("[Step 26u] SKIPPED (--skip-gao-ig)\n")
+    else:
+        logger.info("[Step 26u] Downloading GAO and Inspector General audit reports covering PR...")
+        try:
+            from scripts.download_gao_ig import run as run_gao_ig
+            result = run_gao_ig(root=root)
+            logger.info(f"[Step 26u] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 26u] FAILED: {e}")
+
+    # ------------------------------------------------------------------
+    # Step 26v: PR P3 Authority public-private partnership contracts
+    # ------------------------------------------------------------------
+    if args.skip_p3:
+        logger.info("[Step 26v] SKIPPED (--skip-p3)\n")
+    else:
+        logger.info("[Step 26v] Downloading PR P3 Authority public-private partnership contracts...")
+        try:
+            from scripts.download_p3 import run as run_p3
+            result = run_p3(root=root)
+            logger.info(f"[Step 26v] Done — {result.get('rows', 0):,} rows\n")
+        except Exception as e:
+            logger.error(f"[Step 26v] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 27: OFAC SDN sanctions crossref
