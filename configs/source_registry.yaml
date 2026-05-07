@@ -1,0 +1,17 @@
+version: 1
+defaults:
+  retry:
+    max_attempts: 5
+    base_backoff_seconds: 1.0
+    max_backoff_seconds: 30.0
+  pagination:
+    mode: offset
+    page_size: 1000
+  cache:
+    enabled: true
+    ttl_seconds: 86400
+  resume:
+    enabled: true
+  completeness:
+    min_row_coverage: 0.95
+sources: []

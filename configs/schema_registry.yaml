@@ -1,0 +1,47 @@
+version: 1
+datasets:
+  - name: contracts_master
+    format: parquet
+    required_fields:
+      - entity_id
+      - parent_uei
+      - normalized_name
+      - award_id
+      - funding_source
+      - obligation_amount
+      - geo_location
+      - project_id
+      - agency
+      - source_system
+      - source_url
+      - source_date
+      - link_confidence
+      - risk_score
+    optional_fields:
+      - municipality
+      - contract_type
+      - award_status
+  - name: entities_resolved
+    format: csv
+    required_fields:
+      - entity_id
+      - parent_uei
+      - normalized_name
+      - source_system
+      - link_confidence
+    optional_fields:
+      - alias
+      - tax_id
+      - cage_code
+  - name: execution_chain_master
+    format: csv
+    required_fields:
+      - entity_id
+      - project_id
+      - funding_source
+      - source_system
+      - link_confidence
+    optional_fields:
+      - upstream_entity_id
+      - downstream_asset_id
+      - municipality
