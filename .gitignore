@@ -13,8 +13,11 @@ venv/
 # Data files (downloaded CSVs — too large for git)
 data/staging/expansion/*.csv
 data/staging/processed/*.csv
+data/staging/processed/*.parquet
+data/staging/normalized/*.csv
 data/staging/raw/**/*.csv
 data/raw/*.csv
+data/reports/normalization_summary.json
 
 # Logs
 data/logs/*.log
