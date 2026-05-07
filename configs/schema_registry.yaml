@@ -61,3 +61,23 @@ datasets:
     optional_fields:
       - dominant_agency
       - review_flag
+  - name: financial_flows_master
+    format: parquet
+    required_fields:
+      - flow_id
+      - flow_type
+      - source_system
+      - funding_source
+      - award_id
+      - project_id
+      - entity_id
+      - upstream_entity_id
+      - downstream_asset_id
+      - municipality
+      - amount_type
+      - amount
+      - link_confidence
+    optional_fields:
+      - agency
+      - flow_date
+      - evidence_path
