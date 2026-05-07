@@ -20,6 +20,7 @@ data/raw/*.csv
 data/reports/normalization_summary.json
 data/staging/processed/alias_registry.json
 data/reports/entity_resolution_summary.json
+data/reports/execution_chain_summary.json
 
 # Logs
 data/logs/*.log

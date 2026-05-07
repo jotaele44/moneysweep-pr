@@ -45,3 +45,19 @@ datasets:
       - upstream_entity_id
       - downstream_asset_id
       - municipality
+  - name: execution_chain_per_asset
+    format: csv
+    required_fields:
+      - asset_id
+      - municipality
+      - funding_source
+      - source_system
+      - linked_contract_count
+      - unique_entities
+      - total_obligation
+      - avg_link_confidence
+      - low_confidence_count
+      - coverage_ratio
+    optional_fields:
+      - dominant_agency
+      - review_flag
