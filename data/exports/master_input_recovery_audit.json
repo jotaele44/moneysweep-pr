@@ -1,0 +1,52 @@
+{
+  "allow_partial_rebuild": false,
+  "build_error": "Fail-closed: unresolved master inputs or forbidden candidates detected",
+  "expected_input_count": 21,
+  "forbidden_candidate_count": 4,
+  "forbidden_candidates": [
+    "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByAccount.csv",
+    "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByEntity.csv",
+    "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByYear.csv",
+    "data/staging/processed/graph/top_nodes.csv"
+  ],
+  "generated_at": "2026-05-08T12:54:17Z",
+  "mapped_input_count": 0,
+  "missing_expected_inputs": [
+    "data/staging/expansion/expansion_dod_upr_2001_2015.csv",
+    "data/staging/expansion/expansion_dod_upr_2016_2025.csv",
+    "data/staging/expansion/expansion_idv_indirect_pr.csv",
+    "data/staging/expansion/expansion_reconstruction_2017_2025.csv",
+    "data/staging/processed/pr_cdbg_dr_master.csv",
+    "data/staging/processed/pr_contracts_master.csv",
+    "data/staging/processed/pr_doe_master.csv",
+    "data/staging/processed/pr_dot_master.csv",
+    "data/staging/processed/pr_epa_master.csv",
+    "data/staging/processed/pr_fema_hmgp_master.csv",
+    "data/staging/processed/pr_fema_pa_master.csv",
+    "data/staging/processed/pr_grants_master.csv",
+    "data/staging/processed/pr_hud_master.csv",
+    "data/staging/processed/pr_research_master.csv",
+    "data/staging/processed/pr_sba_loans_master.csv",
+    "data/staging/processed/pr_sbir_master.csv",
+    "data/staging/processed/pr_slfrf_master.csv",
+    "data/staging/processed/pr_subawards_master.csv",
+    "data/staging/processed/pr_usace_civil_master.csv",
+    "data/staging/processed/pr_usda_master.csv",
+    "data/staging/processed/pr_wioa_grants.csv"
+  ],
+  "missing_input_count": 21,
+  "observed_summary_rows": 4503,
+  "observed_summary_unique_entities": 18,
+  "phase_7_8_block_reason": "R4 gate failed; R5 gate not passed; R6 gate not passed",
+  "phase_7_8_blocked": true,
+  "r4_gate_passed": false,
+  "r4_outputs": {
+    "master_input_blockers": "data/review_queue/master_input_recovery_blockers.csv",
+    "master_input_recovery_audit": "data/exports/master_input_recovery_audit.csv",
+    "master_input_recovery_status": "data/exports/master_input_recovery_audit.json"
+  },
+  "rebuild_attempted": false,
+  "rebuild_rows": 0,
+  "rebuild_succeeded": false,
+  "rebuild_unique_entities": 0
+}
