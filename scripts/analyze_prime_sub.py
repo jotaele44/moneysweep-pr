@@ -32,6 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 
 from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from contract_sweeper.validation.production_status import load_current_status
 
 
 def _yr_range(series: pd.Series) -> str:
@@ -150,12 +151,15 @@ def build_prime_sub(root: Path = None) -> dict:
     top_pairs = edges.head(10).to_dict("records")
 
     total_sub_flow = float(edges["total_flow"].sum())
+    status_payload = load_current_status(root)
     summary = {
         "prime_count":        int(edges["prime_recipient"].nunique()),
         "sub_count":          int(edges["sub_recipient"].nunique()),
         "pair_count":         len(edges),
         "sub_only_count":     len(sub_only),
         "total_sub_flow":     total_sub_flow,
+        "production_status": status_payload["production_status"],
+        "production_status_message": status_payload["status_message"],
         "top_primes":         top_primes,
         "top_subs":           top_subs,
         "top_pairs":          top_pairs,

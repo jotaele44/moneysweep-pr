@@ -39,6 +39,7 @@ import pandas as pd
 import numpy as np
 
 from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from contract_sweeper.validation.production_status import load_current_status
 
 
 # ---------------------------------------------------------------------------
@@ -341,12 +342,15 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
         (merged.get("lda_lobbying_total", 0) > 0) &
         (merged["awards_total"] > 0)
     ).sum())
+    status_payload = load_current_status(root)
 
     summary = {
         "total_entities":     len(merged),
         "total_awards_usd":   total_awards_val,
         "multi_source_count": multi_source,
         "full_loop_count":    loop_entities,
+        "production_status": status_payload["production_status"],
+        "production_status_message": status_payload["status_message"],
         "sources_included":   sorted(sources_present),
         "score_weights":      WEIGHTS,
         "top_entities":       top_entities,

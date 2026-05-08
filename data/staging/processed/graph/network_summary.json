@@ -11,5 +11,9 @@
     "top_nodes": "/home/user/Contract-Sweeper/data/staging/processed/graph/top_nodes.csv",
     "entity_edges": "/home/user/Contract-Sweeper/data/staging/processed/graph/entity_edges.csv",
     "summary": "/home/user/Contract-Sweeper/data/staging/processed/graph/network_summary.json"
-  }
+  },
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "production_status_generated_at": "2026-05-08T08:46:03Z",
+  "production_status_message": "Diagnostic output only — not production-valid.",
+  "production_blocker_count": 3
 }
