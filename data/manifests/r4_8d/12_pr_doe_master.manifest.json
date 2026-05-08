@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-05-08T20:18:23Z",
+  "known_gaps": "",
+  "manifest_type": "validated_source_manifest",
+  "producer_script": "scripts/download_doe.py",
+  "row_count": 180,
+  "schema_version": "r4_8d_schema_v1",
+  "sha256": "3a5f1f2e5ba100de06a203e0eca9481cdbbe7911055f9e9ad5c0c02f8964f120",
+  "source_file": "data/staging/processed/pr_doe_master.csv",
+  "source_system": "federal_sectoral_doe",
+  "target_output_path": "data/staging/processed/pr_doe_master.csv",
+  "validation_status": "validated"
+}

@@ -431,6 +431,11 @@ def main() -> int:
         metavar="YEAR",
         help="Only download windows with fy_start >= YEAR (e.g. 2017)",
     )
+    parser.add_argument(
+        "--allow-empty-success",
+        action="store_true",
+        help="Exit 0 when no rows are returned but outputs are still generated.",
+    )
     args = parser.parse_args()
 
     summary = _run(force=args.force, fy_start=args.fy_start)
@@ -443,6 +448,8 @@ def main() -> int:
         print(f"  Errors ({len(summary['errors'])}):")
         for err in summary["errors"]:
             print(f"    {err}")
+        if args.allow_empty_success and int(summary.get("master_rows", 0)) == 0:
+            return 0
         return 1
     return 0
 

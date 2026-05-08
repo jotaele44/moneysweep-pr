@@ -277,13 +277,22 @@ def _run(root: Path = None, force: bool = False) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Download SBIR/STTR awards for Puerto Rico")
     parser.add_argument("--force", action="store_true")
+    parser.add_argument(
+        "--allow-empty-success",
+        action="store_true",
+        help="Exit 0 when no rows are returned but outputs are still produced.",
+    )
     args = parser.parse_args()
     summary = _run(force=args.force)
     print(f"\nSBIR download complete.")
     print(f"  Raw rows:    {summary['raw_rows']:,}")
     print(f"  Master rows: {summary['rows']:,}")
     print(f"  Status:      {summary['status']}")
-    return 0 if summary["status"] == "OK" else 1
+    if summary["status"] == "OK":
+        return 0
+    if args.allow_empty_success and summary["status"] == "EMPTY":
+        return 0
+    return 1
 
 
 if __name__ == "__main__":

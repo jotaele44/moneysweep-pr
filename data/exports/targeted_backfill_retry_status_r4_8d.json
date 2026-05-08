@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-05-08T20:19:08Z",
+  "inputs": {
+    "endpoint_review_queue": "data/review_queue/source_endpoint_review_queue_r4_8c.csv",
+    "execution_results_r4_8b": "data/exports/controlled_backfill_execution_results_r4_8b.csv",
+    "manual_fallback_queue": "data/review_queue/manual_fallback_execution_queue_r4_8c.csv",
+    "producer_fix_queue": "data/review_queue/source_producer_fix_queue_r4_8c.csv",
+    "remediation_matrix": "data/exports/backfill_failure_remediation_matrix_r4_8c.csv",
+    "remediation_status": "data/exports/backfill_failure_remediation_status_r4_8c.json",
+    "retry_order_r4_8c": "data/review_queue/backfill_retry_order_r4_8c.csv",
+    "schema_remediation_queue": "data/review_queue/schema_remediation_queue_r4_8c.csv"
+  },
+  "outputs": {
+    "manual_fallback_remaining": "data/review_queue/manual_fallback_remaining_r4_8d.csv",
+    "retry_order_r4_8d": "data/review_queue/backfill_retry_order_r4_8d.csv",
+    "schema_alignment_report": "data/exports/schema_alignment_report_r4_8d.csv",
+    "targeted_retry_results": "data/exports/targeted_backfill_retry_results_r4_8d.csv",
+    "targeted_retry_status": "data/exports/targeted_backfill_retry_status_r4_8d.json",
+    "unresolved_endpoint": "data/review_queue/unresolved_endpoint_failures_r4_8d.csv",
+    "unresolved_producer": "data/review_queue/unresolved_producer_failures_r4_8d.csv",
+    "unresolved_schema": "data/review_queue/unresolved_schema_failures_r4_8d.csv",
+    "validated_manifest_inventory": "data/exports/validated_source_manifest_inventory_r4_8d.csv"
+  },
+  "phase_7_8_blocked": true,
+  "r4_8d_failed_sources": 4,
+  "r4_8d_forbidden_artifact_usage": false,
+  "r4_8d_gate_passed": true,
+  "r4_8d_manual_fallback_remaining": 13,
+  "r4_8d_phase_type": "TARGETED_PRODUCER_PATCHES_AND_SCHEMA_ALIGNMENT_RETRY",
+  "r4_8d_producer_patches_applied": 4,
+  "r4_8d_production_inputs_staged": 8,
+  "r4_8d_rows_ingested": 3138,
+  "r4_8d_schema_alignments_added": 40,
+  "r4_8d_sources_retried": 12,
+  "r4_8d_successful_sources": 8,
+  "r4_8d_total_sources_considered": 21,
+  "r4_8d_unresolved_endpoint_failures": 9,
+  "r4_8d_unresolved_producer_failures": 4,
+  "r4_8d_unresolved_schema_failures": 0,
+  "r4_8d_validated_source_manifests_written": 8,
+  "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS"
+}
