@@ -1,0 +1,30 @@
+{
+  "artifact_lineage_output": "data/exports/artifact_lineage_audit.csv",
+  "cache_hit_count": 2,
+  "cache_reuse_output": "data/exports/cache_reuse_audit.csv",
+  "downstream_recompute_count": 0,
+  "fixture_or_demo_replay_reasons": [
+    "report unique_entities remains fixed at 18",
+    "power network total_ranked remains fixed at 18",
+    "prime/sub universes remain fixed at 18",
+    "prime/sub matrix appears implausibly dense"
+  ],
+  "fixture_or_demo_replay_suspected": true,
+  "generated_at": "2026-05-08T09:05:51Z",
+  "missing_manifest_count": 42,
+  "missing_manifest_detected": true,
+  "phase_7_8_block_reason": "R1 gate failed or production status is not fully validated",
+  "phase_7_8_blocked": true,
+  "r1_gate_passed": false,
+  "report_regeneration_status": "cached_or_unverified",
+  "reports_recomputed": false,
+  "skip_download_recompute_guard": false,
+  "stale_artifact_count": 0,
+  "stale_artifacts_labeled": false,
+  "top_n_truncation_reasons": [
+    "unique_entities is constrained to 18",
+    "power network ranked universe is constrained to 18",
+    "prime/sub counts exactly mirror entity universe"
+  ],
+  "top_n_truncation_suspected": true
+}
