@@ -284,13 +284,27 @@ def main() -> int:
     )
     args = parser.parse_args()
     summary = _run(force=args.force)
+    status = str(summary.get("status", "EMPTY"))
+    rows_ingested = int(summary.get("rows", 0) or 0)
+    retry_allowed_empty_success = bool(
+        args.allow_empty_success and status == "EMPTY" and rows_ingested == 0
+    )
+    validation_status = (
+        "OK"
+        if status == "OK"
+        else ("EMPTY_OR_NONFATAL_RETRY" if retry_allowed_empty_success else "EMPTY")
+    )
     print(f"\nSBIR download complete.")
     print(f"  Raw rows:    {summary['raw_rows']:,}")
     print(f"  Master rows: {summary['rows']:,}")
     print(f"  Status:      {summary['status']}")
+    print(f"  retry_allowed_empty_success={str(retry_allowed_empty_success).lower()}")
+    print(f"  rows_ingested={rows_ingested}")
+    print("  production_inputs_staged=0")
+    print(f"  validation_status={validation_status}")
     if summary["status"] == "OK":
         return 0
-    if args.allow_empty_success and summary["status"] == "EMPTY":
+    if retry_allowed_empty_success:
         return 0
     return 1
 

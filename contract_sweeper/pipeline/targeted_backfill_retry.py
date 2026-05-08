@@ -265,12 +265,7 @@ def run_targeted_backfill_retry(
     rows_ingested = 0
     production_inputs_staged = 0
     producer_patch_hits = 0
-
-    patched_script_ids = {
-        row.get("producer_script", "")
-        for row in producer_fix_queue
-        if row.get("producer_script", "") in PATCHABLE_SCRIPTS_ALLOW_EMPTY
-    }
+    patched_scripts_used: set[str] = set()
 
     for remediation in sorted(remediation_rows, key=lambda r: _safe_int(r.get("priority"))):
         priority = _safe_int(remediation.get("priority"))
@@ -349,6 +344,8 @@ def run_targeted_backfill_retry(
             row_result["patched_command"] = patched_command
             if patched:
                 producer_patch_hits += 1
+                if producer_script:
+                    patched_scripts_used.add(producer_script)
 
             if not patched_command:
                 row_result["retry_status"] = "failed_missing_command"
@@ -672,6 +669,24 @@ def run_targeted_backfill_retry(
         (row.get("retry_status") != "success") or _to_bool(row.get("manifest_written"))
         for row in targeted_results
     )
+    success_rows = [row for row in targeted_results if row.get("retry_status") == "success"]
+    success_targets = {
+        str(row.get("expected_input", "")).strip(): str(row.get("target_output_path", "")).strip()
+        for row in success_rows
+    }
+    manifest_integrity_ok = True
+    if len(success_rows) != len(validated_manifests):
+        manifest_integrity_ok = False
+    else:
+        for manifest in validated_manifests:
+            source_file = str(manifest.get("source_file", "")).strip()
+            target_output_path = str(manifest.get("target_output_path", "")).strip()
+            row_count = _safe_int(manifest.get("row_count"))
+            sha256 = str(manifest.get("sha256", "")).strip()
+            planned_target = success_targets.get(source_file, "")
+            if row_count <= 0 or not sha256 or not planned_target or planned_target != target_output_path:
+                manifest_integrity_ok = False
+                break
     deterministic_schema_recorded = all(
         row.get("primary_blocker_class") != "schema_mismatch"
         or any(r.get("expected_input") == row.get("expected_input") for r in schema_alignment_report)
@@ -687,7 +702,7 @@ def run_targeted_backfill_retry(
         "r4_8d_successful_sources": successful_sources,
         "r4_8d_failed_sources": failed_sources,
         "r4_8d_schema_alignments_added": schema_alignments_added,
-        "r4_8d_producer_patches_applied": len(patched_script_ids | set()) if patched_script_ids else producer_patch_hits,
+        "r4_8d_producer_patches_applied": len(patched_scripts_used),
         "r4_8d_rows_ingested": rows_ingested,
         "r4_8d_production_inputs_staged": production_inputs_staged,
         "r4_8d_validated_source_manifests_written": manifests_written,
@@ -727,6 +742,7 @@ def run_targeted_backfill_retry(
         and all_have_disposition
         and deterministic_schema_recorded
         and staged_with_manifest
+        and manifest_integrity_ok
         and not forbidden_artifact_usage
         and row_fabrication_policy == "FORBIDDEN_NO_SYNTHETIC_ROWS"
         and phase_7_8_blocked

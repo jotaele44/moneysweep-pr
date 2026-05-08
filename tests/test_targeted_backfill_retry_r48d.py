@@ -477,6 +477,9 @@ def test_r48d_runs_targeted_retry_and_writes_outputs(tmp_path: Path):
         )
     )
     assert len(manifests) == 2
+    for manifest in manifests:
+        assert int(manifest["row_count"]) > 0
+        assert manifest["sha256"].strip()
 
 
 def test_r48d_rejects_forbidden_artifact_paths(tmp_path: Path):
