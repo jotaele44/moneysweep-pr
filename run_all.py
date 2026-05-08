@@ -11,7 +11,7 @@ Core pipeline flags:
   --skip-coverage            Step 6   coverage validation
   --skip-dedup               Step 5.5 cross-file dedup + master build
   --skip-enrichment          Step 7   SAM.gov UEI enrichment
-  --skip-entity-resolution   Step 8   top-100 vendor entity resolution
+  --skip-entity-resolution   Step 8   entity universe resolution toward parent entity
   --skip-dominance           Step 9   HHI / market share dominance
   --skip-graph               Step 10  network graph export
   --skip-grants              Step 11  USASpending federal grants
@@ -99,6 +99,7 @@ Project delivery + final report:
 """
 
 import argparse
+import inspect
 import logging
 import sys
 import time
@@ -119,6 +120,19 @@ def check_pandas() -> bool:
         print("ERROR: pandas is not installed.")
         print("Run: pip install -r requirements.txt")
         return False
+
+
+def _call_step(func, force_recompute: bool = False, **kwargs):
+    """Invoke a step and auto-forward force=True when supported."""
+
+    if force_recompute:
+        try:
+            params = inspect.signature(func).parameters
+        except (TypeError, ValueError):
+            params = {}
+        if "force" in params and "force" not in kwargs:
+            kwargs["force"] = True
+    return func(**kwargs)
 
 
 def setup_pipeline_logging(logs_dir: Path) -> logging.Logger:
@@ -325,7 +339,7 @@ def main() -> int:
     parser.add_argument(
         "--skip-entity-resolution",
         action="store_true",
-        help="Skip step 8 (entity resolution — top 100 vendors → parent entity)",
+        help="Skip step 8 (entity resolution — entity universe → parent entity)",
     )
     parser.add_argument(
         "--skip-dominance",
@@ -594,6 +608,12 @@ def main() -> int:
     # Step 3: Auto-download datasets
     # ------------------------------------------------------------------
     skip_download = args.skip_download or args.manual_only
+    force_recompute_outputs = bool(skip_download)
+    if force_recompute_outputs:
+        logger.info(
+            "[Guard] --skip-download detected: forcing downstream recompute for transform/report layers "
+            "to prevent cached export replay."
+        )
     if skip_download:
         logger.info("[Step 3/29] SKIPPED (--skip-download / --manual-only)\n")
     else:
@@ -843,7 +863,11 @@ def main() -> int:
             _sf133_result = {"rows": 0}
             try:
                 from scripts.ingest_follow_the_money import run as ingest_ftm
-                _sf133_result = ingest_ftm(root=root)
+                _sf133_result = _call_step(
+                    ingest_ftm,
+                    force_recompute=force_recompute_outputs,
+                    root=root,
+                )
                 if _sf133_result.get("rows", 0) > 0:
                     logger.info(f"[Step 6b] Follow the Money ingest done — {_sf133_result['rows']:,} SF-133 rows\n")
             except Exception as _ftm_err:
@@ -962,7 +986,11 @@ def main() -> int:
         logger.info("[Step 6j] Ingesting FPDS Report Builder files (FY2018-2024)...")
         try:
             from scripts.ingest_report_builder import run as run_report_builder
-            result = run_report_builder(root=root)
+            result = _call_step(
+                run_report_builder,
+                force_recompute=force_recompute_outputs,
+                root=root,
+            )
             logger.info(f"[Step 6j] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
             logger.error(f"[Step 6j] FAILED: {e}")
@@ -1044,7 +1072,7 @@ def main() -> int:
                 enrichment_result = f"FAILED: {e}"
 
     # ------------------------------------------------------------------
-    # Step 8: Entity resolution (top 100 vendors → parent entity)
+    # Step 8: Entity resolution (entity universe → parent entity)
     # ------------------------------------------------------------------
     master_ready = dedup_stats is not None and dedup_stats.get("master_rows", 0) > 0
     if args.skip_entity_resolution:
@@ -1052,7 +1080,7 @@ def main() -> int:
     elif not master_ready:
         logger.info("[Step 8/29] SKIPPED — no master data yet\n")
     else:
-        logger.info("[Step 8/29] Resolving top 100 vendor entities...")
+        logger.info("[Step 8/29] Resolving entity universe toward parent entities...")
         try:
             from scripts.entity_resolution import run as run_entity
             run_entity(root=root)
@@ -1111,7 +1139,11 @@ def main() -> int:
             _grants_xml_result = {"rows": 0}
             try:
                 from scripts.ingest_grants import run as ingest_grants_xml
-                _grants_xml_result = ingest_grants_xml(root=root)
+                _grants_xml_result = _call_step(
+                    ingest_grants_xml,
+                    force_recompute=force_recompute_outputs,
+                    root=root,
+                )
                 if _grants_xml_result.get("rows", 0) > 0:
                     logger.info(f"[Step 11/29] Grants.gov XML ingest done — {_grants_xml_result['rows']:,} opportunities\n")
             except Exception as _gx_err:
@@ -1215,7 +1247,11 @@ def main() -> int:
             _cor3_result = {"rows": 0}
             try:
                 from scripts.ingest_cor3 import run as ingest_cor3
-                _cor3_result = ingest_cor3(root=root)
+                _cor3_result = _call_step(
+                    ingest_cor3,
+                    force_recompute=force_recompute_outputs,
+                    root=root,
+                )
                 if _cor3_result.get("rows", 0) > 0:
                     logger.info(f"[Step 15b] Ingest done — {_cor3_result['rows']:,} rows from local Excel\n")
             except Exception as _ingest_err:
@@ -1264,7 +1300,11 @@ def main() -> int:
         logger.info("[Step 15e] Ingesting FEMA PA portal 178-PW authorized export...")
         try:
             from scripts.ingest_fema_pa_portal_exports import run as run_fema_pa_portal
-            result = run_fema_pa_portal(root=root)
+            result = _call_step(
+                run_fema_pa_portal,
+                force_recompute=force_recompute_outputs,
+                root=root,
+            )
             logger.info(f"[Step 15e] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
             logger.error(f"[Step 15e] FAILED: {e}")
@@ -1278,7 +1318,11 @@ def main() -> int:
         logger.info("[Step 15f] Linking FEMA PA project worksheets to contracts and assets...")
         try:
             from scripts.link_fema_pa_to_contracts import run as run_fema_pa_link
-            result = run_fema_pa_link(root=root)
+            result = _call_step(
+                run_fema_pa_link,
+                force_recompute=force_recompute_outputs,
+                root=root,
+            )
             logger.info(f"[Step 15f] Done — {result.get('linkage_rows', 0):,} linkage rows\n")
         except Exception as e:
             logger.error(f"[Step 15f] FAILED: {e}")
@@ -1292,7 +1336,11 @@ def main() -> int:
         logger.info("[Step 15g] Validating FEMA PA coverage and v1/v2 diff...")
         try:
             from scripts.validate_fema_pa_coverage import run as run_fema_pa_val
-            result = run_fema_pa_val(root=root)
+            result = _call_step(
+                run_fema_pa_val,
+                force_recompute=force_recompute_outputs,
+                root=root,
+            )
             logger.info(f"[Step 15g] Done — status: {result.get('status', '?')}\n")
         except Exception as e:
             logger.error(f"[Step 15g] FAILED: {e}")
@@ -1320,7 +1368,11 @@ def main() -> int:
         logger.info("[Step 15i] Ingesting authorized HUD DRGR local export files...")
         try:
             from scripts.ingest_hud_drgr_exports import run as run_drgr_ingest
-            result = run_drgr_ingest(root=root)
+            result = _call_step(
+                run_drgr_ingest,
+                force_recompute=force_recompute_outputs,
+                root=root,
+            )
             logger.info(f"[Step 15i] Done — {result.get('activity_rows', result.get('rows', 0)):,} activity rows\n")
         except Exception as e:
             logger.error(f"[Step 15i] FAILED: {e}")
@@ -1334,7 +1386,11 @@ def main() -> int:
         logger.info("[Step 15j] Normalizing HUD DRGR grants, projects, and activities...")
         try:
             from scripts.normalize_hud_drgr import run as run_drgr_norm
-            result = run_drgr_norm(root=root)
+            result = _call_step(
+                run_drgr_norm,
+                force_recompute=force_recompute_outputs,
+                root=root,
+            )
             logger.info(f"[Step 15j] Done — {result.get('project_rows', 0):,} projects, {result.get('org_rows', 0):,} orgs\n")
         except Exception as e:
             logger.error(f"[Step 15j] FAILED: {e}")
@@ -1348,7 +1404,11 @@ def main() -> int:
         logger.info("[Step 15k] Linking HUD DRGR responsible orgs to contract entities...")
         try:
             from scripts.link_hud_drgr_to_contracts import run as run_drgr_link
-            result = run_drgr_link(root=root)
+            result = _call_step(
+                run_drgr_link,
+                force_recompute=force_recompute_outputs,
+                root=root,
+            )
             logger.info(f"[Step 15k] Done — {result.get('linkage_rows', 0):,} linkage rows\n")
         except Exception as e:
             logger.error(f"[Step 15k] FAILED: {e}")
@@ -1362,7 +1422,11 @@ def main() -> int:
         logger.info("[Step 15l] Linking HUD DRGR activities to physical assets and municipalities...")
         try:
             from scripts.link_hud_drgr_to_assets import run as run_drgr_assets
-            result = run_drgr_assets(root=root)
+            result = _call_step(
+                run_drgr_assets,
+                force_recompute=force_recompute_outputs,
+                root=root,
+            )
             logger.info(f"[Step 15l] Done — {result.get('linkage_rows', 0):,} rows, "
                         f"{result.get('municipalities_matched', 0):,} municipalities\n")
         except Exception as e:
@@ -1377,7 +1441,11 @@ def main() -> int:
         logger.info("[Step 15m] Running HUD DRGR coverage and entity-resolution validation...")
         try:
             from scripts.validate_hud_drgr_coverage import run as run_drgr_cov
-            result = run_drgr_cov(root=root)
+            result = _call_step(
+                run_drgr_cov,
+                force_recompute=force_recompute_outputs,
+                root=root,
+            )
             logger.info(f"[Step 15m] Done — status: {result.get('status', '?')}\n")
         except Exception as e:
             logger.error(f"[Step 15m] FAILED: {e}")
@@ -1391,7 +1459,11 @@ def main() -> int:
         logger.info("[Step 15n] Reconciling HUD DRGR budget, drawdown, and obligation amounts...")
         try:
             from scripts.validate_hud_drgr_amounts import run as run_drgr_amts
-            result = run_drgr_amts(root=root)
+            result = _call_step(
+                run_drgr_amts,
+                force_recompute=force_recompute_outputs,
+                root=root,
+            )
             logger.info(f"[Step 15n] Done — status: {result.get('status', '?')}\n")
         except Exception as e:
             logger.error(f"[Step 15n] FAILED: {e}")
@@ -1405,7 +1477,11 @@ def main() -> int:
         logger.info("[Step 15o] Building financial flows master (FEMA + HUD + procurement)...")
         try:
             from scripts.build_financial_flows_master import run as run_fin_flows
-            result = run_fin_flows(root=root)
+            result = _call_step(
+                run_fin_flows,
+                force_recompute=force_recompute_outputs,
+                root=root,
+            )
             logger.info(f"[Step 15o] Done — {result.get('rows', 0):,} flow records\n")
         except Exception as e:
             logger.error(f"[Step 15o] FAILED: {e}")
@@ -1439,7 +1515,11 @@ def main() -> int:
             # Try manual export from data/raw/FEC/ first
             try:
                 from scripts.ingest_fec import run as ingest_fec
-                fec_result = ingest_fec(root=root)
+                fec_result = _call_step(
+                    ingest_fec,
+                    force_recompute=force_recompute_outputs,
+                    root=root,
+                )
                 if fec_result.get("rows", 0) > 0:
                     logger.info(
                         f"[Step 17/29] Ingest done — {fec_result['rows']:,} rows "
@@ -1496,7 +1576,12 @@ def main() -> int:
         logger.info("[Step 18b/29] Enriching award recipients with LDA lobbying data...")
         try:
             from scripts.lda_enrich import run as run_lda_enrich
-            enrich_result = run_lda_enrich(root=root, api_key=args.lda_api_key)
+            enrich_result = _call_step(
+                run_lda_enrich,
+                force_recompute=force_recompute_outputs,
+                root=root,
+                api_key=args.lda_api_key,
+            )
             logger.info(
                 f"[Step 18b/29] Done — {enrich_result.get('entities_queried', 0):,} queried, "
                 f"{enrich_result.get('entities_matched', 0):,} with LDA filings, "
@@ -1892,7 +1977,11 @@ def main() -> int:
         logger.info("[Step 26c] Analyzing bond flow: underwriters and dealers vs entity master...")
         try:
             from scripts.analyze_bond_flow import run as run_bond_flow
-            result = run_bond_flow(root=root)
+            result = _call_step(
+                run_bond_flow,
+                force_recompute=force_recompute_outputs,
+                root=root,
+            )
             logger.info(f"[Step 26c] Done — {result.get('rows', 0):,} entities, "
                         f"{result.get('dual_role', 0):,} dual-role (bond + federal)\n")
         except Exception as e:
@@ -2235,7 +2324,11 @@ def main() -> int:
         logger.info("[Step 28b] Building contractor project delivery scorecard...")
         try:
             from scripts.analyze_project_delivery import run as run_delivery
-            result = run_delivery(root=root)
+            result = _call_step(
+                run_delivery,
+                force_recompute=force_recompute_outputs,
+                root=root,
+            )
             logger.info(f"[Step 28b] Done — {result.get('rows', 0):,} entities scored\n")
         except Exception as e:
             logger.error(f"[Step 28b] FAILED: {e}")
@@ -2268,8 +2361,15 @@ def main() -> int:
         logger.info("[Step 30] Generating PR investigation report...")
         try:
             from scripts.generate_report import run as run_report
-            result = run_report(root=root)
-            logger.info(f"[Step 30] Done — report written to {result.get('path', 'data/output/')}\n")
+            result = _call_step(
+                run_report,
+                force_recompute=force_recompute_outputs,
+                root=root,
+            )
+            logger.info(
+                f"[Step 30] Done — report written to "
+                f"{result.get('report_path', 'data/reports/pr_investigative_report.md')}\n"
+            )
         except Exception as e:
             logger.error(f"[Step 30] FAILED: {e}")
 

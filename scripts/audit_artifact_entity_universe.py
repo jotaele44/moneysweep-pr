@@ -172,7 +172,63 @@ def _extract_prime_sub_pairs_from_report(report_text: str) -> list[dict[str, Any
     return rows
 
 
-def collect_entity_universe(report_summary: dict[str, Any], power_summary: dict[str, Any]) -> list[dict[str, Any]]:
+def load_entity_lineage_lookup(root: Path) -> dict[str, dict[str, str]]:
+    """Load UEI/parent lineage from entity_master and entity_hierarchy when available."""
+    lookup: dict[str, dict[str, str]] = {}
+
+    entity_master_path = root / "data" / "staging" / "processed" / "entity_master.csv"
+    if entity_master_path.exists():
+        try:
+            df_entity = pd.read_csv(entity_master_path, dtype=str, low_memory=False).fillna("")
+            for _, row in df_entity.iterrows():
+                key = (
+                    str(row.get("entity_key") or row.get("canonical_name_normalized") or "").strip()
+                    or _normalize_name(row.get("canonical_name"))
+                )
+                if not key:
+                    continue
+                entry = lookup.setdefault(key, {"recipient_uei": "", "parent_uei": "", "parent_name": ""})
+                recipient_uei = str(row.get("recipient_uei") or "").strip()
+                parent_uei = str(row.get("parent_uei") or "").strip()
+                parent_name = str(row.get("parent_name") or "").strip()
+                if recipient_uei and not entry["recipient_uei"]:
+                    entry["recipient_uei"] = recipient_uei
+                if parent_uei and not entry["parent_uei"]:
+                    entry["parent_uei"] = parent_uei
+                if parent_name and not entry["parent_name"]:
+                    entry["parent_name"] = parent_name
+        except Exception:
+            pass
+
+    hierarchy_path = root / "data" / "staging" / "processed" / "enrichment" / "entity_hierarchy.csv"
+    if hierarchy_path.exists():
+        try:
+            df_hierarchy = pd.read_csv(hierarchy_path, dtype=str, low_memory=False).fillna("")
+            for _, row in df_hierarchy.iterrows():
+                key = _normalize_name(row.get("vendor_name") or row.get("recipient_name"))
+                if not key:
+                    continue
+                entry = lookup.setdefault(key, {"recipient_uei": "", "parent_uei": "", "parent_name": ""})
+                recipient_uei = str(row.get("uei") or row.get("recipient_uei") or "").strip()
+                parent_uei = str(row.get("parent_uei") or "").strip()
+                parent_name = str(row.get("parent_name") or "").strip()
+                if recipient_uei and not entry["recipient_uei"]:
+                    entry["recipient_uei"] = recipient_uei
+                if parent_uei and not entry["parent_uei"]:
+                    entry["parent_uei"] = parent_uei
+                if parent_name and not entry["parent_name"]:
+                    entry["parent_name"] = parent_name
+        except Exception:
+            pass
+
+    return lookup
+
+
+def collect_entity_universe(
+    report_summary: dict[str, Any],
+    power_summary: dict[str, Any],
+    lineage_lookup: dict[str, dict[str, str]] | None = None,
+) -> list[dict[str, Any]]:
     """Collect entity rows visible from checked-in summaries."""
 
     rows: dict[str, dict[str, Any]] = {}
@@ -225,6 +281,16 @@ def collect_entity_universe(report_summary: dict[str, Any], power_summary: dict[
         row["source_presence"] = _safe_int(entity.get("source_presence"))
         if row["total_obligated"] in {"", 0}:
             row["total_obligated"] = round(_safe_float(entity.get("awards_total")), 2)
+    lineage_lookup = lineage_lookup or {}
+    for key, row in rows.items():
+        lineage = lineage_lookup.get(key, {})
+        if not lineage:
+            continue
+        if not str(row.get("recipient_uei") or "").strip():
+            row["recipient_uei"] = lineage.get("recipient_uei", "")
+        if not str(row.get("parent_uei") or "").strip():
+            row["parent_uei"] = lineage.get("parent_uei", "")
+
     return sorted(rows.values(), key=lambda row: _safe_float(row.get("total_obligated")), reverse=True)
 
 
@@ -312,7 +378,14 @@ def build_cache_reuse_audit(root: Path, lineage_rows: list[dict[str, Any]]) -> l
     report_cached_guard = "Report exists" in generate_report and "CACHED" in generate_report
     unified_cached_guard = "already exists" in build_unified and "--force" in build_unified
     skip_download_present = "--skip-download" in run_all
-    report_force_forwarded = "gen_report" in run_all and "force=True" in run_all
+    report_force_forwarded_legacy = "gen_report" in run_all and "force=True" in run_all
+    report_force_forwarded_guard = (
+        "_call_step(" in run_all
+        and "force_recompute=force_recompute_outputs" in run_all
+        and "run_report" in run_all
+        and "force_recompute_outputs = bool(skip_download)" in run_all
+    )
+    report_force_forwarded = report_force_forwarded_legacy or report_force_forwarded_guard
 
     existing_artifacts = [row for row in lineage_rows if row["exists"]]
     cached_like = [
@@ -347,9 +420,13 @@ def build_cache_reuse_audit(root: Path, lineage_rows: list[dict[str, Any]]) -> l
             "stage": "run_all_skip_download",
             "cache_guard_detected": skip_download_present,
             "cache_hit_ratio": cache_hit_ratio,
-            "report_regeneration_status": "suspect_cached_exports",
-            "downstream_recompute_count": 0 if report_cached_guard else 1,
-            "finding": "run_all.py --skip-download can leave report/export layers cached because downstream force rebuild is not enforced",
+            "report_regeneration_status": "forced_recompute_enabled" if report_force_forwarded else "suspect_cached_exports",
+            "downstream_recompute_count": 1 if report_force_forwarded else 0,
+            "finding": (
+                "run_all.py --skip-download now forwards force-recompute to report/export layers"
+                if report_force_forwarded
+                else "run_all.py --skip-download can leave report/export layers cached because downstream force rebuild is not enforced"
+            ),
         },
     ]
     return rows
@@ -532,7 +609,8 @@ def run_audit(root: Path = PROJECT_ROOT) -> dict[str, Any]:
     dominance_summary = _read_json(root / DOMINANCE_SUMMARY)
     report_text = (root / REPORT_MARKDOWN).read_text(encoding="utf-8", errors="replace") if (root / REPORT_MARKDOWN).exists() else ""
 
-    entity_rows = collect_entity_universe(report_summary, power_summary)
+    lineage_lookup = load_entity_lineage_lookup(root)
+    entity_rows = collect_entity_universe(report_summary, power_summary, lineage_lookup=lineage_lookup)
     collapse_rows = build_collapse_diagnostics(entity_rows)
     lineage_rows = build_artifact_lineage(root, report_summary, report_text)
     cache_rows = build_cache_reuse_audit(root, lineage_rows)
@@ -545,8 +623,24 @@ def run_audit(root: Path = PROJECT_ROOT) -> dict[str, Any]:
     cache_hit_ratio = cache_rows[0]["cache_hit_ratio"] if cache_rows else 0.0
     report_layers_populated = _safe_int(report_summary.get("data_layers"))
     unique_entities = len({row["entity_key"] for row in entity_rows})
-    parent_uei_coverage = 0.0
-    entity_resolution_rate = 0.0
+    parent_uei_coverage = (
+        round(
+            sum(1 for row in entity_rows if str(row.get("parent_uei") or "").strip() != "")
+            / max(unique_entities, 1),
+            4,
+        )
+        if unique_entities
+        else 0.0
+    )
+    entity_resolution_rate = (
+        round(
+            sum(1 for row in entity_rows if str(row.get("recipient_uei") or "").strip() != "")
+            / max(unique_entities, 1),
+            4,
+        )
+        if unique_entities
+        else 0.0
+    )
     high_value_overcollapse_suspect_count = sum(1 for row in collapse_rows if row["high_value_overcollapse_suspect"])
     graph_vendor_nodes = _safe_int(graph_summary.get("vendor_nodes"))
     graph_node_coverage_pct = round(graph_vendor_nodes / max(unique_entities, 1), 4)
@@ -577,6 +671,9 @@ def run_audit(root: Path = PROJECT_ROOT) -> dict[str, Any]:
 
     graph_blockers = build_graph_blockers(gate, source_refresh, prime_sub_shape)
     suspect_collapses = [row for row in collapse_rows if row["high_value_overcollapse_suspect"]]
+    stage_index = {str(row.get("stage")): row for row in cache_rows}
+    report_stage = stage_index.get("report_generation", {})
+    run_all_stage = stage_index.get("run_all_skip_download", {})
 
     summary = {
         "audit_generated_at": _utc_now().strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -586,8 +683,16 @@ def run_audit(root: Path = PROJECT_ROOT) -> dict[str, Any]:
         "required_action": "skip graph rebuild and skip risk engine" if not graph_build_allowed else "graph/risk gate may proceed",
         "artifact_generation_delta_hours": artifact_generation_delta_hours,
         "cache_hit_ratio": cache_hit_ratio,
-        "report_regeneration_status": cache_rows[0]["report_regeneration_status"] if cache_rows else "unknown",
-        "downstream_recompute_count": cache_rows[0]["downstream_recompute_count"] if cache_rows else 0,
+        "report_regeneration_status": (
+            run_all_stage.get("report_regeneration_status")
+            or report_stage.get("report_regeneration_status")
+            or "unknown"
+        ),
+        "downstream_recompute_count": int(
+            run_all_stage.get("downstream_recompute_count")
+            or report_stage.get("downstream_recompute_count")
+            or 0
+        ),
         "source_refresh_timestamp_range": source_refresh,
         "artifact_lineage_chain": lineage_rows,
         "top_n_truncation_suspected": unique_entities <= 20 and _safe_int(report_summary.get("awards", {}).get("unique_entities")) == unique_entities,

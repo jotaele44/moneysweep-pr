@@ -1,5 +1,5 @@
 {
-  "artifact_generation_delta_hours": 96.07,
+  "artifact_generation_delta_hours": 96.45,
   "artifact_lineage_chain": [
     {
       "artifact_path": "data/reports/pr_investigative_report.md",
@@ -178,7 +178,7 @@
       "size_bytes": 39521
     }
   ],
-  "audit_generated_at": "2026-05-08T07:09:11Z",
+  "audit_generated_at": "2026-05-08T07:32:16Z",
   "blocker_count": 8,
   "blockers": [
     {
@@ -239,7 +239,7 @@
     },
     {
       "metric": "source_refresh_timestamp_range",
-      "observed_value": "2026-05-08T07:00:39Z to 2026-05-08T07:08:35Z",
+      "observed_value": "2026-05-08T07:00:39Z to 2026-05-08T07:30:22Z",
       "recommended_action": "compare source mtimes and manifests against the run timestamp before graph rebuild",
       "required_gate": "source freshness must be traceable to current ingest run",
       "severity": "INFO"
@@ -253,7 +253,7 @@
     }
   ],
   "cache_hit_ratio": 0.7,
-  "downstream_recompute_count": 0,
+  "downstream_recompute_count": 1,
   "fixture_or_synthetic_data_detected": true,
   "fixture_or_synthetic_reasons": [
     "report unique_entities is exactly 18",
@@ -307,13 +307,13 @@
     "bond_actor_count",
     "self_pair_ratio"
   ],
-  "report_regeneration_status": "cached_without_force",
+  "report_regeneration_status": "forced_recompute_enabled",
   "required_action": "skip graph rebuild and skip risk engine",
   "risk_engine_allowed": false,
   "source_refresh_timestamp_range": {
-    "newest_source_mtime_utc": "2026-05-08T07:08:35Z",
+    "newest_source_mtime_utc": "2026-05-08T07:30:22Z",
     "oldest_source_mtime_utc": "2026-05-08T07:00:39Z",
-    "source_file_count": 19
+    "source_file_count": 43
   },
   "status": "NON_PRODUCTION_DIAGNOSTIC",
   "top_n_truncation_suspected": true

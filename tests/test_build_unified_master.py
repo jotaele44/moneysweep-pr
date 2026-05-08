@@ -12,6 +12,7 @@ from scripts.build_unified_master import (
     _derive_fiscal_year,
     _normalize_name,
     _standardize_pop_state,
+    run,
 )
 
 
@@ -113,3 +114,60 @@ class TestStandardizePopState:
         out = _standardize_pop_state(s)
         # NaN/None passed through (function returns val for NaN)
         assert pd.isna(out.iloc[0]) or out.iloc[0] is None
+
+
+def test_run_adds_parent_lineage_to_entity_master(tmp_path: Path):
+    processed = tmp_path / "data" / "staging" / "processed"
+    enrichment = processed / "enrichment"
+    processed.mkdir(parents=True, exist_ok=True)
+    enrichment.mkdir(parents=True, exist_ok=True)
+
+    pd.DataFrame(
+        [
+            {
+                "contract_id": "C-1",
+                "vendor_name": "Acme LLC",
+                "agency_name": "FEMA",
+                "award_date": "2024-01-15",
+                "obligated_amount": "1000",
+                "pop_state": "PR",
+                "source_file": "contracts.csv",
+                "fiscal_year": "2024",
+            },
+            {
+                "contract_id": "C-2",
+                "vendor_name": "Acme LLC",
+                "agency_name": "FEMA",
+                "award_date": "2024-02-10",
+                "obligated_amount": "500",
+                "pop_state": "PR",
+                "source_file": "contracts.csv",
+                "fiscal_year": "2024",
+            },
+        ]
+    ).to_csv(processed / "pr_contracts_master.csv", index=False)
+
+    pd.DataFrame(
+        [
+            {
+                "vendor_name": "Acme LLC",
+                "uei": "UEI-ACME-CHILD",
+                "parent_uei": "UEI-ACME-PARENT",
+                "parent_name": "Acme Holdings",
+            }
+        ]
+    ).to_csv(enrichment / "entity_hierarchy.csv", index=False)
+
+    summary = run(root=tmp_path)
+    entity_master = pd.read_csv(processed / "entity_master.csv", dtype=str).fillna("")
+
+    assert summary["entity_master_quality"]["parent_uei_coverage"] == 1.0
+    assert summary["entity_master_quality"]["recipient_uei_coverage"] == 1.0
+
+    row = entity_master.iloc[0]
+    assert row["entity_key"] == "ACME"
+    assert row["recipient_uei"] == "UEI-ACME-CHILD"
+    assert row["parent_uei"] == "UEI-ACME-PARENT"
+    assert row["parent_name"] == "Acme Holdings"
+    assert row["resolved_entity_name"] == "Acme Holdings"
+    assert row["resolved_entity_key"] == "ACME HOLDINGS"

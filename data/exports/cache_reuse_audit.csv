@@ -1,4 +1,4 @@
 stage,cache_guard_detected,cache_hit_ratio,report_regeneration_status,downstream_recompute_count,finding
-report_generation,True,0.7,cached_without_force,0,generate_report.py returns CACHED when report exists unless --force is supplied
+report_generation,True,0.7,cached_without_force,1,generate_report.py returns CACHED when report exists unless --force is supplied
 unified_master,True,0.7,not_applicable,0,build_unified_master.py skips existing pr_all_awards_master.csv unless --force is supplied
-run_all_skip_download,True,0.7,suspect_cached_exports,0,run_all.py --skip-download can leave report/export layers cached because downstream force rebuild is not enforced
+run_all_skip_download,True,0.7,forced_recompute_enabled,1,run_all.py --skip-download now forwards force-recompute to report/export layers

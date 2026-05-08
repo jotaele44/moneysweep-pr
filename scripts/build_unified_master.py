@@ -150,6 +150,64 @@ def _derive_fiscal_year(date_series: pd.Series) -> pd.Series:
     return fy
 
 
+def _first_nonempty(series: pd.Series) -> str:
+    """Return the first non-empty string-like value in a series."""
+    for val in series:
+        if pd.isna(val):
+            continue
+        text = str(val).strip()
+        if text and text.lower() != "nan":
+            return text
+    return ""
+
+
+def _load_entity_hierarchy_map(processed_dir: Path, logger) -> dict[str, dict[str, str]]:
+    """
+    Load entity_hierarchy.csv into a normalized-name keyed lookup.
+
+    Keys are normalized vendor names; values include best-known recipient UEI and
+    parent lineage fields used to collapse entities toward parent organizations.
+    """
+    hierarchy_path = processed_dir / "enrichment" / "entity_hierarchy.csv"
+    if not hierarchy_path.exists():
+        logger.info("  entity_hierarchy.csv not found — parent UEI collapse will use direct recipient records only")
+        return {}
+
+    try:
+        hierarchy = pd.read_csv(hierarchy_path, dtype=str, low_memory=False)
+    except Exception as exc:
+        logger.warning(f"  Failed to read entity hierarchy: {exc} — continuing without parent map")
+        return {}
+
+    if hierarchy.empty:
+        logger.info("  entity_hierarchy.csv is empty — no parent lineage map applied")
+        return {}
+
+    lookup: dict[str, dict[str, str]] = {}
+    for _, row in hierarchy.iterrows():
+        vendor = str(row.get("vendor_name") or row.get("recipient_name") or "").strip()
+        if not vendor:
+            continue
+        key = _normalize_name(vendor)
+        if not key:
+            continue
+
+        parent_uei = str(row.get("parent_uei") or "").strip()
+        parent_name = str(row.get("parent_name") or "").strip()
+        recipient_uei = str(row.get("uei") or row.get("recipient_uei") or "").strip()
+
+        entry = lookup.setdefault(key, {"recipient_uei": "", "parent_uei": "", "parent_name": ""})
+        if recipient_uei and not entry["recipient_uei"]:
+            entry["recipient_uei"] = recipient_uei
+        if parent_uei and not entry["parent_uei"]:
+            entry["parent_uei"] = parent_uei
+        if parent_name and not entry["parent_name"]:
+            entry["parent_name"] = parent_name
+
+    logger.info(f"  Loaded parent lineage map: {len(lookup):,} entities from entity_hierarchy.csv")
+    return lookup
+
+
 # ---------------------------------------------------------------------------
 # Core logic
 # ---------------------------------------------------------------------------
@@ -169,6 +227,7 @@ def run(root=None) -> dict:
     root = Path(root)
     processed_dir = root / "data" / "staging" / "processed"
     logger = setup_logging("build_unified_master", log_dir=root / "data" / "logs")
+    parent_lineage_map = _load_entity_hierarchy_map(processed_dir, logger)
 
     frames = []
 
@@ -492,8 +551,8 @@ def run(root=None) -> dict:
         unified[unified["recipient_name_normalized"] != ""]
         .groupby("recipient_name_normalized")
         .agg(
-            canonical_name    = ("recipient_name",     "first"),
-            recipient_uei     = ("recipient_uei",      "first"),
+            canonical_name    = ("recipient_name",     _first_nonempty),
+            recipient_uei     = ("recipient_uei",      _first_nonempty),
             total_obligated   = ("_amount_num2",       "sum"),
             award_count       = ("award_id",           "nunique"),
             source_datasets   = ("source_dataset",     lambda x: "|".join(sorted(x.dropna().unique()))),
@@ -507,11 +566,56 @@ def run(root=None) -> dict:
         .sort_values("total_obligated", ascending=False)
         .reset_index(drop=True)
     )
+
+    # Preserve normalized keys for downstream joiners.
+    entity_master["canonical_name_normalized"] = entity_master["canonical_name"].apply(_normalize_name)
+    entity_master["norm_key"] = entity_master["entity_key"]
+
+    # Collapse to parent-entity lineage where available.
+    if not entity_master.empty:
+        parent_fields = []
+        for _, row in entity_master.iterrows():
+            key = str(row.get("entity_key") or "").strip()
+            mapped = parent_lineage_map.get(key, {})
+            recipient_uei = str(row.get("recipient_uei") or "").strip() or mapped.get("recipient_uei", "")
+            parent_uei = mapped.get("parent_uei", "")
+            parent_name = mapped.get("parent_name", "")
+            parent_fields.append(
+                {
+                    "recipient_uei": recipient_uei,
+                    "parent_uei": parent_uei,
+                    "parent_name": parent_name,
+                }
+            )
+        parent_df = pd.DataFrame(parent_fields)
+        entity_master["recipient_uei"] = parent_df["recipient_uei"].fillna("")
+        entity_master["parent_uei"] = parent_df["parent_uei"].fillna("")
+        entity_master["parent_name"] = parent_df["parent_name"].fillna("")
+    else:
+        entity_master["parent_uei"] = ""
+        entity_master["parent_name"] = ""
+
+    entity_master["resolved_entity_name"] = entity_master["canonical_name"]
+    has_parent_name = entity_master["parent_name"].astype(str).str.strip() != ""
+    entity_master.loc[has_parent_name, "resolved_entity_name"] = entity_master.loc[has_parent_name, "parent_name"]
+    entity_master["resolved_entity_key"] = entity_master["resolved_entity_name"].apply(_normalize_name)
+
+    parent_coverage = round((entity_master["parent_uei"].astype(str).str.strip() != "").mean(), 4) if len(entity_master) else 0.0
+    recipient_uei_coverage = round((entity_master["recipient_uei"].astype(str).str.strip() != "").mean(), 4) if len(entity_master) else 0.0
+
     entity_master_path = processed_dir / "entity_master.csv"
     entity_master.to_csv(entity_master_path, index=False, encoding="utf-8")
-    logger.info(f"  Entity master: {entity_master_path.name} ({len(entity_master):,} unique entities)")
+    logger.info(
+        f"  Entity master: {entity_master_path.name} ({len(entity_master):,} unique entities, "
+        f"recipient_uei_coverage={recipient_uei_coverage:.1%}, parent_uei_coverage={parent_coverage:.1%})"
+    )
 
     summary["outputs"]["entity_master"] = str(entity_master_path)
+    summary["entity_master_quality"] = {
+        "unique_entities": int(len(entity_master)),
+        "recipient_uei_coverage": recipient_uei_coverage,
+        "parent_uei_coverage": parent_coverage,
+    }
     unified.drop(columns=["_amount_num2"], inplace=True, errors="ignore")
 
     # Clean up temporary column
