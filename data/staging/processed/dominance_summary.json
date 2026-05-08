@@ -42,5 +42,9 @@
     "yoy_trends": "/home/user/Contract-Sweeper/data/staging/processed/dominance_yoy_trends.csv",
     "single_source": "/home/user/Contract-Sweeper/data/staging/processed/dominance_single_source.csv",
     "geo_concentration": "/home/user/Contract-Sweeper/data/staging/processed/dominance_geo_concentration.csv"
-  }
+  },
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "production_status_generated_at": "2026-05-08T08:46:03Z",
+  "production_status_message": "Diagnostic output only — not production-valid.",
+  "production_blocker_count": 3
 }

@@ -199,5 +199,9 @@
       "prime_award_ids": "PRIME-SUB-2017-00000810|PRIME-SUB-2021-00001078|PRIME-SUB-2023-00001324|PRIME-SUB-2024-00001164",
       "fiscal_year_range": "2017-2024"
     }
-  ]
+  ],
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "production_status_generated_at": "2026-05-08T08:46:03Z",
+  "production_status_message": "Diagnostic output only — not production-valid.",
+  "production_blocker_count": 3
 }

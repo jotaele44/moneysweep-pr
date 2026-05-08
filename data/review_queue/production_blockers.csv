@@ -1,0 +1,4 @@
+metric,observed_value,required_gate,severity,reason
+data_layers_populated,3,>= 8,BLOCKER,insufficient populated report layers
+unique_entities,18,>= 100,BLOCKER,entity universe is too small for production claims
+fixture_or_synthetic_data_detected,True,False,BLOCKER,fixture or synthetic data signatures detected
