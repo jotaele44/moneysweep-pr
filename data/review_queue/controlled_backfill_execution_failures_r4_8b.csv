@@ -1,0 +1,22 @@
+priority,expected_input,source_family,terminal_status,reason,attempted,command_executed,command_exit_code,next_action
+1,data/staging/processed/pr_contracts_master.csv,usaspending_federal_awards_backbone,no_data,target output not produced,True,True,0,verify producer output mapping and retry or manual import
+2,data/staging/processed/pr_grants_master.csv,usaspending_federal_awards_backbone,execution_timeout,command timed out after 20s,True,True,124,retry source with longer timeout or manual import
+3,data/staging/processed/pr_subawards_master.csv,fsrs_subawards,execution_failed,command failed with exit code 1,True,True,1,inspect producer script output and retry or use manual fallback
+4,data/staging/processed/pr_fema_pa_master.csv,fema_pa_hmgp,execution_timeout,command timed out after 20s,True,True,124,retry source with longer timeout or manual import
+5,data/staging/processed/pr_fema_hmgp_master.csv,fema_pa_hmgp,execution_timeout,command timed out after 20s,True,True,124,retry source with longer timeout or manual import
+6,data/staging/processed/pr_research_master.csv,federal_research,execution_timeout,command timed out after 20s,True,True,124,retry source with longer timeout or manual import
+7,data/staging/processed/pr_sba_loans_master.csv,sba_loans,execution_failed,command failed with exit code 1,True,True,1,inspect producer script output and retry or use manual fallback
+8,data/staging/processed/pr_slfrf_master.csv,slfrf,schema_failure,missing required columns,True,True,0,repair schema mapping/normalization for this source
+9,data/staging/processed/pr_cdbg_dr_master.csv,hud_cdbg,execution_timeout,command timed out after 20s,True,True,124,retry source with longer timeout or manual import
+10,data/staging/processed/pr_dot_master.csv,federal_sectoral_dot,schema_failure,missing required columns,True,True,0,repair schema mapping/normalization for this source
+11,data/staging/processed/pr_usda_master.csv,federal_sectoral_usda,schema_failure,missing required columns,True,True,0,repair schema mapping/normalization for this source
+12,data/staging/processed/pr_doe_master.csv,federal_sectoral_doe,schema_failure,missing required columns,True,True,0,repair schema mapping/normalization for this source
+13,data/staging/processed/pr_hud_master.csv,hud_cdbg,execution_failed,command failed with exit code 1,True,True,1,inspect producer script output and retry or use manual fallback
+14,data/staging/processed/pr_sbir_master.csv,federal_sectoral_sbir,execution_failed,command failed with exit code 1,True,True,1,inspect producer script output and retry or use manual fallback
+15,data/staging/processed/pr_epa_master.csv,federal_sectoral_epa,schema_failure,missing required columns,True,True,0,repair schema mapping/normalization for this source
+16,data/staging/processed/pr_usace_civil_master.csv,federal_sectoral_usace,execution_failed,command failed with exit code 1,True,True,1,inspect producer script output and retry or use manual fallback
+17,data/staging/processed/pr_wioa_grants.csv,federal_sectoral_wioa,schema_failure,missing required columns,True,True,0,repair schema mapping/normalization for this source
+18,data/staging/expansion/expansion_idv_indirect_pr.csv,usaspending_federal_awards_backbone,execution_timeout,command timed out after 20s,True,True,124,retry source with longer timeout or manual import
+19,data/staging/expansion/expansion_dod_upr_2001_2015.csv,usaspending_federal_awards_backbone,execution_timeout,command timed out after 20s,True,True,124,retry source with longer timeout or manual import
+20,data/staging/expansion/expansion_dod_upr_2016_2025.csv,usaspending_federal_awards_backbone,execution_timeout,command timed out after 20s,True,True,124,retry source with longer timeout or manual import
+21,data/staging/expansion/expansion_reconstruction_2017_2025.csv,usaspending_federal_awards_backbone,execution_timeout,command timed out after 20s,True,True,124,retry source with longer timeout or manual import
