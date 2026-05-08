@@ -11,11 +11,24 @@
   ],
   "fixture_or_demo_replay_suspected": true,
   "generated_at": "2026-05-08T09:05:51Z",
+  "graph_exclusion_count": 0,
+  "high_value_overcollapse_suspect_count": 18,
+  "high_value_unresolved_count": 18,
+  "inferred_18_entity_collapse_stage": "collapse_before_or_at_master_table",
   "missing_manifest_count": 42,
   "missing_manifest_detected": true,
-  "phase_7_8_block_reason": "R1 gate failed or production status is not fully validated",
+  "parent_uei_coverage": 0.0,
+  "phase_7_8_block_reason": "R2 gate failed and/or prior phase gate still blocked",
   "phase_7_8_blocked": true,
   "r1_gate_passed": false,
+  "r2_gate_passed": false,
+  "r2_generated_at": "2026-05-08T11:05:07Z",
+  "r2_outputs": {
+    "entity_collapse_diagnostics": "data/exports/entity_collapse_diagnostics.csv",
+    "entity_universe_audit": "data/exports/entity_universe_audit.csv",
+    "high_value_unresolved_entities": "data/review_queue/high_value_unresolved_entities.csv",
+    "suspect_entity_collapses": "data/review_queue/suspect_entity_collapses.csv"
+  },
   "report_regeneration_status": "cached_or_unverified",
   "reports_recomputed": false,
   "skip_download_recompute_guard": false,
@@ -26,5 +39,6 @@
     "power network ranked universe is constrained to 18",
     "prime/sub counts exactly mirror entity universe"
   ],
-  "top_n_truncation_suspected": true
+  "top_n_truncation_suspected": true,
+  "unique_normalized_entity_count": 18
 }

@@ -1,0 +1,19 @@
+raw_recipient_name,normalized_name,entity_id,parent_uei,parent_name,resolution_method,resolution_confidence,source_system,award_count,obligation_sum,collapsed_group_size,collapse_suspect,high_value_flag,graph_node_present
+Hospital Damas Inc,HOSPITAL DAMAS,HOSPITAL DAMAS,,,summary_only_unresolved,0.2,awards|fec|lda,252,4554283750.25,252,True,True,True
+Municipality of San Juan,MUNICIPALITY OF SAN JUAN,MUNICIPALITY OF SAN JUAN,,,summary_only_unresolved,0.2,awards|fec|lda,282,4453055891.36,282,True,True,True
+Crowley Maritime Corp,CROWLEY MARITIME,CROWLEY MARITIME,,,summary_only_unresolved,0.2,awards|fec|lda,250,3986128201.12,250,True,True,True
+Caribbean Data Services Inc,CARIBBEAN DATA SERVICES,CARIBBEAN DATA SERVICES,,,summary_only_unresolved,0.2,awards|fec|lda,277,3895395595.4,277,True,True,True
+Puerto Rico Aqueduct And Sewer Authority,PUERTO RICO AQUEDUCT AND SEWER AUTHORITY,PUERTO RICO AQUEDUCT AND SEWER AUTHORITY,,,summary_only_unresolved,0.2,awards|fec|lda,288,3772063789.35,288,True,True,True
+Microsoft Puerto Rico Inc,MICROSOFT PUERTO RICO,MICROSOFT PUERTO RICO,,,summary_only_unresolved,0.2,awards|fec|lda,257,3544492914.84,257,True,True,True
+Interamerican University of Puerto Rico Inc,INTERAMERICAN UNIVERSITY OF PUERTO RICO,INTERAMERICAN UNIVERSITY OF PUERTO RICO,,,summary_only_unresolved,0.2,awards|fec|lda,239,3489917116.49,250,True,True,True
+First Bancorp Puerto Rico,FIRST BANCORP PUERTO RICO,FIRST BANCORP PUERTO RICO,,,summary_only_unresolved,0.2,awards|fec|lda,223,3614407444.71,250,True,True,True
+Centro Medico Del Turabo Inc,CENTRO MEDICO DEL TURABO,CENTRO MEDICO DEL TURABO,,,summary_only_unresolved,0.2,awards|fec|lda,245,3356594644.11,250,True,True,True
+University of Puerto Rico,UNIVERSITY OF PUERTO RICO,UNIVERSITY OF PUERTO RICO,,,summary_only_unresolved,0.2,awards|fec|lda,240,3439057682.78,250,True,True,True
+Popular Inc,POPULAR,POPULAR,,,summary_only_unresolved,0.2,awards|fec|lda,246,3389550632.83,250,True,True,True
+Triple-S Management Corp,TRIPLE S MANAGEMENT,TRIPLE S MANAGEMENT,,,summary_only_unresolved,0.2,awards|fec|lda,251,3245897799.17,251,True,True,True
+Hewlett Packard Puerto Rico LLC,HEWLETT PACKARD PUERTO RICO,HEWLETT PACKARD PUERTO RICO,,,summary_only_unresolved,0.2,awards|fec|lda,260,3256235132.82,260,True,True,True
+Puerto Rico Electric Power Authority,PUERTO RICO ELECTRIC POWER AUTHORITY,PUERTO RICO ELECTRIC POWER AUTHORITY,,,summary_only_unresolved,0.2,awards|fec|lda,239,2913161591.99,250,True,True,True
+Municipio de Ponce,MUNICIPIO DE PONCE,MUNICIPIO DE PONCE,,,summary_only_unresolved,0.2,awards,255,3732887866.51,255,True,True,True
+Corporacion Del Fondo Del Seguro Del Estado,CORPORACION DEL FONDO DEL SEGURO DEL ESTADO,CORPORACION DEL FONDO DEL SEGURO DEL ESTADO,,,summary_only_unresolved,0.2,awards,265,3263983340.2,265,True,True,True
+Puerto Rico Industrial Development Company,PUERTO RICO INDUSTRIAL DEVELOPMENT COMPANY,PUERTO RICO INDUSTRIAL DEVELOPMENT COMPANY,,,summary_only_unresolved,0.2,awards,217,3085428489.94,250,True,True,True
+Municipality of Bayamon,MUNICIPALITY OF BAYAMON,MUNICIPALITY OF BAYAMON,,,summary_only_unresolved,0.2,awards,217,2873756379.24,250,True,True,True
