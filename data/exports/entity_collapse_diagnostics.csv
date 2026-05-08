@@ -1,0 +1,9 @@
+diagnostic,observed_value,required_value,severity,notes
+raw_award_rows,4503,>= 1,INFO,rows entering the aggregated award universe
+unique_normalized_entity_count,18,>= 100,BLOCKER,R2 minimum gate for entity universe size
+parent_uei_coverage,0.0,> 0,BLOCKER,R2 minimum gate for parent lineage presence
+high_value_overcollapse_suspect_count,18,== 0,BLOCKER,entities likely collapsed too aggressively
+high_value_unresolved_count,18,== 0,BLOCKER,high-value entities missing parent UEI resolution
+graph_exclusion_count,0,== 0 preferred,PASS,normalized entities not represented as graph vendors
+inferred_18_entity_collapse_stage,collapse_before_or_at_master_table,not collapse_before_or_at_master_table,BLOCKER,where the constrained universe is first observable
+phase_7_8_blocked,True,True until R2 gate passes,INFO,enforcement guard for downstream risk/graph phases
