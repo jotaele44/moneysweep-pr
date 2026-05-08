@@ -8,6 +8,18 @@ version = "0.1.0"
 description = "Puerto Rico Federal Contracts Data Pipeline — automated acquisition, validation, normalization, and coverage analysis of federal procurement data."
 readme = "README.md"
 requires-python = ">=3.8"
+authors = [
+  { name = "Contract-Sweeper Contributors" }
+]
+license = "MIT"
+dependencies = [
+  "pandas>=2.0.0",
+  "requests>=2.28.0",
+  "lxml>=4.9.0",
+  "rapidfuzz>=3.0.0",
+  "python-dotenv>=1.0.0",
+  "pyarrow>=14.0.0",
+]
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",

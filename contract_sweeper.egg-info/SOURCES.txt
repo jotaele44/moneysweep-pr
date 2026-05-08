@@ -3,6 +3,7 @@ pyproject.toml
 contract_sweeper.egg-info/PKG-INFO
 contract_sweeper.egg-info/SOURCES.txt
 contract_sweeper.egg-info/dependency_links.txt
+contract_sweeper.egg-info/requires.txt
 contract_sweeper.egg-info/top_level.txt
 data/raw/SAM/test_sam.py
 scripts/__init__.py
