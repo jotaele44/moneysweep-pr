@@ -211,6 +211,7 @@
       "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/expansion/expansion_reconstruction_2017_2025.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='Award ID,Recipient Name,Awarding Agency,Awarding Sub Agency,Total Obligation,Start Date,Place of Performance State Code,Place of Performance City,Description,generated_internal_id'.split(',') if 'Award ID,Recipient Name,Awarding Agency,Awarding Sub Agency,Total Obligation,Start Date,Place of Performance State Code,Place of Performance City,Description,generated_internal_id' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
     }
   ],
+  "automated_source_count_definition": "21 source tasks are represented in the dry-run runner plan.",
   "counts": {
     "automated_sources": 21,
     "blocked_sources": 0,
@@ -221,11 +222,11 @@
   "execute_downloads_default": false,
   "execute_downloads_requested": false,
   "forbidden_artifact_usage": false,
-  "generated_at": "2026-05-08T14:57:15Z",
+  "generated_at": "2026-05-08T15:07:15Z",
   "input_plan_csv": "data/exports/backfill_execution_plan_r4_6.csv",
   "input_plan_status": {
     "expected_input_count": 21,
-    "generated_at": "2026-05-08T14:54:53Z",
+    "generated_at": "2026-05-08T14:39:19Z",
     "manual_queue_source": "data/review_queue/manual_source_download_queue.csv",
     "outputs": {
       "backfill_plan_csv": "data/exports/backfill_execution_plan_r4_6.csv",
@@ -269,5 +270,12 @@
     "DRY_RUN: python scripts/auto_download.py --only usaspending --force",
     "DRY_RUN: python scripts/auto_download.py --only usaspending --force"
   ],
-  "r4_7_gate_passed": true
+  "r4_7_data_recovery_completed": false,
+  "r4_7_downloads_executed": false,
+  "r4_7_gate_passed": true,
+  "r4_7_phase_type": "DRY_RUN_SCAFFOLDING_ONLY",
+  "r4_7_production_inputs_staged": 0,
+  "r4_7_rows_ingested": 0,
+  "r4_7_runner_scaffolding_completed": true,
+  "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS"
 }
