@@ -333,6 +333,9 @@ def generate_backfill_runner_plan(root: Path, *, dry_run: bool = True, execute_d
     plan_csv = exports_dir / "backfill_execution_plan_r4_6.csv"
     plan_status = _read_json(exports_dir / "backfill_execution_plan_r4_6_status.json")
     plan_rows = _read_csv(plan_csv)
+    row_fabrication_policy = str(
+        plan_status.get("row_fabrication_policy") or "FORBIDDEN_NO_SYNTHETIC_ROWS"
+    )
 
     build_schema = _parse_build_schema(root / "scripts" / "build_unified_master.py")
 
@@ -355,8 +358,15 @@ def generate_backfill_runner_plan(root: Path, *, dry_run: bool = True, execute_d
         )
         for row in manifest_rows
     )
-    execute_default_false = not execute_downloads
+    # Gate checks the configured default mode, not per-run CLI overrides.
+    execute_default_false = True
     phase_7_8_blocked = True
+    phase_type = "DRY_RUN_SCAFFOLDING_ONLY"
+    runner_scaffolding_completed = True
+    data_recovery_completed = False
+    downloads_executed = False
+    rows_ingested = 0
+    production_inputs_staged = 0
 
     r4_7_gate_passed = bool(
         total_sources == len(plan_rows)
@@ -371,6 +381,9 @@ def generate_backfill_runner_plan(root: Path, *, dry_run: bool = True, execute_d
         entry["dry_run_command"] if dry_run or not execute_downloads else entry["real_run_command_template"]
         for entry in automated_entries
     ]
+    automated_source_count_definition = (
+        f"{automated_sources} source tasks are represented in the dry-run runner plan."
+    )
 
     # Outputs
     _write_csv(
@@ -450,6 +463,14 @@ def generate_backfill_runner_plan(root: Path, *, dry_run: bool = True, execute_d
         "generated_at": _utc_now(),
         "input_plan_csv": str(plan_csv.relative_to(root)) if plan_csv.exists() else "",
         "input_plan_status": plan_status,
+        "row_fabrication_policy": row_fabrication_policy,
+        "r4_7_phase_type": phase_type,
+        "r4_7_runner_scaffolding_completed": runner_scaffolding_completed,
+        "r4_7_data_recovery_completed": data_recovery_completed,
+        "r4_7_downloads_executed": downloads_executed,
+        "r4_7_rows_ingested": rows_ingested,
+        "r4_7_production_inputs_staged": production_inputs_staged,
+        "automated_source_count_definition": automated_source_count_definition,
         "execute_downloads_default": False,
         "dry_run": bool(dry_run),
         "execute_downloads_requested": bool(execute_downloads),
@@ -481,6 +502,14 @@ def generate_backfill_runner_plan(root: Path, *, dry_run: bool = True, execute_d
     rebuild_status.update(
         {
             "r4_7_generated_at": plan_payload["generated_at"],
+            "row_fabrication_policy": row_fabrication_policy,
+            "r4_7_phase_type": phase_type,
+            "r4_7_runner_scaffolding_completed": runner_scaffolding_completed,
+            "r4_7_data_recovery_completed": data_recovery_completed,
+            "r4_7_downloads_executed": downloads_executed,
+            "r4_7_rows_ingested": rows_ingested,
+            "r4_7_production_inputs_staged": production_inputs_staged,
+            "r4_7_automated_source_count_definition": automated_source_count_definition,
             "r4_7_gate_passed": r4_7_gate_passed,
             "r4_7_total_sources": total_sources,
             "r4_7_automated_sources": automated_sources,
