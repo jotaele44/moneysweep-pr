@@ -1,7 +1,7 @@
 retry_rank,priority,expected_input,source_family,primary_blocker_class,retry_attempted,retry_status,disposition,next_action
 1,8,data/staging/processed/pr_slfrf_master.csv,slfrf,schema_mismatch,True,success,fixed_and_retried,ready_for_master_rebuild_gate
 2,10,data/staging/processed/pr_dot_master.csv,federal_sectoral_dot,schema_mismatch,True,success,fixed_and_retried,ready_for_master_rebuild_gate
-3,11,data/staging/processed/pr_usda_master.csv,federal_sectoral_usda,schema_mismatch,True,failed_command,manual_fallback_remaining,manual_fallback_required
+3,11,data/staging/processed/pr_usda_master.csv,federal_sectoral_usda,schema_mismatch,True,success,fixed_and_retried,ready_for_master_rebuild_gate
 4,12,data/staging/processed/pr_doe_master.csv,federal_sectoral_doe,schema_mismatch,True,success,fixed_and_retried,ready_for_master_rebuild_gate
 5,13,data/staging/processed/pr_hud_master.csv,hud_cdbg,schema_mismatch,True,success,fixed_and_retried,ready_for_master_rebuild_gate
 6,15,data/staging/processed/pr_epa_master.csv,federal_sectoral_epa,schema_mismatch,True,success,fixed_and_retried,ready_for_master_rebuild_gate
