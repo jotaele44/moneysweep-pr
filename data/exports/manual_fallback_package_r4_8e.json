@@ -1,7 +1,7 @@
 {
   "forbidden_artifact_usage": false,
-  "generated_at": "2026-05-08T21:12:45Z",
-  "manual_fallback_source_count": 15,
+  "generated_at": "2026-05-08T22:37:49Z",
+  "manual_fallback_source_count": 14,
   "phase_type": "R4.8E_MANUAL_FALLBACK_PACKAGE",
   "sources": [
     {
@@ -45,7 +45,7 @@
     {
       "accepted_filename_patterns": "pr_subawards_master.csv|pr_subawards_master*.csv|*.csv",
       "expected_input": "data/staging/processed/pr_subawards_master.csv",
-      "failure_reason": "2026-05-08 17:09:33 [INFO] Starting PR subawards download... 2026-05-08 17:09:33 [INFO] [Window 2000f2009] 2007-10-01 to 2009-09-30 2026-05-08 17:09:33 [INFO] Fetching subawards_grants_2000f2009.csv (2007-10-01 to 2009-09-30, type=grants) 2",
+      "failure_reason": "2026-05-08 18:36:14 [INFO] Starting PR subawards download... 2026-05-08 18:36:14 [INFO] [Window 2000f2009] 2007-10-01 to 2009-09-30 2026-05-08 18:36:14 [INFO] Fetching subawards_grants_2000f2009.csv (2007-10-01 to 2009-09-30, type=grants) 2",
       "forbidden_artifact_usage": "False",
       "manual_export_steps": "1) Open source portal: https://www.fsrs.gov\n2) Confirm no secrets are embedded in exported files.\n3) Export the source dataset for Puerto Rico scope and preserve raw columns.\n4) Save exported file to dropzone path: data/manual_import_dropzone/r4_8e/fsrs_subawards/pr_subawards_master.csv\n5) Validate staged file with: python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_subawards_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\"\n6) If validation fails, queue remediation with source family 'fsrs_subawards' and producer 'scripts/download_subawards.py'.",
       "next_action": "require_manual_file",
@@ -157,25 +157,6 @@
       "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_cdbg_dr_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
     },
     {
-      "accepted_filename_patterns": "pr_usda_master.csv|pr_usda_master*.csv|*.csv",
-      "expected_input": "data/staging/processed/pr_usda_master.csv",
-      "failure_reason": "2026-05-08 17:10:25 [INFO] Starting USDA grants/loans download for Puerto Rico... 2026-05-08 17:10:25 [INFO] [Window 2000f2009] 2007-10-01 to 2009-09-30 2026-05-08 17:10:25 [INFO] Fetching usda_grants_pop_2000f2009.csv (2007-10-01 \u2192 2009-09",
-      "forbidden_artifact_usage": "False",
-      "manual_export_steps": "1) Open source portal: https://www.usda.gov\n2) Confirm no secrets are embedded in exported files.\n3) Export the source dataset for Puerto Rico scope and preserve raw columns.\n4) Save exported file to dropzone path: data/manual_import_dropzone/r4_8e/federal_sectoral_usda/pr_usda_master.csv\n5) Validate staged file with: python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_usda_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\"\n6) If validation fails, queue remediation with source family 'federal_sectoral_usda' and producer 'scripts/download_usda.py'.",
-      "next_action": "require_manual_file",
-      "priority": "11",
-      "producer_script": "scripts/download_usda.py",
-      "required_columns": "award_id|recipient_name|recipient_name_normalized|recipient_uei|awarding_agency|awarding_sub_agency|obligated_amount|award_date|fiscal_year|pop_state|pop_county|description|source_file|source_dataset|award_category|source_system|source_record_id|source_lineage_path|source_lineage_mode",
-      "required_env_vars": "",
-      "required_file_type": "csv",
-      "retry_status": "failed_command",
-      "source_family": "federal_sectoral_usda",
-      "source_url_or_portal": "https://www.usda.gov",
-      "target_dropzone_path": "data/manual_import_dropzone/r4_8e/federal_sectoral_usda/pr_usda_master.csv",
-      "target_output_path": "data/staging/processed/pr_usda_master.csv",
-      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_usda_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
-    },
-    {
       "accepted_filename_patterns": "pr_sbir_master.csv|pr_sbir_master*.csv|*.csv",
       "expected_input": "data/staging/processed/pr_sbir_master.csv",
       "failure_reason": "target output has zero rows",
@@ -197,7 +178,7 @@
     {
       "accepted_filename_patterns": "pr_usace_civil_master.csv|pr_usace_civil_master*.csv|*.csv",
       "expected_input": "data/staging/processed/pr_usace_civil_master.csv",
-      "failure_reason": "2026-05-08 17:11:58 [INFO] Starting USACE civil works download for Puerto Rico... 2026-05-08 17:11:58 [INFO] [Window 2000f2009] 2007-10-01 to 2009-09-30 2026-05-08 17:11:58 [INFO] Fetching usace_civil_pop_2000f2009.csv (filter=pop) 2026-05-",
+      "failure_reason": "2026-05-08 18:37:34 [INFO] Starting USACE civil works download for Puerto Rico... 2026-05-08 18:37:34 [INFO] [Window 2000f2009] 2007-10-01 to 2009-09-30 2026-05-08 18:37:34 [INFO] Fetching usace_civil_pop_2000f2009.csv (filter=pop) 2026-05-",
       "forbidden_artifact_usage": "False",
       "manual_export_steps": "1) Open source portal: https://www.usace.army.mil\n2) Confirm no secrets are embedded in exported files.\n3) Export the source dataset for Puerto Rico scope and preserve raw columns.\n4) Save exported file to dropzone path: data/manual_import_dropzone/r4_8e/federal_sectoral_usace/pr_usace_civil_master.csv\n5) Validate staged file with: python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_usace_civil_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\"\n6) If validation fails, queue remediation with source family 'federal_sectoral_usace' and producer 'scripts/download_usace_civil.py'.",
       "next_action": "require_manual_file",
