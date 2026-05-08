@@ -1,0 +1,281 @@
+{
+  "automated_runner_entries": [
+    {
+      "dry_run_command": "DRY_RUN: python scripts/deduplicate_master.py",
+      "expected_output_path": "data/staging/processed/pr_contracts_master.csv",
+      "priority": 1,
+      "producer_script": "scripts/deduplicate_master.py",
+      "real_run_command_template": "python scripts/deduplicate_master.py",
+      "required_env_vars": "",
+      "source_family": "usaspending_federal_awards_backbone",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_contracts_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='contract_id,vendor_name,agency_name,award_date,obligated_amount,pop_state,source_file,fiscal_year'.split(',') if 'contract_id,vendor_name,agency_name,award_date,obligated_amount,pop_state,source_file,fiscal_year' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_grants.py --force",
+      "expected_output_path": "data/staging/processed/pr_grants_master.csv",
+      "priority": 2,
+      "producer_script": "scripts/download_grants.py",
+      "real_run_command_template": "python scripts/download_grants.py --force",
+      "required_env_vars": "",
+      "source_family": "usaspending_federal_awards_backbone",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_grants_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_subawards.py --force",
+      "expected_output_path": "data/staging/processed/pr_subawards_master.csv",
+      "priority": 3,
+      "producer_script": "scripts/download_subawards.py",
+      "real_run_command_template": "python scripts/download_subawards.py --force",
+      "required_env_vars": "",
+      "source_family": "fsrs_subawards",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_subawards_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_fema.py --force",
+      "expected_output_path": "data/staging/processed/pr_fema_pa_master.csv",
+      "priority": 4,
+      "producer_script": "scripts/download_fema.py",
+      "real_run_command_template": "python scripts/download_fema.py --force",
+      "required_env_vars": "",
+      "source_family": "fema_pa_hmgp",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_fema_pa_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_fema.py --force",
+      "expected_output_path": "data/staging/processed/pr_fema_hmgp_master.csv",
+      "priority": 5,
+      "producer_script": "scripts/download_fema.py",
+      "real_run_command_template": "python scripts/download_fema.py --force",
+      "required_env_vars": "",
+      "source_family": "fema_pa_hmgp",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_fema_hmgp_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_research.py --force",
+      "expected_output_path": "data/staging/processed/pr_research_master.csv",
+      "priority": 6,
+      "producer_script": "scripts/download_research.py",
+      "real_run_command_template": "python scripts/download_research.py --force",
+      "required_env_vars": "",
+      "source_family": "federal_research",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_research_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_sba.py --force",
+      "expected_output_path": "data/staging/processed/pr_sba_loans_master.csv",
+      "priority": 7,
+      "producer_script": "scripts/download_sba.py",
+      "real_run_command_template": "python scripts/download_sba.py --force",
+      "required_env_vars": "",
+      "source_family": "sba_loans",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_sba_loans_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_slfrf.py --force",
+      "expected_output_path": "data/staging/processed/pr_slfrf_master.csv",
+      "priority": 8,
+      "producer_script": "scripts/download_slfrf.py",
+      "real_run_command_template": "python scripts/download_slfrf.py --force",
+      "required_env_vars": "",
+      "source_family": "slfrf",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_slfrf_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_cdbg_dr.py --force",
+      "expected_output_path": "data/staging/processed/pr_cdbg_dr_master.csv",
+      "priority": 9,
+      "producer_script": "scripts/download_cdbg_dr.py",
+      "real_run_command_template": "python scripts/download_cdbg_dr.py --force",
+      "required_env_vars": "",
+      "source_family": "hud_cdbg",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_cdbg_dr_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_dot.py --force",
+      "expected_output_path": "data/staging/processed/pr_dot_master.csv",
+      "priority": 10,
+      "producer_script": "scripts/download_dot.py",
+      "real_run_command_template": "python scripts/download_dot.py --force",
+      "required_env_vars": "",
+      "source_family": "federal_sectoral_dot",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_dot_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_usda.py --force",
+      "expected_output_path": "data/staging/processed/pr_usda_master.csv",
+      "priority": 11,
+      "producer_script": "scripts/download_usda.py",
+      "real_run_command_template": "python scripts/download_usda.py --force",
+      "required_env_vars": "",
+      "source_family": "federal_sectoral_usda",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_usda_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_doe.py --force",
+      "expected_output_path": "data/staging/processed/pr_doe_master.csv",
+      "priority": 12,
+      "producer_script": "scripts/download_doe.py",
+      "real_run_command_template": "python scripts/download_doe.py --force",
+      "required_env_vars": "",
+      "source_family": "federal_sectoral_doe",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_doe_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_hud.py --force",
+      "expected_output_path": "data/staging/processed/pr_hud_master.csv",
+      "priority": 13,
+      "producer_script": "scripts/download_hud.py",
+      "real_run_command_template": "python scripts/download_hud.py --force",
+      "required_env_vars": "",
+      "source_family": "hud_cdbg",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_hud_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_sbir.py --force",
+      "expected_output_path": "data/staging/processed/pr_sbir_master.csv",
+      "priority": 14,
+      "producer_script": "scripts/download_sbir.py",
+      "real_run_command_template": "python scripts/download_sbir.py --force",
+      "required_env_vars": "",
+      "source_family": "federal_sectoral_sbir",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_sbir_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_epa.py --force",
+      "expected_output_path": "data/staging/processed/pr_epa_master.csv",
+      "priority": 15,
+      "producer_script": "scripts/download_epa.py",
+      "real_run_command_template": "python scripts/download_epa.py --force",
+      "required_env_vars": "",
+      "source_family": "federal_sectoral_epa",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_epa_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_usace_civil.py --force",
+      "expected_output_path": "data/staging/processed/pr_usace_civil_master.csv",
+      "priority": 16,
+      "producer_script": "scripts/download_usace_civil.py",
+      "real_run_command_template": "python scripts/download_usace_civil.py --force",
+      "required_env_vars": "",
+      "source_family": "federal_sectoral_usace",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_usace_civil_master.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/download_wioa.py --force",
+      "expected_output_path": "data/staging/processed/pr_wioa_grants.csv",
+      "priority": 17,
+      "producer_script": "scripts/download_wioa.py",
+      "real_run_command_template": "python scripts/download_wioa.py --force",
+      "required_env_vars": "",
+      "source_family": "federal_sectoral_wioa",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/processed/pr_wioa_grants.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode'.split(',') if 'award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,pop_state,pop_county,description,source_file,source_dataset,award_category,source_system,source_record_id,source_lineage_path,source_lineage_mode' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/auto_download.py --only usaspending --force",
+      "expected_output_path": "data/staging/expansion/expansion_idv_indirect_pr.csv",
+      "priority": 18,
+      "producer_script": "scripts/auto_download.py",
+      "real_run_command_template": "python scripts/auto_download.py --only usaspending --force",
+      "required_env_vars": "",
+      "source_family": "usaspending_federal_awards_backbone",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/expansion/expansion_idv_indirect_pr.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='Award ID,Recipient Name,Awarding Agency,Awarding Sub Agency,Total Obligation,Start Date,Place of Performance State Code,Place of Performance City,Description,generated_internal_id'.split(',') if 'Award ID,Recipient Name,Awarding Agency,Awarding Sub Agency,Total Obligation,Start Date,Place of Performance State Code,Place of Performance City,Description,generated_internal_id' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/auto_download.py --only usaspending --force",
+      "expected_output_path": "data/staging/expansion/expansion_dod_upr_2001_2015.csv",
+      "priority": 19,
+      "producer_script": "scripts/auto_download.py",
+      "real_run_command_template": "python scripts/auto_download.py --only usaspending --force",
+      "required_env_vars": "",
+      "source_family": "usaspending_federal_awards_backbone",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/expansion/expansion_dod_upr_2001_2015.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='Award ID,Recipient Name,Awarding Agency,Awarding Sub Agency,Total Obligation,Start Date,Place of Performance State Code,Place of Performance City,Description,generated_internal_id'.split(',') if 'Award ID,Recipient Name,Awarding Agency,Awarding Sub Agency,Total Obligation,Start Date,Place of Performance State Code,Place of Performance City,Description,generated_internal_id' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/auto_download.py --only usaspending --force",
+      "expected_output_path": "data/staging/expansion/expansion_dod_upr_2016_2025.csv",
+      "priority": 20,
+      "producer_script": "scripts/auto_download.py",
+      "real_run_command_template": "python scripts/auto_download.py --only usaspending --force",
+      "required_env_vars": "",
+      "source_family": "usaspending_federal_awards_backbone",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/expansion/expansion_dod_upr_2016_2025.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='Award ID,Recipient Name,Awarding Agency,Awarding Sub Agency,Total Obligation,Start Date,Place of Performance State Code,Place of Performance City,Description,generated_internal_id'.split(',') if 'Award ID,Recipient Name,Awarding Agency,Awarding Sub Agency,Total Obligation,Start Date,Place of Performance State Code,Place of Performance City,Description,generated_internal_id' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    },
+    {
+      "dry_run_command": "DRY_RUN: python scripts/auto_download.py --only usaspending --force",
+      "expected_output_path": "data/staging/expansion/expansion_reconstruction_2017_2025.csv",
+      "priority": 21,
+      "producer_script": "scripts/auto_download.py",
+      "real_run_command_template": "python scripts/auto_download.py --only usaspending --force",
+      "required_env_vars": "",
+      "source_family": "usaspending_federal_awards_backbone",
+      "validation_command": "python -c \"import pandas as pd; from pathlib import Path; p=Path('data/staging/expansion/expansion_reconstruction_2017_2025.csv'); assert p.exists(), 'missing output'; df=pd.read_csv(p,dtype=str,low_memory=False); assert len(df)>0, 'empty output'; req='Award ID,Recipient Name,Awarding Agency,Awarding Sub Agency,Total Obligation,Start Date,Place of Performance State Code,Place of Performance City,Description,generated_internal_id'.split(',') if 'Award ID,Recipient Name,Awarding Agency,Awarding Sub Agency,Total Obligation,Start Date,Place of Performance State Code,Place of Performance City,Description,generated_internal_id' else []; missing=[c for c in req if c and c not in df.columns]; assert not missing, f'missing columns: {missing}'; print('rows',len(df))\""
+    }
+  ],
+  "automated_source_count_definition": "21 source tasks are represented in the dry-run runner plan.",
+  "counts": {
+    "automated_sources": 21,
+    "blocked_sources": 0,
+    "manual_sources": 0,
+    "total_sources": 21
+  },
+  "dry_run": true,
+  "execute_downloads_default": false,
+  "execute_downloads_requested": false,
+  "forbidden_artifact_usage": false,
+  "generated_at": "2026-05-08T15:07:15Z",
+  "input_plan_csv": "data/exports/backfill_execution_plan_r4_6.csv",
+  "input_plan_status": {
+    "expected_input_count": 21,
+    "generated_at": "2026-05-08T14:39:19Z",
+    "manual_queue_source": "data/review_queue/manual_source_download_queue.csv",
+    "outputs": {
+      "backfill_plan_csv": "data/exports/backfill_execution_plan_r4_6.csv",
+      "backfill_plan_md": "data/exports/backfill_execution_plan_r4_6.md"
+    },
+    "phase_7_8_block_reason": "R4.6 backfill planning active; gates for R5/R6 still required before Phase 7/8",
+    "phase_7_8_blocked": true,
+    "plan_row_count": 21,
+    "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS"
+  },
+  "manual_import_slots": [],
+  "outputs": {
+    "backfill_runner_blockers": "data/review_queue/backfill_runner_blockers.csv",
+    "backfill_runner_manifest": "data/exports/backfill_runner_manifest_r4_7.csv",
+    "backfill_runner_plan": "data/exports/backfill_runner_plan_r4_7.json",
+    "import_slots": "data/exports/import_slots_r4_7.csv",
+    "manual_import_slots_required": "data/review_queue/manual_import_slots_required.csv"
+  },
+  "phase_7_8_block_reason": "R4.7 scaffolding only; Phase 7/8 remains blocked until validated backfill + R5/R6 gates",
+  "phase_7_8_blocked": true,
+  "planned_commands": [
+    "DRY_RUN: python scripts/deduplicate_master.py",
+    "DRY_RUN: python scripts/download_grants.py --force",
+    "DRY_RUN: python scripts/download_subawards.py --force",
+    "DRY_RUN: python scripts/download_fema.py --force",
+    "DRY_RUN: python scripts/download_fema.py --force",
+    "DRY_RUN: python scripts/download_research.py --force",
+    "DRY_RUN: python scripts/download_sba.py --force",
+    "DRY_RUN: python scripts/download_slfrf.py --force",
+    "DRY_RUN: python scripts/download_cdbg_dr.py --force",
+    "DRY_RUN: python scripts/download_dot.py --force",
+    "DRY_RUN: python scripts/download_usda.py --force",
+    "DRY_RUN: python scripts/download_doe.py --force",
+    "DRY_RUN: python scripts/download_hud.py --force",
+    "DRY_RUN: python scripts/download_sbir.py --force",
+    "DRY_RUN: python scripts/download_epa.py --force",
+    "DRY_RUN: python scripts/download_usace_civil.py --force",
+    "DRY_RUN: python scripts/download_wioa.py --force",
+    "DRY_RUN: python scripts/auto_download.py --only usaspending --force",
+    "DRY_RUN: python scripts/auto_download.py --only usaspending --force",
+    "DRY_RUN: python scripts/auto_download.py --only usaspending --force",
+    "DRY_RUN: python scripts/auto_download.py --only usaspending --force"
+  ],
+  "r4_7_data_recovery_completed": false,
+  "r4_7_downloads_executed": false,
+  "r4_7_gate_passed": true,
+  "r4_7_phase_type": "DRY_RUN_SCAFFOLDING_ONLY",
+  "r4_7_production_inputs_staged": 0,
+  "r4_7_rows_ingested": 0,
+  "r4_7_runner_scaffolding_completed": true,
+  "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS"
+}
