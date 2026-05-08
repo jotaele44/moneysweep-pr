@@ -1,0 +1,35 @@
+{
+  "forbidden_artifact_usage": false,
+  "generated_at": "2026-05-08T15:42:34Z",
+  "inputs": {
+    "backfill_execution_plan": "data/exports/backfill_execution_plan_r4_6.csv",
+    "backfill_runner_manifest": "data/exports/backfill_runner_manifest_r4_7.csv",
+    "controlled_backfill_manifest": "data/exports/controlled_backfill_manifest_r4_8.csv",
+    "controlled_backfill_plan": "data/exports/controlled_backfill_plan_r4_8.json",
+    "source_manifest_inventory": "data/exports/source_manifest_inventory_r4_8.csv"
+  },
+  "outputs": {
+    "backfill_execution_blockers": "data/review_queue/backfill_execution_blockers_r4_8a.csv",
+    "backfill_readiness_matrix": "data/exports/backfill_readiness_matrix_r4_8a.csv",
+    "backfill_readiness_status": "data/exports/backfill_readiness_status_r4_8a.json",
+    "credentials_required": "data/review_queue/credentials_required_r4_8a.csv",
+    "manual_files_required": "data/review_queue/manual_files_required_r4_8a.csv",
+    "schema_required": "data/review_queue/schema_required_r4_8a.csv"
+  },
+  "phase_7_8_blocked": true,
+  "r4_8a_blocked_count": 0,
+  "r4_8a_downloads_executed": false,
+  "r4_8a_gate_passed": true,
+  "r4_8a_phase_type": "CONTROLLED_BACKFILL_EXECUTION_READINESS_AUDIT",
+  "r4_8a_planning_manifest_count": 21,
+  "r4_8a_production_inputs_staged": 0,
+  "r4_8a_ready_for_execute_downloads_count": 21,
+  "r4_8a_requires_credentials_count": 0,
+  "r4_8a_requires_manual_file_count": 0,
+  "r4_8a_requires_producer_script_count": 0,
+  "r4_8a_requires_schema_mapping_count": 0,
+  "r4_8a_rows_ingested": 0,
+  "r4_8a_total_sources": 21,
+  "r4_8a_validated_source_manifests_written": 0,
+  "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS"
+}
