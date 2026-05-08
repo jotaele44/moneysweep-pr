@@ -38,6 +38,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 
 from scripts.config import PROJECT_ROOT, setup_logging
+from contract_sweeper.validation.production_status import load_current_status
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -622,6 +623,9 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
     s_promesa,  j_promesa  = _section_promesa(promesa_df, fec_df, lda_df, top_n)
 
     generated_at = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+    status_payload = load_current_status(root)
+    production_status = status_payload["production_status"]
+    production_status_message = status_payload["status_message"]
     data_layers = sum([
         not entity_df.empty, not net_df.empty, not ps_df.empty,
         not delivery_df.empty, not rfp_df.empty, not bond_df.empty,
@@ -634,6 +638,8 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
     report = f"""# Puerto Rico Federal Contract Ecosystem — Investigative Report
 
 *Generated: {generated_at}*
+*Production status: {production_status}*
+*{production_status_message}*
 *Data layers populated: {data_layers}/10 — sections marked "pending" require a Mac pipeline run.*
 
 ---
@@ -711,6 +717,8 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
 
     summary = {
         "generated_at":    generated_at,
+        "production_status": production_status,
+        "production_status_message": production_status_message,
         "data_layers":     data_layers,
         "awards":          j_awards,
         "power_network":   j_network,

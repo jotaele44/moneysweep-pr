@@ -1,3 +1,6 @@
+> Production Status: NON_PRODUCTION_DIAGNOSTIC
+> Diagnostic output only — not production-valid.
+
 # Puerto Rico Federal Contract Ecosystem — Investigative Report
 
 *Generated: 2026-05-04 07:05 UTC*

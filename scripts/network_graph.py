@@ -31,6 +31,7 @@ except ImportError:
 import pandas as pd
 
 from scripts.config import MASTER_PATH, PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from contract_sweeper.validation.production_status import load_current_status
 
 MIN_OBLIGATION_DEFAULT = 0
 TOP_NODES_DEFAULT = 30
@@ -217,6 +218,7 @@ def run(root: Path = None, min_obligation: float = MIN_OBLIGATION_DEFAULT, top_n
     vendor_nodes = [n for n, d in G.nodes(data=True) if d.get("node_type") == "vendor"]
     agency_nodes = [n for n, d in G.nodes(data=True) if d.get("node_type") == "agency"]
     parent_nodes = [n for n, d in G.nodes(data=True) if d.get("node_type") == "parent_entity"]
+    status_payload = load_current_status(root)
 
     summary = {
         "total_nodes": G.number_of_nodes(),
@@ -224,6 +226,8 @@ def run(root: Path = None, min_obligation: float = MIN_OBLIGATION_DEFAULT, top_n
         "vendor_nodes": len(vendor_nodes),
         "agency_nodes": len(agency_nodes),
         "parent_entity_nodes": len(parent_nodes),
+        "production_status": status_payload["production_status"],
+        "production_status_message": status_payload["status_message"],
         "top_node_by_pagerank": top1.get("node", ""),
         "top_node_type": top1.get("node_type", ""),
         "outputs": {
