@@ -1,0 +1,39 @@
+{
+  "generated_at": "2026-05-08T16:03:05Z",
+  "inputs": {
+    "backfill_execution_plan": "data/exports/backfill_execution_plan_r4_6.csv",
+    "backfill_readiness_matrix": "data/exports/backfill_readiness_matrix_r4_8a.csv",
+    "backfill_readiness_status": "data/exports/backfill_readiness_status_r4_8a.json",
+    "backfill_runner_manifest": "data/exports/backfill_runner_manifest_r4_7.csv",
+    "controlled_backfill_manifest": "data/exports/controlled_backfill_manifest_r4_8.csv",
+    "controlled_backfill_plan": "data/exports/controlled_backfill_plan_r4_8.json"
+  },
+  "outputs": {
+    "credential_failures": "data/review_queue/credential_failures_r4_8b.csv",
+    "execution_failures": "data/review_queue/controlled_backfill_execution_failures_r4_8b.csv",
+    "execution_results": "data/exports/controlled_backfill_execution_results_r4_8b.csv",
+    "execution_status": "data/exports/controlled_backfill_execution_status_r4_8b.json",
+    "manual_fallback_required": "data/review_queue/manual_fallback_required_r4_8b.csv",
+    "no_data_sources": "data/review_queue/no_data_sources_r4_8b.csv",
+    "schema_failures": "data/review_queue/schema_failures_r4_8b.csv",
+    "validated_source_manifest_inventory": "data/exports/validated_source_manifest_inventory_r4_8b.csv"
+  },
+  "phase_7_8_blocked": true,
+  "r4_8b_attempted_sources": 21,
+  "r4_8b_credential_failures": 0,
+  "r4_8b_downloads_executed": true,
+  "r4_8b_execute_downloads_requested": true,
+  "r4_8b_failed_sources": 21,
+  "r4_8b_forbidden_artifact_usage": false,
+  "r4_8b_gate_passed": true,
+  "r4_8b_manual_fallback_required": 21,
+  "r4_8b_no_data_sources": 1,
+  "r4_8b_phase_type": "CONTROLLED_REAL_BACKFILL_EXECUTION",
+  "r4_8b_production_inputs_staged": 0,
+  "r4_8b_rows_ingested": 0,
+  "r4_8b_schema_failures": 6,
+  "r4_8b_successful_sources": 0,
+  "r4_8b_total_sources": 21,
+  "r4_8b_validated_source_manifests_written": 0,
+  "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS"
+}
