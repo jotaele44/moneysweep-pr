@@ -1,0 +1,22 @@
+priority,expected_input,dataset_label,input_group,reason,recommended_action,producer_scripts
+1,data/staging/processed/pr_contracts_master.csv,contracts,core,no recoverable source file found in allowed roots,Run normalization + dedup pipeline to produce contracts master,scripts/build_financial_flows_master.py|scripts/config.py|scripts/deduplicate_master.py|scripts/dominance_analysis.py|scripts/entity_resolution.py|scripts/link_fema_pa_to_contracts.py|scripts/link_hud_drgr_to_contracts.py|scripts/network_graph.py|scripts/sam_enrichment.py
+2,data/staging/processed/pr_grants_master.csv,grants,canonical_master,no recoverable source file found in allowed roots,Run USAspending grants ingestion,scripts/config.py|scripts/download_grants.py
+3,data/staging/processed/pr_subawards_master.csv,subawards,canonical_master,no recoverable source file found in allowed roots,Run FSRS/subawards ingestion pipeline,scripts/analyze_prime_sub.py|scripts/config.py|scripts/download_subawards.py
+4,data/staging/processed/pr_fema_pa_master.csv,fema_pa,canonical_master,no recoverable source file found in allowed roots,Run FEMA PA ingestion,scripts/analyze_project_delivery.py|scripts/config.py|scripts/download_fema.py
+5,data/staging/processed/pr_fema_hmgp_master.csv,fema_hmgp,canonical_master,no recoverable source file found in allowed roots,Run FEMA HMGP ingestion,scripts/config.py|scripts/download_fema.py
+6,data/staging/processed/pr_research_master.csv,research,canonical_master,no recoverable source file found in allowed roots,Recover or download source input for dataset 'research',scripts/config.py|scripts/download_research.py
+7,data/staging/processed/pr_sba_loans_master.csv,sba_loans,canonical_master,no recoverable source file found in allowed roots,Run SBA loans ingestion,scripts/config.py|scripts/download_sba.py
+8,data/staging/processed/pr_slfrf_master.csv,slfrf,canonical_master,no recoverable source file found in allowed roots,Recover or download source input for dataset 'slfrf',scripts/config.py|scripts/download_slfrf.py
+9,data/staging/processed/pr_cdbg_dr_master.csv,cdbg_dr,canonical_master,no recoverable source file found in allowed roots,Run HUD/CDBG-DR ingestion,scripts/config.py|scripts/download_cdbg_dr.py
+10,data/staging/processed/pr_dot_master.csv,dot,canonical_master,no recoverable source file found in allowed roots,Run DOT ingestion,scripts/download_dot.py
+11,data/staging/processed/pr_usda_master.csv,usda,canonical_master,no recoverable source file found in allowed roots,Run USDA ingestion,scripts/download_usda.py
+12,data/staging/processed/pr_doe_master.csv,doe,canonical_master,no recoverable source file found in allowed roots,Run DOE ingestion,scripts/download_doe.py
+13,data/staging/processed/pr_hud_master.csv,hud,canonical_master,no recoverable source file found in allowed roots,Run HUD ingestion,scripts/download_hud.py
+14,data/staging/processed/pr_sbir_master.csv,sbir,canonical_master,no recoverable source file found in allowed roots,Run SBIR ingestion,scripts/download_sbir.py
+15,data/staging/processed/pr_epa_master.csv,epa,canonical_master,no recoverable source file found in allowed roots,Run EPA ingestion,scripts/download_epa.py
+16,data/staging/processed/pr_usace_civil_master.csv,usace_civil,canonical_master,no recoverable source file found in allowed roots,Run USACE ingestion,scripts/download_usace_civil.py
+17,data/staging/processed/pr_wioa_grants.csv,wioa,canonical_master,no recoverable source file found in allowed roots,Run WIOA ingestion,scripts/download_wioa.py
+18,data/staging/expansion/expansion_idv_indirect_pr.csv,contracts,expansion,no recoverable source file found in allowed roots,Run USASpending expansion extraction (IDV indirect PR),scripts/config.py
+19,data/staging/expansion/expansion_dod_upr_2001_2015.csv,contracts,expansion,no recoverable source file found in allowed roots,Run USASpending expansion extraction (DoD 2001-2015),scripts/config.py
+20,data/staging/expansion/expansion_dod_upr_2016_2025.csv,contracts,expansion,no recoverable source file found in allowed roots,Run USASpending expansion extraction (DoD 2016-2025),scripts/config.py
+21,data/staging/expansion/expansion_reconstruction_2017_2025.csv,contracts,expansion,no recoverable source file found in allowed roots,Run USASpending expansion extraction (reconstruction),scripts/config.py

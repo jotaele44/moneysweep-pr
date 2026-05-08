@@ -1,0 +1,28 @@
+{
+  "existing_input_count": 0,
+  "expected_input_count": 21,
+  "generated_at": "2026-05-08T14:25:20Z",
+  "manual_queue_count": 21,
+  "outputs": {
+    "manual_source_download_queue": "data/review_queue/manual_source_download_queue.csv",
+    "source_input_recovery_audit": "data/exports/source_input_recovery_audit.csv",
+    "source_input_recovery_status": "data/exports/source_input_recovery_status.json"
+  },
+  "phase_7_8_block_reason": "Phase 7/8 blocked during R4.5 source input recovery and canonical staging; await R5 and R6 validation gates",
+  "phase_7_8_blocked": true,
+  "r4_5_gate_passed": false,
+  "recovered_input_count": 0,
+  "rejected_artifact_candidate_count": 10,
+  "rejected_artifact_candidates": [
+    "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByAccount.csv",
+    "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByEntity.csv",
+    "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByYear.csv",
+    "data/staging/processed/dominance_summary.json",
+    "data/staging/processed/graph/entity_edges.csv",
+    "data/staging/processed/graph/network_summary.json",
+    "data/staging/processed/graph/top_nodes.csv",
+    "data/staging/processed/pr_all_awards_summary.json",
+    "data/staging/processed/pr_power_network_summary.json",
+    "data/staging/processed/pr_prime_sub_summary.json"
+  ]
+}
