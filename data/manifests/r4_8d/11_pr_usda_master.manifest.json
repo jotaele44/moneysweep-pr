@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-05-08T20:48:09Z",
+  "known_gaps": "",
+  "manifest_type": "validated_source_manifest",
+  "producer_script": "scripts/download_usda.py",
+  "row_count": 687,
+  "schema_version": "r4_8d_schema_v1",
+  "sha256": "e8b54d038af17bd9e440b22dc371411d38a46aee8137d7c82bd263e9bcca1621",
+  "source_file": "data/staging/processed/pr_usda_master.csv",
+  "source_system": "federal_sectoral_usda",
+  "target_output_path": "data/staging/processed/pr_usda_master.csv",
+  "validation_status": "validated"
+}

@@ -311,6 +311,7 @@ def _run(root=None, force=False, fy_start=None):
         "master_rows": master_rows, "master_path": str(master_path),
         "errors": all_errors, "windows": window_stats,
         "rows": master_rows,
+        "status": "OK" if int(master_rows) > 0 else "EMPTY",
     }
     logger.info("=" * 60)
     logger.info("USACE CIVIL DOWNLOAD SUMMARY")
@@ -327,10 +328,37 @@ def main():
     parser = argparse.ArgumentParser(description="Download USACE civil works data for Puerto Rico")
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--fy-start", type=int, metavar="YEAR")
+    parser.add_argument(
+        "--allow-empty-success",
+        action="store_true",
+        help="Exit 0 even when endpoint errors are present; intended for controlled retries.",
+    )
     args = parser.parse_args()
     summary = _run(force=args.force, fy_start=args.fy_start)
+    status = str(summary.get("status", "EMPTY"))
+    rows_ingested = int(summary.get("master_rows", 0) or 0)
+    has_errors = bool(summary.get("errors"))
+    retry_allowed_empty_success = bool(
+        args.allow_empty_success and has_errors and status == "EMPTY" and rows_ingested == 0
+    )
+    validation_status = (
+        "OK"
+        if status == "OK" and not has_errors
+        else ("EMPTY_OR_NONFATAL_RETRY" if retry_allowed_empty_success else status)
+    )
+
     print(f"\nUSACE civil download complete: {summary['master_rows']:,} master rows")
-    return 1 if summary["errors"] else 0
+    print(f"  Status:      {status}")
+    print(f"  retry_allowed_empty_success={str(retry_allowed_empty_success).lower()}")
+    print(f"  rows_ingested={rows_ingested}")
+    print("  production_inputs_staged=0")
+    print(f"  validation_status={validation_status}")
+
+    if has_errors and not retry_allowed_empty_success:
+        return 1
+    if status == "EMPTY" and not retry_allowed_empty_success:
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
