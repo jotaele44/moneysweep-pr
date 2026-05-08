@@ -1,0 +1,19 @@
+entity_key,canonical_name,total_obligated,parent_uei,recipient_uei,parent_uei_missing,recipient_uei_missing,high_value_overcollapse_suspect,collapse_reason
+HOSPITAL DAMAS,Hospital Damas Inc,4554283750.25,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+MUNICIPALITY OF SAN JUAN,Municipality of San Juan,4453055891.36,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+CROWLEY MARITIME,Crowley Maritime Corp,3986128201.12,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+CARIBBEAN DATA SERVICES,Caribbean Data Services Inc,3895395595.4,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+PUERTO RICO AQUEDUCT AND SEWER AUTHORITY,Puerto Rico Aqueduct And Sewer Authority,3772063789.35,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+MUNICIPIO DE PONCE,Municipio de Ponce,3732887866.51,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+FIRST BANCORP PUERTO RICO,First Bancorp Puerto Rico,3614407444.71,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+MICROSOFT PUERTO RICO,Microsoft Puerto Rico Inc,3544492914.84,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+INTERAMERICAN UNIVERSITY OF PUERTO RICO,Interamerican University of Puerto Rico Inc,3489917116.49,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+UNIVERSITY OF PUERTO RICO,University of Puerto Rico,3439057682.78,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+POPULAR,Popular Inc,3389550632.83,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+CENTRO MEDICO DEL TURABO,Centro Medico Del Turabo Inc,3356594644.11,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+CORPORACION DEL FONDO DEL SEGURO DEL ESTADO,Corporacion Del Fondo Del Seguro Del Estado,3263983340.2,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+HEWLETT PACKARD PUERTO RICO,Hewlett Packard Puerto Rico LLC,3256235132.82,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+TRIPLE S MANAGEMENT,Triple-S Management Corp,3245897799.17,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+PUERTO RICO INDUSTRIAL DEVELOPMENT,Puerto Rico Industrial Development Company,3085428489.94,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+PUERTO RICO ELECTRIC POWER AUTHORITY,Puerto Rico Electric Power Authority,2913161591.99,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage
+MUNICIPALITY OF BAYAMON,Municipality of Bayamon,2873756379.24,,,True,True,True,high value entity lacks parent UEI/recipient UEI lineage

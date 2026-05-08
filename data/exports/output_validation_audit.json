@@ -1,0 +1,320 @@
+{
+  "artifact_generation_delta_hours": 96.07,
+  "artifact_lineage_chain": [
+    {
+      "artifact_path": "data/reports/pr_investigative_report.md",
+      "embedded_absolute_paths": "",
+      "exists": true,
+      "generated_at": "2026-05-04 07:05 UTC",
+      "lineage_issue": "",
+      "mtime_utc": "2026-05-08T07:00:40Z",
+      "row_count": 0,
+      "sha256": "99ef79ae24a9adf154cf2eae23d5e22daad7c6a09d23881dd622c0785f5c162d",
+      "size_bytes": 7206
+    },
+    {
+      "artifact_path": "data/reports/pr_report_summary.json",
+      "embedded_absolute_paths": "",
+      "exists": true,
+      "generated_at": "2026-05-04 07:05 UTC",
+      "lineage_issue": "summary_present",
+      "mtime_utc": "2026-05-08T07:00:40Z",
+      "row_count": 0,
+      "sha256": "ffe8be4854ae6a8a33b46b24225a3fe44cea25f3a109358c867dd445f23460c1",
+      "size_bytes": 4440
+    },
+    {
+      "artifact_path": "data/staging/processed/pr_power_network_summary.json",
+      "embedded_absolute_paths": "",
+      "exists": true,
+      "generated_at": "",
+      "lineage_issue": "summary_present",
+      "mtime_utc": "2026-05-08T07:00:40Z",
+      "row_count": 0,
+      "sha256": "a02c52913139abe22e950d5c28d137b01ea92c9db21a8b5ba12d8ef137c09bc5",
+      "size_bytes": 4685
+    },
+    {
+      "artifact_path": "data/staging/processed/pr_prime_sub_summary.json",
+      "embedded_absolute_paths": "",
+      "exists": true,
+      "generated_at": "",
+      "lineage_issue": "summary_present",
+      "mtime_utc": "2026-05-08T07:00:40Z",
+      "row_count": 0,
+      "sha256": "8126d2f9fd00352a88c9d94ab7e5f6ba3e69911714eb595483ce68ec0ac40503",
+      "size_bytes": 7508
+    },
+    {
+      "artifact_path": "data/staging/processed/graph/network_summary.json",
+      "embedded_absolute_paths": "/home/user/Contract-Sweeper/data/staging/processed/graph/entity_edges.csv|/home/user/Contract-Sweeper/data/staging/processed/graph/network.graphml|/home/user/Contract-Sweeper/data/staging/processed/graph/network_summary.json|/home/user/Contract-Sweeper/data/staging/processed/graph/top_nodes.csv",
+      "exists": true,
+      "generated_at": "",
+      "lineage_issue": "embedded_path_points_to_different_workspace",
+      "mtime_utc": "2026-05-08T07:00:40Z",
+      "row_count": 0,
+      "sha256": "1fa6e0be96abfe9fd50088f8748c3915bc0a60e9ae090e28cf0b483f4077973d",
+      "size_bytes": 596
+    },
+    {
+      "artifact_path": "data/staging/processed/dominance_summary.json",
+      "embedded_absolute_paths": "/home/user/Contract-Sweeper/data/staging/processed/dominance_geo_concentration.csv|/home/user/Contract-Sweeper/data/staging/processed/dominance_hhi_per_agency.csv|/home/user/Contract-Sweeper/data/staging/processed/dominance_single_source.csv|/home/user/Contract-Sweeper/data/staging/processed/dominance_top_vendors_consolidated.csv|/home/user/Contract-Sweeper/data/staging/processed/dominance_top_vendors_raw.csv|/home/user/Contract-Sweeper/data/staging/processed/dominance_yoy_trends.csv",
+      "exists": true,
+      "generated_at": "",
+      "lineage_issue": "embedded_path_points_to_different_workspace",
+      "mtime_utc": "2026-05-08T07:00:40Z",
+      "row_count": 0,
+      "sha256": "da27b63062e83087c19f11feb27f61625645514fd2f5ae8fe5824daf0d736a94",
+      "size_bytes": 1205
+    },
+    {
+      "artifact_path": "data/staging/processed/pr_all_awards_summary.json",
+      "embedded_absolute_paths": "/home/user/Contract-Sweeper/data/staging/processed/pr_all_awards_master.csv",
+      "exists": true,
+      "generated_at": "",
+      "lineage_issue": "embedded_path_points_to_different_workspace",
+      "mtime_utc": "2026-05-08T07:00:40Z",
+      "row_count": 0,
+      "sha256": "d85b4edbb6e316366765f605f48468a5103b67048b9382ba494949c2b239fb1d",
+      "size_bytes": 1608
+    },
+    {
+      "artifact_path": "data/staging/processed/pr_power_network.csv",
+      "embedded_absolute_paths": "",
+      "exists": false,
+      "generated_at": "",
+      "lineage_issue": "missing_artifact",
+      "mtime_utc": "",
+      "row_count": 0,
+      "sha256": "",
+      "size_bytes": 0
+    },
+    {
+      "artifact_path": "data/staging/processed/pr_prime_sub_relationships.csv",
+      "embedded_absolute_paths": "",
+      "exists": false,
+      "generated_at": "",
+      "lineage_issue": "missing_artifact",
+      "mtime_utc": "",
+      "row_count": 0,
+      "sha256": "",
+      "size_bytes": 0
+    },
+    {
+      "artifact_path": "data/staging/processed/entity_master.csv",
+      "embedded_absolute_paths": "",
+      "exists": false,
+      "generated_at": "",
+      "lineage_issue": "missing_artifact",
+      "mtime_utc": "",
+      "row_count": 0,
+      "sha256": "",
+      "size_bytes": 0
+    },
+    {
+      "artifact_path": "data/staging/processed/pr_bond_flow.csv",
+      "embedded_absolute_paths": "",
+      "exists": false,
+      "generated_at": "",
+      "lineage_issue": "missing_artifact",
+      "mtime_utc": "",
+      "row_count": 0,
+      "sha256": "",
+      "size_bytes": 0
+    },
+    {
+      "artifact_path": "data/staging/processed/pr_emma_bonds.csv",
+      "embedded_absolute_paths": "",
+      "exists": false,
+      "generated_at": "",
+      "lineage_issue": "missing_artifact",
+      "mtime_utc": "",
+      "row_count": 0,
+      "sha256": "",
+      "size_bytes": 0
+    },
+    {
+      "artifact_path": "data/staging/processed/pr_emma_underwriters.csv",
+      "embedded_absolute_paths": "",
+      "exists": false,
+      "generated_at": "",
+      "lineage_issue": "missing_artifact",
+      "mtime_utc": "",
+      "row_count": 0,
+      "sha256": "",
+      "size_bytes": 0
+    },
+    {
+      "artifact_path": "data/staging/processed/graph/entity_edges.csv",
+      "embedded_absolute_paths": "",
+      "exists": true,
+      "generated_at": "",
+      "lineage_issue": "",
+      "mtime_utc": "2026-05-08T07:00:40Z",
+      "row_count": 144,
+      "sha256": "126e92c41d21e408b91b69963981837408632be52954f9e64a4414d24dc8532f",
+      "size_bytes": 13312
+    },
+    {
+      "artifact_path": "data/staging/processed/graph/top_nodes.csv",
+      "embedded_absolute_paths": "",
+      "exists": true,
+      "generated_at": "",
+      "lineage_issue": "",
+      "mtime_utc": "2026-05-08T07:00:40Z",
+      "row_count": 26,
+      "sha256": "c2cef94e61b262a940324e8bd6afcbd1dbd8cfed61db1d1beee53755e61b157a",
+      "size_bytes": 1493
+    },
+    {
+      "artifact_path": "data/staging/processed/graph/network.graphml",
+      "embedded_absolute_paths": "",
+      "exists": true,
+      "generated_at": "",
+      "lineage_issue": "",
+      "mtime_utc": "2026-05-08T07:00:40Z",
+      "row_count": 0,
+      "sha256": "881ad881ed18d60da14221f288b719ee498513930fa87a24aefb15aef0f3b28a",
+      "size_bytes": 39521
+    }
+  ],
+  "audit_generated_at": "2026-05-08T07:09:11Z",
+  "blocker_count": 8,
+  "blockers": [
+    {
+      "metric": "unique_normalized_entity_count",
+      "observed_value": 18,
+      "recommended_action": "disable graph/risk outputs and rebuild the entity universe from source records",
+      "required_gate": ">= 100",
+      "severity": "BLOCKER"
+    },
+    {
+      "metric": "entity_resolution_rate",
+      "observed_value": 0.0,
+      "recommended_action": "run deterministic entity resolution with review queue before downstream graphing",
+      "required_gate": ">= 0.95",
+      "severity": "BLOCKER"
+    },
+    {
+      "metric": "parent_uei_coverage",
+      "observed_value": 0.0,
+      "recommended_action": "fix SAM/UEI enrichment and parent collapse before graph rebuild",
+      "required_gate": ">= 0.90",
+      "severity": "BLOCKER"
+    },
+    {
+      "metric": "fixture_or_synthetic_data_detected",
+      "observed_value": true,
+      "recommended_action": "remove fixture/demo fallback data from production pipeline paths",
+      "required_gate": "False",
+      "severity": "BLOCKER"
+    },
+    {
+      "metric": "high_value_overcollapse_suspect_count",
+      "observed_value": 18,
+      "recommended_action": "review high-value entities missing UEI lineage",
+      "required_gate": "0",
+      "severity": "BLOCKER"
+    },
+    {
+      "metric": "report_layers_populated",
+      "observed_value": 3,
+      "recommended_action": "populate at least 8 report layers before production export",
+      "required_gate": ">= 8",
+      "severity": "BLOCKER"
+    },
+    {
+      "metric": "bond_actor_count",
+      "observed_value": 0,
+      "recommended_action": "ingest and link EMMA/MSRB/COFINA/PROMESA bond actors",
+      "required_gate": "> 0",
+      "severity": "BLOCKER"
+    },
+    {
+      "metric": "self_pair_ratio",
+      "observed_value": 0.1,
+      "recommended_action": "fix prime-sub join logic and block self-pair edges except verified legal self-awards",
+      "required_gate": "< 0.05",
+      "severity": "BLOCKER"
+    },
+    {
+      "metric": "source_refresh_timestamp_range",
+      "observed_value": "2026-05-08T07:00:39Z to 2026-05-08T07:08:35Z",
+      "recommended_action": "compare source mtimes and manifests against the run timestamp before graph rebuild",
+      "required_gate": "source freshness must be traceable to current ingest run",
+      "severity": "INFO"
+    },
+    {
+      "metric": "dense_matrix_score",
+      "observed_value": 0.8272,
+      "recommended_action": "inspect FSRS ingestion and prevent synthetic dense edge expansion",
+      "required_gate": "manual review when prime-sub matrix is implausibly dense",
+      "severity": "WARN"
+    }
+  ],
+  "cache_hit_ratio": 0.7,
+  "downstream_recompute_count": 0,
+  "fixture_or_synthetic_data_detected": true,
+  "fixture_or_synthetic_reasons": [
+    "report unique_entities is exactly 18",
+    "power network total_ranked is exactly 18",
+    "prime and sub universes are both exactly 18",
+    "prime-sub pair matrix is implausibly dense",
+    "prime_award_ids use generated PRIME-SUB-* pattern",
+    "fixture/fallback/seed code tokens found in scripts: audit_artifact_entity_universe.py, auto_download.py, build_unified_master.py, config.py, download_aafaf.py, download_act60.py, download_active_contractors.py, download_cabilderos.py, download_cdbg_dr.py, download_chip.py"
+  ],
+  "graph_build_allowed": false,
+  "observed_summaries": {
+    "bond_actor_count": 0,
+    "dominance_unique_vendors": 18,
+    "graph_parent_entity_nodes": 0,
+    "graph_vendor_nodes": 18,
+    "power_total_entities": 18,
+    "report_generated_at": "2026-05-04 07:05 UTC",
+    "report_layers_populated": 3
+  },
+  "prime_sub_shape": {
+    "dense_matrix_score": 0.8272,
+    "edge_reuse_ratio": 7.4444,
+    "reciprocal_pair_count": 2,
+    "reciprocal_pair_ratio": 0.1,
+    "self_pair_count": 2,
+    "self_pair_ratio": 0.1,
+    "summary_pair_count": 268,
+    "unique_primes": 18,
+    "unique_subs": 18,
+    "visible_pair_count": 20
+  },
+  "production_gate": {
+    "bond_actor_count": 0,
+    "entity_resolution_rate": 0.0,
+    "fixture_or_synthetic_data_detected": true,
+    "graph_node_coverage_pct": 1.0,
+    "high_value_overcollapse_suspect_count": 18,
+    "parent_uei_coverage": 0.0,
+    "report_layers_populated": 3,
+    "self_pair_ratio": 0.1,
+    "unique_normalized_entity_count": 18
+  },
+  "production_gate_fields": [
+    "unique_normalized_entity_count",
+    "entity_resolution_rate",
+    "parent_uei_coverage",
+    "graph_node_coverage_pct",
+    "fixture_or_synthetic_data_detected",
+    "high_value_overcollapse_suspect_count",
+    "report_layers_populated",
+    "bond_actor_count",
+    "self_pair_ratio"
+  ],
+  "report_regeneration_status": "cached_without_force",
+  "required_action": "skip graph rebuild and skip risk engine",
+  "risk_engine_allowed": false,
+  "source_refresh_timestamp_range": {
+    "newest_source_mtime_utc": "2026-05-08T07:08:35Z",
+    "oldest_source_mtime_utc": "2026-05-08T07:00:39Z",
+    "source_file_count": 19
+  },
+  "status": "NON_PRODUCTION_DIAGNOSTIC",
+  "top_n_truncation_suspected": true
+}

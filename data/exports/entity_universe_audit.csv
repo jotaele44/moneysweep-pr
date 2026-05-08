@@ -1,0 +1,19 @@
+entity_key,canonical_name,seen_in_awards,seen_in_power_network,award_rank,power_rank,total_obligated,influence_score,source_presence,parent_uei,recipient_uei,audit_note
+HOSPITAL DAMAS,Hospital Damas Inc,True,True,1,1,4554283750.25,68.0,3,,,visible in report summary top_entities
+MUNICIPALITY OF SAN JUAN,Municipality of San Juan,True,True,2,2,4453055891.36,64.57,3,,,visible in report summary top_entities
+CROWLEY MARITIME,Crowley Maritime Corp,True,True,3,3,3986128201.12,55.8,3,,,visible in report summary top_entities
+CARIBBEAN DATA SERVICES,Caribbean Data Services Inc,True,True,4,4,3895395595.4,52.78,3,,,visible in report summary top_entities
+PUERTO RICO AQUEDUCT AND SEWER AUTHORITY,Puerto Rico Aqueduct And Sewer Authority,True,True,5,5,3772063789.35,52.01,3,,,visible in report summary top_entities
+MUNICIPIO DE PONCE,Municipio de Ponce,True,True,6,15,3732887866.51,20.89,1,,,visible in report summary top_entities
+FIRST BANCORP PUERTO RICO,First Bancorp Puerto Rico,True,True,7,8,3614407444.71,43.68,3,,,visible in report summary top_entities
+MICROSOFT PUERTO RICO,Microsoft Puerto Rico Inc,True,True,8,6,3544492914.84,46.0,3,,,visible in report summary top_entities
+INTERAMERICAN UNIVERSITY OF PUERTO RICO,Interamerican University of Puerto Rico Inc,True,True,9,7,3489917116.49,43.72,3,,,visible in report summary top_entities
+UNIVERSITY OF PUERTO RICO,University of Puerto Rico,True,True,10,10,3439057682.78,38.98,3,,,visible in report summary top_entities
+POPULAR,Popular Inc,False,True,,11,3389550632.83,38.2,3,,,visible in power summary only
+CENTRO MEDICO DEL TURABO,Centro Medico Del Turabo Inc,False,True,,9,3356594644.11,39.33,3,,,visible in power summary only
+CORPORACION DEL FONDO DEL SEGURO DEL ESTADO,Corporacion Del Fondo Del Seguro Del Estado,False,True,,16,3263983340.2,11.13,1,,,visible in power summary only
+HEWLETT PACKARD PUERTO RICO,Hewlett Packard Puerto Rico LLC,False,True,,13,3256235132.82,30.92,3,,,visible in power summary only
+TRIPLE S MANAGEMENT,Triple-S Management Corp,False,True,,12,3245897799.17,35.46,3,,,visible in power summary only
+PUERTO RICO INDUSTRIAL DEVELOPMENT,Puerto Rico Industrial Development Company,False,True,,17,3085428489.94,7.41,1,,,visible in power summary only
+PUERTO RICO ELECTRIC POWER AUTHORITY,Puerto Rico Electric Power Authority,False,True,,14,2913161591.99,30.76,3,,,visible in power summary only
+MUNICIPALITY OF BAYAMON,Municipality of Bayamon,False,True,,18,2873756379.24,3.0,1,,,visible in power summary only

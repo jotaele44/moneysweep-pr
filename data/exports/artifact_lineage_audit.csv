@@ -1,0 +1,17 @@
+artifact_path,exists,size_bytes,mtime_utc,sha256,generated_at,row_count,embedded_absolute_paths,lineage_issue
+data/reports/pr_investigative_report.md,True,7206,2026-05-08T07:00:40Z,99ef79ae24a9adf154cf2eae23d5e22daad7c6a09d23881dd622c0785f5c162d,2026-05-04 07:05 UTC,0,,
+data/reports/pr_report_summary.json,True,4440,2026-05-08T07:00:40Z,ffe8be4854ae6a8a33b46b24225a3fe44cea25f3a109358c867dd445f23460c1,2026-05-04 07:05 UTC,0,,summary_present
+data/staging/processed/pr_power_network_summary.json,True,4685,2026-05-08T07:00:40Z,a02c52913139abe22e950d5c28d137b01ea92c9db21a8b5ba12d8ef137c09bc5,,0,,summary_present
+data/staging/processed/pr_prime_sub_summary.json,True,7508,2026-05-08T07:00:40Z,8126d2f9fd00352a88c9d94ab7e5f6ba3e69911714eb595483ce68ec0ac40503,,0,,summary_present
+data/staging/processed/graph/network_summary.json,True,596,2026-05-08T07:00:40Z,1fa6e0be96abfe9fd50088f8748c3915bc0a60e9ae090e28cf0b483f4077973d,,0,/home/user/Contract-Sweeper/data/staging/processed/graph/entity_edges.csv|/home/user/Contract-Sweeper/data/staging/processed/graph/network.graphml|/home/user/Contract-Sweeper/data/staging/processed/graph/network_summary.json|/home/user/Contract-Sweeper/data/staging/processed/graph/top_nodes.csv,embedded_path_points_to_different_workspace
+data/staging/processed/dominance_summary.json,True,1205,2026-05-08T07:00:40Z,da27b63062e83087c19f11feb27f61625645514fd2f5ae8fe5824daf0d736a94,,0,/home/user/Contract-Sweeper/data/staging/processed/dominance_geo_concentration.csv|/home/user/Contract-Sweeper/data/staging/processed/dominance_hhi_per_agency.csv|/home/user/Contract-Sweeper/data/staging/processed/dominance_single_source.csv|/home/user/Contract-Sweeper/data/staging/processed/dominance_top_vendors_consolidated.csv|/home/user/Contract-Sweeper/data/staging/processed/dominance_top_vendors_raw.csv|/home/user/Contract-Sweeper/data/staging/processed/dominance_yoy_trends.csv,embedded_path_points_to_different_workspace
+data/staging/processed/pr_all_awards_summary.json,True,1608,2026-05-08T07:00:40Z,d85b4edbb6e316366765f605f48468a5103b67048b9382ba494949c2b239fb1d,,0,/home/user/Contract-Sweeper/data/staging/processed/pr_all_awards_master.csv,embedded_path_points_to_different_workspace
+data/staging/processed/pr_power_network.csv,False,0,,,,0,,missing_artifact
+data/staging/processed/pr_prime_sub_relationships.csv,False,0,,,,0,,missing_artifact
+data/staging/processed/entity_master.csv,False,0,,,,0,,missing_artifact
+data/staging/processed/pr_bond_flow.csv,False,0,,,,0,,missing_artifact
+data/staging/processed/pr_emma_bonds.csv,False,0,,,,0,,missing_artifact
+data/staging/processed/pr_emma_underwriters.csv,False,0,,,,0,,missing_artifact
+data/staging/processed/graph/entity_edges.csv,True,13312,2026-05-08T07:00:40Z,126e92c41d21e408b91b69963981837408632be52954f9e64a4414d24dc8532f,,144,,
+data/staging/processed/graph/top_nodes.csv,True,1493,2026-05-08T07:00:40Z,c2cef94e61b262a940324e8bd6afcbd1dbd8cfed61db1d1beee53755e61b157a,,26,,
+data/staging/processed/graph/network.graphml,True,39521,2026-05-08T07:00:40Z,881ad881ed18d60da14221f288b719ee498513930fa87a24aefb15aef0f3b28a,,0,,

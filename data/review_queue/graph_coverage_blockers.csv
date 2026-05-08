@@ -1,0 +1,11 @@
+metric,observed_value,required_gate,severity,recommended_action
+unique_normalized_entity_count,18,>= 100,BLOCKER,disable graph/risk outputs and rebuild the entity universe from source records
+entity_resolution_rate,0.0,>= 0.95,BLOCKER,run deterministic entity resolution with review queue before downstream graphing
+parent_uei_coverage,0.0,>= 0.90,BLOCKER,fix SAM/UEI enrichment and parent collapse before graph rebuild
+fixture_or_synthetic_data_detected,True,False,BLOCKER,remove fixture/demo fallback data from production pipeline paths
+high_value_overcollapse_suspect_count,18,0,BLOCKER,review high-value entities missing UEI lineage
+report_layers_populated,3,>= 8,BLOCKER,populate at least 8 report layers before production export
+bond_actor_count,0,> 0,BLOCKER,ingest and link EMMA/MSRB/COFINA/PROMESA bond actors
+self_pair_ratio,0.1,< 0.05,BLOCKER,fix prime-sub join logic and block self-pair edges except verified legal self-awards
+source_refresh_timestamp_range,2026-05-08T07:00:39Z to 2026-05-08T07:08:35Z,source freshness must be traceable to current ingest run,INFO,compare source mtimes and manifests against the run timestamp before graph rebuild
+dense_matrix_score,0.8272,manual review when prime-sub matrix is implausibly dense,WARN,inspect FSRS ingestion and prevent synthetic dense edge expansion
