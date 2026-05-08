@@ -1,0 +1,22 @@
+source_system,years_expected,years_present,year_coverage_pct,rows_total,rows_by_year,field_completeness_pct,pagination_complete,capped_result_detected,fixture_detected,download_timestamp,source_url_or_endpoint,cache_source,backfill_required
+usaspending_awards,2000-2025,,0.0,0,,0.0,True,False,False,,https://api.usaspending.gov/api/v2/search/spending_by_award/,missing_source_files,True
+sam_entity_extract,2000-2025,,0.0,0,,0.0,True,True,False,,https://api.sam.gov/entity-information/v2/entities,missing_source_files,True
+fsrs_subawards,2000-2025,,0.0,0,,0.0,True,False,False,,https://api.usaspending.gov/api/v2/search/spending_by_award/,missing_source_files,True
+fema_pa_hmgp,2000-2025,,0.0,0,,0.0,True,False,False,,https://www.fema.gov/api/open/v2/,missing_source_files,True
+hud_cdbg,2000-2025,,0.0,0,,0.0,True,False,False,,https://api.usaspending.gov/api/v2/search/spending_by_award/,missing_source_files,True
+cor3,2000-2025,,0.0,0,,0.0,True,False,False,,https://recovery.pr.gov,missing_source_files,True
+prasa_aaa,2000-2025,,0.0,0,,0.0,True,False,False,,https://acueductos.pr.gov/compras/api/contratos,missing_source_files,True
+prepa_luma_genera,2000-2025,,0.0,0,,0.0,True,False,False,,https://oversightboard.pr.gov/prepa/,missing_source_files,True
+lda,2000-2025,,0.0,0,,0.0,True,False,False,,https://lda.senate.gov/api/auth/register/,missing_source_files,True
+pr_cabilderos,2000-2025,,0.0,0,,0.0,True,False,False,,https://registrodecabilderos.pr.gov/api/cabilderos,missing_source_files,True
+emma_msrb_bonds,2000-2025,,0.0,0,,0.0,True,True,False,,https://emma.msrb.org,missing_source_files,True
+fdic_banks,2000-2025,,0.0,0,,0.0,True,True,False,,https://banks.data.fdic.gov/api,missing_source_files,True
+cms_medicare,2000-2025,,0.0,0,,0.0,True,True,False,,https://openpaymentsdata.cms.gov/api/1,missing_source_files,True
+fec,2000-2025,,0.0,0,,0.0,True,False,True,,https://api.data.gov/signup/,missing_source_files,True
+municipal_contracts,2000-2025,,0.0,0,,0.0,True,False,False,,https://api.usaspending.gov/api/v2/recipient/state/awards/,missing_source_files,True
+ogpe_permits,2000-2025,,0.0,0,,0.0,True,False,False,,https://p3.pr.gov,missing_source_files,True
+act60_lihtc,2000-2025,,0.0,0,,0.0,True,False,False,,https://data.pr.gov/resource/fmnn-uqb7.json,missing_source_files,True
+promesa_creditors,2000-2025,,0.0,0,,0.0,True,False,False,,https://restructuring.primeclerk.com/puertorico,missing_source_files,True
+sf133,2000-2025,,0.0,0,,0.0,True,False,False,,https://api.usaspending.gov/api/v2/federal_accounts/,missing_source_files,True
+ofac,2000-2025,,0.0,0,,0.0,False,True,False,,https://www.treasury.gov/ofac/downloads/sdn.xml,missing_source_files,True
+master_builder.build_unified_master,n/a,n/a,0.0,0,n/a,0.0,True,False,True,,local builder,0/21 declared inputs present,True
