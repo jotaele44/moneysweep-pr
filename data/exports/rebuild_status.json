@@ -57,7 +57,7 @@
     "suspect_entity_collapses": "data/review_queue/suspect_entity_collapses.csv"
   },
   "r3_gate_passed": false,
-  "r3_generated_at": "2026-05-08T12:35:12Z",
+  "r3_generated_at": "2026-05-08T12:36:17Z",
   "r3_outputs": {
     "source_backfill_queue": "data/review_queue/source_backfill_queue.csv",
     "source_coverage_audit": "data/exports/source_coverage_audit.csv",
