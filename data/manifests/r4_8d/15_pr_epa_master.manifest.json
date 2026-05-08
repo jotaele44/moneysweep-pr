@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-05-08T20:18:55Z",
+  "known_gaps": "",
+  "manifest_type": "validated_source_manifest",
+  "producer_script": "scripts/download_epa.py",
+  "row_count": 631,
+  "schema_version": "r4_8d_schema_v1",
+  "sha256": "810c1b2b8bb4b982a671c551d21112d266d4cb3ce6590d6f16a1f37927a4f048",
+  "source_file": "data/staging/processed/pr_epa_master.csv",
+  "source_system": "federal_sectoral_epa",
+  "target_output_path": "data/staging/processed/pr_epa_master.csv",
+  "validation_status": "validated"
+}

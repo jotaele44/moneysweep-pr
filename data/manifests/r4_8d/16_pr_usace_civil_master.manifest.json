@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-05-08T20:19:01Z",
+  "known_gaps": "",
+  "manifest_type": "validated_source_manifest",
+  "producer_script": "scripts/download_usace_civil.py",
+  "row_count": 3,
+  "schema_version": "r4_8d_schema_v1",
+  "sha256": "067d9cee3bacf3f430282f56aa7f5704477307af91fd21d28d0c76907b39264d",
+  "source_file": "data/staging/processed/pr_usace_civil_master.csv",
+  "source_system": "federal_sectoral_usace",
+  "target_output_path": "data/staging/processed/pr_usace_civil_master.csv",
+  "validation_status": "validated"
+}
