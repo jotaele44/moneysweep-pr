@@ -45,7 +45,7 @@
   "missing_manifest_count": 42,
   "missing_manifest_detected": true,
   "parent_uei_coverage": 0.0,
-  "phase_7_8_block_reason": "Phase 7/8 blocked during R4.5 source input recovery and canonical staging; await R5 and R6 validation gates",
+  "phase_7_8_block_reason": "R4.6 backfill planning active; gates for R5/R6 still required before Phase 7/8",
   "phase_7_8_blocked": true,
   "r1_gate_passed": false,
   "r2_gate_passed": false,
@@ -77,6 +77,14 @@
   },
   "r4_5_recovered_input_count": 0,
   "r4_5_rejected_artifact_candidate_count": 10,
+  "r4_6_gate_passed": true,
+  "r4_6_generated_at": "2026-05-08T14:39:19Z",
+  "r4_6_outputs": {
+    "backfill_plan_csv": "data/exports/backfill_execution_plan_r4_6.csv",
+    "backfill_plan_md": "data/exports/backfill_execution_plan_r4_6.md"
+  },
+  "r4_6_plan_row_count": 21,
+  "r4_6_row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS",
   "r4_forbidden_candidate_count": 4,
   "r4_gate_passed": false,
   "r4_generated_at": "2026-05-08T12:54:17Z",
