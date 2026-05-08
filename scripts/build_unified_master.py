@@ -45,7 +45,22 @@ CANONICAL_COLUMNS = [
     "source_file",
     "source_dataset",
     "award_category",
+    "source_system",
+    "source_record_id",
+    "source_lineage_path",
+    "source_lineage_mode",
 ]
+
+FORBIDDEN_INPUT_TOKENS = (
+    "report",
+    "summary",
+    "top_nodes",
+    "network_summary",
+    "network.graphml",
+    "dominance",
+    "power_network",
+    "prime_sub",
+)
 
 # ---------------------------------------------------------------------------
 # New dataset masters (already in canonical schema)
@@ -150,11 +165,60 @@ def _derive_fiscal_year(date_series: pd.Series) -> pd.Series:
     return fy
 
 
+def _is_forbidden_input_path(path: Path, root: Path) -> bool:
+    try:
+        rel = str(path.resolve().relative_to(root.resolve())).lower()
+    except Exception:
+        rel = str(path).lower()
+    return any(token in rel for token in FORBIDDEN_INPUT_TOKENS)
+
+
+def _resolve_input_path(
+    root: Path,
+    expected_relpath: str,
+    input_map: dict[str, dict[str, str]] | None,
+) -> tuple[Path, str]:
+    if input_map and expected_relpath in input_map:
+        mapped_rel = str(input_map[expected_relpath].get("mapped_rel", expected_relpath))
+        mode = str(input_map[expected_relpath].get("mapping_mode", "fallback"))
+        return root / mapped_rel, mode
+    return root / expected_relpath, "exact"
+
+
+def _apply_lineage(
+    df: pd.DataFrame,
+    *,
+    source_system: str,
+    lineage_path: str,
+    lineage_mode: str,
+) -> pd.DataFrame:
+    # Ensure deterministic row-level provenance even when award_id is blank.
+    if "award_id" not in df.columns:
+        df["award_id"] = ""
+
+    fallback_ids = pd.Series(range(1, len(df) + 1), index=df.index).astype(str)
+    award_ids = df["award_id"].fillna("").astype(str).str.strip()
+    has_award = award_ids != ""
+    df["source_record_id"] = (
+        source_system + ":" + award_ids.where(has_award, "ROW_" + fallback_ids)
+    )
+    df["source_system"] = source_system
+    df["source_lineage_path"] = lineage_path
+    df["source_lineage_mode"] = lineage_mode
+    return df
+
+
 # ---------------------------------------------------------------------------
 # Core logic
 # ---------------------------------------------------------------------------
 
-def run(root=None) -> dict:
+def run(
+    root=None,
+    *,
+    input_map: dict[str, dict[str, str]] | None = None,
+    require_all_inputs: bool = True,
+    fail_on_forbidden: bool = True,
+) -> dict:
     """
     Build the unified awards master. Returns a summary dict.
 
@@ -162,6 +226,12 @@ def run(root=None) -> dict:
     ----------
     root : Path or None
         Project root directory. Defaults to PROJECT_ROOT from config.
+    input_map : dict or None
+        Optional expected->mapped input registry from R4 recovery.
+    require_all_inputs : bool
+        If True, raise when any required build input is missing.
+    fail_on_forbidden : bool
+        If True, reject report/summary/top-node artifacts as build inputs.
     """
     if root is None:
         root = PROJECT_ROOT
@@ -171,11 +241,19 @@ def run(root=None) -> dict:
     logger = setup_logging("build_unified_master", log_dir=root / "data" / "logs")
 
     frames = []
+    missing_inputs: list[str] = []
+    forbidden_inputs: list[str] = []
 
     # ------------------------------------------------------------------
     # 1. Read pr_contracts_master.csv and remap to canonical schema
     # ------------------------------------------------------------------
-    contracts_path = processed_dir / "pr_contracts_master.csv"
+    contracts_expected = "data/staging/processed/pr_contracts_master.csv"
+    contracts_path, contracts_mode = _resolve_input_path(root, contracts_expected, input_map)
+    if fail_on_forbidden and _is_forbidden_input_path(contracts_path, root):
+        forbidden_inputs.append(str(contracts_path))
+        logger.error(f"  Forbidden input path rejected: {contracts_path}")
+    if not contracts_path.exists():
+        missing_inputs.append(contracts_expected)
     if contracts_path.exists():
         logger.info(f"  Reading contracts master: {contracts_path.name}")
         try:
@@ -198,6 +276,13 @@ def run(root=None) -> dict:
             df_canon["awarding_sub_agency"] = ""
             df_canon["pop_county"]        = ""
             df_canon["description"]       = ""
+            df_canon["source_system"]     = "contracts"
+            df_canon = _apply_lineage(
+                df_canon,
+                source_system="contracts",
+                lineage_path=str(contracts_path),
+                lineage_mode=contracts_mode,
+            )
 
             # ----------------------------------------------------------
             # 2. Try to enrich recipient_uei from master_enriched.csv
@@ -252,12 +337,24 @@ def run(root=None) -> dict:
     # 3. Read each new canonical master if it exists
     # ------------------------------------------------------------------
     for filename, dataset_label in NEW_MASTERS:
-        fpath = processed_dir / filename
+        expected_rel = f"data/staging/processed/{filename}"
+        fpath, mapping_mode = _resolve_input_path(root, expected_rel, input_map)
+        if fail_on_forbidden and _is_forbidden_input_path(fpath, root):
+            forbidden_inputs.append(str(fpath))
+            logger.error(f"  Forbidden input path rejected: {fpath}")
+            continue
         if not fpath.exists():
             logger.info(f"  {filename} not found — skipping")
+            missing_inputs.append(expected_rel)
             continue
         try:
             df_new = pd.read_csv(fpath, dtype=str, low_memory=False)
+            df_new = _apply_lineage(
+                df_new,
+                source_system=dataset_label,
+                lineage_path=str(fpath),
+                lineage_mode=mapping_mode,
+            )
             logger.info(f"  {filename}: {len(df_new):,} rows")
             frames.append(df_new)
         except Exception as exc:
@@ -268,9 +365,15 @@ def run(root=None) -> dict:
     # ------------------------------------------------------------------
     expansion_dir = root / "data" / "staging" / "expansion"
     for fname in EXPANSION_FILES:
-        fpath = expansion_dir / fname
+        expected_rel = f"data/staging/expansion/{fname}"
+        fpath, mapping_mode = _resolve_input_path(root, expected_rel, input_map)
+        if fail_on_forbidden and _is_forbidden_input_path(fpath, root):
+            forbidden_inputs.append(str(fpath))
+            logger.error(f"  Forbidden input path rejected: {fpath}")
+            continue
         if not fpath.exists():
             logger.info(f"  {fname} not found — run auto_download.py --only=usaspending")
+            missing_inputs.append(expected_rel)
             continue
         try:
             df_exp = pd.read_csv(fpath, dtype=str, low_memory=False)
@@ -290,10 +393,28 @@ def run(root=None) -> dict:
                 if col not in df_exp.columns:
                     df_exp[col] = ""
             df_exp = df_exp[CANONICAL_COLUMNS]
+            df_exp = _apply_lineage(
+                df_exp,
+                source_system="usaspending_expansion",
+                lineage_path=str(fpath),
+                lineage_mode=mapping_mode,
+            )
             logger.info(f"  {fname}: {len(df_exp):,} rows")
             frames.append(df_exp)
         except Exception as exc:
             logger.error(f"  Failed to read {fname}: {exc} — skipping")
+
+    if fail_on_forbidden and forbidden_inputs:
+        raise RuntimeError(
+            "Fail-closed input guard triggered by forbidden artifact inputs: "
+            + ", ".join(sorted(set(forbidden_inputs)))
+        )
+
+    if require_all_inputs and missing_inputs:
+        raise RuntimeError(
+            "Fail-closed input guard triggered by missing required inputs: "
+            + ", ".join(sorted(set(missing_inputs)))
+        )
 
     # ------------------------------------------------------------------
     # 4. Concatenate all frames
@@ -441,6 +562,9 @@ def run(root=None) -> dict:
     total_rows = len(unified)
     total_obligation = float(unified["_amount_num"].sum())
     unique_recipients = int(unified["recipient_name"].dropna().nunique())
+    unique_normalized_entities = int(unified["recipient_name_normalized"].replace("", pd.NA).dropna().nunique())
+    lineage_non_empty = int(unified["source_record_id"].replace("", pd.NA).dropna().shape[0]) if "source_record_id" in unified.columns else 0
+    lineage_coverage = float(lineage_non_empty / total_rows) if total_rows > 0 else 0.0
 
     by_dataset = {}
     for ds, grp in unified.groupby("source_dataset", sort=False):
@@ -463,6 +587,10 @@ def run(root=None) -> dict:
         "by_dataset": by_dataset,
         "by_fiscal_year": by_fiscal_year,
         "unique_recipients": unique_recipients,
+        "unique_normalized_entities": unique_normalized_entities,
+        "source_lineage_coverage": round(lineage_coverage, 4),
+        "build_input_missing_count": len(set(missing_inputs)),
+        "build_input_forbidden_count": len(set(forbidden_inputs)),
         "outputs": {
             "unified_master": str(output_path),
         },
@@ -521,6 +649,7 @@ def run(root=None) -> dict:
         f"  Unified master complete: {total_rows:,} rows, "
         f"{len(by_dataset)} datasets, "
         f"{unique_recipients:,} unique recipients, "
+        f"{unique_normalized_entities:,} unique normalized entities, "
         f"${total_obligation:,.2f} total obligation"
     )
 
