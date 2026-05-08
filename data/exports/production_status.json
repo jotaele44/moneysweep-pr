@@ -1,0 +1,47 @@
+{
+  "blocker_count": 3,
+  "blockers": [
+    {
+      "metric": "data_layers_populated",
+      "observed_value": 3,
+      "reason": "insufficient populated report layers",
+      "required_gate": ">= 8",
+      "severity": "BLOCKER"
+    },
+    {
+      "metric": "unique_entities",
+      "observed_value": 18,
+      "reason": "entity universe is too small for production claims",
+      "required_gate": ">= 100",
+      "severity": "BLOCKER"
+    },
+    {
+      "metric": "fixture_or_synthetic_data_detected",
+      "observed_value": true,
+      "reason": "fixture or synthetic data signatures detected",
+      "required_gate": "False",
+      "severity": "BLOCKER"
+    }
+  ],
+  "generated_at": "2026-05-08T08:46:03Z",
+  "metrics": {
+    "bond_actor_count": 0,
+    "data_layers_populated": 3,
+    "fixture_or_synthetic_data_detected": true,
+    "fixture_or_synthetic_reasons": [
+      "report unique_entities is exactly 18",
+      "power network total_ranked is exactly 18",
+      "prime/sub universes are both exactly 18",
+      "prime-sub matrix appears implausibly dense"
+    ],
+    "parent_uei_coverage": 0.0,
+    "unique_entities": 18
+  },
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "production_status_message": "Diagnostic output only \u2014 not production-valid.",
+  "stamped_outputs": {
+    "json_summaries_stamped": 5,
+    "report_stamped": true
+  },
+  "status_message": "Diagnostic output only \u2014 not production-valid."
+}

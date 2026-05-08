@@ -225,5 +225,9 @@
         "awards"
       ]
     }
-  ]
+  ],
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "production_status_generated_at": "2026-05-08T08:46:03Z",
+  "production_status_message": "Diagnostic output only — not production-valid.",
+  "production_blocker_count": 3
 }

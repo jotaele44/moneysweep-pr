@@ -24,6 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 
 from scripts.config import MASTER_PATH, PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from contract_sweeper.validation.production_status import load_current_status
 
 TOP_N_DEFAULT = 25
 
@@ -215,6 +216,7 @@ def run(root: Path = None, top_n: int = TOP_N_DEFAULT) -> dict:
     # Summary JSON
     total_obligation = df["obligated_amount"].sum()
     top3_share = top_raw.head(3)["total_obligation"].sum() / max(total_obligation, 1) * 100
+    status_payload = load_current_status(root)
     summary = {
         "total_rows": len(df),
         "unique_vendors": int(df["vendor_name"].nunique()),
@@ -225,6 +227,8 @@ def run(root: Path = None, top_n: int = TOP_N_DEFAULT) -> dict:
         "top_vendor_obligation": round(top_raw.iloc[0]["total_obligation"], 2) if len(top_raw) else 0,
         "high_hhi_agencies": int(len(high_hhi)),
         "fiscal_years": sorted(df["fiscal_year"].dropna().astype(int).unique().tolist()),
+        "production_status": status_payload["production_status"],
+        "production_status_message": status_payload["status_message"],
         "outputs": outputs,
     }
     summary_path = output_dir / "dominance_summary.json"

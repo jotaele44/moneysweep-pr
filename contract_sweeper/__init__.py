@@ -1,0 +1,2 @@
+"""Contract Sweeper shared package."""
+
