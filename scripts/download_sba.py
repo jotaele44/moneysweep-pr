@@ -512,16 +512,39 @@ def main() -> int:
         action="store_true",
         help="Re-download even if raw file already exists",
     )
+    parser.add_argument(
+        "--allow-empty-success",
+        action="store_true",
+        help="Exit 0 when no rows are available but output files are still produced.",
+    )
     args = parser.parse_args()
 
     summary = _run(force=args.force)
+    status = str(summary.get("status", "EMPTY"))
+    rows_ingested = int(summary.get("rows", 0) or 0)
+    retry_allowed_empty_success = bool(
+        args.allow_empty_success and status == "EMPTY" and rows_ingested == 0
+    )
+    validation_status = (
+        "OK"
+        if status == "OK"
+        else ("EMPTY_OR_NONFATAL_RETRY" if retry_allowed_empty_success else "EMPTY")
+    )
 
     print(f"\nSBA download complete.")
     print(f"  Raw rows:    {summary['raw_rows']:,}")
     print(f"  Master rows: {summary['rows']:,}")
     print(f"  Master path: {summary['master_path']}")
     print(f"  Status:      {summary['status']}")
-    return 0 if summary["status"] == "OK" else 1
+    print(f"  retry_allowed_empty_success={str(retry_allowed_empty_success).lower()}")
+    print(f"  rows_ingested={rows_ingested}")
+    print("  production_inputs_staged=0")
+    print(f"  validation_status={validation_status}")
+    if summary["status"] == "OK":
+        return 0
+    if retry_allowed_empty_success:
+        return 0
+    return 1
 
 
 if __name__ == "__main__":

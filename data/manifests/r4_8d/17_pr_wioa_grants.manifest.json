@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-05-08T20:49:41Z",
+  "known_gaps": "",
+  "manifest_type": "validated_source_manifest",
+  "producer_script": "scripts/download_wioa.py",
+  "row_count": 444,
+  "schema_version": "r4_8d_schema_v1",
+  "sha256": "c2387273b96b065630b1df6acb80194809b360e3d051d21a3451506072db930e",
+  "source_file": "data/staging/processed/pr_wioa_grants.csv",
+  "source_system": "federal_sectoral_wioa",
+  "target_output_path": "data/staging/processed/pr_wioa_grants.csv",
+  "validation_status": "validated"
+}

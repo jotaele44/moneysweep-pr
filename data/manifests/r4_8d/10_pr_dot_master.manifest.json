@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-05-08T20:47:46Z",
+  "known_gaps": "",
+  "manifest_type": "validated_source_manifest",
+  "producer_script": "scripts/download_dot.py",
+  "row_count": 374,
+  "schema_version": "r4_8d_schema_v1",
+  "sha256": "35c5284b2b38126f2cebdb9223435eda538abdd5e1d82ba88b601ed6f4b55afb",
+  "source_file": "data/staging/processed/pr_dot_master.csv",
+  "source_system": "federal_sectoral_dot",
+  "target_output_path": "data/staging/processed/pr_dot_master.csv",
+  "validation_status": "validated"
+}

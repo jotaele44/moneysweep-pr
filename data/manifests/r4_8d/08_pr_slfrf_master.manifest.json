@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-05-08T20:47:20Z",
+  "known_gaps": "",
+  "manifest_type": "validated_source_manifest",
+  "producer_script": "scripts/download_slfrf.py",
+  "row_count": 200,
+  "schema_version": "r4_8d_schema_v1",
+  "sha256": "0c90abdc841bef34566964821f7af8dd17661826b2dfa0319c8bf1575a3b82f0",
+  "source_file": "data/staging/processed/pr_slfrf_master.csv",
+  "source_system": "slfrf",
+  "target_output_path": "data/staging/processed/pr_slfrf_master.csv",
+  "validation_status": "validated"
+}

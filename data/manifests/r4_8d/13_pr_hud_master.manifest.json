@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-05-08T20:48:48Z",
+  "known_gaps": "",
+  "manifest_type": "validated_source_manifest",
+  "producer_script": "scripts/download_hud.py",
+  "row_count": 619,
+  "schema_version": "r4_8d_schema_v1",
+  "sha256": "8d5da1cafe28d93f5010ffcac44047483990af476a1c19b9400547483bf126f5",
+  "source_file": "data/staging/processed/pr_hud_master.csv",
+  "source_system": "hud_cdbg",
+  "target_output_path": "data/staging/processed/pr_hud_master.csv",
+  "validation_status": "validated"
+}
