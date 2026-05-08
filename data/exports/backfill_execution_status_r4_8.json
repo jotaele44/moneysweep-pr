@@ -1,0 +1,29 @@
+{
+  "dry_run": true,
+  "execute_downloads_requested": false,
+  "forbidden_artifact_usage": false,
+  "generated_at": "2026-05-08T15:18:45Z",
+  "outputs": {
+    "backfill_execution_blockers": "data/review_queue/backfill_execution_blockers_r4_8.csv",
+    "backfill_execution_results": "data/exports/backfill_execution_results_r4_8.csv",
+    "manual_import_validation": "data/exports/manual_import_validation_r4_8.csv",
+    "manual_import_validation_failures": "data/review_queue/manual_import_validation_failures_r4_8.csv"
+  },
+  "phase_7_8_block_reason": "Phase 7/8 remains blocked until R5/R6/R7 gates pass; R4.8 only executes controlled backfill and manual import validation.",
+  "phase_7_8_blocked": true,
+  "r4_8_downloads_executed": false,
+  "r4_8_execute_downloads_default": false,
+  "r4_8_executed_download_commands": 0,
+  "r4_8_failed_sources": 21,
+  "r4_8_gate_passed": false,
+  "r4_8_manual_slots_missing": 0,
+  "r4_8_manual_slots_ready": 0,
+  "r4_8_manual_slots_total": 0,
+  "r4_8_phase_type": "CONTROLLED_BACKFILL_EXECUTION_AND_MANUAL_IMPORT_VALIDATION",
+  "r4_8_rows_ingested_during_run": 0,
+  "r4_8_rows_observed_valid_outputs": 0,
+  "r4_8_successful_download_commands": 0,
+  "r4_8_total_sources": 21,
+  "r4_8_validated_sources": 0,
+  "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS"
+}
