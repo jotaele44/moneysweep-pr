@@ -1,0 +1,22 @@
+retry_rank,priority,expected_input,source_family,primary_blocker_class,next_action,retry_instruction
+1,8,data/staging/processed/pr_slfrf_master.csv,slfrf,schema_mismatch,add_schema_mapping,add_schema_mapping -> retry_after_fix
+2,10,data/staging/processed/pr_dot_master.csv,federal_sectoral_dot,schema_mismatch,add_schema_mapping,add_schema_mapping -> retry_after_fix
+3,11,data/staging/processed/pr_usda_master.csv,federal_sectoral_usda,schema_mismatch,add_schema_mapping,add_schema_mapping -> retry_after_fix
+4,12,data/staging/processed/pr_doe_master.csv,federal_sectoral_doe,schema_mismatch,add_schema_mapping,add_schema_mapping -> retry_after_fix
+5,13,data/staging/processed/pr_hud_master.csv,hud_cdbg,schema_mismatch,add_schema_mapping,add_schema_mapping -> retry_after_fix
+6,15,data/staging/processed/pr_epa_master.csv,federal_sectoral_epa,schema_mismatch,add_schema_mapping,add_schema_mapping -> retry_after_fix
+7,17,data/staging/processed/pr_wioa_grants.csv,federal_sectoral_wioa,schema_mismatch,add_schema_mapping,add_schema_mapping -> retry_after_fix
+8,3,data/staging/processed/pr_subawards_master.csv,fsrs_subawards,producer_exception,patch_producer_script,patch_producer_script -> retry_after_fix
+9,7,data/staging/processed/pr_sba_loans_master.csv,sba_loans,producer_exception,patch_producer_script,patch_producer_script -> retry_after_fix
+10,14,data/staging/processed/pr_sbir_master.csv,federal_sectoral_sbir,producer_exception,patch_producer_script,patch_producer_script -> retry_after_fix
+11,16,data/staging/processed/pr_usace_civil_master.csv,federal_sectoral_usace,producer_exception,patch_producer_script,patch_producer_script -> retry_after_fix
+12,2,data/staging/processed/pr_grants_master.csv,usaspending_federal_awards_backbone,endpoint_unavailable,endpoint_review,endpoint_review -> retry_after_fix
+13,4,data/staging/processed/pr_fema_pa_master.csv,fema_pa_hmgp,endpoint_unavailable,endpoint_review,endpoint_review -> retry_after_fix
+14,5,data/staging/processed/pr_fema_hmgp_master.csv,fema_pa_hmgp,endpoint_unavailable,endpoint_review,endpoint_review -> retry_after_fix
+15,6,data/staging/processed/pr_research_master.csv,federal_research,endpoint_unavailable,endpoint_review,endpoint_review -> retry_after_fix
+16,9,data/staging/processed/pr_cdbg_dr_master.csv,hud_cdbg,endpoint_unavailable,endpoint_review,endpoint_review -> retry_after_fix
+17,18,data/staging/expansion/expansion_idv_indirect_pr.csv,usaspending_federal_awards_backbone,endpoint_unavailable,endpoint_review,endpoint_review -> retry_after_fix
+18,19,data/staging/expansion/expansion_dod_upr_2001_2015.csv,usaspending_federal_awards_backbone,endpoint_unavailable,endpoint_review,endpoint_review -> retry_after_fix
+19,20,data/staging/expansion/expansion_dod_upr_2016_2025.csv,usaspending_federal_awards_backbone,endpoint_unavailable,endpoint_review,endpoint_review -> retry_after_fix
+20,21,data/staging/expansion/expansion_reconstruction_2017_2025.csv,usaspending_federal_awards_backbone,endpoint_unavailable,endpoint_review,endpoint_review -> retry_after_fix
+21,1,data/staging/processed/pr_contracts_master.csv,usaspending_federal_awards_backbone,no_data,retry_after_fix,retry_after_fix -> retry_after_fix

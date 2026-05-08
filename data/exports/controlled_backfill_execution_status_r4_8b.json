@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T16:03:05Z",
+  "generated_at": "2026-05-08T19:40:14Z",
   "inputs": {
     "backfill_execution_plan": "data/exports/backfill_execution_plan_r4_6.csv",
     "backfill_readiness_matrix": "data/exports/backfill_readiness_matrix_r4_8a.csv",
@@ -31,7 +31,7 @@
   "r4_8b_phase_type": "CONTROLLED_REAL_BACKFILL_EXECUTION",
   "r4_8b_production_inputs_staged": 0,
   "r4_8b_rows_ingested": 0,
-  "r4_8b_schema_failures": 6,
+  "r4_8b_schema_failures": 7,
   "r4_8b_successful_sources": 0,
   "r4_8b_total_sources": 21,
   "r4_8b_validated_source_manifests_written": 0,
