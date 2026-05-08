@@ -1,0 +1,43 @@
+{
+  "dry_run": true,
+  "execute_downloads_requested": false,
+  "forbidden_artifact_usage": false,
+  "generated_at": "2026-05-08T15:30:11Z",
+  "inputs": {
+    "backfill_execution_plan": "data/exports/backfill_execution_plan_r4_6.csv",
+    "backfill_execution_status": "data/exports/backfill_execution_plan_r4_6_status.json",
+    "backfill_runner_manifest": "data/exports/backfill_runner_manifest_r4_7.csv",
+    "backfill_runner_plan": "data/exports/backfill_runner_plan_r4_7.json",
+    "import_slots": "data/exports/import_slots_r4_7.csv"
+  },
+  "manual_import_validation_error_count": 0,
+  "manual_slot_count": 0,
+  "outputs": {
+    "controlled_backfill_blockers": "data/review_queue/controlled_backfill_blockers.csv",
+    "controlled_backfill_manifest": "data/exports/controlled_backfill_manifest_r4_8.csv",
+    "controlled_backfill_plan": "data/exports/controlled_backfill_plan_r4_8.json",
+    "manual_import_validation": "data/exports/manual_import_validation_r4_8.csv",
+    "manual_import_validation_errors": "data/review_queue/manual_import_validation_errors.csv",
+    "secrets_required_for_backfill": "data/review_queue/secrets_required_for_backfill.csv",
+    "source_manifest_inventory": "data/exports/source_manifest_inventory_r4_8.csv"
+  },
+  "phase_7_8_block_reason": "R4.8 preserves Phase 7/8 block until R5/R6/R7 gates pass.",
+  "phase_7_8_blocked": true,
+  "r4_8_blocked_count": 0,
+  "r4_8_data_recovery_completed": false,
+  "r4_8_downloads_executed": false,
+  "r4_8_dry_run_ready_count": 21,
+  "r4_8_executable_with_credentials_count": 0,
+  "r4_8_execute_downloads_default": false,
+  "r4_8_gate_passed": true,
+  "r4_8_manual_import_required_count": 0,
+  "r4_8_missing_credentials_count": 0,
+  "r4_8_missing_schema_count": 0,
+  "r4_8_phase_type": "CONTROLLED_BACKFILL_EXECUTION_AND_MANUAL_IMPORT_VALIDATION",
+  "r4_8_production_inputs_staged": 0,
+  "r4_8_rows_ingested": 0,
+  "r4_8_source_manifests_written": 21,
+  "r4_8_total_sources": 21,
+  "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS",
+  "secrets_required_count": 0
+}
