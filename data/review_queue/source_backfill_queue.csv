@@ -1,0 +1,22 @@
+source_system,priority,script_path,rows_total,year_coverage_pct,field_completeness_pct,manifest_missing_count,recommended_action
+master_builder.build_unified_master,0,scripts/build_unified_master.py,0,0.0,0.0,21,Declared build_unified_master inputs are absent while summary artifacts report populated rows.
+usaspending_awards,1,scripts/auto_download.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%
+sam_entity_extract,2,scripts/sam_enrichment.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%; capped/top-N signature detected
+fsrs_subawards,3,scripts/download_subawards.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%
+fema_pa_hmgp,4,scripts/download_fema.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%
+hud_cdbg,5,scripts/download_cdbg_dr.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%
+cor3,6,scripts/download_cor3.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%
+prasa_aaa,7,scripts/download_prasa.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%
+prepa_luma_genera,8,scripts/download_prepa_contracts.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%
+lda,9,scripts/download_lda.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%
+pr_cabilderos,10,scripts/download_cabilderos.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%
+emma_msrb_bonds,11,scripts/download_emma.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%; capped/top-N signature detected
+fdic_banks,12,scripts/download_fdic.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%; capped/top-N signature detected
+cms_medicare,13,scripts/download_cms.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%; capped/top-N signature detected
+fec,14,scripts/download_fec.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%; fixture/demo signature detected
+municipal_contracts,15,scripts/download_municipal.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%
+ogpe_permits,16,scripts/download_p3.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%
+act60_lihtc,17,scripts/download_act60.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%
+promesa_creditors,18,scripts/download_promesa_creditors.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%
+sf133,19,scripts/download_sf133.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%
+ofac,20,scripts/download_ofac.py,0,0.0,0.0,0,no source rows found; year coverage below 95%; field completeness below 80%; missing pagination signature in script; capped/top-N signature detected

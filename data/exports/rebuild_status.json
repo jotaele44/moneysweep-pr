@@ -1,5 +1,31 @@
 {
   "artifact_lineage_output": "data/exports/artifact_lineage_audit.csv",
+  "builder_expected_input_count": 21,
+  "builder_missing_inputs": [
+    "data/staging/processed/pr_contracts_master.csv",
+    "data/staging/processed/pr_grants_master.csv",
+    "data/staging/processed/pr_subawards_master.csv",
+    "data/staging/processed/pr_fema_pa_master.csv",
+    "data/staging/processed/pr_fema_hmgp_master.csv",
+    "data/staging/processed/pr_research_master.csv",
+    "data/staging/processed/pr_sba_loans_master.csv",
+    "data/staging/processed/pr_slfrf_master.csv",
+    "data/staging/processed/pr_cdbg_dr_master.csv",
+    "data/staging/processed/pr_dot_master.csv",
+    "data/staging/processed/pr_usda_master.csv",
+    "data/staging/processed/pr_doe_master.csv",
+    "data/staging/processed/pr_hud_master.csv",
+    "data/staging/processed/pr_sbir_master.csv",
+    "data/staging/processed/pr_epa_master.csv",
+    "data/staging/processed/pr_usace_civil_master.csv",
+    "data/staging/processed/pr_wioa_grants.csv",
+    "data/staging/expansion/expansion_idv_indirect_pr.csv",
+    "data/staging/expansion/expansion_dod_upr_2001_2015.csv",
+    "data/staging/expansion/expansion_dod_upr_2016_2025.csv",
+    "data/staging/expansion/expansion_reconstruction_2017_2025.csv"
+  ],
+  "builder_present_input_count": 0,
+  "builder_present_input_rows": 0,
   "cache_hit_count": 2,
   "cache_reuse_output": "data/exports/cache_reuse_audit.csv",
   "downstream_recompute_count": 0,
@@ -15,10 +41,11 @@
   "high_value_overcollapse_suspect_count": 18,
   "high_value_unresolved_count": 18,
   "inferred_18_entity_collapse_stage": "collapse_before_or_at_master_table",
+  "master_collapse_cause_gate_passed": false,
   "missing_manifest_count": 42,
   "missing_manifest_detected": true,
   "parent_uei_coverage": 0.0,
-  "phase_7_8_block_reason": "R2 gate failed and/or prior phase gate still blocked",
+  "phase_7_8_block_reason": "R3 gate failed and/or prior phase gate still blocked",
   "phase_7_8_blocked": true,
   "r1_gate_passed": false,
   "r2_gate_passed": false,
@@ -29,9 +56,21 @@
     "high_value_unresolved_entities": "data/review_queue/high_value_unresolved_entities.csv",
     "suspect_entity_collapses": "data/review_queue/suspect_entity_collapses.csv"
   },
+  "r3_gate_passed": false,
+  "r3_generated_at": "2026-05-08T12:36:17Z",
+  "r3_outputs": {
+    "source_backfill_queue": "data/review_queue/source_backfill_queue.csv",
+    "source_coverage_audit": "data/exports/source_coverage_audit.csv",
+    "source_field_completeness": "data/exports/source_field_completeness.csv"
+  },
+  "r3_primary_collapse_cause": "build_unified_master_input_gap_with_stale_summary_replay",
+  "r3_primary_collapse_cause_detail": "Declared build_unified_master inputs are absent while summary artifacts report populated rows.",
   "report_regeneration_status": "cached_or_unverified",
   "reports_recomputed": false,
+  "rows_observed": 4503,
   "skip_download_recompute_guard": false,
+  "source_backfill_queue_empty": false,
+  "source_coverage_gate_passed": false,
   "stale_artifact_count": 0,
   "stale_artifacts_labeled": false,
   "top_n_truncation_reasons": [
@@ -40,5 +79,6 @@
     "prime/sub counts exactly mirror entity universe"
   ],
   "top_n_truncation_suspected": true,
+  "unique_entities_observed": 18,
   "unique_normalized_entity_count": 18
 }
