@@ -1,0 +1,15 @@
+category,severity,item,file,line,details,recommended_action,status
+dependency_range,medium,pandas,requirements.txt,1,Lower-bound-only range permits unreviewed major-version upgrades.,Consider upper bounds or a lockfile in a later dependency remediation PR.,open
+dependency_range,medium,requests,requirements.txt,2,Lower-bound-only range permits unreviewed major-version upgrades.,Consider upper bounds or a lockfile in a later dependency remediation PR.,open
+dependency_range,medium,lxml,requirements.txt,3,Lower-bound-only range permits unreviewed major-version upgrades.,Consider upper bounds or a lockfile in a later dependency remediation PR.,open
+dependency_range,medium,pytest,requirements.txt,4,Lower-bound-only range permits unreviewed major-version upgrades.,Consider upper bounds or a lockfile in a later dependency remediation PR.,open
+dependency_range,medium,rapidfuzz,requirements.txt,5,Lower-bound-only range permits unreviewed major-version upgrades.,Consider upper bounds or a lockfile in a later dependency remediation PR.,open
+dependency_range,medium,python-dotenv,requirements.txt,6,Lower-bound-only range permits unreviewed major-version upgrades.,Consider upper bounds or a lockfile in a later dependency remediation PR.,open
+dependency_range,medium,pyarrow,requirements.txt,7,Lower-bound-only range permits unreviewed major-version upgrades.,Consider upper bounds or a lockfile in a later dependency remediation PR.,open
+native_or_heavy_dependency,info,pandas,requirements.txt,1,Heavy dependency with compiled/transitive footprint.,Keep dependency and CI install posture under review in a later dependency remediation PR.,open
+native_or_heavy_dependency,info,lxml,requirements.txt,3,Native/system dependency risk is obvious from package type.,Keep dependency and CI install posture under review in a later dependency remediation PR.,open
+native_or_heavy_dependency,info,rapidfuzz,requirements.txt,5,Native wheel dependency risk is obvious from package type.,Keep dependency and CI install posture under review in a later dependency remediation PR.,open
+native_or_heavy_dependency,info,pyarrow,requirements.txt,7,Heavy native dependency with large binary/transitive footprint.,Keep dependency and CI install posture under review in a later dependency remediation PR.,open
+manual_workflow_policy,medium,highergov-fetch,.github/workflows/highergov-fetch.yml,,Manual workflow uses an optional GitHub secret and source-fetch script outside CI.,Keep workflow_dispatch-only and do not convert it to push/pull_request/schedule while source recovery remains paused.,open
+secret_scan,info,tracked_text_files,tracked repository files,,No possible secret findings were detected by the R4.9Z-E tracked-file scan.,Continue scanning before credential or workflow changes.,closed
+

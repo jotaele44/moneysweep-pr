@@ -1,0 +1,141 @@
+{
+  "generated_at": "2026-05-09T07:23:12Z",
+  "phase": "R4.9Z-E_DEPENDENCY_AND_SECRET_POLICY_AUDIT",
+  "r4_9z_e_gate_passed": true,
+  "dependency_files_checked": [
+    "requirements.txt"
+  ],
+  "dependency_files_absent": [
+    "pyproject.toml",
+    "setup.py",
+    "setup.cfg"
+  ],
+  "dependency_count": 7,
+  "dependency_classification_counts": {
+    "pinned": 0,
+    "range-pinned": 7,
+    "unpinned": 0,
+    "transitive-only": 0,
+    "unknown": 0
+  },
+  "unpinned_dependency_count": 0,
+  "broad_range_dependency_count": 7,
+  "duplicate_dependency_count": 0,
+  "native_or_heavy_dependency_count": 4,
+  "dependencies": [
+    {
+      "file": "requirements.txt",
+      "line": 1,
+      "package": "pandas",
+      "declaration": "pandas>=2.0.0",
+      "posture": "range-pinned",
+      "risk_flags": [
+        "broad_lower_bound_only",
+        "native_or_heavy_dependency"
+      ]
+    },
+    {
+      "file": "requirements.txt",
+      "line": 2,
+      "package": "requests",
+      "declaration": "requests>=2.28.0",
+      "posture": "range-pinned",
+      "risk_flags": [
+        "broad_lower_bound_only"
+      ]
+    },
+    {
+      "file": "requirements.txt",
+      "line": 3,
+      "package": "lxml",
+      "declaration": "lxml>=4.9.0",
+      "posture": "range-pinned",
+      "risk_flags": [
+        "broad_lower_bound_only",
+        "native_or_heavy_dependency"
+      ]
+    },
+    {
+      "file": "requirements.txt",
+      "line": 4,
+      "package": "pytest",
+      "declaration": "pytest>=7.0.0",
+      "posture": "range-pinned",
+      "risk_flags": [
+        "broad_lower_bound_only"
+      ]
+    },
+    {
+      "file": "requirements.txt",
+      "line": 5,
+      "package": "rapidfuzz",
+      "declaration": "rapidfuzz>=3.0.0",
+      "posture": "range-pinned",
+      "risk_flags": [
+        "broad_lower_bound_only",
+        "native_or_heavy_dependency"
+      ]
+    },
+    {
+      "file": "requirements.txt",
+      "line": 6,
+      "package": "python-dotenv",
+      "declaration": "python-dotenv>=1.0.0",
+      "posture": "range-pinned",
+      "risk_flags": [
+        "broad_lower_bound_only"
+      ]
+    },
+    {
+      "file": "requirements.txt",
+      "line": 7,
+      "package": "pyarrow",
+      "declaration": "pyarrow>=14.0.0",
+      "posture": "range-pinned",
+      "risk_flags": [
+        "broad_lower_bound_only",
+        "native_or_heavy_dependency"
+      ]
+    }
+  ],
+  "possible_secret_findings": 0,
+  "secret_scan_completed": true,
+  "secret_scan_scope": "tracked_text_files_only",
+  "secret_findings_redacted": [],
+  "ci_workflows_checked": [
+    ".github/workflows/ci.yml",
+    ".github/workflows/production-status-gate.yml",
+    ".github/workflows/tests.yml"
+  ],
+  "manual_workflows_observed": [
+    {
+      "file": ".github/workflows/highergov-fetch.yml",
+      "trigger": "workflow_dispatch",
+      "uses_secret": true,
+      "invokes_source_fetch": true,
+      "ci_gate_scope": "excluded_manual_workflow"
+    }
+  ],
+  "ci_secret_required": false,
+  "ci_forbidden_job_count": 0,
+  "ci_env_print_count": 0,
+  "dependency_changes_made": false,
+  "downloads_executed": false,
+  "rows_ingested": 0,
+  "production_inputs_staged": 0,
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "phase_7_8_blocked": true,
+  "gate_conditions": {
+    "dependency_files_inspected": true,
+    "secret_scan_completed": true,
+    "findings_queued_without_exposing_secrets": true,
+    "ci_forbidden_job_count_zero": true,
+    "dependency_versions_unchanged": true,
+    "no_downloads_executed": true,
+    "no_rows_ingested": true,
+    "no_production_inputs_staged": true,
+    "production_status_locked": true,
+    "phase_7_8_blocked_locked": true
+  }
+}
+
