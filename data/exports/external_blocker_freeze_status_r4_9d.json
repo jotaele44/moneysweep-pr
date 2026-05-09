@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-05-09T03:42:14Z",
+  "phase_7_8_blocked": true,
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "r4_9d_blockers_frozen": 21,
+  "r4_9d_downloads_executed": false,
+  "r4_9d_downstream_phases_blocked": 7,
+  "r4_9d_endpoint_delivery_blocked": 0,
+  "r4_9d_forbidden_artifact_usage": false,
+  "r4_9d_gate_passed": true,
+  "r4_9d_manual_file_required": 14,
+  "r4_9d_physical_validated_file_missing": 7,
+  "r4_9d_producer_delivery_blocked": 0,
+  "r4_9d_production_inputs_staged": 0,
+  "r4_9d_retry_suppressed": 21,
+  "r4_9d_rows_ingested": 0,
+  "r4_9d_unfreeze_requirements_written": true,
+  "r4_9d_unknown_external_blocker": 0,
+  "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS"
+}
