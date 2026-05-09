@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-05-09T04:02:37Z",
+  "generated_at": "2026-05-09T08:52:01Z",
   "phase_7_8_blocked": true,
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
-  "r4_9f_candidate_files_found": 0,
+  "r4_9f_candidate_files_found": 18,
   "r4_9f_checklist_rows_checked": 21,
   "r4_9f_downloads_executed": false,
   "r4_9f_downstream_blockers_preserved": true,
@@ -11,7 +11,7 @@
   "r4_9f_production_inputs_staged": 0,
   "r4_9f_retry_suppression_preserved": true,
   "r4_9f_rows_ingested": 0,
-  "r4_9f_sources_still_missing": 21,
-  "r4_9f_unfreeze_candidates": 0,
+  "r4_9f_sources_still_missing": 16,
+  "r4_9f_unfreeze_candidates": 5,
   "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS"
 }
