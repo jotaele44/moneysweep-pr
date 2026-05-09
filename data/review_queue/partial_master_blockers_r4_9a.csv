@@ -1,0 +1,28 @@
+blocker_type,priority,source_family,expected_input,reason,next_action
+partial_mode_support,0,system,build_unified_master.run,run() supports mapped partial diagnostic execution,continue_diagnostic
+rebuild_error,0,system,partial_diagnostic_rebuild,no validated inputs available for partial diagnostic rebuild,debug_wrapper
+manual_missing,1,usaspending_federal_awards_backbone,data/staging/processed/pr_contracts_master.csv,no_file_present,manual_file_delivery
+endpoint_blocked,2,usaspending_federal_awards_backbone,data/staging/processed/pr_grants_master.csv,command timed out after 20s,endpoint_resolution
+manual_missing,2,usaspending_federal_awards_backbone,data/staging/processed/pr_grants_master.csv,no_file_present,manual_file_delivery
+manual_missing,3,fsrs_subawards,data/staging/processed/pr_subawards_master.csv,no_file_present,manual_file_delivery
+producer_blocked,3,fsrs_subawards,data/staging/processed/pr_subawards_master.csv,"2026-05-08 21:00:13 [INFO] Starting PR subawards download... 2026-05-08 21:00:13 [INFO] [Window 2000f2009] 2007-10-01 to 2009-09-30 2026-05-08 21:00:13 [INFO] Fetching subawards_grants_2000f2009.csv (2007-10-01 to 2009-09-30, type=grants) 2026-05-08 21:00:14 [WARNING] No results for subawards_grants_2000f2009.csv 2026-",producer_retry
+endpoint_blocked,4,fema_pa_hmgp,data/staging/processed/pr_fema_pa_master.csv,command timed out after 20s,endpoint_resolution
+manual_missing,4,fema_pa_hmgp,data/staging/processed/pr_fema_pa_master.csv,no_file_present,manual_file_delivery
+endpoint_blocked,5,fema_pa_hmgp,data/staging/processed/pr_fema_hmgp_master.csv,command timed out after 20s,endpoint_resolution
+manual_missing,5,fema_pa_hmgp,data/staging/processed/pr_fema_hmgp_master.csv,no_file_present,manual_file_delivery
+endpoint_blocked,6,federal_research,data/staging/processed/pr_research_master.csv,command timed out after 20s,endpoint_resolution
+manual_missing,6,federal_research,data/staging/processed/pr_research_master.csv,no_file_present,manual_file_delivery
+manual_missing,7,sba_loans,data/staging/processed/pr_sba_loans_master.csv,no_file_present,manual_file_delivery
+endpoint_blocked,9,hud_cdbg,data/staging/processed/pr_cdbg_dr_master.csv,command timed out after 20s,endpoint_resolution
+manual_missing,9,hud_cdbg,data/staging/processed/pr_cdbg_dr_master.csv,no_file_present,manual_file_delivery
+manual_missing,14,federal_sectoral_sbir,data/staging/processed/pr_sbir_master.csv,no_file_present,manual_file_delivery
+manual_missing,16,federal_sectoral_usace,data/staging/processed/pr_usace_civil_master.csv,no_file_present,manual_file_delivery
+producer_blocked,16,federal_sectoral_usace,data/staging/processed/pr_usace_civil_master.csv,"2026-05-08 21:00:18 [INFO] Starting USACE civil works download for Puerto Rico... 2026-05-08 21:00:18 [INFO] [Window 2000f2009] 2007-10-01 to 2009-09-30 2026-05-08 21:00:18 [INFO] Fetching usace_civil_pop_2000f2009.csv (filter=pop) 2026-05-08 21:00:18 [ERROR] HTTP 422 — skipping: {""message"":""'award_type_codes' must onl",producer_retry
+endpoint_blocked,18,usaspending_federal_awards_backbone,data/staging/expansion/expansion_idv_indirect_pr.csv,command timed out after 20s,endpoint_resolution
+manual_missing,18,usaspending_federal_awards_backbone,data/staging/expansion/expansion_idv_indirect_pr.csv,no_file_present,manual_file_delivery
+endpoint_blocked,19,usaspending_federal_awards_backbone,data/staging/expansion/expansion_dod_upr_2001_2015.csv,command timed out after 20s,endpoint_resolution
+manual_missing,19,usaspending_federal_awards_backbone,data/staging/expansion/expansion_dod_upr_2001_2015.csv,no_file_present,manual_file_delivery
+endpoint_blocked,20,usaspending_federal_awards_backbone,data/staging/expansion/expansion_dod_upr_2016_2025.csv,command timed out after 20s,endpoint_resolution
+manual_missing,20,usaspending_federal_awards_backbone,data/staging/expansion/expansion_dod_upr_2016_2025.csv,no_file_present,manual_file_delivery
+endpoint_blocked,21,usaspending_federal_awards_backbone,data/staging/expansion/expansion_reconstruction_2017_2025.csv,command timed out after 20s,endpoint_resolution
+manual_missing,21,usaspending_federal_awards_backbone,data/staging/expansion/expansion_reconstruction_2017_2025.csv,no_file_present,manual_file_delivery

@@ -1,0 +1,39 @@
+{
+  "generated_at": "2026-05-09T01:34:17Z",
+  "inputs": {
+    "backfill_retry_order_r4_8i": "data/review_queue/backfill_retry_order_r4_8i.csv",
+    "endpoints_still_blocked_r4_8i": "data/review_queue/endpoints_still_blocked_r4_8i.csv",
+    "external_acquisition_blocker_package_r4_8i": "data/exports/external_acquisition_blocker_package_r4_8i.json",
+    "final_source_recovery_results_r4_8i": "data/exports/final_source_recovery_results_r4_8i.csv",
+    "final_source_recovery_status_r4_8i": "data/exports/final_source_recovery_status_r4_8i.json",
+    "manual_files_still_required_r4_8i": "data/review_queue/manual_files_still_required_r4_8i.csv",
+    "producers_still_blocked_r4_8i": "data/review_queue/producers_still_blocked_r4_8i.csv",
+    "validated_source_manifest_inventory_r4_8i": "data/exports/validated_source_manifest_inventory_r4_8i.csv"
+  },
+  "outputs": {
+    "blockers_queue": "data/review_queue/partial_master_blockers_r4_9a.csv",
+    "gap_report": "data/exports/partial_master_rebuild_gap_report_r4_9a.csv",
+    "inputs_report": "data/exports/partial_master_rebuild_inputs_r4_9a.csv",
+    "lineage_report": "data/exports/partial_master_rebuild_lineage_report_r4_9a.csv",
+    "missing_inputs_queue": "data/review_queue/partial_master_missing_inputs_r4_9a.csv",
+    "partial_entities_csv": "data/staging/processed/partial/entities_partial_diagnostic.csv",
+    "partial_master_csv": "data/staging/processed/partial/contracts_master_partial_diagnostic.csv",
+    "partial_master_parquet": "data/staging/processed/partial/contracts_master_partial_diagnostic.parquet",
+    "status": "data/exports/partial_master_rebuild_status_r4_9a.json"
+  },
+  "phase_7_8_blocked": true,
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "r4_9a_external_blockers": 25,
+  "r4_9a_forbidden_artifact_usage": false,
+  "r4_9a_gate_passed": true,
+  "r4_9a_missing_inputs": 14,
+  "r4_9a_output_rows": 0,
+  "r4_9a_output_status": "BLOCKED_DIAGNOSTIC",
+  "r4_9a_phase_type": "PARTIAL_DIAGNOSTIC_MASTER_REBUILD",
+  "r4_9a_rebuild_attempted": false,
+  "r4_9a_rebuild_succeeded": false,
+  "r4_9a_source_lineage_coverage": 0.0,
+  "r4_9a_unique_entities": 0,
+  "r4_9a_validated_inputs_available": 0,
+  "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS"
+}
