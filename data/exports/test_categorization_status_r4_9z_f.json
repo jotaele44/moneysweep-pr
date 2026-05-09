@@ -1,0 +1,53 @@
+{
+  "downloads_executed": false,
+  "full_pytest_passed": true,
+  "gate_conditions": {
+    "all_test_files_inventoried": true,
+    "full_pytest_still_passes": true,
+    "markers_defined": true,
+    "no_default_skips_or_xfails_added": true,
+    "no_downloads_executed": true,
+    "no_production_inputs_staged": true,
+    "no_rows_ingested": true,
+    "phase_7_8_blocked_locked": true,
+    "production_status_locked": true
+  },
+  "generated_at": "2026-05-09T08:00:02Z",
+  "marker_descriptions": {
+    "external": "Tests around external source boundaries or downloader modules; not skipped by default.",
+    "integration": "Multi-module or filesystem-backed behavior tests.",
+    "non_executing": "Audits, docs, configuration, validation, and status checks that do not execute source recovery.",
+    "pipeline_gate": "Production, pause, recovery, blocker, or phase-gate invariant tests.",
+    "slow": "Long-running tests reserved for future use; not applied by this phase.",
+    "unit": "Pure logic tests with minimal filesystem or process coupling."
+  },
+  "markers_defined": [
+    "unit",
+    "integration",
+    "pipeline_gate",
+    "non_executing",
+    "external",
+    "slow"
+  ],
+  "phase": "R4.9Z-F_TEST_CATEGORIZATION_AND_MARKERS",
+  "phase_7_8_blocked": true,
+  "production_inputs_staged": 0,
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "r4_9z_f_gate_passed": true,
+  "rows_ingested": 0,
+  "suggested_marker_file_counts": {
+    "external": 12,
+    "integration": 9,
+    "non_executing": 29,
+    "pipeline_gate": 22,
+    "unit": 3
+  },
+  "support_files_observed": [
+    "tests/__init__.py",
+    "tests/conftest.py"
+  ],
+  "test_files_inventoried": 53,
+  "test_functions_inventoried": 475,
+  "tests_skipped_by_default": false,
+  "tests_xfailed_added": false
+}
