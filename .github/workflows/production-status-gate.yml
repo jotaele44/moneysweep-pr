@@ -1,0 +1,84 @@
+name: Production Status Gate
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  production-status-gate:
+    name: Diagnostic status and phase locks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run production status gate
+        run: python scripts/run_production_status_gate.py --root .
+
+      - name: Enforce diagnostic production status
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          status_path = Path("data/exports/production_status.json")
+          rebuild_path = Path("data/exports/rebuild_status.json")
+
+          status = json.loads(status_path.read_text(encoding="utf-8"))
+          rebuild = json.loads(rebuild_path.read_text(encoding="utf-8"))
+
+          production_status = status.get("production_status")
+          phase_blocked = rebuild.get("phase_7_8_blocked")
+
+          if production_status != "NON_PRODUCTION_DIAGNOSTIC":
+              raise SystemExit(f"production_status escalated to {production_status!r}")
+          if phase_blocked is not True:
+              raise SystemExit(f"phase_7_8_blocked changed to {phase_blocked!r}")
+
+          print("production_status=NON_PRODUCTION_DIAGNOSTIC")
+          print("phase_7_8_blocked=True")
+          PY
+
+      - name: Run repo quality audit
+        run: python scripts/run_repo_quality_audit_r49z_b.py --root .
+
+      - name: Enforce repo quality pause locks
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          status = json.loads(
+              Path("data/exports/repo_quality_status_r4_9z_b.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+
+          expectations = {
+              "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+              "phase_7_8_blocked": True,
+              "downloads_executed": False,
+              "rows_ingested": 0,
+              "production_inputs_staged": 0,
+          }
+
+          for key, expected in expectations.items():
+              observed = status.get(key)
+              if observed != expected:
+                  raise SystemExit(f"{key} changed to {observed!r}; expected {expected!r}")
+
+          print("repo quality pause locks preserved")
+          PY
+
