@@ -1,0 +1,8 @@
+phase_code,blocked,blocker_reason,unfreeze_condition,status
+R4.9_PRODUCTION_MASTER_REBUILD,True,R4.9 production rebuild blocked,External source delivery blockers are cleared and validated source coverage materially improves.,blocked
+R5_ENTITY_RESOLUTION,True,R5 entity resolution blocked,External source delivery blockers are cleared and validated source coverage materially improves.,blocked
+R6_EXECUTION_CHAIN_REBUILD,True,R6 execution chain rebuild blocked,External source delivery blockers are cleared and validated source coverage materially improves.,blocked
+R7_FINANCIAL_INTEGRATION,True,R7 financial integration blocked,External source delivery blockers are cleared and validated source coverage materially improves.,blocked
+R8_GRAPH_REBUILD,True,R8 graph rebuild blocked,External source delivery blockers are cleared and validated source coverage materially improves.,blocked
+R9_RISK_ENGINE,True,R9 risk engine blocked,External source delivery blockers are cleared and validated source coverage materially improves.,blocked
+R10_FINAL_REPORTS,True,R10 final reports blocked,External source delivery blockers are cleared and validated source coverage materially improves.,blocked
