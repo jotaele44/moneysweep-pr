@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-05-09T04:18:35Z",
+  "phase_7_8_blocked": true,
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "r4_9z_downloads_executed": false,
+  "r4_9z_downstream_blockers_active": true,
+  "r4_9z_forbidden_artifact_usage": false,
+  "r4_9z_gate_passed": true,
+  "r4_9z_pause_lock_active": true,
+  "r4_9z_production_inputs_staged": 0,
+  "r4_9z_retry_suppression_active": true,
+  "r4_9z_rows_ingested": 0,
+  "r4_9z_sources_still_missing": 21,
+  "r4_9z_unfreeze_candidates": 0,
+  "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS"
+}
