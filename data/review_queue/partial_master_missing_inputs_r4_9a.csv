@@ -6,9 +6,16 @@ priority,source_family,expected_input,target_output_path,failure_reason,review_s
 5,fema_pa_hmgp,data/staging/processed/pr_fema_hmgp_master.csv,data/staging/processed/pr_fema_hmgp_master.csv,no_file_present,pending_manual_file
 6,federal_research,data/staging/processed/pr_research_master.csv,data/staging/processed/pr_research_master.csv,no_file_present,pending_manual_file
 7,sba_loans,data/staging/processed/pr_sba_loans_master.csv,data/staging/processed/pr_sba_loans_master.csv,no_file_present,pending_manual_file
+0,slfrf,data/staging/processed/pr_slfrf_master.csv,data/staging/processed/pr_slfrf_master.csv,validated manifest record present but source file missing,validated_manifest_record_present_but_source_file_missing
 9,hud_cdbg,data/staging/processed/pr_cdbg_dr_master.csv,data/staging/processed/pr_cdbg_dr_master.csv,no_file_present,pending_manual_file
+0,dot,data/staging/processed/pr_dot_master.csv,data/staging/processed/pr_dot_master.csv,validated manifest record present but source file missing,validated_manifest_record_present_but_source_file_missing
+0,usda,data/staging/processed/pr_usda_master.csv,data/staging/processed/pr_usda_master.csv,validated manifest record present but source file missing,validated_manifest_record_present_but_source_file_missing
+0,doe,data/staging/processed/pr_doe_master.csv,data/staging/processed/pr_doe_master.csv,validated manifest record present but source file missing,validated_manifest_record_present_but_source_file_missing
+0,hud,data/staging/processed/pr_hud_master.csv,data/staging/processed/pr_hud_master.csv,validated manifest record present but source file missing,validated_manifest_record_present_but_source_file_missing
 14,federal_sectoral_sbir,data/staging/processed/pr_sbir_master.csv,data/staging/processed/pr_sbir_master.csv,no_file_present,pending_manual_file
+0,epa,data/staging/processed/pr_epa_master.csv,data/staging/processed/pr_epa_master.csv,validated manifest record present but source file missing,validated_manifest_record_present_but_source_file_missing
 16,federal_sectoral_usace,data/staging/processed/pr_usace_civil_master.csv,data/staging/processed/pr_usace_civil_master.csv,no_file_present,pending_manual_file
+0,wioa,data/staging/processed/pr_wioa_grants.csv,data/staging/processed/pr_wioa_grants.csv,validated manifest record present but source file missing,validated_manifest_record_present_but_source_file_missing
 18,usaspending_federal_awards_backbone,data/staging/expansion/expansion_idv_indirect_pr.csv,data/staging/expansion/expansion_idv_indirect_pr.csv,no_file_present,pending_manual_file
 19,usaspending_federal_awards_backbone,data/staging/expansion/expansion_dod_upr_2001_2015.csv,data/staging/expansion/expansion_dod_upr_2001_2015.csv,no_file_present,pending_manual_file
 20,usaspending_federal_awards_backbone,data/staging/expansion/expansion_dod_upr_2016_2025.csv,data/staging/expansion/expansion_dod_upr_2016_2025.csv,no_file_present,pending_manual_file

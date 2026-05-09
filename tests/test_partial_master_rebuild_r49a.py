@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 from contract_sweeper.pipeline.partial_master_rebuild import run_partial_master_rebuild
+from scripts import build_unified_master
 
 
 CANONICAL_COLUMNS = [
@@ -53,7 +54,12 @@ def _write_csv(path: Path, rows: list[dict], fieldnames: list[str]) -> None:
         writer.writerows(rows)
 
 
-def _bootstrap_inputs(tmp_path: Path) -> None:
+def _read_csv_rows(path: Path) -> list[dict]:
+    with path.open(encoding="utf-8", newline="") as handle:
+        return list(csv.DictReader(handle))
+
+
+def _bootstrap_inputs(tmp_path: Path, *, include_source_file: bool) -> None:
     _write_json(
         tmp_path / "data" / "exports" / "final_source_recovery_status_r4_8i.json",
         {
@@ -74,39 +80,42 @@ def _bootstrap_inputs(tmp_path: Path) -> None:
         ["priority", "expected_input", "terminal_status"],
     )
 
-    # One validated staged input (DOE) with canonical schema.
+    # One validated staged input manifest (DOE), optionally with physical staged file.
     doe_path = tmp_path / "data" / "staging" / "processed" / "pr_doe_master.csv"
-    doe_rows = [
-        {
-            "award_id": "DOE-1",
-            "recipient_name": "Example Utility",
-            "recipient_name_normalized": "EXAMPLE UTILITY",
-            "recipient_uei": "",
-            "awarding_agency": "DOE",
-            "awarding_sub_agency": "",
-            "obligated_amount": "1000",
-            "award_date": "2024-01-10",
-            "fiscal_year": "2024",
-            "pop_state": "PR",
-            "pop_county": "San Juan",
-            "description": "grid modernization",
-            "source_file": "pr_doe_master.csv",
-            "source_dataset": "doe",
-            "award_category": "grant",
-            "source_system": "federal_sectoral_doe",
-            "source_record_id": "doe:DOE-1",
-            "source_lineage_path": "data/staging/processed/pr_doe_master.csv",
-            "source_lineage_mode": "r4_8d_validated",
-        }
-    ]
-    _write_csv(doe_path, doe_rows, CANONICAL_COLUMNS)
+    sha = "a" * 64
+    if include_source_file:
+        doe_rows = [
+            {
+                "award_id": "DOE-1",
+                "recipient_name": "Example Utility",
+                "recipient_name_normalized": "EXAMPLE UTILITY",
+                "recipient_uei": "",
+                "awarding_agency": "DOE",
+                "awarding_sub_agency": "",
+                "obligated_amount": "1000",
+                "award_date": "2024-01-10",
+                "fiscal_year": "2024",
+                "pop_state": "PR",
+                "pop_county": "San Juan",
+                "description": "grid modernization",
+                "source_file": "pr_doe_master.csv",
+                "source_dataset": "doe",
+                "award_category": "grant",
+                "source_system": "federal_sectoral_doe",
+                "source_record_id": "doe:DOE-1",
+                "source_lineage_path": "data/staging/processed/pr_doe_master.csv",
+                "source_lineage_mode": "r4_8d_validated",
+            }
+        ]
+        _write_csv(doe_path, doe_rows, CANONICAL_COLUMNS)
+        sha = _sha256(doe_path)
 
     manifest_row = {
         "source_system": "federal_sectoral_doe",
         "source_file": "data/staging/processed/pr_doe_master.csv",
         "target_output_path": "data/staging/processed/pr_doe_master.csv",
         "row_count": "1",
-        "sha256": _sha256(doe_path),
+        "sha256": sha,
         "generated_at": "2026-05-09T00:00:00Z",
         "producer_script": "scripts/download_doe.py",
         "validation_status": "validated",
@@ -205,14 +214,19 @@ def _bootstrap_inputs(tmp_path: Path) -> None:
     )
 
 
-def test_r49a_runs_and_writes_outputs(tmp_path: Path):
-    _bootstrap_inputs(tmp_path)
+def test_r49a_manifest_and_source_file_present(tmp_path: Path):
+    _bootstrap_inputs(tmp_path, include_source_file=True)
 
     result = run_partial_master_rebuild(tmp_path)
+    expected_inputs = 1 + len(build_unified_master.NEW_MASTERS) + len(build_unified_master.EXPANSION_FILES)
 
     assert result["r4_9a_gate_passed"] is True
     assert result["r4_9a_validated_inputs_available"] == 1
-    assert result["r4_9a_missing_inputs"] == 1
+    assert result["r4_9a_validated_manifest_records_available"] == 1
+    assert result["r4_9a_validated_source_files_available"] == 1
+    assert result["r4_9a_missing_physical_validated_files"] == 0
+    assert result["r4_9a_missing_inputs"] == expected_inputs - 1
+    assert result["r4_9a_missing_expected_inputs"] == expected_inputs - 1
     assert result["r4_9a_external_blockers"] == 2
     assert result["r4_9a_rebuild_attempted"] is True
     assert result["r4_9a_rebuild_succeeded"] is True
@@ -240,9 +254,45 @@ def test_r49a_runs_and_writes_outputs(tmp_path: Path):
         / "contracts_master_partial_diagnostic.csv"
     ).exists()
 
+    input_rows = _read_csv_rows(tmp_path / "data" / "exports" / "partial_master_rebuild_inputs_r4_9a.csv")
+    doe_row = next(row for row in input_rows if row["expected_input"] == "data/staging/processed/pr_doe_master.csv")
+    assert doe_row["mapped_rel"] == "data/staging/processed/pr_doe_master.csv"
+    assert doe_row["mapped_abs"].endswith("/data/staging/processed/pr_doe_master.csv")
+    assert doe_row["mapped_abs"].startswith(str(tmp_path))
+    assert doe_row["source_manifest_path"] == "data/manifests/r4_8d/12_pr_doe_master.manifest.json"
+    assert doe_row["target_output_path"] == "data/staging/processed/pr_doe_master.csv"
+    assert doe_row["input_status"] == "validated_available"
+
+    rebuild_status = json.loads((tmp_path / "data" / "exports" / "rebuild_status.json").read_text())
+    assert rebuild_status["production_status"] == "NON_PRODUCTION_DIAGNOSTIC"
+    assert rebuild_status["phase_7_8_blocked"] is True
+
+
+def test_r49a_manifest_present_but_source_file_missing(tmp_path: Path):
+    _bootstrap_inputs(tmp_path, include_source_file=False)
+
+    result = run_partial_master_rebuild(tmp_path)
+    expected_inputs = 1 + len(build_unified_master.NEW_MASTERS) + len(build_unified_master.EXPANSION_FILES)
+
+    assert result["r4_9a_gate_passed"] is True
+    assert result["r4_9a_validated_manifest_records_available"] == 1
+    assert result["r4_9a_validated_source_files_available"] == 0
+    assert result["r4_9a_missing_physical_validated_files"] == 1
+    assert result["r4_9a_missing_expected_inputs"] == expected_inputs - 1
+    assert result["r4_9a_rebuild_attempted"] is False
+    assert result["r4_9a_rebuild_succeeded"] is False
+    assert result["r4_9a_output_status"] == "BLOCKED_DIAGNOSTIC"
+    assert result["production_status"] == "NON_PRODUCTION_DIAGNOSTIC"
+    assert result["phase_7_8_blocked"] is True
+    assert result["r4_9a_forbidden_artifact_usage"] is False
+
+    input_rows = _read_csv_rows(tmp_path / "data" / "exports" / "partial_master_rebuild_inputs_r4_9a.csv")
+    doe_row = next(row for row in input_rows if row["expected_input"] == "data/staging/processed/pr_doe_master.csv")
+    assert doe_row["input_status"] == "validated_manifest_record_present_but_source_file_missing"
+
 
 def test_r49a_blocks_forbidden_artifact_path(tmp_path: Path):
-    _bootstrap_inputs(tmp_path)
+    _bootstrap_inputs(tmp_path, include_source_file=True)
 
     manual_path = tmp_path / "data" / "review_queue" / "manual_files_still_required_r4_8i.csv"
     rows = list(csv.DictReader(manual_path.open(encoding="utf-8")))

@@ -1,6 +1,6 @@
 blocker_type,priority,source_family,expected_input,reason,next_action
 partial_mode_support,0,system,build_unified_master.run,run() supports mapped partial diagnostic execution,continue_diagnostic
-rebuild_error,0,system,partial_diagnostic_rebuild,no validated inputs available for partial diagnostic rebuild,debug_wrapper
+rebuild_error,0,system,partial_diagnostic_rebuild,validated manifest records present but physical source files are missing,debug_wrapper
 manual_missing,1,usaspending_federal_awards_backbone,data/staging/processed/pr_contracts_master.csv,no_file_present,manual_file_delivery
 endpoint_blocked,2,usaspending_federal_awards_backbone,data/staging/processed/pr_grants_master.csv,command timed out after 20s,endpoint_resolution
 manual_missing,2,usaspending_federal_awards_backbone,data/staging/processed/pr_grants_master.csv,no_file_present,manual_file_delivery

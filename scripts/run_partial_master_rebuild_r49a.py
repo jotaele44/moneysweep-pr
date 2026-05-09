@@ -23,6 +23,18 @@ def main() -> int:
 
     print(f"r4_9a_gate_passed: {status.get('r4_9a_gate_passed')}")
     print(f"r4_9a_validated_inputs_available: {status.get('r4_9a_validated_inputs_available')}")
+    print(
+        "r4_9a_validated_manifest_records_available: "
+        f"{status.get('r4_9a_validated_manifest_records_available')}"
+    )
+    print(
+        "r4_9a_validated_source_files_available: "
+        f"{status.get('r4_9a_validated_source_files_available')}"
+    )
+    print(
+        "r4_9a_missing_physical_validated_files: "
+        f"{status.get('r4_9a_missing_physical_validated_files')}"
+    )
     print(f"r4_9a_missing_inputs: {status.get('r4_9a_missing_inputs')}")
     print(f"r4_9a_external_blockers: {status.get('r4_9a_external_blockers')}")
     print(f"r4_9a_rebuild_attempted: {status.get('r4_9a_rebuild_attempted')}")
