@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-05-09T08:51:37Z",
+  "known_gaps": "partial scoped unfreeze only; unresolved sources remain blocked",
+  "manifest_type": "validated_source_manifest",
+  "phase": "R4.9G_SCOPED_UNFREEZE",
+  "producer_script": "scripts/run_scoped_unfreeze_retry_r49g.py",
+  "row_count": 1356,
+  "schema_version": "r4_9g_scoped_unfreeze_v1",
+  "sha256": "c08e70c9539f0a1de4fd2e8c739aa6a63f1a5a80db0227d7537dd08c8f71279f",
+  "source_family": "usaspending_federal_awards_backbone",
+  "source_file": "data/staging/expansion/expansion_reconstruction_2017_2025.csv",
+  "source_system": "usaspending_federal_awards_backbone",
+  "target_output_path": "data/staging/expansion/expansion_reconstruction_2017_2025.csv",
+  "unfreeze_condition": "Provide the required manual source file under data/manual_import_dropzone/r4_8e/usaspending_federal_awards_backbone/expansion_reconstruction_2017_2025.csv, validate schema/rows, and stage to data/staging/expansion/expansion_reconstruction_2017_2025.csv.",
+  "validation_status": "validated"
+}
