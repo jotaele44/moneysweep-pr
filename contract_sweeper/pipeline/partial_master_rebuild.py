@@ -74,38 +74,68 @@ def _expected_input_list(build_module: Any) -> list[tuple[str, str]]:
     return expected
 
 
-def _validated_manifest_rows(root: Path, rows: list[dict[str, str]]) -> list[dict[str, Any]]:
+def _status_is_validated(value: str) -> bool:
+    lowered = str(value or "").strip().lower()
+    if not lowered:
+        return False
+    if lowered.startswith("valid"):
+        return True
+    return lowered in {"ok", "passed", "success", "validated_source_manifest"}
+
+
+def _manifest_type_is_validated(value: str) -> bool:
+    lowered = str(value or "").strip().lower()
+    return lowered == "validated_source_manifest"
+
+
+def _resolve_abs_path(root: Path, path_value: str) -> Path:
+    candidate = Path(str(path_value or "").strip())
+    if candidate.is_absolute():
+        return candidate
+    return (root / candidate).resolve()
+
+
+def _validated_manifest_records(root: Path, rows: list[dict[str, str]]) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     for row in rows:
         target = str(row.get("target_output_path", "")).strip()
         if not target:
             continue
-        if _contains_forbidden_token(target):
-            continue
 
-        abs_path = root / target
-        if not abs_path.exists() or not abs_path.is_file():
-            continue
+        abs_path = _resolve_abs_path(root, target)
+        exists = abs_path.exists() and abs_path.is_file()
 
         row_count = safe_int(row.get("row_count"))
         sha = str(row.get("sha256", "")).strip()
-        if row_count <= 0 or not sha:
+        validation_status = str(row.get("validation_status", "")).strip()
+        manifest_type = str(row.get("manifest_type", "")).strip()
+        source_manifest_path = str(row.get("manifest_path", "")).strip()
+        source_file = str(row.get("source_file", "")).strip()
+
+        if (
+            row_count <= 0
+            or not sha
+            or not _status_is_validated(validation_status)
+            or not _manifest_type_is_validated(manifest_type)
+        ):
             continue
 
         out.append(
             {
                 "source_system": str(row.get("source_system", "")).strip(),
-                "source_file": str(row.get("source_file", "")).strip(),
+                "source_file": source_file,
                 "target_output_path": target,
+                "target_output_abs_path": str(abs_path),
+                "target_output_exists": exists,
                 "row_count": row_count,
                 "sha256": sha,
                 "generated_at": str(row.get("generated_at", "")).strip(),
                 "producer_script": str(row.get("producer_script", "")).strip(),
-                "validation_status": str(row.get("validation_status", "")).strip(),
+                "validation_status": validation_status,
                 "known_gaps": str(row.get("known_gaps", "")).strip(),
                 "schema_version": str(row.get("schema_version", "")).strip(),
-                "manifest_type": str(row.get("manifest_type", "")).strip(),
-                "manifest_path": str(row.get("manifest_path", "")).strip(),
+                "manifest_type": manifest_type,
+                "source_manifest_path": source_manifest_path,
             }
         )
     return out
@@ -114,12 +144,12 @@ def _validated_manifest_rows(root: Path, rows: list[dict[str, str]]) -> list[dic
 def _build_input_rows(
     *,
     expected_inputs: list[tuple[str, str]],
-    validated_rows: list[dict[str, Any]],
+    validated_records: list[dict[str, Any]],
     missing_manual_rows: list[dict[str, str]],
     input_map: dict[str, dict[str, str]],
 ) -> list[dict[str, Any]]:
     validated_by_target = {
-        str(row.get("target_output_path", "")).strip(): row for row in validated_rows
+        str(row.get("target_output_path", "")).strip(): row for row in validated_records
     }
     missing_by_expected = {
         str(row.get("expected_input", "")).strip(): row for row in missing_manual_rows
@@ -129,26 +159,40 @@ def _build_input_rows(
     for expected_input, source_dataset in expected_inputs:
         mapping = input_map.get(expected_input, {})
         mapped_rel = str(mapping.get("mapped_rel", expected_input))
+        mapped_abs = str(mapping.get("mapped_abs", ""))
         mapping_mode = str(mapping.get("mapping_mode", "exact"))
         validation = validated_by_target.get(expected_input)
         missing = missing_by_expected.get(expected_input)
 
-        status = "missing"
+        status = "missing_expected_input"
         row_count = 0
         sha256 = ""
         source_system = source_dataset
         source_file = ""
-        lineage_path = mapped_rel
+        source_manifest_path = ""
+        target_output_path = expected_input
+        lineage_path = expected_input
         reason = "not validated"
 
         if validation:
-            status = "validated_available"
+            source_file_exists = bool(validation.get("target_output_exists", False))
+            status = (
+                "validated_available"
+                if source_file_exists
+                else "validated_manifest_record_present_but_source_file_missing"
+            )
             row_count = safe_int(validation.get("row_count"))
             sha256 = str(validation.get("sha256", ""))
             source_system = str(validation.get("source_system", source_dataset))
             source_file = str(validation.get("source_file", ""))
             lineage_path = str(validation.get("target_output_path", expected_input))
-            reason = "validated manifest input"
+            source_manifest_path = str(validation.get("source_manifest_path", "")).strip()
+            target_output_path = str(validation.get("target_output_path", expected_input)).strip()
+            reason = (
+                "validated source file available"
+                if source_file_exists
+                else "validated manifest record present but source file missing"
+            )
         elif missing:
             status = "missing_manual_blocker"
             reason = str(missing.get("failure_reason", "manual file still required"))
@@ -157,13 +201,16 @@ def _build_input_rows(
             {
                 "expected_input": expected_input,
                 "source_dataset": source_dataset,
-                "mapped_input_path": mapped_rel,
+                "mapped_rel": mapped_rel,
+                "mapped_abs": mapped_abs,
                 "mapping_mode": mapping_mode,
                 "input_status": status,
                 "row_count": row_count,
                 "sha256": sha256,
                 "source_system": source_system,
                 "source_file": source_file,
+                "source_manifest_path": source_manifest_path,
+                "target_output_path": target_output_path,
                 "lineage_path": lineage_path,
                 "reason": reason,
             }
@@ -217,7 +264,11 @@ def _build_lineage_report(input_rows: list[dict[str, Any]]) -> list[dict[str, An
                 "expected_input": str(row.get("expected_input", "")).strip(),
                 "source_system": str(row.get("source_system", "")).strip(),
                 "source_file": str(row.get("source_file", "")).strip(),
+                "source_manifest_path": str(row.get("source_manifest_path", "")).strip(),
+                "target_output_path": str(row.get("target_output_path", "")).strip(),
                 "lineage_path": str(row.get("lineage_path", "")).strip(),
+                "mapped_rel": str(row.get("mapped_rel", "")).strip(),
+                "mapped_abs": str(row.get("mapped_abs", "")).strip(),
                 "mapping_mode": str(row.get("mapping_mode", "")).strip(),
                 "input_status": str(row.get("input_status", "")).strip(),
                 "row_count": safe_int(row.get("row_count")),
@@ -338,26 +389,61 @@ def run_partial_master_rebuild(root: Path) -> dict[str, Any]:
     partial_supported, support_reason = _detect_partial_support(build_module)
 
     expected_inputs = _expected_input_list(build_module)
-    validated_rows = _validated_manifest_rows(root, manifest_rows_raw)
+    expected_input_names = [expected_input for expected_input, _ in expected_inputs]
+    validated_records = _validated_manifest_records(root, manifest_rows_raw)
     validated_lookup = {
-        str(row.get("target_output_path", "")).strip(): row for row in validated_rows
+        str(row.get("target_output_path", "")).strip(): row for row in validated_records
     }
+    validated_file_records = [row for row in validated_records if bool(row.get("target_output_exists"))]
+
+    validated_manifest_records_available = len(validated_records)
+    validated_source_files_available = len(validated_file_records)
+    missing_physical_validated_files = (
+        validated_manifest_records_available - validated_source_files_available
+    )
+    missing_expected_inputs = sum(1 for item in expected_input_names if item not in validated_lookup)
 
     input_map: dict[str, dict[str, str]] = {}
+    build_input_map: dict[str, dict[str, str]] = {}
     for expected_input, _dataset in expected_inputs:
-        if expected_input in validated_lookup:
+        validation = validated_lookup.get(expected_input)
+        if validation:
+            mapped_abs = str(validation.get("target_output_abs_path", "")).strip()
+            mapped_rel = expected_input
+            target_exists = bool(validation.get("target_output_exists", False))
+            mapping_mode = (
+                "r4_9a_validated_source_file"
+                if target_exists
+                else "r4_9a_validated_manifest_missing_source_file"
+            )
             input_map[expected_input] = {
-                "mapped_rel": str((root / expected_input).resolve()),
-                "mapping_mode": "r4_9a_validated",
+                "mapped_rel": mapped_rel,
+                "mapped_abs": mapped_abs,
+                "source_manifest_path": str(validation.get("source_manifest_path", "")).strip(),
+                "target_output_path": str(validation.get("target_output_path", expected_input)).strip(),
+                "mapping_mode": mapping_mode,
+            }
+            build_input_map[expected_input] = {
+                "mapped_rel": mapped_abs if target_exists else mapped_rel,
+                "mapping_mode": mapping_mode,
             }
         else:
+            mapped_rel = f"data/staging/processed/partial/r4_9a_missing/{Path(expected_input).name}"
+            mapped_abs = str((root / mapped_rel).resolve())
             input_map[expected_input] = {
-                "mapped_rel": f"data/staging/processed/partial/r4_9a_missing/{Path(expected_input).name}",
+                "mapped_rel": mapped_rel,
+                "mapped_abs": mapped_abs,
+                "source_manifest_path": "",
+                "target_output_path": expected_input,
+                "mapping_mode": "r4_9a_missing",
+            }
+            build_input_map[expected_input] = {
+                "mapped_rel": mapped_rel,
                 "mapping_mode": "r4_9a_missing",
             }
 
     forbidden_artifact_usage = bool(
-        any(_contains_forbidden_token(str(row.get("target_output_path", ""))) for row in validated_rows)
+        any(_contains_forbidden_token(str(row.get("target_output_path", ""))) for row in validated_records)
         or any(_contains_forbidden_token(str(row.get("expected_input", ""))) for row in missing_manual_rows)
         or any(_contains_forbidden_token(str(row.get("expected_input", ""))) for row in endpoint_blocked_rows)
         or any(_contains_forbidden_token(str(row.get("expected_input", ""))) for row in producer_blocked_rows)
@@ -378,14 +464,14 @@ def run_partial_master_rebuild(root: Path) -> dict[str, Any]:
     partial_master_parquet = partial_dir / "contracts_master_partial_diagnostic.parquet"
     partial_entities_csv = partial_dir / "entities_partial_diagnostic.csv"
 
-    if partial_supported and not forbidden_artifact_usage and len(validated_rows) > 0:
+    if partial_supported and not forbidden_artifact_usage and validated_source_files_available > 0:
         rebuild_attempted = True
         try:
             with tempfile.TemporaryDirectory(prefix="r49a_partial_workspace_") as tmpdir:
                 workspace_root = Path(tmpdir)
                 summary = build_module.run(
                     root=workspace_root,
-                    input_map=input_map,
+                    input_map=build_input_map,
                     require_all_inputs=False,
                     fail_on_forbidden=True,
                 )
@@ -425,7 +511,11 @@ def run_partial_master_rebuild(root: Path) -> dict[str, Any]:
         elif forbidden_artifact_usage:
             rebuild_error = "forbidden artifact usage detected"
         else:
-            rebuild_error = "no validated inputs available for partial diagnostic rebuild"
+            rebuild_error = (
+                "validated manifest records present but physical source files are missing"
+                if validated_manifest_records_available > 0 and validated_source_files_available == 0
+                else "no validated inputs available for partial diagnostic rebuild"
+            )
 
     output_status = derive_output_status(rebuild_succeeded)
     production_status = "NON_PRODUCTION_DIAGNOSTIC"
@@ -436,7 +526,7 @@ def run_partial_master_rebuild(root: Path) -> dict[str, Any]:
 
     input_rows = _build_input_rows(
         expected_inputs=expected_inputs,
-        validated_rows=validated_rows,
+        validated_records=validated_records,
         missing_manual_rows=missing_manual_rows,
         input_map=input_map,
     )
@@ -448,17 +538,36 @@ def run_partial_master_rebuild(root: Path) -> dict[str, Any]:
     )
     lineage_rows = _build_lineage_report(input_rows)
 
-    missing_inputs_rows = [
-        {
-            "priority": safe_int(row.get("priority")),
-            "source_family": str(row.get("source_family", "")).strip(),
-            "expected_input": str(row.get("expected_input", "")).strip(),
-            "target_output_path": str(row.get("target_output_path", "")).strip(),
-            "failure_reason": str(row.get("failure_reason", "")).strip() or "manual file still required",
-            "review_status": str(row.get("review_status", "")).strip() or "pending_manual_file",
-        }
-        for row in missing_manual_rows
-    ]
+    missing_by_expected = {
+        str(row.get("expected_input", "")).strip(): row for row in missing_manual_rows
+    }
+    missing_inputs_rows: list[dict[str, Any]] = []
+    for row in input_rows:
+        input_status = str(row.get("input_status", "")).strip()
+        if input_status == "validated_available":
+            continue
+        expected_input = str(row.get("expected_input", "")).strip()
+        manual_row = missing_by_expected.get(expected_input, {})
+
+        review_status = str(manual_row.get("review_status", "")).strip()
+        if not review_status:
+            review_status = (
+                "validated_manifest_record_present_but_source_file_missing"
+                if input_status == "validated_manifest_record_present_but_source_file_missing"
+                else "pending_manual_file"
+            )
+
+        missing_inputs_rows.append(
+            {
+                "priority": safe_int(manual_row.get("priority")),
+                "source_family": str(manual_row.get("source_family", "")).strip()
+                or str(row.get("source_dataset", "")).strip(),
+                "expected_input": expected_input,
+                "target_output_path": str(row.get("target_output_path", "")).strip(),
+                "failure_reason": str(row.get("reason", "")).strip() or "input unavailable",
+                "review_status": review_status,
+            }
+        )
 
     blocker_rows = _build_blocker_rows(
         missing_manual_rows=missing_manual_rows,
@@ -468,7 +577,10 @@ def run_partial_master_rebuild(root: Path) -> dict[str, Any]:
         rebuild_error=rebuild_error if not rebuild_succeeded else "",
     )
 
-    accounted_inputs = len(input_rows) == len(expected_inputs) and len(missing_inputs_rows) == len(missing_manual_rows)
+    accounted_inputs = (
+        len(input_rows) == len(expected_inputs)
+        and (validated_manifest_records_available + missing_expected_inputs) == len(expected_inputs)
+    )
     rebuild_state_valid = bool(rebuild_succeeded or (not rebuild_succeeded and rebuild_error))
 
     gate_passed = evaluate_partial_gate(
@@ -484,8 +596,12 @@ def run_partial_master_rebuild(root: Path) -> dict[str, Any]:
         "generated_at": utc_now(),
         "r4_9a_phase_type": "PARTIAL_DIAGNOSTIC_MASTER_REBUILD",
         "r4_9a_gate_passed": gate_passed,
-        "r4_9a_validated_inputs_available": len(validated_rows),
-        "r4_9a_missing_inputs": len(missing_inputs_rows),
+        "r4_9a_validated_inputs_available": validated_manifest_records_available,
+        "r4_9a_validated_manifest_records_available": validated_manifest_records_available,
+        "r4_9a_validated_source_files_available": validated_source_files_available,
+        "r4_9a_missing_physical_validated_files": missing_physical_validated_files,
+        "r4_9a_missing_inputs": missing_expected_inputs,
+        "r4_9a_missing_expected_inputs": missing_expected_inputs,
         "r4_9a_external_blockers": external_blocker_count,
         "r4_9a_rebuild_attempted": rebuild_attempted,
         "r4_9a_rebuild_succeeded": rebuild_succeeded,
@@ -528,13 +644,16 @@ def run_partial_master_rebuild(root: Path) -> dict[str, Any]:
         [
             "expected_input",
             "source_dataset",
-            "mapped_input_path",
+            "mapped_rel",
+            "mapped_abs",
             "mapping_mode",
             "input_status",
             "row_count",
             "sha256",
             "source_system",
             "source_file",
+            "source_manifest_path",
+            "target_output_path",
             "lineage_path",
             "reason",
         ],
@@ -560,7 +679,11 @@ def run_partial_master_rebuild(root: Path) -> dict[str, Any]:
             "expected_input",
             "source_system",
             "source_file",
+            "source_manifest_path",
+            "target_output_path",
             "lineage_path",
+            "mapped_rel",
+            "mapped_abs",
             "mapping_mode",
             "input_status",
             "row_count",
@@ -599,8 +722,12 @@ def run_partial_master_rebuild(root: Path) -> dict[str, Any]:
             "r4_9a_generated_at": status_payload["generated_at"],
             "r4_9a_phase_type": status_payload["r4_9a_phase_type"],
             "r4_9a_gate_passed": gate_passed,
-            "r4_9a_validated_inputs_available": len(validated_rows),
-            "r4_9a_missing_inputs": len(missing_inputs_rows),
+            "r4_9a_validated_inputs_available": validated_manifest_records_available,
+            "r4_9a_validated_manifest_records_available": validated_manifest_records_available,
+            "r4_9a_validated_source_files_available": validated_source_files_available,
+            "r4_9a_missing_physical_validated_files": missing_physical_validated_files,
+            "r4_9a_missing_inputs": missing_expected_inputs,
+            "r4_9a_missing_expected_inputs": missing_expected_inputs,
             "r4_9a_external_blockers": external_blocker_count,
             "r4_9a_rebuild_attempted": rebuild_attempted,
             "r4_9a_rebuild_succeeded": rebuild_succeeded,

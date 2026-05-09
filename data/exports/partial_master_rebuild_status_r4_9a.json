@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T01:34:17Z",
+  "generated_at": "2026-05-09T02:22:26Z",
   "inputs": {
     "backfill_retry_order_r4_8i": "data/review_queue/backfill_retry_order_r4_8i.csv",
     "endpoints_still_blocked_r4_8i": "data/review_queue/endpoints_still_blocked_r4_8i.csv",
@@ -26,7 +26,9 @@
   "r4_9a_external_blockers": 25,
   "r4_9a_forbidden_artifact_usage": false,
   "r4_9a_gate_passed": true,
+  "r4_9a_missing_expected_inputs": 14,
   "r4_9a_missing_inputs": 14,
+  "r4_9a_missing_physical_validated_files": 7,
   "r4_9a_output_rows": 0,
   "r4_9a_output_status": "BLOCKED_DIAGNOSTIC",
   "r4_9a_phase_type": "PARTIAL_DIAGNOSTIC_MASTER_REBUILD",
@@ -34,6 +36,8 @@
   "r4_9a_rebuild_succeeded": false,
   "r4_9a_source_lineage_coverage": 0.0,
   "r4_9a_unique_entities": 0,
-  "r4_9a_validated_inputs_available": 0,
+  "r4_9a_validated_inputs_available": 7,
+  "r4_9a_validated_manifest_records_available": 7,
+  "r4_9a_validated_source_files_available": 0,
   "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS"
 }
