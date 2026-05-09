@@ -1,0 +1,15 @@
+retry_rank,priority,expected_input,source_family,next_action,reason
+1,1,data/staging/processed/pr_contracts_master.csv,usaspending_federal_awards_backbone,require_manual_file,no_file_present
+2,2,data/staging/processed/pr_grants_master.csv,usaspending_federal_awards_backbone,require_manual_file,no_file_present
+3,3,data/staging/processed/pr_subawards_master.csv,fsrs_subawards,require_manual_file,no_file_present
+4,4,data/staging/processed/pr_fema_pa_master.csv,fema_pa_hmgp,require_manual_file,no_file_present
+5,5,data/staging/processed/pr_fema_hmgp_master.csv,fema_pa_hmgp,require_manual_file,no_file_present
+6,6,data/staging/processed/pr_research_master.csv,federal_research,require_manual_file,no_file_present
+7,7,data/staging/processed/pr_sba_loans_master.csv,sba_loans,require_manual_file,no_file_present
+8,9,data/staging/processed/pr_cdbg_dr_master.csv,hud_cdbg,require_manual_file,no_file_present
+9,14,data/staging/processed/pr_sbir_master.csv,federal_sectoral_sbir,require_manual_file,no_file_present
+10,16,data/staging/processed/pr_usace_civil_master.csv,federal_sectoral_usace,require_manual_file,no_file_present
+11,18,data/staging/expansion/expansion_idv_indirect_pr.csv,usaspending_federal_awards_backbone,require_manual_file,no_file_present
+12,19,data/staging/expansion/expansion_dod_upr_2001_2015.csv,usaspending_federal_awards_backbone,require_manual_file,no_file_present
+13,20,data/staging/expansion/expansion_dod_upr_2016_2025.csv,usaspending_federal_awards_backbone,require_manual_file,no_file_present
+14,21,data/staging/expansion/expansion_reconstruction_2017_2025.csv,usaspending_federal_awards_backbone,require_manual_file,no_file_present
