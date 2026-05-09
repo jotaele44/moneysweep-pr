@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-05-09T03:23:05Z",
+  "phase_7_8_blocked": true,
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "r4_9c_delivery_blockers": 21,
+  "r4_9c_delivery_requests_checked": 21,
+  "r4_9c_external_blocker_count": 25,
+  "r4_9c_files_found": 0,
+  "r4_9c_files_materialized": 0,
+  "r4_9c_files_validated": 0,
+  "r4_9c_forbidden_artifact_usage": false,
+  "r4_9c_gate_passed": true,
+  "r4_9c_manual_files_still_required": 14,
+  "r4_9c_new_rows_available": 0,
+  "r4_9c_new_validated_source_manifests": 0,
+  "r4_9c_physical_validated_files_still_missing": 7,
+  "r4_9c_rows_available_total": 3135,
+  "r4_9c_validated_source_manifests_total": 7,
+  "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS"
+}
