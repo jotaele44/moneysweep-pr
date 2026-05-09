@@ -1,0 +1,10 @@
+{
+  "generated_at": "2026-05-09T02:57:07Z",
+  "phase_7_8_blocked": true,
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "r4_9b_files_hash_validated": 0,
+  "r4_9b_files_materialized": 0,
+  "r4_9b_forbidden_artifact_usage": false,
+  "r4_9b_manifest_records_checked": 7,
+  "r4_9b_materialization_blockers": 7
+}
