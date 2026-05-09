@@ -1,0 +1,16 @@
+{
+  "downloads_executed": false,
+  "downstream_phases_blocked": true,
+  "generated_at": "2026-05-09T17:12:06Z",
+  "phase_7_8_blocked": true,
+  "production_inputs_staged": 0,
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "r4_9h2_gate_passed": true,
+  "rejected_candidates_reviewed": 24,
+  "rows_ingested": 0,
+  "targets_potentially_unblockable": 0,
+  "targets_still_external_only": 16,
+  "transform_candidates": 0,
+  "transform_rejects": 24,
+  "unfreeze_candidates_created": 0
+}
