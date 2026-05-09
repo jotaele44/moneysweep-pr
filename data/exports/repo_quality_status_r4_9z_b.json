@@ -1,0 +1,16 @@
+{
+  "downloads_executed": false,
+  "downstream_blockers_active": true,
+  "forbidden_artifact_usage": false,
+  "generated_at": "2026-05-09T05:59:23Z",
+  "phase_7_8_blocked": true,
+  "possible_secret_findings": 0,
+  "production_inputs_staged": 0,
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "r4_9z_b_gate_passed": true,
+  "resume_conditions_written": true,
+  "retry_suppression_active": true,
+  "rows_ingested": 0,
+  "sources_still_missing": 21,
+  "unfreeze_candidates": 0
+}
