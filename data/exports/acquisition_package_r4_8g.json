@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-05-09T00:02:10Z",
+  "inputs": {
+    "backfill_retry_order_r4_8f": "data/review_queue/backfill_retry_order_r4_8f.csv",
+    "endpoint_failures_remaining_r4_8f": "data/review_queue/endpoint_failures_remaining_r4_8f.csv",
+    "endpoint_patch_retry_report_r4_8f": "data/exports/endpoint_patch_retry_report_r4_8f.csv",
+    "manual_files_still_required_r4_8f": "data/review_queue/manual_files_still_required_r4_8f.csv",
+    "manual_import_dropzone_inventory_r4_8f": "data/exports/manual_import_dropzone_inventory_r4_8f.csv",
+    "manual_import_dropzone_status_r4_8f": "data/exports/manual_import_dropzone_status_r4_8f.json",
+    "producer_failures_remaining_r4_8f": "data/review_queue/producer_failures_remaining_r4_8f.csv",
+    "producer_patch_retry_report_r4_8f": "data/exports/producer_patch_retry_report_r4_8f.csv",
+    "validated_source_manifest_inventory_r4_8f": "data/exports/validated_source_manifest_inventory_r4_8f.csv"
+  },
+  "outputs": {
+    "acquisition_package_json": "data/exports/acquisition_package_r4_8g.json",
+    "acquisition_package_md": "data/exports/acquisition_package_r4_8g.md",
+    "backfill_retry_order_r4_8g": "data/review_queue/backfill_retry_order_r4_8g.csv",
+    "credential_requests": "data/review_queue/credential_requests_r4_8g.csv",
+    "credential_unblock_plan": "data/exports/credential_unblock_plan_r4_8g.csv",
+    "endpoint_resolution_requests": "data/review_queue/endpoint_resolution_requests_r4_8g.csv",
+    "manual_file_acquisition_matrix": "data/exports/manual_file_acquisition_matrix_r4_8g.csv",
+    "manual_file_requests": "data/review_queue/manual_file_requests_r4_8g.csv",
+    "producer_patch_requests": "data/review_queue/producer_patch_requests_r4_8g.csv"
+  },
+  "phase_7_8_blocked": true,
+  "r4_8g_credential_requests": 9,
+  "r4_8g_downloads_executed": false,
+  "r4_8g_endpoint_resolution_requests": 9,
+  "r4_8g_forbidden_artifact_usage": false,
+  "r4_8g_gate_passed": true,
+  "r4_8g_manual_file_requests": 14,
+  "r4_8g_new_production_inputs_staged": 0,
+  "r4_8g_new_rows_ingested": 0,
+  "r4_8g_new_validated_source_manifests": 0,
+  "r4_8g_phase_type": "MANUAL_FILE_ACQUISITION_AND_CREDENTIALED_ENDPOINT_UNBLOCK_RETRY",
+  "r4_8g_producer_patch_requests": 2,
+  "r4_8g_production_inputs_staged_total": 7,
+  "r4_8g_rows_ingested_total": 3135,
+  "r4_8g_validated_source_manifests_total": 7,
+  "row_fabrication_policy": "FORBIDDEN_NO_SYNTHETIC_ROWS"
+}
