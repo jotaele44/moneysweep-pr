@@ -31,6 +31,58 @@ NAME_FIELDS = [
     "recipient_name", "vendor_name", "award_recipient_name",
     "prime_recipient_name", "sub_recipient_name", "contractor", "applicant",
 ]
+
+# Entity-type classification keyword sets (checked in priority order)
+_AGGREGATE = frozenset(["MULTIPLE RECIPIENTS", "VARIOUS RECIPIENTS", "ALL RECIPIENTS", "UNDISCLOSED"])
+_GOVT = frozenset([
+    "DEPARTMENT OF", "DEPARTAMENTO DE", "DEPT OF",
+    "ADMINISTRACION", "ADMINISTRACIÓN", "ADMINISTRATION OF",
+    "AUTORIDAD", "AUTHORITY OF",
+    "MUNICIPIO", "MUNICIPALITY OF", "MUNICIPALIDAD",
+    "GOVERNMENT OF", "GOBIERNO DE",
+    "GOVERNOR'S",
+    "COMMONWEALTH OF", "ESTADO LIBRE ASOCIADO",
+    "SECRETARIA", "SECRETARÍA", "SECRETARIAT",
+    "JUNTA DE", "JUNTA OF",
+    "OFICINA DE", "OFICINA DEL",
+    "TRIBUNAL",
+    "POLICIA", "POLICE DEPARTMENT",
+    "HACIENDA",
+    "CONSEJO DE",
+    "DEPARTAMENTO",
+    "AGENCIA",
+])
+_NONPROFIT = frozenset([
+    "UNIVERSITY", "UNIVERSIDAD", "COLLEGE", "ESCUELA GRADUADA",
+    "FOUNDATION", "FUNDACION", "FUNDACIÓN",
+    "IGLESIA", "CHURCH", "CATHEDRAL",
+    "NONPROFIT", "NON-PROFIT",
+    "COOPERATIVE", "COOPERATIVA",
+])
+
+
+def _classify_entity_type(name: str) -> str:
+    """Return one of: aggregate, government, nonprofit, individual, corporate."""
+    n = name.upper().strip()
+    if not n:
+        return "unknown"
+    for pat in _AGGREGATE:
+        if pat in n:
+            return "aggregate"
+    for kw in _GOVT:
+        if kw in n:
+            return "government"
+    for kw in _NONPROFIT:
+        if kw in n:
+            return "nonprofit"
+    # Heuristic: "SURNAME, FIRSTNAME [suffix]" pattern → individual
+    if "," in n:
+        parts = n.split(",", 1)
+        left, right = parts[0].strip(), parts[1].strip()
+        biz_suffixes = {"LLC", "INC", "CORP", "SA", "CSP", "LTD", "PSC", "CO", "S.A.", "SRL"}
+        if not any(s in right for s in biz_suffixes) and len(left.split()) <= 2 and len(right.split()) <= 3:
+            return "individual"
+    return "corporate"
 UEI_FIELDS = ["recipient_uei", "uei", "entity_uei", "prime_uei", "sub_uei"]
 PARENT_UEI_FIELDS = ["parent_uei", "ultimate_parent_uei", "immediate_parent_uei"]
 PARENT_NAME_FIELDS = ["parent_name", "ultimate_parent_name", "immediate_parent_name"]
@@ -128,6 +180,7 @@ def build_entities(root: Path) -> dict[str, Any]:
                 "normalized_name": norm,
                 "entity_name": raw_name,
                 "entity_uei": uei,
+                "entity_type": _classify_entity_type(raw_name or norm),
                 "parent_uei": "",
                 "parent_name": "",
                 "resolution_method": "observed_only",
@@ -189,6 +242,12 @@ def build_entities(root: Path) -> dict[str, Any]:
 
     total = len(rows)
     resolved_count = sum(1 for r in rows if r["parent_uei"] or r["parent_name"])
+    corporate = [r for r in rows if r.get("entity_type") == "corporate"]
+    corp_resolved = sum(1 for r in corporate if r.get("parent_uei"))
+    type_counts = {}
+    for r in rows:
+        t = r.get("entity_type", "unknown")
+        type_counts[t] = type_counts.get(t, 0) + 1
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "entity_count": total,
@@ -196,6 +255,9 @@ def build_entities(root: Path) -> dict[str, Any]:
         "resolution_rate": (resolved_count / total) if total else 0.0,
         "high_value_unresolved_count": len(unresolved),
         "parent_conflict_count": len(conflicts),
+        "entity_type_counts": type_counts,
+        "corporate_entity_count": len(corporate),
+        "corporate_parent_uei_rate": (corp_resolved / len(corporate)) if corporate else 0.0,
     }
 
 

@@ -19,7 +19,7 @@
         "year_coverage_pct": 0.95
       },
       "update_cadence": "weekly",
-      "notes": "USAspending API + bulk archive. No key required."
+      "notes": "USAspending API + bulk archive. No key required.\nTop recipients are PR government agencies (PRDOH, ADSEF, PRDE, PRHA) \u2014\nno corporate parent_uei is expected for these entities.\n"
     },
     {
       "source_id": "usaspending_subawards",
@@ -88,10 +88,11 @@
       "schema_version": "r5_v1",
       "validation_threshold": {
         "min_rows": 1,
-        "parent_uei_coverage_pct": 0.9
+        "parent_uei_coverage_pct_govt": 0.0,
+        "parent_uei_coverage_pct_corporate": 0.002
       },
       "update_cadence": "monthly",
-      "notes": "SAM full extract + per-UEI enrichment for parent resolution."
+      "notes": "SAM full extract + per-UEI enrichment for parent resolution.\nSupplemented by scripts/usaspending_parent_uei_extract.py (no rate limit).\nSAM API rate: 1,000 req/day \u2192 full 2,334-UEI run = 2.3+ days.\n"
     },
     {
       "source_id": "highergov_supplemental",
