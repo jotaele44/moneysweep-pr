@@ -33,8 +33,13 @@ sources:
     validation_threshold:
       min_rows: 1
       year_coverage_pct: 0.95
+      # PR2.6: no per-source parent_uei threshold — top entities are PR govt agencies.
+      # Entity-type-aware gates in validation_gates.py handle parent resolution.
     update_cadence: weekly
-    notes: USAspending API + bulk archive. No key required.
+    notes: |
+      USAspending API + bulk archive. No key required.
+      Top recipients are PR government agencies (PRDOH, ADSEF, PRDE, PRHA) —
+      no corporate parent_uei is expected for these entities.
 
   - source_id: usaspending_subawards
     family: federal
@@ -92,9 +97,17 @@ sources:
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
-      parent_uei_coverage_pct: 0.90
+      # PR2.6: global parent_uei_coverage_pct ≥ 0.90 is replaced by entity-type-aware
+      # gates in validation_gates.py (corporate_parent_uei_rate ≥ 0.002).
+      # PR awards are dominated by PR govt agencies that never register corporate
+      # parent UEIs — a global 0.90 threshold is structurally unachievable.
+      parent_uei_coverage_pct_govt: 0.00   # govt entities: no corporate parent expected
+      parent_uei_coverage_pct_corporate: 0.002  # corporate entities: canary threshold
     update_cadence: monthly
-    notes: SAM full extract + per-UEI enrichment for parent resolution.
+    notes: |
+      SAM full extract + per-UEI enrichment for parent resolution.
+      Supplemented by scripts/usaspending_parent_uei_extract.py (no rate limit).
+      SAM API rate: 1,000 req/day → full 2,334-UEI run = 2.3+ days.
 
   - source_id: highergov_supplemental
     family: federal

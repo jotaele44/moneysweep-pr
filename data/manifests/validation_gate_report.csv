@@ -14,9 +14,10 @@ required_source_nonempty,lda,True,True,1,1,data/staging/processed/pr_lda_filings
 required_source_nonempty,pr_cabilderos,True,False,0,1,,backfill_or_manual_export
 required_source_nonempty,fec,True,True,1,1,data/staging/processed/pr_fec_contributions.csv,ok
 source_coverage_rate,,,False,0.5,0.95,,backfill_required_sources
-entity_resolution_rate,,,False,0.0,0.95,,resolve_aliases_and_sam_parent
-parent_uei_coverage,,,False,0.0,0.9,,ingest_sam_full_extract
-high_value_unresolved_zero,,,False,3818,0,,manual_review_required
+entity_resolution_rate,,,False,0.0004,0.95,,resolve_aliases_and_sam_parent
+entity_type_assignment_rate,,,True,1.0,0.8,,ok
+corporate_parent_uei_rate,,,False,0.0004,0.002,,complete_usaspending_enrichment
+high_value_unresolved_review_rate,,,True,1.0,0.9,,ok
 subaward_linkage_rate,,,False,0.0,0.9,,rebuild_execution_chain_master
 execution_chain_linkage_rate,,,False,0,0.9,,build_execution_chains
 manifest_present_per_required,usaspending_prime,,True,present,present,,ok

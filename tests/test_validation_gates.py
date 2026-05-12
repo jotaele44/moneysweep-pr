@@ -52,8 +52,10 @@ def test_write_report_emits_canonical_paths(tmp_path):
     assert paths["csv"] == tmp_path / "data" / "manifests" / "validation_gate_report.csv"
     assert paths["json"].exists()
     payload = json.loads(paths["json"].read_text())
-    assert payload["schema_version"] == "r5_v1"
+    assert payload["schema_version"] == "r5_v2"
     assert "thresholds" in payload
+    assert "entity_type_assignment_rate" in payload["thresholds"]
+    assert "corporate_parent_uei_rate" in payload["thresholds"]
 
 
 @pytest.mark.unit
@@ -63,9 +65,74 @@ def test_entity_resolution_gate_passes_on_fixture(tmp_path):
     proc.mkdir(parents=True, exist_ok=True)
     shutil.copy(FIXTURES / "sample_entities_resolved.csv", proc / "entities_resolved.csv")
     er = vg.gate_entity_resolution(tmp_path)
-    # 5 of 7 rows have a parent_uei → 0.714, below 0.95 target — so the rate
-    # gate fails but the function should report a numeric rate.
+    # 5 of 7 corporate rows have parent_uei → resolution_rate > 0
     assert 0.0 < er["resolution_rate"] <= 1.0
+    # entity_type_assignment_rate: all 9 rows have entity_type → should be 1.0
+    assert er["entity_type_assignment_rate"] == 1.0
+    # corporate_parent_uei_rate: 5 of 7 corporate entities → ~0.71
+    assert er["corporate_parent_uei_rate"] > 0.5
+
+
+@pytest.mark.unit
+def test_entity_type_assignment_gate_passes_when_all_typed(tmp_path):
+    _build_tmp_repo(tmp_path)
+    proc = tmp_path / "data" / "staging" / "processed"
+    proc.mkdir(parents=True, exist_ok=True)
+    shutil.copy(FIXTURES / "sample_entities_resolved.csv", proc / "entities_resolved.csv")
+    er = vg.gate_entity_resolution(tmp_path)
+    type_gate = next(r for r in er["records"] if r["gate"] == "entity_type_assignment_rate")
+    assert type_gate["passed"] is True
+    assert type_gate["observed"] == 1.0
+
+
+@pytest.mark.unit
+def test_corporate_parent_uei_gate_excludes_government_entities(tmp_path):
+    """Government entities in the fixture must not dilute corporate_parent_uei_rate."""
+    _build_tmp_repo(tmp_path)
+    proc = tmp_path / "data" / "staging" / "processed"
+    proc.mkdir(parents=True, exist_ok=True)
+    shutil.copy(FIXTURES / "sample_entities_resolved.csv", proc / "entities_resolved.csv")
+    er = vg.gate_entity_resolution(tmp_path)
+    # Fixture has 7 corporate + 1 government + 1 nonprofit.
+    # 5 of 7 corporate have parent_uei → rate = 5/7 ≈ 0.714
+    # Government and nonprofit entities must not be counted in the denominator.
+    corp_rate = er["corporate_parent_uei_rate"]
+    assert 0.70 < corp_rate < 0.75, f"unexpected rate: {corp_rate}"
+
+
+@pytest.mark.unit
+def test_high_value_review_gate_passes_when_queue_populated(tmp_path):
+    """high_value_unresolved_review_rate passes when unresolved entities are in review_queue."""
+    _build_tmp_repo(tmp_path)
+    proc = tmp_path / "data" / "staging" / "processed"
+    proc.mkdir(parents=True, exist_ok=True)
+    rq = tmp_path / "data" / "review_queue"
+    rq.mkdir(parents=True, exist_ok=True)
+    # Write a high_value_unresolved with 2 rows
+    hvu_rows = [
+        {"entity_id": "A1", "total_obligation": "2000000", "entity_name": "Acme"},
+        {"entity_id": "A2", "total_obligation": "1500000", "entity_name": "Beta"},
+    ]
+    _write_csv_simple(proc / "high_value_unresolved.csv", hvu_rows)
+    # Write review_queue with both entity_ids present
+    _write_csv_simple(rq / "pr2_unresolved_entities.csv", hvu_rows)
+    # Also write a minimal entities_resolved so the gate doesn't return early
+    _write_csv_simple(proc / "entities_resolved.csv", [
+        {"entity_id": "A1", "entity_type": "corporate", "parent_uei": "", "parent_name": "", "total_obligation": "2000000"},
+    ])
+    er = vg.gate_entity_resolution(tmp_path)
+    rv_gate = next((r for r in er["records"] if r["gate"] == "high_value_unresolved_review_rate"), None)
+    assert rv_gate is not None
+    assert rv_gate["passed"] is True
+    assert rv_gate["observed"] == 1.0
+
+
+def _write_csv_simple(path: Path, rows: list[dict]) -> None:
+    import csv
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        w.writeheader(); w.writerows(rows)
 
 
 @pytest.mark.unit
