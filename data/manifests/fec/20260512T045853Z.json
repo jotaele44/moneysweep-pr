@@ -1,0 +1,70 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "fec",
+  "source_url": "https://api.open.fec.gov/",
+  "producer_script": "scripts/download_fec.py",
+  "generated_at": "2026-05-12T04:58:53.460788+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_fec_contributions.csv",
+      "relative_path": "data/staging/processed/pr_fec_contributions.csv",
+      "extension": ".csv",
+      "size_bytes": 14239,
+      "sha256": "c3d64928fc5e08061c912054d572bcab8a1067a9b03e7affe5baf1b685e8463f",
+      "ingestion_timestamp_utc": "2026-05-12T04:58:53.455457+00:00",
+      "source_system": "fec",
+      "source_url": "https://api.open.fec.gov/",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 100,
+      "column_count": 16,
+      "columns": [
+        "cycle",
+        "contributor_name",
+        "contributor_city",
+        "contributor_zip_code",
+        "contributor_employer",
+        "contributor_occupation",
+        "contribution_receipt_amount",
+        "contribution_receipt_date",
+        "committee_id",
+        "committee_name",
+        "candidate_id",
+        "candidate_name",
+        "report_year",
+        "election_type",
+        "memo_text",
+        "is_individual"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "cycle": 1.0,
+        "contributor_name": 1.0,
+        "contributor_city": 1.0,
+        "contributor_zip_code": 0.0,
+        "contributor_employer": 0.86,
+        "contributor_occupation": 0.0,
+        "contribution_receipt_amount": 1.0,
+        "contribution_receipt_date": 1.0,
+        "committee_id": 1.0,
+        "committee_name": 1.0,
+        "candidate_id": 0.0,
+        "candidate_name": 0.0,
+        "report_year": 1.0,
+        "election_type": 0.0,
+        "memo_text": 0.0,
+        "is_individual": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [
+        2000
+      ],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}
