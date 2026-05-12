@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-05-12T09:26:31.722611+00:00",
+  "generated_at": "2026-05-12T19:27:51.046595+00:00",
   "schema_version": "r5_v2",
   "passed": false,
   "source_coverage_rate": 0.5,
-  "entity_resolution_rate": 0.000446681990340502,
+  "entity_resolution_rate": 0.004038749662662038,
   "entity_type_assignment_rate": 1.0,
-  "corporate_parent_uei_rate": 0.0003614056778734129,
+  "corporate_parent_uei_rate": 0.003214608397926673,
   "government_entity_count": 764,
-  "high_value_unresolved_count": 3801,
+  "high_value_unresolved_count": 3618,
   "subaward_linkage_rate": 0.596875,
   "execution_chain_linkage_rate": 0.596875,
   "gate_count": 387,
-  "failed_gate_count": 115,
+  "failed_gate_count": 114,
   "thresholds": {
     "source_coverage_rate": 0.95,
     "entity_resolution_rate": 0.95,
@@ -173,7 +173,7 @@
     {
       "gate": "entity_resolution_rate",
       "passed": false,
-      "observed": 0.0004,
+      "observed": 0.004,
       "threshold": 0.95,
       "action": "resolve_aliases_and_sam_parent"
     },
@@ -186,10 +186,10 @@
     },
     {
       "gate": "corporate_parent_uei_rate",
-      "passed": false,
-      "observed": 0.0004,
+      "passed": true,
+      "observed": 0.0032,
       "threshold": 0.002,
-      "action": "complete_usaspending_enrichment"
+      "action": "ok"
     },
     {
       "gate": "high_value_unresolved_review_rate",
