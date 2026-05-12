@@ -1,6 +1,6 @@
 gate,source_id,required,passed,observed,threshold,evidence,action
 required_source_nonempty,usaspending_prime,True,True,2,1,data/staging/processed/pr_contracts_master.csv;data/staging/processed/pr_all_awards_master.csv,ok
-required_source_nonempty,usaspending_subawards,True,True,1,1,data/staging/processed/pr_subawards_master.csv,ok
+required_source_nonempty,usaspending_subawards,True,True,2,1,data/staging/processed/pr_subawards_master.csv;data/staging/processed/execution/execution_chain_master.csv,ok
 required_source_nonempty,fsrs_subawards,True,False,0,1,,backfill_or_manual_export
 required_source_nonempty,sam_entities,True,True,2,1,data/staging/processed/enrichment/vendor_uei_index.csv;data/staging/processed/entities_resolved.csv,ok
 required_source_nonempty,fema_pa_openfema_v2,True,True,1,1,data/staging/processed/pr_fema_pa_master.csv,ok
@@ -18,8 +18,8 @@ entity_resolution_rate,,,False,0.0004,0.95,,resolve_aliases_and_sam_parent
 entity_type_assignment_rate,,,True,1.0,0.8,,ok
 corporate_parent_uei_rate,,,False,0.0004,0.002,,complete_usaspending_enrichment
 high_value_unresolved_review_rate,,,True,1.0,0.9,,ok
-subaward_linkage_rate,,,False,0.0,0.9,,rebuild_execution_chain_master
-execution_chain_linkage_rate,,,False,0,0.9,,build_execution_chains
+subaward_linkage_rate,,,False,0.5969,0.9,,rebuild_execution_chain_master
+execution_chain_linkage_rate,,,False,0.5969,0.9,,improve_chain_join_evidence
 manifest_present_per_required,usaspending_prime,,True,present,present,,ok
 manifest_present_per_required,usaspending_subawards,,False,missing,present,,run_manifest_runtime_for_source
 manifest_present_per_required,fsrs_subawards,,False,missing,present,,run_manifest_runtime_for_source
