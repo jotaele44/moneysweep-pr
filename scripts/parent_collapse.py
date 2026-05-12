@@ -90,6 +90,7 @@ def _load_sam_index(root: Path) -> dict[str, dict]:
         root / "data" / "staging" / "processed" / "enrichment" / "vendor_uei_index.csv",
         root / "data" / "staging" / "processed" / "sam_entities.csv",
         root / "data" / "staging" / "processed" / "entity_hierarchy.csv",
+        root / "data" / "staging" / "processed" / "enrichment" / "usaspending_parent_index.csv",
     ]
     for p in candidates:
         for row in _read_csv(p):
