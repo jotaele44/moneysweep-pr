@@ -1,0 +1,1355 @@
+{
+  "version": "1.0",
+  "schema_version": "r5_source_registry_v1",
+  "sources": [
+    {
+      "source_id": "usaspending_prime",
+      "family": "federal",
+      "required": true,
+      "authentication": "none",
+      "endpoint_url": "https://api.usaspending.gov/",
+      "producer_script": "scripts/build_unified_master.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_contracts_master.csv",
+        "data/staging/processed/pr_all_awards_master.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1,
+        "year_coverage_pct": 0.95
+      },
+      "update_cadence": "weekly",
+      "notes": "USAspending API + bulk archive. No key required."
+    },
+    {
+      "source_id": "usaspending_subawards",
+      "family": "federal",
+      "required": true,
+      "authentication": "none",
+      "endpoint_url": "https://www.usaspending.gov/download_center/award_data_archive",
+      "producer_script": "scripts/download_subawards.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_subawards_master.csv",
+        "data/staging/processed/execution/execution_chain_master.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1,
+        "linkage_rate_pct": 0.9
+      },
+      "update_cadence": "weekly"
+    },
+    {
+      "source_id": "fpds_report_builder",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.fpds.gov/fpdsng_cms/index.php/en/reports.html",
+      "producer_script": "scripts/download_grants.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_fpds_report_builder.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly",
+      "notes": "FPDS Report Builder FY2018-2024 ingestion. Supplements USAspending."
+    },
+    {
+      "source_id": "fsrs_subawards",
+      "family": "federal",
+      "required": true,
+      "authentication": "none",
+      "endpoint_url": "https://www.fsrs.gov/",
+      "producer_script": "scripts/download_fsrs.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_fsrs_subawards.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1,
+        "linkage_rate_pct": 0.85
+      },
+      "update_cadence": "weekly",
+      "notes": "FSRS prime-to-sub reporting. Joins with USAspending subaward stream."
+    },
+    {
+      "source_id": "sam_entities",
+      "family": "entity_resolution",
+      "required": true,
+      "authentication": "api_key:SAM_API_KEY",
+      "endpoint_url": "https://sam.gov/data-services/Entity%20Information",
+      "producer_script": "scripts/sam_enrichment.py",
+      "expected_outputs": [
+        "data/staging/processed/enrichment/vendor_uei_index.csv",
+        "data/staging/processed/entities_resolved.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1,
+        "parent_uei_coverage_pct": 0.9
+      },
+      "update_cadence": "monthly",
+      "notes": "SAM full extract + per-UEI enrichment for parent resolution."
+    },
+    {
+      "source_id": "highergov_supplemental",
+      "family": "federal",
+      "required": false,
+      "authentication": "api_key:HGOV_API_KEY",
+      "endpoint_url": "https://www.highergov.com/api",
+      "producer_script": "scripts/fetch_highergov_api.py",
+      "expected_outputs": [
+        "data/raw/HigherGov/",
+        "data/staging/processed/pr_highergov_supplement.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "weekly",
+      "notes": "Supplementary federal contract intel via HigherGov. PDFs require parse_highergov_pdfs."
+    },
+    {
+      "source_id": "fema_pa_openfema_v2",
+      "family": "federal",
+      "required": true,
+      "authentication": "none",
+      "endpoint_url": "https://www.fema.gov/openfema-data-page/public-assistance-funded-projects-details-v2",
+      "producer_script": "scripts/download_openfema_pa_projects.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_fema_pa_master.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1,
+        "year_coverage_pct": 0.95
+      },
+      "update_cadence": "monthly",
+      "notes": "Preferred FEMA PA route. OpenFEMA v2 PA projects API."
+    },
+    {
+      "source_id": "fema_hmgp",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.fema.gov/openfema-data-page/hazard-mitigation-grant-program-disaster-summaries-v2",
+      "producer_script": "scripts/download_fema.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_fema_hmgp.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly"
+    },
+    {
+      "source_id": "cor3",
+      "family": "territorial",
+      "required": true,
+      "authentication": "none",
+      "endpoint_url": "https://recovery.pr.gov/",
+      "producer_script": "scripts/download_cor3.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_cor3_master.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly",
+      "notes": "PR Central Office for Recovery, Reconstruction and Resiliency project tracker."
+    },
+    {
+      "source_id": "hud_cdbg_dr_public",
+      "family": "federal",
+      "required": true,
+      "authentication": "none",
+      "endpoint_url": "https://www.hud.gov/program_offices/comm_planning/cdbg-dr",
+      "producer_script": "scripts/download_cdbg_dr.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_cdbg_dr_master.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "hud_drgr_authorized",
+      "family": "manual_export",
+      "required": true,
+      "authentication": "manual_export",
+      "endpoint_url": "https://drgr.hud.gov/",
+      "producer_script": "scripts/ingest_hud_drgr_exports.py",
+      "expected_outputs": [
+        "data/staging/processed/hud_drgr_activities.csv",
+        "data/staging/processed/hud_drgr_projects.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/manual/hud_drgr/",
+      "update_cadence": "monthly",
+      "notes": "Credentialed DRGR portal \u2014 operator must export and drop manifests in manual_drop_dir."
+    },
+    {
+      "source_id": "hud_hcv_section8",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.huduser.gov/portal/datasets/assthsg.html",
+      "producer_script": "scripts/download_hud_hcv.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_hud_hcv.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "prasa",
+      "family": "infrastructure",
+      "required": true,
+      "authentication": "none",
+      "endpoint_url": "https://www.acueductospr.com/",
+      "producer_script": "scripts/ingest_prasa.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_prasa_contracts.csv",
+        "data/staging/processed/prasa_contracts_master.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly",
+      "notes": "PRASA aqueduct/sewer authority. Includes Consulting Engineer Report FY2024 baseline."
+    },
+    {
+      "source_id": "prepa_luma_genera",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://aeepr.com/es-pr/",
+      "producer_script": "scripts/download_prepa_contracts.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_prepa_contracts.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly",
+      "notes": "PREPA / LUMA Energy / Genera PR contracts and operating data."
+    },
+    {
+      "source_id": "act_transition_contracts",
+      "family": "manual_export",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "",
+      "producer_script": "scripts/ingest_active_contractors.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_act_transition_contracts.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/manual/act_transition/",
+      "update_cadence": "ad_hoc",
+      "notes": "PR ACT transition contract files (Autopistas, Ferrovial, LPC&D, etc.). Manual export."
+    },
+    {
+      "source_id": "acuden_2024_transition",
+      "family": "manual_export",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "",
+      "producer_script": "scripts/ingest_active_contractors.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_acuden_transition.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/manual/acuden_2024/",
+      "update_cadence": "ad_hoc",
+      "notes": "ACUDEN 2024 transition contract file. Transfer-of-funds contracts to municipalities/daycare/nonprofits."
+    },
+    {
+      "source_id": "dcaa_active_contractors",
+      "family": "manual_export",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "",
+      "producer_script": "scripts/download_active_contractors.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_dcaa_active_contractors.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/manual/dcaa_active_contractors/",
+      "update_cadence": "ad_hoc",
+      "notes": "DCAA FY2007/FY2012/FY2013 active contractor listings. Alias/crosswalk source."
+    },
+    {
+      "source_id": "oficina_contralor",
+      "family": "territorial",
+      "required": true,
+      "authentication": "none",
+      "endpoint_url": "https://consultacontratos.ocpr.gov.pr/",
+      "producer_script": "scripts/ingest_contralor.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_contralor_contracts.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly",
+      "notes": "PR Comptroller contract registry. Authoritative for territorial contracts."
+    },
+    {
+      "source_id": "compras_pr",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.comprashpr.com/",
+      "producer_script": "scripts/download_compras.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_compras_rfps.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "weekly",
+      "notes": "comprashpr.com RFP / award scrape."
+    },
+    {
+      "source_id": "aafaf",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.aafaf.pr.gov/",
+      "producer_script": "scripts/download_aafaf.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_aafaf_budget.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly",
+      "notes": "PR Fiscal Agency & Financial Advisory Authority. Budget execution."
+    },
+    {
+      "source_id": "hacienda",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://hacienda.pr.gov/",
+      "producer_script": "scripts/download_hacienda.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_hacienda_tax_revenue.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly"
+    },
+    {
+      "source_id": "cofina",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.cofina.pr.gov/",
+      "producer_script": "scripts/download_cofina.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_cofina_sut.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "promesa_creditors",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://cases.ra.kroll.com/puertorico/",
+      "producer_script": "scripts/download_promesa_creditors.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_promesa_creditors.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "ad_hoc"
+    },
+    {
+      "source_id": "pr_act_60_decrees",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.ddec.pr.gov/",
+      "producer_script": "scripts/download_act60.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_act60_decrees.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "p3_authority",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.p3.pr.gov/",
+      "producer_script": "scripts/download_p3.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_p3_contracts.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "pr_pensions",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.retiro.pr.gov/",
+      "producer_script": "scripts/download_pr_pensions.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_pensions_ers_trs_jrs.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "rum_cover_over",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://home.treasury.gov/about/offices/economic-policy/territorial-tax-rebate",
+      "producer_script": "scripts/download_rum_coverover.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_rum_coverover.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "municipal_finance",
+      "family": "municipal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.ocam.pr.gov/",
+      "producer_script": "scripts/download_municipal.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_municipal_finance.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "eqb_epa_icis",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://echo.epa.gov/",
+      "producer_script": "scripts/download_eqb.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_eqb_permits.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly",
+      "notes": "PR Environmental Quality Board + EPA ICIS environmental permits."
+    },
+    {
+      "source_id": "emma_bonds",
+      "family": "bonds",
+      "required": true,
+      "authentication": "none",
+      "endpoint_url": "https://emma.msrb.org/",
+      "producer_script": "scripts/download_emma.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_emma_bonds.csv",
+        "data/staging/processed/bond_asset_map.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "weekly"
+    },
+    {
+      "source_id": "msrb_rtrs_trades",
+      "family": "bonds",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://emma.msrb.org/",
+      "producer_script": "scripts/download_msrb_trades.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_msrb_rtrs_trades.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly"
+    },
+    {
+      "source_id": "lda",
+      "family": "lobbying",
+      "required": true,
+      "authentication": "api_key:LDA_API_KEY",
+      "endpoint_url": "https://lda.senate.gov/api/v1/",
+      "producer_script": "scripts/download_lda.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_lda_filings.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly"
+    },
+    {
+      "source_id": "pr_cabilderos",
+      "family": "lobbying",
+      "required": true,
+      "authentication": "none",
+      "endpoint_url": "https://etica.pr.gov/cabilderos/",
+      "producer_script": "scripts/ingest_cabilderos.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_cabilderos.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "fec",
+      "family": "political_finance",
+      "required": true,
+      "authentication": "api_key:FEC_API_KEY",
+      "endpoint_url": "https://api.open.fec.gov/",
+      "producer_script": "scripts/download_fec.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_fec_contributions.csv",
+        "data/staging/processed/pr_fec_crossref.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly"
+    },
+    {
+      "source_id": "donaciones_pr",
+      "family": "political_finance",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.ceepur.org/",
+      "producer_script": "scripts/ingest_fec.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_donaciones.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "ad_hoc",
+      "notes": "PR State Election Commission donations. Cross-references federal FEC."
+    },
+    {
+      "source_id": "follow_the_money",
+      "family": "political_finance",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.followthemoney.org/",
+      "producer_script": "scripts/ingest_follow_the_money.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_follow_the_money.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly",
+      "notes": "State-level campaign finance for PR + DC connections."
+    },
+    {
+      "source_id": "sba_loans",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.sba.gov/document/report-sba-loan-data-tools",
+      "producer_script": "scripts/download_sba.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_sba_loans.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "sba_ppp",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://data.sba.gov/dataset/ppp-foia",
+      "producer_script": "scripts/download_sba.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_sba_ppp.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "slfrf",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://home.treasury.gov/policy-issues/coronavirus/assistance-for-state-local-and-tribal-governments/state-and-local-fiscal-recovery-funds",
+      "producer_script": "scripts/download_slfrf.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_slfrf_master.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "sbir",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.sbir.gov/",
+      "producer_script": "scripts/download_sbir.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_sbir.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly"
+    },
+    {
+      "source_id": "nih_reporter",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://api.reporter.nih.gov/",
+      "producer_script": "scripts/download_nih.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_nih_grants.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly"
+    },
+    {
+      "source_id": "usace_civil_works",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.usace.army.mil/Missions/Civil-Works/",
+      "producer_script": "scripts/download_usace_civil.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_usace_civil.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "usace_permits",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://permits.ops.usace.army.mil/orm-public",
+      "producer_script": "scripts/download_usace_permits.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_usace_permits.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "epa_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.epa.gov/grants",
+      "producer_script": "scripts/download_epa.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_epa_grants.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "dot_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.transportation.gov/grants",
+      "producer_script": "scripts/download_dot.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_dot_grants.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "usda_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.usda.gov/topics/farming/grants-and-loans",
+      "producer_script": "scripts/download_usda.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_usda.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "doe_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.energy.gov/eere/funding/funding-opportunities",
+      "producer_script": "scripts/download_doe.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_doe.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "doj_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.justice.gov/grants",
+      "producer_script": "scripts/download_doj_grants.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_doj_grants.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "ed_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www2.ed.gov/programs/find/title/index.html",
+      "producer_script": "scripts/download_ed.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_ed_grants.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "hhs_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.hhs.gov/grants/",
+      "producer_script": "scripts/download_hhs.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_hhs_grants.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "oia_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.doi.gov/oia",
+      "producer_script": "scripts/download_oia.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_oia_grants.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "haf",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://home.treasury.gov/policy-issues/coronavirus/assistance-for-state-local-and-tribal-governments/homeowner-assistance-fund",
+      "producer_script": "scripts/download_haf.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_haf.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "exim_bank",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.exim.gov/",
+      "producer_script": "scripts/download_exim.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_exim.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "congressional_earmarks",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.appropriations.house.gov/",
+      "producer_script": "scripts/download_earmarks.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_earmarks.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "ofac_sdn",
+      "family": "entity_resolution",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.treasury.gov/ofac/downloads/sdn.csv",
+      "producer_script": "scripts/download_ofac.py",
+      "expected_outputs": [
+        "data/staging/processed/ofac_sdn.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "weekly"
+    },
+    {
+      "source_id": "opencorporates",
+      "family": "entity_resolution",
+      "required": false,
+      "authentication": "api_key:OPENCORPORATES_API_TOKEN",
+      "endpoint_url": "https://opencorporates.com/",
+      "producer_script": "scripts/download_opencorporates.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_opencorporates.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "ad_hoc"
+    },
+    {
+      "source_id": "pr_corporate_registry",
+      "family": "manual_export",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://rceweb.estado.pr.gov/",
+      "producer_script": "scripts/ingest_active_contractors.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_corporate_registry.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/manual/pr_corporate_registry/",
+      "update_cadence": "ad_hoc"
+    },
+    {
+      "source_id": "medicaid_fmap",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.medicaid.gov/medicaid/financial-management/index.html",
+      "producer_script": "scripts/download_medicaid_fmap.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_medicaid_fmap.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "ssa",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.ssa.gov/data/",
+      "producer_script": "scripts/download_ssa.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_ssa.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "medicare_parts",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.cms.gov/data-research",
+      "producer_script": "scripts/download_medicare_parts.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_medicare_parts.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "medicare_advantage",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.cms.gov/data-research/statistics-trends-and-reports/medicare-advantage-rates-statistics",
+      "producer_script": "scripts/download_medicare_advantage.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_medicare_advantage.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "chip",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.medicaid.gov/chip/index.html",
+      "producer_script": "scripts/download_chip.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_chip.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "cms_open_payments",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://openpaymentsdata.cms.gov/",
+      "producer_script": "scripts/download_cms.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_cms_open_payments.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "wic",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.fns.usda.gov/wic",
+      "producer_script": "scripts/download_wic.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_wic.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "wioa",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.dol.gov/agencies/eta/wioa",
+      "producer_script": "scripts/download_wioa.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_wioa.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "snap_nap",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.fns.usda.gov/snap/nutrition-assistance-puerto-rico",
+      "producer_script": "scripts/download_snap_nap.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_snap_nap.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "va_benefits",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.benefits.va.gov/REPORTS/",
+      "producer_script": "scripts/download_va.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_va.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "fdic",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.fdic.gov/resources/data-tools/",
+      "producer_script": "scripts/download_fdic.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_fdic.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "ncua",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.ncua.gov/analysis/credit-union-corporate-call-report-data",
+      "producer_script": "scripts/download_ncua.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_ncua.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "fhlb",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.fhfa.gov/data",
+      "producer_script": "scripts/download_fhlb.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_fhlb.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "sec_edgar",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.sec.gov/edgar",
+      "producer_script": "scripts/download_sec.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_sec_edgar.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly"
+    },
+    {
+      "source_id": "sec_13f_nport",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.sec.gov/edgar/search-and-access",
+      "producer_script": "scripts/download_sec_holdings.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_sec_holdings.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "fcc_usf",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.fcc.gov/general/universal-service-fund",
+      "producer_script": "scripts/download_fcc.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_fcc_usf.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "nfip_claims",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.fema.gov/openfema-data-page/fima-nfip-redacted-claims-v2",
+      "producer_script": "scripts/download_nfip.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_nfip_claims.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly"
+    },
+    {
+      "source_id": "lihtc",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.huduser.gov/portal/datasets/lihtc.html",
+      "producer_script": "scripts/download_lihtc.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_lihtc.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "nmtc",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.cdfifund.gov/programs-training/programs/new-markets-tax-credit",
+      "producer_script": "scripts/download_nmtc.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_nmtc.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "nonprofits_irs990",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://projects.propublica.org/nonprofits/api",
+      "producer_script": "scripts/download_nonprofits.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_nonprofits_990.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly"
+    },
+    {
+      "source_id": "gao_ig_audits",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.gao.gov/",
+      "producer_script": "scripts/download_gao_ig.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_gao_ig_audits.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly"
+    },
+    {
+      "source_id": "dol_whd_osha",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.dol.gov/agencies/whd",
+      "producer_script": "scripts/download_dol.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_dol_whd.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly"
+    },
+    {
+      "source_id": "sf133_budget_execution",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.whitehouse.gov/omb/budget/sf-133/",
+      "producer_script": "scripts/download_sf133.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_sf133.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly"
+    },
+    {
+      "source_id": "research_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.grants.gov/",
+      "producer_script": "scripts/download_research.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_research_grants.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "weekly"
+    },
+    {
+      "source_id": "grants_gov",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.grants.gov/",
+      "producer_script": "scripts/download_grants.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_grants.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "weekly"
+    }
+  ]
+}

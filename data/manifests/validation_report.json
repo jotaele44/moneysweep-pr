@@ -1,0 +1,3099 @@
+{
+  "generated_at": "2026-05-12T00:27:42.797315+00:00",
+  "schema_version": "r5_v1",
+  "passed": false,
+  "source_coverage_rate": 0.5,
+  "entity_resolution_rate": 0.0,
+  "parent_uei_rate": 0.0,
+  "subaward_linkage_rate": 0.0,
+  "execution_chain_linkage_rate": 0.0,
+  "gate_count": 382,
+  "failed_gate_count": 121,
+  "thresholds": {
+    "source_coverage_rate": 0.95,
+    "entity_resolution_rate": 0.95,
+    "parent_uei_rate": 0.9,
+    "subaward_linkage_rate": 0.9,
+    "execution_chain_linkage_rate": 0.9,
+    "duplicate_rate_limit": 0.05
+  },
+  "records": [
+    {
+      "gate": "required_source_nonempty",
+      "source_id": "usaspending_prime",
+      "required": true,
+      "passed": true,
+      "observed": 2,
+      "threshold": 1,
+      "evidence": "data/staging/processed/pr_contracts_master.csv;data/staging/processed/pr_all_awards_master.csv",
+      "action": "ok"
+    },
+    {
+      "gate": "required_source_nonempty",
+      "source_id": "usaspending_subawards",
+      "required": true,
+      "passed": true,
+      "observed": 1,
+      "threshold": 1,
+      "evidence": "data/staging/processed/pr_subawards_master.csv",
+      "action": "ok"
+    },
+    {
+      "gate": "required_source_nonempty",
+      "source_id": "fsrs_subawards",
+      "required": true,
+      "passed": false,
+      "observed": 0,
+      "threshold": 1,
+      "evidence": "",
+      "action": "backfill_or_manual_export"
+    },
+    {
+      "gate": "required_source_nonempty",
+      "source_id": "sam_entities",
+      "required": true,
+      "passed": true,
+      "observed": 1,
+      "threshold": 1,
+      "evidence": "data/staging/processed/enrichment/vendor_uei_index.csv",
+      "action": "ok"
+    },
+    {
+      "gate": "required_source_nonempty",
+      "source_id": "fema_pa_openfema_v2",
+      "required": true,
+      "passed": true,
+      "observed": 1,
+      "threshold": 1,
+      "evidence": "data/staging/processed/pr_fema_pa_master.csv",
+      "action": "ok"
+    },
+    {
+      "gate": "required_source_nonempty",
+      "source_id": "cor3",
+      "required": true,
+      "passed": false,
+      "observed": 0,
+      "threshold": 1,
+      "evidence": "",
+      "action": "backfill_or_manual_export"
+    },
+    {
+      "gate": "required_source_nonempty",
+      "source_id": "hud_cdbg_dr_public",
+      "required": true,
+      "passed": true,
+      "observed": 1,
+      "threshold": 1,
+      "evidence": "data/staging/processed/pr_cdbg_dr_master.csv",
+      "action": "ok"
+    },
+    {
+      "gate": "required_source_nonempty",
+      "source_id": "hud_drgr_authorized",
+      "required": true,
+      "passed": false,
+      "observed": 0,
+      "threshold": 1,
+      "evidence": "",
+      "action": "backfill_or_manual_export"
+    },
+    {
+      "gate": "required_source_nonempty",
+      "source_id": "prasa",
+      "required": true,
+      "passed": false,
+      "observed": 0,
+      "threshold": 1,
+      "evidence": "",
+      "action": "backfill_or_manual_export"
+    },
+    {
+      "gate": "required_source_nonempty",
+      "source_id": "oficina_contralor",
+      "required": true,
+      "passed": false,
+      "observed": 0,
+      "threshold": 1,
+      "evidence": "",
+      "action": "backfill_or_manual_export"
+    },
+    {
+      "gate": "required_source_nonempty",
+      "source_id": "emma_bonds",
+      "required": true,
+      "passed": false,
+      "observed": 0,
+      "threshold": 1,
+      "evidence": "",
+      "action": "backfill_or_manual_export"
+    },
+    {
+      "gate": "required_source_nonempty",
+      "source_id": "lda",
+      "required": true,
+      "passed": true,
+      "observed": 1,
+      "threshold": 1,
+      "evidence": "data/staging/processed/pr_lda_filings.csv",
+      "action": "ok"
+    },
+    {
+      "gate": "required_source_nonempty",
+      "source_id": "pr_cabilderos",
+      "required": true,
+      "passed": false,
+      "observed": 0,
+      "threshold": 1,
+      "evidence": "",
+      "action": "backfill_or_manual_export"
+    },
+    {
+      "gate": "required_source_nonempty",
+      "source_id": "fec",
+      "required": true,
+      "passed": true,
+      "observed": 1,
+      "threshold": 1,
+      "evidence": "data/staging/processed/pr_fec_contributions.csv",
+      "action": "ok"
+    },
+    {
+      "gate": "source_coverage_rate",
+      "passed": false,
+      "observed": 0.5,
+      "threshold": 0.95,
+      "action": "backfill_required_sources"
+    },
+    {
+      "gate": "entity_resolution_rate",
+      "passed": false,
+      "observed": 0,
+      "threshold": 0.95,
+      "action": "run_parent_collapse"
+    },
+    {
+      "gate": "parent_uei_coverage",
+      "passed": false,
+      "observed": 0,
+      "threshold": 0.9,
+      "action": "ingest_sam_full_extract"
+    },
+    {
+      "gate": "high_value_unresolved_zero",
+      "passed": false,
+      "observed": null,
+      "threshold": 0,
+      "action": "manual_review_required"
+    },
+    {
+      "gate": "subaward_linkage_rate",
+      "passed": false,
+      "observed": 0.0,
+      "threshold": 0.9,
+      "action": "rebuild_execution_chain_master"
+    },
+    {
+      "gate": "execution_chain_linkage_rate",
+      "passed": false,
+      "observed": 0,
+      "threshold": 0.9,
+      "action": "build_execution_chains"
+    },
+    {
+      "gate": "manifest_present_per_required",
+      "source_id": "usaspending_prime",
+      "passed": false,
+      "observed": "missing",
+      "threshold": "present",
+      "action": "run_manifest_runtime_for_source"
+    },
+    {
+      "gate": "manifest_present_per_required",
+      "source_id": "usaspending_subawards",
+      "passed": false,
+      "observed": "missing",
+      "threshold": "present",
+      "action": "run_manifest_runtime_for_source"
+    },
+    {
+      "gate": "manifest_present_per_required",
+      "source_id": "fsrs_subawards",
+      "passed": false,
+      "observed": "missing",
+      "threshold": "present",
+      "action": "run_manifest_runtime_for_source"
+    },
+    {
+      "gate": "manifest_present_per_required",
+      "source_id": "sam_entities",
+      "passed": false,
+      "observed": "missing",
+      "threshold": "present",
+      "action": "run_manifest_runtime_for_source"
+    },
+    {
+      "gate": "manifest_present_per_required",
+      "source_id": "fema_pa_openfema_v2",
+      "passed": false,
+      "observed": "missing",
+      "threshold": "present",
+      "action": "run_manifest_runtime_for_source"
+    },
+    {
+      "gate": "manifest_present_per_required",
+      "source_id": "cor3",
+      "passed": false,
+      "observed": "missing",
+      "threshold": "present",
+      "action": "run_manifest_runtime_for_source"
+    },
+    {
+      "gate": "manifest_present_per_required",
+      "source_id": "hud_cdbg_dr_public",
+      "passed": false,
+      "observed": "missing",
+      "threshold": "present",
+      "action": "run_manifest_runtime_for_source"
+    },
+    {
+      "gate": "manifest_present_per_required",
+      "source_id": "hud_drgr_authorized",
+      "passed": false,
+      "observed": "missing",
+      "threshold": "present",
+      "action": "run_manifest_runtime_for_source"
+    },
+    {
+      "gate": "manifest_present_per_required",
+      "source_id": "prasa",
+      "passed": false,
+      "observed": "missing",
+      "threshold": "present",
+      "action": "run_manifest_runtime_for_source"
+    },
+    {
+      "gate": "manifest_present_per_required",
+      "source_id": "oficina_contralor",
+      "passed": false,
+      "observed": "missing",
+      "threshold": "present",
+      "action": "run_manifest_runtime_for_source"
+    },
+    {
+      "gate": "manifest_present_per_required",
+      "source_id": "emma_bonds",
+      "passed": false,
+      "observed": "missing",
+      "threshold": "present",
+      "action": "run_manifest_runtime_for_source"
+    },
+    {
+      "gate": "manifest_present_per_required",
+      "source_id": "lda",
+      "passed": false,
+      "observed": "missing",
+      "threshold": "present",
+      "action": "run_manifest_runtime_for_source"
+    },
+    {
+      "gate": "manifest_present_per_required",
+      "source_id": "pr_cabilderos",
+      "passed": false,
+      "observed": "missing",
+      "threshold": "present",
+      "action": "run_manifest_runtime_for_source"
+    },
+    {
+      "gate": "manifest_present_per_required",
+      "source_id": "fec",
+      "passed": false,
+      "observed": "missing",
+      "threshold": "present",
+      "action": "run_manifest_runtime_for_source"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "usaspending_prime",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.1111,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "sam_entities",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.1111,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "usaspending_prime",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "usaspending_prime",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "hud_cdbg_dr_public",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "usaspending_prime",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "fec",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "fema_pa_openfema_v2",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "fema_pa_openfema_v2",
+      "passed": false,
+      "observed": 1091.6,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "lda",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "slfrf",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "usaspending_subawards",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "sam_entities",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "hud_cdbg_dr_public",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "fec",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.5381,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 34.5131,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 22.5027,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 4.6763,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.4527,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.7166,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.9914,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 3.3652,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 3.3027,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 4.4655,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.3331,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.1331,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.9545,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.3837,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.8447,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.8681,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.1397,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.5266,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.3834,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.3908,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.3333,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.5,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.2,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.145,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.9114,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.7505,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.4578,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.9071,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.3473,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.5853,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.063,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.4796,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.2532,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.6934,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.0432,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.5691,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.6586,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.7669,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.724,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.7739,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.6919,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.7634,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.3333,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.5,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.2,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.0473,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.9551,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.6251,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.4362,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.9054,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.3547,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.5953,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.2181,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.5176,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.284,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.7016,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.0479,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.5611,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 2.2917,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.7475,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.6894,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.7776,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.6836,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.7663,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.325,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.9636,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.0678,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 4.7202,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 3.4514,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.0966,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.9945,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.4648,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.6562,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 1.7323,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.6102,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.0568,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.3829,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.0862,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.0554,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.1415,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.2944,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.1549,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.187,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.238,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "lda",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": false,
+      "observed": 0.7855,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0023,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "usaspending_subawards",
+      "passed": false,
+      "observed": 1.1739,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "usaspending_subawards",
+      "passed": false,
+      "observed": 0.6949,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "usaspending_subawards",
+      "passed": false,
+      "observed": 0.5873,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "usaspending_subawards",
+      "passed": false,
+      "observed": 0.5873,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "usaspending_subawards",
+      "passed": false,
+      "observed": 3.3478,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "usaspending_subawards",
+      "passed": false,
+      "observed": 0.0753,
+      "threshold": 0.05,
+      "action": "investigate_duplicate_keys"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "usaspending_subawards",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "usaspending_subawards",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "secret_leakage_zero",
+      "passed": true,
+      "observed": "deferred_to_scanner_script",
+      "threshold": 0,
+      "action": "run scripts/scan_for_secrets.py for the real check"
+    }
+  ]
+}

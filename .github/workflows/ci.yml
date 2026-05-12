@@ -25,8 +25,13 @@ jobs:
         run: python -m pip install -r requirements.txt
 
       - name: Compile modules
-        run: python -m compileall contract_sweeper tests
+        run: python -m compileall contract_sweeper scripts tests
 
       - name: Run tests
         run: pytest -q
 
+      - name: Scan for committed secrets
+        run: python scripts/scan_for_secrets.py --root .
+
+      - name: Run R5 validation gates (bootstrap mode)
+        run: python -m contract_sweeper.runtime.validation_gates --root . --allow-failed
