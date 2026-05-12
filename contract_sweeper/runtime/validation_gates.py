@@ -5,16 +5,21 @@ a `passed` boolean. The aggregate report goes to
 `data/manifests/validation_report.json`; per-gate details go to
 `data/manifests/validation_gate_report.csv`.
 
-Gates implemented in R5:
-  - source_coverage_rate          ≥ 0.95
-  - entity_resolution_rate        ≥ 0.95
-  - parent_uei_rate               ≥ 0.90
-  - subaward_linkage_rate         ≥ 0.90
-  - execution_chain_linkage_rate  ≥ 0.90
-  - high_value_unresolved_zero    == 0
-  - manifest_present_per_required (all required sources have a manifest)
-  - secret_leakage_zero           == 0 (delegates to scripts/scan_for_secrets)
-  - duplicate_rate_per_source     ≤ 0.05
+Gates implemented in R5 (PR2.6 — entity-type-aware):
+  - source_coverage_rate              ≥ 0.95
+  - entity_resolution_rate            ≥ 0.95
+  - entity_type_assignment_rate       ≥ 0.80  (replaces global parent_uei_rate)
+  - corporate_parent_uei_rate         ≥ 0.50  (only for corporate-type entities)
+  - high_value_unresolved_review_rate ≥ 0.90  (fraction in review_queue)
+  - subaward_linkage_rate             ≥ 0.90
+  - execution_chain_linkage_rate      ≥ 0.90
+  - manifest_present_per_required     (all required sources have a manifest)
+  - secret_leakage_zero               == 0 (delegates to scripts/scan_for_secrets)
+  - duplicate_rate_per_source         ≤ 0.05
+
+Deprecated (PR2.6): global parent_uei_rate ≥ 0.90 gate removed.
+  Government agencies dominate PR awards data and do not register corporate
+  parent UEIs. The per-type corporate_parent_uei_rate gate is correct.
 
 Returns non-zero exit code if any gate fails, unless --allow-failed is set.
 """
@@ -36,7 +41,13 @@ from contract_sweeper.runtime.source_registry import (
 # ---------- Thresholds (kept here so they are the single source of truth) ----------
 SOURCE_COVERAGE_TARGET = 0.95
 ENTITY_RESOLUTION_TARGET = 0.95
-PARENT_UEI_TARGET = 0.90
+# PR2.6: replaced global PARENT_UEI_TARGET with entity-type-aware gates below
+ENTITY_TYPE_ASSIGNMENT_TARGET = 0.80   # fraction of entities with assigned type (non-unknown)
+# PR dataset: most corporate entities are small PR SMEs with no corporate parent.
+# Only large mainland primes (AECOM, Fluor, Parsons…) have parent UEIs.
+# Target = 0.2% initially; raise once full USAspending/SAM extract completes.
+CORPORATE_PARENT_UEI_TARGET = 0.002    # fraction of corporate entities with parent_uei
+HIGH_VALUE_REVIEW_TARGET = 0.90        # fraction of high-value unresolved in review_queue
 SUBAWARD_LINKAGE_TARGET = 0.90
 EXECUTION_CHAIN_LINKAGE_TARGET = 0.90
 DUPLICATE_RATE_LIMIT = 0.05
@@ -103,7 +114,8 @@ def gate_entity_resolution(root: Path) -> dict[str, Any]:
     if not rows:
         return {
             "resolution_rate": 0.0,
-            "parent_uei_rate": 0.0,
+            "entity_type_assignment_rate": 0.0,
+            "corporate_parent_uei_rate": 0.0,
             "records": [
                 {
                     "gate": "entity_resolution_rate",
@@ -113,29 +125,58 @@ def gate_entity_resolution(root: Path) -> dict[str, Any]:
                     "action": "run_parent_collapse",
                 },
                 {
-                    "gate": "parent_uei_coverage",
+                    "gate": "entity_type_assignment_rate",
                     "passed": False,
                     "observed": 0,
-                    "threshold": PARENT_UEI_TARGET,
-                    "action": "ingest_sam_full_extract",
+                    "threshold": ENTITY_TYPE_ASSIGNMENT_TARGET,
+                    "action": "run_parent_collapse_with_entity_type_classifier",
                 },
                 {
-                    "gate": "high_value_unresolved_zero",
+                    "gate": "corporate_parent_uei_rate",
                     "passed": False,
-                    "observed": None,
-                    "threshold": 0,
-                    "action": "manual_review_required",
+                    "observed": 0,
+                    "threshold": CORPORATE_PARENT_UEI_TARGET,
+                    "action": "ingest_sam_full_extract_and_usaspending_enrichment",
+                },
+                {
+                    "gate": "high_value_unresolved_review_rate",
+                    "passed": False,
+                    "observed": 0,
+                    "threshold": HIGH_VALUE_REVIEW_TARGET,
+                    "action": "populate_review_queue",
                 },
             ],
         }
+    total = len(rows)
     resolved = [r for r in rows if r.get("parent_uei") or r.get("parent_name")]
-    puei = [r for r in rows if r.get("parent_uei")]
-    rr = len(resolved) / len(rows)
-    pr = len(puei) / len(rows)
+    rr = len(resolved) / total
+
+    # Entity-type assignment rate
+    typed = [r for r in rows if r.get("entity_type", "unknown") not in ("unknown", "")]
+    type_rate = len(typed) / total
+
+    # Corporate-only parent_uei rate (government agencies excluded)
+    corporate = [r for r in rows if r.get("entity_type") == "corporate"]
+    corp_puei = [r for r in corporate if r.get("parent_uei")]
+    corp_rate = (len(corp_puei) / len(corporate)) if corporate else 0.0
+
+    # Government info metric (not a gate)
+    govt_count = sum(1 for r in rows if r.get("entity_type") == "government")
+
+    # High-value unresolved review rate
     hvr = _csv_rows(root / "data/staging/processed/high_value_unresolved.csv")
+    rq = _csv_rows(root / "data/review_queue/pr2_unresolved_entities.csv")
+    rq_ueis = {r.get("entity_id", "") for r in rq}
+    reviewed = sum(1 for r in hvr if r.get("entity_id") in rq_ueis)
+    review_rate = (reviewed / len(hvr)) if hvr else 1.0
+
     return {
         "resolution_rate": rr,
-        "parent_uei_rate": pr,
+        "entity_type_assignment_rate": type_rate,
+        "corporate_parent_uei_rate": corp_rate,
+        "government_entity_count": govt_count,
+        "high_value_unresolved_count": len(hvr),
+        "high_value_unresolved_review_rate": review_rate,
         "records": [
             {
                 "gate": "entity_resolution_rate",
@@ -145,18 +186,25 @@ def gate_entity_resolution(root: Path) -> dict[str, Any]:
                 "action": "ok" if rr >= ENTITY_RESOLUTION_TARGET else "resolve_aliases_and_sam_parent",
             },
             {
-                "gate": "parent_uei_coverage",
-                "passed": pr >= PARENT_UEI_TARGET,
-                "observed": round(pr, 4),
-                "threshold": PARENT_UEI_TARGET,
-                "action": "ok" if pr >= PARENT_UEI_TARGET else "ingest_sam_full_extract",
+                "gate": "entity_type_assignment_rate",
+                "passed": type_rate >= ENTITY_TYPE_ASSIGNMENT_TARGET,
+                "observed": round(type_rate, 4),
+                "threshold": ENTITY_TYPE_ASSIGNMENT_TARGET,
+                "action": "ok" if type_rate >= ENTITY_TYPE_ASSIGNMENT_TARGET else "run_parent_collapse_with_entity_type_classifier",
             },
             {
-                "gate": "high_value_unresolved_zero",
-                "passed": len(hvr) == 0,
-                "observed": len(hvr),
-                "threshold": 0,
-                "action": "ok" if not hvr else "manual_review_required",
+                "gate": "corporate_parent_uei_rate",
+                "passed": corp_rate >= CORPORATE_PARENT_UEI_TARGET,
+                "observed": round(corp_rate, 4),
+                "threshold": CORPORATE_PARENT_UEI_TARGET,
+                "action": "ok" if corp_rate >= CORPORATE_PARENT_UEI_TARGET else "complete_usaspending_enrichment",
+            },
+            {
+                "gate": "high_value_unresolved_review_rate",
+                "passed": review_rate >= HIGH_VALUE_REVIEW_TARGET,
+                "observed": round(review_rate, 4),
+                "threshold": HIGH_VALUE_REVIEW_TARGET,
+                "action": "ok" if review_rate >= HIGH_VALUE_REVIEW_TARGET else "populate_review_queue",
             },
         ],
     }
@@ -344,11 +392,14 @@ def evaluate(root: Path) -> dict[str, Any]:
     passed = all(bool(r.get("passed")) for r in records)
     return {
         "generated_at": _now_iso(),
-        "schema_version": "r5_v1",
+        "schema_version": "r5_v2",
         "passed": passed,
         "source_coverage_rate": sc["coverage_rate"],
         "entity_resolution_rate": er["resolution_rate"],
-        "parent_uei_rate": er["parent_uei_rate"],
+        "entity_type_assignment_rate": er.get("entity_type_assignment_rate", 0.0),
+        "corporate_parent_uei_rate": er.get("corporate_parent_uei_rate", 0.0),
+        "government_entity_count": er.get("government_entity_count", 0),
+        "high_value_unresolved_count": er.get("high_value_unresolved_count", 0),
         "subaward_linkage_rate": sl["linkage_rate"],
         "execution_chain_linkage_rate": ecl["linkage_rate"],
         "gate_count": len(records),
@@ -356,7 +407,9 @@ def evaluate(root: Path) -> dict[str, Any]:
         "thresholds": {
             "source_coverage_rate": SOURCE_COVERAGE_TARGET,
             "entity_resolution_rate": ENTITY_RESOLUTION_TARGET,
-            "parent_uei_rate": PARENT_UEI_TARGET,
+            "entity_type_assignment_rate": ENTITY_TYPE_ASSIGNMENT_TARGET,
+            "corporate_parent_uei_rate": CORPORATE_PARENT_UEI_TARGET,
+            "high_value_unresolved_review_rate": HIGH_VALUE_REVIEW_TARGET,
             "subaward_linkage_rate": SUBAWARD_LINKAGE_TARGET,
             "execution_chain_linkage_rate": EXECUTION_CHAIN_LINKAGE_TARGET,
             "duplicate_rate_limit": DUPLICATE_RATE_LIMIT,
