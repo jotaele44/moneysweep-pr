@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T00:27:42.797315+00:00",
+  "generated_at": "2026-05-12T05:04:48.179816+00:00",
   "schema_version": "r5_v1",
   "passed": false,
   "source_coverage_rate": 0.5,
@@ -7,8 +7,8 @@
   "parent_uei_rate": 0.0,
   "subaward_linkage_rate": 0.0,
   "execution_chain_linkage_rate": 0.0,
-  "gate_count": 382,
-  "failed_gate_count": 121,
+  "gate_count": 386,
+  "failed_gate_count": 116,
   "thresholds": {
     "source_coverage_rate": 0.95,
     "entity_resolution_rate": 0.95,
@@ -53,9 +53,9 @@
       "source_id": "sam_entities",
       "required": true,
       "passed": true,
-      "observed": 1,
+      "observed": 2,
       "threshold": 1,
-      "evidence": "data/staging/processed/enrichment/vendor_uei_index.csv",
+      "evidence": "data/staging/processed/enrichment/vendor_uei_index.csv;data/staging/processed/entities_resolved.csv",
       "action": "ok"
     },
     {
@@ -168,21 +168,21 @@
     {
       "gate": "entity_resolution_rate",
       "passed": false,
-      "observed": 0,
+      "observed": 0.0,
       "threshold": 0.95,
-      "action": "run_parent_collapse"
+      "action": "resolve_aliases_and_sam_parent"
     },
     {
       "gate": "parent_uei_coverage",
       "passed": false,
-      "observed": 0,
+      "observed": 0.0,
       "threshold": 0.9,
       "action": "ingest_sam_full_extract"
     },
     {
       "gate": "high_value_unresolved_zero",
       "passed": false,
-      "observed": null,
+      "observed": 3818,
       "threshold": 0,
       "action": "manual_review_required"
     },
@@ -203,10 +203,10 @@
     {
       "gate": "manifest_present_per_required",
       "source_id": "usaspending_prime",
-      "passed": false,
-      "observed": "missing",
+      "passed": true,
+      "observed": "present",
       "threshold": "present",
-      "action": "run_manifest_runtime_for_source"
+      "action": "ok"
     },
     {
       "gate": "manifest_present_per_required",
@@ -227,18 +227,18 @@
     {
       "gate": "manifest_present_per_required",
       "source_id": "sam_entities",
-      "passed": false,
-      "observed": "missing",
+      "passed": true,
+      "observed": "present",
       "threshold": "present",
-      "action": "run_manifest_runtime_for_source"
+      "action": "ok"
     },
     {
       "gate": "manifest_present_per_required",
       "source_id": "fema_pa_openfema_v2",
-      "passed": false,
-      "observed": "missing",
+      "passed": true,
+      "observed": "present",
       "threshold": "present",
-      "action": "run_manifest_runtime_for_source"
+      "action": "ok"
     },
     {
       "gate": "manifest_present_per_required",
@@ -291,10 +291,10 @@
     {
       "gate": "manifest_present_per_required",
       "source_id": "lda",
-      "passed": false,
-      "observed": "missing",
+      "passed": true,
+      "observed": "present",
       "threshold": "present",
-      "action": "run_manifest_runtime_for_source"
+      "action": "ok"
     },
     {
       "gate": "manifest_present_per_required",
@@ -307,10 +307,26 @@
     {
       "gate": "manifest_present_per_required",
       "source_id": "fec",
-      "passed": false,
-      "observed": "missing",
+      "passed": true,
+      "observed": "present",
       "threshold": "present",
-      "action": "run_manifest_runtime_for_source"
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
     },
     {
       "gate": "duplicate_rate_per_source",
@@ -1499,6 +1515,22 @@
     {
       "gate": "duplicate_rate_per_source",
       "source_id": "sam_entities",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "sam_entities",
+      "passed": true,
+      "observed": 0.0,
+      "threshold": 0.05,
+      "action": "ok"
+    },
+    {
+      "gate": "duplicate_rate_per_source",
+      "source_id": "unknown",
       "passed": true,
       "observed": 0.0,
       "threshold": 0.05,

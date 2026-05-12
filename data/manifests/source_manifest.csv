@@ -91,6 +91,9 @@ data/exports/validated_source_manifest_inventory_r4_8f.csv,validated_source_mani
 data/exports/validated_source_manifest_inventory_r4_8h.csv,validated_source_manifest_inventory_r4_8h.csv,unknown,7,12,2416,False,present,,,0.0,9f065a2e1fafc7b17a350f5914d45976c9be94f1cd9d6a225973a1611c25dbc9
 data/exports/validated_source_manifest_inventory_r4_8i.csv,validated_source_manifest_inventory_r4_8i.csv,unknown,7,12,2416,False,present,,,0.0,9f065a2e1fafc7b17a350f5914d45976c9be94f1cd9d6a225973a1611c25dbc9
 data/exports/validated_source_manifest_inventory_r4_9c.csv,validated_source_manifest_inventory_r4_9c.csv,unknown,7,12,2416,False,present,,,0.0,9f065a2e1fafc7b17a350f5914d45976c9be94f1cd9d6a225973a1611c25dbc9
+data/manifests/fec/20260512T045853Z.json,20260512T045853Z.json,unknown,8,8,2103,False,present,,,,8e4eee369c03f77875bfbba5a124e43769258e8521df55ea24e0ee4f92bf06f3
+data/manifests/fema_pa_openfema_v2/20260512T045853Z.json,20260512T045853Z.json,unknown,8,8,2065,False,present,,,,0bff00fa9f7e9bcb09c7968bccc77d1ad86d10f37a2cdf995e5e249fbc23a393
+data/manifests/lda/20260512T045853Z.json,20260512T045853Z.json,unknown,8,8,2626,False,present,,,,641b9dd6fe1db712446b61c496fd4369127892bdc80b146b05c90f47e740ddd6
 data/manifests/r4_8d/08_pr_slfrf_master.manifest.json,08_pr_slfrf_master.manifest.json,unknown,11,11,498,False,present,,,,2db349a2ebb2ed4f32ee2969f02dcf2abce219958d2f8c96984f720e0067e553
 data/manifests/r4_8d/10_pr_dot_master.manifest.json,10_pr_dot_master.manifest.json,unknown,11,11,507,False,present,,,,2eccff510326cd813fcd73f113e20de4d9e4483f244832d58732a81b5e420050
 data/manifests/r4_8d/11_pr_usda_master.manifest.json,11_pr_usda_master.manifest.json,unknown,11,11,511,False,present,,,,159c08f7dd0d7813e02a6c499954cfd8c9f11929fc0b0f51cae046140a13464c
@@ -104,6 +107,12 @@ data/manifests/r4_9g/02_expansion_idv_indirect_pr.csv.manifest.json,02_expansion
 data/manifests/r4_9g/03_expansion_dod_upr_2001_2015.csv.manifest.json,03_expansion_dod_upr_2001_2015.csv.manifest.json,unknown,14,14,1002,False,present,,,,124722d5f156d0df35a7e97affb2921a3ab735a0c2168939a6f6b414422ba740
 data/manifests/r4_9g/04_expansion_dod_upr_2016_2025.csv.manifest.json,04_expansion_dod_upr_2016_2025.csv.manifest.json,unknown,14,14,1002,False,present,,,,57268f240cc06cb3ad871686ceac2caa4bbd8ff1ed5f15dab36edcd5a3a389ee
 data/manifests/r4_9g/05_expansion_reconstruction_2017_2025.csv.manifest.json,05_expansion_reconstruction_2017_2025.csv.manifest.json,unknown,14,14,1030,False,present,,,,86b1c528b902192e96f89336ea93e13e70ca82448bfbe6c8fcefd107c14c7c34
+data/manifests/sam_entities/20260512T045852Z.json,20260512T045852Z.json,unknown,8,8,3451,False,present,,,,d147478f2b90ff5a966a1619f0ba9a32ecffe68bb7b81068088f341189d53bfb
+data/manifests/source_manifest.csv,source_manifest.csv,unknown,472,12,91802,False,present,,,0.0,caa5713c17951f1509cc0bf5ac668ffe19885b67d203a4b1d813de6c485fd16c
+data/manifests/source_manifest.json,source_manifest.json,unknown,7,7,743529,False,present,,,,73aa21e1308f847c7202df0a295e0acc457d388cf3d363ca404774c60d89c5a2
+data/manifests/usaspending_prime/20260512T045846Z.json,20260512T045846Z.json,unknown,8,8,5846,False,present,,,,71f8115977040adbcddd917d8186cced3831c7b8e1e9657027618b942814d9ac
+data/manifests/validation_gate_report.csv,validation_gate_report.csv,unknown,382,8,24874,False,present,,,0.0,286130a93f798a52ca2fddcea103e87ae7fc0dbee775d117e4b7d1d2c620d6e9
+data/manifests/validation_report.json,validation_report.json,unknown,12,12,72844,False,present,,,,a365d458176afa65fa5ee38fa4b2c4ad166d64b2fb12f08c46b6381e372b24fa
 data/raw/Donaciones_20260320.csv,Donaciones_20260320.csv,unknown,4686,11,840153,False,present,,,0.0,a0554ab981db12e520621438e5bd9fe126cf29a3577966010416c2bf19500b82
 data/raw/FEC/efile-2026-05-05T06_41_38.csv,efile-2026-05-05T06_41_38.csv,unknown,23064,35,5353181,False,present,,,0.0,b8d4a880917a7ab9e2a92004915e79b6eb2d6b74cc532b01de8ca074ad0115b3
 data/raw/Follow the Money/EP_PR_PRBank_Summary_ByAccount.csv,EP_PR_PRBank_Summary_ByAccount.csv,unknown,5,3,236,False,present,,,0.0,e7c115e152f1e1e11ae889f4b8e984e6ca322e53db2a2848a0a1626192c880ef
@@ -220,10 +229,12 @@ data/staging/processed/enrichment/failed_lookups.csv,failed_lookups.csv,unknown,
 data/staging/processed/enrichment/master_enriched.csv,master_enriched.csv,unknown,68680,26,23861107,False,present,,1.0,0.0,b58f0000d248bdbea246210a5482fda67870bcba2728324a4c16ba64a6bd8693
 data/staging/processed/enrichment/sam_cache.json,sam_cache.json,sam_entities,12,12,3052,False,present,,,,fbe155e10e1534b7f4b594566cac6590250f0ae01a87f479e2391429ceaa18bb
 data/staging/processed/enrichment/vendor_uei_index.csv,vendor_uei_index.csv,sam_entities,200,15,22208,False,present,,1.0,0.0,5646761e6893c91161459c10fc12d72046ae5ac39c3ea7f95215c8204ad3d660
+data/staging/processed/entities_resolved.csv,entities_resolved.csv,sam_entities,107459,12,18952414,False,present,,1.0,0.0,818aba8069e2b9fed137a770de04e57425d763809e4626343edc060aace4ea54
 data/staging/processed/graph/entity_edges.csv,entity_edges.csv,unknown,144,7,13312,False,present,,,0.0,126e92c41d21e408b91b69963981837408632be52954f9e64a4414d24dc8532f
 data/staging/processed/graph/network.graphml,network.graphml,unknown,,,39521,False,present,,,,881ad881ed18d60da14221f288b719ee498513930fa87a24aefb15aef0f3b28a
 data/staging/processed/graph/network_summary.json,network_summary.json,unknown,12,12,824,False,present,,,,dd32e835b46fba2a5067f643406a19bfafbb8ff951ef006bdf53468b2d471a62
 data/staging/processed/graph/top_nodes.csv,top_nodes.csv,unknown,26,7,1493,False,present,,,0.0,c2cef94e61b262a940324e8bd6afcbd1dbd8cfed61db1d1beee53755e61b157a
+data/staging/processed/high_value_unresolved.csv,high_value_unresolved.csv,unknown,3818,12,1229308,False,present,,1.0,0.0,0cdce45df6846dbf37d4ad4186351963da85161fb2f1ef1cb2d51666e480d6ac
 data/staging/processed/normalized_expansion_dod_upr_2001_2015.csv,normalized_expansion_dod_upr_2001_2015.csv,unknown,1901,21,599581,False,present,,1.0,0.0,7bd509ee468061f653f8c99df645e916ab79f7edcd37bf847ebda49fc3526ed6
 data/staging/processed/normalized_expansion_dod_upr_2016_2025.csv,normalized_expansion_dod_upr_2016_2025.csv,unknown,2774,21,871208,False,present,,1.0,0.0,1e904323927e95b585d5742c982806bb81fb2b8105aeefc4987c5a37ac4d1720
 data/staging/processed/normalized_expansion_fpds_2005_2008_direct.csv,normalized_expansion_fpds_2005_2008_direct.csv,unknown,14716,21,4508902,False,present,,1.0,0.0,a81140f6f58208975b876812cacc65c68adb0b445583eb7518e85756783e82d4
@@ -238,6 +249,7 @@ data/staging/processed/normalized_highergov_idv_awards.csv,normalized_highergov_
 data/staging/processed/normalized_highergov_municipal_awards.csv,normalized_highergov_municipal_awards.csv,unknown,100,46,115652,False,present,,,0.0,8ab9748607d9fc55abfd93b5d3e0a235f549d70fe10b8405c7a32f1f0214c77b
 data/staging/processed/normalized_highergov_prime_awards.csv,normalized_highergov_prime_awards.csv,unknown,100,97,136031,False,present,,,0.0,f594fbdeaf0e781c8cb9b0fb2447074ee266786b06a0e0e7d56d512e5e55f7b6
 data/staging/processed/normalized_highergov_sub_awards.csv,normalized_highergov_sub_awards.csv,unknown,100,68,226728,False,present,,,0.1111111111111111,02f325e4c3f9e8660292758ceb9b47e7531e137101fd345278f727eea9a80113
+data/staging/processed/parent_conflict_queue.csv,parent_conflict_queue.csv,unknown,0,0,0,True,empty_or_header_only,,,,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 data/staging/processed/partial/contracts_master_partial_diagnostic_r4_9g.csv,contracts_master_partial_diagnostic_r4_9g.csv,usaspending_prime,63310,21,24391452,False,present,,1.0,0.0,7f4c359acc92addf873a83341ff39a27b9b30dd58a2990fdf0d80b3e9fd050af
 data/staging/processed/partial/entities_partial_diagnostic_r4_9g.csv,entities_partial_diagnostic_r4_9g.csv,unknown,7217,12,1271558,False,present,,,0.0,79166b0fc1b804510660df6dd625bbddbdb49be16fa1a13629c9cc52e1128998
 data/staging/processed/pr_all_awards_master.csv,pr_all_awards_master.csv,usaspending_prime,466986,15,174533577,False,present,,0.9999891966872722,0.0,3697a26c2612ac44b7631a9eb5f1d75ef9fd86b5a20e21a2ac087dce011e40d0
@@ -470,4 +482,4 @@ data/staging/raw/subawards/subawards_grants_2023f2026.csv,subawards_grants_2023f
 registries/endpoint_candidates.json,endpoint_candidates.json,unknown,3,3,9414,False,present,,,,02593ee31c837df2391b12ebc8b10de483074759bf6315cff1cb994acc2cd898
 registries/manual_export_registry.json,manual_export_registry.json,unknown,3,3,4395,False,present,,,,de32cf8ccf282b3697d3adb88d93c283dfe0e4807558accee73f48ed3bd3a21e
 registries/schema_registry.json,schema_registry.json,unknown,4,4,26867,False,present,,,,221f52f36be9bb88123ac7e90c7b0af8afef3b09578da383339d83c2ba04fd88
-registries/source_registry.json,source_registry.json,unknown,3,3,41725,False,present,,,,9ba6572eca0474ef596998d353a924cf1ac9ff2d4c829bb79c0dc9c2133dae15
+registries/source_registry.json,source_registry.json,unknown,3,3,41887,False,present,,,,bacdd421b469478338d18aa6901a5debf2da5005da7c2107600dc701b81afc8c
