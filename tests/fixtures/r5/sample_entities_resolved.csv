@@ -1,0 +1,8 @@
+entity_id,normalized_name,entity_name,entity_uei,parent_uei,parent_name,resolution_method,match_confidence,total_obligation,record_count,manual_review_required
+UEI001LGA00000,LGA STRATEGIES,LGA Strategies LLC,UEI001LGA00000,UEIPARENT0001,LGA Holdings Inc,parent_field_or_sam_index,0.95,250000.0,1,False
+UEI002AMT00000,AUTOPISTAS METROPOLITANAS DE PUERTO RICO,Autopistas Metropolitanas De Puerto Rico LLC,UEI002AMT00000,UEIPARENT0002,Abertis Infraestructuras SA,parent_field_or_sam_index,0.95,12500000.0,1,False
+UEI003FER00000,FERROVIAL AGROMAN,Ferrovial Agroman LLC,UEI003FER00000,UEIPARENT0003,Ferrovial SA,parent_field_or_sam_index,0.95,8750000.0,1,False
+UEI004INS00000,INSIGHT PUBLIC AFFAIRS,Insight Public Affairs LLC,UEI004INS00000,UEIPARENT0004,Insight Holdings,parent_field_or_sam_index,0.95,150000.0,1,False
+UEI005LBG00000,LBG CONSULTING,LBG Consulting LLC,UEI005LBG00000,,,,observed_only,0.70,75000.0,1,True
+UEI006LPC00000,LPC AND D ENGINEERING,LPC and D Engineering Inc,UEI006LPC00000,UEIPARENT0006,LPC Holdings,parent_field_or_sam_index,0.95,1750000.0,1,False
+UEI007PRO00000,PROPIZIO,Propizio LLC,UEI007PRO00000,,,,observed_only,0.70,50000.0,1,True

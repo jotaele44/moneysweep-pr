@@ -1,0 +1,274 @@
+version: "1.0"
+schema_version: "r5_endpoint_candidates_v1"
+
+# Canonical public endpoints per source_id, used by validate_source_wiring and gap_analysis.
+# Endpoints here are the authoritative landing pages, not API keys.
+# Anything credentialed lives in manual_export_registry.yaml.
+
+endpoint_candidates:
+
+  - source_id: usaspending_prime
+    url: https://api.usaspending.gov/
+    fallback_urls:
+      - https://www.usaspending.gov/download_center/award_data_archive
+    notes: API + bulk archive.
+
+  - source_id: usaspending_subawards
+    url: https://www.usaspending.gov/download_center/award_data_archive
+    fallback_urls:
+      - https://api.usaspending.gov/
+    notes: Bulk archive contains subawards by FY.
+
+  - source_id: fpds_report_builder
+    url: https://www.fpds.gov/fpdsng_cms/index.php/en/reports.html
+    fallback_urls:
+      - https://www.fpds.gov/ezsearch/fpdsportal
+
+  - source_id: fsrs_subawards
+    url: https://www.fsrs.gov/
+    fallback_urls:
+      - https://api.usaspending.gov/
+
+  - source_id: sam_entities
+    url: https://sam.gov/data-services/Entity%20Information
+    fallback_urls:
+      - https://api.sam.gov/entity-information/
+
+  - source_id: highergov_supplemental
+    url: https://www.highergov.com/api
+    fallback_urls: []
+
+  - source_id: fema_pa_openfema_v2
+    url: https://www.fema.gov/openfema-data-page/public-assistance-funded-projects-details-v2
+    fallback_urls:
+      - https://www.fema.gov/about/openfema/api
+
+  - source_id: fema_hmgp
+    url: https://www.fema.gov/openfema-data-page/hazard-mitigation-grant-program-disaster-summaries-v2
+
+  - source_id: cor3
+    url: https://recovery.pr.gov/
+
+  - source_id: hud_cdbg_dr_public
+    url: https://www.hud.gov/program_offices/comm_planning/cdbg-dr
+
+  - source_id: hud_drgr_authorized
+    url: https://drgr.hud.gov/
+    notes: Credentialed. Manual export only.
+
+  - source_id: hud_hcv_section8
+    url: https://www.huduser.gov/portal/datasets/assthsg.html
+
+  - source_id: prasa
+    url: https://www.acueductospr.com/
+
+  - source_id: prepa_luma_genera
+    url: https://aeepr.com/es-pr/
+
+  - source_id: act_transition_contracts
+    url: ""
+    notes: Manual export only.
+
+  - source_id: acuden_2024_transition
+    url: ""
+    notes: Manual export only.
+
+  - source_id: dcaa_active_contractors
+    url: ""
+    notes: Manual export only.
+
+  - source_id: oficina_contralor
+    url: https://consultacontratos.ocpr.gov.pr/
+
+  - source_id: compras_pr
+    url: https://www.comprashpr.com/
+
+  - source_id: aafaf
+    url: https://www.aafaf.pr.gov/
+
+  - source_id: hacienda
+    url: https://hacienda.pr.gov/
+
+  - source_id: cofina
+    url: https://www.cofina.pr.gov/
+
+  - source_id: promesa_creditors
+    url: https://cases.ra.kroll.com/puertorico/
+
+  - source_id: pr_act_60_decrees
+    url: https://www.ddec.pr.gov/
+
+  - source_id: p3_authority
+    url: https://www.p3.pr.gov/
+
+  - source_id: pr_pensions
+    url: https://www.retiro.pr.gov/
+
+  - source_id: rum_cover_over
+    url: https://home.treasury.gov/about/offices/economic-policy/territorial-tax-rebate
+
+  - source_id: municipal_finance
+    url: https://www.ocam.pr.gov/
+
+  - source_id: eqb_epa_icis
+    url: https://echo.epa.gov/
+
+  - source_id: emma_bonds
+    url: https://emma.msrb.org/
+
+  - source_id: msrb_rtrs_trades
+    url: https://emma.msrb.org/
+
+  - source_id: lda
+    url: https://lda.senate.gov/api/v1/
+
+  - source_id: pr_cabilderos
+    url: https://etica.pr.gov/cabilderos/
+
+  - source_id: fec
+    url: https://api.open.fec.gov/
+
+  - source_id: donaciones_pr
+    url: https://www.ceepur.org/
+
+  - source_id: follow_the_money
+    url: https://www.followthemoney.org/
+
+  - source_id: sba_loans
+    url: https://www.sba.gov/document/report-sba-loan-data-tools
+
+  - source_id: sba_ppp
+    url: https://data.sba.gov/dataset/ppp-foia
+
+  - source_id: slfrf
+    url: https://home.treasury.gov/policy-issues/coronavirus/assistance-for-state-local-and-tribal-governments/state-and-local-fiscal-recovery-funds
+
+  - source_id: sbir
+    url: https://www.sbir.gov/
+
+  - source_id: nih_reporter
+    url: https://api.reporter.nih.gov/
+
+  - source_id: usace_civil_works
+    url: https://www.usace.army.mil/Missions/Civil-Works/
+
+  - source_id: usace_permits
+    url: https://permits.ops.usace.army.mil/orm-public
+
+  - source_id: epa_grants
+    url: https://www.epa.gov/grants
+
+  - source_id: dot_grants
+    url: https://www.transportation.gov/grants
+
+  - source_id: usda_grants
+    url: https://www.usda.gov/topics/farming/grants-and-loans
+
+  - source_id: doe_grants
+    url: https://www.energy.gov/eere/funding/funding-opportunities
+
+  - source_id: doj_grants
+    url: https://www.justice.gov/grants
+
+  - source_id: ed_grants
+    url: https://www2.ed.gov/programs/find/title/index.html
+
+  - source_id: hhs_grants
+    url: https://www.hhs.gov/grants/
+
+  - source_id: oia_grants
+    url: https://www.doi.gov/oia
+
+  - source_id: haf
+    url: https://home.treasury.gov/policy-issues/coronavirus/assistance-for-state-local-and-tribal-governments/homeowner-assistance-fund
+
+  - source_id: exim_bank
+    url: https://www.exim.gov/
+
+  - source_id: congressional_earmarks
+    url: https://www.appropriations.house.gov/
+
+  - source_id: ofac_sdn
+    url: https://www.treasury.gov/ofac/downloads/sdn.csv
+
+  - source_id: opencorporates
+    url: https://opencorporates.com/
+
+  - source_id: pr_corporate_registry
+    url: https://rceweb.estado.pr.gov/
+    notes: Manual export only.
+
+  - source_id: medicaid_fmap
+    url: https://www.medicaid.gov/medicaid/financial-management/index.html
+
+  - source_id: ssa
+    url: https://www.ssa.gov/data/
+
+  - source_id: medicare_parts
+    url: https://www.cms.gov/data-research
+
+  - source_id: medicare_advantage
+    url: https://www.cms.gov/data-research/statistics-trends-and-reports/medicare-advantage-rates-statistics
+
+  - source_id: chip
+    url: https://www.medicaid.gov/chip/index.html
+
+  - source_id: cms_open_payments
+    url: https://openpaymentsdata.cms.gov/
+
+  - source_id: wic
+    url: https://www.fns.usda.gov/wic
+
+  - source_id: wioa
+    url: https://www.dol.gov/agencies/eta/wioa
+
+  - source_id: snap_nap
+    url: https://www.fns.usda.gov/snap/nutrition-assistance-puerto-rico
+
+  - source_id: va_benefits
+    url: https://www.benefits.va.gov/REPORTS/
+
+  - source_id: fdic
+    url: https://www.fdic.gov/resources/data-tools/
+
+  - source_id: ncua
+    url: https://www.ncua.gov/analysis/credit-union-corporate-call-report-data
+
+  - source_id: fhlb
+    url: https://www.fhfa.gov/data
+
+  - source_id: sec_edgar
+    url: https://www.sec.gov/edgar
+
+  - source_id: sec_13f_nport
+    url: https://www.sec.gov/edgar/search-and-access
+
+  - source_id: fcc_usf
+    url: https://www.fcc.gov/general/universal-service-fund
+
+  - source_id: nfip_claims
+    url: https://www.fema.gov/openfema-data-page/fima-nfip-redacted-claims-v2
+
+  - source_id: lihtc
+    url: https://www.huduser.gov/portal/datasets/lihtc.html
+
+  - source_id: nmtc
+    url: https://www.cdfifund.gov/programs-training/programs/new-markets-tax-credit
+
+  - source_id: nonprofits_irs990
+    url: https://projects.propublica.org/nonprofits/api
+
+  - source_id: gao_ig_audits
+    url: https://www.gao.gov/
+
+  - source_id: dol_whd_osha
+    url: https://www.dol.gov/agencies/whd
+
+  - source_id: sf133_budget_execution
+    url: https://www.whitehouse.gov/omb/budget/sf-133/
+
+  - source_id: research_grants
+    url: https://www.grants.gov/
+
+  - source_id: grants_gov
+    url: https://www.grants.gov/
