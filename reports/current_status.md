@@ -1,8 +1,8 @@
-# Current Status — R5 PR2
+# Current Status — R5 PR2.5
 
 **Updated:** 2026-05-12  
 **Branch:** `claude/r5-pr2-top5-source-materialization`  
-**Phase:** PR2 — Entity baseline + per-source manifests
+**Phase:** PR2.5 — USAspending parent enrichment + structural blocker report
 
 ## Outputs produced this PR
 
@@ -33,6 +33,20 @@
 ## Entity resolution baseline
 
 - 107,459 unique entities observed across all staged CSVs
-- 0% parent-resolved (vendor_uei_index.csv has 200 cached rows, no parent_uei filled)
+- 0.0009% parent-resolved (1 self-referential; 0 distinct corporate parents)
 - 3,818 entities with total_obligation ≥ $1M require manual review
-- Resolution will improve when: (a) full SAM API extract runs, (b) PR contracts master is enriched
+- **Structural finding:** Top entities by obligation are PR government agencies — no corporate parent_uei expected
+- USAspending lookup running in background (~7h ETA); will refresh once complete
+- Gate recalibration recommended: `parent_uei_rate ≥ 0.05` for PR govt sources (was 0.90)
+
+## PR2.5 outputs
+
+| Output | Status |
+|---|---|
+| `scripts/parent_collapse.py` USAspending index patch | ✓ |
+| `data/processed/entities_resolved_top5.csv` | ✓ 5 rows |
+| `data/processed/alias_registry_top5.json` | ✓ 5 entries |
+| `data/review_queue/pr2_unresolved_entities.csv` | ✓ 3,818 rows |
+| `reports/pr2_5_sam_parent_resolution_report.md` | ✓ written |
+| Tests (PR2-specific): 11 passed | ✓ |
+| Secret scan | ✓ 0 findings |

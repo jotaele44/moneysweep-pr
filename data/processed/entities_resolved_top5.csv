@@ -1,0 +1,6 @@
+entity_id,normalized_name,entity_name,entity_uei,parent_uei,parent_name,resolution_method,match_confidence,total_obligation,record_count,source_files,manual_review_required
+MULTIPLE RECIPIENTS,MULTIPLE RECIPIENTS,MULTIPLE RECIPIENTS,,,,observed_only,0.0,183994275440.06,173875,pr_all_awards_master.csv;pr_entity_profiles.csv;pr_grants_master.csv;pr_usda_master.csv,True
+NMLEHM4JTN15,PUERTO RICO DEPARTMENT OF HEALTH,PUERTO RICO DEPARTMENT OF HEALTH,NMLEHM4JTN15,,,uei_no_parent,0.7,86788395154.9,1316,pr_all_awards_master.csv;pr_grants_master.csv,True
+K1YTP5WAJ5L5,ADMINISTRACION DE DESARROLLO SOCIOECONOMICO DE LA FAMILIA,ADMINISTRACION DE DESARROLLO SOCIOECONOMICO DE LA FAMILIA,K1YTP5WAJ5L5,,,uei_no_parent,0.7,83107909286.14,310,pr_all_awards_master.csv;pr_grants_master.csv,True
+HEJDFU1K4E22,GOVERNOR S AUTHORIZED REPRESENTATIVE,GOVERNOR'S AUTHORIZED REPRESENTATIVE,HEJDFU1K4E22,,,uei_no_parent,0.7,80103957049.68,192,pr_all_awards_master.csv;pr_grants_master.csv,True
+KUHBF2X2EGN3,DEPARTMENT OF EDUCATION OF PUERTO RICO,DEPARTMENT OF EDUCATION OF PUERTO RICO,KUHBF2X2EGN3,,,uei_no_parent,0.7,44299261792.02,1108,pr_all_awards_master.csv;pr_grants_master.csv,True
