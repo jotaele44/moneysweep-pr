@@ -357,6 +357,11 @@ def run_recovery_and_rebuild(root: Path, *, allow_partial_rebuild: bool = False)
     forbidden = resolved["forbidden_candidate_count"]
 
     can_attempt_rebuild = bool(allow_partial_rebuild or (missing == 0 and forbidden == 0))
+    dedup_trace_rows: list[dict[str, Any]] = []
+    source_contribution_rows: list[dict[str, Any]] = []
+    rebuilt_outputs: dict[str, str] = {}
+    schema_validation_passed = False
+
     if can_attempt_rebuild:
         rebuild_attempted = True
         try:
@@ -368,6 +373,51 @@ def run_recovery_and_rebuild(root: Path, *, allow_partial_rebuild: bool = False)
                 require_all_inputs=(not allow_partial_rebuild),
                 fail_on_forbidden=True,
             )
+            # R4.9 artifact upgrades: export parquet + source matrix + dedup trace.
+            master_csv = root / "data" / "staging" / "processed" / "pr_all_awards_master.csv"
+            master_parquet = root / "data" / "staging" / "processed" / "contracts_master.parquet"
+            if not master_csv.exists():
+                raise RuntimeError("Unified master CSV missing after rebuild")
+
+            master_df = pd.read_csv(master_csv, dtype=str, low_memory=False)
+            required_cols = {
+                "award_id",
+                "source_dataset",
+                "source_record_id",
+                "source_lineage_path",
+                "source_lineage_mode",
+            }
+            missing_required = sorted(required_cols.difference(master_df.columns))
+            if missing_required:
+                raise RuntimeError(f"Schema violation in rebuilt master: missing columns {missing_required}")
+            schema_validation_passed = True
+
+            master_df.to_parquet(master_parquet, index=False)
+            rebuilt_outputs["pr_all_awards_master_csv"] = "data/staging/processed/pr_all_awards_master.csv"
+            rebuilt_outputs["contracts_master_parquet"] = "data/staging/processed/contracts_master.parquet"
+
+            if "source_dataset" in master_df.columns:
+                for ds, grp in master_df.groupby("source_dataset", dropna=False):
+                    source_contribution_rows.append(
+                        {
+                            "source_dataset": str(ds),
+                            "row_count": int(len(grp)),
+                            "unique_award_id_count": int(grp.get("award_id", pd.Series(dtype=str)).fillna("").replace("", pd.NA).dropna().nunique()),
+                        }
+                    )
+            if "award_id" in master_df.columns and "source_dataset" in master_df.columns:
+                dup_mask = master_df["award_id"].fillna("").str.strip() != ""
+                dup_df = master_df.loc[dup_mask].copy()
+                grouped = dup_df.groupby("award_id")["source_dataset"].nunique()
+                duplicate_ids = grouped[grouped > 1]
+                for award_id, unique_sources in duplicate_ids.items():
+                    dedup_trace_rows.append(
+                        {
+                            "award_id": str(award_id),
+                            "source_dataset_count": int(unique_sources),
+                            "source_datasets": "|".join(sorted(dup_df.loc[dup_df["award_id"] == award_id, "source_dataset"].astype(str).unique())),
+                        }
+                    )
             rebuild_succeeded = True
         except Exception as exc:
             build_error = str(exc)
@@ -428,7 +478,13 @@ def run_recovery_and_rebuild(root: Path, *, allow_partial_rebuild: bool = False)
             "master_input_recovery_audit": "data/exports/master_input_recovery_audit.csv",
             "master_input_recovery_status": "data/exports/master_input_recovery_audit.json",
             "master_input_blockers": "data/review_queue/master_input_recovery_blockers.csv",
+            "rebuild_audit": "data/exports/r49_rebuild_audit.json",
+            "source_contribution_matrix": "data/exports/r49_source_contribution_matrix.csv",
+            "deduplication_trace": "data/exports/r49_deduplication_trace.csv",
         },
+        "forbidden_artifact_usage": False,
+        "schema_validation_passed": schema_validation_passed,
+        "rebuild_outputs": rebuilt_outputs,
     }
 
     _write_csv(
@@ -472,6 +528,30 @@ def run_recovery_and_rebuild(root: Path, *, allow_partial_rebuild: bool = False)
     )
 
     _write_json(exports_dir / "master_input_recovery_audit.json", recovery_payload)
+    _write_csv(
+        exports_dir / "r49_source_contribution_matrix.csv",
+        source_contribution_rows,
+        ["source_dataset", "row_count", "unique_award_id_count"],
+    )
+    _write_csv(
+        exports_dir / "r49_deduplication_trace.csv",
+        dedup_trace_rows,
+        ["award_id", "source_dataset_count", "source_datasets"],
+    )
+    _write_json(
+        exports_dir / "r49_rebuild_audit.json",
+        {
+            "generated_at": recovery_payload["generated_at"],
+            "rebuild_attempted": rebuild_attempted,
+            "rebuild_succeeded": rebuild_succeeded,
+            "build_error": build_error,
+            "schema_validation_passed": schema_validation_passed,
+            "forbidden_artifact_usage": False,
+            "rebuild_outputs": rebuilt_outputs,
+            "source_contribution_rows": len(source_contribution_rows),
+            "deduplication_trace_rows": len(dedup_trace_rows),
+        },
+    )
 
     # Persist R4 in shared rebuild status.
     rebuild_status = dict(prior_rebuild)

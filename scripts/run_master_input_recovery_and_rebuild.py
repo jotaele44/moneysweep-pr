@@ -39,6 +39,9 @@ def main() -> int:
     print("wrote: data/exports/master_input_recovery_audit.json")
     print("wrote: data/review_queue/master_input_recovery_blockers.csv")
     print("wrote: data/exports/rebuild_status.json")
+    print("wrote: data/exports/r49_rebuild_audit.json")
+    print("wrote: data/exports/r49_source_contribution_matrix.csv")
+    print("wrote: data/exports/r49_deduplication_trace.csv")
     return 0
 
 
