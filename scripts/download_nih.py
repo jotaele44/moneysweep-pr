@@ -16,6 +16,7 @@ Output:
 Usage:
   python3 scripts/download_nih.py [--force]
 """
+from __future__ import annotations
 
 import argparse
 import sys

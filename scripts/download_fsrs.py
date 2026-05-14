@@ -7,6 +7,7 @@ FSRS data is available through their web interface. This module attempts to:
 
 Note: FSRS doesn't have a public API; web scraping may be fragile.
 """
+from __future__ import annotations
 import os
 import sys
 from pathlib import Path

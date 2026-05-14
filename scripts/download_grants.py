@@ -28,6 +28,7 @@ Usage:
   python3 scripts/download_grants.py --force           # re-download existing
   python3 scripts/download_grants.py --pass grants_pop # single pass only
 """
+from __future__ import annotations
 
 import argparse
 import io

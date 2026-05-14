@@ -1,39 +1,37 @@
 # Next Actions
 
-**Updated:** 2026-05-12  
-**Current branch:** `claude/r5-pr2-top5-source-materialization`
+**Updated:** 2026-05-14
+**Current branch:** `claude/r5-pr59-fsrs-subawards`
 
-## PR2.5 (in-progress)
+## PR #59 — Subaward linkage (complete)
 
-- [x] Patch `parent_collapse.py` to load `usaspending_parent_index.csv`
-- [x] Re-run `parent_collapse.py` with enriched index
-- [x] Emit `data/processed/entities_resolved_top5.csv`
-- [x] Emit `data/processed/alias_registry_top5.json`
-- [x] Emit `data/review_queue/pr2_unresolved_entities.csv`
-- [x] Write `reports/pr2_5_sam_parent_resolution_report.md`
-- [x] Tests (PR2-specific): 11 passed
-- [x] Secret scan: 0 findings
-- [ ] USAspending background lookup complete (~7h ETA) → re-run `parent_collapse.py` → refresh stats
-- [ ] Recalibrate `source_registry.yaml` parent_uei thresholds (B4)
-- [ ] Commit + push + PR
+- [x] Fix Python 3.9 `X | None` import failures across config + 68 scripts
+- [x] Fix `download_subawards.py` pagination (`hasNext` key) + `MAX_PAGES` cap
+- [x] Capture `prime_award_generated_internal_id` in subaward master
+- [x] Repair subaward→prime join in `execution_chain_builder.py`
+- [x] Re-run download (4,834 subawards), chain builder, influence graph
+- [x] `execution_chain_linkage_rate` 0.5969 → 1.0 (PASS); `failed_gate_count` 114 → 112
+- [x] Tests: 89 unit passed; secret scan: 0 findings
+- [x] `reports/pr59_fsrs_subawards_report.md`
 
-## When USAspending lookup completes
+## PR #60 — EMMA bonds (next)
 
-```bash
-# Re-run entity resolution with full USAspending enrichment
-python3 scripts/parent_collapse.py
+1. Run `python3 scripts/download_emma.py` → emit `pr_emma_bonds.csv`, `pr_emma_underwriters.csv`
+2. Refresh influence graph bond-underwriter layer
+3. Add per-source manifest; confirm `source_coverage_rate` advances
+4. Tests + secret scan + PR
 
-# Update top5 outputs
-python3 -c "
-import csv, json
-from pathlib import Path
-# [same emit script as PR2.5 step 4]
-"
-```
+## Remaining required-source backfill (PR #60–65)
 
-## PR3 (next, after PR2.5 gate)
+Priority order from `reports/backfill_plan.md`:
 
-1. Port `execution_chain_builder.py` from sibling Contract-Sweep
-2. Emit `execution_chain_master.csv`, `execution_chain_per_asset.csv`, `execution_chain_per_municipality.csv`
-3. Wire into `validation_gates.py` `execution_chain_linkage_rate` gate
-4. Tests + secret scan + PR #53
+1. ~~`fsrs_subawards`~~ — done (PR #59, via USAspending subaward API)
+2. `emma_bonds` — PR #60, no credentials
+3. `oficina_contralor` — PR #61, no credentials
+4. `pr_cabilderos` — PR #62, no credentials
+5. `cor3` — PR #63, manual export (confirm drop-zone file)
+6. `prasa` — PR #64, manual export (confirm drop-zone file)
+7. `hud_drgr_authorized` — PR #65, grantee login (deferred if file absent)
+
+Target after PR #60–62: `source_coverage_rate` 0.50 → ~0.79.
+Target after PR #63–65: `source_coverage_rate` → ~1.00.

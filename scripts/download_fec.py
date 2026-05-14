@@ -17,6 +17,7 @@ Usage:
   python3 scripts/download_fec.py --api-key YOUR_KEY
   python3 scripts/download_fec.py --force
 """
+from __future__ import annotations
 
 import argparse
 import os

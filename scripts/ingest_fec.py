@@ -25,6 +25,7 @@ Usage:
   python3 scripts/ingest_fec.py
   python3 scripts/ingest_fec.py --force
 """
+from __future__ import annotations
 
 import argparse
 import sys

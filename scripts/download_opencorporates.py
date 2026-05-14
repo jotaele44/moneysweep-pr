@@ -19,6 +19,7 @@ Usage:
   python3 scripts/download_opencorporates.py [--force] [--api-token TOKEN]
   # TOKEN from env var OPENCORPORATES_API_TOKEN if not provided
 """
+from __future__ import annotations
 
 import argparse
 import os

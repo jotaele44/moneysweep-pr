@@ -17,6 +17,7 @@ Usage:
   python3 scripts/download_compras.py --force
   python3 scripts/download_compras.py --max-pages 50
 """
+from __future__ import annotations
 
 import argparse
 import json

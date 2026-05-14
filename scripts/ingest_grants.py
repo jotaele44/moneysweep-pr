@@ -11,6 +11,7 @@ Usage:
   python3 scripts/ingest_grants.py
   python3 scripts/ingest_grants.py --force
 """
+from __future__ import annotations
 
 import argparse
 import sys

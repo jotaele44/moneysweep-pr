@@ -18,6 +18,7 @@ Usage:
   python3 scripts/download_fdic.py
   python3 scripts/download_fdic.py --force
 """
+from __future__ import annotations
 
 import argparse
 import sys

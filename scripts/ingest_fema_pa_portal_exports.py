@@ -9,6 +9,7 @@ Usage:
   python3 scripts/ingest_fema_pa_portal_exports.py
   python3 scripts/ingest_fema_pa_portal_exports.py --force
 """
+from __future__ import annotations
 
 import sys
 from pathlib import Path

@@ -35,7 +35,22 @@ NAME_FIELDS = ["recipient_name", "vendor_name", "prime_recipient_name", "prime_n
 UEI_FIELDS = ["recipient_uei", "uei", "prime_uei", "prime_recipient_uei"]
 PARENT_UEI_FIELDS = ["parent_uei", "prime_parent_uei", "ultimate_parent_uei"]
 AMOUNT_FIELDS = ["obligated_amount", "total_obligation", "obligation_amount", "amount"]
-AWARD_ID_FIELDS = ["award_id", "prime_award_id", "generated_unique_award_id", "prime_award_unique_key"]
+AWARD_ID_FIELDS = ["award_id", "prime_award_id", "prime_award_ids",
+                   "prime_award_generated_internal_id", "generated_internal_id",
+                   "contract_id", "generated_unique_award_id", "prime_award_unique_key"]
+# Fields a subaward row may carry that identify its prime award, in join-priority
+# order: the USAspending generated internal id is the strongest (matches the prime
+# contracts master's generated_internal_id exactly); plural variants come from the
+# pre-aggregated pr_prime_sub_relationships.csv summary.
+SUB_JOIN_FIELDS = ["prime_award_generated_internal_id", "prime_award_id",
+                   "prime_award_ids", "award_id", "generated_unique_award_id",
+                   "prime_award_unique_key"]
+# Keys to index the prime-award masters by, so any of the above resolves.
+PRIME_KEY_FIELDS = ["generated_internal_id", "contract_id", "award_id",
+                    "generated_unique_award_id", "prime_award_unique_key"]
+PRIME_NAME_FIELDS = ["prime_recipient_name", "prime_name", "prime_recipient"]
+FUNDING_FIELDS = ["funding_source", "funding_agency", "awarding_agency",
+                  "awarding_agencies", "awarding_sub_agency"]
 SUBAWARD_ID_FIELDS = ["subaward_id", "subaward_number", "generated_unique_subaward_id"]
 MUNICIPALITY_FIELDS = ["municipality", "pop_county", "county", "pop_city", "place_of_performance_city"]
 
@@ -85,6 +100,13 @@ def _chain_id(*parts: str) -> str:
 
 
 def _load_prime_index(root: Path) -> dict[str, dict]:
+    """Index prime awards by every identifier a subaward might join on.
+
+    A subaward's prime is identified by USAspending's generated internal id
+    (e.g. CONT_AWD_W912DY18F0003_9700_...), which matches pr_contracts_master's
+    ``generated_internal_id``. Older masters key on ``award_id``. We index every
+    candidate key so any of them resolves.
+    """
     idx: dict[str, dict] = {}
     for path in [
         root / "data/staging/processed/pr_all_awards_master.csv",
@@ -92,9 +114,10 @@ def _load_prime_index(root: Path) -> dict[str, dict]:
         root / "data/staging/processed/pr_fema_pa_master.csv",
     ]:
         for row in _read_csv(path):
-            aid = _first(row, AWARD_ID_FIELDS)
-            if aid:
-                idx.setdefault(aid, row)
+            for kf in PRIME_KEY_FIELDS:
+                k = (row.get(kf) or "").strip()
+                if k:
+                    idx.setdefault(k, row)
     return idx
 
 
@@ -109,15 +132,22 @@ def _load_entity_index(root: Path) -> dict[str, dict]:
 
 
 def _link_confidence(
-    aid: str, prime: str, subn: str, prime_uei: str, sub_uei: str, prime_in_index: bool
+    aid: str, prime: str, subn: str, prime_uei: str, sub_uei: str,
+    prime_in_index: bool, strong_key: bool
 ) -> float:
+    """Confidence that a subaward is correctly linked to its prime award.
+
+    ``strong_key`` means the subaward carries USAspending's authoritative prime
+    generated-internal-id — a source-published linkage, the strongest signal.
+    ``prime_in_index`` means we also hold that prime locally (enrichable).
+    """
     score = 0.0
-    score += 0.35 if aid else 0.0
+    score += 0.40 if strong_key else (0.25 if aid else 0.0)
+    score += 0.20 if prime else 0.0
     score += 0.15 if prime_in_index else 0.0
-    score += 0.15 if prime else 0.0
     score += 0.15 if subn else 0.0
-    score += 0.10 if prime_uei else 0.0
-    score += 0.10 if sub_uei else 0.0
+    score += 0.05 if prime_uei else 0.0
+    score += 0.05 if sub_uei else 0.0
     return round(min(score, 1.0), 3)
 
 
@@ -134,10 +164,11 @@ def build_execution_chains(root: Path) -> dict[str, Any]:
     review: list[dict] = []
 
     for i, s in enumerate(sub_rows, 1):
-        aid = _first(s, AWARD_ID_FIELDS)
+        aid = _first(s, SUB_JOIN_FIELDS)
         m = prime_idx.get(aid, {})
+        strong_key = bool((s.get("prime_award_generated_internal_id") or "").strip())
 
-        prime = _first(s, ["prime_recipient_name", "prime_name"]) or _first(m, NAME_FIELDS)
+        prime = _first(s, PRIME_NAME_FIELDS) or _first(m, NAME_FIELDS)
         subn = _first(s, ["sub_recipient_name", "subawardee_name", "sub_name", "sub_recipient", "recipient_name"])
 
         prime_uei = _first(s, ["prime_uei", "prime_recipient_uei"]) or _first(m, UEI_FIELDS)
@@ -155,13 +186,22 @@ def build_execution_chains(root: Path) -> dict[str, Any]:
         asset_id = _first(s, ["asset_id", "facility_id", "project_number", "project_id"]) or \
                    _first(m, ["asset_id", "facility_id", "project_number", "project_id"])
 
-        conf = _link_confidence(aid, prime, subn, prime_uei, sub_uei, bool(m))
+        conf = _link_confidence(aid, prime, subn, prime_uei, sub_uei, bool(m), strong_key)
+
+        if aid and m:
+            link_method = "prime_award_id_join"
+        elif aid and prime:
+            # USAspending publishes the prime↔sub relationship in the subaward
+            # record itself; the prime award is identified even when it is not
+            # also present in our locally-downloaded prime masters.
+            link_method = "subaward_declared_prime"
+        else:
+            link_method = "subaward_record_only"
 
         chain: dict = {
             "chain_id": _chain_id(aid, prime, subn, str(i)),
             "generated_at": datetime.now(timezone.utc).isoformat(),
-            "funding_source": _first(m, ["funding_source", "funding_agency", "awarding_agency",
-                                         "awarding_sub_agency"]) or _first(s, ["awarding_agency"]),
+            "funding_source": _first(m, FUNDING_FIELDS) or _first(s, FUNDING_FIELDS),
             "program": _first(m, ["program", "assistance_listing", "cfda_number", "award_category"])
                        or _first(s, ["award_category"]),
             "prime_name": prime,
@@ -177,7 +217,7 @@ def build_execution_chains(root: Path) -> dict[str, Any]:
             "municipality": municipality,
             "obligation_amount": _money(m),
             "subaward_amount": _money(s),
-            "link_method": "prime_award_id_join" if (aid and bool(m)) else "subaward_record_only",
+            "link_method": link_method,
             "link_confidence": conf,
             "manual_review_required": conf < 0.9,
         }
@@ -239,7 +279,12 @@ def build_execution_chains(root: Path) -> dict[str, Any]:
     _write_csv(out / "execution_chain_per_municipality.csv", muni_rows)
     _write_csv(out / "execution_chain_review_queue.csv", review)
 
-    linked = sum(1 for c in chains if c["link_method"] == "prime_award_id_join")
+    # A chain is "linked" when the prime award is identified (either matched into
+    # our prime index, or declared authoritatively in the subaward record itself).
+    # "enriched" is the stricter subset whose prime we also hold locally.
+    enriched = sum(1 for c in chains if c["link_method"] == "prime_award_id_join")
+    declared = sum(1 for c in chains if c["link_method"] == "subaward_declared_prime")
+    linked = enriched + declared
     linkage_rate = linked / len(chains) if chains else 0.0
     full_chains = sum(1 for c in chains if c["prime_name"] and c["sub_name"] and c["award_id"])
 
@@ -247,7 +292,10 @@ def build_execution_chains(root: Path) -> dict[str, Any]:
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "chain_count": len(chains),
         "linked_to_prime": linked,
+        "enriched_from_prime_index": enriched,
+        "declared_prime_only": declared,
         "linkage_rate": round(linkage_rate, 4),
+        "enrichment_rate": round(enriched / len(chains), 4) if chains else 0.0,
         "full_chain_rate": round(full_chains / len(chains), 4) if chains else 0.0,
         "review_queue_count": len(review),
         "per_asset_count": len(by_asset),

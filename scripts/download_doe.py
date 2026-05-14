@@ -21,6 +21,7 @@ Usage:
   python3 scripts/download_doe.py --force
   python3 scripts/download_doe.py --fy-start 2017
 """
+from __future__ import annotations
 
 import argparse
 import sys

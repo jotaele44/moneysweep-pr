@@ -14,6 +14,7 @@ Usage:
   python3 scripts/download_nonprofits.py --min-revenue 100000
   python3 scripts/download_nonprofits.py --force
 """
+from __future__ import annotations
 
 import argparse
 import sys

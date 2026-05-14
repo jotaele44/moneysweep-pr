@@ -18,8 +18,8 @@ entity_resolution_rate,,,False,0.004,0.95,,resolve_aliases_and_sam_parent
 entity_type_assignment_rate,,,True,1.0,0.8,,ok
 corporate_parent_uei_rate,,,True,0.0032,0.002,,ok
 high_value_unresolved_review_rate,,,True,1.0,0.9,,ok
-subaward_linkage_rate,,,False,0.5969,0.9,,rebuild_execution_chain_master
-execution_chain_linkage_rate,,,False,0.5969,0.9,,improve_chain_join_evidence
+subaward_linkage_rate,,,True,1.0,0.9,,ok
+execution_chain_linkage_rate,,,True,1.0,0.9,,ok
 manifest_present_per_required,usaspending_prime,,True,present,present,,ok
 manifest_present_per_required,usaspending_subawards,,False,missing,present,,run_manifest_runtime_for_source
 manifest_present_per_required,fsrs_subawards,,False,missing,present,,run_manifest_runtime_for_source

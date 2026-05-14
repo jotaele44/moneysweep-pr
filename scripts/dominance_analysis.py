@@ -12,6 +12,7 @@ Usage:
   python3 scripts/dominance_analysis.py
   python3 scripts/dominance_analysis.py --top 50   # top 50 vendors in report
 """
+from __future__ import annotations
 
 import argparse
 import csv

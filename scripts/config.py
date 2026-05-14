@@ -2,6 +2,7 @@
 Shared configuration for the Puerto Rico Federal Contracts Data Pipeline.
 Single source of truth for paths, file manifest, column families, and helpers.
 """
+from __future__ import annotations
 
 import logging
 import sys

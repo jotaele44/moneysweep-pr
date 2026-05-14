@@ -17,6 +17,7 @@ Usage:
   python3 scripts/download_subawards.py --force          # re-download existing
   python3 scripts/download_subawards.py --fy-start 2017  # only FY2017+
 """
+from __future__ import annotations
 
 import argparse
 import sys
@@ -74,6 +75,7 @@ MASTER_COLUMNS = [
     "description",
     "prime_award_id",
     "prime_recipient_name",
+    "prime_award_generated_internal_id",
     "source_file",
     "source_dataset",
     "award_category",
@@ -83,6 +85,7 @@ MAX_RETRIES = 3
 RETRY_BACKOFF = [2, 4, 8]
 PAGE_SLEEP = 0.3
 RATE_LIMIT_SLEEP = 30
+MAX_PAGES = 2000  # safety cap: ~200k records/window before forced stop
 
 
 # ---------------------------------------------------------------------------
@@ -150,11 +153,16 @@ def _fetch_page(session: requests.Session, payload: dict, logger) -> dict | None
 
 
 def _paginate(session: requests.Session, base_payload: dict, logger) -> list[dict]:
-    """Paginate through all results for a given payload. Returns list of raw result dicts."""
+    """Paginate through all results for a given payload. Returns list of raw result dicts.
+
+    The spending_by_award endpoint reports continuation via ``page_metadata.hasNext``
+    (camelCase). Page-based paging can return a small overlap between adjacent pages
+    when many records share the sort value; callers dedupe on award_id downstream.
+    """
     all_results = []
     page = 1
 
-    while True:
+    while page <= MAX_PAGES:
         payload = dict(base_payload)
         payload["page"] = page
 
@@ -169,7 +177,7 @@ def _paginate(session: requests.Session, base_payload: dict, logger) -> list[dic
         all_results.extend(results)
 
         page_meta = data.get("page_metadata", {})
-        has_next = page_meta.get("has_next_page", False)
+        has_next = page_meta.get("hasNext", page_meta.get("has_next_page", False))
 
         if page % 10 == 0:
             logger.info(f"    Page {page} ({len(all_results)} records so far)")
@@ -179,6 +187,9 @@ def _paginate(session: requests.Session, base_payload: dict, logger) -> list[dic
 
         page += 1
         time.sleep(PAGE_SLEEP)
+
+    if page > MAX_PAGES:
+        logger.warning(f"    Hit MAX_PAGES={MAX_PAGES} cap ({len(all_results)} records) — stopping")
 
     return all_results
 

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T19:27:51.046595+00:00",
+  "generated_at": "2026-05-14T20:08:42.580156+00:00",
   "schema_version": "r5_v2",
   "passed": false,
   "source_coverage_rate": 0.5,
@@ -8,10 +8,10 @@
   "corporate_parent_uei_rate": 0.003214608397926673,
   "government_entity_count": 764,
   "high_value_unresolved_count": 3618,
-  "subaward_linkage_rate": 0.596875,
-  "execution_chain_linkage_rate": 0.596875,
+  "subaward_linkage_rate": 1.0,
+  "execution_chain_linkage_rate": 1.0,
   "gate_count": 387,
-  "failed_gate_count": 114,
+  "failed_gate_count": 112,
   "thresholds": {
     "source_coverage_rate": 0.95,
     "entity_resolution_rate": 0.95,
@@ -200,17 +200,17 @@
     },
     {
       "gate": "subaward_linkage_rate",
-      "passed": false,
-      "observed": 0.5969,
+      "passed": true,
+      "observed": 1.0,
       "threshold": 0.9,
-      "action": "rebuild_execution_chain_master"
+      "action": "ok"
     },
     {
       "gate": "execution_chain_linkage_rate",
-      "passed": false,
-      "observed": 0.5969,
+      "passed": true,
+      "observed": 1.0,
       "threshold": 0.9,
-      "action": "improve_chain_join_evidence"
+      "action": "ok"
     },
     {
       "gate": "manifest_present_per_required",

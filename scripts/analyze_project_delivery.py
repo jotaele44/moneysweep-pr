@@ -21,6 +21,7 @@ Usage:
   python3 scripts/analyze_project_delivery.py
   python3 scripts/analyze_project_delivery.py --force
 """
+from __future__ import annotations
 
 import argparse
 import sys

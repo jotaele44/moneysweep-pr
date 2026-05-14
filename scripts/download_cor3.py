@@ -14,6 +14,7 @@ Usage:
   python3 scripts/download_cor3.py
   python3 scripts/download_cor3.py --force
 """
+from __future__ import annotations
 
 import argparse
 import json
