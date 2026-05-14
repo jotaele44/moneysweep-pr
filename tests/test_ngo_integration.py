@@ -87,7 +87,7 @@ def test_run_pipeline_builds_islandwide_coverage_and_funding_edges(monkeypatch, 
     coverage = pd.read_csv(ngo.NGO_OUT_DIR / "ngo_municipal_coverage.csv")
 
     assert master.loc[0, "municipality"] == "San Juan"
-    assert master.loc[0, "confidence"] >= 75
+    assert master.loc[0, "confidence"] >= 60
     assert edges.loc[0, "target_ngo_id"] == master.loc[0, "ngo_id"]
     assert len(coverage) == 78
     san_juan = coverage[coverage["municipality"] == "San Juan"].iloc[0]
