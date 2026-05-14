@@ -9,6 +9,7 @@ Usage:
   python3 scripts/download_fema.py --hmgp-only # only Hazard Mitigation
   python3 scripts/download_fema.py --force     # re-download even if file exists
 """
+from __future__ import annotations
 
 import sys
 from pathlib import Path

@@ -17,6 +17,7 @@ Output:
 Usage:
   python3 scripts/download_snap_nap.py [--force]
 """
+from __future__ import annotations
 
 import argparse
 import sys

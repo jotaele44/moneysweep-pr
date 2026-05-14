@@ -20,6 +20,7 @@ Usage:
   python3 scripts/analyze_bond_flow.py
   python3 scripts/analyze_bond_flow.py --force
 """
+from __future__ import annotations
 
 import argparse
 import sys

@@ -11,6 +11,7 @@ Usage:
   python3 scripts/download_municipal.py
   python3 scripts/download_municipal.py --force
 """
+from __future__ import annotations
 
 import argparse
 import sys

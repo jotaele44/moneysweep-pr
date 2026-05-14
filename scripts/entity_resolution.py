@@ -9,6 +9,7 @@ Usage:
   python3 scripts/entity_resolution.py --top 50      # top 50
   python3 scripts/entity_resolution.py --resume      # resume from cache
 """
+from __future__ import annotations
 
 import argparse
 import csv

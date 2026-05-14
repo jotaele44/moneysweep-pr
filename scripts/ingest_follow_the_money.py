@@ -23,6 +23,7 @@ Usage:
   python3 scripts/ingest_follow_the_money.py
   python3 scripts/ingest_follow_the_money.py --force
 """
+from __future__ import annotations
 
 import argparse
 import sys

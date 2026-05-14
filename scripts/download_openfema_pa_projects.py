@@ -10,6 +10,7 @@ Usage:
   python3 scripts/download_openfema_pa_projects.py
   python3 scripts/download_openfema_pa_projects.py --force
 """
+from __future__ import annotations
 
 import sys
 from pathlib import Path

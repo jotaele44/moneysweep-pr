@@ -27,6 +27,7 @@ Usage:
   python3 scripts/lda_enrich.py --force          # ignore cached entity queries
   python3 scripts/lda_enrich.py --api-key TOKEN
 """
+from __future__ import annotations
 
 import argparse
 import json
