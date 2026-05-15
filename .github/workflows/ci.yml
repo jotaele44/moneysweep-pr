@@ -35,3 +35,6 @@ jobs:
 
       - name: Run R5 validation gates (enforced)
         run: python -m contract_sweeper.runtime.validation_gates --root .
+
+      - name: Validate import graph (pipeline layer has no unexpected importers)
+        run: python scripts/check_import_graph.py --root .
