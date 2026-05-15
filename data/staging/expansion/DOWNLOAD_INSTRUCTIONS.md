@@ -8,6 +8,59 @@ expansion datasets from federal procurement data sources.
 > These instructions apply to the 1 remaining manual file (FSRS) or as a
 > fallback if automated downloads fail.
 
+---
+
+## PRIORITY: HUD DRGR Authorized Export (gate blocker)
+
+**Gate status**: `hud_drgr_authorized` is the **one permanently failing R5 gate**.
+It requires login credentials to the HUD DRGR grantee portal — the data is not
+accessible programmatically. Completing this export raises the source coverage
+gate from 85 % (13/14) to 92.8 % and should be done before Phase 7 begins.
+
+**Portal**: https://drgr.hud.gov/ (requires authorized grantee credentials)
+
+**Steps**:
+1. Log into https://drgr.hud.gov/ with your authorized grantee account
+2. Navigate to **Reports → Activities** (or the equivalent export screen)
+3. Filter: **Grantee = Puerto Rico** (all programs: CDBG-DR, NSP, Section 108)
+4. Select all available columns — minimum required:
+   `grant_number`, `grantee_name`, `project_id`, `project_name`,
+   `activity_id`, `activity_name`, `responsible_organization`,
+   `budget`, `obligated`, `drawdown`, `status`
+5. Export as **CSV** — do NOT select XLSX (the ingest script prefers CSV)
+6. Save the file(s) to: **`data/manual/hud_drgr/`** (create the directory if it
+   does not exist)
+7. Also export the **drawdowns** and **appropriations** tables if available;
+   place all export files in the same `data/manual/hud_drgr/` directory
+8. Run the ingest script:
+   ```bash
+   python3 scripts/ingest_hud_drgr_exports.py
+   ```
+   This reads all CSVs from `data/manual/hud_drgr/` and writes:
+   - `data/staging/processed/hud_drgr_activities.csv`
+   - `data/staging/processed/hud_drgr_projects.csv`
+9. Verify gate passes:
+   ```bash
+   python3 -c "
+   from pathlib import Path
+   from contract_sweeper.runtime.validation_gates import gate_source_coverage
+   r = gate_source_coverage(Path('.'))
+   print('Source coverage:', r)
+   "
+   ```
+   Expected: gate passes with `obs >= 0.93` once all 14 sources have data.
+
+**After completing this export**, update `SOURCE_COVERAGE_TARGET` in
+`contract_sweeper/runtime/validation_gates.py` from `0.85` → `0.93` per the
+comment on line 46.
+
+**Raw file locations the ingest script will also search** (legacy drop locations):
+- `data/raw/HUD DRGR/`
+- `data/raw/HUD/`
+- `data/raw/hud_drgr/`
+
+---
+
 **Manual download constraints** (FSRS and fallback only):
 - Format: **CSV**
 - Fields: **ALL available** (do not filter columns)
