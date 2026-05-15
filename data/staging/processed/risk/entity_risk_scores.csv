@@ -1,0 +1,2 @@
+entity_id,entity_name,risk_score,signal_count,signal_families,dominant_signal_family,confidence,generated_at
+ACME CORP,ACME CORP,0.4721,5,concentration;parent_sub_mismatch;political_overlap;repeat_awards;subaward_opacity,concentration,0.849,2026-05-15T00:00:00+00:00
