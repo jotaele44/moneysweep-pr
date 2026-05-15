@@ -1,220 +1,100 @@
 # Contract-Sweeper
 
-![Tests](https://github.com/jotaele44/contract-sweeper/actions/workflows/tests.yml/badge.svg)
+Puerto Rico federal-contracting data pipeline — governed analytical platform.  
+14 registered sources · R5 validation gates enforced · R7 risk signals active.
 
-Puerto Rico Federal Contracts Data Pipeline — automated acquisition, validation,
-normalization, and coverage analysis of federal procurement data (FY 2000–2025).
+## What This Is
 
-## Overview
+Contract-Sweeper acquires, normalises, and cross-references federal procurement,
+disaster-recovery, bond, and political-finance data related to Puerto Rico to produce
+risk-ranked, investigative-ready outputs.
 
-Contract-Sweeper gathers federal contract data related to Puerto Rico from three
-sources (FPDS, USASpending, FSRS), validates the downloads, normalizes them into
-a standard schema, and checks for complete fiscal-year coverage across a 26-year
-window. The pipeline handles 13 distinct datasets spanning 8 FPDS time-window
-files, 4 USASpending query files, and 1 FSRS subcontract file.
-
-## Architecture
-
-```
-Step 1    Setup Directories          scripts/setup_directories.py
-Step 2    Generate Instructions      scripts/download_instructions.py
-Step 3    Auto-Download Datasets     scripts/auto_download.py
-Step 4    Validate Downloads         scripts/validate_downloads.py
-Step 5    Normalize & Transform      scripts/normalize_expansion_inputs.py
-Step 5.5  Cross-File Dedup + Master  scripts/deduplicate_master.py
-Step 6    Validate Coverage          scripts/validate_expansion_coverage.py
-Step 7    SAM.gov UEI Enrichment     scripts/sam_enrichment.py  (optional)
-```
-
-All steps are orchestrated by `run_all.py`, which produces a summary report
-with timing, coverage stats, and pass/fail status for each stage.
-
-## Data Sources
-
-| # | Filename | Source | Years | Description |
-|---|----------|--------|-------|-------------|
-| 1 | `expansion_fpds_2000_2004_direct.csv` | FPDS | 2000–2004 | Place of Performance = PR |
-| 2 | `expansion_fpds_2000_2004_vendor.csv` | FPDS | 2000–2004 | Vendor State = PR |
-| 3 | `expansion_fpds_2005_2008_direct.csv` | FPDS | 2005–2008 | PoP = PR (**must contain 2007**) |
-| 4 | `expansion_fpds_2005_2008_vendor.csv` | FPDS | 2005–2008 | Vendor = PR (**must contain 2007**) |
-| 5 | `expansion_fpds_2009_2016_direct.csv` | FPDS | 2009–2016 | PoP = PR |
-| 6 | `expansion_fpds_2009_2016_vendor.csv` | FPDS | 2009–2016 | Vendor = PR |
-| 7 | `expansion_fpds_2017_2025_direct.csv` | FPDS | 2017–2025 | PoP = PR |
-| 8 | `expansion_fpds_2017_2025_vendor.csv` | FPDS | 2017–2025 | Vendor = PR |
-| 9 | `expansion_idv_indirect_pr.csv` | USASpending | 2000–2025 | IDV awards referencing PR (non-PR recipients) |
-| 10 | `expansion_dod_upr_2001_2015.csv` | USASpending | 2001–2015 | DoD corridor (UPR, military bases) |
-| 11 | `expansion_dod_upr_2016_2025.csv` | USASpending | 2016–2025 | DoD corridor (post-2016) |
-| 12 | `expansion_reconstruction_2017_2025.csv` | USASpending | 2017–2025 | Post-hurricane reconstruction (FEMA/HUD/DOT/USACE/VA) |
-| 13 | `expansion_subcontracts_pr.csv` | FSRS | 2000–2025 | Subcontract data, PoP = PR |
+It is not a scraper collection. Every output is traceable to a source row, every gate
+is enforced by CI, and every risk signal carries a deterministic `explanation` field.
 
 ## Quick Start
 
 ```bash
-# Install dependencies
 pip install -r requirements.txt
 
-# Run the full pipeline
-python3 run_all.py
-
-# Or run only setup (directories + download instructions)
-python3 run_all.py --only-setup
+python scripts/pipeline.py all      # full pipeline: validate → build → signals → report
+python scripts/pipeline.py status   # check gate status without failing
+pytest -q                           # run tests (~640 passing)
 ```
 
-After Step 2, detailed per-file download instructions are available at
-`data/staging/expansion/DOWNLOAD_INSTRUCTIONS.md`.
-
-## CLI Reference
-
-### run_all.py (orchestrator)
-
-```
-python3 run_all.py [flags]
-
---only-setup        Run steps 1-2 only (dirs + instructions)
---skip-download     Skip step 3 (auto-download)
---manual-only       Alias for --skip-download
---force-download    Re-download even if files already exist
---skip-validation   Skip step 4 (download validation)
---skip-normalize    Skip step 5 (normalization)
---skip-dedup        Skip step 5.5 (cross-file dedup + master build)
---skip-coverage     Skip step 6 (coverage validation)
---skip-enrichment   Skip step 7 (SAM.gov UEI enrichment)
-```
-
-### Individual scripts
-
-```bash
-python3 scripts/auto_download.py                  # download all
-python3 scripts/auto_download.py --force           # re-download existing
-python3 scripts/auto_download.py --only=fpds       # FPDS only
-python3 scripts/auto_download.py --only=usaspending
-python3 scripts/validate_downloads.py              # validate downloads
-python3 scripts/normalize_expansion_inputs.py      # normalize all
-python3 scripts/validate_expansion_coverage.py     # check year coverage
-```
-
-## Directory Structure
-
-```
-Contract-Sweeper/
-├── run_all.py                      # 6-step pipeline orchestrator
-├── requirements.txt                # pandas, requests, lxml
-├── README.md
-├── scripts/
-│   ├── config.py                   # paths, manifest, column families, helpers
-│   ├── setup_directories.py        # step 1: create directory structure
-│   ├── download_instructions.py    # step 2: generate DOWNLOAD_INSTRUCTIONS.md
-│   ├── auto_download.py            # step 3: FPDS/USASpending/FSRS downloads
-│   ├── validate_downloads.py       # step 4: file existence + column checks
-│   ├── normalize_expansion_inputs.py  # step 5: standardize schema + dates
-│   └── validate_expansion_coverage.py # step 6: FY 2000-2025 coverage matrix
-├── tests/                          # pytest test suite
-│   ├── conftest.py                 # shared fixtures
-│   ├── test_config.py
-│   ├── test_normalize.py
-│   ├── test_validate_downloads.py
-│   ├── test_validate_coverage.py
-│   ├── test_setup_directories.py
-│   └── test_download_instructions.py
-└── data/
-    ├── staging/
-    │   ├── expansion/              # raw downloaded CSVs (13 files)
-    │   └── processed/              # normalized CSVs
-    ├── raw/                        # reserved
-    └── logs/                       # timestamped pipeline logs
-```
+See [SETUP.md](SETUP.md) for full environment setup, API key handling, and troubleshooting.
 
 ## Pipeline Steps
 
-### Step 1: Setup Directories
-Creates the full `data/` directory tree and `.gitkeep` files for version control.
+The canonical entry point is `scripts/pipeline.py`:
 
-### Step 2: Generate Download Instructions
-Produces `DOWNLOAD_INSTRUCTIONS.md` with per-file step-by-step browser instructions
-and a machine-readable `manifest.json` for all 13 datasets.
+| Subcommand | What it does |
+|---|---|
+| `validate` | Run R5 validation gates (14-source coverage check) |
+| `build` | Build unified master, execution chains, parent collapse |
+| `signals` | Compute R7 risk signals (8 families) |
+| `report` | Generate investigative output report |
+| `all` | Chain validate → build → signals → report |
+| `status` | Print gate status; always exits 0 |
 
-### Step 3: Auto-Download
-Downloads 12 of 13 datasets automatically:
-- **FPDS** (8 files): Atom/XML feed at `fpds.gov`, 500 rows per page, with retry logic.
-- **USASpending** (4 files): REST API at `api.usaspending.gov`, 100 results per page.
-- **FSRS** (1 file): Attempts automated form POST; falls back to manual instructions.
+## Data Sources (14 Registered)
 
-### Step 4: Validate Downloads
-Checks each file for: existence, non-empty rows, required column families
-(date, vendor, agency, amount), and data quality (non-null key fields).
+All sources are declared in `registries/source_registry.yaml`. The 14 required sources
+span federal procurement (FPDS, USASpending, FSRS), disaster recovery (HUD DRGR),
+municipal bonds (EMMA), vendor identity (SAM.gov), and political-finance crossrefs
+(LDA lobbying, OpenSecrets, FEC, OGPe, NGO beneficiaries).
 
-### Step 5: Normalize & Transform
-Standardizes column names across all sources to `STANDARD_COLUMNS`, parses dates
-(flexible format), derives federal fiscal year (Oct–Sept boundary), cleans
-dollar amounts, deduplicates within each file, and outputs to `data/staging/processed/`.
+## Architecture
 
-### Step 5.5: Cross-File Deduplication + Master Build
-Merges all 13 normalized CSVs into a single `pr_contracts_master.csv`. Removes
-duplicate contracts that appear in both `*_direct` and `*_vendor` files using a
-composite key of `(contract_id, award_date, vendor_name, obligated_amount)`.
-Source-file provenance is consolidated into a comma-joined `source_file` column.
-
-### Step 6: Validate Coverage
-Builds a fiscal-year coverage matrix (2000–2025), checks for the **critical 2007 gap**
-in FPDS 2005–2008 files (FPDS migrated platforms around 2007), and verifies
-timeline continuity with no internal gaps.
-
-### Step 7: SAM.gov UEI Enrichment (optional)
-Resolves vendor UEI/CAGE/DUNS via the SAM.gov Entity Information API v2, with
-USASpending.gov as a fallback. Requires a free API key — see setup below.
-
-**Setup:**
-```bash
-# Option A — environment variable
-export SAM_API_KEY=your_key_here
-
-# Option B — .env file (gitignored, never committed)
-cp .env.example .env
-# edit .env and replace placeholder with real key
+```
+Sources ──► Normalisation ──► Validation (R5) ──► Signal (R7) ──► Output
+              pipeline/           runtime/          runtime/        output/
 ```
 
-**Running:**
-```bash
-python3 run_all.py                              # includes enrichment if key is set
-python3 run_all.py --skip-enrichment           # skip enrichment
-python3 scripts/sam_enrichment.py --dry-run    # validate config, no API calls
-python3 scripts/sam_enrichment.py --resume     # resume from checkpoint
-python3 scripts/sam_enrichment.py --top 500    # top 500 vendors by value only
-```
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the full layer diagram and module tables.
 
-**Outputs** (in `data/staging/processed/enrichment/`):
-- `vendor_uei_index.csv` — resolved UEI/CAGE/DUNS per vendor
-- `master_enriched.csv` — master CSV with UEI columns filled
-- `enrichment_summary.json` — coverage stats and gate result
-- `failed_lookups.csv` — vendors needing manual resolution
+## CI Gates
 
-⚠️ The enrichment output directory is gitignored — it may contain vendor PII.
+Every push runs three gate layers:
 
-## Known Issues
+| Gate | Check | Enforced since |
+|---|---|---|
+| R5 validation | 14/14 sources present, coverage ≥ 0.93 | CI hardening commit |
+| R7 risk | Schema valid, lineage complete, deterministic scores | R7 ship commit |
+| Import graph | Zero imports of `contract_sweeper.pipeline` outside pipeline/ | PR-4 commit |
 
-- **2007 FPDS gap**: FPDS migrated platforms circa 2007. The FY2005–2008 files may
-  have spotty 2007 data. The pipeline detects this and raises a critical alert.
-  If 2007 is missing, download it separately with date range 10/01/2006–09/30/2007.
+No `--allow-failed` bypass is permitted. CI exits 1 on any gate failure.
 
-- **FSRS manual download**: FSRS has no public API. The auto-download attempts a
-  form POST but typically requires a browser session. Follow the manual instructions
-  in `DOWNLOAD_INSTRUCTIONS.md`.
+## Key Files
 
-- **FPDS 500K row limit**: FPDS exports may cap at 500,000 rows. If a time window
-  hits this limit, split into smaller date ranges and combine the CSVs.
+| File | Purpose |
+|---|---|
+| `scripts/pipeline.py` | Canonical entry point |
+| `contract_sweeper/runtime/risk_signals.py` | R7 signal engine (8 families) |
+| `contract_sweeper/runtime/validation_gates.py` | R5 gate enforcer |
+| `registries/source_registry.yaml` | 14-source registry (source of truth) |
+| `data/ci/seeds/` | Committed CI seed data (gate-satisfying) |
+| `SETUP.md` | Environment setup, variables, troubleshooting |
+| `ARCHITECTURE.md` | Layer diagram and module tables |
+| `HANDOFF.md` | Current state, branch audit, next steps |
+| `DATA_POLICY.md` | What is committed vs gitignored, seed provenance |
 
 ## Testing
 
 ```bash
-# Install test dependencies
-pip install -r requirements.txt
-
-# Run all tests
-python3 -m pytest tests/ -v
-
-# Run a specific test file
-python3 -m pytest tests/test_config.py -v
-
-# Run with coverage (requires pytest-cov)
-python3 -m pytest tests/ --cov=scripts --cov-report=term-missing
+pytest -q                   # all tests
+pytest -m unit -q           # fast unit tests only
+pytest -m pipeline_gate -q  # gate-enforcement tests only
 ```
+
+## What Not To Do
+
+- Do not commit `.env`, `*.key`, or any file containing API credentials
+- Do not bypass CI gates with `--allow-failed`
+- Do not import from `contract_sweeper.pipeline` in new code (CI enforces zero violations)
+- Do not push directly to `main` — open a PR
+- Do not add sources without updating `registries/source_registry.yaml`
+- Do not commit files from `data/staging/processed/enrichment/` (gitignored — may contain vendor PII)
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development workflow and [DATA_POLICY.md](DATA_POLICY.md)
+for a complete breakdown of what is and is not committed.
