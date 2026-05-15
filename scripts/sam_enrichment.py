@@ -16,6 +16,7 @@ Usage:
   python3 scripts/sam_enrichment.py --dry-run     # validate config only
   python3 scripts/sam_enrichment.py --top 500     # first 500 vendors by value
 """
+from __future__ import annotations
 
 import argparse
 import csv

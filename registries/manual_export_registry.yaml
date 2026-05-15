@@ -1,0 +1,115 @@
+version: "1.0"
+schema_version: "r5_manual_export_registry_v1"
+
+# Operator-supplied exports for credentialed portals.
+# No automated credentialed scraping is performed by Contract-Sweeper.
+# The operator drops files into expected_drop_dir; the ingester reads from there.
+
+manual_exports:
+
+  - source_id: hud_drgr_authorized
+    expected_drop_dir: data/manual/hud_drgr/
+    expected_filename_pattern: "*.csv"
+    expected_columns:
+      - grant_number
+      - grantee_name
+      - project_id
+      - project_name
+      - activity_id
+      - activity_name
+      - responsible_organization
+      - budget
+      - obligated
+      - drawdown
+      - status
+    validation_rules:
+      - rule: required_columns
+        action: reject_if_missing
+      - rule: row_count_min
+        value: 1
+        action: warn_if_below
+      - rule: header_only_check
+        action: reject_if_header_only
+    notes: HUD DRGR authorized exports. Operator logs into DRGR portal and exports allocation/budget/drawdown/obligation tables.
+
+  - source_id: fema_178_pw_portal
+    expected_drop_dir: data/manual/fema_178_pw/
+    expected_filename_pattern: "*.xlsx|*.csv"
+    expected_columns:
+      - pw_number
+      - project_name
+      - applicant
+      - subrecipient
+      - municipality
+      - federal_share_obligated
+      - federal_share_paid
+      - status
+      - disaster_number
+    validation_rules:
+      - rule: required_columns
+        action: reject_if_missing
+      - rule: row_count_min
+        value: 1
+        action: warn_if_below
+    notes: FEMA Public Assistance 178-PW Excel exports from the authorized PA portal. OpenFEMA v2 is preferred; 178-PW is the supplement.
+
+  - source_id: pr_corporate_registry
+    expected_drop_dir: data/manual/pr_corporate_registry/
+    expected_filename_pattern: "*.csv|*.xlsx"
+    expected_columns:
+      - registration_number
+      - entity_name
+      - status
+      - registered_agent
+      - principal_address
+      - registration_date
+    validation_rules:
+      - rule: required_columns
+        action: reject_if_missing
+    notes: PR Department of State corporate registry (rceweb.estado.pr.gov). No public bulk API.
+
+  - source_id: act_transition_contracts
+    expected_drop_dir: data/manual/act_transition/
+    expected_filename_pattern: "*.csv|*.xlsx|*.pdf"
+    expected_columns:
+      - contractor_name
+      - contract_number
+      - start_date
+      - end_date
+      - amount
+      - service_type
+    validation_rules:
+      - rule: required_columns
+        action: warn_if_missing
+    notes: PR ACT transition contracts (Autopistas de Puerto Rico, Autopistas Metropolitanas, Ferrovial Agroman, LPC&D, etc.). Long-horizon concession entries.
+
+  - source_id: acuden_2024_transition
+    expected_drop_dir: data/manual/acuden_2024/
+    expected_filename_pattern: "*.csv|*.xlsx"
+    expected_columns:
+      - contract_number
+      - contractor
+      - start_date
+      - end_date
+      - amount
+      - service_type
+    validation_rules:
+      - rule: required_columns
+        action: warn_if_missing
+    notes: ACUDEN 2024 transition contract file. Mostly transfer-of-funds contracts to municipalities, daycare operators, nonprofits, and individuals.
+
+  - source_id: dcaa_active_contractors
+    expected_drop_dir: data/manual/dcaa_active_contractors/
+    expected_filename_pattern: "*.csv|*.xlsx|*.pdf"
+    expected_columns:
+      - contractor_name
+      - address
+      - office_code
+      - cage
+      - duns
+      - phone
+      - fiscal_year
+    validation_rules:
+      - rule: required_columns
+        action: warn_if_missing
+    notes: DCAA FY2007 / FY2012 / FY2013 active contractor listings. Historical entity-resolution aid and alias/crosswalk source. Use only when matched to PR-relevant entities.

@@ -14,6 +14,7 @@ Usage:
   python3 scripts/network_graph.py
   python3 scripts/network_graph.py --min-obligation 100000   # filter small contracts
 """
+from __future__ import annotations
 
 import argparse
 import json

@@ -16,6 +16,7 @@ Outputs:
 Usage:
   python3 scripts/download_ssa.py [--force]
 """
+from __future__ import annotations
 
 import argparse
 import sys

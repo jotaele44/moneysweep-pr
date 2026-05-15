@@ -1,0 +1,11 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "hud_cdbg_dr_public",
+  "source_url": "https://www.hud.gov/program_offices/comm_planning/cdbg-dr",
+  "producer_script": "scripts/download_cdbg_dr.py",
+  "generated_at": "2026-05-15T00:00:00+00:00",
+  "file_count": 0,
+  "files": [],
+  "note": "Source materialized (7697 rows per gap analysis). Full file profile requires operator re-run of write_source_manifests.py with data present."
+}

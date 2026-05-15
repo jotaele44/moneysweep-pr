@@ -3,6 +3,7 @@
 Maps HigherGov columns (opportunity, idv, contract, subcontract) to standard
 normalized contract columns with validation of date/amount parsing.
 """
+from __future__ import annotations
 import pandas as pd
 import logging
 

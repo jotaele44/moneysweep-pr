@@ -20,6 +20,7 @@ Usage:
   python3 scripts/download_dot.py --force
   python3 scripts/download_dot.py --fy-start 2017
 """
+from __future__ import annotations
 
 import argparse
 import sys

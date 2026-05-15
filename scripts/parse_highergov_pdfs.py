@@ -7,6 +7,7 @@ Parse strategy (tried in order):
   3. pdftotext subprocess — layout text, parse as JSON then tabular
 Writes CSVs to data/staging/expansion/ with names expected by normalization.
 """
+from __future__ import annotations
 import json
 import re
 import sys

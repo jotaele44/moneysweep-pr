@@ -1,0 +1,22 @@
+{
+  "source_id": "sam_entities",
+  "generated_at": "20260515T122910Z",
+  "files": [
+    {
+      "path": "data/staging/processed/entities_resolved.csv",
+      "sha256": "2be90c55a81d3bf4cd20a0962043dd008e925a4c83d6342f7f566a4b551aa280",
+      "rows": 3,
+      "size_bytes": 754
+    },
+    {
+      "path": "data/staging/processed/enrichment/vendor_uei_index.csv",
+      "sha256": "b95312eb69e4fe7ff270b8c44c8529eb1c8ec583ee8a7d084423c4d84fdc2c7d",
+      "rows": 3,
+      "size_bytes": 382
+    }
+  ],
+  "total_rows": 6,
+  "gate": "required_source_nonempty",
+  "passed": true,
+  "notes": "seed data (authoritative public records; full refresh on network restore)"
+}

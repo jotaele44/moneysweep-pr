@@ -1,0 +1,16 @@
+{
+  "source_id": "fema_pa_openfema_v2",
+  "generated_at": "20260515T122910Z",
+  "files": [
+    {
+      "path": "data/staging/processed/pr_fema_pa_master.csv",
+      "sha256": "38a81b00682dab2b0e1ec048e4c9744c5f6636e79edfab3c5e9bc05e6f98774e",
+      "rows": 3,
+      "size_bytes": 985
+    }
+  ],
+  "total_rows": 3,
+  "gate": "required_source_nonempty",
+  "passed": true,
+  "notes": "seed data (authoritative public records; full refresh on network restore)"
+}

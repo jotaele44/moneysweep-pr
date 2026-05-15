@@ -1,0 +1,5 @@
+prime_award_id,prime_recipient_name,prime_uei,sub_recipient_name,sub_uei,subaward_id,subaward_amount,action_date
+USAS-0002,Autopistas Metropolitanas De Puerto Rico LLC,UEI002AMT00000,Ferrovial Agroman LLC,UEI003FER00000,SUB-00001,2500000.00,2023-10-01
+USAS-0003,Ferrovial Agroman LLC,UEI003FER00000,LPC and D Engineering Inc,UEI006LPC00000,SUB-00002,1750000.00,2022-04-15
+USAS-0001,LGA Strategies LLC,UEI001LGA00000,Propizio LLC,UEI007PRO00000,SUB-00003,50000.00,2024-06-10
+USAS-9999,,,Orphan Sub LLC,,SUB-ORPH-9999,12500.00,2024-08-01
