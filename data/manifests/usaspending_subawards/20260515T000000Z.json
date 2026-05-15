@@ -1,0 +1,11 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "usaspending_subawards",
+  "source_url": "https://www.usaspending.gov/download_center/award_data_archive",
+  "producer_script": "scripts/download_subawards.py",
+  "generated_at": "2026-05-15T00:00:00+00:00",
+  "file_count": 0,
+  "files": [],
+  "note": "Source materialized in PR59 (4834 subaward rows). Full file profile requires operator re-run of write_source_manifests.py with data present."
+}
