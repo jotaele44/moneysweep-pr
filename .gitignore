@@ -9,11 +9,12 @@ venv/
 .env
 *.key
 
-# Data files (downloaded CSVs — too large for git)
+# Data files (downloaded CSVs / normalized outputs — too large for git)
 data/staging/expansion/*.csv
 data/staging/processed/*.csv
 data/staging/raw/**/*.csv
 data/raw/*.csv
+data/normalized/
 
 # Logs
 data/logs/*.log
