@@ -71,14 +71,30 @@ data/
 tests/                     # pytest test suite
 ```
 
-## Running Individual Pipeline Steps
+## Running the Pipeline
+
+The canonical entry point chains the full pipeline in the correct order:
+
+```bash
+# Full pipeline: validate → build → signals → report
+python scripts/pipeline.py all
+
+# Individual steps
+python scripts/pipeline.py validate   # run CI validation gates (exits 1 on failure)
+python scripts/pipeline.py build      # build unified master + execution chains
+python scripts/pipeline.py signals    # compute R7 risk signals
+python scripts/pipeline.py report     # generate investigative report
+python scripts/pipeline.py status     # print gate status, always exits 0
+```
+
+Each step can also be run directly:
 
 ```bash
 # Build unified awards master (requires live USASpending data)
 python scripts/build_unified_master.py
 
 # Build risk signals from existing processed outputs
-python scripts/build_risk_signals.py
+python scripts/build_risk_signals.py --root .
 
 # Run validation gates (no network required)
 python -m contract_sweeper.runtime.validation_gates --root .

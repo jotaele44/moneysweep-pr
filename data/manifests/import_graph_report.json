@@ -1,0 +1,27 @@
+{
+  "generated_at": "2026-05-15T20:01:35.616148+00:00",
+  "scan_dirs": [
+    "contract_sweeper",
+    "scripts",
+    "tests"
+  ],
+  "exclude_prefixes": [
+    "archive",
+    "contract_sweeper/pipeline"
+  ],
+  "known_exceptions": [
+    "scripts/run_repo_quality_audit_r49z_b.py"
+  ],
+  "total_violations": 1,
+  "new_violations": 0,
+  "known_violations": 1,
+  "passed": true,
+  "violations": [
+    {
+      "file": "scripts/run_repo_quality_audit_r49z_b.py",
+      "line": 12,
+      "text": "from contract_sweeper.pipeline.repo_quality_audit import run_repo_quality_audit",
+      "known_exception": true
+    }
+  ]
+}
