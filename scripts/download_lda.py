@@ -18,6 +18,7 @@ Usage:
   python3 scripts/download_lda.py --api-key YOUR_TOKEN
   python3 scripts/download_lda.py --force
 """
+from __future__ import annotations
 
 import argparse
 import os

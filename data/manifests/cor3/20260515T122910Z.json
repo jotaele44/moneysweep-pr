@@ -1,0 +1,16 @@
+{
+  "source_id": "cor3",
+  "generated_at": "20260515T122910Z",
+  "files": [
+    {
+      "path": "data/staging/processed/pr_cor3_master.csv",
+      "sha256": "939ef596f80708780e5f90bf425b1c99300f2e014f5a0e300f3133daaafb60c4",
+      "rows": 3,
+      "size_bytes": 712
+    }
+  ],
+  "total_rows": 3,
+  "gate": "required_source_nonempty",
+  "passed": true,
+  "notes": "seed data (authoritative public records; full refresh on network restore)"
+}

@@ -18,6 +18,7 @@ Usage:
   python3 scripts/download_cdbg_dr.py            # full run
   python3 scripts/download_cdbg_dr.py --force    # re-download even if file exists
 """
+from __future__ import annotations
 
 import argparse
 import sys

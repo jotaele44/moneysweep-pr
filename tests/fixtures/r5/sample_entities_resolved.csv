@@ -1,0 +1,10 @@
+entity_id,normalized_name,entity_name,entity_uei,entity_type,parent_uei,parent_name,resolution_method,match_confidence,total_obligation,record_count,manual_review_required,source_files
+UEI001LGA00000,LGA STRATEGIES,LGA Strategies LLC,UEI001LGA00000,corporate,UEIPARENT0001,LGA Holdings Inc,parent_field_or_sam_index,0.95,250000.0,1,False,sample.csv
+UEI002AMT00000,AUTOPISTAS METROPOLITANAS DE PUERTO RICO,Autopistas Metropolitanas De Puerto Rico LLC,UEI002AMT00000,corporate,UEIPARENT0002,Abertis Infraestructuras SA,parent_field_or_sam_index,0.95,12500000.0,1,False,sample.csv
+UEI003FER00000,FERROVIAL AGROMAN,Ferrovial Agroman LLC,UEI003FER00000,corporate,UEIPARENT0003,Ferrovial SA,parent_field_or_sam_index,0.95,8750000.0,1,False,sample.csv
+UEI004INS00000,INSIGHT PUBLIC AFFAIRS,Insight Public Affairs LLC,UEI004INS00000,corporate,UEIPARENT0004,Insight Holdings,parent_field_or_sam_index,0.95,150000.0,1,False,sample.csv
+UEI005LBG00000,LBG CONSULTING,LBG Consulting LLC,UEI005LBG00000,corporate,,,observed_only,0.70,75000.0,1,True,sample.csv
+UEI006LPC00000,LPC AND D ENGINEERING,LPC and D Engineering Inc,UEI006LPC00000,corporate,UEIPARENT0006,LPC Holdings,parent_field_or_sam_index,0.95,1750000.0,1,False,sample.csv
+UEI007PRO00000,PROPIZIO,Propizio LLC,UEI007PRO00000,corporate,,,observed_only,0.70,50000.0,1,True,sample.csv
+PRDOH000000000,PUERTO RICO DEPARTMENT OF HEALTH,Puerto Rico Department of Health,PRDOH000000000,government,,,observed_only,0.0,5000000.0,1,True,sample.csv
+PRUNI000000000,UNIVERSITY OF PUERTO RICO,University of Puerto Rico,PRUNI000000000,nonprofit,,,observed_only,0.0,3000000.0,1,True,sample.csv

@@ -24,6 +24,7 @@ Usage:
   python3 scripts/download_cms.py --skip-medicare
   python3 scripts/download_cms.py --force
 """
+from __future__ import annotations
 
 import argparse
 import sys

@@ -2,6 +2,7 @@
 
 Reads API key from HIGHERGOV_API_KEY env var.
 """
+from __future__ import annotations
 import os
 import sys
 from pathlib import Path

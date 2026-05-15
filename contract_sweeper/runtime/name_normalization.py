@@ -1,0 +1,57 @@
+"""Entity-name normalization helpers.
+
+Strips legal suffixes, normalizes '&', collapses whitespace, drops
+non-alphanumeric characters. Used to cluster aliases and join entities
+across federal, territorial, lobbying, and political-finance datasets.
+"""
+from __future__ import annotations
+
+import re
+
+LEGAL_SUFFIXES = frozenset(
+    [
+        "INC",
+        "INCORPORATED",
+        "CORP",
+        "CORPORATION",
+        "CO",
+        "COMPANY",
+        "LLC",
+        "LTD",
+        "LP",
+        "LLP",
+        "PSC",
+        "PC",
+        "SA",
+        "SE",
+        "GMBH",
+        "PLC",
+        "LIMITED",
+        "INTL",
+        "INTERNATIONAL",
+    ]
+)
+
+_AMP = re.compile(r"\s*&\s*")
+_NON_ALNUM = re.compile(r"[^A-Z0-9 ]+")
+_SPACE = re.compile(r"\s+")
+# Collapse dotted abbreviations like "S.A.", "L.L.C.", "P.S.C." into a single token.
+_DOTTED = re.compile(r"\b(?:[A-Z]\.){2,}")
+
+
+def normalize_name(name: str | None) -> str:
+    """Return a canonical, alphanumeric-uppercase form for clustering.
+
+    Empty or None inputs return an empty string. Pure-punctuation inputs
+    also return an empty string. Suffix-only inputs (e.g. "LLC") return an
+    empty string.
+    """
+    if not name:
+        return ""
+    s = str(name).upper()
+    s = _AMP.sub(" AND ", s)
+    s = _DOTTED.sub(lambda m: m.group(0).replace(".", ""), s)
+    s = _NON_ALNUM.sub(" ", s)
+    s = _SPACE.sub(" ", s).strip()
+    tokens = [t for t in s.split(" ") if t and t not in LEGAL_SUFFIXES]
+    return " ".join(tokens)

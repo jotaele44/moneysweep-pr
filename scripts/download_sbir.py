@@ -13,6 +13,7 @@ Usage:
   python3 scripts/download_sbir.py
   python3 scripts/download_sbir.py --force
 """
+from __future__ import annotations
 
 import argparse
 import sys

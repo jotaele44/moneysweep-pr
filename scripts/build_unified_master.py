@@ -11,6 +11,7 @@ Usage:
   python3 scripts/build_unified_master.py          # build unified master
   python3 scripts/build_unified_master.py --force  # rebuild even if exists
 """
+from __future__ import annotations
 
 import re
 import sys

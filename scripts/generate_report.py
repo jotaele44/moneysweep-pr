@@ -26,6 +26,7 @@ Usage:
   python3 scripts/generate_report.py --force
   python3 scripts/generate_report.py --top 25
 """
+from __future__ import annotations
 
 import argparse
 import json

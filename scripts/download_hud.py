@@ -21,6 +21,7 @@ Usage:
   python3 scripts/download_hud.py --force
   python3 scripts/download_hud.py --fy-start 2017
 """
+from __future__ import annotations
 
 import argparse
 import sys

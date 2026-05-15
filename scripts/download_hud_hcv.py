@@ -15,6 +15,7 @@ Output:
 Usage:
   python3 scripts/download_hud_hcv.py [--force]
 """
+from __future__ import annotations
 
 import argparse
 import io

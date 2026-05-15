@@ -18,6 +18,7 @@ Usage:
   python3 scripts/download_slfrf.py            # full run
   python3 scripts/download_slfrf.py --force    # re-download even if files exist
 """
+from __future__ import annotations
 
 import argparse
 import sys

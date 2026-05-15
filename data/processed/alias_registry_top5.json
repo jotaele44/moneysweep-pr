@@ -1,0 +1,134 @@
+{
+  "entries": [
+    {
+      "aliases": [
+        "MULTIPLE RECIPIENTS"
+      ],
+      "canonical_name": "MULTIPLE RECIPIENTS",
+      "manual_review_required": false,
+      "normalized_name": "MULTIPLE RECIPIENTS",
+      "parent_name": "",
+      "parent_uei": "",
+      "row_count": 173875,
+      "sources": [
+        "pr_all_awards_master.csv",
+        "pr_entity_profiles.csv",
+        "pr_grants_master.csv",
+        "pr_usda_master.csv"
+      ],
+      "status": "candidate_alias_cluster",
+      "total_amount": 183994275440.06
+    },
+    {
+      "aliases": [
+        "PUERTO RICO DEPARTMENT OF HEALTH"
+      ],
+      "canonical_name": "PUERTO RICO DEPARTMENT OF HEALTH",
+      "manual_review_required": false,
+      "normalized_name": "PUERTO RICO DEPARTMENT OF HEALTH",
+      "parent_name": "",
+      "parent_uei": "",
+      "row_count": 3733,
+      "sources": [
+        "contracts_master_partial_diagnostic_r4_9g.csv",
+        "entity_hierarchy.csv",
+        "failed_lookups.csv",
+        "master_enriched.csv",
+        "normalized_expansion_fpds_2005_2008_direct.csv",
+        "normalized_expansion_fpds_2005_2008_vendor.csv",
+        "normalized_expansion_fpds_2009_2016_direct.csv",
+        "normalized_expansion_fpds_2009_2016_vendor.csv",
+        "normalized_expansion_fpds_2017_2025_direct.csv",
+        "normalized_expansion_fpds_2017_2025_vendor.csv",
+        "normalized_expansion_idv_indirect_pr.csv",
+        "pr_all_awards_master.csv",
+        "pr_cdbg_dr_master.csv",
+        "pr_contracts_master.csv",
+        "pr_ed_master.csv",
+        "pr_entity_profiles.csv",
+        "pr_grants_master.csv",
+        "pr_hhs_master.csv",
+        "pr_hud_master.csv",
+        "pr_subawards_master.csv",
+        "pr_usda_master.csv",
+        "vendor_targets.csv"
+      ],
+      "status": "candidate_alias_cluster",
+      "total_amount": 124457824222.44
+    },
+    {
+      "aliases": [
+        "ADMINISTRACION DE DESARROLLO SOCIOECONOMICO DE LA FAMILIA"
+      ],
+      "canonical_name": "ADMINISTRACION DE DESARROLLO SOCIOECONOMICO DE LA FAMILIA",
+      "manual_review_required": false,
+      "normalized_name": "ADMINISTRACION DE DESARROLLO SOCIOECONOMICO DE LA FAMILIA",
+      "parent_name": "",
+      "parent_uei": "",
+      "row_count": 342,
+      "sources": [
+        "pr_all_awards_master.csv",
+        "pr_entity_profiles.csv",
+        "pr_grants_master.csv",
+        "pr_hhs_master.csv",
+        "pr_usda_master.csv"
+      ],
+      "status": "candidate_alias_cluster",
+      "total_amount": 84502585319.06
+    },
+    {
+      "aliases": [
+        "GOVERNOR'S AUTHORIZED REPRESENTATIVE"
+      ],
+      "canonical_name": "GOVERNOR'S AUTHORIZED REPRESENTATIVE",
+      "manual_review_required": false,
+      "normalized_name": "GOVERNOR S AUTHORIZED REPRESENTATIVE",
+      "parent_name": "",
+      "parent_uei": "",
+      "row_count": 196,
+      "sources": [
+        "pr_all_awards_master.csv",
+        "pr_doe_master.csv",
+        "pr_entity_profiles.csv",
+        "pr_grants_master.csv",
+        "pr_subawards_master.csv"
+      ],
+      "status": "candidate_alias_cluster",
+      "total_amount": 80169269153.38
+    },
+    {
+      "aliases": [
+        "DEPARTMENT OF EDUCATION OF PUERTO RICO"
+      ],
+      "canonical_name": "DEPARTMENT OF EDUCATION OF PUERTO RICO",
+      "manual_review_required": false,
+      "normalized_name": "DEPARTMENT OF EDUCATION OF PUERTO RICO",
+      "parent_name": "",
+      "parent_uei": "",
+      "row_count": 1434,
+      "sources": [
+        "contracts_master_partial_diagnostic_r4_9g.csv",
+        "entity_hierarchy.csv",
+        "master_enriched.csv",
+        "normalized_expansion_fpds_2005_2008_direct.csv",
+        "normalized_expansion_fpds_2005_2008_vendor.csv",
+        "normalized_expansion_fpds_2009_2016_vendor.csv",
+        "normalized_expansion_fpds_2017_2025_direct.csv",
+        "normalized_expansion_fpds_2017_2025_vendor.csv",
+        "pr_all_awards_master.csv",
+        "pr_contracts_master.csv",
+        "pr_doj_grants_master.csv",
+        "pr_ed_master.csv",
+        "pr_entity_profiles.csv",
+        "pr_grants_master.csv",
+        "pr_subawards_master.csv",
+        "pr_usda_master.csv"
+      ],
+      "status": "candidate_alias_cluster",
+      "total_amount": 67143618176.62
+    }
+  ],
+  "entry_count": 5,
+  "generated_at": "2026-05-12T07:08:38.113719+00:00",
+  "identity_warning": "Alias clusters are normalized-name candidates, not verified legal identity."
+}

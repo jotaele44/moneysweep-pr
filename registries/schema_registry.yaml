@@ -1,0 +1,307 @@
+version: "1.0"
+schema_version: "r5_schema_registry_v1"
+
+# Canonical tables for the Puerto Rico execution-chain reconstruction.
+#
+# Every canonical column carries a dtype + required flag.
+# canonical_mappings declare known alias-fields per source so ingestion can normalize.
+
+# ----- Shared canonical column dictionary (referenced by tables below) -----
+canonical_columns:
+  entity_id:           {dtype: string,  required: true,  description: "Unique resolved-entity id; UEI when present, else hashed normalized_name."}
+  parent_uei:          {dtype: string,  required: false, description: "SAM ultimate parent UEI."}
+  uei:                 {dtype: string,  required: false, description: "SAM UEI of the entity itself."}
+  duns:                {dtype: string,  required: false, description: "Legacy DUNS."}
+  cage:                {dtype: string,  required: false, description: "CAGE code."}
+  normalized_name:     {dtype: string,  required: true,  description: "Legal-suffix-stripped, alphanumeric-cleaned name."}
+  raw_name:            {dtype: string,  required: true,  description: "Original name as ingested."}
+  award_id:            {dtype: string,  required: false, description: "Prime award id (USAspending generated_unique_award_id or FPDS PIID)."}
+  contract_number:     {dtype: string,  required: false, description: "Territorial contract number where USAspending id is not available."}
+  subaward_id:         {dtype: string,  required: false, description: "FSRS / USAspending subaward id."}
+  funding_source:      {dtype: string,  required: false, description: "Federal/territorial funding stream name."}
+  awarding_agency:     {dtype: string,  required: false, description: "Agency that issued the award."}
+  obligation_amount:   {dtype: float64, required: false, description: "Federal obligated amount in USD."}
+  outlay_amount:       {dtype: float64, required: false, description: "Federal outlay amount in USD."}
+  award_date:          {dtype: date,    required: false, description: "Award action date."}
+  start_date:          {dtype: date,    required: false, description: "Period of performance start."}
+  end_date:            {dtype: date,    required: false, description: "Period of performance end."}
+  project_id:          {dtype: string,  required: false, description: "Project / PW / activity id."}
+  asset_id:            {dtype: string,  required: false, description: "Operational asset id (treatment plant, dam, road, etc.)."}
+  asset_name:          {dtype: string,  required: false, description: "Human-readable asset name."}
+  asset_type:          {dtype: string,  required: false, description: "Asset taxonomy: dam, wtp, wwtp, road, bridge, port, airport, grid, etc."}
+  municipality:        {dtype: string,  required: false, description: "PR municipality."}
+  geo_location:        {dtype: string,  required: false, description: "WKT/lat,lon or '' if unknown."}
+  source_system:       {dtype: string,  required: true,  description: "source_id from source_registry.yaml."}
+  source_file:         {dtype: string,  required: true,  description: "Repo-relative path of the staged file."}
+  source_url:          {dtype: string,  required: false, description: "Public/authorized URL from which this row was ingested."}
+  source_hash:         {dtype: string,  required: true,  description: "sha256 of the source file at ingest time."}
+  link_confidence:     {dtype: float64, required: false, description: "0.0-1.0 confidence on join evidence."}
+  resolution_method:   {dtype: string,  required: false, description: "How the entity was resolved: parent_field_or_sam_index, uei_no_parent, observed_only, manual_review."}
+  ingestion_timestamp: {dtype: timestamp, required: true, description: "UTC ISO ingest time."}
+
+# ----- Canonical tables -----
+canonical_tables:
+
+  contracts_master:
+    primary_key: [award_id, source_system]
+    columns:
+      - {name: award_id,            ref: award_id}
+      - {name: contract_number,     ref: contract_number}
+      - {name: recipient_name,      ref: raw_name}
+      - {name: recipient_uei,       ref: uei}
+      - {name: parent_uei,          ref: parent_uei}
+      - {name: normalized_name,     ref: normalized_name}
+      - {name: funding_source,      ref: funding_source}
+      - {name: awarding_agency,     ref: awarding_agency}
+      - {name: obligation_amount,   ref: obligation_amount}
+      - {name: outlay_amount,       ref: outlay_amount}
+      - {name: award_date,          ref: award_date}
+      - {name: start_date,          ref: start_date}
+      - {name: end_date,            ref: end_date}
+      - {name: fiscal_year,         dtype: int64, required: false}
+      - {name: project_id,          ref: project_id}
+      - {name: asset_id,            ref: asset_id}
+      - {name: municipality,        ref: municipality}
+      - {name: geo_location,        ref: geo_location}
+      - {name: source_system,       ref: source_system}
+      - {name: source_file,         ref: source_file}
+      - {name: source_url,          ref: source_url}
+      - {name: source_hash,         ref: source_hash}
+      - {name: link_confidence,     ref: link_confidence}
+    canonical_mappings:
+      usaspending_prime:
+        award_id:          [generated_unique_award_id, award_id]
+        recipient_name:    [recipient_name, awardee_or_recipient_legal]
+        recipient_uei:     [recipient_uei, awardee_or_recipient_uniqu]
+        parent_uei:        [ultimate_parent_uei, parent_uei]
+        funding_source:    [funding_agency_name, awarding_agency_name]
+        awarding_agency:   [awarding_agency_name, funding_sub_agency_name]
+        obligation_amount: [total_obligation, obligated_amount, current_total_value_of_award]
+        award_date:        [action_date, period_of_performance_start_date]
+        municipality:      [recipient_city_name, primary_place_of_performance_city_name, pop_county_name]
+      fpds_report_builder:
+        award_id:          [piid, contract_award_unique_key]
+        recipient_name:    [vendor_name, recipient_legal_name]
+      oficina_contralor:
+        contract_number:   [numero_contrato, contract_number]
+        recipient_name:    [contratista, contractor_name]
+        obligation_amount: [cuantia, amount]
+
+  entities_resolved:
+    primary_key: [entity_id]
+    columns:
+      - {name: entity_id,                ref: entity_id}
+      - {name: normalized_name,          ref: normalized_name}
+      - {name: entity_name,              ref: raw_name}
+      - {name: entity_uei,               ref: uei}
+      - {name: parent_uei,               ref: parent_uei}
+      - {name: parent_name,              dtype: string,  required: false}
+      - {name: resolution_method,        ref: resolution_method}
+      - {name: match_confidence,         dtype: float64, required: false}
+      - {name: total_obligation,         dtype: float64, required: false}
+      - {name: record_count,             dtype: int64,   required: true}
+      - {name: source_files,             dtype: string,  required: false}
+      - {name: manual_review_required,   dtype: bool,    required: true}
+
+  execution_chain_master:
+    primary_key: [chain_id]
+    columns:
+      - {name: chain_id,                 dtype: string,  required: true}
+      - {name: funding_source,           ref: funding_source}
+      - {name: program,                  dtype: string,  required: false}
+      - {name: prime_name,               dtype: string,  required: false}
+      - {name: prime_uei,                ref: uei}
+      - {name: prime_parent_uei,         ref: parent_uei}
+      - {name: sub_name,                 dtype: string,  required: false}
+      - {name: sub_uei,                  dtype: string,  required: false}
+      - {name: sub_parent_uei,           dtype: string,  required: false}
+      - {name: award_id,                 ref: award_id}
+      - {name: subaward_id,              ref: subaward_id}
+      - {name: project_id,               ref: project_id}
+      - {name: asset_id,                 ref: asset_id}
+      - {name: municipality,             ref: municipality}
+      - {name: obligation_amount,        ref: obligation_amount}
+      - {name: subaward_amount,          dtype: float64, required: false}
+      - {name: link_method,              dtype: string,  required: false}
+      - {name: link_confidence,          ref: link_confidence}
+      - {name: manual_review_required,   dtype: bool,    required: true}
+    joins:
+      - {left: prime_uei,        right: entities_resolved.entity_uei,        how: left}
+      - {left: prime_parent_uei, right: entities_resolved.parent_uei,        how: left}
+      - {left: sub_uei,          right: entities_resolved.entity_uei,        how: left}
+      - {left: award_id,         right: contracts_master.award_id,           how: left}
+
+  execution_chain_per_asset:
+    primary_key: [asset_id, chain_id]
+    columns:
+      - {name: asset_id,                 ref: asset_id}
+      - {name: asset_name,               ref: asset_name}
+      - {name: asset_type,               ref: asset_type}
+      - {name: chain_id,                 dtype: string,  required: true}
+      - {name: prime_parent_uei,         ref: parent_uei}
+      - {name: sub_parent_uei,           dtype: string,  required: false}
+      - {name: funding_source,           ref: funding_source}
+      - {name: obligation_amount,        ref: obligation_amount}
+      - {name: municipality,             ref: municipality}
+      - {name: link_confidence,          ref: link_confidence}
+
+  execution_chain_per_municipality:
+    primary_key: [municipality, chain_id]
+    columns:
+      - {name: municipality,             ref: municipality}
+      - {name: chain_id,                 dtype: string,  required: true}
+      - {name: prime_parent_uei,         ref: parent_uei}
+      - {name: funding_source,           ref: funding_source}
+      - {name: obligation_amount,        ref: obligation_amount}
+      - {name: asset_id,                 ref: asset_id}
+      - {name: link_confidence,          ref: link_confidence}
+
+  alias_registry:
+    primary_key: [normalized_name]
+    columns:
+      - {name: normalized_name,          ref: normalized_name}
+      - {name: canonical_name,           dtype: string,  required: true}
+      - {name: aliases,                  dtype: string,  required: true,  description: "JSON array of all observed raw names."}
+      - {name: sources,                  dtype: string,  required: true,  description: "JSON array of source files where aliases appeared."}
+      - {name: row_count,                dtype: int64,   required: true}
+      - {name: total_amount,             dtype: float64, required: false}
+      - {name: parent_uei,               ref: parent_uei}
+      - {name: parent_name,              dtype: string,  required: false}
+      - {name: status,                   dtype: string,  required: true,  description: "candidate_alias_cluster | confirmed_alias | manual_review"}
+      - {name: manual_review_required,   dtype: bool,    required: true}
+
+  entity_edges:
+    primary_key: [source, target, edge_type, evidence_id]
+    columns:
+      - {name: source,                   dtype: string,  required: true}
+      - {name: target,                   dtype: string,  required: true}
+      - {name: edge_type,                dtype: string,  required: true,  description: "awards_to | subawards_to | parent_of | located_in | underwrites | funds_asset | lobbies_for | contributes_to | operates_asset"}
+      - {name: weight,                   dtype: float64, required: false}
+      - {name: source_dataset,           dtype: string,  required: true}
+      - {name: evidence_id,              dtype: string,  required: true}
+      - {name: confidence,               dtype: float64, required: true}
+      - {name: manual_review_required,   dtype: bool,    required: true}
+
+  assets_master:
+    primary_key: [asset_id]
+    columns:
+      - {name: asset_id,                 ref: asset_id}
+      - {name: asset_name,               ref: asset_name}
+      - {name: asset_type,               ref: asset_type}
+      - {name: municipality,             ref: municipality}
+      - {name: geo_location,             ref: geo_location}
+      - {name: operator_entity_id,       dtype: string,  required: false}
+      - {name: source_system,            ref: source_system}
+      - {name: source_file,              ref: source_file}
+      - {name: source_hash,              ref: source_hash}
+
+  lobbying_edges:
+    primary_key: [registrant_name, client_name, filing_uuid]
+    columns:
+      - {name: registrant_name,          dtype: string,  required: true}
+      - {name: client_name,              dtype: string,  required: true}
+      - {name: client_entity_id,         dtype: string,  required: false}
+      - {name: lobbyist_names,           dtype: string,  required: false}
+      - {name: amount,                   dtype: float64, required: false}
+      - {name: filing_year,              dtype: int64,   required: false}
+      - {name: filing_uuid,              dtype: string,  required: true}
+      - {name: source_system,            ref: source_system}
+      - {name: confidence,               dtype: float64, required: true}
+
+  campaign_finance_edges:
+    primary_key: [contributor_name, committee_name, transaction_id]
+    columns:
+      - {name: contributor_name,         dtype: string,  required: true}
+      - {name: committee_name,           dtype: string,  required: true}
+      - {name: contributor_entity_id,    dtype: string,  required: false}
+      - {name: amount,                   dtype: float64, required: false}
+      - {name: report_year,              dtype: int64,   required: false}
+      - {name: transaction_id,           dtype: string,  required: true}
+      - {name: source_system,            ref: source_system}
+      - {name: confidence,               dtype: float64, required: true}
+
+  bond_underwriter_edges:
+    primary_key: [issuer, underwriter, cusip]
+    columns:
+      - {name: issuer,                   dtype: string,  required: true}
+      - {name: underwriter,              dtype: string,  required: true}
+      - {name: cusip,                    dtype: string,  required: false}
+      - {name: par_amount,               dtype: float64, required: false}
+      - {name: issue_date,               dtype: date,    required: false}
+      - {name: source_system,            ref: source_system}
+      - {name: confidence,               dtype: float64, required: true}
+
+  financial_flows_master:
+    primary_key: [flow_id]
+    columns:
+      - {name: flow_id,                  dtype: string,  required: true}
+      - {name: funding_source,           ref: funding_source}
+      - {name: recipient_entity_id,      dtype: string,  required: true}
+      - {name: program,                  dtype: string,  required: false}
+      - {name: amount,                   dtype: float64, required: false}
+      - {name: flow_date,                dtype: date,    required: false}
+      - {name: project_id,               ref: project_id}
+      - {name: asset_id,                 ref: asset_id}
+      - {name: municipality,             ref: municipality}
+      - {name: source_system,            ref: source_system}
+      - {name: source_file,              ref: source_file}
+      - {name: link_confidence,          ref: link_confidence}
+
+  top_25_control_entities:
+    primary_key: [node]
+    columns:
+      - {name: node,                     dtype: string,  required: true}
+      - {name: node_type,                dtype: string,  required: true}
+      - {name: degree,                   dtype: int64,   required: true}
+      - {name: weighted_degree,          dtype: float64, required: true}
+      - {name: contract_value_weight,    dtype: float64, required: true}
+      - {name: manual_review_edges,      dtype: int64,   required: true}
+
+  top_execution_entities:
+    primary_key: [parent_uei, normalized_name]
+    columns:
+      - {name: parent_uei,               ref: parent_uei}
+      - {name: normalized_name,          ref: normalized_name}
+      - {name: total_obligation,         dtype: float64, required: true}
+      - {name: chain_count,              dtype: int64,   required: true}
+      - {name: asset_count,              dtype: int64,   required: false}
+      - {name: municipality_count,       dtype: int64,   required: false}
+
+  gap_analysis_report:
+    primary_key: [source_id]
+    columns:
+      - {name: source_id,                dtype: string,  required: true}
+      - {name: expected_years,           dtype: string,  required: false,  description: "JSON list of expected years."}
+      - {name: actual_years,             dtype: string,  required: false,  description: "JSON list of years actually present."}
+      - {name: year_coverage_pct,        dtype: float64, required: true}
+      - {name: row_count,                dtype: int64,   required: true}
+      - {name: duplicate_rate,           dtype: float64, required: false}
+      - {name: field_completeness_pct,   dtype: float64, required: false}
+      - {name: entity_match_rate_pct,    dtype: float64, required: false}
+      - {name: high_value_unresolved,    dtype: int64,   required: false}
+      - {name: source_freshness_days,    dtype: int64,   required: false}
+      - {name: backfill_route,           dtype: string,  required: false}
+
+  review_queue:
+    primary_key: [item_id]
+    columns:
+      - {name: item_id,                  dtype: string,  required: true}
+      - {name: source_system,            ref: source_system}
+      - {name: source_file,              ref: source_file}
+      - {name: review_reason,            dtype: string,  required: true}
+      - {name: link_confidence,          ref: link_confidence}
+      - {name: payload,                  dtype: string,  required: false,  description: "JSON snapshot of the disputed row."}
+      - {name: created_at,               dtype: timestamp, required: true}
+
+  validation_report:
+    primary_key: [generated_at]
+    columns:
+      - {name: generated_at,             dtype: timestamp, required: true}
+      - {name: passed,                   dtype: bool,    required: true}
+      - {name: source_coverage_rate,     dtype: float64, required: true}
+      - {name: entity_resolution_rate,   dtype: float64, required: true}
+      - {name: parent_uei_rate,          dtype: float64, required: true}
+      - {name: subaward_linkage_rate,    dtype: float64, required: true}
+      - {name: gate_count,               dtype: int64,   required: true}
+      - {name: failed_gate_count,        dtype: int64,   required: true}
+      - {name: records,                  dtype: string,  required: true,  description: "JSON array of per-gate records."}
