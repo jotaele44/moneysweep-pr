@@ -1,0 +1,172 @@
+{
+  "generated": "2026-05-15",
+  "repo": "contract-sweeper",
+  "branch": "claude/module-reduction-cleanup-ogfpf",
+  "test_suite": {
+    "runner": "pytest",
+    "passed": 594,
+    "skipped": 4,
+    "failed": 0,
+    "duration_seconds": 10.1,
+    "status": "GREEN"
+  },
+  "codebase_snapshot": {
+    "total_py_files": 228,
+    "total_lines": 80308,
+    "packages": {
+      "contract_sweeper/pipeline": {
+        "files": 43,
+        "lines": 14855
+      },
+      "contract_sweeper/runtime": {
+        "files": 9,
+        "lines": 866
+      },
+      "contract_sweeper/validation": {
+        "files": 8,
+        "lines": 2827
+      },
+      "scripts": {
+        "files": 165,
+        "lines": 59472
+      },
+      "root": {
+        "files": 1,
+        "lines": 2288
+      }
+    }
+  },
+  "module_categories": {
+    "KEEP": {
+      "count": 151,
+      "description": "Retain as-is \u2014 unique logic, high import count, or tested"
+    },
+    "MERGE": {
+      "count": 62,
+      "description": "Consolidate into 13 target modules",
+      "consolidation_groups": [
+        {
+          "target": "scripts/run_pipeline.py",
+          "sources": 29,
+          "saves": 28
+        },
+        {
+          "target": "scripts/ingest_pr_local_sources.py",
+          "sources": 5,
+          "saves": 4
+        },
+        {
+          "target": "scripts/download_cms_programs.py",
+          "sources": 4,
+          "saves": 3
+        },
+        {
+          "target": "scripts/source_mappers.py",
+          "sources": 4,
+          "saves": 3
+        },
+        {
+          "target": "scripts/asset_linkers.py",
+          "sources": 3,
+          "saves": 2
+        },
+        {
+          "target": "scripts/validate_disaster_funding.py",
+          "sources": 3,
+          "saves": 2
+        },
+        {
+          "target": "scripts/analyze_crossref.py",
+          "sources": 2,
+          "saves": 1
+        },
+        {
+          "target": "scripts/normalize_inputs.py",
+          "sources": 2,
+          "saves": 1
+        },
+        {
+          "target": "scripts/ingest_disaster_recovery.py",
+          "sources": 2,
+          "saves": 1
+        },
+        {
+          "target": "contract_sweeper/pipeline/schema_management.py",
+          "sources": 2,
+          "saves": 1
+        },
+        {
+          "target": "contract_sweeper/pipeline/endpoint_management.py",
+          "sources": 2,
+          "saves": 1
+        },
+        {
+          "target": "contract_sweeper/pipeline/producer_management.py",
+          "sources": 2,
+          "saves": 1
+        },
+        {
+          "target": "scripts/ingest_disaster_recovery.py",
+          "sources": 2,
+          "saves": 1
+        }
+      ]
+    },
+    "ARCHIVE": {
+      "count": 10,
+      "description": "Move to archive/ \u2014 stale, dev-only, or superseded",
+      "files": [
+        "data/raw/SAM/test_sam.py",
+        "scripts/highergov_manifest.py",
+        "scripts/fetch_highergov_api.py",
+        "scripts/dominance_analysis.py",
+        "scripts/analyze_prime_sub.py",
+        "scripts/triage_misc_drop.py",
+        "scripts/scan_for_secrets.py",
+        "scripts/regenerate_registry_json.py",
+        "scripts/parse_highergov_pdfs.py",
+        "contract_sweeper/validation/cache_audit.py",
+        "contract_sweeper/pipeline/credential_unblock_plan.py"
+      ]
+    },
+    "DELETE": {
+      "count": 6,
+      "description": "Remove \u2014 micro-modules with trivially inlinable logic",
+      "files": [
+        "contract_sweeper/pipeline/partial_rebuild_gate.py",
+        "contract_sweeper/pipeline/unfreeze_guard.py",
+        "contract_sweeper/pipeline/manual_fulfillment_execution.py",
+        "contract_sweeper/pipeline/import_slots.py",
+        "contract_sweeper/runtime/file_hash_runtime.py",
+        "contract_sweeper/runtime/pagination_runtime.py"
+      ]
+    }
+  },
+  "reduction_metrics": {
+    "files_before": 228,
+    "files_eliminated_by_merge": 49,
+    "files_archived": 11,
+    "files_deleted": 6,
+    "files_after_estimate": 162,
+    "reduction_pct": 29,
+    "lines_before": 80308,
+    "lines_eliminated_estimate": 9200,
+    "lines_after_estimate": 71100
+  },
+  "health_signals": {
+    "highest_import_count": {
+      "module": "scripts/config.py",
+      "count": 121
+    },
+    "modules_with_zero_imports": 87,
+    "modules_with_zero_tests": 163,
+    "largest_module": {
+      "module": "run_all.py",
+      "lines": 2288
+    },
+    "smallest_nontrivial_module": {
+      "module": "contract_sweeper/pipeline/partial_rebuild_gate.py",
+      "lines": 26
+    }
+  }
+}
