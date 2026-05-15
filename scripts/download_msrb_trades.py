@@ -22,6 +22,7 @@ Usage:
   python3 scripts/download_msrb_trades.py --force
   python3 scripts/download_msrb_trades.py --max-cusips 200
 """
+from __future__ import annotations
 
 import argparse
 import io

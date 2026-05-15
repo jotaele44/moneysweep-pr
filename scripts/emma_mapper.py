@@ -3,6 +3,7 @@
 Maps EMMA bond and underwriter columns to standard normalized format
 with validation of date/amount parsing.
 """
+from __future__ import annotations
 import pandas as pd
 import logging
 

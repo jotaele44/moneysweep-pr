@@ -26,6 +26,7 @@ Output:
 Usage:
   python3 scripts/analyze_entity_profiles.py
 """
+from __future__ import annotations
 
 import re
 import sys

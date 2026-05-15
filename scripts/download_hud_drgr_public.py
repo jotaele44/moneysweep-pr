@@ -17,6 +17,7 @@ Usage:
   python3 scripts/download_hud_drgr_public.py
   python3 scripts/download_hud_drgr_public.py --force
 """
+from __future__ import annotations
 
 import argparse
 import sys

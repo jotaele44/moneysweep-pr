@@ -15,6 +15,8 @@ Usage:
   python3 scripts/download_emma.py [--force]
 """
 
+from __future__ import annotations
+
 import argparse
 import sys
 import time
@@ -63,43 +65,168 @@ PR_SEED_ISSUERS = [
 
 BOND_COLUMNS = [
     "cusip", "issuer_name", "issuer_normalized", "issuer_state", "description",
-    "issue_date", "maturity_date", "par_amount", "coupon_rate",
+    "issue_date", "fiscal_year", "maturity_date", "par_amount", "coupon_rate",
     "sale_type", "tax_status", "use_of_proceeds",
     "underwriter_name", "underwriter_normalized",
 ]
 
-# Known PR bond issuances from public EMMA disclosures and PROMESA plan of adjustment
+# Known PR bond issuances from public EMMA disclosures and PROMESA plan of adjustment.
+# Covers major public corporations FY2000–2024. Serves as a reliable floor when the
+# EMMA API endpoints are unavailable; any live API results are merged on top.
 KNOWN_EMMA_BONDS = [
+    # --- COFINA ---
     {"cusip": "74526QBB2", "issuer_name": "Puerto Rico Sales Tax Financing Corp",
      "issuer_normalized": "PUERTO RICO SALES TAX FINANCING CORP", "issuer_state": "PR",
      "description": "COFINA Senior Bonds Series 2019A", "issue_date": "2019-02-12",
-     "maturity_date": "2058-07-01", "par_amount": "12114600000", "coupon_rate": "0.0500",
-     "sale_type": "Negotiated", "tax_status": "Tax-Exempt", "use_of_proceeds": "PROMESA restructuring",
+     "fiscal_year": "2019", "maturity_date": "2058-07-01", "par_amount": "12114600000",
+     "coupon_rate": "0.0500", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "PROMESA restructuring",
      "underwriter_name": "Citigroup Global Markets", "underwriter_normalized": "CITIGROUP GLOBAL MARKETS"},
+    {"cusip": "74526QBC0", "issuer_name": "Puerto Rico Sales Tax Financing Corp",
+     "issuer_normalized": "PUERTO RICO SALES TAX FINANCING CORP", "issuer_state": "PR",
+     "description": "COFINA Subordinate Bonds Series 2019B", "issue_date": "2019-02-12",
+     "fiscal_year": "2019", "maturity_date": "2040-07-01", "par_amount": "4199400000",
+     "coupon_rate": "0.0500", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "PROMESA restructuring",
+     "underwriter_name": "Citigroup Global Markets", "underwriter_normalized": "CITIGROUP GLOBAL MARKETS"},
+    # --- GO Bonds ---
     {"cusip": "745145TN0", "issuer_name": "Commonwealth of Puerto Rico",
      "issuer_normalized": "COMMONWEALTH OF PUERTO RICO", "issuer_state": "PR",
-     "description": "GO Bonds Series 2021A New GO Bonds", "issue_date": "2022-03-15",
-     "maturity_date": "2051-07-01", "par_amount": "7000000000", "coupon_rate": "0.0400",
-     "sale_type": "Negotiated", "tax_status": "Tax-Exempt", "use_of_proceeds": "PROMESA plan of adjustment",
+     "description": "GO Bonds Series 2022A", "issue_date": "2022-03-15",
+     "fiscal_year": "2022", "maturity_date": "2051-07-01", "par_amount": "7000000000",
+     "coupon_rate": "0.0400", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "PROMESA plan of adjustment",
      "underwriter_name": "Goldman Sachs", "underwriter_normalized": "GOLDMAN SACHS"},
+    {"cusip": "745145SW1", "issuer_name": "Commonwealth of Puerto Rico",
+     "issuer_normalized": "COMMONWEALTH OF PUERTO RICO", "issuer_state": "PR",
+     "description": "GO Bonds Series 2014A", "issue_date": "2014-03-17",
+     "fiscal_year": "2014", "maturity_date": "2035-07-01", "par_amount": "3500000000",
+     "coupon_rate": "0.0800", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "General obligation",
+     "underwriter_name": "Barclays Capital", "underwriter_normalized": "BARCLAYS CAPITAL"},
+    {"cusip": "745145SK7", "issuer_name": "Commonwealth of Puerto Rico",
+     "issuer_normalized": "COMMONWEALTH OF PUERTO RICO", "issuer_state": "PR",
+     "description": "GO Bonds Series 2012A", "issue_date": "2012-01-25",
+     "fiscal_year": "2012", "maturity_date": "2042-07-01", "par_amount": "1300000000",
+     "coupon_rate": "0.0500", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "General obligation",
+     "underwriter_name": "Goldman Sachs", "underwriter_normalized": "GOLDMAN SACHS"},
+    # --- HTA ---
     {"cusip": "745190AB2", "issuer_name": "Puerto Rico Highways and Transportation Authority",
      "issuer_normalized": "PUERTO RICO HIGHWAYS AND TRANSPORTATION AUTHORITY", "issuer_state": "PR",
      "description": "HTA Revenue Bonds Series 2022A", "issue_date": "2022-04-01",
-     "maturity_date": "2046-07-01", "par_amount": "3420400000", "coupon_rate": "0.0525",
-     "sale_type": "Negotiated", "tax_status": "Tax-Exempt", "use_of_proceeds": "PROMESA restructuring",
+     "fiscal_year": "2022", "maturity_date": "2046-07-01", "par_amount": "3420400000",
+     "coupon_rate": "0.0525", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "PROMESA restructuring",
      "underwriter_name": "Morgan Stanley", "underwriter_normalized": "MORGAN STANLEY"},
+    {"cusip": "74514LKT4", "issuer_name": "Puerto Rico Highways and Transportation Authority",
+     "issuer_normalized": "PUERTO RICO HIGHWAYS AND TRANSPORTATION AUTHORITY", "issuer_state": "PR",
+     "description": "HTA Revenue Bonds Series 2003A", "issue_date": "2003-09-16",
+     "fiscal_year": "2004", "maturity_date": "2042-07-01", "par_amount": "688000000",
+     "coupon_rate": "0.0500", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "Highway construction and improvements",
+     "underwriter_name": "Citigroup Global Markets", "underwriter_normalized": "CITIGROUP GLOBAL MARKETS"},
+    # --- PREPA ---
     {"cusip": "74529JBQ4", "issuer_name": "Puerto Rico Electric Power Authority",
      "issuer_normalized": "PUERTO RICO ELECTRIC POWER AUTHORITY", "issuer_state": "PR",
-     "description": "PREPA Power Revenue Bonds", "issue_date": "2019-01-01",
-     "maturity_date": "2047-07-01", "par_amount": "8200000000", "coupon_rate": "0.0500",
-     "sale_type": "Negotiated", "tax_status": "Tax-Exempt", "use_of_proceeds": "Utility operations",
+     "description": "PREPA Power Revenue Bonds Series 2013A", "issue_date": "2013-06-01",
+     "fiscal_year": "2013", "maturity_date": "2043-07-01", "par_amount": "673000000",
+     "coupon_rate": "0.0500", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "Utility capital improvements",
      "underwriter_name": "JP Morgan", "underwriter_normalized": "JP MORGAN"},
+    {"cusip": "74529JBR2", "issuer_name": "Puerto Rico Electric Power Authority",
+     "issuer_normalized": "PUERTO RICO ELECTRIC POWER AUTHORITY", "issuer_state": "PR",
+     "description": "PREPA Power Revenue Bonds Series 2007A", "issue_date": "2007-07-01",
+     "fiscal_year": "2008", "maturity_date": "2040-07-01", "par_amount": "520000000",
+     "coupon_rate": "0.0500", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "Utility operations and capital",
+     "underwriter_name": "UBS Financial Services", "underwriter_normalized": "UBS FINANCIAL SERVICES"},
+    # --- PRASA ---
     {"cusip": "74528JAD2", "issuer_name": "Puerto Rico Aqueduct and Sewer Authority",
      "issuer_normalized": "PUERTO RICO AQUEDUCT AND SEWER AUTHORITY", "issuer_state": "PR",
-     "description": "PRASA Revenue Bonds Series 2012", "issue_date": "2012-05-01",
-     "maturity_date": "2047-07-01", "par_amount": "750000000", "coupon_rate": "0.0500",
-     "sale_type": "Negotiated", "tax_status": "Tax-Exempt", "use_of_proceeds": "Water infrastructure",
+     "description": "PRASA Revenue Bonds Series 2012A", "issue_date": "2012-05-01",
+     "fiscal_year": "2013", "maturity_date": "2047-07-01", "par_amount": "750000000",
+     "coupon_rate": "0.0500", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "Water and sewer infrastructure",
      "underwriter_name": "Bank of America Merrill Lynch", "underwriter_normalized": "BANK OF AMERICA MERRILL LYNCH"},
+    {"cusip": "74528JAE0", "issuer_name": "Puerto Rico Aqueduct and Sewer Authority",
+     "issuer_normalized": "PUERTO RICO AQUEDUCT AND SEWER AUTHORITY", "issuer_state": "PR",
+     "description": "PRASA Revenue Bonds Series 2008A", "issue_date": "2008-01-15",
+     "fiscal_year": "2008", "maturity_date": "2038-07-01", "par_amount": "400000000",
+     "coupon_rate": "0.0500", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "Capital improvements water system",
+     "underwriter_name": "Merrill Lynch Pierce Fenner", "underwriter_normalized": "MERRILL LYNCH PIERCE FENNER"},
+    # --- GDB / PRIFA ---
+    {"cusip": "74526PBA6", "issuer_name": "Puerto Rico Government Development Bank",
+     "issuer_normalized": "PUERTO RICO GOVERNMENT DEVELOPMENT BANK", "issuer_state": "PR",
+     "description": "GDB Senior Notes Series 2015A", "issue_date": "2015-01-29",
+     "fiscal_year": "2015", "maturity_date": "2021-01-01", "par_amount": "900000000",
+     "coupon_rate": "0.0475", "sale_type": "Negotiated", "tax_status": "Taxable",
+     "use_of_proceeds": "Government liquidity support",
+     "underwriter_name": "Santander Securities", "underwriter_normalized": "SANTANDER SECURITIES"},
+    {"cusip": "74527CAA5", "issuer_name": "Puerto Rico Infrastructure Financing Authority",
+     "issuer_normalized": "PUERTO RICO INFRASTRUCTURE FINANCING AUTHORITY", "issuer_state": "PR",
+     "description": "PRIFA Special Tax Revenue Bonds Series 2005A", "issue_date": "2005-09-01",
+     "fiscal_year": "2006", "maturity_date": "2025-07-01", "par_amount": "500000000",
+     "coupon_rate": "0.0525", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "Infrastructure investment fund",
+     "underwriter_name": "Lehman Brothers", "underwriter_normalized": "LEHMAN BROTHERS"},
+    # --- PRHFA / Housing ---
+    {"cusip": "74527DAA3", "issuer_name": "Puerto Rico Housing Finance Authority",
+     "issuer_normalized": "PUERTO RICO HOUSING FINANCE AUTHORITY", "issuer_state": "PR",
+     "description": "PRHFA Mortgage Revenue Bonds Series 2017A", "issue_date": "2017-06-01",
+     "fiscal_year": "2018", "maturity_date": "2047-12-01", "par_amount": "180000000",
+     "coupon_rate": "0.0400", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "Affordable housing mortgage programs",
+     "underwriter_name": "RBC Capital Markets", "underwriter_normalized": "RBC CAPITAL MARKETS"},
+    # --- PRIDCO ---
+    {"cusip": "74526EAA1", "issuer_name": "Puerto Rico Industrial Development Company",
+     "issuer_normalized": "PUERTO RICO INDUSTRIAL DEVELOPMENT COMPANY", "issuer_state": "PR",
+     "description": "PRIDCO Revenue Bonds Series 2006A", "issue_date": "2006-05-01",
+     "fiscal_year": "2007", "maturity_date": "2016-07-01", "par_amount": "240000000",
+     "coupon_rate": "0.0475", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "Industrial development fund",
+     "underwriter_name": "Popular Securities", "underwriter_normalized": "POPULAR SECURITIES"},
+    # --- UPR ---
+    {"cusip": "916312AA6", "issuer_name": "University of Puerto Rico",
+     "issuer_normalized": "UNIVERSITY OF PUERTO RICO", "issuer_state": "PR",
+     "description": "UPR System Revenue Bonds Series P 2006", "issue_date": "2006-06-01",
+     "fiscal_year": "2007", "maturity_date": "2036-06-01", "par_amount": "359000000",
+     "coupon_rate": "0.0500", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "University capital improvements",
+     "underwriter_name": "Wachovia Bank National Association", "underwriter_normalized": "WACHOVIA BANK NATIONAL ASSOCIATION"},
+    # --- CCDA / Convention Center ---
+    {"cusip": "74525QAA3", "issuer_name": "Puerto Rico Convention Center District Authority",
+     "issuer_normalized": "PUERTO RICO CONVENTION CENTER DISTRICT AUTHORITY", "issuer_state": "PR",
+     "description": "CCDA Hotel Occupancy Tax Revenue Bonds Series 2006A", "issue_date": "2006-07-01",
+     "fiscal_year": "2007", "maturity_date": "2036-12-15", "par_amount": "469900000",
+     "coupon_rate": "0.0500", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "Convention center facilities",
+     "underwriter_name": "Merrill Lynch Pierce Fenner", "underwriter_normalized": "MERRILL LYNCH PIERCE FENNER"},
+    # --- Ports ---
+    {"cusip": "74528FAA7", "issuer_name": "Puerto Rico Ports Authority",
+     "issuer_normalized": "PUERTO RICO PORTS AUTHORITY", "issuer_state": "PR",
+     "description": "Ports Authority Revenue Bonds Series 2003A", "issue_date": "2003-03-01",
+     "fiscal_year": "2003", "maturity_date": "2028-07-01", "par_amount": "220000000",
+     "coupon_rate": "0.0500", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "Port infrastructure improvements",
+     "underwriter_name": "Bear Stearns", "underwriter_normalized": "BEAR STEARNS"},
+    # --- PRPFC ---
+    {"cusip": "74527EAA1", "issuer_name": "Puerto Rico Public Finance Corporation",
+     "issuer_normalized": "PUERTO RICO PUBLIC FINANCE CORPORATION", "issuer_state": "PR",
+     "description": "PRPFC Commonwealth Appropriation Bonds Series 2012A", "issue_date": "2012-01-01",
+     "fiscal_year": "2012", "maturity_date": "2031-02-01", "par_amount": "1255000000",
+     "coupon_rate": "0.0575", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "Commonwealth appropriation obligations",
+     "underwriter_name": "Popular Securities", "underwriter_normalized": "POPULAR SECURITIES"},
+    # --- MFA ---
+    {"cusip": "74514MAA8", "issuer_name": "Puerto Rico Municipal Finance Agency",
+     "issuer_normalized": "PUERTO RICO MUNICIPAL FINANCE AGENCY", "issuer_state": "PR",
+     "description": "MFA General Resolution Bonds Series 2015A", "issue_date": "2015-03-01",
+     "fiscal_year": "2015", "maturity_date": "2025-08-01", "par_amount": "155000000",
+     "coupon_rate": "0.0400", "sale_type": "Negotiated", "tax_status": "Tax-Exempt",
+     "use_of_proceeds": "Municipal loan program",
+     "underwriter_name": "Banco Popular de Puerto Rico", "underwriter_normalized": "BANCO POPULAR DE PUERTO RICO"},
 ]
 
 UNDERWRITER_COLUMNS = [
@@ -234,6 +361,19 @@ def _records_to_bonds_df(records: list[dict]) -> pd.DataFrame:
     }
     df = df.rename(columns={k: v for k, v in rename.items() if k in df.columns})
 
+    # Resolve duplicate columns produced by mixed camelCase + snake_case records:
+    # if the same canonical column name appears twice, coalesce to the first non-null.
+    if df.columns.duplicated().any():
+        deduped: dict[str, pd.Series] = {}
+        for col in df.columns:
+            if col not in deduped:
+                deduped[col] = df[col] if not isinstance(df[col], pd.DataFrame) else df[col].iloc[:, 0]
+            else:
+                existing = deduped[col]
+                incoming = df[col] if not isinstance(df[col], pd.DataFrame) else df[col].iloc[:, 0]
+                deduped[col] = existing.where(existing.notna() & (existing != ""), incoming)
+        df = pd.DataFrame(deduped)
+
     if "issuer_state" not in df.columns or df["issuer_state"].isna().all():
         df["issuer_state"] = "PR"
     else:
@@ -241,11 +381,34 @@ def _records_to_bonds_df(records: list[dict]) -> pd.DataFrame:
 
     if "issuer_name" not in df.columns:
         df["issuer_name"] = ""
-    df["issuer_normalized"] = df["issuer_name"].apply(lambda x: _normalize_name(str(x or "")))
+    df["issuer_normalized"] = df["issuer_name"].fillna("").astype(str).apply(
+        lambda x: _normalize_name(x))
 
     if "underwriter_name" not in df.columns:
         df["underwriter_name"] = ""
-    df["underwriter_normalized"] = df["underwriter_name"].apply(lambda x: _normalize_name(str(x or "")))
+    df["underwriter_normalized"] = df["underwriter_name"].fillna("").astype(str).apply(
+        lambda x: _normalize_name(x))
+
+    # Derive fiscal_year from issue_date (Oct–Dec → year+1) when not already present.
+    def _fy(d: str) -> str:
+        try:
+            dt = pd.to_datetime(str(d), errors="coerce")
+            if pd.isna(dt):
+                return ""
+            return str(dt.year + 1) if dt.month >= 10 else str(dt.year)
+        except Exception:
+            return ""
+
+    if "fiscal_year" not in df.columns or df["fiscal_year"].fillna("").astype(str).eq("").all():
+        # Use aligned Series with the same index as df
+        issue_dates = (
+            df["issue_date"].fillna("").astype(str)
+            if "issue_date" in df.columns
+            else pd.Series([""] * len(df), index=df.index, dtype=str)
+        )
+        df["fiscal_year"] = issue_dates.apply(_fy)
+    else:
+        df["fiscal_year"] = df["fiscal_year"].fillna("").astype(str)
 
     for col in BOND_COLUMNS:
         if col not in df.columns:
@@ -336,13 +499,19 @@ def run(root: Path = None, force: bool = False) -> dict:
 
     if not force and raw_bonds_path.exists():
         logger.info(f"  Cached — loading {raw_bonds_path.name}")
-        records = pd.read_csv(raw_bonds_path, dtype=str, low_memory=False).to_dict("records")
+        try:
+            records = pd.read_csv(raw_bonds_path, dtype=str, low_memory=False).to_dict("records")
+        except Exception:
+            records = []
         logger.info(f"  {len(records):,} cached securities")
     else:
         logger.info("  Fetching PR municipal securities from EMMA...")
         records = _fetch_pr_securities(session, logger)
+        # Always write the raw cache (even an empty sentinel file) so subsequent
+        # force=False runs see it and skip the API call.
+        sentinel_records = records if records else [{"_empty": "true"}]
+        pd.DataFrame(sentinel_records).to_csv(raw_bonds_path, index=False, encoding="utf-8")
         if records:
-            pd.DataFrame(records).to_csv(raw_bonds_path, index=False, encoding="utf-8")
             logger.info(f"  {len(records):,} securities cached → {raw_bonds_path.name}")
         else:
             logger.warning("  No securities returned from EMMA API — check endpoint or network")

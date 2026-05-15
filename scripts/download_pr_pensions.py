@@ -21,6 +21,7 @@ Outputs:
 Usage:
   python3 scripts/download_pr_pensions.py [--force]
 """
+from __future__ import annotations
 
 import argparse
 import re

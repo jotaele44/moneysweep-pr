@@ -13,6 +13,7 @@ Usage:
   python3 scripts/download_eqb.py
   python3 scripts/download_eqb.py --force
 """
+from __future__ import annotations
 
 import argparse
 import io

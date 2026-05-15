@@ -19,6 +19,7 @@ Usage:
   python3 scripts/analyze_rfp_lobby.py
   python3 scripts/analyze_rfp_lobby.py --window-days 180
 """
+from __future__ import annotations
 
 import argparse
 import sys

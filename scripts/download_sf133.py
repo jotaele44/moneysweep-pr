@@ -12,6 +12,7 @@ Usage:
   python3 scripts/download_sf133.py --force
   python3 scripts/download_sf133.py --fy-start 2017
 """
+from __future__ import annotations
 
 import argparse
 import sys

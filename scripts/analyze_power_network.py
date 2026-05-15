@@ -26,6 +26,7 @@ Usage:
   python3 scripts/analyze_power_network.py
   python3 scripts/analyze_power_network.py --top 100
 """
+from __future__ import annotations
 
 import argparse
 import json

@@ -15,6 +15,7 @@ Usage:
   python3 scripts/download_usace_permits.py
   python3 scripts/download_usace_permits.py --force
 """
+from __future__ import annotations
 
 import argparse
 import io

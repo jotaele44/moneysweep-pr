@@ -17,6 +17,7 @@ Usage:
   python3 scripts/download_subawards.py --force          # re-download existing
   python3 scripts/download_subawards.py --fy-start 2017  # only FY2017+
 """
+from __future__ import annotations
 
 import argparse
 import sys
