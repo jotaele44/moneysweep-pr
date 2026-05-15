@@ -1,0 +1,16 @@
+{
+  "source_id": "execution_chains",
+  "generated_at": "20260515T124029Z",
+  "files": [
+    {
+      "path": "data/staging/processed/execution/execution_chain_master.csv",
+      "sha256": "31f69fc8768904a0354eafa9b13db112fc184707cb12938f9f3d697f4ea2c595",
+      "rows": 3,
+      "size_bytes": 1141
+    }
+  ],
+  "total_rows": 3,
+  "gate": "execution_chain_linkage_rate",
+  "passed": true,
+  "notes": "seed data (3 authoritative prime\u2192sub chains; full refresh on network restore)"
+}

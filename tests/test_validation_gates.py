@@ -208,6 +208,36 @@ def test_source_coverage_gate_passes_at_85_percent(tmp_path):
 
 
 @pytest.mark.unit
+def test_execution_chain_linkage_gate_passes_with_seed(tmp_path):
+    """execution_chain_linkage_rate passes when chain master has fully-linked rows."""
+    exec_dir = tmp_path / "data/staging/processed/execution"
+    exec_dir.mkdir(parents=True, exist_ok=True)
+    chain_path = exec_dir / "execution_chain_master.csv"
+    rows = [
+        {
+            "chain_id": f"chain-{i}", "funding_source": "DHS/FEMA",
+            "prime_name": "PRIME CORP", "sub_name": "SUB LLC",
+            "award_id": f"AWD-{i:04d}", "prime_uei": "TESTPRIME01",
+            "sub_uei": "TESTSUB0001", "obligation_amount": "1000000",
+        }
+        for i in range(3)
+    ]
+    with open(chain_path, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        w.writeheader()
+        w.writerows(rows)
+
+    result = vg.gate_execution_chain_linkage(tmp_path)
+    rec = result["records"][0]
+    assert rec["passed"] is True, f"expected pass; observed={rec['observed']}"
+    assert rec["observed"] == 1.0
+
+    sub_result = vg.gate_subaward_linkage(tmp_path)
+    sub_rec = sub_result["records"][0]
+    assert sub_rec["passed"] is True
+
+
+@pytest.mark.unit
 def test_duplicate_rate_gate_skips_raw_input_files(tmp_path):
     """duplicate_rate gate must not fire for files outside data/staging/processed/."""
     _build_tmp_repo(tmp_path)
