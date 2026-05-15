@@ -30,3 +30,7 @@ data/raw/Grants/*.xml
 
 # Local raw source acquisitions
 /data/raw/USAS/
+
+# Triaged document corpus — keep the manifest + index tracked, ignore binaries
+data/raw/documents/**/*.pdf
+data/raw/documents/**/*.txt
