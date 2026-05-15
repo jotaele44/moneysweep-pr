@@ -33,5 +33,5 @@ jobs:
       - name: Scan for committed secrets
         run: python scripts/scan_for_secrets.py --root .
 
-      - name: Run R5 validation gates (bootstrap mode)
-        run: python -m contract_sweeper.runtime.validation_gates --root . --allow-failed
+      - name: Run R5 validation gates (enforced)
+        run: python -m contract_sweeper.runtime.validation_gates --root .

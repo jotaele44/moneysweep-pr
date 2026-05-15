@@ -1,0 +1,4 @@
+contract_id,vendor_name,vendor_normalized,contract_type,contract_value,award_date,start_date,end_date,project_description,source_dataset
+PRASA-2018-0001,CONSOLIDATED CONTRACTORS INTL,CONSOLIDATED CONTRACTORS INTL,Construction,45000000,2018-06-01,2018-07-01,2020-06-30,Water Treatment Plant Rehabilitation,prasa
+PRASA-2019-0002,JOSE SANTIAGO INC,JOSE SANTIAGO INC,Construction,8200000,2019-03-15,2019-04-01,2021-03-31,Pipeline Replacement Program,prasa
+PRASA-2020-0003,ATKINS NORTH AMERICA INC,ATKINS NORTH AMERICA INC,Professional Services,3500000,2020-01-10,2020-02-01,2022-01-31,Engineering Design Services,prasa

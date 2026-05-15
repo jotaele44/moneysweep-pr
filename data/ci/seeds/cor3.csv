@@ -1,0 +1,4 @@
+project_id,applicant_name,applicant_normalized,program,category,municipality,total_approved,total_disbursed,status,fiscal_year,source_dataset
+COR3-PA-001,MUNICIPALITY OF HUMACAO,MUNICIPALITY OF HUMACAO,Public Assistance,Roads,Humacao,5200000,3100000,Active,2019,cor3
+COR3-PA-002,PR ELECTRIC POWER AUTHORITY,PREPA,Public Assistance,Utilities,Statewide,950000000,620000000,Active,2018,cor3
+COR3-CDBG-001,PR DEPARTMENT OF HOUSING,PR DEPARTMENT OF HOUSING,CDBG-DR,Housing,Statewide,1800000000,750000000,Active,2020,cor3

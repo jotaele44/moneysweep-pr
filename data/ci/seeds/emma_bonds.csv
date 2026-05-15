@@ -1,0 +1,4 @@
+cusip,issuer_name,issuer_normalized,issuer_state,description,issue_date,maturity_date,par_amount,coupon_rate,underwriter,fiscal_year,source_dataset
+74526QAA1,PUERTO RICO SALES TAX FINANCING CORP,COFINA,PR,COFINA Senior Series 2019A,2019-03-15,2058-07-01,12100000000,5.0,Citigroup,2019,emma_bonds
+745220AB3,COMMONWEALTH OF PUERTO RICO,COMMONWEALTH OF PUERTO RICO,PR,GO Bonds Series 2022A,2022-03-15,2051-07-01,7000000000,4.0,Goldman Sachs,2022,emma_bonds
+745145AE7,PUERTO RICO HIGHWAYS AND TRANSPORTATION AUTHORITY,HTA,PR,HTA Revenue Series 2022A,2022-07-01,2053-07-01,3400000000,5.25,Morgan Stanley,2022,emma_bonds

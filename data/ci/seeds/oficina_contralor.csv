@@ -1,0 +1,4 @@
+contract_id,entity_name,entity_normalized,agency,contract_type,contract_amount,award_date,expiry_date,contract_description,source_dataset
+OC-2019-001,SISTEMAS DE SALUD INC,SISTEMAS DE SALUD INC,ASES,Professional Services,12000000,2019-01-15,2021-01-14,Health System Administration,oficina_contralor
+OC-2020-002,INNOVATIVE EMERGENCY MANAGEMENT INC,INNOVATIVE EMERGENCY MANAGEMENT INC,FEMA-PR,Consulting,4500000,2020-03-01,2022-02-28,Emergency Management Consulting,oficina_contralor
+OC-2021-003,PARSONS GOVERNMENT SERVICES,PARSONS GOVERNMENT SERVICES,HUD-PR,Engineering,22000000,2021-06-15,2024-06-14,Infrastructure Assessment,oficina_contralor

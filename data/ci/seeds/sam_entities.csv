@@ -1,0 +1,5 @@
+uei,legal_business_name,entity_type,corporate_parent_uei,corporate_parent_name,resolution_source,resolution_date,uei_status
+FLRFED123456,FLUOR FEDERAL SOLUTIONS LLC,corporate,FLURMAIN001,FLUOR CORPORATION,sam_extract,2024-01-15,active
+AECOMTS789012,AECOM TECHNICAL SERVICES INC,corporate,AECOMMAIN01,AECOM,sam_extract,2024-01-15,active
+CWPROO345678,COMMONWEALTH OF PUERTO RICO,government,,,,2024-01-15,active
+PRIMCAR123456,PRIMORIS CARIBE INC,corporate,,,sam_extract,2024-01-15,active

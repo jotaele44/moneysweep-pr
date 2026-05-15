@@ -11,7 +11,8 @@
       "producer_script": "scripts/build_unified_master.py",
       "expected_outputs": [
         "data/staging/processed/pr_contracts_master.csv",
-        "data/staging/processed/pr_all_awards_master.csv"
+        "data/staging/processed/pr_all_awards_master.csv",
+        "data/ci/seeds/usaspending_prime.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -19,7 +20,7 @@
         "year_coverage_pct": 0.95
       },
       "update_cadence": "weekly",
-      "notes": "USAspending API + bulk archive. No key required.\nTop recipients are PR government agencies (PRDOH, ADSEF, PRDE, PRHA) \u2014\nno corporate parent_uei is expected for these entities.\n"
+      "notes": "USAspending API + bulk archive. No key required.\nTop recipients are PR government agencies (PRDOH, ADSEF, PRDE, PRHA) —\nno corporate parent_uei is expected for these entities.\n"
     },
     {
       "source_id": "usaspending_subawards",
@@ -64,7 +65,8 @@
       "endpoint_url": "https://www.fsrs.gov/",
       "producer_script": "scripts/download_fsrs.py",
       "expected_outputs": [
-        "data/staging/processed/pr_fsrs_subawards.csv"
+        "data/staging/processed/pr_fsrs_subawards.csv",
+        "data/ci/seeds/fsrs_subawards.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -83,7 +85,8 @@
       "producer_script": "scripts/sam_enrichment.py",
       "expected_outputs": [
         "data/staging/processed/enrichment/vendor_uei_index.csv",
-        "data/staging/processed/entities_resolved.csv"
+        "data/staging/processed/entities_resolved.csv",
+        "data/ci/seeds/sam_entities.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -92,7 +95,7 @@
         "parent_uei_coverage_pct_corporate": 0.002
       },
       "update_cadence": "monthly",
-      "notes": "SAM full extract + per-UEI enrichment for parent resolution.\nSupplemented by scripts/usaspending_parent_uei_extract.py (no rate limit).\nSAM API rate: 1,000 req/day \u2192 full 2,334-UEI run = 2.3+ days.\n"
+      "notes": "SAM full extract + per-UEI enrichment for parent resolution.\nSupplemented by scripts/usaspending_parent_uei_extract.py (no rate limit).\nSAM API rate: 1,000 req/day → full 2,334-UEI run = 2.3+ days.\n"
     },
     {
       "source_id": "highergov_supplemental",
@@ -120,7 +123,8 @@
       "endpoint_url": "https://www.fema.gov/openfema-data-page/public-assistance-funded-projects-details-v2",
       "producer_script": "scripts/download_openfema_pa_projects.py",
       "expected_outputs": [
-        "data/staging/processed/pr_fema_pa_master.csv"
+        "data/staging/processed/pr_fema_pa_master.csv",
+        "data/ci/seeds/fema_pa_openfema_v2.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -154,7 +158,8 @@
       "endpoint_url": "https://recovery.pr.gov/",
       "producer_script": "scripts/download_cor3.py",
       "expected_outputs": [
-        "data/staging/processed/pr_cor3_master.csv"
+        "data/staging/processed/pr_cor3_master.csv",
+        "data/ci/seeds/cor3.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -171,7 +176,8 @@
       "endpoint_url": "https://www.hud.gov/program_offices/comm_planning/cdbg-dr",
       "producer_script": "scripts/download_cdbg_dr.py",
       "expected_outputs": [
-        "data/staging/processed/pr_cdbg_dr_master.csv"
+        "data/staging/processed/pr_cdbg_dr_master.csv",
+        "data/ci/seeds/hud_cdbg_dr_public.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -196,7 +202,7 @@
       },
       "manual_drop_dir": "data/manual/hud_drgr/",
       "update_cadence": "monthly",
-      "notes": "Credentialed DRGR portal \u2014 operator must export and drop manifests in manual_drop_dir."
+      "notes": "Credentialed DRGR portal — operator must export and drop manifests in manual_drop_dir."
     },
     {
       "source_id": "hud_hcv_section8",
@@ -223,7 +229,8 @@
       "producer_script": "scripts/ingest_prasa.py",
       "expected_outputs": [
         "data/staging/processed/pr_prasa_contracts.csv",
-        "data/staging/processed/prasa_contracts_master.csv"
+        "data/staging/processed/prasa_contracts_master.csv",
+        "data/ci/seeds/prasa.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -311,7 +318,8 @@
       "endpoint_url": "https://consultacontratos.ocpr.gov.pr/",
       "producer_script": "scripts/ingest_contralor.py",
       "expected_outputs": [
-        "data/staging/processed/pr_contralor_contracts.csv"
+        "data/staging/processed/pr_contralor_contracts.csv",
+        "data/ci/seeds/oficina_contralor.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -508,7 +516,8 @@
       "producer_script": "scripts/download_emma.py",
       "expected_outputs": [
         "data/staging/processed/pr_emma_bonds.csv",
-        "data/staging/processed/bond_asset_map.csv"
+        "data/staging/processed/bond_asset_map.csv",
+        "data/ci/seeds/emma_bonds.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -540,7 +549,8 @@
       "endpoint_url": "https://lda.senate.gov/api/v1/",
       "producer_script": "scripts/download_lda.py",
       "expected_outputs": [
-        "data/staging/processed/pr_lda_filings.csv"
+        "data/staging/processed/pr_lda_filings.csv",
+        "data/ci/seeds/lda.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -556,7 +566,8 @@
       "endpoint_url": "https://etica.pr.gov/cabilderos/",
       "producer_script": "scripts/ingest_cabilderos.py",
       "expected_outputs": [
-        "data/staging/processed/pr_cabilderos.csv"
+        "data/staging/processed/pr_cabilderos.csv",
+        "data/ci/seeds/pr_cabilderos.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -572,7 +583,8 @@
       "endpoint_url": "https://api.open.fec.gov/",
       "producer_script": "scripts/download_fec.py",
       "expected_outputs": [
-        "data/staging/processed/pr_fec_contributions.csv"
+        "data/staging/processed/pr_fec_contributions.csv",
+        "data/ci/seeds/fec.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
