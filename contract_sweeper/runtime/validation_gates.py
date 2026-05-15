@@ -15,7 +15,7 @@ Gates implemented in R5 (PR2.6 — entity-type-aware):
   - execution_chain_linkage_rate      ≥ 0.90
   - manifest_present_per_required     (all required sources have a manifest)
   - secret_leakage_zero               == 0 (delegates to scripts/scan_for_secrets)
-  - duplicate_rate_per_source         ≤ 0.05
+  - duplicate_rate_per_source         ≤ 0.05  (canonical processed files only; raw inputs excluded)
 
 Deprecated (PR2.6): global parent_uei_rate ≥ 0.90 gate removed.
   Government agencies dominate PR awards data and do not register corporate
@@ -319,8 +319,29 @@ def gate_manifests_present(root: Path) -> dict[str, Any]:
     return {"records": records}
 
 
+_RAW_PATH_PREFIXES = (
+    "data/staging/raw/",
+    "data/raw/",
+    "data/review_queue/",
+    "data/exports/",
+    "data/logs/",
+)
+
+
+def _is_canonical_processed(relative_path: str) -> bool:
+    """True only for files in the canonical processed output tree.
+
+    Raw input files (staging/raw, raw, review_queue, exports) accumulate rows
+    across fiscal years and naturally have duplicate award_ids because they are
+    denormalized grant-by-recipient exports, not deduplicated canonical tables.
+    Applying the duplicate_rate gate to those files produces spurious failures.
+    Only processed canonical outputs (data/staging/processed/) are gated.
+    """
+    return relative_path.startswith("data/staging/processed/")
+
+
 def gate_duplicate_rate(root: Path) -> dict[str, Any]:
-    """Read the canonical source manifest and report any source > DUPLICATE_RATE_LIMIT."""
+    """Report processed canonical files whose duplicate_rate exceeds DUPLICATE_RATE_LIMIT."""
     canonical = root / "data" / "manifests" / "source_manifest.json"
     records: list[dict[str, Any]] = []
     if not canonical.exists():
@@ -338,7 +359,10 @@ def gate_duplicate_rate(root: Path) -> dict[str, Any]:
     data = json.loads(canonical.read_text(encoding="utf-8"))
     for f in data.get("files", []):
         dr = f.get("duplicate_rate")
+        rel = f.get("relative_path", "")
         if dr is None:
+            continue
+        if not _is_canonical_processed(rel):
             continue
         records.append(
             {

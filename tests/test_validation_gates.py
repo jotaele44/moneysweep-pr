@@ -183,6 +183,54 @@ def test_manifest_gate_skips_unmaterialized_sources(tmp_path):
 
 
 @pytest.mark.unit
+def test_duplicate_rate_gate_skips_raw_input_files(tmp_path):
+    """duplicate_rate gate must not fire for files outside data/staging/processed/."""
+    _build_tmp_repo(tmp_path)
+    (tmp_path / "data" / "manifests").mkdir(parents=True, exist_ok=True)
+    # Build a fake canonical manifest with one raw file (high dup rate) and one processed file (clean)
+    raw_entry = {
+        "relative_path": "data/staging/raw/grants/direct_recipient_fy2008.csv",
+        "source_system": "unknown",
+        "duplicate_rate": 34.51,
+        "pk_field": "award_id",
+    }
+    processed_entry = {
+        "relative_path": "data/staging/processed/pr_contracts_master.csv",
+        "source_system": "usaspending_prime",
+        "duplicate_rate": 0.0,
+        "pk_field": "award_id",
+    }
+    manifest = {"files": [raw_entry, processed_entry]}
+    (tmp_path / "data" / "manifests" / "source_manifest.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+    result = vg.gate_duplicate_rate(tmp_path)
+    source_ids = [r.get("source_id") for r in result["records"]]
+    assert "unknown" not in source_ids, "raw file with source_system=unknown must be skipped"
+    assert any(r.get("source_id") == "usaspending_prime" for r in result["records"]), (
+        "processed file must still be checked"
+    )
+
+
+@pytest.mark.unit
+def test_duplicate_rate_gate_skips_review_queue_and_exports(tmp_path):
+    """Files in review_queue/ and exports/ must also be excluded from the gate."""
+    _build_tmp_repo(tmp_path)
+    (tmp_path / "data" / "manifests").mkdir(parents=True, exist_ok=True)
+    entries = [
+        {"relative_path": "data/review_queue/suspect_entities.csv", "source_system": "unknown", "duplicate_rate": 0.5},
+        {"relative_path": "data/exports/rebuild_status.csv", "source_system": "unknown", "duplicate_rate": 0.3},
+    ]
+    (tmp_path / "data" / "manifests" / "source_manifest.json").write_text(
+        json.dumps({"files": entries}), encoding="utf-8"
+    )
+    result = vg.gate_duplicate_rate(tmp_path)
+    # No processed files → gate emits the "no pk yet" pass record
+    assert len(result["records"]) == 1
+    assert result["records"][0]["passed"] is True
+
+
+@pytest.mark.unit
 def test_manifest_gate_fires_only_for_materialized_sources(tmp_path):
     """manifest_present_per_required fires exactly for sources whose output files exist."""
     _build_tmp_repo(tmp_path)
