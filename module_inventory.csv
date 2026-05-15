@@ -1,0 +1,305 @@
+path,type,lines,purpose,test_count,category,note
+contract_sweeper/__init__.py,module,7,Contract Sweeper shared package,,KEEP,test file
+contract_sweeper/pipeline/__init__.py,module,1,Pipeline orchestration utilities,,KEEP,package init
+contract_sweeper/pipeline/acquisition_package.py,module,261,Manual acquisition package builders for R4,,ARCHIVE,R4 utility — phase complete; preserve for reference
+contract_sweeper/pipeline/backfill_failure_remediation.py,module,710,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/backfill_readiness_audit.py,module,574,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/backfill_runner.py,module,526,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/completion_gate.py,module,114,Classification and gate helpers for R4,,MERGE,merge → pipeline/gate_helpers.py
+contract_sweeper/pipeline/controlled_backfill.py,module,489,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/controlled_backfill_execution.py,module,810,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/credential_unblock_plan.py,module,126,Credential and endpoint unblock planning for R4,,MERGE,merge → pipeline/credential_utils.py
+contract_sweeper/pipeline/credentialed_endpoint_execution.py,module,547,Credential-aware endpoint and producer retry utilities for R4,,MERGE,merge → pipeline/credential_utils.py
+contract_sweeper/pipeline/delivered_source_validation.py,module,196,Validation helpers for R4,,ARCHIVE,R4 utility — phase complete; preserve for reference
+contract_sweeper/pipeline/endpoint_patch_retry.py,module,229,Endpoint follow-up patch retry support for R4,,MERGE,merge → pipeline/endpoint_retry_utils.py
+contract_sweeper/pipeline/endpoint_resolution.py,module,157,Endpoint failure classification and light probe support for R4,,MERGE,merge → pipeline/endpoint_retry_utils.py
+contract_sweeper/pipeline/external_acquisition_blocker_package.py,module,182,External acquisition blocker packaging for R4,,MERGE,merge → pipeline/endpoint_retry_utils.py
+contract_sweeper/pipeline/external_blocker_freeze.py,module,431,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/external_source_delivery_gate.py,module,611,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/final_backfill_retry.py,module,739,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/final_source_recovery_pass.py,module,703,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/import_slots.py,module,67,Manual import slot builders for R4,,MERGE,merge → pipeline/manual_import_utils.py
+contract_sweeper/pipeline/manual_fallback_package.py,module,199,Manual fallback package generation for R4,,MERGE,merge → pipeline/manual_import_utils.py
+contract_sweeper/pipeline/manual_fulfillment_execution.py,module,60,Manual file fulfillment execution utilities for R4,,MERGE,merge → pipeline/manual_import_utils.py
+contract_sweeper/pipeline/manual_import_dropzone.py,module,459,Manual import dropzone execution support for R4,,ARCHIVE,R4 utility — phase complete; preserve for reference
+contract_sweeper/pipeline/manual_import_validation.py,module,224,Manual import slot generation and validation for controlled backfill,,MERGE,merge → pipeline/manual_import_utils.py
+contract_sweeper/pipeline/partial_master_rebuild.py,module,747,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/partial_rebuild_gate.py,module,26,Gate evaluation helpers for R4,,MERGE,merge → pipeline/gate_helpers.py
+contract_sweeper/pipeline/partial_rebuild_retry.py,module,247,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/producer_failure_resolution.py,module,125,Producer-failure classification for R4,,MERGE,merge → pipeline/endpoint_retry_utils.py
+contract_sweeper/pipeline/producer_patch_retry.py,module,226,Producer patch retry support for R4,,MERGE,merge → pipeline/endpoint_retry_utils.py
+contract_sweeper/pipeline/raw_source_candidate_validation.py,module,233,Raw source candidate validation helpers for R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/raw_usaspending_discovery.py,module,647,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/raw_usaspending_mapping_feasibility.py,module,384,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/repo_quality_audit.py,module,389,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/schema_alignment.py,module,224,Deterministic schema alignment utilities for R4,,MERGE,merge → pipeline/schema_utils.py
+contract_sweeper/pipeline/schema_remediation.py,module,150,Schema remediation helpers for R4,,MERGE,merge → pipeline/schema_utils.py
+contract_sweeper/pipeline/scoped_partial_rebuild.py,module,448,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/scoped_unfreeze_materialization.py,module,435,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/source_delivery_handoff.py,module,382,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/source_delivery_watch.py,module,374,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/source_manifest_writer.py,module,105,Source manifest inventory writer for controlled backfill phases,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/source_materialization.py,module,408,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/source_recovery_pause_lock.py,module,303,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/targeted_backfill_retry.py,module,784,R4,,ARCHIVE,R4 backfill phase (complete) — archive
+contract_sweeper/pipeline/unfreeze_guard.py,module,71,Gate helpers for R4,,MERGE,merge → pipeline/gate_helpers.py
+contract_sweeper/runtime/__init__.py,module,36,"R5 runtime: source/schema registries, manifest writers, validation gates",,KEEP,active production runtime
+contract_sweeper/runtime/file_hash_runtime.py,module,16,sha256 file hashing — used by manifests and validation,,KEEP,active production runtime
+contract_sweeper/runtime/linkage_confidence.py,module,59,Link-confidence scoring for joining sub-awards to prime awards,,KEEP,active production runtime
+contract_sweeper/runtime/manifest_runtime.py,module,389,Manifest writer for ingested datasets,,KEEP,active production runtime
+contract_sweeper/runtime/name_normalization.py,module,57,Entity-name normalization helpers,,KEEP,active production runtime
+contract_sweeper/runtime/pagination_runtime.py,module,45,Pagination helper for ingestion scripts,,KEEP,active production runtime
+contract_sweeper/runtime/retry_runtime.py,module,68,Retry helper with jittered exponential backoff,,KEEP,active production runtime
+contract_sweeper/runtime/risk_signal_gates.py,module,194,R7 risk signal completion gates,,KEEP,active production runtime
+contract_sweeper/runtime/risk_signals.py,module,708,Phase 7 risk signal engine for Puerto Rico contract/spending data,,KEEP,active production runtime
+contract_sweeper/runtime/schema_registry.py,module,106,Schema-registry loader,,KEEP,active production runtime
+contract_sweeper/runtime/source_registry.py,module,126,Source-registry loader,,KEEP,active production runtime
+contract_sweeper/runtime/validation_gates.py,module,503,Validation gates that block downstream layers when coverage is insufficient,,KEEP,active production runtime
+contract_sweeper/validation/__init__.py,module,2,Validation and production gating utilities,,KEEP,active validation layer
+contract_sweeper/validation/artifact_lineage.py,module,267,R1 artifact lineage helpers,,KEEP,active validation layer
+contract_sweeper/validation/backfill_execution_plan.py,module,249,R4,,KEEP,active validation layer
+contract_sweeper/validation/cache_audit.py,module,238,R1 cache/staleness audit built on artifact lineage rows,,KEEP,active validation layer
+contract_sweeper/validation/entity_universe_audit.py,module,464,R2 entity universe and collapse audit,,KEEP,active validation layer
+contract_sweeper/validation/master_input_recovery.py,module,500,R4 master input recovery and fail-closed rebuild orchestration,,KEEP,active validation layer
+contract_sweeper/validation/production_status.py,module,320,R0 production-status gate for report and graph-facing outputs,,KEEP,active validation layer
+contract_sweeper/validation/source_coverage.py,module,536,R3 source coverage + master input audit,,KEEP,active validation layer
+contract_sweeper/validation/source_input_recovery.py,module,533,R4,,KEEP,active validation layer
+scripts/__init__.py,script,1,,,KEEP,misc script
+scripts/alias_registry_builder.py,script,120,Build a name-alias cluster registry from all staged CSVs,,KEEP,active data processing
+scripts/analyze_bond_flow.py,script,302,"Cross-reference PR municipal bond market participants (issuers, underwriters,",,KEEP,active analysis
+scripts/analyze_entity_profiles.py,script,363,Build enriched entity profiles by cross-referencing the unified awards master,,KEEP,active analysis
+scripts/analyze_fec_crossref.py,script,189,Cross-reference FEC campaign contributions against the unified awards master,,MERGE,merge → analyze_political_crossref.py (with lobbying_crossref)
+scripts/analyze_lobbying_crossref.py,script,229,Cross-reference LDA lobbying clients against the unified awards master,,MERGE,merge → analyze_political_crossref.py (with fec_crossref)
+scripts/analyze_power_network.py,script,426,Integrated power/influence network analysis for Puerto Rico,,KEEP,active analysis
+scripts/analyze_prime_sub.py,script,213,Analyze prime-to-subcontractor relationships from the subawards master,,KEEP,active analysis
+scripts/analyze_project_delivery.py,script,273,Score contractors on project delivery performance by synthesizing:,,KEEP,active analysis
+scripts/analyze_rfp_lobby.py,script,218,Cross-reference PR government RFPs with LDA federal lobbying filings to quantify,,KEEP,active analysis
+scripts/auto_download.py,script,875,"Automated download of expansion datasets (12/13 automated, 1 manual fallback)",,ARCHIVE,expansion source downloader — not in core 14
+scripts/build_financial_flows_master.py,script,350,Build financial_flows_master — synthesizes all upstream financial data into a single,,KEEP,active build pipeline
+scripts/build_risk_signals.py,script,97,Build risk signals master from R5 data shapes,,KEEP,active build pipeline
+scripts/build_unified_master.py,script,697,Build a unified awards master CSV from all individual dataset masters,,KEEP,active build pipeline
+scripts/cms_mapper.py,script,156,Deterministic column mapping for CMS (Centers for Medicare & Medicaid Services) data,,KEEP,active column mapper
+scripts/config.py,script,538,Shared configuration for the Puerto Rico Federal Contracts Data Pipeline,,KEEP,core infra
+scripts/deduplicate_master.py,script,121,Merge all normalized expansion CSVs into a single master file and remove,,KEEP,active data processing
+scripts/dominance_analysis.py,script,257,Dominance Analysis — Market Concentration & Vendor Rankings,,KEEP,active data processing
+scripts/download_aafaf.py,script,308,Download AAFAF (Autoridad de Asesoría Financiera y Agencia Fiscal de Puerto Rico),,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_act60.py,script,304,Download Puerto Rico Act 60 tax incentive decree holders from DDEC / Hacienda,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_active_contractors.py,script,231,Download PR active contractor registry from government supplier databases,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_cabilderos.py,script,237,Download PR state-level lobbyist (cabilderos) registrations,,KEEP,registered source downloader
+scripts/download_cdbg_dr.py,script,690,Download HUD Community Development Block Grant - Disaster Recovery (CDBG-DR) data,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_chip.py,script,268,Download CMS CHIP (Children's Health Insurance Program) data for Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_cms.py,script,503,Download CMS (Centers for Medicare & Medicaid Services) financial data for PR,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_cofina.py,script,282,Download COFINA (PR Sales Tax Financing Corporation) SUT revenue bond data,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_compras.py,script,305,Download Puerto Rico government procurement data from Compras PR,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_contralor.py,script,289,Download Oficina del Contralor de Puerto Rico audit and contract records,,KEEP,registered source downloader
+scripts/download_cor3.py,script,281,"Download COR3 (Central Office for Recovery, Reconstruction and Resiliency) project",,KEEP,registered source downloader
+scripts/download_doe.py,script,345,Download Department of Energy grants to/in Puerto Rico from USASpending,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_doj_grants.py,script,299,Download Department of Justice grants to/in Puerto Rico from USASpending,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_dol.py,script,377,Download DOL (Department of Labor) enforcement data for Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_dot.py,script,344,Download Department of Transportation grants to/in Puerto Rico from USASpending,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_earmarks.py,script,259,Download congressional earmarks for Puerto Rico from USASpending,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_ed.py,script,299,Download Department of Education grants to/in Puerto Rico from USASpending,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_emma.py,script,577,Download Puerto Rico municipal bond data from MSRB EMMA (Electronic Municipal,,KEEP,registered source downloader
+scripts/download_epa.py,script,334,Download EPA (Environmental Protection Agency) grants and cooperative agreements,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_eqb.py,script,201,Download PR Environmental Quality Board (EQB / Junta de Calidad Ambiental) permit,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_exim.py,script,269,Download Ex-Im Bank (Export-Import Bank) loans and guarantees for Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_fcc.py,script,325,Download FCC Universal Service Fund (USF) disbursements for Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_fdic.py,script,363,Download FDIC bank institution profiles and financial history for Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_fec.py,script,283,Download Federal Election Commission (FEC) Schedule A contributions from,,KEEP,registered source downloader
+scripts/download_fema.py,script,545,Download OpenFEMA datasets for Puerto Rico:,,KEEP,registered source downloader
+scripts/download_fhlb.py,script,234,Download Federal Home Loan Bank (FHLB) advances to Puerto Rico member institutions,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_fsrs.py,script,202,Download FSRS (Federal Subaward Reporting System) subcontract data for Puerto Rico,,KEEP,registered source downloader
+scripts/download_gao_ig.py,script,342,Download GAO audit reports and Inspector General reports covering Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_grants.py,script,643,Download all non-contract federal awards to/in Puerto Rico via USASpending bulk download,,KEEP,registered source downloader
+scripts/download_hacienda.py,script,300,Download PR Department of Treasury (Hacienda) monthly revenue data,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_haf.py,script,270,Download Homeowner Assistance Fund (HAF) spending for Puerto Rico via USASpending,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_hhs.py,script,310,Download HHS (HRSA + ACF) grants to/in Puerto Rico from USASpending,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_hud.py,script,345,Download HUD (regular CDBG + HOME + other) grants to/in Puerto Rico from USASpending,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_hud_drgr_public.py,script,516,Download publicly available HUD CDBG-DR data for Puerto Rico,,KEEP,registered source downloader
+scripts/download_hud_hcv.py,script,308,Download HUD Section 8 / Housing Choice Voucher (HCV) data for Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_instructions.py,script,317,Generate detailed download instructions for all expansion datasets,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_lda.py,script,348,Download Senate Lobbying Disclosure Act (LDA) filings involving Puerto Rico,,KEEP,registered source downloader
+scripts/download_lihtc.py,script,231,Download HUD Low-Income Housing Tax Credit (LIHTC) project data for Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_medicaid_fmap.py,script,274,Download Puerto Rico Medicaid FMAP rates and CMS-64 expenditure data,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_medicare_advantage.py,script,283,Download CMS Medicare Advantage plan payments to Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_medicare_parts.py,script,269,Download Medicare Part A (hospital insurance) and Part D (prescription drugs),,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_msrb_trades.py,script,338,Download MSRB RTRS (Real-Time Reporting System) secondary market trade data,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_municipal.py,script,242,Download PR municipal fiscal health data from public sources:,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_ncua.py,script,259,Download NCUA credit union call report data for Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_nfip.py,script,191,Download NFIP (National Flood Insurance Program) claims for Puerto Rico via OpenFEMA,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_nih.py,script,317,Download NIH (National Institutes of Health) research grants to Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_nmtc.py,script,238,Download CDFI Fund New Markets Tax Credit (NMTC) allocatee data for Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_nonprofits.py,script,348,Download IRS 990 nonprofit financial data for Puerto Rico via ProPublica API,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_ofac.py,script,312,Download OFAC Specially Designated Nationals (SDN) list and cross-reference,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_oia.py,script,303,Download Office of Insular Affairs (OIA) grants to/in Puerto Rico from USASpending,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_opencorporates.py,script,365,Download Puerto Rico business entity registrations from OpenCorporates,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_openfema_pa_projects.py,script,340,Download OpenFEMA PA v2 projects for Puerto Rico and save full schema to parquet,,KEEP,registered source downloader
+scripts/download_p3.py,script,249,Download Puerto Rico P3 Authority (Public-Private Partnerships) contract data,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_pr_pensions.py,script,312,"Download Puerto Rico public pension fund data for ERS, TRS, and JRS",,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_prasa.py,script,261,Download PRASA (Puerto Rico Aqueduct and Sewer Authority) contract data,,KEEP,registered source downloader
+scripts/download_prepa_contracts.py,script,277,Download PREPA / Luma Energy / Genera PR contract data from FOMB and P3 Authority,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_promesa_creditors.py,script,342,Download PROMESA Title III creditor data for Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_research.py,script,571,Download federal research grants to Puerto Rico institutions,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_rum_coverover.py,script,218,Download Puerto Rico Rum Cover-Over data from TTB and AAFAF,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_sba.py,script,552,Download SBA Disaster Loan data for Puerto Rico from data,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_sbir.py,script,314,Download SBIR/STTR (Small Business Innovation Research / Technology Transfer) awards,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_sec.py,script,454,Download SEC EDGAR financial data for Puerto Rico-significant public companies,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_sec_holdings.py,script,291,Download SEC 13F and N-PORT filings disclosing institutional holdings of,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_sf133.py,script,246,Download SF-133 budget execution data for PR-relevant federal programs via USASpending,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_slfrf.py,script,378,Download Treasury SLFRF (State and Local Fiscal Recovery Funds / ARPA) data for Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_snap_nap.py,script,375,Download USDA FNS Nutrition Assistance Program (NAP) data for Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_ssa.py,script,300,Download Social Security Administration benefit data for Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_subawards.py,script,491,Download USASpending subawards where place of performance or prime recipient,,KEEP,registered source downloader
+scripts/download_usace_civil.py,script,365,Download USACE (Army Corps of Engineers) civil works contracts and grants,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_usace_permits.py,script,223,Download USACE Section 404/Section 10 permit data for Puerto Rico via EPA ECHO,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_usda.py,script,355,Download USDA grants and loans to/in Puerto Rico from USASpending,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_va.py,script,332,Download Veterans Affairs (VA) benefit payments and contract spending for Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_wic.py,script,329,"Download USDA FNS WIC (Women, Infants, and Children) program data for Puerto Rico",,ARCHIVE,expansion source downloader — not in core 14
+scripts/download_wioa.py,script,329,Download DOL WIOA (Workforce Innovation and Opportunity Act) grants to Puerto Rico,,ARCHIVE,expansion source downloader — not in core 14
+scripts/emma_mapper.py,script,139,Deterministic column mapping for EMMA municipal bond data,,KEEP,active column mapper
+scripts/entity_resolution.py,script,316,Entity Resolution — Top N Vendors → Parent Entity Hierarchy,,KEEP,active data processing
+scripts/execution_chain_builder.py,script,322,Build execution chains linking prime awards → subawards → assets → municipalities,,KEEP,active data processing
+scripts/fdic_mapper.py,script,141,Deterministic column mapping for FDIC bank institution data,,KEEP,active column mapper
+scripts/fetch_highergov_api.py,script,102,Fetch HigherGov API exports and write normalized CSVs into data/staging/expansion,,KEEP,active highergov ingestion
+scripts/gap_analysis_builder.py,script,188,Build gap analysis report comparing declared vs materialized source outputs,,KEEP,active data processing
+scripts/generate_report.py,script,771,Synthesize all pipeline outputs into a single investigative report,,KEEP,active report generation
+scripts/highergov_manifest.py,script,39,,,DELETE,"empty module — no docstring, no functions"
+scripts/highergov_mapper.py,script,142,Deterministic column mapping for HigherGov API resources,,KEEP,active column mapper
+scripts/influence_graph_builder.py,script,300,Build influence graph linking agencies → primes → subs → assets → municipalities,,KEEP,active data processing
+scripts/ingest_active_contractors.py,script,245,Ingest PR Active Contractor Listing from the PR government registry,,KEEP,active ingest script
+scripts/ingest_cabilderos.py,script,248,Ingest PR Cabilderos (state-level lobbyist registry) data,,KEEP,active ingest script
+scripts/ingest_contralor.py,script,256,Ingest PR Oficina del Contralor (Comptroller's Office) audit and contract data,,KEEP,active ingest script
+scripts/ingest_cor3.py,script,219,"Ingest COR3 (Central Office for Recovery, Reconstruction and Resiliency)",,KEEP,active ingest script
+scripts/ingest_fec.py,script,246,Ingest FEC contribution data exported from the FEC website,,KEEP,active ingest script
+scripts/ingest_fema_pa_portal_exports.py,script,304,"Ingest authorized FEMA PA portal export files (178-PW data) from local directories,",,KEEP,active ingest script
+scripts/ingest_follow_the_money.py,script,518,Ingest Follow the Money CSV exports,,ARCHIVE,expansion source — not in core 14
+scripts/ingest_grants.py,script,176,Ingest Grants,,KEEP,active ingest script
+scripts/ingest_hud_drgr_exports.py,script,278,Load authorized local HUD DRGR exports from data/raw/HUD DRGR/ or data/raw/HUD/,,KEEP,active ingest script
+scripts/ingest_prasa.py,script,253,Ingest PRASA (Puerto Rico Aqueduct and Sewer Authority) contract data,,KEEP,active ingest script
+scripts/ingest_report_builder.py,script,371,Ingest FPDS / USASpending Report Builder Excel exports for Puerto Rico,,KEEP,active data processing
+scripts/lda_enrich.py,script,462,LDA Enrichment Layer — link federal award recipients to their lobbying activity,,KEEP,active data processing
+scripts/link_fema_pa_to_contracts.py,script,246,"Link FEMA PA project worksheets to COR3 recovery projects, contracts, and entity master",,KEEP,active linkage script
+scripts/link_hud_drgr_to_assets.py,script,210,Link HUD DRGR activities to physical assets and municipalities,,KEEP,active linkage script
+scripts/link_hud_drgr_to_contracts.py,script,201,Link HUD DRGR responsible organizations to federal contracts and entity master,,KEEP,active linkage script
+scripts/network_graph.py,script,266,Network Graph — Vendor-Agency Contract Network,,KEEP,active data processing
+scripts/ngo_integration.py,script,676,NGO / OSFL integration layer for Contract-Sweeper,,KEEP,active data processing
+scripts/normalize_expansion_inputs.py,script,345,Normalize expansion CSV inputs (Section 7),,KEEP,active data processing
+scripts/normalize_hud_drgr.py,script,223,Normalize and reconcile HUD DRGR data from public downloads and local exports,,KEEP,active HUD/FEMA validation
+scripts/parent_collapse.py,script,273,Resolve entity parent-UEI relationships and emit entities_resolved,,KEEP,active data processing
+scripts/parquet_utils.py,script,61,Parquet read/write helpers with graceful CSV fallback when pyarrow is absent,,KEEP,core infra
+scripts/parse_highergov_pdfs.py,script,153,Extract tables from HigherGov PDFs into CSV for normalization,,KEEP,active highergov ingestion
+scripts/regenerate_registry_json.py,script,61,Regenerate JSON siblings of the YAML registries,,KEEP,active data processing
+scripts/run_acquisition_package_r48g.py,script,364,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_artifact_lineage_audit.py,script,34,Run R1 artifact lineage and cache-reuse audit,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_backfill_execution_plan_r46.py,script,33,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_backfill_failure_remediation_r48c.py,script,69,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_backfill_readiness_audit_r48a.py,script,51,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_backfill_runner_r47.py,script,64,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_controlled_backfill_execution_r48b.py,script,79,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_controlled_backfill_r48.py,script,67,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_entity_universe_audit.py,script,38,Run R2 entity universe and collapse audit,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_external_blocker_freeze_r49d.py,script,56,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_external_source_delivery_gate_r49c.py,script,55,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_final_source_recovery_pass_r48i.py,script,79,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_manual_fallback_endpoint_resolution_r48e.py,script,543,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_manual_fulfillment_endpoint_retry_r48h.py,script,80,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_manual_import_dropzone_retry_r48f.py,script,574,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_master_input_recovery_and_rebuild.py,script,46,Run R4 master-input recovery and fail-closed rebuild,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_partial_master_rebuild_r49a.py,script,62,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_production_status_gate.py,script,30,Run R0 production-status gate and stamp existing outputs,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_raw_usaspending_discovery_r49h.py,script,68,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_raw_usaspending_mapping_feasibility_r49h2.py,script,60,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_repo_quality_audit_r49z_b.py,script,45,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_scoped_unfreeze_retry_r49g.py,script,80,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_source_coverage_audit.py,script,35,Run R3 source coverage and master-input audit,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_source_delivery_handoff_r49e.py,script,55,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_source_delivery_watch_r49f.py,script,55,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_source_input_recovery_and_canonical_staging.py,script,36,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_source_materialization_rebuild_retry_r49b.py,script,55,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_source_recovery_pause_lock_r49z.py,script,48,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/run_targeted_backfill_retry_r48d.py,script,75,Run R4,,ARCHIVE,R4/Rn phase runner — phase complete
+scripts/sam_enrichment.py,script,609,SAM,,KEEP,active data processing
+scripts/sam_uei_parent_lookup.py,script,309,SAM,,KEEP,active data processing
+scripts/scan_for_secrets.py,script,168,Scan the repo for accidentally-committed secrets,,KEEP,core infra
+scripts/setup_directories.py,script,47,Setup the directory structure for the Puerto Rico Federal Contracts Data Pipeline,,KEEP,core infra
+scripts/triage_misc_drop.py,script,237,Triage the data/raw/misc,,KEEP,active data processing
+scripts/usaspending_parent_uei_extract.py,script,255,Extract parent_uei for every unique UEI using USAspending,,KEEP,active SAM/USAspending enrichment
+scripts/validate_downloads.py,script,216,Validate downloaded expansion CSV files (Section 6),,KEEP,active validation script
+scripts/validate_expansion_coverage.py,script,219,Validate expansion coverage across normalized files (Section 8),,KEEP,active validation script
+scripts/validate_fema_pa_coverage.py,script,252,"Validate FEMA PA coverage: 178-PW loading, v1 vs v2 diff, gap analysis, high-value unresolved",,KEEP,active validation script
+scripts/validate_hud_drgr_amounts.py,script,197,Budget/drawdown/obligation reconciliation for HUD DRGR,,KEEP,active validation script
+scripts/validate_hud_drgr_coverage.py,script,186,Coverage and entity-resolution report for HUD DRGR,,KEEP,active validation script
+scripts/write_source_manifests.py,script,127,Write per-source manifests for registry-declared sources,,KEEP,active data processing
+tests/__init__.py,test,0,,0,KEEP,test file
+tests/conftest.py,test,93,Shared fixtures for Contract-Sweeper test suite,0,KEEP,test file
+tests/test_acquisition_package_r48g.py,test,357,Tests for R4,2,KEEP,test file
+tests/test_alias_registry_builder.py,test,69,Tests for scripts/alias_registry_builder,4,KEEP,test file
+tests/test_analyze_bond_flow.py,test,130,Tests for analyze_bond_flow — name matching and dual-role detection,18,KEEP,test file
+tests/test_analyze_project_delivery.py,test,219,Tests for analyze_project_delivery — sub-scorers and composite score,24,KEEP,test file
+tests/test_analyze_rfp_lobby.py,test,125,Tests for analyze_rfp_lobby — vendor matching and influence score formula,15,KEEP,test file
+tests/test_artifact_lineage_audit.py,test,128,Tests for R1 artifact lineage and cache audit,2,KEEP,test file
+tests/test_backfill_execution_plan.py,test,98,Tests for R4,2,KEEP,test file
+tests/test_backfill_failure_remediation_r48c.py,test,548,Tests for R4,3,KEEP,test file
+tests/test_backfill_readiness_audit_r48a.py,test,379,Tests for R4,3,KEEP,test file
+tests/test_backfill_runner_r47.py,test,168,Tests for R4,3,KEEP,test file
+tests/test_build_unified_master.py,test,115,Tests for scripts/build_unified_master,21,KEEP,test file
+tests/test_cms_mapper.py,test,154,Tests for cms_mapper — deterministic CMS healthcare data mapping,11,KEEP,test file
+tests/test_config.py,test,187,Tests for scripts/config,32,KEEP,test file
+tests/test_controlled_backfill_execution_r48b.py,test,640,Tests for R4,3,KEEP,test file
+tests/test_controlled_backfill_r48.py,test,240,Tests for R4,3,KEEP,test file
+tests/test_deduplicate_master.py,test,121,Tests for scripts/deduplicate_master,9,KEEP,test file
+tests/test_download_cms.py,test,110,Tests for download_cms — CMS Open Payments and Medicare provider data,8,KEEP,test file
+tests/test_download_emma.py,test,320,"Tests for download_emma — record normalization, underwriter extraction, and run() flow",26,KEEP,test file
+tests/test_download_fdic.py,test,79,Tests for download_fdic — FDIC bank institution and financial data,5,KEEP,test file
+tests/test_download_fsrs.py,test,116,Tests for download_fsrs — FSRS subaward data via USAspending fallback,6,KEEP,test file
+tests/test_download_instructions.py,test,45,Tests for scripts/download_instructions,5,KEEP,test file
+tests/test_download_ofac.py,test,92,Tests for scripts/download_ofac,6,KEEP,test file
+tests/test_download_sf133.py,test,81,Tests for download_sf133 — account relevance filter and obligation rate,10,KEEP,test file
+tests/test_emma_mapper.py,test,133,Tests for emma_mapper — deterministic EMMA bond data mapping,10,KEEP,test file
+tests/test_entity_universe_audit.py,test,121,Tests for R2 entity universe and collapse audit,2,KEEP,test file
+tests/test_execution_chain_builder.py,test,167,Tests for scripts/execution_chain_builder,11,KEEP,test file
+tests/test_external_blocker_freeze_r49d.py,test,317,Tests for R4,2,KEEP,test file
+tests/test_external_source_delivery_gate_r49c.py,test,325,Tests for R4,2,KEEP,test file
+tests/test_fdic_mapper.py,test,152,Tests for fdic_mapper — deterministic FDIC bank data mapping,10,KEEP,test file
+tests/test_final_source_recovery_pass_r48i.py,test,308,Tests for R4,2,KEEP,test file
+tests/test_gap_analysis_builder.py,test,145,Tests for scripts/gap_analysis_builder,9,KEEP,test file
+tests/test_highergov_mapper.py,test,95,Tests for highergov_mapper — deterministic HigherGov resource mapping,7,KEEP,test file
+tests/test_influence_graph_builder.py,test,147,Tests for scripts/influence_graph_builder,10,KEEP,test file
+tests/test_ingest_manual_data.py,test,470,Tests for the 5 manual data ingestion scripts,47,KEEP,test file
+tests/test_lda_enrich.py,test,80,Tests for scripts/lda_enrich,15,KEEP,test file
+tests/test_linkage_confidence.py,test,59,Tests for the subaward linkage confidence helper,5,KEEP,test file
+tests/test_manifest_runtime.py,test,111,Tests for the manifest runtime,7,KEEP,test file
+tests/test_manual_fallback_endpoint_resolution_r48e.py,test,325,Tests for R4,2,KEEP,test file
+tests/test_manual_fulfillment_endpoint_retry_r48h.py,test,278,Tests for R4,2,KEEP,test file
+tests/test_manual_import_dropzone_retry_r48f.py,test,293,Tests for R4,2,KEEP,test file
+tests/test_master_input_recovery.py,test,109,Tests for R4 master input recovery + rebuild gate orchestration,2,KEEP,test file
+tests/test_name_normalization.py,test,39,Tests for the name-normalization helper,4,KEEP,test file
+tests/test_new_downloaders.py,test,663,Tests for the 15 new downloader scripts added in Round 3 pipeline expansion,84,KEEP,test file
+tests/test_ngo_integration.py,test,130,Tests for the additive NGO / OSFL integration layer,3,KEEP,test file
+tests/test_no_secret_leakage.py,test,47,Tests that no secrets are committed to the repo,3,KEEP,test file
+tests/test_normalize.py,test,169,Tests for scripts/normalize_expansion_inputs,15,KEEP,test file
+tests/test_parent_collapse.py,test,139,Tests for scripts/parent_collapse,11,KEEP,test file
+tests/test_partial_master_rebuild_r49a.py,test,306,Tests for R4,3,KEEP,test file
+tests/test_production_status_gate.py,test,112,Tests for R0 production status gate,7,KEEP,test file
+tests/test_r48d_downloader_return_flow.py,test,157,Return-flow tests for R4,4,KEEP,test file
+tests/test_r4_build_unified_master_guards.py,test,140,R4 tests for fail-closed input guards and source lineage in build_unified_master,3,KEEP,test file
+tests/test_raw_usaspending_discovery_r49h.py,test,316,Tests for R4,2,KEEP,test file
+tests/test_raw_usaspending_mapping_feasibility_r49h2.py,test,272,Tests for R4,2,KEEP,test file
+tests/test_repo_quality_audit_r49z_b.py,test,225,Tests for R4,2,KEEP,test file
+tests/test_risk_signals.py,test,484,Unit tests for the R7 risk signal engine and gates,40,KEEP,test file
+tests/test_sam_enrichment.py,test,129,Tests for scripts/sam_enrichment,14,KEEP,test file
+tests/test_schema_registry.py,test,62,Tests for the schema registry loader,5,KEEP,test file
+tests/test_scoped_unfreeze_retry_r49g.py,test,387,Tests for R4,2,KEEP,test file
+tests/test_setup_directories.py,test,57,Tests for scripts/setup_directories,3,KEEP,test file
+tests/test_source_coverage_audit.py,test,150,Tests for R3 source coverage and master-input audit,3,KEEP,test file
+tests/test_source_delivery_handoff_r49e.py,test,262,Tests for R4,2,KEEP,test file
+tests/test_source_delivery_watch_r49f.py,test,295,Tests for R4,3,KEEP,test file
+tests/test_source_input_recovery.py,test,135,Tests for R4,3,KEEP,test file
+tests/test_source_materialization_rebuild_retry_r49b.py,test,242,Tests for R4,2,KEEP,test file
+tests/test_source_recovery_pause_lock_r49z.py,test,231,Tests for R4,2,KEEP,test file
+tests/test_source_registry.py,test,86,Tests for the source registry loader,7,KEEP,test file
+tests/test_targeted_backfill_retry_r48d.py,test,514,Tests for R4,3,KEEP,test file
+tests/test_validate_coverage.py,test,100,Tests for scripts/validate_expansion_coverage,11,KEEP,test file
+tests/test_validate_downloads.py,test,95,Tests for scripts/validate_downloads,7,KEEP,test file
+tests/test_validation_gates.py,test,331,Tests for the R5 validation gates,17,KEEP,test file
+tests/test_write_source_manifests.py,test,77,Tests for scripts/write_source_manifests,3,KEEP,test file
