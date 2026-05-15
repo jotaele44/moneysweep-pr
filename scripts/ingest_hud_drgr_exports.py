@@ -30,12 +30,15 @@ from scripts.config import PROJECT_ROOT, setup_logging
 NORMALIZED_DIR = PROJECT_ROOT / "data" / "normalized"
 
 RAW_DIRS = [
+    PROJECT_ROOT / "data" / "manual" / "hud_drgr",  # primary operator drop dir (documented in source_registry.json)
     PROJECT_ROOT / "data" / "raw",               # catches root-level files e.g. "HUD DRGR (all PR grantees).xls"
     PROJECT_ROOT / "data" / "raw" / "HUD DRGR",
     PROJECT_ROOT / "data" / "raw" / "HUD",
     PROJECT_ROOT / "data" / "raw" / "hud_drgr",
     PROJECT_ROOT / "data" / "raw" / "hud",
 ]
+
+PROCESSED_DIR = PROJECT_ROOT / "data" / "staging" / "processed" / "hud_drgr"
 
 ACTIVITY_COLUMNS = [
     "activity_id", "grant_number", "project_id",
@@ -243,6 +246,20 @@ def run(root=None, force=False):
     a_rows = _save(activity_dfs,     ACTIVITY_COLUMNS,     activity_path,     "activities")
     d_rows = _save(drawdown_dfs,     DRAWDOWN_COLUMNS,     drawdown_path,     "drawdowns")
     p_rows = _save(appropriation_dfs, APPROPRIATION_COLUMNS, appropriation_path, "appropriations")
+
+    # Write gate-visible CSVs to the subdirectory expected by the source registry
+    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    if activity_dfs:
+        acts = pd.concat(activity_dfs, ignore_index=True)
+        acts.to_csv(PROCESSED_DIR / "hud_drgr_activities.csv", index=False)
+        proj = acts.groupby("project_id", dropna=False).agg(
+            grant_number=("grant_number", "first"),
+            activity_count=("activity_id", "count"),
+            total_budget=("total_budget", "first"),
+            status=("status", "first"),
+        ).reset_index()
+        proj.to_csv(PROCESSED_DIR / "hud_drgr_projects.csv", index=False)
+        logger.info("  Staged CSVs: %d activities, %d projects", a_rows, len(proj))
 
     return {"activity_rows": a_rows, "drawdown_rows": d_rows, "appropriation_rows": p_rows, "status": "OK"}
 
