@@ -1,0 +1,133 @@
+{
+  "generated_at": "2026-05-15",
+  "totals": {
+    "modules": 304,
+    "total_lines": 79608
+  },
+  "by_category": {
+    "KEEP": {
+      "count": 167,
+      "total_lines": 40186
+    },
+    "ARCHIVE": {
+      "count": 118,
+      "total_lines": 36238
+    },
+    "MERGE": {
+      "count": 18,
+      "total_lines": 3145
+    },
+    "DELETE": {
+      "count": 1,
+      "total_lines": 39
+    }
+  },
+  "by_layer": {
+    "contract_sweeper/runtime": {
+      "count": 12,
+      "total_lines": 2307
+    },
+    "contract_sweeper/pipeline": {
+      "count": 43,
+      "total_lines": 15123
+    },
+    "contract_sweeper/validation": {
+      "count": 9,
+      "total_lines": 3109
+    },
+    "scripts": {
+      "count": 166,
+      "total_lines": 44461
+    },
+    "tests": {
+      "count": 73,
+      "total_lines": 14601
+    }
+  },
+  "script_families": {
+    "download": {
+      "count": 74,
+      "total_lines": 24527
+    },
+    "run_wrappers": {
+      "count": 29,
+      "total_lines": 2936
+    },
+    "ingest": {
+      "count": 11,
+      "total_lines": 3114
+    },
+    "analyze": {
+      "count": 8,
+      "total_lines": 2213
+    }
+  },
+  "test_health": {
+    "total_test_files": 73,
+    "stub_test_files_le2": 19,
+    "stub_test_paths": [
+      "tests/conftest.py",
+      "tests/test_acquisition_package_r48g.py",
+      "tests/test_artifact_lineage_audit.py",
+      "tests/test_backfill_execution_plan.py",
+      "tests/test_entity_universe_audit.py",
+      "tests/test_external_blocker_freeze_r49d.py",
+      "tests/test_external_source_delivery_gate_r49c.py",
+      "tests/test_final_source_recovery_pass_r48i.py",
+      "tests/test_manual_fallback_endpoint_resolution_r48e.py",
+      "tests/test_manual_fulfillment_endpoint_retry_r48h.py",
+      "tests/test_manual_import_dropzone_retry_r48f.py",
+      "tests/test_master_input_recovery.py",
+      "tests/test_raw_usaspending_discovery_r49h.py",
+      "tests/test_raw_usaspending_mapping_feasibility_r49h2.py",
+      "tests/test_repo_quality_audit_r49z_b.py",
+      "tests/test_scoped_unfreeze_retry_r49g.py",
+      "tests/test_source_delivery_handoff_r49e.py",
+      "tests/test_source_materialization_rebuild_retry_r49b.py",
+      "tests/test_source_recovery_pause_lock_r49z.py"
+    ],
+    "passing": 639,
+    "skipped": 5
+  },
+  "merge_groups": {
+    "pipeline/gate_helpers.py": [
+      "contract_sweeper/pipeline/completion_gate.py",
+      "contract_sweeper/pipeline/partial_rebuild_gate.py",
+      "contract_sweeper/pipeline/unfreeze_guard.py"
+    ],
+    "pipeline/credential_utils.py": [
+      "contract_sweeper/pipeline/credential_unblock_plan.py",
+      "contract_sweeper/pipeline/credentialed_endpoint_execution.py"
+    ],
+    "pipeline/endpoint_retry_utils.py": [
+      "contract_sweeper/pipeline/endpoint_patch_retry.py",
+      "contract_sweeper/pipeline/endpoint_resolution.py",
+      "contract_sweeper/pipeline/external_acquisition_blocker_package.py",
+      "contract_sweeper/pipeline/producer_failure_resolution.py",
+      "contract_sweeper/pipeline/producer_patch_retry.py"
+    ],
+    "pipeline/manual_import_utils.py": [
+      "contract_sweeper/pipeline/import_slots.py",
+      "contract_sweeper/pipeline/manual_fallback_package.py",
+      "contract_sweeper/pipeline/manual_fulfillment_execution.py",
+      "contract_sweeper/pipeline/manual_import_validation.py"
+    ],
+    "pipeline/schema_utils.py": [
+      "contract_sweeper/pipeline/schema_alignment.py",
+      "contract_sweeper/pipeline/schema_remediation.py"
+    ],
+    "analyze_political_crossref.py (with lobbying_crossref)": [
+      "scripts/analyze_fec_crossref.py"
+    ],
+    "analyze_political_crossref.py (with fec_crossref)": [
+      "scripts/analyze_lobbying_crossref.py"
+    ]
+  },
+  "reduction_estimate": {
+    "archiveable_lines": 36238,
+    "mergeable_lines": 3145,
+    "deleteable_lines": 39,
+    "keepable_lines": 40186,
+    "lines_removable_pct": 47.9
+  }
+}
