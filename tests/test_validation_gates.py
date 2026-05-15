@@ -147,3 +147,55 @@ def test_main_exits_0_with_allow_failed(tmp_path):
     _build_tmp_repo(tmp_path)
     exit_code = vg.main(["--root", str(tmp_path), "--allow-failed"])
     assert exit_code == 0
+
+
+@pytest.mark.unit
+def test_entity_resolution_gate_passes_low_rate_pr_data(tmp_path):
+    """entity_resolution_rate of ~0.4 % (realistic PR gov data) must PASS at canary threshold."""
+    _build_tmp_repo(tmp_path)
+    proc = tmp_path / "data" / "staging" / "processed"
+    proc.mkdir(parents=True, exist_ok=True)
+    # 1 000 entities; only 5 have parent_uei (0.5 %) — matches real PR universe
+    rows = [
+        {"entity_id": f"E{i:04d}", "entity_type": "government", "parent_uei": "", "parent_name": ""}
+        for i in range(995)
+    ] + [
+        {"entity_id": f"C{i:04d}", "entity_type": "corporate", "parent_uei": f"PUEI{i}", "parent_name": f"Parent {i}"}
+        for i in range(5)
+    ]
+    _write_csv_simple(proc / "entities_resolved.csv", rows)
+    er = vg.gate_entity_resolution(tmp_path)
+    rate_gate = next(r for r in er["records"] if r["gate"] == "entity_resolution_rate")
+    # 5/1000 = 0.005 > threshold 0.001 → must pass
+    assert rate_gate["passed"] is True, f"entity_resolution_rate should pass at 0.005 (threshold 0.001); got {rate_gate}"
+
+
+@pytest.mark.unit
+def test_manifest_gate_skips_unmaterialized_sources(tmp_path):
+    """manifest_present_per_required must not flag sources with no output files."""
+    _build_tmp_repo(tmp_path)
+    # No expected_output files exist anywhere → all required sources are unmaterialized
+    result = vg.gate_manifests_present(tmp_path)
+    # Every required source is unmaterialized, so the gate produces no records at all
+    assert result["records"] == [], (
+        "gate_manifests_present should produce no records when no source has been materialized"
+    )
+
+
+@pytest.mark.unit
+def test_manifest_gate_fires_only_for_materialized_sources(tmp_path):
+    """manifest_present_per_required fires exactly for sources whose output files exist."""
+    _build_tmp_repo(tmp_path)
+    reg = json.loads((tmp_path / "registries" / "source_registry.json").read_text())
+    # Find a required source with at least one expected_output and plant a fake file there
+    required = [s for s in reg.get("sources", []) if s.get("required") and s.get("expected_outputs")]
+    assert required, "need at least one required source with expected_outputs for this test"
+    src = required[0]
+    fake_output = tmp_path / src["expected_outputs"][0]
+    fake_output.parent.mkdir(parents=True, exist_ok=True)
+    fake_output.write_text("col\nval\n", encoding="utf-8")
+    result = vg.gate_manifests_present(tmp_path)
+    # Only the one source we planted a file for should appear
+    assert len(result["records"]) == 1
+    assert result["records"][0]["source_id"] == src["source_id"]
+    assert result["records"][0]["passed"] is False  # no manifest directory yet

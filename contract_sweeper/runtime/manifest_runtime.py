@@ -106,8 +106,21 @@ def _csv_completeness_and_matches(path: Path) -> dict[str, Any]:
         with path.open(encoding="utf-8-sig", newline="") as f:
             reader = csv.DictReader(f)
             fields = list(reader.fieldnames or [])
-            # Pick a pk-ish field if available.
-            for cand in ("award_id", "generated_unique_award_id", "subaward_id", "contract_number"):
+            # Pick a pk-ish field if available. More-specific fields first so that
+            # FEMA PA (pw_number), project-level sources, and subaward tables do not
+            # accidentally use a shared parent key (e.g. award_id) as their pk and
+            # produce spurious duplicate_rate > 1 readings.
+            for cand in (
+                "pw_number",
+                "project_number",
+                "project_id",
+                "subaward_number",
+                "subaward_id",
+                "generated_unique_award_id",
+                "unique_award_key",
+                "contract_number",
+                "award_id",
+            ):
                 if cand in fields:
                     pk_field = cand
                     break
@@ -147,7 +160,10 @@ def _csv_completeness_and_matches(path: Path) -> dict[str, Any]:
         "field_completeness_pct_by_column": field_completeness,
         "entity_match_rate_pct": (entity_normalized / entity_total) if entity_total else None,
         "actual_years": sorted(years),
-        "duplicate_rate": (duplicate_rows / len(pk_keys)) if pk_keys else 0.0,
+        # Rate = duplicate rows / total rows scanned (not / unique-key count).
+        # The old formula (/ len(pk_keys)) can exceed 1.0 when a pk field is shared
+        # across many rows (e.g. FEMA PA award_id shared by ~1 000 project rows).
+        "duplicate_rate": (duplicate_rows / (duplicate_rows + len(pk_keys))) if pk_keys else 0.0,
         "pk_field": pk_field,
     }
 
