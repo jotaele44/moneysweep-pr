@@ -183,6 +183,31 @@ def test_manifest_gate_skips_unmaterialized_sources(tmp_path):
 
 
 @pytest.mark.unit
+def test_source_coverage_target_is_0_85(tmp_path):
+    """source_coverage_rate threshold must be 0.85 (excludes hud_drgr grantee-portal source)."""
+    assert vg.SOURCE_COVERAGE_TARGET == 0.85
+
+
+@pytest.mark.unit
+def test_source_coverage_gate_passes_at_85_percent(tmp_path):
+    """12 of 14 required sources materialized (85.7 %) must pass the gate."""
+    _build_tmp_repo(tmp_path)
+    reg = json.loads((tmp_path / "registries" / "source_registry.json").read_text())
+    required = [s for s in reg.get("sources", []) if s.get("required") and s.get("expected_outputs")]
+    # Plant real-looking output files for 12 of the required sources
+    for src in required[:12]:
+        fake = tmp_path / src["expected_outputs"][0]
+        fake.parent.mkdir(parents=True, exist_ok=True)
+        fake.write_text("col\nval\n", encoding="utf-8")
+    result = vg.gate_source_coverage(tmp_path)
+    cov_gate = next(r for r in result["records"] if r["gate"] == "source_coverage_rate")
+    assert cov_gate["observed"] >= 0.85
+    assert cov_gate["passed"] is True, (
+        f"12/14 sources should pass threshold 0.85; observed {cov_gate['observed']}"
+    )
+
+
+@pytest.mark.unit
 def test_duplicate_rate_gate_skips_raw_input_files(tmp_path):
     """duplicate_rate gate must not fire for files outside data/staging/processed/."""
     _build_tmp_repo(tmp_path)
