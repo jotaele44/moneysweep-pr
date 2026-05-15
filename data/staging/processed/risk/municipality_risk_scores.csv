@@ -1,0 +1,3 @@
+municipality,award_count,total_amount,top_recipient,risk_score,signal_count,generated_at
+SAN JUAN,2,3000000.0,ACME CORP,0.0,0,2026-05-15T00:00:00+00:00
+PONCE,1,100000.0,BETA LLC,0.0,0,2026-05-15T00:00:00+00:00
