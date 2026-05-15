@@ -1,0 +1,4 @@
+award_id,recipient_name,recipient_name_normalized,recipient_uei,awarding_agency,awarding_sub_agency,obligated_amount,award_date,fiscal_year,place_of_performance_state,award_type,source_dataset
+CONT-2017-PR-001,FLUOR FEDERAL SOLUTIONS LLC,FLUOR FEDERAL SOLUTIONS LLC,FLRFED123456,FEMA,FEMA Disaster Assistance,185000000,2017-11-15,2018,PR,CONT,usaspending_prime
+CONT-2018-PR-002,AECOM TECHNICAL SERVICES INC,AECOM TECHNICAL SERVICES INC,AECOMTS789012,USACE,USACE Puerto Rico,42000000,2018-03-01,2018,PR,CONT,usaspending_prime
+GRANT-2019-PR-003,COMMONWEALTH OF PUERTO RICO,COMMONWEALTH OF PUERTO RICO,CWPROO345678,HUD,HUD CPD,750000000,2019-06-15,2019,PR,GRANT,usaspending_prime

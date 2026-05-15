@@ -1,0 +1,4 @@
+filing_uuid,filing_year,filing_type,period_of_report,registrant_id,registrant_name,registrant_state,client_id,client_name,lobbying_issues,income,source_dataset
+LDA-2022-PR-001,2022,RR,2022Q1,REG-001,PATTON BOGGS LLP,DC,CLI-001,COMMONWEALTH OF PUERTO RICO,PROMESA/Fiscal Oversight,125000,lda
+LDA-2022-PR-002,2022,RR,2022Q2,REG-002,AKIN GUMP STRAUSS HAUER & FELD LLP,DC,CLI-001,COMMONWEALTH OF PUERTO RICO,Disaster Recovery Funding,95000,lda
+LDA-2023-PR-003,2023,RR,2023Q1,REG-003,SQUIRE PATTON BOGGS,DC,CLI-002,PUERTO RICO FISCAL AGENCY AND FINANCIAL ADVISORY AUTHORITY,Federal Funding,110000,lda
