@@ -44,7 +44,7 @@ from contract_sweeper.runtime.source_registry import (
 # credentials.  13/14 automatable sources at full coverage = 92.8 %.
 # 0.85 is a meaningful production threshold that excludes the one structurally
 # blocked source; raise to 0.93 once hud_drgr manual export is delivered.
-SOURCE_COVERAGE_TARGET = 0.85
+SOURCE_COVERAGE_TARGET = 0.93
 # PR2.6 finding (PR60): "entity resolved" = has parent_uei or parent_name.
 # PR award data is dominated by PR government agencies and small local SMEs;
 # neither class registers corporate parent UEIs in SAM or USAspending.

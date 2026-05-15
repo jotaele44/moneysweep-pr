@@ -187,8 +187,8 @@
       "endpoint_url": "https://drgr.hud.gov/",
       "producer_script": "scripts/ingest_hud_drgr_exports.py",
       "expected_outputs": [
-        "data/staging/processed/hud_drgr_activities.csv",
-        "data/staging/processed/hud_drgr_projects.csv"
+        "data/staging/processed/hud_drgr/hud_drgr_activities.csv",
+        "data/staging/processed/hud_drgr/hud_drgr_projects.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {

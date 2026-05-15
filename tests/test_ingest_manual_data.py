@@ -395,3 +395,76 @@ def test_prasa_no_files_returns_zero(tmp_path):
     from scripts.ingest_prasa import _run
     result = _run(root=tmp_path, force=True)
     assert result["rows"] == 0
+
+
+# ---------------------------------------------------------------------------
+# ingest_hud_drgr_exports
+# ---------------------------------------------------------------------------
+
+from scripts.ingest_hud_drgr_exports import (
+    ACTIVITY_COLUMNS,
+    _classify,
+    _map_to_schema,
+    ACTIVITY_COL_MAP,
+)
+
+
+@pytest.mark.unit
+def test_hud_drgr_activity_columns_canonical():
+    for col in ("activity_id", "grant_number", "project_id", "activity_name",
+                "status", "responsible_org", "total_budget", "amount_drawn"):
+        assert col in ACTIVITY_COLUMNS
+
+
+@pytest.mark.unit
+def test_hud_drgr_classify_activity_file(tmp_path):
+    """Files with 'Activity' column names are classified as activities."""
+    path = tmp_path / "hud_activities_pr.csv"
+    df = pd.DataFrame({"Activity ID": ["A1"], "Activity Name": ["Housing Repair"], "Status": ["Open"]})
+    result = _classify(path, df)
+    assert result == "activities"
+
+
+@pytest.mark.unit
+def test_hud_drgr_classify_drawdown_by_name(tmp_path):
+    """Files with 'drawdown' in the name classify as drawdowns."""
+    path = tmp_path / "hud_drawdown_report.csv"
+    df = pd.DataFrame({"Amount": ["1000"], "Date": ["2023-01-01"]})
+    result = _classify(path, df)
+    assert result == "drawdowns"
+
+
+@pytest.mark.unit
+def test_hud_drgr_run_reads_manual_drop_dir_and_writes_staged_csvs(tmp_path):
+    """run() picks up CSVs from data/manual/hud_drgr/ and writes staged gate outputs."""
+    import importlib, sys
+    # Build a minimal project tree under tmp_path
+    manual_dir = tmp_path / "data" / "manual" / "hud_drgr"
+    manual_dir.mkdir(parents=True, exist_ok=True)
+    activities_csv = manual_dir / "hud_activities_pr.csv"
+    activities_csv.write_text(
+        "Activity ID,Grant Number,Project ID,Activity Name,Status,Responsible Organization,"
+        "Total Budget,Amount Drawn\n"
+        "A-001,B-17-DL-72-0001,PR-R3,Housing Repair,Open,PR Dept of Housing,1000000,250000\n"
+        "A-002,B-17-DL-72-0001,PR-R3,Reconstruction,Open,PR Dept of Housing,2000000,500000\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "data" / "normalized").mkdir(parents=True, exist_ok=True)
+
+    from unittest.mock import patch
+    import scripts.ingest_hud_drgr_exports as mod
+
+    with patch.object(mod, "PROJECT_ROOT", tmp_path), \
+         patch.object(mod, "RAW_DIRS", [manual_dir]), \
+         patch.object(mod, "PROCESSED_DIR", tmp_path / "data" / "staging" / "processed" / "hud_drgr"):
+        result = mod.run(root=tmp_path, force=True)
+
+    assert result["activity_rows"] == 2
+    staged_acts = tmp_path / "data" / "staging" / "processed" / "hud_drgr" / "hud_drgr_activities.csv"
+    staged_proj = tmp_path / "data" / "staging" / "processed" / "hud_drgr" / "hud_drgr_projects.csv"
+    assert staged_acts.exists(), "hud_drgr_activities.csv should be written to staging/processed/hud_drgr/"
+    assert staged_proj.exists(), "hud_drgr_projects.csv should be written to staging/processed/hud_drgr/"
+    acts_df = pd.read_csv(staged_acts)
+    assert len(acts_df) == 2
+    proj_df = pd.read_csv(staged_proj)
+    assert len(proj_df) >= 1

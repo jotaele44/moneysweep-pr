@@ -183,27 +183,54 @@ def test_manifest_gate_skips_unmaterialized_sources(tmp_path):
 
 
 @pytest.mark.unit
-def test_source_coverage_target_is_0_85(tmp_path):
-    """source_coverage_rate threshold must be 0.85 (excludes hud_drgr grantee-portal source)."""
-    assert vg.SOURCE_COVERAGE_TARGET == 0.85
+def test_source_coverage_target_is_0_93(tmp_path):
+    """source_coverage_rate threshold is 0.93 (raised after hud_drgr seed delivery; all 14 sources now reachable)."""
+    assert vg.SOURCE_COVERAGE_TARGET == 0.93
 
 
 @pytest.mark.unit
-def test_source_coverage_gate_passes_at_85_percent(tmp_path):
-    """12 of 14 required sources materialized (85.7 %) must pass the gate."""
+def test_source_coverage_gate_passes_at_93_percent(tmp_path):
+    """13 of 14 required sources materialized (92.9 %) must pass the 0.93 gate."""
     _build_tmp_repo(tmp_path)
     reg = json.loads((tmp_path / "registries" / "source_registry.json").read_text())
     required = [s for s in reg.get("sources", []) if s.get("required") and s.get("expected_outputs")]
-    # Plant real-looking output files for 12 of the required sources
-    for src in required[:12]:
+    # Plant real-looking output files for all 14 required sources
+    for src in required:
         fake = tmp_path / src["expected_outputs"][0]
         fake.parent.mkdir(parents=True, exist_ok=True)
         fake.write_text("col\nval\n", encoding="utf-8")
     result = vg.gate_source_coverage(tmp_path)
     cov_gate = next(r for r in result["records"] if r["gate"] == "source_coverage_rate")
-    assert cov_gate["observed"] >= 0.85
+    assert cov_gate["observed"] == 1.0
     assert cov_gate["passed"] is True, (
-        f"12/14 sources should pass threshold 0.85; observed {cov_gate['observed']}"
+        f"14/14 sources should pass threshold 0.93; observed {cov_gate['observed']}"
+    )
+
+
+@pytest.mark.unit
+def test_hud_drgr_gate_passes_with_seed_files(tmp_path):
+    """gate_source_coverage passes for hud_drgr_authorized when seed CSVs are present."""
+    _build_tmp_repo(tmp_path)
+    # Plant the hud_drgr seed CSVs in the subdirectory path declared in the registry
+    hud_dir = tmp_path / "data" / "staging" / "processed" / "hud_drgr"
+    hud_dir.mkdir(parents=True, exist_ok=True)
+    (hud_dir / "hud_drgr_activities.csv").write_text(
+        "activity_id,grant_number,project_id,activity_name,status\n"
+        "R3-001,B-17-DL-72-0001,PR-R3,R3 Housing,Open\n",
+        encoding="utf-8",
+    )
+    (hud_dir / "hud_drgr_projects.csv").write_text(
+        "project_id,grant_number,activity_count,status\n"
+        "PR-R3,B-17-DL-72-0001,1,Open\n",
+        encoding="utf-8",
+    )
+    result = vg.gate_source_coverage(tmp_path)
+    drgr_rec = next(
+        (r for r in result["records"] if r.get("source_id") == "hud_drgr_authorized"), None
+    )
+    assert drgr_rec is not None, "hud_drgr_authorized should appear in gate records"
+    assert drgr_rec["passed"] is True, (
+        f"hud_drgr_authorized should pass with seed CSVs; got {drgr_rec}"
     )
 
 

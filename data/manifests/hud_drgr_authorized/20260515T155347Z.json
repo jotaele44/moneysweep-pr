@@ -1,0 +1,16 @@
+{
+  "source_id": "hud_drgr_authorized",
+  "produced_at": "2026-05-15T15:53:47Z",
+  "status": "seed_public_record",
+  "row_count": 5,
+  "project_count": 4,
+  "outputs": [
+    "data/staging/processed/hud_drgr/hud_drgr_activities.csv",
+    "data/staging/processed/hud_drgr/hud_drgr_projects.csv"
+  ],
+  "grants": [
+    {"grant_number": "B-17-DL-72-0001", "program": "CDBG-DR Maria First Allocation", "grantee": "PR Department of Housing"},
+    {"grant_number": "B-18-DP-72-0001", "program": "CDBG-DR Maria Second Allocation", "grantee": "PR Department of Housing"}
+  ],
+  "notes": "Seeded from public HUD CDBG-DR Action Plans for Puerto Rico (post-Hurricane Maria). Replace with authorized portal export from drgr.hud.gov once operator credentials are available."
+}
