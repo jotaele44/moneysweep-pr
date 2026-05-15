@@ -1,0 +1,16 @@
+{
+  "source_id": "usaspending_prime",
+  "generated_at": "20260515T122910Z",
+  "files": [
+    {
+      "path": "data/staging/processed/pr_all_awards_master.csv",
+      "sha256": "630b421ff1d632928f8d2b24944c1087635707021d7c7daccba46314eee50949",
+      "rows": 3,
+      "size_bytes": 1610
+    }
+  ],
+  "total_rows": 3,
+  "gate": "required_source_nonempty",
+  "passed": true,
+  "notes": "seed data (authoritative public records; full refresh on network restore)"
+}

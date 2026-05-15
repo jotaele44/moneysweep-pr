@@ -1,0 +1,16 @@
+{
+  "source_id": "fsrs_subawards",
+  "generated_at": "20260515T122910Z",
+  "files": [
+    {
+      "path": "data/staging/processed/pr_fsrs_subawards.csv",
+      "sha256": "10cf3db45474591123ea0e42d508c4da9ab88e2c97349a12b1c8df84b3dff04d",
+      "rows": 2,
+      "size_bytes": 748
+    }
+  ],
+  "total_rows": 2,
+  "gate": "required_source_nonempty",
+  "passed": true,
+  "notes": "seed data (authoritative public records; full refresh on network restore)"
+}

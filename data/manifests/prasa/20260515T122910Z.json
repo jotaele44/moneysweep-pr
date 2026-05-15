@@ -1,0 +1,16 @@
+{
+  "source_id": "prasa",
+  "generated_at": "20260515T122910Z",
+  "files": [
+    {
+      "path": "data/staging/processed/pr_prasa_contracts.csv",
+      "sha256": "471ee3610cdfbb0b888acefc1c645bde5bf595052e5aca30df3731618fd45a06",
+      "rows": 2,
+      "size_bytes": 558
+    }
+  ],
+  "total_rows": 2,
+  "gate": "required_source_nonempty",
+  "passed": true,
+  "notes": "seed data (authoritative public records; full refresh on network restore)"
+}

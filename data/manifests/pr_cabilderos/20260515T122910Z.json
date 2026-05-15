@@ -1,0 +1,16 @@
+{
+  "source_id": "pr_cabilderos",
+  "generated_at": "20260515T122910Z",
+  "files": [
+    {
+      "path": "data/staging/processed/pr_cabilderos.csv",
+      "sha256": "1ae7eb00ca9f89afc493200ccb4738196edd01ed8357fe7cca4dca47322acc7c",
+      "rows": 2,
+      "size_bytes": 656
+    }
+  ],
+  "total_rows": 2,
+  "gate": "required_source_nonempty",
+  "passed": true,
+  "notes": "seed data (authoritative public records; full refresh on network restore)"
+}
