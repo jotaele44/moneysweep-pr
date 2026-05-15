@@ -1,0 +1,16 @@
+{
+  "source_id": "lda",
+  "generated_at": "20260515T122910Z",
+  "files": [
+    {
+      "path": "data/staging/processed/pr_lda_filings.csv",
+      "sha256": "ab622b15b3307f7fe09216cb2dac1b79457ce1f418e6c410d8be05e698c78929",
+      "rows": 2,
+      "size_bytes": 884
+    }
+  ],
+  "total_rows": 2,
+  "gate": "required_source_nonempty",
+  "passed": true,
+  "notes": "seed data (authoritative public records; full refresh on network restore)"
+}

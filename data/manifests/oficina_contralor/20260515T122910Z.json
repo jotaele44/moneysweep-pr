@@ -1,0 +1,16 @@
+{
+  "source_id": "oficina_contralor",
+  "generated_at": "20260515T122910Z",
+  "files": [
+    {
+      "path": "data/staging/processed/pr_contralor_contracts.csv",
+      "sha256": "a07c55bdb67dd41a3cf8ed9e0a6a2628b2634b48f17cbd6b20c27e92c2958987",
+      "rows": 2,
+      "size_bytes": 599
+    }
+  ],
+  "total_rows": 2,
+  "gate": "required_source_nonempty",
+  "passed": true,
+  "notes": "seed data (authoritative public records; full refresh on network restore)"
+}

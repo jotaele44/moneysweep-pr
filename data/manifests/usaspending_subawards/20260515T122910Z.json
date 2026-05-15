@@ -1,0 +1,16 @@
+{
+  "source_id": "usaspending_subawards",
+  "generated_at": "20260515T122910Z",
+  "files": [
+    {
+      "path": "data/staging/processed/pr_subawards_master.csv",
+      "sha256": "c6d7cbcadf119a9457f535514193f8d7946f3e232b62c2ce8ffb9714c33235ed",
+      "rows": 2,
+      "size_bytes": 816
+    }
+  ],
+  "total_rows": 2,
+  "gate": "required_source_nonempty",
+  "passed": true,
+  "notes": "seed data (authoritative public records; full refresh on network restore)"
+}

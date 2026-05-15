@@ -1,0 +1,16 @@
+{
+  "source_id": "fec",
+  "generated_at": "20260515T122910Z",
+  "files": [
+    {
+      "path": "data/staging/processed/pr_fec_contributions.csv",
+      "sha256": "05c95e5f2582af6419551fbaadb4fda0e47637b5a0669088afe0b453be3ada64",
+      "rows": 2,
+      "size_bytes": 641
+    }
+  ],
+  "total_rows": 2,
+  "gate": "required_source_nonempty",
+  "passed": true,
+  "notes": "seed data (authoritative public records; full refresh on network restore)"
+}
