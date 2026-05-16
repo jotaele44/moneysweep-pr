@@ -11,7 +11,7 @@ venv/
 
 # Data files (downloaded CSVs / normalized outputs — too large for git)
 data/staging/expansion/*.csv
-data/staging/processed/*.csv
+data/staging/processed/**
 data/staging/raw/**/*.csv
 data/raw/*.csv
 data/normalized/
@@ -24,6 +24,7 @@ data/staging/processed/enrichment/
 
 # Keep structure files
 !data/**/.gitkeep
+!data/staging/processed/.gitkeep
 !data/staging/expansion/DOWNLOAD_INSTRUCTIONS.md
 !data/staging/expansion/manifest.json
 data/raw/Grants/*.xml
