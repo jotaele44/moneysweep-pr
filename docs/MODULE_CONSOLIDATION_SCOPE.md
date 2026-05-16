@@ -46,10 +46,12 @@ These bind every PR in the sequence:
 
 Each entry below is a **scope spec** for a future PR. Order is risk-ascending; later PRs may not start until earlier ones merge and Architect re-approves.
 
-### PR-0 — Establish archive root + delete HigherGov manifest stub
-- **Action:** Create `archive/r4_legacy/.gitkeep`. Delete `scripts/highergov_manifest.py` (39 lines, 0 inbound imports, superseded by `source_registry`).
-- **Approval gate:** Architect confirmation that HigherGov manifest has zero references in `source_registry`, `run_all.py`, and CI workflows.
-- **Evidence required:** `rg "highergov_manifest" -n` output showing zero hits outside the file itself.
+### PR-0 — Establish archive root (setup-only)
+- **Action:** Create `archive/r4_legacy/.gitkeep` only. No source deletions in PR-0.
+- **Explicitly excluded:** `scripts/highergov_manifest.py` is **not** removed in PR-0 (see §6 P1 Review Adjustment).
+- **Approval gate:** Architect confirmation that the archive root layout is acceptable.
+- **Evidence required:** Diff shows only the new directory marker; `rg "archive/r4_legacy" -n` returns no live import references.
+- **Live source deletions:** Permitted in PR-0 only if a later evidence package proves 0 inbound runtime use. The HigherGov manifest does not meet this bar (see §6); any future deletion of a live module requires its own approval gate after a refactor PR removes its consumers.
 
 ### PR-1 — Archive dead `scripts/run_*.py` wrappers
 - **Scope:** Move the subset of the 29 `scripts/run_*.py` wrappers whose target pipeline module is itself already archive-eligible (per `docs/MODULE_REDUCTION_PLAN.md`) **and** which appear in zero CI workflow file under `.github/workflows/`.
@@ -68,8 +70,8 @@ Each entry below is a **scope spec** for a future PR. Order is risk-ascending; l
   - `scripts/scan_for_secrets.py`
   - `scripts/regenerate_registry_json.py`
   - `scripts/parse_highergov_pdfs.py`
-  - `scripts/fetch_highergov_api.py`
   - `data/raw/SAM/test_sam.py`
+- **Removed from candidate list (P1 finding):** `scripts/fetch_highergov_api.py` — live, invoked from `run_all.py` when `HIGHERGOV_API_KEY` is set (see §6).
 - **Constraint:** None of these may be referenced by `run_all.py` or any test in `tests/`. Confirm with `rg` before move.
 
 ### PR-3 — Archive `validation/cache_audit.py` + `pipeline/credential_unblock_plan.py`
@@ -102,11 +104,45 @@ The 12 merge groups in `docs/MODULE_REDUCTION_PLAN.md` (e.g., `source_mappers.py
 ## 5. Next command
 
 ```
-# After Architect accepts this scope plan, open PR-0:
-git checkout -b claude/archive-root-and-highergov-manifest-delete
+# After Architect re-confirms this scope plan (post P1 patch), open PR-0:
+git checkout -b claude/archive-root-setup
 mkdir -p archive/r4_legacy && touch archive/r4_legacy/.gitkeep
-rg -n "highergov_manifest" > /tmp/highergov_refs.txt
-# Attach /tmp/highergov_refs.txt to PR body as import check evidence.
+# PR-0 is setup-only: no source deletions, no HigherGov changes.
 ```
 
 No file movement performed by this PR.
+
+---
+
+## 6. P1 Review Adjustment (Codex review of PR #73)
+
+Codex P1 review surfaced live runtime references that invalidate the
+original PR-0 deletion target and one PR-2 archive candidate. Both
+modules remain **live** and are removed from any archive/deletion scope
+in this plan until a separate refactor PR detaches their consumers.
+
+| Module | Status | Live consumer (P1 evidence) | Required precondition before any archive/delete PR |
+|--------|--------|-----------------------------|----------------------------------------------------|
+| `scripts/highergov_manifest.py` | **Keep — live** | `scripts/normalize_expansion_inputs.py` imports `HIGHERGOV_MANIFEST` | Refactor PR moves `HIGHERGOV_MANIFEST` to canonical `source_registry` and switches the consumer; only then may a deletion PR open |
+| `scripts/fetch_highergov_api.py` | **Keep — live** | `run_all.py` imports/runs it when `HIGHERGOV_API_KEY` is set | Refactor PR consolidates HigherGov fetch into the active downloader path; only then may an archive PR open |
+
+**Net effect on this scope plan:**
+- PR-0 is reduced to archive-root setup (see §3 PR-0).
+- PR-2 candidate list no longer includes `scripts/fetch_highergov_api.py`.
+- A new **refactor PR series** (out of scope for this plan) is required before either HigherGov module can be archived or deleted.
+
+---
+
+## 7. Validation requirement for every future archive candidate
+
+Each candidate module (regardless of PR number) must pass **all four**
+checks below before being added to a PR body. Failure of any check
+returns the module to KEEP and blocks the PR.
+
+1. **`rg` / import check** — `rg -n "<module_stem>" --type py` returns zero hits outside the file itself and its tests.
+2. **`run_all.py` reference check** — `rg -n "<module_stem>" run_all.py` returns zero hits; conditional/env-gated invocations (e.g. `if HIGHERGOV_API_KEY`) count as live references.
+3. **`pytest`** — `python3 -m pytest tests/ -q` passes before and after the move with no new failures or skips.
+4. **Source-coverage regression check** — The 14-source active registry remains fully ingestable end-to-end; PR body explicitly enumerates which of the 14 sources, if any, the candidate touches and confirms each remains reachable through the canonical entry point.
+
+The PR body must include the raw output (or trimmed evidence block) for
+all four checks per candidate.
