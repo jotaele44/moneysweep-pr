@@ -74,6 +74,29 @@ See `docs/OPERATOR_NEXT_ACTIONS_AFTER_R4_9Z.md` for the unfreeze sequence.
 
 ---
 
+## Org Transfer Evaluation
+
+| Gate | Status | Notes |
+|------|--------|-------|
+| Tests reproducible | ✅ GREEN | 594 passed · 4 skipped · 0 failed (offline, no API keys) |
+| Secrets clean | ✅ CLEAN | 0 findings across 560 files; `.env` gitignored |
+| Setup documented | ✅ DONE | `SETUP.md` covers clone → install → test |
+| `.env.example` present | ✅ DONE | 6 keys documented; none committed |
+| `.gitignore` coverage | ✅ FIXED | `data/staging/processed/**` now covers subdirs + JSON/graphml |
+| Handoff files complete | ✅ DONE | All Issue #70 files generated and committed |
+| Edu-account clone test | ⬜ PENDING | External action — incoming operator must confirm |
+| Module consolidation | ⬜ PENDING | Awaiting Architect approval (Issue #69) |
+| Production source delivery | ⬜ BLOCKED | 21 inputs missing; does not block transfer itself |
+
+**Verdict:** Transfer is technically safe once the Edu-account clone gate passes. Production source blockers are a pipeline concern, not a transfer blocker.
+
+**Preferred governance sequence:**
+1. jotaele44 → legacy owner / backup admin
+2. Edu account → active operator (after clone validation)
+3. GitHub Organization (TBD) → future final owner
+
+---
+
 ## What NOT To Do Right Now
 
 - Do not run download retries.
