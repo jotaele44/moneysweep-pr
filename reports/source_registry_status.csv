@@ -1,0 +1,83 @@
+source_id,family,required,authentication,producer_script,expected_outputs,update_cadence,pipeline_status,blocker_notes
+usaspending_prime,federal,True,none,scripts/build_unified_master.py,data/staging/processed/pr_contracts_master.csv;data/staging/processed/pr_all_awards_master.csv,weekly,fully_materialized,"USAspending API + bulk archive. No key required. Top recipients are PR government agencies (PRDOH, ADSEF, PRDE, PRHA) — "
+usaspending_subawards,federal,True,none,scripts/download_subawards.py,data/staging/processed/pr_subawards_master.csv;data/staging/processed/execution/execution_chain_master.csv,weekly,fully_materialized,
+fpds_report_builder,federal,False,none,scripts/download_grants.py,data/staging/processed/pr_fpds_report_builder.csv,quarterly,not_materialized,FPDS Report Builder FY2018-2024 ingestion. Supplements USAspending.
+fsrs_subawards,federal,True,none,scripts/download_fsrs.py,data/staging/processed/pr_fsrs_subawards.csv,weekly,not_materialized,FSRS prime-to-sub reporting. Joins with USAspending subaward stream.
+sam_entities,entity_resolution,True,api_key:SAM_API_KEY,scripts/sam_enrichment.py,data/staging/processed/enrichment/vendor_uei_index.csv;data/staging/processed/entities_resolved.csv,monthly,fully_materialized,SAM full extract + per-UEI enrichment for parent resolution. Supplemented by scripts/usaspending_parent_uei_extract.py (
+highergov_supplemental,federal,False,api_key:HGOV_API_KEY,scripts/fetch_highergov_api.py,data/raw/HigherGov/;data/staging/processed/pr_highergov_supplement.csv,weekly,partially_materialized,Supplementary federal contract intel via HigherGov. PDFs require parse_highergov_pdfs.
+fema_pa_openfema_v2,federal,True,none,scripts/download_openfema_pa_projects.py,data/staging/processed/pr_fema_pa_master.csv,monthly,fully_materialized,Preferred FEMA PA route. OpenFEMA v2 PA projects API.
+fema_hmgp,federal,False,none,scripts/download_fema.py,data/staging/processed/pr_fema_hmgp.csv,monthly,not_materialized,
+cor3,territorial,True,none,scripts/download_cor3.py,data/staging/processed/pr_cor3_master.csv,quarterly,not_materialized,"PR Central Office for Recovery, Reconstruction and Resiliency project tracker."
+hud_cdbg_dr_public,federal,True,none,scripts/download_cdbg_dr.py,data/staging/processed/pr_cdbg_dr_master.csv,quarterly,fully_materialized,
+hud_drgr_authorized,manual_export,True,manual_export,scripts/ingest_hud_drgr_exports.py,data/staging/processed/hud_drgr_activities.csv;data/staging/processed/hud_drgr_projects.csv,monthly,not_materialized,Credentialed DRGR portal — operator must export and drop manifests in manual_drop_dir.
+hud_hcv_section8,federal,False,none,scripts/download_hud_hcv.py,data/staging/processed/pr_hud_hcv.csv,yearly,not_materialized,
+prasa,infrastructure,True,none,scripts/ingest_prasa.py,data/staging/processed/pr_prasa_contracts.csv;data/staging/processed/prasa_contracts_master.csv,yearly,not_materialized,PRASA aqueduct/sewer authority. Includes Consulting Engineer Report FY2024 baseline.
+prepa_luma_genera,infrastructure,False,none,scripts/download_prepa_contracts.py,data/staging/processed/pr_prepa_contracts.csv,quarterly,not_materialized,PREPA / LUMA Energy / Genera PR contracts and operating data.
+act_transition_contracts,manual_export,False,manual_export,scripts/ingest_active_contractors.py,data/staging/processed/pr_act_transition_contracts.csv,ad_hoc,not_materialized,"PR ACT transition contract files (Autopistas, Ferrovial, LPC&D, etc.). Manual export."
+acuden_2024_transition,manual_export,False,manual_export,scripts/ingest_active_contractors.py,data/staging/processed/pr_acuden_transition.csv,ad_hoc,not_materialized,ACUDEN 2024 transition contract file. Transfer-of-funds contracts to municipalities/daycare/nonprofits.
+dcaa_active_contractors,manual_export,False,manual_export,scripts/download_active_contractors.py,data/staging/processed/pr_dcaa_active_contractors.csv,ad_hoc,not_materialized,DCAA FY2007/FY2012/FY2013 active contractor listings. Alias/crosswalk source.
+oficina_contralor,territorial,True,none,scripts/ingest_contralor.py,data/staging/processed/pr_contralor_contracts.csv,monthly,not_materialized,PR Comptroller contract registry. Authoritative for territorial contracts.
+compras_pr,territorial,False,none,scripts/download_compras.py,data/staging/processed/pr_compras_rfps.csv,weekly,not_materialized,comprashpr.com RFP / award scrape.
+aafaf,territorial,False,none,scripts/download_aafaf.py,data/staging/processed/pr_aafaf_budget.csv,monthly,not_materialized,PR Fiscal Agency & Financial Advisory Authority. Budget execution.
+hacienda,territorial,False,none,scripts/download_hacienda.py,data/staging/processed/pr_hacienda_tax_revenue.csv,monthly,not_materialized,
+cofina,territorial,False,none,scripts/download_cofina.py,data/staging/processed/pr_cofina_sut.csv,quarterly,not_materialized,
+promesa_creditors,territorial,False,none,scripts/download_promesa_creditors.py,data/staging/processed/pr_promesa_creditors.csv,ad_hoc,not_materialized,
+pr_act_60_decrees,territorial,False,none,scripts/download_act60.py,data/staging/processed/pr_act60_decrees.csv,yearly,not_materialized,
+p3_authority,territorial,False,none,scripts/download_p3.py,data/staging/processed/pr_p3_contracts.csv,quarterly,not_materialized,
+pr_pensions,territorial,False,none,scripts/download_pr_pensions.py,data/staging/processed/pr_pensions_ers_trs_jrs.csv,yearly,not_materialized,
+rum_cover_over,territorial,False,none,scripts/download_rum_coverover.py,data/staging/processed/pr_rum_coverover.csv,yearly,not_materialized,
+municipal_finance,municipal,False,none,scripts/download_municipal.py,data/staging/processed/pr_municipal_finance.csv,yearly,not_materialized,
+eqb_epa_icis,territorial,False,none,scripts/download_eqb.py,data/staging/processed/pr_eqb_permits.csv,monthly,not_materialized,PR Environmental Quality Board + EPA ICIS environmental permits.
+emma_bonds,bonds,True,none,scripts/download_emma.py,data/staging/processed/pr_emma_bonds.csv;data/staging/processed/bond_asset_map.csv,weekly,not_materialized,
+msrb_rtrs_trades,bonds,False,none,scripts/download_msrb_trades.py,data/staging/processed/pr_msrb_rtrs_trades.csv,monthly,not_materialized,
+lda,lobbying,True,api_key:LDA_API_KEY,scripts/download_lda.py,data/staging/processed/pr_lda_filings.csv,monthly,fully_materialized,
+pr_cabilderos,lobbying,True,none,scripts/ingest_cabilderos.py,data/staging/processed/pr_cabilderos.csv,quarterly,not_materialized,
+fec,political_finance,True,api_key:FEC_API_KEY,scripts/download_fec.py,data/staging/processed/pr_fec_contributions.csv,monthly,fully_materialized,pr_fec_crossref.csv is generated by analyze_fec_crossref.py after the unified awards master is entity-resolved (PR3 depe
+donaciones_pr,political_finance,False,none,scripts/ingest_fec.py,data/staging/processed/pr_donaciones.csv,ad_hoc,not_materialized,PR State Election Commission donations. Cross-references federal FEC.
+follow_the_money,political_finance,False,none,scripts/ingest_follow_the_money.py,data/staging/processed/pr_follow_the_money.csv,yearly,not_materialized,State-level campaign finance for PR + DC connections.
+sba_loans,federal,False,none,scripts/download_sba.py,data/staging/processed/pr_sba_loans.csv,quarterly,not_materialized,
+sba_ppp,federal,False,none,scripts/download_sba.py,data/staging/processed/pr_sba_ppp.csv,yearly,not_materialized,
+slfrf,federal,False,none,scripts/download_slfrf.py,data/staging/processed/pr_slfrf_master.csv,quarterly,fully_materialized,
+sbir,federal,False,none,scripts/download_sbir.py,data/staging/processed/pr_sbir.csv,monthly,not_materialized,
+nih_reporter,federal,False,none,scripts/download_nih.py,data/staging/processed/pr_nih_grants.csv,monthly,not_materialized,
+usace_civil_works,federal,False,none,scripts/download_usace_civil.py,data/staging/processed/pr_usace_civil.csv,quarterly,not_materialized,
+usace_permits,federal,False,none,scripts/download_usace_permits.py,data/staging/processed/pr_usace_permits.csv,quarterly,not_materialized,
+epa_grants,federal,False,none,scripts/download_epa.py,data/staging/processed/pr_epa_grants.csv,quarterly,not_materialized,
+dot_grants,federal,False,none,scripts/download_dot.py,data/staging/processed/pr_dot_grants.csv,quarterly,not_materialized,
+usda_grants,federal,False,none,scripts/download_usda.py,data/staging/processed/pr_usda.csv,quarterly,not_materialized,
+doe_grants,federal,False,none,scripts/download_doe.py,data/staging/processed/pr_doe.csv,quarterly,not_materialized,
+doj_grants,federal,False,none,scripts/download_doj_grants.py,data/staging/processed/pr_doj_grants.csv,quarterly,not_materialized,
+ed_grants,federal,False,none,scripts/download_ed.py,data/staging/processed/pr_ed_grants.csv,quarterly,not_materialized,
+hhs_grants,federal,False,none,scripts/download_hhs.py,data/staging/processed/pr_hhs_grants.csv,quarterly,not_materialized,
+oia_grants,federal,False,none,scripts/download_oia.py,data/staging/processed/pr_oia_grants.csv,yearly,not_materialized,
+haf,federal,False,none,scripts/download_haf.py,data/staging/processed/pr_haf.csv,quarterly,not_materialized,
+exim_bank,federal,False,none,scripts/download_exim.py,data/staging/processed/pr_exim.csv,yearly,not_materialized,
+congressional_earmarks,federal,False,none,scripts/download_earmarks.py,data/staging/processed/pr_earmarks.csv,yearly,partially_materialized,
+ofac_sdn,entity_resolution,False,none,scripts/download_ofac.py,data/staging/processed/ofac_sdn.csv,weekly,not_materialized,
+opencorporates,entity_resolution,False,api_key:OPENCORPORATES_API_TOKEN,scripts/download_opencorporates.py,data/staging/processed/pr_opencorporates.csv,ad_hoc,not_materialized,
+pr_corporate_registry,manual_export,False,manual_export,scripts/ingest_active_contractors.py,data/staging/processed/pr_corporate_registry.csv,ad_hoc,not_materialized,
+medicaid_fmap,federal,False,none,scripts/download_medicaid_fmap.py,data/staging/processed/pr_medicaid_fmap.csv,yearly,not_materialized,
+ssa,federal,False,none,scripts/download_ssa.py,data/staging/processed/pr_ssa.csv,yearly,not_materialized,
+medicare_parts,federal,False,none,scripts/download_medicare_parts.py,data/staging/processed/pr_medicare_parts.csv,yearly,not_materialized,
+medicare_advantage,federal,False,none,scripts/download_medicare_advantage.py,data/staging/processed/pr_medicare_advantage.csv,yearly,not_materialized,
+chip,federal,False,none,scripts/download_chip.py,data/staging/processed/pr_chip.csv,yearly,not_materialized,
+cms_open_payments,federal,False,none,scripts/download_cms.py,data/staging/processed/pr_cms_open_payments.csv,yearly,not_materialized,
+wic,federal,False,none,scripts/download_wic.py,data/staging/processed/pr_wic.csv,yearly,not_materialized,
+wioa,federal,False,none,scripts/download_wioa.py,data/staging/processed/pr_wioa.csv,yearly,not_materialized,
+snap_nap,federal,False,none,scripts/download_snap_nap.py,data/staging/processed/pr_snap_nap.csv,yearly,not_materialized,
+va_benefits,federal,False,none,scripts/download_va.py,data/staging/processed/pr_va.csv,yearly,not_materialized,
+fdic,federal,False,none,scripts/download_fdic.py,data/staging/processed/pr_fdic.csv,quarterly,not_materialized,
+ncua,federal,False,none,scripts/download_ncua.py,data/staging/processed/pr_ncua.csv,quarterly,not_materialized,
+fhlb,federal,False,none,scripts/download_fhlb.py,data/staging/processed/pr_fhlb.csv,quarterly,not_materialized,
+sec_edgar,federal,False,none,scripts/download_sec.py,data/staging/processed/pr_sec_edgar.csv,monthly,not_materialized,
+sec_13f_nport,federal,False,none,scripts/download_sec_holdings.py,data/staging/processed/pr_sec_holdings.csv,quarterly,not_materialized,
+fcc_usf,federal,False,none,scripts/download_fcc.py,data/staging/processed/pr_fcc_usf.csv,yearly,not_materialized,
+nfip_claims,federal,False,none,scripts/download_nfip.py,data/staging/processed/pr_nfip_claims.csv,monthly,not_materialized,
+lihtc,federal,False,none,scripts/download_lihtc.py,data/staging/processed/pr_lihtc.csv,yearly,not_materialized,
+nmtc,federal,False,none,scripts/download_nmtc.py,data/staging/processed/pr_nmtc.csv,yearly,not_materialized,
+nonprofits_irs990,federal,False,none,scripts/download_nonprofits.py,data/staging/processed/pr_nonprofits_990.csv,yearly,not_materialized,
+gao_ig_audits,federal,False,none,scripts/download_gao_ig.py,data/staging/processed/pr_gao_ig_audits.csv,monthly,not_materialized,
+dol_whd_osha,federal,False,none,scripts/download_dol.py,data/staging/processed/pr_dol_whd.csv,monthly,not_materialized,
+sf133_budget_execution,federal,False,none,scripts/download_sf133.py,data/staging/processed/pr_sf133.csv,quarterly,not_materialized,
+research_grants,federal,False,none,scripts/download_research.py,data/staging/processed/pr_research_grants.csv,weekly,not_materialized,
+grants_gov,federal,False,none,scripts/download_grants.py,data/staging/processed/pr_grants.csv,weekly,not_materialized,
