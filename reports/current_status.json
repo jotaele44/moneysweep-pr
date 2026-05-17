@@ -1,8 +1,81 @@
 {
-  "active_vector": "ORG_TRANSFER_READY",
-  "active_branch": "main",
+  "active_vector": "FINANCIAL_SOURCE_MATERIALIZATION_AUDIT_PHASE_1",
+  "active_branch": "claude/issue-69-review-GpdMH",
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_active": true,
+  "previous_vector": "ORG_TRANSFER_READY",
+  "audit_phase_1": {
+    "scope": "Static cross-reference of source_registry_status.csv against scripts/ tree, run_all.py imports, and data/staging/processed/ disk contents. No module execution. No master rebuild.",
+    "ran_at": "2026-05-17",
+    "deliverables": [
+      "reports/source_audit_matrix.csv (82 source_ids × 14 columns)",
+      "scripts/build_source_audit_matrix.py (re-runnable generator)"
+    ],
+    "totals": {
+      "sources_audited": 82,
+      "declared_green_verified_full": 0,
+      "declared_green_partial_on_disk": 1,
+      "declared_green_no_output_on_disk": 5,
+      "declared_green_unwired_no_output": 2,
+      "declared_partial_verified": 1,
+      "declared_partial_no_output_on_disk": 1,
+      "ready_not_materialized": 60,
+      "blocked_not_wired": 6,
+      "blocked_manual_export": 5,
+      "blocked_needs_api_key": 1
+    },
+    "critical_anomalies": [
+      {
+        "class": "DECLARED_GREEN_UNWIRED_NO_OUTPUT",
+        "severity": "HIGH",
+        "count": 2,
+        "source_ids": ["hud_cdbg_dr_public", "slfrf"],
+        "description": "Source registry marks these as fully_materialized, but their producer scripts (scripts/download_cdbg_dr.py, scripts/download_slfrf.py) are NOT imported by run_all.py and no declared outputs exist on disk in this clone. The materialization claim is unverifiable from the automated pipeline.",
+        "remediation": "Either wire the producers into run_all.py and execute, or downgrade the registry status to not_materialized and document the actual provenance (e.g., one-off operator run)."
+      },
+      {
+        "class": "DECLARED_GREEN_NO_OUTPUT_ON_DISK",
+        "severity": "MEDIUM",
+        "count": 5,
+        "source_ids": ["usaspending_prime", "sam_entities", "fema_pa_openfema_v2", "lda", "fec"],
+        "description": "Registry marks these fully_materialized and the producers ARE wired into run_all.py, but no declared output files exist in data/staging/processed/ in this clone. Consistent with a code-only repo (data .gitignored or generated elsewhere), but means the claim cannot be verified locally.",
+        "remediation": "Confirm whether materialization happens out-of-band (CI, separate data volume). If so, document the provenance in source_registry_status.csv blocker_notes. If not, the claim should be downgraded."
+      },
+      {
+        "class": "DECLARED_GREEN_PARTIAL_ON_DISK",
+        "severity": "MEDIUM",
+        "count": 1,
+        "source_ids": ["usaspending_subawards"],
+        "description": "Declared 2 outputs (pr_subawards_master.csv + execution/execution_chain_master.csv); only execution_chain_master.csv is on disk. Primary subaward master is missing.",
+        "remediation": "Re-run scripts/download_subawards.py to regenerate the primary output, or split the source_id so that subaward materialization and execution-chain derivation are tracked independently."
+      },
+      {
+        "class": "BLOCKED_NOT_WIRED",
+        "severity": "MEDIUM",
+        "count": 6,
+        "source_ids": ["sba_loans", "sba_ppp", "sbir", "dot_grants", "usda_grants", "doe_grants"],
+        "description": "Producer scripts exist on disk but are NOT imported into run_all.py. These sources will never materialize through the automated pipeline.",
+        "remediation": "Decide per source: wire into run_all.py if intended, or drop from source_registry_status.csv if abandoned."
+      }
+    ],
+    "filesystem_observation": {
+      "data_staging_processed_csv_files_present": 5,
+      "files": [
+        "data/staging/processed/execution/execution_chain_master.csv",
+        "data/staging/processed/graph/entity_edges.csv",
+        "data/staging/processed/graph/top_nodes.csv",
+        "data/staging/processed/partial/contracts_master_partial_diagnostic_r4_9g.csv",
+        "data/staging/processed/partial/entities_partial_diagnostic_r4_9g.csv"
+      ],
+      "interpretation": "This clone contains code only; the canonical pr_*_master.csv outputs declared across 82 registry entries are absent. Any 'master row count' reported elsewhere (e.g., the 4,503-row pr_all_awards_master figure flagged earlier) cannot be verified from this working tree."
+    },
+    "phase_2_prerequisites": [
+      "Architect decision on the 4 critical anomaly classes above",
+      "Network/credential plan: which API keys are available for executing the 1 BLOCKED_NEEDS_API_KEY source (opencorporates) and the 4 green-but-keyed sources (sam_entities, highergov_supplemental, lda, fec) for verification",
+      "Manual-export delivery plan for the 5 BLOCKED_MANUAL_EXPORT sources",
+      "Explicit go/no-go on running the 60 READY_NOT_MATERIALIZED downloaders (most are public-no-key, but cumulative network/time cost is non-trivial)"
+    ]
+  },
   "completed": [
     "R5 gate-closure chain (PR1–PR64) — all validation gates pass",
     "EMMA municipal bonds corpus + Python 3.9 annotation sweep (#68)",
@@ -18,15 +91,18 @@
     "Issues #69 and #70 commented with Builder completion status",
     "PR #71 merged to main — all handoff deliverables on main branch",
     "Edu-account clone validation passed: 594 passed, 4 skipped (66.79s)",
-    "Org transfer: all gates clear — ORG_TRANSFER_READY"
+    "Org transfer: all gates clear — ORG_TRANSFER_READY",
+    "FINANCIAL_SOURCE_MATERIALIZATION_AUDIT Phase 1 — reports/source_audit_matrix.csv + scripts/build_source_audit_matrix.py"
   ],
   "in_progress": [
-    "Issue #69 — Awaiting Architect approval before any module consolidation moves"
+    "Issue #69 — Awaiting Architect approval before any module consolidation moves",
+    "FINANCIAL_SOURCE_MATERIALIZATION_AUDIT — Phase 1 complete, Phase 2 (execution) awaiting decisions on 4 critical anomalies + network/credential plan"
   ],
   "blocked": [
-    "Production master rebuild: 21 source inputs missing (14 manual_file_required, 7 physical_validated_file_missing)",
+    "Production master rebuild: 21 source inputs missing (14 manual_file_required, 7 physical_validated_file_missing); reconfirmed by audit Phase 1",
     "Phase 7/8 pipeline: blocked until unfreeze candidates > 0",
-    "Module consolidation execution: blocked pending Architect approval (Issue #69 gate)"
+    "Module consolidation execution: blocked pending Architect approval (Issue #69 gate)",
+    "2 DECLARED_GREEN_UNWIRED_NO_OUTPUT sources (hud_cdbg_dr_public, slfrf) require Architect decision before audit Phase 2"
   ],
   "last_tests": {
     "command": "python3 -m pytest tests/ -q",
@@ -90,6 +166,6 @@
       "future_owner": "GitHub Organization (TBD)"
     }
   },
-  "next_command": "AWAIT_OPERATOR_CONFIRMATION_FOR_NEXT_VECTOR",
+  "next_command": "AWAIT_ARCHITECT_DECISION_ON_AUDIT_PHASE_1_ANOMALIES",
   "next_safe_consolidation_pr": "Merge source mappers (cms_mapper + fdic_mapper + emma_mapper + highergov_mapper → scripts/source_mappers.py) — lowest risk, all four have tests"
 }
