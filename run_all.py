@@ -1513,8 +1513,8 @@ def main() -> int:
     else:
         logger.info("[Step 19/29] Running FEC and lobbying cross-reference analyses...")
         for label, mod, fn in [
-            ("FEC crossref",      "analyze_fec_crossref",      "build_crossref"),
-            ("Lobbying crossref", "analyze_lobbying_crossref", "build_crossref"),
+            ("FEC crossref",      "analyze_political_crossref", "build_fec_crossref"),
+            ("Lobbying crossref", "analyze_political_crossref", "build_lobbying_crossref"),
         ]:
             try:
                 import importlib

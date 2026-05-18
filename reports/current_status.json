@@ -1,6 +1,6 @@
 {
-  "active_vector": "ORG_TRANSFER_READY",
-  "active_branch": "main",
+  "active_vector": "PR_C_POLITICAL_CROSSREF_CLEAN",
+  "active_branch": "claude/pr-c-political-crossref-clean",
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_active": true,
   "completed": [
@@ -18,7 +18,8 @@
     "Issues #69 and #70 commented with Builder completion status",
     "PR #71 merged to main — all handoff deliverables on main branch",
     "Edu-account clone validation passed: 594 passed, 4 skipped (66.79s)",
-    "Org transfer: all gates clear — ORG_TRANSFER_READY"
+    "Org transfer: all gates clear — ORG_TRANSFER_READY",
+    "PR-C: merge analyze_fec_crossref + analyze_lobbying_crossref → analyze_political_crossref (clean branch from main)"
   ],
   "in_progress": [
     "Issue #69 — Awaiting Architect approval before any module consolidation moves"
@@ -90,6 +91,6 @@
       "future_owner": "GitHub Organization (TBD)"
     }
   },
-  "next_command": "AWAIT_OPERATOR_CONFIRMATION_FOR_NEXT_VECTOR",
+  "next_command": "OPEN_PR_C_CLEAN_TO_MAIN",
   "next_safe_consolidation_pr": "Merge source mappers (cms_mapper + fdic_mapper + emma_mapper + highergov_mapper → scripts/source_mappers.py) — lowest risk, all four have tests"
 }
