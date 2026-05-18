@@ -1,6 +1,6 @@
 {
-  "active_vector": "NATIVE_EXECUTION_MODE",
-  "active_branch": "main",
+  "active_vector": "PR_E_RUN_WRAPPER_ARCHIVE",
+  "active_branch": "claude/pr-e-run-wrapper-archive",
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_active": true,
   "completed": [
@@ -21,10 +21,11 @@
     "Org transfer gates cleared before handoff mode retirement",
     "PR-C political crossref merge (#75) — merged to main 2026-05-18",
     "PR-D archive expansion download scripts (#76) — merged to main; archive excludes pytest via norecursedirs",
-    "Handoff mode retired as active operating mode; artifacts preserved as historical audit records"
+    "Handoff mode retired as active operating mode; artifacts preserved as historical audit records",
+    "G1 approved PR-E scope via Issue #69 comment 4477327241"
   ],
   "in_progress": [
-    "G1 — run-wrapper archive candidate proof pending before PR-1",
+    "PR-E archive 26 run-wrapper/dev-tool candidates",
     "Source intake taxonomy for uploaded PR contract, lobbying, PRASA, and contractor-reference datasets pending",
     "PR2.5/PR2.6 entity-gate branch reconciliation pending before PR3 deduplication"
   ],
@@ -109,5 +110,5 @@
     "Federal LDA registrants",
     "DCAA active contractor listings"
   ],
-  "next_command": "EXECUTE_NEXT_VECTOR: SELECT_NEXT_NATIVE_EXECUTION_VECTOR → CHOOSE_ONE: G1_RUN_WRAPPER_CANDIDATE_PROOF OR SOURCE_INTAKE_TAXONOMY OR PR2_5_PR2_6_RECONCILIATION"
+  "next_command": "OPEN_PR_E_RUN_WRAPPER_ARCHIVE"
 }
