@@ -1,6 +1,6 @@
 {
-  "active_vector": "PR_D_ARCHIVE_EXPANSION_DOWNLOADS",
-  "active_branch": "claude/pr-d-archive-expansion-downloads",
+  "active_vector": "NATIVE_EXECUTION_MODE",
+  "active_branch": "main",
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_active": true,
   "completed": [
@@ -18,18 +18,21 @@
     "Issues #69 and #70 commented with Builder completion status",
     "PR #71 merged to main — all handoff deliverables on main branch",
     "Edu-account clone validation passed: 594 passed, 4 skipped (66.79s)",
-    "Org transfer: all gates clear — ORG_TRANSFER_READY",
-    "PR-C: merge analyze_fec_crossref + analyze_lobbying_crossref → analyze_political_crossref (clean branch from main)",
-    "PR-C political crossref merge (#75) — merged to main 2026-05-18"
+    "Org transfer gates cleared before handoff mode retirement",
+    "PR-C political crossref merge (#75) — merged to main 2026-05-18",
+    "PR-D archive expansion download scripts (#76) — merged to main; archive excludes pytest via norecursedirs",
+    "Handoff mode retired as active operating mode; artifacts preserved as historical audit records"
   ],
   "in_progress": [
-    "Issue #69 — Awaiting Architect approval before any module consolidation moves",
-    "PR-D archive expansion download scripts"
+    "G1 — run-wrapper archive candidate proof pending before PR-1",
+    "Source intake taxonomy for uploaded PR contract, lobbying, PRASA, and contractor-reference datasets pending",
+    "PR2.5/PR2.6 entity-gate branch reconciliation pending before PR3 deduplication"
   ],
   "blocked": [
-    "Production master rebuild: 21 source inputs missing (14 manual_file_required, 7 physical_validated_file_missing)",
-    "Phase 7/8 pipeline: blocked until unfreeze candidates > 0",
-    "Module consolidation execution: blocked pending Architect approval (Issue #69 gate)"
+    "Production master rebuild: source inputs still require validated delivery before promotion",
+    "Archive PR-1: blocked until G1 candidate list and import-graph proof are approved",
+    "PR3 deduplication/entity integration: blocked until PR2.5/PR2.6 branch is reconciled against latest main",
+    "HigherGov archive/deletion: blocked until consumer refactor removes live references"
   ],
   "last_tests": {
     "command": "python -m pytest -q --tb=no",
@@ -71,29 +74,40 @@
     "root_duplicates_removed": true,
     "gitignore_subdir_coverage_fixed": true
   },
-  "org_transfer_evaluation": {
-    "status": "READY",
-    "technical_gates": {
-      "tests_pass": true,
-      "secrets_clean": true,
-      "setup_documented": true,
-      "gitignore_correct": true,
-      "env_example_present": true,
-      "edu_clone_validated": true
-    },
-    "remaining_gate": null,
-    "edu_clone_evidence": {
-      "result": "594 passed, 4 skipped",
-      "duration_s": 66.79,
-      "confirmed_at": "2026-05-16"
-    },
-    "conclusion": "All gates passed including Edu-account independent clone validation. Transfer can proceed immediately.",
-    "preferred_governance": {
-      "legacy_owner": "jotaele44 (backup admin)",
-      "active_operator": "Edu-enabled GitHub account",
-      "future_owner": "GitHub Organization (TBD)"
-    }
+  "handoff_mode": {
+    "status": "RETIRED",
+    "reason": "Operator elected to continue native repo execution instead of org-transfer handoff.",
+    "preserve_handoff_artifacts": true,
+    "historical_artifacts": [
+      "HANDOFF.md",
+      "STATUS.md",
+      "SETUP.md"
+    ],
+    "retired_at": "2026-05-18"
   },
-  "next_command": "OPEN_PR_D_ARCHIVE_EXPANSION_DOWNLOADS",
-  "next_safe_consolidation_pr": "Merge source mappers (cms_mapper + fdic_mapper + emma_mapper + highergov_mapper → scripts/source_mappers.py) — lowest risk, all four have tests"
+  "module_reduction_state": {
+    "scope_plan": "docs/MODULE_CONSOLIDATION_SCOPE.md",
+    "pr0_archive_root_setup": "merged",
+    "pr_d_expansion_download_archive": "merged",
+    "archive_root": "archive/r4_legacy/",
+    "highergov_boundary": "protected; no deletion or archive authorized until consumer refactor",
+    "next_gate": "G1_RUN_WRAPPER_CANDIDATE_PROOF"
+  },
+  "native_execution_controls": {
+    "delta_only_reporting": true,
+    "no_broad_audits_without_approval": true,
+    "fresh_main_branches_required": true,
+    "status_files_are_source_of_truth": true,
+    "handoff_artifacts_historical_only": true
+  },
+  "source_intake_backlog": [
+    "2020 ACT transition contracts",
+    "2024 transition contracts",
+    "PRASA completed projects",
+    "PRASA FY2024 Consulting Engineer's Report",
+    "Puerto Rico lobbyist registry",
+    "Federal LDA registrants",
+    "DCAA active contractor listings"
+  ],
+  "next_command": "EXECUTE_NEXT_VECTOR: SELECT_NEXT_NATIVE_EXECUTION_VECTOR → CHOOSE_ONE: G1_RUN_WRAPPER_CANDIDATE_PROOF OR SOURCE_INTAKE_TAXONOMY OR PR2_5_PR2_6_RECONCILIATION"
 }
