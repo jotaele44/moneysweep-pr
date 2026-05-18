@@ -1,6 +1,6 @@
 {
-  "active_vector": "PR_F_DEFERRED_WRAPPER_ARCHIVE",
-  "active_branch": "claude/pr-f-deferred-wrapper-archive",
+  "active_vector": "POST_PR_F_IDLE",
+  "active_branch": "main",
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_active": true,
   "completed": [
@@ -24,10 +24,10 @@
     "Handoff mode retired as active operating mode; artifacts preserved as historical audit records",
     "G1 approved PR-E scope via Issue #69 comment 4477327241",
     "PR-E archive 26 run-wrapper/dev-tool candidates (#78) — merged to main",
-    "G2 approved PR-F scope via Issue #69 comment 4477712617"
+    "G2 approved PR-F scope via Issue #69 comment 4477712617",
+    "PR-F archive 3 deferred wrappers + 3 companion tests (#79) — merged to main 2026-05-18; merge SHA c31c7d2"
   ],
   "in_progress": [
-    "PR-F archive 3 deferred wrappers and companion tests",
     "Source intake taxonomy for uploaded PR contract, lobbying, PRASA, and contractor-reference datasets pending",
     "PR2.5/PR2.6 entity-gate branch reconciliation pending before PR3 deduplication"
   ],
@@ -39,12 +39,12 @@
   ],
   "last_tests": {
     "command": "python -m pytest -q --tb=no",
-    "passed": 481,
-    "skipped": 1,
+    "passed": 475,
+    "skipped": 0,
     "failed": 0,
     "status": "GREEN",
     "run_at": "2026-05-18",
-    "note": "65 expansion download scripts + 6 tests archived to archive/r4_legacy/; norecursedirs=archive added to pytest.ini"
+    "note": "PR-F merged: 3 deferred wrappers + 3 companion tests archived; 475 passed on main post-merge"
   },
   "secrets_audit": {
     "files_scanned": 560,
@@ -92,9 +92,11 @@
     "scope_plan": "docs/MODULE_CONSOLIDATION_SCOPE.md",
     "pr0_archive_root_setup": "merged",
     "pr_d_expansion_download_archive": "merged",
+    "pr_e_run_wrapper_archive": "merged",
+    "pr_f_deferred_wrapper_archive": "merged",
     "archive_root": "archive/r4_legacy/",
     "highergov_boundary": "protected; no deletion or archive authorized until consumer refactor",
-    "next_gate": "G1_RUN_WRAPPER_CANDIDATE_PROOF"
+    "next_gate": "G3_PR_G_CANDIDATE_APPROVAL"
   },
   "native_execution_controls": {
     "delta_only_reporting": true,
@@ -112,5 +114,5 @@
     "Federal LDA registrants",
     "DCAA active contractor listings"
   ],
-  "next_command": "OPEN_PR_F_DEFERRED_WRAPPER_ARCHIVE"
+  "next_command": "SELECT_PR_G_CANDIDATE_SCOPE"
 }
