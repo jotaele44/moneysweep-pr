@@ -1,6 +1,6 @@
 {
-  "active_vector": "PR_C_POLITICAL_CROSSREF_CLEAN",
-  "active_branch": "claude/pr-c-political-crossref-clean",
+  "active_vector": "PR_D_ARCHIVE_EXPANSION_DOWNLOADS",
+  "active_branch": "claude/pr-d-archive-expansion-downloads",
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_active": true,
   "completed": [
@@ -19,10 +19,12 @@
     "PR #71 merged to main — all handoff deliverables on main branch",
     "Edu-account clone validation passed: 594 passed, 4 skipped (66.79s)",
     "Org transfer: all gates clear — ORG_TRANSFER_READY",
-    "PR-C: merge analyze_fec_crossref + analyze_lobbying_crossref → analyze_political_crossref (clean branch from main)"
+    "PR-C: merge analyze_fec_crossref + analyze_lobbying_crossref → analyze_political_crossref (clean branch from main)",
+    "PR-C political crossref merge (#75) — merged to main 2026-05-18"
   ],
   "in_progress": [
-    "Issue #69 — Awaiting Architect approval before any module consolidation moves"
+    "Issue #69 — Awaiting Architect approval before any module consolidation moves",
+    "PR-D archive expansion download scripts"
   ],
   "blocked": [
     "Production master rebuild: 21 source inputs missing (14 manual_file_required, 7 physical_validated_file_missing)",
@@ -30,12 +32,13 @@
     "Module consolidation execution: blocked pending Architect approval (Issue #69 gate)"
   ],
   "last_tests": {
-    "command": "python3 -m pytest tests/ -q",
-    "passed": 594,
-    "skipped": 4,
+    "command": "python -m pytest -q --tb=no",
+    "passed": 481,
+    "skipped": 1,
     "failed": 0,
     "status": "GREEN",
-    "run_at": "2026-05-15"
+    "run_at": "2026-05-18",
+    "note": "65 expansion download scripts + 6 tests archived to archive/r4_legacy/; norecursedirs=archive added to pytest.ini"
   },
   "secrets_audit": {
     "files_scanned": 560,
@@ -91,6 +94,6 @@
       "future_owner": "GitHub Organization (TBD)"
     }
   },
-  "next_command": "OPEN_PR_C_CLEAN_TO_MAIN",
+  "next_command": "OPEN_PR_D_ARCHIVE_EXPANSION_DOWNLOADS",
   "next_safe_consolidation_pr": "Merge source mappers (cms_mapper + fdic_mapper + emma_mapper + highergov_mapper → scripts/source_mappers.py) — lowest risk, all four have tests"
 }
