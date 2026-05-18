@@ -1,6 +1,6 @@
 {
-  "active_vector": "PR_E_RUN_WRAPPER_ARCHIVE",
-  "active_branch": "claude/pr-e-run-wrapper-archive",
+  "active_vector": "PR_F_DEFERRED_WRAPPER_ARCHIVE",
+  "active_branch": "claude/pr-f-deferred-wrapper-archive",
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_active": true,
   "completed": [
@@ -22,10 +22,12 @@
     "PR-C political crossref merge (#75) — merged to main 2026-05-18",
     "PR-D archive expansion download scripts (#76) — merged to main; archive excludes pytest via norecursedirs",
     "Handoff mode retired as active operating mode; artifacts preserved as historical audit records",
-    "G1 approved PR-E scope via Issue #69 comment 4477327241"
+    "G1 approved PR-E scope via Issue #69 comment 4477327241",
+    "PR-E archive 26 run-wrapper/dev-tool candidates (#78) — merged to main",
+    "G2 approved PR-F scope via Issue #69 comment 4477712617"
   ],
   "in_progress": [
-    "PR-E archive 26 run-wrapper/dev-tool candidates",
+    "PR-F archive 3 deferred wrappers and companion tests",
     "Source intake taxonomy for uploaded PR contract, lobbying, PRASA, and contractor-reference datasets pending",
     "PR2.5/PR2.6 entity-gate branch reconciliation pending before PR3 deduplication"
   ],
@@ -110,5 +112,5 @@
     "Federal LDA registrants",
     "DCAA active contractor listings"
   ],
-  "next_command": "OPEN_PR_E_RUN_WRAPPER_ARCHIVE"
+  "next_command": "OPEN_PR_F_DEFERRED_WRAPPER_ARCHIVE"
 }
