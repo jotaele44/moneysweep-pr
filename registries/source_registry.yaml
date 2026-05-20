@@ -145,7 +145,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.fema.gov/openfema-data-page/hazard-mitigation-grant-program-disaster-summaries-v2
-    producer_script: archive/r4_legacy/scripts/download_fema.py
+    producer_script: scripts/download_fema.py
     expected_outputs:
       - data/staging/processed/pr_fema_hmgp.csv
     schema_version: r5_v1
@@ -579,7 +579,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://home.treasury.gov/policy-issues/coronavirus/assistance-for-state-local-and-tribal-governments/state-and-local-fiscal-recovery-funds
-    producer_script: archive/r4_legacy/scripts/download_slfrf.py
+    producer_script: scripts/download_slfrf.py
     expected_outputs:
       - data/staging/processed/pr_slfrf_master.csv
     schema_version: r5_v1
@@ -605,7 +605,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://api.reporter.nih.gov/
-    producer_script: archive/r4_legacy/scripts/download_nih.py
+    producer_script: scripts/download_nih.py
     expected_outputs:
       - data/staging/processed/pr_nih_grants.csv
     schema_version: r5_v1
@@ -618,7 +618,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.usace.army.mil/Missions/Civil-Works/
-    producer_script: archive/r4_legacy/scripts/download_usace_civil.py
+    producer_script: scripts/download_usace_civil.py
     expected_outputs:
       - data/staging/processed/pr_usace_civil.csv
     schema_version: r5_v1
@@ -631,7 +631,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://permits.ops.usace.army.mil/orm-public
-    producer_script: archive/r4_legacy/scripts/download_usace_permits.py
+    producer_script: scripts/download_usace_permits.py
     expected_outputs:
       - data/staging/processed/pr_usace_permits.csv
     schema_version: r5_v1
@@ -748,7 +748,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://home.treasury.gov/policy-issues/coronavirus/assistance-for-state-local-and-tribal-governments/homeowner-assistance-fund
-    producer_script: archive/r4_legacy/scripts/download_haf.py
+    producer_script: scripts/download_haf.py
     expected_outputs:
       - data/staging/processed/pr_haf.csv
     schema_version: r5_v1
@@ -1038,7 +1038,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.fema.gov/openfema-data-page/fima-nfip-redacted-claims-v2
-    producer_script: archive/r4_legacy/scripts/download_nfip.py
+    producer_script: scripts/download_nfip.py
     expected_outputs:
       - data/staging/processed/pr_nfip_claims.csv
     schema_version: r5_v1
