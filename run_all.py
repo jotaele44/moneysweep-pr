@@ -1068,16 +1068,7 @@ def main() -> int:
     elif not master_ready:
         logger.info("[Step 9/29] SKIPPED — no master data yet\n")
     else:
-        logger.info("[Step 9/29] Computing dominance metrics...")
-        try:
-            from scripts.dominance_analysis import run as run_dominance
-            summary_d = run_dominance(root=root)
-            logger.info(
-                f"[Step 9/29] Done — top vendor: {summary_d.get('top_vendor', '?')}, "
-                f"${summary_d.get('top_vendor_obligation', 0):,.0f}\n"
-            )
-        except Exception as e:
-            logger.error(f"[Step 9/29] FAILED: {e}")
+        logger.info("[Step 9/29] SKIPPED — dominance_analysis retired from active pipeline\n")
 
     # ------------------------------------------------------------------
     # Step 10: Network graph
@@ -2246,18 +2237,7 @@ def main() -> int:
     if args.skip_prime_sub:
         logger.info("[Step 29/29] SKIPPED (--skip-prime-sub)\n")
     else:
-        logger.info("[Step 29/29] Analyzing prime-to-subcontractor relationships...")
-        try:
-            from scripts.analyze_prime_sub import build_prime_sub
-            ps_result = build_prime_sub(root=root)
-            logger.info(
-                f"[Step 29/29] Done — {ps_result.get('rows', 0):,} prime-sub pairs, "
-                f"{ps_result.get('prime_count', 0):,} primes, "
-                f"{ps_result.get('sub_count', 0):,} subs, "
-                f"${ps_result.get('total_flow', 0):,.0f} total flow\n"
-            )
-        except Exception as e:
-            logger.error(f"[Step 29/29] FAILED: {e}")
+        logger.info("[Step 29/29] SKIPPED — analyze_prime_sub retired from active pipeline\n")
 
     # ------------------------------------------------------------------
     # Step 30: Generate PR investigation report
