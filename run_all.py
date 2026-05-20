@@ -99,6 +99,9 @@ Project delivery + final report:
 """
 
 import argparse
+import importlib.abc
+import importlib.util
+import json
 import logging
 import sys
 import time
@@ -108,6 +111,68 @@ from pathlib import Path
 # Ensure project root is on sys.path for all imports
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
+
+
+# ---------------------------------------------------------------------------
+# Archived-source graceful skip
+#
+# The source registry keeps some optional producer scripts under archive/. Their
+# per-source step blocks below still `import scripts.<producer>`. Rather than
+# crash with ModuleNotFoundError (logged as a misleading FAILED), a meta-path
+# finder supplies a skip-stub for exactly those modules. When a source is later
+# un-archived (its registry producer_script moves back to scripts/), it drops
+# out of the archived set and the real module imports normally.
+# ---------------------------------------------------------------------------
+
+
+def archived_producer_modules(root: Path) -> set:
+    """Module basenames whose registry producer_script lives under archive/."""
+    registry = root / "registries" / "source_registry.json"
+    try:
+        sources = json.loads(registry.read_text(encoding="utf-8")).get("sources", [])
+    except (OSError, ValueError):
+        return set()
+    return {
+        Path(s["producer_script"]).stem
+        for s in sources
+        if str(s.get("producer_script", "")).startswith("archive/")
+    }
+
+
+class _ArchivedSourceFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
+    """Supplies skip-stubs for `scripts.<producer>` modules kept archived."""
+
+    def __init__(self, archived: set, logger: logging.Logger) -> None:
+        self._archived = archived
+        self._logger = logger
+
+    def find_spec(self, fullname, path=None, target=None):
+        if not fullname.startswith("scripts."):
+            return None
+        if fullname.split(".")[-1] not in self._archived:
+            return None
+        return importlib.util.spec_from_loader(fullname, self)
+
+    def create_module(self, spec):
+        return None
+
+    def exec_module(self, module) -> None:
+        name = module.__name__.split(".")[-1]
+        logger = self._logger
+
+        def run(*_args, **_kwargs):
+            logger.info(f"  SKIPPED — source archived, not wired ({name})")
+            return {"rows": 0, "skipped": True, "archived": True}
+
+        module.run = run
+
+
+def install_archived_source_skip(root: Path, logger: logging.Logger) -> set:
+    """Register the archived-source finder; return the archived module set."""
+    archived = archived_producer_modules(root)
+    if archived:
+        sys.meta_path.insert(0, _ArchivedSourceFinder(archived, logger))
+    return archived
 
 
 def check_pandas() -> bool:
@@ -538,6 +603,13 @@ def main() -> int:
 
     logger = setup_pipeline_logging(logs_dir)
     print_banner(logger)
+
+    archived_sources = install_archived_source_skip(root, logger)
+    if archived_sources:
+        logger.info(
+            f"Registry: {len(archived_sources)} optional source(s) archived — "
+            f"their pipeline steps skip gracefully (not wired).\n"
+        )
 
     start_time = time.time()
     steps = {}
@@ -1170,7 +1242,6 @@ def main() -> int:
             ("DOE",     "download_doe"),
             ("DOT",     "download_dot"),
             ("USDA",    "download_usda"),
-            ("HUD-CPD", "download_hud"),
         ]:
             try:
                 import importlib
@@ -1287,20 +1358,6 @@ def main() -> int:
             logger.info(f"[Step 15g] Done — status: {result.get('status', '?')}\n")
         except Exception as e:
             logger.error(f"[Step 15g] FAILED: {e}")
-
-    # ------------------------------------------------------------------
-    # Step 15h: HUD DRGR public financial report download
-    # ------------------------------------------------------------------
-    if args.skip_drgr_public:
-        logger.info("[Step 15h] SKIPPED (--skip-drgr-public)\n")
-    else:
-        logger.info("[Step 15h] Downloading HUD DRGR public financial reports...")
-        try:
-            from scripts.download_hud_drgr_public import run as run_drgr_pub
-            result = run_drgr_pub(root=root)
-            logger.info(f"[Step 15h] Done — {result.get('rows', 0):,} rows\n")
-        except Exception as e:
-            logger.error(f"[Step 15h] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 15i: HUD DRGR authorized local export ingest
@@ -2042,12 +2099,6 @@ def main() -> int:
             _cab_result = run_ingest_cab(root=root)
         except Exception as e:
             logger.warning(f"[Step 26n] ingest_cabilderos failed: {e}")
-        if _cab_result.get("rows", 0) == 0:
-            try:
-                from scripts.download_cabilderos import run as run_fetch_cab
-                _cab_result = run_fetch_cab(root=root)
-            except Exception as e:
-                logger.error(f"[Step 26n] download_cabilderos FAILED: {e}")
         logger.info(f"[Step 26n] Done — {_cab_result.get('rows', 0):,} cabildero records\n")
 
     # ------------------------------------------------------------------
@@ -2063,12 +2114,6 @@ def main() -> int:
             _con_result = run_ingest_con(root=root)
         except Exception as e:
             logger.warning(f"[Step 26o] ingest_contralor failed: {e}")
-        if _con_result.get("rows", 0) == 0:
-            try:
-                from scripts.download_contralor import run as run_fetch_con
-                _con_result = run_fetch_con(root=root)
-            except Exception as e:
-                logger.error(f"[Step 26o] download_contralor FAILED: {e}")
         logger.info(f"[Step 26o] Done — {_con_result.get('rows', 0):,} audit/contract records\n")
 
     # ------------------------------------------------------------------
@@ -2105,12 +2150,6 @@ def main() -> int:
             _prasa_result = run_ingest_prasa(root=root)
         except Exception as e:
             logger.warning(f"[Step 26q] ingest_prasa failed: {e}")
-        if _prasa_result.get("rows", 0) == 0:
-            try:
-                from scripts.download_prasa import run as run_fetch_prasa
-                _prasa_result = run_fetch_prasa(root=root)
-            except Exception as e:
-                logger.error(f"[Step 26q] download_prasa FAILED: {e}")
         logger.info(f"[Step 26q] Done — {_prasa_result.get('rows', 0):,} PRASA contract records\n")
 
     # ------------------------------------------------------------------
