@@ -553,7 +553,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.sba.gov/document/report-sba-loan-data-tools
-    producer_script: archive/r4_legacy/scripts/download_sba.py
+    producer_script: scripts/download_sba.py
     expected_outputs:
       - data/staging/processed/pr_sba_loans.csv
     schema_version: r5_v1
@@ -566,7 +566,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://data.sba.gov/dataset/ppp-foia
-    producer_script: archive/r4_legacy/scripts/download_sba.py
+    producer_script: scripts/download_sba.py
     expected_outputs:
       - data/staging/processed/pr_sba_ppp.csv
     schema_version: r5_v1
@@ -592,7 +592,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.sbir.gov/
-    producer_script: archive/r4_legacy/scripts/download_sbir.py
+    producer_script: scripts/download_sbir.py
     expected_outputs:
       - data/staging/processed/pr_sbir.csv
     schema_version: r5_v1
@@ -761,7 +761,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.exim.gov/
-    producer_script: archive/r4_legacy/scripts/download_exim.py
+    producer_script: scripts/download_exim.py
     expected_outputs:
       - data/staging/processed/pr_exim.csv
     schema_version: r5_v1
@@ -960,7 +960,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.fdic.gov/resources/data-tools/
-    producer_script: archive/r4_legacy/scripts/download_fdic.py
+    producer_script: scripts/download_fdic.py
     expected_outputs:
       - data/staging/processed/pr_fdic.csv
     schema_version: r5_v1
@@ -973,7 +973,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.ncua.gov/analysis/credit-union-corporate-call-report-data
-    producer_script: archive/r4_legacy/scripts/download_ncua.py
+    producer_script: scripts/download_ncua.py
     expected_outputs:
       - data/staging/processed/pr_ncua.csv
     schema_version: r5_v1
@@ -986,7 +986,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.fhfa.gov/data
-    producer_script: archive/r4_legacy/scripts/download_fhlb.py
+    producer_script: scripts/download_fhlb.py
     expected_outputs:
       - data/staging/processed/pr_fhlb.csv
     schema_version: r5_v1
@@ -999,7 +999,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.sec.gov/edgar
-    producer_script: archive/r4_legacy/scripts/download_sec.py
+    producer_script: scripts/download_sec.py
     expected_outputs:
       - data/staging/processed/pr_sec_edgar.csv
     schema_version: r5_v1
@@ -1012,7 +1012,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.sec.gov/edgar/search-and-access
-    producer_script: archive/r4_legacy/scripts/download_sec_holdings.py
+    producer_script: scripts/download_sec_holdings.py
     expected_outputs:
       - data/staging/processed/pr_sec_holdings.csv
     schema_version: r5_v1
