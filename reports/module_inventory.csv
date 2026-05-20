@@ -71,7 +71,7 @@ scripts/analyze_entity_profiles.py,GRAPH,scripts.config,run_all.py,,KEEP,"Unique
 scripts/analyze_fec_crossref.py,GRAPH,scripts.config,,,MERGE→scripts/analyze_crossref.py,Structurally identical to merge-target siblings; consolidate under one module
 scripts/analyze_lobbying_crossref.py,GRAPH,scripts.config,,,MERGE→scripts/analyze_crossref.py,Structurally identical to merge-target siblings; consolidate under one module
 scripts/analyze_power_network.py,GRAPH,contract_sweeper.validation.production_status;scripts.config,run_all.py,,KEEP,"Unique logic, active imports, or tested"
-scripts/analyze_prime_sub.py,GRAPH,contract_sweeper.validation.production_status;scripts.config,run_all.py,,ARCHIVE,No active test coverage; not wired into run_all; dev-only or one-time artifact
+archive/r4_legacy/scripts/analyze_prime_sub.py,GRAPH,contract_sweeper.validation.production_status;scripts.config,run_all.py,,ARCHIVED,PR-I: archived 2026-05-20
 scripts/analyze_project_delivery.py,GRAPH,scripts.config;scripts.sam_enrichment,run_all.py;tests/test_analyze_project_delivery.py,,KEEP,"Unique logic, active imports, or tested"
 scripts/analyze_rfp_lobby.py,GRAPH,scripts.build_unified_master;scripts.config;scripts.sam_enrichment,run_all.py;tests/test_analyze_rfp_lobby.py,,KEEP,"Unique logic, active imports, or tested"
 scripts/auto_download.py,INGEST,scripts.config,run_all.py,data/staging/processed/pr_auto_download*.csv,KEEP,"Unique logic, active imports, or tested"
@@ -80,7 +80,7 @@ scripts/build_unified_master.py,ORCHESTRATE,scripts.config,contract_sweeper/vali
 scripts/cms_mapper.py,NORMALIZE,,run_all.py;tests/test_cms_mapper.py,,MERGE→scripts/source_mappers.py,Structurally identical to merge-target siblings; consolidate under one module
 scripts/config.py,UTILITY,,run_all.py;scripts/analyze_bond_flow.py;scripts/analyze_entity_profiles.py;scripts/analyze_fec_crossref.py;scripts/analyze_lobbying_crossref.py…,,KEEP,"Unique logic, active imports, or tested"
 scripts/deduplicate_master.py,NORMALIZE,scripts.config,run_all.py;tests/test_deduplicate_master.py,data/staging/processed/pr_all_awards_master.csv,KEEP,"Unique logic, active imports, or tested"
-scripts/dominance_analysis.py,UTILITY,contract_sweeper.validation.production_status;scripts.config,run_all.py,,ARCHIVE,No active test coverage; not wired into run_all; dev-only or one-time artifact
+archive/r4_legacy/scripts/dominance_analysis.py,UTILITY,contract_sweeper.validation.production_status;scripts.config,run_all.py,,ARCHIVED,PR-I: archived 2026-05-20
 archive/r4_legacy/scripts/download_aafaf.py,INGEST,scripts.config,run_all.py,data/staging/processed/pr_aafaf*.csv,ARCHIVED,"Unique logic, active imports, or tested"
 archive/r4_legacy/scripts/download_act60.py,INGEST,scripts.config,run_all.py;tests/test_new_downloaders.py,data/staging/processed/pr_act60*.csv,ARCHIVED,"Unique logic, active imports, or tested"
 archive/r4_legacy/scripts/download_active_contractors.py,INGEST,scripts.build_unified_master;scripts.config,run_all.py,data/staging/processed/pr_active_contractors*.csv,ARCHIVED,"Unique logic, active imports, or tested"
