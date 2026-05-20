@@ -61,6 +61,61 @@ def _file_status(root: Path, rel_path: str) -> dict:
     return {"status": "present", "size_bytes": size, "row_count": row_count}
 
 
+def _source_status(root: Path, src: dict) -> str:
+    """Materialization status for one source, derived from expected_outputs on disk."""
+    expected = src.get("expected_outputs", [])
+    if not expected:
+        return "no_outputs_declared"
+    min_rows = src.get("validation_threshold", {}).get("min_rows", 1)
+    statuses = [_file_status(root, rel) for rel in expected]
+    present = [f for f in statuses if f["status"] == "present"]
+    missing = [f for f in statuses if f["status"] == "missing"]
+    empty = [f for f in statuses if f["status"] in ("empty", "header_only")]
+    if missing and not present:
+        return "not_materialized"
+    if missing or empty:
+        return "partially_materialized"
+    under = [f for f in present if f["row_count"] != -1 and f["row_count"] < min_rows]
+    return "partially_materialized" if under else "fully_materialized"
+
+
+STATUS_CSV_FIELDS = [
+    "source_id", "family", "required", "authentication", "producer_script",
+    "expected_outputs", "update_cadence", "pipeline_status", "blocker_notes",
+]
+
+
+def write_status_csv(root: Path, sources: list[dict] | None = None) -> Path:
+    """Generate reports/source_registry_status.csv from the registry + data state.
+
+    Replaces the formerly hand-maintained file: producer_script paths come
+    straight from the registry, and pipeline_status is derived from whether the
+    declared outputs actually exist on disk (never hand-authored).
+    """
+    if sources is None:
+        sources = _read_registry(root)
+    rows = []
+    for src in sources:
+        rows.append({
+            "source_id": src.get("source_id", ""),
+            "family": src.get("family", ""),
+            "required": bool(src.get("required", False)),
+            "authentication": src.get("authentication", ""),
+            "producer_script": src.get("producer_script", ""),
+            "expected_outputs": ";".join(src.get("expected_outputs", [])),
+            "update_cadence": src.get("update_cadence", ""),
+            "pipeline_status": _source_status(root, src),
+            "blocker_notes": " ".join((src.get("notes") or "").split()),
+        })
+    out = root / "reports" / "source_registry_status.csv"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with out.open("w", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=STATUS_CSV_FIELDS)
+        w.writeheader()
+        w.writerows(rows)
+    return out
+
+
 def build_gap_analysis(root: Path) -> dict[str, Any]:
     sources = _read_registry(root)
     records: list[dict] = []
@@ -167,11 +222,14 @@ def build_gap_analysis(root: Path) -> dict[str, Any]:
         "outputs": [
             "reports/gap_analysis_report.csv",
             "reports/gap_analysis_report.json",
+            "reports/source_registry_status.csv",
         ],
     }
 
     json_path = reports_dir / "gap_analysis_report.json"
     json_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
+
+    write_status_csv(root, sources)
 
     return result
 
