@@ -958,7 +958,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.medicaid.gov/medicaid/financial-management/index.html",
-      "producer_script": "archive/r4_legacy/scripts/download_medicaid_fmap.py",
+      "producer_script": "scripts/download_medicaid_fmap.py",
       "expected_outputs": [
         "data/staging/processed/pr_medicaid_fmap.csv"
       ],
@@ -974,7 +974,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.ssa.gov/data/",
-      "producer_script": "archive/r4_legacy/scripts/download_ssa.py",
+      "producer_script": "scripts/download_ssa.py",
       "expected_outputs": [
         "data/staging/processed/pr_ssa.csv"
       ],
@@ -990,7 +990,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.cms.gov/data-research",
-      "producer_script": "archive/r4_legacy/scripts/download_medicare_parts.py",
+      "producer_script": "scripts/download_medicare_parts.py",
       "expected_outputs": [
         "data/staging/processed/pr_medicare_parts.csv"
       ],
@@ -1006,7 +1006,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.cms.gov/data-research/statistics-trends-and-reports/medicare-advantage-rates-statistics",
-      "producer_script": "archive/r4_legacy/scripts/download_medicare_advantage.py",
+      "producer_script": "scripts/download_medicare_advantage.py",
       "expected_outputs": [
         "data/staging/processed/pr_medicare_advantage.csv"
       ],
@@ -1022,7 +1022,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.medicaid.gov/chip/index.html",
-      "producer_script": "archive/r4_legacy/scripts/download_chip.py",
+      "producer_script": "scripts/download_chip.py",
       "expected_outputs": [
         "data/staging/processed/pr_chip.csv"
       ],
@@ -1038,7 +1038,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://openpaymentsdata.cms.gov/",
-      "producer_script": "archive/r4_legacy/scripts/download_cms.py",
+      "producer_script": "scripts/download_cms.py",
       "expected_outputs": [
         "data/staging/processed/pr_cms_open_payments.csv"
       ],
@@ -1054,7 +1054,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.fns.usda.gov/wic",
-      "producer_script": "archive/r4_legacy/scripts/download_wic.py",
+      "producer_script": "scripts/download_wic.py",
       "expected_outputs": [
         "data/staging/processed/pr_wic.csv"
       ],
@@ -1070,7 +1070,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.dol.gov/agencies/eta/wioa",
-      "producer_script": "archive/r4_legacy/scripts/download_wioa.py",
+      "producer_script": "scripts/download_wioa.py",
       "expected_outputs": [
         "data/staging/processed/pr_wioa.csv"
       ],
@@ -1086,7 +1086,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.fns.usda.gov/snap/nutrition-assistance-puerto-rico",
-      "producer_script": "archive/r4_legacy/scripts/download_snap_nap.py",
+      "producer_script": "scripts/download_snap_nap.py",
       "expected_outputs": [
         "data/staging/processed/pr_snap_nap.csv"
       ],
@@ -1102,7 +1102,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.benefits.va.gov/REPORTS/",
-      "producer_script": "archive/r4_legacy/scripts/download_va.py",
+      "producer_script": "scripts/download_va.py",
       "expected_outputs": [
         "data/staging/processed/pr_va.csv"
       ],
@@ -1294,7 +1294,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.dol.gov/agencies/whd",
-      "producer_script": "archive/r4_legacy/scripts/download_dol.py",
+      "producer_script": "scripts/download_dol.py",
       "expected_outputs": [
         "data/staging/processed/pr_dol_whd.csv"
       ],
