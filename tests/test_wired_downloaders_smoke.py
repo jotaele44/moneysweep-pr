@@ -30,14 +30,30 @@ B1_FEDERAL_GRANTS = [
     ("fpds_report_builder", "download_grants"),
 ]
 
+B2_BENEFITS_HEALTH = [
+    ("chip", "download_chip"),
+    ("cms_open_payments", "download_cms"),
+    ("medicaid_fmap", "download_medicaid_fmap"),
+    ("medicare_parts", "download_medicare_parts"),
+    ("medicare_advantage", "download_medicare_advantage"),
+    ("ssa", "download_ssa"),
+    ("va_benefits", "download_va"),
+    ("wic", "download_wic"),
+    ("wioa", "download_wioa"),
+    ("snap_nap", "download_snap_nap"),
+    ("dol_whd_osha", "download_dol"),
+]
 
-@pytest.mark.parametrize("source_id,module", B1_FEDERAL_GRANTS)
+WIRED_SOURCES = B1_FEDERAL_GRANTS + B2_BENEFITS_HEALTH
+
+
+@pytest.mark.parametrize("source_id,module", WIRED_SOURCES)
 def test_wired_producer_imports_and_runs(source_id, module):
     mod = importlib.import_module(f"scripts.{module}")
     assert callable(getattr(mod, "run", None)), f"{module}: missing callable run()"
 
 
-@pytest.mark.parametrize("source_id,module", B1_FEDERAL_GRANTS)
+@pytest.mark.parametrize("source_id,module", WIRED_SOURCES)
 def test_wired_registry_points_to_scripts(source_id, module):
     src = source_by_id(source_id)
     assert src is not None, f"{source_id}: not in registry"
