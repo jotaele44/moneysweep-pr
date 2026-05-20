@@ -1,7 +1,7 @@
 source_id,family,required,authentication,producer_script,expected_outputs,update_cadence,pipeline_status,blocker_notes
 usaspending_prime,federal,True,none,scripts/build_unified_master.py,data/staging/processed/pr_contracts_master.csv;data/staging/processed/pr_all_awards_master.csv,weekly,not_materialized,"USAspending API + bulk archive. No key required. Top recipients are PR government agencies (PRDOH, ADSEF, PRDE, PRHA) — no corporate parent_uei is expected for these entities."
 usaspending_subawards,federal,True,none,scripts/download_subawards.py,data/staging/processed/pr_subawards_master.csv;data/staging/processed/execution/execution_chain_master.csv,weekly,partially_materialized,
-fpds_report_builder,federal,False,none,archive/r4_legacy/scripts/download_grants.py,data/staging/processed/pr_fpds_report_builder.csv,quarterly,not_materialized,FPDS Report Builder FY2018-2024 ingestion. Supplements USAspending.
+fpds_report_builder,federal,False,none,scripts/download_grants.py,data/staging/processed/pr_fpds_report_builder.csv,quarterly,not_materialized,FPDS Report Builder FY2018-2024 ingestion. Supplements USAspending.
 fsrs_subawards,federal,True,none,scripts/download_fsrs.py,data/staging/processed/pr_fsrs_subawards.csv,weekly,not_materialized,FSRS prime-to-sub reporting. Joins with USAspending subaward stream.
 sam_entities,entity_resolution,True,api_key:SAM_API_KEY,scripts/sam_enrichment.py,data/staging/processed/enrichment/vendor_uei_index.csv;data/staging/processed/entities_resolved.csv,monthly,not_materialized,"SAM full extract + per-UEI enrichment for parent resolution. Supplemented by scripts/usaspending_parent_uei_extract.py (no rate limit). SAM API rate: 1,000 req/day → full 2,334-UEI run = 2.3+ days."
 highergov_supplemental,federal,False,api_key:HGOV_API_KEY,scripts/fetch_highergov_api.py,data/raw/HigherGov/;data/staging/processed/pr_highergov_supplement.csv,weekly,partially_materialized,Supplementary federal contract intel via HigherGov. PDFs require parse_highergov_pdfs.
@@ -42,14 +42,14 @@ sbir,federal,False,none,archive/r4_legacy/scripts/download_sbir.py,data/staging/
 nih_reporter,federal,False,none,archive/r4_legacy/scripts/download_nih.py,data/staging/processed/pr_nih_grants.csv,monthly,not_materialized,
 usace_civil_works,federal,False,none,archive/r4_legacy/scripts/download_usace_civil.py,data/staging/processed/pr_usace_civil.csv,quarterly,not_materialized,
 usace_permits,federal,False,none,archive/r4_legacy/scripts/download_usace_permits.py,data/staging/processed/pr_usace_permits.csv,quarterly,not_materialized,
-epa_grants,federal,False,none,archive/r4_legacy/scripts/download_epa.py,data/staging/processed/pr_epa_grants.csv,quarterly,not_materialized,
-dot_grants,federal,False,none,archive/r4_legacy/scripts/download_dot.py,data/staging/processed/pr_dot_grants.csv,quarterly,not_materialized,
-usda_grants,federal,False,none,archive/r4_legacy/scripts/download_usda.py,data/staging/processed/pr_usda.csv,quarterly,not_materialized,
-doe_grants,federal,False,none,archive/r4_legacy/scripts/download_doe.py,data/staging/processed/pr_doe.csv,quarterly,not_materialized,
-doj_grants,federal,False,none,archive/r4_legacy/scripts/download_doj_grants.py,data/staging/processed/pr_doj_grants.csv,quarterly,not_materialized,
-ed_grants,federal,False,none,archive/r4_legacy/scripts/download_ed.py,data/staging/processed/pr_ed_grants.csv,quarterly,not_materialized,
-hhs_grants,federal,False,none,archive/r4_legacy/scripts/download_hhs.py,data/staging/processed/pr_hhs_grants.csv,quarterly,not_materialized,
-oia_grants,federal,False,none,archive/r4_legacy/scripts/download_oia.py,data/staging/processed/pr_oia_grants.csv,yearly,not_materialized,
+epa_grants,federal,False,none,scripts/download_epa.py,data/staging/processed/pr_epa_grants.csv,quarterly,not_materialized,
+dot_grants,federal,False,none,scripts/download_dot.py,data/staging/processed/pr_dot_grants.csv,quarterly,not_materialized,
+usda_grants,federal,False,none,scripts/download_usda.py,data/staging/processed/pr_usda.csv,quarterly,not_materialized,
+doe_grants,federal,False,none,scripts/download_doe.py,data/staging/processed/pr_doe.csv,quarterly,not_materialized,
+doj_grants,federal,False,none,scripts/download_doj_grants.py,data/staging/processed/pr_doj_grants.csv,quarterly,not_materialized,
+ed_grants,federal,False,none,scripts/download_ed.py,data/staging/processed/pr_ed_grants.csv,quarterly,not_materialized,
+hhs_grants,federal,False,none,scripts/download_hhs.py,data/staging/processed/pr_hhs_grants.csv,quarterly,not_materialized,
+oia_grants,federal,False,none,scripts/download_oia.py,data/staging/processed/pr_oia_grants.csv,yearly,not_materialized,
 haf,federal,False,none,archive/r4_legacy/scripts/download_haf.py,data/staging/processed/pr_haf.csv,quarterly,not_materialized,
 exim_bank,federal,False,none,archive/r4_legacy/scripts/download_exim.py,data/staging/processed/pr_exim.csv,yearly,not_materialized,
 congressional_earmarks,federal,False,none,archive/r4_legacy/scripts/download_earmarks.py,data/staging/processed/pr_earmarks.csv,yearly,not_materialized,
@@ -79,5 +79,5 @@ nonprofits_irs990,federal,False,none,archive/r4_legacy/scripts/download_nonprofi
 gao_ig_audits,federal,False,none,archive/r4_legacy/scripts/download_gao_ig.py,data/staging/processed/pr_gao_ig_audits.csv,monthly,not_materialized,
 dol_whd_osha,federal,False,none,archive/r4_legacy/scripts/download_dol.py,data/staging/processed/pr_dol_whd.csv,monthly,not_materialized,
 sf133_budget_execution,federal,False,none,archive/r4_legacy/scripts/download_sf133.py,data/staging/processed/pr_sf133.csv,quarterly,not_materialized,
-research_grants,federal,False,none,archive/r4_legacy/scripts/download_research.py,data/staging/processed/pr_research_grants.csv,weekly,not_materialized,
-grants_gov,federal,False,none,archive/r4_legacy/scripts/download_grants.py,data/staging/processed/pr_grants.csv,weekly,not_materialized,
+research_grants,federal,False,none,scripts/download_research.py,data/staging/processed/pr_research_grants.csv,weekly,not_materialized,
+grants_gov,federal,False,none,scripts/download_grants.py,data/staging/processed/pr_grants.csv,weekly,not_materialized,

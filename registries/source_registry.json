@@ -45,7 +45,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.fpds.gov/fpdsng_cms/index.php/en/reports.html",
-      "producer_script": "archive/r4_legacy/scripts/download_grants.py",
+      "producer_script": "scripts/download_grants.py",
       "expected_outputs": [
         "data/staging/processed/pr_fpds_report_builder.csv"
       ],
@@ -733,7 +733,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.epa.gov/grants",
-      "producer_script": "archive/r4_legacy/scripts/download_epa.py",
+      "producer_script": "scripts/download_epa.py",
       "expected_outputs": [
         "data/staging/processed/pr_epa_grants.csv"
       ],
@@ -749,7 +749,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.transportation.gov/grants",
-      "producer_script": "archive/r4_legacy/scripts/download_dot.py",
+      "producer_script": "scripts/download_dot.py",
       "expected_outputs": [
         "data/staging/processed/pr_dot_grants.csv"
       ],
@@ -765,7 +765,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.usda.gov/topics/farming/grants-and-loans",
-      "producer_script": "archive/r4_legacy/scripts/download_usda.py",
+      "producer_script": "scripts/download_usda.py",
       "expected_outputs": [
         "data/staging/processed/pr_usda.csv"
       ],
@@ -781,7 +781,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.energy.gov/eere/funding/funding-opportunities",
-      "producer_script": "archive/r4_legacy/scripts/download_doe.py",
+      "producer_script": "scripts/download_doe.py",
       "expected_outputs": [
         "data/staging/processed/pr_doe.csv"
       ],
@@ -797,7 +797,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.justice.gov/grants",
-      "producer_script": "archive/r4_legacy/scripts/download_doj_grants.py",
+      "producer_script": "scripts/download_doj_grants.py",
       "expected_outputs": [
         "data/staging/processed/pr_doj_grants.csv"
       ],
@@ -813,7 +813,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www2.ed.gov/programs/find/title/index.html",
-      "producer_script": "archive/r4_legacy/scripts/download_ed.py",
+      "producer_script": "scripts/download_ed.py",
       "expected_outputs": [
         "data/staging/processed/pr_ed_grants.csv"
       ],
@@ -829,7 +829,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.hhs.gov/grants/",
-      "producer_script": "archive/r4_legacy/scripts/download_hhs.py",
+      "producer_script": "scripts/download_hhs.py",
       "expected_outputs": [
         "data/staging/processed/pr_hhs_grants.csv"
       ],
@@ -845,7 +845,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.doi.gov/oia",
-      "producer_script": "archive/r4_legacy/scripts/download_oia.py",
+      "producer_script": "scripts/download_oia.py",
       "expected_outputs": [
         "data/staging/processed/pr_oia_grants.csv"
       ],
@@ -1326,7 +1326,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.grants.gov/",
-      "producer_script": "archive/r4_legacy/scripts/download_research.py",
+      "producer_script": "scripts/download_research.py",
       "expected_outputs": [
         "data/staging/processed/pr_research_grants.csv"
       ],
@@ -1342,7 +1342,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.grants.gov/",
-      "producer_script": "archive/r4_legacy/scripts/download_grants.py",
+      "producer_script": "scripts/download_grants.py",
       "expected_outputs": [
         "data/staging/processed/pr_grants.csv"
       ],
