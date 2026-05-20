@@ -30,7 +30,8 @@
     "PR-G archive credential_unblock_plan + cache_audit + companion (#81) — merged to main",
     "G4 approved PR-H run_all unlock refactor via Issue #69 comment 4495438700",
     "PR-H run_all unlock refactor (#82) — merged to main 2026-05-20",
-    "G5 approved PR-I two-file archive via Issue #69 comment 4495830815"
+    "G5 approved PR-I two-file archive via Issue #69 comment 4495830815",
+    "Batch 101-110 speed-run reconciliation — reports/batch_101_110_reconciliation.md"
   ],
   "in_progress": [
     "PR-I archive dominance_analysis and analyze_prime_sub",
@@ -44,13 +45,16 @@
     "HigherGov archive/deletion: blocked until consumer refactor removes live references"
   ],
   "last_tests": {
-    "command": "python -m pytest -q --tb=no",
-    "passed": 473,
-    "skipped": 0,
-    "failed": 0,
-    "status": "GREEN",
-    "run_at": "2026-05-18",
-    "note": "PR-H branch: run_all.py step 9+29 imports removed; 473 passed, 0 failed"
+    "command": "pytest -q",
+    "collected": 473,
+    "ci_runtime": "python-3.11",
+    "ci_status": "GREEN",
+    "local_runtime": "python-3.14.4",
+    "local_passed": 470,
+    "local_failed": 3,
+    "status": "GREEN_ON_SUPPORTED_RUNTIME",
+    "run_at": "2026-05-20",
+    "note": "PR83 reconciliation preserved after rebase onto main d1cb07a. CI on supported Python 3.11 is green. Local Python 3.14 shows 3 R4.8 backfill failures from runtime-specific ordering behavior; not treated as a main regression. See reports/batch_101_110_reconciliation.md."
   },
   "secrets_audit": {
     "files_scanned": 560,
