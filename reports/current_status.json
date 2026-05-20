@@ -1,6 +1,6 @@
 {
-  "active_vector": "PR_G_PIPELINE_VALIDATION_ARCHIVE",
-  "active_branch": "claude/pr-g-pipeline-validation-archive",
+  "active_vector": "PR_H_RUN_ALL_UNLOCK_REFACTOR",
+  "active_branch": "claude/pr-h-run-all-unlock-archive-candidates",
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_active": true,
   "completed": [
@@ -26,10 +26,12 @@
     "PR-E archive 26 run-wrapper/dev-tool candidates (#78) — merged to main",
     "G2 approved PR-F scope via Issue #69 comment 4477712617",
     "PR-F archive 3 deferred wrappers + 3 companion tests (#79) — merged to main 2026-05-18; merge SHA c31c7d2",
-    "G3 approved PR-G scope via Issue #69 comments 4479768122 + 4480006526"
+    "G3 approved PR-G scope via Issue #69 comments 4479768122 + 4480006526",
+    "PR-G archive credential_unblock_plan + cache_audit + companion (#81) — merged to main",
+    "G4 approved PR-H run_all unlock refactor via Issue #69 comment 4495438700"
   ],
   "in_progress": [
-    "PR-G archive credential_unblock_plan.py + cache_audit.py + companion test (3 files)",
+    "PR-H remove run_all refs blocking dominance_analysis/analyze_prime_sub archive",
     "Source intake taxonomy for uploaded PR contract, lobbying, PRASA, and contractor-reference datasets pending",
     "PR2.5/PR2.6 entity-gate branch reconciliation pending before PR3 deduplication"
   ],
@@ -46,7 +48,7 @@
     "failed": 0,
     "status": "GREEN",
     "run_at": "2026-05-18",
-    "note": "PR-G branch: credential_unblock_plan + cache_audit + companion archived; 473 passed (2 companion tests removed)"
+    "note": "PR-H branch: run_all.py step 9+29 imports removed; 473 passed, 0 failed"
   },
   "secrets_audit": {
     "files_scanned": 560,
@@ -96,10 +98,11 @@
     "pr_d_expansion_download_archive": "merged",
     "pr_e_run_wrapper_archive": "merged",
     "pr_f_deferred_wrapper_archive": "merged",
-    "pr_g_pipeline_validation_archive": "in_progress",
+    "pr_g_pipeline_validation_archive": "merged",
+    "pr_h_run_all_unlock_refactor": "in_progress",
     "archive_root": "archive/r4_legacy/",
     "highergov_boundary": "protected; no deletion or archive authorized until consumer refactor",
-    "next_gate": "G4_14_SOURCE_REGISTRY_ATTESTATION"
+    "next_gate": "G5_ARCHIVE_DOMINANCE_PRIME_SUB"
   },
   "native_execution_controls": {
     "delta_only_reporting": true,
@@ -117,5 +120,5 @@
     "Federal LDA registrants",
     "DCAA active contractor listings"
   ],
-  "next_command": "OPEN_PR_G_PIPELINE_VALIDATION_ARCHIVE"
+  "next_command": "OPEN_PR_H_RUN_ALL_UNLOCK_REFACTOR"
 }
