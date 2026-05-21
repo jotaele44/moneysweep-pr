@@ -89,12 +89,20 @@ B5_TERRITORIAL_MUNICIPAL = [
     ("prepa_luma_genera", "download_prepa_contracts"),
 ]
 
+B6_BONDS_ENTITY_MANUAL = [
+    ("msrb_rtrs_trades", "download_msrb_trades"),
+    ("ofac_sdn", "download_ofac"),
+    ("opencorporates", "download_opencorporates"),
+    ("dcaa_active_contractors", "download_active_contractors"),
+]
+
 WIRED_SOURCES = (
     B1_FEDERAL_GRANTS
     + B2_BENEFITS_HEALTH
     + B3_FEDERAL_FINANCIAL
     + B4_DISASTER_RESEARCH
     + B5_TERRITORIAL_MUNICIPAL
+    + B6_BONDS_ENTITY_MANUAL
 )
 
 
