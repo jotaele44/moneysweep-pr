@@ -56,7 +56,27 @@ B3_FEDERAL_FINANCIAL = [
     ("sbir", "download_sbir"),
 ]
 
-WIRED_SOURCES = B1_FEDERAL_GRANTS + B2_BENEFITS_HEALTH + B3_FEDERAL_FINANCIAL
+B4_DISASTER_RESEARCH = [
+    ("fema_hmgp", "download_fema"),
+    ("haf", "download_haf"),
+    ("slfrf", "download_slfrf"),
+    ("nfip_claims", "download_nfip"),
+    ("lihtc", "download_lihtc"),
+    ("nmtc", "download_nmtc"),
+    ("usace_civil_works", "download_usace_civil"),
+    ("usace_permits", "download_usace_permits"),
+    ("hud_hcv_section8", "download_hud_hcv"),
+    ("congressional_earmarks", "download_earmarks"),
+    ("sf133_budget_execution", "download_sf133"),
+    ("fcc_usf", "download_fcc"),
+    ("nih_reporter", "download_nih"),
+    ("gao_ig_audits", "download_gao_ig"),
+    ("nonprofits_irs990", "download_nonprofits"),
+]
+
+WIRED_SOURCES = (
+    B1_FEDERAL_GRANTS + B2_BENEFITS_HEALTH + B3_FEDERAL_FINANCIAL + B4_DISASTER_RESEARCH
+)
 
 
 @pytest.mark.parametrize("source_id,module", WIRED_SOURCES)
