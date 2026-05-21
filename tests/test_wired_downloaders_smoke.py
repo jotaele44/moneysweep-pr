@@ -74,8 +74,27 @@ B4_DISASTER_RESEARCH = [
     ("nonprofits_irs990", "download_nonprofits"),
 ]
 
+B5_TERRITORIAL_MUNICIPAL = [
+    ("aafaf", "download_aafaf"),
+    ("hacienda", "download_hacienda"),
+    ("cofina", "download_cofina"),
+    ("promesa_creditors", "download_promesa_creditors"),
+    ("pr_act_60_decrees", "download_act60"),
+    ("p3_authority", "download_p3"),
+    ("pr_pensions", "download_pr_pensions"),
+    ("rum_cover_over", "download_rum_coverover"),
+    ("municipal_finance", "download_municipal"),
+    ("eqb_epa_icis", "download_eqb"),
+    ("compras_pr", "download_compras"),
+    ("prepa_luma_genera", "download_prepa_contracts"),
+]
+
 WIRED_SOURCES = (
-    B1_FEDERAL_GRANTS + B2_BENEFITS_HEALTH + B3_FEDERAL_FINANCIAL + B4_DISASTER_RESEARCH
+    B1_FEDERAL_GRANTS
+    + B2_BENEFITS_HEALTH
+    + B3_FEDERAL_FINANCIAL
+    + B4_DISASTER_RESEARCH
+    + B5_TERRITORIAL_MUNICIPAL
 )
 
 
