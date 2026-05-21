@@ -231,7 +231,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://aeepr.com/es-pr/
-    producer_script: archive/r4_legacy/scripts/download_prepa_contracts.py
+    producer_script: scripts/download_prepa_contracts.py
     expected_outputs:
       - data/staging/processed/pr_prepa_contracts.csv
     schema_version: r5_v1
@@ -305,7 +305,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.comprashpr.com/
-    producer_script: archive/r4_legacy/scripts/download_compras.py
+    producer_script: scripts/download_compras.py
     expected_outputs:
       - data/staging/processed/pr_compras_rfps.csv
     schema_version: r5_v1
@@ -319,7 +319,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.aafaf.pr.gov/
-    producer_script: archive/r4_legacy/scripts/download_aafaf.py
+    producer_script: scripts/download_aafaf.py
     expected_outputs:
       - data/staging/processed/pr_aafaf_budget.csv
     schema_version: r5_v1
@@ -333,7 +333,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://hacienda.pr.gov/
-    producer_script: archive/r4_legacy/scripts/download_hacienda.py
+    producer_script: scripts/download_hacienda.py
     expected_outputs:
       - data/staging/processed/pr_hacienda_tax_revenue.csv
     schema_version: r5_v1
@@ -346,7 +346,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.cofina.pr.gov/
-    producer_script: archive/r4_legacy/scripts/download_cofina.py
+    producer_script: scripts/download_cofina.py
     expected_outputs:
       - data/staging/processed/pr_cofina_sut.csv
     schema_version: r5_v1
@@ -359,7 +359,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://cases.ra.kroll.com/puertorico/
-    producer_script: archive/r4_legacy/scripts/download_promesa_creditors.py
+    producer_script: scripts/download_promesa_creditors.py
     expected_outputs:
       - data/staging/processed/pr_promesa_creditors.csv
     schema_version: r5_v1
@@ -372,7 +372,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.ddec.pr.gov/
-    producer_script: archive/r4_legacy/scripts/download_act60.py
+    producer_script: scripts/download_act60.py
     expected_outputs:
       - data/staging/processed/pr_act60_decrees.csv
     schema_version: r5_v1
@@ -385,7 +385,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.p3.pr.gov/
-    producer_script: archive/r4_legacy/scripts/download_p3.py
+    producer_script: scripts/download_p3.py
     expected_outputs:
       - data/staging/processed/pr_p3_contracts.csv
     schema_version: r5_v1
@@ -398,7 +398,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.retiro.pr.gov/
-    producer_script: archive/r4_legacy/scripts/download_pr_pensions.py
+    producer_script: scripts/download_pr_pensions.py
     expected_outputs:
       - data/staging/processed/pr_pensions_ers_trs_jrs.csv
     schema_version: r5_v1
@@ -411,7 +411,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://home.treasury.gov/about/offices/economic-policy/territorial-tax-rebate
-    producer_script: archive/r4_legacy/scripts/download_rum_coverover.py
+    producer_script: scripts/download_rum_coverover.py
     expected_outputs:
       - data/staging/processed/pr_rum_coverover.csv
     schema_version: r5_v1
@@ -424,7 +424,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.ocam.pr.gov/
-    producer_script: archive/r4_legacy/scripts/download_municipal.py
+    producer_script: scripts/download_municipal.py
     expected_outputs:
       - data/staging/processed/pr_municipal_finance.csv
     schema_version: r5_v1
@@ -437,7 +437,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://echo.epa.gov/
-    producer_script: archive/r4_legacy/scripts/download_eqb.py
+    producer_script: scripts/download_eqb.py
     expected_outputs:
       - data/staging/processed/pr_eqb_permits.csv
     schema_version: r5_v1
