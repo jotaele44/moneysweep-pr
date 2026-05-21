@@ -145,7 +145,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.fema.gov/openfema-data-page/hazard-mitigation-grant-program-disaster-summaries-v2
-    producer_script: archive/r4_legacy/scripts/download_fema.py
+    producer_script: scripts/download_fema.py
     expected_outputs:
       - data/staging/processed/pr_fema_hmgp.csv
     schema_version: r5_v1
@@ -202,7 +202,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.huduser.gov/portal/datasets/assthsg.html
-    producer_script: archive/r4_legacy/scripts/download_hud_hcv.py
+    producer_script: scripts/download_hud_hcv.py
     expected_outputs:
       - data/staging/processed/pr_hud_hcv.csv
     schema_version: r5_v1
@@ -579,7 +579,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://home.treasury.gov/policy-issues/coronavirus/assistance-for-state-local-and-tribal-governments/state-and-local-fiscal-recovery-funds
-    producer_script: archive/r4_legacy/scripts/download_slfrf.py
+    producer_script: scripts/download_slfrf.py
     expected_outputs:
       - data/staging/processed/pr_slfrf_master.csv
     schema_version: r5_v1
@@ -605,7 +605,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://api.reporter.nih.gov/
-    producer_script: archive/r4_legacy/scripts/download_nih.py
+    producer_script: scripts/download_nih.py
     expected_outputs:
       - data/staging/processed/pr_nih_grants.csv
     schema_version: r5_v1
@@ -618,7 +618,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.usace.army.mil/Missions/Civil-Works/
-    producer_script: archive/r4_legacy/scripts/download_usace_civil.py
+    producer_script: scripts/download_usace_civil.py
     expected_outputs:
       - data/staging/processed/pr_usace_civil.csv
     schema_version: r5_v1
@@ -631,7 +631,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://permits.ops.usace.army.mil/orm-public
-    producer_script: archive/r4_legacy/scripts/download_usace_permits.py
+    producer_script: scripts/download_usace_permits.py
     expected_outputs:
       - data/staging/processed/pr_usace_permits.csv
     schema_version: r5_v1
@@ -748,7 +748,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://home.treasury.gov/policy-issues/coronavirus/assistance-for-state-local-and-tribal-governments/homeowner-assistance-fund
-    producer_script: archive/r4_legacy/scripts/download_haf.py
+    producer_script: scripts/download_haf.py
     expected_outputs:
       - data/staging/processed/pr_haf.csv
     schema_version: r5_v1
@@ -774,7 +774,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.appropriations.house.gov/
-    producer_script: archive/r4_legacy/scripts/download_earmarks.py
+    producer_script: scripts/download_earmarks.py
     expected_outputs:
       - data/staging/processed/pr_earmarks.csv
     schema_version: r5_v1
@@ -1025,7 +1025,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.fcc.gov/general/universal-service-fund
-    producer_script: archive/r4_legacy/scripts/download_fcc.py
+    producer_script: scripts/download_fcc.py
     expected_outputs:
       - data/staging/processed/pr_fcc_usf.csv
     schema_version: r5_v1
@@ -1038,7 +1038,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.fema.gov/openfema-data-page/fima-nfip-redacted-claims-v2
-    producer_script: archive/r4_legacy/scripts/download_nfip.py
+    producer_script: scripts/download_nfip.py
     expected_outputs:
       - data/staging/processed/pr_nfip_claims.csv
     schema_version: r5_v1
@@ -1051,7 +1051,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.huduser.gov/portal/datasets/lihtc.html
-    producer_script: archive/r4_legacy/scripts/download_lihtc.py
+    producer_script: scripts/download_lihtc.py
     expected_outputs:
       - data/staging/processed/pr_lihtc.csv
     schema_version: r5_v1
@@ -1064,7 +1064,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.cdfifund.gov/programs-training/programs/new-markets-tax-credit
-    producer_script: archive/r4_legacy/scripts/download_nmtc.py
+    producer_script: scripts/download_nmtc.py
     expected_outputs:
       - data/staging/processed/pr_nmtc.csv
     schema_version: r5_v1
@@ -1077,7 +1077,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://projects.propublica.org/nonprofits/api
-    producer_script: archive/r4_legacy/scripts/download_nonprofits.py
+    producer_script: scripts/download_nonprofits.py
     expected_outputs:
       - data/staging/processed/pr_nonprofits_990.csv
     schema_version: r5_v1
@@ -1090,7 +1090,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.gao.gov/
-    producer_script: archive/r4_legacy/scripts/download_gao_ig.py
+    producer_script: scripts/download_gao_ig.py
     expected_outputs:
       - data/staging/processed/pr_gao_ig_audits.csv
     schema_version: r5_v1
@@ -1116,7 +1116,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://www.whitehouse.gov/omb/budget/sf-133/
-    producer_script: archive/r4_legacy/scripts/download_sf133.py
+    producer_script: scripts/download_sf133.py
     expected_outputs:
       - data/staging/processed/pr_sf133.csv
     schema_version: r5_v1

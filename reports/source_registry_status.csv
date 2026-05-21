@@ -6,11 +6,11 @@ fsrs_subawards,federal,True,none,scripts/download_fsrs.py,data/staging/processed
 sam_entities,entity_resolution,True,api_key:SAM_API_KEY,scripts/sam_enrichment.py,data/staging/processed/enrichment/vendor_uei_index.csv;data/staging/processed/entities_resolved.csv,monthly,not_materialized,"SAM full extract + per-UEI enrichment for parent resolution. Supplemented by scripts/usaspending_parent_uei_extract.py (no rate limit). SAM API rate: 1,000 req/day → full 2,334-UEI run = 2.3+ days."
 highergov_supplemental,federal,False,api_key:HGOV_API_KEY,scripts/fetch_highergov_api.py,data/raw/HigherGov/;data/staging/processed/pr_highergov_supplement.csv,weekly,partially_materialized,Supplementary federal contract intel via HigherGov. PDFs require parse_highergov_pdfs.
 fema_pa_openfema_v2,federal,True,none,scripts/download_openfema_pa_projects.py,data/staging/processed/pr_fema_pa_master.csv,monthly,not_materialized,Preferred FEMA PA route. OpenFEMA v2 PA projects API.
-fema_hmgp,federal,False,none,archive/r4_legacy/scripts/download_fema.py,data/staging/processed/pr_fema_hmgp.csv,monthly,not_materialized,
+fema_hmgp,federal,False,none,scripts/download_fema.py,data/staging/processed/pr_fema_hmgp.csv,monthly,not_materialized,
 cor3,territorial,True,none,scripts/download_cor3.py,data/staging/processed/pr_cor3_master.csv,quarterly,not_materialized,"PR Central Office for Recovery, Reconstruction and Resiliency project tracker."
 hud_cdbg_dr_public,federal,True,none,scripts/download_cdbg_dr.py,data/staging/processed/pr_cdbg_dr_master.csv,quarterly,not_materialized,
 hud_drgr_authorized,manual_export,True,manual_export,scripts/ingest_hud_drgr_exports.py,data/staging/processed/hud_drgr_activities.csv;data/staging/processed/hud_drgr_projects.csv,monthly,not_materialized,Credentialed DRGR portal — operator must export and drop manifests in manual_drop_dir.
-hud_hcv_section8,federal,False,none,archive/r4_legacy/scripts/download_hud_hcv.py,data/staging/processed/pr_hud_hcv.csv,yearly,not_materialized,
+hud_hcv_section8,federal,False,none,scripts/download_hud_hcv.py,data/staging/processed/pr_hud_hcv.csv,yearly,not_materialized,
 prasa,infrastructure,True,none,scripts/ingest_prasa.py,data/staging/processed/pr_prasa_contracts.csv;data/staging/processed/prasa_contracts_master.csv,yearly,not_materialized,PRASA aqueduct/sewer authority. Includes Consulting Engineer Report FY2024 baseline.
 prepa_luma_genera,infrastructure,False,none,archive/r4_legacy/scripts/download_prepa_contracts.py,data/staging/processed/pr_prepa_contracts.csv,quarterly,not_materialized,PREPA / LUMA Energy / Genera PR contracts and operating data.
 act_transition_contracts,manual_export,False,manual_export,scripts/ingest_active_contractors.py,data/staging/processed/pr_act_transition_contracts.csv,ad_hoc,not_materialized,"PR ACT transition contract files (Autopistas, Ferrovial, LPC&D, etc.). Manual export."
@@ -37,11 +37,11 @@ donaciones_pr,political_finance,False,none,scripts/ingest_fec.py,data/staging/pr
 follow_the_money,political_finance,False,none,scripts/ingest_follow_the_money.py,data/staging/processed/pr_follow_the_money.csv,yearly,not_materialized,State-level campaign finance for PR + DC connections.
 sba_loans,federal,False,none,scripts/download_sba.py,data/staging/processed/pr_sba_loans.csv,quarterly,not_materialized,
 sba_ppp,federal,False,none,scripts/download_sba.py,data/staging/processed/pr_sba_ppp.csv,yearly,not_materialized,
-slfrf,federal,False,none,archive/r4_legacy/scripts/download_slfrf.py,data/staging/processed/pr_slfrf_master.csv,quarterly,not_materialized,
+slfrf,federal,False,none,scripts/download_slfrf.py,data/staging/processed/pr_slfrf_master.csv,quarterly,not_materialized,
 sbir,federal,False,none,scripts/download_sbir.py,data/staging/processed/pr_sbir.csv,monthly,not_materialized,
-nih_reporter,federal,False,none,archive/r4_legacy/scripts/download_nih.py,data/staging/processed/pr_nih_grants.csv,monthly,not_materialized,
-usace_civil_works,federal,False,none,archive/r4_legacy/scripts/download_usace_civil.py,data/staging/processed/pr_usace_civil.csv,quarterly,not_materialized,
-usace_permits,federal,False,none,archive/r4_legacy/scripts/download_usace_permits.py,data/staging/processed/pr_usace_permits.csv,quarterly,not_materialized,
+nih_reporter,federal,False,none,scripts/download_nih.py,data/staging/processed/pr_nih_grants.csv,monthly,not_materialized,
+usace_civil_works,federal,False,none,scripts/download_usace_civil.py,data/staging/processed/pr_usace_civil.csv,quarterly,not_materialized,
+usace_permits,federal,False,none,scripts/download_usace_permits.py,data/staging/processed/pr_usace_permits.csv,quarterly,not_materialized,
 epa_grants,federal,False,none,scripts/download_epa.py,data/staging/processed/pr_epa_grants.csv,quarterly,not_materialized,
 dot_grants,federal,False,none,scripts/download_dot.py,data/staging/processed/pr_dot_grants.csv,quarterly,not_materialized,
 usda_grants,federal,False,none,scripts/download_usda.py,data/staging/processed/pr_usda.csv,quarterly,not_materialized,
@@ -50,9 +50,9 @@ doj_grants,federal,False,none,scripts/download_doj_grants.py,data/staging/proces
 ed_grants,federal,False,none,scripts/download_ed.py,data/staging/processed/pr_ed_grants.csv,quarterly,not_materialized,
 hhs_grants,federal,False,none,scripts/download_hhs.py,data/staging/processed/pr_hhs_grants.csv,quarterly,not_materialized,
 oia_grants,federal,False,none,scripts/download_oia.py,data/staging/processed/pr_oia_grants.csv,yearly,not_materialized,
-haf,federal,False,none,archive/r4_legacy/scripts/download_haf.py,data/staging/processed/pr_haf.csv,quarterly,not_materialized,
+haf,federal,False,none,scripts/download_haf.py,data/staging/processed/pr_haf.csv,quarterly,not_materialized,
 exim_bank,federal,False,none,scripts/download_exim.py,data/staging/processed/pr_exim.csv,yearly,not_materialized,
-congressional_earmarks,federal,False,none,archive/r4_legacy/scripts/download_earmarks.py,data/staging/processed/pr_earmarks.csv,yearly,not_materialized,
+congressional_earmarks,federal,False,none,scripts/download_earmarks.py,data/staging/processed/pr_earmarks.csv,yearly,not_materialized,
 ofac_sdn,entity_resolution,False,none,archive/r4_legacy/scripts/download_ofac.py,data/staging/processed/ofac_sdn.csv,weekly,not_materialized,
 opencorporates,entity_resolution,False,api_key:OPENCORPORATES_API_TOKEN,archive/r4_legacy/scripts/download_opencorporates.py,data/staging/processed/pr_opencorporates.csv,ad_hoc,not_materialized,
 pr_corporate_registry,manual_export,False,manual_export,scripts/ingest_active_contractors.py,data/staging/processed/pr_corporate_registry.csv,ad_hoc,not_materialized,
@@ -71,13 +71,13 @@ ncua,federal,False,none,scripts/download_ncua.py,data/staging/processed/pr_ncua.
 fhlb,federal,False,none,scripts/download_fhlb.py,data/staging/processed/pr_fhlb.csv,quarterly,not_materialized,
 sec_edgar,federal,False,none,scripts/download_sec.py,data/staging/processed/pr_sec_edgar.csv,monthly,not_materialized,
 sec_13f_nport,federal,False,none,scripts/download_sec_holdings.py,data/staging/processed/pr_sec_holdings.csv,quarterly,not_materialized,
-fcc_usf,federal,False,none,archive/r4_legacy/scripts/download_fcc.py,data/staging/processed/pr_fcc_usf.csv,yearly,not_materialized,
-nfip_claims,federal,False,none,archive/r4_legacy/scripts/download_nfip.py,data/staging/processed/pr_nfip_claims.csv,monthly,not_materialized,
-lihtc,federal,False,none,archive/r4_legacy/scripts/download_lihtc.py,data/staging/processed/pr_lihtc.csv,yearly,not_materialized,
-nmtc,federal,False,none,archive/r4_legacy/scripts/download_nmtc.py,data/staging/processed/pr_nmtc.csv,yearly,not_materialized,
-nonprofits_irs990,federal,False,none,archive/r4_legacy/scripts/download_nonprofits.py,data/staging/processed/pr_nonprofits_990.csv,yearly,not_materialized,
-gao_ig_audits,federal,False,none,archive/r4_legacy/scripts/download_gao_ig.py,data/staging/processed/pr_gao_ig_audits.csv,monthly,not_materialized,
+fcc_usf,federal,False,none,scripts/download_fcc.py,data/staging/processed/pr_fcc_usf.csv,yearly,not_materialized,
+nfip_claims,federal,False,none,scripts/download_nfip.py,data/staging/processed/pr_nfip_claims.csv,monthly,not_materialized,
+lihtc,federal,False,none,scripts/download_lihtc.py,data/staging/processed/pr_lihtc.csv,yearly,not_materialized,
+nmtc,federal,False,none,scripts/download_nmtc.py,data/staging/processed/pr_nmtc.csv,yearly,not_materialized,
+nonprofits_irs990,federal,False,none,scripts/download_nonprofits.py,data/staging/processed/pr_nonprofits_990.csv,yearly,not_materialized,
+gao_ig_audits,federal,False,none,scripts/download_gao_ig.py,data/staging/processed/pr_gao_ig_audits.csv,monthly,not_materialized,
 dol_whd_osha,federal,False,none,scripts/download_dol.py,data/staging/processed/pr_dol_whd.csv,monthly,not_materialized,
-sf133_budget_execution,federal,False,none,archive/r4_legacy/scripts/download_sf133.py,data/staging/processed/pr_sf133.csv,quarterly,not_materialized,
+sf133_budget_execution,federal,False,none,scripts/download_sf133.py,data/staging/processed/pr_sf133.csv,quarterly,not_materialized,
 research_grants,federal,False,none,scripts/download_research.py,data/staging/processed/pr_research_grants.csv,weekly,not_materialized,
 grants_gov,federal,False,none,scripts/download_grants.py,data/staging/processed/pr_grants.csv,weekly,not_materialized,
