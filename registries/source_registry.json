@@ -291,7 +291,7 @@
       "required": false,
       "authentication": "manual_export",
       "endpoint_url": "",
-      "producer_script": "archive/r4_legacy/scripts/download_active_contractors.py",
+      "producer_script": "scripts/download_active_contractors.py",
       "expected_outputs": [
         "data/staging/processed/pr_dcaa_active_contractors.csv"
       ],
@@ -522,7 +522,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://emma.msrb.org/",
-      "producer_script": "archive/r4_legacy/scripts/download_msrb_trades.py",
+      "producer_script": "scripts/download_msrb_trades.py",
       "expected_outputs": [
         "data/staging/processed/pr_msrb_rtrs_trades.csv"
       ],
@@ -909,7 +909,7 @@
       "required": false,
       "authentication": "none",
       "endpoint_url": "https://www.treasury.gov/ofac/downloads/sdn.csv",
-      "producer_script": "archive/r4_legacy/scripts/download_ofac.py",
+      "producer_script": "scripts/download_ofac.py",
       "expected_outputs": [
         "data/staging/processed/ofac_sdn.csv"
       ],
@@ -925,7 +925,7 @@
       "required": false,
       "authentication": "api_key:OPENCORPORATES_API_TOKEN",
       "endpoint_url": "https://opencorporates.com/",
-      "producer_script": "archive/r4_legacy/scripts/download_opencorporates.py",
+      "producer_script": "scripts/download_opencorporates.py",
       "expected_outputs": [
         "data/staging/processed/pr_opencorporates.csv"
       ],
