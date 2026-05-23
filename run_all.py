@@ -593,6 +593,11 @@ def main() -> int:
                         help="Skip step 25e (PR Hacienda monthly tax revenues)")
     parser.add_argument("--skip-cofina", action="store_true",
                         help="Skip step 25f (COFINA SUT revenue bond allocation)")
+    parser.add_argument("--strict-preflight", action="store_true",
+                        help="Abort before the pipeline if the readiness preflight "
+                             "finds structural errors (missing keys never abort)")
+    parser.add_argument("--skip-preflight", action="store_true",
+                        help="Skip the registry readiness preflight")
     args = parser.parse_args()
 
     root = PROJECT_ROOT
@@ -603,6 +608,22 @@ def main() -> int:
 
     logger = setup_pipeline_logging(logs_dir)
     print_banner(logger)
+
+    # Registry readiness preflight — inspects all sources without executing any
+    # producer or making network calls. Missing API keys are non-fatal; structural
+    # errors abort only under --strict-preflight.
+    if not args.skip_preflight:
+        try:
+            from scripts.pipeline_preflight import run_pipeline_preflight
+            preflight = run_pipeline_preflight(root, logger, strict=args.strict_preflight)
+            if args.strict_preflight and not preflight["ok"]:
+                logger.error(
+                    "[preflight] strict mode: structural errors present — "
+                    "aborting before pipeline execution."
+                )
+                return 2
+        except Exception as e:
+            logger.warning(f"[preflight] readiness preflight could not run: {e}")
 
     archived_sources = install_archived_source_skip(root, logger)
     if archived_sources:

@@ -163,7 +163,7 @@ def _env_vars_for_script(path: Path) -> list[str]:
     text = path.read_text(encoding="utf-8", errors="replace")
     hits = set(re.findall(r"(?:os\.)?getenv\([\"']([A-Z0-9_]+)[\"']", text))
     # Also infer from argparse hints.
-    for token in ("FEC_API_KEY", "LDA_API_KEY", "SAM_API_KEY", "HGOV_API_KEY"):
+    for token in ("FEC_API_KEY", "LDA_API_KEY", "SAM_API_KEY", "HIGHERGOV_API_KEY"):
         if token in text:
             hits.add(token)
     return sorted(hits)
