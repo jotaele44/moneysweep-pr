@@ -1,6 +1,6 @@
 {
-  "active_vector": "SOURCE_REGISTRY_REWIRE_COMPLETE_ALL_82_PRODUCERS_WIRED",
-  "active_branch": "claude/wire-bonds-entity-sources",
+  "active_vector": "POST_PR97_STATUS_NORMALIZATION_REQUIRED_BACKFILL_GATE",
+  "active_branch": "claude/post-pr97-status-normalization",
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_active": true,
   "completed": [
@@ -38,10 +38,10 @@
     "PR-B4 wire federal disaster/research sources — un-archived 15 downloader modules (fema, haf, slfrf, nfip, lihtc, nmtc, usace_civil, usace_permits, hud_hcv, earmarks, sf133, fcc, nih, gao_ig, nonprofits) covering 15 sources; registry repointed to scripts/; test_download_sf133.py restored from archive; smoke test extended; 16 sources still archived; 588 passed — merged to main (#93)",
     "PR-B5 wire territorial/municipal/infrastructure sources — un-archived 12 downloader modules (aafaf, hacienda, cofina, promesa_creditors, act60, p3, pr_pensions, rum_coverover, municipal, eqb, compras, prepa_contracts) covering 12 sources; registry repointed to scripts/; test_new_downloaders.py restored from archive (cross-batch import test, 84 cases); smoke test extended; 4 sources still archived; 696 passed — merged to main (#95)",
     "PR-B6 wire bonds/entity-resolution/manual sources — un-archived 4 downloader modules (msrb_trades, ofac, opencorporates, active_contractors) covering 4 sources; registry repointed to scripts/; test_download_ofac.py restored from archive; smoke test extended; SOURCE REGISTRY REWIRE COMPLETE — all 82 producer_script paths point to scripts/, 0 optional sources archived; 710 passed",
-    "Pipeline readiness preflight — scripts/pipeline_preflight.py (registry-driven, no producer execution, no network): classifies all 82 sources by readiness, reports API-key presence/absence without logging values, --strict-preflight aborts run_all only on structural errors; tests/test_pipeline_preflight.py added (PR #97)"
+    "Pipeline readiness preflight — scripts/pipeline_preflight.py (registry-driven, no producer execution, no network): classifies all 82 sources by readiness, reports API-key presence/absence without logging values, --strict-preflight aborts run_all only on structural errors; tests/test_pipeline_preflight.py added (PR #97)",
+    "PR #97 pipeline readiness preflight merged to main — strict preflight available"
   ],
   "in_progress": [
-    "PR-I archive dominance_analysis and analyze_prime_sub",
     "Source intake taxonomy for uploaded PR contract, lobbying, PRASA, and contractor-reference datasets pending",
     "PR2.5/PR2.6 entity-gate branch reconciliation pending before PR3 deduplication"
   ],
@@ -52,13 +52,13 @@
     "HigherGov archive/deletion: blocked until consumer refactor removes live references"
   ],
   "last_tests": {
-    "command": "python -m pytest -q --tb=no",
-    "passed": 473,
-    "skipped": 0,
-    "failed": 0,
-    "status": "GREEN",
-    "run_at": "2026-05-18",
-    "note": "PR-H branch: run_all.py step 9+29 imports removed; 473 passed, 0 failed"
+    "command": "python3 -m pytest -q --ignore=.claude",
+    "passed": 713,
+    "skipped": 2,
+    "failed": 4,
+    "status": "YELLOW",
+    "run_at": "2026-05-23",
+    "note": "4 pre-existing failures on main, not introduced by this branch: test_r48b_executes_with_explicit_terminal_statuses (order-dependent, passes in isolation), test_r48d_runs_targeted_retry_and_writes_outputs, test_r48d_schema_alignment_report_records_deterministic_mappings, test_status_csv_regenerates_identically (order-dependent, passes in isolation). All 5 preflight tests pass."
   },
   "secrets_audit": {
     "files_scanned": 560,
@@ -131,5 +131,22 @@
     "Federal LDA registrants",
     "DCAA active contractor listings"
   ],
-  "next_command": "POST_REWIRE_VALIDATION_AND_CLOSEOUT"
+  "next_command": "BACKFILL_REQUIRED_SOURCES_ONLY_AFTER_STRICT_PREFLIGHT",
+  "next_command_detail": {
+    "description": "Run producer scripts for required=True sources only; do not run optional sources",
+    "required_sources_not_materialized": [
+      "usaspending_prime (partially_materialized)",
+      "fsrs_subawards (not_materialized)",
+      "sam_entities (not_materialized — requires SAM_API_KEY)",
+      "cor3 (not_materialized — manual export)",
+      "hud_drgr_authorized (not_materialized — manual export)",
+      "prasa (not_materialized — manual export)",
+      "oficina_contralor (not_materialized — manual export)",
+      "emma_bonds (partially_materialized)",
+      "pr_cabilderos (partially_materialized)"
+    ],
+    "gate": "strict preflight must pass before each producer run",
+    "excluded": "optional sources (required=False) — do not run in this pass",
+    "materialization_vocabulary_patch": "next_patch — gap_analysis_builder.py has fully_materialized/partially_materialized/not_materialized/below_threshold/no_outputs_declared; proposed new terms (full_materialized, partial_materialized, seed_only, manual_required, failed_api_query) diverge from existing vocabulary and would require a refactor; defer to dedicated PR"
+  }
 }
