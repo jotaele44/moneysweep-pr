@@ -87,4 +87,4 @@ usda_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/process
 va_benefits,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_va.csv,
 wic,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_wic.csv,
 wioa,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_wioa.csv,
-highergov_supplemental,federal,False,api_key:HGOV_API_KEY,2,1,1,0,partially_materialized,0,1,data/raw/HigherGov/,Supplementary federal contract intel via HigherGov. PDFs require parse_highergov_pdfs.
+highergov_supplemental,federal,False,api_key:HIGHERGOV_API_KEY,2,1,1,0,partially_materialized,0,1,data/raw/HigherGov/,Supplementary federal contract intel via HigherGov. PDFs require parse_highergov_pdfs.

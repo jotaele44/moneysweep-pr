@@ -98,7 +98,7 @@
       "source_id": "highergov_supplemental",
       "family": "federal",
       "required": false,
-      "authentication": "api_key:HGOV_API_KEY",
+      "authentication": "api_key:HIGHERGOV_API_KEY",
       "endpoint_url": "https://www.highergov.com/api",
       "producer_script": "scripts/fetch_highergov_api.py",
       "expected_outputs": [
