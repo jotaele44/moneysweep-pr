@@ -29,13 +29,23 @@ from scripts.config import PROJECT_ROOT, setup_logging
 
 NORMALIZED_DIR = PROJECT_ROOT / "data" / "normalized"
 
-RAW_DIRS = [
-    PROJECT_ROOT / "data" / "raw",               # catches root-level files e.g. "HUD DRGR (all PR grantees).xls"
-    PROJECT_ROOT / "data" / "raw" / "HUD DRGR",
-    PROJECT_ROOT / "data" / "raw" / "HUD",
-    PROJECT_ROOT / "data" / "raw" / "hud_drgr",
-    PROJECT_ROOT / "data" / "raw" / "hud",
-]
+# Directories scanned for HUD DRGR exports, relative to the run root.
+# `data/manual/hud_drgr/` is the registry's manual_drop_dir for the
+# `hud_drgr_authorized` source; the others catch legacy drop locations.
+RAW_RELATIVE_DIRS = (
+    "data/manual/hud_drgr",
+    "data/raw",
+    "data/raw/HUD DRGR",
+    "data/raw/HUD",
+    "data/raw/hud_drgr",
+    "data/raw/hud",
+)
+
+# A file is treated as a HUD DRGR export only if its basename or parent dir
+# contains one of these keywords. Without this filter, unrelated CSVs that
+# live under `data/raw/` (e.g. Follow the Money, FEC, documents) get pulled
+# in and crash `_map_to_schema` on an all-scalar column dict.
+HUD_DRGR_FILENAME_KEYWORDS = ("hud", "drgr", "cdbg")
 
 ACTIVITY_COLUMNS = [
     "activity_id", "grant_number", "project_id",
@@ -162,7 +172,8 @@ def _map_to_schema(df, col_map, columns, source_file):
     for out_col, candidates in col_map.items():
         src = _map_col(df.columns.tolist(), candidates)
         out[out_col] = df[src] if src else ""
-    result = pd.DataFrame(out)
+    # Pass index=df.index so an all-scalar `out` still constructs cleanly.
+    result = pd.DataFrame(out, index=df.index)
     result["source_file"] = source_file
     for col in columns:
         if col not in result.columns:
@@ -170,9 +181,17 @@ def _map_to_schema(df, col_map, columns, source_file):
     return result[columns]
 
 
-def _find_raw_files(logger):
+def _looks_like_hud_drgr(path):
+    """True only if filename or parent dir suggests a HUD/DRGR/CDBG export."""
+    name = path.name.lower()
+    parent = path.parent.name.lower()
+    return any(kw in name or kw in parent for kw in HUD_DRGR_FILENAME_KEYWORDS)
+
+
+def _find_raw_files(root, logger):
     found = []
-    for raw_dir in RAW_DIRS:
+    for rel in RAW_RELATIVE_DIRS:
+        raw_dir = root / rel
         if not raw_dir.exists():
             continue
         for pattern in ("*.xlsx", "*.xls", "*.csv"):
@@ -186,8 +205,15 @@ def _find_raw_files(logger):
                     for f in sub.glob(pattern):
                         if not f.name.startswith("."):
                             found.append(f)
-    logger.info(f"  Found {len(found)} HUD DRGR export files")
-    return sorted(set(found))
+    relevant = sorted({f for f in found if _looks_like_hud_drgr(f)})
+    if not relevant:
+        logger.info(
+            f"  Found 0 HUD DRGR export files (scanned {len(found)} candidates; "
+            f"none matched {HUD_DRGR_FILENAME_KEYWORDS})"
+        )
+    else:
+        logger.info(f"  Found {len(relevant)} HUD DRGR export files")
+    return relevant
 
 
 def run(root=None, force=False):
@@ -205,7 +231,23 @@ def run(root=None, force=False):
         logger.info(f"  HUD DRGR exports: {a_rows:,} activities — skipping (use --force).")
         return {"activity_rows": a_rows, "drawdown_rows": 0, "appropriation_rows": 0, "status": "CACHED"}
 
-    files = _find_raw_files(logger)
+    files = _find_raw_files(root, logger)
+
+    if not files:
+        logger.warning(
+            "  No HUD DRGR manual export files found — drop authorized exports at "
+            "data/manual/hud_drgr/ (or data/raw/HUD DRGR/) and re-run."
+        )
+        # Write empty parquets so expected_outputs exist; signal manual_required.
+        pq_write(pd.DataFrame(columns=ACTIVITY_COLUMNS), activity_path)
+        pq_write(pd.DataFrame(columns=DRAWDOWN_COLUMNS), drawdown_path)
+        pq_write(pd.DataFrame(columns=APPROPRIATION_COLUMNS), appropriation_path)
+        return {
+            "activity_rows": 0,
+            "drawdown_rows": 0,
+            "appropriation_rows": 0,
+            "status": "manual_required",
+        }
 
     activity_dfs, drawdown_dfs, appropriation_dfs = [], [], []
 
