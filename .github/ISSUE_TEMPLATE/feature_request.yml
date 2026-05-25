@@ -1,0 +1,39 @@
+name: Feature request
+description: A new source, capability, or pipeline stage.
+title: "[Feature]: "
+labels: ["feature-request"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What new capability is requested?
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this needed? What coverage or analysis gap does it close?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Target area
+      options:
+        - sources / new data source
+        - ingest / downloaders
+        - normalize / resolve / link
+        - geo / graph
+        - validate / production gates
+        - export / reports
+        - orchestration
+        - CI / repo governance
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope notes
+      description: Staged-PR batch, dependencies, or gates this depends on.

@@ -1,0 +1,16 @@
+name: Question
+description: A question about the pipeline, data, or operating procedure.
+title: "[Question]: "
+labels: ["question"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What you have already read or tried (STATUS.md, docs/, reports/).
