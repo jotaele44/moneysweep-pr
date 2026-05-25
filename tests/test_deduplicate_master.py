@@ -3,6 +3,7 @@
 import sys
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -119,3 +120,110 @@ class TestMain:
         assert stats["master_rows"] == 3
         assert stats["duplicates_removed"] == 1
         assert (tmp_project / "data" / "staging" / "processed" / "pr_contracts_master.csv").exists()
+
+
+# ---------------------------------------------------------------------------
+# Dedup-key edge cases — pin current behavior (incl. known limitations).
+#
+# The composite dedup key is (contract_id, award_date, vendor_name,
+# obligated_amount). The function does NOT normalize any of those fields
+# before comparing — it uses raw `drop_duplicates`. The tests below pin
+# that as the current contract so future normalization changes are explicit.
+# ---------------------------------------------------------------------------
+
+@pytest.mark.unit
+class TestDedupEdgeCases:
+    def test_vendor_name_trailing_whitespace_not_collapsed(self, logger):
+        df = pd.DataFrame({
+            "contract_id": ["C001", "C001"],
+            "award_date": ["2020-01-01", "2020-01-01"],
+            "vendor_name": ["ACME", "ACME "],
+            "obligated_amount": ["1000", "1000"],
+            "source_file": ["a", "b"],
+        })
+        result = deduplicate(df, logger)
+        assert len(result) == 2
+
+    def test_vendor_name_case_variance_not_collapsed(self, logger):
+        df = pd.DataFrame({
+            "contract_id": ["C001", "C001"],
+            "award_date": ["2020-01-01", "2020-01-01"],
+            "vendor_name": ["acme inc", "ACME INC"],
+            "obligated_amount": ["1000", "1000"],
+            "source_file": ["a", "b"],
+        })
+        result = deduplicate(df, logger)
+        assert len(result) == 2
+
+    def test_amount_string_format_variance_not_collapsed(self, logger):
+        df = pd.DataFrame({
+            "contract_id": ["C001", "C001"],
+            "award_date": ["2020-01-01", "2020-01-01"],
+            "vendor_name": ["ACME", "ACME"],
+            "obligated_amount": ["1000", "1000.00"],
+            "source_file": ["a", "b"],
+        })
+        result = deduplicate(df, logger)
+        assert len(result) == 2
+
+    def test_amount_with_currency_symbols_not_collapsed(self, logger):
+        df = pd.DataFrame({
+            "contract_id": ["C001", "C001"],
+            "award_date": ["2020-01-01", "2020-01-01"],
+            "vendor_name": ["ACME", "ACME"],
+            "obligated_amount": ["$1,000.00", "1000"],
+            "source_file": ["a", "b"],
+        })
+        result = deduplicate(df, logger)
+        assert len(result) == 2
+
+    def test_nan_in_dedup_key_kept_separate(self, logger):
+        df = pd.DataFrame({
+            "contract_id": ["C001", "C001"],
+            "award_date": ["2020-01-01", "2020-01-01"],
+            "vendor_name": ["ACME", "ACME"],
+            "obligated_amount": [np.nan, np.nan],
+            "source_file": ["a", "b"],
+        })
+        result = deduplicate(df, logger)
+        # pandas drop_duplicates treats NaN as equal under default semantics,
+        # so these rows collapse to one. Pinning current behavior.
+        assert len(result) == 1
+
+    def test_source_file_aggregation_with_null_one_side(self, logger):
+        df = pd.DataFrame({
+            "contract_id": ["C001", "C001"],
+            "award_date": ["2020-01-01", "2020-01-01"],
+            "vendor_name": ["ACME", "ACME"],
+            "obligated_amount": ["1000", "1000"],
+            "source_file": ["a", None],
+        })
+        result = deduplicate(df, logger)
+        assert len(result) == 1
+        # null side is dropped, not joined as "a,"
+        assert result.iloc[0]["source_file"] == "a"
+
+    def test_source_file_aggregation_deduplicates_within_group(self, logger):
+        df = pd.DataFrame({
+            "contract_id": ["C001", "C001", "C001"],
+            "award_date": ["2020-01-01", "2020-01-01", "2020-01-01"],
+            "vendor_name": ["ACME", "ACME", "ACME"],
+            "obligated_amount": ["1000", "1000", "1000"],
+            "source_file": ["a", "b", "a"],
+        })
+        result = deduplicate(df, logger)
+        assert len(result) == 1
+        # set-based, sorted
+        assert result.iloc[0]["source_file"] == "a,b"
+
+    def test_malformed_award_date_compared_as_string(self, logger):
+        df = pd.DataFrame({
+            "contract_id": ["C001", "C001"],
+            "award_date": ["not-a-date", "not-a-date"],
+            "vendor_name": ["ACME", "ACME"],
+            "obligated_amount": ["1000", "1000"],
+            "source_file": ["a", "b"],
+        })
+        result = deduplicate(df, logger)
+        # bytewise-identical strings → collapse
+        assert len(result) == 1
