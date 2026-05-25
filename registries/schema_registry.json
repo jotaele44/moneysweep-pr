@@ -117,6 +117,46 @@
       "required": false,
       "description": "WKT/lat,lon or '' if unknown."
     },
+    "geo_municipality_code": {
+      "dtype": "string",
+      "required": false,
+      "description": "5-digit PR county FIPS (e.g. 72127 San Juan). Populated by post_ingest.apply_post_ingest()."
+    },
+    "geo_municipality_name": {
+      "dtype": "string",
+      "required": false,
+      "description": "Canonical English PR municipality name. Joined from data/reference/pr_municipalities.csv."
+    },
+    "geo_county_fips": {
+      "dtype": "string",
+      "required": false,
+      "description": "PR county FIPS (same as municipality_code in PR)."
+    },
+    "geo_zip": {
+      "dtype": "string",
+      "required": false,
+      "description": "ZIP code if the source provides one, else blank."
+    },
+    "geo_lat": {
+      "dtype": "string",
+      "required": false,
+      "description": "Latitude if the source provides one, else blank."
+    },
+    "geo_lon": {
+      "dtype": "string",
+      "required": false,
+      "description": "Longitude if the source provides one, else blank."
+    },
+    "geo_attribution_source": {
+      "dtype": "string",
+      "required": false,
+      "description": "Input column name that produced the match."
+    },
+    "geo_attribution_confidence": {
+      "dtype": "string",
+      "required": false,
+      "description": "exact_fips | exact_name | normalized_name | fuzzy_name | unknown."
+    },
     "source_system": {
       "dtype": "string",
       "required": true,
@@ -232,6 +272,38 @@
         {
           "name": "geo_location",
           "ref": "geo_location"
+        },
+        {
+          "name": "geo_municipality_code",
+          "ref": "geo_municipality_code"
+        },
+        {
+          "name": "geo_municipality_name",
+          "ref": "geo_municipality_name"
+        },
+        {
+          "name": "geo_county_fips",
+          "ref": "geo_county_fips"
+        },
+        {
+          "name": "geo_zip",
+          "ref": "geo_zip"
+        },
+        {
+          "name": "geo_lat",
+          "ref": "geo_lat"
+        },
+        {
+          "name": "geo_lon",
+          "ref": "geo_lon"
+        },
+        {
+          "name": "geo_attribution_source",
+          "ref": "geo_attribution_source"
+        },
+        {
+          "name": "geo_attribution_confidence",
+          "ref": "geo_attribution_confidence"
         },
         {
           "name": "source_system",
@@ -450,6 +522,22 @@
           "ref": "municipality"
         },
         {
+          "name": "geo_municipality_code",
+          "ref": "geo_municipality_code"
+        },
+        {
+          "name": "geo_municipality_name",
+          "ref": "geo_municipality_name"
+        },
+        {
+          "name": "geo_county_fips",
+          "ref": "geo_county_fips"
+        },
+        {
+          "name": "geo_attribution_confidence",
+          "ref": "geo_attribution_confidence"
+        },
+        {
           "name": "obligation_amount",
           "ref": "obligation_amount"
         },
@@ -541,6 +629,14 @@
           "ref": "municipality"
         },
         {
+          "name": "geo_municipality_code",
+          "ref": "geo_municipality_code"
+        },
+        {
+          "name": "geo_attribution_confidence",
+          "ref": "geo_attribution_confidence"
+        },
+        {
           "name": "link_confidence",
           "ref": "link_confidence"
         }
@@ -555,6 +651,14 @@
         {
           "name": "municipality",
           "ref": "municipality"
+        },
+        {
+          "name": "geo_municipality_code",
+          "ref": "geo_municipality_code"
+        },
+        {
+          "name": "geo_municipality_name",
+          "ref": "geo_municipality_name"
         },
         {
           "name": "chain_id",
@@ -716,6 +820,18 @@
         {
           "name": "geo_location",
           "ref": "geo_location"
+        },
+        {
+          "name": "geo_municipality_code",
+          "ref": "geo_municipality_code"
+        },
+        {
+          "name": "geo_municipality_name",
+          "ref": "geo_municipality_name"
+        },
+        {
+          "name": "geo_attribution_confidence",
+          "ref": "geo_attribution_confidence"
         },
         {
           "name": "operator_entity_id",
@@ -925,6 +1041,18 @@
         {
           "name": "municipality",
           "ref": "municipality"
+        },
+        {
+          "name": "geo_municipality_code",
+          "ref": "geo_municipality_code"
+        },
+        {
+          "name": "geo_municipality_name",
+          "ref": "geo_municipality_name"
+        },
+        {
+          "name": "geo_attribution_confidence",
+          "ref": "geo_attribution_confidence"
         },
         {
           "name": "source_system",
