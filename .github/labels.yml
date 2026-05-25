@@ -1,0 +1,65 @@
+# Canonical issue/PR label set for Contract-Sweeper.
+# Sync with: gh label create / a label-sync action. Maintained for label hygiene
+# so triage categories and areas stay consistent across issues.
+
+# --- Triage category ---
+- name: bug
+  color: d73a4a
+  description: Defect, regression, or incorrect behavior
+- name: feature-request
+  color: 0e8a16
+  description: New source, capability, or pipeline stage
+- name: improvement
+  color: 1d76db
+  description: Refactor, consolidation, or quality work on existing code
+- name: question
+  color: d876e3
+  description: Question about pipeline, data, or procedure
+
+# --- Priority ---
+- name: priority:critical
+  color: b60205
+  description: Blocks other work; address first
+- name: priority:high
+  color: e99695
+  description: Important; schedule soon
+- name: priority:medium
+  color: fbca04
+  description: Normal backlog priority
+- name: priority:low
+  color: c2e0c6
+  description: Nice to have
+
+# --- Area ---
+- name: area:ingest
+  color: bfdadc
+  description: Downloaders and source intake
+- name: area:governance
+  color: 5319e7
+  description: Repo governance, production gates, promotion controls
+- name: area:architecture
+  color: 0052cc
+  description: Module structure and consolidation
+- name: area:data-ingestion
+  color: c5def5
+  description: New federal/territorial data sources
+
+# --- Existing repo labels (preserved) ---
+- name: handoff
+  color: ededed
+  description: Repository handoff preparation
+- name: repo-governance
+  color: ededed
+  description: Repository governance and operating controls
+- name: edu-transition
+  color: ededed
+  description: Education-account operational transition
+- name: architecture
+  color: ededed
+  description: Architecture and target structure
+- name: module-reduction
+  color: ededed
+  description: Module sprawl reduction
+- name: inventory-first
+  color: ededed
+  description: Inventory-before-movement discipline

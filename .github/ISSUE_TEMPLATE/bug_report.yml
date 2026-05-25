@@ -1,0 +1,45 @@
+name: Bug report
+description: A defect, regression, or incorrect behavior in the pipeline.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is broken?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Commands, modules, or sources involved.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - ingest / downloaders
+        - normalize / resolve / link
+        - geo / graph
+        - validate / production gates
+        - export / reports
+        - orchestration (run_all)
+        - CI / repo governance
+        - other / unsure
+    validations:
+      required: true
+  - type: input
+    id: tests
+    attributes:
+      label: Test baseline
+      description: Output of `python -m pytest -q --tb=no`, if available.
