@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Project status and operating rules
+    url: https://github.com/jotaele44/Contract-Sweeper/blob/main/STATUS.md
+    about: Read current pipeline state, blockers, and operating rules before filing.

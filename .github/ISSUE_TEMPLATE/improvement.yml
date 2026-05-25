@@ -1,0 +1,30 @@
+name: Improvement
+description: Refactor, consolidation, performance, or quality work on existing code.
+title: "[Improvement]: "
+labels: ["improvement"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What should be improved?
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current state
+      description: What exists today and why it is suboptimal.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+    validations:
+      required: true
+  - type: textarea
+    id: gates
+    attributes:
+      label: Approval gates / constraints
+      description: Architect gates, file-move approvals, or operating rules that apply.
