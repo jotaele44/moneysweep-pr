@@ -109,3 +109,60 @@ def test_pw_number_preferred_over_award_id_as_pk(tmp_path):
     item = mr.profile_file(target, root=tmp_path)
     assert item.get("pk_field") == "pw_number"
     assert item["duplicate_rate"] == 0.0
+
+
+@pytest.mark.unit
+def test_profile_records_columns_for_drift_detection(tmp_path):
+    """profile_file must record the column list in order so downstream
+    schema-drift comparisons can diff two manifests."""
+    target = tmp_path / "data" / "staging" / "processed" / "drift_a.csv"
+    target.parent.mkdir(parents=True)
+    target.write_text("alpha,beta,gamma\n1,2,3\n", encoding="utf-8")
+    item = mr.profile_file(target, root=tmp_path)
+    assert item["columns"] == ["alpha", "beta", "gamma"]
+    assert item["column_count"] == 3
+
+
+@pytest.mark.unit
+def test_sha256_changes_when_file_content_changes(tmp_path):
+    """profile_file must re-hash on every call; no stale cache."""
+    target = tmp_path / "data" / "staging" / "processed" / "hash_test.csv"
+    target.parent.mkdir(parents=True)
+    target.write_text("a,b\n1,2\n", encoding="utf-8")
+    first = mr.profile_file(target, root=tmp_path)["sha256"]
+    # Append a row; hash must shift.
+    with target.open("a", encoding="utf-8") as f:
+        f.write("3,4\n")
+    second = mr.profile_file(target, root=tmp_path)["sha256"]
+    assert first != second
+    assert len(first) == 64 and len(second) == 64
+
+
+@pytest.mark.integration
+def test_per_source_manifest_includes_columns_field(tmp_path):
+    """write_per_source_manifest persists the columns list inside each
+    file profile, so drift detection works against the written JSON."""
+    # write_per_source_manifest calls source_by_id which loads the
+    # registry; copy the production registry into tmp_path so the
+    # lookup succeeds in isolation.
+    repo_root = Path(__file__).resolve().parents[1]
+    src_reg_dir = repo_root / "registries"
+    dst_reg_dir = tmp_path / "registries"
+    dst_reg_dir.mkdir(parents=True)
+    for f in src_reg_dir.glob("source_registry.*"):
+        shutil.copy(f, dst_reg_dir / f.name)
+
+    target = tmp_path / "data" / "staging" / "processed" / "src.csv"
+    target.parent.mkdir(parents=True)
+    target.write_text("one,two\n1,2\n3,4\n", encoding="utf-8")
+    profile = mr.profile_file(target, root=tmp_path)
+    # Use a source_id that is unlikely to exist; the function falls back
+    # to {"source_id": source_id} so this still exercises the write path.
+    manifest_path = mr.write_per_source_manifest(
+        tmp_path,
+        source_id="synthetic_test_source",
+        files=[profile],
+    )
+    payload = json.loads(manifest_path.read_text())
+    assert payload["file_count"] == 1
+    assert payload["files"][0]["columns"] == ["one", "two"]
