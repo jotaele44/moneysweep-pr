@@ -1,0 +1,2 @@
+project_id,chain_id,award_id,prime_name,sub_name,municipality,obligation_amount,risk_score,signal_count,chain_confidence,opacity_flag,generated_at
+P1,C001,A001,ACME CORP,SUB CORP,SAN JUAN,1000000,0.6,2,0.75,True,2026-05-15T00:00:00+00:00
