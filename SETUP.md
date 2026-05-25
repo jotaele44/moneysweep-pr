@@ -3,6 +3,8 @@
 **Tested on:** Python 3.9+ · Ubuntu/Debian · macOS  
 **Estimated setup time:** 5 minutes (no data download required for tests)
 
+> Use **Python 3.11** locally (see `.python-version`) to match CI — newer interpreters (3.14+) can produce false test failures in R4.8 backfill tests due to dict-ordering changes.
+
 ---
 
 ## 1. Clone
