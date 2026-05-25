@@ -30,6 +30,14 @@ jobs:
       - name: Run tests
         run: pytest -q
 
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+          if-no-files-found: ignore
+
       - name: Scan for committed secrets
         run: python scripts/scan_for_secrets.py --root .
 

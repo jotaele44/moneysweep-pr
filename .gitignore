@@ -5,6 +5,11 @@ __pycache__/
 .venv/
 venv/
 
+# Coverage reports
+.coverage
+coverage.xml
+htmlcov/
+
 # Secrets — NEVER commit
 .env
 *.key
