@@ -12,10 +12,12 @@ from .base import SourceAdapter
 from ._stub import NotImplementedAdapter
 from .fdic import FDICInstitutionsAdapter
 from .fec import FECPRAdapter
+from .highergov import HigherGovSupplementalAdapter
 from .lda import LDAAdapter
 from .nih import NIHReporterAdapter
 from .nonprofits import NonprofitsIRS990Adapter
 from .nsf import NSFAwardsAdapter
+from .opencorporates import OpenCorporatesAdapter
 from .openfema import (
     OpenFEMAHmgpAdapter,
     OpenFEMANfipClaimsAdapter,
@@ -73,6 +75,9 @@ ADAPTER_REGISTRY: dict[str, Type[SourceAdapter]] = {
     NonprofitsIRS990Adapter.source_id: NonprofitsIRS990Adapter,
     SBALoansAdapter.source_id: SBALoansAdapter,
     SBAPaycheckProtectionAdapter.source_id: SBAPaycheckProtectionAdapter,
+    # Auth-gated adapters (Batch 6)
+    OpenCorporatesAdapter.source_id: OpenCorporatesAdapter,
+    HigherGovSupplementalAdapter.source_id: HigherGovSupplementalAdapter,
 }
 
 
