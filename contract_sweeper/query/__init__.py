@@ -16,6 +16,7 @@ for on-demand queries by construction.
 """
 from __future__ import annotations
 
+from .cli import main
 from .dispatcher import query
 from .types import (
     CredentialMissing,
@@ -28,6 +29,7 @@ from .types import (
 
 __all__ = [
     "query",
+    "main",
     "Query",
     "QueryResult",
     "SourceQueryOutcome",
