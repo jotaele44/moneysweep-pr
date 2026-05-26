@@ -1,0 +1,183 @@
+version: "1.0"
+schema_version: "r5_alias_overrides_v1"
+
+# Curated canonical-name overrides for entity clustering.
+#
+# Each entry forces all listed aliases (after default normalization via
+# contract_sweeper.runtime.name_normalization.normalize_name) to collapse
+# into the same canonical group. Use this only for cases where the default
+# normalizer cannot bridge the variants — e.g. structural rebrands, shared
+# subsidiaries, or PR-specific spelling variants.
+#
+# canonical_name      Display form used for the merged cluster.
+# aliases             Raw observed names (case-insensitive, punctuation insensitive).
+# canonical_uei       Optional UEI of the canonical legal entity, when known.
+# parent_canonical    Optional canonical_name of the parent group; used to
+#                     express subsidiary → parent relationships without
+#                     forcing a parent merge.
+# notes               Free text rationale.
+# evidence            Source filename or document sha256 (from
+#                     data/raw/documents/documents_manifest.csv) supporting
+#                     the equivalence. Required for audit.
+#
+# Identity warning: these are operator-curated equivalences, not legal
+# identity assertions. Downstream consumers must still respect the
+# CLAIM_LANGUAGE_POLICY tiering.
+
+entries:
+
+  - canonical_name: "LPC & D"
+    aliases:
+      - "LPC & D"
+      - "LPC and D"
+      - "LPC Contractors"
+      - "LPC Contractors Inc"
+      - "LPC Contractors, Inc."
+      - "LPC&D"
+    notes: |
+      ACT transition manual export lists LPC & D and LPC Contractors as the
+      same vendor across different filing years. Source registry note for
+      act_transition_contracts (source_registry.yaml line 257) explicitly
+      names LPC&D.
+    evidence: "registries/source_registry.yaml:act_transition_contracts"
+
+  - canonical_name: "Super Asphalt Pavement Corp"
+    aliases:
+      - "Super Asphalt"
+      - "Super Asphalt Pavement"
+      - "Super Asphalt Pavement Corp"
+      - "Super Asphalt Pavement Corporation"
+      - "Superasphalt"
+      - "Superasphalt Pavement Corp"
+    notes: |
+      Common PR DOT/ACT highway resurfacing vendor; appears with and
+      without internal space and with/without "Pavement" qualifier.
+    evidence: "operator_blind_spot_report_2026_05_26"
+
+  - canonical_name: "Autopistas de Puerto Rico"
+    aliases:
+      - "Autopistas de Puerto Rico"
+      - "Autopistas de PR"
+      - "Autopistas de Puerto Rico, LLC"
+      - "Autopistas de Puerto Rico LLC"
+      - "Autopistas de PR LLC"
+    notes: |
+      Toll-road concessionaire (PR-22 / PR-5). Distinct from
+      Autopistas Metropolitanas; do not merge with that entity.
+    evidence: "registries/manual_export_registry.yaml:act_transition_contracts"
+
+  - canonical_name: "Autopistas Metropolitanas de Puerto Rico"
+    aliases:
+      - "Autopistas Metropolitanas"
+      - "Autopistas Metropolitanas de Puerto Rico"
+      - "Autopistas Metropolitanas de Puerto Rico LLC"
+      - "Autopistas Metropolitanas de PR"
+      - "Metropistas"
+    parent_canonical: "Abertis Infraestructuras"
+    notes: |
+      Concessionaire for PR-22 expansion ("Metropistas" rebrand).
+      Separate legal entity from Autopistas de Puerto Rico.
+    evidence: "registries/manual_export_registry.yaml:act_transition_contracts"
+
+  - canonical_name: "AECOM"
+    aliases:
+      - "AECOM"
+      - "AECOM Caribe"
+      - "AECOM Caribe, LLP"
+      - "AECOM Caribe LLP"
+      - "AECOM Technical Services"
+      - "AECOM Technical Services Inc"
+      - "AECOM Technical Services, Inc."
+      - "AECOM USA"
+      - "AECOM USA Inc"
+      - "AECOM USA, Inc."
+    notes: |
+      AECOM subsidiaries surface across federal contracts, PR ACT, and
+      FEMA PA projects. Collapse to single parent for power-network
+      scoring; preserve sub-name in evidence trail.
+    evidence: "data/raw/documents/contractor_listings"
+
+  - canonical_name: "Arcadis"
+    aliases:
+      - "Arcadis"
+      - "Arcadis Caribe"
+      - "Arcadis Caribe PSC"
+      - "Arcadis Caribe, PSC"
+      - "Arcadis US"
+      - "Arcadis US Inc"
+      - "Arcadis US, Inc."
+      - "Arcadis NV"
+      - "Arcadis N.V."
+    notes: |
+      See "Consolidating 100% of Arcadis-Linked Online Contracts in
+      Puerto Rico" memo in data/raw/documents/contractor_listings.
+    evidence: "data/raw/documents/contractor_listings/Consolidating 100% of Arcadis-Linked Online Contracts in Puerto Rico.pdf"
+
+  - canonical_name: "Genera PR"
+    aliases:
+      - "Genera PR"
+      - "Genera PR LLC"
+      - "Genera Puerto Rico"
+      - "Genera Caribbean"
+      - "Genera Caribbean LLC"
+    notes: |
+      Thermal generation operator (succeeded PREPA generation function).
+    evidence: "registries/source_registry.yaml:prepa_luma_genera"
+
+  - canonical_name: "BPAS Trust"
+    aliases:
+      - "BPAS Trust"
+      - "BPAS Trust Services"
+      - "BPAS Trust Company"
+      - "BPAS Trust Co"
+      - "Benefit Plans Administrative Services Trust"
+    notes: |
+      Trust company surfaced in LDA filings; multiple corporate-suffix
+      variants need pre-collapse before lobbying anchor lookup.
+    evidence: "operator_blind_spot_report_2026_05_26"
+
+  - canonical_name: "International Equipment Logistics LLC"
+    aliases:
+      - "International Equipment Logistics"
+      - "International Equipment Logistics LLC"
+      - "International Equipment Logistics, LLC"
+      - "IEL"
+      - "IEL LLC"
+    notes: |
+      Disaster-recovery logistics vendor; LDA filings use the IEL
+      abbreviation which the default normalizer cannot reconnect to the
+      full name.
+    evidence: "operator_blind_spot_report_2026_05_26"
+
+  - canonical_name: "Gainwell Technologies"
+    aliases:
+      - "Gainwell"
+      - "Gainwell Technologies"
+      - "Gainwell Technologies LLC"
+      - "Gainwell Technologies, LLC"
+    notes: |
+      Medicaid systems vendor; LDA registrations sometimes use the bare
+      "Gainwell" without qualifier.
+    evidence: "operator_blind_spot_report_2026_05_26"
+
+  - canonical_name: "Puerto Rico Energy LLC"
+    aliases:
+      - "Puerto Rico Energy"
+      - "Puerto Rico Energy LLC"
+      - "Puerto Rico Energy, LLC"
+      - "PR Energy LLC"
+    notes: |
+      Generation/transmission lobbying entity; distinct from PREPA and
+      from Genera PR.
+    evidence: "operator_blind_spot_report_2026_05_26"
+
+  - canonical_name: "Puerto Rico Municipal Financing"
+    aliases:
+      - "PR Municipal Financing"
+      - "Puerto Rico Municipal Financing"
+      - "Puerto Rico Municipal Financing Agency"
+      - "PR Municipal Finance Agency"
+    notes: |
+      Municipal bond/finance vehicle. Anchor target for EMMA/MSRB
+      lobbying edges once bond outputs materialize.
+    evidence: "operator_blind_spot_report_2026_05_26"

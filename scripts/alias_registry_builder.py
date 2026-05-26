@@ -22,6 +22,8 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from contract_sweeper.runtime.alias_overrides import apply as apply_override
+from contract_sweeper.runtime.alias_overrides import load_overrides
 from contract_sweeper.runtime.name_normalization import normalize_name
 
 NAME_FIELDS = [
@@ -58,14 +60,17 @@ def _iter_rows(path: Path):
 
 def build_alias_registry(root: Path) -> dict:
     processed = root / "data" / "staging" / "processed"
+    overrides = load_overrides()
+    override_count = 0
     clusters: dict = defaultdict(lambda: {
         "aliases": set(), "sources": set(), "row_count": 0, "total_amount": 0.0,
+        "override_hits": 0,
     })
     for path in (processed.rglob("*.csv") if processed.exists() else []):
         for row in _iter_rows(path):
             for field in NAME_FIELDS:
                 raw = (row.get(field) or "").strip()
-                norm = normalize_name(raw)
+                norm, overridden = apply_override(raw, overrides)
                 if len(norm) < 3:
                     continue
                 c = clusters[norm]
@@ -73,6 +78,9 @@ def build_alias_registry(root: Path) -> dict:
                 c["sources"].add(path.name)
                 c["row_count"] += 1
                 c["total_amount"] += _amt(row)
+                if overridden:
+                    c["override_hits"] += 1
+                    override_count += 1
 
     entries = [
         {
@@ -84,8 +92,14 @@ def build_alias_registry(root: Path) -> dict:
             "total_amount": round(c["total_amount"], 2),
             "parent_uei": "",
             "parent_name": "",
-            "status": "candidate_alias_cluster",
-            "manual_review_required": len(c["aliases"]) > 1,
+            "status": (
+                "operator_curated_cluster" if c["override_hits"] > 0
+                else "candidate_alias_cluster"
+            ),
+            "manual_review_required": (
+                len(c["aliases"]) > 1 and c["override_hits"] == 0
+            ),
+            "override_hits": c["override_hits"],
         }
         for n, c in sorted(clusters.items(), key=lambda kv: (-kv[1]["total_amount"], kv[0]))
     ]
@@ -93,6 +107,7 @@ def build_alias_registry(root: Path) -> dict:
     out = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "entry_count": len(entries),
+        "override_count": override_count,
         "identity_warning": (
             "Alias clusters are normalized-name candidates, "
             "not verified legal identity."

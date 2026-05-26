@@ -30,6 +30,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
 
+from contract_sweeper.runtime.alias_overrides import apply as apply_override
+from contract_sweeper.runtime.alias_overrides import load_overrides
 from scripts.config import PROJECT_ROOT, setup_logging
 
 
@@ -44,6 +46,8 @@ _SUFFIXES = {
     "PLLC", "DBA", "THE", "AND", "OF", "SA", "SL", "SRL",
 }
 
+_OVERRIDES = load_overrides()
+
 
 def _normalize(name: str) -> str:
     if not name or pd.isna(name):
@@ -54,7 +58,9 @@ def _normalize(name: str) -> str:
     tokens = n.split()
     while tokens and tokens[-1] in _SUFFIXES:
         tokens.pop()
-    return " ".join(tokens)
+    local = " ".join(tokens)
+    canonical, overridden = apply_override(local, _OVERRIDES)
+    return canonical if overridden else local
 
 
 def _year_range(series: pd.Series) -> str:
