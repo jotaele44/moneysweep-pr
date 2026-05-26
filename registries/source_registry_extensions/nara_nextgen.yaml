@@ -2,4 +2,42 @@ version: "1.0"
 schema_version: "r5_source_registry_extension_v1"
 extension_id: provenance_archival_nara
 family: provenance_archival
-sources: []
+notes: Targeted archival metadata locator extension. Not part of the contract-award or financial-flow spine.
+
+sources:
+  - source_id: nara_nextgen_catalog_v3
+    family: provenance_archival
+    required: false
+    authentication: api_key:NARA_API_KEY
+    endpoint_url: https://catalog.archives.gov/api/v3/records/search
+    expected_outputs:
+      - data/staging/processed/nara_nextgen/nara_record_locator_index.csv
+      - reports/source_manifests/nara_nextgen_catalog_v3_manifest.json
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 0
+      monthly_query_limit: 10000
+    update_cadence: ad_hoc
+    notes: |
+      Targeted archival locator only. Do not use as a contract-award,
+      financial-flow, or bulk archival source. Fetcher intentionally not
+      implemented until a credential and bounded query allowlist are available.
+      Persist minimal locator metadata only; do not store full responses,
+      extracted text, or digital objects.
+
+  - source_id: nara_catalog_aws_open_data
+    family: provenance_archival
+    required: false
+    authentication: none
+    endpoint_url: https://registry.opendata.aws/
+    expected_outputs:
+      - data/staging/processed/nara_nextgen/nara_bulk_catalog_index.csv
+      - reports/source_manifests/nara_catalog_aws_open_data_manifest.json
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 0
+    update_cadence: ad_hoc
+    notes: |
+      Future candidate for bulk archival metadata. Evaluate separately from
+      the targeted Catalog API path after dataset location, format, licensing,
+      and storage policy are verified.
