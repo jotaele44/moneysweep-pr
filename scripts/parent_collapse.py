@@ -25,6 +25,8 @@ from typing import Any
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from contract_sweeper.runtime.alias_overrides import apply as apply_override
+from contract_sweeper.runtime.alias_overrides import load_overrides
 from contract_sweeper.runtime.name_normalization import normalize_name
 
 NAME_FIELDS = [
@@ -162,6 +164,7 @@ def _load_sam_index(root: Path) -> dict[str, dict]:
 def build_entities(root: Path) -> dict[str, Any]:
     processed = root / "data" / "staging" / "processed"
     sam = _load_sam_index(root)
+    overrides = load_overrides()
     ents: dict[str, dict] = {}
     conflicts: list[dict] = []
 
@@ -171,7 +174,9 @@ def build_entities(root: Path) -> dict[str, Any]:
         for row in _read_csv(path):
             raw_name = _first(row, NAME_FIELDS)
             uei = _first(row, UEI_FIELDS)
-            norm = normalize_name(raw_name or row.get("normalized_name", ""))
+            norm, was_overridden = apply_override(
+                raw_name or row.get("normalized_name", ""), overrides
+            )
             if not norm and not uei:
                 continue
             key = uei or norm
@@ -183,12 +188,15 @@ def build_entities(root: Path) -> dict[str, Any]:
                 "entity_type": _classify_entity_type(raw_name or norm),
                 "parent_uei": "",
                 "parent_name": "",
-                "resolution_method": "observed_only",
-                "match_confidence": 0.0,
+                "resolution_method": "alias_override" if was_overridden else "observed_only",
+                "match_confidence": 0.85 if was_overridden else 0.0,
                 "total_obligation": 0.0,
                 "record_count": 0,
                 "source_files": set(),
             })
+            if was_overridden and e["resolution_method"] == "observed_only":
+                e["resolution_method"] = "alias_override"
+                e["match_confidence"] = max(e["match_confidence"], 0.85)
             e["record_count"] += 1
             e["total_obligation"] += _money(row)
             e["source_files"].add(path.name)
