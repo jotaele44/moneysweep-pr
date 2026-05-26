@@ -21,6 +21,7 @@ from scripts.config import (
     PROJECT_ROOT, PROCESSED_DIR, setup_logging,
     SOURCE_PRIORITY, EXPANSION_PRIORITY, REQUIRED_MASTER_COLUMNS, NULL_THRESHOLDS,
 )
+from contract_sweeper.runtime.post_ingest import apply_post_ingest
 import pandas as pd
 import argparse
 import json
@@ -551,6 +552,7 @@ def run(
     # 8. Write unified master CSV
     # ------------------------------------------------------------------
     processed_dir.mkdir(parents=True, exist_ok=True)
+    unified = apply_post_ingest(unified, source_id="usaspending_prime", root=root)
     unified.to_csv(output_path, index=False, encoding="utf-8")
     logger.info(f"  Written: {output_path} ({len(unified):,} rows)")
 

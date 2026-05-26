@@ -24,6 +24,9 @@ data/normalized/
 # Logs
 data/logs/*.log
 
+# On-demand query cache (parquet bodies + sidecar manifests)
+data/cache/
+
 # Enrichment outputs (may contain vendor PII)
 data/staging/processed/enrichment/
 
