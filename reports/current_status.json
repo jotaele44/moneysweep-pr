@@ -39,8 +39,10 @@
     "PR-B5 wire territorial/municipal/infrastructure sources — un-archived 12 downloader modules (aafaf, hacienda, cofina, promesa_creditors, act60, p3, pr_pensions, rum_coverover, municipal, eqb, compras, prepa_contracts) covering 12 sources; registry repointed to scripts/; test_new_downloaders.py restored from archive (cross-batch import test, 84 cases); smoke test extended; 4 sources still archived; 696 passed — merged to main (#95)",
     "PR-B6 wire bonds/entity-resolution/manual sources — un-archived 4 downloader modules (msrb_trades, ofac, opencorporates, active_contractors) covering 4 sources; registry repointed to scripts/; test_download_ofac.py restored from archive; smoke test extended; SOURCE REGISTRY REWIRE COMPLETE — all 82 producer_script paths point to scripts/, 0 optional sources archived; 710 passed",
     "Pipeline readiness preflight — scripts/pipeline_preflight.py (registry-driven, no producer execution, no network): classifies all 82 sources by readiness, reports API-key presence/absence without logging values, --strict-preflight aborts run_all only on structural errors; tests/test_pipeline_preflight.py added (PR #97)",
-    "PR #97 pipeline readiness preflight merged to main — strict preflight available"
+    "PR #97 pipeline readiness preflight merged to main — strict preflight available",
+    "On-demand query adapter batch 5 (branch claude/source-wirings-output-HRHQW) — 8 new adapters (nfip_claims, slfrf, haf, exim_bank, fdic, nonprofits_irs990, sba_ppp, sba_loans); ADAPTER_REGISTRY 18 → 26 (~32% of 82); source recovery matrix at reports/source_recovery_matrix.{csv,md}; 836 passed, 4 skipped"
   ],
+  "concrete_adapter_count": 26,
   "in_progress": [
     "Source intake taxonomy for uploaded PR contract, lobbying, PRASA, and contractor-reference datasets pending",
     "PR2.5/PR2.6 entity-gate branch reconciliation pending before PR3 deduplication"
@@ -52,13 +54,13 @@
     "HigherGov archive/deletion: blocked until consumer refactor removes live references"
   ],
   "last_tests": {
-    "command": "python3 -m pytest -q --ignore=.claude",
-    "passed": 713,
-    "skipped": 2,
-    "failed": 4,
-    "status": "YELLOW",
-    "run_at": "2026-05-23",
-    "note": "4 pre-existing failures on main, not introduced by this branch: test_r48b_executes_with_explicit_terminal_statuses (order-dependent, passes in isolation), test_r48d_runs_targeted_retry_and_writes_outputs, test_r48d_schema_alignment_report_records_deterministic_mappings, test_status_csv_regenerates_identically (order-dependent, passes in isolation). All 5 preflight tests pass."
+    "command": "python -m pytest tests/ -q",
+    "passed": 836,
+    "skipped": 4,
+    "failed": 0,
+    "status": "GREEN",
+    "run_at": "2026-05-26",
+    "note": "Full suite green on branch claude/source-wirings-output-HRHQW after 8-adapter batch; previously yellow 4 failures on main not surfaced here."
   },
   "secrets_audit": {
     "files_scanned": 560,
@@ -131,7 +133,7 @@
     "Federal LDA registrants",
     "DCAA active contractor listings"
   ],
-  "next_command": "BACKFILL_REQUIRED_SOURCES_ONLY_AFTER_STRICT_PREFLIGHT",
+  "next_command": "QUERY_ADAPTER_BATCH_6_AUTH_OR_KEY_GATED_OR_CMS_OPEN_PAYMENTS",
   "next_command_detail": {
     "description": "Run producer scripts for required=True sources only; do not run optional sources",
     "required_sources_not_materialized": [
