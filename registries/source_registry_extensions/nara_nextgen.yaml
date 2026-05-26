@@ -1,0 +1,5 @@
+version: "1.0"
+schema_version: "r5_source_registry_extension_v1"
+extension_id: provenance_archival_nara
+family: provenance_archival
+sources: []
