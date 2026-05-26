@@ -78,6 +78,21 @@ def test_json_sibling_matches_yaml_keys(tmp_path):
 
 
 @pytest.mark.unit
+def test_source_registry_extensions_are_loaded():
+    nara = sr.source_by_id("nara_nextgen_catalog_v3", REPO_ROOT)
+    assert nara is not None
+    assert nara["family"] == "provenance_archival"
+    assert nara["required"] is False
+    assert nara["authentication"] == "api_key:NARA_API_KEY"
+    assert "producer_script" not in nara
+
+    bulk = sr.source_by_id("nara_catalog_aws_open_data", REPO_ROOT)
+    assert bulk is not None
+    assert bulk["family"] == "provenance_archival"
+    assert bulk["authentication"] == "none"
+
+
+@pytest.mark.unit
 def test_expected_outputs_for_resolves_to_repo_root():
     src = sr.source_by_id("usaspending_prime", REPO_ROOT)
     assert src is not None
