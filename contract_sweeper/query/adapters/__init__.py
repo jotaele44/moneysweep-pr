@@ -11,14 +11,25 @@ from typing import Type
 from .base import SourceAdapter
 from ._stub import NotImplementedAdapter
 from .fec import FECPRAdapter
-from .openfema import OpenFEMAPaAdapter
-from .usaspending import USAspendingPrimeAdapter
+from .nih import NIHReporterAdapter
+from .openfema import OpenFEMAHmgpAdapter, OpenFEMAPaAdapter
+from .sbir import SBIRAdapter
+from .usaspending import (
+    USAspendingGrantsAdapter,
+    USAspendingPrimeAdapter,
+    USAspendingSubawardsAdapter,
+)
 
 #: Concrete adapters keyed by their registry source_id.
 ADAPTER_REGISTRY: dict[str, Type[SourceAdapter]] = {
     USAspendingPrimeAdapter.source_id: USAspendingPrimeAdapter,
+    USAspendingSubawardsAdapter.source_id: USAspendingSubawardsAdapter,
+    USAspendingGrantsAdapter.source_id: USAspendingGrantsAdapter,
     OpenFEMAPaAdapter.source_id: OpenFEMAPaAdapter,
+    OpenFEMAHmgpAdapter.source_id: OpenFEMAHmgpAdapter,
     FECPRAdapter.source_id: FECPRAdapter,
+    NIHReporterAdapter.source_id: NIHReporterAdapter,
+    SBIRAdapter.source_id: SBIRAdapter,
 }
 
 

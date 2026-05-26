@@ -10,9 +10,19 @@ import pytest
 
 from contract_sweeper.query.adapters._stub import NotImplementedAdapter
 from contract_sweeper.query.adapters.fec import FECPRAdapter
-from contract_sweeper.query.adapters.openfema import OpenFEMAPaAdapter, build_filter
+from contract_sweeper.query.adapters.nih import NIHReporterAdapter, build_payload as nih_build_payload
+from contract_sweeper.query.adapters.openfema import (
+    OpenFEMAHmgpAdapter,
+    OpenFEMAPaAdapter,
+    build_filter,
+    build_hmgp_filter,
+)
+from contract_sweeper.query.adapters.sbir import SBIRAdapter
 from contract_sweeper.query.adapters.usaspending import (
+    USAspendingGrantsAdapter,
     USAspendingPrimeAdapter,
+    USAspendingSubawardsAdapter,
+    _build_filters,
     _municipalities_to_county_suffixes,
     build_payload,
 )
@@ -176,3 +186,144 @@ def test_stub_adapter_raises_manual_only_with_producer_script():
         adapter.fetch(Query())
     assert excinfo.value.source_id == "lda"
     assert "download_lda.py" in str(excinfo.value)
+
+
+# ---------------------------------------------------------------------------
+# USAspending subawards
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_usaspending_subawards_payload_includes_subawards_flag():
+    filters = _build_filters(
+        Query(municipalities=("San Juan",), fiscal_years=(2024,)),
+        root=REPO_ROOT,
+        type_codes=["A", "B", "C", "D", "02", "03", "04", "05"],
+        subawards=True,
+    )
+    assert filters["subawards"] is True
+    assert {"country": "USA", "state": "PR", "county": "127"} in filters["place_of_performance_locations"]
+
+
+@pytest.mark.unit
+def test_usaspending_subawards_adapter_fetches_with_subaward_fields():
+    session = MagicMock()
+    session.post.return_value = _mock_response(
+        {
+            "results": [{"Sub-Award ID": "SUB-1", "Sub-Awardee Name": "X", "Place of Performance City": "SAN JUAN"}],
+            "page_metadata": {"hasNext": False},
+        }
+    )
+    adapter = USAspendingSubawardsAdapter(root=REPO_ROOT, session=session)
+    df = adapter.fetch(Query(municipalities=("San Juan",), fiscal_years=(2024,)))
+    sent_payload = session.post.call_args.kwargs["json"]
+    assert sent_payload["filters"]["subawards"] is True
+    assert "Sub-Award ID" in sent_payload["fields"]
+    assert len(df) == 1
+
+
+# ---------------------------------------------------------------------------
+# USAspending grants (registered as `grants_gov`)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_usaspending_grants_uses_grant_type_codes():
+    adapter = USAspendingGrantsAdapter(root=REPO_ROOT, session=MagicMock())
+    adapter._session.post.return_value = _mock_response(
+        {"results": [], "page_metadata": {"hasNext": False}}
+    )
+    adapter.fetch(Query(fiscal_years=(2024,)))
+    sent_payload = adapter._session.post.call_args.kwargs["json"]
+    assert sent_payload["filters"]["award_type_codes"] == ["02", "03", "04", "05"]
+    assert sent_payload["filters"].get("subawards") is None
+
+
+# ---------------------------------------------------------------------------
+# OpenFEMA HMGP
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_openfema_hmgp_filter_uses_state_code():
+    f = build_hmgp_filter(Query())
+    assert f == "stateCode eq 'PR'"
+
+
+@pytest.mark.unit
+def test_openfema_hmgp_fetch_paginates():
+    big = [{"disasterNumber": str(i), "stateCode": "PR"} for i in range(1000)]
+    short = [{"disasterNumber": "1000", "stateCode": "PR"}]
+    session = MagicMock()
+    session.get.side_effect = [
+        _mock_response({"HazardMitigationGrantProgramDisasterSummaries": big}),
+        _mock_response({"HazardMitigationGrantProgramDisasterSummaries": short}),
+    ]
+    adapter = OpenFEMAHmgpAdapter(root=REPO_ROOT, session=session)
+    df = adapter.fetch(Query())
+    assert len(df) == 1001
+
+
+# ---------------------------------------------------------------------------
+# NIH Reporter
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_nih_payload_pins_pr_state_and_fiscal_years():
+    payload = nih_build_payload(Query(fiscal_years=(2024, 2023)), offset=0)
+    assert payload["criteria"]["org_state"] == ["PR"]
+    assert payload["criteria"]["fiscal_years"] == [2023, 2024]
+    assert payload["limit"] == 500
+
+
+@pytest.mark.unit
+def test_nih_fetch_paginates_via_offset():
+    session = MagicMock()
+    session.post.side_effect = [
+        _mock_response(
+            {
+                "results": [{"ProjectNum": "R01CA001", "OrgCity": "SAN JUAN"}] * 500,
+                "meta": {"total": 750},
+            }
+        ),
+        _mock_response(
+            {
+                "results": [{"ProjectNum": "R01CA002", "OrgCity": "SAN JUAN"}] * 250,
+                "meta": {"total": 750},
+            }
+        ),
+    ]
+    adapter = NIHReporterAdapter(root=REPO_ROOT, session=session)
+    df = adapter.fetch(Query(fiscal_years=(2024,)))
+    assert len(df) == 750
+    assert session.post.call_count == 2
+
+
+# ---------------------------------------------------------------------------
+# SBIR
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_sbir_fetch_uses_first_endpoint_when_it_returns_records():
+    session = MagicMock()
+    session.get.side_effect = [
+        _mock_response({"totalCount": 1, "data": [{"award_amount": "100"}]}),
+    ]
+    adapter = SBIRAdapter(root=REPO_ROOT, session=session)
+    df = adapter.fetch(Query())
+    assert len(df) == 1
+    # Should have used api.sbir.gov, not the fallback.
+    args, kwargs = session.get.call_args
+    assert args[0] == "https://api.sbir.gov/public/awards"
+    assert kwargs["params"]["state"] == "PR"
+
+
+@pytest.mark.unit
+def test_sbir_fetch_handles_list_response():
+    session = MagicMock()
+    session.get.return_value = _mock_response([{"award_amount": "5"}, {"award_amount": "10"}])
+    adapter = SBIRAdapter(root=REPO_ROOT, session=session)
+    df = adapter.fetch(Query())
+    assert len(df) == 2

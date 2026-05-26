@@ -1,11 +1,11 @@
-"""USAspending prime-award adapter.
+"""USAspending adapters — prime awards, subawards, and grants.
 
 Targets the public `spending_by_award` endpoint with a place-of-performance
 filter that includes both the PR state code and (when the caller passes
 municipalities) the 3-digit county FIPS suffix derived from the canonical
 PR municipalities reference table.
 
-Endpoint and request shape mirror the existing bulk producer at
+Endpoint and request shape mirror the existing bulk producers at
 `scripts/download_grants.py:_build_bulk_payload` and
 `scripts/download_subawards.py:_fetch_page`.
 """
@@ -26,6 +26,7 @@ from .base import SourceAdapter
 
 USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 CONTRACT_TYPE_CODES = ["A", "B", "C", "D"]
+GRANT_TYPE_CODES = ["02", "03", "04", "05"]
 PAGE_LIMIT = 100
 MAX_PAGES = 200
 
@@ -43,6 +44,20 @@ PRIME_FIELDS = [
     "Place of Performance City",
     "Description",
     "awarding_agency_id",
+]
+
+SUBAWARD_FIELDS = [
+    "Sub-Award ID",
+    "Sub-Awardee Name",
+    "Sub-Award Amount",
+    "Sub-Award Date",
+    "Prime Award ID",
+    "Prime Recipient Name",
+    "Awarding Agency",
+    "Place of Performance State Code",
+    "Place of Performance County Name",
+    "Place of Performance City",
+    "Description",
 ]
 
 
@@ -93,7 +108,13 @@ def _date_window(query: Query) -> tuple[str, str]:
     return f"{today.year - 25}-10-01", today.isoformat()
 
 
-def build_payload(query: Query, *, root, page: int = 1) -> dict[str, Any]:
+def _build_filters(
+    query: Query,
+    *,
+    root,
+    type_codes: list[str],
+    subawards: bool,
+) -> dict[str, Any]:
     counties = _municipalities_to_county_suffixes(query.municipalities, root)
     if counties:
         locations = [
@@ -103,18 +124,25 @@ def build_payload(query: Query, *, root, page: int = 1) -> dict[str, Any]:
         locations = [{"country": "USA", "state": "PR"}]
     start, end = _date_window(query)
     filters: dict[str, Any] = {
-        "award_type_codes": CONTRACT_TYPE_CODES,
+        "award_type_codes": type_codes,
         "time_period": [{"start_date": start, "end_date": end}],
         "place_of_performance_locations": locations,
     }
+    if subawards:
+        filters["subawards"] = True
     if query.agencies:
         filters["agencies"] = [
             {"type": "awarding", "tier": "toptier", "name": a} for a in query.agencies
         ]
     if query.recipient_ueis:
         filters["recipient_search_text"] = list(query.recipient_ueis)
+    return filters
+
+
+def build_payload(query: Query, *, root, page: int = 1) -> dict[str, Any]:
+    """Backward-compatible payload builder for the prime adapter (contracts)."""
     return {
-        "filters": filters,
+        "filters": _build_filters(query, root=root, type_codes=CONTRACT_TYPE_CODES, subawards=False),
         "fields": PRIME_FIELDS,
         "page": page,
         "limit": PAGE_LIMIT,
@@ -123,21 +151,38 @@ def build_payload(query: Query, *, root, page: int = 1) -> dict[str, Any]:
     }
 
 
-class USAspendingPrimeAdapter(SourceAdapter):
-    source_id = "usaspending_prime"
+class _USAspendingBase(SourceAdapter):
+    """Shared HTTP + pagination scaffolding for USAspending adapters."""
+
+    type_codes: list[str] = CONTRACT_TYPE_CODES
+    subawards: bool = False
+    fields: list[str] = PRIME_FIELDS
+    sort_field: str = "Award Amount"
 
     def __init__(self, *, root, session=None):
         super().__init__(root=root)
-        self._session = session  # Injectable for tests.
+        self._session = session
 
     def _get_session(self):
         if self._session is not None:
             return self._session
-        import requests  # imported here so test envs without `requests` can still import the module
+        import requests
 
         s = requests.Session()
         s.headers.update({"Accept": "application/json", "User-Agent": "contract-sweeper-query/1"})
         return s
+
+    def _payload(self, query: Query, page: int) -> dict[str, Any]:
+        return {
+            "filters": _build_filters(
+                query, root=self.root, type_codes=self.type_codes, subawards=self.subawards
+            ),
+            "fields": self.fields,
+            "page": page,
+            "limit": PAGE_LIMIT,
+            "sort": self.sort_field,
+            "order": "desc",
+        }
 
     def _post(self, session, payload):
         resp = session.post(USASPENDING_URL, json=payload, timeout=60)
@@ -151,7 +196,7 @@ class USAspendingPrimeAdapter(SourceAdapter):
         def fetch_page(marker):
             page = int(marker) if marker else 1
             data = with_retry(
-                lambda: self._post(session, build_payload(query, root=self.root, page=page)),
+                lambda: self._post(session, self._payload(query, page)),
                 policy=policy,
             )
             records = data.get("results", []) or []
@@ -161,5 +206,35 @@ class USAspendingPrimeAdapter(SourceAdapter):
 
         rows = list(paginate(fetch_page, start_marker=1, max_pages=MAX_PAGES))
         if not rows:
-            return pd.DataFrame(columns=PRIME_FIELDS)
+            return pd.DataFrame(columns=self.fields)
         return pd.DataFrame(rows)
+
+
+class USAspendingPrimeAdapter(_USAspendingBase):
+    source_id = "usaspending_prime"
+    type_codes = CONTRACT_TYPE_CODES
+    subawards = False
+    fields = PRIME_FIELDS
+
+
+class USAspendingSubawardsAdapter(_USAspendingBase):
+    """USAspending subawards (both grant and contract subawards merged)."""
+
+    source_id = "usaspending_subawards"
+    # Subawards filter accepts either grant or contract type codes; the API
+    # then returns all subawards under prime awards of those types. Use the
+    # union to capture both flows.
+    type_codes = CONTRACT_TYPE_CODES + GRANT_TYPE_CODES
+    subawards = True
+    fields = SUBAWARD_FIELDS
+    sort_field = "Sub-Award Amount"
+
+
+class USAspendingGrantsAdapter(_USAspendingBase):
+    """USAspending grant awards (registry source_id `grants_gov`)."""
+
+    source_id = "grants_gov"
+    type_codes = GRANT_TYPE_CODES
+    subawards = False
+    fields = PRIME_FIELDS
+    sort_field = "Award Amount"
