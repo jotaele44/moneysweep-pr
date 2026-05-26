@@ -22,6 +22,7 @@ from .base import SourceAdapter
 FEMA_BASE = "https://www.fema.gov/api/open/v2/"
 OPENFEMA_PA_URL = FEMA_BASE + "PublicAssistanceFundedProjectsDetails"
 OPENFEMA_HMGP_URL = FEMA_BASE + "HazardMitigationGrantProgramDisasterSummaries"
+OPENFEMA_NFIP_URL = FEMA_BASE + "FimaNfipClaims"
 PAGE_SIZE = 1000
 MAX_PAGES = 200
 
@@ -131,4 +132,14 @@ class OpenFEMAHmgpAdapter(_OpenFEMABase):
 
     def fetch(self, query: Query) -> pd.DataFrame:
         rows = self._paginate(build_hmgp_filter(query))
+        return pd.DataFrame(rows) if rows else pd.DataFrame()
+
+
+class OpenFEMANfipClaimsAdapter(_OpenFEMABase):
+    source_id = "nfip_claims"
+    endpoint_url = OPENFEMA_NFIP_URL
+    data_key = "FimaNfipClaims"
+
+    def fetch(self, query: Query) -> pd.DataFrame:
+        rows = self._paginate(build_filter(query, root=self.root))
         return pd.DataFrame(rows) if rows else pd.DataFrame()

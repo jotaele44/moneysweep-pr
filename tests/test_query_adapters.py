@@ -494,3 +494,248 @@ def test_nsf_fetch_paginates_until_short_page():
 @pytest.mark.unit
 def test_nsf_source_id_matches_registry():
     assert NSFAwardsAdapter.source_id == "research_grants"
+
+
+# ---------------------------------------------------------------------------
+# OpenFEMA NFIP claims
+# ---------------------------------------------------------------------------
+
+
+from contract_sweeper.query.adapters.openfema import OpenFEMANfipClaimsAdapter  # noqa: E402
+
+
+@pytest.mark.unit
+def test_nfip_claims_adapter_uses_state_pr_filter_and_data_key():
+    big_page = [{"reportedCity": "San Juan", "amountPaidOnBuildingClaim": "100"}] * 1000
+    short_page = [{"reportedCity": "Ponce", "amountPaidOnBuildingClaim": "200"}]
+    session = MagicMock()
+    session.get.side_effect = [
+        _mock_response({"FimaNfipClaims": big_page}),
+        _mock_response({"FimaNfipClaims": short_page}),
+    ]
+    adapter = OpenFEMANfipClaimsAdapter(root=REPO_ROOT, session=session)
+    df = adapter.fetch(Query(municipalities=("San Juan",)))
+    assert len(df) == 1001
+    # Both calls carried state=PR and the san-juan county fips clause.
+    for call_args in session.get.call_args_list:
+        params = call_args.kwargs.get("params") or call_args[1]["params"]
+        assert "state eq 'PR'" in params["$filter"]
+        assert "countyFips eq '72127'" in params["$filter"]
+
+
+# ---------------------------------------------------------------------------
+# USAspending program-narrow adapters (SLFRF / HAF / EXIM)
+# ---------------------------------------------------------------------------
+
+
+from contract_sweeper.query.adapters.usaspending import (  # noqa: E402
+    DIRECT_PAYMENT_TYPE_CODES,
+    EXIMBankAdapter,
+    HAFAdapter,
+    LOAN_TYPE_CODES,
+    SLFRFAdapter,
+)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "adapter_cls,expected_agency,expected_program",
+    [
+        (SLFRFAdapter, "Department of the Treasury", None),
+        (HAFAdapter, "Department of the Treasury", ["21.026"]),
+        (EXIMBankAdapter, "Export-Import Bank of the United States", None),
+    ],
+)
+def test_usaspending_narrow_adapters_inject_agency_and_program(
+    adapter_cls, expected_agency, expected_program
+):
+    adapter = adapter_cls(root=REPO_ROOT)
+    payload = adapter._payload(Query(municipalities=("San Juan",)), page=1)
+    agencies = payload["filters"]["agencies"]
+    assert agencies[0]["name"] == expected_agency
+    if expected_program is None:
+        assert "program_numbers" not in payload["filters"]
+    else:
+        assert payload["filters"]["program_numbers"] == expected_program
+
+
+@pytest.mark.unit
+def test_haf_adapter_award_type_codes_are_grants_only():
+    adapter = HAFAdapter(root=REPO_ROOT)
+    payload = adapter._payload(Query(), page=1)
+    assert payload["filters"]["award_type_codes"] == ["02", "03", "04", "05"]
+
+
+@pytest.mark.unit
+def test_exim_adapter_award_type_codes_include_loans():
+    adapter = EXIMBankAdapter(root=REPO_ROOT)
+    payload = adapter._payload(Query(), page=1)
+    codes = payload["filters"]["award_type_codes"]
+    for c in DIRECT_PAYMENT_TYPE_CODES + LOAN_TYPE_CODES:
+        assert c in codes
+
+
+@pytest.mark.unit
+def test_caller_supplied_agency_overrides_narrow_adapter_default():
+    """A caller passing an explicit agency must not get overwritten by the subclass default."""
+    adapter = SLFRFAdapter(root=REPO_ROOT)
+    payload = adapter._payload(Query(agencies=("Department of Energy",)), page=1)
+    names = [a["name"] for a in payload["filters"]["agencies"]]
+    assert names == ["Department of Energy"]
+
+
+# ---------------------------------------------------------------------------
+# FDIC
+# ---------------------------------------------------------------------------
+
+
+from contract_sweeper.query.adapters.fdic import FDICInstitutionsAdapter  # noqa: E402
+
+
+@pytest.mark.unit
+def test_fdic_adapter_sends_stalp_pr_filter_and_offset_paginates():
+    big = [{"data": {"NAME": f"BANK_{i}", "STALP": "PR"}} for i in range(1000)]
+    short = [{"data": {"NAME": "BANK_LAST", "STALP": "PR"}}]
+    session = MagicMock()
+    session.get.side_effect = [
+        _mock_response({"data": big, "meta": {"total": 1001}}),
+        _mock_response({"data": short, "meta": {"total": 1001}}),
+    ]
+    adapter = FDICInstitutionsAdapter(root=REPO_ROOT, session=session)
+    df = adapter.fetch(Query())
+    assert len(df) == 1001
+    for call_args in session.get.call_args_list:
+        params = call_args.kwargs.get("params") or call_args[1]["params"]
+        assert params["filters"] == "STALP:PR"
+    # Offsets should advance.
+    offsets = [
+        (ca.kwargs.get("params") or ca[1]["params"])["offset"]
+        for ca in session.get.call_args_list
+    ]
+    assert offsets == [0, 1000]
+
+
+@pytest.mark.unit
+def test_fdic_adapter_returns_empty_df_when_no_records():
+    session = MagicMock()
+    session.get.return_value = _mock_response({"data": [], "meta": {"total": 0}})
+    adapter = FDICInstitutionsAdapter(root=REPO_ROOT, session=session)
+    df = adapter.fetch(Query())
+    assert df.empty
+
+
+# ---------------------------------------------------------------------------
+# ProPublica Nonprofits
+# ---------------------------------------------------------------------------
+
+
+from contract_sweeper.query.adapters.nonprofits import NonprofitsIRS990Adapter  # noqa: E402
+
+
+@pytest.mark.unit
+def test_nonprofits_adapter_sends_state_pr_and_page_paginates():
+    page0 = [{"ein": str(i), "state": "PR"} for i in range(25)]
+    page1 = [{"ein": "999", "state": "PR"}]
+    session = MagicMock()
+    session.get.side_effect = [
+        _mock_response({"organizations": page0}),
+        _mock_response({"organizations": page1}),
+        _mock_response({"organizations": []}),
+    ]
+    adapter = NonprofitsIRS990Adapter(root=REPO_ROOT, session=session)
+    df = adapter.fetch(Query())
+    assert len(df) == 26
+    pages = [
+        (ca.kwargs.get("params") or ca[1]["params"])["page"]
+        for ca in session.get.call_args_list
+    ]
+    assert pages == [0, 1, 2]
+    for ca in session.get.call_args_list:
+        params = ca.kwargs.get("params") or ca[1]["params"]
+        assert params["state[id]"] == "PR"
+
+
+@pytest.mark.unit
+def test_nonprofits_adapter_attaches_api_key_when_set(monkeypatch):
+    monkeypatch.setenv("PROPUBLICA_API_KEY", "test-token")
+    adapter = NonprofitsIRS990Adapter(root=REPO_ROOT)
+    session = adapter._get_session()
+    assert session.headers["X-API-Key"] == "test-token"
+
+
+@pytest.mark.unit
+def test_nonprofits_adapter_omits_api_key_header_when_unset(monkeypatch):
+    monkeypatch.delenv("PROPUBLICA_API_KEY", raising=False)
+    adapter = NonprofitsIRS990Adapter(root=REPO_ROOT)
+    session = adapter._get_session()
+    assert "X-API-Key" not in session.headers
+
+
+# ---------------------------------------------------------------------------
+# SBA (PPP + 7(a)/504 disaster loans)
+# ---------------------------------------------------------------------------
+
+
+from contract_sweeper.query.adapters.sba import (  # noqa: E402
+    SBALoansAdapter,
+    SBAPaycheckProtectionAdapter,
+    CKAN_DATASTORE_URL,
+    CKAN_PACKAGE_URL,
+)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "adapter_cls,expected_state_field",
+    [
+        (SBALoansAdapter, "State"),
+        (SBAPaycheckProtectionAdapter, "BorrowerState"),
+    ],
+)
+def test_sba_adapter_discovers_resource_and_filters_state(adapter_cls, expected_state_field):
+    session = MagicMock()
+    session.get.side_effect = [
+        _mock_response({
+            "success": True,
+            "result": {"resources": [{"id": "abc-resource", "format": "CSV"}]},
+        }),
+        _mock_response({
+            "success": True,
+            "result": {"records": [{"LoanID": "1", expected_state_field: "PR"}], "total": 1},
+        }),
+        _mock_response({"success": True, "result": {"records": [], "total": 1}}),
+    ]
+    adapter = adapter_cls(root=REPO_ROOT, session=session)
+    df = adapter.fetch(Query())
+    assert len(df) == 1
+    # First call is package_show.
+    first_call = session.get.call_args_list[0]
+    assert first_call.args[0] == CKAN_PACKAGE_URL or first_call[0][0] == CKAN_PACKAGE_URL
+    # Subsequent calls hit datastore_search with the right state filter.
+    second_call = session.get.call_args_list[1]
+    url = second_call.args[0] if second_call.args else second_call[0][0]
+    assert url == CKAN_DATASTORE_URL
+    params = second_call.kwargs.get("params") or second_call[1]["params"]
+    assert json.loads(params["filters"]) == {expected_state_field: "PR"}
+    assert params["resource_id"] == "abc-resource"
+
+
+@pytest.mark.unit
+def test_sba_adapter_returns_empty_when_discovery_fails():
+    session = MagicMock()
+    # Every package_show + package_search lookup fails.
+    session.get.return_value = _mock_response({"success": False, "result": {}})
+    adapter = SBALoansAdapter(root=REPO_ROOT, session=session)
+    df = adapter.fetch(Query())
+    assert df.empty
+
+
+# ---------------------------------------------------------------------------
+# Registry size check
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_adapter_registry_size_matches_concrete_count():
+    from contract_sweeper.query.adapters import ADAPTER_REGISTRY
+    assert len(ADAPTER_REGISTRY) == 26

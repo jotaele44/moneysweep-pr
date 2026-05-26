@@ -10,11 +10,18 @@ from typing import Type
 
 from .base import SourceAdapter
 from ._stub import NotImplementedAdapter
+from .fdic import FDICInstitutionsAdapter
 from .fec import FECPRAdapter
 from .lda import LDAAdapter
 from .nih import NIHReporterAdapter
+from .nonprofits import NonprofitsIRS990Adapter
 from .nsf import NSFAwardsAdapter
-from .openfema import OpenFEMAHmgpAdapter, OpenFEMAPaAdapter
+from .openfema import (
+    OpenFEMAHmgpAdapter,
+    OpenFEMANfipClaimsAdapter,
+    OpenFEMAPaAdapter,
+)
+from .sba import SBALoansAdapter, SBAPaycheckProtectionAdapter
 from .sbir import SBIRAdapter
 from .usaspending import (
     DOEGrantsAdapter,
@@ -22,8 +29,11 @@ from .usaspending import (
     DOTGrantsAdapter,
     EDGrantsAdapter,
     EPAGrantsAdapter,
+    EXIMBankAdapter,
+    HAFAdapter,
     HHSGrantsAdapter,
     OIAGrantsAdapter,
+    SLFRFAdapter,
     USAspendingGrantsAdapter,
     USAspendingPrimeAdapter,
     USAspendingSubawardsAdapter,
@@ -52,6 +62,17 @@ ADAPTER_REGISTRY: dict[str, Type[SourceAdapter]] = {
     # Distinct-API adapters
     LDAAdapter.source_id: LDAAdapter,
     NSFAwardsAdapter.source_id: NSFAwardsAdapter,
+    # OpenFEMA NFIP claims (same v2 surface as fema_pa)
+    OpenFEMANfipClaimsAdapter.source_id: OpenFEMANfipClaimsAdapter,
+    # USAspending program-narrows (Treasury / EXIM)
+    SLFRFAdapter.source_id: SLFRFAdapter,
+    HAFAdapter.source_id: HAFAdapter,
+    EXIMBankAdapter.source_id: EXIMBankAdapter,
+    # New distinct-API adapters
+    FDICInstitutionsAdapter.source_id: FDICInstitutionsAdapter,
+    NonprofitsIRS990Adapter.source_id: NonprofitsIRS990Adapter,
+    SBALoansAdapter.source_id: SBALoansAdapter,
+    SBAPaycheckProtectionAdapter.source_id: SBAPaycheckProtectionAdapter,
 }
 
 

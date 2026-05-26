@@ -27,6 +27,8 @@ from .base import SourceAdapter
 USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 CONTRACT_TYPE_CODES = ["A", "B", "C", "D"]
 GRANT_TYPE_CODES = ["02", "03", "04", "05"]
+DIRECT_PAYMENT_TYPE_CODES = ["06"]
+LOAN_TYPE_CODES = ["07", "08"]
 PAGE_LIMIT = 100
 MAX_PAGES = 200
 
@@ -137,6 +139,13 @@ def _build_filters(
     if query.recipient_ueis:
         filters["recipient_search_text"] = list(query.recipient_ueis)
     return filters
+
+
+def _inject_program_numbers(payload: dict[str, Any], program_numbers: tuple[str, ...]) -> dict[str, Any]:
+    """Add CFDA program numbers to a payload's filters if not already present."""
+    if program_numbers and "program_numbers" not in payload["filters"]:
+        payload["filters"]["program_numbers"] = list(program_numbers)
+    return payload
 
 
 def build_payload(query: Query, *, root, page: int = 1) -> dict[str, Any]:
@@ -311,3 +320,42 @@ class USDAGrantsAdapter(_USAspendingAgencyGrantsAdapter):
 class OIAGrantsAdapter(_USAspendingAgencyGrantsAdapter):
     source_id = "oia_grants"
     agency_name = "Department of the Interior"
+
+
+# ---------------------------------------------------------------------------
+# USAspending program-narrow adapters (Treasury SLFRF / HAF, EXIM Bank)
+# ---------------------------------------------------------------------------
+# These pin both an agency and (optionally) a CFDA program number list,
+# mirroring the existing bulk producers under scripts/download_<source>.py.
+# Where the producer fetches multiple type-code groups in separate passes,
+# the adapter unions those codes into a single award_type_codes filter —
+# USAspending's spending_by_award endpoint accepts heterogeneous codes.
+
+
+class _USAspendingNarrowAdapter(_USAspendingAgencyGrantsAdapter):
+    """Pins agency + program_numbers when the caller leaves them empty."""
+
+    program_numbers: tuple[str, ...] = ()
+
+    def _payload(self, query: Query, page: int) -> dict[str, Any]:
+        payload = super()._payload(query, page)
+        return _inject_program_numbers(payload, self.program_numbers)
+
+
+class SLFRFAdapter(_USAspendingNarrowAdapter):
+    source_id = "slfrf"
+    agency_name = "Department of the Treasury"
+    type_codes = GRANT_TYPE_CODES + CONTRACT_TYPE_CODES + DIRECT_PAYMENT_TYPE_CODES
+
+
+class HAFAdapter(_USAspendingNarrowAdapter):
+    source_id = "haf"
+    agency_name = "Department of the Treasury"
+    program_numbers = ("21.026",)
+    type_codes = GRANT_TYPE_CODES
+
+
+class EXIMBankAdapter(_USAspendingNarrowAdapter):
+    source_id = "exim_bank"
+    agency_name = "Export-Import Bank of the United States"
+    type_codes = GRANT_TYPE_CODES + DIRECT_PAYMENT_TYPE_CODES + LOAN_TYPE_CODES
