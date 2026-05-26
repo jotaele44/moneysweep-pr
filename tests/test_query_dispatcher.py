@@ -44,11 +44,11 @@ def _isolate_cache(tmp_path, monkeypatch):
 
 @pytest.mark.unit
 def test_dispatcher_returns_manual_only_for_stubbed_source(tmp_path):
-    # 'lda' has no concrete adapter — must report manual_only without raising.
-    r = query(Query(municipalities=("San Juan",)), source_ids=["lda"], root=tmp_path)
-    assert r.outcomes["lda"].status == "manual_only"
-    assert r.outcomes["lda"].df is None
-    assert "download_lda.py" in (r.outcomes["lda"].reason or "")
+    # 'sam_entities' has no concrete adapter — must report manual_only without raising.
+    r = query(Query(municipalities=("San Juan",)), source_ids=["sam_entities"], root=tmp_path)
+    assert r.outcomes["sam_entities"].status == "manual_only"
+    assert r.outcomes["sam_entities"].df is None
+    assert "sam_enrichment.py" in (r.outcomes["sam_entities"].reason or "")
 
 
 @pytest.mark.unit
@@ -109,11 +109,11 @@ def test_dispatcher_mixed_query_partial_success(tmp_path):
     with patch.dict(ADAPTER_REGISTRY, {"usaspending_prime": _StaticAdapter}, clear=False):
         r = query(
             Query(municipalities=("San Juan",)),
-            source_ids=["usaspending_prime", "lda"],
+            source_ids=["usaspending_prime", "sam_entities"],
             root=tmp_path,
         )
     assert r.outcomes["usaspending_prime"].status == "ok"
-    assert r.outcomes["lda"].status == "manual_only"
+    assert r.outcomes["sam_entities"].status == "manual_only"
     combined = r.combined
     # Only the ok outcome contributes rows.
     assert (combined["source_id"] == "usaspending_prime").all()

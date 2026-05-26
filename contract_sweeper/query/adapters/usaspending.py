@@ -238,3 +238,76 @@ class USAspendingGrantsAdapter(_USAspendingBase):
     subawards = False
     fields = PRIME_FIELDS
     sort_field = "Award Amount"
+
+
+# ---------------------------------------------------------------------------
+# Per-agency USAspending grant adapters
+# ---------------------------------------------------------------------------
+# These mirror the existing bulk producers under scripts/download_<agency>.py
+# (each pins one toptier `awarding agency` and pulls grant-type-coded
+# awards for PR). All they need is the agency_name; the shared
+# _USAspendingAgencyGrantsAdapter handles the rest.
+
+
+class _USAspendingAgencyGrantsAdapter(_USAspendingBase):
+    """Base for the per-agency grants adapters.
+
+    Subclasses set `source_id` and `agency_name`. The agency is injected
+    into the outgoing payload's `filters.agencies` only when the caller
+    didn't already specify one — so a caller can still narrow further if
+    they want.
+    """
+
+    type_codes = GRANT_TYPE_CODES
+    subawards = False
+    fields = PRIME_FIELDS
+    sort_field = "Award Amount"
+    agency_name: str = ""
+
+    def _payload(self, query: Query, page: int) -> dict[str, Any]:
+        from dataclasses import replace
+
+        effective = query
+        if not query.agencies and self.agency_name:
+            effective = replace(query, agencies=(self.agency_name,))
+        return super()._payload(effective, page)
+
+
+class EPAGrantsAdapter(_USAspendingAgencyGrantsAdapter):
+    source_id = "epa_grants"
+    agency_name = "Environmental Protection Agency"
+
+
+class DOTGrantsAdapter(_USAspendingAgencyGrantsAdapter):
+    source_id = "dot_grants"
+    agency_name = "Department of Transportation"
+
+
+class EDGrantsAdapter(_USAspendingAgencyGrantsAdapter):
+    source_id = "ed_grants"
+    agency_name = "Department of Education"
+
+
+class HHSGrantsAdapter(_USAspendingAgencyGrantsAdapter):
+    source_id = "hhs_grants"
+    agency_name = "Department of Health and Human Services"
+
+
+class DOEGrantsAdapter(_USAspendingAgencyGrantsAdapter):
+    source_id = "doe_grants"
+    agency_name = "Department of Energy"
+
+
+class DOJGrantsAdapter(_USAspendingAgencyGrantsAdapter):
+    source_id = "doj_grants"
+    agency_name = "Department of Justice"
+
+
+class USDAGrantsAdapter(_USAspendingAgencyGrantsAdapter):
+    source_id = "usda_grants"
+    agency_name = "Department of Agriculture"
+
+
+class OIAGrantsAdapter(_USAspendingAgencyGrantsAdapter):
+    source_id = "oia_grants"
+    agency_name = "Department of the Interior"

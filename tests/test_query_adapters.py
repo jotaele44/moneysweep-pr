@@ -327,3 +327,170 @@ def test_sbir_fetch_handles_list_response():
     adapter = SBIRAdapter(root=REPO_ROOT, session=session)
     df = adapter.fetch(Query())
     assert len(df) == 2
+
+
+# ---------------------------------------------------------------------------
+# Per-agency USAspending grant adapters
+# ---------------------------------------------------------------------------
+
+
+from contract_sweeper.query.adapters.usaspending import (  # noqa: E402
+    DOEGrantsAdapter,
+    DOJGrantsAdapter,
+    DOTGrantsAdapter,
+    EDGrantsAdapter,
+    EPAGrantsAdapter,
+    HHSGrantsAdapter,
+    OIAGrantsAdapter,
+    USDAGrantsAdapter,
+)
+
+
+AGENCY_GRANT_ADAPTERS = [
+    (EPAGrantsAdapter, "epa_grants", "Environmental Protection Agency"),
+    (DOTGrantsAdapter, "dot_grants", "Department of Transportation"),
+    (EDGrantsAdapter, "ed_grants", "Department of Education"),
+    (HHSGrantsAdapter, "hhs_grants", "Department of Health and Human Services"),
+    (DOEGrantsAdapter, "doe_grants", "Department of Energy"),
+    (DOJGrantsAdapter, "doj_grants", "Department of Justice"),
+    (USDAGrantsAdapter, "usda_grants", "Department of Agriculture"),
+    (OIAGrantsAdapter, "oia_grants", "Department of the Interior"),
+]
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("cls,sid,agency", AGENCY_GRANT_ADAPTERS)
+def test_agency_grants_adapter_injects_correct_agency(cls, sid, agency):
+    adapter = cls(root=REPO_ROOT, session=MagicMock())
+    payload = adapter._payload(Query(fiscal_years=(2024,)), 1)
+    assert adapter.source_id == sid
+    assert payload["filters"]["agencies"] == [
+        {"type": "awarding", "tier": "toptier", "name": agency}
+    ]
+    assert payload["filters"]["award_type_codes"] == ["02", "03", "04", "05"]
+
+
+@pytest.mark.unit
+def test_agency_grants_adapter_respects_caller_supplied_agency():
+    """If the caller already specified agencies, the adapter doesn't override."""
+    adapter = EPAGrantsAdapter(root=REPO_ROOT, session=MagicMock())
+    payload = adapter._payload(Query(agencies=("Custom Agency",)), 1)
+    # The caller's agency wins, not the adapter's default.
+    assert payload["filters"]["agencies"][0]["name"] == "Custom Agency"
+
+
+# ---------------------------------------------------------------------------
+# LDA
+# ---------------------------------------------------------------------------
+
+
+from contract_sweeper.query.adapters.lda import LDAAdapter, build_params as lda_build_params  # noqa: E402
+
+
+@pytest.mark.unit
+def test_lda_build_params_includes_state_param_and_page_size():
+    params = lda_build_params(Query(), state_param="client_state", page=2)
+    assert params["client_state"] == "PR"
+    assert params["page"] == 2
+    assert params["page_size"] == 100
+    assert "filing_year" not in params
+
+
+@pytest.mark.unit
+def test_lda_build_params_with_fiscal_years_sets_filing_year():
+    params = lda_build_params(Query(fiscal_years=(2022, 2024, 2023)), state_param="registrant_state", page=1)
+    assert params["registrant_state"] == "PR"
+    assert params["filing_year"] == 2024  # most recent
+
+
+@pytest.mark.unit
+def test_lda_fetch_dedupes_across_client_and_registrant_passes():
+    session = MagicMock()
+    # client_state pass returns 2 filings; registrant_state pass returns one duplicate + one new.
+    session.get.side_effect = [
+        _mock_response(
+            {
+                "results": [
+                    {"filing_uuid": "abc", "filing_type": "Q1"},
+                    {"filing_uuid": "def", "filing_type": "Q2"},
+                ],
+                "next": None,
+            }
+        ),
+        _mock_response(
+            {
+                "results": [
+                    {"filing_uuid": "abc", "filing_type": "Q1"},  # duplicate
+                    {"filing_uuid": "ghi", "filing_type": "Q3"},  # new
+                ],
+                "next": None,
+            }
+        ),
+    ]
+    adapter = LDAAdapter(root=REPO_ROOT, session=session)
+    df = adapter.fetch(Query())
+    # Two passes were made.
+    assert session.get.call_count == 2
+    # Dedup: 3 unique uuids (abc, def, ghi).
+    assert len(df) == 3
+    assert set(df["filing_uuid"]) == {"abc", "def", "ghi"}
+
+
+@pytest.mark.unit
+def test_lda_session_includes_token_when_api_key_set():
+    """When an explicit api_key is passed, the session sends Authorization header."""
+    adapter = LDAAdapter(root=REPO_ROOT, api_key="my-test-token")
+    session = adapter._get_session()
+    assert session.headers["Authorization"] == "Token my-test-token"
+
+
+@pytest.mark.unit
+def test_lda_session_omits_token_when_no_api_key(monkeypatch):
+    monkeypatch.delenv("LDA_API_KEY", raising=False)
+    adapter = LDAAdapter(root=REPO_ROOT)
+    session = adapter._get_session()
+    assert "Authorization" not in session.headers
+
+
+# ---------------------------------------------------------------------------
+# NSF Awards
+# ---------------------------------------------------------------------------
+
+
+from contract_sweeper.query.adapters.nsf import NSFAwardsAdapter, build_params as nsf_build_params  # noqa: E402
+
+
+@pytest.mark.unit
+def test_nsf_build_params_pins_awardee_state_to_pr():
+    params = nsf_build_params(Query(), offset=1)
+    assert params["awardeeStateCode"] == "PR"
+    assert params["offset"] == 1
+    assert "awardeeName" in params["printFields"]
+    assert "fundsObligatedAmt" in params["printFields"]
+
+
+@pytest.mark.unit
+def test_nsf_build_params_with_fiscal_years_sets_date_window():
+    params = nsf_build_params(Query(fiscal_years=(2020, 2024, 2022)), offset=1)
+    assert params["dateStart"] == "01/01/2020"
+    assert params["dateEnd"] == "12/31/2024"
+
+
+@pytest.mark.unit
+def test_nsf_fetch_paginates_until_short_page():
+    full = [{"id": str(i), "awardeeStateCode": "PR"} for i in range(25)]
+    short = [{"id": "100", "awardeeStateCode": "PR"}]
+    session = MagicMock()
+    session.get.side_effect = [
+        _mock_response({"response": {"award": full}}),
+        _mock_response({"response": {"award": short}}),
+    ]
+    adapter = NSFAwardsAdapter(root=REPO_ROOT, session=session)
+    df = adapter.fetch(Query())
+    assert len(df) == 26
+    assert session.get.call_count == 2
+
+
+@pytest.mark.unit
+def test_nsf_source_id_matches_registry():
+    assert NSFAwardsAdapter.source_id == "research_grants"
