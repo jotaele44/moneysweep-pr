@@ -38,8 +38,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
 
-from scripts.config import PROJECT_ROOT, setup_logging
+from contract_sweeper.runtime.maturity_gate import (
+    claim_tier,
+    load_dataset_to_source_map,
+    load_source_maturity,
+    unmaterialized_sources,
+)
 from contract_sweeper.validation.production_status import load_current_status
+from scripts.config import PROJECT_ROOT, setup_logging
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -84,6 +90,30 @@ def _fmt_usd(v) -> str:
 
 def _pending(label: str) -> str:
     return f"*{label} — data pending; run pipeline from Mac to populate.*\n"
+
+
+_TIER_PREFIX = {
+    "observed": "_Claim tier: **observed** — record shows; sources fully materialized._",
+    "linked":   "_Claim tier: **linked** — matched to; sources partially materialized._",
+    "blocked":  "_Claim tier: **blocked / unvalidated** — not validated; required sources not materialized._",
+}
+
+
+def _tier_marker(
+    source_datasets: list[str],
+    maturity: dict[str, str],
+    dataset_map: dict[str, str],
+) -> str:
+    """Return the markdown tier marker for a section, per CLAIM_LANGUAGE_POLICY.md."""
+    if not source_datasets:
+        return ""
+    tier = claim_tier(source_datasets, maturity, dataset_map)
+    line = _TIER_PREFIX.get(tier, "")
+    if tier == "blocked":
+        blocked = unmaterialized_sources(source_datasets, maturity, dataset_map)
+        if blocked:
+            line += f"  \n_Unmaterialized: {', '.join(blocked)}._"
+    return line + "\n\n" if line else ""
 
 
 # ---------------------------------------------------------------------------
@@ -611,6 +641,15 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
     fec_df      = _load(proc / "pr_fec_contributions.csv",      "fec_contributions",   logger)
     lda_df      = _load(proc / "pr_lda_filings.csv",            "lda_filings",         logger)
 
+    # Maturity gate inputs — applied as a markdown prefix per section so that
+    # claims read with the right CLAIM_LANGUAGE_POLICY tier even before the
+    # full pipeline materializes.
+    maturity = load_source_maturity(root)
+    dataset_map = load_dataset_to_source_map(root)
+
+    def tag(section_sources: list[str], body: str) -> str:
+        return _tier_marker(section_sources, maturity, dataset_map) + body
+
     # Build each section
     s_awards,   j_awards   = _section_awards(entity_df, top_n)
     s_network,  j_network  = _section_power_network(net_df, top_n)
@@ -622,6 +661,16 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
     s_sf133,    j_sf133    = _section_sf133(sf133_df, top_n)
     s_taxinc,   j_taxinc   = _section_tax_incentive(act60_df, lihtc_df, entity_df, net_df, top_n)
     s_promesa,  j_promesa  = _section_promesa(promesa_df, fec_df, lda_df, top_n)
+
+    s_awards   = tag(["pr_all_awards_master.csv", "pr_contracts_master.csv"], s_awards)
+    s_network  = tag(["pr_lda_filings.csv", "pr_fec_contributions.csv"], s_network)
+    s_primesub = tag(["pr_subawards_master.csv"], s_primesub)
+    s_delivery = tag(["pr_fema_pa_master.csv", "pr_eqb_permits.csv"], s_delivery)
+    s_rfplob   = tag(["pr_compras_rfps.csv", "pr_lda_filings.csv"], s_rfplob)
+    s_bond     = tag(["pr_emma_bonds.csv", "pr_msrb_rtrs_trades.csv"], s_bond)
+    s_sf133    = tag(["pr_sf133_budget_execution.csv"], s_sf133)
+    s_taxinc   = tag(["pr_act60_decrees.csv"], s_taxinc)
+    s_promesa  = tag(["pr_promesa_creditors.csv", "pr_fec_contributions.csv", "pr_lda_filings.csv"], s_promesa)
 
     generated_at = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
     status_payload = load_current_status(root)
@@ -716,11 +765,23 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
     report_path.write_text(report, encoding="utf-8")
     logger.info(f"  Written: {report_path.name}")
 
+    claim_tiers = {
+        "awards":        claim_tier(["pr_all_awards_master.csv", "pr_contracts_master.csv"], maturity, dataset_map),
+        "power_network": claim_tier(["pr_lda_filings.csv", "pr_fec_contributions.csv"], maturity, dataset_map),
+        "prime_sub":     claim_tier(["pr_subawards_master.csv"], maturity, dataset_map),
+        "delivery":      claim_tier(["pr_fema_pa_master.csv", "pr_eqb_permits.csv"], maturity, dataset_map),
+        "rfp_lobby":     claim_tier(["pr_compras_rfps.csv", "pr_lda_filings.csv"], maturity, dataset_map),
+        "bond_flow":     claim_tier(["pr_emma_bonds.csv", "pr_msrb_rtrs_trades.csv"], maturity, dataset_map),
+        "sf133":         claim_tier(["pr_sf133_budget_execution.csv"], maturity, dataset_map),
+        "tax_incentive": claim_tier(["pr_act60_decrees.csv"], maturity, dataset_map),
+        "promesa":       claim_tier(["pr_promesa_creditors.csv", "pr_fec_contributions.csv", "pr_lda_filings.csv"], maturity, dataset_map),
+    }
     summary = {
         "generated_at":    generated_at,
         "production_status": production_status,
         "production_status_message": production_status_message,
         "data_layers":     data_layers,
+        "claim_tiers":     claim_tiers,
         "awards":          j_awards,
         "power_network":   j_network,
         "prime_sub":       j_primesub,
