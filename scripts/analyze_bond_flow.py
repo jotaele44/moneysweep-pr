@@ -30,6 +30,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
 
+from contract_sweeper.runtime.maturity_gate import (
+    claim_tier,
+    load_dataset_to_source_map,
+    load_source_maturity,
+    unmaterialized_sources,
+)
 from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
 from scripts.build_unified_master import _normalize_name
 from scripts.sam_enrichment import name_similarity
@@ -54,6 +60,13 @@ BOND_FLOW_COLUMNS = [
     "is_dual_role",           # federal award recipient AND underwriter/dealer
     "is_issuer_and_awardee",  # bond issuer AND federal award recipient
     "dual_role_awards",       # total federal awards for dual-role entities
+    "claim_tier",             # observed | linked | blocked (per maturity gate)
+]
+
+BOND_SOURCE_DATASETS = [
+    "pr_emma_bonds.csv",
+    "pr_emma_underwriters.csv",
+    "pr_msrb_trades.csv",
 ]
 
 # ---------------------------------------------------------------------------
@@ -101,10 +114,23 @@ def run(root: Path = None, force: bool = False) -> dict:
 
     logger = setup_logging("analyze_bond_flow", log_dir=root / "data" / "logs")
 
+    maturity = load_source_maturity(root)
+    dataset_map = load_dataset_to_source_map(root)
+    bond_tier = claim_tier(BOND_SOURCE_DATASETS, maturity, dataset_map)
+    blocked_bond_sources = unmaterialized_sources(BOND_SOURCE_DATASETS, maturity, dataset_map)
+    if bond_tier == "blocked":
+        logger.warning(
+            "  Bond claim tier: blocked — unmaterialized sources: "
+            f"{', '.join(blocked_bond_sources) or 'unknown'}. "
+            "Outputs carry claim_tier=blocked per CLAIM_LANGUAGE_POLICY.md."
+        )
+    else:
+        logger.info(f"  Bond claim tier: {bond_tier}")
+
     if out_path.exists() and not force:
         rows = sum(1 for _ in open(out_path)) - 1
         logger.info(f"  Bond flow: exists ({rows:,} rows) — skipping (use --force).")
-        return {"status": "CACHED", "rows": rows}
+        return {"status": "CACHED", "rows": rows, "claim_tier": bond_tier}
 
     # Load inputs
     bonds_df  = _load(proc / "pr_emma_bonds.csv",        "EMMA bonds",       logger)
@@ -253,6 +279,7 @@ def run(root: Path = None, force: bool = False) -> dict:
             "is_dual_role":            is_dual_role,
             "is_issuer_and_awardee":   is_issuer_and_awardee,
             "dual_role_awards":        awards_val if is_dual_role else 0.0,
+            "claim_tier":              bond_tier,
         })
 
     df_out = pd.DataFrame(rows, columns=BOND_FLOW_COLUMNS)
@@ -281,6 +308,8 @@ def run(root: Path = None, force: bool = False) -> dict:
         "rows":                  n,
         "dual_role_count":       dual_role_count,
         "issuer_awardee_count":  issuer_awardee_count,
+        "claim_tier":            bond_tier,
+        "blocked_bond_sources":  blocked_bond_sources,
     }
 
 
