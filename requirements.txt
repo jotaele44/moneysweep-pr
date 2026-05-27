@@ -9,3 +9,5 @@ pyarrow>=14.0.0
 # R5 foundation deps
 PyYAML>=6.0
 networkx>=3.0
+# ACT/ACUDEN PDF extraction harness
+pdfplumber>=0.10.0

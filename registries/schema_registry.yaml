@@ -191,8 +191,24 @@ canonical_tables:
       - {name: total_amount,             dtype: float64, required: false}
       - {name: parent_uei,               ref: parent_uei}
       - {name: parent_name,              dtype: string,  required: false}
-      - {name: status,                   dtype: string,  required: true,  description: "candidate_alias_cluster | confirmed_alias | manual_review"}
+      - {name: status,                   dtype: string,  required: true,  description: "candidate_alias_cluster | operator_curated_cluster | confirmed_alias | manual_review"}
       - {name: manual_review_required,   dtype: bool,    required: true}
+      - {name: override_hits,            dtype: int64,   required: false, description: "Count of rows whose raw name matched an operator-curated alias override."}
+
+  alias_overrides:
+    primary_key: [canonical_name]
+    description: |
+      Operator-curated alias-collapse table at registries/alias_overrides.yaml.
+      Forces listed aliases to share a canonical cluster during entity
+      resolution. Identity warning: equivalences are curated, not legally
+      verified — downstream claims still respect CLAIM_LANGUAGE_POLICY.md.
+    columns:
+      - {name: canonical_name,           dtype: string,  required: true,  description: "Display form for the merged cluster."}
+      - {name: aliases,                  dtype: string,  required: true,  description: "YAML list of raw observed names that should collapse into canonical_name."}
+      - {name: canonical_uei,            dtype: string,  required: false, description: "UEI of the canonical legal entity when known."}
+      - {name: parent_canonical,         dtype: string,  required: false, description: "canonical_name of the parent group; expresses subsidiary relationship without forcing a parent-side merge."}
+      - {name: notes,                    dtype: string,  required: false}
+      - {name: evidence,                 dtype: string,  required: true,  description: "Source filename or document SHA256 supporting the equivalence."}
 
   entity_edges:
     primary_key: [source, target, edge_type, evidence_id]

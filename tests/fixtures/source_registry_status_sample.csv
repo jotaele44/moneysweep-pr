@@ -1,0 +1,8 @@
+source_id,family,required,authentication,producer_script,expected_outputs,update_cadence,pipeline_status,blocker_notes
+emma_bonds,bonds,True,none,scripts/download_emma.py,data/staging/processed/pr_emma_bonds.csv;data/staging/processed/bond_asset_map.csv,weekly,not_materialized,
+msrb_rtrs_trades,bonds,False,none,scripts/download_msrb_trades.py,data/staging/processed/pr_msrb_rtrs_trades.csv,monthly,not_materialized,
+lda,lobbying,True,api_key:LDA_API_KEY,scripts/download_lda.py,data/staging/processed/pr_lda_filings.csv,monthly,partially_materialized,
+fec,political_finance,True,api_key:FEC_API_KEY,scripts/download_fec.py,data/staging/processed/pr_fec_contributions.csv,monthly,fully_materialized,
+usaspending_prime,federal,True,none,scripts/build_unified_master.py,data/staging/processed/pr_contracts_master.csv;data/staging/processed/pr_all_awards_master.csv,weekly,fully_materialized,
+fpds_report_builder,federal,False,none,scripts/download_grants.py,data/staging/processed/pr_fpds_report_builder.csv,quarterly,below_threshold,
+opencorporates,entity_resolution,False,api_key:OPENCORPORATES_API_TOKEN,scripts/download_opencorporates.py,data/staging/processed/pr_opencorporates.csv,monthly,no_outputs_declared,
