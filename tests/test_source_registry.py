@@ -84,7 +84,7 @@ def test_source_registry_extensions_are_loaded():
     assert nara["family"] == "provenance_archival"
     assert nara["required"] is False
     assert nara["authentication"] == "api_key:NARA_API_KEY"
-    assert "producer_script" not in nara
+    assert nara["producer_script"] == ""
 
     bulk = sr.source_by_id("nara_catalog_aws_open_data", REPO_ROOT)
     assert bulk is not None
