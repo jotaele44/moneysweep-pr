@@ -53,9 +53,15 @@ HTML_PDF_OR_PR_GOV = {
     "emma_bonds", "msrb_rtrs_trades",
 }
 
+PUBLIC_PRODUCER_READY = {
+    "hud_cdbg_dr_public",
+}
+
 ACTION_BY_BUCKET = {
     "public_api_adapter_ready":
         "Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work.",
+    "public_producer_ready":
+        "Run producer under strict preflight; source has public producer path and no credential gate.",
     "auth_or_key_gated":
         "Set the required credential env var in `.env`; rerun producer.",
     "manual_export_only":
@@ -93,6 +99,8 @@ def _bucket(row: dict, producer_exists: bool) -> tuple[str, str]:
         return "semantic_duplicate", f"covered by {SEMANTIC_DUPLICATES[sid]}"
     if not producer_exists or "stub" in notes or "broken" in notes:
         return "stub_or_broken_producer", "producer script missing or marked stub"
+    if sid in PUBLIC_PRODUCER_READY:
+        return "public_producer_ready", "producer has public API/local/seed fallback path"
     if auth == "manual_export":
         return "manual_export_only", "manual delivery required"
     if auth.startswith("api_key:") or auth.startswith("oauth"):
