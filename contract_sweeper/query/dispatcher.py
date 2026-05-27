@@ -12,8 +12,14 @@ from contract_sweeper.runtime.source_registry import (
     source_by_id,
 )
 
-from .adapters import ADAPTER_REGISTRY, get_adapter
+from .adapters import (
+    ADAPTER_REGISTRY,
+    ENTITY_ADAPTER_REGISTRY,
+    get_adapter,
+    get_entity_adapter,
+)
 from .cache import FileCache, ttl_for_cadence
+from .entity_types import EntityQuery
 from .types import (
     CredentialMissing,
     ManualOnlyError,
@@ -138,6 +144,108 @@ def query(
     result = QueryResult(query=criteria)
     for sid in source_ids:
         result.outcomes[sid] = _query_one(
+            sid, criteria, root=root, cache=cache, force_refresh=force_refresh
+        )
+    return result
+
+
+def _entity_query_one(
+    source_id: str,
+    criteria: EntityQuery,
+    *,
+    root: Path,
+    cache: FileCache,
+    force_refresh: bool,
+) -> SourceQueryOutcome:
+    query_hash = criteria.canonical_hash()
+    ttl = _resolve_ttl(source_id, root)
+
+    if not force_refresh:
+        hit = cache.get(source_id, query_hash, ttl_seconds=ttl)
+        if hit is not None:
+            df, meta = hit
+            return SourceQueryOutcome(
+                source_id=source_id,
+                status="cache_hit",
+                df=df,
+                rows=int(len(df)),
+                fetched_at=meta.get("fetched_at"),
+            )
+
+    if source_id not in ENTITY_ADAPTER_REGISTRY:
+        return SourceQueryOutcome(
+            source_id=source_id,
+            status="manual_only",
+            df=None,
+            rows=0,
+            fetched_at=None,
+            reason=f"{source_id}: no entity-mode adapter registered",
+        )
+
+    adapter = get_entity_adapter(source_id, root=root)
+    try:
+        raw = adapter.fetch(criteria)
+    except CredentialMissing as exc:
+        return SourceQueryOutcome(
+            source_id=source_id,
+            status="error",
+            df=None,
+            rows=0,
+            fetched_at=None,
+            error=str(exc),
+        )
+    except Exception as exc:  # noqa: BLE001 — adapter errors must not bubble
+        _LOG.exception("entity adapter %s failed", source_id)
+        return SourceQueryOutcome(
+            source_id=source_id,
+            status="error",
+            df=None,
+            rows=0,
+            fetched_at=None,
+            error=f"{type(exc).__name__}: {exc}",
+        )
+
+    # No post_ingest for entity records: they aren't PR-row-shaped.
+    cache.put(source_id, query_hash, raw, query=criteria, ttl_seconds=ttl)
+    return SourceQueryOutcome(
+        source_id=source_id,
+        status="ok",
+        df=raw,
+        rows=int(len(raw)),
+        fetched_at=_utcnow_iso(),
+    )
+
+
+def query_entities(
+    criteria: EntityQuery,
+    *,
+    source_ids: list[str] | None = None,
+    root: Path | None = None,
+    force_refresh: bool = False,
+) -> QueryResult:
+    """Run an on-demand entity-mode query across one or more registered adapters.
+
+    Parameters
+    ----------
+    criteria
+        The entity-mode query spec. Identifier order doesn't affect caching.
+    source_ids
+        Registered entity source_ids to consult. None defaults to every
+        adapter in :data:`ENTITY_ADAPTER_REGISTRY`. Unknown source_ids
+        resolve to ``status='manual_only'`` outcomes.
+    root
+        Repo root. Defaults to the package's REPO_ROOT.
+    force_refresh
+        Skip the cache lookup and re-fetch from upstream.
+    """
+    root = Path(root) if root else REPO_ROOT
+    cache = FileCache(root)
+    if source_ids is None:
+        source_ids = sorted(ENTITY_ADAPTER_REGISTRY.keys())
+
+    result = QueryResult(query=criteria)
+    for sid in source_ids:
+        result.outcomes[sid] = _entity_query_one(
             sid, criteria, root=root, cache=cache, force_refresh=force_refresh
         )
     return result

@@ -17,7 +17,8 @@ for on-demand queries by construction.
 from __future__ import annotations
 
 from .cli import main
-from .dispatcher import query
+from .dispatcher import query, query_entities
+from .entity_types import EntityIdentifier, EntityQuery
 from .types import (
     CredentialMissing,
     ManualOnlyError,
@@ -29,8 +30,11 @@ from .types import (
 
 __all__ = [
     "query",
+    "query_entities",
     "main",
     "Query",
+    "EntityQuery",
+    "EntityIdentifier",
     "QueryResult",
     "SourceQueryOutcome",
     "QueryError",
