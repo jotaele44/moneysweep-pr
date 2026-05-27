@@ -257,3 +257,64 @@ def test_shipped_overrides_collapse_transporte_rodriguez_accent() -> None:
     accented, _ = apply("Transporte Rodríguez Asfalto, Inc.", mapping)
     unaccented, _ = apply("Transporte Rodriguez Asfalto, Inc.", mapping)
     assert accented == unaccented == "TRANSPORTE RODRIGUEZ ASFALTO"
+
+
+@pytest.mark.unit
+def test_shipped_overrides_collapse_virella_ing_credential_prefix() -> None:
+    """`Ing.` is a credential prefix; bare and prefixed forms must collapse."""
+    mapping = load_overrides()
+    bare, bare_overridden = apply("Juan O. Virella Sánchez", mapping)
+    prefixed, prefixed_overridden = apply("Ing. Juan O. Virella Sánchez", mapping)
+    assert bare == prefixed
+    assert bare_overridden is True
+    assert prefixed_overridden is True
+
+
+@pytest.mark.unit
+def test_shipped_overrides_collapse_om_consulting_engineering_variants() -> None:
+    """The ACT 2020 PDF's `O & M CONSULTING ENGINEERING ,P.S.C.` leading-comma
+    quirk and ampersand-spacing variants must collapse to one canonical."""
+    mapping = load_overrides()
+    variants = [
+        "O & M CONSULTING ENGINEERING ,P.S.C.",
+        "O&M Consulting Engineering",
+        "O & M Consulting Engineering, PSC",
+    ]
+    canonicals = {apply(v, mapping)[0] for v in variants}
+    assert len(canonicals) == 1
+
+
+@pytest.mark.unit
+def test_shipped_overrides_collapse_cosiani_typo() -> None:
+    """ACUDEN 2024 has the typo `Integraod` vs correct `Integrados`; both must
+    collapse to one canonical."""
+    mapping = load_overrides()
+    typo, typo_ovrd = apply("Cooperativa de Servicios Integraod a la Niñez (COSIANI)", mapping)
+    correct, correct_ovrd = apply(
+        "Cooperativa de Servicios Integrados a la Niñez (COSIANI)", mapping
+    )
+    assert typo == correct
+    assert typo_ovrd is True
+    assert correct_ovrd is True
+
+
+@pytest.mark.unit
+def test_shipped_overrides_collapse_rajohnyari_typo() -> None:
+    """ACUDEN 2024 has both `Rajohnyari` (with h) and `Rajonyari` (without h)
+    for the same childcare operator; must collapse."""
+    mapping = load_overrides()
+    with_h, _ = apply("Rajohnyari Day Care & Academy Bilingual School Inc.", mapping)
+    without_h, _ = apply("Rajonyari Day Care & Academy Bilingual School Inc.", mapping)
+    assert with_h == without_h
+
+
+@pytest.mark.unit
+def test_shipped_overrides_collapse_maritime_transport_truncations() -> None:
+    """The ACT 2020 PDF text truncates both the English and Spanish forms; the
+    truncated variants must still collapse to the Maritime Transport canonical."""
+    mapping = load_overrides()
+    english_trunc, en_ovrd = apply("Maritime Transport Authority for Puerto Rico and t", mapping)
+    spanish_trunc, sp_ovrd = apply("AUTORIDAD DE TRANSPORTE MARITIMO Y LAS ISLAS MUNIC", mapping)
+    assert english_trunc == spanish_trunc
+    assert en_ovrd is True
+    assert sp_ovrd is True
