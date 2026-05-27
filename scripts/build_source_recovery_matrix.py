@@ -29,6 +29,10 @@ ADAPTER_REGISTRY_AFTER_PR = {
     "slfrf", "haf", "exim_bank",
     "fdic", "nonprofits_irs990",
     "sba_ppp", "sba_loans",
+    # Batch 6 (auth-gated geographic adapters)
+    "opencorporates", "highergov_supplemental",
+    # Entity-mode adapters
+    "sam_entities", "ofac_sdn",
 }
 
 SEMANTIC_DUPLICATES = {

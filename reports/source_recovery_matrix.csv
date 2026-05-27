@@ -1,7 +1,4 @@
 source_id,required,producer_script,expected_outputs_count,outputs_present_count,failure_bucket,blocker,recommended_action
-highergov_supplemental,False,scripts/fetch_highergov_api.py,2,1,auth_or_key_gated,api_key:HIGHERGOV_API_KEY,Set the required credential env var in `.env`; rerun producer.
-opencorporates,False,scripts/download_opencorporates.py,1,0,auth_or_key_gated,api_key:OPENCORPORATES_API_TOKEN,Set the required credential env var in `.env`; rerun producer.
-sam_entities,True,scripts/sam_enrichment.py,2,0,auth_or_key_gated,api_key:SAM_API_KEY,Set the required credential env var in `.env`; rerun producer.
 aafaf,False,scripts/download_aafaf.py,1,0,html_pdf_or_pr_gov_custom,scrape / PDF / custom PR-gov surface,Defer; needs scraping adapter design pass.
 cofina,False,scripts/download_cofina.py,1,0,html_pdf_or_pr_gov_custom,scrape / PDF / custom PR-gov surface,Defer; needs scraping adapter design pass.
 compras_pr,False,scripts/download_compras.py,1,0,html_pdf_or_pr_gov_custom,scrape / PDF / custom PR-gov surface,Defer; needs scraping adapter design pass.
@@ -40,7 +37,6 @@ medicare_advantage,False,scripts/download_medicare_advantage.py,1,0,never_run_or
 medicare_parts,False,scripts/download_medicare_parts.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 ncua,False,scripts/download_ncua.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 nmtc,False,scripts/download_nmtc.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
-ofac_sdn,False,scripts/download_ofac.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 sec_13f_nport,False,scripts/download_sec_holdings.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 sec_edgar,False,scripts/download_sec.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 sf133_budget_execution,False,scripts/download_sf133.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
@@ -64,12 +60,16 @@ fema_pa_openfema_v2,True,scripts/download_openfema_pa_projects.py,1,0,public_api
 grants_gov,False,scripts/download_grants.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 haf,False,scripts/download_haf.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 hhs_grants,False,scripts/download_hhs.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
+highergov_supplemental,False,scripts/fetch_highergov_api.py,2,1,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 lda,True,scripts/download_lda.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 nfip_claims,False,scripts/download_nfip.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 nih_reporter,False,scripts/download_nih.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 nonprofits_irs990,False,scripts/download_nonprofits.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
+ofac_sdn,False,scripts/download_ofac.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 oia_grants,False,scripts/download_oia.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
+opencorporates,False,scripts/download_opencorporates.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 research_grants,False,scripts/download_research.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
+sam_entities,True,scripts/sam_enrichment.py,2,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 sba_loans,False,scripts/download_sba.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 sba_ppp,False,scripts/download_sba.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 sbir,False,scripts/download_sbir.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
