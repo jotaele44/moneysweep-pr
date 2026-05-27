@@ -34,12 +34,22 @@ entries:
       - "LPC Contractors Inc"
       - "LPC Contractors, Inc."
       - "LPC&D"
+      - "L. P. C. and D. Inc."
+      - "L.P.C. & D., INC."
+      - "L. P. C. & D., INC"
+      - "L. P. C. & D, INC."
+      - "L. P. C. & D., INC."
+      - "L. P. C. and D., Inc."
     notes: |
       ACT transition manual export lists LPC & D and LPC Contractors as the
-      same vendor across different filing years. Source registry note for
-      act_transition_contracts (source_registry.yaml line 257) explicitly
-      names LPC&D.
-    evidence: "registries/source_registry.yaml:act_transition_contracts"
+      same vendor across different filing years. The dot-and-space spelling
+      forms ("L. P. C. and D. Inc.", "L.P.C. & D., INC.") appear throughout
+      the ACT 2020 transition PDF and normalize to "L P C ..." rather than
+      "LPC ..." under the default normalizer — so they need explicit
+      override entries even though they look obviously equivalent.
+      Source registry note for act_transition_contracts
+      (source_registry.yaml line 257) explicitly names LPC&D.
+    evidence: "registries/source_registry.yaml:act_transition_contracts;reports/act_2020_alias_audit.md"
 
   - canonical_name: "Super Asphalt Pavement Corp"
     aliases:
@@ -181,3 +191,206 @@ entries:
       Municipal bond/finance vehicle. Anchor target for EMMA/MSRB
       lobbying edges once bond outputs materialize.
     evidence: "operator_blind_spot_report_2026_05_26"
+
+  # ----- ACT 2020 transition PDF — entity families surfaced 2026-05-27 -----
+
+  - canonical_name: "Ferrovial Agroman"
+    aliases:
+      - "Ferrovial Agroman"
+      - "Ferrovial Agroman SA"
+      - "Ferrovial Agroman S.A."
+      - "Ferrovial Agroman, S.A."
+      - "Ferrovial-Agroman SA"
+      - "Ferrovial- Agroman, SA"
+      - "Ferrovial Agroman LLC"
+      - "Ferrovial Agroman, LLC"
+    notes: |
+      Spanish-parented construction contractor; appears across the ACT
+      2020 transition PDF in four corporate-suffix variants (SA / S.A. /
+      LLC / hyphenated). Sister entity to Ferrovial Construccion PR LLC
+      (separate line of business — kept as its own canonical with a
+      parent_canonical link).
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Ferrovial Construccion PR"
+    aliases:
+      - "Ferrovial Construccion PR"
+      - "Ferrovial Construccion PR LLC"
+      - "Ferrovial Construccion PR, LLC"
+      - "Ferrovial Construccion Puerto Rico"
+      - "Ferrovial Construccion Puerto Rico LLC"
+    parent_canonical: "Ferrovial Agroman"
+    notes: |
+      PR operating entity of Ferrovial; shows up alongside Ferrovial
+      Agroman LLC across multiple ACT 2020 contracts. Kept separate
+      because the legal entities are distinct, but linked via
+      parent_canonical so power-network scoring can reach the parent.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Desarrolladora J.A."
+    aliases:
+      - "Desarrolladora J.A."
+      - "Desarrolladora J.A. Inc"
+      - "Desarrolladora J.A. Inc."
+      - "Desarrolladora J.A., Inc."
+      - "Desarrolladora J.A.. Inc."
+      - "Desarrolladora J.A.. Inc"
+      - "Desarrolladora JA Inc"
+      - "Desarrolladora JA, Inc."
+      - "Desarrolladora JA, Inc.."
+      - "Desarrolladora J A Inc"
+    notes: |
+      ACT 2020 PDF contains 5+ punctuation/typo variants of the same
+      contractor (trailing double-dot, missing comma, with/without
+      periods between J and A). All collapse to one canonical.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "CMA Architects & Engineers"
+    aliases:
+      - "CMA Architects & Engineers"
+      - "CMA Architects and Engineers"
+      - "CMA Architects and Engineers LLC"
+      - "CMA Architects and Engineers, LLC"
+      - "CMA Architects and Engineers LLP"
+      - "CMA Architects and Engineers, LLP"
+      - "CMA Architects & Engineers, LLP"
+      - "CMA Architects & Engineers,LLP"
+      - "CMA Architects & Engineers, L.L.P."
+      - "CMA Architecs & Engineers"
+      - "CMA Architecs & Engineers, L.L.P."
+      - "CMA Architecs & Engineers, LLP"
+    notes: |
+      Engineering firm appearing 8+ times across the ACT 2020 PDF with
+      legitimate variants (LLP vs LLC vs L.L.P.) AND the recurring typo
+      "Architecs" (missing T). Override captures both axes.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "CSA Architects & Engineers"
+    aliases:
+      - "CSA Architects & Engineers"
+      - "CSA Architects and Engineers"
+      - "CSA Architects and Engineers LLP"
+      - "CSA Architects and Engineers, LLP"
+      - "CSA Architects & Engineers, LLP"
+      - "CSA Architects & Engineers,LLP"
+      - "CSA Architects & Engineers LLP"
+    notes: |
+      Engineering firm; separate entity from CMA Architects (often
+      confused). Multiple punctuation variants in the ACT 2020 PDF.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Transporte Rodriguez Asfalto"
+    aliases:
+      - "Transporte Rodriguez Asfalto"
+      - "Transporte Rodriguez Asfalto Inc"
+      - "Transporte Rodriguez Asfalto, Inc."
+      - "Transporte Rodríguez Asfalto"
+      - "Transporte Rodríguez Asfalto, Inc."
+    notes: |
+      Paving contractor with 7+ ACT 2020 contracts across multiple
+      amendments. The accented and unaccented forms (Rodriguez vs
+      Rodríguez) should collapse for cross-source joins.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Barrett, Hale & Alamo"
+    aliases:
+      - "Barrett, Hale & Alamo"
+      - "Barrett, Hale & Alamo, LLC"
+      - "Barrett Hale & Alamo, LLC"
+      - "Barret Hale & Alamo, LLC"
+      - "Barret, Hale & Alamo, LLC"
+      - "Barret Hale and Alamo LLC"
+    notes: |
+      Professional-services contractor; ACT 2020 PDF includes the
+      recurring typo "Barret" (single T) alongside the correct
+      "Barrett". Both must collapse for crossref scoring.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Behar-Ybarra & Associates"
+    aliases:
+      - "Behar-Ybarra & Associates"
+      - "Behar-Ybarra and Associates"
+      - "Behar-Ybarra & Associates, LLP"
+      - "Behar-Ybarra & Associates, LLC"
+      - "Behar-Ybarra and Associates, LLP"
+      - "Behar-Ybarra and Associates,LLP"
+      - "Behar Ybarra & Associates LLP"
+    notes: |
+      Consulting firm; appears with both LLP and LLC suffixes in the
+      ACT 2020 PDF (likely a re-registration). Collapse so the entity
+      surfaces once in the influence graph.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Jose A. Batlle & Asociados"
+    aliases:
+      - "Jose A. Batlle & Asociados"
+      - "Jose A. Batlle & Asociados, C.S.P."
+      - "Jose A. Batlle & Asociados CSP"
+      - "Jose A. Batlle y Asociados"
+      - "Ingenieros Jose A. Batlle & Asociados"
+      - "Ingenieros Jose A. Batlle & Asociados, CSP"
+      - "José A. Batlle & Asociados"
+      - "José A. Batlle & Asociados, C.S.P."
+      - "INGENIEROS JOSÉ A. BATLLE & ASOCIADOS, CSP"
+    notes: |
+      Engineering firm; the "Ingenieros" prefix is a professional
+      credential (engineer-led firm), not a separate legal entity.
+      Collapse both prefixed and unprefixed forms, and the accented
+      and unaccented José variants.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Integra Design Group"
+    aliases:
+      - "Integra Design Group"
+      - "Integra Design Group, PSC"
+      - "Integra Design Group PSC"
+      - "Integra Design Group Architects & Engineers"
+      - "Integra Design Group Architects & Engineers, PSC"
+      - "Integra Design Group Architects and Engineers, PSC"
+    notes: |
+      Engineering firm; the long-form "Architects & Engineers, PSC"
+      and short-form "PSC" both appear in the ACT 2020 PDF.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "EBP Design Group"
+    aliases:
+      - "EBP Design Group"
+      - "EBP Design Group PSC"
+      - "EBP Design Group, PSC"
+      - "EBP Design Group Consulting Engineers"
+      - "EBP Design Group, Consulting Engineers, P.S.C."
+      - "EBP Design Group Consulting Engineers, PSC"
+    notes: |
+      Consulting-engineering firm; variants differ only in the
+      "Consulting Engineers" qualifier and the P.S.C. / PSC
+      punctuation.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Bermudez, Longo, Diaz-Masso"
+    aliases:
+      - "Bermudez, Longo, Diaz-Masso"
+      - "Bermudez, Longo, Diaz-Masso, LLC"
+      - "Bermudez Longo Diaz-Masso LLC"
+      - "Bermúdez, Longo, Díaz-Massó"
+      - "Bermúdez, Longo, Díaz-Massó, LLC"
+      - "BLDM"
+    notes: |
+      High-value PR contractor; appears in ACT 2020 and is flagged in
+      the operator bond-flow memo as a recurring LDA-registered
+      vendor. The "BLDM" abbreviation surfaces in lobbying filings.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt;operator_blind_spot_report_2026_05_26"
+
+  - canonical_name: "Maritime Transport Authority for Puerto Rico"
+    aliases:
+      - "Maritime Transport Authority for Puerto Rico"
+      - "Maritime Transport Authority for Puerto Rico and the Municipal Islands"
+      - "Autoridad de Transporte Maritimo"
+      - "Autoridad de Transporte Maritimo y Las Islas Municipales"
+      - "Autoridad de Transporte Marítimo"
+      - "Autoridad de Transporte Marítimo y las Islas Municipales"
+      - "ATM"
+    notes: |
+      Puerto Rico government maritime-transport authority; ACT 2020
+      PDF shows both Spanish and English names (often truncated in
+      the source text), which the default normalizer can't bridge.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
