@@ -6,19 +6,12 @@ Total sources: **82**
 
 | failure_bucket | count | recommended_action |
 | --- | --- | --- |
-| `public_api_adapter_ready` | 26 | Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work. |
-| `never_run_or_unverified` | 24 | Run producer to determine bucket. |
+| `public_api_adapter_ready` | 30 | Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work. |
+| `never_run_or_unverified` | 23 | Run producer to determine bucket. |
 | `html_pdf_or_pr_gov_custom` | 20 | Defer; needs scraping adapter design pass. |
 | `manual_export_only` | 5 | External delivery to `data/manual_import_dropzone/<family>/`; see SOURCE_RECOVERY_RUNBOOK. |
-| `auth_or_key_gated` | 3 | Set the required credential env var in `.env`; rerun producer. |
 | `semantic_duplicate` | 3 | No action; covered by sibling source. |
 | `required_missing_blocker` | 1 | Escalate; required source has no available path. |
-
-## auth_or_key_gated (3)
-
-- `highergov_supplemental`
-- `opencorporates`
-- `sam_entities`
 
 ## html_pdf_or_pr_gov_custom (20)
 
@@ -51,7 +44,7 @@ Total sources: **82**
 - `hud_drgr_authorized`
 - `pr_corporate_registry`
 
-## never_run_or_unverified (24)
+## never_run_or_unverified (23)
 
 - `chip`
 - `cms_open_payments`
@@ -66,7 +59,6 @@ Total sources: **82**
 - `medicare_parts`
 - `ncua`
 - `nmtc`
-- `ofac_sdn`
 - `sec_13f_nport`
 - `sec_edgar`
 - `sf133_budget_execution`
@@ -78,7 +70,7 @@ Total sources: **82**
 - `wic`
 - `wioa`
 
-## public_api_adapter_ready (26)
+## public_api_adapter_ready (30)
 
 - `doe_grants`
 - `doj_grants`
@@ -93,12 +85,16 @@ Total sources: **82**
 - `grants_gov`
 - `haf`
 - `hhs_grants`
+- `highergov_supplemental`
 - `lda`
 - `nfip_claims`
 - `nih_reporter`
 - `nonprofits_irs990`
+- `ofac_sdn`
 - `oia_grants`
+- `opencorporates`
 - `research_grants`
+- `sam_entities`
 - `sba_loans`
 - `sba_ppp`
 - `sbir`

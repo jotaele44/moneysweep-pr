@@ -10,6 +10,7 @@ from typing import Type
 
 from .base import SourceAdapter
 from ._stub import NotImplementedAdapter
+from .entity_base import EntityAdapter
 from .fdic import FDICInstitutionsAdapter
 from .fec import FECPRAdapter
 from .highergov import HigherGovSupplementalAdapter
@@ -17,7 +18,9 @@ from .lda import LDAAdapter
 from .nih import NIHReporterAdapter
 from .nonprofits import NonprofitsIRS990Adapter
 from .nsf import NSFAwardsAdapter
+from .ofac import OFACSDNAdapter
 from .opencorporates import OpenCorporatesAdapter
+from .sam import SAMEntitiesAdapter
 from .openfema import (
     OpenFEMAHmgpAdapter,
     OpenFEMANfipClaimsAdapter,
@@ -81,6 +84,15 @@ ADAPTER_REGISTRY: dict[str, Type[SourceAdapter]] = {
 }
 
 
+#: Entity-mode adapters keyed by their registry source_id. Ride a separate
+#: registry from the geographic :data:`ADAPTER_REGISTRY` so callers can't
+#: accidentally route an entity-shaped source through ``query()``.
+ENTITY_ADAPTER_REGISTRY: dict[str, Type[EntityAdapter]] = {
+    SAMEntitiesAdapter.source_id: SAMEntitiesAdapter,
+    OFACSDNAdapter.source_id: OFACSDNAdapter,
+}
+
+
 def get_adapter(source_id: str, *, root: Path) -> SourceAdapter:
     """Return a concrete adapter for `source_id`, or the stub fallback."""
     cls = ADAPTER_REGISTRY.get(source_id)
@@ -89,4 +101,21 @@ def get_adapter(source_id: str, *, root: Path) -> SourceAdapter:
     return cls(root=root)
 
 
-__all__ = ["ADAPTER_REGISTRY", "get_adapter", "SourceAdapter", "NotImplementedAdapter"]
+def get_entity_adapter(source_id: str, *, root: Path) -> EntityAdapter:
+    """Return a concrete entity adapter for ``source_id``.
+
+    Raises ``KeyError`` if the source isn't registered; the dispatcher
+    handles routing decisions before calling this.
+    """
+    return ENTITY_ADAPTER_REGISTRY[source_id](root=root)
+
+
+__all__ = [
+    "ADAPTER_REGISTRY",
+    "ENTITY_ADAPTER_REGISTRY",
+    "get_adapter",
+    "get_entity_adapter",
+    "SourceAdapter",
+    "EntityAdapter",
+    "NotImplementedAdapter",
+]

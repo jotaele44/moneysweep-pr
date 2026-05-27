@@ -22,7 +22,7 @@ import pandas as pd
 
 from contract_sweeper.runtime.source_registry import REPO_ROOT
 
-from .adapters import ADAPTER_REGISTRY
+from .adapters import ADAPTER_REGISTRY, ENTITY_ADAPTER_REGISTRY
 from .dispatcher import query as run_query
 from .types import Query, QueryResult, SourceQueryOutcome
 
@@ -166,7 +166,12 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--list-adapters",
         action="store_true",
-        help="Print the registered adapter source_ids and exit.",
+        help="Print the registered geographic adapter source_ids and exit.",
+    )
+    p.add_argument(
+        "--list-entity-adapters",
+        action="store_true",
+        help="Print the registered entity-mode adapter source_ids and exit.",
     )
     p.add_argument(
         "--root",
@@ -183,6 +188,11 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     if args.list_adapters:
         for sid in sorted(ADAPTER_REGISTRY.keys()):
+            print(sid)
+        return 0
+
+    if args.list_entity_adapters:
+        for sid in sorted(ENTITY_ADAPTER_REGISTRY.keys()):
             print(sid)
         return 0
 
