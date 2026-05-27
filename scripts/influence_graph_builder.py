@@ -36,6 +36,12 @@ from typing import Any
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from contract_sweeper.runtime.maturity_gate import (
+    claim_tier,
+    load_dataset_to_source_map,
+    load_source_maturity,
+)
+
 NAME_FIELDS = ["recipient_name", "vendor_name", "award_recipient_name", "prime_recipient_name"]
 UEI_FIELDS = ["recipient_uei", "uei", "entity_uei", "prime_uei"]
 PARENT_UEI_FIELDS = ["parent_uei", "parent_name", "ultimate_parent_uei", "prime_parent_uei"]
@@ -97,11 +103,17 @@ def _add_edge(
     confidence: float = 0.5,
     source_type: str = "entity",
     target_type: str = "entity",
+    *,
+    maturity: dict[str, str] | None = None,
+    dataset_map: dict[str, str] | None = None,
 ) -> None:
     if not source or not target:
         return
     nodes.setdefault(source, {"id": source, "label": source, "node_type": source_type})
     nodes.setdefault(target, {"id": target, "label": target, "node_type": target_type})
+    tier = claim_tier(
+        [source_dataset], maturity or {}, dataset_map or {}
+    ) if source_dataset else "blocked"
     edges.append({
         "source": source,
         "target": target,
@@ -110,6 +122,7 @@ def _add_edge(
         "source_dataset": source_dataset,
         "evidence_id": evidence_id,
         "confidence": round(float(confidence), 3),
+        "claim_tier": tier,
         "manual_review_required": confidence < 0.8,
     })
 
@@ -136,6 +149,11 @@ def _build_edges(root: Path) -> tuple[dict, list]:
     nodes: dict[str, dict] = {}
     edges: list[dict] = []
     entity_idx = _load_entity_index(root)
+    maturity = load_source_maturity(root)
+    dataset_map = load_dataset_to_source_map(root)
+
+    def add(*args, **kwargs):
+        _add_edge(*args, maturity=maturity, dataset_map=dataset_map, **kwargs)
 
     # Awards: agency → prime, parent → prime, prime → municipality
     for path in [proc / "pr_all_awards_master.csv", proc / "pr_contracts_master.csv",
@@ -149,14 +167,14 @@ def _build_edges(root: Path) -> tuple[dict, list]:
             amt = _money(row)
             muni = _first(row, MUNICIPALITY_FIELDS)
 
-            _add_edge(edges, nodes, agency, recip, "awards_to", amt, path.name, aid,
-                      0.75, "agency", "prime")
+            add(edges, nodes, agency, recip, "awards_to", amt, path.name, aid,
+                0.75, "agency", "prime")
             if parent:
-                _add_edge(edges, nodes, parent, recip, "parent_of", 1.0, path.name, aid,
-                          0.90, "parent_entity", "prime")
+                add(edges, nodes, parent, recip, "parent_of", 1.0, path.name, aid,
+                    0.90, "parent_entity", "prime")
             if muni:
-                _add_edge(edges, nodes, recip, muni, "located_in", 1.0, path.name, aid,
-                          0.60, "prime", "municipality")
+                add(edges, nodes, recip, muni, "located_in", 1.0, path.name, aid,
+                    0.60, "prime", "municipality")
 
     # Execution chains: prime → sub, sub → asset/project, asset → municipality
     for row in _read_csv(proc / "execution" / "execution_chain_master.csv"):
@@ -168,15 +186,15 @@ def _build_edges(root: Path) -> tuple[dict, list]:
         muni = _first(row, MUNICIPALITY_FIELDS)
         asset = _first(row, ["asset_id", "project_id"])
 
-        _add_edge(edges, nodes, prime, sub, "subawards_to", amt,
-                  "execution_chain_master.csv", aid, conf, "prime", "subcontractor")
+        add(edges, nodes, prime, sub, "subawards_to", amt,
+            "execution_chain_master.csv", aid, conf, "prime", "subcontractor")
         if asset:
-            _add_edge(edges, nodes, sub or prime, asset, "executes_project", amt,
-                      "execution_chain_master.csv", aid, conf, "subcontractor", "asset")
+            add(edges, nodes, sub or prime, asset, "executes_project", amt,
+                "execution_chain_master.csv", aid, conf, "subcontractor", "asset")
         if muni:
             src_node = asset or sub or prime
-            _add_edge(edges, nodes, src_node, muni, "located_in", 1.0,
-                      "execution_chain_master.csv", aid, 0.60, "asset", "municipality")
+            add(edges, nodes, src_node, muni, "located_in", 1.0,
+                "execution_chain_master.csv", aid, 0.60, "asset", "municipality")
 
     # LDA lobbying: registrant → client
     for row in _read_csv(proc / "pr_lda_filings.csv"):
@@ -184,8 +202,8 @@ def _build_edges(root: Path) -> tuple[dict, list]:
         client = _first(row, ["client_name", "client"])
         filing_id = _first(row, ["filing_uuid", "filing_id"])
         amt = _money(row) or 1.0
-        _add_edge(edges, nodes, registrant, client, "lobbies_for", amt, "pr_lda_filings.csv",
-                  filing_id, 0.65, "lobbying_registrant", "lobbying_client")
+        add(edges, nodes, registrant, client, "lobbies_for", amt, "pr_lda_filings.csv",
+            filing_id, 0.65, "lobbying_registrant", "lobbying_client")
 
     # FEC contributions: contributor → committee
     for row in _read_csv(proc / "pr_fec_contributions.csv"):
@@ -193,8 +211,8 @@ def _build_edges(root: Path) -> tuple[dict, list]:
         committee = _first(row, ["committee_name", "recipient_committee", "committee"])
         txn = _first(row, ["transaction_id", "report_year"])
         amt = _money(row) or 1.0
-        _add_edge(edges, nodes, contributor, committee, "contributes_to", amt,
-                  "pr_fec_contributions.csv", txn, 0.55, "person_or_entity", "campaign_committee")
+        add(edges, nodes, contributor, committee, "contributes_to", amt,
+            "pr_fec_contributions.csv", txn, 0.55, "person_or_entity", "campaign_committee")
 
     # EMMA bonds: issuer → underwriter, issuer → asset
     for path in [proc / "pr_emma_bonds.csv", proc / "pr_emma_underwriters.csv"]:
@@ -204,11 +222,11 @@ def _build_edges(root: Path) -> tuple[dict, list]:
             cusip = _first(row, ["cusip", "issue_id", "series"])
             par = _money(row)
             asset = _first(row, ["project_asset", "asset_id", "project_id"])
-            _add_edge(edges, nodes, issuer, under, "underwrites", par,
-                      path.name, cusip, 0.80, "bond_issuer", "underwriter")
+            add(edges, nodes, issuer, under, "underwrites", par,
+                path.name, cusip, 0.80, "bond_issuer", "underwriter")
             if asset:
-                _add_edge(edges, nodes, issuer, asset, "funds_asset", par,
-                          path.name, cusip, 0.65, "bond_issuer", "asset")
+                add(edges, nodes, issuer, asset, "funds_asset", par,
+                    path.name, cusip, 0.65, "bond_issuer", "asset")
 
     return nodes, edges
 
@@ -216,6 +234,7 @@ def _build_edges(root: Path) -> tuple[dict, list]:
 def _compute_metrics(nodes: dict, edges: list) -> list[dict]:
     CONTRACT_TYPES = {"awards_to", "subawards_to", "underwrites", "funds_asset"}
     met: dict[str, dict] = {}
+    tier_seen: dict[str, set[str]] = {}
     for e in edges:
         for n in [e["source"], e["target"]]:
             if n not in met:
@@ -226,7 +245,9 @@ def _compute_metrics(nodes: dict, edges: list) -> list[dict]:
                     "weighted_degree": 0.0,
                     "contract_value_weight": 0.0,
                     "manual_review_edges": 0,
+                    "claim_tier": "observed",
                 }
+                tier_seen[n] = set()
             m = met[n]
             m["degree"] += 1
             m["weighted_degree"] += float(e.get("weight") or 0)
@@ -234,6 +255,16 @@ def _compute_metrics(nodes: dict, edges: list) -> list[dict]:
                 m["contract_value_weight"] += float(e.get("weight") or 0)
             if str(e.get("manual_review_required")).lower() == "true":
                 m["manual_review_edges"] += 1
+            edge_tier = e.get("claim_tier") or "blocked"
+            tier_seen[n].add(edge_tier)
+    # Each node's tier is the worst tier across its incident edges.
+    for node, tiers in tier_seen.items():
+        if "blocked" in tiers:
+            met[node]["claim_tier"] = "blocked"
+        elif "linked" in tiers:
+            met[node]["claim_tier"] = "linked"
+        else:
+            met[node]["claim_tier"] = "observed"
     return list(met.values())
 
 
