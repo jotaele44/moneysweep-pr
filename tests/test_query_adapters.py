@@ -901,4 +901,4 @@ def test_highergov_paginates_until_short_page(monkeypatch):
 @pytest.mark.unit
 def test_adapter_registry_size_matches_concrete_count():
     from contract_sweeper.query.adapters import ADAPTER_REGISTRY
-    assert len(ADAPTER_REGISTRY) == 28
+    assert len(ADAPTER_REGISTRY) == 33

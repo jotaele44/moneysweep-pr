@@ -24,17 +24,12 @@ acuden_2024_transition,False,scripts/ingest_active_contractors.py,1,0,manual_exp
 dcaa_active_contractors,False,scripts/download_active_contractors.py,1,0,manual_export_only,manual delivery required,External delivery to `data/manual_import_dropzone/<family>/`; see SOURCE_RECOVERY_RUNBOOK.
 hud_drgr_authorized,True,scripts/ingest_hud_drgr_exports.py,2,0,manual_export_only,manual delivery required,External delivery to `data/manual_import_dropzone/<family>/`; see SOURCE_RECOVERY_RUNBOOK.
 pr_corporate_registry,False,scripts/ingest_active_contractors.py,1,0,manual_export_only,manual delivery required,External delivery to `data/manual_import_dropzone/<family>/`; see SOURCE_RECOVERY_RUNBOOK.
-chip,False,scripts/download_chip.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
-cms_open_payments,False,scripts/download_cms.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 dol_whd_osha,False,scripts/download_dol.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 fcc_usf,False,scripts/download_fcc.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 fhlb,False,scripts/download_fhlb.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 gao_ig_audits,False,scripts/download_gao_ig.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 hud_hcv_section8,False,scripts/download_hud_hcv.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 lihtc,False,scripts/download_lihtc.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
-medicaid_fmap,False,scripts/download_medicaid_fmap.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
-medicare_advantage,False,scripts/download_medicare_advantage.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
-medicare_parts,False,scripts/download_medicare_parts.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 ncua,False,scripts/download_ncua.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 nmtc,False,scripts/download_nmtc.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 sec_13f_nport,False,scripts/download_sec_holdings.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
@@ -47,6 +42,8 @@ usace_permits,False,scripts/download_usace_permits.py,1,0,never_run_or_unverifie
 va_benefits,False,scripts/download_va.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 wic,False,scripts/download_wic.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
 wioa,False,scripts/download_wioa.py,1,0,never_run_or_unverified,producer wired but not validated,Run producer to determine bucket.
+chip,False,scripts/download_chip.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
+cms_open_payments,False,scripts/download_cms.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 doe_grants,False,scripts/download_doe.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 doj_grants,False,scripts/download_doj_grants.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 dot_grants,False,scripts/download_dot.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
@@ -62,6 +59,9 @@ haf,False,scripts/download_haf.py,1,0,public_api_adapter_ready,,"Query via `pyth
 hhs_grants,False,scripts/download_hhs.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 highergov_supplemental,False,scripts/fetch_highergov_api.py,2,1,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 lda,True,scripts/download_lda.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
+medicaid_fmap,False,scripts/download_medicaid_fmap.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
+medicare_advantage,False,scripts/download_medicare_advantage.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
+medicare_parts,False,scripts/download_medicare_parts.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 nfip_claims,False,scripts/download_nfip.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 nih_reporter,False,scripts/download_nih.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
 nonprofits_irs990,False,scripts/download_nonprofits.py,1,0,public_api_adapter_ready,,"Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work."
