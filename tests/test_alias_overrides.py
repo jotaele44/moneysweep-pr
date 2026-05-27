@@ -178,3 +178,82 @@ def test_parent_collapse_records_override_method(alias_repo_with_override: Path)
     lpc_rows = [r for r in rows if r["normalized_name"] == "LPC AND D"]
     assert lpc_rows, "expected LPC AND D entity after override collapse"
     assert lpc_rows[0]["resolution_method"] == "alias_override"
+
+
+# ---------------------------------------------------------------------------
+# Regression: shipped registry collapses ACT 2020 entity families
+#
+# These tests pin the behaviour of registries/alias_overrides.yaml (the
+# shipped file, not a synthetic fixture) so future edits don't accidentally
+# break the ACT 2020 transition PDF coverage added 2026-05-27.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_shipped_overrides_collapse_lpc_dotted_variants() -> None:
+    mapping = load_overrides()  # default path → registries/alias_overrides.yaml
+    canonical, overridden = apply("L. P. C. and D. Inc.", mapping)
+    assert canonical == "LPC AND D"
+    assert overridden is True
+    # Existing form still resolves to the same canonical.
+    canonical2, _ = apply("LPC Contractors, Inc.", mapping)
+    assert canonical2 == "LPC AND D"
+
+
+@pytest.mark.unit
+def test_shipped_overrides_collapse_ferrovial_family() -> None:
+    mapping = load_overrides()
+    variants = [
+        "FERROVIAL AGROMAN, LLC",
+        "FERROVIAL- AGROMAN, SA",
+        "Ferrovial Agroman, S.A.",
+        "Ferrovial Agroman",
+    ]
+    canonicals = {apply(v, mapping)[0] for v in variants}
+    assert canonicals == {"FERROVIAL AGROMAN"}
+    # Sister entity stays distinct.
+    sister, _ = apply("FERROVIAL CONSTRUCCION PR, LLC", mapping)
+    assert sister == "FERROVIAL CONSTRUCCION PR"
+
+
+@pytest.mark.unit
+def test_shipped_overrides_collapse_cma_architecs_typo() -> None:
+    """The typo 'Architecs' (missing T) must collapse into CMA Architects."""
+    mapping = load_overrides()
+    canonical, overridden = apply("CMA Architecs & Engineers, L.L.P.", mapping)
+    assert canonical == "CMA ARCHITECTS AND ENGINEERS"
+    assert overridden is True
+    canonical2, _ = apply("CMA ARCHITECTS AND ENGINEERS LLC", mapping)
+    assert canonical2 == "CMA ARCHITECTS AND ENGINEERS"
+
+
+@pytest.mark.unit
+def test_shipped_overrides_collapse_barrett_hale_alamo_typo() -> None:
+    """'Barret' (single T typo) must collapse with 'Barrett'."""
+    mapping = load_overrides()
+    canonical_typo, overridden = apply("Barret Hale & Alamo, LLC", mapping)
+    canonical_ok, _ = apply("Barrett, Hale & Alamo, LLC", mapping)
+    assert canonical_typo == canonical_ok == "BARRETT HALE AND ALAMO"
+    assert overridden is True
+
+
+@pytest.mark.unit
+def test_shipped_overrides_collapse_desarrolladora_ja_variants() -> None:
+    mapping = load_overrides()
+    variants = [
+        "DESARROLLADORA J.A., INC.",
+        "Desarrolladora J.A.. Inc.",
+        "Desarrolladora JA, Inc..",
+        "Desarrolladora J.A.",
+    ]
+    canonicals = {apply(v, mapping)[0] for v in variants}
+    assert canonicals == {"DESARROLLADORA JA"}
+
+
+@pytest.mark.unit
+def test_shipped_overrides_collapse_transporte_rodriguez_accent() -> None:
+    """Accented and unaccented Rodríguez must collapse."""
+    mapping = load_overrides()
+    accented, _ = apply("Transporte Rodríguez Asfalto, Inc.", mapping)
+    unaccented, _ = apply("Transporte Rodriguez Asfalto, Inc.", mapping)
+    assert accented == unaccented == "TRANSPORTE RODRIGUEZ ASFALTO"
