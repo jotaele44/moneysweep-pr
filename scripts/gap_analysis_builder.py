@@ -29,12 +29,10 @@ HIGH_VALUE_OBLIGATION_THRESHOLD = 1_000_000_000.0  # $1B marks critical sources
 
 
 def _read_registry(root: Path) -> list[dict]:
-    path = root / "registries" / "source_registry.json"
-    if not path.exists():
-        return []
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-        return data.get("sources", [])
+        from contract_sweeper.runtime.source_registry import load_source_registry
+
+        return load_source_registry(root).get("sources", [])
     except Exception:
         return []
 
