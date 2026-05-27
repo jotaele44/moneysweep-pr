@@ -33,6 +33,9 @@ ADAPTER_REGISTRY_AFTER_PR = {
     "opencorporates", "highergov_supplemental",
     # Entity-mode adapters
     "sam_entities", "ofac_sdn",
+    # Batch 7a CMS family (Socrata + CKAN-metastore)
+    "medicare_advantage", "medicare_parts",
+    "cms_open_payments", "medicaid_fmap", "chip",
 }
 
 SEMANTIC_DUPLICATES = {
