@@ -1,8 +1,9 @@
 """Source-registry loader.
 
-Reads `registries/source_registry.json` (stable wire format).
-YAML is the human-editable source of truth; the JSON sibling is regenerated
-via `scripts/regenerate_registry_json.py`.
+Reads `registries/source_registry.json` (stable wire format), then appends
+optional JSON extensions from `registries/source_registry_extensions/*.json`.
+YAML is the human-editable source of truth; JSON siblings are regenerated via
+`scripts/regenerate_registry_json.py`.
 """
 from __future__ import annotations
 
@@ -13,15 +14,37 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_REGISTRY_PATH = "registries/source_registry.json"
+DEFAULT_EXTENSIONS_DIR = "registries/source_registry_extensions"
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _load_json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _load_registry_extensions(root: Path) -> list[dict[str, Any]]:
+    """Load optional source-registry extension JSON files."""
+    extensions_dir = root / DEFAULT_EXTENSIONS_DIR
+    if not extensions_dir.exists():
+        return []
+    sources: list[dict[str, Any]] = []
+    for path in sorted(extensions_dir.glob("*.json")):
+        data = _load_json(path)
+        sources.extend(data.get("sources", []))
+    return sources
 
 
 def load_source_registry(root: Path | None = None) -> dict[str, Any]:
     """Load the source registry as a dict. Caller may pass a custom root."""
     root = root or REPO_ROOT
     path = root / DEFAULT_REGISTRY_PATH
-    return json.loads(path.read_text(encoding="utf-8"))
+    reg = _load_json(path)
+    extension_sources = _load_registry_extensions(root)
+    if extension_sources:
+        reg = dict(reg)
+        reg["sources"] = [*reg.get("sources", []), *extension_sources]
+    return reg
 
 
 def required_sources(root: Path | None = None) -> list[dict[str, Any]]:
