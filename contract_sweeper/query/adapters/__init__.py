@@ -10,6 +10,12 @@ from typing import Type
 
 from .base import SourceAdapter
 from ._stub import NotImplementedAdapter
+from .ckan_metastore import (
+    CHIPAdapter,
+    CMSOpenPaymentsAdapter,
+    MedicaidFMAPAdapter,
+)
+from .cms_socrata import MedicareAdvantageAdapter, MedicarePartsAdapter
 from .entity_base import EntityAdapter
 from .fdic import FDICInstitutionsAdapter
 from .fec import FECPRAdapter
@@ -81,6 +87,12 @@ ADAPTER_REGISTRY: dict[str, Type[SourceAdapter]] = {
     # Auth-gated adapters (Batch 6)
     OpenCorporatesAdapter.source_id: OpenCorporatesAdapter,
     HigherGovSupplementalAdapter.source_id: HigherGovSupplementalAdapter,
+    # CMS family (Batch 7a — Socrata + CKAN-metastore)
+    MedicareAdvantageAdapter.source_id: MedicareAdvantageAdapter,
+    MedicarePartsAdapter.source_id: MedicarePartsAdapter,
+    CMSOpenPaymentsAdapter.source_id: CMSOpenPaymentsAdapter,
+    MedicaidFMAPAdapter.source_id: MedicaidFMAPAdapter,
+    CHIPAdapter.source_id: CHIPAdapter,
 }
 
 

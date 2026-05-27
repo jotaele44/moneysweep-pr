@@ -6,9 +6,9 @@ Total sources: **82**
 
 | failure_bucket | count | recommended_action |
 | --- | --- | --- |
-| `public_api_adapter_ready` | 30 | Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work. |
-| `never_run_or_unverified` | 23 | Run producer to determine bucket. |
+| `public_api_adapter_ready` | 35 | Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work. |
 | `html_pdf_or_pr_gov_custom` | 20 | Defer; needs scraping adapter design pass. |
+| `never_run_or_unverified` | 18 | Run producer to determine bucket. |
 | `manual_export_only` | 5 | External delivery to `data/manual_import_dropzone/<family>/`; see SOURCE_RECOVERY_RUNBOOK. |
 | `semantic_duplicate` | 3 | No action; covered by sibling source. |
 | `required_missing_blocker` | 1 | Escalate; required source has no available path. |
@@ -44,19 +44,14 @@ Total sources: **82**
 - `hud_drgr_authorized`
 - `pr_corporate_registry`
 
-## never_run_or_unverified (23)
+## never_run_or_unverified (18)
 
-- `chip`
-- `cms_open_payments`
 - `dol_whd_osha`
 - `fcc_usf`
 - `fhlb`
 - `gao_ig_audits`
 - `hud_hcv_section8`
 - `lihtc`
-- `medicaid_fmap`
-- `medicare_advantage`
-- `medicare_parts`
 - `ncua`
 - `nmtc`
 - `sec_13f_nport`
@@ -70,8 +65,10 @@ Total sources: **82**
 - `wic`
 - `wioa`
 
-## public_api_adapter_ready (30)
+## public_api_adapter_ready (35)
 
+- `chip`
+- `cms_open_payments`
 - `doe_grants`
 - `doj_grants`
 - `dot_grants`
@@ -87,6 +84,9 @@ Total sources: **82**
 - `hhs_grants`
 - `highergov_supplemental`
 - `lda`
+- `medicaid_fmap`
+- `medicare_advantage`
+- `medicare_parts`
 - `nfip_claims`
 - `nih_reporter`
 - `nonprofits_irs990`
