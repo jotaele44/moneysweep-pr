@@ -66,12 +66,26 @@ endpoint_candidates:
     url: https://aeepr.com/es-pr/
 
   - source_id: act_transition_contracts
-    url: ""
-    notes: Manual export only.
+    url: "https://consultacontratos.ocpr.gov.pr/"
+    notes: |
+      Manual export only. OCPR Registro de Contratos is the canonical
+      upstream — every ACT contract over the publishing threshold is
+      filed there; ACT agency code is 032. The §9(a)(12) transition
+      publication (e.g. `Contratos_Vigentes_ACT.pdf` for the 2020
+      Vázquez Garced → Pierluisi transition) is a periodic snapshot
+      also published on the ACT/DTOP transparency page. See
+      `docs/ACT_DATA_INVENTORY.md` for the full catalog.
 
   - source_id: acuden_2024_transition
-    url: ""
-    notes: Manual export only.
+    url: "https://consultacontratos.ocpr.gov.pr/"
+    notes: |
+      Manual export only. ACUDEN's
+      `Informe_Contratos_Vigentes_al_Momento_de_Transicion.pdf` for
+      the 2024 Pierluisi → next-administration transition is the
+      operator-provided reference (~1,147 rows of childcare-operator,
+      municipio, and admin/legal vendor records). Same OCPR upstream
+      as ACT; ACUDEN's agency code is separate from 032 — verify on
+      retrieval.
 
   - source_id: dcaa_active_contractors
     url: ""
