@@ -173,8 +173,76 @@ def build_fec_crossref(root: Path | None = None) -> dict:
 # Lobbying crossref
 # ---------------------------------------------------------------------------
 
+def _normalized_name_set(df: pd.DataFrame, columns: list[str]) -> set[str]:
+    """Return the set of non-empty _normalize results across the given columns."""
+    out: set[str] = set()
+    for col in columns:
+        if col in df.columns:
+            for raw in df[col].dropna().unique():
+                norm = _normalize(raw)
+                if norm:
+                    out.add(norm)
+    return out
+
+
+def _load_anchor_sets(processed_dir: Path) -> dict[str, set[str]]:
+    """Build {anchor_type: {normalized_names}} from the materialized anchor sources."""
+    anchors: dict[str, set[str]] = {
+        "contract": set(),
+        "subaward": set(),
+        "emma_underwriter": set(),
+    }
+    for path in (
+        processed_dir / "pr_contracts_master.csv",
+        processed_dir / "pr_all_awards_master.csv",
+    ):
+        if path.exists():
+            df = pd.read_csv(path, dtype=str, low_memory=False)
+            anchors["contract"] |= _normalized_name_set(
+                df, ["recipient_name", "vendor_name", "award_recipient_name"]
+            )
+
+    sub_path = processed_dir / "pr_subawards_master.csv"
+    if sub_path.exists():
+        df = pd.read_csv(sub_path, dtype=str, low_memory=False)
+        anchors["subaward"] |= _normalized_name_set(
+            df, ["sub_recipient_name", "subawardee_name", "recipient_name"]
+        )
+
+    for path in (
+        processed_dir / "pr_emma_bonds.csv",
+        processed_dir / "pr_emma_underwriters.csv",
+    ):
+        if path.exists():
+            df = pd.read_csv(path, dtype=str, low_memory=False)
+            anchors["emma_underwriter"] |= _normalized_name_set(
+                df, ["issuer", "issuer_name", "underwriter", "underwriter_name", "dealer"]
+            )
+    return anchors
+
+
+def _classify_anchor(norm: str, anchors: dict[str, set[str]]) -> tuple[str, str]:
+    """Priority: contract > subaward > emma_underwriter > unmatched."""
+    if norm in anchors["contract"]:
+        return "matched_to_contract", "pr_contracts_master.csv|pr_all_awards_master.csv"
+    if norm in anchors["subaward"]:
+        return "matched_to_subaward", "pr_subawards_master.csv"
+    if norm in anchors["emma_underwriter"]:
+        return "matched_to_emma_underwriter", "pr_emma_bonds.csv|pr_emma_underwriters.csv"
+    return "unmatched_no_anchor", ""
+
+
 def build_lobbying_crossref(root: Path | None = None) -> dict:
-    """Cross-reference LDA lobbying clients against the awards master."""
+    """Cross-reference LDA lobbying clients against the awards master.
+
+    Every LDA client surfaces in the output with an ``anchor_status``
+    column. Clients whose normalized name matches a federal contract,
+    subaward, or EMMA bond party are tagged accordingly; clients with
+    no matching anchor are tagged ``unmatched_no_anchor`` so unanchored
+    high-value lobbying entities (e.g. Arcadis, Genera PR, Gainwell)
+    surface explicitly instead of being silently dropped by an inner
+    join.
+    """
     root = Path(root) if root is not None else PROJECT_ROOT
     processed_dir = root / "data" / "staging" / "processed"
     logger = setup_logging("analyze_political_crossref.lda")
@@ -195,48 +263,85 @@ def build_lobbying_crossref(root: Path | None = None) -> dict:
     logger.info(f"  {len(awards):,} award rows · {len(lda):,} LDA filing rows")
 
     award_index = _build_award_index(awards)
+    anchors = _load_anchor_sets(processed_dir)
 
-    lda_clients = lda[lda["client_state"] == "PR"].copy()
+    lda_clients = lda[lda["client_state"] == "PR"].copy() if "client_state" in lda.columns else lda.copy()
     if lda_clients.empty:
         lda_clients = lda.copy()
 
     lda_clients["_norm"] = lda_clients["client_name"].apply(_normalize)
     lda_clients["_income"] = pd.to_numeric(lda_clients["income"], errors="coerce").fillna(0)
     lda_clients["_expense"] = pd.to_numeric(lda_clients["expenses"], errors="coerce").fillna(0)
+
+    # Capture one evidence filing per client for the unmatched rows.
+    evidence_filings = (
+        lda_clients[lda_clients["_norm"] != ""]
+        .groupby("_norm")["filing_uuid"]
+        .first()
+        .to_dict()
+        if "filing_uuid" in lda_clients.columns
+        else {}
+    )
+
     lda_index = (
         lda_clients[lda_clients["_norm"] != ""]
         .groupby("_norm")
         .agg(
             lda_client_name=("client_name", "first"),
-            lda_client_description=("client_description", "first"),
-            filing_count=("filing_uuid", "nunique"),
+            lda_client_description=(
+                "client_description" if "client_description" in lda_clients.columns else "client_name",
+                "first",
+            ),
+            filing_count=("filing_uuid", "nunique") if "filing_uuid" in lda_clients.columns else ("client_name", "count"),
             total_registrant_income=("_income", "sum"),
             total_client_expenses=("_expense", "sum"),
-            years_active=("filing_year", _year_range),
-            issue_codes=("general_issue_codes", lambda x: _merge_pipe(x, 15)),
-            lobbyists_hired=("lobbyist_names", lambda x: _merge_pipe(x, 20)),
-            registrants_used=("registrant_name", lambda x: "|".join(sorted(x.dropna().unique())[:10])),
+            years_active=("filing_year", _year_range) if "filing_year" in lda_clients.columns else ("client_name", "first"),
+            issue_codes=("general_issue_codes", lambda x: _merge_pipe(x, 15)) if "general_issue_codes" in lda_clients.columns else ("client_name", "first"),
+            lobbyists_hired=("lobbyist_names", lambda x: _merge_pipe(x, 20)) if "lobbyist_names" in lda_clients.columns else ("client_name", "first"),
+            registrants_used=("registrant_name", lambda x: "|".join(sorted(x.dropna().unique())[:10])) if "registrant_name" in lda_clients.columns else ("client_name", "first"),
         )
         .reset_index()
     )
 
-    merged = award_index.merge(lda_index, on="_norm", how="inner")
-    if merged.empty:
-        logger.warning("  No lobbying cross-reference matches found.")
-        merged = pd.DataFrame(columns=[
-            "normalized_name", "award_recipient_name", "lda_client_name",
-            "lda_client_description", "total_awards_obligated", "award_count",
-            "award_datasets", "award_years", "filing_count",
-            "total_registrant_income", "total_client_expenses",
-            "years_active", "issue_codes", "lobbyists_hired", "registrants_used",
-        ])
-    else:
-        merged = merged.rename(columns={"_norm": "normalized_name"})
-        merged = merged.sort_values("total_awards_obligated", ascending=False)
+    # Left-merge: every LDA client surfaces, with award columns NaN when unanchored.
+    merged = lda_index.merge(award_index, on="_norm", how="left")
+    merged = merged.rename(columns={"_norm": "normalized_name"})
+
+    # Anchor classification per row.
+    statuses = []
+    sources = []
+    evidence = []
+    for _, row in merged.iterrows():
+        norm = row["normalized_name"]
+        status, src = _classify_anchor(norm, anchors)
+        statuses.append(status)
+        sources.append(src)
+        evidence.append(evidence_filings.get(norm, ""))
+    merged["anchor_status"] = statuses
+    merged["anchor_source_dataset"] = sources
+    merged["anchor_evidence_id"] = evidence
+
+    # Numeric coercions so unmatched rows aren't NaN-typed in the CSV.
+    for col in ("total_awards_obligated", "award_count"):
+        if col in merged.columns:
+            merged[col] = pd.to_numeric(merged[col], errors="coerce").fillna(0)
+
+    sort_col = "total_awards_obligated" if "total_awards_obligated" in merged.columns else "total_registrant_income"
+    merged = merged.sort_values(sort_col, ascending=False)
 
     merged.to_csv(out_path, index=False, encoding="utf-8")
-    logger.info(f"  Lobbying crossref: {len(merged):,} matched entities → {out_path.name}")
-    return {"rows": len(merged), "status": "OK" if not merged.empty else "EMPTY", "path": str(out_path)}
+
+    status_counts = merged["anchor_status"].value_counts().to_dict()
+    logger.info(
+        f"  Lobbying crossref: {len(merged):,} clients → {out_path.name} | "
+        f"anchor breakdown: {status_counts}"
+    )
+    return {
+        "rows": len(merged),
+        "status": "OK" if not merged.empty else "EMPTY",
+        "path": str(out_path),
+        "anchor_breakdown": status_counts,
+    }
 
 
 # ---------------------------------------------------------------------------
