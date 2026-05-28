@@ -1,0 +1,52 @@
+{
+  "checks": [
+    {
+      "check": "unknown_amount_share_decomposed",
+      "has_unclassified": false,
+      "passed": true,
+      "threshold": 0.1,
+      "unknown_amount_share": 0.115
+    },
+    {
+      "biased_share_of_san_juan": 0.0,
+      "check": "san_juan_share_explained",
+      "explained": true,
+      "passed": true,
+      "san_juan_share": 0.6637,
+      "threshold": 0.35
+    },
+    {
+      "check": "no_false_pr_municipio_code",
+      "false_pr_record_count": 0,
+      "passed": true
+    },
+    {
+      "check": "graphml_has_edge_metadata",
+      "edge_count": 10,
+      "passed": true,
+      "zero_metadata_fields": false
+    },
+    {
+      "check": "edges_have_lineage_and_confidence",
+      "edges_missing_confidence": 0,
+      "edges_missing_lineage": 0,
+      "passed": true
+    },
+    {
+      "check": "totals_reconciled",
+      "density_record_count": 6,
+      "density_total_amount": 2260000.0,
+      "input_record_count": 6,
+      "input_total_amount": 2260000.0,
+      "passed": true
+    }
+  ],
+  "generated_at": "2026-05-28T22:06:54Z",
+  "input_mode": "canonical_masters",
+  "passed": true,
+  "producer": "scripts/run_contract_finance_geo_reasoning.py",
+  "source_inputs": [
+    "tests/fixtures/sample_master_inputs/contracts_master.csv",
+    "tests/fixtures/sample_master_inputs/financial_flows_master.csv"
+  ]
+}
