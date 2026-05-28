@@ -7,6 +7,7 @@ across federal, territorial, lobbying, and political-finance datasets.
 from __future__ import annotations
 
 import re
+import unicodedata
 
 LEGAL_SUFFIXES = frozenset(
     [
@@ -42,10 +43,10 @@ _DOTTED = re.compile(r"\b(?:[A-Z]\.){2,}")
 # Juan", and "Municipio Autónomo de San Juan" all cluster together. The
 # MUNICIPIO marker is kept (rather than collapsing to the bare town) so a
 # private entity named after a town does not merge into the government
-# municipio. Operates on the uppercased string, before accent-stripping, so
-# the optional "AUTÓNOMO"/"AUTONOMO" qualifier matches with or without accent.
+# municipio. Operates after NFKD accent-folding, so "AUTÓNOMO" has already
+# been reduced to "AUTONOMO" before this regex runs.
 _MUNICIPIO_PREFIX = re.compile(
-    r"^(?:MUNICIPIO(?:\s+AUT[OÓ]NOMO)?\s+DE\s+|MUNICIPALITY\s+OF\s+(?:THE\s+)?)"
+    r"^(?:MUNICIPIO(?:\s+AUTONOMO)?\s+DE\s+|MUNICIPALITY\s+OF\s+(?:THE\s+)?)"
 )
 
 
@@ -59,6 +60,8 @@ def normalize_name(name: str | None) -> str:
     if not name:
         return ""
     s = str(name).upper()
+    s = unicodedata.normalize("NFKD", s)
+    s = "".join(c for c in s if not unicodedata.combining(c))
     s = _MUNICIPIO_PREFIX.sub("MUNICIPIO ", s)
     s = _AMP.sub(" AND ", s)
     s = _DOTTED.sub(lambda m: m.group(0).replace(".", ""), s)

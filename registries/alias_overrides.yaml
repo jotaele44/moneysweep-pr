@@ -279,19 +279,6 @@ entries:
       confused). Multiple punctuation variants in the ACT 2020 PDF.
     evidence: "tests/fixtures/act_2020_transition_pasted.txt"
 
-  - canonical_name: "Transporte Rodriguez Asfalto"
-    aliases:
-      - "Transporte Rodriguez Asfalto"
-      - "Transporte Rodriguez Asfalto Inc"
-      - "Transporte Rodriguez Asfalto, Inc."
-      - "Transporte Rodríguez Asfalto"
-      - "Transporte Rodríguez Asfalto, Inc."
-    notes: |
-      Paving contractor with 7+ ACT 2020 contracts across multiple
-      amendments. The accented and unaccented forms (Rodriguez vs
-      Rodríguez) should collapse for cross-source joins.
-    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
-
   - canonical_name: "Barrett, Hale & Alamo"
     aliases:
       - "Barrett, Hale & Alamo"
