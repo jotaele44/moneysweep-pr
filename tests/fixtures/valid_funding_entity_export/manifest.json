@@ -4,7 +4,7 @@
     "fiscal_year_min": 2023
   },
   "created_at": "2024-01-15T12:00:00Z",
-  "export_contract_version": "1.0.0",
+  "export_contract_version": "1.1.0",
   "extracted_at": "2024-01-15T12:00:00Z",
   "federation": {
     "consumer_component": "query-hub",
@@ -17,7 +17,7 @@
       "filename": "entities.jsonl",
       "record_count": 2,
       "schema_id": "contract_sweeper_entity.schema.json",
-      "sha256": "1087128428fe4210990054a658c50122400821dfc4c38bc8e541a4109a5a4459",
+      "sha256": "f862177eca6a4beabd2cbaa37314152aad0cbc78d2c14294da49c35830652fd8",
       "stream": "entities"
     },
     {
@@ -31,14 +31,14 @@
       "filename": "funding_awards.jsonl",
       "record_count": 1,
       "schema_id": "contract_sweeper_funding_award.schema.json",
-      "sha256": "1db486a3e97e8047fa6b536c6adbd059d8bac7836103cd7233143270b6e4cc9a",
+      "sha256": "1844dfda3a01853715d4cfa1ba208b07b8be0cc249919ebf4aec9ffec988161c",
       "stream": "funding_awards"
     },
     {
       "filename": "transactions.jsonl",
       "record_count": 1,
       "schema_id": "contract_sweeper_transaction.schema.json",
-      "sha256": "05e335e55be709f9c8db9cc1cbfaecd00412a48cb13b3e49ded438d1f636beba",
+      "sha256": "a81cbd48121778d3fe555311a8b5f7cc810d73f05271a1633d45120587b04478",
       "stream": "transactions"
     },
     {
@@ -50,7 +50,7 @@
     }
   ],
   "mode": "test",
-  "package_id": "pkg_716216b37aba5b8fc5a453d240b9aa57",
+  "package_id": "pkg_0091daf003357720e00834c0edf239e8",
   "producer": "contract-sweeper",
   "producer_version": "0.1.0"
 }
