@@ -51,6 +51,16 @@ Then run:
 python run_pr_intake_router.py --input data/intake/pr_news/raw_items_latest.jsonl --out-dir data/exports/pr_intake_router
 ```
 
+## Downstream consumer (spiderweb-pr)
+
+`spiderweb_pr_derivatives.csv` is the spiderweb-pr lane of this export. It is consumed by
+spiderweb-pr's `readiness/pr_intake_import.py`, which validates each row against
+`schemas/pr_intake_derivative.schema.json` and normalizes it into a Spiderweb intel-record
+layer (zero-loss; invalid rows go to a review queue). The producer (or an operator) copies
+the file into the spiderweb-pr dropzone `data/intake/pr_intake/`. The full contract —
+on-disk CSV shape, required columns, and a noted limitation (the derivative does not yet
+carry coordinates) — lives in `spiderweb-pr/docs/contracts/PR_INTAKE_DERIVATIVE_HANDOFF.md`.
+
 ## Validation invariant
 
 Every raw item must receive one final status:
