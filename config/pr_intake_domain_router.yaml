@@ -1,0 +1,252 @@
+version: 0.1.0
+router_name: pr_intake_domain_router
+primary_repo: Contract-Sweeper
+paired_repo: spiderweb-pr
+zero_loss_required: true
+
+final_status_values:
+  - routed_contract_sweeper
+  - routed_spiderweb_pr
+  - dual_routed_contract_primary
+  - dual_routed_spiderweb_primary
+  - duplicate_consolidated
+  - not_relevant_with_reason
+  - manual_review_required
+  - source_inaccessible
+  - blocked_or_paywalled
+  - metadata_only_archived
+
+canonical_repos:
+  contract_sweeper:
+    owns:
+      - politics
+      - finance
+      - public_funding
+      - procurement
+      - contracts
+      - lobbying
+      - municipal_finance
+      - budget_authority
+      - agency_authority
+      - public_corporation_finance
+      - contractor_recipient_chains
+  spiderweb_pr:
+    owns:
+      - geography_gis
+      - infrastructure_footprint
+      - subsurface_hydro
+      - aviation_activity
+      - maritime_activity
+      - federal_military_activity
+      - environment_weather
+      - science_dataset
+      - physical_observation
+      - poi_aoi_corridor_candidate
+
+routing_rules:
+  - rule_id: CS_PUBLIC_FUNDING
+    canonical_repo: Contract-Sweeper
+    domains: [public_funding, finance]
+    keywords:
+      - asignacion
+      - asignación
+      - fondos
+      - obligacion
+      - obligación
+      - reembolso
+      - inversion
+      - inversión
+      - desembolso
+      - award
+      - grant
+      - allocation
+      - obligation
+      - reimbursement
+      - disbursement
+    output_tables:
+      - funding_event_leads
+      - verification_queue
+
+  - rule_id: CS_CONTRACTS_PROCUREMENT
+    canonical_repo: Contract-Sweeper
+    domains: [procurement, contracts]
+    keywords:
+      - contrato
+      - subasta
+      - licitacion
+      - licitación
+      - rfp
+      - rfq
+      - aviso de adjudicacion
+      - aviso de adjudicación
+      - amendment
+      - purchase order
+      - procurement
+    output_tables:
+      - contracts_procurement_events
+      - contract_sweeper_crosswalk_queue
+
+  - rule_id: CS_POLITICS_AUTHORITY
+    canonical_repo: Contract-Sweeper
+    domains: [politics, lobbying, agency_authority, budget_authority]
+    keywords:
+      - orden ejecutiva
+      - plan fiscal
+      - presupuesto
+      - junta
+      - nombramiento
+      - cabildero
+      - lobbying
+      - fiscal plan
+      - budget
+      - appropriation
+    output_tables:
+      - politics_finance_items
+      - agency_actions
+      - lobbying_political_links
+
+  - rule_id: SW_GIS_INFRASTRUCTURE
+    canonical_repo: spiderweb-pr
+    domains: [geography_gis, infrastructure_footprint]
+    keywords:
+      - gis
+      - geojson
+      - kml
+      - shapefile
+      - mapa
+      - carretera
+      - puente
+      - represa
+      - embalse
+      - planta
+      - subestacion
+      - subestación
+      - transmission
+      - right of way
+      - row
+    output_tables:
+      - spatial_intake_items
+      - infrastructure_assets
+      - poi_candidates
+
+  - rule_id: SW_SUBSURFACE_HYDRO
+    canonical_repo: spiderweb-pr
+    domains: [subsurface_hydro]
+    keywords:
+      - lidar
+      - dem
+      - bathymetry
+      - batimetria
+      - batimetría
+      - karst
+      - cueva
+      - quebrada
+      - humedal
+      - acuifero
+      - acuífero
+      - watershed
+      - landslide
+      - slope
+      - geology
+    output_tables:
+      - hydro_environment_items
+      - aoi_candidates
+      - corridor_candidates
+
+  - rule_id: SW_AVIATION_MARITIME_FEDMIL
+    canonical_repo: spiderweb-pr
+    domains: [aviation_activity, maritime_activity, federal_military_activity]
+    keywords:
+      - ads-b
+      - flight
+      - helicopter
+      - aircraft
+      - survey flight
+      - ais
+      - vessel
+      - coast guard
+      - uscg
+      - cbp
+      - dhs
+      - usace
+      - dod
+      - military
+      - restricted area
+    output_tables:
+      - aviation_activity_items
+      - maritime_activity_items
+      - federal_military_activity_items
+
+  - rule_id: SW_ENVIRONMENT_WEATHER_SCIENCE
+    canonical_repo: spiderweb-pr
+    domains: [environment_weather, science_dataset]
+    keywords:
+      - noaa
+      - nws
+      - usgs
+      - environmental protection agency
+      - drna
+      - caricoos
+      - earthquake
+      - flood
+      - drought
+      - water quality
+      - air quality
+      - dataset
+      - research
+      - monitoring
+    output_tables:
+      - hydro_environment_items
+      - science_dataset_items
+      - dataset_registry
+
+dual_route_conditions:
+  - condition_id: INFRASTRUCTURE_WITH_FUNDING
+    if_domains_include: [infrastructure_footprint, public_funding]
+    canonical_repo: Contract-Sweeper
+    derivative_repo: spiderweb-pr
+    required_backlink: true
+
+  - condition_id: ENVIRONMENTAL_GRANT_OR_AWARD
+    if_domains_include: [environment_weather, public_funding]
+    canonical_repo: Contract-Sweeper
+    derivative_repo: spiderweb-pr
+    required_backlink: true
+
+  - condition_id: GIS_DATASET_WITH_CONTRACT
+    if_domains_include: [geography_gis, contracts]
+    canonical_repo: spiderweb-pr
+    derivative_repo: Contract-Sweeper
+    required_backlink: true
+
+  - condition_id: AVIATION_MARITIME_WITH_PROCUREMENT
+    if_domains_include: [aviation_activity, procurement]
+    canonical_repo: spiderweb-pr
+    derivative_repo: Contract-Sweeper
+    required_backlink: true
+
+required_common_fields:
+  - source_item_id
+  - source_name
+  - source_url
+  - published_at
+  - discovered_at
+  - title
+  - summary_own_words
+  - evidence_tier
+  - confidence_level
+  - source_hash
+  - content_hash
+  - dedupe_group_id
+  - final_status
+  - canonical_repo
+  - related_repo_record_id
+
+validation_gates:
+  - no_raw_item_without_final_status
+  - no_confirmed_status_without_t1_match
+  - no_cross_repo_derivative_without_backlink
+  - no_dedupe_without_preserved_source_urls
+  - fail_production_if_required_schema_missing
+  - every_spatial_record_has_location_or_manual_geocode_required
+  - every_geometry_has_geometry_confidence
