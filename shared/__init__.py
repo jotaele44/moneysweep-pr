@@ -1,1 +1,1 @@
-"""Shared utilities for Contract-Sweeper."""
+"""Shared utilities for spiderweb-pr."""
