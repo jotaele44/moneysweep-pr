@@ -6,24 +6,38 @@ on:
       - 'shared/pr_intake_router.py'
       - 'scripts/route_pr_intake.py'
       - 'scripts/run_pr_intake_router_hook.py'
+      - 'scripts/produce_pr_news_raw_intake.py'
+      - 'scripts/run_pr_news_router_pipeline.py'
       - 'run_pr_intake_router.py'
+      - 'run_pr_news_raw_intake.py'
+      - 'run_pr_news_router_pipeline.py'
       - 'config/pr_intake_domain_router.yaml'
       - 'tests/test_pr_intake_router.py'
       - 'tests/test_route_pr_intake_cli.py'
       - 'tests/test_pr_intake_router_hook.py'
+      - 'tests/test_produce_pr_news_raw_intake.py'
+      - 'tests/test_pr_news_router_pipeline.py'
       - 'tests/fixtures/pr_intake_router_sample.jsonl'
+      - 'tests/fixtures/pr_news_incoming_sample.jsonl'
       - '.github/workflows/pr-intake-router.yml'
   pull_request:
     paths:
       - 'shared/pr_intake_router.py'
       - 'scripts/route_pr_intake.py'
       - 'scripts/run_pr_intake_router_hook.py'
+      - 'scripts/produce_pr_news_raw_intake.py'
+      - 'scripts/run_pr_news_router_pipeline.py'
       - 'run_pr_intake_router.py'
+      - 'run_pr_news_raw_intake.py'
+      - 'run_pr_news_router_pipeline.py'
       - 'config/pr_intake_domain_router.yaml'
       - 'tests/test_pr_intake_router.py'
       - 'tests/test_route_pr_intake_cli.py'
       - 'tests/test_pr_intake_router_hook.py'
+      - 'tests/test_produce_pr_news_raw_intake.py'
+      - 'tests/test_pr_news_router_pipeline.py'
       - 'tests/fixtures/pr_intake_router_sample.jsonl'
+      - 'tests/fixtures/pr_news_incoming_sample.jsonl'
       - '.github/workflows/pr-intake-router.yml'
   workflow_dispatch:
 
@@ -46,14 +60,20 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run targeted router tests
-        run: python -m pytest tests/test_pr_intake_router.py tests/test_route_pr_intake_cli.py tests/test_pr_intake_router_hook.py -v
+      - name: Run targeted router and producer tests
+        run: python -m pytest tests/test_pr_intake_router.py tests/test_route_pr_intake_cli.py tests/test_pr_intake_router_hook.py tests/test_produce_pr_news_raw_intake.py tests/test_pr_news_router_pipeline.py -v
 
       - name: Run router export command
         run: python run_pr_intake_router.py --input tests/fixtures/pr_intake_router_sample.jsonl --out-dir data/exports/pr_intake_router --fail-on-validation-errors
 
+      - name: Run PR News producer-to-router handoff
+        run: python run_pr_news_router_pipeline.py --incoming tests/fixtures/pr_news_incoming_sample.jsonl --raw-output data/intake/pr_news/raw_items_latest.jsonl --manifest data/intake/pr_news/raw_items_latest_manifest.json --export-dir data/exports/pr_intake_router --fail-on-validation-errors
+
       - name: Show routing summary
         run: cat data/exports/pr_intake_router/routing_summary.json
+
+      - name: Show export verification
+        run: cat data/exports/pr_intake_router/export_verification.json
 
       - name: Upload router exports
         uses: actions/upload-artifact@v4
