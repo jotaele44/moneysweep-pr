@@ -1,0 +1,58 @@
+name: PR Intake Router
+
+on:
+  push:
+    paths:
+      - 'shared/pr_intake_router.py'
+      - 'scripts/route_pr_intake.py'
+      - 'run_pr_intake_router.py'
+      - 'config/pr_intake_domain_router.yaml'
+      - 'tests/test_pr_intake_router.py'
+      - 'tests/test_route_pr_intake_cli.py'
+      - 'tests/fixtures/pr_intake_router_sample.jsonl'
+      - '.github/workflows/pr-intake-router.yml'
+  pull_request:
+    paths:
+      - 'shared/pr_intake_router.py'
+      - 'scripts/route_pr_intake.py'
+      - 'run_pr_intake_router.py'
+      - 'config/pr_intake_domain_router.yaml'
+      - 'tests/test_pr_intake_router.py'
+      - 'tests/test_route_pr_intake_cli.py'
+      - 'tests/fixtures/pr_intake_router_sample.jsonl'
+      - '.github/workflows/pr-intake-router.yml'
+  workflow_dispatch:
+
+jobs:
+  router-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run targeted router tests
+        run: python -m pytest tests/test_pr_intake_router.py tests/test_route_pr_intake_cli.py -v
+
+      - name: Run router export command
+        run: python run_pr_intake_router.py --input tests/fixtures/pr_intake_router_sample.jsonl --out-dir data/exports/pr_intake_router --fail-on-validation-errors
+
+      - name: Show routing summary
+        run: cat data/exports/pr_intake_router/routing_summary.json
+
+      - name: Upload router exports
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-intake-router-exports-py${{ matrix.python-version }}
+          path: data/exports/pr_intake_router/
