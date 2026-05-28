@@ -26,9 +26,9 @@ administration transition. ACT and ACUDEN both produce such reports.
 | ACT (Autoridad de Carreteras) | 2008 (Fortuño) | ⬜ | unknown | unknown | Predates structured publication; likely archived only at the OCPR or PR State Archives. |
 | ACT | 2012 (García Padilla) | ⬜ | unknown | unknown | TODO — check ACT/DTOP transparency page archive. |
 | ACT | 2016 (Rosselló) | 🟡 | unknown | unknown | Should exist on ACT/DTOP transparency page; operator hasn't retrieved. |
-| ACT | 2020 (Vázquez Garced → Pierluisi) | ✅ | `Contratos_Vigentes_ACT.pdf` | ~1,000+ | Extracted into `data/raw/act_transition/transition_contracts_extracted.csv` (`source_dataset=ACT_2020`). See `reports/act_data_provenance.md`. |
+| ACT | 2020 (Vázquez Garced → Pierluisi) | ✅ | `Contratos_Vigentes_ACT.pdf` | 650 | Extracted into `data/raw/act_transition/transition_contracts_extracted.csv` (`source_dataset=ACT_2020`) via `scripts/build_act_transition_extract.py`. See `reports/act_data_provenance.md`. |
 | ACT | 2024-25 (Pierluisi → next) | 🟡 | unknown | unknown | Should now be published; check ACT/DTOP transparency page and OCPR. |
-| ACUDEN | 2024 (Pierluisi → next) | ✅ | `Informe_Contratos_Vigentes_al_Momento_de_Transicion.pdf` | ~1,147 | Extracted into the same CSV (`source_dataset=ACUDEN_2024`). Same provenance entry. |
+| ACUDEN | 2024 (Pierluisi → next) | ✅ | `Informe_Contratos_Vigentes_al_Momento_de_Transicion.pdf` | 1,147 | Extracted into the same CSV (`source_dataset=ACUDEN_2024`). Same provenance entry. |
 
 ### Rolling / ongoing publications
 
