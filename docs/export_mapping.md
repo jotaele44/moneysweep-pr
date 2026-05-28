@@ -36,6 +36,7 @@ stream rather than an error.
 | `normalized_name` | `normalized_name` (else `normalize_name(entity_name)`) |
 | `entity_type` | `entity_type` (default `recipient`) |
 | `jurisdiction` | `US` (default — see decisions) |
+| `external_ids` (optional) | `{uei: entity_uei, parent_uei: parent_uei}` (populated subfields only; synthesized agencies omit it) |
 | `confidence` | `match_confidence` (clamped to `[0,1]`) |
 | `lineage` | `producer_script=scripts/entity_resolution.py`, `source_inputs=source_files`, `extraction_method=resolution_method` |
 
@@ -61,6 +62,7 @@ stream rather than an error.
 | `award_type` | `funding_source` (default `contract`) |
 | `award_date` | `award_date` |
 | `confidence` | `link_confidence` |
+| `location` (optional) | from geo_* columns (see below) |
 
 ### transactions ← `financial_flows_master.csv`
 | Export field | Source |
@@ -74,6 +76,7 @@ stream rather than an error.
 | `transaction_date` | `flow_date` |
 | `transaction_type` | `disbursement` |
 | `confidence` | `link_confidence` |
+| `location` (optional) | from geo_* columns (see below) |
 
 ### relationships ← `entity_edges.csv`
 | Export field | Source |
@@ -84,6 +87,23 @@ stream rather than an error.
 | `target_entity_id` | crosswalk(`target`) |
 | `relationship_type` | `edge_type` |
 | `confidence` | `confidence` |
+
+### location (inline, v1.1.0) ← geo_* columns
+
+Emitted on awards & transactions only when `geo_municipality_code` or
+`municipality` is present; populated subfields only.
+
+| Export `location.*` | Source column |
+|---|---|
+| `country` | (default `US`) |
+| `municipality` | `municipality` |
+| `municipality_code` | `geo_municipality_code` (primary match key) |
+| `municipality_name` | `geo_municipality_name` |
+| `county_fips` | `geo_county_fips` (awards only) |
+| `postal_code` | `geo_zip` (awards only) |
+| `latitude` / `longitude` | `geo_lat` / `geo_lon` (awards only) |
+| `attribution_source` | `geo_attribution_source` |
+| `attribution_confidence` | `geo_attribution_confidence` |
 
 ## Reused helpers
 

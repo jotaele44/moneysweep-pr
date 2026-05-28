@@ -37,6 +37,8 @@ errors = validate_package(package_dir, mode="test")   # [] means valid
 | 15 | `dangling_entity_ref` | An entity/source reference (`recipient_entity_id`, `funding_agency_entity_id`, `payer_entity_id`, `payee_entity_id`, `source_entity_id`, `target_entity_id`, `evidence_source_id`) does not resolve. |
 | 16 | `synthetic_in_production` | In `mode=production`, a row has `synthetic: true`. |
 | 17 | `federation_invalid` | `manifest.federation` is missing/malformed or does not name the `spiderweb-pr` `query-hub` consumer (`producer_repo`, `consumer_repo`, `consumer_component`, `contract`). |
+| 18 | `location_invalid` | **Optional-field check.** When an award/transaction row has a `location`, it must be an object; `latitude` in `[-90,90]`, `longitude` in `[-180,180]`, `attribution_confidence` in `[0,1]` when present. Absent `location` → no error. |
+| 19 | `external_ids_invalid` | **Optional-field check.** When an entity row has `external_ids`, it must be an object with string values. Absent → no error. |
 
 ## Mode differences
 

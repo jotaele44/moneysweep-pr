@@ -24,6 +24,14 @@
     "normalized_name": {"type": "string"},
     "entity_type": {"type": "string"},
     "jurisdiction": {"type": "string"},
+    "external_ids": {
+      "type": "object",
+      "description": "Optional external identifiers for cross-repo entity matching by the spiderweb-pr query hub.",
+      "properties": {
+        "uei": {"type": "string"},
+        "parent_uei": {"type": "string"}
+      }
+    },
     "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
     "lineage": {"$ref": "#/definitions/lineage"},
     "synthetic": {"type": "boolean"},

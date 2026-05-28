@@ -6,7 +6,7 @@ federation. Contract-Sweeper is a *producer*: it emits portable, validated
 [`spiderweb-pr`](#cross-repo-federation-handshake) repo) ingests.
 
 - **Contract name:** `contract-sweeper-export`
-- **Contract version:** `1.0.0` (field `export_contract_version`)
+- **Contract version:** `1.1.0` (field `export_contract_version`)
 
 This document is the index for the contract. Per-stream field details live in
 [`funding_schema.md`](funding_schema.md), [`entity_schema.md`](entity_schema.md),
@@ -57,6 +57,17 @@ Every row in every stream carries this envelope:
 Each stream additionally has its own identity field and payload — see the
 per-stream docs.
 
+### Matching fields (v1.1.0)
+
+To support matching by the `spiderweb-pr` query hub, two optional fields were
+added in v1.1.0 (additive; a 1.0.0 consumer ignores them):
+
+- **`location`** on `funding_awards` and `transactions` — inline place of
+  performance (municipality, `municipality_code`, lat/lon, …) for spatial
+  matching. See [award_schema.md](award_schema.md#optional-location-place-of-performance).
+- **`external_ids`** on `entities` — `uei` / `parent_uei` for strong cross-repo
+  entity matching. See [entity_schema.md](entity_schema.md#optional-external_ids-cross-repo-matching).
+
 ## Deterministic IDs
 
 Every ID is deterministic: `<prefix>_<sha256(canonical_payload)[:32]>` (lowercase
@@ -82,7 +93,7 @@ reconcile across deliveries. The canonical helper is
   "package_id": "pkg_<32-hex>",
   "producer": "contract-sweeper",
   "producer_version": "0.1.0",
-  "export_contract_version": "1.0.0",
+  "export_contract_version": "1.1.0",
   "mode": "test",
   "created_at": "2024-01-15T12:00:00Z",
   "extracted_at": "2024-01-15T12:00:00Z",
