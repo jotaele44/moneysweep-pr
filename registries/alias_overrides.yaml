@@ -384,13 +384,180 @@ entries:
     aliases:
       - "Maritime Transport Authority for Puerto Rico"
       - "Maritime Transport Authority for Puerto Rico and the Municipal Islands"
+      - "Maritime Transport Authority for Puerto Rico and t"
       - "Autoridad de Transporte Maritimo"
       - "Autoridad de Transporte Maritimo y Las Islas Municipales"
       - "Autoridad de Transporte Marítimo"
       - "Autoridad de Transporte Marítimo y las Islas Municipales"
+      - "Autoridad de Transporte Maritimo y Las Islas Munic"
+      - "AUTORIDAD DE TRANSPORTE MARITIMO Y LAS ISLAS MUNIC"
       - "ATM"
     notes: |
       Puerto Rico government maritime-transport authority; ACT 2020
       PDF shows both Spanish and English names (often truncated in
       the source text), which the default normalizer can't bridge.
-    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+      Truncated forms ("…y las Islas Munic", "…and t") added after
+      the operator's structured CSV extraction surfaced both
+      truncations as distinct normalized canonicals.
+    evidence: "tests/fixtures/act_transition/sample_rows.csv;reports/act_transition_alias_audit.md"
+
+  # -- Layer A: the 7 deferred families from PR #112's plan -------------------
+  # All surfaced in `Contratos_Vigentes_ACT.pdf` (source_dataset=ACT_2020) with
+  # at least one occurrence apiece. Single-form coverage today, but registering
+  # canonical names lets downstream cross-source joins reach these entities by
+  # their canonical label and pre-collapses any future spelling variants.
+
+  - canonical_name: "Obratec Contratista General"
+    aliases:
+      - "Obratec Contratista General"
+      - "Obratec Contratista General, Inc."
+      - "Obratec Contratista General Inc"
+      - "Obratec Contratista General LLC"
+      - "Obratec Contratista General, LLC"
+    notes: |
+      Recurring road-construction contractor on ACT §9(a)(12)
+      transition contracts (rows 2014-000202 K, 2016-000115 J,
+      2016-000116 L, 2017-000113 F, 2020-000183).
+    evidence: "tests/fixtures/act_transition/sample_rows.csv"
+
+  - canonical_name: "Klein Engineering"
+    aliases:
+      - "Klein Engineering"
+      - "Klein Engineering PSC"
+      - "Klein Engineering, PSC"
+      - "Klein Engineering LLC"
+      - "Klein Engineering, LLC"
+      - "KLEIN ENGINEERING, PSC"
+    notes: |
+      Consulting-engineering firm on ACT 2020 professional-services
+      contracts (rows 2019-000022 C, 2019-000109 B).
+    evidence: "tests/fixtures/act_transition/sample_rows.csv"
+
+  - canonical_name: "O & M Consulting Engineering"
+    aliases:
+      - "O & M Consulting Engineering"
+      - "O&M Consulting Engineering"
+      - "O & M Consulting Engineering PSC"
+      - "O & M Consulting Engineering, PSC"
+      - "O & M Consulting Engineering P.S.C."
+      - "O & M Consulting Engineering ,P.S.C."
+      - "O AND M Consulting Engineering"
+      - "OyM Consulting Engineering"
+    notes: |
+      Engineering firm; the raw PDF text uses a leading-comma
+      trailing-period quirk (`,P.S.C.`) that the default normalizer
+      preserves as whitespace, so the canonical with bare `O & M`
+      remains stable. Multiple ACT 2020 occurrences
+      (2019-000026 B/C, 2019-000042 E, 2019-000128 C, 2020-000261).
+    evidence: "tests/fixtures/act_transition/sample_rows.csv"
+
+  - canonical_name: "Allied Waste of Puerto Rico"
+    aliases:
+      - "Allied Waste of Puerto Rico"
+      - "Allied Waste of Puerto Rico Inc"
+      - "Allied Waste of Puerto Rico, Inc."
+      - "ALLIED WASTE OF PUERTO RICO, INC."
+    notes: |
+      Solid-waste vendor on ACT 2020 equipment-rental contracts
+      (rows 2020-000070, 2020-000070 A).
+    evidence: "tests/fixtures/act_transition/sample_rows.csv"
+
+  - canonical_name: "Piloto Construction"
+    aliases:
+      - "Piloto Construction"
+      - "Piloto Construction LLC"
+      - "Piloto Construction, LLC"
+      - "PILOTO CONSTRUCTION, LLC"
+    notes: |
+      Highway-construction prime on ACT 2020 contracts (rows
+      2020-000153, 2020-000198, 2020-000222).
+    evidence: "tests/fixtures/act_transition/sample_rows.csv"
+
+  - canonical_name: "M2A Group"
+    aliases:
+      - "M2A Group"
+      - "M2A Group PSC"
+      - "M2A Group, PSC"
+      - "M2A GROUP, PSC"
+    notes: |
+      Consulting firm on ACT 2020 professional-services contracts
+      (rows 2019-000227 A/B, 2020-000122 A/B).
+    evidence: "tests/fixtures/act_transition/sample_rows.csv"
+
+  - canonical_name: "Juan O. Virella Sanchez"
+    aliases:
+      - "Juan O. Virella Sanchez"
+      - "Juan O. Virella Sánchez"
+      - "Ing. Juan O. Virella Sanchez"
+      - "Ing. Juan O. Virella Sánchez"
+      - "Ingeniero Juan O. Virella Sanchez"
+      - "Ingeniero Juan O. Virella Sánchez"
+    notes: |
+      Individual professional engineer; ACT 2020 PDF uses both bare
+      name and `Ing.` credential-prefixed form (rows 2017-000095 D,
+      2017-000100 E, 2019-000030 C, 2019-000130 C/D, 2019-000168 D,
+      2019-000221, 2020-000228, 2020-000266). `Ing.` is a credential,
+      not a legal-entity differentiator — same pattern as
+      `Ingenieros José A. Batlle` already in this registry.
+    evidence: "tests/fixtures/act_transition/sample_rows.csv"
+
+  # -- Layer B: audit-surfaced clusters needing explicit alias entries --------
+  # Each of these has ≥2 distinct normalized forms that the default normalizer
+  # cannot bridge (typos, DBA chains). Identified via
+  # `scripts/audit_act_alias_coverage.py` against the operator's structured CSV.
+
+  - canonical_name: "Cooperativa de Servicios Integrados a la Ninez COSIANI"
+    aliases:
+      - "Cooperativa de Servicios Integrados a la Ninez COSIANI"
+      - "Cooperativa de Servicios Integrados a la Niñez (COSIANI)"
+      - "Cooperativa de Servicios Integraod a la Niñez (COSIANI)"
+      - "Cooperativa de Servicios Integraod a la Niñez COSIANI"
+      - "COSIANI"
+    notes: |
+      ACUDEN 2024 PDF has the typo `Integraod` (transposed `aod` vs
+      correct `ados`) recurring across 2023-001107 A-E. The correct
+      spelling `Integrados` appears on 2024-000530 A/B, 2024-000622,
+      2025-000216, 2025-000460. Typo bridges to canonical.
+    evidence: "tests/fixtures/act_transition/sample_rows.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Rajohnyari Day Care & Academy Bilingual School"
+    aliases:
+      - "Rajohnyari Day Care & Academy Bilingual School"
+      - "Rajohnyari Day Care & Academy Bilingual School Inc"
+      - "Rajohnyari Day Care & Academy Bilingual School Inc."
+      - "Rajohnyari Day Care and Academy Bilingual School Inc."
+      - "Rajonyari Day Care & Academy Bilingual School Inc."
+      - "Rajonyari Day Care and Academy Bilingual School Inc."
+    notes: |
+      Childcare operator; ACUDEN 2024 has both spellings —
+      `Rajohnyari` (with h) on 2023-000512 A-C, 2024-000550 A/B and
+      `Rajonyari` (without h) on 2025-000172 A. Typo bridge.
+    evidence: "tests/fixtures/act_transition/sample_rows.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Carmen Mangual Perez"
+    aliases:
+      - "Carmen Mangual Perez"
+      - "Carmen Mangual Pérez"
+      - "Centro Infantil Esquilin Mangual"
+      - "Centro Infantil Esquilín Mangual"
+      - "Centro Infantil Esquilin Mangual DBA Carmen Mangual Perez"
+      - "Centro Infantil Esquilín Mangual DBA Carmen Mangual Pérez"
+    notes: |
+      Childcare operator; appears in ACUDEN 2024 as bare individual
+      name (2024-000509 A/B, 2025-000282) and as DBA chain
+      `Centro Infantil Esquilín Mangual DBA Carmen Mangual Pérez`
+      (2024-000746, 2024-000746 A/B). Collapse so both forms map to
+      one entity for cross-source crossref.
+    evidence: "tests/fixtures/act_transition/sample_rows.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Jennifer Soto Santiago"
+    aliases:
+      - "Jennifer Soto Santiago"
+      - "Jennifer Soto Santiago d/b/a Centro Educativo ABC"
+      - "Jennifer Soto Santiago DBA Centro Educativo ABC"
+      - "Centro Educativo ABC"
+    notes: |
+      Childcare operator; ACUDEN 2024 has bare name on early rows
+      (2023-000255 A-C) and DBA chain on 2025-000423. Collapse so
+      both forms map to one entity.
+    evidence: "tests/fixtures/act_transition/sample_rows.csv;reports/act_transition_alias_audit.md"
