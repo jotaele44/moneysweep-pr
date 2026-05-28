@@ -2,14 +2,14 @@
 
 - Input: `tests/fixtures/act_transition/sample_rows.csv`
 - Rows scanned: 57
-- Distinct canonical clusters: 28
+- Distinct canonical clusters: 27
 - Alias overrides loaded: 103
 
 ## Coverage summary
 
 - Matched (cluster has at least one override hit): **14**
-- Unmatched (no override hit; default-normalized canonical): **14**
-- Cross-source clusters (appear in ≥2 source_dataset values): **1**
+- Unmatched (no override hit; default-normalized canonical): **13**
+- Cross-source clusters (appear in ≥2 source_dataset values): **2**
 
 ## Per-source-year breakdown
 
@@ -38,19 +38,22 @@ Every cluster where no alias override fired. The reviewer should scan for semant
 | `FUNDACI N EDUCATIVA CONCEPCI N MART N CENTRO DE CUIDO SONIFEL` | 2 | Fundación Educativa Concepción Martín (Centro de Cuido Sonifel) · Fundación Educativa Concepción Martín Inc. (Centro de Cuido Sonifel) | ACUDEN_2024 |
 | `KLEIN ENGINEERING` | 2 | KLEIN ENGINEERING, PSC | ACT_2020 |
 | `M2A GROUP` | 2 | M2A GROUP, PSC | ACT_2020 |
+| `MUNICIPIO CAMUY` | 2 | MUNICIPIO DE CAMUY · Municipio de Camuy | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO SAN JUAN` | 2 | MUNICIPALITY OF SAN JUAN · Municipio de San Juan | ACT_2020, ACUDEN_2024 |
 | `O AND M CONSULTING ENGINEERING` | 2 | O & M CONSULTING ENGINEERING ,P.S.C. | ACT_2020 |
 | `OBRATEC CONTRATISTA GENERAL` | 2 | Obratec Contratista General, Inc. | ACT_2020 |
 | `PILOTO CONSTRUCTION` | 2 | PILOTO CONSTRUCTION, LLC | ACT_2020 |
 
 ## Cross-source clusters (entities in both ACT_2020 and ACUDEN_2024)
 
-_None._
-
-## Bilingual municipio collapse evidence (deferred to normalizer-rule PR)
-
-Pairs of `MUNICIPIO DE X` (Spanish) and `MUNICIPALITY OF X` (English) canonicals that refer to the same PR municipio. These are intentionally NOT in `recommended` above — the right fix is a single normalizer rule, not 78 alias entries.
-
-| town | spanish canonical | raw forms |
+| canonical | total rows | by source |
 |---|---|---|
-| SAN JUAN | `MUNICIPIO DE SAN JUAN` | MUNICIPALITY OF SAN JUAN · Municipio de San Juan |
+| `MUNICIPIO CAMUY` | 2 | ACT_2020=1, ACUDEN_2024=1 |
+| `MUNICIPIO SAN JUAN` | 2 | ACT_2020=1, ACUDEN_2024=1 |
+
+## Bilingual municipio collapse regression check
+
+`normalize_name()` now bridges Spanish/English municipio designators to a canonical `MUNICIPIO <town>` form (see `contract_sweeper.runtime.name_normalization`). This section should normally be empty: any residual pair of `MUNICIPIO DE X` and `MUNICIPALITY OF X` canonicals here means a designator variant slipped past that rule and the normalizer regex needs widening.
+
+_None — the normalizer rule bridges every municipio pair in this input._
 

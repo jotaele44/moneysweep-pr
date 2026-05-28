@@ -67,14 +67,18 @@ administration transition. ACT and ACUDEN both produce such reports.
    `registries/alias_overrides.yaml` with `evidence:` citing both the CSV and
    the audit report.
 
+## Resolved follow-ups
+
+- **Bilingual municipio normalizer rule.** ✅ Implemented in
+  `contract_sweeper.runtime.name_normalization`: `Municipio de X`,
+  `Municipality of X`, and `Municipio Autónomo de X` now collapse to a canonical
+  `MUNICIPIO <town>` form, bridging the Spanish/English variants across both
+  source datasets without needing per-municipio alias entries. The audit
+  report's former "Bilingual municipio collapse evidence" section is now a
+  regression check (should stay empty).
+
 ## Deferred follow-ups
 
-- **Bilingual municipio normalizer rule.** `MUNICIPIO DE X` ↔ `Municipality of X`
-  for the same PR municipio currently produce distinct normalized forms. ~78
-  municipios affected across both source datasets. The fix is a single rule
-  inside `contract_sweeper.runtime.name_normalization`, not 78 alias entries.
-  Tracked as a separate PR. The audit report's "Bilingual municipio collapse
-  evidence" section is the test-fixture source for that PR.
 - **Vendor-vs-fund-transfer classification.** ACUDEN's `Transferencia de Fondos`
   rows (where the counterparty is a municipio or nonprofit recipient) aren't
   "contractor" relationships in the typical vendor sense. Whether to surface

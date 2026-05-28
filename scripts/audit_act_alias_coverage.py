@@ -242,16 +242,18 @@ def _write_markdown(
             lines.append(f"| `{c.canonical}` | {c.total_occurrences} | {per_src} |")
     lines.append("")
 
-    lines.append("## Bilingual municipio collapse evidence (deferred to normalizer-rule PR)")
+    lines.append("## Bilingual municipio collapse regression check")
     lines.append("")
     lines.append(
-        "Pairs of `MUNICIPIO DE X` (Spanish) and `MUNICIPALITY OF X` (English) canonicals that "
-        "refer to the same PR municipio. These are intentionally NOT in `recommended` above — "
-        "the right fix is a single normalizer rule, not 78 alias entries."
+        "`normalize_name()` now bridges Spanish/English municipio designators to a "
+        "canonical `MUNICIPIO <town>` form (see `contract_sweeper.runtime.name_normalization`). "
+        "This section should normally be empty: any residual pair of `MUNICIPIO DE X` and "
+        "`MUNICIPALITY OF X` canonicals here means a designator variant slipped past that rule "
+        "and the normalizer regex needs widening."
     )
     lines.append("")
     if not municipio_pairs:
-        lines.append("_None observed in this input._")
+        lines.append("_None — the normalizer rule bridges every municipio pair in this input._")
     else:
         lines.append("| town | spanish canonical | raw forms |")
         lines.append("|---|---|---|")
