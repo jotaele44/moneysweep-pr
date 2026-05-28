@@ -1,0 +1,4 @@
+entity_id,normalized_name,entity_name,entity_uei,entity_type,parent_uei,parent_name,resolution_method,match_confidence,total_obligation,record_count,source_files,manual_review_required
+MULTIPLE RECIPIENTS,MULTIPLE RECIPIENTS,MULTIPLE RECIPIENTS,,aggregate,,,observed_only,0.0,1000.0,5,pr_all_awards_master.csv,True
+ACME123UEI,ACME CONSTRUCTION,ACME Construction Inc.,ACME123UEI,recipient,,,uei_no_parent,0.95,1750000.0,3,pr_all_awards_master.csv;pr_contracts_master.csv,False
+CARIB456UEI,CARIBBEAN BUILDERS,Caribbean Builders LLC,CARIB456UEI,recipient,,,uei_no_parent,0.88,750000.0,2,pr_all_awards_master.csv,False
