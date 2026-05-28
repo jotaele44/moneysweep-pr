@@ -1,0 +1,3 @@
+flow_id,funding_source,recipient_entity_id,program,amount,flow_date,project_id,asset_id,municipality,source_system,source_file,link_confidence
+FL-0001,Federal Emergency Management Agency,ACME123UEI,Public Assistance,750000.00,2023-04-01,PROJ1,ASSET1,San Juan,usaspending_prime,pr_financial_flows_master.csv,0.90
+FL-0002,Department of Defense,CARIB456UEI,Construction,250000.00,2022-08-15,PROJ2,ASSET2,Ponce,fpds_report_builder,pr_financial_flows_master.csv,0.85
