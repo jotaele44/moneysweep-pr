@@ -147,6 +147,46 @@ def _parse_date(raw: str | None) -> str | None:
     return None
 
 
+def _build_location(row: dict[str, str]) -> dict[str, Any] | None:
+    """Build an optional inline location object from a row's geo_* columns.
+
+    Returns None when neither a municipality code nor a municipality name is
+    present (no place of performance to match on).
+    """
+    municipality = _clean(row.get("municipality"))
+    code = _clean(row.get("geo_municipality_code"))
+    if not municipality and not code:
+        return None
+
+    location: dict[str, Any] = {"country": "US"}
+    if municipality:
+        location["municipality"] = municipality
+    if code:
+        location["municipality_code"] = code
+    name = _clean(row.get("geo_municipality_name"))
+    if name:
+        location["municipality_name"] = name
+    fips = _clean(row.get("geo_county_fips"))
+    if fips:
+        location["county_fips"] = fips
+    postal = _clean(row.get("geo_zip"))
+    if postal:
+        location["postal_code"] = postal
+    lat = _parse_amount(row.get("geo_lat"))
+    if lat is not None and -90.0 <= lat <= 90.0:
+        location["latitude"] = lat
+    lon = _parse_amount(row.get("geo_lon"))
+    if lon is not None and -180.0 <= lon <= 180.0:
+        location["longitude"] = lon
+    attr_source = _clean(row.get("geo_attribution_source"))
+    if attr_source:
+        location["attribution_source"] = attr_source
+    attr_conf = _clean(row.get("geo_attribution_confidence"))
+    if attr_conf:
+        location["attribution_confidence"] = _parse_confidence(attr_conf)
+    return location
+
+
 def _parse_confidence(raw: str | None) -> float:
     s = _clean(raw)
     if not s:
@@ -280,7 +320,12 @@ def _build_entities(
             continue
         ent_id = _entity_id_for(norm, etype, DEFAULT_JURISDICTION)
         source_files = [s for s in _clean(row.get("source_files")).split(";") if s]
-        out[ent_id] = {
+        external_ids: dict[str, str] = {}
+        if _clean(row.get("entity_uei")):
+            external_ids["uei"] = _clean(row.get("entity_uei"))
+        if _clean(row.get("parent_uei")):
+            external_ids["parent_uei"] = _clean(row.get("parent_uei"))
+        entity_row: dict[str, Any] = {
             "entity_id": ent_id,
             "source_id": derived_source_id,
             "name": _clean(row.get("entity_name")) or norm,
@@ -298,6 +343,9 @@ def _build_entities(
             "created_at": ts,
             "extracted_at": ts,
         }
+        if external_ids:
+            entity_row["external_ids"] = external_ids
+        out[ent_id] = entity_row
         crosswalk.register(ent_id, row.get("entity_uei"), row.get("entity_id"), norm, row.get("entity_name"))
 
     # Synthesize funding-agency entities referenced by awards/flows.
@@ -383,7 +431,7 @@ def _build_awards(
                 "fiscal_year": fiscal_year,
             },
         )
-        out[award_id] = {
+        award_row: dict[str, Any] = {
             "award_id": award_id,
             "source_id": source_id,
             "recipient_entity_id": recipient,
@@ -404,6 +452,10 @@ def _build_awards(
             "created_at": ts,
             "extracted_at": ts,
         }
+        location = _build_location(row)
+        if location is not None:
+            award_row["location"] = location
+        out[award_id] = award_row
     rep.emitted = len(out)
     return list(out.values())
 
@@ -447,7 +499,7 @@ def _build_transactions(
                 "transaction_type": "disbursement",
             },
         )
-        out[txn_id] = {
+        txn_row: dict[str, Any] = {
             "transaction_id": txn_id,
             "source_id": source_id,
             "payer_entity_id": payer,
@@ -467,6 +519,10 @@ def _build_transactions(
             "created_at": ts,
             "extracted_at": ts,
         }
+        location = _build_location(row)
+        if location is not None:
+            txn_row["location"] = location
+        out[txn_id] = txn_row
     rep.emitted = len(out)
     return list(out.values())
 

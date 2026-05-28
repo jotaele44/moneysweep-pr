@@ -117,6 +117,46 @@ def _is_finite_number(value: Any) -> bool:
     )
 
 
+def _check_location(location: Any, loc: str) -> list[ValidationError]:
+    """Validate an optional `location` object (awards/transactions)."""
+    errors: list[ValidationError] = []
+    if not isinstance(location, dict):
+        return [ValidationError("location_invalid", loc, "location must be an object")]
+    for field_name, lo, hi in (
+        ("latitude", -90.0, 90.0),
+        ("longitude", -180.0, 180.0),
+        ("attribution_confidence", 0.0, 1.0),
+    ):
+        if field_name in location:
+            value = location[field_name]
+            if not _is_finite_number(value) or not (lo <= float(value) <= hi):
+                errors.append(
+                    ValidationError(
+                        "location_invalid",
+                        loc,
+                        f"location.{field_name}={value!r} is outside [{lo}, {hi}] or not a number",
+                    )
+                )
+    return errors
+
+
+def _check_external_ids(external_ids: Any, loc: str) -> list[ValidationError]:
+    """Validate an optional entity `external_ids` object (string values only)."""
+    if not isinstance(external_ids, dict):
+        return [ValidationError("external_ids_invalid", loc, "external_ids must be an object")]
+    errors: list[ValidationError] = []
+    for key, value in external_ids.items():
+        if not isinstance(value, str):
+            errors.append(
+                ValidationError(
+                    "external_ids_invalid",
+                    loc,
+                    f"external_ids.{key}={value!r} must be a string",
+                )
+            )
+    return errors
+
+
 def _read_jsonl(path: Path) -> tuple[list[dict[str, Any]], list[ValidationError]]:
     rows: list[dict[str, Any]] = []
     errors: list[ValidationError] = []
@@ -396,6 +436,14 @@ def validate_package(package_dir: str | Path, mode: str = "test") -> list[Valida
                         "synthetic=true rows are not permitted in mode=production",
                     )
                 )
+
+            # Optional location object (awards & transactions) — for hub spatial matching.
+            if "location" in row:
+                errors.extend(_check_location(row["location"], loc))
+
+            # Optional entity external_ids — for cross-repo entity matching.
+            if stream == "entities" and "external_ids" in row:
+                errors.extend(_check_external_ids(row["external_ids"], loc))
 
             row_id = row.get(id_field)
             if isinstance(row_id, str):

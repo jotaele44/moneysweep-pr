@@ -36,6 +36,21 @@ conventions live in `contract_sweeper/runtime/name_normalization.py`.
 {"entity_id":"ent_ee9bafc35b7200bc560f2c7f2e7d7d1d","source_id":"src_633ec79b98705f6ddce6dbd6555d0cee","name":"Federal Emergency Management Agency","normalized_name":"FEDERAL EMERGENCY MANAGEMENT AGENCY","entity_type":"funding_agency","jurisdiction":"US","confidence":0.98,"lineage":{"producer_script":"scripts/build_export_package.py","producer_phase":"EXPORT_PACKAGE_BUILD","source_inputs":["data/processed/entity_master.csv"],"extraction_method":"deterministic_canonicalization"},"synthetic":true,"created_at":"2024-01-15T12:00:00Z","extracted_at":"2024-01-15T12:00:00Z"}
 ```
 
+## Optional `external_ids` (cross-repo matching)
+
+Since contract v1.1.0, entities may carry an optional `external_ids` object so
+the `spiderweb-pr` query hub can match on a strong identifier rather than only
+`normalized_name`:
+
+| Field | Type | Source column |
+|---|---|---|
+| `uei` | string | `entity_uei` |
+| `parent_uei` | string | `parent_uei` |
+
+Populated subfields only; synthesized funding-agency entities (which have no
+UEI) omit the object. A non-object `external_ids` (or non-string value) fails
+the `external_ids_invalid` gate.
+
 ## Referential integrity
 
 Every `entity_id` referenced by awards (`recipient_entity_id`,

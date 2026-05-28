@@ -97,6 +97,29 @@ def test_duplicate_award_id(tmp_path):
 
 
 @pytest.mark.unit
+def test_invalid_latitude(tmp_path):
+    pkg = _copy_fixture(tmp_path)
+    _mutate(pkg, "funding_awards.jsonl",
+            lambda rows: rows[0]["location"].__setitem__("latitude", 999.0))
+    assert "location_invalid" in _codes(validate_package(pkg, mode="test"))
+
+
+@pytest.mark.unit
+def test_invalid_attribution_confidence(tmp_path):
+    pkg = _copy_fixture(tmp_path)
+    _mutate(pkg, "transactions.jsonl",
+            lambda rows: rows[0]["location"].__setitem__("attribution_confidence", 2.0))
+    assert "location_invalid" in _codes(validate_package(pkg, mode="test"))
+
+
+@pytest.mark.unit
+def test_external_ids_must_be_object(tmp_path):
+    pkg = _copy_fixture(tmp_path)
+    _mutate(pkg, "entities.jsonl", lambda rows: rows[0].__setitem__("external_ids", "ACME123UEI"))
+    assert "external_ids_invalid" in _codes(validate_package(pkg, mode="test"))
+
+
+@pytest.mark.unit
 def test_synthetic_rejected_in_production():
     assert "synthetic_in_production" in _codes(validate_package(FIXTURE, mode="production"))
 
