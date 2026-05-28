@@ -37,6 +37,16 @@ _NON_ALNUM = re.compile(r"[^A-Z0-9 ]+")
 _SPACE = re.compile(r"\s+")
 # Collapse dotted abbreviations like "S.A.", "L.L.C.", "P.S.C." into a single token.
 _DOTTED = re.compile(r"\b(?:[A-Z]\.){2,}")
+# Bridge Spanish/English Puerto Rico municipio designators to one canonical
+# "MUNICIPIO " prefix so that "Municipio de San Juan", "Municipality of San
+# Juan", and "Municipio Autónomo de San Juan" all cluster together. The
+# MUNICIPIO marker is kept (rather than collapsing to the bare town) so a
+# private entity named after a town does not merge into the government
+# municipio. Operates on the uppercased string, before accent-stripping, so
+# the optional "AUTÓNOMO"/"AUTONOMO" qualifier matches with or without accent.
+_MUNICIPIO_PREFIX = re.compile(
+    r"^(?:MUNICIPIO(?:\s+AUT[OÓ]NOMO)?\s+DE\s+|MUNICIPALITY\s+OF\s+(?:THE\s+)?)"
+)
 
 
 def normalize_name(name: str | None) -> str:
@@ -49,6 +59,7 @@ def normalize_name(name: str | None) -> str:
     if not name:
         return ""
     s = str(name).upper()
+    s = _MUNICIPIO_PREFIX.sub("MUNICIPIO ", s)
     s = _AMP.sub(" AND ", s)
     s = _DOTTED.sub(lambda m: m.group(0).replace(".", ""), s)
     s = _NON_ALNUM.sub(" ", s)

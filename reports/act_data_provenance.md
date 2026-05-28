@@ -61,11 +61,11 @@ follow-up normalizer PR).
 
 ## Out-of-scope follow-ups flagged during extraction review
 
-1. **Bilingual municipio normalizer rule.** `MUNICIPIO DE X` (Spanish) and
-   `Municipality of X` (English) for the same PR municipio currently produce
-   different normalized forms. Estimated 78 municipios affected. Right fix is
-   a single rule inside `contract_sweeper.runtime.name_normalization`, not 78
-   alias entries. Deferred to a separate PR.
+1. **Bilingual municipio normalizer rule.** ✅ Resolved. `Municipio de X`,
+   `Municipality of X`, and `Municipio Autónomo de X` now collapse to a
+   canonical `MUNICIPIO <town>` form in
+   `contract_sweeper.runtime.name_normalization`, bridging the Spanish/English
+   variants without per-municipio alias entries.
 
 2. **Vendor-vs-fund-transfer classification.** ACUDEN rows with
    `service_type = "Transferencia de Fondos"` represent fund transfers to
