@@ -1,0 +1,56 @@
+{
+  "coverage_window": {
+    "fiscal_year_max": 2023,
+    "fiscal_year_min": 2023
+  },
+  "created_at": "2024-01-15T12:00:00Z",
+  "export_contract_version": "1.0.0",
+  "extracted_at": "2024-01-15T12:00:00Z",
+  "federation": {
+    "consumer_component": "query-hub",
+    "consumer_repo": "spiderweb-pr",
+    "contract": "contract-sweeper-export",
+    "producer_repo": "contract-sweeper"
+  },
+  "files": [
+    {
+      "filename": "entities.jsonl",
+      "record_count": 2,
+      "schema_id": "contract_sweeper_entity.schema.json",
+      "sha256": "1087128428fe4210990054a658c50122400821dfc4c38bc8e541a4109a5a4459",
+      "stream": "entities"
+    },
+    {
+      "filename": "sources.jsonl",
+      "record_count": 1,
+      "schema_id": "contract_sweeper_source.schema.json",
+      "sha256": "673dca542fcfb3e0e03ded65bbeb47b4cc2f611b2351430f85af80033aa18a83",
+      "stream": "sources"
+    },
+    {
+      "filename": "funding_awards.jsonl",
+      "record_count": 1,
+      "schema_id": "contract_sweeper_funding_award.schema.json",
+      "sha256": "1db486a3e97e8047fa6b536c6adbd059d8bac7836103cd7233143270b6e4cc9a",
+      "stream": "funding_awards"
+    },
+    {
+      "filename": "transactions.jsonl",
+      "record_count": 1,
+      "schema_id": "contract_sweeper_transaction.schema.json",
+      "sha256": "05e335e55be709f9c8db9cc1cbfaecd00412a48cb13b3e49ded438d1f636beba",
+      "stream": "transactions"
+    },
+    {
+      "filename": "relationships.jsonl",
+      "record_count": 1,
+      "schema_id": "contract_sweeper_relationship.schema.json",
+      "sha256": "f16f768165a7047bbb8b3dee57d7b800ce1672b03445f3dbd8e5bd128be4eadb",
+      "stream": "relationships"
+    }
+  ],
+  "mode": "test",
+  "package_id": "pkg_716216b37aba5b8fc5a453d240b9aa57",
+  "producer": "contract-sweeper",
+  "producer_version": "0.1.0"
+}
