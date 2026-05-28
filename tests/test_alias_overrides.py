@@ -318,3 +318,38 @@ def test_shipped_overrides_collapse_maritime_transport_truncations() -> None:
     assert english_trunc == spanish_trunc
     assert en_ovrd is True
     assert sp_ovrd is True
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "raw_a, raw_b",
+    [
+        ("Unlimited Learning Center, Inc.", "Unlimited Lerning Center Inc."),
+        ("JJ Investment Group LLC", "JJ Investmentt Group LLC"),
+        ("All Access Academics LLC", "All Acess Academics LLC"),
+        ("Kiddiecare Pre-School and Tutoring Center LLC", "Kiddiecare Preschool and Tutoring Center LLC"),
+        ("Adonai Day Care & Learning Center, Corp.", "Adonai Daycare and Learning Center Corp"),
+        ("OCTAGON CONSULTANT GROUP, CORP.", "Octagon Consulting Group LLC"),
+        ("CDI Emanuel, Inc.", "CDI Emmanuel Inc"),
+        ("Little Kids Adventure Day Care and Leaning Center Inc.", "Little Kids Adventure Day Care Learning Center Inc"),
+        ("Topee-Topee, LLC", "Topeee Topee LLC"),
+        ("Centro Cuidado Amor Inc.", "Centro de Cuidado Amor Inc"),
+    ],
+)
+def test_shipped_overrides_collapse_layer_c_typo_clusters(raw_a, raw_b) -> None:
+    """Layer C: typo/spelling clusters surfaced from the full 1,797-row extraction
+    must collapse to one canonical (and not stay split)."""
+    mapping = load_overrides()
+    ca, _ = apply(raw_a, mapping)
+    cb, _ = apply(raw_b, mapping)
+    assert ca == cb
+
+
+@pytest.mark.unit
+def test_shipped_overrides_keep_distinct_similar_entities_apart() -> None:
+    """Near-duplicate but genuinely distinct entities must NOT be merged."""
+    mapping = load_overrides()
+    # CMA vs CSA Architects are different firms.
+    cma, _ = apply("CMA Architects & Engineers, LLP", mapping)
+    csa, _ = apply("CSA Architects & Engineers, LLP", mapping)
+    assert cma != csa
