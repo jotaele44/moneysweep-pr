@@ -13,7 +13,7 @@ import csv
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Mapping
+from typing import Any, Dict, Iterable, List, Mapping, Sequence
 
 # Allow direct execution from repo root or scripts/.
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -29,7 +29,7 @@ from shared.pr_intake_router import (  # noqa: E402
 )
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Route Puerto Rico raw intake items into repo-specific derivative outputs.")
     parser.add_argument("--input", required=True, help="Input JSONL, JSON array, or CSV file containing raw intake items.")
     parser.add_argument("--config", default="config/pr_intake_domain_router.yaml", help="Router YAML config path.")
@@ -44,7 +44,7 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Write outputs, then return exit code 2 if any route result has validation errors.",
     )
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
 def load_items(path: Path) -> List[Dict[str, Any]]:
@@ -106,8 +106,8 @@ def write_csv(path: Path, rows: List[Mapping[str, Any]]) -> None:
         writer.writerows(flat_rows)
 
 
-def main() -> int:
-    args = parse_args()
+def main_with_args(argv: Sequence[str] | None = None) -> int:
+    args = parse_args(argv)
     input_path = Path(args.input)
     config_path = Path(args.config)
     out_dir = Path(args.out_dir)
@@ -188,6 +188,10 @@ def main() -> int:
 
     print(json.dumps(summary, indent=2, ensure_ascii=False))
     return 0
+
+
+def main() -> int:
+    return main_with_args()
 
 
 if __name__ == "__main__":
