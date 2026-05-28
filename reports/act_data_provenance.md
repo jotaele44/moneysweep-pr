@@ -47,9 +47,19 @@ follow-up normalizer PR).
 
 ### Full extraction
 
-| Path | Status |
-|------|--------|
-| `data/raw/act_transition/transition_contracts_extracted.csv` | Pending operator push (see `data/raw/act_transition/README.md`) |
+| Path | SHA256 | Rows |
+|------|--------|------|
+| `data/raw/act_transition/transition_contracts_extracted.csv` | `556fdd569525d5d4f4f24e72dca5b60f601a1fe1ba085f9395e9181a326fa160` | 1,797 data rows + header (ACT_2020=650, ACUDEN_2024=1,147) |
+
+Generated deterministically by `scripts/build_act_transition_extract.py` from the
+two operator-supplied source PDFs (uploaded 2026-05-28). The PDFs themselves are
+not committed (binary; `data/raw/documents/**/*.pdf` is gitignored) — their
+SHA256 is recorded here for traceability:
+
+| Source PDF | SHA256 |
+|------------|--------|
+| `Contratos_Vigentes_ACT.pdf` (41pp) | `ff9f5a5c726e293943810343249dae4304fd0eb1bc820be90733360046c409bf` |
+| `Informe_Contratos_Vigentes_al_Momento_de_Transicion.pdf` (49pp) | `79c160b984aff5fc0ac06aa473f8f77f045e3010bf2a53cd5b3563e4dcb769d9` |
 
 ## Downstream
 
@@ -67,8 +77,26 @@ follow-up normalizer PR).
    `contract_sweeper.runtime.name_normalization`, bridging the Spanish/English
    variants without per-municipio alias entries.
 
-2. **Vendor-vs-fund-transfer classification.** ACUDEN rows with
+2. **Accent-folding in `normalize_name` — TOP PRIORITY follow-up.** The full
+   extraction's near-duplicate scan shows the single biggest clustering gap is
+   that the normalizer *deletes* accented characters instead of folding them to
+   ASCII: `Comerío`→`COMER O` (vs `COMERIO`), `Juana Díaz`→`JUANA D AZ`,
+   `Paraíso`→`PARA SO`, `Borínquen`→`BOR NQUEN`, `Pequeñines`→`PEQUE INES`,
+   `María`→`MAR A`. Dozens of municipios, daycare names, and person names fail
+   to collapse for this reason alone. The fix is a single NFKD/`unicodedata`
+   accent-fold step in `contract_sweeper.runtime.name_normalization` (sibling to
+   the municipio rule). It would also let us delete several now-redundant alias
+   entries that only exist to bridge accents (Transporte Rodríguez, José A.
+   Batlle, Bermúdez Longo Díaz-Massó). High blast radius (47 call sites) →
+   warrants its own PR + full-suite review, exactly like #122.
+
+3. **Vendor-vs-fund-transfer classification.** ACUDEN rows with
    `service_type = "Transferencia de Fondos"` represent fund transfers to
    municipios/nonprofits rather than vendor contracts. Whether to surface this
    as a distinct entity-role in downstream clustering is a separate design
    decision; flagged here so it isn't lost.
+
+4. **Broad fuzzy near-duplicate vendor sweep.** A difflib pass over the ~1.5k
+   distinct vendors surfaced ~50 candidate merge pairs; the 10 highest-confidence
+   non-accent typo clusters were added to `alias_overrides.yaml` (Layer C). A
+   systematic rapidfuzz-backed reviewer with operator sign-off is a separate PR.

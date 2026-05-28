@@ -561,3 +561,110 @@ entries:
       (2023-000255 A-C) and DBA chain on 2025-000423. Collapse so
       both forms map to one entity.
     evidence: "tests/fixtures/act_transition/sample_rows.csv;reports/act_transition_alias_audit.md"
+
+  # -- Layer C: typo/spelling clusters from the full extraction -----------------
+  # Surfaced by a difflib near-duplicate pass over the real 1,797-row extraction
+  # (scripts/build_act_transition_extract.py output). Each is a confirmed
+  # same-entity spelling/spacing/typo variant the default normalizer can't bridge
+  # and that accent-folding would NOT fix. Distinct-but-similar entities (CMA vs
+  # CSA Architects, Yabucoa vs Yauco, differing middle initials) are intentionally
+  # left un-merged. Evidence cites the real extraction's audit report.
+
+  - canonical_name: "Unlimited Learning Center"
+    aliases:
+      - "Unlimited Learning Center"
+      - "Unlimited Learning Center, Inc."
+      - "Unlimited Lerning Center Inc."
+    notes: |
+      ACUDEN 2024 childcare operator; "Lerning" (missing A) is a typo of
+      the same center (5 + 2 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "JJ Investment Group"
+    aliases:
+      - "JJ Investment Group"
+      - "JJ Investment Group LLC"
+      - "JJ Investmentt Group LLC"
+    notes: |
+      ACUDEN 2024 vendor; "Investmentt" (double-T) is a typo of the same
+      LLC (3 + 4 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "All Access Academics"
+    aliases:
+      - "All Access Academics"
+      - "All Access Academics LLC"
+      - "All Acess Academics LLC"
+    notes: |
+      ACUDEN 2024 operator; "Acess" (missing C) typo of the same LLC.
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Kiddiecare Preschool and Tutoring Center"
+    aliases:
+      - "Kiddiecare Preschool and Tutoring Center"
+      - "Kiddiecare Preschool and Tutoring Center LLC"
+      - "Kiddiecare Pre-School and Tutoring Center LLC"
+    notes: |
+      ACUDEN 2024 operator; "Pre-School" vs "Preschool" spacing variant
+      of the same LLC (3 + 2 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Adonai Day Care & Learning Center"
+    aliases:
+      - "Adonai Day Care & Learning Center"
+      - "Adonai Day Care & Learning Center, Corp."
+      - "Adonai Daycare and Learning Center Corp"
+    notes: |
+      ACUDEN 2024 operator; "Day Care" vs "Daycare" variant of the same
+      corp (3 + 1 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Octagon Consulting Group"
+    aliases:
+      - "Octagon Consulting Group"
+      - "Octagon Consulting Group LLC"
+      - "Octagon Consultant Group, Corp."
+    notes: |
+      Appears in both ACT 2020 ("Consultant Group, Corp.") and ACUDEN 2024
+      ("Consulting Group LLC") — same consulting firm, cross-source.
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "CDI Emmanuel"
+    aliases:
+      - "CDI Emmanuel"
+      - "CDI Emmanuel Inc"
+      - "CDI Emanuel, Inc."
+    notes: |
+      ACUDEN 2024 operator; "Emanuel" vs "Emmanuel" spelling variant of
+      the same center (2 + 1 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Little Kids Adventure Day Care Learning Center"
+    aliases:
+      - "Little Kids Adventure Day Care Learning Center"
+      - "Little Kids Adventure Day Care Learning Center Inc"
+      - "Little Kids Adventure Day Care and Leaning Center Inc."
+    notes: |
+      ACUDEN 2024 operator; "Leaning" (missing R) typo of the same center
+      (5 + 1 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Topee-Topee"
+    aliases:
+      - "Topee-Topee"
+      - "Topee-Topee, LLC"
+      - "Topeee Topee LLC"
+    notes: |
+      ACUDEN 2024 operator; "Topeee" (triple-E) typo of the same LLC
+      (5 + 1 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Centro de Cuidado Amor"
+    aliases:
+      - "Centro de Cuidado Amor"
+      - "Centro de Cuidado Amor Inc"
+      - "Centro Cuidado Amor Inc."
+    notes: |
+      ACUDEN 2024 operator; the missing-"de" form is the same center
+      (7 + 1 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"

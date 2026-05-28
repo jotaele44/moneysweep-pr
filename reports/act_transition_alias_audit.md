@@ -1,22 +1,22 @@
 # ACT-family alias coverage audit
 
-- Input: `tests/fixtures/act_transition/sample_rows.csv`
-- Rows scanned: 57
-- Distinct canonical clusters: 27
-- Alias overrides loaded: 103
+- Input: `data/raw/act_transition/transition_contracts_extracted.csv`
+- Rows scanned: 1797
+- Distinct canonical clusters: 651
+- Alias overrides loaded: 123
 
 ## Coverage summary
 
-- Matched (cluster has at least one override hit): **14**
-- Unmatched (no override hit; default-normalized canonical): **13**
-- Cross-source clusters (appear in ≥2 source_dataset values): **2**
+- Matched (cluster has at least one override hit): **26**
+- Unmatched (no override hit; default-normalized canonical): **625**
+- Cross-source clusters (appear in ≥2 source_dataset values): **47**
 
 ## Per-source-year breakdown
 
 | source_dataset | rows | distinct canonical clusters |
 |---|---|---|
-| `ACT_2020` | 45 | 22 |
-| `ACUDEN_2024` | 12 | 7 |
+| `ACT_2020` | 650 | 277 |
+| `ACUDEN_2024` | 1147 | 421 |
 
 ## Recommended new overrides
 
@@ -30,26 +30,683 @@ Every cluster where no alias override fired. The reviewer should scan for semant
 
 | canonical | rows | distinct raw forms | sources |
 |---|---|---|---|
+| `3 R OS` | 1 | 3 RÍOS LTD. CORP. | ACT_2020 |
+| `4 0 TEAM TORRIMAR LEARNING CENTER` | 1 | 4.0 Team LLC (Torrimar Learning Center) | ACUDEN_2024 |
+| `411 CLAIMS PR` | 1 | 411 Claims P.R. LLC | ACT_2020 |
+| `A AND M GROUP` | 1 | A&M GROUP, INC. | ACT_2020 |
+| `A AND N ROADS DEVELOPMENT` | 1 | A&N ROADS DEVELOPMENT, LLC | ACT_2020 |
+| `A LA LIMON DAY CARE AND LEARNING CENTER` | 1 | A la Limon Day Care and Learning Center Inc. | ACUDEN_2024 |
+| `ABC HUELLITAS DAY CARE CENTER` | 4 | ABC Huellitas Day Care Center Corp · ABC Huellitas Day Care Center, Corp | ACUDEN_2024 |
+| `ABC INFANTIL` | 1 | ABC Infantil Inc | ACUDEN_2024 |
+| `ACADEMIA BAUTISTA DE YAUCO` | 2 | Academia Bautista de Yauco, Inc. | ACUDEN_2024 |
+| `ACADEMIA CRISTIANA HASIEL` | 4 | Academia Cristiana Hasiel Inc · Academia Cristiana Hasiel, Inc | ACUDEN_2024 |
+| `ACADEMIA CRISTO DE LOS MILAGROS` | 1 | Academia Cristo de los Milagros | ACUDEN_2024 |
+| `ACADEMIA HUELLITAS DEL SABER` | 6 | Academia Huellitas del Saber Inc · Academia Huellitas del Saber, Inc. | ACUDEN_2024 |
+| `ACADEMIA LA MILAGROSA LIL EXPLORERS CHILD CARE BY ALM` | 1 | Academia La Milagrosa Inc Lil' Explorers Child Care By ALM | ACUDEN_2024 |
+| `ACADEMIA ROSABEL` | 1 | Academia Rosabel Corp | ACUDEN_2024 |
+| `ACCI N SOCIAL GIDA LOS CANTARES` | 1 | ACCIÓN SOCIAL ÉGIDA LOS CANTARES, INC. | ACT_2020 |
+| `ACCION SOCIAL` | 1 | Accion Social | ACT_2020 |
+| `ACI HERZOG A JOINT VENTURE` | 1 | ACI-HERZOG, A JOINT VENTURE | ACT_2020 |
+| `ACUMENIAN` | 2 | ACUMENIAN, LLC | ACT_2020 |
+| `ADMINISTRACI N DE FAMILIAS Y NI OS` | 1 | Administración de Familias y Niños | ACUDEN_2024 |
+| `AFK LEARNING CENTER` | 4 | AFK Learning Center · AFK Learning Center Inc. | ACUDEN_2024 |
+| `AGARRADITOS DE LA MANO` | 1 | Agarraditos de la Mano Inc | ACUDEN_2024 |
+| `AIDA BELEN RIVERA RUIZ` | 1 | AIDA BELEN RIVERA RUIZ | ACT_2020 |
+| `ALADDIN PRESCHOOL AND DAY CARE` | 2 | Aladdin Preschool & Day Care LLC | ACUDEN_2024 |
+| `ALELI ACADEMY` | 1 | Aleli Academy LLC | ACUDEN_2024 |
 | `ALLIED WASTE OF PUERTO RICO` | 2 | ALLIED WASTE OF PUERTO RICO, INC. | ACT_2020 |
-| `BEHAR YBARRA AND ASSOCIATES` | 3 | BEHAR-YBARRA & ASSOCIATES, LLC · BEHAR-YBARRA & ASSOCIATES, LLP · Behar-Ybarra and Associates,LLP | ACT_2020 |
-| `DESARROLLADORA JA` | 3 | DESARROLLADORA J.A., INC. · Desarrolladora J.A.. Inc. · Desarrolladora JA, Inc.. | ACT_2020 |
-| `FERROVIAL AGROMAN` | 3 | FERROVIAL AGROMAN, LLC · FERROVIAL AGROMAN, S.A. · FERROVIAL- AGROMAN, SA | ACT_2020 |
-| `FERROVIAL CONSTRUCCION PR` | 1 | FERROVIAL CONSTRUCCION PR, LLC | ACT_2020 |
-| `FUNDACI N EDUCATIVA CONCEPCI N MART N CENTRO DE CUIDO SONIFEL` | 2 | Fundación Educativa Concepción Martín (Centro de Cuido Sonifel) · Fundación Educativa Concepción Martín Inc. (Centro de Cuido Sonifel) | ACUDEN_2024 |
+| `ALTERNATE CONCEPTS` | 1 | ALTERNATE CONCEPTS, INC. | ACT_2020 |
+| `ANA RAMOS CRUZ KIDS GARDEN` | 1 | Ana Ramos Cruz (Kids Garden) | ACUDEN_2024 |
+| `ANDARINES DAY CARE` | 1 | Andarines Day Care Inc. | ACUDEN_2024 |
+| `ANDREWS KEY VI` | 1 | ANDREWS KEY VI, LLC | ACT_2020 |
+| `ANIBAL DIAZ CONSTRUCTION` | 1 | Anibal Diaz Construction, Inc. | ACT_2020 |
+| `ANTONIO AND M CONSTRUCTION` | 1 | ANTONIO & M CONSTRUCTION, INC. | ACT_2020 |
+| `APNI` | 1 | Apni Inc. | ACUDEN_2024 |
+| `APPLIED RESEARCH` | 1 | APPLIED RESEARCH, INC. | ACT_2020 |
+| `APRENDIENDO CON AMOR` | 2 | Aprendiendo con Amor, LLC | ACUDEN_2024 |
+| `APTIM ENVIROMENTAL AND INFRASTRUCTURE` | 1 | APTIM ENVIROMENTAL & INFRASTRUCTURE, LLC | ACT_2020 |
+| `ARLENE SIERRA GUZM N` | 1 | Arlene Sierra Guzmán | ACUDEN_2024 |
+| `ASOCIACI N COMUNITARIA PALMAREJO II` | 1 | ASOCIACIÓN COMUNITARIA PALMAREJO II, INC. | ACT_2020 |
+| `ASOCIACI N CRISTIANA DE J VENES DE PONCE YOUNG MEN S CHRISTIAN ASSOCIATION OF PONCE` | 3 | Asociación Cristiana de Jóvenes de Ponce (Young Men's Christian Association of Ponce) Inc. | ACUDEN_2024 |
+| `ASOCIACI N DE RESIDENTES ABCC` | 1 | ASOCIACIÓN DE RESIDENTES ABCC, INC. | ACT_2020 |
+| `ASOCIACION MAYAGUEZANA PERSONAS CON IMPEDIMENTOS` | 1 | ASOCIACION MAYAGUEZANA PERSONAS CON IMPEDIMENTOS, | ACT_2020 |
+| `ASTURIA S LITTLE SCHOOL AND NURSERY` | 1 | Asturia's Little School & Nursery Inc | ACUDEN_2024 |
+| `ASTURIAS LITTLE SCHOOL AND NURSERY` | 3 | Asturias Little School & Nursery, Inc | ACUDEN_2024 |
+| `AUT METROPOLITANA DE AUTOBUSES` | 2 | AUT. METROPOLITANA DE AUTOBUSES | ACT_2020 |
+| `AUTOPISTAS DE PUERTO RICO Y COMPA IA` | 3 | AUTOPISTAS DE PUERTO RICO Y COMPAÑIA, S.E. | ACT_2020 |
+| `AUTOPISTAS METROPOLITANAS DE PUERTO RICO` | 22 | AUTOPISTAS METROPOLITANAS DE PUERTO RICO, LLC · AUTOPISTAS METROPOLITANAS DE PUERTO RICO, LLC. | ACT_2020 |
+| `AUTORIDAD DE EDIFICIOS P BLICOS` | 2 | Autoridad de Edificios Públicos | ACUDEN_2024 |
+| `AUTORIDAD FINANCIAMIENTO DE INFRAESTRUCTURA` | 1 | AUTORIDAD FINANCIAMIENTO DE INFRAESTRUCTURA | ACT_2020 |
+| `AUTORIDAD METROPOLITANA DE AUTOBUSES` | 2 | AUTORIDAD METROPOLITANA DE AUTOBUSES | ACT_2020 |
+| `BDC KIDS` | 2 | BDC Kids, LLC | ACUDEN_2024 |
+| `BEHAR YBARRA AND ASSOCIATES` | 7 | BEHAR-YBARRA & ASSOCIATES, LLC · BEHAR-YBARRA & ASSOCIATES, LLP · Behar-Ybarra and Associates,LLP | ACT_2020 |
+| `BEHRING BRAZILIAN JIU JITSU PUERTO RICO` | 1 | BEHRING BRAZILIAN JIU JITSU PUERTO RICO, INC. | ACT_2020 |
+| `BEST WORK CONSTRUCTION` | 1 | BEST WORK CONSTRUCTION, S.E. | ACT_2020 |
+| `BETANCES SCHOOL` | 6 | Betances School Inc · Betances School, Inc | ACUDEN_2024 |
+| `BETARA GROUP SERVICES` | 1 | BETARA GROUP SERVICES, PSC | ACT_2020 |
+| `BETTER GRADES TUTORING SERVICES` | 5 | Better Grades Tutoring Services Inc · Better Grades Tutoring Services Inc. | ACUDEN_2024 |
+| `BLOOMING HAPPY HEARTS` | 1 | Blooming Happy Hearts Corp | ACUDEN_2024 |
+| `BOR NQUEN BILINGUAL SCHOOL AND SPORT DEVELOPMENT CENTER` | 2 | Borínquen Bilingual School & Sport Development Center, Inc | ACUDEN_2024 |
+| `BORINQUEN BILINGUAL SCHOOL AND SPORT DEVELOPMENT CENTER` | 1 | Borinquen Bilingual School & Sport Development Center Inc | ACUDEN_2024 |
+| `BOSQUE INFANTIL ALYANER` | 1 | Bosque Infantil Alyaner Inc | ACUDEN_2024 |
+| `BOYS AND GIRLS CLUB PUERTO RICO` | 1 | Boys & Girls Club Puerto Rico | ACUDEN_2024 |
+| `BRIGHT BEGGININGS DAY CARE AND LEARNING ACADEMY` | 1 | Bright Begginings Day Care and Learning Academy Corp. | ACUDEN_2024 |
+| `BRIGHT BEGINNING DAY CARE AND LEARNING CENTER` | 2 | Bright Beginning Day Care and Learning Center, Corp | ACUDEN_2024 |
+| `BRIGHT LITTLE MINDS` | 6 | Bright Little Minds Inc · Bright Little Minds Inc. | ACUDEN_2024 |
+| `BRIGHT START BILINGUAL PRESCHOOL` | 1 | Bright Start Bilingual Preschool LLC | ACUDEN_2024 |
+| `BRIGHT START BILINGUAL SCHOOL` | 3 | Bright Start Bilingual School LLC | ACUDEN_2024 |
+| `CAC CRESPO BUILDERS` | 4 | CAC CRESPO BUILDERS, LLC | ACT_2020 |
+| `CAMIEL MARIEL ARROYO GORDILLO DBA GALLERY KIDS` | 2 | Camiel Mariel Arroyo Gordillo DBA Gallery Kids | ACUDEN_2024 |
+| `CAMPO MONTESSORI` | 1 | Campo Montessori Inc | ACUDEN_2024 |
+| `CARIBBEAN SCHOOL` | 1 | Caribbean School Inc | ACUDEN_2024 |
+| `CARIBBEAN SIGN SUPPLIES` | 1 | CARIBBEAN SIGN SUPPLIES | ACT_2020 |
+| `CARIBBEAN SIGN SUPPLIES MANUFACTURERS` | 2 | CARIBBEAN SIGN SUPPLIES MANUFACTURERS, INC. | ACT_2020 |
+| `CARIBBEAN STRATEGIC ADVISORS` | 1 | CARIBBEAN STRATEGIC ADVISORS, LLC | ACT_2020 |
+| `CARITAS ALEGRES LEARNING CENTER` | 5 | Caritas Alegres Learning Center LLC | ACUDEN_2024 |
+| `CARMEN RIVERA` | 3 | Carmen Rivera | ACUDEN_2024 |
+| `CASA MONTESSORI MIS PEQUE AS MANOS` | 1 | Casa Montessori Mis Pequeñas Manos Inc | ACUDEN_2024 |
+| `CASITA DE AMOR BILINGUAL PRESCHOOL AND DAY CARE CENTER` | 4 | Casita de Amor Bilingual Preschool and Day Care Center Inc. | ACUDEN_2024 |
+| `CASTILLO DE NGELES` | 2 | Castillo de Ángeles | ACUDEN_2024 |
+| `CCD MUNDO INFANTIL` | 2 | CCD Mundo Infantil Inc. | ACUDEN_2024 |
+| `CCD Y EDUCATIVO PEQUE INES` | 2 | CCD y Educativo Pequeñines LLC | ACUDEN_2024 |
+| `CCDN DEJANDO HUELLAS D B A CCDN LITTLE EISTEIN` | 1 | CCDN Dejando Huellas LLC d/b/a CCDN Little Eistein | ACUDEN_2024 |
+| `CELI MARIE WILLIAMS CAMPI D B A BEN AND JERRY CAFE` | 1 | CELI MARIE WILLIAMS CAMPI D/B/A BEN & JERRY CAFE | ACT_2020 |
+| `CENTRO APRENDA` | 1 | Centro Aprenda Inc. | ACUDEN_2024 |
+| `CENTRO AYANI` | 1 | CENTRO AYANI, INC. | ACT_2020 |
+| `CENTRO CHIQUIMUNDI` | 2 | Centro Chiquimundi LLC | ACUDEN_2024 |
+| `CENTRO CUIDADO DIURNO ARRULLO MATERNAL` | 3 | Centro Cuidado Diurno Arrullo Maternal, Inc | ACUDEN_2024 |
+| `CENTRO CULTURAL Y DE SERVICIOS DE CANTERA` | 1 | CENTRO CULTURAL Y DE SERVICIOS DE CANTERA, INC. | ACT_2020 |
+| `CENTRO DE APRENDIZAJE AMOR Y PINTURA` | 3 | Centro de Aprendizaje Amor y Pintura Inc | ACUDEN_2024 |
+| `CENTRO DE AYUDA Y TERAPIA AL NI O COMO IMPEDIMENTO AYANI` | 3 | Centro de Ayuda y Terapia al Niño como Impedimento Inc. (AYANI) | ACUDEN_2024 |
+| `CENTRO DE CUIDADO DE NI OS CARITAS FELICES` | 1 | Centro de Cuidado de Niños Caritas Felices Inc. | ACUDEN_2024 |
+| `CENTRO DE CUIDADO DIURNO HABACUC` | 6 | Centro de Cuidado Diurno Habacuc Inc · Centro de Cuidado Diurno Habacuc, Inc | ACUDEN_2024 |
+| `CENTRO DE CUIDADO DIURNO MUNDO INFANTIL` | 2 | Centro de Cuidado Diurno Mundo Infantil, Inc | ACUDEN_2024 |
+| `CENTRO DE CUIDADO DIURNO SUE O INFANTIL` | 2 | Centro de Cuidado Diurno Sueño Infantil Inc. | ACUDEN_2024 |
+| `CENTRO DE CUIDADO DIURNO VALERIANA` | 1 | Centro de Cuidado Diurno Valeriana Inc. | ACUDEN_2024 |
+| `CENTRO DE CUIDADO DIURNO Y EDUCACI N INTEGRAL CHIQUITINES A B C` | 1 | Centro de Cuidado Diurno y Educación Integral Chiquitines A B C Inc. | ACUDEN_2024 |
+| `CENTRO DE CUIDADO Y DESARROLLO INFANTIL SAN PATRICIO` | 4 | Centro de Cuidado y Desarrollo Infantil San Patricio Inc · Centro de Cuidado y Desarrollo Infantil San Patricio Inc. | ACUDEN_2024 |
+| `CENTRO DE CUIDO ABRAZO MATERNAL` | 6 | Centro de Cuido Abrazo Maternal LLC | ACUDEN_2024 |
+| `CENTRO DE CUIDO DIRUNO ARRULLO MATERNAL` | 1 | Centro de Cuido Diruno Arrullo Maternal Inc. | ACUDEN_2024 |
+| `CENTRO DE CUIDO DIURNO EL PEQUE O PR NCIPE` | 2 | Centro de Cuido Diurno El Pequeño Príncipe | ACUDEN_2024 |
+| `CENTRO DE CUIDO DIURNO EL PEQUE O PR NCIPE DAY CARE` | 2 | Centro de Cuido Diurno el Pequeño Príncipe Day Care, Corp | ACUDEN_2024 |
+| `CENTRO DE CUIDO DIURNO Y EDUCATIVO PEQUE INES` | 3 | Centro de Cuido Diurno y Educativo Pequeñines LLC | ACUDEN_2024 |
+| `CENTRO DE CUIDO INFANTIL HUELLITAS` | 1 | Centro de Cuido Infantil Huellitas Inc | ACUDEN_2024 |
+| `CENTRO DE CUIDO MD` | 3 | Centro de Cuido MD LLC · Centro de Cuido MD, LLC | ACUDEN_2024 |
+| `CENTRO DE CUIDO SONRISITAS DE AMOR` | 1 | Centro de Cuido Sonrisitas de Amor Inc. | ACUDEN_2024 |
+| `CENTRO DE CUIDO Y APRENDIZAJE MY FIRST SCHOOL` | 2 | Centro de Cuido y Aprendizaje My First School, Inc | ACUDEN_2024 |
+| `CENTRO DE DESARROLLO EDUCATIVO Y DEPORTIVO` | 2 | Centro de Desarrollo Educativo y Deportivo, Inc | ACUDEN_2024 |
+| `CENTRO DE DESARROLLO INFANTIL AEIOU` | 1 | Centro de Desarrollo Infantil AEIOU Inc | ACUDEN_2024 |
+| `CENTRO DE DESARROLLO INFANTIL GARBIDALIS` | 6 | Centro de Desarrollo Infantil Garbidalis Inc · Centro de Desarrollo Infantil Garbidalis, Inc | ACUDEN_2024 |
+| `CENTRO DE DESARROLLO SIEMPRE NI OS` | 1 | Centro de Desarrollo Siempre Niños Inc | ACUDEN_2024 |
+| `CENTRO DE EDUCACI N SOLES DEL JARD N` | 3 | Centro de Educación Soles del Jardín, Inc | ACUDEN_2024 |
+| `CENTRO DE EDUCACI N SOLES DEL JARDIN` | 1 | Centro de Educación Soles del Jardin Inc | ACUDEN_2024 |
+| `CENTRO DE SONRISITAS DE AMOR` | 3 | Centro de Sonrisitas de Amor Inc. | ACUDEN_2024 |
+| `CENTRO DEL TRIUNFO` | 4 | Centro Del Triunfo · Centro del Triunfo Inc. | ACUDEN_2024 |
+| `CENTRO DESARROLLO PREESCOLAR UPR PONCE` | 1 | Centro Desarrollo Preescolar UPR Ponce | ACUDEN_2024 |
+| `CENTRO EDUCATIVO CARITAS FELICES` | 1 | Centro Educativo Caritas Felices Inc. | ACUDEN_2024 |
+| `CENTRO EDUCATIVO DESARROLLO INTEGRAL CEDI DE CAMUY` | 1 | Centro Educativo Desarrollo Integral (CEDI) de Camuy | ACUDEN_2024 |
+| `CENTRO EDUCATIVO JUEGO EXPLORO Y APRENDO` | 4 | Centro Educativo Juego, Exploro y Aprendo Inc. · Centro Educativo: Juego, Exploro y Aprendo Inc. | ACUDEN_2024 |
+| `CENTRO EDUCATIVO PASITOS DEL SABER` | 1 | Centro Educativo Pasitos del Saber Inc | ACUDEN_2024 |
+| `CENTRO ESPERANZA INCORPORADO` | 3 | Centro Esperanza Incorporado | ACUDEN_2024 |
+| `CENTRO MARGARITA` | 2 | Centro Margarita Inc | ACUDEN_2024 |
+| `CENTRO NI OS EN ACCI N` | 3 | Centro Niños en Acción | ACUDEN_2024 |
+| `CENTRO PIEZAS Y SERVICIOS SANCHEZ AND MACHINE SHOP` | 1 | Centro Piezas y Servicios Sanchez & Machine Shop | ACT_2020 |
+| `CENTRO PRE ESCOLAR BONNY` | 8 | Centro Pre-Escolar Bonny Inc · Centro Pre-Escolar Bonny Inc. | ACUDEN_2024 |
+| `CENTRO PRE ESCOLAR LA CASITA DULCE` | 3 | Centro Pre-Escolar La Casita Dulce Inc | ACUDEN_2024 |
+| `CENTRO PRE ESCOLAR Y ESTUDIOS COMPLEMENTARIOS NIM` | 2 | Centro Pre-Escolar y Estudios Complementarios NIM Inc | ACUDEN_2024 |
+| `CENTRO PREESCOLAR COLOR N COLORADO DBA PAOLA ORTIZ CHANG` | 2 | Centro Preescolar Colorín Colorado DBA Paola Ortiz Chang | ACUDEN_2024 |
+| `CENTRO PREESCOLAR LA CASITA DULCE` | 2 | Centro Preescolar La Casita Dulce Inc. | ACUDEN_2024 |
+| `CENTRO PREESCOLAR Y ESTUDIOS COMPLEMENTARIOS NIM` | 3 | Centro Preescolar y Estudios Complementarios NIM, Inc | ACUDEN_2024 |
+| `CENTRO PROVIDENCIA PARA PERSONAS DE MAYOR EDAD DE` | 1 | CENTRO PROVIDENCIA PARA PERSONAS DE MAYOR EDAD, DE | ACT_2020 |
+| `CENTRO RAMON FRADE PARA PERSONAS DE EDAD` | 1 | CENTRO RAMON FRADE PARA PERSONAS DE EDAD, INC. | ACT_2020 |
+| `CENTRO SOR ISOLINA FERR` | 2 | Centro Sor Isolina Ferré Inc. | ACUDEN_2024 |
+| `CENTROS NI OS EN ACCI N` | 2 | Centros Niños en Acción Inc. | ACUDEN_2024 |
+| `CERO Y M S` | 3 | Cero y Más Corp · Cero y Más Corp. | ACUDEN_2024 |
+| `CHILDREN S ZONE` | 5 | Children's Zone, Inc | ACUDEN_2024 |
+| `CHILDRENS ZONE` | 2 | Childrens Zone Inc. | ACUDEN_2024 |
+| `CHIQUILLOS` | 4 | Chiquillos Inc · Chiquillos Inc. | ACUDEN_2024 |
+| `CHIQUIMUNDI` | 4 | Chiquimundi LLC | ACUDEN_2024 |
+| `CHIQUITINES A B C` | 3 | Chiquitines A B C Inc. | ACUDEN_2024 |
+| `CHIQUITITOS CENDI` | 3 | Chiquititos CENDI Inc · Chiquititos CENDI, Inc | ACUDEN_2024 |
+| `CHM INGENIEROS AND ARQUITECTOS` | 1 | CHM INGENIEROS & ARQUITECTOS | ACT_2020 |
+| `CHM INGENIEROS CSP` | 1 | CHM INGENIEROS, CSP. | ACT_2020 |
+| `CHOO CHOO TRAIN DAY CARE AND MORE` | 4 | Choo Choo Train Day Care & More · Choo Choo Train Day Care & More Inc | ACUDEN_2024 |
+| `CINDERELLA NURSERY DAY CARE CENTER` | 4 | Cinderella Nursery Day Care Center Inc · Cinderella Nursery Day Care Center, Inc. | ACUDEN_2024 |
+| `CJO CONSTRUCTION` | 3 | CJO Construction, Inc. | ACT_2020 |
+| `CLUB DE NI OS FELICES` | 1 | Club de Niños Felices LLC | ACUDEN_2024 |
+| `CLUB DE ORO DE CAGUAS PR` | 2 | CLUB DE ORO DE CAGUAS PR, INC. | ACT_2020 |
+| `COLEGIO ADIANEZ` | 1 | Colegio Adianez Inc. | ACUDEN_2024 |
+| `COLEGIO BUENAS NUEVAS` | 3 | Colegio Buenas Nuevas Inc · Colegio Buenas Nuevas, Inc | ACUDEN_2024 |
+| `COLEGIO EVANG LICO DEL NAZARENO GERM N I DEIDA BORGES` | 1 | Colegio Evangélico del Nazareno Germán I. Deida Borges Inc. | ACUDEN_2024 |
+| `COLEGIO LA CASITA FELIZ` | 5 | Colegio La Casita Feliz Inc · Colegio La Casita Feliz Inc. | ACUDEN_2024 |
+| `COLEGIO LA MONSERRATE` | 4 | Colegio La Monserrate Inc. · Colegio La Monserrate, Inc. | ACUDEN_2024 |
+| `COLEGIO LOURDES` | 2 | Colegio Lourdes Inc | ACUDEN_2024 |
+| `COLEGIO MAR A AUXILIADORA DE CAROLINA` | 3 | Colegio María Auxiliadora de Carolina | ACUDEN_2024 |
+| `COLEGIO MAR A AUXILIADORA DE CAROLINA PR` | 1 | Colegio María Auxiliadora de Carolina PR Inc | ACUDEN_2024 |
+| `COLEGIO NUESTRA ORA DEL CARMEN DE TRUJILLO ALTO` | 2 | Colegio Nuestra Señora del Carmen de Trujillo Alto, Inc | ACUDEN_2024 |
+| `COLEGIO PUERTORRIQUE O MARINEL` | 3 | Colegio Puertorriqueño Marinel Inc. · Colegio Puertorriqueño Marinel, Inc | ACUDEN_2024 |
+| `COLEGIO UTUADE O SAN JOS` | 1 | Colegio Utuadeño San José Inc. | ACUDEN_2024 |
+| `COMAS AND COMAS CONTRACTORS` | 1 | COMAS & COMAS CONTRACTORS, CORP. | ACT_2020 |
+| `COMIT DE GERICULTURA DE GUAYAMA` | 1 | COMITÉ DE GERICULTURA DE GUAYAMA, INC. | ACT_2020 |
+| `COMPLIANCE AND RESEARCH` | 1 | COMPLIANCE AND RESEARCH, INC. | ACT_2020 |
+| `CONSTRUCCIONES JOSE CARRO` | 2 | CONSTRUCCIONES JOSE CARRO, S.E. | ACT_2020 |
+| `CONSTRUCTORA HARTMANN` | 5 | CONSTRUCTORA HARTMANN, S.E. | ACT_2020 |
+| `CONSTRUCTORA I MELENDEZ` | 3 | Constructora I. Melendez, LLC | ACT_2020 |
+| `CONSTRUCTORA SANTIAGO II` | 3 | CONSTRUCTORA SANTIAGO II, CORP | ACT_2020 |
+| `CONTINENTAL CONSTRUCTION AND CONSULTING` | 3 | CONTINENTAL CONSTRUCTION & CONSULTING, LLC | ACT_2020 |
+| `COOPERVISION MANUFACTURING PUERTO RICO` | 1 | COOPERVISION MANUFACTURING PUERTO RICO, LLC | ACT_2020 |
+| `CORPORACI N DE PUERTO RICO PARA LA DIFUSI N P BLICA` | 1 | Corporación de Puerto Rico para la Difusión Pública | ACUDEN_2024 |
+| `CORPORACI N EDUCATIVA RAM N BARQU N AMERICAN MILITARY` | 2 | Corporación Educativa Ramón Barquín / American Military | ACUDEN_2024 |
+| `COSSMA` | 2 | COSSMA, INC | ACT_2020 |
+| `CPH` | 1 | CPH-PSC | ACT_2020 |
+| `CPM PR` | 2 | CPM PR, LLC | ACT_2020 |
+| `CRAYOLAS CENTRO DE APRENDIZAJE Y SERVICIOS PSICOL GICOS` | 3 | Crayolas Centro de Aprendizaje y Servicios Psicológicos Inc · Crayolas Centro de Aprendizaje y Servicios Psicológicos, Inc | ACUDEN_2024 |
+| `CRESPO AND RODR GUEZ` | 1 | Crespo & Rodríguez, Inc. | ACT_2020 |
+| `CRISTINA GARC A REYES CENTRO DIURNO INFANTIL CHIKITINES` | 1 | Cristina García Reyes (Centro Diurno Infantil Chikitines) | ACUDEN_2024 |
+| `CRITICAL HUB NETWORKS` | 1 | CRITICAL HUB NETWORKS, Inc. | ACT_2020 |
+| `CSA ARCHITECTS AND ENGINEERS` | 8 | CSA ARCHITECTS & ENGINEERS · CSA ARCHITECTS & ENGINEERS, LLP · CSA ARCHITECTS & ENGINEERS,LLP · CSA ARCHITECTS AND ENGINEERS, LLP | ACT_2020 |
+| `CSCG` | 1 | CSCG, INC. | ACT_2020 |
+| `CUERPO DE BOMBEROS DE PUERTO RICO` | 2 | CUERPO DE BOMBEROS DE PUERTO RICO | ACT_2020 |
+| `CUIDO CORAZONCITO` | 4 | Cuido Corazoncito Inc | ACUDEN_2024 |
+| `CURBELO AND RULLAN CONSULTING ENGINEERS` | 1 | Curbelo & Rullan Consulting Engineers, PSC | ACT_2020 |
+| `CVS CONSULTANT AND PROJECT MANAGEMENT` | 3 | CVS Consultant and Project Management PSC | ACUDEN_2024 |
+| `CYNTHIA DAY CARE CENTER CRL` | 6 | Cynthia Day Care Center CRL · Cynthia Day Care Center, CRL | ACUDEN_2024 |
+| `DATAWORKS CONSULTING GROUP` | 5 | DATAWORKS CONSULTING GROUP | ACT_2020 |
+| `DAVID MORENO V ZQUEZ` | 1 | DAVID MORENO VÁZQUEZ | ACT_2020 |
+| `DE ANGEL AND COMPA IA CPA` | 1 | DE ANGEL & COMPAÑIA CPA, LLC | ACT_2020 |
+| `DEL CENTRO CARDIOVASCULAR DE PR Y EL CARIBE` | 1 | CORP. DEL CENTRO CARDIOVASCULAR DE PR Y EL CARIBE | ACT_2020 |
+| `DEL VALLE GROUP SP` | 11 | DEL VALLE GROUP, S.P. · Del Valle Group SP | ACT_2020 |
+| `DELEITE INFANTIL` | 1 | Deleite Infantil Inc | ACUDEN_2024 |
+| `DELIZ LEGAL` | 1 | Deliz Legal LLC | ACUDEN_2024 |
+| `DEPARTAMENTO DE CORRECCI N Y REHABILITACI N` | 1 | DEPARTAMENTO DE CORRECCIÓN Y REHABILITACIÓN | ACT_2020 |
+| `DEPARTAMENTO DE TRANSPORTACION Y OBRAS PUBLICAS` | 3 | DEPARTAMENTO DE TRANSPORTACION Y OBRAS PUBLICAS | ACT_2020 |
+| `DESARROLLADORA JA` | 13 | DESARROLLADORA J.A., INC. · Desarrolladora J.A.. Inc. · Desarrolladora JA, Inc.. | ACT_2020 |
+| `DESIGN BUILD` | 4 | Design Build, LLC | ACT_2020 |
+| `DESING BUILD` | 1 | Desing Build , LLC | ACT_2020 |
+| `DEVELOPMENT AND CONSTRUCTION LAW GROUP` | 1 | DEVELOPMENT AND CONSTRUCTION LAW GROUP, LLC | ACT_2020 |
+| `DG3A DESIGN GROUP` | 4 | DG3A Design Group, PSC | ACT_2020 |
+| `DIAL JUST FRO KIDS` | 1 | Dial Corp (Just fro Kids) | ACUDEN_2024 |
+| `DIEGO AND FRIENDS` | 2 | Diego & Friends, LLC. | ACUDEN_2024 |
+| `DIVERSI N Y ENSE ANZA` | 1 | Diversión y Enseñanza Inc. | ACUDEN_2024 |
+| `DO A MAGALY GALARZA CRUZ` | 1 | DOÑA MAGALY GALARZA CRUZ | ACT_2020 |
+| `EAS AND ASSOCIATES` | 2 | EAS & ASSOCIATES, PSC | ACT_2020 |
+| `ECLIPSE MANAGEMENT` | 2 | Eclipse Management, LLC | ACT_2020 |
+| `ECOVAL` | 4 | Ecoval LLC | ACUDEN_2024 |
+| `EJ CONSTRUCTION` | 2 | EJ CONSTRUCTION, SE | ACT_2020 |
+| `EL ED N PARA SO INFANTIL` | 2 | El Edén Paraíso Infantil, Corp. | ACUDEN_2024 |
+| `EL ED N PARAISO INFANTIL` | 1 | El Edén Paraiso Infantil Corp | ACUDEN_2024 |
+| `EL INSTITUTO DE CULTURA PUERTORRIQUE A` | 1 | EL INSTITUTO DE CULTURA PUERTORRIQUEÑA | ACT_2020 |
+| `EL MUNICIPIO DE ARROYO` | 1 | EL MUNICIPIO DE ARROYO | ACT_2020 |
+| `EL RECINTO UNIVERSITARIO DE MAYAG EZ DE LA UNIVERS` | 1 | EL RECINTO UNIVERSITARIO DE MAYAGÜEZ DE LA UNIVERS | ACT_2020 |
+| `ELSIE P REZ SOTO GUARDER A INFANTIL CHIQUITOS` | 1 | Elsie Pérez Soto (Guardería Infantil Chiquitos) | ACUDEN_2024 |
+| `EMANUEL RIER SOTO` | 1 | EMANUEL RIER SOTO | ACT_2020 |
+| `EMPRESAS JBR` | 3 | EMPRESAS JBR, INC. | ACT_2020 |
+| `ENDARIS DAY CARE AND LEARNING CENTER` | 1 | Endaris Day Care & Learning Center Corp | ACUDEN_2024 |
+| `ENRIQUE RUIZ AND ASSOCIATES` | 1 | Enrique Ruiz & Associates, PSC | ACT_2020 |
+| `ESCUELA AMBIENTE MONTESSORI MUNDO DEL NI O` | 4 | Escuela Ambiente Montessori Mundo del Niño Inc. | ACUDEN_2024 |
+| `ESCUELA MONTESSORI SAN CRIST BAL` | 1 | Escuela Montessori San Cristóbal Inc. | ACUDEN_2024 |
+| `ESQ LEGAL SERVICES` | 3 | ESQ Legal Services, LLC · ESQ. LEGAL SERVICES, PSC | ACT_2020 |
+| `ESTACI N INFANTIL` | 7 | Estación Infantil Inc. · Estación Infantil, Inc | ACUDEN_2024 |
+| `ESTEBAN NU EZ CAMACHO` | 1 | ESTEBAN NUÑEZ CAMACHO | ACT_2020 |
+| `EVELYN YANIRA VEGA ORSINI H N C CHILDREN S PARADISE DAY CARE` | 1 | Evelyn Yanira Vega Orsini h/n/c Children's Paradise Day Care | ACUDEN_2024 |
+| `EXPO DESIGN` | 1 | Expo Design Inc. | ACUDEN_2024 |
+| `EYRS LEGAL AND CONSULTING SERVICE` | 2 | EYRS Legal and Consulting Service LLC | ACUDEN_2024 |
+| `FACSIMILE PAPER CONNECTION` | 1 | Facsimile Paper Connection Inc | ACUDEN_2024 |
+| `FADIBELLA` | 5 | Fadibella LLC | ACUDEN_2024 |
+| `FALCON CRUZ` | 1 | Falcon Cruz LLC | ACUDEN_2024 |
+| `FAMILY KIDS DAY CARE AND EDUCATION CENTER` | 2 | Family Kids Day Care and Education Center | ACUDEN_2024 |
+| `FDDS MANAGEMENT AND ENGINEERING` | 4 | FDDS MANAGEMENT & ENGINEERING, PSC | ACT_2020 |
+| `FEF CONSULTORES CSP` | 1 | FEF Consultores, CSP. | ACT_2020 |
+| `FERROVIAL AGROMAN` | 9 | FERROVIAL AGROMAN, LLC · FERROVIAL AGROMAN, S.A. · FERROVIAL- AGROMAN, SA | ACT_2020 |
+| `FERROVIAL CONSTRUCCION PR` | 5 | FERROVIAL CONSTRUCCION PR, LLC | ACT_2020 |
+| `FIDEICOMISO PARA EL DESARROLLO DE R O PIEDRAS` | 2 | FIDEICOMISO PARA EL DESARROLLO DE RÍO PIEDRAS | ACT_2020 |
+| `FIRST STEP CENTER` | 2 | First Step Center, Corp | ACUDEN_2024 |
+| `FLOR DE LOTO MONTESSORI` | 3 | Flor de Loto Montessori, Corp | ACUDEN_2024 |
+| `FONDOS UNIOS DE PUERTO RICO` | 4 | Fondos Unios de Puerto Rico Inc | ACUDEN_2024 |
+| `FOUR A S KIDS CCDA KID S PLANET` | 1 | Four a's Kids Corp / CCDA Kid's Planet | ACUDEN_2024 |
+| `FRANCISCO A RIVERA RIVERA` | 2 | FRANCISCO A. RIVERA RIVERA | ACT_2020 |
+| `FUNDACI N ATENCI N ATENCI N` | 2 | Fundación Atención Atención Inc · Fundación Atención Atención Inc. | ACUDEN_2024 |
+| `FUNDACI N DE DESARROLLO COMUNAL DE PR FUNDESCO` | 3 | Fundación de Desarrollo Comunal de P.R. Inc. (FUNDESCO) · Fundación de Desarrollo Comunal de PR, Inc (FUNDESCO) | ACUDEN_2024 |
+| `FUNDACI N EDUCATIVA CONCEPCI N MART N CENTRO DE CUIDO SONIFEL` | 4 | Fundación Educativa Concepción Martín (Centro de Cuido Sonifel) · Fundación Educativa Concepción Martín Inc. (Centro de Cuido Sonifel) | ACUDEN_2024 |
+| `FUNDACI N PARA EL DESARROLLO DEL HOGAR PROPIO` | 6 | Fundación para el Desarrollo del Hogar Propio Inc | ACUDEN_2024 |
+| `FUNDACI N PARA EL DESARROLLO DEL HOGAR PROPIO INCORPORADO` | 2 | Fundación para el Desarrollo del Hogar Propio Incorporado | ACUDEN_2024 |
+| `FUNDACION MODESTO GOTAY` | 1 | FUNDACION MODESTO GOTAY, INC. | ACT_2020 |
+| `G DORADA` | 4 | G Dorada Inc. | ACUDEN_2024 |
+| `G DORADA CENTRO TECH` | 2 | G Dorada Inc | Centro Tech | ACUDEN_2024 |
+| `GARABATOS` | 8 | Garabatos Inc | ACUDEN_2024 |
+| `GARTM` | 2 | GARTM Inc | ACUDEN_2024 |
+| `GENERACI N FUTURA` | 1 | Generación Futura Inc | ACUDEN_2024 |
+| `GEOCIM` | 1 | GEOCIM, INC, PSC | ACT_2020 |
+| `GERM N TORRES BERR OS D B A GERM N TORRES BERR OS` | 1 | GERMÁN TORRES BERRÍOS D/B/A GERMÁN TORRES BERRÍOS | ACT_2020 |
+| `GERM N TORRES BERRIOS` | 2 | Germán Torres Berrios | ACT_2020 |
+| `GILL ENGINEERING GROUP` | 2 | GILL ENGINEERING GROUP, INC. | ACT_2020 |
+| `GLORIANN RAMOS ACEVEDO MY HAPPY LITTLE GARDEN` | 1 | Gloriann Ramos Acevedo (My Happy Little Garden) | ACUDEN_2024 |
+| `GOTITAS DE AMOR` | 3 | Gotitas de Amor Inc | ACUDEN_2024 |
+| `GREEN GARAGE` | 1 | GREEN GARAGE CORPORATION | ACT_2020 |
+| `GRUPO DE DESARROLLO LOS ALTOS SAN JUAN` | 1 | GRUPO DE DESARROLLO LOS ALTOS SAN JUAN, INC. | ACT_2020 |
+| `GUEVAREZ AND GUEVAREZ` | 2 | GUEVAREZ & GUEVAREZ, CORP. | ACT_2020 |
+| `H2 ASOCIADOS` | 2 | H2 Asociados, PSC | ACT_2020 |
+| `HAPPY FACE HUMACAO` | 6 | Happy Face Humacao LLC · Happy Face Humacao, LLC | ACUDEN_2024 |
+| `HAPPY KIDS DAY CARE AND MILL` | 2 | Happy Kids Day Care & Mill, Inc. | ACUDEN_2024 |
+| `HAPPY LAND DAY CARE AND SCHOOL` | 3 | Happy Land Day Care and School, Inc. | ACUDEN_2024 |
+| `HAPPY MOMENTS PRODUCTIONS` | 1 | Happy Moments Productions Inc. | ACUDEN_2024 |
+| `HARTMAN` | 1 | Hartman S.E. | ACT_2020 |
+| `HCL CONSULTING` | 1 | HCL Consulting, LLC | ACT_2020 |
+| `HEAVENLY KIDS` | 2 | Heavenly Kids Inc | ACUDEN_2024 |
+| `HILDANN M RODR GUEZ MART NEZ MI MAM ME MIMA` | 1 | Hildann M. Rodríguez Martínez (Mi Mamá Me Mima) | ACUDEN_2024 |
+| `HOGAR RUTH PARA MUJERES MALTRATADAS` | 2 | Hogar Ruth para Mujeres Maltratadas, Inc. | ACUDEN_2024 |
+| `HOGAR SAN JOSE HORMIGUEROS` | 1 | HOGAR SAN JOSE (HORMIGUEROS) | ACT_2020 |
+| `HORACIO D AZ AND ASSOCIATE` | 1 | Horacio Díaz & Associate, Corp. | ACT_2020 |
+| `HORACIO DIAZ AND ASSOCIATES CSP` | 1 | HORACIO DIAZ & ASSOCIATES CORP., CSP | ACT_2020 |
+| `IGLESIAS V ZQUEZ AND ASSOCIATES ENGINEERS` | 2 | Iglesias, Vázquez and Associates Engineers, PSC | ACT_2020 |
+| `ILDEFONSO TORRES RODR GUEZ` | 1 | Ildefonso Torres Rodríguez | ACUDEN_2024 |
+| `INDUSTRIAL SECURITY PRODUCTS` | 1 | Industrial Security Products Inc. | ACUDEN_2024 |
+| `INFOKEEPERS OF PUERTO RICO` | 1 | Infokeepers of Puerto Rico, Inc. | ACT_2020 |
+| `INICIATIVA COMUNITARIA DE INVESTIGACI N` | 1 | INICIATIVA COMUNITARIA DE INVESTIGACIÓN, INC. | ACT_2020 |
+| `INPRENDE` | 2 | Inprende LLC | ACUDEN_2024 |
+| `INPRENDE PLATAFORMA ACUDEN QUALITY SYSTEM` | 1 | Inprende (Plataforma ACUDEN Quality System) | ACUDEN_2024 |
+| `INSTITUTO COMERCIAL DE PUERTO RICO D B A ICP` | 1 | INSTITUTO COMERCIAL DE PUERTO RICO, INC. D/B/A ICP | ACT_2020 |
+| `INSTITUTO DEL DESARROLLO DE LA JUVENTUD` | 3 | Instituto del Desarrollo de la Juventud · Instituto del Desarrollo de la Juventud LLC | ACUDEN_2024 |
+| `INSTITUTO PSICOPEDAGOGICO DE PUERTO RICO` | 1 | INSTITUTO PSICOPEDAGOGICO DE PUERTO RICO | ACT_2020 |
+| `INTER AMERICAN UNIVERSITY OF PUERTO RICO UNIVERSIDAD INTERAMERICANA DE PUERTO RICO` | 1 | Inter American University of Puerto Rico, Inc. (Universidad Interamericana de Puerto Rico) | ACUDEN_2024 |
+| `INTERNET VISION DEVELOPMENT INVID` | 3 | Internet Vision Development (INVID) LLC | ACUDEN_2024 |
+| `IZA Y BURGOS R OS DBA MIS PRIMEROS PASOS` | 2 | Iza Y. Burgos Ríos DBA Mis Primeros Pasos | ACUDEN_2024 |
+| `JACKELINE RODR GUEZ AYALA DBA COLEGIO PRE ESCOLAR JARD NES` | 2 | Jackeline Rodríguez Ayala DBA Colegio Pre Escolar Jardínes | ACUDEN_2024 |
+| `JARD N INFANTIL SOLEIL` | 1 | Jardín Infantil Soleil Inc | ACUDEN_2024 |
+| `JARD N MONTESSORI` | 4 | Jardín Montessori Inc · Jardín Montessori Inc. | ACUDEN_2024 |
+| `JAVIER ENRIQUE MATEO NORIEGA DBA KOKOPELLI PRE AND ELEMENTARY SCHOOL` | 2 | Javier Enrique Mateo Noriega DBA Kokopelli Pre & Elementary School | ACUDEN_2024 |
+| `JAVIER MATEO NORIEGO H N C CCDA KOKOPELLI AND PRE AND ELEMENTARY SCHOOL` | 1 | Javier Mateo Noriego h/n/c/ CCDA Kokopelli and Pre and Elementary School | ACUDEN_2024 |
+| `JEANERIS ALFONZO` | 3 | Jeaneris Alfonzo | ACUDEN_2024 |
+| `JEANERIS ALFONZO D B A CCDN DEJANDO HUELLAS` | 1 | Jeaneris Alfonzo d/b/a CCDN Dejando Huellas | ACUDEN_2024 |
+| `JESSICA M SOTO ADAMES` | 3 | Jessica M. Soto Adames | ACUDEN_2024 |
+| `JFA LEGAL CONSULTANTS` | 1 | JFA Legal Consultants LLC | ACUDEN_2024 |
+| `JIREH CHRISTIAN ACADEMY AND DAY CARE` | 1 | Jireh Christian Academy & Day Care Inc. | ACUDEN_2024 |
+| `JIREH CHRISTIAN ACADEMY DAY CARE` | 3 | Jireh Christian Academy Day Care LLC | ACUDEN_2024 |
+| `JJM CONSTRUCTION` | 2 | JJM CONSTRUCTION, CORP. | ACT_2020 |
+| `JM CARIBBEAN BUILDERS` | 1 | JM CARIBBEAN BUILDERS CORP. | ACT_2020 |
+| `JOHANNA D AZ MALDONADO DBA RAYITOS DEL SOL` | 2 | Johanna Díaz Maldonado DBA Rayitos del Sol | ACUDEN_2024 |
+| `JR SITE CONSTRUCTION` | 2 | JR SITE CONSTRUCTION, CORP. | ACT_2020 |
+| `JUAN B SOTO LAW OFFICES` | 1 | Juan B. Soto Law Offices P.S.C. | ACUDEN_2024 |
+| `JUDITH MARGARITA CASANOVA SANTIAGO` | 7 | Judith Margarita Casanova Santiago | ACUDEN_2024 |
+| `JUNTA DE CALIDAD AMBIENTAL` | 1 | JUNTA DE CALIDAD AMBIENTAL | ACT_2020 |
+| `JUST 4 KIDS DAY CARE` | 1 | Just 4 Kids Day Care Corp | ACUDEN_2024 |
+| `K SITA DE RISAS Y APRENDIZAJE CORPORACI N` | 1 | K-sita de Risas y Aprendizaje Corporación | ACUDEN_2024 |
+| `KAREN SCHOOL` | 4 | Karen School Inc. | ACUDEN_2024 |
+| `KAREN SCHOOL KELLYS SCHOOL` | 1 | Karen School Inc (Kellys School) | ACUDEN_2024 |
+| `KARISMA` | 2 | Karisma LLC | ACUDEN_2024 |
+| `KID S PARADISE DAY CARE AND LEARNING CENTER` | 3 | Kid's Paradise Day Care & Learning Center, Inc. | ACUDEN_2024 |
+| `KIDS CASTLE` | 4 | Kids Castle Inc. · Kids Castle, Inc | ACUDEN_2024 |
+| `KIMLEY HORN PUERTO RICO` | 1 | Kimley-Horn Puerto Rico, LLC | ACT_2020 |
 | `KLEIN ENGINEERING` | 2 | KLEIN ENGINEERING, PSC | ACT_2020 |
-| `M2A GROUP` | 2 | M2A GROUP, PSC | ACT_2020 |
-| `MUNICIPIO CAMUY` | 2 | MUNICIPIO DE CAMUY · Municipio de Camuy | ACT_2020, ACUDEN_2024 |
-| `MUNICIPIO SAN JUAN` | 2 | MUNICIPALITY OF SAN JUAN · Municipio de San Juan | ACT_2020, ACUDEN_2024 |
-| `O AND M CONSULTING ENGINEERING` | 2 | O & M CONSULTING ENGINEERING ,P.S.C. | ACT_2020 |
-| `OBRATEC CONTRATISTA GENERAL` | 2 | Obratec Contratista General, Inc. | ACT_2020 |
-| `PILOTO CONSTRUCTION` | 2 | PILOTO CONSTRUCTION, LLC | ACT_2020 |
+| `KNOWLEDGE POWER GROUP KPG` | 2 | Knowledge Power Group Inc. (KPG) | ACUDEN_2024 |
+| `KOALA S BABY DAY CARE DBA RUTH MIRIAM MALDONADO FIGUEROA` | 3 | Koala's Baby Day Care DBA Ruth Miriam Maldonado Figueroa | ACUDEN_2024 |
+| `KPMG` | 1 | KPMG LLP | ACT_2020 |
+| `KYP ACADEMY` | 3 | KYP Academy Corp. · KYP Academy, Corp | ACUDEN_2024 |
+| `LA AUTORIDAD DE TRANSPORTE INTEGRADO DE PUERTO RIC` | 1 | LA AUTORIDAD DE TRANSPORTE INTEGRADO DE PUERTO RIC | ACT_2020 |
+| `LA CASA DE ABU DAY CARE AND PRE SCHOOL` | 3 | La Casa de Abu Day Care & Pre School, Inc | ACUDEN_2024 |
+| `LA IGLESIA CAT LICA APOST LICA Y ROMANA EN PUERTO RICO DIOCESIS DE CAGUAS` | 4 | La Iglesia Católica Apostólica y Romana en Puerto Rico Diocesis de Caguas | ACUDEN_2024 |
+| `LAM CONSULTING` | 1 | LAM CONSULTING, INC. | ACT_2020 |
+| `LCS PRIVATE SCHOOL` | 1 | LCS Private School LLC | ACUDEN_2024 |
+| `LETMARIS` | 3 | Letmaris LLC | ACUDEN_2024 |
+| `LFDC` | 1 | LFDC Corp | ACUDEN_2024 |
+| `LIONS CUBS DAY CARE PROGRAM` | 1 | Lions Cubs Day Care Program | ACUDEN_2024 |
+| `LITTLE BRAINS` | 3 | Little Brains Inc. | ACUDEN_2024 |
+| `LITTLE DREAMERS LEARNING CENTER` | 1 | Little Dreamers Learning Center LLC | ACUDEN_2024 |
+| `LITTLE IN ACTION DAY CARE AND LEARNING CENTER` | 1 | Little in Action Day Care & Learning Center Inc | ACUDEN_2024 |
+| `LITTLE PARADISE DAY CARE AND LEARNING CENTER` | 4 | Little Paradise Day Care and Learning Center · Little Paradise Day Care and Learning Center LLC | ACUDEN_2024 |
+| `LITTLE THINKERS D B A HEALTHY KIDS WORLD` | 1 | Little Thinkers LLC d/b/a Healthy Kids World | ACUDEN_2024 |
+| `LOGISTIC ENGINEERING CONSULTANTS CSP` | 2 | LOGISTIC ENGINEERING CONSULTANTS, CSP | ACT_2020 |
+| `LOS BEB S DEL MILENIO` | 2 | Los Bebés del Milenio Inc | ACUDEN_2024 |
+| `LOS BEB S DEL MILENIO D B A LEVITTOWN ACADEMY AND LEARNING CENTER` | 1 | Los Bebés del Milenio Inc. d/b/a Levittown Academy & Learning Center Inc | ACUDEN_2024 |
+| `LUIS A COL N ROSARIO H N C THE LOCO DOG` | 1 | LUIS A. COLÓN ROSARIO h/n/c THE LOCO DOG | ACT_2020 |
+| `LUIS E BORGES REYES` | 1 | LUIS E. BORGES REYES | ACT_2020 |
+| `LUJANI GENERAL CONTRACTOR` | 4 | LUJANI GENERAL CONTRACTOR, INC. | ACT_2020 |
+| `LUZ BARBONELL P REZ EL PARAISO INFANTIL` | 1 | Luz Barbonell Pérez (El Paraiso Infantil) | ACUDEN_2024 |
+| `LUZ CARBONEL P REZ DBA EL PARA SO INFANTIL` | 2 | Luz Carbonel Pérez dba El Paraíso Infantil | ACUDEN_2024 |
+| `LUZ H OCASIO NIEVES` | 3 | Luz H. Ocasio Nieves | ACUDEN_2024 |
+| `M AND D CONSULTING GROUP` | 3 | M&D Consulting Group LLC | ACUDEN_2024 |
+| `M2A GROUP` | 4 | M2A GROUP, PSC | ACT_2020 |
+| `MA EDUCATIONAL CENTER CENTRO EDUCATIVO KIDDY` | 1 | MA Educational Center Inc (Centro Educativo Kiddy) | ACUDEN_2024 |
+| `MANAGEMENT AND TECHNICAL CONSULTING GROUP` | 2 | MANAGEMENT & TECHNICAL CONSULTING GROUP, INC. | ACT_2020 |
+| `MANITAS DE SEDA` | 2 | Manitas de Seda, LLC | ACUDEN_2024 |
+| `MANOS AND MANITAS CENTRO DE CUIDO INFANTIL` | 4 | Manos & Manitas Centro de Cuido Infantil Inc. | ACUDEN_2024 |
+| `MANPOWERGROUP` | 7 | Manpowergroup Inc. | ACUDEN_2024 |
+| `MANUEL A BERM DEZ PAG N` | 1 | MANUEL A. BERMÚDEZ PAGÁN | ACT_2020 |
+| `MAR A COL N MOLINA DBA CENTRO INFANTIL JUNMARY` | 2 | María Colón Molina DBA Centro Infantil Junmary | ACUDEN_2024 |
+| `MAR A RIOS HERN NDEZ POTOKYTOS` | 1 | María Rios Hernández (Potokytos) | ACUDEN_2024 |
+| `MAR A ROL N MART NEZ` | 2 | María Rolón Martínez | ACUDEN_2024 |
+| `MAR A T JIM NEZ NOYA MI PEQUE O KINDER` | 1 | María T. Jiménez Noya (Mi Pequeño Kinder) | ACUDEN_2024 |
+| `MARI CARMEN SANABRIA DIVINO NI O DAY CARE` | 1 | Mari Carmen Sanabria (Divino Niño Day Care) | ACUDEN_2024 |
+| `MARITZA ROSA LAGUER DBA MRL VENDING MACHINE` | 2 | Maritza Rosa Laguer DBA MRL Vending Machine | ACT_2020 |
+| `MATERNELLE` | 1 | Maternelle Inc | ACUDEN_2024 |
+| `MAXISERVICE AL` | 1 | MAXISERVICE AL, INC. | ACT_2020 |
+| `MD ENGINEERS` | 4 | MD Engineers, PSC | ACT_2020 |
+| `MELENDEZ BRAVO Y ASOCIADOS` | 1 | Melendez, Bravo Y Asociados, Inc. | ACT_2020 |
+| `MENDEG ENGINEERING` | 1 | MenDeg Engineering, PSC | ACT_2020 |
+| `METRIC ENGINEERING` | 5 | METRIC ENGINEERING, INC. | ACT_2020 |
+| `METRIC ENGINEERING OF PUERTO RICO` | 2 | METRIC ENGINEERING OF PUERTO RICO, PSC | ACT_2020 |
+| `MG CONSULTING GROUP` | 7 | MG Consulting Group LLC | ACUDEN_2024 |
+| `MGV GES LAB` | 1 | MGV-GES LAB, INC | ACT_2020 |
+| `MI NUEVA CASITA` | 1 | Mi Nueva Casita Inc | ACUDEN_2024 |
+| `MI PEQUE O ED N` | 3 | Mi Pequeño Edén Inc. | ACUDEN_2024 |
+| `MI PEQUE O PARA SO INFANTIL DE CAYEY` | 2 | Mi Pequeño Paraíso Infantil de Cayey, Inc. | ACUDEN_2024 |
+| `MI PEQUE O PARAISO INFANTIL CAYEY` | 1 | Mi Pequeño Paraiso Infantil Cayey Inc | ACUDEN_2024 |
+| `MI REINO INFANTIL` | 8 | Mi Reino Infantil Inc. · Mi Reino Infantil, Inc | ACUDEN_2024 |
+| `MI SORPRESA INFANTIL` | 3 | Mi Sorpresa Infantil, Inc | ACUDEN_2024 |
+| `MICHELLE RIVERA L PEZ D B A CENTRO PREESCOLAR MONTESSORI DE GUAYNABO` | 1 | Michelle Rivera López d/b/a Centro Preescolar Montessori de Guaynabo | ACUDEN_2024 |
+| `MICHELLE RIVERA L PEZ DBA CENTRO MONTESSORI DE GUAYNABO` | 5 | Michelle Rivera López DBA Centro Montessori de Guaynabo | ACUDEN_2024 |
+| `MICROJURIS COM` | 1 | Microjuris.com, Inc. | ACT_2020 |
+| `MILAGROS CABALLERO ROM N` | 1 | Milagros Caballero Román | ACUDEN_2024 |
+| `MILAGROS CABALLERO ROM N DBA ESCUELITA D FANTAS A` | 5 | Milagros Caballero Román DBA Escuelita D'Fantasía | ACUDEN_2024 |
+| `MILLENNIUM KIDS ACADEMY` | 1 | Millennium Kids Academy, Inc. | ACUDEN_2024 |
+| `MIS QUERUBINES DAY CARE AND LEARNING CENTER` | 1 | Mis Querubines Day Care & Learning Center | ACUDEN_2024 |
+| `MOMMY S DAY CARE` | 1 | Mommy's Day Care Corp | ACUDEN_2024 |
+| `MONTESSORI HOUSE` | 6 | Montessori House LLC | ACUDEN_2024 |
+| `MOVIMIENTO ALCANCE VIDA INDEPENDIENTE` | 2 | MOVIMIENTO ALCANCE VIDA INDEPENDIENTE, INC. | ACT_2020 |
+| `MPJV LEARNING CENTER` | 4 | M.P.J.V. Learning Center, Inc · M.P.J.V. Learning Center, Inc. | ACUDEN_2024 |
+| `MTPR WAREHOUSE LA CERAMICA` | 2 | MTPR Warehouse La Ceramica LLC | ACUDEN_2024 |
+| `MUN DE ARROYO` | 1 | MUN. DE ARROYO | ACT_2020 |
+| `MUNCICIPIO DE CAN VANAS` | 1 | Muncicipio de Canóvanas | ACUDEN_2024 |
+| `MUNCIPIO DE CAROLINA` | 2 | Muncipio de Carolina | ACUDEN_2024 |
+| `MUNCIPIO DE CATA O` | 1 | Muncipio de Cataño | ACUDEN_2024 |
+| `MUNCIPIO DE DORADO` | 1 | Muncipio de Dorado | ACUDEN_2024 |
+| `MUNDO DE FLORIDA MI PEQUE O MUNDO I Y MI PEQUE O MUNDO II` | 3 | Mundo de Florida (Mi Pequeño Mundo I y Mi Pequeño Mundo II) | ACUDEN_2024 |
+| `MUNDO M GICO` | 4 | Mundo Mágico Inc | ACUDEN_2024 |
+| `MUNICIOIO DE VILLALBA` | 1 | Municioio de Villalba | ACUDEN_2024 |
+| `MUNICIPALLTY OF CAMUY` | 1 | MUNICIPALlTY OF CAMUY | ACT_2020 |
+| `MUNICIPALLTY OF GU NICA` | 1 | MUNICIPALlTY OF GUÁNICA | ACT_2020 |
+| `MUNICIPALLTY OF HORMIGUEROS` | 1 | MUNICIPALlTY OF HORMIGUEROS | ACT_2020 |
+| `MUNICIPALLTY OF PE UELAS` | 1 | MUNICIPALlTY OF PEÑUELAS | ACT_2020 |
+| `MUNICIPALLTY OF TRUJILLO ALTO` | 1 | MUNICIPALlTY OF TRUJILLO ALTO | ACT_2020 |
+| `MUNICIPIO A ASCO` | 6 | MUNICIPALITY OF AÑASCO · MUNICIPIO DE AÑASCO · Municipio de Añasco | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO ADJUNTAS` | 2 | MUNICIPIO DE ADJUNTAS · Municipio de Adjuntas | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO AGUADA` | 6 | MUNICIPIO DE AGUADA · Municipio de Aguada | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO AGUADILLA` | 14 | MUNICIPIO DE AGUADILLA · Municipio de Aguadilla | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO AGUAS BUENAS` | 4 | MUNICIPIO DE AGUAS BUENAS · Municipality of Aguas Buenas · Municipio de Aguas Buenas | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO AIBONITO` | 5 | MUNICIPALITY OF AIBONITO · MUNICIPIO DE AIBONITO · Municipio de Aibonito | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO ARECIBO` | 5 | MUNICIPIO DE ARECIBO · Municipio de Arecibo | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO ARROYO` | 4 | MUNICIPIO DE ARROYO · Municipio de Arroyo | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO BARCELONETA` | 3 | MUNICIPALITY OF BARCELONETA | ACT_2020 |
+| `MUNICIPIO BARRANQUITAS` | 1 | MUNICIPALITY OF BARRANQUITAS | ACT_2020 |
+| `MUNICIPIO BAYAM N` | 3 | Municipality of Bayamón · Municipio de Bayamón | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO CABO ROJO` | 8 | MUNICIPALITY OF CABO ROJO · Municipio de Cabo Rojo | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO CAGUAS` | 6 | Municipality of Caguas · Municipio de Caguas | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO CAMUY` | 16 | MUNICIPALITY OF CAMUY · MUNICIPIO DE CAMUY · Municipio de Camuy | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO CAN VANAS` | 5 | MUNICIPIO DE CANÓVANAS · Municipio de Canóvanas | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO CANOVANAS` | 1 | MUNICIPALITY OF CANOVANAS | ACT_2020 |
+| `MUNICIPIO CATA O` | 2 | MUNICIPALITY OF CATAÑO · Municipio de Cataño | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO CAYEY` | 20 | MUNICIPALITY OF CAYEY · MUNICIPIO DE CAYEY · Municipio de Cayey | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO CEIBA` | 2 | MUNICIPALITY OF CEIBA · Municipio de Ceiba | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO CIALES` | 1 | Municipio de Ciales | ACUDEN_2024 |
+| `MUNICIPIO CIDRA` | 2 | Municipality of Cidra | ACT_2020 |
+| `MUNICIPIO COAMO` | 14 | MUNICIPALITY OF COAMO · MUNICIPIO DE COAMO · Municipio de Coamo | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO COMER O` | 1 | Municipality of Comerío | ACT_2020 |
+| `MUNICIPIO COMERIO` | 3 | Municipio de Comerio | ACUDEN_2024 |
+| `MUNICIPIO COROZAL` | 3 | MUNICIPALITY OF COROZAL | ACT_2020 |
+| `MUNICIPIO CULEBRA` | 1 | Municipio de Culebra | ACUDEN_2024 |
+| `MUNICIPIO CULEBRA LA CASA DE LA ALEGR A` | 2 | Municipio de Culebra - La Casa de la Alegría | ACUDEN_2024 |
+| `MUNICIPIO DORADO` | 10 | MUNICIPALITY OF DORADO · MUNICIPIO DE DORADO · Municipio de Dorado | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO FAJARDO` | 15 | MUNICIPALITY OF FAJARDO · Municipio de Fajardo | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO FLORIDA` | 6 | MUNICIPALITY OF FLORIDA · MUNICIPIO DE FLORIDA · Municipio de Florida | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO GU NICA` | 5 | Municipio de Guánica | ACUDEN_2024 |
+| `MUNICIPIO GUAYAMA` | 5 | MUNICIPALITY OF GUAYAMA · Municipio de Guayama | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO GUAYANILLA` | 9 | MUNICIPALITY OF GUAYANILLA · Municipio de Guayanilla | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO GUAYANILLA CCD MUNDO DE SUE OS` | 5 | Municipio de Guayanilla - CCD Mundo De Sueños | ACUDEN_2024 |
+| `MUNICIPIO GUAYNABO` | 2 | MUNICIPIO DE GUAYNABO · Municipality of Guaynabo | ACT_2020 |
+| `MUNICIPIO GURABO` | 11 | MUNICIPALITY OF GURABO · MUNICIPIO DE GURABO · Municipio de Gurabo | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO HATILLO` | 3 | MUNICIPIO DE HATILLO · Municipio de Hatillo | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO HORMIGUEROS` | 3 | MUNICIPALITY OF HORMIGUEROS · Municipio de Hormigueros | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO HUMACAO` | 6 | MUNICIPALITY OF HUMACAO · MUNICIPIO AUTÓNOMO DE HUMACAO · MUNICIPIO DE HUMACAO · Municipio de Humacao | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO HUMACAO CHILD CARE HUMACAO` | 2 | Municipio de Humacao - Child Care Humacao | ACUDEN_2024 |
+| `MUNICIPIO ISABELA` | 7 | MUNICIPALITY OF ISABELA · Municipio de Isabela | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO JAYUYA` | 6 | MUNICIPIO DE JAYUYA · Municipality of Jayuya · Municipio Jayuya · Municipio de Jayuya | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO JUANA D AZ` | 15 | Municipio de Juana Díaz | ACUDEN_2024 |
+| `MUNICIPIO JUANA DIAZ` | 1 | MUNICIPALITY OF JUANA DIAZ | ACT_2020 |
+| `MUNICIPIO JUNCOS` | 4 | MUNICIPALITY OF JUNCOS · MUNICIPIO DE JUNCOS · Municipio de Juncos | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO LAJAS` | 12 | MUNICIPALITY OF LAJAS · MUNICIPIO DE LAJAS · Municipio de Lajas | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO LARES` | 1 | Municipio de Lares | ACUDEN_2024 |
+| `MUNICIPIO LAS MAR AS` | 1 | Municipio Las Marías | ACUDEN_2024 |
+| `MUNICIPIO LAS MARIAS` | 2 | MUNICIPIO DE LAS MARIAS · Municipio Las Marias | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO LAS PIEDRAS` | 2 | MUNICIPALITY OF LAS PIEDRAS · MUNICIPIO DE LAS PIEDRAS | ACT_2020 |
+| `MUNICIPIO LUQUILLO` | 6 | MUNICIPALITY OF LUQUILLO · MUNICIPIO DE LUQUILLO · Municipio de Luquillo | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO MANATI` | 1 | MUNICIPALITY OF MANATI | ACT_2020 |
+| `MUNICIPIO MARICAO` | 1 | Municipio de Maricao | ACUDEN_2024 |
+| `MUNICIPIO MAUNABO` | 5 | MUNICIPIO DE MAUNABO · Municipio de Maunabo | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO MAYAGUEZ` | 2 | MUNICIPIO DE MAYAGUEZ | ACT_2020 |
+| `MUNICIPIO MOCA` | 4 | MUNICIPALITY OF MOCA · MUNICIPIO DE MOCA | ACT_2020 |
+| `MUNICIPIO MOROVIS` | 4 | Municipality of Morovis · Municipio de Morovis | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO NAGUABO` | 2 | MUNICIPALITY OF NAGUABO · Municipio de Naguabo | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO NAGUABO NAGUABO CHILD CARE` | 2 | Municipio de Naguabo - Naguabo Child Care | ACUDEN_2024 |
+| `MUNICIPIO NARANJITO` | 5 | MUNICIPALITY OF NARANJITO · Municipio de Naranjito | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO OROCOVIS` | 2 | MUNICIPIO DE OROCOVIS | ACT_2020 |
+| `MUNICIPIO PATILLAS` | 12 | MUNICIPIO DE PATILLAS · Municipality of Patillas · Municipio de Patillas | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO PE UELAS` | 3 | MUNICIPALITY OF PEÑUELAS · MUNICIPIO DE PEÑUELAS | ACT_2020 |
+| `MUNICIPIO PONCE` | 2 | MUNICIPIO DE PONCE | ACT_2020 |
+| `MUNICIPIO QUEBRADILLAS` | 6 | Municipio de Quebradillas | ACUDEN_2024 |
+| `MUNICIPIO R O GRANDE` | 2 | MUNICIPALITY OF RÍO GRANDE | ACT_2020 |
+| `MUNICIPIO RINC N` | 1 | MUNICIPALITY OF RINCÓN | ACT_2020 |
+| `MUNICIPIO RINCON` | 2 | MUNICIPIO DE RINCON | ACT_2020 |
+| `MUNICIPIO RIO GRANDE` | 2 | MUNICIPIO DE RIO GRANDE · Municipio de Rio Grande | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO SABANA GRANDE` | 16 | Municipio de Sabana Grande | ACUDEN_2024 |
+| `MUNICIPIO SALINAS` | 6 | MUNICIPALITY OF SALINAS · MUNICIPIO DE SALINAS · Municipio de Salinas | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO SAN GERM N` | 3 | MUNICIPALITY OF SAN GERMÁN | ACT_2020 |
+| `MUNICIPIO SAN JUAN` | 17 | MUNICIPALITY OF SAN JUAN · Municipio de San Juan | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO SAN LORENZO` | 3 | MUNICIPIO DE SAN LORENZO · Municipio de San Lorenzo | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO SAN SEBASTI N` | 1 | Municipio de San Sebastián | ACUDEN_2024 |
+| `MUNICIPIO SAN SEBASTIAN` | 7 | MUNICIPALITY OF SAN SEBASTIAN · MUNICIPIO DE SAN SEBASTIAN | ACT_2020 |
+| `MUNICIPIO SANTA ISABEL` | 1 | Municipio de Santa Isabel | ACUDEN_2024 |
+| `MUNICIPIO TOA ALTA` | 2 | MUNICIPIO DE TOA ALTA · Municipio de Toa Alta | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO TOA BAJA` | 4 | MUNICIPIO DE TOA BAJA · Municipality of Toa Baja | ACT_2020 |
+| `MUNICIPIO TRUJILLO ALTO` | 3 | MUNICIPALITY OF TRUJILLO ALTO · MUNICIPIO DE TRUJILLO ALTO | ACT_2020 |
+| `MUNICIPIO UTUADO` | 2 | MUNICIPIO DE UTUADO · Municipio de Utuado | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO VEGA ALTA` | 6 | Municipio de Vega Alta | ACUDEN_2024 |
+| `MUNICIPIO VEGA BAJA` | 18 | MUNICIPALITY OF VEGA BAJA · MUNICIPIO DE VEGA BAJA · Municipio de Vega Baja | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO VIEQUES` | 2 | MUNICIPIO DE VIEQUES | ACT_2020 |
+| `MUNICIPIO VILLALBA` | 2 | MUNICIPIO DE VILLALBA | ACT_2020 |
+| `MUNICIPIO YABUCOA` | 11 | MUNICIPIO DE YABUCOA · Municipio de Yabucoa | ACT_2020, ACUDEN_2024 |
+| `MUNICIPIO YAUCO` | 2 | Municipality of Yauco · Municipio de Yauco | ACT_2020, ACUDEN_2024 |
+| `MY JUNGLE NURSERY AND PREESCHOOL` | 1 | My Jungle Nursery & Preeschool Inc | ACUDEN_2024 |
+| `MY LITTLE ADVENTURE DAY CARE AND LEARNING` | 1 | My Little Adventure Day Care & Learning LLC | ACUDEN_2024 |
+| `MY LITTLE COLLEGE` | 1 | My Little College Inc. | ACUDEN_2024 |
+| `NATURAL BABIES GUARDER A INFANTIL` | 2 | Natural Babies, Guardería Infantil, Inc. | ACUDEN_2024 |
+| `NETWAVE EQUIPMENT` | 1 | Netwave Equipment Corp. | ACT_2020 |
+| `NEVARES AND VILLAVICENCIO CONSTRUCTION GROUP` | 1 | NEVARES & VILLAVICENCIO CONSTRUCTION GROUP, INC. | ACT_2020 |
+| `NGEL DE LA GUARDA` | 2 | Ángel de la Guarda Inc | ACUDEN_2024 |
+| `NI OS EXPLORADORES` | 5 | Niños Exploradores Inc · Niños Exploradores Inc. | ACUDEN_2024 |
+| `NISSIS DAY CARE AND LEARNING CENTER` | 1 | Nissis Day Care and Learning Center | ACUDEN_2024 |
+| `NORILIZ VIERA MANGUAL LA CASITA DE MAMI` | 1 | Noriliz Viera Mangual (La Casita de Mami) | ACUDEN_2024 |
+| `NORVAN GENERAL CONTRACTOR` | 1 | Norvan General Contractor, INC. | ACT_2020 |
+| `NU STREAM COMMUNICATION` | 1 | NU STREAM COMMUNICATION, INC. | ACT_2020 |
+| `NUESTRA ESCUELA` | 2 | Nuestra Escuela · Nuestra Escuela Inc. | ACUDEN_2024 |
+| `NUESTRA ESCUELA CASA ROSA` | 1 | Nuestra Escuela - Casa Rosa | ACUDEN_2024 |
+| `O AND M CONSULTING ENGINEERING` | 5 | O & M CONSULTING ENGINEERING ,P.S.C. | ACT_2020 |
+| `OCEAN PARK KIDS` | 2 | Ocean Park Kids, Inc | ACUDEN_2024 |
+| `OLYMPIC PERFORMANCE` | 1 | Olympic Performance LLC | ACUDEN_2024 |
+| `OMAYRA FIGUEROA RAMOS DBA CENTRO DE CUIDO NI ILANDIA` | 1 | Omayra Figueroa Ramos dba Centro de Cuido Niñilandia | ACUDEN_2024 |
+| `ORTIZ NOLASCO AND ASOCIADOS CSP` | 2 | ORTIZ NOLASCO & ASOCIADOS, CSP | ACT_2020 |
+| `OT COMMUNITY HEALTH SERVICES SCHOOL` | 1 | OT Community Health Services School Inc., | ACUDEN_2024 |
+| `PAMILIA RIVERA VELEZ` | 1 | Pamilia Rivera Velez | ACUDEN_2024 |
+| `PAOLA ORTIZ COLORIN COLORADO` | 1 | Paola Ortiz (Colorin Colorado) | ACUDEN_2024 |
+| `PARA SO INFANTIL` | 3 | Paraíso Infantil Inc. | ACUDEN_2024 |
+| `PARAISO INFANTIL` | 2 | Paraiso Infantil Inc. | ACUDEN_2024 |
+| `PARAMOUNT MANAGEMENT GROUP` | 1 | PARAMOUNT MANAGEMENT GROUP, LLC | ACT_2020 |
+| `PASEMISIN KIDS` | 1 | Pasemisin Kids Corp | ACUDEN_2024 |
+| `PASITOS DEL FUTURO` | 1 | Pasitos del Futuro Inc. | ACUDEN_2024 |
+| `PASITOS KIDS CARE` | 1 | Pasitos Kids Care Inc | ACUDEN_2024 |
+| `PATHWAY SERVICES` | 1 | PATHWAY SERVICES, INC. | ACT_2020 |
+| `PEDRO A MORALES HERN NDEZ` | 1 | PEDRO A. MORALES HERNÁNDEZ | ACT_2020 |
+| `PEDRO GUZM N MEDINA DBA HEALTHY KIDS WORLD` | 2 | Pedro Guzmán Medina DBA Healthy Kids World | ACUDEN_2024 |
+| `PEDRO J D VILA COL N PROFESSIONAL LAND SURVEYORS` | 1 | Pedro J. Dávila Colón Professional Land Surveyors, | ACT_2020 |
+| `PEDRO J MORALES HERNANDEZ` | 1 | PEDRO J. MORALES HERNANDEZ | ACT_2020 |
+| `PEEK A BOO DAY CARE` | 4 | Peek A Boo Day Care Inc · Peek a Boo Day Care, Inc | ACUDEN_2024 |
+| `PEEK A BOO DAY CARE II` | 2 | Peek A Boo Day Care II, Inc | ACUDEN_2024 |
+| `PEEK A BOO II DAY CARE` | 1 | Peek A Boo II Day Care Inc | ACUDEN_2024 |
+| `PEQUE AS MANITAS DAY CARE AND PRE SCHOOL` | 4 | Pequeñas Manitas Day Care and Pre-School Inc | ACUDEN_2024 |
+| `PEQUE INES CENTRO EDUCATIVO DE APRENDIZAJE M LTIPLES` | 2 | Pequeñines Centro Educativo de Aprendizaje Múltiples Inc. | ACUDEN_2024 |
+| `PEQUE INES CENTRO EDUCATIVO DE APRENDIZAJES M LTIPLES` | 5 | Pequeñines Centro Educativo de Aprendizajes Múltiples, Inc | ACUDEN_2024 |
+| `PERFECT INTEGRATED SOLUTIONS` | 2 | PERFECT INTEGRATED SOLUTIONS, INC. | ACT_2020 |
+| `PERFECT PIVOT` | 1 | Perfect Pivot LLC | ACUDEN_2024 |
+| `PIESITOS CENTRO DE DESARROLLO INTEGRAL DEL NI O` | 7 | Piesitos Centro de Desarrollo Integral del Niño · Piesitos Centro de Desarrollo Integral del Niño Inc | ACUDEN_2024 |
+| `PILOTO CONSTRUCTION` | 5 | PILOTO CONSTRUCTION, LLC | ACT_2020 |
+| `PISADAS DE ANGELITOS` | 4 | Pisadas de Angelitos Inc · Pisadas de Angelitos Inc. | ACUDEN_2024 |
+| `PLAZA INTERNACIONAL PUERTO RICO` | 1 | Plaza Internacional Puerto Rico, LLC | ACT_2020 |
+| `PLAZA KIDS SCHOOL` | 1 | Plaza Kids School Corp | ACUDEN_2024 |
+| `POLIMAT` | 1 | Polimat LLC | ACUDEN_2024 |
+| `PR SPECIAL COMMUNITY SERVICES` | 1 | PR Special Community Services Inc. | ACUDEN_2024 |
+| `PRE ESCOLAR SAN JUAN EVANGELISTA` | 3 | Pre Escolar San Juan Evangelista, Inc | ACUDEN_2024 |
+| `PROCUREMENT MANAGEMENT AND OPERATIONS SOLUTIONS` | 1 | Procurement Management & Operations Solutions, LLC | ACT_2020 |
+| `PROFESSIONAL ACCOUNT MANAGEMENT` | 1 | PROFESSIONAL ACCOUNT MANAGEMENT, LLC | ACT_2020 |
+| `PROFESSIONAL ASPHALT` | 3 | PROFESSIONAL ASPHALT, LLC | ACT_2020 |
+| `PUBLIC SAFETY DEPARTMENT` | 1 | Public Safety Department | ACT_2020 |
+| `PUERTO RICO ASPHALT` | 1 | PUERTO RICO ASPHALT LLC | ACT_2020 |
+| `PUERTO RICO DOWN SYNDROME FOUNDATION` | 2 | Puerto Rico Down Syndrome Foundation Inc | ACUDEN_2024 |
+| `PUERTO RICO ECCE` | 1 | Puerto Rico Ecce LLC | ACUDEN_2024 |
+| `PUERTO RICO INFRASTRUCTURE FINANCING AUTHORITY AFI` | 1 | Puerto Rico Infrastructure Financing Authority AFI | ACT_2020 |
+| `PUERTO RICO INTEGRATED TRANSPORTATION AUTHORITY` | 1 | Puerto Rico Integrated Transportation Authority | ACT_2020 |
+| `PUERTO RICO TELEPHONE` | 1 | PUERTO RICO TELEPHONE COMPANY, INC. | ACT_2020 |
+| `R AND F ASPHALT UNLIMITED` | 1 | R & F ASPHALT UNLIMITED, INC. | ACT_2020 |
+| `RAINBOW KIDS` | 4 | Rainbow Kids Corporation | ACUDEN_2024 |
+| `RDJ GROUP` | 3 | RDJ Group LLC | ACUDEN_2024 |
+| `REBECA F ROJAS COLON` | 1 | REBECA F. ROJAS COLON | ACT_2020 |
+| `RECINTO UNIVERSITARIO DE MAYAGUEZ CENTRO DE DESARROLLO PRE ESCOLAR RUM` | 1 | Recinto Universitario de Mayaguez (Centro de Desarrollo Pre-Escolar RUM) | ACUDEN_2024 |
+| `RED POR LOS DERECHOS DE LA NI EZ Y LA JUVENTUD` | 1 | Red por los Derechos de la Niñez y la Juventud | ACUDEN_2024 |
+| `RED POR LOS DERECHOS DE LA NI EZ Y LA JUVENTUD DE PUERTO RICO` | 7 | Red por los Derechos de la Niñez y la Juventud de Puerto Rico Inc. | ACUDEN_2024 |
+| `REGALOS DE AMOR` | 2 | Regalos de Amor Inc | ACUDEN_2024 |
+| `REMA` | 1 | Rema LLC | ACUDEN_2024 |
+| `REZILIENTKIDZ` | 1 | Rezilientkidz | ACUDEN_2024 |
+| `RINCON CHRISTIAN ACADEMY` | 1 | Rincon Christian Academy Inc. | ACUDEN_2024 |
+| `RL P REZ` | 4 | RL Pérez Inc | ACUDEN_2024 |
+| `RL P REZ MUNDO DE JUGUETES` | 1 | RL Pérez Inc (Mundo de Juguetes) | ACUDEN_2024 |
+| `ROBERTO E CRUZ CRUZ` | 1 | Roberto E Cruz Cruz | ACUDEN_2024 |
+| `ROBERTO REXACH CINTRON AND ASSOCIATES` | 1 | ROBERTO REXACH CINTRON & ASSOCIATES | ACT_2020 |
+| `ROBLES ASPHALT` | 2 | ROBLES ASPHALT, CORP. | ACT_2020 |
+| `ROCK SOLID TECHNOLOGIES` | 3 | Rock Solid Technologies Inc. | ACUDEN_2024 |
+| `ROSA M HERN NDEZ CARRASQUILLO GALERIA MATERNAL` | 1 | Rosa M. Hernández Carrasquillo (Galeria Maternal) | ACUDEN_2024 |
+| `ROSA MAR A HERN NDEZ CARRASQUILLO` | 3 | Rosa María Hernández Carrasquillo | ACUDEN_2024 |
+| `ROSELYN N SANTIAGO CARDONA DBA TWIN LITTLE STAR DAY CARE AND LEARNING CENTER` | 2 | Roselyn N. Santiago Cardona dba Twin Little Star Day care & Learning Center | ACUDEN_2024 |
+| `RRG APPRAISAL GROUP` | 1 | RRG APPRAISAL GROUP, INC. | ACT_2020 |
+| `RSD ENGINEERING AND CONSULTING GROUP` | 1 | RSD Engineering & Consulting Group, PSC | ACT_2020 |
+| `RUAJ S DAY CARE AND PRESCHOOL` | 2 | Ruaj's Day Care & Preschool, Inc | ACUDEN_2024 |
+| `RUAJS DAY CARE PRESCHOOL` | 1 | Ruajs Day Care Preschool Inc. | ACUDEN_2024 |
+| `RUTH M MALDONADO FIGUEROA D B A KOALA S BABY DAY CARE` | 1 | Ruth M. Maldonado Figueroa d/b/a Koala's Baby Day Care | ACUDEN_2024 |
+| `SAINT PATRICK S SCHOOL` | 6 | Saint Patrick's School Inc. | ACUDEN_2024 |
+| `SAJOR` | 1 | Sajorí Inc. | ACUDEN_2024 |
+| `SAJORI` | 2 | Sajori, Inc | ACUDEN_2024 |
+| `SAKIMA ROVIRA VARGAS DBA KIMA KIDS AND SESO` | 2 | Sakima Rovira Vargas DBA Kima Kids & Seso | ACUDEN_2024 |
+| `SAKIMA ROVIRA VARGAS KIMA KIDS AND SESO` | 1 | Sakima Rovira Vargas (Kima Kids & SESO) | ACUDEN_2024 |
+| `SALTARINES CENTRO DE CUIDO PREESCOLAR` | 1 | Saltarines Centro de Cuido Preescolar | ACUDEN_2024 |
+| `SANTA AND` | 1 | SANTA & CO. | ACT_2020 |
+| `SAVE GREEN` | 3 | SAVE GREEN CORP. | ACT_2020 |
+| `SEMILLITAS DE AMOR` | 4 | Semillitas de Amor Corp · Semillitas de Amor, Corp | ACUDEN_2024 |
+| `SERVICIOS SOCIALES EPISCOPALES` | 1 | Servicios Sociales Episcopales Inc | ACUDEN_2024 |
+| `SHARON MEL NDEZ ORT Z` | 1 | Sharon Meléndez Ortíz | ACT_2020 |
+| `SHINING STARTS DAY CARE` | 1 | Shining Starts Day Care Inc | ACUDEN_2024 |
+| `SMALL AMBASSADOR PRE SCHOOL` | 1 | Small Ambassador Pre-School Inc | ACUDEN_2024 |
+| `SMALL AMBASSADORS PRE SCHOOL` | 3 | Small Ambassadors Pre-School Inc | ACUDEN_2024 |
+| `SN FOODS` | 1 | SN FOODS, LLC | ACT_2020 |
+| `SOLUTIONS BY DESIGN` | 2 | Solutions By Design Inc | ACUDEN_2024 |
+| `SORIA` | 1 | Soria, LLC | ACT_2020 |
+| `SPECTRA QEST AMERICA` | 1 | SPECTRA QEST AMERICA, CORP. | ACT_2020 |
+| `STANLEY CONSULTANTS ENGINEERS` | 1 | Stanley Consultants Engineers, PSC | ACT_2020 |
+| `STEP BY STEP EARLY CHILDHOOD PROGRAM ECP` | 4 | Step by Step Early Childhood Program E.C.P. · Step by Step Early Childhood Program E.C.P., Corp | ACUDEN_2024 |
+| `STRATSOL` | 8 | Stratsol Inc · Stratsol Inc. | ACUDEN_2024 |
+| `SUELOS` | 1 | Suelos, P.S.C.. | ACT_2020 |
+| `SUPER HEROES 5K` | 1 | Super Heroes 5k Inc | ACUDEN_2024 |
+| `TAMRIO` | 5 | TAMRIO, INC · TAMRIO, INC. | ACT_2020 |
+| `TECHNO INVENTORS` | 1 | Techno Inventors Inc. | ACUDEN_2024 |
+| `TESORITOS DAY CARE AND LEARNING CENTER` | 6 | Tesoritos Day Care & Learning Center Inc · Tesoritos Day Care and Learning Center Inc. | ACUDEN_2024 |
+| `THE ENIAC` | 4 | The Eniac Corporation | ACT_2020 |
+| `THE NEW YORK FOUNDLING` | 1 | The New York Foundling Corporation | ACUDEN_2024 |
+| `THE TREEHOUSE CHILD DEVELOPMENT AND LEARNING CENTER` | 2 | The Treehouse Child Development & Learning Center | ACUDEN_2024 |
+| `THE TRUSTEE OF COLUMBIA UNIVERSITY IN THE CITY NEW YORK` | 3 | The Trustee of Columbia University in the City New York | ACUDEN_2024 |
+| `THEATINE SISTERS OF THE INMACULATE CONCEPTION` | 1 | Theatine Sisters of the Inmaculate Conception Corp | ACUDEN_2024 |
+| `THEATINE SISTERS OF THE INMACULATE CONCEPTION JARDIN DE LA INFANCIA RELIGIOSAS TEATINAS` | 2 | Theatine Sisters of the Inmaculate Conception Corp. (Jardin de la Infancia Religiosas Teatinas) | ACUDEN_2024 |
+| `TI PROJECT MANAGEMENT AND ENGINEERING` | 1 | TI PROJECT MANAGEMENT & ENGINEERING | ACT_2020 |
+| `TI PROJECT MANAGEMENT AND ENGINEERS` | 1 | TI PROJECT MANAGEMENT AND ENGINEERS, PSC | ACT_2020 |
+| `TINY FOOTSTEPS` | 1 | Tiny Footsteps | ACUDEN_2024 |
+| `TITI MILLIE DAY CARE` | 2 | Titi Millie Day Care Inc. | ACUDEN_2024 |
+| `TORRES ROSA CONSULTING ENGINEERS` | 5 | Torres-Rosa Consulting Engineers | ACT_2020 |
+| `TOTAL PETROLEUM PUERTO RICO` | 2 | TOTAL PETROLEUM PUERTO RICO CORP. | ACT_2020 |
+| `UNION HOLDING` | 1 | Union Holding Inc. | ACUDEN_2024 |
+| `UNIPRO ARCHITECTS ENGINEERS` | 4 | UNIPRO ARCHITECTS- ENGINEERS, LLP | ACT_2020 |
+| `UNIVERSIDAD DE PUERTO RICO RECINTO DE CIENCIAS M DICAS` | 3 | Universidad de Puerto Rico - Recinto de Ciencias Médicas | ACUDEN_2024 |
+| `UNIVERSIDAD DE PUERTO RICO RECINTO DE RIO PIEDRAS` | 1 | Universidad de Puerto Rico - Recinto de Rio Piedras | ACUDEN_2024 |
+| `UNIVERSIDAD INTERAMERICANA DE PUERTO RICO RECINTO DE SAN GERM N` | 3 | Universidad Interamericana de Puerto Rico Inc (Recinto de San Germán) | ACUDEN_2024 |
+| `V ZQUEZ AND VILANOVA LAW FIRM` | 2 | Vázquez & Vilanova Law Firm LLC | ACUDEN_2024 |
+| `VAG TRANSPORTATION ENGINEERING CONSULTANTS` | 2 | VAG TRANSPORTATION ENGINEERING CONSULTANTS, PSC | ACT_2020 |
+| `VANESSA TORRES APONTE` | 1 | Vanessa Torres Aponte | ACUDEN_2024 |
+| `VANGUARD ASSET MANAGEMENT GROUP` | 1 | Vanguard Asset Management Group Inc. | ACUDEN_2024 |
+| `VAZQUEZ ASSOCIATES INGENIEROS` | 1 | VAZQUEZ ASSOCIATES, INGENIEROS, PSC | ACT_2020 |
+| `VECTURA ADVISORS` | 1 | VECTURA ADVISORS, LLC | ACT_2020 |
+| `VELEZ MAIZ DBA MAYAGUEZ FLEET SERVICE` | 1 | VELEZ MAIZ CORPORATION, DBA MAYAGUEZ FLEET SERVICE | ACT_2020 |
+| `VENEGAS CONSTRUCTION` | 3 | VENEGAS CONSTRUCTION CORPORATION | ACT_2020 |
+| `VIMENTI` | 1 | Vimenti LLC | ACUDEN_2024 |
+| `VIRGINIA RIVERA CALDERON` | 1 | VIRGINIA RIVERA CALDERON | ACT_2020 |
+| `VOCES COALIZACI N DE INMUNIZACI N Y PROMOCI N DE SALUD` | 1 | Voces Coalización de Inmunización y Promoción de Salud Inc. | ACUDEN_2024 |
+| `VPC DEVELOPMENT MANAGEMENT GROUP` | 1 | VPC Development Management Group, PSC | ACT_2020 |
+| `WALKS WEBS WESTERN EAGLE BILINGUAL SCHOOL` | 1 | Walks Webs Western Eagle Bilingual School | ACUDEN_2024 |
+| `WALKS WEBS WESTERN EAGLE SCHOOL PRE K TO 12TH GRADE` | 2 | W.A.L.K.S./ W.E.B.S. Western Eagle School, Pre K To 12th Grade, INc. | ACUDEN_2024 |
+| `WILNI M VEGA FLORES` | 3 | Wilni M. Vega Flores | ACUDEN_2024 |
+| `WILNI N VEGA FLORES D B A EARLY BRAIN` | 1 | Wilni N. Vega Flores d/b/a Early Brain | ACUDEN_2024 |
+| `WISE PEOPLE SCHOOL AND DAY CARE` | 1 | Wise People School and Day Care Inc | ACUDEN_2024 |
+| `WORKS CONSULTING` | 1 | Works Consulting, LLC | ACT_2020 |
+| `WORLD CHILDREN SCHOOL` | 4 | World Children School · World Children School Inc · World Children School, Inc. | ACUDEN_2024 |
+| `WSP USA` | 1 | WSP USA, INC. | ACT_2020 |
+| `YES MEDIA` | 1 | YES MEDIA, CORP. | ACT_2020 |
+| `YMCA DE SAN JUAN` | 3 | YMCA de San Juan | ACUDEN_2024 |
+| `YOLANDA RIVERA RIVERA` | 1 | Yolanda Rivera Rivera | ACUDEN_2024 |
 
 ## Cross-source clusters (entities in both ACT_2020 and ACUDEN_2024)
 
 | canonical | total rows | by source |
 |---|---|---|
-| `MUNICIPIO CAMUY` | 2 | ACT_2020=1, ACUDEN_2024=1 |
-| `MUNICIPIO SAN JUAN` | 2 | ACT_2020=1, ACUDEN_2024=1 |
+| `MUNICIPIO CAYEY` | 20 | ACT_2020=3, ACUDEN_2024=17 |
+| `MUNICIPIO VEGA BAJA` | 18 | ACT_2020=2, ACUDEN_2024=16 |
+| `MUNICIPIO SAN JUAN` | 17 | ACT_2020=3, ACUDEN_2024=14 |
+| `MUNICIPIO CAMUY` | 16 | ACT_2020=3, ACUDEN_2024=13 |
+| `MUNICIPIO FAJARDO` | 15 | ACT_2020=1, ACUDEN_2024=14 |
+| `MUNICIPIO AGUADILLA` | 14 | ACT_2020=1, ACUDEN_2024=13 |
+| `MUNICIPIO COAMO` | 14 | ACT_2020=6, ACUDEN_2024=8 |
+| `MUNICIPIO LAJAS` | 12 | ACT_2020=8, ACUDEN_2024=4 |
+| `MUNICIPIO PATILLAS` | 12 | ACT_2020=5, ACUDEN_2024=7 |
+| `MUNICIPIO GURABO` | 11 | ACT_2020=4, ACUDEN_2024=7 |
+| `MUNICIPIO YABUCOA` | 11 | ACT_2020=2, ACUDEN_2024=9 |
+| `MUNICIPIO DORADO` | 10 | ACT_2020=2, ACUDEN_2024=8 |
+| `MUNICIPIO GUAYANILLA` | 9 | ACT_2020=1, ACUDEN_2024=8 |
+| `MUNICIPIO CABO ROJO` | 8 | ACT_2020=1, ACUDEN_2024=7 |
+| `MUNICIPIO ISABELA` | 7 | ACT_2020=1, ACUDEN_2024=6 |
+| `MUNICIPIO A ASCO` | 6 | ACT_2020=4, ACUDEN_2024=2 |
+| `MUNICIPIO AGUADA` | 6 | ACT_2020=3, ACUDEN_2024=3 |
+| `MUNICIPIO CAGUAS` | 6 | ACT_2020=4, ACUDEN_2024=2 |
+| `MUNICIPIO FLORIDA` | 6 | ACT_2020=5, ACUDEN_2024=1 |
+| `MUNICIPIO HUMACAO` | 6 | ACT_2020=4, ACUDEN_2024=2 |
+| `MUNICIPIO JAYUYA` | 6 | ACT_2020=4, ACUDEN_2024=2 |
+| `MUNICIPIO LUQUILLO` | 6 | ACT_2020=5, ACUDEN_2024=1 |
+| `MUNICIPIO SALINAS` | 6 | ACT_2020=4, ACUDEN_2024=2 |
+| `MUNICIPIO AIBONITO` | 5 | ACT_2020=4, ACUDEN_2024=1 |
+| `MUNICIPIO ARECIBO` | 5 | ACT_2020=2, ACUDEN_2024=3 |
+| `MUNICIPIO CAN VANAS` | 5 | ACT_2020=1, ACUDEN_2024=4 |
+| `MUNICIPIO GUAYAMA` | 5 | ACT_2020=4, ACUDEN_2024=1 |
+| `MUNICIPIO MAUNABO` | 5 | ACT_2020=2, ACUDEN_2024=3 |
+| `MUNICIPIO NARANJITO` | 5 | ACT_2020=1, ACUDEN_2024=4 |
+| `MUNICIPIO AGUAS BUENAS` | 4 | ACT_2020=2, ACUDEN_2024=2 |
+| `MUNICIPIO ARROYO` | 4 | ACT_2020=2, ACUDEN_2024=2 |
+| `MUNICIPIO JUNCOS` | 4 | ACT_2020=3, ACUDEN_2024=1 |
+| `MUNICIPIO MOROVIS` | 4 | ACT_2020=2, ACUDEN_2024=2 |
+| `MUNICIPIO BAYAM N` | 3 | ACT_2020=1, ACUDEN_2024=2 |
+| `MUNICIPIO HATILLO` | 3 | ACT_2020=1, ACUDEN_2024=2 |
+| `MUNICIPIO HORMIGUEROS` | 3 | ACT_2020=2, ACUDEN_2024=1 |
+| `MUNICIPIO SAN LORENZO` | 3 | ACT_2020=1, ACUDEN_2024=2 |
+| `MUNICIPIO ADJUNTAS` | 2 | ACT_2020=1, ACUDEN_2024=1 |
+| `MUNICIPIO CATA O` | 2 | ACT_2020=1, ACUDEN_2024=1 |
+| `MUNICIPIO CEIBA` | 2 | ACT_2020=1, ACUDEN_2024=1 |
+| `MUNICIPIO LAS MARIAS` | 2 | ACT_2020=1, ACUDEN_2024=1 |
+| `MUNICIPIO NAGUABO` | 2 | ACT_2020=1, ACUDEN_2024=1 |
+| `MUNICIPIO RIO GRANDE` | 2 | ACT_2020=1, ACUDEN_2024=1 |
+| `MUNICIPIO TOA ALTA` | 2 | ACT_2020=1, ACUDEN_2024=1 |
+| `MUNICIPIO UTUADO` | 2 | ACT_2020=1, ACUDEN_2024=1 |
+| `MUNICIPIO YAUCO` | 2 | ACT_2020=1, ACUDEN_2024=1 |
+| `OCTAGON CONSULTING GROUP` | 2 | ACT_2020=1, ACUDEN_2024=1 |
 
 ## Bilingual municipio collapse regression check
 
