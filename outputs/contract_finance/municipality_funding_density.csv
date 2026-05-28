@@ -1,0 +1,5 @@
+municipality_geoid,municipality_code,municipality_name,municipality_name_ascii,municipality_name_canonical,jurisdiction_class,geo_resolution_method,geo_resolution_reason,geo_confidence,total_amount,record_count,unknown_reason,outside_pr_state,source_count
+72127,72127,San Juan,San Juan,San Juan,PR_MUNICIPIO,code_exact,municipality_name_only,0.95,750000.0,1,,,1
+72127,72127,San Juan,San Juan,San Juan,PR_MUNICIPIO,code_exact,place_of_performance_exact,0.97,750000.0,2,,,1
+72113,72113,Ponce,Ponce,Ponce,PR_MUNICIPIO,code_exact,recipient_municipality_match,0.8,500000.0,1,,,1
+,,,,,UNKNOWN_MISSING,none,missing_location,0.0,260000.0,2,missing_location,,2

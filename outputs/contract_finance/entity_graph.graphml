@@ -1,0 +1,214 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d15" for="edge" attr.name="synthetic" attr.type="boolean"/>
+<key id="d14" for="edge" attr.name="lineage" attr.type="string"/>
+<key id="d13" for="edge" attr.name="confidence" attr.type="double"/>
+<key id="d12" for="edge" attr.name="geo_resolution_reason" attr.type="string"/>
+<key id="d11" for="edge" attr.name="municipality_name" attr.type="string"/>
+<key id="d10" for="edge" attr.name="municipality_code" attr.type="string"/>
+<key id="d9" for="edge" attr.name="event_date" attr.type="string"/>
+<key id="d8" for="edge" attr.name="currency" attr.type="string"/>
+<key id="d7" for="edge" attr.name="amount" attr.type="double"/>
+<key id="d6" for="edge" attr.name="transaction_id" attr.type="string"/>
+<key id="d5" for="edge" attr.name="award_id" attr.type="string"/>
+<key id="d4" for="edge" attr.name="source_id" attr.type="string"/>
+<key id="d3" for="edge" attr.name="source_dataset" attr.type="string"/>
+<key id="d2" for="edge" attr.name="relationship_type" attr.type="string"/>
+<key id="d1" for="node" attr.name="node_type" attr.type="string"/>
+<key id="d0" for="node" attr.name="label" attr.type="string"/>
+<graph edgedefault="directed"><node id="entity:ACME CONSTRUCTION INC.">
+  <data key="d0">ACME Construction Inc.</data>
+  <data key="d1">recipient</data>
+</node>
+<node id="entity:FEDERAL EMERGENCY MANAGEMENT AGENCY">
+  <data key="d0">Federal Emergency Management Agency</data>
+  <data key="d1">funding_agency</data>
+</node>
+<node id="municipality:72127">
+  <data key="d0">San Juan</data>
+  <data key="d1">municipality</data>
+</node>
+<node id="entity:CARIBBEAN BUILDERS LLC">
+  <data key="d0">Caribbean Builders LLC</data>
+  <data key="d1">recipient</data>
+</node>
+<node id="entity:DEPARTMENT OF DEFENSE">
+  <data key="d0">Department of Defense</data>
+  <data key="d1">funding_agency</data>
+</node>
+<node id="municipality:72113">
+  <data key="d0">Ponce</data>
+  <data key="d1">municipality</data>
+</node>
+<node id="entity:GHOST CORP">
+  <data key="d0">Ghost Corp</data>
+  <data key="d1">recipient</data>
+</node>
+<node id="entity:ACME123UEI">
+  <data key="d0">ACME123UEI</data>
+  <data key="d1">recipient</data>
+</node>
+<node id="entity:CARIB456UEI">
+  <data key="d0">CARIB456UEI</data>
+  <data key="d1">recipient</data>
+</node>
+<edge source="entity:ACME CONSTRUCTION INC." target="municipality:72127" id="loc-CT-0001">
+  <data key="d2">located_in</data>
+  <data key="d3">usaspending_prime</data>
+  <data key="d4">usaspending_prime</data>
+  <data key="d5">CT-0001</data>
+  <data key="d6"></data>
+  <data key="d7">1000000.0</data>
+  <data key="d8">USD</data>
+  <data key="d9">2023-03-15</data>
+  <data key="d10">72127</data>
+  <data key="d11">San Juan</data>
+  <data key="d12">place_of_performance_exact</data>
+  <data key="d13">0.97</data>
+  <data key="d14">{"extraction_method": "row_level_contract_finance", "producer_phase": "RCF_GEO_REASONING", "producer_script": "scripts/run_contract_finance_geo_reasoning.py", "source_inputs": ["tests/fixtures/sample_master_inputs/contracts_master.csv", "tests/fixtures/sample_master_inputs/financial_flows_master.csv"]}</data>
+  <data key="d15">False</data>
+</edge>
+<edge source="entity:ACME CONSTRUCTION INC." target="municipality:72127" id="loc-CT-0003">
+  <data key="d2">located_in</data>
+  <data key="d3">usaspending_prime</data>
+  <data key="d4">usaspending_prime</data>
+  <data key="d5">CT-0003</data>
+  <data key="d6"></data>
+  <data key="d7">-250000.0</data>
+  <data key="d8">USD</data>
+  <data key="d9">2023-05-01</data>
+  <data key="d10">72127</data>
+  <data key="d11">San Juan</data>
+  <data key="d12">place_of_performance_exact</data>
+  <data key="d13">0.97</data>
+  <data key="d14">{"extraction_method": "row_level_contract_finance", "producer_phase": "RCF_GEO_REASONING", "producer_script": "scripts/run_contract_finance_geo_reasoning.py", "source_inputs": ["tests/fixtures/sample_master_inputs/contracts_master.csv", "tests/fixtures/sample_master_inputs/financial_flows_master.csv"]}</data>
+  <data key="d15">False</data>
+</edge>
+<edge source="entity:ACME CONSTRUCTION INC." target="entity:FEDERAL EMERGENCY MANAGEMENT AGENCY" id="fin-CT-0001">
+  <data key="d2">received_award_from</data>
+  <data key="d3">usaspending_prime</data>
+  <data key="d4">usaspending_prime</data>
+  <data key="d5">CT-0001</data>
+  <data key="d6"></data>
+  <data key="d7">1000000.0</data>
+  <data key="d8">USD</data>
+  <data key="d9">2023-03-15</data>
+  <data key="d10">72127</data>
+  <data key="d11">San Juan</data>
+  <data key="d12">place_of_performance_exact</data>
+  <data key="d13">0.97</data>
+  <data key="d14">{"extraction_method": "row_level_contract_finance", "producer_phase": "RCF_GEO_REASONING", "producer_script": "scripts/run_contract_finance_geo_reasoning.py", "source_inputs": ["tests/fixtures/sample_master_inputs/contracts_master.csv", "tests/fixtures/sample_master_inputs/financial_flows_master.csv"]}</data>
+  <data key="d15">False</data>
+</edge>
+<edge source="entity:ACME CONSTRUCTION INC." target="entity:FEDERAL EMERGENCY MANAGEMENT AGENCY" id="fin-CT-0003">
+  <data key="d2">received_award_from</data>
+  <data key="d3">usaspending_prime</data>
+  <data key="d4">usaspending_prime</data>
+  <data key="d5">CT-0003</data>
+  <data key="d6"></data>
+  <data key="d7">-250000.0</data>
+  <data key="d8">USD</data>
+  <data key="d9">2023-05-01</data>
+  <data key="d10">72127</data>
+  <data key="d11">San Juan</data>
+  <data key="d12">place_of_performance_exact</data>
+  <data key="d13">0.97</data>
+  <data key="d14">{"extraction_method": "row_level_contract_finance", "producer_phase": "RCF_GEO_REASONING", "producer_script": "scripts/run_contract_finance_geo_reasoning.py", "source_inputs": ["tests/fixtures/sample_master_inputs/contracts_master.csv", "tests/fixtures/sample_master_inputs/financial_flows_master.csv"]}</data>
+  <data key="d15">False</data>
+</edge>
+<edge source="entity:CARIBBEAN BUILDERS LLC" target="municipality:72113" id="loc-CT-0002">
+  <data key="d2">located_in</data>
+  <data key="d3">fpds_report_builder</data>
+  <data key="d4">fpds_report_builder</data>
+  <data key="d5">CT-0002</data>
+  <data key="d6"></data>
+  <data key="d7">500000.0</data>
+  <data key="d8">USD</data>
+  <data key="d9">2022-07-01</data>
+  <data key="d10">72113</data>
+  <data key="d11">Ponce</data>
+  <data key="d12">recipient_municipality_match</data>
+  <data key="d13">0.8</data>
+  <data key="d14">{"extraction_method": "row_level_contract_finance", "producer_phase": "RCF_GEO_REASONING", "producer_script": "scripts/run_contract_finance_geo_reasoning.py", "source_inputs": ["tests/fixtures/sample_master_inputs/contracts_master.csv", "tests/fixtures/sample_master_inputs/financial_flows_master.csv"]}</data>
+  <data key="d15">False</data>
+</edge>
+<edge source="entity:CARIBBEAN BUILDERS LLC" target="entity:DEPARTMENT OF DEFENSE" id="fin-CT-0002">
+  <data key="d2">received_award_from</data>
+  <data key="d3">fpds_report_builder</data>
+  <data key="d4">fpds_report_builder</data>
+  <data key="d5">CT-0002</data>
+  <data key="d6"></data>
+  <data key="d7">500000.0</data>
+  <data key="d8">USD</data>
+  <data key="d9">2022-07-01</data>
+  <data key="d10">72113</data>
+  <data key="d11">Ponce</data>
+  <data key="d12">recipient_municipality_match</data>
+  <data key="d13">0.8</data>
+  <data key="d14">{"extraction_method": "row_level_contract_finance", "producer_phase": "RCF_GEO_REASONING", "producer_script": "scripts/run_contract_finance_geo_reasoning.py", "source_inputs": ["tests/fixtures/sample_master_inputs/contracts_master.csv", "tests/fixtures/sample_master_inputs/financial_flows_master.csv"]}</data>
+  <data key="d15">False</data>
+</edge>
+<edge source="entity:GHOST CORP" target="entity:FEDERAL EMERGENCY MANAGEMENT AGENCY" id="fin-CT-0004">
+  <data key="d2">received_award_from</data>
+  <data key="d3">usaspending_prime</data>
+  <data key="d4">usaspending_prime</data>
+  <data key="d5">CT-0004</data>
+  <data key="d6"></data>
+  <data key="d7">10000.0</data>
+  <data key="d8">USD</data>
+  <data key="d9">2023-06-01</data>
+  <data key="d10"></data>
+  <data key="d11"></data>
+  <data key="d12">missing_location</data>
+  <data key="d13">0.0</data>
+  <data key="d14">{"extraction_method": "row_level_contract_finance", "producer_phase": "RCF_GEO_REASONING", "producer_script": "scripts/run_contract_finance_geo_reasoning.py", "source_inputs": ["tests/fixtures/sample_master_inputs/contracts_master.csv", "tests/fixtures/sample_master_inputs/financial_flows_master.csv"]}</data>
+  <data key="d15">False</data>
+</edge>
+<edge source="entity:ACME123UEI" target="municipality:72127" id="loc-FL-0001">
+  <data key="d2">located_in</data>
+  <data key="d3">usaspending_prime</data>
+  <data key="d4">usaspending_prime</data>
+  <data key="d5"></data>
+  <data key="d6">FL-0001</data>
+  <data key="d7">750000.0</data>
+  <data key="d8">USD</data>
+  <data key="d9">2023-04-01</data>
+  <data key="d10">72127</data>
+  <data key="d11">San Juan</data>
+  <data key="d12">municipality_name_only</data>
+  <data key="d13">0.95</data>
+  <data key="d14">{"extraction_method": "row_level_contract_finance", "producer_phase": "RCF_GEO_REASONING", "producer_script": "scripts/run_contract_finance_geo_reasoning.py", "source_inputs": ["tests/fixtures/sample_master_inputs/contracts_master.csv", "tests/fixtures/sample_master_inputs/financial_flows_master.csv"]}</data>
+  <data key="d15">False</data>
+</edge>
+<edge source="entity:ACME123UEI" target="entity:FEDERAL EMERGENCY MANAGEMENT AGENCY" id="fin-FL-0001">
+  <data key="d2">received_payment_from</data>
+  <data key="d3">usaspending_prime</data>
+  <data key="d4">usaspending_prime</data>
+  <data key="d5"></data>
+  <data key="d6">FL-0001</data>
+  <data key="d7">750000.0</data>
+  <data key="d8">USD</data>
+  <data key="d9">2023-04-01</data>
+  <data key="d10">72127</data>
+  <data key="d11">San Juan</data>
+  <data key="d12">municipality_name_only</data>
+  <data key="d13">0.95</data>
+  <data key="d14">{"extraction_method": "row_level_contract_finance", "producer_phase": "RCF_GEO_REASONING", "producer_script": "scripts/run_contract_finance_geo_reasoning.py", "source_inputs": ["tests/fixtures/sample_master_inputs/contracts_master.csv", "tests/fixtures/sample_master_inputs/financial_flows_master.csv"]}</data>
+  <data key="d15">False</data>
+</edge>
+<edge source="entity:CARIB456UEI" target="entity:DEPARTMENT OF DEFENSE" id="fin-FL-0002">
+  <data key="d2">received_payment_from</data>
+  <data key="d3">fpds_report_builder</data>
+  <data key="d4">fpds_report_builder</data>
+  <data key="d5"></data>
+  <data key="d6">FL-0002</data>
+  <data key="d7">250000.0</data>
+  <data key="d8">USD</data>
+  <data key="d9">2022-08-15</data>
+  <data key="d10"></data>
+  <data key="d11"></data>
+  <data key="d12">missing_location</data>
+  <data key="d13">0.0</data>
+  <data key="d14">{"extraction_method": "row_level_contract_finance", "producer_phase": "RCF_GEO_REASONING", "producer_script": "scripts/run_contract_finance_geo_reasoning.py", "source_inputs": ["tests/fixtures/sample_master_inputs/contracts_master.csv", "tests/fixtures/sample_master_inputs/financial_flows_master.csv"]}</data>
+  <data key="d15">False</data>
+</edge>
+</graph></graphml>
