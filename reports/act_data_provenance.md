@@ -77,18 +77,14 @@ SHA256 is recorded here for traceability:
    `contract_sweeper.runtime.name_normalization`, bridging the Spanish/English
    variants without per-municipio alias entries.
 
-2. **Accent-folding in `normalize_name` — TOP PRIORITY follow-up.** The full
-   extraction's near-duplicate scan shows the single biggest clustering gap is
-   that the normalizer *deletes* accented characters instead of folding them to
-   ASCII: `Comerío`→`COMER O` (vs `COMERIO`), `Juana Díaz`→`JUANA D AZ`,
-   `Paraíso`→`PARA SO`, `Borínquen`→`BOR NQUEN`, `Pequeñines`→`PEQUE INES`,
-   `María`→`MAR A`. Dozens of municipios, daycare names, and person names fail
-   to collapse for this reason alone. The fix is a single NFKD/`unicodedata`
-   accent-fold step in `contract_sweeper.runtime.name_normalization` (sibling to
-   the municipio rule). It would also let us delete several now-redundant alias
-   entries that only exist to bridge accents (Transporte Rodríguez, José A.
-   Batlle, Bermúdez Longo Díaz-Massó). High blast radius (47 call sites) →
-   warrants its own PR + full-suite review, exactly like #122.
+2. **Accent-folding in `normalize_name`.** ✅ Resolved. A NFKD
+   `unicodedata` step now folds accented characters to ASCII before all
+   other processing: `Comerío`→`COMERIO`, `Juana Díaz`→`JUANA DIAZ`,
+   `Rodríguez`→`RODRIGUEZ`, etc. The `Transporte Rodriguez Asfalto` alias
+   entry (which only existed to bridge the accent gap) has been removed;
+   all remaining entries that contain accented aliases are still retained
+   because they also bridge non-accent differences (credential prefixes,
+   abbreviations, or typos).
 
 3. **Vendor-vs-fund-transfer classification.** ACUDEN rows with
    `service_type = "Transferencia de Fondos"` represent fund transfers to

@@ -77,3 +77,30 @@ def test_normalize_name_municipio_bilingual_pairs_collapse():
 )
 def test_normalize_name_municipio_rule_no_false_positives(raw, expected):
     assert normalize_name(raw) == expected
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "raw, expected",
+    [
+        ("Comerío", "COMERIO"),
+        ("Juana Díaz", "JUANA DIAZ"),
+        ("Paraíso", "PARAISO"),
+        ("Borínquen", "BORINQUEN"),
+        ("Pequeñines", "PEQUENINES"),
+        ("María", "MARIA"),
+        ("Rodríguez", "RODRIGUEZ"),
+        ("José", "JOSE"),
+        ("Bermúdez", "BERMUDEZ"),
+    ],
+)
+def test_normalize_name_folds_accented_chars_to_ascii(raw, expected):
+    assert normalize_name(raw) == expected
+
+
+@pytest.mark.unit
+def test_normalize_name_accent_fold_collapses_accented_unaccented_pair():
+    """Accented and unaccented forms of the same name must normalize identically."""
+    assert normalize_name("Transporte Rodríguez Asfalto") == normalize_name("Transporte Rodriguez Asfalto")
+    assert normalize_name("Juana Díaz") == normalize_name("Juana Diaz")
+    assert normalize_name("José A. Batlle") == normalize_name("Jose A. Batlle")

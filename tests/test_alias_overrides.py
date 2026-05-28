@@ -266,7 +266,9 @@ def test_shipped_overrides_collapse_virella_ing_credential_prefix() -> None:
     bare, bare_overridden = apply("Juan O. Virella Sánchez", mapping)
     prefixed, prefixed_overridden = apply("Ing. Juan O. Virella Sánchez", mapping)
     assert bare == prefixed
-    assert bare_overridden is True
+    # After accent-folding the bare form normalizes directly to the canonical
+    # (no override entry needed); the "Ing." prefix still requires the alias.
+    assert bare_overridden is False
     assert prefixed_overridden is True
 
 
@@ -295,7 +297,9 @@ def test_shipped_overrides_collapse_cosiani_typo() -> None:
     )
     assert typo == correct
     assert typo_ovrd is True
-    assert correct_ovrd is True
+    # After accent-folding the correct spelling normalizes directly to the
+    # canonical (no override needed); the typo variant still requires one.
+    assert correct_ovrd is False
 
 
 @pytest.mark.unit
