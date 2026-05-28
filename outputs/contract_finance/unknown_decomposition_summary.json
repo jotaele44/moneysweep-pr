@@ -1,0 +1,13 @@
+{
+  "by_reason": {
+    "missing_location": {
+      "record_count": 2,
+      "total_amount": 260000.0
+    }
+  },
+  "has_unclassified": false,
+  "total_amount": 2260000.0,
+  "unknown_amount": 260000.0,
+  "unknown_amount_share": 0.115,
+  "unknown_record_count": 2
+}
