@@ -5,20 +5,24 @@ on:
     paths:
       - 'shared/pr_intake_router.py'
       - 'scripts/route_pr_intake.py'
+      - 'scripts/run_pr_intake_router_hook.py'
       - 'run_pr_intake_router.py'
       - 'config/pr_intake_domain_router.yaml'
       - 'tests/test_pr_intake_router.py'
       - 'tests/test_route_pr_intake_cli.py'
+      - 'tests/test_pr_intake_router_hook.py'
       - 'tests/fixtures/pr_intake_router_sample.jsonl'
       - '.github/workflows/pr-intake-router.yml'
   pull_request:
     paths:
       - 'shared/pr_intake_router.py'
       - 'scripts/route_pr_intake.py'
+      - 'scripts/run_pr_intake_router_hook.py'
       - 'run_pr_intake_router.py'
       - 'config/pr_intake_domain_router.yaml'
       - 'tests/test_pr_intake_router.py'
       - 'tests/test_route_pr_intake_cli.py'
+      - 'tests/test_pr_intake_router_hook.py'
       - 'tests/fixtures/pr_intake_router_sample.jsonl'
       - '.github/workflows/pr-intake-router.yml'
   workflow_dispatch:
@@ -43,7 +47,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run targeted router tests
-        run: python -m pytest tests/test_pr_intake_router.py tests/test_route_pr_intake_cli.py -v
+        run: python -m pytest tests/test_pr_intake_router.py tests/test_route_pr_intake_cli.py tests/test_pr_intake_router_hook.py -v
 
       - name: Run router export command
         run: python run_pr_intake_router.py --input tests/fixtures/pr_intake_router_sample.jsonl --out-dir data/exports/pr_intake_router --fail-on-validation-errors
