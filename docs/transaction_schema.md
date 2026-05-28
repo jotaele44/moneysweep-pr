@@ -39,6 +39,16 @@ transactions are the cash flows under it.
 {"transaction_id":"txn_0624b7f4231a96ef917e56c60e8dfcfd","source_id":"src_633ec79b98705f6ddce6dbd6555d0cee","payer_entity_id":"ent_ee9bafc35b7200bc560f2c7f2e7d7d1d","payee_entity_id":"ent_9f4831646edda3ece7dd1ff3a8b8738c","amount":1000000.0,"currency":"USD","transaction_date":"2023-03-20","transaction_type":"disbursement","confidence":0.9,"lineage":{"producer_script":"scripts/build_export_package.py","producer_phase":"EXPORT_PACKAGE_BUILD","source_inputs":["data/processed/funding_awards.csv"],"extraction_method":"deterministic_canonicalization"},"synthetic":true,"created_at":"2024-01-15T12:00:00Z","extracted_at":"2024-01-15T12:00:00Z"}
 ```
 
+## Optional `location` (place of performance)
+
+Since contract v1.1.0, transactions may carry the same optional inline
+`location` object as awards (see [award_schema.md](award_schema.md#optional-location-place-of-performance)),
+sourced from the `financial_flows_master` geo columns (`municipality`,
+`geo_municipality_code`, `geo_municipality_name`, `geo_attribution_confidence`;
+no lat/lon in this table). It lets the `spiderweb-pr` query hub match
+transactions by location. A malformed `location` fails the `location_invalid`
+gate.
+
 ## Integrity gates
 
 - `payer_entity_id` and `payee_entity_id` must resolve in `entities.jsonl`

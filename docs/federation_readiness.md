@@ -77,6 +77,19 @@ The following are **not** part of this producer-side change:
   The builder consumes *pre-shaped* JSONL; mapping the live pipeline outputs into
   that shape is a separate, later step.
 
+## v1.1.0 — matching fields
+
+Contract v1.1.0 (additive, backward compatible) adds the join keys the
+`spiderweb-pr` `query-hub` needs to match Contract-Sweeper data:
+
+- **`location`** (inline, optional) on awards & transactions — place of
+  performance (`municipality_code`, lat/lon, …) for spatial matching.
+- **`external_ids`** (optional) on entities — `uei` / `parent_uei` for strong
+  cross-repo entity matching.
+
+A 1.0.0 consumer ignores these fields; `export_contract_version` remains the
+single compatibility key.
+
 ## Next steps (future work)
 
 1. Map `data/processed/` master outputs into the five canonical streams.
