@@ -1,0 +1,69 @@
+name: Federation Export
+
+# Builds and validates a production federation export package
+# (masters -> streams -> package -> validate, via scripts/run_export.py) and
+# uploads it as an artifact for the spiderweb-pr query-hub to ingest.
+#
+# Runs on demand and on a weekly schedule. While the production pipeline is
+# paused (NON_PRODUCTION_DIAGNOSTIC) the canonical masters under
+# data/staging/processed/ are absent (data/ is gitignored), so the job SKIPS
+# gracefully and stays green; it activates automatically once real masters
+# are present on the runner.
+
+on:
+  workflow_dispatch:
+    inputs:
+      processed_dir:
+        description: "Directory containing the canonical master CSVs"
+        default: "data/staging/processed"
+  schedule:
+    - cron: "0 6 * * 1"  # Mondays 06:00 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # run_export.py + its imports are pure stdlib — no pip install needed.
+
+      - name: Resolve processed dir
+        id: resolve
+        run: echo "dir=${{ github.event.inputs.processed_dir || 'data/staging/processed' }}" >> "$GITHUB_OUTPUT"
+
+      - name: Check canonical masters are present
+        id: guard
+        run: |
+          dir="${{ steps.resolve.outputs.dir }}"
+          if [ -f "$dir/entities_resolved.csv" ] \
+             && [ -f "$dir/contracts_master.csv" ] \
+             && [ -f "$dir/financial_flows_master.csv" ] \
+             && [ -f "$dir/entity_edges.csv" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Canonical masters not found under '$dir'; skipping production export (pipeline is NON_PRODUCTION_DIAGNOSTIC)."
+          fi
+
+      - name: Build + validate production export package
+        if: steps.guard.outputs.present == 'true'
+        run: |
+          python scripts/run_export.py \
+            --processed-dir "${{ steps.resolve.outputs.dir }}" \
+            --output-dir exports/scheduled_export \
+            --mode production
+
+      - name: Upload export package artifact
+        if: steps.guard.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-sweeper-export
+          path: exports/scheduled_export
+          if-no-files-found: error
