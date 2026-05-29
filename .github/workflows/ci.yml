@@ -43,3 +43,6 @@ jobs:
 
       - name: Run R5 validation gates (bootstrap mode)
         run: python -m contract_sweeper.runtime.validation_gates --root . --allow-failed
+
+      - name: Validate Canonical Entity Relationship Model v1 (bootstrap mode)
+        run: python -m contract_sweeper.validation.canonical_v1_schema --root . --allow-failed
