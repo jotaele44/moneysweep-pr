@@ -1,4 +1,15 @@
-"""Write a Contract-Sweeper federation export package.
+"""Write a Contract-Sweeper federation *evidence-envelope* export package.
+
+.. note::
+   This module is the **evidence-envelope track** (``schema_version "0.1"``,
+   records shaped as ``record_id``/``payload``/``entities[]``/``geo``). It is
+   **NOT** the on-wire financial export contract consumed by spiderweb-pr's
+   ``contract_finance`` layer. That live contract is the flat v1.2.0 stream
+   shape produced by ``scripts/build_export_package.py``, defined by
+   ``schemas/contract_sweeper_*.schema.json``, and enforced by
+   ``scripts/validate_export.py``. Do not confuse the two: editing this file
+   does not change what the federation handoff ships. See
+   ``docs/export_contract.md``.
 
 A package is a directory containing one ``<stream>.jsonl`` file per record
 stream plus a ``manifest.json`` sidecar. Each JSONL line is one evidence

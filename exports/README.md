@@ -13,15 +13,27 @@ producer side of that cross-repo channel.
 ```
 exports/
   README.md             # this file
-  samples/              # canonical, self-contained example package
+  samples/              # canonical, self-contained example package (synthetic)
     manifest.sample.json
     entities.sample.jsonl
     sources.sample.jsonl
     funding_awards.sample.jsonl
     transactions.sample.jsonl
     relationships.sample.jsonl
+  conformance/v1_2/     # non-synthetic cross-repo conformance package (see below)
   build_<utc-timestamp>/   # throwaway packages written by build_export_package.py
 ```
+
+## Cross-repo conformance (v1.2.0)
+
+`conformance/v1_2/` is a committed, **non-synthetic** package in the current
+`1.2.0` on-wire shape. A byte-identical copy lives in the consumer repo at
+`spiderweb-pr/tests/fixtures/contract_sweeper_v1_2/`, where
+`tests/test_contract_sweeper_conformance.py` ingests it through the consumer's
+adapter + production gate + contract-finance layer. This pair guards against the
+contract-drift incident in which both repos shipped incompatible "1.1.0"
+definitions — see the consumer-side report at
+`spiderweb-pr/docs/contracts/CONTRACT_FINANCE_CONNECTIVITY_HEALTH.md`.
 
 * `samples/` is the small, committed example used by `scripts/smoke_export.py`
   and as documentation of the on-the-wire shape. Files carry a `.sample` infix;
