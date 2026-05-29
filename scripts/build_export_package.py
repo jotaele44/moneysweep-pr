@@ -30,7 +30,7 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
-EXPORT_CONTRACT_VERSION = "1.1.0"
+EXPORT_CONTRACT_VERSION = "1.2.0"
 PRODUCER_NAME = "contract-sweeper"
 DEFAULT_PRODUCER_VERSION = "0.1.0"
 
