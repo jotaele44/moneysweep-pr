@@ -50,6 +50,31 @@ _MUNICIPIO_PREFIX = re.compile(
 )
 
 
+# Generational/honorific suffix tokens dropped when normalizing *person* names
+# so "Pedro Pierluisi", "Pedro Pierluisi Jr." and "PEDRO PIERLUISI III" cluster
+# together. Unlike org normalization, person normalization keeps all surnames
+# (Puerto Rico naming commonly carries two) and does not strip legal suffixes.
+PERSON_SUFFIXES = frozenset(["JR", "SR", "II", "III", "IV", "V"])
+
+
+def normalize_person_name(name: str | None) -> str:
+    """Return a canonical, alphanumeric-uppercase form for a person's name.
+
+    Accent-folds (NFKD), uppercases, removes punctuation, collapses whitespace,
+    and drops generational suffixes (JR/SR/II/III/...). All name tokens
+    (including a second surname) are preserved. Empty/None -> empty string.
+    """
+    if not name:
+        return ""
+    s = str(name).upper()
+    s = unicodedata.normalize("NFKD", s)
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = _NON_ALNUM.sub(" ", s)
+    s = _SPACE.sub(" ", s).strip()
+    tokens = [t for t in s.split(" ") if t and t not in PERSON_SUFFIXES]
+    return " ".join(tokens)
+
+
 def normalize_name(name: str | None) -> str:
     """Return a canonical, alphanumeric-uppercase form for clustering.
 

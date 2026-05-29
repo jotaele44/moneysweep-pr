@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "canonical_v1/properties.schema.json",
+  "title": "Canonical v1 — Property",
+  "description": "A hotel, land parcel, concession, or facility in Canonical Entity Relationship Model v1.",
+  "type": "object",
+  "required": ["property_id", "property_type", "confidence"],
+  "properties": {
+    "property_id": {"type": "string", "pattern": "^property_[A-Za-z0-9_]+$"},
+    "property_name": {"type": "string"},
+    "property_type": {"type": "string", "enum": ["hotel", "land", "concession", "facility", "other"]},
+    "owner_entity_id": {"type": "string", "pattern": "^entity_[A-Za-z0-9_]+$"},
+    "municipality_id": {"type": "string", "pattern": "^muni_pr_[A-Za-z0-9_]+$"},
+    "address": {"type": "string"},
+    "parcel_or_concession_id": {"type": "string"},
+    "value": {"type": "number", "minimum": 0.0},
+    "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+    "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+    "evidence_id": {"type": "string", "pattern": "^evidence_[A-Za-z0-9_]+$"},
+    "review_status": {"type": "string", "enum": ["accepted", "pending", "rejected"]},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}
