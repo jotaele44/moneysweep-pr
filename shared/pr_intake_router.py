@@ -321,6 +321,20 @@ def _build_derivative(
         "source_hash": raw_item.get("source_hash") or _hash_text(source_url),
         "content_hash": raw_item.get("content_hash") or _hash_text(_normalized_search_text(raw_item)),
         "dedupe_group_id": raw_item.get("dedupe_group_id"),
+        # Geocode / asset enrichment for the spiderweb-pr spatial lane. These pass
+        # through whatever the raw item carries (empty when absent — degrade
+        # gracefully); when latitude/longitude are present the lane places the
+        # record on the map instead of queuing it for manual geocoding. Field
+        # names match the lane's normalized record and the router's own
+        # `every_spatial_record_has_location_or_manual_geocode_required` gate.
+        "latitude": raw_item.get("latitude") or raw_item.get("lat"),
+        "longitude": raw_item.get("longitude") or raw_item.get("lon"),
+        "location_text": raw_item.get("location_text") or raw_item.get("location"),
+        "municipality_name": raw_item.get("municipality_name") or raw_item.get("municipality"),
+        "asset_type": raw_item.get("asset_type"),
+        "dataset_type": raw_item.get("dataset_type"),
+        "file_format": raw_item.get("file_format"),
+        "agency_entity": raw_item.get("agency_entity") or raw_item.get("agency"),
     }
 
 
