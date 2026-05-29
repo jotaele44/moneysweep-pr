@@ -1,0 +1,14 @@
+{
+  "producer_script": "scripts/ingest_municipalities.py",
+  "producer_phase": "CANONICAL_V1_MUNICIPALITIES_INGEST",
+  "source_inputs": [
+    "data/reference/pr_municipalities.csv"
+  ],
+  "output": "data/canonical_v1/municipalities.csv",
+  "row_count": 78,
+  "expected_count": 78,
+  "coverage_pct": 100.0,
+  "evidence_rows_added": 78,
+  "evidence_table_rows": 78,
+  "generated_at": "2026-05-29T21:27:02.994628+00:00"
+}

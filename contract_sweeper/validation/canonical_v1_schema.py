@@ -163,11 +163,18 @@ def validate_row(row: dict[str, str], schema: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     required = set(schema.get("required", []))
     props = schema.get("properties", {})
+
+    def _cell(col: str) -> str:
+        # CSV cells are strings, but in-memory rows may carry native types
+        # (float confidence, bool current, ...) -> coerce for uniform checks.
+        raw = row.get(col)
+        return "" if raw is None else str(raw).strip()
+
     for col in required:
-        if not (row.get(col) or "").strip():
+        if not _cell(col):
             errors.append(f"missing required field '{col}'")
     for col, prop in props.items():
-        value = (row.get(col) or "").strip()
+        value = _cell(col)
         if value == "":
             continue  # empty CSV cell == absent; only `required` cares
         msg = _check_value(value, prop)
