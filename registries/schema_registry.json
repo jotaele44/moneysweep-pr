@@ -1298,5 +1298,77 @@
         }
       ]
     }
+  },
+  "canonical_v1": {
+    "schema_version": "canonical_entity_relationship_model_v1",
+    "schema_dir": "schemas/canonical_v1",
+    "data_dir": "data/canonical_v1",
+    "tables": {
+      "people": {
+        "schema": "people.schema.json",
+        "csv": "people.csv",
+        "primary_key": "person_id"
+      },
+      "entities": {
+        "schema": "entities.schema.json",
+        "csv": "entities.csv",
+        "primary_key": "entity_id"
+      },
+      "roles": {
+        "schema": "roles.schema.json",
+        "csv": "roles.csv",
+        "primary_key": "role_id"
+      },
+      "contracts": {
+        "schema": "contracts.schema.json",
+        "csv": "contracts.csv",
+        "primary_key": "contract_id"
+      },
+      "projects": {
+        "schema": "projects.schema.json",
+        "csv": "projects.csv",
+        "primary_key": "project_id"
+      },
+      "debt_instruments": {
+        "schema": "debt_instruments.schema.json",
+        "csv": "debt_instruments.csv",
+        "primary_key": "debt_id"
+      },
+      "lobbying_records": {
+        "schema": "lobbying_records.schema.json",
+        "csv": "lobbying_records.csv",
+        "primary_key": "lobbying_record_id"
+      },
+      "funding_sources": {
+        "schema": "funding_sources.schema.json",
+        "csv": "funding_sources.csv",
+        "primary_key": "funding_source_id"
+      },
+      "properties": {
+        "schema": "properties.schema.json",
+        "csv": "properties.csv",
+        "primary_key": "property_id"
+      },
+      "municipalities": {
+        "schema": "municipalities.schema.json",
+        "csv": "municipalities.csv",
+        "primary_key": "municipality_id"
+      },
+      "edges": {
+        "schema": "edges.schema.json",
+        "csv": "edges.csv",
+        "primary_key": "edge_id"
+      },
+      "evidence": {
+        "schema": "evidence.schema.json",
+        "csv": "evidence.csv",
+        "primary_key": "evidence_id"
+      },
+      "review_queue": {
+        "schema": "review_queue.schema.json",
+        "csv": "review_queue.csv",
+        "primary_key": "review_id"
+      }
+    }
   }
 }

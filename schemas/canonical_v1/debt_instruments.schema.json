@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "canonical_v1/debt_instruments.schema.json",
+  "title": "Canonical v1 — Debt Instrument",
+  "description": "A bond / debt instrument (GO, COFINA, PREPA, PRASA, HTA, ...) in Canonical Entity Relationship Model v1.",
+  "type": "object",
+  "required": ["debt_id", "issuer_entity_id", "debt_class", "currency", "confidence"],
+  "properties": {
+    "debt_id": {"type": "string", "pattern": "^debt_[A-Za-z0-9_]+$"},
+    "issuer_entity_id": {"type": "string", "pattern": "^entity_[A-Za-z0-9_]+$"},
+    "debt_class": {"type": "string", "enum": ["GO", "COFINA", "PREPA", "PRASA", "HTA", "other"]},
+    "series": {"type": "string"},
+    "issue_year": {"type": "integer", "minimum": 1900, "maximum": 2100},
+    "par_amount": {"type": "number", "minimum": 0.0},
+    "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+    "maturity_date": {"type": "string"},
+    "status": {"type": "string"},
+    "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+    "evidence_id": {"type": "string", "pattern": "^evidence_[A-Za-z0-9_]+$"},
+    "review_status": {"type": "string", "enum": ["accepted", "pending", "rejected"]},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}

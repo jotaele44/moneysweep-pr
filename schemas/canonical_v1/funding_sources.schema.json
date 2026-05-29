@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "canonical_v1/funding_sources.schema.json",
+  "title": "Canonical v1 — Funding Source",
+  "description": "A federal/territorial funding program in Canonical Entity Relationship Model v1.",
+  "type": "object",
+  "required": ["funding_source_id", "program", "confidence"],
+  "properties": {
+    "funding_source_id": {"type": "string", "pattern": "^funding_[A-Za-z0-9_]+$"},
+    "program": {"type": "string", "enum": ["FEMA", "HUD", "EPA", "DOE", "CDBG-DR", "ARPA", "other"]},
+    "program_year": {"type": "integer", "minimum": 1900, "maximum": 2100},
+    "administering_entity_id": {"type": "string", "pattern": "^entity_[A-Za-z0-9_]+$"},
+    "jurisdiction": {"type": "string"},
+    "total_allocation": {"type": "number", "minimum": 0.0},
+    "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+    "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+    "evidence_id": {"type": "string", "pattern": "^evidence_[A-Za-z0-9_]+$"},
+    "review_status": {"type": "string", "enum": ["accepted", "pending", "rejected"]},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}
