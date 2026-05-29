@@ -1,0 +1,132 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_type": "contract_finance_artifact_manifest",
+  "producer": {
+    "repository": "jotaele44/Contract-Sweeper",
+    "branch": "main",
+    "commit": "17c21ac2f3675895d890bf51a508167de50943c9",
+    "producer_script": "scripts/run_contract_finance_geo_reasoning.py",
+    "input_mode": "canonical_masters",
+    "source_inputs": [
+      "tests/fixtures/sample_master_inputs/contracts_master.csv",
+      "tests/fixtures/sample_master_inputs/financial_flows_master.csv"
+    ]
+  },
+  "hash_policy": {
+    "primary_hash_algorithm": "git_blob_sha",
+    "note": "Git blob SHAs are recorded from GitHub Contents API at producer commit 17c21ac2f3675895d890bf51a508167de50943c9. SHA-256 is not recorded in this manifest because connector responses may truncate large file content."
+  },
+  "consumer_contract": {
+    "consume_declared_outputs_only": true,
+    "do_not_consume_aggregate_municipality_csv_as_source_of_truth": true,
+    "row_level_source_of_truth": "outputs/contract_finance/contract_finance_geo_rows.csv",
+    "readiness_gate": "outputs/contract_finance/spiderweb_engine_readiness_reassessment.json",
+    "graph_edge_metadata_required": true
+  },
+  "artifacts": [
+    {
+      "path": "outputs/contract_finance/contract_finance_geo_rows.csv",
+      "required": true,
+      "format": "csv",
+      "role": "row_level_geo_reasoned_records",
+      "git_blob_sha": "a85126f32d27f3d829dd1e59ee9c4ae9115d743d"
+    },
+    {
+      "path": "outputs/contract_finance/municipality_funding_density.csv",
+      "required": true,
+      "format": "csv",
+      "role": "aggregated_density_output_from_row_level_records",
+      "git_blob_sha": "90dcc611540f408b09b99bd7e993a0d2236be7b6"
+    },
+    {
+      "path": "outputs/contract_finance/unknown_decomposition.csv",
+      "required": true,
+      "format": "csv",
+      "role": "unknown_bucket_row_level_decomposition",
+      "git_blob_sha": "ae1a776156fc59594c905345d5e990b390e5b9fb"
+    },
+    {
+      "path": "outputs/contract_finance/unknown_decomposition_summary.json",
+      "required": true,
+      "format": "json",
+      "role": "unknown_bucket_summary",
+      "git_blob_sha": "c0e22ef4396f38977c263f8be855cd36a7f8c6d2"
+    },
+    {
+      "path": "outputs/contract_finance/san_juan_hq_bias_report.csv",
+      "required": true,
+      "format": "csv",
+      "role": "san_juan_hq_default_location_bias_rows",
+      "git_blob_sha": "36e24214c211443e567dc4b3f2f72526f3d7aa70"
+    },
+    {
+      "path": "outputs/contract_finance/san_juan_hq_bias_summary.json",
+      "required": true,
+      "format": "json",
+      "role": "san_juan_hq_default_location_bias_summary",
+      "git_blob_sha": "edf250a2efcac3ba316b5ad4e393f3fc7e427ef8"
+    },
+    {
+      "path": "outputs/contract_finance/entity_graph.graphml",
+      "required": true,
+      "format": "graphml",
+      "role": "entity_graph_with_edge_metadata",
+      "git_blob_sha": "3b5873b9429fc79d913ec33c97e4ae0d7d1acdcb"
+    },
+    {
+      "path": "outputs/contract_finance/entity_graph_edge_metadata_audit.csv",
+      "required": true,
+      "format": "csv",
+      "role": "edge_metadata_completeness_audit",
+      "git_blob_sha": "eb2b1cd3c6ea5cbb30af7245798c4114c9d84c07"
+    },
+    {
+      "path": "outputs/contract_finance/entity_graph_qa_report.json",
+      "required": true,
+      "format": "json",
+      "role": "graph_quality_report",
+      "git_blob_sha": "db8de45477a53e710d4f836ed80a23dc5cd35780"
+    },
+    {
+      "path": "outputs/contract_finance/spiderweb_engine_readiness_reassessment.json",
+      "required": true,
+      "format": "json",
+      "role": "spiderweb_readiness_gate_reassessment",
+      "git_blob_sha": "7297f3e5210e3f53abd8fdc7c70ebfa62f9e96b2"
+    },
+    {
+      "path": "data/reference/pr_78_municipio_crosswalk.csv",
+      "required": true,
+      "format": "csv",
+      "role": "canonical_pr_municipio_crosswalk",
+      "git_blob_sha": "a2df81eb6abf2defd0a1a24a378e4e3f3560c393"
+    }
+  ],
+  "validation": {
+    "artifact_count": 11,
+    "required_artifact_count": 11,
+    "all_required_artifacts_present": true,
+    "readiness_passed": true,
+    "unknown_amount_share": 0.115,
+    "unknown_has_unclassified": false,
+    "san_juan_share": 0.6637,
+    "san_juan_bias_explained": true,
+    "graph_edge_count": 10,
+    "graph_edges_missing_confidence": 0,
+    "graph_edges_missing_lineage": 0,
+    "false_pr_municipio_code_count": 0,
+    "input_record_count": 6,
+    "density_record_count": 6,
+    "input_total_amount": 2260000.0,
+    "density_total_amount": 2260000.0
+  },
+  "spiderweb_consumer_requirements": [
+    "Load this manifest first.",
+    "Resolve artifacts by path and git_blob_sha at producer commit.",
+    "Reject missing, extra-substituted, or hash-mismatched artifacts.",
+    "Use contract_finance_geo_rows.csv as the row-level source of truth.",
+    "Use municipality_funding_density.csv only as a derived aggregate output.",
+    "Require spiderweb_engine_readiness_reassessment.json passed=true before enabling the layer.",
+    "Reject GraphML with zero edge metadata fields or missing confidence/lineage on edges."
+  ]
+}
