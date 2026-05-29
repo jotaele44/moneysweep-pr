@@ -172,3 +172,65 @@ def test_route_raw_items_assigns_final_status_to_all():
 
     assert len(results) == 2
     assert all(result.final_status for result in results)
+
+
+def test_spiderweb_derivative_carries_geocode_and_asset_enrichment():
+    """Enrichment: when the raw item carries location/asset fields, the
+    spiderweb-pr derivative passes them through so the spatial lane can place
+    the record on the map instead of queuing it for manual geocoding."""
+    config = load_router_config(CONFIG_PATH)
+    item = {
+        "source_item_id": "RAW-ENRICH-1",
+        "source_name": "USGS",
+        "source_url": "https://example.test/lidar-ponce",
+        "published_at": "2026-05-27",
+        "discovered_at": "2026-05-27T12:00:00Z",
+        "title": "Nuevo dataset LiDAR de quebrada en Ponce",
+        "summary": "Dataset GIS con DEM para análisis de hidrología.",
+        "latitude": 18.0111,
+        "longitude": -66.6141,
+        "location_text": "Ponce, Puerto Rico",
+        "municipality": "Ponce",
+        "asset_type": "hydrology_dataset",
+        "dataset_type": "lidar_dem",
+        "file_format": "GeoTIFF",
+        "agency": "USGS",
+    }
+
+    result = route_raw_item(item, config)
+    deriv = result.spiderweb_pr_derivative
+
+    assert deriv is not None
+    assert deriv["latitude"] == 18.0111
+    assert deriv["longitude"] == -66.6141
+    assert deriv["location_text"] == "Ponce, Puerto Rico"
+    assert deriv["municipality_name"] == "Ponce"   # aliased from `municipality`
+    assert deriv["asset_type"] == "hydrology_dataset"
+    assert deriv["dataset_type"] == "lidar_dem"
+    assert deriv["file_format"] == "GeoTIFF"
+    assert deriv["agency_entity"] == "USGS"          # aliased from `agency`
+
+
+def test_spiderweb_derivative_enrichment_absent_degrades_gracefully():
+    """When the raw item has no location/asset fields, the enrichment keys are
+    present but empty/None (the spatial lane then queues for manual geocoding)."""
+    config = load_router_config(CONFIG_PATH)
+    item = {
+        "source_item_id": "RAW-ENRICH-2",
+        "source_name": "USGS",
+        "source_url": "https://example.test/lidar-nogeo",
+        "published_at": "2026-05-27",
+        "discovered_at": "2026-05-27T12:00:00Z",
+        "title": "Nuevo dataset LiDAR sin coordenadas",
+        "summary": "Dataset GIS con DEM para análisis de hidrología.",
+        "location_text": "Puerto Rico",  # keeps the spatial gate satisfied
+    }
+
+    result = route_raw_item(item, config)
+    deriv = result.spiderweb_pr_derivative
+
+    assert deriv is not None
+    for key in ("latitude", "longitude", "municipality_name", "asset_type",
+                "dataset_type", "file_format", "agency_entity"):
+        assert key in deriv
+        assert not deriv[key]
