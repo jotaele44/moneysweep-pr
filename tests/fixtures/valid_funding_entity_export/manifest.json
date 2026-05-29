@@ -4,7 +4,7 @@
     "fiscal_year_min": 2023
   },
   "created_at": "2024-01-15T12:00:00Z",
-  "export_contract_version": "1.1.0",
+  "export_contract_version": "1.2.0",
   "extracted_at": "2024-01-15T12:00:00Z",
   "federation": {
     "consumer_component": "query-hub",

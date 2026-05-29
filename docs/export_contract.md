@@ -6,7 +6,14 @@ federation. Contract-Sweeper is a *producer*: it emits portable, validated
 [`spiderweb-pr`](#cross-repo-federation-handshake) repo) ingests.
 
 - **Contract name:** `contract-sweeper-export`
-- **Contract version:** `1.1.0` (field `export_contract_version`)
+- **Contract version:** `1.2.0` (field `export_contract_version`)
+
+> **v1.2.0 (current):** no field changes versus v1.1.0 — this is a coordination
+> bump that re-synchronizes the producer with the `spiderweb-pr` consumer after a
+> contract-drift incident (both repos had independently shipped incompatible
+> "1.1.0" definitions). The on-wire shape below is now honored on both sides and
+> guarded by a cross-repo conformance test. See the consumer-side report at
+> `spiderweb-pr/docs/contracts/CONTRACT_FINANCE_CONNECTIVITY_HEALTH.md`.
 
 This document is the index for the contract. Per-stream field details live in
 [`funding_schema.md`](funding_schema.md), [`entity_schema.md`](entity_schema.md),
@@ -93,7 +100,7 @@ reconcile across deliveries. The canonical helper is
   "package_id": "pkg_<32-hex>",
   "producer": "contract-sweeper",
   "producer_version": "0.1.0",
-  "export_contract_version": "1.1.0",
+  "export_contract_version": "1.2.0",
   "mode": "test",
   "created_at": "2024-01-15T12:00:00Z",
   "extracted_at": "2024-01-15T12:00:00Z",
