@@ -1,0 +1,22 @@
+{
+  "producer_script": "scripts/ingest_people.py",
+  "producer_phase": "CANONICAL_V1_PEOPLE_INGEST",
+  "source_inputs": [
+    "data/raw/top250_power_registry.csv"
+  ],
+  "policy": "accept verified (confirmed + T1/T2); queue the rest; commit verified only",
+  "committed_outputs": [
+    "data/canonical_v1/people.csv",
+    "data/canonical_v1/evidence.csv"
+  ],
+  "gitignored_outputs": [
+    "data/staging/processed/canonical_v1/review_queue_people_pending.csv"
+  ],
+  "counts": {
+    "input_persons": 236,
+    "verified_accepted": 60,
+    "pending_unverified": 176
+  },
+  "evidence_table_rows": 138,
+  "generated_at": "2026-05-30T17:57:23.119360+00:00"
+}
