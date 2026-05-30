@@ -1,0 +1,15 @@
+name,entity_type,jurisdiction,aliases,description
+Commonwealth of Puerto Rico,agency,PR,Government of Puerto Rico|ELA|Estado Libre Asociado de Puerto Rico,General-obligation (GO) debt issuer and central government.
+Financial Oversight and Management Board for Puerto Rico,agency,US,FOMB|Oversight Board|La Junta|FOMBPR,PROMESA Title III fiscal oversight board.
+Puerto Rico Fiscal Agency and Financial Advisory Authority,agency,PR,AAFAF|AFAF,Fiscal agent and financial advisor to the government.
+Puerto Rico Public-Private Partnerships Authority,agency,PR,P3 Authority|AAPP|Autoridad de Alianzas Publico-Privadas,Authority that structures public-private partnership transactions.
+Puerto Rico Electric Power Authority,utility,PR,PREPA|AEE|Autoridad de Energia Electrica,Public electric power utility and debt issuer.
+Puerto Rico Aqueduct and Sewer Authority,utility,PR,PRASA|AAA|Autoridad de Acueductos y Alcantarillados,Public water and sewer utility and debt issuer.
+Puerto Rico Highways and Transportation Authority,agency,PR,HTA|ACT|Autoridad de Carreteras y Transportacion,Highways and transportation authority and debt issuer.
+Puerto Rico Sales Tax Financing Corporation,fund,PR,COFINA|Corporacion del Fondo de Interes Apremiante,Sales-tax-backed bond issuing corporation.
+Government Development Bank for Puerto Rico,agency,PR,GDB|BGF|Banco Gubernamental de Fomento,Former fiscal agent and development bank.
+Puerto Rico Department of Economic Development and Commerce,agency,PR,DDEC|Departamento de Desarrollo Economico y Comercio,Economic development and commerce department.
+Puerto Rico Public Buildings Authority,agency,PR,PBA|AEP|Autoridad de Edificios Publicos,Public buildings authority and debt issuer.
+LUMA Energy,firm,PR,LUMA,Private transmission and distribution operator under P3 concession.
+Genera PR,firm,PR,Genera|Genera Puerto Rico,Private power-generation operator under P3 concession.
+Autopistas Metropolitanas de Puerto Rico,firm,PR,Metropistas,Toll-road concessionaire on long-term HTA agreements.
