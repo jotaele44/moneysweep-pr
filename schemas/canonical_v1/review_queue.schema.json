@@ -9,7 +9,7 @@
     "review_id": {"type": "string", "pattern": "^review_[A-Za-z0-9_]+$"},
     "object_type": {"type": "string"},
     "object_id": {"type": "string"},
-    "issue_type": {"type": "string", "enum": ["ambiguous", "conflicting", "unverified", "missing_evidence", "low_confidence", "unknown_vocab", "broken_reference", "other"]},
+    "issue_type": {"type": "string", "enum": ["ambiguous", "ambiguous_merge", "conflicting", "unverified", "missing_evidence", "low_confidence", "unknown_vocab", "broken_reference", "other"]},
     "raw_value": {"type": "string"},
     "candidate_match": {"type": "string"},
     "source_name": {"type": "string"},

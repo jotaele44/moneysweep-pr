@@ -1,0 +1,9 @@
+name,tier,flows,evidence_tier,flow_score,confirmed
+Alice Verified,A,Debt,T1,90,True
+Bob Pending,B,Debt,T2,70,False
+Carol Lowtier,C,Debt,T3,55,True
+Firm Co (Dan Embedded),C,Debt,T2,60,True
+Eve Multi,A,Debt,T1,80,True
+Eve Multi,B,"Debt,Contracts",T2,70,True
+Frank Smith,A,Debt,T1,80,True
+Frank A Smith,C,Debt,T1,60,True
