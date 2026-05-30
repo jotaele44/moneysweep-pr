@@ -19,10 +19,13 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import sys
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from contract_sweeper.runtime.canonical_ids import evidence_id
 from contract_sweeper.runtime.evidence_tiers import (
@@ -133,6 +136,39 @@ def from_csv_source(
                 extraction_method=extraction_method,
             ))
     return rows
+
+
+def read_evidence(path: Path) -> list[Evidence]:
+    """Load an existing evidence.csv into Evidence objects (for merge/append).
+
+    Returns an empty list if the file is missing or header-only.
+    """
+    if not path.exists():
+        return []
+    out: list[Evidence] = []
+    with path.open(newline="", encoding="utf-8") as fh:
+        for row in csv.DictReader(fh):
+            if not (row.get("evidence_id") or "").strip():
+                continue
+            out.append(Evidence(
+                evidence_id=row.get("evidence_id", ""),
+                source_type=row.get("source_type", ""),
+                source_name=row.get("source_name", ""),
+                source_path_or_url=row.get("source_path_or_url", ""),
+                page_or_line_ref=row.get("page_or_line_ref", ""),
+                claim=row.get("claim", ""),
+                evidence_tier=row.get("evidence_tier", ""),
+                extraction_method=row.get("extraction_method", ""),
+                confidence=float(row["confidence"]) if (row.get("confidence") or "").strip() else 0.0,
+                review_status=row.get("review_status", "pending"),
+            ))
+    return out
+
+
+def merge_evidence(path: Path, new_items: Iterable[Evidence]) -> dict[str, Any]:
+    """Append new evidence to an existing table, dedupe by id, and rewrite it."""
+    combined = dedupe_evidence(list(read_evidence(path)) + list(new_items))
+    return write_evidence(combined, path)
 
 
 def dedupe_evidence(items: Iterable[Evidence]) -> list[Evidence]:

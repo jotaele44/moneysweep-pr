@@ -130,8 +130,12 @@ def test_in_memory_good_tables_pass_all_integrity_checks():
 
 
 @pytest.mark.integration
-def test_validate_all_on_repo_templates_is_clean():
-    """The committed header-only templates have zero rows and must validate clean."""
+def test_validate_all_on_repo_tables_is_clean():
+    """The committed canonical_v1 tables must always validate clean.
+
+    Once a source is ingested (e.g. the 78 municipalities) the table is no
+    longer empty, but it must still pass schema + referential-integrity +
+    controlled-vocab + evidence-presence checks.
+    """
     report = cv1.validate_all(REPO_ROOT)
     assert report.ok, report.errors
-    assert all(count == 0 for count in report.counts.values())
