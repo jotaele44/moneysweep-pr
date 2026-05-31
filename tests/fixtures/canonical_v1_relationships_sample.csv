@@ -1,0 +1,5 @@
+source_node_type,source_name,edge_type,target_node_type,target_name,source_type,evidence_tier,extraction_method,claim
+Entity,Puerto Rico Electric Power Authority,LOCATED_IN,Municipality,San Juan,web,T2,manual,PREPA is headquartered in San Juan.
+Entity,PREPA,SECRETLY_RUNS,Municipality,San Juan,web,T2,manual,uncontrolled verb should be skipped.
+Entity,Nonexistent Phantom Org,LOCATED_IN,Municipality,San Juan,web,T2,manual,unresolved source should be skipped.
+Entity,Puerto Rico Aqueduct and Sewer Authority,LOCATED_IN,Municipality,Atlantis,web,T2,manual,unresolved target should be skipped.
