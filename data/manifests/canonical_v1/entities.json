@@ -1,0 +1,17 @@
+{
+  "producer_script": "scripts/ingest_entities.py",
+  "producer_phase": "CANONICAL_V1_ENTITIES_SEED",
+  "source_inputs": [
+    "data/reference/pr_public_money_entities.csv"
+  ],
+  "row_count": 14,
+  "evidence_rows_added": 14,
+  "evidence_table_rows": 152,
+  "entity_types": [
+    "agency",
+    "firm",
+    "fund",
+    "utility"
+  ],
+  "generated_at": "2026-05-30T19:51:04.793148+00:00"
+}
