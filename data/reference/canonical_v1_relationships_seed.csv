@@ -1,0 +1,11 @@
+source_node_type,source_name,edge_type,target_node_type,target_name,source_type,evidence_tier,extraction_method,claim
+Entity,Commonwealth of Puerto Rico,LOCATED_IN,Municipality,San Juan,web,T2,manual,The central government of Puerto Rico has its administrative seat in San Juan.
+Entity,Puerto Rico Fiscal Agency and Financial Advisory Authority,LOCATED_IN,Municipality,San Juan,web,T2,manual,AAFAF is headquartered in San Juan Puerto Rico.
+Entity,Puerto Rico Public-Private Partnerships Authority,LOCATED_IN,Municipality,San Juan,web,T2,manual,The Puerto Rico P3 Authority is headquartered in San Juan Puerto Rico.
+Entity,Puerto Rico Electric Power Authority,LOCATED_IN,Municipality,San Juan,web,T2,manual,PREPA has its headquarters in San Juan Puerto Rico.
+Entity,Puerto Rico Aqueduct and Sewer Authority,LOCATED_IN,Municipality,San Juan,web,T2,manual,PRASA has its headquarters in San Juan Puerto Rico.
+Entity,Puerto Rico Highways and Transportation Authority,LOCATED_IN,Municipality,San Juan,web,T2,manual,The Highways and Transportation Authority is headquartered in San Juan Puerto Rico.
+Entity,Puerto Rico Sales Tax Financing Corporation,LOCATED_IN,Municipality,San Juan,web,T2,manual,COFINA is domiciled in San Juan Puerto Rico.
+Entity,Government Development Bank for Puerto Rico,LOCATED_IN,Municipality,San Juan,web,T2,manual,The Government Development Bank is headquartered in San Juan Puerto Rico.
+Entity,Puerto Rico Department of Economic Development and Commerce,LOCATED_IN,Municipality,San Juan,web,T2,manual,The Department of Economic Development and Commerce is headquartered in San Juan Puerto Rico.
+Entity,Puerto Rico Public Buildings Authority,LOCATED_IN,Municipality,San Juan,web,T2,manual,The Public Buildings Authority is headquartered in San Juan Puerto Rico.

@@ -1,0 +1,15 @@
+{
+  "producer_script": "scripts/build_edges.py",
+  "producer_phase": "CANONICAL_V1_EDGES_BUILD",
+  "source_inputs": [
+    "data/reference/canonical_v1_relationships_seed.csv"
+  ],
+  "edge_count": 10,
+  "edge_types": {
+    "LOCATED_IN": 10
+  },
+  "skipped_count": 0,
+  "skipped": [],
+  "evidence_table_rows": 162,
+  "generated_at": "2026-05-31T02:57:18.070922+00:00"
+}
