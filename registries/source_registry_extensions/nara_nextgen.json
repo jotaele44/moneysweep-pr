@@ -22,7 +22,7 @@
       },
       "update_cadence": "ad_hoc",
       "notes": "Targeted archival locator only. Do not use as a contract-award, financial-flow, or bulk archival source. Fetcher intentionally not implemented until a credential and bounded query allowlist are available. Persist minimal locator metadata only; do not store full responses, extracted text, or digital objects.",
-      "producer_script": ""
+      "producer_script": "scripts/download_nara_nextgen.py"
     },
     {
       "source_id": "nara_catalog_aws_open_data",
@@ -40,7 +40,7 @@
       },
       "update_cadence": "ad_hoc",
       "notes": "Future candidate for bulk archival metadata. Evaluate separately from the targeted Catalog API path after dataset location, format, licensing, and storage policy are verified.",
-      "producer_script": ""
+      "producer_script": "scripts/download_nara_nextgen.py"
     }
   ]
 }

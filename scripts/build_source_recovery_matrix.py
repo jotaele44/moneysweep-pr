@@ -1,50 +1,52 @@
-"""Source recovery matrix builder.
+"""Source materialization readiness classifier.
 
-Reads the existing ``reports/source_registry_status.csv`` produced by
-``scripts/gap_analysis_builder.py`` and classifies every source into one
-of eight failure buckets, emitting both a per-source CSV and a roll-up
-markdown summary under ``reports/``.
+Classifies every registered source by its **materialization path** and decides
+whether it is *automatable* — i.e. can materialize with no human-supplied file
+and no unbuilt code, given network egress (and an API key where required).
 
-Read-only triage: no network, no writes outside ``reports/``, no edits
-to the registry. Re-running yields byte-identical output.
+The target for "fill all sources to 100%" is the **automatable** set. Sources
+that are not automatable are explicitly *queued* with a documented reason:
+``manual_export`` (operator file), ``scraper_needed`` (PR-gov HTML/PDF surface
+with no real fetcher yet), ``deferred_stub`` (intentionally unimplemented), or
+``semantic_duplicate`` (covered by a sibling source).
+
+Inputs (no network):
+  - the live source registry (incl. extensions) via ``load_source_registry``
+  - the live query-adapter registries (``ADAPTER_REGISTRY`` + ``ENTITY_ADAPTER_REGISTRY``)
+  - per-source producer health via ``pipeline_preflight.classify_source_readiness``
+
+Outputs (under ``reports/``, deterministic / byte-identical on re-run):
+  - ``source_recovery_matrix.csv``     — per-source readiness row
+  - ``source_recovery_matrix.md``      — roll-up by path_type
+  - ``materialization_readiness.json`` — headline readiness summary (the gate number)
+
+Read-only triage: no network, no writes outside ``reports/``, no registry edits.
 """
 from __future__ import annotations
 
 import csv
+import json
+import sys
 from collections import Counter
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from contract_sweeper.query.adapters import ADAPTER_REGISTRY, ENTITY_ADAPTER_REGISTRY
+from contract_sweeper.runtime.source_registry import load_source_registry
+from scripts.pipeline_preflight import STRUCTURAL_STATUSES, classify_source_readiness
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
-STATUS_CSV = REPO_ROOT / "reports" / "source_registry_status.csv"
 OUT_CSV = REPO_ROOT / "reports" / "source_recovery_matrix.csv"
 OUT_MD = REPO_ROOT / "reports" / "source_recovery_matrix.md"
+OUT_JSON = REPO_ROOT / "reports" / "materialization_readiness.json"
 
-ADAPTER_REGISTRY_AFTER_PR = {
-    "usaspending_prime", "usaspending_subawards", "usaspending_grants_gov",
-    "grants_gov",
-    "fema_pa_openfema_v2", "fema_hmgp", "nfip_claims",
-    "fec", "nih_reporter", "sbir", "lda", "research_grants",
-    "epa_grants", "dot_grants", "ed_grants", "hhs_grants",
-    "doe_grants", "doj_grants", "usda_grants", "oia_grants",
-    "slfrf", "haf", "exim_bank",
-    "fdic", "nonprofits_irs990",
-    "sba_ppp", "sba_loans",
-    # Batch 6 (auth-gated geographic adapters)
-    "opencorporates", "highergov_supplemental",
-    # Entity-mode adapters
-    "sam_entities", "ofac_sdn",
-    # Batch 7a CMS family (Socrata + CKAN-metastore)
-    "medicare_advantage", "medicare_parts",
-    "cms_open_payments", "medicaid_fmap", "chip",
-}
+ADAPTER_SOURCE_IDS = set(ADAPTER_REGISTRY) | set(ENTITY_ADAPTER_REGISTRY)
 
-SEMANTIC_DUPLICATES = {
-    "fpds_report_builder": "usaspending_prime",
-    "fsrs_subawards": "usaspending_subawards",
-    "congressional_earmarks": "usaspending_grants_gov",
-}
-
-HTML_PDF_OR_PR_GOV = {
+# PR-gov HTML/PDF / custom surfaces whose producer is a placeholder, not a real
+# fetcher. Queued for a dedicated scraping-adapter design pass (out of scope of
+# the automatable fill). Curated domain knowledge — kept explicit on purpose.
+SCRAPER_NEEDED = {
     "compras_pr", "aafaf", "hacienda", "cofina", "prepa_luma_genera",
     "cor3", "prasa", "p3_authority", "oficina_contralor",
     "pr_act_60_decrees", "promesa_creditors", "rum_cover_over",
@@ -53,125 +55,205 @@ HTML_PDF_OR_PR_GOV = {
     "emma_bonds", "msrb_rtrs_trades",
 }
 
-PUBLIC_PRODUCER_READY = {
-    "hud_cdbg_dr_public",
+# Sources fully covered by a sibling source; they never materialize independently.
+SEMANTIC_DUPLICATES = {
+    "fpds_report_builder": "usaspending_prime",
+    "fsrs_subawards": "usaspending_subawards",
+    "congressional_earmarks": "usaspending_grants_gov",
 }
 
-ACTION_BY_BUCKET = {
-    "public_api_adapter_ready":
-        "Query via `python -m contract_sweeper.query --source <id>`; bulk producer unblocked by validation, not adapter work.",
-    "public_producer_ready":
-        "Run producer under strict preflight; source has public producer path and no credential gate.",
-    "auth_or_key_gated":
-        "Set the required credential env var in `.env`; rerun producer.",
-    "manual_export_only":
-        "External delivery to `data/manual_import_dropzone/<family>/`; see SOURCE_RECOVERY_RUNBOOK.",
-    "html_pdf_or_pr_gov_custom":
-        "Defer; needs scraping adapter design pass.",
-    "semantic_duplicate":
+DEFERRED_PRODUCER = "scripts/download_nara_nextgen.py"
+DEFERRED_NOTE_MARKERS = ("intentionally not implemented", "deferred")
+
+# path_type -> automatable + recommended action.
+PATH_TYPES = {
+    "api_adapter": (
+        True,
+        "Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).",
+    ),
+    "api_producer": (
+        True,
+        "Run producer under strict preflight; public API path, set key if gated.",
+    ),
+    "manual_export": (
+        False,
+        "Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.",
+    ),
+    "scraper_needed": (
+        False,
+        "Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.",
+    ),
+    "deferred_stub": (
+        False,
+        "Intentionally unimplemented; remains not_materialized by design.",
+    ),
+    "semantic_duplicate": (
+        False,
         "No action; covered by sibling source.",
-    "stub_or_broken_producer":
-        "Repair producer or mark stubbed in registry.",
-    "required_missing_blocker":
-        "Escalate; required source has no available path.",
-    "never_run_or_unverified":
-        "Run producer to determine bucket.",
+    ),
+    "broken_producer": (
+        False,
+        "Repair: producer fails import / has no callable entrypoint / is missing.",
+    ),
 }
 
+QUEUED_PATH_TYPES = (
+    "manual_export", "scraper_needed", "deferred_stub",
+    "semantic_duplicate", "broken_producer",
+)
 
-def _outputs_present(expected_outputs: str) -> tuple[int, int]:
-    paths = [p.strip() for p in (expected_outputs or "").split(";") if p.strip()]
-    present = sum(1 for p in paths if (REPO_ROOT / p).exists())
-    return len(paths), present
+
+def _outputs_present(expected_outputs: list[str]) -> tuple[int, int]:
+    present = sum(1 for p in expected_outputs if p and (REPO_ROOT / p).exists())
+    return len(expected_outputs), present
 
 
-def _bucket(row: dict, producer_exists: bool) -> tuple[str, str]:
-    sid = row["source_id"]
-    auth = (row.get("authentication") or "").strip()
-    required = row.get("required") == "True"
-    notes = (row.get("blocker_notes") or "").lower()
-    expected_outputs = row.get("expected_outputs") or ""
-    _, present = _outputs_present(expected_outputs)
+def _is_deferred(src: dict) -> bool:
+    if (src.get("producer_script") or "") == DEFERRED_PRODUCER:
+        return True
+    notes = (src.get("notes") or "").lower()
+    return any(marker in notes for marker in DEFERRED_NOTE_MARKERS)
 
-    if sid in ADAPTER_REGISTRY_AFTER_PR:
-        return "public_api_adapter_ready", ""
+
+def _classify(src: dict) -> str:
+    """Return the path_type for a source (priority-ordered)."""
+    sid = src.get("source_id", "")
+    auth = (src.get("authentication") or "").strip()
+    if _is_deferred(src):
+        return "deferred_stub"
     if sid in SEMANTIC_DUPLICATES:
-        return "semantic_duplicate", f"covered by {SEMANTIC_DUPLICATES[sid]}"
-    if not producer_exists or "stub" in notes or "broken" in notes:
-        return "stub_or_broken_producer", "producer script missing or marked stub"
-    if sid in PUBLIC_PRODUCER_READY:
-        return "public_producer_ready", "producer has public API/local/seed fallback path"
-    if auth == "manual_export":
-        return "manual_export_only", "manual delivery required"
-    if auth.startswith("api_key:") or auth.startswith("oauth"):
-        return "auth_or_key_gated", auth
-    if sid in HTML_PDF_OR_PR_GOV:
-        return "html_pdf_or_pr_gov_custom", "scrape / PDF / custom PR-gov surface"
-    if required and present == 0:
-        return "required_missing_blocker", "required source has no current path"
-    return "never_run_or_unverified", "producer wired but not validated"
+        return "semantic_duplicate"
+    if auth == "manual_export" or src.get("manual_drop_dir"):
+        return "manual_export"
+    if sid in SCRAPER_NEEDED:
+        return "scraper_needed"
+    # Structural producer defect (import error / missing callable / missing script).
+    preflight = classify_source_readiness(REPO_ROOT, src)["readiness_status"]
+    if sid not in ADAPTER_SOURCE_IDS and preflight in STRUCTURAL_STATUSES:
+        return "broken_producer"
+    if sid in ADAPTER_SOURCE_IDS:
+        return "api_adapter"
+    return "api_producer"
 
 
-def main() -> None:
-    if not STATUS_CSV.exists():
-        raise SystemExit(f"missing {STATUS_CSV} — run scripts/gap_analysis_builder.py first")
-
-    with STATUS_CSV.open(encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
-
-    out_rows = []
-    bucket_counts: Counter = Counter()
-    for row in rows:
-        producer = (row.get("producer_script") or "").strip()
-        producer_exists = bool(producer) and (REPO_ROOT / producer).exists()
-        total, present = _outputs_present(row.get("expected_outputs", ""))
-        bucket, blocker = _bucket(row, producer_exists)
-        bucket_counts[bucket] += 1
-        out_rows.append({
-            "source_id": row["source_id"],
-            "required": row.get("required", ""),
-            "producer_script": producer,
+def build_rows() -> list[dict]:
+    sources = load_source_registry(REPO_ROOT).get("sources", [])
+    rows: list[dict] = []
+    for src in sources:
+        sid = src.get("source_id", "")
+        auth = (src.get("authentication") or "").strip()
+        expected = list(src.get("expected_outputs") or [])
+        total, present = _outputs_present(expected)
+        min_rows = (src.get("validation_threshold") or {}).get("min_rows", 1)
+        path_type = _classify(src)
+        automatable, action = PATH_TYPES[path_type]
+        needs_key = auth.split("api_key:", 1)[1] if auth.startswith("api_key:") else ""
+        has_adapter = sid in ADAPTER_SOURCE_IDS
+        preflight = classify_source_readiness(REPO_ROOT, src)["readiness_status"]
+        producer_importable = preflight not in STRUCTURAL_STATUSES
+        # Structurally ready = automatable, has a working entrypoint, and declares outputs.
+        ready = bool(automatable and (has_adapter or producer_importable) and total > 0)
+        rows.append({
+            "source_id": sid,
+            "required": bool(src.get("required", False)),
+            "path_type": path_type,
+            "automatable": automatable,
+            "ready": ready,
+            "needs_key": needs_key,
+            "has_adapter": has_adapter,
+            "producer_importable": producer_importable,
+            "producer_script": src.get("producer_script", ""),
             "expected_outputs_count": total,
             "outputs_present_count": present,
-            "failure_bucket": bucket,
-            "blocker": blocker,
-            "recommended_action": ACTION_BY_BUCKET[bucket],
+            "min_rows": min_rows,
+            "dropzone_path": src.get("manual_drop_dir", "") or "",
+            "recommended_action": action,
         })
+    rows.sort(key=lambda r: (not r["automatable"], r["path_type"], r["source_id"]))
+    return rows
 
-    out_rows.sort(key=lambda r: (r["failure_bucket"], r["source_id"]))
 
+def build_summary(rows: list[dict]) -> dict:
+    automatable = [r for r in rows if r["automatable"]]
+    queued = Counter(r["path_type"] for r in rows if not r["automatable"])
+    needs_key = sorted({r["needs_key"] for r in automatable if r["needs_key"]})
+    return {
+        "schema_version": "r5_readiness_v1",
+        "total_sources": len(rows),
+        "automatable_total": len(automatable),
+        "automatable_ready": sum(1 for r in automatable if r["ready"]),
+        "automatable_not_ready": sorted(r["source_id"] for r in automatable if not r["ready"]),
+        "automatable_needs_key_count": sum(1 for r in automatable if r["needs_key"]),
+        "automatable_required_keys": needs_key,
+        "queued_excluded": {k: queued.get(k, 0) for k in QUEUED_PATH_TYPES},
+        "queued_excluded_total": sum(queued.values()),
+        "outputs": [
+            "reports/source_recovery_matrix.csv",
+            "reports/source_recovery_matrix.md",
+            "reports/materialization_readiness.json",
+        ],
+    }
+
+
+def _write_csv(rows: list[dict]) -> None:
     OUT_CSV.parent.mkdir(parents=True, exist_ok=True)
     with OUT_CSV.open("w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=list(out_rows[0].keys()))
+        writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
         writer.writeheader()
-        for r in out_rows:
-            writer.writerow(r)
+        writer.writerows(rows)
 
-    lines: list[str] = []
-    lines.append("# Source Recovery Matrix")
+
+def _write_md(rows: list[dict], summary: dict) -> None:
+    counts = Counter(r["path_type"] for r in rows)
+    lines = ["# Source Materialization Readiness", ""]
+    lines.append(f"Total sources: **{summary['total_sources']}**")
+    lines.append(
+        f"Automatable: **{summary['automatable_total']}** "
+        f"(ready: **{summary['automatable_ready']}**, "
+        f"need API key at run time: {summary['automatable_needs_key_count']})"
+    )
+    lines.append(f"Queued / excluded: **{summary['queued_excluded_total']}**")
     lines.append("")
-    lines.append(f"Total sources: **{len(out_rows)}**")
+    lines.append("## Path types")
     lines.append("")
-    lines.append("## Bucket counts")
+    lines.append("| path_type | automatable | count | recommended_action |")
+    lines.append("| --- | --- | --- | --- |")
+    for pt in sorted(counts, key=lambda b: (not PATH_TYPES[b][0], -counts[b], b)):
+        lines.append(
+            f"| `{pt}` | {PATH_TYPES[pt][0]} | {counts[pt]} | {PATH_TYPES[pt][1]} |"
+        )
     lines.append("")
-    lines.append("| failure_bucket | count | recommended_action |")
-    lines.append("| --- | --- | --- |")
-    for bucket in sorted(bucket_counts, key=lambda b: (-bucket_counts[b], b)):
-        lines.append(f"| `{bucket}` | {bucket_counts[bucket]} | {ACTION_BY_BUCKET[bucket]} |")
-    lines.append("")
-    for bucket in sorted(bucket_counts):
-        members = sorted(r["source_id"] for r in out_rows if r["failure_bucket"] == bucket)
-        lines.append(f"## {bucket} ({len(members)})")
+    if summary["automatable_required_keys"]:
+        lines.append(
+            "API keys needed for full automatable materialization: "
+            + ", ".join(f"`{k}`" for k in summary["automatable_required_keys"])
+        )
+        lines.append("")
+    for pt in sorted(counts):
+        members = sorted(r["source_id"] for r in rows if r["path_type"] == pt)
+        lines.append(f"## {pt} ({len(members)})")
         lines.append("")
         for m in members:
             lines.append(f"- `{m}`")
         lines.append("")
     OUT_MD.write_text("\n".join(lines), encoding="utf-8")
-    print(f"wrote {OUT_CSV.relative_to(REPO_ROOT)} ({len(out_rows)} rows)")
+
+
+def main() -> int:
+    rows = build_rows()
+    summary = build_summary(rows)
+    _write_csv(rows)
+    _write_md(rows, summary)
+    OUT_JSON.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+    print(f"wrote {OUT_CSV.relative_to(REPO_ROOT)} ({len(rows)} rows)")
     print(f"wrote {OUT_MD.relative_to(REPO_ROOT)}")
-    for b, n in bucket_counts.most_common():
-        print(f"  {b}: {n}")
+    print(f"wrote {OUT_JSON.relative_to(REPO_ROOT)}")
+    print(
+        f"  automatable_ready={summary['automatable_ready']}/"
+        f"{summary['automatable_total']}  queued={summary['queued_excluded_total']}"
+    )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
