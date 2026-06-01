@@ -1,37 +1,41 @@
 # Next Actions
 
-**Updated:** 2026-05-14
-**Current branch:** `claude/r5-pr59-fsrs-subawards`
+**Updated:** 2026-06-01
+**Active vector:** `MATERIALIZATION_READINESS_LOCKED_AWAITING_EGRESS_FILL`
 
-## PR #59 — Subaward linkage (complete)
+## Done (this cycle — merged #144)
 
-- [x] Fix Python 3.9 `X | None` import failures across config + 68 scripts
-- [x] Fix `download_subawards.py` pagination (`hasNext` key) + `MAX_PAGES` cap
-- [x] Capture `prime_award_generated_internal_id` in subaward master
-- [x] Repair subaward→prime join in `execution_chain_builder.py`
-- [x] Re-run download (4,834 subawards), chain builder, influence graph
-- [x] `execution_chain_linkage_rate` 0.5969 → 1.0 (PASS); `failed_gate_count` 114 → 112
-- [x] Tests: 89 unit passed; secret scan: 0 findings
-- [x] `reports/pr59_fsrs_subawards_report.md`
+- [x] Restored the strict-preflight gate (deferred NARA stubs no longer abort it;
+      84 sources, 0 structural errors) via `scripts/download_nara_nextgen.py`.
+- [x] Materialization readiness gate — `scripts/build_source_recovery_matrix.py`
+      now classifies every source from the live registry + adapter registries +
+      preflight. Headline: `reports/materialization_readiness.json`.
+- [x] `tests/test_materialization_readiness.py` (the gate) + `docs/MATERIALIZATION_RUNBOOK.md`.
+- [x] Full suite green: 1229 passed, 5 skipped.
 
-## PR #60 — EMMA bonds (next)
+## Readiness snapshot
 
-1. Run `python3 scripts/download_emma.py` → emit `pr_emma_bonds.csv`, `pr_emma_underwriters.csv`
-2. Refresh influence graph bond-underwriter layer
-3. Add per-source manifest; confirm `source_coverage_rate` advances
-4. Tests + secret scan + PR
+- 84 sources → **54 automatable, all structurally ready**; 0 broken producers.
+- 5 automatable sources need a run-time key: SAM, LDA, FEC, OpenCorporates, HigherGov.
+- 30 queued/excluded: 20 `scraper_needed`, 5 `manual_export`, 3 `semantic_duplicate`, 2 `deferred_stub`.
 
-## Remaining required-source backfill (PR #60–65)
+## Next command — `FILL_AUTOMATABLE_SOURCES_IN_EGRESS_ENABLED_ENVIRONMENT`
 
-Priority order from `reports/backfill_plan.md`:
+Run the fill per `docs/MATERIALIZATION_RUNBOOK.md` **in an environment with
+outbound HTTPS** (the web sandbox blocks egress — HTTP 403 — so no producer or
+adapter can fetch data there):
 
-1. ~~`fsrs_subawards`~~ — done (PR #59, via USAspending subaward API)
-2. `emma_bonds` — PR #60, no credentials
-3. `oficina_contralor` — PR #61, no credentials
-4. `pr_cabilderos` — PR #62, no credentials
-5. `cor3` — PR #63, manual export (confirm drop-zone file)
-6. `prasa` — PR #64, manual export (confirm drop-zone file)
-7. `hud_drgr_authorized` — PR #65, grantee login (deferred if file absent)
+1. `pip install -r requirements.txt`
+2. Set the 5 keys in `.env`.
+3. `python3 run_all.py --only-setup --strict-preflight` (expect 0 structural errors).
+4. Materialize: `python -m contract_sweeper.query --source <id>` (35 adapter
+   sources) and/or `python3 run_all.py --strict-preflight`.
+5. `python3 scripts/gap_analysis_builder.py && python3 scripts/build_source_recovery_matrix.py`.
+6. Verify `automatable_ready == automatable_total` and each automatable source
+   `fully_materialized`.
 
-Target after PR #60–62: `source_coverage_rate` 0.50 → ~0.79.
-Target after PR #63–65: `source_coverage_rate` → ~1.00.
+## Future work (separate egress-enabled PRs)
+
+- Build the 20 `scraper_needed` PR-gov HTML/PDF scraping adapters.
+- Integrate the manual datasets (ACT, ACUDEN, PRASA, cabilderos, DCAA) via the
+  dropzones in `registries/manual_export_registry.yaml`.
