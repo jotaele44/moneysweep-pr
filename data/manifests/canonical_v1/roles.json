@@ -1,0 +1,12 @@
+{
+  "producer_script": "scripts/ingest_roles.py",
+  "producer_phase": "CANONICAL_V1_ROLES_INGEST",
+  "source_inputs": [
+    "data/reference/fomb_board_roles.csv"
+  ],
+  "row_count": 7,
+  "skipped_count": 0,
+  "skipped": [],
+  "evidence_table_rows": 169,
+  "generated_at": "2026-06-01T10:16:36.027945+00:00"
+}
