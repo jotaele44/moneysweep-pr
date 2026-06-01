@@ -12,14 +12,29 @@ FIXTURE = Path(__file__).resolve().parent / "fixtures" / "canonical_v1_relations
 
 
 @pytest.mark.integration
-def test_builds_located_in_and_holds_role_in_edges():
+def test_builds_all_seeded_edge_types():
     built = be.build_edges(REPO_ROOT)
     by_type: dict[str, int] = {}
     for e in built["edge_rows"]:
         by_type[e["edge_type"]] = by_type.get(e["edge_type"], 0) + 1
     assert built["skipped"] == []
-    assert by_type == {"LOCATED_IN": 10, "HOLDS_ROLE_IN": 7}
-    assert len(built["edge_rows"]) == 17
+    assert by_type == {"LOCATED_IN": 10, "HOLDS_ROLE_IN": 7, "HOLDS_DEBT": 11}
+    assert len(built["edge_rows"]) == 28
+
+
+@pytest.mark.integration
+def test_holds_debt_edges_link_entity_to_debt():
+    built = be.build_edges(REPO_ROOT)
+    tables = cv1.load_all_tables(REPO_ROOT)
+    entity_ids = {r["entity_id"] for r in tables["entities"]}
+    debt_ids = {r["debt_id"] for r in tables["debt_instruments"]}
+    debt_edges = [e for e in built["edge_rows"] if e["edge_type"] == "HOLDS_DEBT"]
+    assert len(debt_edges) == len(tables["debt_instruments"])
+    for e in debt_edges:
+        assert e["source_node_type"] == "Entity"
+        assert e["source_node_id"] in entity_ids
+        assert e["target_node_type"] == "DebtInstrument"
+        assert e["target_node_id"] in debt_ids
 
 
 @pytest.mark.integration
@@ -73,8 +88,9 @@ def test_resolver_handles_aliases_and_normalization():
 @pytest.mark.integration
 def test_uncontrolled_verb_and_unresolved_endpoints_are_skipped(monkeypatch, tmp_path):
     monkeypatch.setattr(be, "RELATIONSHIPS", str(FIXTURE))
-    # isolate from the on-disk roles.csv so we test only the seed rows
+    # isolate from the on-disk roles/debt tables so we test only the seed rows
     monkeypatch.setattr(be, "ROLES_IN", str(tmp_path / "no_roles.csv"))
+    monkeypatch.setattr(be, "DEBT_IN", str(tmp_path / "no_debt.csv"))
     built = be.build_edges(REPO_ROOT)
     assert len(built["edge_rows"]) == 1                  # only the valid PREPA->San Juan row
     reasons = " ".join(s["reason"] for s in built["skipped"])

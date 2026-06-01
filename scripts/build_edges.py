@@ -41,6 +41,7 @@ RELATIONSHIPS = "data/reference/canonical_v1_relationships_seed.csv"
 EDGES_OUT = "data/canonical_v1/edges.csv"
 EVIDENCE_OUT = "data/canonical_v1/evidence.csv"
 ROLES_IN = "data/canonical_v1/roles.csv"
+DEBT_IN = "data/canonical_v1/debt_instruments.csv"
 DATA_DIR = "data/canonical_v1"
 MANIFEST_OUT = "data/manifests/canonical_v1/edges.json"
 SOURCE_NAME = "PR Public-Money Relationships (reference seed)"
@@ -188,6 +189,37 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
             "notes": (role.get("role_title") or "").strip(),
         })
 
+    # Derive HOLDS_DEBT edges from debt_instruments.csv: the issuer entity holds
+    # (issues) the instrument. The issuer name is carried in the debt row notes as
+    # "...; issuer=<name>"; resolve it to an existing entity. Edges are emitted
+    # only when the issuer resolves (no broken reference); unresolved issuers are
+    # reported so they can be added as entities later.
+    for debt in _read_debt(root):
+        did = (debt.get("debt_id") or "").strip()
+        ev_id = (debt.get("evidence_id") or "").strip()
+        issuer_eid = (debt.get("issuer_entity_id") or "").strip()
+        if not (did and ev_id and issuer_eid):
+            continue
+        eid = edge_id(issuer_eid, "HOLDS_DEBT", did)
+        if eid in seen:
+            continue
+        seen.add(eid)
+        edge_rows.append({
+            "edge_id": eid,
+            "source_node_type": "Entity",
+            "source_node_id": issuer_eid,
+            "edge_type": "HOLDS_DEBT",
+            "target_node_type": "DebtInstrument",
+            "target_node_id": did,
+            "start_date": "",
+            "end_date": (debt.get("maturity_date") or "").strip(),
+            "amount": (debt.get("par_amount") or "").strip(),
+            "currency": (debt.get("currency") or "").strip(),
+            "confidence": (debt.get("confidence") or "").strip(),
+            "evidence_id": ev_id,
+            "notes": (debt.get("debt_class") or "").strip(),
+        })
+
     return {"edge_rows": edge_rows, "evidence_rows": evidence_rows, "skipped": skipped}
 
 
@@ -198,6 +230,17 @@ def _read_roles(root: Path) -> list[dict[str, str]]:
         return []
     with path.open(newline="", encoding="utf-8") as fh:
         return [r for r in csv.DictReader(fh) if (r.get("role_id") or "").strip()]
+
+
+def _read_debt(root: Path) -> list[dict[str, str]]:
+    """Read debt_instruments.csv rows (empty list if missing or header-only)."""
+    path = root / DEBT_IN
+    if not path.exists():
+        return []
+    with path.open(newline="", encoding="utf-8") as fh:
+        return [r for r in csv.DictReader(fh) if (r.get("debt_id") or "").strip()]
+
+
 
 
 def _write(rows: list[dict[str, Any]], out_path: Path) -> None:
