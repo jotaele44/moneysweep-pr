@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Source Registry Top-Form Alignment Row",
+  "type": "object",
+  "required": [
+    "source_id",
+    "family",
+    "required",
+    "authentication",
+    "intake_mode",
+    "refresh_frequency",
+    "blocker_type",
+    "alignment_status",
+    "has_expected_outputs",
+    "has_validation_threshold",
+    "manual_drop_dir",
+    "producer_script",
+    "issue"
+  ],
+  "properties": {
+    "source_id": {"type": "string", "minLength": 1},
+    "family": {"type": "string"},
+    "required": {"type": "boolean"},
+    "authentication": {"type": "string"},
+    "intake_mode": {
+      "type": "string",
+      "enum": ["api", "api_key", "manual_export", "static_file", "scrape", "derived", "unknown"]
+    },
+    "refresh_frequency": {
+      "type": "string",
+      "enum": ["daily", "weekly", "monthly", "quarterly", "yearly", "ad_hoc", "unknown"]
+    },
+    "blocker_type": {
+      "type": "string",
+      "enum": [
+        "none",
+        "auth_required",
+        "manual_required",
+        "manual_review_required",
+        "producer_missing",
+        "required_archived",
+        "output_missing",
+        "schema_threshold",
+        "path_traversal",
+        "unknown"
+      ]
+    },
+    "alignment_status": {
+      "type": "string",
+      "enum": ["aligned", "warning", "error"]
+    },
+    "has_expected_outputs": {"type": "boolean"},
+    "has_validation_threshold": {"type": "boolean"},
+    "manual_drop_dir": {"type": "string"},
+    "producer_script": {"type": "string"},
+    "issue": {"type": "string"}
+  },
+  "additionalProperties": false
+}
