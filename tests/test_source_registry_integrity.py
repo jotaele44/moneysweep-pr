@@ -45,9 +45,26 @@ def test_status_csv_producer_scripts_match_registry():
 
 
 def test_status_csv_regenerates_identically():
-    committed = STATUS_CSV.read_text(encoding="utf-8")
+    """Verify that source_registry_status.csv is fully determined by the registry JSON.
+
+    All columns (source_id, family, required, authentication, producer_script,
+    expected_outputs, update_cadence, blocker_notes) derive exclusively from
+    registries/source_registry.json — no filesystem presence check is involved.
+    This means the file regenerates identically on any fresh clone without data
+    files present.
+
+    Note: pipeline_status is intentionally absent from this file. Live
+    materialization state lives in reports/gap_analysis_report.csv, which is
+    gitignored.
+    """
+    def _parse(path: Path) -> list[dict]:
+        with path.open(encoding="utf-8", newline="") as f:
+            return list(csv.DictReader(f))
+
+    before = _parse(STATUS_CSV)
     write_status_csv(REPO_ROOT)
-    assert STATUS_CSV.read_text(encoding="utf-8") == committed, (
+    after = _parse(STATUS_CSV)
+    assert before == after, (
         "reports/source_registry_status.csv is stale — "
         "regenerate with: python3 scripts/gap_analysis_builder.py"
     )

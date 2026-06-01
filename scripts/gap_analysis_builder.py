@@ -79,7 +79,7 @@ def _source_status(root: Path, src: dict) -> str:
 
 STATUS_CSV_FIELDS = [
     "source_id", "family", "required", "authentication", "producer_script",
-    "expected_outputs", "update_cadence", "pipeline_status", "blocker_notes",
+    "expected_outputs", "update_cadence", "blocker_notes",
 ]
 
 
@@ -102,7 +102,6 @@ def write_status_csv(root: Path, sources: list[dict] | None = None) -> Path:
             "producer_script": src.get("producer_script", ""),
             "expected_outputs": ";".join(src.get("expected_outputs", [])),
             "update_cadence": src.get("update_cadence", ""),
-            "pipeline_status": _source_status(root, src),
             "blocker_notes": " ".join((src.get("notes") or "").split()),
         })
     out = root / "reports" / "source_registry_status.csv"
