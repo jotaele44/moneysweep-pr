@@ -56,6 +56,8 @@ medicare_advantage,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/
 medicare_parts,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_medicare_parts.csv,
 msrb_rtrs_trades,bonds,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_msrb_rtrs_trades.csv,
 municipal_finance,municipal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_municipal_finance.csv,
+nara_catalog_aws_open_data,provenance_archival,False,none,2,0,2,0,not_materialized,0,0,data/staging/processed/nara_nextgen/nara_bulk_catalog_index.csv,"Future candidate for bulk archival metadata. Evaluate separately from the targeted Catalog API path after dataset location, format, licensing, and storage policy are verified."
+nara_nextgen_catalog_v3,provenance_archival,False,api_key:NARA_API_KEY,2,0,2,0,not_materialized,0,0,data/staging/processed/nara_nextgen/nara_record_locator_index.csv,"Targeted archival locator only. Do not use as a contract-award, financial-flow, or bulk archival source. Fetcher intentionally not implemented until a credential and bounded query allowlist are availa"
 ncua,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ncua.csv,
 nfip_claims,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_nfip_claims.csv,
 nih_reporter,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_nih_grants.csv,
