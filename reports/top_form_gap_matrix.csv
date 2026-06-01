@@ -1,0 +1,63 @@
+gate,item,status,priority,owner,file_or_source,next_action
+source_registry,stable_source_ids,partial,P0,GPT/Claude,source_registry,verify all 82 sources have stable source_id
+source_registry,intake_mode,partial,P0,GPT/Claude,source_registry,add api/manual/scrape/upload classification
+source_registry,materialization_status,partial,P0,GPT/Claude,reports/source_registry_status.csv,lock existing vocabulary and avoid synonyms
+source_registry,required_source_validation,partial,P0,GPT/Claude,scripts/pipeline_preflight.py,enforce required-source validation
+source_registry,refresh_frequency,missing,P1,GPT/Claude,source_registry,add refresh cadence for every source
+source_registry,blocker_taxonomy,partial,P1,GPT/Claude,source_registry,standardize blocker categories
+required_sources,usaspending_prime,partial,P0,Claude,current_status.json,complete materialization
+required_sources,fsrs_subawards,missing,P0,Claude,current_status.json,materialize or classify blocker
+required_sources,sam_entities,auth_required,P0,Operator,current_status.json,provide SAM_API_KEY or mark auth_required
+required_sources,cor3,manual_required,P0,Operator,current_status.json,place manual export under declared path
+required_sources,hud_drgr_authorized,manual_required,P0,Operator,current_status.json,place authorized export under data/manual/hud_drgr
+required_sources,prasa,manual_required,P0,Operator,current_status.json,place or export PRASA source data
+required_sources,oficina_contralor,manual_required,P0,Operator,current_status.json,define manual export or scraper path
+required_sources,emma_bonds,partial,P1,Claude,current_status.json,complete EMMA materialization
+required_sources,pr_cabilderos,partial,P1,Claude,current_status.json,normalize cabilderos registry
+federal_procurement,fpds_ingestion,partial,P0,Claude,run_all.py,verify latest FPDS run and schema
+federal_procurement,usaspending_ingestion,partial,P0,Claude,run_all.py,verify prime award ingestion
+federal_procurement,fsrs_ingestion,missing,P0,Claude,source_registry,materialize FSRS subaward input
+federal_procurement,sam_enrichment,auth_required,P0,Operator,scripts,provide SAM key or preserve auth-required blocker
+federal_procurement,dedup_master,partial,P0,Claude,data/processed,rerun after required sources materialize
+federal_procurement,coverage_matrix,partial,P1,Claude,reports,verify regeneration
+entity_master,entity_master,missing,P0,GPT/Claude,data/reference/entity_master.csv,create stable entity master schema
+entity_master,entity_aliases,partial,P0,GPT/Claude,data/reference/entity_aliases.csv,expand and validate aliases
+entity_master,parent_map,partial,P1,GPT/Claude,data/reference/entity_parent_map.csv,add parent and subsidiary mapping
+entity_master,person_master,missing,P1,GPT/Claude,data/reference/person_master.csv,create person registry for lobbyists officials donors
+entity_master,agency_master,partial,P1,GPT/Claude,data/reference/agency_master.csv,normalize agencies and authorities
+entity_master,review_queue,partial,P0,GPT/Claude,reports/entity_resolution_review_queue.csv,stabilize review queue format
+local_contracts,act_transition,partial,P0,GPT/Claude,uploaded ACT data,extract into canonical contract table
+local_contracts,acuden_transition,partial,P0,GPT/Claude,uploaded ACUDEN data,extract amendments and base records
+local_contracts,prasa_projects,partial,P1,GPT/Claude,uploaded PRASA projects,normalize project rows
+local_contracts,prasa_cer,partial,P1,GPT/Claude,uploaded PRASA CER,extract CIP fiscal regulatory facts
+local_contracts,prepa_contracts,partial,P1,GPT/Claude,source_registry,connect PREPA contracts to energy continuity layer
+local_contracts,p3_contracts,partial,P1,GPT/Claude,source_registry,normalize P3 concession records
+influence,pr_cabilderos,partial,P0,GPT/Claude,uploaded registry,normalize registrants clients personnel
+influence,federal_lda,partial,P1,GPT/Claude,uploaded LDA records,normalize registrants clients amounts periods
+influence,campaign_finance,partial,P1,GPT/Claude,unknown,inventory available campaign finance sources
+influence,contractor_donor_overlap,partial,P1,GPT/Claude,reports,convert research output to reproducible pipeline
+influence,influence_edge_schema,missing,P0,GPT/Claude,schemas/influence_edges.schema.json,lock influence edge schema
+debt_fiscal,emma_bonds,partial,P1,GPT/Claude,current_status.json,complete bond source materialization
+debt_fiscal,debt_instrument_schema,missing,P1,GPT/Claude,schemas,define debt instrument schema
+debt_fiscal,creditor_mapping,missing,P2,GPT/Claude,reports,build GO COFINA PREPA PRASA HTA creditor registry
+debt_fiscal,fiscal_control_events,missing,P2,GPT/Claude,reports,build fiscal decision timeline
+gis,municipality_crosswalk,partial,P0,GPT/Claude,data/reference,lock 78-municipio crosswalk
+gis,geo_reason_codes,missing,P0,GPT/Claude,geo resolver,add geo resolution reason codes
+gis,project_geocoding,partial,P1,GPT/Claude,exports/gis,create project point layer
+gis,layer_manifest,missing,P1,GPT/Claude,exports/gis/layer_manifest.json,create GIS layer manifest
+gis,hq_bias_correction,partial,P1,GPT/Claude,reports,split HQ location from place of performance
+graph_export,node_schema,missing,P0,GPT/Claude,exports/graph/nodes.csv,define node schema
+graph_export,edge_schema,missing,P0,GPT/Claude,exports/graph/edges.csv,define edge schema
+graph_export,neo4j_export,missing,P1,GPT/Claude,exports/graph,create Neo4j export format
+graph_export,evidence_confidence,partial,P0,GPT/Claude,exports/graph,require evidence_tier and confidence on every edge
+dashboard,analyst_reports,partial,P2,GPT/Claude,reports,standardize report outputs
+dashboard,dashboard_app,missing,P3,GPT/Claude,dashboard,defer until graph and GIS are stable
+dashboard,source_drilldown,missing,P2,GPT/Claude,reports,add source provenance drilldown
+foia,foia_tracker,missing,P1,GPT/Claude,reports/foia_priority_queue.csv,create request tracker schema
+foia,request_templates,partial,P2,GPT/Claude,docs,standardize public records request templates
+foia,yield_tracking,missing,P2,GPT/Claude,reports,track request yield and unresolved gaps
+testing,entity_resolution_tests,missing,P0,Claude,tests,add tests after entity schema
+testing,graph_export_tests,missing,P1,Claude,tests,add graph schema validation tests
+testing,gis_export_tests,missing,P1,Claude,tests,add GeoJSON and layer manifest tests
+testing,output_snapshot_tests,missing,P1,Claude,tests,add output schema snapshot tests
+testing,fresh_clone_repro,partial,P1,Claude,CI,add reproducibility job after source gates stabilize
