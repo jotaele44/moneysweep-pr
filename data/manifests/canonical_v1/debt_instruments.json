@@ -4,54 +4,18 @@
   "source_inputs": [
     "scripts/download_emma.py:KNOWN_EMMA_BONDS"
   ],
-  "row_count": 11,
+  "row_count": 20,
   "debt_class_counts": {
     "COFINA": 2,
     "GO": 3,
     "HTA": 2,
     "PREPA": 2,
-    "PRASA": 2
+    "PRASA": 2,
+    "other": 9
   },
-  "skipped_non_canonical_issuers": 9,
-  "skipped": [
-    {
-      "cusip": "74526PBA6",
-      "reason": "unresolved issuer 'Puerto Rico Government Development Bank'"
-    },
-    {
-      "cusip": "74527CAA5",
-      "reason": "unresolved issuer 'Puerto Rico Infrastructure Financing Authority'"
-    },
-    {
-      "cusip": "74527DAA3",
-      "reason": "unresolved issuer 'Puerto Rico Housing Finance Authority'"
-    },
-    {
-      "cusip": "74526EAA1",
-      "reason": "unresolved issuer 'Puerto Rico Industrial Development Company'"
-    },
-    {
-      "cusip": "916312AA6",
-      "reason": "unresolved issuer 'University of Puerto Rico'"
-    },
-    {
-      "cusip": "74525QAA3",
-      "reason": "unresolved issuer 'Puerto Rico Convention Center District Authority'"
-    },
-    {
-      "cusip": "74528FAA7",
-      "reason": "unresolved issuer 'Puerto Rico Ports Authority'"
-    },
-    {
-      "cusip": "74527EAA1",
-      "reason": "unresolved issuer 'Puerto Rico Public Finance Corporation'"
-    },
-    {
-      "cusip": "74514MAA8",
-      "reason": "unresolved issuer 'Puerto Rico Municipal Finance Agency'"
-    }
-  ],
-  "evidence_rows_added": 11,
-  "evidence_table_rows": 180,
-  "generated_at": "2026-06-01T11:33:32.707856+00:00"
+  "skipped_non_canonical_issuers": 0,
+  "skipped": [],
+  "evidence_rows_added": 20,
+  "evidence_table_rows": 197,
+  "generated_at": "2026-06-01T12:41:28.635047+00:00"
 }

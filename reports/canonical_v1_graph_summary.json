@@ -1,36 +1,36 @@
 {
   "gate": "NON_PRODUCTION_DIAGNOSTIC",
-  "generated_at": "2026-06-01T11:34:11.471378+00:00",
+  "generated_at": "2026-06-01T12:41:28.823212+00:00",
   "node_counts": {
     "people": 60,
-    "entities": 14,
+    "entities": 22,
     "roles": 7,
     "contracts": 0,
     "projects": 0,
-    "debt_instruments": 11,
+    "debt_instruments": 20,
     "lobbying_records": 0,
     "funding_sources": 0,
     "properties": 0,
     "municipalities": 78
   },
-  "total_nodes": 170,
-  "edge_count": 28,
+  "total_nodes": 187,
+  "edge_count": 37,
   "edge_type_counts": {
-    "HOLDS_DEBT": 11,
+    "HOLDS_DEBT": 20,
     "HOLDS_ROLE_IN": 7,
     "LOCATED_IN": 10
   },
-  "evidence_count": 180,
+  "evidence_count": 197,
   "evidence_tier_counts": {
-    "T1": 128,
-    "T2": 52
+    "T1": 136,
+    "T2": 61
   },
   "evidence_review_status_counts": {
-    "accepted": 180
+    "accepted": 197
   },
   "edge_evidence_coverage_pct": 100.0,
-  "edges_backed_by_accepted_evidence": 28,
-  "connected_node_count": 30,
+  "edges_backed_by_accepted_evidence": 37,
+  "connected_node_count": 47,
   "review_queue_open": 0,
   "top_degree_nodes": [
     {
@@ -62,15 +62,15 @@
       "degree": 3
     },
     {
+      "node_id": "entity_d363e4ddf2ce6a5d",
+      "degree": 2
+    },
+    {
       "node_id": "debt_commonwealth_of_puerto_rico_go_2012_745145sk7",
       "degree": 1
     },
     {
       "node_id": "debt_commonwealth_of_puerto_rico_go_2014_745145sw1",
-      "degree": 1
-    },
-    {
-      "node_id": "debt_commonwealth_of_puerto_rico_go_2022_745145tn0",
       "degree": 1
     }
   ]

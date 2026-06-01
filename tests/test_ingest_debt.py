@@ -23,13 +23,14 @@ def test_classify_maps_issuers_to_enum():
 
 
 @pytest.mark.integration
-def test_only_canonical_issuers_are_ingested(built):
+def test_all_bonds_resolve_to_canonical_issuers(built):
     rows = built["debt_rows"]
-    # 11 bonds map to the 5 canonical issuers (Commonwealth, COFINA, HTA, PREPA, PRASA)
-    assert len(rows) == 11
-    assert len(built["skipped"]) == 9
+    # all 20 KNOWN_EMMA_BONDS issuers now exist as canonical entities
+    assert len(rows) == 20
+    assert len(built["skipped"]) == 0
     assert idebt.check(rows) == []
-    assert {r["debt_class"] for r in rows} == {"GO", "COFINA", "HTA", "PREPA", "PRASA"}
+    # the 5 primary classes plus 'other' for the remaining instrumentalities
+    assert {r["debt_class"] for r in rows} == {"GO", "COFINA", "HTA", "PREPA", "PRASA", "other"}
 
 
 @pytest.mark.integration
