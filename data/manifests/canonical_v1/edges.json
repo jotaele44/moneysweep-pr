@@ -4,14 +4,15 @@
   "source_inputs": [
     "data/reference/canonical_v1_relationships_seed.csv"
   ],
-  "edge_count": 37,
+  "edge_count": 42,
   "edge_types": {
     "LOCATED_IN": 10,
+    "ADVISES": 5,
     "HOLDS_ROLE_IN": 7,
     "HOLDS_DEBT": 20
   },
   "skipped_count": 0,
   "skipped": [],
-  "evidence_table_rows": 197,
-  "generated_at": "2026-06-01T12:41:28.769595+00:00"
+  "evidence_table_rows": 202,
+  "generated_at": "2026-06-01T12:53:12.289427+00:00"
 }

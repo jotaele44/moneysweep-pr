@@ -9,3 +9,9 @@ Entity,Puerto Rico Sales Tax Financing Corporation,LOCATED_IN,Municipality,San J
 Entity,Government Development Bank for Puerto Rico,LOCATED_IN,Municipality,San Juan,web,T2,manual,The Government Development Bank is headquartered in San Juan Puerto Rico.
 Entity,Puerto Rico Department of Economic Development and Commerce,LOCATED_IN,Municipality,San Juan,web,T2,manual,The Department of Economic Development and Commerce is headquartered in San Juan Puerto Rico.
 Entity,Puerto Rico Public Buildings Authority,LOCATED_IN,Municipality,San Juan,web,T2,manual,The Public Buildings Authority is headquartered in San Juan Puerto Rico.
+Entity,Puerto Rico Fiscal Agency and Financial Advisory Authority,ADVISES,Entity,Commonwealth of Puerto Rico,web,T2,manual,Under Act 2-2017 AAFAF acts as fiscal agent and financial advisor to the Commonwealth of Puerto Rico.
+Entity,Puerto Rico Fiscal Agency and Financial Advisory Authority,ADVISES,Entity,Puerto Rico Electric Power Authority,web,T2,manual,Under Act 2-2017 AAFAF acts as fiscal agent and financial advisor to PREPA as an instrumentality.
+Entity,Puerto Rico Fiscal Agency and Financial Advisory Authority,ADVISES,Entity,Puerto Rico Aqueduct and Sewer Authority,web,T2,manual,Under Act 2-2017 AAFAF acts as fiscal agent and financial advisor to PRASA as an instrumentality.
+Entity,Puerto Rico Fiscal Agency and Financial Advisory Authority,ADVISES,Entity,Puerto Rico Highways and Transportation Authority,web,T2,manual,Under Act 2-2017 AAFAF acts as fiscal agent and financial advisor to the Highways and Transportation Authority as an instrumentality.
+Entity,Puerto Rico Fiscal Agency and Financial Advisory Authority,ADVISES,Entity,Puerto Rico Sales Tax Financing Corporation,web,T2,manual,Under Act 2-2017 AAFAF acts as fiscal agent and financial advisor to COFINA as an instrumentality.
+

@@ -1,6 +1,6 @@
 {
   "gate": "NON_PRODUCTION_DIAGNOSTIC",
-  "generated_at": "2026-06-01T12:41:28.823212+00:00",
+  "generated_at": "2026-06-01T12:53:12.341125+00:00",
   "node_counts": {
     "people": 60,
     "entities": 22,
@@ -14,22 +14,23 @@
     "municipalities": 78
   },
   "total_nodes": 187,
-  "edge_count": 37,
+  "edge_count": 42,
   "edge_type_counts": {
+    "ADVISES": 5,
     "HOLDS_DEBT": 20,
     "HOLDS_ROLE_IN": 7,
     "LOCATED_IN": 10
   },
-  "evidence_count": 197,
+  "evidence_count": 202,
   "evidence_tier_counts": {
     "T1": 136,
-    "T2": 61
+    "T2": 66
   },
   "evidence_review_status_counts": {
-    "accepted": 197
+    "accepted": 202
   },
   "edge_evidence_coverage_pct": 100.0,
-  "edges_backed_by_accepted_evidence": 37,
+  "edges_backed_by_accepted_evidence": 42,
   "connected_node_count": 47,
   "review_queue_open": 0,
   "top_degree_nodes": [
@@ -42,24 +43,28 @@
       "degree": 7
     },
     {
+      "node_id": "entity_1c1ee3c0f0c85d23",
+      "degree": 6
+    },
+    {
       "node_id": "entity_125b538f289a4708",
-      "degree": 4
+      "degree": 5
     },
     {
       "node_id": "entity_5204a3d8f84bbfcd",
-      "degree": 3
+      "degree": 4
     },
     {
       "node_id": "entity_6c1d858c1babe390",
-      "degree": 3
+      "degree": 4
     },
     {
       "node_id": "entity_b182f85acf46f69b",
-      "degree": 3
+      "degree": 4
     },
     {
       "node_id": "entity_c5fb8a7f44e8ff18",
-      "degree": 3
+      "degree": 4
     },
     {
       "node_id": "entity_d363e4ddf2ce6a5d",
@@ -67,10 +72,6 @@
     },
     {
       "node_id": "debt_commonwealth_of_puerto_rico_go_2012_745145sk7",
-      "degree": 1
-    },
-    {
-      "node_id": "debt_commonwealth_of_puerto_rico_go_2014_745145sw1",
       "degree": 1
     }
   ]
