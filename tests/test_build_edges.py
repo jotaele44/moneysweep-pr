@@ -18,8 +18,8 @@ def test_builds_all_seeded_edge_types():
     for e in built["edge_rows"]:
         by_type[e["edge_type"]] = by_type.get(e["edge_type"], 0) + 1
     assert built["skipped"] == []
-    assert by_type == {"LOCATED_IN": 10, "HOLDS_ROLE_IN": 7, "HOLDS_DEBT": 11}
-    assert len(built["edge_rows"]) == 28
+    assert by_type == {"LOCATED_IN": 10, "HOLDS_ROLE_IN": 7, "HOLDS_DEBT": 20}
+    assert len(built["edge_rows"]) == 37
 
 
 @pytest.mark.integration
