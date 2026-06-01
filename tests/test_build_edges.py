@@ -18,8 +18,21 @@ def test_builds_all_seeded_edge_types():
     for e in built["edge_rows"]:
         by_type[e["edge_type"]] = by_type.get(e["edge_type"], 0) + 1
     assert built["skipped"] == []
-    assert by_type == {"LOCATED_IN": 10, "HOLDS_ROLE_IN": 7, "HOLDS_DEBT": 20}
-    assert len(built["edge_rows"]) == 37
+    assert by_type == {"LOCATED_IN": 10, "HOLDS_ROLE_IN": 7, "HOLDS_DEBT": 20, "ADVISES": 5}
+    assert len(built["edge_rows"]) == 42
+
+
+@pytest.mark.integration
+def test_advises_edges_are_entity_to_entity():
+    built = be.build_edges(REPO_ROOT)
+    entity_ids = {r["entity_id"] for r in cv1.load_all_tables(REPO_ROOT)["entities"]}
+    advises = [e for e in built["edge_rows"] if e["edge_type"] == "ADVISES"]
+    assert len(advises) == 5
+    for e in advises:
+        assert e["source_node_type"] == "Entity"
+        assert e["target_node_type"] == "Entity"
+        assert e["source_node_id"] in entity_ids
+        assert e["target_node_id"] in entity_ids
 
 
 @pytest.mark.integration
