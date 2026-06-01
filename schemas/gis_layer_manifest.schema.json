@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GIS Layer Manifest",
+  "type": "object",
+  "required": ["layers"],
+  "properties": {
+    "layers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "layer_id",
+          "layer_name",
+          "layer_type",
+          "path",
+          "geometry_type",
+          "source_id",
+          "refresh_frequency",
+          "status"
+        ],
+        "properties": {
+          "layer_id": {"type": "string", "minLength": 1},
+          "layer_name": {"type": "string", "minLength": 1},
+          "layer_type": {
+            "type": "string",
+            "enum": [
+              "municipality_density",
+              "project_points",
+              "infrastructure_assets",
+              "contract_flows",
+              "influence_overlay",
+              "debt_fiscal_overlay"
+            ]
+          },
+          "path": {"type": "string", "minLength": 1},
+          "geometry_type": {
+            "type": "string",
+            "enum": ["Point", "LineString", "Polygon", "MultiPolygon", "None"]
+          },
+          "source_id": {"type": "string", "minLength": 1},
+          "refresh_frequency": {"type": "string", "minLength": 1},
+          "status": {
+            "type": "string",
+            "enum": ["done", "partial", "missing", "blocked", "manual_required", "auth_required", "unknown"]
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Graph Edge Row",
+  "type": "object",
+  "required": [
+    "edge_id",
+    "from_node_id",
+    "to_node_id",
+    "edge_type",
+    "source_id",
+    "evidence_tier",
+    "confidence"
+  ],
+  "properties": {
+    "edge_id": {"type": "string", "minLength": 1},
+    "from_node_id": {"type": "string", "minLength": 1},
+    "to_node_id": {"type": "string", "minLength": 1},
+    "edge_type": {
+      "type": "string",
+      "enum": [
+        "AWARDED_TO",
+        "SUBCONTRACTED_TO",
+        "FUNDED_BY",
+        "LOCATED_IN",
+        "REGISTERED_LOBBYING_FOR",
+        "DONATED_TO",
+        "EMPLOYED_BY",
+        "BOARD_MEMBER_OF",
+        "OWNS",
+        "PARENT_OF",
+        "AMENDED_BY",
+        "PART_OF_PROJECT",
+        "AFFECTED_BY_DECISION",
+        "ADVISED_BY",
+        "LEGAL_REPRESENTED_BY",
+        "RELATED_TO"
+      ]
+    },
+    "relationship_start": {"type": "string"},
+    "relationship_end": {"type": "string"},
+    "amount": {"type": "number"},
+    "source_id": {"type": "string", "minLength": 1},
+    "source_file": {"type": "string"},
+    "source_url": {"type": "string"},
+    "evidence_tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}
