@@ -42,6 +42,7 @@ EDGES_OUT = "data/canonical_v1/edges.csv"
 EVIDENCE_OUT = "data/canonical_v1/evidence.csv"
 ROLES_IN = "data/canonical_v1/roles.csv"
 DEBT_IN = "data/canonical_v1/debt_instruments.csv"
+PROJECTS_IN = "data/canonical_v1/projects.csv"
 DATA_DIR = "data/canonical_v1"
 MANIFEST_OUT = "data/manifests/canonical_v1/edges.json"
 SOURCE_NAME = "PR Public-Money Relationships (reference seed)"
@@ -220,7 +221,45 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
             "notes": (debt.get("debt_class") or "").strip(),
         })
 
+    # Derive LOCATED_IN edges from projects.csv: a project located in a
+    # municipality. The project row already carries a resolved municipality_id and
+    # an accepted evidence_id, so the edge reuses that provenance.
+    for proj in _read_projects(root):
+        pid = (proj.get("project_id") or "").strip()
+        muni_id = (proj.get("municipality_id") or "").strip()
+        ev_id = (proj.get("evidence_id") or "").strip()
+        if not (pid and muni_id and ev_id):
+            continue
+        eid = edge_id(pid, "LOCATED_IN", muni_id)
+        if eid in seen:
+            continue
+        seen.add(eid)
+        edge_rows.append({
+            "edge_id": eid,
+            "source_node_type": "Project",
+            "source_node_id": pid,
+            "edge_type": "LOCATED_IN",
+            "target_node_type": "Municipality",
+            "target_node_id": muni_id,
+            "start_date": "",
+            "end_date": "",
+            "amount": "",
+            "currency": "",
+            "confidence": (proj.get("confidence") or "").strip(),
+            "evidence_id": ev_id,
+            "notes": (proj.get("project_type") or "").strip(),
+        })
+
     return {"edge_rows": edge_rows, "evidence_rows": evidence_rows, "skipped": skipped}
+
+
+def _read_projects(root: Path) -> list[dict[str, str]]:
+    """Read projects.csv rows (empty list if the table is missing or header-only)."""
+    path = root / PROJECTS_IN
+    if not path.exists():
+        return []
+    with path.open(newline="", encoding="utf-8") as fh:
+        return [r for r in csv.DictReader(fh) if (r.get("project_id") or "").strip()]
 
 
 def _read_roles(root: Path) -> list[dict[str, str]]:
