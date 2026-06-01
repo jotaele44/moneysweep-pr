@@ -1,0 +1,76 @@
+{
+  "gate": "NON_PRODUCTION_DIAGNOSTIC",
+  "generated_at": "2026-06-01T10:44:05.663435+00:00",
+  "node_counts": {
+    "people": 60,
+    "entities": 14,
+    "roles": 7,
+    "contracts": 0,
+    "projects": 0,
+    "debt_instruments": 0,
+    "lobbying_records": 0,
+    "funding_sources": 0,
+    "properties": 0,
+    "municipalities": 78
+  },
+  "total_nodes": 159,
+  "edge_count": 17,
+  "edge_type_counts": {
+    "HOLDS_ROLE_IN": 7,
+    "LOCATED_IN": 10
+  },
+  "evidence_count": 169,
+  "evidence_tier_counts": {
+    "T1": 128,
+    "T2": 41
+  },
+  "evidence_review_status_counts": {
+    "accepted": 169
+  },
+  "edge_evidence_coverage_pct": 100.0,
+  "edges_backed_by_accepted_evidence": 17,
+  "connected_node_count": 19,
+  "review_queue_open": 0,
+  "top_degree_nodes": [
+    {
+      "node_id": "muni_pr_san_juan",
+      "degree": 10
+    },
+    {
+      "node_id": "entity_3d2fd8a05e1703b2",
+      "degree": 7
+    },
+    {
+      "node_id": "entity_125b538f289a4708",
+      "degree": 1
+    },
+    {
+      "node_id": "entity_1c1ee3c0f0c85d23",
+      "degree": 1
+    },
+    {
+      "node_id": "entity_42ffd9ad9ab45e6a",
+      "degree": 1
+    },
+    {
+      "node_id": "entity_5204a3d8f84bbfcd",
+      "degree": 1
+    },
+    {
+      "node_id": "entity_67880db21dd281cd",
+      "degree": 1
+    },
+    {
+      "node_id": "entity_6c1d858c1babe390",
+      "degree": 1
+    },
+    {
+      "node_id": "entity_8d511bc1aaa048d4",
+      "degree": 1
+    },
+    {
+      "node_id": "entity_b182f85acf46f69b",
+      "degree": 1
+    }
+  ]
+}
