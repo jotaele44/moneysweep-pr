@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Influence Edge Row",
+  "type": "object",
+  "required": [
+    "edge_id",
+    "source_id",
+    "source_type",
+    "from_entity_id",
+    "from_entity_type",
+    "to_entity_id",
+    "to_entity_type",
+    "relationship_type",
+    "evidence_tier",
+    "confidence"
+  ],
+  "properties": {
+    "edge_id": {"type": "string", "minLength": 1},
+    "source_id": {"type": "string", "minLength": 1},
+    "source_type": {
+      "type": "string",
+      "enum": ["pr_cabilderos", "lda", "campaign_finance", "contract", "registry", "manual_review"]
+    },
+    "from_entity_id": {"type": "string", "minLength": 1},
+    "from_entity_type": {"type": "string", "minLength": 1},
+    "to_entity_id": {"type": "string", "minLength": 1},
+    "to_entity_type": {"type": "string", "minLength": 1},
+    "relationship_type": {
+      "type": "string",
+      "enum": [
+        "LOBBIES_FOR",
+        "AUTHORIZED_PERSONNEL_OF",
+        "DONATED_TO",
+        "EMPLOYED_BY",
+        "BOARD_MEMBER_OF",
+        "REGISTERED_FOR",
+        "CLIENT_OF",
+        "SUBSIDIARY_OF",
+        "CONTRACTED_WITH",
+        "FUNDED_BY",
+        "OWNS_OR_CONTROLS"
+      ]
+    },
+    "relationship_subtype": {"type": "string"},
+    "amount": {"type": "number"},
+    "period_start": {"type": "string"},
+    "period_end": {"type": "string"},
+    "filing_year": {"type": "string"},
+    "jurisdiction": {"type": "string"},
+    "source_document": {"type": "string"},
+    "evidence_tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}
