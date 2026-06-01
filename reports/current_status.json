@@ -1,6 +1,6 @@
 {
   "active_vector": "POST_PR97_STATUS_NORMALIZATION_REQUIRED_BACKFILL_GATE",
-  "active_branch": "claude/post-pr97-status-normalization",
+  "active_branch": "",
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_active": true,
   "completed": [
