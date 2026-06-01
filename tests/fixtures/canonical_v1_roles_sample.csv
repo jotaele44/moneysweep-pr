@@ -1,0 +1,5 @@
+person_name,entity_name,role_title,role_category,start_date,end_date,current,source_type,evidence_tier,extraction_method,claim
+Alice Verified,Test Utility Authority,Member,board,2016,,true,web,T2,manual,Alice Verified serves on the board of the Test Utility Authority.
+Phantom Person,Test Utility Authority,Member,board,2016,,true,web,T2,manual,unresolved person should be skipped.
+Alice Verified,Nonexistent Org,Member,board,2016,,true,web,T2,manual,unresolved entity should be skipped.
+Alice Verified,Test Utility Authority,Member,spaceship,2016,,true,web,T2,manual,invalid role_category should be skipped.

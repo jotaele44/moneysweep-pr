@@ -40,6 +40,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 RELATIONSHIPS = "data/reference/canonical_v1_relationships_seed.csv"
 EDGES_OUT = "data/canonical_v1/edges.csv"
 EVIDENCE_OUT = "data/canonical_v1/evidence.csv"
+ROLES_IN = "data/canonical_v1/roles.csv"
 DATA_DIR = "data/canonical_v1"
 MANIFEST_OUT = "data/manifests/canonical_v1/edges.json"
 SOURCE_NAME = "PR Public-Money Relationships (reference seed)"
@@ -158,7 +159,45 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
                 "notes": "",
             })
 
+    # Derive HOLDS_ROLE_IN edges from roles.csv (single-writer: edges.csv is only
+    # written here). Each role row already carries a resolved person_id, entity_id,
+    # and an accepted evidence_id, so the role edge reuses that provenance.
+    for role in _read_roles(root):
+        pid = (role.get("person_id") or "").strip()
+        eid_entity = (role.get("entity_id") or "").strip()
+        ev_id = (role.get("evidence_id") or "").strip()
+        if not (pid and eid_entity and ev_id):
+            continue
+        eid = edge_id(pid, "HOLDS_ROLE_IN", eid_entity)
+        if eid in seen:
+            continue
+        seen.add(eid)
+        edge_rows.append({
+            "edge_id": eid,
+            "source_node_type": "Person",
+            "source_node_id": pid,
+            "edge_type": "HOLDS_ROLE_IN",
+            "target_node_type": "Entity",
+            "target_node_id": eid_entity,
+            "start_date": (role.get("start_date") or "").strip(),
+            "end_date": (role.get("end_date") or "").strip(),
+            "amount": "",
+            "currency": "",
+            "confidence": (role.get("confidence") or "").strip(),
+            "evidence_id": ev_id,
+            "notes": (role.get("role_title") or "").strip(),
+        })
+
     return {"edge_rows": edge_rows, "evidence_rows": evidence_rows, "skipped": skipped}
+
+
+def _read_roles(root: Path) -> list[dict[str, str]]:
+    """Read roles.csv rows (empty list if the table is missing or header-only)."""
+    path = root / ROLES_IN
+    if not path.exists():
+        return []
+    with path.open(newline="", encoding="utf-8") as fh:
+        return [r for r in csv.DictReader(fh) if (r.get("role_id") or "").strip()]
 
 
 def _write(rows: list[dict[str, Any]], out_path: Path) -> None:
