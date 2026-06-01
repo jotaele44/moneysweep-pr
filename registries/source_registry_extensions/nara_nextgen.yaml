@@ -10,7 +10,7 @@ sources:
     required: false
     authentication: api_key:NARA_API_KEY
     endpoint_url: https://catalog.archives.gov/api/v3/records/search
-    producer_script: ""
+    producer_script: scripts/download_nara_nextgen.py
     expected_outputs:
       - data/staging/processed/nara_nextgen/nara_record_locator_index.csv
       - reports/source_manifests/nara_nextgen_catalog_v3_manifest.json
@@ -31,7 +31,7 @@ sources:
     required: false
     authentication: none
     endpoint_url: https://registry.opendata.aws/
-    producer_script: ""
+    producer_script: scripts/download_nara_nextgen.py
     expected_outputs:
       - data/staging/processed/nara_nextgen/nara_bulk_catalog_index.csv
       - reports/source_manifests/nara_catalog_aws_open_data_manifest.json
