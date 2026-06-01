@@ -1,6 +1,6 @@
 # Canonical v1 Graph Summary
 
-**Gate:** `NON_PRODUCTION_DIAGNOSTIC` · **Generated:** 2026-06-01T13:11:19.962031+00:00
+**Gate:** `NON_PRODUCTION_DIAGNOSTIC` · **Generated:** 2026-06-01T17:17:59.990830+00:00
 
 _Descriptive, derived summary of the committed canonical_v1 tables. Asserts no new sourced claims; every figure is a count over existing, evidence-backed rows. Phrasing follows `docs/CLAIM_LANGUAGE_POLICY.md`._
 
@@ -19,7 +19,7 @@ _Descriptive, derived summary of the committed canonical_v1 tables. Asserts no n
 | `properties` | 0 |
 | `municipalities` | 78 |
 
-## Edges (47 total)
+## Edges (50 total)
 
 | edge_type | Count |
 |-----------|-------|
@@ -27,17 +27,18 @@ _Descriptive, derived summary of the committed canonical_v1 tables. Asserts no n
 | `HOLDS_DEBT` | 20 |
 | `HOLDS_ROLE_IN` | 7 |
 | `LOCATED_IN` | 15 |
+| `OWNS_OR_CONTROLS` | 3 |
 
 ## Evidence
 
-- Rows: **207**
-- Tier distribution: {'T1': 136, 'T2': 71}
-- Review status: {'accepted': 207}
-- Edge evidence coverage: **100.0%** (47/47 edges backed by an accepted evidence row)
+- Rows: **210**
+- Tier distribution: {'T1': 136, 'T2': 74}
+- Review status: {'accepted': 210}
+- Edge evidence coverage: **100.0%** (50/50 edges backed by an accepted evidence row)
 
 ## Connectivity
 
-- Nodes touched by ≥1 edge: **52**
+- Nodes touched by ≥1 edge: **55**
 - Open review-queue items: 0
 
 ### Highest-degree nodes (record shows most edge endpoints)
@@ -53,4 +54,4 @@ _Descriptive, derived summary of the committed canonical_v1 tables. Asserts no n
 | `entity_b182f85acf46f69b` | 4 |
 | `entity_c5fb8a7f44e8ff18` | 4 |
 | `entity_d363e4ddf2ce6a5d` | 2 |
-| `debt_commonwealth_of_puerto_rico_go_2012_745145sk7` | 1 |
+| `project_puerto_rico_electric_power_authority_prepa_gen_oma_2023` | 2 |
