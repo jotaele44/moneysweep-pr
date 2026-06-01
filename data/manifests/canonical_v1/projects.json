@@ -1,0 +1,18 @@
+{
+  "producer_script": "scripts/ingest_projects.py",
+  "producer_phase": "CANONICAL_V1_PROJECTS_INGEST",
+  "source_inputs": [
+    "data/reference/pr_infrastructure_projects.csv"
+  ],
+  "row_count": 5,
+  "project_type_counts": {
+    "ppp": 3,
+    "recovery": 1,
+    "infrastructure": 1
+  },
+  "skipped_count": 0,
+  "skipped": [],
+  "evidence_rows_added": 5,
+  "evidence_table_rows": 207,
+  "generated_at": "2026-06-01T13:10:23.720999+00:00"
+}
