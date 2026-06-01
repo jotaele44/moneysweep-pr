@@ -1,0 +1,8 @@
+person_name,entity_name,role_title,role_category,start_date,end_date,current,source_type,evidence_tier,extraction_method,claim
+José B. Carrión III,Financial Oversight and Management Board for Puerto Rico,Chair (former),board,2016,2021,false,web,T2,manual,José B. Carrión III served as a member and chair of the PROMESA Financial Oversight and Management Board.
+Andrew Biggs,Financial Oversight and Management Board for Puerto Rico,Member,board,2016,,false,web,T2,manual,Andrew Biggs served as a member of the PROMESA Financial Oversight and Management Board.
+Carlos García,Financial Oversight and Management Board for Puerto Rico,Member,board,2016,,false,web,T2,manual,Carlos M. García served as a member of the PROMESA Financial Oversight and Management Board.
+Arthur Gonzalez,Financial Oversight and Management Board for Puerto Rico,Member,board,2016,,false,web,T2,manual,Arthur J. González served as a member of the PROMESA Financial Oversight and Management Board.
+José González,Financial Oversight and Management Board for Puerto Rico,Member,board,2016,,false,web,T2,manual,José R. González served as a member of the PROMESA Financial Oversight and Management Board.
+Ana Matosantos,Financial Oversight and Management Board for Puerto Rico,Member,board,2016,,true,web,T2,manual,Ana J. Matosantos served as a member of the PROMESA Financial Oversight and Management Board.
+David Skeel,Financial Oversight and Management Board for Puerto Rico,Member,board,2016,,true,web,T2,manual,David A. Skeel Jr. served as a member of the PROMESA Financial Oversight and Management Board.
