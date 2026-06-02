@@ -48,7 +48,7 @@ ADAPTER_SOURCE_IDS = set(ADAPTER_REGISTRY) | set(ENTITY_ADAPTER_REGISTRY)
 # the automatable fill). Curated domain knowledge — kept explicit on purpose.
 SCRAPER_NEEDED = {
     "compras_pr", "aafaf", "hacienda", "cofina", "prepa_luma_genera",
-    "cor3", "prasa", "p3_authority", "oficina_contralor",
+    "cor3", "prasa", "p3_authority",
     "pr_act_60_decrees", "promesa_creditors", "rum_cover_over",
     "municipal_finance", "pr_pensions", "eqb_epa_icis",
     "pr_cabilderos", "donaciones_pr", "follow_the_money",

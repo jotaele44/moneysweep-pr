@@ -59,6 +59,7 @@ act_transition_contracts,False,manual_export,False,False,,False,True,scripts/ing
 acuden_2024_transition,False,manual_export,False,False,,False,True,scripts/ingest_act_transition.py,1,0,1,data/manual/acuden_2024/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 dcaa_active_contractors,False,manual_export,False,False,,False,True,scripts/download_active_contractors.py,1,0,1,data/manual/dcaa_active_contractors/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 hud_drgr_authorized,True,manual_export,False,False,,False,True,scripts/ingest_hud_drgr_exports.py,2,0,1,data/manual/hud_drgr/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+oficina_contralor,True,manual_export,False,False,,False,True,scripts/ingest_contralor.py,1,0,1,data/raw/Oficina del Contralor/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 pr_corporate_registry,False,manual_export,False,False,,False,True,scripts/ingest_active_contractors.py,1,0,1,data/manual/pr_corporate_registry/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 aafaf,False,scraper_needed,False,False,,False,True,scripts/download_aafaf.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 cofina,False,scraper_needed,False,False,,False,True,scripts/download_cofina.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
@@ -71,7 +72,6 @@ follow_the_money,False,scraper_needed,False,False,,False,True,scripts/ingest_fol
 hacienda,False,scraper_needed,False,False,,False,True,scripts/download_hacienda.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 msrb_rtrs_trades,False,scraper_needed,False,False,,False,True,scripts/download_msrb_trades.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 municipal_finance,False,scraper_needed,False,False,,False,True,scripts/download_municipal.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-oficina_contralor,True,scraper_needed,False,False,,False,True,scripts/ingest_contralor.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 p3_authority,False,scraper_needed,False,False,,False,True,scripts/download_p3.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 pr_act_60_decrees,False,scraper_needed,False,False,,False,True,scripts/download_act60.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 pr_cabilderos,True,scraper_needed,False,False,,False,True,scripts/ingest_cabilderos.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.

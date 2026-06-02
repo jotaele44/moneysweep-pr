@@ -8,7 +8,7 @@ fsrs_subawards,federal,True,none,1,0,1,0,not_materialized,0,1,data/staging/proce
 hud_cdbg_dr_public,federal,True,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cdbg_dr_master.csv,
 hud_drgr_authorized,manual_export,True,manual_export,2,0,2,0,not_materialized,0,1,data/staging/processed/hud_drgr_activities.csv,Credentialed DRGR portal — operator must export and drop manifests in manual_drop_dir.
 lda,lobbying,True,api_key:LDA_API_KEY,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_lda_filings.csv,
-oficina_contralor,territorial,True,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_contralor_contracts.csv,PR Comptroller contract registry. Authoritative for territorial contracts.
+oficina_contralor,territorial,True,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_contralor_audits.csv,PR Comptroller (OCPR) audit reports and findings on government entities and contractors. Operator delivers exported CSV/Excel to the dropzone. NOTE the OCPR contract registry (consultacontratos.ocpr.g
 pr_cabilderos,lobbying,True,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cabilderos.csv,
 prasa,infrastructure,True,none,2,0,2,0,not_materialized,0,1,data/staging/processed/pr_prasa_contracts.csv,PRASA aqueduct/sewer authority. Includes Consulting Engineer Report FY2024 baseline.
 sam_entities,entity_resolution,True,api_key:SAM_API_KEY,2,0,2,0,not_materialized,0,1,data/staging/processed/enrichment/vendor_uei_index.csv,"SAM full extract + per-UEI enrichment for parent resolution.
