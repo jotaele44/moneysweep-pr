@@ -99,6 +99,20 @@ KNOWN_COVEROVER = [
 ]
 
 
+def parse_records(records: list[dict]) -> pd.DataFrame:
+    """Map raw rum cover-over records to the canonical schema.
+    Pure — no network or I/O. Live fetch still needs egress to access
+    the TTB statistics site (ttb.gov) and Treasury FiscalData API.
+    """
+    if not records:
+        return pd.DataFrame(columns=RUM_COLUMNS)
+    df = pd.DataFrame(records)
+    for col in RUM_COLUMNS:
+        if col not in df.columns:
+            df[col] = ""
+    return df[RUM_COLUMNS]
+
+
 def _session():
     s = requests.Session()
     s.headers.update({"User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0)"})

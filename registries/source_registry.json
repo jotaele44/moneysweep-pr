@@ -154,7 +154,7 @@
       "endpoint_url": "https://recovery.pr.gov/",
       "producer_script": "scripts/download_cor3.py",
       "expected_outputs": [
-        "data/staging/processed/pr_cor3_master.csv"
+        "data/staging/processed/pr_cor3_projects.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -218,7 +218,7 @@
       "source_id": "prasa",
       "family": "infrastructure",
       "required": true,
-      "authentication": "none",
+      "authentication": "manual_export",
       "endpoint_url": "https://www.acueductospr.com/",
       "producer_script": "scripts/ingest_prasa.py",
       "expected_outputs": [
@@ -229,8 +229,9 @@
       "validation_threshold": {
         "min_rows": 1
       },
+      "manual_drop_dir": "data/raw/PRASA/",
       "update_cadence": "yearly",
-      "notes": "PRASA aqueduct/sewer authority. Includes Consulting Engineer Report FY2024 baseline."
+      "notes": "PRASA aqueduct/sewer authority. ingest_prasa.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers exported procurement files to data/raw/PRASA/. Includes Consulting Engineer Report FY2024 baseline. NOTE expected output prasa_contracts_master.csv is declared but has no producer or consumer yet (the producer writes only pr_prasa_contracts.csv, which build_financial_flows_master.py consumes); the master aggregation is a future deliverable, not a current gap."
     },
     {
       "source_id": "prepa_luma_genera",
@@ -255,7 +256,7 @@
       "required": false,
       "authentication": "manual_export",
       "endpoint_url": "",
-      "producer_script": "scripts/ingest_active_contractors.py",
+      "producer_script": "scripts/ingest_act_transition.py",
       "expected_outputs": [
         "data/staging/processed/pr_act_transition_contracts.csv"
       ],
@@ -273,7 +274,7 @@
       "required": false,
       "authentication": "manual_export",
       "endpoint_url": "",
-      "producer_script": "scripts/ingest_active_contractors.py",
+      "producer_script": "scripts/ingest_act_transition.py",
       "expected_outputs": [
         "data/staging/processed/pr_acuden_transition.csv"
       ],
@@ -307,18 +308,19 @@
       "source_id": "oficina_contralor",
       "family": "territorial",
       "required": true,
-      "authentication": "none",
-      "endpoint_url": "https://consultacontratos.ocpr.gov.pr/",
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.ocpr.gov.pr/",
       "producer_script": "scripts/ingest_contralor.py",
       "expected_outputs": [
-        "data/staging/processed/pr_contralor_contracts.csv"
+        "data/staging/processed/pr_contralor_audits.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
         "min_rows": 1
       },
+      "manual_drop_dir": "data/raw/Oficina del Contralor/",
       "update_cadence": "monthly",
-      "notes": "PR Comptroller contract registry. Authoritative for territorial contracts."
+      "notes": "PR Comptroller (OCPR) audit reports and findings on government entities and contractors. Operator delivers exported CSV/Excel to the dropzone. NOTE the OCPR contract registry (consultacontratos.ocpr.gov.pr) is a separate product still needing a dedicated scraper."
     },
     {
       "source_id": "compras_pr",
@@ -328,7 +330,8 @@
       "endpoint_url": "https://www.comprashpr.com/",
       "producer_script": "scripts/download_compras.py",
       "expected_outputs": [
-        "data/staging/processed/pr_compras_rfps.csv"
+        "data/staging/processed/pr_compras_rfps.csv",
+        "data/staging/processed/pr_compras_awards.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -362,7 +365,7 @@
       "endpoint_url": "https://hacienda.pr.gov/",
       "producer_script": "scripts/download_hacienda.py",
       "expected_outputs": [
-        "data/staging/processed/pr_hacienda_tax_revenue.csv"
+        "data/staging/processed/pr_hacienda_revenues.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -378,7 +381,7 @@
       "endpoint_url": "https://www.cofina.pr.gov/",
       "producer_script": "scripts/download_cofina.py",
       "expected_outputs": [
-        "data/staging/processed/pr_cofina_sut.csv"
+        "data/staging/processed/pr_cofina.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -442,7 +445,7 @@
       "endpoint_url": "https://www.retiro.pr.gov/",
       "producer_script": "scripts/download_pr_pensions.py",
       "expected_outputs": [
-        "data/staging/processed/pr_pensions_ers_trs_jrs.csv"
+        "data/staging/processed/pr_pension_funds.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -508,7 +511,7 @@
       "producer_script": "scripts/download_emma.py",
       "expected_outputs": [
         "data/staging/processed/pr_emma_bonds.csv",
-        "data/staging/processed/bond_asset_map.csv"
+        "data/staging/processed/pr_emma_underwriters.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -524,7 +527,7 @@
       "endpoint_url": "https://emma.msrb.org/",
       "producer_script": "scripts/download_msrb_trades.py",
       "expected_outputs": [
-        "data/staging/processed/pr_msrb_rtrs_trades.csv"
+        "data/staging/processed/pr_msrb_trades.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
@@ -552,7 +555,7 @@
       "source_id": "pr_cabilderos",
       "family": "lobbying",
       "required": true,
-      "authentication": "none",
+      "authentication": "manual_export",
       "endpoint_url": "https://etica.pr.gov/cabilderos/",
       "producer_script": "scripts/ingest_cabilderos.py",
       "expected_outputs": [
@@ -562,7 +565,9 @@
       "validation_threshold": {
         "min_rows": 1
       },
-      "update_cadence": "quarterly"
+      "manual_drop_dir": "data/raw/Cabilderos/",
+      "update_cadence": "quarterly",
+      "notes": "PR Office of Government Ethics (OEG) state-level lobbyist (cabildero) registry. ingest_cabilderos.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers the OEG export to data/raw/Cabilderos/. Cross-references cabildero clients with federal award recipients to surface dual-influence entities."
     },
     {
       "source_id": "fec",
@@ -585,9 +590,9 @@
       "source_id": "donaciones_pr",
       "family": "political_finance",
       "required": false,
-      "authentication": "none",
+      "authentication": "manual_export",
       "endpoint_url": "https://www.ceepur.org/",
-      "producer_script": "scripts/ingest_fec.py",
+      "producer_script": "scripts/ingest_donaciones.py",
       "expected_outputs": [
         "data/staging/processed/pr_donaciones.csv"
       ],
@@ -595,25 +600,30 @@
       "validation_threshold": {
         "min_rows": 1
       },
+      "manual_drop_dir": "data/raw/Donaciones/",
       "update_cadence": "ad_hoc",
-      "notes": "PR State Election Commission donations. Cross-references federal FEC."
+      "notes": "PR State Election Commission (CEE/CEEPUR) state-level donation registry. ingest_donaciones.py is a dropzone reader for operator-delivered CEE CSV exports \u2014 no network code. Previously mislabeled as using ingest_fec.py (federal FEC) with a wrong output path. Cross-references federal FEC via analyze_political_crossref.py."
     },
     {
       "source_id": "follow_the_money",
       "family": "political_finance",
       "required": false,
-      "authentication": "none",
+      "authentication": "manual_export",
       "endpoint_url": "https://www.followthemoney.org/",
       "producer_script": "scripts/ingest_follow_the_money.py",
       "expected_outputs": [
-        "data/staging/processed/pr_follow_the_money.csv"
+        "data/staging/processed/pr_sf133_budget_execution.csv",
+        "data/staging/processed/pr_ftm_wire_ledger.csv",
+        "data/staging/processed/pr_ftm_municipal_bridge.csv",
+        "data/staging/processed/pr_ftm_facility_matches.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
         "min_rows": 1
       },
+      "manual_drop_dir": "data/raw/Follow the Money/",
       "update_cadence": "yearly",
-      "notes": "State-level campaign finance for PR + DC connections."
+      "notes": "Follow the Money export data for PR. ingest_follow_the_money.py is a dropzone reader (no network code) producing 4 outputs from operator-delivered CSV exports in data/raw/Follow the Money/. Previously mislabeled with a phantom pr_follow_the_money.csv output that is never written."
     },
     {
       "source_id": "sba_loans",

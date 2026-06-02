@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Top Form Gap Matrix Row",
+  "type": "object",
+  "required": [
+    "gate",
+    "item",
+    "status",
+    "priority",
+    "owner",
+    "file_or_source",
+    "next_action"
+  ],
+  "properties": {
+    "gate": {"type": "string", "minLength": 1},
+    "item": {"type": "string", "minLength": 1},
+    "status": {
+      "type": "string",
+      "enum": ["done", "partial", "missing", "blocked", "manual_required", "auth_required", "unknown"]
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["P0", "P1", "P2", "P3"]
+    },
+    "owner": {"type": "string", "minLength": 1},
+    "file_or_source": {"type": "string", "minLength": 1},
+    "next_action": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}

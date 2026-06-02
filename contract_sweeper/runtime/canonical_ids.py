@@ -93,6 +93,11 @@ def municipality_id(name: str | None) -> str:
     return f"muni_pr_{slug(normalize_name(name))}"
 
 
+def property_id(name: str | None, owner: str | None = None) -> str:
+    """Deterministic id for a property/asset from its owner + name."""
+    return f"property_{slug(owner)}_{slug(name)}"
+
+
 # --------------------------------------------------------------------------- #
 # Edge / evidence IDs
 # --------------------------------------------------------------------------- #

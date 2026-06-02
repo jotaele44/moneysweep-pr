@@ -9,3 +9,13 @@ Entity,Puerto Rico Sales Tax Financing Corporation,LOCATED_IN,Municipality,San J
 Entity,Government Development Bank for Puerto Rico,LOCATED_IN,Municipality,San Juan,web,T2,manual,The Government Development Bank is headquartered in San Juan Puerto Rico.
 Entity,Puerto Rico Department of Economic Development and Commerce,LOCATED_IN,Municipality,San Juan,web,T2,manual,The Department of Economic Development and Commerce is headquartered in San Juan Puerto Rico.
 Entity,Puerto Rico Public Buildings Authority,LOCATED_IN,Municipality,San Juan,web,T2,manual,The Public Buildings Authority is headquartered in San Juan Puerto Rico.
+Entity,Puerto Rico Fiscal Agency and Financial Advisory Authority,ADVISES,Entity,Commonwealth of Puerto Rico,web,T2,manual,Under Act 2-2017 AAFAF acts as fiscal agent and financial advisor to the Commonwealth of Puerto Rico.
+Entity,Puerto Rico Fiscal Agency and Financial Advisory Authority,ADVISES,Entity,Puerto Rico Electric Power Authority,web,T2,manual,Under Act 2-2017 AAFAF acts as fiscal agent and financial advisor to PREPA as an instrumentality.
+Entity,Puerto Rico Fiscal Agency and Financial Advisory Authority,ADVISES,Entity,Puerto Rico Aqueduct and Sewer Authority,web,T2,manual,Under Act 2-2017 AAFAF acts as fiscal agent and financial advisor to PRASA as an instrumentality.
+Entity,Puerto Rico Fiscal Agency and Financial Advisory Authority,ADVISES,Entity,Puerto Rico Highways and Transportation Authority,web,T2,manual,Under Act 2-2017 AAFAF acts as fiscal agent and financial advisor to the Highways and Transportation Authority as an instrumentality.
+Entity,Puerto Rico Fiscal Agency and Financial Advisory Authority,ADVISES,Entity,Puerto Rico Sales Tax Financing Corporation,web,T2,manual,Under Act 2-2017 AAFAF acts as fiscal agent and financial advisor to COFINA as an instrumentality.
+Entity,LUMA Energy,OWNS_OR_CONTROLS,Project,LUMA Energy Transmission and Distribution Operation,web,T2,manual,LUMA Energy operates and controls the PREPA transmission and distribution operation under its public-private partnership agreement.
+Entity,Genera PR,OWNS_OR_CONTROLS,Project,Genera PR Generation Operation,web,T2,manual,Genera PR operates and controls the legacy PREPA power-generation operation under its public-private partnership agreement.
+Entity,Autopistas Metropolitanas de Puerto Rico,OWNS_OR_CONTROLS,Project,Metropistas Toll Road Concession (PR-22 and PR-5),web,T2,manual,Autopistas Metropolitanas operates and controls the PR-22 and PR-5 toll-road concession under its agreement with the Highways and Transportation Authority.
+
+

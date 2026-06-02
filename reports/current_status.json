@@ -1,6 +1,6 @@
 {
-  "active_vector": "POST_PR97_STATUS_NORMALIZATION_REQUIRED_BACKFILL_GATE",
-  "active_branch": "claude/post-pr97-status-normalization",
+  "active_vector": "MATERIALIZATION_READINESS_LOCKED_AWAITING_EGRESS_FILL",
+  "active_branch": "",
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_active": true,
   "completed": [
@@ -40,9 +40,10 @@
     "PR-B6 wire bonds/entity-resolution/manual sources — un-archived 4 downloader modules (msrb_trades, ofac, opencorporates, active_contractors) covering 4 sources; registry repointed to scripts/; test_download_ofac.py restored from archive; smoke test extended; SOURCE REGISTRY REWIRE COMPLETE — all 82 producer_script paths point to scripts/, 0 optional sources archived; 710 passed",
     "Pipeline readiness preflight — scripts/pipeline_preflight.py (registry-driven, no producer execution, no network): classifies all 82 sources by readiness, reports API-key presence/absence without logging values, --strict-preflight aborts run_all only on structural errors; tests/test_pipeline_preflight.py added (PR #97)",
     "PR #97 pipeline readiness preflight merged to main — strict preflight available",
-    "On-demand query adapter batch 5 (branch claude/source-wirings-output-HRHQW) — 8 new adapters (nfip_claims, slfrf, haf, exim_bank, fdic, nonprofits_irs990, sba_ppp, sba_loans); ADAPTER_REGISTRY 18 → 26 (~32% of 82); source recovery matrix at reports/source_recovery_matrix.{csv,md}; 836 passed, 4 skipped"
+    "On-demand query adapter batch 5 (branch claude/source-wirings-output-HRHQW) — 8 new adapters (nfip_claims, slfrf, haf, exim_bank, fdic, nonprofits_irs990, sba_ppp, sba_loans); ADAPTER_REGISTRY 18 → 26 (~32% of 82); source recovery matrix at reports/source_recovery_matrix.{csv,md}; 836 passed, 4 skipped",
+    "Strict-preflight gate restored + materialization readiness gate (#144, squash 53da515) — added scripts/download_nara_nextgen.py (deferred no-op producer) so the 2 optional NARA extension stubs no longer abort strict preflight (84 sources, 0 structural errors); upgraded scripts/build_source_recovery_matrix.py into a readiness classifier driven by the live source + adapter registries and pipeline_preflight; reports/materialization_readiness.json: 84 total → 54 automatable all ready, 0 broken, 30 queued (20 scraper_needed, 5 manual_export, 3 semantic_duplicate, 2 deferred_stub), 5 automatable need a key at run time; tests/test_materialization_readiness.py (gate) + docs/MATERIALIZATION_RUNBOOK.md added; 1229 passed, 5 skipped"
   ],
-  "concrete_adapter_count": 26,
+  "concrete_adapter_count": 35,
   "in_progress": [
     "Source intake taxonomy for uploaded PR contract, lobbying, PRASA, and contractor-reference datasets pending",
     "PR2.5/PR2.6 entity-gate branch reconciliation pending before PR3 deduplication"
@@ -55,12 +56,12 @@
   ],
   "last_tests": {
     "command": "python -m pytest tests/ -q",
-    "passed": 836,
-    "skipped": 4,
+    "passed": 1229,
+    "skipped": 5,
     "failed": 0,
     "status": "GREEN",
-    "run_at": "2026-05-26",
-    "note": "Full suite green on branch claude/source-wirings-output-HRHQW after 8-adapter batch; previously yellow 4 failures on main not surfaced here."
+    "run_at": "2026-06-01",
+    "note": "Full suite green on main after #144 (materialization readiness gate); strict preflight 0 structural errors across 84 sources."
   },
   "secrets_audit": {
     "files_scanned": 560,
@@ -133,22 +134,20 @@
     "Federal LDA registrants",
     "DCAA active contractor listings"
   ],
-  "next_command": "QUERY_ADAPTER_BATCH_6_AUTH_OR_KEY_GATED_OR_CMS_OPEN_PAYMENTS",
+  "next_command": "FILL_AUTOMATABLE_SOURCES_IN_EGRESS_ENABLED_ENVIRONMENT",
   "next_command_detail": {
-    "description": "Run producer scripts for required=True sources only; do not run optional sources",
-    "required_sources_not_materialized": [
-      "usaspending_prime (partially_materialized)",
-      "fsrs_subawards (not_materialized)",
-      "sam_entities (not_materialized — requires SAM_API_KEY)",
-      "cor3 (not_materialized — manual export)",
-      "hud_drgr_authorized (not_materialized — manual export)",
-      "prasa (not_materialized — manual export)",
-      "oficina_contralor (not_materialized — manual export)",
-      "emma_bonds (partially_materialized)",
-      "pr_cabilderos (partially_materialized)"
+    "description": "Materialize the 54 automatable sources per docs/MATERIALIZATION_RUNBOOK.md. Requires an environment with outbound HTTPS — the web sandbox blocks egress (HTTP 403), so no producer/adapter can fetch data there.",
+    "readiness_source_of_truth": "reports/materialization_readiness.json (automatable_ready=54/54, queued_excluded=30)",
+    "steps": [
+      "pip install -r requirements.txt",
+      "set the 5 run-time keys in .env: SAM_API_KEY, LDA_API_KEY, FEC_API_KEY, OPENCORPORATES_API_TOKEN, HIGHERGOV_API_KEY",
+      "python3 run_all.py --only-setup --strict-preflight (expect 0 structural errors)",
+      "materialize: python -m contract_sweeper.query --source <id> (35 adapter sources) and/or python3 run_all.py --strict-preflight",
+      "regenerate: python3 scripts/gap_analysis_builder.py && python3 scripts/build_source_recovery_matrix.py",
+      "verify automatable_ready == automatable_total and each automatable source fully_materialized"
     ],
     "gate": "strict preflight must pass before each producer run",
-    "excluded": "optional sources (required=False) — do not run in this pass",
-    "materialization_vocabulary_patch": "next_patch — gap_analysis_builder.py has fully_materialized/partially_materialized/not_materialized/below_threshold/no_outputs_declared; proposed new terms (full_materialized, partial_materialized, seed_only, manual_required, failed_api_query) diverge from existing vocabulary and would require a refactor; defer to dedicated PR"
+    "queued_excluded": "30 sources not in the automatable target: 20 scraper_needed (need PR-gov scraping adapters), 5 manual_export (operator files), 3 semantic_duplicate (sibling-covered), 2 deferred_stub (NARA)",
+    "future_work": "build the 20 scraper_needed PR-gov adapters and integrate the manual datasets (ACT/ACUDEN/PRASA/cabilderos/DCAA) in dedicated egress-enabled PRs"
   }
 }

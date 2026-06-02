@@ -7,9 +7,21 @@ Puerto Rico Electric Power Authority,utility,PR,PREPA|AEE|Autoridad de Energia E
 Puerto Rico Aqueduct and Sewer Authority,utility,PR,PRASA|AAA|Autoridad de Acueductos y Alcantarillados,Public water and sewer utility and debt issuer.
 Puerto Rico Highways and Transportation Authority,agency,PR,HTA|ACT|Autoridad de Carreteras y Transportacion,Highways and transportation authority and debt issuer.
 Puerto Rico Sales Tax Financing Corporation,fund,PR,COFINA|Corporacion del Fondo de Interes Apremiante,Sales-tax-backed bond issuing corporation.
-Government Development Bank for Puerto Rico,agency,PR,GDB|BGF|Banco Gubernamental de Fomento,Former fiscal agent and development bank.
+Government Development Bank for Puerto Rico,agency,PR,GDB|BGF|Banco Gubernamental de Fomento|Puerto Rico Government Development Bank,Former fiscal agent and development bank.
 Puerto Rico Department of Economic Development and Commerce,agency,PR,DDEC|Departamento de Desarrollo Economico y Comercio,Economic development and commerce department.
 Puerto Rico Public Buildings Authority,agency,PR,PBA|AEP|Autoridad de Edificios Publicos,Public buildings authority and debt issuer.
 LUMA Energy,firm,PR,LUMA,Private transmission and distribution operator under P3 concession.
 Genera PR,firm,PR,Genera|Genera Puerto Rico,Private power-generation operator under P3 concession.
 Autopistas Metropolitanas de Puerto Rico,firm,PR,Metropistas,Toll-road concessionaire on long-term HTA agreements.
+Puerto Rico Infrastructure Financing Authority,agency,PR,PRIFA|AFI|Autoridad para el Financiamiento de la Infraestructura,Infrastructure financing authority and debt issuer.
+Puerto Rico Housing Finance Authority,agency,PR,PRHFA|AFV|Autoridad para el Financiamiento de la Vivienda,Housing finance authority and debt issuer.
+Puerto Rico Industrial Development Company,agency,PR,PRIDCO|PRIDCO Real Estate|Compania de Fomento Industrial,Industrial development company and debt issuer.
+University of Puerto Rico,agency,PR,UPR|Universidad de Puerto Rico,Public university system and debt issuer.
+Puerto Rico Convention Center District Authority,agency,PR,CCDA|Autoridad del Distrito del Centro de Convenciones,Convention center district authority and debt issuer.
+Puerto Rico Ports Authority,agency,PR,Ports Authority|Autoridad de los Puertos,Ports authority and debt issuer.
+Puerto Rico Public Finance Corporation,fund,PR,PRPFC|Corporacion de Financiamiento Publico,Public finance corporation and debt issuer.
+Puerto Rico Municipal Finance Agency,agency,PR,MFA|Agencia de Financiamiento Municipal,Municipal finance agency and debt issuer.
+LGA Strategies,firm,PR,LGA,Government-affairs and lobbying firm registered in the Puerto Rico lobbying registry.
+The RCL Group,firm,PR,RCL Group|RCL,Government-affairs and lobbying firm registered in the Puerto Rico lobbying registry.
+Puerto Rico Energy LLC,firm,PR,PR Energy LLC,Private energy-sector company appearing as a lobbying-registry client.
+Arcadis Caribe,firm,PR,Arcadis,Engineering and consulting firm appearing as a lobbying-registry client.

@@ -1,8 +1,8 @@
-# Current Status — Post-PR97 Normalization
+# Current Status — Materialization Readiness Locked
 
-**Updated:** 2026-05-23
-**Branch:** `claude/post-pr97-status-normalization`
-**Phase:** Required-source backfill gate (strict preflight confirmed)
+**Updated:** 2026-06-01
+**Active vector:** `MATERIALIZATION_READINESS_LOCKED_AWAITING_EGRESS_FILL`
+**Phase:** Readiness gate green; awaiting egress-enabled fill (see docs/MATERIALIZATION_RUNBOOK.md)
 
 ---
 
@@ -10,12 +10,11 @@
 
 | Item | Status |
 |---|---|
-| Source registry wiring | COMPLETE — all 82 producer_script paths point to scripts/ |
-| PR #97 (pipeline readiness preflight) | MERGED to main (commit cd85605) |
-| Strict preflight result | PASS — 0 structural errors, 5 missing_key_limited (non-fatal) |
-| Full test suite (2026-05-23) | 713 passed, 4 pre-existing failures, 2 skipped |
-| Preflight-specific tests | 5/5 passed |
-| Production status | NON_PRODUCTION_DIAGNOSTIC |
+| Source registry wiring | COMPLETE — all 82 producer_script paths point to scripts/ (84 sources incl. NARA extensions) |
+| Strict preflight result | PASS — 84 sources, 0 structural errors, 6 missing_key_limited (non-fatal) |
+| Materialization readiness (#144) | 54/54 automatable sources ready; 0 broken; 30 queued/excluded |
+| Full test suite (2026-06-01) | 1229 passed, 5 skipped, 0 failed |
+| Production status | NON_PRODUCTION_DIAGNOSTIC (no data materialized yet — egress blocked here) |
 | Pause lock | ACTIVE |
 
 ---

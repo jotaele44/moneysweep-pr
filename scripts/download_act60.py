@@ -182,6 +182,14 @@ def _records_to_df(records, source_url):
     return result[ACT60_COLUMNS]
 
 
+def parse_records(records: list[dict], source_url: str = "known_seed") -> pd.DataFrame:
+    """Map raw Act 60 decree records to the canonical schema.
+    Pure — no network or I/O. Live fetch still needs egress to access
+    the DDEC data.pr.gov API and Act 60 page.
+    """
+    return _records_to_df(records, source_url)
+
+
 def _build_manual_template(out_path, logger):
     """Write an empty CSV with instructions when no data is available."""
     logger.warning("  No Act 60 data retrieved from any source.")

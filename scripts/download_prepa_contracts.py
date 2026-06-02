@@ -153,6 +153,22 @@ def _normalize_name(name):
     return re.sub(r"\s+", " ", n).strip()
 
 
+def parse_records(records: list[dict]) -> pd.DataFrame:
+    """Map raw PREPA contract records to the canonical schema.
+    Pure — no network or I/O. Live fetch still needs egress to access
+    the FOMB PREPA page (oversightboard.pr.gov) and P3 Authority portal.
+    """
+    if not records:
+        return pd.DataFrame(columns=PREPA_COLUMNS)
+    df = pd.DataFrame(records)
+    if "vendor_name" in df.columns:
+        df["vendor_normalized"] = df["vendor_name"].apply(_normalize_name)
+    for col in PREPA_COLUMNS:
+        if col not in df.columns:
+            df[col] = ""
+    return df[PREPA_COLUMNS]
+
+
 def _session():
     s = requests.Session()
     s.headers.update({

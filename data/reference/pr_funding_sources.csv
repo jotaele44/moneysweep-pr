@@ -1,0 +1,5 @@
+program,program_year,jurisdiction,total_allocation,currency,name,description
+FEMA,2017,PR,,USD,FEMA Public Assistance Program (Puerto Rico),FEMA Public Assistance disaster-recovery funding for Puerto Rico following Hurricanes Irma and Maria.
+CDBG-DR,2018,PR,,USD,HUD CDBG-DR (Puerto Rico),HUD Community Development Block Grant Disaster Recovery allocation administered for Puerto Rico recovery.
+EPA,2019,PR,,USD,EPA Clean and Drinking Water State Revolving Funds (Puerto Rico),EPA Clean Water and Drinking Water State Revolving Fund capitalization for Puerto Rico water infrastructure.
+DOE,2023,PR,,USD,DOE Puerto Rico Grid Resilience Funding,U.S. Department of Energy funding supporting Puerto Rico electricity grid resilience and modernization.

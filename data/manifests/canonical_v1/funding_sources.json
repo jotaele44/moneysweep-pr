@@ -1,0 +1,17 @@
+{
+  "producer_script": "scripts/ingest_funding_sources.py",
+  "producer_phase": "CANONICAL_V1_FUNDING_INGEST",
+  "source_inputs": [
+    "data/reference/pr_funding_sources.csv"
+  ],
+  "row_count": 4,
+  "program_counts": {
+    "FEMA": 1,
+    "CDBG-DR": 1,
+    "EPA": 1,
+    "DOE": 1
+  },
+  "evidence_rows_added": 4,
+  "evidence_table_rows": 214,
+  "generated_at": "2026-06-02T19:02:08.271449+00:00"
+}

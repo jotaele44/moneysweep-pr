@@ -23,9 +23,25 @@ def test_seed_has_core_institutions(built):
         "Puerto Rico Aqueduct and Sewer Authority",
         "Puerto Rico Sales Tax Financing Corporation",
         "Financial Oversight and Management Board for Puerto Rico",
+        # bond issuers added so their HOLDS_DEBT edges resolve
+        "Puerto Rico Infrastructure Financing Authority",
+        "University of Puerto Rico",
+        "Puerto Rico Ports Authority",
+        "Puerto Rico Municipal Finance Agency",
     ]:
         assert required in names
+    assert len(rows) == 26
     assert ie.check(rows) == []
+
+
+@pytest.mark.integration
+def test_gdb_alias_covers_bond_issuer_spelling(built):
+    """The GDB bond's issuer name resolves to the existing GDB entity via alias."""
+    from scripts.build_edges import build_resolver, resolve
+    resolver = build_resolver(REPO_ROOT)
+    canonical = resolve(resolver, "Entity", "Government Development Bank for Puerto Rico")
+    bond_spelling = resolve(resolver, "Entity", "Puerto Rico Government Development Bank")
+    assert canonical and canonical == bond_spelling
 
 
 @pytest.mark.integration
