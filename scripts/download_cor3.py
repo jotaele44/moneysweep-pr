@@ -8,7 +8,13 @@ per project, revealing disbursement bottlenecks and delivery delays.
 
 Outputs:
   data/staging/raw/cor3/cor3_projects_raw.json
-  data/staging/processed/pr_cor3_projects.csv
+  data/staging/processed/pr_cor3_projects.csv   (registry expected_output)
+
+Status note: the live fetch endpoints below are best-effort guesses at the
+recovery.pr.gov XHR/export surface and are NOT yet confirmed against a real
+response. The pure transform (`parse_records`) is unit-tested and locks the
+output contract; confirming the working endpoint + raw schema requires running
+with network egress (see docs/MATERIALIZATION_RUNBOOK.md).
 
 Usage:
   python3 scripts/download_cor3.py
@@ -187,6 +193,22 @@ def _normalize_record(r: dict) -> dict:
     }
 
 
+def parse_records(raw_records: list[dict]) -> pd.DataFrame:
+    """Map raw COR3 records to the canonical schema. Pure — no network or I/O.
+
+    Normalizes each record, deduplicates on ``project_id``, and sorts by
+    ``total_approved`` descending. Kept separate from :func:`run` so the
+    transform is unit-testable without the (currently unverified) live fetch.
+    """
+    normalized = [_normalize_record(r) for r in raw_records]
+    df = pd.DataFrame(normalized, columns=OUTPUT_COLUMNS)
+    if df.empty:
+        return df
+    return df.drop_duplicates(subset=["project_id"]).sort_values(
+        "total_approved", ascending=False
+    ).reset_index(drop=True)
+
+
 # ---------------------------------------------------------------------------
 # Core
 # ---------------------------------------------------------------------------
@@ -241,12 +263,8 @@ def run(root: Path = None, force: bool = False) -> dict:
     raw_path.write_text(json.dumps(raw_records, ensure_ascii=False, indent=2))
     logger.info(f"  Raw data saved: {raw_path.name}")
 
-    # Normalize
-    normalized = [_normalize_record(r) for r in raw_records]
-    df = pd.DataFrame(normalized, columns=OUTPUT_COLUMNS)
-    df = df.drop_duplicates(subset=["project_id"]).sort_values(
-        "total_approved", ascending=False
-    )
+    # Normalize (pure transform — see parse_records)
+    df = parse_records(raw_records)
     df.to_csv(out_path, index=False)
 
     n = len(df)
