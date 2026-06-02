@@ -1,1 +1,5 @@
 funding_source_id,program,program_year,administering_entity_id,jurisdiction,total_allocation,currency,confidence,evidence_id,review_status,notes
+funding_fema_2017,FEMA,2017,,PR,,USD,0.85,evidence_pr_public_funding_sources_reference_seed_row_2_95186d5e4e,accepted,name=FEMA Public Assistance Program (Puerto Rico)
+funding_cdbg_dr_2018,CDBG-DR,2018,,PR,,USD,0.85,evidence_pr_public_funding_sources_reference_seed_row_3_2a37a2e4cc,accepted,name=HUD CDBG-DR (Puerto Rico)
+funding_epa_2019,EPA,2019,,PR,,USD,0.85,evidence_pr_public_funding_sources_reference_seed_row_4_e383570e89,accepted,name=EPA Clean and Drinking Water State Revolving Funds (Puerto Rico)
+funding_doe_2023,DOE,2023,,PR,,USD,0.85,evidence_pr_public_funding_sources_reference_seed_row_5_93bdbd1bca,accepted,name=DOE Puerto Rico Grid Resilience Funding

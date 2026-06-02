@@ -1,6 +1,6 @@
 {
   "gate": "NON_PRODUCTION_DIAGNOSTIC",
-  "generated_at": "2026-06-01T17:17:59.990830+00:00",
+  "generated_at": "2026-06-02T19:02:08.428043+00:00",
   "node_counts": {
     "people": 60,
     "entities": 22,
@@ -9,30 +9,31 @@
     "projects": 5,
     "debt_instruments": 20,
     "lobbying_records": 0,
-    "funding_sources": 0,
+    "funding_sources": 4,
     "properties": 0,
     "municipalities": 78
   },
-  "total_nodes": 192,
-  "edge_count": 50,
+  "total_nodes": 196,
+  "edge_count": 54,
   "edge_type_counts": {
     "ADVISES": 5,
+    "FUNDED_BY": 4,
     "HOLDS_DEBT": 20,
     "HOLDS_ROLE_IN": 7,
     "LOCATED_IN": 15,
     "OWNS_OR_CONTROLS": 3
   },
-  "evidence_count": 210,
+  "evidence_count": 218,
   "evidence_tier_counts": {
     "T1": 136,
-    "T2": 74
+    "T2": 82
   },
   "evidence_review_status_counts": {
-    "accepted": 210
+    "accepted": 218
   },
   "edge_evidence_coverage_pct": 100.0,
-  "edges_backed_by_accepted_evidence": 50,
-  "connected_node_count": 55,
+  "edges_backed_by_accepted_evidence": 54,
+  "connected_node_count": 59,
   "review_queue_open": 0,
   "top_degree_nodes": [
     {
@@ -68,12 +69,12 @@
       "degree": 4
     },
     {
-      "node_id": "entity_d363e4ddf2ce6a5d",
-      "degree": 2
+      "node_id": "project_puerto_rico_aqueduct_and_sewer_authority_prasa_cip",
+      "degree": 3
     },
     {
-      "node_id": "project_puerto_rico_electric_power_authority_prepa_gen_oma_2023",
-      "degree": 2
+      "node_id": "project_puerto_rico_electric_power_authority_prepa_grid_recov",
+      "degree": 3
     }
   ]
 }
