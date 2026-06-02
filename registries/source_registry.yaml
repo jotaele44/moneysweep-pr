@@ -214,7 +214,7 @@ sources:
   - source_id: prasa
     family: infrastructure
     required: true
-    authentication: none
+    authentication: manual_export
     endpoint_url: https://www.acueductospr.com/
     producer_script: scripts/ingest_prasa.py
     expected_outputs:
@@ -223,8 +223,9 @@ sources:
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
+    manual_drop_dir: data/raw/PRASA/
     update_cadence: yearly
-    notes: PRASA aqueduct/sewer authority. Includes Consulting Engineer Report FY2024 baseline.
+    notes: PRASA aqueduct/sewer authority. ingest_prasa.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers exported procurement files to data/raw/PRASA/. Includes Consulting Engineer Report FY2024 baseline. NOTE expected output prasa_contracts_master.csv is declared but has no producer or consumer yet (the producer writes only pr_prasa_contracts.csv, which build_financial_flows_master.py consumes); the master aggregation is a future deliverable, not a current gap.
 
   - source_id: prepa_luma_genera
     family: infrastructure
