@@ -141,6 +141,17 @@ def _build_rows(df: pd.DataFrame, permit_type: str) -> list[dict]:
     return rows
 
 
+def parse_records(raw_df: "pd.DataFrame | None", permit_type: str = "air") -> pd.DataFrame:
+    """Map a raw EPA ECHO facilities DataFrame to the canonical EQB schema.
+    Pure — no network or I/O. Live fetch still needs egress to download
+    EPA ECHO ICIS ZIP files from echo.epa.gov.
+    """
+    if raw_df is None or (hasattr(raw_df, "empty") and raw_df.empty):
+        return pd.DataFrame(columns=OUTPUT_COLUMNS)
+    rows = _build_rows(raw_df, permit_type)
+    return pd.DataFrame(rows, columns=OUTPUT_COLUMNS)
+
+
 # ---------------------------------------------------------------------------
 # Core
 # ---------------------------------------------------------------------------
