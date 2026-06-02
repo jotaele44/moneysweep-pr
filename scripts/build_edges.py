@@ -43,6 +43,7 @@ EVIDENCE_OUT = "data/canonical_v1/evidence.csv"
 ROLES_IN = "data/canonical_v1/roles.csv"
 DEBT_IN = "data/canonical_v1/debt_instruments.csv"
 PROJECTS_IN = "data/canonical_v1/projects.csv"
+FUNDING_LINKS = "data/reference/canonical_v1_funding_links.csv"
 DATA_DIR = "data/canonical_v1"
 MANIFEST_OUT = "data/manifests/canonical_v1/edges.json"
 SOURCE_NAME = "PR Public-Money Relationships (reference seed)"
@@ -59,6 +60,7 @@ _NODE_LOOKUP = {
     "Entity": ("entities.csv", "entity_id", "name", None, False),  # aliases live in notes
     "Municipality": ("municipalities.csv", "municipality_id", "name", "aliases", False),
     "Project": ("projects.csv", "project_id", "project_name", None, False),
+    "FundingSource": ("funding_sources.csv", "funding_source_id", "program", None, False),
 }
 
 
@@ -83,10 +85,13 @@ def build_resolver(root: Path) -> dict[str, dict[str, str]]:
                 names = [row.get(name_col, "")]
                 if alias_col and row.get(alias_col):
                     names.extend(row[alias_col].split("|"))
-                # entities keep aliases inside notes as "aliases=A|B|C"
+                # entities keep aliases inside notes as "aliases=A|B|C";
+                # funding sources keep their display name as "name=...".
                 notes = row.get("notes", "") or ""
                 if notes.startswith("aliases="):
                     names.extend(notes[len("aliases="):].split("|"))
+                elif notes.startswith("name="):
+                    names.append(notes[len("name="):])
                 for n in names:
                     key = _norm(n, person)
                     if key:
@@ -250,6 +255,54 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
             "evidence_id": ev_id,
             "notes": (proj.get("project_type") or "").strip(),
         })
+
+    # Derive FUNDED_BY edges (Project -> FundingSource) from the funding-links
+    # seed. Supports many-to-many (a project can draw on multiple programs). Each
+    # link row is evidence-backed; emit only when both endpoints resolve.
+    funding_links = root / FUNDING_LINKS
+    if funding_links.exists():
+        with funding_links.open(newline="", encoding="utf-8") as fh:
+            for i, link in enumerate(csv.DictReader(fh), start=2):
+                proj_name = (link.get("project_name") or "").strip()
+                fund_name = (link.get("funding_source") or "").strip()
+                pid = resolve(resolver, "Project", proj_name)
+                fid = resolve(resolver, "FundingSource", fund_name)
+                if pid is None:
+                    skipped.append({"row": f"funding_link:{i}", "reason": f"unresolved project {proj_name!r}"})
+                    continue
+                if fid is None:
+                    skipped.append({"row": f"funding_link:{i}", "reason": f"unresolved funding source {fund_name!r}"})
+                    continue
+                ev = make_evidence(
+                    source_type=(link.get("source_type") or "web").strip(),
+                    source_name="PR Project Funding Links (reference seed)",
+                    source_path_or_url=FUNDING_LINKS,
+                    page_or_line_ref=f"row {i}",
+                    claim=(link.get("claim") or f"{proj_name} funded by {fund_name}").strip(),
+                    extraction_method=(link.get("extraction_method") or "manual").strip(),
+                    evidence_tier=(link.get("evidence_tier") or "").strip() or None,
+                    review_status="accepted",
+                )
+                eid = edge_id(pid, "FUNDED_BY", fid)
+                if eid in seen:
+                    continue
+                seen.add(eid)
+                evidence_rows.append(ev)
+                edge_rows.append({
+                    "edge_id": eid,
+                    "source_node_type": "Project",
+                    "source_node_id": pid,
+                    "edge_type": "FUNDED_BY",
+                    "target_node_type": "FundingSource",
+                    "target_node_id": fid,
+                    "start_date": "",
+                    "end_date": "",
+                    "amount": "",
+                    "currency": "",
+                    "confidence": ev.confidence,
+                    "evidence_id": ev.evidence_id,
+                    "notes": "",
+                })
 
     return {"edge_rows": edge_rows, "evidence_rows": evidence_rows, "skipped": skipped}
 
