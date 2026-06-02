@@ -20,8 +20,23 @@ def test_builds_all_seeded_edge_types():
     assert built["skipped"] == []
     # 10 entity->muni + 5 project->muni LOCATED_IN
     assert by_type == {"LOCATED_IN": 15, "HOLDS_ROLE_IN": 7, "HOLDS_DEBT": 20,
-                       "ADVISES": 5, "OWNS_OR_CONTROLS": 3}
-    assert len(built["edge_rows"]) == 50
+                       "ADVISES": 5, "OWNS_OR_CONTROLS": 3, "FUNDED_BY": 4}
+    assert len(built["edge_rows"]) == 54
+
+
+@pytest.mark.integration
+def test_funded_by_edges_are_project_to_funding_source():
+    built = be.build_edges(REPO_ROOT)
+    tables = cv1.load_all_tables(REPO_ROOT)
+    project_ids = {r["project_id"] for r in tables["projects"]}
+    funding_ids = {r["funding_source_id"] for r in tables["funding_sources"]}
+    funded = [e for e in built["edge_rows"] if e["edge_type"] == "FUNDED_BY"]
+    assert len(funded) == 4
+    for e in funded:
+        assert e["source_node_type"] == "Project"
+        assert e["source_node_id"] in project_ids
+        assert e["target_node_type"] == "FundingSource"
+        assert e["target_node_id"] in funding_ids
 
 
 @pytest.mark.integration
@@ -145,6 +160,7 @@ def test_uncontrolled_verb_and_unresolved_endpoints_are_skipped(monkeypatch, tmp
     monkeypatch.setattr(be, "ROLES_IN", str(tmp_path / "no_roles.csv"))
     monkeypatch.setattr(be, "DEBT_IN", str(tmp_path / "no_debt.csv"))
     monkeypatch.setattr(be, "PROJECTS_IN", str(tmp_path / "no_projects.csv"))
+    monkeypatch.setattr(be, "FUNDING_LINKS", str(tmp_path / "no_funding_links.csv"))
     built = be.build_edges(REPO_ROOT)
     assert len(built["edge_rows"]) == 1                  # only the valid PREPA->San Juan row
     reasons = " ".join(s["reason"] for s in built["skipped"])
