@@ -1,10 +1,10 @@
 # Canonical v1 Graph Summary
 
-**Gate:** `NON_PRODUCTION_DIAGNOSTIC` · **Generated:** 2026-06-02T19:48:59.658055+00:00
+**Gate:** `NON_PRODUCTION_DIAGNOSTIC` · **Generated:** 2026-06-02T21:33:33.820855+00:00
 
 _Descriptive, derived summary of the committed canonical_v1 tables. Asserts no new sourced claims; every figure is a count over existing, evidence-backed rows. Phrasing follows `docs/CLAIM_LANGUAGE_POLICY.md`._
 
-## Nodes (206 total)
+## Nodes (210 total)
 
 | Table | Count |
 |-------|-------|
@@ -16,10 +16,10 @@ _Descriptive, derived summary of the committed canonical_v1 tables. Asserts no n
 | `debt_instruments` | 20 |
 | `lobbying_records` | 3 |
 | `funding_sources` | 4 |
-| `properties` | 0 |
+| `properties` | 4 |
 | `municipalities` | 78 |
 
-## Edges (60 total)
+## Edges (64 total)
 
 | edge_type | Count |
 |-----------|-------|
@@ -28,27 +28,27 @@ _Descriptive, derived summary of the committed canonical_v1 tables. Asserts no n
 | `HOLDS_DEBT` | 20 |
 | `HOLDS_ROLE_IN` | 7 |
 | `LOBBIES_FOR` | 3 |
-| `LOCATED_IN` | 15 |
+| `LOCATED_IN` | 19 |
 | `OWNS_OR_CONTROLS` | 3 |
 | `RECEIVES_CONTRACT` | 3 |
 
 ## Evidence
 
-- Rows: **228**
-- Tier distribution: {'T1': 140, 'T2': 85, 'T3': 3}
-- Review status: {'accepted': 228}
-- Edge evidence coverage: **100.0%** (60/60 edges backed by an accepted evidence row)
+- Rows: **232**
+- Tier distribution: {'T1': 140, 'T2': 86, 'T3': 6}
+- Review status: {'accepted': 232}
+- Edge evidence coverage: **100.0%** (64/64 edges backed by an accepted evidence row)
 
 ## Connectivity
 
-- Nodes touched by ≥1 edge: **66**
+- Nodes touched by ≥1 edge: **70**
 - Open review-queue items: 0
 
 ### Highest-degree nodes (record shows most edge endpoints)
 
 | node_id | degree |
 |---------|--------|
-| `muni_pr_san_juan` | 15 |
+| `muni_pr_san_juan` | 19 |
 | `entity_3d2fd8a05e1703b2` | 7 |
 | `entity_1c1ee3c0f0c85d23` | 6 |
 | `entity_125b538f289a4708` | 5 |
