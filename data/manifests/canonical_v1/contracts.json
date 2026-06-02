@@ -1,0 +1,15 @@
+{
+  "producer_script": "scripts/ingest_contracts.py",
+  "producer_phase": "CANONICAL_V1_CONTRACTS_INGEST",
+  "source_inputs": [
+    "data/reference/pr_public_contracts.csv"
+  ],
+  "row_count": 3,
+  "with_contractor": 3,
+  "with_project": 3,
+  "skipped_count": 0,
+  "skipped": [],
+  "evidence_rows_added": 3,
+  "evidence_table_rows": 221,
+  "generated_at": "2026-06-02T19:39:40.375177+00:00"
+}
