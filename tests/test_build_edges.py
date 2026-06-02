@@ -21,8 +21,21 @@ def test_builds_all_seeded_edge_types():
     # 10 entity->muni + 5 project->muni LOCATED_IN
     assert by_type == {"LOCATED_IN": 15, "HOLDS_ROLE_IN": 7, "HOLDS_DEBT": 20,
                        "ADVISES": 5, "OWNS_OR_CONTROLS": 3, "FUNDED_BY": 4,
-                       "RECEIVES_CONTRACT": 3}
-    assert len(built["edge_rows"]) == 57
+                       "RECEIVES_CONTRACT": 3, "LOBBIES_FOR": 3}
+    assert len(built["edge_rows"]) == 60
+
+
+@pytest.mark.integration
+def test_lobbies_for_edges_are_entity_to_entity():
+    built = be.build_edges(REPO_ROOT)
+    entity_ids = {r["entity_id"] for r in cv1.load_all_tables(REPO_ROOT)["entities"]}
+    lf = [e for e in built["edge_rows"] if e["edge_type"] == "LOBBIES_FOR"]
+    assert len(lf) == 3
+    for e in lf:
+        assert e["source_node_type"] == "Entity"
+        assert e["source_node_id"] in entity_ids
+        assert e["target_node_type"] == "Entity"
+        assert e["target_node_id"] in entity_ids
 
 
 @pytest.mark.integration
@@ -177,6 +190,7 @@ def test_uncontrolled_verb_and_unresolved_endpoints_are_skipped(monkeypatch, tmp
     monkeypatch.setattr(be, "DEBT_IN", str(tmp_path / "no_debt.csv"))
     monkeypatch.setattr(be, "PROJECTS_IN", str(tmp_path / "no_projects.csv"))
     monkeypatch.setattr(be, "CONTRACTS_IN", str(tmp_path / "no_contracts.csv"))
+    monkeypatch.setattr(be, "LOBBYING_IN", str(tmp_path / "no_lobbying.csv"))
     monkeypatch.setattr(be, "FUNDING_LINKS", str(tmp_path / "no_funding_links.csv"))
     built = be.build_edges(REPO_ROOT)
     assert len(built["edge_rows"]) == 1                  # only the valid PREPA->San Juan row
