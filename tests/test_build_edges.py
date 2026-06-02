@@ -19,8 +19,31 @@ def test_builds_all_seeded_edge_types():
         by_type[e["edge_type"]] = by_type.get(e["edge_type"], 0) + 1
     assert built["skipped"] == []
     # 10 entity->muni + 5 project->muni LOCATED_IN
-    assert by_type == {"LOCATED_IN": 15, "HOLDS_ROLE_IN": 7, "HOLDS_DEBT": 20, "ADVISES": 5}
-    assert len(built["edge_rows"]) == 47
+    assert by_type == {"LOCATED_IN": 15, "HOLDS_ROLE_IN": 7, "HOLDS_DEBT": 20,
+                       "ADVISES": 5, "OWNS_OR_CONTROLS": 3}
+    assert len(built["edge_rows"]) == 50
+
+
+@pytest.mark.integration
+def test_owns_or_controls_edges_are_operator_to_project():
+    built = be.build_edges(REPO_ROOT)
+    tables = cv1.load_all_tables(REPO_ROOT)
+    entity_ids = {r["entity_id"] for r in tables["entities"]}
+    project_ids = {r["project_id"] for r in tables["projects"]}
+    control = [e for e in built["edge_rows"] if e["edge_type"] == "OWNS_OR_CONTROLS"]
+    assert len(control) == 3
+    for e in control:
+        assert e["source_node_type"] == "Entity"
+        assert e["source_node_id"] in entity_ids
+        assert e["target_node_type"] == "Project"
+        assert e["target_node_id"] in project_ids
+
+
+@pytest.mark.unit
+def test_resolver_resolves_project_targets():
+    resolver = be.build_resolver(REPO_ROOT)
+    pid = be.resolve(resolver, "Project", "PRASA Capital Improvement Program")
+    assert pid and pid.startswith("project_")
 
 
 @pytest.mark.integration

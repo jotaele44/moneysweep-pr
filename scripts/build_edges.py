@@ -58,6 +58,7 @@ _NODE_LOOKUP = {
     "Person": ("people.csv", "person_id", "full_name", "aliases", True),
     "Entity": ("entities.csv", "entity_id", "name", None, False),  # aliases live in notes
     "Municipality": ("municipalities.csv", "municipality_id", "name", "aliases", False),
+    "Project": ("projects.csv", "project_id", "project_name", None, False),
 }
 
 
