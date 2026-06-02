@@ -214,7 +214,13 @@ def _fetch_pr_data_portal(session: requests.Session, logger) -> list[dict]:
     return rows
 
 
-def _normalize_records(records: list[dict], logger) -> pd.DataFrame:
+def parse_records(records: list[dict]) -> pd.DataFrame:
+    """Map raw AAFAF records to the canonical schema. Pure — no network or I/O.
+
+    Accepts a list of dicts from any AAFAF source (Excel parse, CKAN API,
+    or the built-in KNOWN_AAFAF_DATA fallback) and returns a DataFrame with
+    AAFAF_COLUMNS. Live fetch still needs egress to confirm endpoint availability.
+    """
     if not records:
         return pd.DataFrame(columns=AAFAF_COLUMNS)
 
@@ -246,8 +252,13 @@ def _normalize_records(records: list[dict], logger) -> pd.DataFrame:
         if col not in df.columns:
             df[col] = ""
 
-    logger.info(f"  Normalized {len(df):,} AAFAF records")
     return df[AAFAF_COLUMNS]
+
+
+def _normalize_records(records: list[dict], logger) -> pd.DataFrame:
+    df = parse_records(records)
+    logger.info(f"  Normalized {len(df):,} AAFAF records")
+    return df
 
 
 def run(root: Path = None, force: bool = False) -> dict:
