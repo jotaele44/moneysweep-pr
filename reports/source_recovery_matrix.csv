@@ -67,7 +67,7 @@ pr_corporate_registry,False,manual_export,False,False,,False,True,scripts/ingest
 prasa,True,manual_export,False,False,,False,True,scripts/ingest_prasa.py,2,0,1,data/raw/PRASA/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 aafaf,False,scraper_needed,False,False,,False,True,scripts/download_aafaf.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 cofina,False,scraper_needed,False,False,,False,True,scripts/download_cofina.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-compras_pr,False,scraper_needed,False,False,,False,True,scripts/download_compras.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+compras_pr,False,scraper_needed,False,False,,False,True,scripts/download_compras.py,2,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 cor3,True,scraper_needed,False,False,,False,True,scripts/download_cor3.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 emma_bonds,True,scraper_needed,False,False,,False,True,scripts/download_emma.py,2,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 eqb_epa_icis,False,scraper_needed,False,False,,False,True,scripts/download_eqb.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
