@@ -98,6 +98,28 @@ KNOWN_P3_PROJECTS = [
 ]
 
 
+def parse_records(records: list[dict]) -> pd.DataFrame:
+    """Map raw P3 portal records to the canonical schema.
+    Pure — no network or I/O. Live fetch still needs egress to scrape the
+    P3 Authority portal (p3.pr.gov) and AAFAF P3 page.
+    """
+    if not records:
+        return pd.DataFrame(columns=P3_COLUMNS)
+    processed = []
+    for r in records:
+        row = dict(r)
+        if not row.get("concessionaire_normalized"):
+            row["concessionaire_normalized"] = _normalize_name(
+                str(row.get("concessionaire_name", ""))
+            )
+        processed.append(row)
+    df = pd.DataFrame(processed)
+    for col in P3_COLUMNS:
+        if col not in df.columns:
+            df[col] = ""
+    return df[P3_COLUMNS]
+
+
 def _session() -> requests.Session:
     s = requests.Session()
     s.headers.update({
