@@ -160,7 +160,7 @@ sources:
     endpoint_url: https://recovery.pr.gov/
     producer_script: scripts/download_cor3.py
     expected_outputs:
-      - data/staging/processed/pr_cor3_master.csv
+      - data/staging/processed/pr_cor3_projects.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -246,7 +246,7 @@ sources:
     required: false
     authentication: manual_export
     endpoint_url: ""
-    producer_script: scripts/ingest_active_contractors.py
+    producer_script: scripts/ingest_act_transition.py
     expected_outputs:
       - data/staging/processed/pr_act_transition_contracts.csv
     schema_version: r5_v1
@@ -261,7 +261,7 @@ sources:
     required: false
     authentication: manual_export
     endpoint_url: ""
-    producer_script: scripts/ingest_active_contractors.py
+    producer_script: scripts/ingest_act_transition.py
     expected_outputs:
       - data/staging/processed/pr_acuden_transition.csv
     schema_version: r5_v1

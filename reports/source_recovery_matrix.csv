@@ -55,8 +55,8 @@ wic,False,api_producer,True,True,,False,True,scripts/download_wic.py,1,0,1,,"Run
 wioa,False,api_producer,True,True,,False,True,scripts/download_wioa.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 nara_catalog_aws_open_data,False,deferred_stub,False,False,,False,True,scripts/download_nara_nextgen.py,2,0,0,,Intentionally unimplemented; remains not_materialized by design.
 nara_nextgen_catalog_v3,False,deferred_stub,False,False,NARA_API_KEY,False,True,scripts/download_nara_nextgen.py,2,0,0,,Intentionally unimplemented; remains not_materialized by design.
-act_transition_contracts,False,manual_export,False,False,,False,True,scripts/ingest_active_contractors.py,1,0,1,data/manual/act_transition/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
-acuden_2024_transition,False,manual_export,False,False,,False,True,scripts/ingest_active_contractors.py,1,0,1,data/manual/acuden_2024/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+act_transition_contracts,False,manual_export,False,False,,False,True,scripts/ingest_act_transition.py,1,0,1,data/manual/act_transition/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+acuden_2024_transition,False,manual_export,False,False,,False,True,scripts/ingest_act_transition.py,1,0,1,data/manual/acuden_2024/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 dcaa_active_contractors,False,manual_export,False,False,,False,True,scripts/download_active_contractors.py,1,0,1,data/manual/dcaa_active_contractors/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 hud_drgr_authorized,True,manual_export,False,False,,False,True,scripts/ingest_hud_drgr_exports.py,2,0,1,data/manual/hud_drgr/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 pr_corporate_registry,False,manual_export,False,False,,False,True,scripts/ingest_active_contractors.py,1,0,1,data/manual/pr_corporate_registry/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
