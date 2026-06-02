@@ -10,8 +10,8 @@ Queued / excluded: **30**
 | --- | --- | --- | --- |
 | `api_adapter` | True | 35 | Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated). |
 | `api_producer` | True | 19 | Run producer under strict preflight; public API path, set key if gated. |
-| `scraper_needed` | False | 19 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
-| `manual_export` | False | 6 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
+| `scraper_needed` | False | 18 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
+| `manual_export` | False | 7 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
 | `deferred_stub` | False | 2 | Intentionally unimplemented; remains not_materialized by design. |
 
@@ -82,7 +82,7 @@ API keys needed for full automatable materialization: `FEC_API_KEY`, `HIGHERGOV_
 - `nara_catalog_aws_open_data`
 - `nara_nextgen_catalog_v3`
 
-## manual_export (6)
+## manual_export (7)
 
 - `act_transition_contracts`
 - `acuden_2024_transition`
@@ -90,8 +90,9 @@ API keys needed for full automatable materialization: `FEC_API_KEY`, `HIGHERGOV_
 - `hud_drgr_authorized`
 - `oficina_contralor`
 - `pr_corporate_registry`
+- `prasa`
 
-## scraper_needed (19)
+## scraper_needed (18)
 
 - `aafaf`
 - `cofina`
@@ -108,7 +109,6 @@ API keys needed for full automatable materialization: `FEC_API_KEY`, `HIGHERGOV_
 - `pr_act_60_decrees`
 - `pr_cabilderos`
 - `pr_pensions`
-- `prasa`
 - `prepa_luma_genera`
 - `promesa_creditors`
 - `rum_cover_over`

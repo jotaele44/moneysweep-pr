@@ -13,8 +13,8 @@
     "SAM_API_KEY"
   ],
   "queued_excluded": {
-    "manual_export": 6,
-    "scraper_needed": 19,
+    "manual_export": 7,
+    "scraper_needed": 18,
     "deferred_stub": 2,
     "semantic_duplicate": 3,
     "broken_producer": 0
