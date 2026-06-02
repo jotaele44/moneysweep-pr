@@ -229,6 +229,24 @@ def _normalize_name(name):
     return re.sub(r"\s+", " ", n).strip()
 
 
+def parse_records(records: list[dict]) -> pd.DataFrame:
+    """Map raw PROMESA creditor records to the canonical schema.
+    Pure — no network or I/O. Live fetch still needs egress to access
+    the Prime Clerk docket (restructuring.primeclerk.com/puertorico).
+    """
+    if not records:
+        return pd.DataFrame(columns=PROMESA_COLUMNS)
+    df = pd.DataFrame(records)
+    if "creditor_name" in df.columns:
+        df["creditor_normalized"] = df["creditor_name"].apply(_normalize_name)
+    if "new_bond_cusip" not in df.columns:
+        df["new_bond_cusip"] = ""
+    for col in PROMESA_COLUMNS:
+        if col not in df.columns:
+            df[col] = ""
+    return df[PROMESA_COLUMNS]
+
+
 def _session():
     s = requests.Session()
     s.headers.update({
