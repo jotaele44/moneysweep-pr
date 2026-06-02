@@ -43,6 +43,7 @@ EVIDENCE_OUT = "data/canonical_v1/evidence.csv"
 ROLES_IN = "data/canonical_v1/roles.csv"
 DEBT_IN = "data/canonical_v1/debt_instruments.csv"
 PROJECTS_IN = "data/canonical_v1/projects.csv"
+CONTRACTS_IN = "data/canonical_v1/contracts.csv"
 FUNDING_LINKS = "data/reference/canonical_v1_funding_links.csv"
 DATA_DIR = "data/canonical_v1"
 MANIFEST_OUT = "data/manifests/canonical_v1/edges.json"
@@ -61,6 +62,7 @@ _NODE_LOOKUP = {
     "Municipality": ("municipalities.csv", "municipality_id", "name", "aliases", False),
     "Project": ("projects.csv", "project_id", "project_name", None, False),
     "FundingSource": ("funding_sources.csv", "funding_source_id", "program", None, False),
+    "Contract": ("contracts.csv", "contract_id", "contract_number", None, False),
 }
 
 
@@ -304,7 +306,45 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
                     "notes": "",
                 })
 
+    # Derive RECEIVES_CONTRACT edges (Contractor Entity -> Contract) from
+    # contracts.csv rows that carry a contractor_entity_id, reusing the contract's
+    # evidence_id. Mirrors the HOLDS_DEBT derivation (single-writer edges.csv).
+    for contract in _read_contracts(root):
+        cid = (contract.get("contract_id") or "").strip()
+        contractor_id = (contract.get("contractor_entity_id") or "").strip()
+        ev_id = (contract.get("evidence_id") or "").strip()
+        if not (cid and contractor_id and ev_id):
+            continue
+        eid = edge_id(contractor_id, "RECEIVES_CONTRACT", cid)
+        if eid in seen:
+            continue
+        seen.add(eid)
+        edge_rows.append({
+            "edge_id": eid,
+            "source_node_type": "Entity",
+            "source_node_id": contractor_id,
+            "edge_type": "RECEIVES_CONTRACT",
+            "target_node_type": "Contract",
+            "target_node_id": cid,
+            "start_date": (contract.get("start_date") or "").strip(),
+            "end_date": (contract.get("end_date") or "").strip(),
+            "amount": (contract.get("award_amount") or "").strip(),
+            "currency": (contract.get("currency") or "").strip(),
+            "confidence": (contract.get("confidence") or "").strip(),
+            "evidence_id": ev_id,
+            "notes": (contract.get("service_type") or "").strip(),
+        })
+
     return {"edge_rows": edge_rows, "evidence_rows": evidence_rows, "skipped": skipped}
+
+
+def _read_contracts(root: Path) -> list[dict[str, str]]:
+    """Read contracts.csv rows (empty list if the table is missing or header-only)."""
+    path = root / CONTRACTS_IN
+    if not path.exists():
+        return []
+    with path.open(newline="", encoding="utf-8") as fh:
+        return [r for r in csv.DictReader(fh) if (r.get("contract_id") or "").strip()]
 
 
 def _read_projects(root: Path) -> list[dict[str, str]]:
