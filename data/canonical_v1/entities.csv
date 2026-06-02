@@ -21,3 +21,7 @@ entity_2c16f9ae54df7e1e,Puerto Rico Convention Center District Authority,PUERTO 
 entity_efcec09764306ade,Puerto Rico Ports Authority,PUERTO RICO PORTS AUTHORITY,agency,,PR,,0.95,evidence_pr_public_money_institutions_reference_seed_row_21_2e3a11247a,accepted,aliases=Ports Authority|Autoridad de los Puertos
 entity_b14376987d82d5ee,Puerto Rico Public Finance Corporation,PUERTO RICO PUBLIC FINANCE,fund,,PR,,0.95,evidence_pr_public_money_institutions_reference_seed_row_22_3d7555db1d,accepted,aliases=PRPFC|Corporacion de Financiamiento Publico
 entity_e73c9879d715653a,Puerto Rico Municipal Finance Agency,PUERTO RICO MUNICIPAL FINANCE AGENCY,agency,,PR,,0.95,evidence_pr_public_money_institutions_reference_seed_row_23_6952147e80,accepted,aliases=MFA|Agencia de Financiamiento Municipal
+entity_36443c30dc526c13,LGA Strategies,LGA STRATEGIES,firm,,PR,,0.95,evidence_pr_public_money_institutions_reference_seed_row_24_3063296e97,accepted,aliases=LGA
+entity_a034a2e43d67206d,The RCL Group,THE RCL GROUP,firm,,PR,,0.95,evidence_pr_public_money_institutions_reference_seed_row_25_6d166192f8,accepted,aliases=RCL Group|RCL
+entity_30007ca84af23b8d,Puerto Rico Energy LLC,PUERTO RICO ENERGY,firm,,PR,,0.95,evidence_pr_public_money_institutions_reference_seed_row_26_ec236f7a55,accepted,aliases=PR Energy LLC
+entity_21371fab1b27e788,Arcadis Caribe,ARCADIS CARIBE,firm,,PR,,0.95,evidence_pr_public_money_institutions_reference_seed_row_27_1c6da30a91,accepted,aliases=Arcadis

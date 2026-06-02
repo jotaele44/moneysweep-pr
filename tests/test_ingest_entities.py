@@ -30,7 +30,7 @@ def test_seed_has_core_institutions(built):
         "Puerto Rico Municipal Finance Agency",
     ]:
         assert required in names
-    assert len(rows) == 22
+    assert len(rows) == 26
     assert ie.check(rows) == []
 
 
