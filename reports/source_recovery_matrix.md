@@ -10,8 +10,8 @@ Queued / excluded: **30**
 | --- | --- | --- | --- |
 | `api_adapter` | True | 35 | Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated). |
 | `api_producer` | True | 19 | Run producer under strict preflight; public API path, set key if gated. |
-| `scraper_needed` | False | 17 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
-| `manual_export` | False | 8 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
+| `scraper_needed` | False | 16 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
+| `manual_export` | False | 9 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
 | `deferred_stub` | False | 2 | Intentionally unimplemented; remains not_materialized by design. |
 
@@ -82,24 +82,24 @@ API keys needed for full automatable materialization: `FEC_API_KEY`, `HIGHERGOV_
 - `nara_catalog_aws_open_data`
 - `nara_nextgen_catalog_v3`
 
-## manual_export (8)
+## manual_export (9)
 
 - `act_transition_contracts`
 - `acuden_2024_transition`
 - `dcaa_active_contractors`
+- `donaciones_pr`
 - `hud_drgr_authorized`
 - `oficina_contralor`
 - `pr_cabilderos`
 - `pr_corporate_registry`
 - `prasa`
 
-## scraper_needed (17)
+## scraper_needed (16)
 
 - `aafaf`
 - `cofina`
 - `compras_pr`
 - `cor3`
-- `donaciones_pr`
 - `emma_bonds`
 - `eqb_epa_icis`
 - `follow_the_money`
