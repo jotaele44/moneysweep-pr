@@ -51,7 +51,7 @@ SCRAPER_NEEDED = {
     "cor3", "p3_authority",
     "pr_act_60_decrees", "promesa_creditors", "rum_cover_over",
     "municipal_finance", "pr_pensions", "eqb_epa_icis",
-    "donaciones_pr", "follow_the_money",
+    "follow_the_money",
     "emma_bonds", "msrb_rtrs_trades",
 }
 
