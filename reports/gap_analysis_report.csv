@@ -32,7 +32,7 @@ dcaa_active_contractors,manual_export,False,manual_export,1,0,1,0,not_materializ
 doe_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_doe.csv,
 doj_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_doj_grants.csv,
 dol_whd_osha,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_dol_whd.csv,
-donaciones_pr,political_finance,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_donaciones.csv,PR State Election Commission donations. Cross-references federal FEC.
+donaciones_pr,political_finance,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_donaciones.csv,PR State Election Commission (CEE/CEEPUR) state-level donation registry. ingest_donaciones.py is a dropzone reader for operator-delivered CEE CSV exports — no network code. Previously mislabeled as us
 dot_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_dot_grants.csv,
 ed_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ed_grants.csv,
 epa_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_epa_grants.csv,
