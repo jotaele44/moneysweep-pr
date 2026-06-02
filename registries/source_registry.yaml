@@ -310,6 +310,7 @@ sources:
     producer_script: scripts/download_compras.py
     expected_outputs:
       - data/staging/processed/pr_compras_rfps.csv
+      - data/staging/processed/pr_compras_awards.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -337,7 +338,7 @@ sources:
     endpoint_url: https://hacienda.pr.gov/
     producer_script: scripts/download_hacienda.py
     expected_outputs:
-      - data/staging/processed/pr_hacienda_tax_revenue.csv
+      - data/staging/processed/pr_hacienda_revenues.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -350,7 +351,7 @@ sources:
     endpoint_url: https://www.cofina.pr.gov/
     producer_script: scripts/download_cofina.py
     expected_outputs:
-      - data/staging/processed/pr_cofina_sut.csv
+      - data/staging/processed/pr_cofina.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -402,7 +403,7 @@ sources:
     endpoint_url: https://www.retiro.pr.gov/
     producer_script: scripts/download_pr_pensions.py
     expected_outputs:
-      - data/staging/processed/pr_pensions_ers_trs_jrs.csv
+      - data/staging/processed/pr_pension_funds.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -457,7 +458,7 @@ sources:
     producer_script: scripts/download_emma.py
     expected_outputs:
       - data/staging/processed/pr_emma_bonds.csv
-      - data/staging/processed/bond_asset_map.csv
+      - data/staging/processed/pr_emma_underwriters.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -470,7 +471,7 @@ sources:
     endpoint_url: https://emma.msrb.org/
     producer_script: scripts/download_msrb_trades.py
     expected_outputs:
-      - data/staging/processed/pr_msrb_rtrs_trades.csv
+      - data/staging/processed/pr_msrb_trades.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
