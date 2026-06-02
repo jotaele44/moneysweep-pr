@@ -42,7 +42,7 @@ fcc_usf,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/p
 fdic,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fdic.csv,
 fema_hmgp,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fema_hmgp.csv,
 fhlb,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fhlb.csv,
-follow_the_money,political_finance,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_follow_the_money.csv,State-level campaign finance for PR + DC connections.
+follow_the_money,political_finance,False,manual_export,4,0,4,0,not_materialized,0,1,data/staging/processed/pr_sf133_budget_execution.csv,Follow the Money export data for PR. ingest_follow_the_money.py is a dropzone reader (no network code) producing 4 outputs from operator-delivered CSV exports in data/raw/Follow the Money/. Previously
 fpds_report_builder,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fpds_report_builder.csv,FPDS Report Builder FY2018-2024 ingestion. Supplements USAspending.
 gao_ig_audits,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_gao_ig_audits.csv,
 grants_gov,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_grants.csv,
