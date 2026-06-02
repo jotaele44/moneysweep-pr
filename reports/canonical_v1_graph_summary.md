@@ -1,25 +1,25 @@
 # Canonical v1 Graph Summary
 
-**Gate:** `NON_PRODUCTION_DIAGNOSTIC` · **Generated:** 2026-06-02T19:39:40.529924+00:00
+**Gate:** `NON_PRODUCTION_DIAGNOSTIC` · **Generated:** 2026-06-02T19:48:59.658055+00:00
 
 _Descriptive, derived summary of the committed canonical_v1 tables. Asserts no new sourced claims; every figure is a count over existing, evidence-backed rows. Phrasing follows `docs/CLAIM_LANGUAGE_POLICY.md`._
 
-## Nodes (199 total)
+## Nodes (206 total)
 
 | Table | Count |
 |-------|-------|
 | `people` | 60 |
-| `entities` | 22 |
+| `entities` | 26 |
 | `roles` | 7 |
 | `contracts` | 3 |
 | `projects` | 5 |
 | `debt_instruments` | 20 |
-| `lobbying_records` | 0 |
+| `lobbying_records` | 3 |
 | `funding_sources` | 4 |
 | `properties` | 0 |
 | `municipalities` | 78 |
 
-## Edges (57 total)
+## Edges (60 total)
 
 | edge_type | Count |
 |-----------|-------|
@@ -27,20 +27,21 @@ _Descriptive, derived summary of the committed canonical_v1 tables. Asserts no n
 | `FUNDED_BY` | 4 |
 | `HOLDS_DEBT` | 20 |
 | `HOLDS_ROLE_IN` | 7 |
+| `LOBBIES_FOR` | 3 |
 | `LOCATED_IN` | 15 |
 | `OWNS_OR_CONTROLS` | 3 |
 | `RECEIVES_CONTRACT` | 3 |
 
 ## Evidence
 
-- Rows: **221**
-- Tier distribution: {'T1': 136, 'T2': 85}
-- Review status: {'accepted': 221}
-- Edge evidence coverage: **100.0%** (57/57 edges backed by an accepted evidence row)
+- Rows: **228**
+- Tier distribution: {'T1': 140, 'T2': 85, 'T3': 3}
+- Review status: {'accepted': 228}
+- Edge evidence coverage: **100.0%** (60/60 edges backed by an accepted evidence row)
 
 ## Connectivity
 
-- Nodes touched by ≥1 edge: **62**
+- Nodes touched by ≥1 edge: **66**
 - Open review-queue items: 0
 
 ### Highest-degree nodes (record shows most edge endpoints)
@@ -55,5 +56,5 @@ _Descriptive, derived summary of the committed canonical_v1 tables. Asserts no n
 | `entity_6c1d858c1babe390` | 4 |
 | `entity_b182f85acf46f69b` | 4 |
 | `entity_c5fb8a7f44e8ff18` | 4 |
+| `entity_0f8f1789b2c687ed` | 3 |
 | `project_puerto_rico_aqueduct_and_sewer_authority_prasa_cip` | 3 |
-| `project_puerto_rico_electric_power_authority_prepa_grid_recov` | 3 |

@@ -44,6 +44,7 @@ ROLES_IN = "data/canonical_v1/roles.csv"
 DEBT_IN = "data/canonical_v1/debt_instruments.csv"
 PROJECTS_IN = "data/canonical_v1/projects.csv"
 CONTRACTS_IN = "data/canonical_v1/contracts.csv"
+LOBBYING_IN = "data/canonical_v1/lobbying_records.csv"
 FUNDING_LINKS = "data/reference/canonical_v1_funding_links.csv"
 DATA_DIR = "data/canonical_v1"
 MANIFEST_OUT = "data/manifests/canonical_v1/edges.json"
@@ -63,6 +64,7 @@ _NODE_LOOKUP = {
     "Project": ("projects.csv", "project_id", "project_name", None, False),
     "FundingSource": ("funding_sources.csv", "funding_source_id", "program", None, False),
     "Contract": ("contracts.csv", "contract_id", "contract_number", None, False),
+    "LobbyingRecord": ("lobbying_records.csv", "lobbying_record_id", "registration_number", None, False),
 }
 
 
@@ -335,7 +337,45 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
             "notes": (contract.get("service_type") or "").strip(),
         })
 
+    # Derive LOBBIES_FOR edges (lobbyist Entity -> client Entity) from
+    # lobbying_records.csv rows that carry both a lobbyist and a client entity,
+    # reusing the record's evidence_id. Single-writer edges.csv.
+    for lob in _read_lobbying(root):
+        lobbyist_id = (lob.get("lobbyist_entity_id") or "").strip()
+        client_id = (lob.get("client_entity_id") or "").strip()
+        ev_id = (lob.get("evidence_id") or "").strip()
+        if not (lobbyist_id and client_id and ev_id):
+            continue
+        eid = edge_id(lobbyist_id, "LOBBIES_FOR", client_id)
+        if eid in seen:
+            continue
+        seen.add(eid)
+        edge_rows.append({
+            "edge_id": eid,
+            "source_node_type": "Entity",
+            "source_node_id": lobbyist_id,
+            "edge_type": "LOBBIES_FOR",
+            "target_node_type": "Entity",
+            "target_node_id": client_id,
+            "start_date": "",
+            "end_date": "",
+            "amount": "",
+            "currency": "",
+            "confidence": (lob.get("confidence") or "").strip(),
+            "evidence_id": ev_id,
+            "notes": (lob.get("subject_matter") or "").strip(),
+        })
+
     return {"edge_rows": edge_rows, "evidence_rows": evidence_rows, "skipped": skipped}
+
+
+def _read_lobbying(root: Path) -> list[dict[str, str]]:
+    """Read lobbying_records.csv rows (empty list if missing or header-only)."""
+    path = root / LOBBYING_IN
+    if not path.exists():
+        return []
+    with path.open(newline="", encoding="utf-8") as fh:
+        return [r for r in csv.DictReader(fh) if (r.get("lobbying_record_id") or "").strip()]
 
 
 def _read_contracts(root: Path) -> list[dict[str, str]]:
