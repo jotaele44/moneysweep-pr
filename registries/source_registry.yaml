@@ -493,7 +493,7 @@ sources:
   - source_id: pr_cabilderos
     family: lobbying
     required: true
-    authentication: none
+    authentication: manual_export
     endpoint_url: https://etica.pr.gov/cabilderos/
     producer_script: scripts/ingest_cabilderos.py
     expected_outputs:
@@ -501,7 +501,9 @@ sources:
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
+    manual_drop_dir: data/raw/Cabilderos/
     update_cadence: quarterly
+    notes: PR Office of Government Ethics (OEG) state-level lobbyist (cabildero) registry. ingest_cabilderos.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers the OEG export to data/raw/Cabilderos/. Cross-references cabildero clients with federal award recipients to surface dual-influence entities.
 
   # ----- Political finance -----
   - source_id: fec
