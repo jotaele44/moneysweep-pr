@@ -1,0 +1,5 @@
+property_name,property_type,owner_entity,municipality,address,parcel_or_concession_id,value,currency,source_type,evidence_tier,extraction_method,claim
+PR-22 and PR-5 Toll Road,concession,Puerto Rico Highways and Transportation Authority,San Juan,,HTA-PPP-2011,,USD,web,T2,manual,The PR-22 and PR-5 toll roads are public highway concession assets of the Highways and Transportation Authority.
+PREPA Electric Generation Facilities,facility,Puerto Rico Electric Power Authority,San Juan,,,,USD,web,T3,manual,PREPA owns the public electric power-generation facilities operated under the generation concession.
+PRASA Water and Sewer Facilities,facility,Puerto Rico Aqueduct and Sewer Authority,San Juan,,,,USD,web,T3,manual,PRASA owns the public water and sewer treatment facilities serving Puerto Rico.
+Puerto Rico Convention Center,facility,Puerto Rico Convention Center District Authority,San Juan,,,,USD,web,T3,manual,The Puerto Rico Convention Center is a public facility of the Convention Center District Authority.

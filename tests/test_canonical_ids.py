@@ -30,6 +30,7 @@ def test_all_generators_match_schema_patterns():
     assert re.fullmatch(ID_PATTERNS["lobby"], cid.lobbying_id("PR", "REG-42", "2024Q1"))
     assert re.fullmatch(ID_PATTERNS["funding"], cid.funding_id("CDBG-DR", 2020))
     assert re.fullmatch(ID_PATTERNS["muni"], cid.municipality_id("San Juan"))
+    assert re.fullmatch(r"^property_[A-Za-z0-9_]+$", cid.property_id("PR-22 Toll Road", "HTA"))
     assert re.fullmatch(ID_PATTERNS["edge"], cid.edge_id("entity_a", "OWNS_OR_CONTROLS", "entity_b"))
     assert re.fullmatch(ID_PATTERNS["evidence"], cid.evidence_id("EMMA filing", "p.12", "claim"))
 

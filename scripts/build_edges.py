@@ -45,6 +45,7 @@ DEBT_IN = "data/canonical_v1/debt_instruments.csv"
 PROJECTS_IN = "data/canonical_v1/projects.csv"
 CONTRACTS_IN = "data/canonical_v1/contracts.csv"
 LOBBYING_IN = "data/canonical_v1/lobbying_records.csv"
+PROPERTIES_TABLE_IN = "data/canonical_v1/properties.csv"
 FUNDING_LINKS = "data/reference/canonical_v1_funding_links.csv"
 DATA_DIR = "data/canonical_v1"
 MANIFEST_OUT = "data/manifests/canonical_v1/edges.json"
@@ -65,6 +66,7 @@ _NODE_LOOKUP = {
     "FundingSource": ("funding_sources.csv", "funding_source_id", "program", None, False),
     "Contract": ("contracts.csv", "contract_id", "contract_number", None, False),
     "LobbyingRecord": ("lobbying_records.csv", "lobbying_record_id", "registration_number", None, False),
+    "Property": ("properties.csv", "property_id", "property_name", None, False),
 }
 
 
@@ -366,7 +368,45 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
             "notes": (lob.get("subject_matter") or "").strip(),
         })
 
+    # Derive LOCATED_IN edges from properties.csv: a property located in a
+    # municipality. The property row already carries a resolved municipality_id and
+    # an accepted evidence_id, so the edge reuses that provenance.
+    for prop in _read_properties_table(root):
+        pid = (prop.get("property_id") or "").strip()
+        muni_id = (prop.get("municipality_id") or "").strip()
+        ev_id = (prop.get("evidence_id") or "").strip()
+        if not (pid and muni_id and ev_id):
+            continue
+        eid = edge_id(pid, "LOCATED_IN", muni_id)
+        if eid in seen:
+            continue
+        seen.add(eid)
+        edge_rows.append({
+            "edge_id": eid,
+            "source_node_type": "Property",
+            "source_node_id": pid,
+            "edge_type": "LOCATED_IN",
+            "target_node_type": "Municipality",
+            "target_node_id": muni_id,
+            "start_date": "",
+            "end_date": "",
+            "amount": "",
+            "currency": "",
+            "confidence": (prop.get("confidence") or "").strip(),
+            "evidence_id": ev_id,
+            "notes": (prop.get("property_type") or "").strip(),
+        })
+
     return {"edge_rows": edge_rows, "evidence_rows": evidence_rows, "skipped": skipped}
+
+
+def _read_properties_table(root: Path) -> list[dict[str, str]]:
+    """Read properties.csv rows (empty list if missing or header-only)."""
+    path = root / PROPERTIES_TABLE_IN
+    if not path.exists():
+        return []
+    with path.open(newline="", encoding="utf-8") as fh:
+        return [r for r in csv.DictReader(fh) if (r.get("property_id") or "").strip()]
 
 
 def _read_lobbying(root: Path) -> list[dict[str, str]]:

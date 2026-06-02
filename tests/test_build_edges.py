@@ -19,10 +19,25 @@ def test_builds_all_seeded_edge_types():
         by_type[e["edge_type"]] = by_type.get(e["edge_type"], 0) + 1
     assert built["skipped"] == []
     # 10 entity->muni + 5 project->muni LOCATED_IN
-    assert by_type == {"LOCATED_IN": 15, "HOLDS_ROLE_IN": 7, "HOLDS_DEBT": 20,
+    # LOCATED_IN: 10 entity->muni + 5 project->muni + 4 property->muni
+    assert by_type == {"LOCATED_IN": 19, "HOLDS_ROLE_IN": 7, "HOLDS_DEBT": 20,
                        "ADVISES": 5, "OWNS_OR_CONTROLS": 3, "FUNDED_BY": 4,
                        "RECEIVES_CONTRACT": 3, "LOBBIES_FOR": 3}
-    assert len(built["edge_rows"]) == 60
+    assert len(built["edge_rows"]) == 64
+
+
+@pytest.mark.integration
+def test_property_located_in_edges():
+    built = be.build_edges(REPO_ROOT)
+    tables = cv1.load_all_tables(REPO_ROOT)
+    property_ids = {r["property_id"] for r in tables["properties"]}
+    muni_ids = {r["municipality_id"] for r in tables["municipalities"]}
+    prop_edges = [e for e in built["edge_rows"]
+                  if e["edge_type"] == "LOCATED_IN" and e["source_node_type"] == "Property"]
+    assert len(prop_edges) == len(tables["properties"])
+    for e in prop_edges:
+        assert e["source_node_id"] in property_ids
+        assert e["target_node_id"] in muni_ids
 
 
 @pytest.mark.integration
@@ -149,8 +164,9 @@ def test_edges_validate_and_endpoints_resolve():
         assert e["evidence_id"] in evidence_ids          # no provenance -> no edge
         assert e["edge_type"] in cv1.EDGE_TYPES          # controlled vocab
         if e["edge_type"] == "LOCATED_IN":
-            # LOCATED_IN sources are Entity or Project; targets are municipalities
-            assert e["source_node_id"] in (entity_ids | project_ids)
+            # LOCATED_IN sources are Entity, Project, or Property; targets are munis
+            property_ids = {r["property_id"] for r in tables["properties"]}
+            assert e["source_node_id"] in (entity_ids | project_ids | property_ids)
             assert e["target_node_id"] in muni_ids
         elif e["edge_type"] == "HOLDS_ROLE_IN":
             assert e["source_node_type"] == "Person"
@@ -191,6 +207,7 @@ def test_uncontrolled_verb_and_unresolved_endpoints_are_skipped(monkeypatch, tmp
     monkeypatch.setattr(be, "PROJECTS_IN", str(tmp_path / "no_projects.csv"))
     monkeypatch.setattr(be, "CONTRACTS_IN", str(tmp_path / "no_contracts.csv"))
     monkeypatch.setattr(be, "LOBBYING_IN", str(tmp_path / "no_lobbying.csv"))
+    monkeypatch.setattr(be, "PROPERTIES_TABLE_IN", str(tmp_path / "no_properties.csv"))
     monkeypatch.setattr(be, "FUNDING_LINKS", str(tmp_path / "no_funding_links.csv"))
     built = be.build_edges(REPO_ROOT)
     assert len(built["edge_rows"]) == 1                  # only the valid PREPA->San Juan row
