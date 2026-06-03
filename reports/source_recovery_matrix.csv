@@ -1,5 +1,5 @@
 source_id,required,path_type,automatable,ready,needs_key,has_adapter,producer_importable,producer_script,expected_outputs_count,outputs_present_count,min_rows,dropzone_path,recommended_action
-chip,False,api_adapter,True,True,,True,True,scripts/download_chip.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+chip,False,api_adapter,True,True,,True,True,scripts/download_chip.py,1,1,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 cms_open_payments,False,api_adapter,True,True,,True,True,scripts/download_cms.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 doe_grants,False,api_adapter,True,True,,True,True,scripts/download_doe.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 doj_grants,False,api_adapter,True,True,,True,True,scripts/download_doj_grants.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
@@ -8,50 +8,50 @@ ed_grants,False,api_adapter,True,True,,True,True,scripts/download_ed.py,1,0,1,,M
 epa_grants,False,api_adapter,True,True,,True,True,scripts/download_epa.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 exim_bank,False,api_adapter,True,True,,True,True,scripts/download_exim.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 fdic,False,api_adapter,True,True,,True,True,scripts/download_fdic.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
-fec,True,api_adapter,True,True,FEC_API_KEY,True,True,scripts/download_fec.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+fec,True,api_adapter,True,True,FEC_API_KEY,True,True,scripts/download_fec.py,1,1,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 fema_hmgp,False,api_adapter,True,True,,True,True,scripts/download_fema.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
-fema_pa_openfema_v2,True,api_adapter,True,True,,True,True,scripts/download_openfema_pa_projects.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+fema_pa_openfema_v2,True,api_adapter,True,True,,True,True,scripts/download_openfema_pa_projects.py,1,1,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 grants_gov,False,api_adapter,True,True,,True,True,scripts/download_grants.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 haf,False,api_adapter,True,True,,True,True,scripts/download_haf.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 hhs_grants,False,api_adapter,True,True,,True,True,scripts/download_hhs.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 highergov_supplemental,False,api_adapter,True,True,HIGHERGOV_API_KEY,True,True,scripts/fetch_highergov_api.py,2,1,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
-lda,True,api_adapter,True,True,LDA_API_KEY,True,True,scripts/download_lda.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
-medicaid_fmap,False,api_adapter,True,True,,True,True,scripts/download_medicaid_fmap.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
-medicare_advantage,False,api_adapter,True,True,,True,True,scripts/download_medicare_advantage.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
-medicare_parts,False,api_adapter,True,True,,True,True,scripts/download_medicare_parts.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
-nfip_claims,False,api_adapter,True,True,,True,True,scripts/download_nfip.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
-nih_reporter,False,api_adapter,True,True,,True,True,scripts/download_nih.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+lda,True,api_adapter,True,True,LDA_API_KEY,True,True,scripts/download_lda.py,1,1,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+medicaid_fmap,False,api_adapter,True,True,,True,True,scripts/download_medicaid_fmap.py,1,1,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+medicare_advantage,False,api_adapter,True,True,,True,True,scripts/download_medicare_advantage.py,1,1,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+medicare_parts,False,api_adapter,True,True,,True,True,scripts/download_medicare_parts.py,1,1,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+nfip_claims,False,api_adapter,True,True,,True,True,scripts/download_nfip.py,1,1,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+nih_reporter,False,api_adapter,True,True,,True,True,scripts/download_nih.py,1,1,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 nonprofits_irs990,False,api_adapter,True,True,,True,True,scripts/download_nonprofits.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 ofac_sdn,False,api_adapter,True,True,,True,True,scripts/download_ofac.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 oia_grants,False,api_adapter,True,True,,True,True,scripts/download_oia.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 opencorporates,False,api_adapter,True,True,OPENCORPORATES_API_TOKEN,True,True,scripts/download_opencorporates.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 research_grants,False,api_adapter,True,True,,True,True,scripts/download_research.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
-sam_entities,True,api_adapter,True,True,SAM_API_KEY,True,True,scripts/sam_enrichment.py,2,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+sam_entities,True,api_adapter,True,True,SAM_API_KEY,True,True,scripts/sam_enrichment.py,2,1,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 sba_loans,False,api_adapter,True,True,,True,True,scripts/download_sba.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 sba_ppp,False,api_adapter,True,True,,True,True,scripts/download_sba.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 sbir,False,api_adapter,True,True,,True,True,scripts/download_sbir.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
-slfrf,False,api_adapter,True,True,,True,True,scripts/download_slfrf.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
-usaspending_prime,True,api_adapter,True,True,,True,True,scripts/build_unified_master.py,2,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
-usaspending_subawards,True,api_adapter,True,True,,True,True,scripts/download_subawards.py,2,1,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+slfrf,False,api_adapter,True,True,,True,True,scripts/download_slfrf.py,1,1,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+usaspending_prime,True,api_adapter,True,True,,True,True,scripts/build_unified_master.py,2,1,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+usaspending_subawards,True,api_adapter,True,True,,True,True,scripts/download_subawards.py,2,2,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 usda_grants,False,api_adapter,True,True,,True,True,scripts/download_usda.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 dol_whd_osha,False,api_producer,True,True,,False,True,scripts/download_dol.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
-fcc_usf,False,api_producer,True,True,,False,True,scripts/download_fcc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+fcc_usf,False,api_producer,True,True,,False,True,scripts/download_fcc.py,1,1,1,,"Run producer under strict preflight; public API path, set key if gated."
 fhlb,False,api_producer,True,True,,False,True,scripts/download_fhlb.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 gao_ig_audits,False,api_producer,True,True,,False,True,scripts/download_gao_ig.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
-hud_cdbg_dr_public,True,api_producer,True,True,,False,True,scripts/download_cdbg_dr.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
-hud_hcv_section8,False,api_producer,True,True,,False,True,scripts/download_hud_hcv.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+hud_cdbg_dr_public,True,api_producer,True,True,,False,True,scripts/download_cdbg_dr.py,1,1,1,,"Run producer under strict preflight; public API path, set key if gated."
+hud_hcv_section8,False,api_producer,True,True,,False,True,scripts/download_hud_hcv.py,1,1,1,,"Run producer under strict preflight; public API path, set key if gated."
 lihtc,False,api_producer,True,True,,False,True,scripts/download_lihtc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 ncua,False,api_producer,True,True,,False,True,scripts/download_ncua.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 nmtc,False,api_producer,True,True,,False,True,scripts/download_nmtc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
-sec_13f_nport,False,api_producer,True,True,,False,True,scripts/download_sec_holdings.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+sec_13f_nport,False,api_producer,True,True,,False,True,scripts/download_sec_holdings.py,1,1,1,,"Run producer under strict preflight; public API path, set key if gated."
 sec_edgar,False,api_producer,True,True,,False,True,scripts/download_sec.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sf133_budget_execution,False,api_producer,True,True,,False,True,scripts/download_sf133.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
-snap_nap,False,api_producer,True,True,,False,True,scripts/download_snap_nap.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+snap_nap,False,api_producer,True,True,,False,True,scripts/download_snap_nap.py,1,1,1,,"Run producer under strict preflight; public API path, set key if gated."
 ssa,False,api_producer,True,True,,False,True,scripts/download_ssa.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 usace_civil_works,False,api_producer,True,True,,False,True,scripts/download_usace_civil.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
-usace_permits,False,api_producer,True,True,,False,True,scripts/download_usace_permits.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+usace_permits,False,api_producer,True,True,,False,True,scripts/download_usace_permits.py,1,1,1,,"Run producer under strict preflight; public API path, set key if gated."
 va_benefits,False,api_producer,True,True,,False,True,scripts/download_va.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
-wic,False,api_producer,True,True,,False,True,scripts/download_wic.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+wic,False,api_producer,True,True,,False,True,scripts/download_wic.py,1,1,1,,"Run producer under strict preflight; public API path, set key if gated."
 wioa,False,api_producer,True,True,,False,True,scripts/download_wioa.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 nara_catalog_aws_open_data,False,deferred_stub,False,False,,False,True,scripts/download_nara_nextgen.py,2,0,0,,Intentionally unimplemented; remains not_materialized by design.
 nara_nextgen_catalog_v3,False,deferred_stub,False,False,NARA_API_KEY,False,True,scripts/download_nara_nextgen.py,2,0,0,,Intentionally unimplemented; remains not_materialized by design.
@@ -59,27 +59,27 @@ act_transition_contracts,False,manual_export,False,False,,False,True,scripts/ing
 acuden_2024_transition,False,manual_export,False,False,,False,True,scripts/ingest_act_transition.py,1,0,1,data/manual/acuden_2024/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 dcaa_active_contractors,False,manual_export,False,False,,False,True,scripts/download_active_contractors.py,1,0,1,data/manual/dcaa_active_contractors/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 hud_drgr_authorized,True,manual_export,False,False,,False,True,scripts/ingest_hud_drgr_exports.py,2,0,1,data/manual/hud_drgr/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
-oficina_contralor,True,manual_export,False,False,,False,True,scripts/ingest_contralor.py,1,0,1,data/raw/Oficina del Contralor/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+oficina_contralor,True,manual_export,False,False,,False,True,scripts/ingest_contralor.py,1,1,1,data/raw/Oficina del Contralor/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 pr_corporate_registry,False,manual_export,False,False,,False,True,scripts/ingest_active_contractors.py,1,0,1,data/manual/pr_corporate_registry/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
-aafaf,False,scraper_needed,False,False,,False,True,scripts/download_aafaf.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+aafaf,False,scraper_needed,False,False,,False,True,scripts/download_aafaf.py,1,1,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 cofina,False,scraper_needed,False,False,,False,True,scripts/download_cofina.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-compras_pr,False,scraper_needed,False,False,,False,True,scripts/download_compras.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-cor3,True,scraper_needed,False,False,,False,True,scripts/download_cor3.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+compras_pr,False,scraper_needed,False,False,,False,True,scripts/download_compras.py,1,1,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+cor3,True,scraper_needed,False,False,,False,True,scripts/download_cor3.py,1,1,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 donaciones_pr,False,scraper_needed,False,False,,False,True,scripts/ingest_fec.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-emma_bonds,True,scraper_needed,False,False,,False,True,scripts/download_emma.py,2,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-eqb_epa_icis,False,scraper_needed,False,False,,False,True,scripts/download_eqb.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+emma_bonds,True,scraper_needed,False,False,,False,True,scripts/download_emma.py,2,1,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+eqb_epa_icis,False,scraper_needed,False,False,,False,True,scripts/download_eqb.py,1,1,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 follow_the_money,False,scraper_needed,False,False,,False,True,scripts/ingest_follow_the_money.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 hacienda,False,scraper_needed,False,False,,False,True,scripts/download_hacienda.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 msrb_rtrs_trades,False,scraper_needed,False,False,,False,True,scripts/download_msrb_trades.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-municipal_finance,False,scraper_needed,False,False,,False,True,scripts/download_municipal.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-p3_authority,False,scraper_needed,False,False,,False,True,scripts/download_p3.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-pr_act_60_decrees,False,scraper_needed,False,False,,False,True,scripts/download_act60.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-pr_cabilderos,True,scraper_needed,False,False,,False,True,scripts/ingest_cabilderos.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+municipal_finance,False,scraper_needed,False,False,,False,True,scripts/download_municipal.py,1,1,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+p3_authority,False,scraper_needed,False,False,,False,True,scripts/download_p3.py,1,1,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+pr_act_60_decrees,False,scraper_needed,False,False,,False,True,scripts/download_act60.py,1,1,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+pr_cabilderos,True,scraper_needed,False,False,,False,True,scripts/ingest_cabilderos.py,1,1,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 pr_pensions,False,scraper_needed,False,False,,False,True,scripts/download_pr_pensions.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-prasa,True,scraper_needed,False,False,,False,True,scripts/ingest_prasa.py,2,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-prepa_luma_genera,False,scraper_needed,False,False,,False,True,scripts/download_prepa_contracts.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-promesa_creditors,False,scraper_needed,False,False,,False,True,scripts/download_promesa_creditors.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-rum_cover_over,False,scraper_needed,False,False,,False,True,scripts/download_rum_coverover.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-congressional_earmarks,False,semantic_duplicate,False,False,,False,True,scripts/download_earmarks.py,1,0,1,,No action; covered by sibling source.
+prasa,True,scraper_needed,False,False,,False,True,scripts/ingest_prasa.py,2,1,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+prepa_luma_genera,False,scraper_needed,False,False,,False,True,scripts/download_prepa_contracts.py,1,1,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+promesa_creditors,False,scraper_needed,False,False,,False,True,scripts/download_promesa_creditors.py,1,1,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+rum_cover_over,False,scraper_needed,False,False,,False,True,scripts/download_rum_coverover.py,1,1,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+congressional_earmarks,False,semantic_duplicate,False,False,,False,True,scripts/download_earmarks.py,1,1,1,,No action; covered by sibling source.
 fpds_report_builder,False,semantic_duplicate,False,False,,False,True,scripts/download_grants.py,1,0,1,,No action; covered by sibling source.
 fsrs_subawards,True,semantic_duplicate,False,False,,False,True,scripts/download_fsrs.py,1,0,1,,No action; covered by sibling source.
