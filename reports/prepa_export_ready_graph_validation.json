@@ -1,0 +1,27 @@
+{
+  "active_vector": "PREPA_GRAPHML_ESCAPE_PATCH \u2192 VALIDATION_PASS \u2192 LOAD_READINESS_GATE",
+  "manifest_source": "outputs/prepa_full_universe/postmatch_qa_strict/prepa_export_ready_registry.csv",
+  "export_ready_rows": 13,
+  "checks": [
+    {
+      "file": "outputs/prepa_full_universe/export_ready_graph/neo4j_nodes_export_ready.csv",
+      "rows": 13,
+      "required_missing": []
+    },
+    {
+      "file": "outputs/prepa_full_universe/export_ready_graph/neo4j_edges_export_ready.csv",
+      "rows": 73,
+      "required_missing": []
+    },
+    {
+      "file": "outputs/prepa_full_universe/export_ready_graph/gis_entities_export_ready.csv",
+      "rows": 13,
+      "required_missing": []
+    }
+  ],
+  "graphml_status": "parse_ok",
+  "dangling_edge_count": 0,
+  "validation_status": "PASS",
+  "errors": [],
+  "next_action": "If PASS, load Neo4j nodes/edges and GIS entities. If FAIL, patch export generator."
+}
