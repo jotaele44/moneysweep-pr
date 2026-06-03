@@ -1,0 +1,8 @@
+{
+  "active_vector": "PREPA_GRAPH_EXPORT_VALIDATED \u2192 NEO4J_GIS_LOAD_RECIPE \u2192 IMPORT_TEST_GATE",
+  "status": "load recipe generated",
+  "validation_status": "PASS",
+  "graphml_status": "parse_ok",
+  "load_recipe": "docs/prepa_export_ready_graph_load_recipe.md",
+  "next_action": "Run Neo4j import in local graph environment; keep GIS layer non-geocoded until facility-level linkage exists."
+}
