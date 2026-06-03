@@ -57,13 +57,13 @@ nara_catalog_aws_open_data,False,deferred_stub,False,False,,False,True,scripts/d
 nara_nextgen_catalog_v3,False,deferred_stub,False,False,NARA_API_KEY,False,True,scripts/download_nara_nextgen.py,2,0,0,,Intentionally unimplemented; remains not_materialized by design.
 act_transition_contracts,False,manual_export,False,False,,False,True,scripts/ingest_act_transition.py,1,0,1,data/manual/act_transition/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 acuden_2024_transition,False,manual_export,False,False,,False,True,scripts/ingest_act_transition.py,1,0,1,data/manual/acuden_2024/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
-dcaa_active_contractors,False,manual_export,False,False,,False,True,scripts/download_active_contractors.py,1,0,1,data/manual/dcaa_active_contractors/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+dcaa_active_contractors,False,manual_export,False,False,,False,True,scripts/download_active_contractors.py,1,0,1,data/raw/Active Contractor Listing/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 donaciones_pr,False,manual_export,False,False,,False,True,scripts/ingest_donaciones.py,1,0,1,data/raw/Donaciones/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 follow_the_money,False,manual_export,False,False,,False,True,scripts/ingest_follow_the_money.py,4,0,1,data/raw/Follow the Money/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 hud_drgr_authorized,True,manual_export,False,False,,False,True,scripts/ingest_hud_drgr_exports.py,2,0,1,data/manual/hud_drgr/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 oficina_contralor,True,manual_export,False,False,,False,True,scripts/ingest_contralor.py,1,0,1,data/raw/Oficina del Contralor/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 pr_cabilderos,True,manual_export,False,False,,False,True,scripts/ingest_cabilderos.py,1,0,1,data/raw/Cabilderos/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
-pr_corporate_registry,False,manual_export,False,False,,False,True,scripts/ingest_active_contractors.py,1,0,1,data/manual/pr_corporate_registry/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+pr_corporate_registry,False,manual_export,False,False,,False,True,scripts/ingest_active_contractors.py,1,0,1,data/raw/Active Contractor Listing/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 prasa,True,manual_export,False,False,,False,True,scripts/ingest_prasa.py,2,0,1,data/raw/PRASA/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 aafaf,False,scraper_needed,False,False,,False,True,scripts/download_aafaf.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 cofina,False,scraper_needed,False,False,,False,True,scripts/download_cofina.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.

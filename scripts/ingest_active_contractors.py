@@ -10,7 +10,7 @@ Input:
   data/raw/Active Contractor Listing/ — CSV or Excel files
 
 Output:
-  data/staging/processed/pr_active_contractors.csv
+  data/staging/processed/pr_corporate_registry.csv
 
 Usage:
   python3 scripts/ingest_active_contractors.py
@@ -165,6 +165,15 @@ def _find_files(raw_dir, logger):
     return files
 
 
+def parse_records(df: "pd.DataFrame", source_file: str = "fixture") -> "pd.DataFrame":
+    """Map a raw contractor listing DataFrame to the canonical schema.
+    Pure — no network or I/O. Live ingest still needs a file dropped into
+    data/raw/Active Contractor Listing/ (see manual_drop_dir in source registry).
+    """
+    import logging
+    return _parse_df(df, source_file, logging.getLogger("ingest_active_contractors"))
+
+
 def _file_has_data(path):
     if not path.exists():
         return False
@@ -181,14 +190,14 @@ def run(root=None):
 def _run(root=None, force=False):
     if root is None:
         root = PROJECT_ROOT
-    out_path = root / "data" / "staging" / "processed" / "pr_active_contractors.csv"
+    out_path = root / "data" / "staging" / "processed" / "pr_corporate_registry.csv"
     raw_dir = root / "data" / "raw"
     logger = setup_logging("ingest_active_contractors")
     logger.info("Starting PR Active Contractor Listing ingestion...")
 
     if not force and _file_has_data(out_path):
         rows = len(pd.read_csv(out_path, dtype=str, low_memory=False))
-        logger.info(f"  pr_active_contractors.csv exists ({rows:,} rows) — skipping.")
+        logger.info(f"  pr_corporate_registry.csv exists ({rows:,} rows) — skipping.")
         return {"rows": rows, "path": str(out_path), "errors": []}
 
     files = _find_files(raw_dir, logger)
