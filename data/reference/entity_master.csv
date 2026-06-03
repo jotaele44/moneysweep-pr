@@ -1,0 +1,27 @@
+entity_id,entity_type,canonical_name,jurisdiction,source_id,evidence_tier,confidence,notes
+ENT_AGENCY_125b538f289a4708,government_agency,Commonwealth of Puerto Rico,PR,pr_public_money_entities,T1,0.95,aliases=Government of Puerto Rico|ELA|Estado Libre Asociado de Puerto Rico
+ENT_AGENCY_3d2fd8a05e1703b2,government_agency,Financial Oversight and Management Board for Puerto Rico,US,pr_public_money_entities,T1,0.95,aliases=FOMB|Oversight Board|La Junta|FOMBPR
+ENT_AGENCY_1c1ee3c0f0c85d23,government_agency,Puerto Rico Fiscal Agency and Financial Advisory Authority,PR,pr_public_money_entities,T1,0.95,aliases=AAFAF|AFAF
+ENT_AGENCY_8d511bc1aaa048d4,government_agency,Puerto Rico Public-Private Partnerships Authority,PR,pr_public_money_entities,T1,0.95,aliases=P3 Authority|AAPP|Autoridad de Alianzas Publico-Privadas
+ENT_AGENCY_6c1d858c1babe390,government_agency,Puerto Rico Electric Power Authority,PR,pr_public_money_entities,T1,0.95,aliases=PREPA|AEE|Autoridad de Energia Electrica
+ENT_AGENCY_c5fb8a7f44e8ff18,government_agency,Puerto Rico Aqueduct and Sewer Authority,PR,pr_public_money_entities,T1,0.95,aliases=PRASA|AAA|Autoridad de Acueductos y Alcantarillados
+ENT_AGENCY_b182f85acf46f69b,government_agency,Puerto Rico Highways and Transportation Authority,PR,pr_public_money_entities,T1,0.95,aliases=HTA|ACT|Autoridad de Carreteras y Transportacion
+ENT_ORG_5204a3d8f84bbfcd,organization,Puerto Rico Sales Tax Financing Corporation,PR,pr_public_money_entities,T1,0.95,aliases=COFINA|Corporacion del Fondo de Interes Apremiante
+ENT_AGENCY_d363e4ddf2ce6a5d,government_agency,Government Development Bank for Puerto Rico,PR,pr_public_money_entities,T1,0.95,aliases=GDB|BGF|Banco Gubernamental de Fomento|Puerto Rico Government Development Bank
+ENT_AGENCY_67880db21dd281cd,government_agency,Puerto Rico Department of Economic Development and Commerce,PR,pr_public_money_entities,T1,0.95,aliases=DDEC|Departamento de Desarrollo Economico y Comercio
+ENT_AGENCY_42ffd9ad9ab45e6a,government_agency,Puerto Rico Public Buildings Authority,PR,pr_public_money_entities,T1,0.95,aliases=PBA|AEP|Autoridad de Edificios Publicos
+ENT_ORG_299e165490469537,organization,LUMA Energy,PR,pr_public_money_entities,T1,0.95,aliases=LUMA
+ENT_ORG_0f8f1789b2c687ed,organization,Genera PR,PR,pr_public_money_entities,T1,0.95,aliases=Genera|Genera Puerto Rico
+ENT_ORG_3719113e87688e83,organization,Autopistas Metropolitanas de Puerto Rico,PR,pr_public_money_entities,T1,0.95,aliases=Metropistas
+ENT_AGENCY_7cf79ff780fb8279,government_agency,Puerto Rico Infrastructure Financing Authority,PR,pr_public_money_entities,T1,0.95,aliases=PRIFA|AFI|Autoridad para el Financiamiento de la Infraestructura
+ENT_AGENCY_c6aa8887d7248228,government_agency,Puerto Rico Housing Finance Authority,PR,pr_public_money_entities,T1,0.95,aliases=PRHFA|AFV|Autoridad para el Financiamiento de la Vivienda
+ENT_AGENCY_5f99300da364ea64,government_agency,Puerto Rico Industrial Development Company,PR,pr_public_money_entities,T1,0.95,aliases=PRIDCO|PRIDCO Real Estate|Compania de Fomento Industrial
+ENT_AGENCY_cc41784f4b40b6ff,government_agency,University of Puerto Rico,PR,pr_public_money_entities,T1,0.95,aliases=UPR|Universidad de Puerto Rico
+ENT_AGENCY_2c16f9ae54df7e1e,government_agency,Puerto Rico Convention Center District Authority,PR,pr_public_money_entities,T1,0.95,aliases=CCDA|Autoridad del Distrito del Centro de Convenciones
+ENT_AGENCY_efcec09764306ade,government_agency,Puerto Rico Ports Authority,PR,pr_public_money_entities,T1,0.95,aliases=Ports Authority|Autoridad de los Puertos
+ENT_ORG_b14376987d82d5ee,organization,Puerto Rico Public Finance Corporation,PR,pr_public_money_entities,T1,0.95,aliases=PRPFC|Corporacion de Financiamiento Publico
+ENT_AGENCY_e73c9879d715653a,government_agency,Puerto Rico Municipal Finance Agency,PR,pr_public_money_entities,T1,0.95,aliases=MFA|Agencia de Financiamiento Municipal
+ENT_ORG_36443c30dc526c13,organization,LGA Strategies,PR,pr_public_money_entities,T1,0.95,aliases=LGA
+ENT_ORG_a034a2e43d67206d,organization,The RCL Group,PR,pr_public_money_entities,T1,0.95,aliases=RCL Group|RCL
+ENT_ORG_30007ca84af23b8d,organization,Puerto Rico Energy LLC,PR,pr_public_money_entities,T1,0.95,aliases=PR Energy LLC
+ENT_ORG_21371fab1b27e788,organization,Arcadis Caribe,PR,pr_public_money_entities,T1,0.95,aliases=Arcadis
