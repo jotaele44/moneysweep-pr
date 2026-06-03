@@ -1,5 +1,5 @@
 {
-  "active_vector": "MATERIALIZATION_READINESS_LOCKED_AWAITING_EGRESS_FILL",
+  "active_vector": "CONTRACT_SWEEPER_100_PERCENT_COMPLETION_ROADMAP → TRANCHE_A_STATUS_TRUTH",
   "active_branch": "",
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_active": true,
@@ -132,9 +132,19 @@
     "PRASA FY2024 Consulting Engineer's Report",
     "Puerto Rico lobbyist registry",
     "Federal LDA registrants",
-    "DCAA active contractor listings"
+    "DCAA active contractor listings",
+    "ACQUIRED_NOT_INGESTED: Contratos Vigentes ACT.pdf",
+    "ACQUIRED_NOT_INGESTED: Informe Contratos Vigentes al Momento de Transición.pdf",
+    "ACQUIRED_NOT_INGESTED: completed_projects_AAA.pdf",
+    "ACQUIRED_NOT_INGESTED: FY2024 CER_Final.pdf",
+    "ACQUIRED_NOT_INGESTED: Registro de cabilderos Abril 18 2026.pdf",
+    "ACQUIRED_NOT_INGESTED: Registrants.pdf",
+    "ACQUIRED_NOT_INGESTED: subcontractingdirectory.772857981.pdf",
+    "ACQUIRED_NOT_INGESTED: FY_2007_Active_Contractor_Listing_Final.pdf",
+    "ACQUIRED_NOT_INGESTED: FY_2012_All_Active_Contractor_Listing.pdf",
+    "ACQUIRED_NOT_INGESTED: FY_2013_All_Active_Contractor_Listing.pdf"
   ],
-  "next_command": "FILL_AUTOMATABLE_SOURCES_IN_EGRESS_ENABLED_ENVIRONMENT",
+  "next_command": "TRANCHE_B_MANUAL_SOURCE_INGESTION",
   "next_command_detail": {
     "description": "Materialize the 54 automatable sources per docs/MATERIALIZATION_RUNBOOK.md. Requires an environment with outbound HTTPS — the web sandbox blocks egress (HTTP 403), so no producer/adapter can fetch data there.",
     "readiness_source_of_truth": "reports/materialization_readiness.json (automatable_ready=54/54, queued_excluded=30)",
@@ -149,5 +159,18 @@
     "gate": "strict preflight must pass before each producer run",
     "queued_excluded": "30 sources not in the automatable target: 20 scraper_needed (need PR-gov scraping adapters), 5 manual_export (operator files), 3 semantic_duplicate (sibling-covered), 2 deferred_stub (NARA)",
     "future_work": "build the 20 scraper_needed PR-gov adapters and integrate the manual datasets (ACT/ACUDEN/PRASA/cabilderos/DCAA) in dedicated egress-enabled PRs"
+  },
+  "materialization_readiness_truth": {
+    "total_sources": 84,
+    "automatable_total": 54,
+    "automatable_ready": 54,
+    "queued_excluded_total": 30,
+    "queued_excluded": {
+      "manual_export": 10,
+      "scraper_needed": 15,
+      "semantic_duplicate": 3,
+      "deferred_stub": 2,
+      "broken_producer": 0
+    }
   }
 }
