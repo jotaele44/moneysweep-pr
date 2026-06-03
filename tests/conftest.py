@@ -11,6 +11,75 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 
+# Committed, deterministic, generated report files that some tests regenerate
+# in place against the real repo root. Snapshotting + restoring them around
+# every test keeps the suite order-independent: no test can leave one mutated
+# as a polluted baseline for another (e.g. the "regenerates identically"
+# invariant tests). Content is captured and rewritten verbatim.
+_PROTECTED_REPORT_FILES = (
+    "reports/source_registry_status.csv",
+    "reports/source_recovery_matrix.csv",
+    "reports/source_recovery_matrix.md",
+    "reports/materialization_readiness.json",
+    "reports/gap_analysis_report.csv",
+    "reports/gap_analysis_report.json",
+)
+
+# Directories where tests may create transient outputs against the real repo
+# root. Any file that did not exist before a test is removed afterward, so a
+# leaked materialized output cannot flip another test's data-presence-derived
+# status (e.g. gap_analysis status: not_materialized -> fully_materialized).
+# Pre-existing / git-tracked files are never touched.
+_TRANSIENT_OUTPUT_DIRS = (
+    "data/staging/processed",
+    "data/manifests",
+    "reports/source_manifests",
+)
+
+
+def _snapshot_dir_files(root: Path) -> set[Path]:
+    if not root.exists():
+        return set()
+    return {p for p in root.rglob("*") if p.is_file()}
+
+
+@pytest.fixture(autouse=True)
+def _isolate_generated_artifacts():
+    """Roll generated repo artifacts back to their pre-test state after each test.
+
+    Guarantees order-independence by construction: committed report files are
+    restored verbatim, and newly created transient output files are removed.
+    """
+    report_snapshots: dict[Path, bytes | None] = {}
+    for rel in _PROTECTED_REPORT_FILES:
+        p = PROJECT_ROOT / rel
+        report_snapshots[p] = p.read_bytes() if p.exists() else None
+
+    dir_snapshots: dict[Path, set[Path]] = {}
+    for rel in _TRANSIENT_OUTPUT_DIRS:
+        d = PROJECT_ROOT / rel
+        dir_snapshots[d] = _snapshot_dir_files(d)
+
+    try:
+        yield
+    finally:
+        # Restore committed report files to their pre-test bytes.
+        for p, original in report_snapshots.items():
+            if original is None:
+                if p.exists():
+                    p.unlink()
+            elif not p.exists() or p.read_bytes() != original:
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_bytes(original)
+        # Remove transient files that the test created.
+        for d, before in dir_snapshots.items():
+            for p in _snapshot_dir_files(d) - before:
+                try:
+                    p.unlink()
+                except OSError:
+                    pass
+
+
 @pytest.fixture
 def tmp_project(tmp_path):
     """Create a minimal project directory structure matching the pipeline layout."""
