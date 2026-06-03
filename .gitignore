@@ -43,3 +43,4 @@ data/raw/Grants/*.xml
 # Triaged document corpus — keep the manifest + index tracked, ignore binaries
 data/raw/documents/**/*.pdf
 data/raw/documents/**/*.txt
+.claude/
