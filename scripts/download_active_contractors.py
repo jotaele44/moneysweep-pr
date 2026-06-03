@@ -153,6 +153,17 @@ def _normalize_df(df, source_file):
     return result[CONTRACTOR_COLUMNS]
 
 
+def parse_records(df: "pd.DataFrame", source_file: str = "fixture") -> pd.DataFrame:
+    """Map a raw contractor listing DataFrame to the canonical schema.
+    Pure — no network or I/O. Live scrape still needs egress to PR government
+    contractor APIs (asg.pr.gov, consultacontratos.ocpr.gov.pr) or a file
+    dropped into data/raw/Active Contractor Listing/.
+    """
+    if df is None or (hasattr(df, "empty") and df.empty):
+        return pd.DataFrame(columns=CONTRACTOR_COLUMNS)
+    return _normalize_df(df, source_file)
+
+
 def _try_manual_files(logger):
     all_dfs = []
     for raw_dir in RAW_DIRS:

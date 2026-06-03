@@ -1,0 +1,18 @@
+{
+  "producer_script": "scripts/ingest_properties.py",
+  "producer_phase": "CANONICAL_V1_PROPERTIES_INGEST",
+  "source_inputs": [
+    "data/reference/pr_properties.csv"
+  ],
+  "row_count": 4,
+  "property_type_counts": {
+    "concession": 1,
+    "facility": 3
+  },
+  "with_municipality": 4,
+  "skipped_count": 0,
+  "skipped": [],
+  "evidence_rows_added": 4,
+  "evidence_table_rows": 232,
+  "generated_at": "2026-06-02T21:33:33.683110+00:00"
+}
