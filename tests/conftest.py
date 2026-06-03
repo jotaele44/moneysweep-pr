@@ -11,6 +11,47 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 
+# Committed, deterministic, generated report files that some tests regenerate
+# in place against the real repo root. Snapshotting + restoring them around
+# every test keeps the working tree clean and prevents one test leaving a
+# mutated file as a polluted baseline for another's committed-vs-regenerated
+# comparison. Content is captured and rewritten verbatim.
+#
+# Note: the strongest data-presence-dependent invariant
+# (test_status_csv_regenerates_identically) does NOT rely on this fixture — it
+# regenerates inside a clean ``git worktree`` of HEAD, so it is immune to
+# working-tree pollution regardless of collection order. This fixture is
+# defence-in-depth + working-tree hygiene for the registry-derived comparison
+# tests.
+_PROTECTED_REPORT_FILES = (
+    "reports/source_registry_status.csv",
+    "reports/source_recovery_matrix.csv",
+    "reports/source_recovery_matrix.md",
+    "reports/materialization_readiness.json",
+    "reports/gap_analysis_report.csv",
+    "reports/gap_analysis_report.json",
+)
+
+
+@pytest.fixture(autouse=True)
+def _restore_committed_reports():
+    """Restore committed report files to their pre-test bytes after each test."""
+    snapshots: dict[Path, bytes | None] = {}
+    for rel in _PROTECTED_REPORT_FILES:
+        p = PROJECT_ROOT / rel
+        snapshots[p] = p.read_bytes() if p.exists() else None
+    try:
+        yield
+    finally:
+        for p, original in snapshots.items():
+            if original is None:
+                if p.exists():
+                    p.unlink()
+            elif not p.exists() or p.read_bytes() != original:
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_bytes(original)
+
+
 @pytest.fixture
 def tmp_project(tmp_path):
     """Create a minimal project directory structure matching the pipeline layout."""

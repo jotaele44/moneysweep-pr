@@ -7,7 +7,9 @@ scripts/gap_analysis_builder.write_status_csv; these tests keep it honest.
 """
 
 import csv
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -20,6 +22,7 @@ from contract_sweeper.runtime.source_registry import (
 from scripts.gap_analysis_builder import write_status_csv
 
 STATUS_CSV = REPO_ROOT / "reports" / "source_registry_status.csv"
+STATUS_REL = "reports/source_registry_status.csv"
 
 
 def _status_rows():
@@ -45,9 +48,36 @@ def test_status_csv_producer_scripts_match_registry():
 
 
 def test_status_csv_regenerates_identically():
-    committed = STATUS_CSV.read_text(encoding="utf-8")
-    write_status_csv(REPO_ROOT)
-    assert STATUS_CSV.read_text(encoding="utf-8") == committed, (
+    """The committed status CSV must equal what the generator produces from a
+    *clean* checkout.
+
+    Regenerating against the live working tree is not order-independent: the
+    status is data-presence derived (see gap_analysis_builder._source_status),
+    so any test that leaves a transient output under data/staging/processed
+    would flip a source's status and make this comparison flaky. Instead we
+    regenerate inside a throwaway ``git worktree`` of HEAD — exactly the state a
+    fresh CI checkout has — which is immune to working-tree pollution from other
+    tests regardless of collection order.
+    """
+    committed = subprocess.run(
+        ["git", "show", f"HEAD:{STATUS_REL}"],
+        cwd=REPO_ROOT, capture_output=True, text=True, check=True,
+    ).stdout
+    with tempfile.TemporaryDirectory() as td:
+        worktree = Path(td) / "wt"
+        subprocess.run(
+            ["git", "worktree", "add", "--detach", "-f", str(worktree), "HEAD"],
+            cwd=REPO_ROOT, capture_output=True, text=True, check=True,
+        )
+        try:
+            write_status_csv(worktree)
+            regenerated = (worktree / STATUS_REL).read_text(encoding="utf-8")
+        finally:
+            subprocess.run(
+                ["git", "worktree", "remove", "--force", str(worktree)],
+                cwd=REPO_ROOT, capture_output=True, text=True,
+            )
+    assert regenerated == committed, (
         "reports/source_registry_status.csv is stale — "
         "regenerate with: python3 scripts/gap_analysis_builder.py"
     )
