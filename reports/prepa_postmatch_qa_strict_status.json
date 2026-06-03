@@ -1,0 +1,17 @@
+{
+  "active_vector": "PREPA_POSTMATCH_QA_REFINEMENT \u2192 STRICT_CANONICAL_CLEANING \u2192 EXPORT_READY_REGISTRY",
+  "status": "strict postmatch QA executed",
+  "summary": {
+    "input_rows": 31,
+    "validated_canonical_rows": 6,
+    "review_rows": 20,
+    "suppressed_rows": 2,
+    "outputs": {
+      "validated": "outputs/prepa_full_universe/postmatch_qa_strict/prepa_top100_validated.csv",
+      "review": "outputs/prepa_full_universe/postmatch_qa_strict/prepa_review_queue.csv",
+      "suppressed": "outputs/prepa_full_universe/postmatch_qa_strict/prepa_suppressed_false_positive_candidates.csv"
+    }
+  },
+  "export_policy": "Only postmatch_qa_strict/prepa_top100_validated.csv is eligible for Neo4j/GIS export. Review and suppressed queues are excluded.",
+  "next_action": "Inspect strict validated rows; then export strict validated registry to Neo4j/GIS."
+}

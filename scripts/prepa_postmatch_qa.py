@@ -22,7 +22,9 @@ from typing import Any
 ADDRESS_TERMS = {
     "ATTN", "ATTENTION", "ADDRESS", "FILE", "ST", "STREET", "AVE", "AVENUE", "ROAD", "RD",
     "CARR", "CARRETERA", "SUITE", "STE", "OFICINA", "OFFICE", "PLAZA", "BLDG", "BUILDING",
-    "CHICAGO", "RALEIGH", "IL", "NC", "PR", "ZIP", "PO", "BOX", "C", "O", "RE", "RES", "TO"
+    "CHICAGO", "RALEIGH", "IL", "NC", "PR", "ZIP", "PO", "BOX", "C", "O", "RE", "RES", "TO",
+    "PAYSHPERE", "PAYSPHERE", "CIRCLE", "CENTRO", "INTERNACIONAL", "MUNDO", "BORI", "URB",
+    "ALTURAS", "PENUELAS", "SCOTIABANK", "ROOSEVELT", "ELEONOR"
 }
 
 GENERIC_TERMS = {
@@ -66,11 +68,11 @@ def strip_metadata(name: str) -> str:
     toks = norm(name).split()
     kept = []
     for tok in toks:
-        if tok in ADDRESS_TERMS:
+        if tok in ADDRESS_TERMS or tok.isdigit():
             break
         kept.append(tok)
     if not kept:
-        kept = toks[:5]
+        kept = [t for t in toks[:5] if not t.isdigit()]
     return " ".join(kept).strip()
 
 def canonical_name(name: str) -> str:
@@ -108,6 +110,8 @@ def classify_status(row: dict[str, str], canon: str, cleaned: str) -> tuple[str,
     if "ADDRESS ON FILE" in raw:
         return "review", "person_or_address_on_file"
     if dataset_count >= 2 or temporal_edges >= 20:
+        if gr >= 0.55 or any(ch.isdigit() for ch in cleaned):
+            return "review", "validated_signal_but_dirty_or_generic_canonical"
         return "validated", "multi_dataset_or_high_temporal_support"
     return "review", "needs_corrob_or_alias_resolution"
 
