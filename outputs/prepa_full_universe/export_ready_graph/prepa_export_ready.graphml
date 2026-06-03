@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
+<key id="canonical_name" for="node" attr.name="canonical_name" attr.type="string"/>
+<key id="sector" for="node" attr.name="sector" attr.type="string"/>
+<key id="continuity_score" for="node" attr.name="continuity_score" attr.type="double"/>
+<key id="type" for="edge" attr.name="type" attr.type="string"/>
+<key id="count" for="edge" attr.name="count" attr.type="int"/>
+<graph id="PREPAExportReady" edgedefault="directed">
+  <node id="prepa:aireko_services_instalation_inc">
+    <data key="canonical_name">AIREKO</data>
+    <data key="sector">infrastructure_contractor</data>
+    <data key="continuity_score">438.75</data>
+  </node>
+  <node id="prepa:general_motriz_auto_parts">
+    <data key="canonical_name">GENERAL MOTRIZ AUTO PARTS</data>
+    <data key="sector">infrastructure_contractor</data>
+    <data key="continuity_score">378.75</data>
+  </node>
+  <node id="prepa:aecom_environmental_consulting_1178_paysphere_circle_chicago_il">
+    <data key="canonical_name">AECOM</data>
+    <data key="sector">infrastructure_contractor</data>
+    <data key="continuity_score">313.75</data>
+  </node>
+  <node id="prepa:puma_energy_caribe_llc_attn_victor_m_dominguez_re_sto_puma_energy_caribe_llc">
+    <data key="canonical_name">PUMA ENERGY CARIBE</data>
+    <data key="sector">energy_fuel</data>
+    <data key="continuity_score">102.25</data>
+  </node>
+  <node id="prepa:alstom_caribe_inc_el_mundo_office_building_suite">
+    <data key="canonical_name">ALSTOM</data>
+    <data key="sector">infrastructure_contractor</data>
+    <data key="continuity_score">89.75</data>
+  </node>
+  <node id="prepa:ernst_young_llp_1000_scotiabank_plaza_273">
+    <data key="canonical_name">ERNST & YOUNG</data>
+    <data key="sector">legal</data>
+    <data key="continuity_score">20.75</data>
+  </node>
+  <node id="prepa:black_veatch_puerto_rico_psc_centro_internacional">
+    <data key="canonical_name">BLACK & VEATCH</data>
+    <data key="sector">infrastructure_contractor</data>
+    <data key="continuity_score">279.75</data>
+  </node>
+  <node id="prepa:ecoelectrica_lp_attn_carlos_reyes_plaza_scotiabank_suite">
+    <data key="canonical_name">ECOELECTRICA</data>
+    <data key="sector">energy_fuel</data>
+    <data key="continuity_score">64.75</data>
+  </node>
+  <node id="prepa:rico_fiscal_agency_and_financial_advisory_authority_greenberg">
+    <data key="canonical_name">AAFAF</data>
+    <data key="sector">legal</data>
+    <data key="continuity_score">39.75</data>
+  </node>
+  <node id="prepa:proskauer_rose_llp">
+    <data key="canonical_name">PROSKAUER ROSE</data>
+    <data key="sector">legal</data>
+    <data key="continuity_score">22.25</data>
+  </node>
+  <node id="prepa:freepoint_commodities_llc_attn_brandon_diket_freepo_int">
+    <data key="canonical_name">FREEPOINT COMMODITIES</data>
+    <data key="sector">energy_fuel</data>
+    <data key="continuity_score">17.25</data>
+  </node>
+  <node id="prepa:vitol_inc_attn_gregory_g_garre_francisco_g">
+    <data key="canonical_name">VITOL</data>
+    <data key="sector">energy_fuel</data>
+    <data key="continuity_score">17.25</data>
+  </node>
+  <node id="prepa:paul_hastings_llp">
+    <data key="canonical_name">PAUL HASTINGS</data>
+    <data key="sector">legal</data>
+    <data key="continuity_score">10.25</data>
+  </node>
+  <edge source="prepa:aireko_services_instalation_inc" target="milestone:restructuring">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">103</data>
+  </edge>
+  <edge source="prepa:aireko_services_instalation_inc" target="milestone:reconstruction">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">118</data>
+  </edge>
+  <edge source="prepa:aireko_services_instalation_inc" target="milestone:privatization">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">134</data>
+  </edge>
+  <edge source="prepa:aireko_services_instalation_inc" target="milestone:generation">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">72</data>
+  </edge>
+  <edge source="prepa:general_motriz_auto_parts" target="milestone:restructuring">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">59</data>
+  </edge>
+  <edge source="prepa:general_motriz_auto_parts" target="milestone:reconstruction">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">64</data>
+  </edge>
+  <edge source="prepa:general_motriz_auto_parts" target="milestone:privatization">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">109</data>
+  </edge>
+  <edge source="prepa:general_motriz_auto_parts" target="milestone:generation">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">135</data>
+  </edge>
+  <edge source="prepa:aecom_environmental_consulting_1178_paysphere_circle_chicago_il" target="milestone:restructuring">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">79</data>
+  </edge>
+  <edge source="prepa:aecom_environmental_consulting_1178_paysphere_circle_chicago_il" target="milestone:reconstruction">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">82</data>
+  </edge>
+  <edge source="prepa:aecom_environmental_consulting_1178_paysphere_circle_chicago_il" target="milestone:generation">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">65</data>
+  </edge>
+  <edge source="prepa:aecom_environmental_consulting_1178_paysphere_circle_chicago_il" target="milestone:privatization">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">76</data>
+  </edge>
+  <edge source="prepa:puma_energy_caribe_llc_attn_victor_m_dominguez_re_sto_puma_energy_caribe_llc" target="milestone:restructuring">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">33</data>
+  </edge>
+  <edge source="prepa:puma_energy_caribe_llc_attn_victor_m_dominguez_re_sto_puma_energy_caribe_llc" target="milestone:reconstruction">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">25</data>
+  </edge>
+  <edge source="prepa:puma_energy_caribe_llc_attn_victor_m_dominguez_re_sto_puma_energy_caribe_llc" target="milestone:privatization">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">15</data>
+  </edge>
+  <edge source="prepa:puma_energy_caribe_llc_attn_victor_m_dominguez_re_sto_puma_energy_caribe_llc" target="milestone:generation">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">16</data>
+  </edge>
+  <edge source="prepa:alstom_caribe_inc_el_mundo_office_building_suite" target="milestone:restructuring">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">30</data>
+  </edge>
+  <edge source="prepa:alstom_caribe_inc_el_mundo_office_building_suite" target="milestone:reconstruction">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">22</data>
+  </edge>
+  <edge source="prepa:alstom_caribe_inc_el_mundo_office_building_suite" target="milestone:privatization">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">13</data>
+  </edge>
+  <edge source="prepa:alstom_caribe_inc_el_mundo_office_building_suite" target="milestone:generation">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">13</data>
+  </edge>
+  <edge source="prepa:ernst_young_llp_1000_scotiabank_plaza_273" target="milestone:privatization">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">2</data>
+  </edge>
+  <edge source="prepa:ernst_young_llp_1000_scotiabank_plaza_273" target="milestone:generation">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">4</data>
+  </edge>
+  <edge source="prepa:ernst_young_llp_1000_scotiabank_plaza_273" target="milestone:restructuring">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">2</data>
+  </edge>
+  <edge source="prepa:ernst_young_llp_1000_scotiabank_plaza_273" target="milestone:reconstruction">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">1</data>
+  </edge>
+  <edge source="prepa:black_veatch_puerto_rico_psc_centro_internacional" target="milestone:generation">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">74</data>
+  </edge>
+  <edge source="prepa:black_veatch_puerto_rico_psc_centro_internacional" target="milestone:restructuring">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">57</data>
+  </edge>
+  <edge source="prepa:black_veatch_puerto_rico_psc_centro_internacional" target="milestone:reconstruction">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">56</data>
+  </edge>
+  <edge source="prepa:black_veatch_puerto_rico_psc_centro_internacional" target="milestone:privatization">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">81</data>
+  </edge>
+  <edge source="prepa:ecoelectrica_lp_attn_carlos_reyes_plaza_scotiabank_suite" target="milestone:restructuring">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">13</data>
+  </edge>
+  <edge source="prepa:ecoelectrica_lp_attn_carlos_reyes_plaza_scotiabank_suite" target="milestone:reconstruction">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">14</data>
+  </edge>
+  <edge source="prepa:ecoelectrica_lp_attn_carlos_reyes_plaza_scotiabank_suite" target="milestone:privatization">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">15</data>
+  </edge>
+  <edge source="prepa:ecoelectrica_lp_attn_carlos_reyes_plaza_scotiabank_suite" target="milestone:generation">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">11</data>
+  </edge>
+  <edge source="prepa:rico_fiscal_agency_and_financial_advisory_authority_greenberg" target="milestone:restructuring">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">6</data>
+  </edge>
+  <edge source="prepa:rico_fiscal_agency_and_financial_advisory_authority_greenberg" target="milestone:reconstruction">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">5</data>
+  </edge>
+  <edge source="prepa:rico_fiscal_agency_and_financial_advisory_authority_greenberg" target="milestone:privatization">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">11</data>
+  </edge>
+  <edge source="prepa:rico_fiscal_agency_and_financial_advisory_authority_greenberg" target="milestone:generation">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">6</data>
+  </edge>
+  <edge source="prepa:proskauer_rose_llp" target="milestone:restructuring">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">1</data>
+  </edge>
+  <edge source="prepa:proskauer_rose_llp" target="milestone:reconstruction">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">1</data>
+  </edge>
+  <edge source="prepa:proskauer_rose_llp" target="milestone:privatization">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">7</data>
+  </edge>
+  <edge source="prepa:proskauer_rose_llp" target="milestone:generation">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">3</data>
+  </edge>
+  <edge source="prepa:freepoint_commodities_llc_attn_brandon_diket_freepo_int" target="milestone:privatization">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">2</data>
+  </edge>
+  <edge source="prepa:freepoint_commodities_llc_attn_brandon_diket_freepo_int" target="milestone:restructuring">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">2</data>
+  </edge>
+  <edge source="prepa:freepoint_commodities_llc_attn_brandon_diket_freepo_int" target="milestone:reconstruction">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">2</data>
+  </edge>
+  <edge source="prepa:freepoint_commodities_llc_attn_brandon_diket_freepo_int" target="milestone:generation">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">1</data>
+  </edge>
+  <edge source="prepa:vitol_inc_attn_gregory_g_garre_francisco_g" target="milestone:privatization">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">2</data>
+  </edge>
+  <edge source="prepa:vitol_inc_attn_gregory_g_garre_francisco_g" target="milestone:restructuring">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">2</data>
+  </edge>
+  <edge source="prepa:vitol_inc_attn_gregory_g_garre_francisco_g" target="milestone:reconstruction">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">2</data>
+  </edge>
+  <edge source="prepa:vitol_inc_attn_gregory_g_garre_francisco_g" target="milestone:generation">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">1</data>
+  </edge>
+  <edge source="prepa:paul_hastings_llp" target="milestone:restructuring">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">2</data>
+  </edge>
+  <edge source="prepa:paul_hastings_llp" target="milestone:reconstruction">
+    <data key="type">TEMPORALLY_NEAR</data>
+    <data key="count">2</data>
+  </edge>
+</graph>
+</graphml>

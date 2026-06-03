@@ -1,0 +1,13 @@
+{
+  "active_vector": "PREPA_EXPORT_READY_REGISTRY \u2192 NEO4J_GIS_EXPORT \u2192 ARTIFACT_MANIFEST",
+  "source": "outputs/prepa_full_universe/postmatch_qa_strict/prepa_export_ready_registry.csv",
+  "export_ready_rows": 13,
+  "outputs": {
+    "neo4j_nodes": "outputs/prepa_full_universe/export_ready_graph/neo4j_nodes_export_ready.csv",
+    "neo4j_edges": "outputs/prepa_full_universe/export_ready_graph/neo4j_edges_export_ready.csv",
+    "gis_entities": "outputs/prepa_full_universe/export_ready_graph/gis_entities_export_ready.csv",
+    "graphml": "outputs/prepa_full_universe/export_ready_graph/prepa_export_ready.graphml"
+  },
+  "export_constraint": "Only export-ready reviewed registry was used. Review and suppressed queues excluded.",
+  "analytic_label": "correlation_not_allegation"
+}
