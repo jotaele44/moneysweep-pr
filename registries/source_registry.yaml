@@ -279,11 +279,11 @@ sources:
     endpoint_url: ""
     producer_script: scripts/download_active_contractors.py
     expected_outputs:
-      - data/staging/processed/pr_dcaa_active_contractors.csv
+      - data/staging/processed/pr_active_contractors.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
-    manual_drop_dir: data/manual/dcaa_active_contractors/
+    manual_drop_dir: data/raw/Active Contractor Listing/
     update_cadence: ad_hoc
     notes: DCAA FY2007/FY2012/FY2013 active contractor listings. Alias/crosswalk source.
 
@@ -830,7 +830,7 @@ sources:
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
-    manual_drop_dir: data/manual/pr_corporate_registry/
+    manual_drop_dir: data/raw/Active Contractor Listing/
     update_cadence: ad_hoc
 
   # ----- Healthcare programs -----

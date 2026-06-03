@@ -84,3 +84,43 @@ def test_committed_summary_matches_live_registry():
     committed = json.loads(OUT_JSON.read_text(encoding="utf-8"))
     live = build_summary(build_rows())
     assert committed == live
+
+
+# Terminal-source guard (Task 20): these 5 sources must stay excluded forever.
+# They are not bugs — they are intentionally non-materializing by design.
+_DEFERRED_STUBS = {"nara_nextgen_catalog_v3", "nara_catalog_aws_open_data"}
+_SEMANTIC_DUPES = {"fpds_report_builder", "fsrs_subawards", "congressional_earmarks"}
+_TERMINAL_SOURCES = _DEFERRED_STUBS | _SEMANTIC_DUPES
+
+_ROWS_BY_ID = {r["source_id"]: r for r in ROWS}
+
+
+def test_deferred_stub_sources_are_classified_correctly():
+    """NARA sources must remain deferred_stub, never automatable."""
+    for sid in _DEFERRED_STUBS:
+        row = _ROWS_BY_ID.get(sid)
+        assert row is not None, f"deferred source {sid!r} missing from registry"
+        assert row["path_type"] == "deferred_stub", (
+            f"{sid}: expected path_type='deferred_stub', got {row['path_type']!r}"
+        )
+        assert not row["automatable"], f"{sid} must not be automatable"
+
+
+def test_semantic_duplicate_sources_are_classified_correctly():
+    """Semantic-duplicate sources must remain semantic_duplicate, never automatable."""
+    for sid in _SEMANTIC_DUPES:
+        row = _ROWS_BY_ID.get(sid)
+        assert row is not None, f"semantic-duplicate source {sid!r} missing from registry"
+        assert row["path_type"] == "semantic_duplicate", (
+            f"{sid}: expected path_type='semantic_duplicate', got {row['path_type']!r}"
+        )
+        assert not row["automatable"], f"{sid} must not be automatable"
+
+
+def test_terminal_sources_never_appear_in_automatable_set():
+    """No terminal source may slip into the automatable bucket."""
+    automatable_ids = {r["source_id"] for r in ROWS if r["automatable"]}
+    overlap = automatable_ids & _TERMINAL_SOURCES
+    assert overlap == set(), (
+        f"Terminal sources incorrectly marked automatable: {overlap}"
+    )

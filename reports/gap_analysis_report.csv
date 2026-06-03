@@ -28,7 +28,7 @@ cms_open_payments,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/p
 cofina,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cofina.csv,
 compras_pr,territorial,False,none,2,0,2,0,not_materialized,0,1,data/staging/processed/pr_compras_rfps.csv,comprashpr.com RFP / award scrape.
 congressional_earmarks,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_earmarks.csv,
-dcaa_active_contractors,manual_export,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_dcaa_active_contractors.csv,DCAA FY2007/FY2012/FY2013 active contractor listings. Alias/crosswalk source.
+dcaa_active_contractors,manual_export,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_active_contractors.csv,DCAA FY2007/FY2012/FY2013 active contractor listings. Alias/crosswalk source.
 doe_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_doe.csv,
 doj_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_doj_grants.csv,
 dol_whd_osha,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_dol_whd.csv,
