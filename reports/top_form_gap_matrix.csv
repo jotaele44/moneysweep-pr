@@ -10,10 +10,10 @@ required_sources,fsrs_subawards,missing,P0,Claude,current_status.json,materializ
 required_sources,sam_entities,auth_required,P0,Operator,current_status.json,provide SAM_API_KEY or mark auth_required
 required_sources,cor3,manual_required,P0,Operator,current_status.json,place manual export under declared path
 required_sources,hud_drgr_authorized,manual_required,P0,Operator,current_status.json,place authorized export under data/manual/hud_drgr
-required_sources,prasa,manual_required,P0,Operator,current_status.json,place or export PRASA source data
+required_sources,prasa,manual_required,P0,Operator,current_status.json,source files acquired; build PRASA canonical ingestion outputs and validation before materialization promotion
 required_sources,oficina_contralor,manual_required,P0,Operator,current_status.json,define manual export or scraper path
 required_sources,emma_bonds,partial,P1,Claude,current_status.json,complete EMMA materialization
-required_sources,pr_cabilderos,partial,P1,Claude,current_status.json,normalize cabilderos registry
+required_sources,pr_cabilderos,partial,P1,Claude,current_status.json,source file acquired; build cabilderos canonical ingestion output and validation before materialization promotion
 federal_procurement,fpds_ingestion,partial,P0,Claude,run_all.py,verify latest FPDS run and schema
 federal_procurement,usaspending_ingestion,partial,P0,Claude,run_all.py,verify prime award ingestion
 federal_procurement,fsrs_ingestion,missing,P0,Claude,source_registry,materialize FSRS subaward input
@@ -26,14 +26,14 @@ entity_master,parent_map,partial,P1,GPT/Claude,data/reference/entity_parent_map.
 entity_master,person_master,missing,P1,GPT/Claude,data/reference/person_master.csv,create person registry for lobbyists officials donors
 entity_master,agency_master,partial,P1,GPT/Claude,data/reference/agency_master.csv,normalize agencies and authorities
 entity_master,review_queue,partial,P0,GPT/Claude,reports/entity_resolution_review_queue.csv,stabilize review queue format
-local_contracts,act_transition,partial,P0,GPT/Claude,uploaded ACT data,extract into canonical contract table
-local_contracts,acuden_transition,partial,P0,GPT/Claude,uploaded ACUDEN data,extract amendments and base records
-local_contracts,prasa_projects,partial,P1,GPT/Claude,uploaded PRASA projects,normalize project rows
-local_contracts,prasa_cer,partial,P1,GPT/Claude,uploaded PRASA CER,extract CIP fiscal regulatory facts
+local_contracts,act_transition,partial,P0,GPT/Claude,uploaded ACT data,"source file acquired; build parser, canonical local-contract output, schema validation, and tests"
+local_contracts,acuden_transition,partial,P0,GPT/Claude,uploaded ACUDEN data,"source file acquired; build parser for base/amendment records, canonical output, schema validation, and tests"
+local_contracts,prasa_projects,partial,P1,GPT/Claude,uploaded PRASA projects,"source file acquired; build PRASA completed-projects parser, canonical infrastructure output, schema validation, and tests"
+local_contracts,prasa_cer,partial,P1,GPT/Claude,uploaded PRASA CER,"source file acquired; build PRASA CER fact/table extractor, canonical infrastructure/fiscal outputs, schema validation, and tests"
 local_contracts,prepa_contracts,partial,P1,GPT/Claude,source_registry,connect PREPA contracts to energy continuity layer
 local_contracts,p3_contracts,partial,P1,GPT/Claude,source_registry,normalize P3 concession records
-influence,pr_cabilderos,partial,P0,GPT/Claude,uploaded registry,normalize registrants clients personnel
-influence,federal_lda,partial,P1,GPT/Claude,uploaded LDA records,normalize registrants clients amounts periods
+influence,pr_cabilderos,partial,P0,GPT/Claude,uploaded registry,"source file acquired; build cabilderos parser, client/person normalization, influence-edge output, schema validation, and tests"
+influence,federal_lda,partial,P1,GPT/Claude,uploaded LDA records,"source file acquired; build LDA parser, registrant/client normalization, influence-window output, schema validation, and tests"
 influence,campaign_finance,partial,P1,GPT/Claude,unknown,inventory available campaign finance sources
 influence,contractor_donor_overlap,partial,P1,GPT/Claude,reports,convert research output to reproducible pipeline
 influence,influence_edge_schema,missing,P0,GPT/Claude,schemas/influence_edges.schema.json,lock influence edge schema

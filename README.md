@@ -1,5 +1,17 @@
 # Contract-Sweeper
 
+## Current Scope
+
+Contract-Sweeper now tracks an 84-source Puerto Rico public-money registry spanning federal procurement, territorial and municipal contracts, infrastructure, lobbying, campaign-finance, debt/fiscal-control, contractor-reference, and geospatial source families.
+
+The original 13-dataset federal procurement pipeline remains a core historical pipeline, but it is no longer the full project boundary. Current completion work is governed by top-form controls, source materialization readiness, strict preflight, and staged manual-source ingestion.
+
+Current operating state:
+- Top-form controls define production-complete gates across source, entity, influence, debt, GIS, graph, analyst, and reproducibility layers.
+- Materialization readiness classifies automatable, manual-export, scraper-needed, semantic-duplicate, and deferred-stub sources.
+- Manual-source ingestion is the next stage for acquired files such as ACT, ACUDEN, PRASA, cabilderos, LDA, and DCAA records.
+- Strict preflight remains the gate before producer execution or production promotion.
+
 ![Tests](https://github.com/jotaele44/contract-sweeper/actions/workflows/tests.yml/badge.svg)
 
 Puerto Rico Federal Contracts Data Pipeline — automated acquisition, validation,

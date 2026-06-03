@@ -1,41 +1,31 @@
 # Next Actions
 
-**Updated:** 2026-06-01
-**Active vector:** `MATERIALIZATION_READINESS_LOCKED_AWAITING_EGRESS_FILL`
+## Current Vector
 
-## Done (this cycle — merged #144)
+`CONTRACT_SWEEPER_100_PERCENT_COMPLETION_ROADMAP → TRANCHE_A_STATUS_TRUTH`
 
-- [x] Restored the strict-preflight gate (deferred NARA stubs no longer abort it;
-      84 sources, 0 structural errors) via `scripts/download_nara_nextgen.py`.
-- [x] Materialization readiness gate — `scripts/build_source_recovery_matrix.py`
-      now classifies every source from the live registry + adapter registries +
-      preflight. Headline: `reports/materialization_readiness.json`.
-- [x] `tests/test_materialization_readiness.py` (the gate) + `docs/MATERIALIZATION_RUNBOOK.md`.
-- [x] Full suite green: 1229 passed, 5 skipped.
+Tranche A is metadata/control-plane only. It reconciles status truth, readiness counts, source-intake backlog, top-form gap wording, README scope, and next-vector routing. It does not ingest, parse, OCR, transform, extract, materialize, scrape, or run live producers.
 
-## Readiness snapshot
+## Next Vector
 
-- 84 sources → **54 automatable, all structurally ready**; 0 broken producers.
-- 5 automatable sources need a run-time key: SAM, LDA, FEC, OpenCorporates, HigherGov.
-- 30 queued/excluded: 20 `scraper_needed`, 5 `manual_export`, 3 `semantic_duplicate`, 2 `deferred_stub`.
+`TRANCHE_B_MANUAL_SOURCE_INGESTION`
 
-## Next command — `FILL_AUTOMATABLE_SOURCES_IN_EGRESS_ENABLED_ENVIRONMENT`
+## Scope
 
-Run the fill per `docs/MATERIALIZATION_RUNBOOK.md` **in an environment with
-outbound HTTPS** (the web sandbox blocks egress — HTTP 403 — so no producer or
-adapter can fetch data there):
+Tranche B covers acquired manual/source files for:
 
-1. `pip install -r requirements.txt`
-2. Set the 5 keys in `.env`.
-3. `python3 run_all.py --only-setup --strict-preflight` (expect 0 structural errors).
-4. Materialize: `python -m contract_sweeper.query --source <id>` (35 adapter
-   sources) and/or `python3 run_all.py --strict-preflight`.
-5. `python3 scripts/gap_analysis_builder.py && python3 scripts/build_source_recovery_matrix.py`.
-6. Verify `automatable_ready == automatable_total` and each automatable source
-   `fully_materialized`.
+- ACT transition contracts
+- ACUDEN transition contracts
+- PRASA completed projects
+- PRASA FY2024 Consulting Engineer's Report
+- Puerto Rico cabilderos registry
+- Federal LDA registrants
+- DCAA active contractor listings
 
-## Future work (separate egress-enabled PRs)
+## Required Tranche B Outputs
 
-- Build the 20 `scraper_needed` PR-gov HTML/PDF scraping adapters.
-- Integrate the manual datasets (ACT, ACUDEN, PRASA, cabilderos, DCAA) via the
-  dropzones in `registries/manual_export_registry.yaml`.
+Tranche B should create parsers, canonical outputs, schemas, and tests for the acquired files. No source should be marked done or fully materialized until canonical outputs validate and regression tests pass.
+
+## Recommended Branch
+
+`gpt/manual-source-ingestion-tranche-b`
