@@ -1,0 +1,4 @@
+jurisdiction,registration_number,period,filing_type,lobbyist_entity,client_entity,subject_matter,amount,currency,source_type,evidence_tier,extraction_method,claim
+PR,PR-LGA-GENERA,2023,PR_cabildero,LGA Strategies,Genera PR,Energy generation policy and contracting,,USD,registry,T3,manual,The Puerto Rico lobbying registry lists LGA Strategies as a registered lobbyist with Genera PR as a client.
+PR,PR-LGA-PRENERGY,2023,PR_cabildero,LGA Strategies,Puerto Rico Energy LLC,Energy-sector policy,,USD,registry,T3,manual,The Puerto Rico lobbying registry lists LGA Strategies as a registered lobbyist with Puerto Rico Energy LLC as a client.
+PR,PR-RCL-ARCADIS,2023,PR_cabildero,The RCL Group,Arcadis Caribe,Infrastructure and engineering policy,,USD,registry,T3,manual,The Puerto Rico lobbying registry lists The RCL Group as a registered lobbyist with Arcadis Caribe as a client.

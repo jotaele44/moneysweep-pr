@@ -142,6 +142,23 @@ def _get(session, url, params, logger) -> dict | None:
 # Fetch from USASpending county breakdown
 # ---------------------------------------------------------------------------
 
+def parse_records(records: list[dict]) -> pd.DataFrame:
+    """Map raw municipal finance records to the canonical schema.
+    Pure — no network or I/O. Live fetch still needs egress to query
+    the USASpending API (api.usaspending.gov).
+    """
+    if not records:
+        return pd.DataFrame(columns=OUTPUT_COLUMNS)
+    df = pd.DataFrame(records)
+    for col in OUTPUT_COLUMNS:
+        if col not in df.columns:
+            df[col] = ""
+    df["federal_awards_obligated"] = pd.to_numeric(
+        df["federal_awards_obligated"], errors="coerce"
+    ).fillna(0)
+    return df[OUTPUT_COLUMNS]
+
+
 def _fetch_county_awards(session, fy: int, logger) -> list[dict]:
     """Fetch award totals per PR county (municipality) for a fiscal year."""
     url = "https://api.usaspending.gov/api/v2/search/spending_by_geography/"

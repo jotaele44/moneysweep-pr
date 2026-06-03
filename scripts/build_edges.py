@@ -43,6 +43,10 @@ EVIDENCE_OUT = "data/canonical_v1/evidence.csv"
 ROLES_IN = "data/canonical_v1/roles.csv"
 DEBT_IN = "data/canonical_v1/debt_instruments.csv"
 PROJECTS_IN = "data/canonical_v1/projects.csv"
+CONTRACTS_IN = "data/canonical_v1/contracts.csv"
+LOBBYING_IN = "data/canonical_v1/lobbying_records.csv"
+PROPERTIES_TABLE_IN = "data/canonical_v1/properties.csv"
+FUNDING_LINKS = "data/reference/canonical_v1_funding_links.csv"
 DATA_DIR = "data/canonical_v1"
 MANIFEST_OUT = "data/manifests/canonical_v1/edges.json"
 SOURCE_NAME = "PR Public-Money Relationships (reference seed)"
@@ -58,6 +62,11 @@ _NODE_LOOKUP = {
     "Person": ("people.csv", "person_id", "full_name", "aliases", True),
     "Entity": ("entities.csv", "entity_id", "name", None, False),  # aliases live in notes
     "Municipality": ("municipalities.csv", "municipality_id", "name", "aliases", False),
+    "Project": ("projects.csv", "project_id", "project_name", None, False),
+    "FundingSource": ("funding_sources.csv", "funding_source_id", "program", None, False),
+    "Contract": ("contracts.csv", "contract_id", "contract_number", None, False),
+    "LobbyingRecord": ("lobbying_records.csv", "lobbying_record_id", "registration_number", None, False),
+    "Property": ("properties.csv", "property_id", "property_name", None, False),
 }
 
 
@@ -82,10 +91,13 @@ def build_resolver(root: Path) -> dict[str, dict[str, str]]:
                 names = [row.get(name_col, "")]
                 if alias_col and row.get(alias_col):
                     names.extend(row[alias_col].split("|"))
-                # entities keep aliases inside notes as "aliases=A|B|C"
+                # entities keep aliases inside notes as "aliases=A|B|C";
+                # funding sources keep their display name as "name=...".
                 notes = row.get("notes", "") or ""
                 if notes.startswith("aliases="):
                     names.extend(notes[len("aliases="):].split("|"))
+                elif notes.startswith("name="):
+                    names.append(notes[len("name="):])
                 for n in names:
                     key = _norm(n, person)
                     if key:
@@ -250,7 +262,169 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
             "notes": (proj.get("project_type") or "").strip(),
         })
 
+    # Derive FUNDED_BY edges (Project -> FundingSource) from the funding-links
+    # seed. Supports many-to-many (a project can draw on multiple programs). Each
+    # link row is evidence-backed; emit only when both endpoints resolve.
+    funding_links = root / FUNDING_LINKS
+    if funding_links.exists():
+        with funding_links.open(newline="", encoding="utf-8") as fh:
+            for i, link in enumerate(csv.DictReader(fh), start=2):
+                proj_name = (link.get("project_name") or "").strip()
+                fund_name = (link.get("funding_source") or "").strip()
+                pid = resolve(resolver, "Project", proj_name)
+                fid = resolve(resolver, "FundingSource", fund_name)
+                if pid is None:
+                    skipped.append({"row": f"funding_link:{i}", "reason": f"unresolved project {proj_name!r}"})
+                    continue
+                if fid is None:
+                    skipped.append({"row": f"funding_link:{i}", "reason": f"unresolved funding source {fund_name!r}"})
+                    continue
+                ev = make_evidence(
+                    source_type=(link.get("source_type") or "web").strip(),
+                    source_name="PR Project Funding Links (reference seed)",
+                    source_path_or_url=FUNDING_LINKS,
+                    page_or_line_ref=f"row {i}",
+                    claim=(link.get("claim") or f"{proj_name} funded by {fund_name}").strip(),
+                    extraction_method=(link.get("extraction_method") or "manual").strip(),
+                    evidence_tier=(link.get("evidence_tier") or "").strip() or None,
+                    review_status="accepted",
+                )
+                eid = edge_id(pid, "FUNDED_BY", fid)
+                if eid in seen:
+                    continue
+                seen.add(eid)
+                evidence_rows.append(ev)
+                edge_rows.append({
+                    "edge_id": eid,
+                    "source_node_type": "Project",
+                    "source_node_id": pid,
+                    "edge_type": "FUNDED_BY",
+                    "target_node_type": "FundingSource",
+                    "target_node_id": fid,
+                    "start_date": "",
+                    "end_date": "",
+                    "amount": "",
+                    "currency": "",
+                    "confidence": ev.confidence,
+                    "evidence_id": ev.evidence_id,
+                    "notes": "",
+                })
+
+    # Derive RECEIVES_CONTRACT edges (Contractor Entity -> Contract) from
+    # contracts.csv rows that carry a contractor_entity_id, reusing the contract's
+    # evidence_id. Mirrors the HOLDS_DEBT derivation (single-writer edges.csv).
+    for contract in _read_contracts(root):
+        cid = (contract.get("contract_id") or "").strip()
+        contractor_id = (contract.get("contractor_entity_id") or "").strip()
+        ev_id = (contract.get("evidence_id") or "").strip()
+        if not (cid and contractor_id and ev_id):
+            continue
+        eid = edge_id(contractor_id, "RECEIVES_CONTRACT", cid)
+        if eid in seen:
+            continue
+        seen.add(eid)
+        edge_rows.append({
+            "edge_id": eid,
+            "source_node_type": "Entity",
+            "source_node_id": contractor_id,
+            "edge_type": "RECEIVES_CONTRACT",
+            "target_node_type": "Contract",
+            "target_node_id": cid,
+            "start_date": (contract.get("start_date") or "").strip(),
+            "end_date": (contract.get("end_date") or "").strip(),
+            "amount": (contract.get("award_amount") or "").strip(),
+            "currency": (contract.get("currency") or "").strip(),
+            "confidence": (contract.get("confidence") or "").strip(),
+            "evidence_id": ev_id,
+            "notes": (contract.get("service_type") or "").strip(),
+        })
+
+    # Derive LOBBIES_FOR edges (lobbyist Entity -> client Entity) from
+    # lobbying_records.csv rows that carry both a lobbyist and a client entity,
+    # reusing the record's evidence_id. Single-writer edges.csv.
+    for lob in _read_lobbying(root):
+        lobbyist_id = (lob.get("lobbyist_entity_id") or "").strip()
+        client_id = (lob.get("client_entity_id") or "").strip()
+        ev_id = (lob.get("evidence_id") or "").strip()
+        if not (lobbyist_id and client_id and ev_id):
+            continue
+        eid = edge_id(lobbyist_id, "LOBBIES_FOR", client_id)
+        if eid in seen:
+            continue
+        seen.add(eid)
+        edge_rows.append({
+            "edge_id": eid,
+            "source_node_type": "Entity",
+            "source_node_id": lobbyist_id,
+            "edge_type": "LOBBIES_FOR",
+            "target_node_type": "Entity",
+            "target_node_id": client_id,
+            "start_date": "",
+            "end_date": "",
+            "amount": "",
+            "currency": "",
+            "confidence": (lob.get("confidence") or "").strip(),
+            "evidence_id": ev_id,
+            "notes": (lob.get("subject_matter") or "").strip(),
+        })
+
+    # Derive LOCATED_IN edges from properties.csv: a property located in a
+    # municipality. The property row already carries a resolved municipality_id and
+    # an accepted evidence_id, so the edge reuses that provenance.
+    for prop in _read_properties_table(root):
+        pid = (prop.get("property_id") or "").strip()
+        muni_id = (prop.get("municipality_id") or "").strip()
+        ev_id = (prop.get("evidence_id") or "").strip()
+        if not (pid and muni_id and ev_id):
+            continue
+        eid = edge_id(pid, "LOCATED_IN", muni_id)
+        if eid in seen:
+            continue
+        seen.add(eid)
+        edge_rows.append({
+            "edge_id": eid,
+            "source_node_type": "Property",
+            "source_node_id": pid,
+            "edge_type": "LOCATED_IN",
+            "target_node_type": "Municipality",
+            "target_node_id": muni_id,
+            "start_date": "",
+            "end_date": "",
+            "amount": "",
+            "currency": "",
+            "confidence": (prop.get("confidence") or "").strip(),
+            "evidence_id": ev_id,
+            "notes": (prop.get("property_type") or "").strip(),
+        })
+
     return {"edge_rows": edge_rows, "evidence_rows": evidence_rows, "skipped": skipped}
+
+
+def _read_properties_table(root: Path) -> list[dict[str, str]]:
+    """Read properties.csv rows (empty list if missing or header-only)."""
+    path = root / PROPERTIES_TABLE_IN
+    if not path.exists():
+        return []
+    with path.open(newline="", encoding="utf-8") as fh:
+        return [r for r in csv.DictReader(fh) if (r.get("property_id") or "").strip()]
+
+
+def _read_lobbying(root: Path) -> list[dict[str, str]]:
+    """Read lobbying_records.csv rows (empty list if missing or header-only)."""
+    path = root / LOBBYING_IN
+    if not path.exists():
+        return []
+    with path.open(newline="", encoding="utf-8") as fh:
+        return [r for r in csv.DictReader(fh) if (r.get("lobbying_record_id") or "").strip()]
+
+
+def _read_contracts(root: Path) -> list[dict[str, str]]:
+    """Read contracts.csv rows (empty list if the table is missing or header-only)."""
+    path = root / CONTRACTS_IN
+    if not path.exists():
+        return []
+    with path.open(newline="", encoding="utf-8") as fh:
+        return [r for r in csv.DictReader(fh) if (r.get("contract_id") or "").strip()]
 
 
 def _read_projects(root: Path) -> list[dict[str, str]]:

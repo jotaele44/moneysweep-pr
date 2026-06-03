@@ -1,0 +1,15 @@
+{
+  "producer_script": "scripts/ingest_lobbying.py",
+  "producer_phase": "CANONICAL_V1_LOBBYING_INGEST",
+  "source_inputs": [
+    "data/reference/pr_lobbying_records.csv"
+  ],
+  "row_count": 3,
+  "with_lobbyist": 3,
+  "with_client": 3,
+  "skipped_count": 0,
+  "skipped": [],
+  "evidence_rows_added": 3,
+  "evidence_table_rows": 228,
+  "generated_at": "2026-06-02T19:48:59.490251+00:00"
+}
