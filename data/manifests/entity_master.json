@@ -1,0 +1,15 @@
+{
+  "producer_script": "scripts/build_entity_master.py",
+  "producer_phase": "TOP_FORM_ENTITY_MASTER",
+  "schema": "schemas/entity_master.schema.json",
+  "source_inputs": [
+    "data/reference/pr_public_money_entities.csv"
+  ],
+  "output": "data/reference/entity_master.csv",
+  "row_count": 26,
+  "entity_types": [
+    "government_agency",
+    "organization"
+  ],
+  "generated_at": "2026-06-03T14:22:31.828345+00:00"
+}

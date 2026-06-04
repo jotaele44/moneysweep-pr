@@ -20,7 +20,7 @@ federal_procurement,fsrs_ingestion,missing,P0,Claude,source_registry,materialize
 federal_procurement,sam_enrichment,auth_required,P0,Operator,scripts,provide SAM key or preserve auth-required blocker
 federal_procurement,dedup_master,partial,P0,Claude,data/processed,rerun after required sources materialize
 federal_procurement,coverage_matrix,partial,P1,Claude,reports,verify regeneration
-entity_master,entity_master,missing,P0,GPT/Claude,data/reference/entity_master.csv,create stable entity master schema
+entity_master,entity_master,done,P0,GPT/Claude,data/reference/entity_master.csv,schema-locked producer scripts/build_entity_master.py + offline tests; 26 rows
 entity_master,entity_aliases,partial,P0,GPT/Claude,data/reference/entity_aliases.csv,expand and validate aliases
 entity_master,parent_map,partial,P1,GPT/Claude,data/reference/entity_parent_map.csv,add parent and subsidiary mapping
 entity_master,person_master,missing,P1,GPT/Claude,data/reference/person_master.csv,create person registry for lobbyists officials donors
