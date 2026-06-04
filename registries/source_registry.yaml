@@ -1159,3 +1159,29 @@ sources:
     validation_threshold:
       min_rows: 1
     update_cadence: weekly
+
+  # ----- Optional commercial enrichment (default-disabled, license-gated) -----
+  - source_id: financialdata_net
+    family: optional_commercial_enrichment
+    required: false
+    default_enabled: false
+    authentication: api_key:FINANCIALDATA_API_KEY
+    license_gate: FINANCIALDATA_LICENSE_APPROVED
+    endpoint_url: https://financialdata.net/api/v1/
+    producer_script: scripts/enrichment/enrich_financialdata_entities.py
+    expected_outputs:
+      - outputs/enrichment/financialdata_identifier_crosswalk.csv
+      - outputs/enrichment/financialdata_entity_matches.csv
+      - outputs/review/financialdata_match_review_queue.csv
+      - reports/financialdata_enrichment_readiness.json
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 0   # optional layer — zero rows is a valid state
+    update_cadence: ad_hoc
+    notes: >
+      OPTIONAL commercial provider for public-market entity resolution
+      (CUSIP / ISIN / FIGI / LEI / CIK / ticker crosswalks). NOT a required
+      source — never wired into coverage gates. Live use requires BOTH
+      FINANCIALDATA_API_KEY and FINANCIALDATA_LICENSE_APPROVED=true.
+      Default mode is dry-run/mock with synthetic fixtures. Raw vendor payloads
+      are never persisted. See docs/financialdata_provider.md.
