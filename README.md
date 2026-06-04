@@ -105,6 +105,30 @@ python3 scripts/normalize_expansion_inputs.py      # normalize all
 python3 scripts/validate_expansion_coverage.py     # check year coverage
 ```
 
+### NGO / OSFL layer
+
+```bash
+python3 scripts/ngo_integration.py                 # build the NGO/OSFL layer
+python3 scripts/ngo_integration.py --schema-only   # write schema files only
+python3 -m pytest tests/test_ngo_integration.py -v # run NGO tests
+```
+
+Drop optional source files into the dropzones (created on first run):
+
+```text
+data/raw/ngos/irs_eo_bmf/*.{csv,txt}
+data/raw/ngos/teos/*.{csv,json,jsonl}
+data/raw/ngos/pr_state_registry/*.csv
+data/raw/ngos/usaspending/*.{csv,json,jsonl}
+```
+
+Primary outputs (CSV + Parquet) land in `data/staging/processed/ngos/`:
+`ngos_master`, `ngo_funding_edges`, `ngo_asset_edges`,
+`ngo_fiscal_sponsor_edges`, `ngo_municipal_coverage`, plus the `ngo_graph.gexf`
+layer. NGO funding, asset, and fiscal-sponsor edges are merged into the unified
+influence graph by `scripts/influence_graph_builder.py`. See
+[docs/NGO_INTEGRATION.md](docs/NGO_INTEGRATION.md).
+
 ## Directory Structure
 
 ```
