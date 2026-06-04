@@ -1,0 +1,25 @@
+{
+  "producer_script": "scripts/build_fiscal_control_events.py",
+  "producer_phase": "TOP_FORM_FISCAL_CONTROL_EVENTS",
+  "schema": "schemas/fiscal_control_event.schema.json",
+  "source_inputs": [
+    "data/reference/fiscal_control_events_seed.csv",
+    "data/reference/entity_master.csv"
+  ],
+  "output": "data/reference/fiscal_control_events.csv",
+  "row_count": 12,
+  "event_types": [
+    "disaster",
+    "legislation",
+    "operations",
+    "oversight_board",
+    "plan_of_adjustment",
+    "restructuring",
+    "title_iii_filing"
+  ],
+  "date_range": [
+    "2016-06-30",
+    "2023-07-01"
+  ],
+  "generated_at": "2026-06-04T21:30:29.326487+00:00"
+}
