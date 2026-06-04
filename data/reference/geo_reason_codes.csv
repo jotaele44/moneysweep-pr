@@ -1,0 +1,20 @@
+code,kind,is_unknown,description
+place_of_performance_exact,geo_resolution_reason,false,Location taken from an exact place-of-performance municipio code.
+project_municipality_match,geo_resolution_reason,false,Location matched from the project's municipality.
+recipient_municipality_match,geo_resolution_reason,false,Location matched from the recipient's municipality.
+municipality_name_only,geo_resolution_reason,false,Location resolved from a municipality name string only (no code).
+headquarters_only,geo_resolution_reason,true,"Only a headquarters location was available — flagged as HQ bias, not place of performance."
+agency_default,geo_resolution_reason,true,No row-level location; fell back to the awarding agency's default.
+outside_pr,geo_resolution_reason,true,Location resolved to a place outside Puerto Rico.
+missing_location,geo_resolution_reason,true,No usable location evidence present in the row.
+ambiguous_location,geo_resolution_reason,true,Multiple conflicting locations could not be disambiguated.
+invalid_pr_municipio,geo_resolution_reason,true,A PR municipio code/name was present but did not validate against the crosswalk.
+parser_failed,geo_resolution_reason,true,The location parser failed to interpret the raw value.
+PR_MUNICIPIO,jurisdiction_class,false,Resolved to one of the 78 Puerto Rico municipios.
+UNKNOWN_MISSING,jurisdiction_class,true,No location evidence — jurisdiction unknown.
+UNKNOWN_AMBIGUOUS,jurisdiction_class,true,Conflicting location evidence — jurisdiction unknown.
+OUTSIDE_PR_US_STATE,jurisdiction_class,true,Resolved to a U.S. state outside Puerto Rico.
+OUTSIDE_PR_US_COUNTY,jurisdiction_class,true,Resolved to a U.S. county outside Puerto Rico.
+OUTSIDE_PR_FOREIGN,jurisdiction_class,true,Resolved to a foreign country.
+HEADQUARTERS_ONLY,jurisdiction_class,true,Only a headquarters location was available (HQ-bias bucket).
+AGENCY_DEFAULT,jurisdiction_class,true,Fell back to the awarding agency's default jurisdiction.

@@ -1,0 +1,11 @@
+{
+  "producer_script": "scripts/build_hq_bias_reference.py",
+  "producer_phase": "TOP_FORM_HQ_BIAS_CORRECTION",
+  "schema": "schemas/hq_bias_correction.schema.json",
+  "source_inputs": [
+    "scripts/run_contract_finance_geo_reasoning.py"
+  ],
+  "output": "data/reference/hq_bias_correction.csv",
+  "row_count": 4,
+  "generated_at": "2026-06-04T21:36:19.631090+00:00"
+}

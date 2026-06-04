@@ -1,0 +1,70 @@
+{
+  "layers": [
+    {
+      "layer_id": "municipality_density",
+      "layer_name": "PR Municipio Density Key",
+      "layer_type": "municipality_density",
+      "path": "data/reference/pr_78_municipio_crosswalk.csv",
+      "geometry_type": "None",
+      "source_id": "pr_78_municipio_crosswalk",
+      "refresh_frequency": "annual",
+      "status": "done",
+      "notes": "Locked 78-municipio crosswalk; the spatial key every layer joins on."
+    },
+    {
+      "layer_id": "influence_overlay",
+      "layer_name": "Influence Edge Overlay",
+      "layer_type": "influence_overlay",
+      "path": "data/reference/influence_edges.csv",
+      "geometry_type": "None",
+      "source_id": "influence_edges",
+      "refresh_frequency": "on_change",
+      "status": "done",
+      "notes": "Influence edges joinable to municipio via entity location."
+    },
+    {
+      "layer_id": "debt_fiscal_overlay",
+      "layer_name": "Debt / Creditor Overlay",
+      "layer_type": "debt_fiscal_overlay",
+      "path": "data/reference/creditor_mapping.csv",
+      "geometry_type": "None",
+      "source_id": "creditor_mapping",
+      "refresh_frequency": "on_change",
+      "status": "partial",
+      "notes": "Issuer-level creditor registry; per-municipio attribution pending."
+    },
+    {
+      "layer_id": "project_points",
+      "layer_name": "Project Point Layer",
+      "layer_type": "project_points",
+      "path": "exports/gis/project_points.geojson",
+      "geometry_type": "Point",
+      "source_id": "pr_infrastructure_projects",
+      "refresh_frequency": "on_change",
+      "status": "blocked",
+      "notes": "No lat/lon committed; geocoding needs egress to a geocoder."
+    },
+    {
+      "layer_id": "infrastructure_assets",
+      "layer_name": "Infrastructure Asset Layer",
+      "layer_type": "infrastructure_assets",
+      "path": "exports/gis/infrastructure_assets.geojson",
+      "geometry_type": "Point",
+      "source_id": "pr_properties",
+      "refresh_frequency": "on_change",
+      "status": "blocked",
+      "notes": "No asset coordinates committed."
+    },
+    {
+      "layer_id": "contract_flows",
+      "layer_name": "Contract Flow Layer",
+      "layer_type": "contract_flows",
+      "path": "exports/gis/contract_flows.geojson",
+      "geometry_type": "LineString",
+      "source_id": "pr_public_contracts",
+      "refresh_frequency": "on_change",
+      "status": "blocked",
+      "notes": "Origin/destination geometry needs project + recipient coordinates."
+    }
+  ]
+}

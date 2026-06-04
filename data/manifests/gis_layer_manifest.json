@@ -1,0 +1,13 @@
+{
+  "producer_script": "scripts/build_gis_layer_manifest.py",
+  "producer_phase": "TOP_FORM_GIS_LAYER_MANIFEST",
+  "schema": "schemas/gis_layer_manifest.schema.json",
+  "output": "exports/gis/layer_manifest.json",
+  "layer_count": 6,
+  "status_breakdown": {
+    "blocked": 3,
+    "done": 2,
+    "partial": 1
+  },
+  "generated_at": "2026-06-04T21:36:19.288864+00:00"
+}
