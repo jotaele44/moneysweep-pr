@@ -23,8 +23,8 @@ federal_procurement,coverage_matrix,partial,P1,Claude,reports,verify regeneratio
 entity_master,entity_master,done,P0,GPT/Claude,data/reference/entity_master.csv,schema-locked producer scripts/build_entity_master.py + offline tests; 26 rows
 entity_master,entity_aliases,partial,P0,GPT/Claude,data/reference/entity_aliases.csv,expand and validate aliases
 entity_master,parent_map,partial,P1,GPT/Claude,data/reference/entity_parent_map.csv,add parent and subsidiary mapping
-entity_master,person_master,missing,P1,GPT/Claude,data/reference/person_master.csv,create person registry for lobbyists officials donors
-entity_master,agency_master,partial,P1,GPT/Claude,data/reference/agency_master.csv,normalize agencies and authorities
+entity_master,person_master,done,P1,GPT/Claude,data/reference/person_master.csv,schema-locked producer scripts/build_person_master.py + offline tests; 60 persons
+entity_master,agency_master,done,P1,GPT/Claude,data/reference/agency_master.csv,schema-locked producer scripts/build_agency_master.py + offline tests; 95 agencies+municipios
 entity_master,review_queue,partial,P0,GPT/Claude,reports/entity_resolution_review_queue.csv,stabilize review queue format
 local_contracts,act_transition,partial,P0,GPT/Claude,uploaded ACT data,"source file acquired; build parser, canonical local-contract output, schema validation, and tests"
 local_contracts,acuden_transition,partial,P0,GPT/Claude,uploaded ACUDEN data,"source file acquired; build parser for base/amendment records, canonical output, schema validation, and tests"
