@@ -1,0 +1,65 @@
+name: Top-form reproducibility
+
+# Regenerates every top-form reference producer in a clean checkout and fails if
+# any committed artifact would change — i.e. the producers are the single source
+# of truth and the checked-in outputs are reproducible from them.
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce-top-form-outputs:
+    name: Regenerate top-form outputs and assert no diff
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Regenerate entity-master family
+        run: |
+          python scripts/build_entity_master.py
+          python scripts/build_agency_master.py
+          python scripts/build_person_master.py
+          python scripts/build_entity_aliases.py
+          python scripts/build_entity_parent_map.py
+          python scripts/build_entity_resolution_review_queue.py
+
+      - name: Regenerate influence / debt_fiscal layers
+        run: |
+          python scripts/build_influence_edges.py
+          python scripts/build_debt_instruments.py
+          python scripts/build_creditor_mapping.py
+          python scripts/build_fiscal_control_events.py
+
+      - name: Regenerate gis layer
+        run: |
+          python scripts/build_municipality_crosswalk.py
+          python scripts/build_geo_reason_codes.py
+          python scripts/build_hq_bias_reference.py
+          python scripts/build_gis_layer_manifest.py
+
+      - name: Regenerate graph export
+        run: python scripts/build_graph_export.py
+
+      - name: Assert the substantive outputs are reproducible
+        # Manifests carry a generated_at timestamp (provenance, not data), so they
+        # are excluded; the schemas, reference CSVs, and exports must be identical.
+        run: |
+          if ! git diff --exit-code -- ':!data/manifests'; then
+            echo "::error::A top-form producer output drifted from its committed artifact."
+            git status --porcelain -- ':!data/manifests'
+            exit 1
+          fi
