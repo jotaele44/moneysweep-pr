@@ -44,3 +44,6 @@ data/raw/Grants/*.xml
 data/raw/documents/**/*.pdf
 data/raw/documents/**/*.txt
 .claude/
+
+# Machine-specific cypher-shell discovery output emitted by PREPA load launchers
+outputs/**/cypher_shell_candidates.txt
