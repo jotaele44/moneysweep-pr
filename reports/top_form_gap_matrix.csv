@@ -41,11 +41,11 @@ debt_fiscal,emma_bonds,blocked,P1,GPT/Claude,current_status.json,20-bond referen
 debt_fiscal,debt_instrument_schema,done,P1,GPT/Claude,schemas/debt_instrument.schema.json,locked into scripts/build_debt_instruments.py -> data/reference/debt_instruments.csv (20 bonds) + offline tests
 debt_fiscal,creditor_mapping,done,P2,GPT/Claude,data/reference/creditor_mapping.csv,scripts/build_creditor_mapping.py aggregates 20 bonds into 14 issuer rows (GO/COFINA/PREPA/PRASA/HTA + others) + offline tests
 debt_fiscal,fiscal_control_events,done,P2,GPT/Claude,data/reference/fiscal_control_events.csv,scripts/build_fiscal_control_events.py from curated public-fact seed (12 PROMESA/Title III/PoA milestones) + offline tests
-gis,municipality_crosswalk,partial,P0,GPT/Claude,data/reference,lock 78-municipio crosswalk
-gis,geo_reason_codes,missing,P0,GPT/Claude,geo resolver,add geo resolution reason codes
-gis,project_geocoding,partial,P1,GPT/Claude,exports/gis,create project point layer
-gis,layer_manifest,missing,P1,GPT/Claude,exports/gis/layer_manifest.json,create GIS layer manifest
-gis,hq_bias_correction,partial,P1,GPT/Claude,reports,split HQ location from place of performance
+gis,municipality_crosswalk,done,P0,GPT/Claude,data/reference/pr_78_municipio_crosswalk.csv,schemas/municipality_crosswalk.schema.json + scripts/build_municipality_crosswalk.py locks 78 municipios (unique 72xxx geoids) + offline tests
+gis,geo_reason_codes,done,P0,GPT/Claude,data/reference/geo_reason_codes.csv,scripts/build_geo_reason_codes.py imports the resolver vocab (11 reasons + 8 jurisdiction classes) into a schema-locked reference + drift test
+gis,project_geocoding,blocked,P1,GPT/Claude,exports/gis,no lat/lon committed for projects; point layer needs egress to a geocoder (see layer_manifest project_points status)
+gis,layer_manifest,done,P1,GPT/Claude,exports/gis/layer_manifest.json,scripts/build_gis_layer_manifest.py builds 6-layer manifest against schemas/gis_layer_manifest.schema.json + offline tests
+gis,hq_bias_correction,done,P1,GPT/Claude,data/reference/hq_bias_correction.csv,scripts/build_hq_bias_reference.py locks the HQ-vs-place-of-performance contract (hq_bias_flag/headquarters_only/HEADQUARTERS_ONLY) against the resolver + tests
 graph_export,node_schema,done,P0,GPT/Claude,exports/graph/nodes.csv,schemas/graph_nodes.schema.json + scripts/build_graph_export.py (164 nodes) + offline tests
 graph_export,edge_schema,done,P0,GPT/Claude,exports/graph/edges.csv,schemas/graph_edges.schema.json locked into scripts/build_graph_export.py (30 edges) + offline tests
 graph_export,neo4j_export,done,P1,GPT/Claude,exports/graph,neo4j_nodes.csv/neo4j_edges.csv with typed import headers from scripts/build_graph_export.py

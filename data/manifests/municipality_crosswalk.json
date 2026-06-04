@@ -1,0 +1,15 @@
+{
+  "producer_script": "scripts/build_municipality_crosswalk.py",
+  "producer_phase": "TOP_FORM_MUNICIPALITY_CROSSWALK",
+  "schema": "schemas/municipality_crosswalk.schema.json",
+  "source_inputs": [
+    "data/reference/pr_78_municipio_crosswalk.csv"
+  ],
+  "output": "data/reference/pr_78_municipio_crosswalk.csv",
+  "row_count": 78,
+  "geoid_range": [
+    "72001",
+    "72153"
+  ],
+  "generated_at": "2026-06-04T21:36:18.805706+00:00"
+}
