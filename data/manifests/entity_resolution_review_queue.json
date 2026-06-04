@@ -1,0 +1,12 @@
+{
+  "producer_script": "scripts/build_entity_resolution_review_queue.py",
+  "producer_phase": "TOP_FORM_REVIEW_QUEUE",
+  "schema": "schemas/canonical_v1/review_queue.schema.json",
+  "source_inputs": [
+    "data/reference/person_master.csv"
+  ],
+  "output": "reports/entity_resolution_review_queue.csv",
+  "row_count": 24,
+  "confidence_threshold": 0.9,
+  "generated_at": "2026-06-04T16:18:47.405429+00:00"
+}

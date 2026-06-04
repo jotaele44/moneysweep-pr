@@ -1,0 +1,17 @@
+{
+  "producer_script": "scripts/build_entity_parent_map.py",
+  "producer_phase": "TOP_FORM_PARENT_MAP",
+  "schema": "schemas/entity_parent_map.schema.json",
+  "source_inputs": [
+    "data/reference/entity_parent_map_seed.csv",
+    "data/reference/entity_master.csv"
+  ],
+  "output": "data/reference/entity_parent_map.csv",
+  "row_count": 20,
+  "relationship_types": [
+    "CONCESSION_OPERATOR_OF",
+    "INSTRUMENTALITY_OF",
+    "P3_OPERATOR_OF"
+  ],
+  "generated_at": "2026-06-04T16:18:47.339080+00:00"
+}
