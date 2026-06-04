@@ -1,0 +1,21 @@
+parent_name,child_name,relationship_type,evidence_tier,confidence,claim
+Commonwealth of Puerto Rico,Puerto Rico Fiscal Agency and Financial Advisory Authority,INSTRUMENTALITY_OF,T2,0.9,AAFAF is a public corporation and instrumentality of the Commonwealth acting as fiscal agent and financial advisor.
+Commonwealth of Puerto Rico,Puerto Rico Public-Private Partnerships Authority,INSTRUMENTALITY_OF,T2,0.9,The P3 Authority is an instrumentality of the Commonwealth that structures public-private partnerships.
+Commonwealth of Puerto Rico,Puerto Rico Electric Power Authority,INSTRUMENTALITY_OF,T2,0.9,PREPA is a public corporation and instrumentality of the Commonwealth.
+Commonwealth of Puerto Rico,Puerto Rico Aqueduct and Sewer Authority,INSTRUMENTALITY_OF,T2,0.9,PRASA is a public corporation and instrumentality of the Commonwealth.
+Commonwealth of Puerto Rico,Puerto Rico Highways and Transportation Authority,INSTRUMENTALITY_OF,T2,0.9,HTA is a public corporation and instrumentality of the Commonwealth.
+Commonwealth of Puerto Rico,Puerto Rico Sales Tax Financing Corporation,INSTRUMENTALITY_OF,T2,0.9,COFINA is a government-owned corporation and instrumentality of the Commonwealth.
+Commonwealth of Puerto Rico,Government Development Bank for Puerto Rico,INSTRUMENTALITY_OF,T2,0.9,GDB is a public corporation and instrumentality of the Commonwealth.
+Commonwealth of Puerto Rico,Puerto Rico Department of Economic Development and Commerce,INSTRUMENTALITY_OF,T2,0.9,DDEC is an executive department and instrumentality of the Commonwealth.
+Commonwealth of Puerto Rico,Puerto Rico Public Buildings Authority,INSTRUMENTALITY_OF,T2,0.9,PBA is a public corporation and instrumentality of the Commonwealth.
+Commonwealth of Puerto Rico,Puerto Rico Infrastructure Financing Authority,INSTRUMENTALITY_OF,T2,0.9,PRIFA is a public corporation and instrumentality of the Commonwealth.
+Commonwealth of Puerto Rico,Puerto Rico Housing Finance Authority,INSTRUMENTALITY_OF,T2,0.9,PRHFA is a public corporation and instrumentality of the Commonwealth.
+Commonwealth of Puerto Rico,Puerto Rico Industrial Development Company,INSTRUMENTALITY_OF,T2,0.9,PRIDCO is a public corporation and instrumentality of the Commonwealth.
+Commonwealth of Puerto Rico,University of Puerto Rico,INSTRUMENTALITY_OF,T2,0.9,UPR is a public corporation and instrumentality of the Commonwealth.
+Commonwealth of Puerto Rico,Puerto Rico Convention Center District Authority,INSTRUMENTALITY_OF,T2,0.9,CCDA is a public corporation and instrumentality of the Commonwealth.
+Commonwealth of Puerto Rico,Puerto Rico Ports Authority,INSTRUMENTALITY_OF,T2,0.9,The Ports Authority is a public corporation and instrumentality of the Commonwealth.
+Commonwealth of Puerto Rico,Puerto Rico Public Finance Corporation,INSTRUMENTALITY_OF,T2,0.9,PRPFC is a government-owned corporation and instrumentality of the Commonwealth.
+Commonwealth of Puerto Rico,Puerto Rico Municipal Finance Agency,INSTRUMENTALITY_OF,T2,0.9,The Municipal Finance Agency is a public corporation and instrumentality of the Commonwealth.
+Puerto Rico Electric Power Authority,LUMA Energy,P3_OPERATOR_OF,T2,0.85,LUMA Energy operates and controls the PREPA transmission and distribution system under a public-private partnership agreement.
+Puerto Rico Electric Power Authority,Genera PR,P3_OPERATOR_OF,T2,0.85,Genera PR operates and controls the legacy PREPA power-generation fleet under a public-private partnership agreement.
+Puerto Rico Highways and Transportation Authority,Autopistas Metropolitanas de Puerto Rico,CONCESSION_OPERATOR_OF,T2,0.85,Autopistas Metropolitanas operates the PR-22 and PR-5 toll roads under a long-term concession agreement with the HTA.
