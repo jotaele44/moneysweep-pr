@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Person Master Row",
+  "type": "object",
+  "required": [
+    "person_id",
+    "canonical_name",
+    "jurisdiction",
+    "source_id",
+    "evidence_tier",
+    "confidence"
+  ],
+  "properties": {
+    "person_id": {
+      "type": "string",
+      "pattern": "^ENT_PERSON_[A-Za-z0-9_.:-]+$"
+    },
+    "canonical_name": {"type": "string", "minLength": 1},
+    "normalized_name": {"type": "string"},
+    "jurisdiction": {"type": "string", "minLength": 1},
+    "source_person_id": {"type": "string"},
+    "source_id": {"type": "string", "minLength": 1},
+    "evidence_tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}

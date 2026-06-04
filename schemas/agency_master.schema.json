@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agency Master Row",
+  "type": "object",
+  "required": [
+    "agency_id",
+    "agency_type",
+    "canonical_name",
+    "jurisdiction",
+    "source_id",
+    "evidence_tier",
+    "confidence"
+  ],
+  "properties": {
+    "agency_id": {
+      "type": "string",
+      "pattern": "^ENT_(AGENCY|MUNI)_[A-Za-z0-9_.:-]+$"
+    },
+    "agency_type": {
+      "type": "string",
+      "enum": ["government_agency", "public_corporation", "municipality"]
+    },
+    "canonical_name": {"type": "string", "minLength": 1},
+    "jurisdiction": {"type": "string", "minLength": 1},
+    "aliases": {"type": "string"},
+    "source_id": {"type": "string", "minLength": 1},
+    "evidence_tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}
