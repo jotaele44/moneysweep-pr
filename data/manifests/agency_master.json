@@ -1,0 +1,17 @@
+{
+  "producer_script": "scripts/build_agency_master.py",
+  "producer_phase": "TOP_FORM_AGENCY_MASTER",
+  "schema": "schemas/agency_master.schema.json",
+  "source_inputs": [
+    "data/reference/pr_public_money_entities.csv",
+    "data/reference/pr_municipalities.csv"
+  ],
+  "output": "data/reference/agency_master.csv",
+  "row_count": 95,
+  "agency_types": [
+    "government_agency",
+    "municipality",
+    "public_corporation"
+  ],
+  "generated_at": "2026-06-04T12:21:44.480953+00:00"
+}

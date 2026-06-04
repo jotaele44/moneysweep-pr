@@ -1,0 +1,61 @@
+person_id,canonical_name,normalized_name,jurisdiction,source_person_id,source_id,evidence_tier,confidence,notes
+ENT_PERSON_a89bb0a6e1dc2ead,Alejandro García Padilla,ALEJANDRO GARCIA PADILLA,PR,person_a89bb0a6e1dc2ead,canonical_v1_people,T2,0.85,registry_tiers=A; flows=Debt; flow_score=75
+ENT_PERSON_d49c52440c3b0fcc,Ana Matosantos,ANA MATOSANTOS,PR,person_d49c52440c3b0fcc,canonical_v1_people,T2,0.95,"registry_tiers=A/E; flows=Debt,Lobbying; flow_score=80"
+ENT_PERSON_fe6141b802c515fa,Andrew Biggs,ANDREW BIGGS,PR,person_fe6141b802c515fa,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=80
+ENT_PERSON_f0188290b19a29f4,Andrew N. Rosenberg,ANDREW N ROSENBERG,PR,person_f0188290b19a29f4,canonical_v1_people,T2,0.95,registry_tiers=C; flows=Debt; flow_score=60
+ENT_PERSON_835ab43bfd838dc3,Andrew Rosenberg,ANDREW ROSENBERG,PR,person_835ab43bfd838dc3,canonical_v1_people,T2,0.85,registry_tiers=B; flows=Debt; flow_score=70
+ENT_PERSON_2f80fed2bcdf8335,Aníbal Acevedo Vilá,ANIBAL ACEVEDO VILA,PR,person_2f80fed2bcdf8335,canonical_v1_people,T2,0.85,registry_tiers=A; flows=Debt; flow_score=75
+ENT_PERSON_217d43d36b0b0144,Antonio L. Medina,ANTONIO L MEDINA,PR,person_217d43d36b0b0144,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=80
+ENT_PERSON_a35cecb3df82d944,Arthur Gonzalez,ARTHUR GONZALEZ,PR,person_a35cecb3df82d944,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=85
+ENT_PERSON_60199ff85cc1996f,Betty Rosa,BETTY ROSA,PR,person_60199ff85cc1996f,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=80
+ENT_PERSON_656bae285db2e7cd,Brian Rosen,BRIAN ROSEN,PR,person_656bae285db2e7cd,canonical_v1_people,T2,0.85,registry_tiers=B/C; flows=Debt; flow_score=70
+ENT_PERSON_00b24791faec5525,Bruce Karsh,BRUCE KARSH,PR,person_00b24791faec5525,canonical_v1_people,T2,0.85,registry_tiers=B; flows=Debt; flow_score=70
+ENT_PERSON_813253a976e98383,Cameron McKenzie,CAMERON MCKENZIE,PR,person_813253a976e98383,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=80
+ENT_PERSON_8bda3b4b5c15b2ee,Carlos García,CARLOS GARCIA,PR,person_8bda3b4b5c15b2ee,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=80
+ENT_PERSON_8deb3bc24debda01,Christian Sobrino,CHRISTIAN SOBRINO,PR,person_8deb3bc24debda01,canonical_v1_people,T2,0.85,"registry_tiers=A/E; flows=Debt,Lobbying; flow_score=80"
+ENT_PERSON_d932762e92b2850d,David Skeel,DAVID SKEEL,PR,person_d932762e92b2850d,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=85
+ENT_PERSON_bf99c391020aed7c,Doriel Pagán,DORIEL PAGAN,PR,person_bf99c391020aed7c,canonical_v1_people,T2,0.95,registry_tiers=D; flows=Utilities; flow_score=50
+ENT_PERSON_613d394e04265e46,Federico Stubbe,FEDERICO STUBBE,PR,person_613d394e04265e46,canonical_v1_people,T2,0.85,registry_tiers=F; flows=RealEstate; flow_score=30
+ENT_PERSON_35443914de750eeb,Fermin Fontanes,FERMIN FONTANES,PR,person_35443914de750eeb,canonical_v1_people,T2,0.95,"registry_tiers=D; flows=Contracts,Privatization; flow_score=50"
+ENT_PERSON_332832c031efb0ab,Francisco J. Domenech,FRANCISCO J DOMENECH,PR,person_332832c031efb0ab,canonical_v1_people,T2,0.95,"registry_tiers=A; flows=Contracts,Debt; flow_score=85"
+ENT_PERSON_d30846d82010402a,Howard Marks,HOWARD MARKS,PR,person_d30846d82010402a,canonical_v1_people,T2,0.85,registry_tiers=B; flows=Debt; flow_score=75
+ENT_PERSON_12aab94c3ff757f4,Ivan Báez,IVAN BAEZ,PR,person_12aab94c3ff757f4,canonical_v1_people,T2,0.95,registry_tiers=D; flows=Utilities; flow_score=50
+ENT_PERSON_7e8f75436608b940,Jaime El Koury,JAIME EL KOURY,PR,person_7e8f75436608b940,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=80
+ENT_PERSON_46643ae50692f228,Janisse Quiñones,JANISSE QUINONES,PR,person_46643ae50692f228,canonical_v1_people,T2,0.95,registry_tiers=D; flows=Utilities; flow_score=50
+ENT_PERSON_a5b69668fded6da2,Jenniffer González Colón,JENNIFFER GONZALEZ COLON,PR,person_a5b69668fded6da2,canonical_v1_people,T2,0.95,"registry_tiers=A; flows=Debt,Legislative; flow_score=80"
+ENT_PERSON_1264805214368d4f,John E. Nixon,JOHN E NIXON,PR,person_1264805214368d4f,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=85
+ENT_PERSON_d07e714899f4c094,John J. Rapisardi,JOHN J RAPISARDI,PR,person_d07e714899f4c094,canonical_v1_people,T2,0.85,registry_tiers=C; flows=Debt; flow_score=60
+ENT_PERSON_b8c3af7cce81fcdd,John Paulson,JOHN PAULSON,PR,person_b8c3af7cce81fcdd,canonical_v1_people,T2,0.85,"registry_tiers=A; flows=Debt,RealEstate; flow_score=85"
+ENT_PERSON_a4c2c17d33ca9418,John Rapisardi,JOHN RAPISARDI,PR,person_a4c2c17d33ca9418,canonical_v1_people,T2,0.95,registry_tiers=B/C; flows=Debt; flow_score=70
+ENT_PERSON_4aa5cea3c114182d,Jorge Hernández,JORGE HERNANDEZ,PR,person_4aa5cea3c114182d,canonical_v1_people,T2,0.85,"registry_tiers=D; flows=Contracts,Privatization; flow_score=45"
+ENT_PERSON_ae8093f10cb9500b,José B. Carrión III,JOSE B CARRION,PR,person_ae8093f10cb9500b,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=85
+ENT_PERSON_44d7c54317afb0bf,José González,JOSE GONZALEZ,PR,person_44d7c54317afb0bf,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=80
+ENT_PERSON_ac8447c1ebd7c13b,José Ortiz,JOSE ORTIZ,PR,person_ac8447c1ebd7c13b,canonical_v1_people,T2,0.95,"registry_tiers=D; flows=Reconstruction,Utilities; flow_score=50"
+ENT_PERSON_9e124b2b77d10cc3,José R. Pérez-Riera,JOSE R PEREZ RIERA,PR,person_9e124b2b77d10cc3,canonical_v1_people,T2,0.95,"registry_tiers=A; flows=Contracts,Debt; flow_score=80"
+ENT_PERSON_907296dd99e2bf13,Josue Colón,JOSUE COLON,PR,person_907296dd99e2bf13,canonical_v1_people,T2,0.95,"registry_tiers=D; flows=Reconstruction,Utilities; flow_score=50"
+ENT_PERSON_571734a5af914837,Juan Sabater,JUAN SABATER,PR,person_571734a5af914837,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=80
+ENT_PERSON_c7fecfd48a82ab0a,Juan Saca,JUAN SACA,PR,person_c7fecfd48a82ab0a,canonical_v1_people,T2,0.95,registry_tiers=D; flows=Utilities; flow_score=50
+ENT_PERSON_090d91b5e053d5aa,Justin Peterson,JUSTIN PETERSON,PR,person_090d91b5e053d5aa,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=80
+ENT_PERSON_81f9169b90872a8d,Laura Taylor Swain,LAURA TAYLOR SWAIN,PR,person_81f9169b90872a8d,canonical_v1_people,T2,0.95,registry_tiers=C; flows=Debt; flow_score=60
+ENT_PERSON_18b2039c27dfc985,Leon Cooperman,LEON COOPERMAN,PR,person_18b2039c27dfc985,canonical_v1_people,T2,0.85,registry_tiers=B; flows=Debt; flow_score=70
+ENT_PERSON_3db224357139b5de,Luc Despins,LUC DESPINS,PR,person_3db224357139b5de,canonical_v1_people,T2,0.85,registry_tiers=B/C; flows=Debt; flow_score=70
+ENT_PERSON_5d0c409febd51ae5,Luis Fortuño,LUIS FORTUNO,PR,person_5d0c409febd51ae5,canonical_v1_people,T2,0.85,registry_tiers=A; flows=Debt; flow_score=75
+ENT_PERSON_0cd1fa6213e3794a,Luis Ubiñas,LUIS UBINAS,PR,person_0cd1fa6213e3794a,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=80
+ENT_PERSON_df7bfebca478a14e,Manuel Laboy,MANUEL LABOY,PR,person_df7bfebca478a14e,canonical_v1_people,T2,0.85,"registry_tiers=D; flows=Contracts,Privatization; flow_score=45"
+ENT_PERSON_5c5a6630b6036e88,Marc Lasry,MARC LASRY,PR,person_5c5a6630b6036e88,canonical_v1_people,T2,0.85,registry_tiers=B; flows=Debt; flow_score=70
+ENT_PERSON_365ee146683a6115,Mark Brodsky,MARK BRODSKY,PR,person_365ee146683a6115,canonical_v1_people,T2,0.85,registry_tiers=B; flows=Debt; flow_score=75
+ENT_PERSON_84b42d3e4c6ec57e,Martin Bienenstock,MARTIN BIENENSTOCK,PR,person_84b42d3e4c6ec57e,canonical_v1_people,T2,0.95,registry_tiers=B/C; flows=Debt; flow_score=70
+ENT_PERSON_768140b5fa96c154,Natalie Jaresko,NATALIE JARESKO,PR,person_768140b5fa96c154,canonical_v1_people,T2,0.95,registry_tiers=A; flows=Debt; flow_score=85
+ENT_PERSON_1a0a11709659afd0,Nicholas Prouty,NICHOLAS PROUTY,PR,person_1a0a11709659afd0,canonical_v1_people,T2,0.85,"registry_tiers=F; flows=Privatization,RealEstate; flow_score=30"
+ENT_PERSON_58d71c508a2bba6b,Omar Marrero,OMAR MARRERO,PR,person_58d71c508a2bba6b,canonical_v1_people,T2,0.95,"registry_tiers=A; flows=Contracts,Debt; flow_score=85"
+ENT_PERSON_448daf3be1802601,Paul Singer,PAUL SINGER,PR,person_448daf3be1802601,canonical_v1_people,T2,0.85,registry_tiers=B; flows=Debt; flow_score=75
+ENT_PERSON_9be24fcf5b9cb4ee,Pedro Pierluisi,PEDRO PIERLUISI,PR,person_9be24fcf5b9cb4ee,canonical_v1_people,T2,0.95,"registry_tiers=A; flows=Debt,Reconstruction; flow_score=85"
+ENT_PERSON_c19b23e5ca5ef74b,Peter Friedman,PETER FRIEDMAN,PR,person_c19b23e5ca5ef74b,canonical_v1_people,T2,0.95,registry_tiers=B/C; flows=Debt; flow_score=70
+ENT_PERSON_e571c45ee3aff079,Ricardo Rosselló,RICARDO ROSSELLO,PR,person_e571c45ee3aff079,canonical_v1_people,T2,0.85,"registry_tiers=A; flows=Debt,Privatization; flow_score=80"
+ENT_PERSON_f6dc4e3d66a1518d,Robert Mujica,ROBERT MUJICA,PR,person_f6dc4e3d66a1518d,canonical_v1_people,T2,0.95,"registry_tiers=A; flows=Debt,Fiscal; flow_score=85"
+ENT_PERSON_9a3b4ceb64e03ead,Seth Klarman,SETH KLARMAN,PR,person_9a3b4ceb64e03ead,canonical_v1_people,T2,0.85,registry_tiers=B; flows=Debt; flow_score=75
+ENT_PERSON_6c54762fbce7bfba,Steven Tananbaum,STEVEN TANANBAUM,PR,person_6c54762fbce7bfba,canonical_v1_people,T2,0.85,registry_tiers=B; flows=Debt; flow_score=75
+ENT_PERSON_169b72f0a9766e6d,Susheel Kirpalani,SUSHEEL KIRPALANI,PR,person_169b72f0a9766e6d,canonical_v1_people,T2,0.95,registry_tiers=B/C; flows=Debt; flow_score=70
+ENT_PERSON_7844ebbba9a82994,Wanda Vázquez Garced,WANDA VAZQUEZ GARCED,PR,person_7844ebbba9a82994,canonical_v1_people,T2,0.85,registry_tiers=A; flows=Debt; flow_score=75
+ENT_PERSON_78b47ca3600420ce,Wayne Stensby,WAYNE STENSBY,PR,person_78b47ca3600420ce,canonical_v1_people,T2,0.95,registry_tiers=D; flows=Utilities; flow_score=50
+ENT_PERSON_46b2e7029e5a6b97,Wes Edens,WES EDENS,PR,person_46b2e7029e5a6b97,canonical_v1_people,T2,0.85,"registry_tiers=D; flows=Contracts,Privatization; flow_score=45"

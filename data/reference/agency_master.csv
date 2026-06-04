@@ -1,0 +1,96 @@
+agency_id,agency_type,canonical_name,jurisdiction,aliases,source_id,evidence_tier,confidence,notes
+ENT_AGENCY_125b538f289a4708,government_agency,Commonwealth of Puerto Rico,PR,Government of Puerto Rico|ELA|Estado Libre Asociado de Puerto Rico,pr_public_money_entities,T1,0.95,General-obligation (GO) debt issuer and central government.
+ENT_AGENCY_3d2fd8a05e1703b2,government_agency,Financial Oversight and Management Board for Puerto Rico,US,FOMB|Oversight Board|La Junta|FOMBPR,pr_public_money_entities,T1,0.95,PROMESA Title III fiscal oversight board.
+ENT_AGENCY_1c1ee3c0f0c85d23,government_agency,Puerto Rico Fiscal Agency and Financial Advisory Authority,PR,AAFAF|AFAF,pr_public_money_entities,T1,0.95,Fiscal agent and financial advisor to the government.
+ENT_AGENCY_8d511bc1aaa048d4,government_agency,Puerto Rico Public-Private Partnerships Authority,PR,P3 Authority|AAPP|Autoridad de Alianzas Publico-Privadas,pr_public_money_entities,T1,0.95,Authority that structures public-private partnership transactions.
+ENT_AGENCY_6c1d858c1babe390,public_corporation,Puerto Rico Electric Power Authority,PR,PREPA|AEE|Autoridad de Energia Electrica,pr_public_money_entities,T1,0.95,Public electric power utility and debt issuer.
+ENT_AGENCY_c5fb8a7f44e8ff18,public_corporation,Puerto Rico Aqueduct and Sewer Authority,PR,PRASA|AAA|Autoridad de Acueductos y Alcantarillados,pr_public_money_entities,T1,0.95,Public water and sewer utility and debt issuer.
+ENT_AGENCY_b182f85acf46f69b,government_agency,Puerto Rico Highways and Transportation Authority,PR,HTA|ACT|Autoridad de Carreteras y Transportacion,pr_public_money_entities,T1,0.95,Highways and transportation authority and debt issuer.
+ENT_AGENCY_d363e4ddf2ce6a5d,government_agency,Government Development Bank for Puerto Rico,PR,GDB|BGF|Banco Gubernamental de Fomento|Puerto Rico Government Development Bank,pr_public_money_entities,T1,0.95,Former fiscal agent and development bank.
+ENT_AGENCY_67880db21dd281cd,government_agency,Puerto Rico Department of Economic Development and Commerce,PR,DDEC|Departamento de Desarrollo Economico y Comercio,pr_public_money_entities,T1,0.95,Economic development and commerce department.
+ENT_AGENCY_42ffd9ad9ab45e6a,government_agency,Puerto Rico Public Buildings Authority,PR,PBA|AEP|Autoridad de Edificios Publicos,pr_public_money_entities,T1,0.95,Public buildings authority and debt issuer.
+ENT_AGENCY_7cf79ff780fb8279,government_agency,Puerto Rico Infrastructure Financing Authority,PR,PRIFA|AFI|Autoridad para el Financiamiento de la Infraestructura,pr_public_money_entities,T1,0.95,Infrastructure financing authority and debt issuer.
+ENT_AGENCY_c6aa8887d7248228,government_agency,Puerto Rico Housing Finance Authority,PR,PRHFA|AFV|Autoridad para el Financiamiento de la Vivienda,pr_public_money_entities,T1,0.95,Housing finance authority and debt issuer.
+ENT_AGENCY_5f99300da364ea64,government_agency,Puerto Rico Industrial Development Company,PR,PRIDCO|PRIDCO Real Estate|Compania de Fomento Industrial,pr_public_money_entities,T1,0.95,Industrial development company and debt issuer.
+ENT_AGENCY_cc41784f4b40b6ff,government_agency,University of Puerto Rico,PR,UPR|Universidad de Puerto Rico,pr_public_money_entities,T1,0.95,Public university system and debt issuer.
+ENT_AGENCY_2c16f9ae54df7e1e,government_agency,Puerto Rico Convention Center District Authority,PR,CCDA|Autoridad del Distrito del Centro de Convenciones,pr_public_money_entities,T1,0.95,Convention center district authority and debt issuer.
+ENT_AGENCY_efcec09764306ade,government_agency,Puerto Rico Ports Authority,PR,Ports Authority|Autoridad de los Puertos,pr_public_money_entities,T1,0.95,Ports authority and debt issuer.
+ENT_AGENCY_e73c9879d715653a,government_agency,Puerto Rico Municipal Finance Agency,PR,MFA|Agencia de Financiamiento Municipal,pr_public_money_entities,T1,0.95,Municipal finance agency and debt issuer.
+ENT_MUNI_72001,municipality,Adjuntas,PR,ADJUNTAS|MUNICIPIO DE ADJUNTAS,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72003,municipality,Aguada,PR,AGUADA|MUNICIPIO DE AGUADA,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72005,municipality,Aguadilla,PR,AGUADILLA|MUNICIPIO DE AGUADILLA,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72007,municipality,Aguas Buenas,PR,AGUAS BUENAS|MUNICIPIO DE AGUAS BUENAS,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72009,municipality,Aibonito,PR,AIBONITO|MUNICIPIO DE AIBONITO,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72011,municipality,Anasco,PR,ANASCO|ANYASCO|MUNICIPIO DE ANASCO,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72013,municipality,Arecibo,PR,ARECIBO|MUNICIPIO DE ARECIBO,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72015,municipality,Arroyo,PR,ARROYO|MUNICIPIO DE ARROYO,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72017,municipality,Barceloneta,PR,BARCELONETA|MUNICIPIO DE BARCELONETA,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72019,municipality,Barranquitas,PR,BARRANQUITAS|MUNICIPIO DE BARRANQUITAS,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72021,municipality,Bayamon,PR,BAYAMON|MUNICIPIO DE BAYAMON,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72023,municipality,Cabo Rojo,PR,CABO ROJO|MUNICIPIO DE CABO ROJO,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72025,municipality,Caguas,PR,CAGUAS|MUNICIPIO DE CAGUAS,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72027,municipality,Camuy,PR,CAMUY|MUNICIPIO DE CAMUY,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72029,municipality,Canovanas,PR,CANOVANAS|MUNICIPIO DE CANOVANAS,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72031,municipality,Carolina,PR,CAROLINA|MUNICIPIO DE CAROLINA,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72033,municipality,Catano,PR,CATANO|MUNICIPIO DE CATANO,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72035,municipality,Cayey,PR,CAYEY|MUNICIPIO DE CAYEY,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72037,municipality,Ceiba,PR,CEIBA|MUNICIPIO DE CEIBA,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72039,municipality,Ciales,PR,CIALES|MUNICIPIO DE CIALES,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72041,municipality,Cidra,PR,CIDRA|MUNICIPIO DE CIDRA,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72043,municipality,Coamo,PR,COAMO|MUNICIPIO DE COAMO,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72045,municipality,Comerio,PR,COMERIO|MUNICIPIO DE COMERIO,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72047,municipality,Corozal,PR,COROZAL|MUNICIPIO DE COROZAL,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72049,municipality,Culebra,PR,CULEBRA|MUNICIPIO DE CULEBRA|ISLA CULEBRA,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72051,municipality,Dorado,PR,DORADO|MUNICIPIO DE DORADO,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72053,municipality,Fajardo,PR,FAJARDO|MUNICIPIO DE FAJARDO,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72054,municipality,Florida,PR,FLORIDA|MUNICIPIO DE FLORIDA,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72055,municipality,Guanica,PR,GUANICA|MUNICIPIO DE GUANICA,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72057,municipality,Guayama,PR,GUAYAMA|MUNICIPIO DE GUAYAMA,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72059,municipality,Guayanilla,PR,GUAYANILLA|MUNICIPIO DE GUAYANILLA,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72061,municipality,Guaynabo,PR,GUAYNABO|MUNICIPIO DE GUAYNABO,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72063,municipality,Gurabo,PR,GURABO|MUNICIPIO DE GURABO,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72065,municipality,Hatillo,PR,HATILLO|MUNICIPIO DE HATILLO,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72067,municipality,Hormigueros,PR,HORMIGUEROS|MUNICIPIO DE HORMIGUEROS,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72069,municipality,Humacao,PR,HUMACAO|MUNICIPIO DE HUMACAO,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72071,municipality,Isabela,PR,ISABELA|MUNICIPIO DE ISABELA,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72073,municipality,Jayuya,PR,JAYUYA|MUNICIPIO DE JAYUYA,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72075,municipality,Juana Diaz,PR,JUANA DIAZ|MUNICIPIO DE JUANA DIAZ,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72077,municipality,Juncos,PR,JUNCOS|MUNICIPIO DE JUNCOS,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72079,municipality,Lajas,PR,LAJAS|MUNICIPIO DE LAJAS,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72081,municipality,Lares,PR,LARES|MUNICIPIO DE LARES,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72083,municipality,Las Marias,PR,LAS MARIAS|MUNICIPIO DE LAS MARIAS,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72085,municipality,Las Piedras,PR,LAS PIEDRAS|MUNICIPIO DE LAS PIEDRAS,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72087,municipality,Loiza,PR,LOIZA|MUNICIPIO DE LOIZA,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72089,municipality,Luquillo,PR,LUQUILLO|MUNICIPIO DE LUQUILLO,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72091,municipality,Manati,PR,MANATI|MUNICIPIO DE MANATI,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72093,municipality,Maricao,PR,MARICAO|MUNICIPIO DE MARICAO,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72095,municipality,Maunabo,PR,MAUNABO|MUNICIPIO DE MAUNABO,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72097,municipality,Mayaguez,PR,MAYAGUEZ|MUNICIPIO DE MAYAGUEZ,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72099,municipality,Moca,PR,MOCA|MUNICIPIO DE MOCA,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72101,municipality,Morovis,PR,MOROVIS|MUNICIPIO DE MOROVIS,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72103,municipality,Naguabo,PR,NAGUABO|MUNICIPIO DE NAGUABO,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72105,municipality,Naranjito,PR,NARANJITO|MUNICIPIO DE NARANJITO,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72107,municipality,Orocovis,PR,OROCOVIS|MUNICIPIO DE OROCOVIS,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72109,municipality,Patillas,PR,PATILLAS|MUNICIPIO DE PATILLAS,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72111,municipality,Penuelas,PR,PENUELAS|MUNICIPIO DE PENUELAS,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72113,municipality,Ponce,PR,PONCE|MUNICIPIO DE PONCE,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72115,municipality,Quebradillas,PR,QUEBRADILLAS|MUNICIPIO DE QUEBRADILLAS,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72117,municipality,Rincon,PR,RINCON|MUNICIPIO DE RINCON,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72119,municipality,Rio Grande,PR,RIO GRANDE|MUNICIPIO DE RIO GRANDE,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72121,municipality,Sabana Grande,PR,SABANA GRANDE|MUNICIPIO DE SABANA GRANDE,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72123,municipality,Salinas,PR,SALINAS|MUNICIPIO DE SALINAS,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72125,municipality,San German,PR,SAN GERMAN|MUNICIPIO DE SAN GERMAN,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72127,municipality,San Juan,PR,SAN JUAN|MUNICIPIO DE SAN JUAN|SAN JUAN MUNICIPIO|SJU|RIO PIEDRAS|HATO REY|SANTURCE,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72129,municipality,San Lorenzo,PR,SAN LORENZO|MUNICIPIO DE SAN LORENZO,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72131,municipality,San Sebastian,PR,SAN SEBASTIAN|MUNICIPIO DE SAN SEBASTIAN,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72133,municipality,Santa Isabel,PR,SANTA ISABEL|MUNICIPIO DE SANTA ISABEL,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72135,municipality,Toa Alta,PR,TOA ALTA|MUNICIPIO DE TOA ALTA,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72137,municipality,Toa Baja,PR,TOA BAJA|MUNICIPIO DE TOA BAJA,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72139,municipality,Trujillo Alto,PR,TRUJILLO ALTO|MUNICIPIO DE TRUJILLO ALTO,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72141,municipality,Utuado,PR,UTUADO|MUNICIPIO DE UTUADO,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72143,municipality,Vega Alta,PR,VEGA ALTA|MUNICIPIO DE VEGA ALTA,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72145,municipality,Vega Baja,PR,VEGA BAJA|MUNICIPIO DE VEGA BAJA,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72147,municipality,Vieques,PR,VIEQUES|MUNICIPIO DE VIEQUES|ISLA VIEQUES,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72149,municipality,Villalba,PR,VILLALBA|MUNICIPIO DE VILLALBA,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72151,municipality,Yabucoa,PR,YABUCOA|MUNICIPIO DE YABUCOA,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72153,municipality,Yauco,PR,YAUCO|MUNICIPIO DE YAUCO,pr_municipalities,T1,0.95,region=south
