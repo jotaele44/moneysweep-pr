@@ -1,0 +1,26 @@
+{
+  "producer_script": "scripts/build_influence_edges.py",
+  "producer_phase": "TOP_FORM_INFLUENCE_EDGES",
+  "schema": "schemas/influence_edges.schema.json",
+  "source_inputs": [
+    "data/canonical_v1/lobbying_records.csv",
+    "data/canonical_v1/roles.csv",
+    "data/reference/entity_parent_map.csv",
+    "data/reference/entity_master.csv",
+    "data/reference/agency_master.csv",
+    "data/reference/person_master.csv"
+  ],
+  "output": "data/reference/influence_edges.csv",
+  "row_count": 30,
+  "relationship_types": [
+    "BOARD_MEMBER_OF",
+    "LOBBIES_FOR",
+    "OWNS_OR_CONTROLS",
+    "SUBSIDIARY_OF"
+  ],
+  "source_types": [
+    "pr_cabilderos",
+    "registry"
+  ],
+  "generated_at": "2026-06-04T21:24:58.567159+00:00"
+}

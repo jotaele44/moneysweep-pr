@@ -34,9 +34,9 @@ local_contracts,prepa_contracts,partial,P1,GPT/Claude,source_registry,connect PR
 local_contracts,p3_contracts,partial,P1,GPT/Claude,source_registry,normalize P3 concession records
 influence,pr_cabilderos,partial,P0,GPT/Claude,uploaded registry,"source file acquired; build cabilderos parser, client/person normalization, influence-edge output, schema validation, and tests"
 influence,federal_lda,partial,P1,GPT/Claude,uploaded LDA records,"source file acquired; build LDA parser, registrant/client normalization, influence-window output, schema validation, and tests"
-influence,campaign_finance,partial,P1,GPT/Claude,unknown,inventory available campaign finance sources
-influence,contractor_donor_overlap,partial,P1,GPT/Claude,reports,convert research output to reproducible pipeline
-influence,influence_edge_schema,missing,P0,GPT/Claude,schemas/influence_edges.schema.json,lock influence edge schema
+influence,campaign_finance,blocked,P1,GPT/Claude,unknown,no in-repo campaign-finance source identified; egress to FEC/state filings required to materialize
+influence,contractor_donor_overlap,blocked,P1,GPT/Claude,reports,depends on campaign_finance donor data (blocked); convert to reproducible pipeline once a donor source is available
+influence,influence_edge_schema,done,P0,GPT/Claude,schemas/influence_edges.schema.json,locked into scripts/build_influence_edges.py -> data/reference/influence_edges.csv (30 edges) + offline tests
 debt_fiscal,emma_bonds,partial,P1,GPT/Claude,current_status.json,complete bond source materialization
 debt_fiscal,debt_instrument_schema,missing,P1,GPT/Claude,schemas,define debt instrument schema
 debt_fiscal,creditor_mapping,missing,P2,GPT/Claude,reports,build GO COFINA PREPA PRASA HTA creditor registry
