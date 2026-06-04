@@ -1,0 +1,22 @@
+{
+  "producer_script": "scripts/build_debt_instruments.py",
+  "producer_phase": "TOP_FORM_DEBT_INSTRUMENTS",
+  "schema": "schemas/debt_instrument.schema.json",
+  "source_inputs": [
+    "data/canonical_v1/debt_instruments.csv",
+    "data/reference/entity_master.csv"
+  ],
+  "output": "data/reference/debt_instruments.csv",
+  "row_count": 20,
+  "issuer_count": 14,
+  "total_par": 38844300000.0,
+  "debt_classes": [
+    "COFINA",
+    "GO",
+    "HTA",
+    "PRASA",
+    "PREPA",
+    "other"
+  ],
+  "generated_at": "2026-06-04T21:30:29.220946+00:00"
+}

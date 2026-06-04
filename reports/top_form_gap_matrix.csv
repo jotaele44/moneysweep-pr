@@ -37,10 +37,10 @@ influence,federal_lda,partial,P1,GPT/Claude,uploaded LDA records,"source file ac
 influence,campaign_finance,blocked,P1,GPT/Claude,unknown,no in-repo campaign-finance source identified; egress to FEC/state filings required to materialize
 influence,contractor_donor_overlap,blocked,P1,GPT/Claude,reports,depends on campaign_finance donor data (blocked); convert to reproducible pipeline once a donor source is available
 influence,influence_edge_schema,done,P0,GPT/Claude,schemas/influence_edges.schema.json,locked into scripts/build_influence_edges.py -> data/reference/influence_edges.csv (30 edges) + offline tests
-debt_fiscal,emma_bonds,partial,P1,GPT/Claude,current_status.json,complete bond source materialization
-debt_fiscal,debt_instrument_schema,missing,P1,GPT/Claude,schemas,define debt instrument schema
-debt_fiscal,creditor_mapping,missing,P2,GPT/Claude,reports,build GO COFINA PREPA PRASA HTA creditor registry
-debt_fiscal,fiscal_control_events,missing,P2,GPT/Claude,reports,build fiscal decision timeline
+debt_fiscal,emma_bonds,blocked,P1,GPT/Claude,current_status.json,20-bond reference seed materialized; full EMMA bond-universe materialization needs egress to emma.msrb.org
+debt_fiscal,debt_instrument_schema,done,P1,GPT/Claude,schemas/debt_instrument.schema.json,locked into scripts/build_debt_instruments.py -> data/reference/debt_instruments.csv (20 bonds) + offline tests
+debt_fiscal,creditor_mapping,done,P2,GPT/Claude,data/reference/creditor_mapping.csv,scripts/build_creditor_mapping.py aggregates 20 bonds into 14 issuer rows (GO/COFINA/PREPA/PRASA/HTA + others) + offline tests
+debt_fiscal,fiscal_control_events,done,P2,GPT/Claude,data/reference/fiscal_control_events.csv,scripts/build_fiscal_control_events.py from curated public-fact seed (12 PROMESA/Title III/PoA milestones) + offline tests
 gis,municipality_crosswalk,partial,P0,GPT/Claude,data/reference,lock 78-municipio crosswalk
 gis,geo_reason_codes,missing,P0,GPT/Claude,geo resolver,add geo resolution reason codes
 gis,project_geocoding,partial,P1,GPT/Claude,exports/gis,create project point layer
