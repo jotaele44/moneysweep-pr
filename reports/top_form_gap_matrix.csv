@@ -56,8 +56,8 @@ dashboard,source_drilldown,missing,P2,GPT/Claude,reports,add source provenance d
 foia,foia_tracker,missing,P1,GPT/Claude,reports/foia_priority_queue.csv,create request tracker schema
 foia,request_templates,partial,P2,GPT/Claude,docs,standardize public records request templates
 foia,yield_tracking,missing,P2,GPT/Claude,reports,track request yield and unresolved gaps
-testing,entity_resolution_tests,missing,P0,Claude,tests,add tests after entity schema
-testing,graph_export_tests,missing,P1,Claude,tests,add graph schema validation tests
-testing,gis_export_tests,missing,P1,Claude,tests,add GeoJSON and layer manifest tests
-testing,output_snapshot_tests,missing,P1,Claude,tests,add output schema snapshot tests
-testing,fresh_clone_repro,partial,P1,Claude,CI,add reproducibility job after source gates stabilize
+testing,entity_resolution_tests,done,P0,Claude,tests/test_entity_resolution.py,alias->entity + parent_map + influence/debt endpoint integrity and orphan checks across the masters
+testing,graph_export_tests,done,P1,Claude,tests/test_export_schemas.py,on-disk graph nodes/edges validated against schemas with node-existence + evidence + neo4j header checks
+testing,gis_export_tests,done,P1,Claude,tests/test_export_schemas.py,on-disk gis layer_manifest validated against schema; committed GeoJSON layers checked as FeatureCollections
+testing,output_snapshot_tests,done,P1,Claude,tests/test_output_snapshots.py,byte-identical regeneration of every top-form producer (entity/influence/debt/gis/graph)
+testing,fresh_clone_repro,done,P1,Claude,.github/workflows/repro.yml,CI regenerates all top-form producers in a clean checkout and fails on any output drift; guarded by tests/test_fresh_clone_repro.py
