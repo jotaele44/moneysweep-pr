@@ -1,0 +1,35 @@
+{
+  "producer_script": "scripts/build_graph_export.py",
+  "producer_phase": "TOP_FORM_GRAPH_EXPORT",
+  "node_schema": "schemas/graph_nodes.schema.json",
+  "edge_schema": "schemas/graph_edges.schema.json",
+  "source_inputs": [
+    "data/reference/entity_master.csv",
+    "data/reference/agency_master.csv",
+    "data/reference/person_master.csv",
+    "data/reference/entity_parent_map.csv",
+    "data/canonical_v1/lobbying_records.csv",
+    "data/canonical_v1/roles.csv"
+  ],
+  "outputs": [
+    "exports/graph/nodes.csv",
+    "exports/graph/edges.csv",
+    "exports/graph/neo4j_nodes.csv",
+    "exports/graph/neo4j_edges.csv"
+  ],
+  "node_count": 164,
+  "edge_count": 30,
+  "node_types": [
+    "government_agency",
+    "municipality",
+    "organization",
+    "person"
+  ],
+  "edge_types": [
+    "BOARD_MEMBER_OF",
+    "PARENT_OF",
+    "REGISTERED_LOBBYING_FOR",
+    "RELATED_TO"
+  ],
+  "generated_at": "2026-06-04T21:19:35.689879+00:00"
+}

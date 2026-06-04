@@ -46,10 +46,10 @@ gis,geo_reason_codes,missing,P0,GPT/Claude,geo resolver,add geo resolution reaso
 gis,project_geocoding,partial,P1,GPT/Claude,exports/gis,create project point layer
 gis,layer_manifest,missing,P1,GPT/Claude,exports/gis/layer_manifest.json,create GIS layer manifest
 gis,hq_bias_correction,partial,P1,GPT/Claude,reports,split HQ location from place of performance
-graph_export,node_schema,missing,P0,GPT/Claude,exports/graph/nodes.csv,define node schema
-graph_export,edge_schema,missing,P0,GPT/Claude,exports/graph/edges.csv,define edge schema
-graph_export,neo4j_export,missing,P1,GPT/Claude,exports/graph,create Neo4j export format
-graph_export,evidence_confidence,partial,P0,GPT/Claude,exports/graph,require evidence_tier and confidence on every edge
+graph_export,node_schema,done,P0,GPT/Claude,exports/graph/nodes.csv,schemas/graph_nodes.schema.json + scripts/build_graph_export.py (164 nodes) + offline tests
+graph_export,edge_schema,done,P0,GPT/Claude,exports/graph/edges.csv,schemas/graph_edges.schema.json locked into scripts/build_graph_export.py (30 edges) + offline tests
+graph_export,neo4j_export,done,P1,GPT/Claude,exports/graph,neo4j_nodes.csv/neo4j_edges.csv with typed import headers from scripts/build_graph_export.py
+graph_export,evidence_confidence,done,P0,GPT/Claude,exports/graph,check() enforces evidence_tier+confidence and node-existence on every edge; covered by tests/test_graph_export.py
 dashboard,analyst_reports,partial,P2,GPT/Claude,reports,standardize report outputs
 dashboard,dashboard_app,missing,P3,GPT/Claude,dashboard,defer until graph and GIS are stable
 dashboard,source_drilldown,missing,P2,GPT/Claude,reports,add source provenance drilldown
