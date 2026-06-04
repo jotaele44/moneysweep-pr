@@ -536,3 +536,35 @@ def get_sam_api_key() -> str:
         f"  2. Create {PROJECT_ROOT / '.env'} containing: SAM_API_KEY=your_key_here\n"
         "Get a free key at https://sam.gov/data-services"
     )
+
+
+def get_financialdata_api_key() -> str | None:
+    """
+    Return FinancialData.net API key if present; never raises.
+
+    The FinancialData.net adapter is optional and license-gated, so the absence
+    of a key is a normal state — callers route to a structured "missing_key"
+    readiness signal rather than crashing.
+    """
+    import os
+    key = os.environ.get("FINANCIALDATA_API_KEY", "").strip()
+    if key:
+        return key
+    parsed = _load_dotenv(PROJECT_ROOT / ".env")
+    key = parsed.get("FINANCIALDATA_API_KEY", "").strip()
+    return key or None
+
+
+def is_financialdata_license_approved() -> bool:
+    """
+    Return True only if FINANCIALDATA_LICENSE_APPROVED is set to a truthy value.
+
+    Live use of the FinancialData.net adapter requires this explicit operator
+    acknowledgement in addition to the API key — see docs/financialdata_provider.md.
+    """
+    import os
+    val = os.environ.get("FINANCIALDATA_LICENSE_APPROVED", "").strip()
+    if not val:
+        parsed = _load_dotenv(PROJECT_ROOT / ".env")
+        val = parsed.get("FINANCIALDATA_LICENSE_APPROVED", "").strip()
+    return val.lower() in {"true", "1", "yes", "y", "approved"}
