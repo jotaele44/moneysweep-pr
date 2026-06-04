@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fiscal Control Event Row",
+  "type": "object",
+  "required": [
+    "event_id",
+    "event_date",
+    "event_type",
+    "title",
+    "claim",
+    "source_id",
+    "evidence_tier",
+    "confidence"
+  ],
+  "properties": {
+    "event_id": {"type": "string", "pattern": "^FCE_[A-Za-z0-9_.:-]+$"},
+    "event_date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "legislation",
+        "oversight_board",
+        "title_iii_filing",
+        "plan_of_adjustment",
+        "restructuring",
+        "disaster",
+        "operations",
+        "default",
+        "audit",
+        "other"
+      ]
+    },
+    "title": {"type": "string", "minLength": 1},
+    "related_entity_id": {
+      "type": "string",
+      "pattern": "^ENT_(ORG|PERSON|AGENCY|MUNI|PROJECT|CONTRACT|DEBT|PROPERTY|ASSET)_[A-Za-z0-9_.:-]+$"
+    },
+    "related_entity_name": {"type": "string"},
+    "claim": {"type": "string", "minLength": 1},
+    "source_id": {"type": "string", "minLength": 1},
+    "evidence_tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}

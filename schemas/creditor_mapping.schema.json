@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Creditor Mapping Row",
+  "type": "object",
+  "required": [
+    "issuer_entity_id",
+    "canonical_name",
+    "debt_classes",
+    "instrument_count",
+    "total_par",
+    "currency",
+    "evidence_tier",
+    "confidence"
+  ],
+  "properties": {
+    "issuer_entity_id": {
+      "type": "string",
+      "pattern": "^ENT_(ORG|PERSON|AGENCY|MUNI|PROJECT|CONTRACT|DEBT|PROPERTY|ASSET)_[A-Za-z0-9_.:-]+$"
+    },
+    "canonical_name": {"type": "string", "minLength": 1},
+    "debt_classes": {"type": "string", "minLength": 1},
+    "instrument_count": {"type": "integer", "minimum": 1},
+    "total_par": {"type": "number", "minimum": 0},
+    "currency": {"type": "string", "enum": ["USD"]},
+    "evidence_tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}

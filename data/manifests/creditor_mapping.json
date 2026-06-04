@@ -1,0 +1,12 @@
+{
+  "producer_script": "scripts/build_creditor_mapping.py",
+  "producer_phase": "TOP_FORM_CREDITOR_MAPPING",
+  "schema": "schemas/creditor_mapping.schema.json",
+  "source_inputs": [
+    "data/reference/debt_instruments.csv"
+  ],
+  "output": "data/reference/creditor_mapping.csv",
+  "row_count": 14,
+  "total_par": 38844300000.0,
+  "generated_at": "2026-06-04T21:30:29.272647+00:00"
+}

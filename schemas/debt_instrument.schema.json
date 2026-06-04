@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Top-form Debt Instrument Row",
+  "type": "object",
+  "required": [
+    "debt_id",
+    "issuer_entity_id",
+    "issuer_name",
+    "debt_class",
+    "currency",
+    "evidence_tier",
+    "confidence"
+  ],
+  "properties": {
+    "debt_id": {"type": "string", "minLength": 1},
+    "issuer_entity_id": {
+      "type": "string",
+      "pattern": "^ENT_(ORG|PERSON|AGENCY|MUNI|PROJECT|CONTRACT|DEBT|PROPERTY|ASSET)_[A-Za-z0-9_.:-]+$"
+    },
+    "issuer_name": {"type": "string", "minLength": 1},
+    "debt_class": {
+      "type": "string",
+      "enum": ["GO", "COFINA", "PREPA", "PRASA", "HTA", "other"]
+    },
+    "series": {"type": "string"},
+    "issue_year": {"type": "integer", "minimum": 1900, "maximum": 2100},
+    "par_amount": {"type": "number", "minimum": 0},
+    "currency": {"type": "string", "enum": ["USD"]},
+    "maturity_date": {"type": "string"},
+    "evidence_tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}
