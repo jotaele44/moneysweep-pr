@@ -1,0 +1,12 @@
+{
+  "active_vector": "PREPA_GRAPH_LOAD_RECIPE_COMPLETE \u2192 NEO4J_DRY_IMPORT_SCRIPT \u2192 NO_DB_MUTATION",
+  "status": "PASS",
+  "db_mutation": "none",
+  "nodes": 13,
+  "edges": 73,
+  "dangling_edges": 0,
+  "empty_node_ids": 0,
+  "empty_edge_refs": 0,
+  "cypher_script": "outputs/prepa_full_universe/export_ready_graph/import_scripts/prepa_neo4j_import.cypher",
+  "next_action": "Copy CSVs to Neo4j import directory and run cypher script only after local DB target is confirmed."
+}

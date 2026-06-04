@@ -1,0 +1,27 @@
+{
+  "active_vector": "PREPA_STRICT_QA_REVIEW \u2192 MANUAL_PROMOTION_GATE \u2192 GRAPH_EXPORT_READY_REGISTRY",
+  "status": "export-ready registry generated",
+  "summary": {
+    "strict_validated_source": "outputs/prepa_full_universe/postmatch_qa_strict/prepa_top100_validated.csv",
+    "review_source": "outputs/prepa_full_universe/postmatch_qa_strict/prepa_review_queue.csv",
+    "export_ready_registry": "outputs/prepa_full_universe/postmatch_qa_strict/prepa_export_ready_registry.csv",
+    "export_ready_rows": 13,
+    "manual_promotions": [
+      "AAFAF",
+      "BLACK & VEATCH",
+      "ECOELECTRICA",
+      "FREEPOINT COMMODITIES",
+      "PAUL HASTINGS",
+      "PROSKAUER ROSE",
+      "VITOL"
+    ],
+    "excluded": [
+      "PREPA self-node as vendor",
+      "generic contractors without external confirmation",
+      "individual/address-on-file rows",
+      "suppressed rows"
+    ]
+  },
+  "export_policy": "Use only prepa_export_ready_registry.csv for Neo4j/GIS export.",
+  "next_action": "Generate Neo4j/GIS exports from export-ready registry."
+}

@@ -1,0 +1,11 @@
+{
+  "input_rows": 31,
+  "validated_canonical_rows": 6,
+  "review_rows": 20,
+  "suppressed_rows": 2,
+  "outputs": {
+    "validated": "outputs/prepa_full_universe/postmatch_qa_strict/prepa_top100_validated.csv",
+    "review": "outputs/prepa_full_universe/postmatch_qa_strict/prepa_review_queue.csv",
+    "suppressed": "outputs/prepa_full_universe/postmatch_qa_strict/prepa_suppressed_false_positive_candidates.csv"
+  }
+}
