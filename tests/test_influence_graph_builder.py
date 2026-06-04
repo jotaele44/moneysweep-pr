@@ -134,6 +134,51 @@ def test_add_edge_creates_node_entries():
     assert edges[0]["edge_type"] == "awards_to"
 
 
+@pytest.fixture
+def graph_repo_with_ngos(graph_repo):
+    ngo_dir = graph_repo / "data" / "staging" / "processed" / "ngos"
+    ngo_dir.mkdir(parents=True)
+    _write_csv(ngo_dir / "ngo_funding_edges.csv", [
+        {"edge_id": "NE1", "source_entity": "FEMA", "target_ngo_id": "ngo_aaa",
+         "target_name": "Fundacion Comunitaria", "award_id": "AW001", "amount": "125000",
+         "municipality": "San Juan", "confidence": "90"},
+    ])
+    _write_csv(ngo_dir / "ngo_asset_edges.csv", [
+        {"ngo_id": "ngo_aaa", "asset_id": "PW-100", "municipality": "San Juan",
+         "relationship_type": "executes", "evidence_class": "award_id_match", "confidence": "80"},
+    ])
+    _write_csv(ngo_dir / "ngo_fiscal_sponsor_edges.csv", [
+        {"sponsor_ngo_id": "ngo_central", "sponsored_entity": "ngo_aaa",
+         "relationship_type": "group_exemption", "source_file": "irs_eo_bmf:x.csv", "confidence": "70"},
+    ])
+    return graph_repo
+
+
+@pytest.mark.unit
+def test_build_graph_merges_ngo_edges(graph_repo_with_ngos):
+    build_graph(graph_repo_with_ngos)
+    out = graph_repo_with_ngos / "data" / "staging" / "processed" / "graphs"
+    with (out / "entity_edges.csv").open(encoding="utf-8") as f:
+        edges = list(csv.DictReader(f))
+    types = {e["edge_type"] for e in edges}
+    assert "funds_ngo" in types
+    assert "executes_project" in types
+    assert "fiscal_sponsor_of" in types
+    # NGO node carries its label, and the funder→NGO edge rescales 90 → 0.9
+    funds = [e for e in edges if e["edge_type"] == "funds_ngo"]
+    assert any(e["target"] == "ngo_aaa" and float(e["confidence"]) == 0.9 for e in funds)
+
+
+@pytest.mark.unit
+def test_build_graph_ngo_edges_absent_when_no_files(graph_repo):
+    build_graph(graph_repo)
+    out = graph_repo / "data" / "staging" / "processed" / "graphs"
+    with (out / "entity_edges.csv").open(encoding="utf-8") as f:
+        edges = list(csv.DictReader(f))
+    types = {e["edge_type"] for e in edges}
+    assert "funds_ngo" not in types
+
+
 @pytest.mark.unit
 def test_compute_metrics_contract_value_weight():
     nodes = {"A": {"node_type": "agency"}, "B": {"node_type": "prime"}}

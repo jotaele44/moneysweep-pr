@@ -34,7 +34,13 @@ from pathlib import Path
 from typing import Iterable
 from xml.sax.saxutils import escape
 
+import sys
+
 import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from scripts.parquet_utils import pq_write
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW_NGO_DIR = ROOT / "data" / "raw" / "ngos"
@@ -75,6 +81,14 @@ FUNDING_EDGE_COLUMNS = [
     "edge_id", "source_entity", "target_ngo_id", "target_name", "award_id", "amount",
     "program", "funding_channel", "role", "period_start", "period_end", "municipality",
     "source_url", "source_file", "confidence",
+]
+
+ASSET_EDGE_COLUMNS = [
+    "ngo_id", "asset_id", "municipality", "relationship_type", "evidence_class", "confidence",
+]
+
+FISCAL_SPONSOR_EDGE_COLUMNS = [
+    "sponsor_ngo_id", "sponsored_entity", "relationship_type", "source_file", "confidence",
 ]
 
 
@@ -211,6 +225,19 @@ def classify_entity_type(name: str, ntee: str = "") -> str:
     return "nonprofit"
 
 
+def source_families(row: pd.Series) -> set[str]:
+    """Return the set of source families backing a row, e.g. {"irs_eo_bmf"}.
+
+    ``source_ids`` is a JSON list like ``["irs_eo_bmf:x.csv", "teos:y.csv"]``; the
+    family is the token before the first colon.
+    """
+    try:
+        ids = json.loads(row.get("source_ids") or "[]")
+    except (json.JSONDecodeError, TypeError):
+        ids = []
+    return {str(sid).split(":", 1)[0] for sid in ids if sid}
+
+
 def score_row(row: pd.Series) -> tuple[int, str]:
     score = 0
     if row.get("ein"):
@@ -226,6 +253,15 @@ def score_row(row: pd.Series) -> tuple[int, str]:
     if row.get("municipality"):
         score += 10
     if row.get("legal_name"):
+        score += 10
+    # Canonical-source provenance bonus: IRS federal registries (EO BMF / TEOS)
+    # and the PR state registry are authoritative identity sources, so rows backed
+    # by them should not languish in the conservative `probable` band on identity
+    # fields alone.
+    families = source_families(row)
+    if families & {"irs_eo_bmf", "teos"}:
+        score += 15
+    if "pr_state_registry" in families:
         score += 10
     score = min(score, 100)
     if score >= 90:
@@ -268,6 +304,18 @@ def create_schema_files() -> None:
             ],
             "required_municipalities": PR_MUNICIPALITIES,
         },
+        "ngo_asset_edges.schema.json": {
+            "name": "ngo_asset_edges",
+            "primary_key": ["ngo_id", "asset_id"],
+            "columns": ASSET_EDGE_COLUMNS,
+            "required": ["ngo_id", "asset_id", "relationship_type", "evidence_class", "confidence"],
+        },
+        "ngo_fiscal_sponsor_edges.schema.json": {
+            "name": "ngo_fiscal_sponsor_edges",
+            "primary_key": ["sponsor_ngo_id", "sponsored_entity"],
+            "columns": FISCAL_SPONSOR_EDGE_COLUMNS,
+            "required": ["sponsor_ngo_id", "sponsored_entity", "relationship_type", "confidence"],
+        },
     }
     for filename, payload in schemas.items():
         (SCHEMA_OUT_DIR / filename).write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -305,6 +353,9 @@ def ingest_irs_eo_bmf() -> pd.DataFrame:
                 "lon": "",
                 "coverage_municipalities": json.dumps([municipality] if municipality else [], ensure_ascii=False),
                 "source_ids": json.dumps([f"irs_eo_bmf:{path.name}"], ensure_ascii=False),
+                "group_exemption": str(first_present(row, ["group_exemption_number", "group_exemption", "gen"]) or ""),
+                "affiliation": str(first_present(row, ["affiliation", "affiliation_code"]) or ""),
+                "fiscal_sponsor": str(first_present(row, ["fiscal_sponsor", "sponsored_by", "fiscal_agent"]) or ""),
             })
         if rows:
             frames.append(pd.DataFrame(rows))
@@ -341,6 +392,9 @@ def ingest_teos_bulk(existing: pd.DataFrame) -> pd.DataFrame:
                 "lon": "",
                 "coverage_municipalities": json.dumps([municipality] if municipality else [], ensure_ascii=False),
                 "source_ids": json.dumps([f"teos:{path.name}"], ensure_ascii=False),
+                "group_exemption": str(first_present(row, ["group_exemption_number", "group_exemption", "gen"]) or ""),
+                "affiliation": str(first_present(row, ["affiliation", "affiliation_code"]) or ""),
+                "fiscal_sponsor": str(first_present(row, ["fiscal_sponsor", "sponsored_by", "fiscal_agent"]) or ""),
             })
     if teos_rows:
         records = pd.concat([records, pd.DataFrame(teos_rows)], ignore_index=True)
@@ -514,13 +568,168 @@ def join_usaspending_awards_subawards(ngos: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(edges, columns=FUNDING_EDGE_COLUMNS).drop_duplicates("edge_id") if edges else pd.DataFrame(columns=FUNDING_EDGE_COLUMNS)
 
 
-def build_78_municipality_coverage_matrix(ngos: pd.DataFrame, edges: pd.DataFrame) -> pd.DataFrame:
+def _affiliation_digit(value: object) -> str:
+    """Normalize an IRS affiliation code to its bare digit (e.g. "06" -> "6")."""
+    digits = re.sub(r"\D+", "", str(value or ""))
+    return digits.lstrip("0") or digits
+
+
+def detect_fiscal_sponsor_edges(records: pd.DataFrame) -> pd.DataFrame:
+    """Derive fiscal-sponsor / umbrella relationships from the ingested NGO records.
+
+    Two signals are used:
+
+    1. **Declared overrides** — a hand-curated ``fiscal_sponsor`` / ``sponsored_by``
+       column on a dropped-in row names the entity's umbrella explicitly.
+    2. **IRS group exemptions** — organizations sharing a Group Exemption Number
+       (GEN) form a group ruling. The central organization (affiliation code 6)
+       is the fiscal umbrella for its subordinates (affiliation code 9).
+    """
+    if records is None or records.empty:
+        return pd.DataFrame(columns=FISCAL_SPONSOR_EDGE_COLUMNS)
+
+    edges: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+
+    def source_file_of(row: pd.Series) -> str:
+        try:
+            ids = json.loads(row.get("source_ids") or "[]")
+        except (json.JSONDecodeError, TypeError):
+            ids = []
+        return str(ids[0]) if ids else ""
+
+    def emit(sponsor_id: str, sponsored: str, rel: str, src: str, conf: int) -> None:
+        if not sponsor_id or not sponsored or sponsor_id == sponsored:
+            return
+        key = (sponsor_id, sponsored)
+        if key in seen:
+            return
+        seen.add(key)
+        edges.append({
+            "sponsor_ngo_id": sponsor_id,
+            "sponsored_entity": sponsored,
+            "relationship_type": rel,
+            "source_file": src,
+            "confidence": conf,
+        })
+
+    # 1. Declared overrides.
+    for _, row in records.iterrows():
+        declared = str(first_present(row, ["fiscal_sponsor", "sponsored_by", "fiscal_agent"]) or "").strip()
+        if not declared:
+            continue
+        sponsor_id = stable_id("ngo", declared, row.get("municipality"))
+        emit(sponsor_id, str(row.get("ngo_id") or ""), "declared_fiscal_sponsor",
+             source_file_of(row), 80)
+
+    # 2. IRS group exemptions.
+    work = records.copy()
+    if "group_exemption" not in work.columns:
+        work["group_exemption"] = ""
+    work["gen_key"] = work["group_exemption"].map(lambda v: re.sub(r"\D+", "", str(v or "")).lstrip("0"))
+    for gen, group in work.groupby("gen_key", dropna=False):
+        if not gen or len(group) < 2:
+            continue
+        centrals = [r for _, r in group.iterrows() if _affiliation_digit(r.get("affiliation")) == "6"]
+        subordinates = [r for _, r in group.iterrows() if _affiliation_digit(r.get("affiliation")) == "9"]
+        for central in centrals:
+            for sub in subordinates:
+                emit(str(central.get("ngo_id") or ""), str(sub.get("ngo_id") or ""),
+                     "group_exemption", source_file_of(sub), 70)
+
+    return pd.DataFrame(edges, columns=FISCAL_SPONSOR_EDGE_COLUMNS)
+
+
+def detect_asset_edges(ngos: pd.DataFrame, funding_edges: pd.DataFrame) -> pd.DataFrame:
+    """Link funded NGOs to infrastructure assets/projects.
+
+    Reuses award/asset identifiers already present in the award sources and in the
+    pipeline's execution-chain and FEMA PA masters rather than inventing new joins.
+    An NGO is asset-linked when one of its funding edges resolves to a known
+    asset/project id, either by award id (strong) or by normalized recipient name +
+    municipality (weaker).
+    """
+    if funding_edges is None or funding_edges.empty:
+        return pd.DataFrame(columns=ASSET_EDGE_COLUMNS)
+
+    asset_fields = ["asset_id", "project_id", "pw_number", "disaster_number", "facility_id"]
+    recipient_fields = [
+        "recipient_name", "vendor_name", "awardee_or_recipient_legal", "legal_entity_name",
+        "subawardee_name", "subcontractor_name", "prime_awardee_name", "sub_name", "prime_name",
+    ]
+    award_id_fields = [
+        "award_id", "contract_id", "generated_unique_award_id", "piid", "subaward_number",
+        "subaward_id", "chain_id",
+    ]
+
+    by_award: dict[str, set[tuple[str, str]]] = {}
+    by_name_muni: dict[tuple[str, str], set[tuple[str, str]]] = {}
+
+    def index_row(row: pd.Series) -> None:
+        asset = str(first_present(row, asset_fields) or "").strip()
+        if not asset:
+            return
+        muni = detect_municipality_from_row(row)
+        award_id = str(first_present(row, award_id_fields) or "").strip()
+        name_key = norm_text(first_present(row, recipient_fields))
+        if award_id:
+            by_award.setdefault(award_id, set()).add((asset, muni))
+        if name_key:
+            by_name_muni.setdefault((name_key, muni), set()).add((asset, muni))
+
+    for _source_file, df in read_award_sources():
+        for _, row in df.iterrows():
+            index_row(row)
+
+    for rel in ["execution/execution_chain_master.csv", "pr_fema_pa_master.csv"]:
+        path = PROCESSED_DIR / rel
+        if path.exists():
+            df = lower_columns(read_table_file(path))
+            for _, row in df.iterrows():
+                index_row(row)
+
+    edges: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+
+    def emit(ngo_id: str, asset_id: str, muni: str, rel: str, evidence: str, conf: int) -> None:
+        key = (ngo_id, asset_id)
+        if not ngo_id or not asset_id or key in seen:
+            return
+        seen.add(key)
+        edges.append({
+            "ngo_id": ngo_id,
+            "asset_id": asset_id,
+            "municipality": muni,
+            "relationship_type": rel,
+            "evidence_class": evidence,
+            "confidence": conf,
+        })
+
+    for _, fe in funding_edges.iterrows():
+        ngo_id = str(fe.get("target_ngo_id") or "").strip()
+        if not ngo_id:
+            continue
+        award_id = str(fe.get("award_id") or "").strip()
+        muni = str(fe.get("municipality") or "").strip()
+        name_key = norm_text(fe.get("target_name"))
+        for asset, amuni in by_award.get(award_id, set()):
+            emit(ngo_id, asset, muni or amuni, "executes", "award_id_match", 80)
+        for asset, amuni in by_name_muni.get((name_key, muni), set()):
+            emit(ngo_id, asset, muni or amuni, "funded_at", "name_muni_match", 55)
+
+    return pd.DataFrame(edges, columns=ASSET_EDGE_COLUMNS)
+
+
+def build_78_municipality_coverage_matrix(ngos: pd.DataFrame, edges: pd.DataFrame, asset_edges: pd.DataFrame | None = None) -> pd.DataFrame:
     rows = []
     funded_ids = set(edges["target_ngo_id"].dropna().astype(str)) if not edges.empty else set()
+    has_assets = asset_edges is not None and not asset_edges.empty
     recovery_terms = re.compile(r"FEMA|HUD|CDBG|DISASTER|RECOVERY|HURRICANE|MARIA|COR3", re.I)
     for muni in PR_MUNICIPALITIES:
         registered = ngos[ngos["municipality"] == muni] if not ngos.empty else pd.DataFrame()
         funded_edges = edges[edges["municipality"] == muni] if not edges.empty else pd.DataFrame()
+        muni_assets = asset_edges[asset_edges["municipality"] == muni] if has_assets else pd.DataFrame()
+        asset_linked = int(muni_assets["ngo_id"].nunique()) if not muni_assets.empty else 0
         registered_funded = registered[registered["ngo_id"].isin(funded_ids)] if not registered.empty else pd.DataFrame()
         disaster = funded_edges[funded_edges.apply(lambda r: bool(recovery_terms.search(" ".join(str(x) for x in r.values))), axis=1)] if not funded_edges.empty else pd.DataFrame()
         score = 0
@@ -545,7 +754,7 @@ def build_78_municipality_coverage_matrix(ngos: pd.DataFrame, edges: pd.DataFram
             "ngo_count_registered": int(len(registered)),
             "ngo_count_federally_funded": int(len(registered_funded) + max(0, len(funded_edges) - len(registered_funded))),
             "ngo_count_disaster_recovery": int(len(disaster)),
-            "ngo_count_asset_linked": 0,
+            "ngo_count_asset_linked": asset_linked,
             "unmatched_awards": int(len(funded_edges[~funded_edges["target_ngo_id"].isin(set(registered["ngo_id"]))])) if not funded_edges.empty and not registered.empty else int(len(funded_edges)) if not funded_edges.empty else 0,
             "coverage_score": min(score, 100),
             "blind_spot_reason": reason,
@@ -606,15 +815,27 @@ def export_graph_layer(ngos: pd.DataFrame, edges: pd.DataFrame) -> None:
     (NGO_OUT_DIR / "ngo_graph.gexf").write_text("\n".join(lines), encoding="utf-8")
 
 
-def write_review_outputs(ngos: pd.DataFrame, edges: pd.DataFrame, coverage: pd.DataFrame) -> None:
+def write_review_outputs(
+    ngos: pd.DataFrame,
+    edges: pd.DataFrame,
+    coverage: pd.DataFrame,
+    asset_edges: pd.DataFrame | None = None,
+    fiscal_edges: pd.DataFrame | None = None,
+) -> None:
     review = ngos[ngos["review_status"].isin(["needs_review", "lead_only"])] if not ngos.empty else pd.DataFrame(columns=NGO_COLUMNS)
     review.to_csv(NGO_OUT_DIR / "ngo_review_queue.csv", index=False)
     duplicates = ngos[ngos.duplicated(["legal_name", "municipality"], keep=False)] if not ngos.empty else pd.DataFrame(columns=NGO_COLUMNS)
     duplicates.to_csv(NGO_OUT_DIR / "ngo_duplicate_candidates.csv", index=False)
     disaster = edges[edges.apply(lambda r: bool(re.search(r"FEMA|HUD|CDBG|DISASTER|RECOVERY|HURRICANE|MARIA|COR3", " ".join(str(x) for x in r.values), re.I)), axis=1)] if not edges.empty else pd.DataFrame(columns=FUNDING_EDGE_COLUMNS)
     disaster.to_csv(NGO_OUT_DIR / "ngo_disaster_recovery_exposure.csv", index=False)
-    (NGO_OUT_DIR / "ngo_asset_edges.csv").write_text("ngo_id,asset_id,municipality,relationship_type,evidence_class,confidence\n", encoding="utf-8")
-    (NGO_OUT_DIR / "ngo_fiscal_sponsor_edges.csv").write_text("sponsor_ngo_id,sponsored_entity,relationship_type,source_file,confidence\n", encoding="utf-8")
+    if asset_edges is None:
+        asset_edges = pd.DataFrame(columns=ASSET_EDGE_COLUMNS)
+    if fiscal_edges is None:
+        fiscal_edges = pd.DataFrame(columns=FISCAL_SPONSOR_EDGE_COLUMNS)
+    asset_edges.to_csv(NGO_OUT_DIR / "ngo_asset_edges.csv", index=False)
+    fiscal_edges.to_csv(NGO_OUT_DIR / "ngo_fiscal_sponsor_edges.csv", index=False)
+    pq_write(asset_edges, NGO_OUT_DIR / "ngo_asset_edges.parquet")
+    pq_write(fiscal_edges, NGO_OUT_DIR / "ngo_fiscal_sponsor_edges.parquet")
     report = [
         "# NGO Integration Coverage Report",
         "",
@@ -642,16 +863,23 @@ def run_pipeline() -> dict[str, object]:
     records = ingest_pr_state_registry(records)
     ngos = consolidate_ngos(records)
     funding_edges = join_usaspending_awards_subawards(ngos)
-    coverage = build_78_municipality_coverage_matrix(ngos, funding_edges)
+    asset_edges = detect_asset_edges(ngos, funding_edges)
+    fiscal_edges = detect_fiscal_sponsor_edges(records)
+    coverage = build_78_municipality_coverage_matrix(ngos, funding_edges, asset_edges)
     ngos.to_csv(NGO_OUT_DIR / "ngos_master.csv", index=False)
     funding_edges.to_csv(NGO_OUT_DIR / "ngo_funding_edges.csv", index=False)
     coverage.to_csv(NGO_OUT_DIR / "ngo_municipal_coverage.csv", index=False)
+    pq_write(ngos, NGO_OUT_DIR / "ngos_master.parquet")
+    pq_write(funding_edges, NGO_OUT_DIR / "ngo_funding_edges.parquet")
+    pq_write(coverage, NGO_OUT_DIR / "ngo_municipal_coverage.parquet")
     export_alias_registry(ngos)
     export_graph_layer(ngos, funding_edges)
-    write_review_outputs(ngos, funding_edges, coverage)
+    write_review_outputs(ngos, funding_edges, coverage, asset_edges, fiscal_edges)
     summary = {
         "ngos": int(len(ngos)),
         "funding_edges": int(len(funding_edges)),
+        "asset_edges": int(len(asset_edges)),
+        "fiscal_sponsor_edges": int(len(fiscal_edges)),
         "municipalities": int(coverage["municipality"].nunique()),
         "output_dir": str(NGO_OUT_DIR.relative_to(ROOT)),
         "status": "pass" if coverage["municipality"].nunique() == 78 else "fail",

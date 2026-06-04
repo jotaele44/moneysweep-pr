@@ -228,6 +228,55 @@ def _build_edges(root: Path) -> tuple[dict, list]:
                 add(edges, nodes, issuer, asset, "funds_asset", par,
                     path.name, cusip, 0.65, "bond_issuer", "asset")
 
+    # NGO / OSFL layer: funder → NGO, NGO → municipality, NGO → asset, sponsor → NGO.
+    # Confidence in the NGO outputs is on a 0-100 scale; rescale to 0-1 here.
+    ngo_dir = proc / "ngos"
+    for row in _read_csv(ngo_dir / "ngo_funding_edges.csv"):
+        funder = _first(row, ["source_entity", "funding_agency"])
+        ngo_id = _first(row, ["target_ngo_id"])
+        ngo_name = _first(row, ["target_name"])
+        award_id = _first(row, ["award_id", "edge_id"])
+        amt = _money(row)
+        muni = _first(row, MUNICIPALITY_FIELDS)
+        try:
+            conf = min(0.95, float(row.get("confidence") or 0) / 100.0)
+        except Exception:
+            conf = 0.45
+        if ngo_id and ngo_name:
+            nodes.setdefault(ngo_id, {"id": ngo_id, "label": ngo_name, "node_type": "ngo"})
+        if funder and ngo_id:
+            add(edges, nodes, funder, ngo_id, "funds_ngo", amt,
+                "ngo_funding_edges.csv", award_id, conf, "agency", "ngo")
+        if ngo_id and muni:
+            add(edges, nodes, ngo_id, muni, "located_in", 1.0,
+                "ngo_funding_edges.csv", award_id, 0.60, "ngo", "municipality")
+
+    for row in _read_csv(ngo_dir / "ngo_asset_edges.csv"):
+        ngo_id = _first(row, ["ngo_id"])
+        asset = _first(row, ["asset_id"])
+        muni = _first(row, MUNICIPALITY_FIELDS)
+        try:
+            conf = min(0.95, float(row.get("confidence") or 0) / 100.0)
+        except Exception:
+            conf = 0.55
+        if ngo_id and asset:
+            add(edges, nodes, ngo_id, asset, "executes_project", 1.0,
+                "ngo_asset_edges.csv", asset, conf, "ngo", "asset")
+        if asset and muni:
+            add(edges, nodes, asset, muni, "located_in", 1.0,
+                "ngo_asset_edges.csv", asset, 0.60, "asset", "municipality")
+
+    for row in _read_csv(ngo_dir / "ngo_fiscal_sponsor_edges.csv"):
+        sponsor = _first(row, ["sponsor_ngo_id"])
+        sponsored = _first(row, ["sponsored_entity"])
+        try:
+            conf = min(0.95, float(row.get("confidence") or 0) / 100.0)
+        except Exception:
+            conf = 0.70
+        if sponsor and sponsored:
+            add(edges, nodes, sponsor, sponsored, "fiscal_sponsor_of", 1.0,
+                "ngo_fiscal_sponsor_edges.csv", "", conf, "ngo", "ngo")
+
     return nodes, edges
 
 
