@@ -70,7 +70,14 @@ Schema files:
 data/staging/processed/ngos/schema/ngos_master.schema.json
 data/staging/processed/ngos/schema/ngo_funding_edges.schema.json
 data/staging/processed/ngos/schema/ngo_municipal_coverage.schema.json
+data/staging/processed/ngos/schema/ngo_asset_edges.schema.json
+data/staging/processed/ngos/schema/ngo_fiscal_sponsor_edges.schema.json
 ```
+
+Tabular outputs are additionally written as Parquet (with automatic CSV fallback
+when `pyarrow` is unavailable), e.g. `ngos_master.parquet`,
+`ngo_funding_edges.parquet`, `ngo_asset_edges.parquet`,
+`ngo_fiscal_sponsor_edges.parquet`, `ngo_municipal_coverage.parquet`.
 
 ## Coverage Logic
 
@@ -96,6 +103,8 @@ Coverage is therefore not silently assumed. Missing or weakly supported municipa
 | PR status present and not `unknown` | +10 |
 | Municipality detected | +10 |
 | Legal name present | +10 |
+| Canonical IRS source (EO BMF / TEOS) | +15 |
+| Canonical PR state registry source | +10 |
 
 Current bands:
 
@@ -107,7 +116,11 @@ Current bands:
 | 40-59 | `needs_review` |
 | <40 | `lead_only` |
 
-Known calibration issue: IRS EO BMF-only records with EIN + IRS active + municipality + legal name score around 60, which is technically valid but conservative. Future improvement should add an explicit canonical-source bonus so IRS BMF / TEOS / PR registry rows score closer to 75-90 when source provenance is strong.
+An explicit **canonical-source bonus** lifts rows backed by authoritative
+provenance: IRS EO BMF / TEOS rows receive +15 and PR state-registry rows +10. As
+a result, an IRS EO BMF-only record with EIN + IRS active + municipality + legal
+name now scores ~75 (`strong_probable`) rather than the previously conservative
+~60, while rows backed only by weaker sources are unaffected.
 
 ## Entity Resolution Rules Implemented
 
@@ -154,14 +167,36 @@ Minimum current gates:
 | Duplicate queue | Implemented |
 | Disaster-recovery exposure extract | Implemented |
 | GEXF graph export | Implemented |
-| Asset edges | Stubbed output only |
-| Fiscal sponsor edges | Stubbed output only |
-| Live source downloaders | Not implemented |
-| Parquet exports | Not implemented |
-| README integration | Not implemented |
+| Asset edges | Implemented |
+| Fiscal sponsor edges | Implemented |
+| Parquet exports | Implemented |
+| README integration | Implemented |
+| Influence-graph merge | Implemented |
+| Live source downloaders | Deferred (layer runs on dropped-in files; bulk IRS/TEOS/PR-registry downloaders are a separate manual-export concern) |
+
+## Asset Edges
+
+`ngo_asset_edges.csv` links funded NGOs to infrastructure assets/projects. An NGO
+is asset-linked when one of its funding edges resolves to a known asset/project id
+found in the award sources, the execution-chain master, or the FEMA PA master —
+either by award id (`evidence_class=award_id_match`, confidence 80) or by
+normalized recipient name + municipality (`evidence_class=name_muni_match`,
+confidence 55). The 78-municipality matrix's `ngo_count_asset_linked` is populated
+from these edges.
+
+## Fiscal Sponsor Edges
+
+`ngo_fiscal_sponsor_edges.csv` captures umbrella relationships from two signals:
+
+1. **Declared overrides** — a `fiscal_sponsor` / `sponsored_by` column on a
+   dropped-in row (`relationship_type=declared_fiscal_sponsor`, confidence 80).
+2. **IRS group exemptions** — organizations sharing a Group Exemption Number (GEN)
+   form a group ruling; the central organization (affiliation code 6) is emitted
+   as the sponsor of its subordinates (affiliation code 9)
+   (`relationship_type=group_exemption`, confidence 70).
 
 ## Recommended Next Vector
 
 ```text
-EXECUTE_NEXT_VECTOR: RUN_TARGETED_TESTS → FIX_RUNTIME_ERRORS → ADD_CANONICAL_SOURCE_BONUS → ADD_PARQUET_EXPORTS → ADD_README_CLI_REFERENCE → IMPLEMENT_FISCAL_SPONSOR_EDGE_DETECTION → IMPLEMENT_ASSET_EDGE_LINKING → MERGE_NGO_GRAPH_INTO_INFLUENCE_GRAPH
+EXECUTE_NEXT_VECTOR: STAGE_IRS_TEOS_PR_REGISTRY_BULK_DROPS → BACKFILL_GROUP_EXEMPTION_AND_AFFILIATION_FIELDS → REVIEW_ASSET_EDGE_NAME_MATCHES
 ```
