@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PR Municipality Crosswalk Row",
+  "type": "object",
+  "required": [
+    "municipality_geoid",
+    "municipality_code",
+    "municipality_name",
+    "municipality_name_canonical"
+  ],
+  "properties": {
+    "municipality_geoid": {"type": "string", "pattern": "^72[0-9]{3}$"},
+    "municipality_code": {"type": "string", "pattern": "^72[0-9]{3}$"},
+    "municipality_name": {"type": "string", "minLength": 1},
+    "municipality_name_ascii": {"type": "string", "minLength": 1},
+    "municipality_name_canonical": {"type": "string", "minLength": 1},
+    "municipality_name_es": {"type": "string"},
+    "aliases": {"type": "string"}
+  },
+  "additionalProperties": true
+}

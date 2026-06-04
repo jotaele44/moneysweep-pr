@@ -1,0 +1,13 @@
+{
+  "producer_script": "scripts/build_geo_reason_codes.py",
+  "producer_phase": "TOP_FORM_GEO_REASON_CODES",
+  "schema": "schemas/geo_reason_codes.schema.json",
+  "source_inputs": [
+    "scripts/run_contract_finance_geo_reasoning.py"
+  ],
+  "output": "data/reference/geo_reason_codes.csv",
+  "row_count": 19,
+  "reason_count": 11,
+  "jurisdiction_class_count": 8,
+  "generated_at": "2026-06-04T21:36:19.180212+00:00"
+}

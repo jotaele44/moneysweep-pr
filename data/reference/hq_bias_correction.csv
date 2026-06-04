@@ -1,0 +1,5 @@
+aspect,value,description
+flag_column,hq_bias_flag,"Boolean row column set true when the location came only from a headquarters, not a place of performance."
+reason_code,headquarters_only,geo_resolution_reason emitted when only an HQ location was available.
+jurisdiction_class,HEADQUARTERS_ONLY,"Jurisdiction bucket for HQ-only rows; treated as unknown jurisdiction, not as a municipio of performance."
+place_precedence,place_of_performance_exact>project_municipality_match>recipient_municipality_match>municipality_name_only>headquarters_only,Resolution precedence: a real place-of-performance/project/recipient municipio always overrides a headquarters location.

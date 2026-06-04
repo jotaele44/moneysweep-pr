@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HQ Bias Correction Contract Row",
+  "type": "object",
+  "required": ["aspect", "value", "description"],
+  "properties": {
+    "aspect": {
+      "type": "string",
+      "enum": ["flag_column", "reason_code", "jurisdiction_class", "place_precedence"]
+    },
+    "value": {"type": "string", "minLength": 1},
+    "description": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": true
+}

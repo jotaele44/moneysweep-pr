@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Geo Resolution Reason Code Row",
+  "type": "object",
+  "required": ["code", "kind", "description"],
+  "properties": {
+    "code": {"type": "string", "minLength": 1},
+    "kind": {
+      "type": "string",
+      "enum": ["geo_resolution_reason", "jurisdiction_class"]
+    },
+    "is_unknown": {"type": "string", "enum": ["true", "false"]},
+    "description": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": true
+}
