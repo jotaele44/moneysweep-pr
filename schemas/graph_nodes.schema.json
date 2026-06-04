@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Graph Node Row",
+  "type": "object",
+  "required": [
+    "node_id",
+    "node_type",
+    "canonical_name",
+    "jurisdiction",
+    "source_id",
+    "evidence_tier",
+    "confidence"
+  ],
+  "properties": {
+    "node_id": {
+      "type": "string",
+      "pattern": "^ENT_(ORG|PERSON|AGENCY|MUNI|PROJECT|CONTRACT|DEBT|PROPERTY|ASSET)_[A-Za-z0-9_.:-]+$"
+    },
+    "node_type": {
+      "type": "string",
+      "enum": ["organization", "government_agency", "municipality", "person"]
+    },
+    "canonical_name": {"type": "string", "minLength": 1},
+    "jurisdiction": {"type": "string", "minLength": 1},
+    "source_id": {"type": "string", "minLength": 1},
+    "evidence_tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}
