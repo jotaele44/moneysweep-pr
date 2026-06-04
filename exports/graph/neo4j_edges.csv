@@ -1,0 +1,31 @@
+:START_ID,:END_ID,:TYPE,edge_id,source_id,evidence_tier,confidence:float,notes
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_1c1ee3c0f0c85d23,PARENT_OF,EDGE_5e0807bd79db102d,entity_parent_map,T2,0.9,AAFAF is a public corporation and instrumentality of the Commonwealth acting as fiscal agent and financial advisor.
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_8d511bc1aaa048d4,PARENT_OF,EDGE_fee68ca8aa5cec5c,entity_parent_map,T2,0.9,The P3 Authority is an instrumentality of the Commonwealth that structures public-private partnerships.
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_6c1d858c1babe390,PARENT_OF,EDGE_3b4908e0f4bddc37,entity_parent_map,T2,0.9,PREPA is a public corporation and instrumentality of the Commonwealth.
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_c5fb8a7f44e8ff18,PARENT_OF,EDGE_16706f1ad20154c5,entity_parent_map,T2,0.9,PRASA is a public corporation and instrumentality of the Commonwealth.
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_b182f85acf46f69b,PARENT_OF,EDGE_d294dc076a50c9bd,entity_parent_map,T2,0.9,HTA is a public corporation and instrumentality of the Commonwealth.
+ENT_AGENCY_125b538f289a4708,ENT_ORG_5204a3d8f84bbfcd,PARENT_OF,EDGE_c70aff1d55b42a98,entity_parent_map,T2,0.9,COFINA is a government-owned corporation and instrumentality of the Commonwealth.
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_d363e4ddf2ce6a5d,PARENT_OF,EDGE_b9642a2b722875b9,entity_parent_map,T2,0.9,GDB is a public corporation and instrumentality of the Commonwealth.
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_67880db21dd281cd,PARENT_OF,EDGE_39fcfc619974d146,entity_parent_map,T2,0.9,DDEC is an executive department and instrumentality of the Commonwealth.
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_42ffd9ad9ab45e6a,PARENT_OF,EDGE_0f40cafd9bc1beef,entity_parent_map,T2,0.9,PBA is a public corporation and instrumentality of the Commonwealth.
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_7cf79ff780fb8279,PARENT_OF,EDGE_c35f8bd646630ed1,entity_parent_map,T2,0.9,PRIFA is a public corporation and instrumentality of the Commonwealth.
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_c6aa8887d7248228,PARENT_OF,EDGE_df44635848454e22,entity_parent_map,T2,0.9,PRHFA is a public corporation and instrumentality of the Commonwealth.
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_5f99300da364ea64,PARENT_OF,EDGE_7f9dc33ea3f0c922,entity_parent_map,T2,0.9,PRIDCO is a public corporation and instrumentality of the Commonwealth.
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_cc41784f4b40b6ff,PARENT_OF,EDGE_bca7cd36cc727d5d,entity_parent_map,T2,0.9,UPR is a public corporation and instrumentality of the Commonwealth.
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_2c16f9ae54df7e1e,PARENT_OF,EDGE_d3f6e423294a5b38,entity_parent_map,T2,0.9,CCDA is a public corporation and instrumentality of the Commonwealth.
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_efcec09764306ade,PARENT_OF,EDGE_911df2b7cecbbf80,entity_parent_map,T2,0.9,The Ports Authority is a public corporation and instrumentality of the Commonwealth.
+ENT_AGENCY_125b538f289a4708,ENT_ORG_b14376987d82d5ee,PARENT_OF,EDGE_0687fbd57fea5ea8,entity_parent_map,T2,0.9,PRPFC is a government-owned corporation and instrumentality of the Commonwealth.
+ENT_AGENCY_125b538f289a4708,ENT_AGENCY_e73c9879d715653a,PARENT_OF,EDGE_3a54a31bf2594d5a,entity_parent_map,T2,0.9,The Municipal Finance Agency is a public corporation and instrumentality of the Commonwealth.
+ENT_AGENCY_6c1d858c1babe390,ENT_ORG_299e165490469537,RELATED_TO,EDGE_143a40873a65d02e,entity_parent_map,T2,0.85,P3_OPERATOR_OF: LUMA Energy operates and controls the PREPA transmission and distribution system under a public-private partnership agreement.
+ENT_AGENCY_6c1d858c1babe390,ENT_ORG_0f8f1789b2c687ed,RELATED_TO,EDGE_8ff5d3e504dc52ca,entity_parent_map,T2,0.85,P3_OPERATOR_OF: Genera PR operates and controls the legacy PREPA power-generation fleet under a public-private partnership agreement.
+ENT_AGENCY_b182f85acf46f69b,ENT_ORG_3719113e87688e83,RELATED_TO,EDGE_2e7457827a037fda,entity_parent_map,T2,0.85,CONCESSION_OPERATOR_OF: Autopistas Metropolitanas operates the PR-22 and PR-5 toll roads under a long-term concession agreement with the HTA.
+ENT_ORG_36443c30dc526c13,ENT_ORG_0f8f1789b2c687ed,REGISTERED_LOBBYING_FOR,EDGE_df990df782bd86b9,canonical_v1_lobbying_records,T3,0.6,lobbyist=LGA Strategies; client=Genera PR
+ENT_ORG_36443c30dc526c13,ENT_ORG_30007ca84af23b8d,REGISTERED_LOBBYING_FOR,EDGE_316420dbb3248aa7,canonical_v1_lobbying_records,T3,0.6,lobbyist=LGA Strategies; client=Puerto Rico Energy LLC
+ENT_ORG_a034a2e43d67206d,ENT_ORG_21371fab1b27e788,REGISTERED_LOBBYING_FOR,EDGE_6b29cfe0e2e43534,canonical_v1_lobbying_records,T3,0.6,lobbyist=The RCL Group; client=Arcadis Caribe
+ENT_PERSON_ae8093f10cb9500b,ENT_AGENCY_3d2fd8a05e1703b2,BOARD_MEMBER_OF,EDGE_60e0fe6521f9cdc4,canonical_v1_roles,T2,0.85,Chair (former)
+ENT_PERSON_fe6141b802c515fa,ENT_AGENCY_3d2fd8a05e1703b2,BOARD_MEMBER_OF,EDGE_8127ac68cd0de49a,canonical_v1_roles,T2,0.85,Member
+ENT_PERSON_8bda3b4b5c15b2ee,ENT_AGENCY_3d2fd8a05e1703b2,BOARD_MEMBER_OF,EDGE_e718b6b269b74b45,canonical_v1_roles,T2,0.85,Member
+ENT_PERSON_a35cecb3df82d944,ENT_AGENCY_3d2fd8a05e1703b2,BOARD_MEMBER_OF,EDGE_3d3b8f02e30cd3bf,canonical_v1_roles,T2,0.85,Member
+ENT_PERSON_44d7c54317afb0bf,ENT_AGENCY_3d2fd8a05e1703b2,BOARD_MEMBER_OF,EDGE_fed891764d89a14a,canonical_v1_roles,T2,0.85,Member
+ENT_PERSON_d49c52440c3b0fcc,ENT_AGENCY_3d2fd8a05e1703b2,BOARD_MEMBER_OF,EDGE_349ade6fdb7b6f88,canonical_v1_roles,T2,0.85,Member
+ENT_PERSON_d932762e92b2850d,ENT_AGENCY_3d2fd8a05e1703b2,BOARD_MEMBER_OF,EDGE_59652d7062b0c27f,canonical_v1_roles,T2,0.85,Member

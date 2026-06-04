@@ -1,0 +1,165 @@
+node_id:ID,:LABEL,canonical_name,jurisdiction,source_id,evidence_tier,confidence:float,notes
+ENT_AGENCY_125b538f289a4708,government_agency,Commonwealth of Puerto Rico,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_3d2fd8a05e1703b2,government_agency,Financial Oversight and Management Board for Puerto Rico,US,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_1c1ee3c0f0c85d23,government_agency,Puerto Rico Fiscal Agency and Financial Advisory Authority,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_8d511bc1aaa048d4,government_agency,Puerto Rico Public-Private Partnerships Authority,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_6c1d858c1babe390,government_agency,Puerto Rico Electric Power Authority,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_c5fb8a7f44e8ff18,government_agency,Puerto Rico Aqueduct and Sewer Authority,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_b182f85acf46f69b,government_agency,Puerto Rico Highways and Transportation Authority,PR,pr_public_money_entities,T1,0.95,
+ENT_ORG_5204a3d8f84bbfcd,organization,Puerto Rico Sales Tax Financing Corporation,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_d363e4ddf2ce6a5d,government_agency,Government Development Bank for Puerto Rico,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_67880db21dd281cd,government_agency,Puerto Rico Department of Economic Development and Commerce,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_42ffd9ad9ab45e6a,government_agency,Puerto Rico Public Buildings Authority,PR,pr_public_money_entities,T1,0.95,
+ENT_ORG_299e165490469537,organization,LUMA Energy,PR,pr_public_money_entities,T1,0.95,
+ENT_ORG_0f8f1789b2c687ed,organization,Genera PR,PR,pr_public_money_entities,T1,0.95,
+ENT_ORG_3719113e87688e83,organization,Autopistas Metropolitanas de Puerto Rico,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_7cf79ff780fb8279,government_agency,Puerto Rico Infrastructure Financing Authority,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_c6aa8887d7248228,government_agency,Puerto Rico Housing Finance Authority,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_5f99300da364ea64,government_agency,Puerto Rico Industrial Development Company,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_cc41784f4b40b6ff,government_agency,University of Puerto Rico,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_2c16f9ae54df7e1e,government_agency,Puerto Rico Convention Center District Authority,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_efcec09764306ade,government_agency,Puerto Rico Ports Authority,PR,pr_public_money_entities,T1,0.95,
+ENT_ORG_b14376987d82d5ee,organization,Puerto Rico Public Finance Corporation,PR,pr_public_money_entities,T1,0.95,
+ENT_AGENCY_e73c9879d715653a,government_agency,Puerto Rico Municipal Finance Agency,PR,pr_public_money_entities,T1,0.95,
+ENT_ORG_36443c30dc526c13,organization,LGA Strategies,PR,pr_public_money_entities,T1,0.95,
+ENT_ORG_a034a2e43d67206d,organization,The RCL Group,PR,pr_public_money_entities,T1,0.95,
+ENT_ORG_30007ca84af23b8d,organization,Puerto Rico Energy LLC,PR,pr_public_money_entities,T1,0.95,
+ENT_ORG_21371fab1b27e788,organization,Arcadis Caribe,PR,pr_public_money_entities,T1,0.95,
+ENT_MUNI_72001,municipality,Adjuntas,PR,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72003,municipality,Aguada,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72005,municipality,Aguadilla,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72007,municipality,Aguas Buenas,PR,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72009,municipality,Aibonito,PR,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72011,municipality,Anasco,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72013,municipality,Arecibo,PR,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72015,municipality,Arroyo,PR,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72017,municipality,Barceloneta,PR,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72019,municipality,Barranquitas,PR,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72021,municipality,Bayamon,PR,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72023,municipality,Cabo Rojo,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72025,municipality,Caguas,PR,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72027,municipality,Camuy,PR,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72029,municipality,Canovanas,PR,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72031,municipality,Carolina,PR,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72033,municipality,Catano,PR,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72035,municipality,Cayey,PR,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72037,municipality,Ceiba,PR,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72039,municipality,Ciales,PR,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72041,municipality,Cidra,PR,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72043,municipality,Coamo,PR,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72045,municipality,Comerio,PR,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72047,municipality,Corozal,PR,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72049,municipality,Culebra,PR,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72051,municipality,Dorado,PR,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72053,municipality,Fajardo,PR,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72054,municipality,Florida,PR,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72055,municipality,Guanica,PR,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72057,municipality,Guayama,PR,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72059,municipality,Guayanilla,PR,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72061,municipality,Guaynabo,PR,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72063,municipality,Gurabo,PR,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72065,municipality,Hatillo,PR,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72067,municipality,Hormigueros,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72069,municipality,Humacao,PR,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72071,municipality,Isabela,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72073,municipality,Jayuya,PR,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72075,municipality,Juana Diaz,PR,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72077,municipality,Juncos,PR,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72079,municipality,Lajas,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72081,municipality,Lares,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72083,municipality,Las Marias,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72085,municipality,Las Piedras,PR,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72087,municipality,Loiza,PR,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72089,municipality,Luquillo,PR,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72091,municipality,Manati,PR,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72093,municipality,Maricao,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72095,municipality,Maunabo,PR,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72097,municipality,Mayaguez,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72099,municipality,Moca,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72101,municipality,Morovis,PR,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72103,municipality,Naguabo,PR,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72105,municipality,Naranjito,PR,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72107,municipality,Orocovis,PR,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72109,municipality,Patillas,PR,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72111,municipality,Penuelas,PR,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72113,municipality,Ponce,PR,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72115,municipality,Quebradillas,PR,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72117,municipality,Rincon,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72119,municipality,Rio Grande,PR,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72121,municipality,Sabana Grande,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72123,municipality,Salinas,PR,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72125,municipality,San German,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72127,municipality,San Juan,PR,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72129,municipality,San Lorenzo,PR,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72131,municipality,San Sebastian,PR,pr_municipalities,T1,0.95,region=west
+ENT_MUNI_72133,municipality,Santa Isabel,PR,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72135,municipality,Toa Alta,PR,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72137,municipality,Toa Baja,PR,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72139,municipality,Trujillo Alto,PR,pr_municipalities,T1,0.95,region=metro
+ENT_MUNI_72141,municipality,Utuado,PR,pr_municipalities,T1,0.95,region=central
+ENT_MUNI_72143,municipality,Vega Alta,PR,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72145,municipality,Vega Baja,PR,pr_municipalities,T1,0.95,region=north
+ENT_MUNI_72147,municipality,Vieques,PR,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72149,municipality,Villalba,PR,pr_municipalities,T1,0.95,region=south
+ENT_MUNI_72151,municipality,Yabucoa,PR,pr_municipalities,T1,0.95,region=east
+ENT_MUNI_72153,municipality,Yauco,PR,pr_municipalities,T1,0.95,region=south
+ENT_PERSON_a89bb0a6e1dc2ead,person,Alejandro García Padilla,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_d49c52440c3b0fcc,person,Ana Matosantos,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_fe6141b802c515fa,person,Andrew Biggs,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_f0188290b19a29f4,person,Andrew N. Rosenberg,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_835ab43bfd838dc3,person,Andrew Rosenberg,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_2f80fed2bcdf8335,person,Aníbal Acevedo Vilá,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_217d43d36b0b0144,person,Antonio L. Medina,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_a35cecb3df82d944,person,Arthur Gonzalez,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_60199ff85cc1996f,person,Betty Rosa,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_656bae285db2e7cd,person,Brian Rosen,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_00b24791faec5525,person,Bruce Karsh,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_813253a976e98383,person,Cameron McKenzie,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_8bda3b4b5c15b2ee,person,Carlos García,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_8deb3bc24debda01,person,Christian Sobrino,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_d932762e92b2850d,person,David Skeel,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_bf99c391020aed7c,person,Doriel Pagán,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_613d394e04265e46,person,Federico Stubbe,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_35443914de750eeb,person,Fermin Fontanes,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_332832c031efb0ab,person,Francisco J. Domenech,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_d30846d82010402a,person,Howard Marks,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_12aab94c3ff757f4,person,Ivan Báez,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_7e8f75436608b940,person,Jaime El Koury,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_46643ae50692f228,person,Janisse Quiñones,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_a5b69668fded6da2,person,Jenniffer González Colón,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_1264805214368d4f,person,John E. Nixon,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_d07e714899f4c094,person,John J. Rapisardi,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_b8c3af7cce81fcdd,person,John Paulson,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_a4c2c17d33ca9418,person,John Rapisardi,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_4aa5cea3c114182d,person,Jorge Hernández,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_ae8093f10cb9500b,person,José B. Carrión III,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_44d7c54317afb0bf,person,José González,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_ac8447c1ebd7c13b,person,José Ortiz,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_9e124b2b77d10cc3,person,José R. Pérez-Riera,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_907296dd99e2bf13,person,Josue Colón,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_571734a5af914837,person,Juan Sabater,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_c7fecfd48a82ab0a,person,Juan Saca,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_090d91b5e053d5aa,person,Justin Peterson,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_81f9169b90872a8d,person,Laura Taylor Swain,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_18b2039c27dfc985,person,Leon Cooperman,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_3db224357139b5de,person,Luc Despins,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_5d0c409febd51ae5,person,Luis Fortuño,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_0cd1fa6213e3794a,person,Luis Ubiñas,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_df7bfebca478a14e,person,Manuel Laboy,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_5c5a6630b6036e88,person,Marc Lasry,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_365ee146683a6115,person,Mark Brodsky,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_84b42d3e4c6ec57e,person,Martin Bienenstock,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_768140b5fa96c154,person,Natalie Jaresko,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_1a0a11709659afd0,person,Nicholas Prouty,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_58d71c508a2bba6b,person,Omar Marrero,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_448daf3be1802601,person,Paul Singer,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_9be24fcf5b9cb4ee,person,Pedro Pierluisi,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_c19b23e5ca5ef74b,person,Peter Friedman,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_e571c45ee3aff079,person,Ricardo Rosselló,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_f6dc4e3d66a1518d,person,Robert Mujica,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_9a3b4ceb64e03ead,person,Seth Klarman,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_6c54762fbce7bfba,person,Steven Tananbaum,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_169b72f0a9766e6d,person,Susheel Kirpalani,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_7844ebbba9a82994,person,Wanda Vázquez Garced,PR,canonical_v1_people,T2,0.85,
+ENT_PERSON_78b47ca3600420ce,person,Wayne Stensby,PR,canonical_v1_people,T2,0.95,
+ENT_PERSON_46b2e7029e5a6b97,person,Wes Edens,PR,canonical_v1_people,T2,0.85,
