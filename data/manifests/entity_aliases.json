@@ -1,0 +1,13 @@
+{
+  "producer_script": "scripts/build_entity_aliases.py",
+  "producer_phase": "TOP_FORM_ENTITY_ALIASES",
+  "schema": "schemas/entity_aliases.schema.json",
+  "source_inputs": [
+    "data/reference/entity_master.csv",
+    "data/reference/agency_master.csv"
+  ],
+  "output": "data/reference/entity_aliases.csv",
+  "row_count": 224,
+  "distinct_entities": 104,
+  "generated_at": "2026-06-04T16:18:47.268494+00:00"
+}
