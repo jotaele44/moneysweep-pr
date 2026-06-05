@@ -1,0 +1,15 @@
+{
+  "producer_script": "scripts/build_foia_letters.py",
+  "producer_phase": "TOP_FORM_FOIA_LETTERS",
+  "source_inputs": [
+    "reports/foia_priority_queue.csv",
+    "data/reference/foia_requester.json"
+  ],
+  "output": "docs/foia_letters",
+  "letter_count": 9,
+  "jurisdictions": [
+    "PR",
+    "US"
+  ],
+  "generated_at": "2026-06-05T14:34:56.534317+00:00"
+}

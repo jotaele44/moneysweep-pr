@@ -42,7 +42,7 @@ OUT = "exports/dashboard/index.html"
 MANIFEST_OUT = "data/manifests/dashboard_explorer.json"
 
 # Markers a valid render must contain (also asserted by the test).
-REQUIRED_MARKERS = ("Contract Sweeper", "id=\"reports\"", "id=\"lineage\"", "id=\"gaps\"", "application/json")
+REQUIRED_MARKERS = ("Contract Sweeper", "id=\"reports\"", "id=\"lineage\"", "id=\"gaps\"", "id=\"letters\"", "application/json")
 
 
 def _read_json(root: Path, rel: str) -> Any:
@@ -73,11 +73,13 @@ def build_data(root: Path | None = None) -> dict[str, Any]:
     root = root or REPO_ROOT
     reports = _read_json(root, ANALYST_REPORTS).get("reports", [])
     lineage = _read_json(root, SOURCE_DRILLDOWN).get("sources", [])
+    letters = [r for r in reports if r.get("gate") == "foia" and r.get("format") == "md"]
     return {
         "title": "Contract Sweeper — Top-Form Explorer",
         "reports": reports,
         "lineage": lineage,
         "gap_summary": _gap_summary(root),
+        "letters": letters,
     }
 
 
@@ -169,11 +171,13 @@ _TEMPLATE = """<!DOCTYPE html>
   <button data-tab="reports" class="active">Reports</button>
   <button data-tab="lineage">Lineage</button>
   <button data-tab="gaps">Gap Matrix</button>
+  <button data-tab="letters">FOIA Letters</button>
 </nav>
 <main>
   <section id="reports" class="active"></section>
   <section id="lineage"></section>
   <section id="gaps"></section>
+  <section id="letters"></section>
 </main>
 <script type="application/json" id="data">__DATA__</script>
 <script>
@@ -235,6 +239,22 @@ _TEMPLATE = """<!DOCTYPE html>
       var tr = el("tr"); tr.appendChild(el("td", esc(r.gate)));
       tr.appendChild(el("td", esc(r.done))); tr.appendChild(el("td", esc(r.total))); return tr;
     }));
+  })();
+
+  // FOIA Letters tab
+  (function(){
+    var rows = DATA.letters || [];
+    var s = document.getElementById("letters");
+    s.appendChild(el("h3", "FOIA / Public-Records Request Letters"));
+    s.appendChild(el("p", '<span class="muted">Per-target populated request letters. To submit: fill requester info in data/reference/foia_requester.json, then run scripts/validate_foia_submission_ready.py.</span>'));
+    var t = table(["Title","Status","Path"], rows, function(r){
+      var tr = el("tr");
+      tr.appendChild(el("td", esc(r.title)));
+      tr.appendChild(el("td", pill(r.status)));
+      tr.appendChild(el("td", '<span class="muted">' + esc(r.path) + '</span>'));
+      return tr;
+    });
+    s.appendChild(t);
   })();
 
   // Tabs
