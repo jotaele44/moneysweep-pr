@@ -1,0 +1,35 @@
+{
+  "producer_script": "scripts/build_analyst_reports_manifest.py",
+  "producer_phase": "TOP_FORM_ANALYST_REPORTS",
+  "schema": "schemas/analyst_reports_manifest.schema.json",
+  "source_inputs": [
+    "data/reference/entity_master.csv",
+    "data/reference/agency_master.csv",
+    "data/reference/person_master.csv",
+    "data/reference/entity_aliases.csv",
+    "data/reference/entity_parent_map.csv",
+    "reports/entity_resolution_review_queue.csv",
+    "data/reference/influence_edges.csv",
+    "data/reference/debt_instruments.csv",
+    "data/reference/creditor_mapping.csv",
+    "data/reference/fiscal_control_events.csv",
+    "data/reference/geo_reason_codes.csv",
+    "data/reference/hq_bias_correction.csv",
+    "exports/gis/layer_manifest.json",
+    "exports/graph/nodes.csv",
+    "exports/graph/edges.csv",
+    "reports/foia_priority_queue.csv",
+    "reports/foia_yield_tracking.csv"
+  ],
+  "output": "exports/reports/analyst_reports_manifest.json",
+  "row_count": 17,
+  "gates": [
+    "debt_fiscal",
+    "entity_master",
+    "foia",
+    "gis",
+    "graph_export",
+    "influence"
+  ],
+  "generated_at": "2026-06-05T13:15:16.506722+00:00"
+}

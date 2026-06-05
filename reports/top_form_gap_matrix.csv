@@ -50,9 +50,9 @@ graph_export,node_schema,done,P0,GPT/Claude,exports/graph/nodes.csv,schemas/grap
 graph_export,edge_schema,done,P0,GPT/Claude,exports/graph/edges.csv,schemas/graph_edges.schema.json locked into scripts/build_graph_export.py (30 edges) + offline tests
 graph_export,neo4j_export,done,P1,GPT/Claude,exports/graph,neo4j_nodes.csv/neo4j_edges.csv with typed import headers from scripts/build_graph_export.py
 graph_export,evidence_confidence,done,P0,GPT/Claude,exports/graph,check() enforces evidence_tier+confidence and node-existence on every edge; covered by tests/test_graph_export.py
-dashboard,analyst_reports,partial,P2,GPT/Claude,reports,standardize report outputs
-dashboard,dashboard_app,missing,P3,GPT/Claude,dashboard,defer until graph and GIS are stable
-dashboard,source_drilldown,missing,P2,GPT/Claude,reports,add source provenance drilldown
+dashboard,analyst_reports,done,P2,GPT/Claude,exports/reports/analyst_reports_manifest.json,scripts/build_analyst_reports_manifest.py catalogs 17 top-form deliverables with live row counts + schema + offline tests
+dashboard,dashboard_app,done,P3,GPT/Claude,exports/dashboard/index.html,scripts/build_dashboard_explorer.py builds a self-contained static HTML explorer (reports/lineage/gap-matrix tabs; no egress) + deterministic snapshot test
+dashboard,source_drilldown,done,P2,GPT/Claude,exports/reports/source_drilldown.json,scripts/build_source_drilldown.py auto-derives a 20-artifact provenance lineage index from data/manifests + offline tests
 foia,foia_tracker,done,P1,GPT/Claude,reports/foia_priority_queue.csv,schemas/foia_request.schema.json + scripts/build_foia_tracker.py (9 requests derived from unmet source gaps; referential integrity vs source_registry_status) + offline tests
 foia,request_templates,done,P2,GPT/Claude,docs/FOIA_REQUEST_TEMPLATES.md,standardized PR Ley 141-2019 + federal 5 U.S.C. 552 request templates keyed to the priority queue + marker test
 foia,yield_tracking,done,P2,GPT/Claude,reports/foia_yield_tracking.csv,scripts/build_foia_yield_tracking.py reconciles each request against its live unresolved gap (9 open) + offline tests

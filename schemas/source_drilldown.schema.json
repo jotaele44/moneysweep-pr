@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Source Provenance Drilldown Entry",
+  "type": "object",
+  "required": [
+    "artifact",
+    "producer_script",
+    "producer_phase",
+    "schemas",
+    "source_inputs"
+  ],
+  "properties": {
+    "artifact": {"type": "string", "minLength": 1},
+    "producer_script": {"type": "string", "minLength": 1},
+    "producer_phase": {"type": "string", "minLength": 1},
+    "phase_label": {"type": "string"},
+    "schemas": {"type": "array", "items": {"type": "string"}},
+    "source_inputs": {"type": "array", "items": {"type": "string"}},
+    "row_count": {"type": "integer", "minimum": 0}
+  },
+  "additionalProperties": true
+}
