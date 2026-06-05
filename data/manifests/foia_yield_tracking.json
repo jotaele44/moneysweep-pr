@@ -1,0 +1,13 @@
+{
+  "producer_script": "scripts/build_foia_yield_tracking.py",
+  "producer_phase": "TOP_FORM_FOIA_YIELD_TRACKING",
+  "schema": "schemas/foia_yield.schema.json",
+  "source_inputs": [
+    "reports/foia_priority_queue.csv",
+    "reports/source_registry_status.csv"
+  ],
+  "output": "reports/foia_yield_tracking.csv",
+  "row_count": 9,
+  "open_gaps": 9,
+  "generated_at": "2026-06-05T13:06:51.582529+00:00"
+}

@@ -34,6 +34,8 @@ STANDARD_PRODUCERS = [
     ("scripts.build_debt_instruments", "OUT"),
     ("scripts.build_creditor_mapping", "OUT"),
     ("scripts.build_fiscal_control_events", "OUT"),
+    ("scripts.build_foia_tracker", "OUT"),
+    ("scripts.build_foia_yield_tracking", "OUT"),
     ("scripts.build_geo_reason_codes", "OUT"),
     ("scripts.build_hq_bias_reference", "OUT"),
 ]

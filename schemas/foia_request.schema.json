@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FOIA / Public-Records Request Row",
+  "type": "object",
+  "required": [
+    "request_id",
+    "target_source_id",
+    "target_agency",
+    "jurisdiction",
+    "record_type",
+    "statute",
+    "request_status",
+    "priority",
+    "rationale",
+    "evidence_tier",
+    "confidence"
+  ],
+  "properties": {
+    "request_id": {"type": "string", "pattern": "^FOIA_[A-Za-z0-9_.:-]+$"},
+    "target_source_id": {"type": "string", "minLength": 1},
+    "target_agency": {"type": "string", "minLength": 1},
+    "jurisdiction": {"type": "string", "enum": ["PR", "US"]},
+    "record_type": {"type": "string", "minLength": 1},
+    "statute": {"type": "string", "minLength": 1},
+    "request_status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "drafted",
+        "submitted",
+        "awaiting_response",
+        "partial_yield",
+        "fulfilled",
+        "denied",
+        "appealed"
+      ]
+    },
+    "priority": {"type": "string", "enum": ["P0", "P1", "P2", "P3"]},
+    "rationale": {"type": "string", "minLength": 1},
+    "evidence_tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}
