@@ -34,6 +34,28 @@ LINKED_DIR     = PROJECT_ROOT / "data" / "linked"
 REVIEW_DIR     = PROJECT_ROOT / "data" / "review"
 PROCESSED_DIR  = PROJECT_ROOT / "data" / "staging" / "processed"
 
+def _municipality_of(v2_row, portal_row):
+    """Resolve the applicant municipality for a linkage row.
+
+    The OpenFEMA v2 feed carries only ``county`` (which in Puerto Rico is the
+    municipio), while the portal 178-PW export carries a distinct
+    ``municipality`` field. Prefer the explicit municipality when a portal match
+    exists, then any municipality on the v2 row, then fall back to county.
+    Previously this column was hard-wired to ``county``, so the real municipality
+    from a matched portal row was discarded.
+    """
+    candidates = (
+        portal_row.get("municipality", "") if portal_row else "",
+        v2_row.get("municipality", ""),
+        v2_row.get("county", ""),
+    )
+    for value in candidates:
+        text = str(value or "").strip()
+        if text:
+            return text
+    return ""
+
+
 LINKAGE_COLUMNS = [
     "pw_number", "disaster_number",
     "applicant_name", "applicant_normalized",
@@ -93,7 +115,7 @@ def _build_linkage(df_v2, df_portal, df_cor3, df_contracts, df_entity, logger):
         for _, r in df_cor3.iterrows():
             key = str(r.get("applicant_normalized", "")).strip()
             if key:
-                cor3_lookup[key] = r
+                cor3_lookup[key] = r.to_dict()
 
     contract_lookup = {}
     name_col = None
@@ -105,7 +127,7 @@ def _build_linkage(df_v2, df_portal, df_cor3, df_contracts, df_entity, logger):
         for _, r in df_contracts.iterrows():
             key = _norm(r.get(name_col, ""))
             if key and key not in contract_lookup:
-                contract_lookup[key] = r
+                contract_lookup[key] = r.to_dict()
 
     entity_lookup = {}
     if not df_entity.empty:
@@ -114,7 +136,7 @@ def _build_linkage(df_v2, df_portal, df_cor3, df_contracts, df_entity, logger):
                 for _, r in df_entity.iterrows():
                     key = str(r.get(col, "")).strip()
                     if key:
-                        entity_lookup[key] = r
+                        entity_lookup[key] = r.to_dict()
                 break
 
     # Build portal lookup by pw_number + disaster_number
@@ -125,7 +147,7 @@ def _build_linkage(df_v2, df_portal, df_cor3, df_contracts, df_entity, logger):
             dis = str(r.get("disaster_number", "")).strip()
             key = (pw, dis)
             if pw:
-                portal_lookup[key] = r
+                portal_lookup[key] = r.to_dict()
 
     # Source: v2 projects
     if not df_v2.empty:
@@ -170,7 +192,7 @@ def _build_linkage(df_v2, df_portal, df_cor3, df_contracts, df_entity, logger):
                 "matched_contract":        matched_contract,
                 "matched_entity":          matched_entity,
                 "county":                  r.get("county", ""),
-                "municipality":            r.get("county", ""),
+                "municipality":            _municipality_of(r, portal_row),
                 "category":                r.get("category", ""),
             })
 
