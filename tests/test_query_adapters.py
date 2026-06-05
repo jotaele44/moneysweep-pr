@@ -901,4 +901,7 @@ def test_highergov_paginates_until_short_page(monkeypatch):
 @pytest.mark.unit
 def test_adapter_registry_size_matches_concrete_count():
     from contract_sweeper.query.adapters import ADAPTER_REGISTRY
-    assert len(ADAPTER_REGISTRY) == 33
+    # 33 original + 5 USASpending agency+CFDA benefit narrows
+    # (va_benefits, wioa, wic, snap_nap, hud_hcv_section8)
+    # + usace_civil_works (sub-agency narrow) + fhlb (FDIC SDI).
+    assert len(ADAPTER_REGISTRY) == 40

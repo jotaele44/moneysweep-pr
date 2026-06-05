@@ -19,6 +19,7 @@ from .cms_socrata import MedicareAdvantageAdapter, MedicarePartsAdapter
 from .entity_base import EntityAdapter
 from .fdic import FDICInstitutionsAdapter
 from .fec import FECPRAdapter
+from .fhlb import FHLBAdvancesAdapter
 from .highergov import HigherGovSupplementalAdapter
 from .lda import LDAAdapter
 from .nih import NIHReporterAdapter
@@ -43,12 +44,18 @@ from .usaspending import (
     EXIMBankAdapter,
     HAFAdapter,
     HHSGrantsAdapter,
+    HUDHCVSection8Adapter,
     OIAGrantsAdapter,
     SLFRFAdapter,
+    SNAPNAPAdapter,
     USAspendingGrantsAdapter,
     USAspendingPrimeAdapter,
     USAspendingSubawardsAdapter,
+    USACECivilWorksAdapter,
     USDAGrantsAdapter,
+    VABenefitsAdapter,
+    WICAdapter,
+    WIOAAdapter,
 )
 
 #: Concrete adapters keyed by their registry source_id.
@@ -79,6 +86,15 @@ ADAPTER_REGISTRY: dict[str, Type[SourceAdapter]] = {
     SLFRFAdapter.source_id: SLFRFAdapter,
     HAFAdapter.source_id: HAFAdapter,
     EXIMBankAdapter.source_id: EXIMBankAdapter,
+    # USAspending agency+CFDA narrows (benefit programs)
+    VABenefitsAdapter.source_id: VABenefitsAdapter,
+    WIOAAdapter.source_id: WIOAAdapter,
+    WICAdapter.source_id: WICAdapter,
+    SNAPNAPAdapter.source_id: SNAPNAPAdapter,
+    HUDHCVSection8Adapter.source_id: HUDHCVSection8Adapter,
+    # USAspending sub-agency narrow + FDIC SDI
+    USACECivilWorksAdapter.source_id: USACECivilWorksAdapter,
+    FHLBAdvancesAdapter.source_id: FHLBAdvancesAdapter,
     # New distinct-API adapters
     FDICInstitutionsAdapter.source_id: FDICInstitutionsAdapter,
     NonprofitsIRS990Adapter.source_id: NonprofitsIRS990Adapter,
