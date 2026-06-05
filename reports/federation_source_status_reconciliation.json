@@ -1,0 +1,39 @@
+{
+  "schema_version": "federation_source_status_reconciliation_v1",
+  "active_vector": "CONTRACT_SWEEPER_FEDERATION_READINESS_AUDIT",
+  "reconciled_at": "2026-06-05",
+  "status": "CONTROL_PLANE_RECONCILED",
+  "canonical_source_count": 84,
+  "source_count_file": "reports/materialization_readiness.json",
+  "automatable_total": 54,
+  "automatable_ready": 54,
+  "queued_excluded_total": 30,
+  "queued_excluded": {
+    "manual_export": 10,
+    "scraper_needed": 15,
+    "semantic_duplicate": 3,
+    "deferred_stub": 2,
+    "broken_producer": 0
+  },
+  "runtime_required_keys": [
+    "FEC_API_KEY",
+    "HIGHERGOV_API_KEY",
+    "LDA_API_KEY",
+    "OPENCORPORATES_API_TOKEN",
+    "SAM_API_KEY"
+  ],
+  "historical_drift_notes": [
+    "Older status text may still reference 82 sources. Federation readers must use the current 84-source materialization readiness file.",
+    "Older next-action text may describe a stale queued breakdown. Federation readers must use the queued_excluded object in this file."
+  ],
+  "federation_gate": {
+    "ready_for_hub_discovery": true,
+    "ready_for_live_execution": false,
+    "live_execution_blockers": [
+      "Tranche B manual ingestion not materialized",
+      "Scraper-needed source queue not resolved",
+      "Runtime keys are local operator requirements",
+      "Strict preflight must pass before producer execution"
+    ]
+  }
+}
