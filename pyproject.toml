@@ -1,0 +1,13 @@
+[tool.mypy]
+# Lenient, gradually-typed baseline. Type checking runs report-only in CI
+# (see .github/workflows/mypy.yml) so it surfaces issues without blocking merges.
+# Tighten incrementally (drop ignore_missing_imports, add modules to strict) as
+# annotations land.
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = false
+warn_redundant_casts = true
+no_implicit_optional = true
+# Pipeline/CLI scripts are not yet annotated; focus checking on the package.
+files = ["contract_sweeper"]
+exclude = "(^archive/|^scripts/|tests/)"
