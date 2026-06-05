@@ -53,9 +53,9 @@ graph_export,evidence_confidence,done,P0,GPT/Claude,exports/graph,check() enforc
 dashboard,analyst_reports,partial,P2,GPT/Claude,reports,standardize report outputs
 dashboard,dashboard_app,missing,P3,GPT/Claude,dashboard,defer until graph and GIS are stable
 dashboard,source_drilldown,missing,P2,GPT/Claude,reports,add source provenance drilldown
-foia,foia_tracker,missing,P1,GPT/Claude,reports/foia_priority_queue.csv,create request tracker schema
-foia,request_templates,partial,P2,GPT/Claude,docs,standardize public records request templates
-foia,yield_tracking,missing,P2,GPT/Claude,reports,track request yield and unresolved gaps
+foia,foia_tracker,done,P1,GPT/Claude,reports/foia_priority_queue.csv,schemas/foia_request.schema.json + scripts/build_foia_tracker.py (9 requests derived from unmet source gaps; referential integrity vs source_registry_status) + offline tests
+foia,request_templates,done,P2,GPT/Claude,docs/FOIA_REQUEST_TEMPLATES.md,standardized PR Ley 141-2019 + federal 5 U.S.C. 552 request templates keyed to the priority queue + marker test
+foia,yield_tracking,done,P2,GPT/Claude,reports/foia_yield_tracking.csv,scripts/build_foia_yield_tracking.py reconciles each request against its live unresolved gap (9 open) + offline tests
 testing,entity_resolution_tests,done,P0,Claude,tests/test_entity_resolution.py,alias->entity + parent_map + influence/debt endpoint integrity and orphan checks across the masters
 testing,graph_export_tests,done,P1,Claude,tests/test_export_schemas.py,on-disk graph nodes/edges validated against schemas with node-existence + evidence + neo4j header checks
 testing,gis_export_tests,done,P1,Claude,tests/test_export_schemas.py,on-disk gis layer_manifest validated against schema; committed GeoJSON layers checked as FeatureCollections

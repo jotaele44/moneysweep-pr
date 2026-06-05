@@ -1,0 +1,20 @@
+{
+  "producer_script": "scripts/build_foia_tracker.py",
+  "producer_phase": "TOP_FORM_FOIA_TRACKER",
+  "schema": "schemas/foia_request.schema.json",
+  "source_inputs": [
+    "data/reference/foia_priority_queue_seed.csv",
+    "reports/source_registry_status.csv"
+  ],
+  "output": "reports/foia_priority_queue.csv",
+  "row_count": 9,
+  "jurisdictions": [
+    "PR",
+    "US"
+  ],
+  "priorities": [
+    "P0",
+    "P1"
+  ],
+  "generated_at": "2026-06-05T13:06:51.530399+00:00"
+}

@@ -44,6 +44,11 @@ jobs:
           python scripts/build_creditor_mapping.py
           python scripts/build_fiscal_control_events.py
 
+      - name: Regenerate foia layer
+        run: |
+          python scripts/build_foia_tracker.py
+          python scripts/build_foia_yield_tracking.py
+
       - name: Regenerate gis layer
         run: |
           python scripts/build_municipality_crosswalk.py

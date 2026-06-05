@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FOIA Yield Tracking Row",
+  "type": "object",
+  "required": [
+    "request_id",
+    "target_source_id",
+    "request_status",
+    "records_received",
+    "yield_status",
+    "unresolved_gap",
+    "evidence_tier",
+    "confidence"
+  ],
+  "properties": {
+    "request_id": {"type": "string", "pattern": "^FOIA_[A-Za-z0-9_.:-]+$"},
+    "target_source_id": {"type": "string", "minLength": 1},
+    "request_status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "drafted",
+        "submitted",
+        "awaiting_response",
+        "partial_yield",
+        "fulfilled",
+        "denied",
+        "appealed"
+      ]
+    },
+    "records_received": {"type": "integer", "minimum": 0},
+    "yield_status": {
+      "type": "string",
+      "enum": ["pending", "partial", "received", "gap_closed", "no_response"]
+    },
+    "unresolved_gap": {"type": "string", "minLength": 1},
+    "evidence_tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}
