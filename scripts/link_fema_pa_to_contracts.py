@@ -34,6 +34,30 @@ LINKED_DIR     = PROJECT_ROOT / "data" / "linked"
 REVIEW_DIR     = PROJECT_ROOT / "data" / "review"
 PROCESSED_DIR  = PROJECT_ROOT / "data" / "staging" / "processed"
 
+# FEMA Public Assistance work is organized into categories A-G. Classify each PW
+# into a coarse asset type from its category code/text and applicant, so funded
+# work can be rolled up by facility class (mirrors the HUD DRGR asset-type pass in
+# scripts/link_hud_drgr_to_assets.py).
+FEMA_ASSET_TYPE_KEYWORDS = {
+    "debris":        ["debris", "category a", "cat a", "cat. a"],
+    "emergency":     ["emergency protective", "protective measures", "category b", "cat b", "cat. b"],
+    "roads_bridges": ["road", "bridge", "highway", "culvert", "category c", "cat c", "cat. c"],
+    "water_control": ["water control", "dam", "levee", "channel", "dike", "irrigation", "category d", "cat d", "cat. d"],
+    "buildings":     ["building", "equipment", "facility", "school", "hospital", "vehicle", "category e", "cat e", "cat. e"],
+    "utilities":     ["utility", "utilities", "power", "electric", "grid", "water system", "sewer", "wastewater", "treatment plant", "category f", "cat f", "cat. f"],
+    "parks_rec":     ["park", "recreation", "playground", "beach", "category g", "cat g", "cat. g"],
+}
+
+
+def _classify_asset_type(category, applicant_name=""):
+    """Coarse FEMA PA asset class from category text/code and applicant name."""
+    combined = (str(category or "") + " " + str(applicant_name or "")).lower()
+    for asset_type, keywords in FEMA_ASSET_TYPE_KEYWORDS.items():
+        if any(kw in combined for kw in keywords):
+            return asset_type
+    return "other"
+
+
 def _municipality_of(v2_row, portal_row):
     """Resolve the applicant municipality for a linkage row.
 
@@ -65,7 +89,7 @@ LINKAGE_COLUMNS = [
     "contract_id", "recipient_name",
     "link_confidence",
     "matched_cor3", "matched_contract", "matched_entity",
-    "county", "municipality", "category",
+    "county", "municipality", "category", "asset_type",
 ]
 
 UNMATCHED_COLUMNS = [
@@ -194,6 +218,7 @@ def _build_linkage(df_v2, df_portal, df_cor3, df_contracts, df_entity, logger):
                 "county":                  r.get("county", ""),
                 "municipality":            _municipality_of(r, portal_row),
                 "category":                r.get("category", ""),
+                "asset_type":              _classify_asset_type(r.get("category", ""), applicant),
             })
 
     df_out = pd.DataFrame(rows, columns=LINKAGE_COLUMNS) if rows else pd.DataFrame(columns=LINKAGE_COLUMNS)

@@ -72,6 +72,27 @@ def test_contract_and_cor3_matches_set_confidence():
 
 
 @pytest.mark.unit
+def test_asset_type_classification():
+    assert mod._classify_asset_type("Category C - Roads and Bridges") == "roads_bridges"
+    assert mod._classify_asset_type("Cat. F", "PREPA") == "utilities"
+    assert mod._classify_asset_type("Debris Removal") == "debris"
+    assert mod._classify_asset_type("Buildings and Equipment") == "buildings"
+    assert mod._classify_asset_type("", "") == "other"
+
+
+@pytest.mark.unit
+def test_asset_type_in_linkage_output():
+    df_v2 = pd.DataFrame([{
+        "pw_number": "400", "disaster_number": "4339",
+        "applicant_name": "Municipality of Loiza", "county": "Loiza",
+        "category": "Category C - Roads and Bridges",
+    }])
+    empty = pd.DataFrame()
+    out = mod._build_linkage(df_v2, empty, empty, empty, empty, _logger())
+    assert out.loc[0, "asset_type"] == "roads_bridges"
+
+
+@pytest.mark.unit
 def test_municipality_helper_priority():
     assert mod._municipality_of({"county": "Ponce"}, {"municipality": "Real Muni"}) == "Real Muni"
     assert mod._municipality_of({"county": "Ponce"}, {}) == "Ponce"
