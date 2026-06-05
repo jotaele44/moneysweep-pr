@@ -333,13 +333,26 @@ class OIAGrantsAdapter(_USAspendingAgencyGrantsAdapter):
 
 
 class _USAspendingNarrowAdapter(_USAspendingAgencyGrantsAdapter):
-    """Pins agency + program_numbers when the caller leaves them empty."""
+    """Pins agency, an optional sub-agency, and program_numbers when the caller
+    leaves them empty."""
 
     program_numbers: tuple[str, ...] = ()
+    sub_agency_name: str = ""
 
     def _payload(self, query: Query, page: int) -> dict[str, Any]:
         payload = super()._payload(query, page)
-        return _inject_program_numbers(payload, self.program_numbers)
+        payload = _inject_program_numbers(payload, self.program_numbers)
+        if self.sub_agency_name and not query.agencies:
+            agencies = payload["filters"].setdefault("agencies", [])
+            already = any(
+                a.get("tier") == "subtier" and a.get("name") == self.sub_agency_name
+                for a in agencies
+            )
+            if not already:
+                agencies.append(
+                    {"type": "awarding", "tier": "subtier", "name": self.sub_agency_name}
+                )
+        return payload
 
 
 class SLFRFAdapter(_USAspendingNarrowAdapter):
@@ -401,3 +414,11 @@ class HUDHCVSection8Adapter(_USAspendingNarrowAdapter):
     agency_name = "Department of Housing and Urban Development"
     program_numbers = ("14.871",)  # Housing Choice Vouchers (Section 8)
     type_codes = GRANT_TYPE_CODES
+
+
+class USACECivilWorksAdapter(_USAspendingNarrowAdapter):
+    source_id = "usace_civil_works"
+    agency_name = "Department of Defense"
+    sub_agency_name = "U.S. Army Corps of Engineers"
+    # USACE civil works spans grants (02-05) and contracts (A-D).
+    type_codes = GRANT_TYPE_CODES + CONTRACT_TYPE_CODES

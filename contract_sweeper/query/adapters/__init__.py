@@ -19,6 +19,7 @@ from .cms_socrata import MedicareAdvantageAdapter, MedicarePartsAdapter
 from .entity_base import EntityAdapter
 from .fdic import FDICInstitutionsAdapter
 from .fec import FECPRAdapter
+from .fhlb import FHLBAdvancesAdapter
 from .highergov import HigherGovSupplementalAdapter
 from .lda import LDAAdapter
 from .nih import NIHReporterAdapter
@@ -50,6 +51,7 @@ from .usaspending import (
     USAspendingGrantsAdapter,
     USAspendingPrimeAdapter,
     USAspendingSubawardsAdapter,
+    USACECivilWorksAdapter,
     USDAGrantsAdapter,
     VABenefitsAdapter,
     WICAdapter,
@@ -90,6 +92,9 @@ ADAPTER_REGISTRY: dict[str, Type[SourceAdapter]] = {
     WICAdapter.source_id: WICAdapter,
     SNAPNAPAdapter.source_id: SNAPNAPAdapter,
     HUDHCVSection8Adapter.source_id: HUDHCVSection8Adapter,
+    # USAspending sub-agency narrow + FDIC SDI
+    USACECivilWorksAdapter.source_id: USACECivilWorksAdapter,
+    FHLBAdvancesAdapter.source_id: FHLBAdvancesAdapter,
     # New distinct-API adapters
     FDICInstitutionsAdapter.source_id: FDICInstitutionsAdapter,
     NonprofitsIRS990Adapter.source_id: NonprofitsIRS990Adapter,
