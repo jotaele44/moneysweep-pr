@@ -21,6 +21,13 @@ data/staging/raw/**/*.csv
 data/raw/*.csv
 data/normalized/
 
+# Large raw acquisitions (untracked blobs — keep out going forward). These are the
+# heavyweight raw drops; curated small CSVs and tracked reference PDFs under
+# data/raw/** stay tracked. Status reports are data-presence derived, so we only
+# untrack inputs that are NOT declared as any source's expected_output.
+data/raw/Follow the Money/funding_flows_sf133.csv
+data/raw/FEC/*.csv
+
 # Logs
 data/logs/*.log
 
