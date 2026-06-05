@@ -33,6 +33,9 @@ REPRODUCED_PRODUCERS = [
     "scripts/build_hq_bias_reference.py",
     "scripts/build_gis_layer_manifest.py",
     "scripts/build_graph_export.py",
+    "scripts/build_source_drilldown.py",
+    "scripts/build_analyst_reports_manifest.py",
+    "scripts/build_dashboard_explorer.py",
 ]
 
 

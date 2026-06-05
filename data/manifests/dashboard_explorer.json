@@ -1,0 +1,13 @@
+{
+  "producer_script": "scripts/build_dashboard_explorer.py",
+  "producer_phase": "TOP_FORM_DASHBOARD_EXPLORER",
+  "source_inputs": [
+    "exports/reports/analyst_reports_manifest.json",
+    "exports/reports/source_drilldown.json",
+    "reports/top_form_gap_matrix.csv"
+  ],
+  "output": "exports/dashboard/index.html",
+  "report_count": 17,
+  "lineage_count": 20,
+  "generated_at": "2026-06-05T13:15:16.549044+00:00"
+}

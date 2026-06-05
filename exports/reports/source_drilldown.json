@@ -1,0 +1,293 @@
+{
+  "sources": [
+    {
+      "artifact": "data/reference/agency_master.csv",
+      "producer_script": "scripts/build_agency_master.py",
+      "producer_phase": "TOP_FORM_AGENCY_MASTER",
+      "phase_label": "agency_master",
+      "schemas": [
+        "schemas/agency_master.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/pr_public_money_entities.csv",
+        "data/reference/pr_municipalities.csv"
+      ],
+      "row_count": 95
+    },
+    {
+      "artifact": "data/reference/creditor_mapping.csv",
+      "producer_script": "scripts/build_creditor_mapping.py",
+      "producer_phase": "TOP_FORM_CREDITOR_MAPPING",
+      "phase_label": "creditor_mapping",
+      "schemas": [
+        "schemas/creditor_mapping.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/debt_instruments.csv"
+      ],
+      "row_count": 14
+    },
+    {
+      "artifact": "data/reference/debt_instruments.csv",
+      "producer_script": "scripts/build_debt_instruments.py",
+      "producer_phase": "TOP_FORM_DEBT_INSTRUMENTS",
+      "phase_label": "debt_instruments",
+      "schemas": [
+        "schemas/debt_instrument.schema.json"
+      ],
+      "source_inputs": [
+        "data/canonical_v1/debt_instruments.csv",
+        "data/reference/entity_master.csv"
+      ],
+      "row_count": 20
+    },
+    {
+      "artifact": "data/reference/entity_aliases.csv",
+      "producer_script": "scripts/build_entity_aliases.py",
+      "producer_phase": "TOP_FORM_ENTITY_ALIASES",
+      "phase_label": "entity_aliases",
+      "schemas": [
+        "schemas/entity_aliases.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/entity_master.csv",
+        "data/reference/agency_master.csv"
+      ],
+      "row_count": 224
+    },
+    {
+      "artifact": "data/reference/entity_master.csv",
+      "producer_script": "scripts/build_entity_master.py",
+      "producer_phase": "TOP_FORM_ENTITY_MASTER",
+      "phase_label": "entity_master",
+      "schemas": [
+        "schemas/entity_master.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/pr_public_money_entities.csv"
+      ],
+      "row_count": 26
+    },
+    {
+      "artifact": "data/reference/entity_parent_map.csv",
+      "producer_script": "scripts/build_entity_parent_map.py",
+      "producer_phase": "TOP_FORM_PARENT_MAP",
+      "phase_label": "parent_map",
+      "schemas": [
+        "schemas/entity_parent_map.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/entity_parent_map_seed.csv",
+        "data/reference/entity_master.csv"
+      ],
+      "row_count": 20
+    },
+    {
+      "artifact": "data/reference/fiscal_control_events.csv",
+      "producer_script": "scripts/build_fiscal_control_events.py",
+      "producer_phase": "TOP_FORM_FISCAL_CONTROL_EVENTS",
+      "phase_label": "fiscal_control_events",
+      "schemas": [
+        "schemas/fiscal_control_event.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/fiscal_control_events_seed.csv",
+        "data/reference/entity_master.csv"
+      ],
+      "row_count": 12
+    },
+    {
+      "artifact": "data/reference/geo_reason_codes.csv",
+      "producer_script": "scripts/build_geo_reason_codes.py",
+      "producer_phase": "TOP_FORM_GEO_REASON_CODES",
+      "phase_label": "geo_reason_codes",
+      "schemas": [
+        "schemas/geo_reason_codes.schema.json"
+      ],
+      "source_inputs": [
+        "scripts/run_contract_finance_geo_reasoning.py"
+      ],
+      "row_count": 19
+    },
+    {
+      "artifact": "data/reference/hq_bias_correction.csv",
+      "producer_script": "scripts/build_hq_bias_reference.py",
+      "producer_phase": "TOP_FORM_HQ_BIAS_CORRECTION",
+      "phase_label": "hq_bias_correction",
+      "schemas": [
+        "schemas/hq_bias_correction.schema.json"
+      ],
+      "source_inputs": [
+        "scripts/run_contract_finance_geo_reasoning.py"
+      ],
+      "row_count": 4
+    },
+    {
+      "artifact": "data/reference/influence_edges.csv",
+      "producer_script": "scripts/build_influence_edges.py",
+      "producer_phase": "TOP_FORM_INFLUENCE_EDGES",
+      "phase_label": "influence_edges",
+      "schemas": [
+        "schemas/influence_edges.schema.json"
+      ],
+      "source_inputs": [
+        "data/canonical_v1/lobbying_records.csv",
+        "data/canonical_v1/roles.csv",
+        "data/reference/entity_parent_map.csv",
+        "data/reference/entity_master.csv",
+        "data/reference/agency_master.csv",
+        "data/reference/person_master.csv"
+      ],
+      "row_count": 30
+    },
+    {
+      "artifact": "data/reference/person_master.csv",
+      "producer_script": "scripts/build_person_master.py",
+      "producer_phase": "TOP_FORM_PERSON_MASTER",
+      "phase_label": "person_master",
+      "schemas": [
+        "schemas/person_master.schema.json"
+      ],
+      "source_inputs": [
+        "data/canonical_v1/people.csv"
+      ],
+      "row_count": 60
+    },
+    {
+      "artifact": "data/reference/pr_78_municipio_crosswalk.csv",
+      "producer_script": "scripts/build_municipality_crosswalk.py",
+      "producer_phase": "TOP_FORM_MUNICIPALITY_CROSSWALK",
+      "phase_label": "municipality_crosswalk",
+      "schemas": [
+        "schemas/municipality_crosswalk.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/pr_78_municipio_crosswalk.csv"
+      ],
+      "row_count": 78
+    },
+    {
+      "artifact": "exports/gis/layer_manifest.json",
+      "producer_script": "scripts/build_gis_layer_manifest.py",
+      "producer_phase": "TOP_FORM_GIS_LAYER_MANIFEST",
+      "phase_label": "gis_layer_manifest",
+      "schemas": [
+        "schemas/gis_layer_manifest.schema.json"
+      ],
+      "source_inputs": []
+    },
+    {
+      "artifact": "exports/graph/edges.csv",
+      "producer_script": "scripts/build_graph_export.py",
+      "producer_phase": "TOP_FORM_GRAPH_EXPORT",
+      "phase_label": "graph_export",
+      "schemas": [
+        "schemas/graph_nodes.schema.json",
+        "schemas/graph_edges.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/entity_master.csv",
+        "data/reference/agency_master.csv",
+        "data/reference/person_master.csv",
+        "data/reference/entity_parent_map.csv",
+        "data/canonical_v1/lobbying_records.csv",
+        "data/canonical_v1/roles.csv"
+      ]
+    },
+    {
+      "artifact": "exports/graph/neo4j_edges.csv",
+      "producer_script": "scripts/build_graph_export.py",
+      "producer_phase": "TOP_FORM_GRAPH_EXPORT",
+      "phase_label": "graph_export",
+      "schemas": [
+        "schemas/graph_nodes.schema.json",
+        "schemas/graph_edges.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/entity_master.csv",
+        "data/reference/agency_master.csv",
+        "data/reference/person_master.csv",
+        "data/reference/entity_parent_map.csv",
+        "data/canonical_v1/lobbying_records.csv",
+        "data/canonical_v1/roles.csv"
+      ]
+    },
+    {
+      "artifact": "exports/graph/neo4j_nodes.csv",
+      "producer_script": "scripts/build_graph_export.py",
+      "producer_phase": "TOP_FORM_GRAPH_EXPORT",
+      "phase_label": "graph_export",
+      "schemas": [
+        "schemas/graph_nodes.schema.json",
+        "schemas/graph_edges.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/entity_master.csv",
+        "data/reference/agency_master.csv",
+        "data/reference/person_master.csv",
+        "data/reference/entity_parent_map.csv",
+        "data/canonical_v1/lobbying_records.csv",
+        "data/canonical_v1/roles.csv"
+      ]
+    },
+    {
+      "artifact": "exports/graph/nodes.csv",
+      "producer_script": "scripts/build_graph_export.py",
+      "producer_phase": "TOP_FORM_GRAPH_EXPORT",
+      "phase_label": "graph_export",
+      "schemas": [
+        "schemas/graph_nodes.schema.json",
+        "schemas/graph_edges.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/entity_master.csv",
+        "data/reference/agency_master.csv",
+        "data/reference/person_master.csv",
+        "data/reference/entity_parent_map.csv",
+        "data/canonical_v1/lobbying_records.csv",
+        "data/canonical_v1/roles.csv"
+      ]
+    },
+    {
+      "artifact": "reports/entity_resolution_review_queue.csv",
+      "producer_script": "scripts/build_entity_resolution_review_queue.py",
+      "producer_phase": "TOP_FORM_REVIEW_QUEUE",
+      "phase_label": "review_queue",
+      "schemas": [
+        "schemas/canonical_v1/review_queue.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/person_master.csv"
+      ],
+      "row_count": 24
+    },
+    {
+      "artifact": "reports/foia_priority_queue.csv",
+      "producer_script": "scripts/build_foia_tracker.py",
+      "producer_phase": "TOP_FORM_FOIA_TRACKER",
+      "phase_label": "foia_tracker",
+      "schemas": [
+        "schemas/foia_request.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/foia_priority_queue_seed.csv",
+        "reports/source_registry_status.csv"
+      ],
+      "row_count": 9
+    },
+    {
+      "artifact": "reports/foia_yield_tracking.csv",
+      "producer_script": "scripts/build_foia_yield_tracking.py",
+      "producer_phase": "TOP_FORM_FOIA_YIELD_TRACKING",
+      "phase_label": "foia_yield_tracking",
+      "schemas": [
+        "schemas/foia_yield.schema.json"
+      ],
+      "source_inputs": [
+        "reports/foia_priority_queue.csv",
+        "reports/source_registry_status.csv"
+      ],
+      "row_count": 9
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "reports": [
+    {
+      "report_id": "RPT_355f79cb4ff16d91",
+      "title": "Entity Master",
+      "gate": "entity_master",
+      "path": "data/reference/entity_master.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_entity_master.py",
+      "status": "done",
+      "row_count": 26
+    },
+    {
+      "report_id": "RPT_f3ee1af690f5dd71",
+      "title": "Agency & Municipio Master",
+      "gate": "entity_master",
+      "path": "data/reference/agency_master.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_agency_master.py",
+      "status": "done",
+      "row_count": 95
+    },
+    {
+      "report_id": "RPT_fabd0f1b40985896",
+      "title": "Person Master",
+      "gate": "entity_master",
+      "path": "data/reference/person_master.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_person_master.py",
+      "status": "done",
+      "row_count": 60
+    },
+    {
+      "report_id": "RPT_024e2975d89dc663",
+      "title": "Entity Aliases",
+      "gate": "entity_master",
+      "path": "data/reference/entity_aliases.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_entity_aliases.py",
+      "status": "done",
+      "row_count": 224
+    },
+    {
+      "report_id": "RPT_3df7bf2784debeaa",
+      "title": "Entity Parent / Operator Map",
+      "gate": "entity_master",
+      "path": "data/reference/entity_parent_map.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_entity_parent_map.py",
+      "status": "done",
+      "row_count": 20
+    },
+    {
+      "report_id": "RPT_a8c88630f6ef4b08",
+      "title": "Entity Resolution Review Queue",
+      "gate": "entity_master",
+      "path": "reports/entity_resolution_review_queue.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_entity_resolution_review_queue.py",
+      "status": "done",
+      "row_count": 24
+    },
+    {
+      "report_id": "RPT_c8bc50879d6a8e5c",
+      "title": "Influence Edges",
+      "gate": "influence",
+      "path": "data/reference/influence_edges.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_influence_edges.py",
+      "status": "done",
+      "row_count": 30
+    },
+    {
+      "report_id": "RPT_91e8490f4c97be50",
+      "title": "Debt Instruments",
+      "gate": "debt_fiscal",
+      "path": "data/reference/debt_instruments.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_debt_instruments.py",
+      "status": "done",
+      "row_count": 20
+    },
+    {
+      "report_id": "RPT_ba0481dcbf989076",
+      "title": "Creditor Mapping",
+      "gate": "debt_fiscal",
+      "path": "data/reference/creditor_mapping.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_creditor_mapping.py",
+      "status": "done",
+      "row_count": 14
+    },
+    {
+      "report_id": "RPT_25408420b68f17f4",
+      "title": "Fiscal Control Events Timeline",
+      "gate": "debt_fiscal",
+      "path": "data/reference/fiscal_control_events.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_fiscal_control_events.py",
+      "status": "done",
+      "row_count": 12
+    },
+    {
+      "report_id": "RPT_87a6548e7f3000c6",
+      "title": "Geo Resolution Codes",
+      "gate": "gis",
+      "path": "data/reference/geo_reason_codes.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_geo_reason_codes.py",
+      "status": "done",
+      "row_count": 19
+    },
+    {
+      "report_id": "RPT_953907bd4f276872",
+      "title": "HQ Bias Correction Contract",
+      "gate": "gis",
+      "path": "data/reference/hq_bias_correction.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_hq_bias_reference.py",
+      "status": "done",
+      "row_count": 4
+    },
+    {
+      "report_id": "RPT_3514c68ea67886d5",
+      "title": "GIS Layer Manifest",
+      "gate": "gis",
+      "path": "exports/gis/layer_manifest.json",
+      "format": "json",
+      "producer_script": "scripts/build_gis_layer_manifest.py",
+      "status": "done",
+      "row_count": 6
+    },
+    {
+      "report_id": "RPT_01cd853c9725edd0",
+      "title": "Graph Nodes",
+      "gate": "graph_export",
+      "path": "exports/graph/nodes.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_graph_export.py",
+      "status": "done",
+      "row_count": 164
+    },
+    {
+      "report_id": "RPT_2168b573f213ff72",
+      "title": "Graph Edges",
+      "gate": "graph_export",
+      "path": "exports/graph/edges.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_graph_export.py",
+      "status": "done",
+      "row_count": 30
+    },
+    {
+      "report_id": "RPT_27b6ec89af89b2be",
+      "title": "FOIA Priority Queue",
+      "gate": "foia",
+      "path": "reports/foia_priority_queue.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_foia_tracker.py",
+      "status": "done",
+      "row_count": 9
+    },
+    {
+      "report_id": "RPT_4c0f975db7527f36",
+      "title": "FOIA Yield Tracking",
+      "gate": "foia",
+      "path": "reports/foia_yield_tracking.csv",
+      "format": "csv",
+      "producer_script": "scripts/build_foia_yield_tracking.py",
+      "status": "done",
+      "row_count": 9
+    }
+  ]
+}
