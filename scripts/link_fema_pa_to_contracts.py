@@ -34,6 +34,52 @@ LINKED_DIR     = PROJECT_ROOT / "data" / "linked"
 REVIEW_DIR     = PROJECT_ROOT / "data" / "review"
 PROCESSED_DIR  = PROJECT_ROOT / "data" / "staging" / "processed"
 
+# FEMA Public Assistance work is organized into categories A-G. Classify each PW
+# into a coarse asset type from its category code/text and applicant, so funded
+# work can be rolled up by facility class (mirrors the HUD DRGR asset-type pass in
+# scripts/link_hud_drgr_to_assets.py).
+FEMA_ASSET_TYPE_KEYWORDS = {
+    "debris":        ["debris", "category a", "cat a", "cat. a"],
+    "emergency":     ["emergency protective", "protective measures", "category b", "cat b", "cat. b"],
+    "roads_bridges": ["road", "bridge", "highway", "culvert", "category c", "cat c", "cat. c"],
+    "water_control": ["water control", "dam", "levee", "channel", "dike", "irrigation", "category d", "cat d", "cat. d"],
+    "buildings":     ["building", "equipment", "facility", "school", "hospital", "vehicle", "category e", "cat e", "cat. e"],
+    "utilities":     ["utility", "utilities", "power", "electric", "grid", "water system", "sewer", "wastewater", "treatment plant", "category f", "cat f", "cat. f"],
+    "parks_rec":     ["park", "recreation", "playground", "beach", "category g", "cat g", "cat. g"],
+}
+
+
+def _classify_asset_type(category, applicant_name=""):
+    """Coarse FEMA PA asset class from category text/code and applicant name."""
+    combined = (str(category or "") + " " + str(applicant_name or "")).lower()
+    for asset_type, keywords in FEMA_ASSET_TYPE_KEYWORDS.items():
+        if any(kw in combined for kw in keywords):
+            return asset_type
+    return "other"
+
+
+def _municipality_of(v2_row, portal_row):
+    """Resolve the applicant municipality for a linkage row.
+
+    The OpenFEMA v2 feed carries only ``county`` (which in Puerto Rico is the
+    municipio), while the portal 178-PW export carries a distinct
+    ``municipality`` field. Prefer the explicit municipality when a portal match
+    exists, then any municipality on the v2 row, then fall back to county.
+    Previously this column was hard-wired to ``county``, so the real municipality
+    from a matched portal row was discarded.
+    """
+    candidates = (
+        portal_row.get("municipality", "") if portal_row else "",
+        v2_row.get("municipality", ""),
+        v2_row.get("county", ""),
+    )
+    for value in candidates:
+        text = str(value or "").strip()
+        if text:
+            return text
+    return ""
+
+
 LINKAGE_COLUMNS = [
     "pw_number", "disaster_number",
     "applicant_name", "applicant_normalized",
@@ -43,7 +89,7 @@ LINKAGE_COLUMNS = [
     "contract_id", "recipient_name",
     "link_confidence",
     "matched_cor3", "matched_contract", "matched_entity",
-    "county", "municipality", "category",
+    "county", "municipality", "category", "asset_type",
 ]
 
 UNMATCHED_COLUMNS = [
@@ -93,7 +139,7 @@ def _build_linkage(df_v2, df_portal, df_cor3, df_contracts, df_entity, logger):
         for _, r in df_cor3.iterrows():
             key = str(r.get("applicant_normalized", "")).strip()
             if key:
-                cor3_lookup[key] = r
+                cor3_lookup[key] = r.to_dict()
 
     contract_lookup = {}
     name_col = None
@@ -105,7 +151,7 @@ def _build_linkage(df_v2, df_portal, df_cor3, df_contracts, df_entity, logger):
         for _, r in df_contracts.iterrows():
             key = _norm(r.get(name_col, ""))
             if key and key not in contract_lookup:
-                contract_lookup[key] = r
+                contract_lookup[key] = r.to_dict()
 
     entity_lookup = {}
     if not df_entity.empty:
@@ -114,7 +160,7 @@ def _build_linkage(df_v2, df_portal, df_cor3, df_contracts, df_entity, logger):
                 for _, r in df_entity.iterrows():
                     key = str(r.get(col, "")).strip()
                     if key:
-                        entity_lookup[key] = r
+                        entity_lookup[key] = r.to_dict()
                 break
 
     # Build portal lookup by pw_number + disaster_number
@@ -125,7 +171,7 @@ def _build_linkage(df_v2, df_portal, df_cor3, df_contracts, df_entity, logger):
             dis = str(r.get("disaster_number", "")).strip()
             key = (pw, dis)
             if pw:
-                portal_lookup[key] = r
+                portal_lookup[key] = r.to_dict()
 
     # Source: v2 projects
     if not df_v2.empty:
@@ -170,8 +216,9 @@ def _build_linkage(df_v2, df_portal, df_cor3, df_contracts, df_entity, logger):
                 "matched_contract":        matched_contract,
                 "matched_entity":          matched_entity,
                 "county":                  r.get("county", ""),
-                "municipality":            r.get("county", ""),
+                "municipality":            _municipality_of(r, portal_row),
                 "category":                r.get("category", ""),
+                "asset_type":              _classify_asset_type(r.get("category", ""), applicant),
             })
 
     df_out = pd.DataFrame(rows, columns=LINKAGE_COLUMNS) if rows else pd.DataFrame(columns=LINKAGE_COLUMNS)
