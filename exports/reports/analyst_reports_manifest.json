@@ -169,6 +169,96 @@
       "producer_script": "scripts/build_foia_yield_tracking.py",
       "status": "done",
       "row_count": 9
+    },
+    {
+      "report_id": "RPT_ee8f5ebbcf2ea458",
+      "title": "FOIA Letter \u2014 HUD DRGR",
+      "gate": "foia",
+      "path": "docs/foia_letters/FOIA_c509296376f145b1.md",
+      "format": "md",
+      "producer_script": "scripts/build_foia_letters.py",
+      "status": "done",
+      "row_count": 0
+    },
+    {
+      "report_id": "RPT_78d52f575c9b9e52",
+      "title": "FOIA Letter \u2014 PRASA",
+      "gate": "foia",
+      "path": "docs/foia_letters/FOIA_3429122f5837fd47.md",
+      "format": "md",
+      "producer_script": "scripts/build_foia_letters.py",
+      "status": "done",
+      "row_count": 0
+    },
+    {
+      "report_id": "RPT_8ff9e07ee02b6925",
+      "title": "FOIA Letter \u2014 OCPR",
+      "gate": "foia",
+      "path": "docs/foia_letters/FOIA_aef916ac9b8ed071.md",
+      "format": "md",
+      "producer_script": "scripts/build_foia_letters.py",
+      "status": "done",
+      "row_count": 0
+    },
+    {
+      "report_id": "RPT_00185373eb9fe652",
+      "title": "FOIA Letter \u2014 COR3",
+      "gate": "foia",
+      "path": "docs/foia_letters/FOIA_f7d5acaf207ff8a5.md",
+      "format": "md",
+      "producer_script": "scripts/build_foia_letters.py",
+      "status": "done",
+      "row_count": 0
+    },
+    {
+      "report_id": "RPT_7028a7390d7dd1ff",
+      "title": "FOIA Letter \u2014 GSA FSRS",
+      "gate": "foia",
+      "path": "docs/foia_letters/FOIA_64d22dfe3108f7b1.md",
+      "format": "md",
+      "producer_script": "scripts/build_foia_letters.py",
+      "status": "done",
+      "row_count": 0
+    },
+    {
+      "report_id": "RPT_5e604ed1c4c73a29",
+      "title": "FOIA Letter \u2014 SAM.gov",
+      "gate": "foia",
+      "path": "docs/foia_letters/FOIA_95021847de4153af.md",
+      "format": "md",
+      "producer_script": "scripts/build_foia_letters.py",
+      "status": "done",
+      "row_count": 0
+    },
+    {
+      "report_id": "RPT_5499858586dfbe94",
+      "title": "FOIA Letter \u2014 OEG (Cabilderos)",
+      "gate": "foia",
+      "path": "docs/foia_letters/FOIA_7ef254a89545013c.md",
+      "format": "md",
+      "producer_script": "scripts/build_foia_letters.py",
+      "status": "done",
+      "row_count": 0
+    },
+    {
+      "report_id": "RPT_733bb9d2429e7ea9",
+      "title": "FOIA Letter \u2014 CEE (Donaciones)",
+      "gate": "foia",
+      "path": "docs/foia_letters/FOIA_220df26653119d96.md",
+      "format": "md",
+      "producer_script": "scripts/build_foia_letters.py",
+      "status": "done",
+      "row_count": 0
+    },
+    {
+      "report_id": "RPT_27e64cdbaac36682",
+      "title": "FOIA Letter \u2014 compras.pr.gov",
+      "gate": "foia",
+      "path": "docs/foia_letters/FOIA_7fef81739082ae00.md",
+      "format": "md",
+      "producer_script": "scripts/build_foia_letters.py",
+      "status": "done",
+      "row_count": 0
     }
   ]
 }

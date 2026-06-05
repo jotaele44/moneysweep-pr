@@ -28,6 +28,7 @@ REPRODUCED_PRODUCERS = [
     "scripts/build_fiscal_control_events.py",
     "scripts/build_foia_tracker.py",
     "scripts/build_foia_yield_tracking.py",
+    "scripts/build_foia_letters.py",
     "scripts/build_municipality_crosswalk.py",
     "scripts/build_geo_reason_codes.py",
     "scripts/build_hq_bias_reference.py",

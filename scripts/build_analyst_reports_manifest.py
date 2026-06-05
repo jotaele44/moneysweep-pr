@@ -58,6 +58,15 @@ CATALOG: list[tuple[str, str, str, str, str]] = [
     ("exports/graph/edges.csv", "Graph Edges", "graph_export", "csv", "scripts/build_graph_export.py"),
     ("reports/foia_priority_queue.csv", "FOIA Priority Queue", "foia", "csv", "scripts/build_foia_tracker.py"),
     ("reports/foia_yield_tracking.csv", "FOIA Yield Tracking", "foia", "csv", "scripts/build_foia_yield_tracking.py"),
+    ("docs/foia_letters/FOIA_c509296376f145b1.md", "FOIA Letter — HUD DRGR", "foia", "md", "scripts/build_foia_letters.py"),
+    ("docs/foia_letters/FOIA_3429122f5837fd47.md", "FOIA Letter — PRASA", "foia", "md", "scripts/build_foia_letters.py"),
+    ("docs/foia_letters/FOIA_aef916ac9b8ed071.md", "FOIA Letter — OCPR", "foia", "md", "scripts/build_foia_letters.py"),
+    ("docs/foia_letters/FOIA_f7d5acaf207ff8a5.md", "FOIA Letter — COR3", "foia", "md", "scripts/build_foia_letters.py"),
+    ("docs/foia_letters/FOIA_64d22dfe3108f7b1.md", "FOIA Letter — GSA FSRS", "foia", "md", "scripts/build_foia_letters.py"),
+    ("docs/foia_letters/FOIA_95021847de4153af.md", "FOIA Letter — SAM.gov", "foia", "md", "scripts/build_foia_letters.py"),
+    ("docs/foia_letters/FOIA_7ef254a89545013c.md", "FOIA Letter — OEG (Cabilderos)", "foia", "md", "scripts/build_foia_letters.py"),
+    ("docs/foia_letters/FOIA_220df26653119d96.md", "FOIA Letter — CEE (Donaciones)", "foia", "md", "scripts/build_foia_letters.py"),
+    ("docs/foia_letters/FOIA_7fef81739082ae00.md", "FOIA Letter — compras.pr.gov", "foia", "md", "scripts/build_foia_letters.py"),
 ]
 
 
