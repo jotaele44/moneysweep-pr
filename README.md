@@ -1,256 +1,317 @@
 # Contract-Sweeper
 
-## Current Scope
-
-Contract-Sweeper now tracks an 84-source Puerto Rico public-money registry spanning federal procurement, territorial and municipal contracts, infrastructure, lobbying, campaign-finance, debt/fiscal-control, contractor-reference, and geospatial source families.
-
-The original 13-dataset federal procurement pipeline remains a core historical pipeline, but it is no longer the full project boundary. Current completion work is governed by top-form controls, source materialization readiness, strict preflight, and staged manual-source ingestion.
-
-Current operating state:
-- Top-form controls define production-complete gates across source, entity, influence, debt, GIS, graph, analyst, and reproducibility layers.
-- Materialization readiness classifies automatable, manual-export, scraper-needed, semantic-duplicate, and deferred-stub sources.
-- Manual-source ingestion is the next stage for acquired files such as ACT, ACUDEN, PRASA, cabilderos, LDA, and DCAA records.
-- Strict preflight remains the gate before producer execution or production promotion.
-
 ![Tests](https://github.com/jotaele44/contract-sweeper/actions/workflows/tests.yml/badge.svg)
 
-Puerto Rico Federal Contracts Data Pipeline — automated acquisition, validation,
-normalization, and coverage analysis of federal procurement data (FY 2000–2025).
+Contract-Sweeper is a Puerto Rico public-money intelligence pipeline for acquiring,
+normalizing, validating, and cross-linking public procurement, infrastructure,
+lobbying, campaign-finance, debt/fiscal-control, contractor-reference, and geospatial
+records.
 
-## Overview
+The project began as a 13-dataset federal procurement pipeline. It has expanded into
+an 84-source registry with source-readiness gates, strict preflight controls,
+manual-source ingestion, entity-resolution staging, and graph/influence outputs.
 
-Contract-Sweeper gathers federal contract data related to Puerto Rico from three
-sources (FPDS, USASpending, FSRS), validates the downloads, normalizes them into
-a standard schema, and checks for complete fiscal-year coverage across a 26-year
-window. The pipeline handles 13 distinct datasets spanning 8 FPDS time-window
-files, 4 USASpending query files, and 1 FSRS subcontract file.
+## Current Operating State
+
+Contract-Sweeper is **not yet a production-certified master dataset**. The current
+state is a controlled buildout phase:
+
+- **Source registry:** 84 tracked source definitions.
+- **Automatable sources:** 54 marked ready by the materialization-readiness gate.
+- **Queued / excluded sources:** manual exports, scraper-needed Puerto Rico sources,
+  semantic duplicates, and deferred stubs remain outside the automatable target.
+- **Strict preflight:** required before producer execution or promotion.
+- **Current active work:** Tranche B manual-source ingestion and reconciliation.
+- **Last recorded full test baseline:** 1229 passed, 5 skipped, 0 failed.
+
+Source-of-truth status files:
+
+```text
+reports/current_status.json
+reports/current_blockers.md
+reports/next_actions.md
+reports/materialization_readiness.json
+reports/source_registry_status.csv
+```
+
+## Scope
+
+Contract-Sweeper currently tracks source families across the following domains:
+
+| Domain | Examples |
+|---|---|
+| Federal procurement | FPDS, USASpending, FSRS, SAM.gov enrichment |
+| Federal grants and recovery | FEMA, HUD/CDBG-DR, USACE, DOT, USDA, DOE, DOJ, HHS, ED |
+| Territorial / municipal contracts | Puerto Rico agency contracts, municipality-linked spending, Compras |
+| Infrastructure | PRASA, PREPA, ACT, PPP, capital projects, recovery projects |
+| Lobbying and influence | Puerto Rico cabilderos, federal LDA, campaign-finance crosswalks |
+| Debt and fiscal control | EMMA/MSRB, COFINA, AAFAF, PROMESA creditor/fiscal-control references |
+| Contractor references | DCAA active contractor listings, OFAC, OpenCorporates, entity aliases |
+| Geospatial analysis | Municipality normalization, infrastructure geography, GIS overlays |
+
+## Manual Source Intake Backlog
+
+The following acquired or known manual-source families require schema mapping,
+parser validation, and ingestion before they can be promoted into canonical outputs:
+
+```text
+Contratos Vigentes ACT.pdf
+Informe Contratos Vigentes al Momento de Transición.pdf
+completed_projects_AAA.pdf
+FY2024 CER_Final.pdf
+Registro de cabilderos Abril 18 2026.pdf
+Registrants.pdf
+subcontractingdirectory.772857981.pdf
+FY_2007_Active_Contractor_Listing_Final.pdf
+FY_2012_All_Active_Contractor_Listing.pdf
+FY_2013_All_Active_Contractor_Listing.pdf
+```
+
+Manual files should not be treated as authoritative canonical tables until they pass:
+
+1. file inventory and provenance capture;
+2. parser/schema validation;
+3. row-count and column-coverage checks;
+4. entity normalization and alias review;
+5. export validation;
+6. source-to-output lineage registration.
 
 ## Architecture
 
+The repository is organized around a registry-first pipeline:
+
+```text
+source registry
+   ↓
+strict preflight / readiness classification
+   ↓
+producer execution or manual-file intake
+   ↓
+raw/staging outputs
+   ↓
+normalization and schema validation
+   ↓
+entity resolution / alias review
+   ↓
+canonical contract, source, influence, debt, GIS, and graph outputs
+   ↓
+coverage, lineage, and analyst reports
 ```
-Step 1    Setup Directories          scripts/setup_directories.py
-Step 2    Generate Instructions      scripts/download_instructions.py
-Step 3    Auto-Download Datasets     scripts/auto_download.py
-Step 4    Validate Downloads         scripts/validate_downloads.py
-Step 5    Normalize & Transform      scripts/normalize_expansion_inputs.py
-Step 5.5  Cross-File Dedup + Master  scripts/deduplicate_master.py
-Step 6    Validate Coverage          scripts/validate_expansion_coverage.py
-Step 7    SAM.gov UEI Enrichment     scripts/sam_enrichment.py  (optional)
-```
 
-All steps are orchestrated by `run_all.py`, which produces a summary report
-with timing, coverage stats, and pass/fail status for each stage.
+Core execution layers:
 
-## Data Sources
-
-| # | Filename | Source | Years | Description |
-|---|----------|--------|-------|-------------|
-| 1 | `expansion_fpds_2000_2004_direct.csv` | FPDS | 2000–2004 | Place of Performance = PR |
-| 2 | `expansion_fpds_2000_2004_vendor.csv` | FPDS | 2000–2004 | Vendor State = PR |
-| 3 | `expansion_fpds_2005_2008_direct.csv` | FPDS | 2005–2008 | PoP = PR (**must contain 2007**) |
-| 4 | `expansion_fpds_2005_2008_vendor.csv` | FPDS | 2005–2008 | Vendor = PR (**must contain 2007**) |
-| 5 | `expansion_fpds_2009_2016_direct.csv` | FPDS | 2009–2016 | PoP = PR |
-| 6 | `expansion_fpds_2009_2016_vendor.csv` | FPDS | 2009–2016 | Vendor = PR |
-| 7 | `expansion_fpds_2017_2025_direct.csv` | FPDS | 2017–2025 | PoP = PR |
-| 8 | `expansion_fpds_2017_2025_vendor.csv` | FPDS | 2017–2025 | Vendor = PR |
-| 9 | `expansion_idv_indirect_pr.csv` | USASpending | 2000–2025 | IDV awards referencing PR (non-PR recipients) |
-| 10 | `expansion_dod_upr_2001_2015.csv` | USASpending | 2001–2015 | DoD corridor (UPR, military bases) |
-| 11 | `expansion_dod_upr_2016_2025.csv` | USASpending | 2016–2025 | DoD corridor (post-2016) |
-| 12 | `expansion_reconstruction_2017_2025.csv` | USASpending | 2017–2025 | Post-hurricane reconstruction (FEMA/HUD/DOT/USACE/VA) |
-| 13 | `expansion_subcontracts_pr.csv` | FSRS | 2000–2025 | Subcontract data, PoP = PR |
+| Layer | Purpose |
+|---|---|
+| `run_all.py` | Main orchestrator and strict-preflight entry point |
+| `scripts/pipeline_preflight.py` | Registry-driven structural gate before execution |
+| `scripts/build_source_recovery_matrix.py` | Materialization-readiness and source-recovery classification |
+| `scripts/gap_analysis_builder.py` | Source-registry status regeneration |
+| `contract_sweeper.query` | On-demand query adapter entry point |
+| `scripts/*download*` / producer modules | Source-specific acquisition modules |
+| `tests/` | Pytest validation suite |
+| `docs/` | Architecture, runbooks, data policy, and operating controls |
+| `reports/` | Machine-readable status, readiness, blockers, and audit outputs |
 
 ## Quick Start
 
 ```bash
-# Install dependencies
+# 1. Clone and enter the repo
+git clone https://github.com/jotaele44/Contract-Sweeper.git
+cd Contract-Sweeper
+
+# 2. Create an isolated Python environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 3. Install dependencies
 pip install -r requirements.txt
 
-# Run the full pipeline
-python3 run_all.py
+# 4. Run tests
+python -m pytest tests/ -q
 
-# Or run only setup (directories + download instructions)
-python3 run_all.py --only-setup
+# 5. Run setup and strict preflight without executing producers
+python3 run_all.py --only-setup --strict-preflight
 ```
 
-After Step 2, detailed per-file download instructions are available at
-`data/staging/expansion/DOWNLOAD_INSTRUCTIONS.md`.
+## Running the Pipeline
 
-## CLI Reference
+### Safe setup / validation mode
 
-### run_all.py (orchestrator)
-
-```
-python3 run_all.py [flags]
-
---only-setup        Run steps 1-2 only (dirs + instructions)
---skip-download     Skip step 3 (auto-download)
---manual-only       Alias for --skip-download
---force-download    Re-download even if files already exist
---skip-validation   Skip step 4 (download validation)
---skip-normalize    Skip step 5 (normalization)
---skip-dedup        Skip step 5.5 (cross-file dedup + master build)
---skip-coverage     Skip step 6 (coverage validation)
---skip-enrichment   Skip step 7 (SAM.gov UEI enrichment)
-```
-
-### Individual scripts
+Use this mode before any source materialization work:
 
 ```bash
-python3 scripts/auto_download.py                  # download all
-python3 scripts/auto_download.py --force           # re-download existing
-python3 scripts/auto_download.py --only=fpds       # FPDS only
-python3 scripts/auto_download.py --only=usaspending
-python3 scripts/validate_downloads.py              # validate downloads
-python3 scripts/normalize_expansion_inputs.py      # normalize all
-python3 scripts/validate_expansion_coverage.py     # check year coverage
+python3 run_all.py --only-setup --strict-preflight
+python3 scripts/gap_analysis_builder.py
+python3 scripts/build_source_recovery_matrix.py
 ```
 
-### NGO / OSFL layer
+### Full orchestrator
 
 ```bash
-python3 scripts/ngo_integration.py                 # build the NGO/OSFL layer
-python3 scripts/ngo_integration.py --schema-only   # write schema files only
-python3 -m pytest tests/test_ngo_integration.py -v # run NGO tests
+python3 run_all.py --strict-preflight
 ```
 
-Drop optional source files into the dropzones (created on first run):
+Useful flags:
 
 ```text
-data/raw/ngos/irs_eo_bmf/*.{csv,txt}
-data/raw/ngos/teos/*.{csv,json,jsonl}
-data/raw/ngos/pr_state_registry/*.csv
-data/raw/ngos/usaspending/*.{csv,json,jsonl}
+--only-setup        Run setup and instruction generation only
+--skip-download     Skip producer download step
+--manual-only       Alias for --skip-download
+--force-download    Re-download existing source files
+--skip-validation   Skip download validation
+--skip-normalize    Skip normalization
+--skip-dedup        Skip cross-file deduplication
+--skip-coverage     Skip coverage validation
+--skip-enrichment   Skip SAM.gov UEI enrichment
+--strict-preflight  Abort on structural readiness errors before execution
 ```
 
-Primary outputs (CSV + Parquet) land in `data/staging/processed/ngos/`:
-`ngos_master`, `ngo_funding_edges`, `ngo_asset_edges`,
-`ngo_fiscal_sponsor_edges`, `ngo_municipal_coverage`, plus the `ngo_graph.gexf`
-layer. NGO funding, asset, and fiscal-sponsor edges are merged into the unified
-influence graph by `scripts/influence_graph_builder.py`. See
-[docs/NGO_INTEGRATION.md](docs/NGO_INTEGRATION.md).
+### On-demand adapter execution
 
-## Directory Structure
+Some source families are available through query adapters:
 
-```
-Contract-Sweeper/
-├── run_all.py                      # 6-step pipeline orchestrator
-├── requirements.txt                # pandas, requests, lxml
-├── README.md
-├── scripts/
-│   ├── config.py                   # paths, manifest, column families, helpers
-│   ├── setup_directories.py        # step 1: create directory structure
-│   ├── download_instructions.py    # step 2: generate DOWNLOAD_INSTRUCTIONS.md
-│   ├── auto_download.py            # step 3: FPDS/USASpending/FSRS downloads
-│   ├── validate_downloads.py       # step 4: file existence + column checks
-│   ├── normalize_expansion_inputs.py  # step 5: standardize schema + dates
-│   └── validate_expansion_coverage.py # step 6: FY 2000-2025 coverage matrix
-├── tests/                          # pytest test suite
-│   ├── conftest.py                 # shared fixtures
-│   ├── test_config.py
-│   ├── test_normalize.py
-│   ├── test_validate_downloads.py
-│   ├── test_validate_coverage.py
-│   ├── test_setup_directories.py
-│   └── test_download_instructions.py
-└── data/
-    ├── staging/
-    │   ├── expansion/              # raw downloaded CSVs (13 files)
-    │   └── processed/              # normalized CSVs
-    ├── raw/                        # reserved
-    └── logs/                       # timestamped pipeline logs
-```
-
-## Pipeline Steps
-
-### Step 1: Setup Directories
-Creates the full `data/` directory tree and `.gitkeep` files for version control.
-
-### Step 2: Generate Download Instructions
-Produces `DOWNLOAD_INSTRUCTIONS.md` with per-file step-by-step browser instructions
-and a machine-readable `manifest.json` for all 13 datasets.
-
-### Step 3: Auto-Download
-Downloads 12 of 13 datasets automatically:
-- **FPDS** (8 files): Atom/XML feed at `fpds.gov`, 500 rows per page, with retry logic.
-- **USASpending** (4 files): REST API at `api.usaspending.gov`, 100 results per page.
-- **FSRS** (1 file): Attempts automated form POST; falls back to manual instructions.
-
-### Step 4: Validate Downloads
-Checks each file for: existence, non-empty rows, required column families
-(date, vendor, agency, amount), and data quality (non-null key fields).
-
-### Step 5: Normalize & Transform
-Standardizes column names across all sources to `STANDARD_COLUMNS`, parses dates
-(flexible format), derives federal fiscal year (Oct–Sept boundary), cleans
-dollar amounts, deduplicates within each file, and outputs to `data/staging/processed/`.
-
-### Step 5.5: Cross-File Deduplication + Master Build
-Merges all 13 normalized CSVs into a single `pr_contracts_master.csv`. Removes
-duplicate contracts that appear in both `*_direct` and `*_vendor` files using a
-composite key of `(contract_id, award_date, vendor_name, obligated_amount)`.
-Source-file provenance is consolidated into a comma-joined `source_file` column.
-
-### Step 6: Validate Coverage
-Builds a fiscal-year coverage matrix (2000–2025), checks for the **critical 2007 gap**
-in FPDS 2005–2008 files (FPDS migrated platforms around 2007), and verifies
-timeline continuity with no internal gaps.
-
-### Step 7: SAM.gov UEI Enrichment (optional)
-Resolves vendor UEI/CAGE/DUNS via the SAM.gov Entity Information API v2, with
-USASpending.gov as a fallback. Requires a free API key — see setup below.
-
-**Setup:**
 ```bash
-# Option A — environment variable
-export SAM_API_KEY=your_key_here
+python -m contract_sweeper.query --source <source_id>
+```
 
-# Option B — .env file (gitignored, never committed)
+After adapter or producer work, regenerate status artifacts:
+
+```bash
+python3 scripts/gap_analysis_builder.py
+python3 scripts/build_source_recovery_matrix.py
+python -m pytest tests/ -q
+```
+
+## API Keys and Secrets
+
+Some producers require credentials at runtime. Keep all keys outside git.
+
+```bash
 cp .env.example .env
-# edit .env and replace placeholder with real key
+# edit .env locally; never commit real credentials
 ```
 
-**Running:**
+Common runtime keys include:
+
+```text
+SAM_API_KEY
+LDA_API_KEY
+FEC_API_KEY
+OPENCORPORATES_API_TOKEN
+HIGHERGOV_API_KEY
+```
+
+The repository should never contain live credentials, downloaded PII-heavy outputs,
+or private raw files unless they are explicitly approved and policy-compliant.
+
+## Data Directories
+
+```text
+data/
+├── raw/                         # manually acquired or raw producer inputs
+├── staging/                     # staging and expansion work products
+│   ├── expansion/               # original federal procurement staging area
+│   └── processed/               # normalized/generated outputs; often gitignored
+└── logs/                        # local run logs
+```
+
+Generated data products are generally excluded from git unless they are small,
+policy-safe, and intentionally promoted as fixtures, manifests, or audit reports.
+
+## Canonical Outputs
+
+Canonical outputs vary by active vector. Common target families include:
+
+```text
+contracts master tables
+source registry status reports
+materialization-readiness reports
+entity master / alias review queues
+lobbying and influence edge tables
+debt/fiscal-control relationship tables
+municipality and GIS normalization layers
+graph exports and analyst audit tables
+```
+
+Before treating any output as authoritative, verify:
+
 ```bash
-python3 run_all.py                              # includes enrichment if key is set
-python3 run_all.py --skip-enrichment           # skip enrichment
-python3 scripts/sam_enrichment.py --dry-run    # validate config, no API calls
-python3 scripts/sam_enrichment.py --resume     # resume from checkpoint
-python3 scripts/sam_enrichment.py --top 500    # top 500 vendors by value only
+python3 scripts/gap_analysis_builder.py
+python3 scripts/build_source_recovery_matrix.py
+python -m pytest tests/ -q
 ```
 
-**Outputs** (in `data/staging/processed/enrichment/`):
-- `vendor_uei_index.csv` — resolved UEI/CAGE/DUNS per vendor
-- `master_enriched.csv` — master CSV with UEI columns filled
-- `enrichment_summary.json` — coverage stats and gate result
-- `failed_lookups.csv` — vendors needing manual resolution
-
-⚠️ The enrichment output directory is gitignored — it may contain vendor PII.
-
-## Known Issues
-
-- **2007 FPDS gap**: FPDS migrated platforms circa 2007. The FY2005–2008 files may
-  have spotty 2007 data. The pipeline detects this and raises a critical alert.
-  If 2007 is missing, download it separately with date range 10/01/2006–09/30/2007.
-
-- **FSRS manual download**: FSRS has no public API. The auto-download attempts a
-  form POST but typically requires a browser session. Follow the manual instructions
-  in `DOWNLOAD_INSTRUCTIONS.md`.
-
-- **FPDS 500K row limit**: FPDS exports may cap at 500,000 rows. If a time window
-  hits this limit, split into smaller date ranges and combine the CSVs.
+Then inspect the relevant `reports/` status artifact for gate status and blockers.
 
 ## Testing
 
 ```bash
-# Install test dependencies
-pip install -r requirements.txt
+# Full suite
+python -m pytest tests/ -q
 
-# Run all tests
-python3 -m pytest tests/ -v
+# Verbose mode
+python -m pytest tests/ -v
 
-# Run a specific test file
-python3 -m pytest tests/test_config.py -v
-
-# Run with coverage (requires pytest-cov)
-python3 -m pytest tests/ --cov=scripts --cov-report=term-missing
+# Run a focused test file
+python -m pytest tests/test_pipeline_preflight.py -q
 ```
+
+For coverage-enabled environments:
+
+```bash
+python -m pytest tests/ --cov=scripts --cov=contract_sweeper --cov-report=term-missing
+```
+
+## Operating Controls
+
+Current repo-control conventions:
+
+- Use status files as the source of truth.
+- Prefer delta-only reporting during long execution threads.
+- Do not perform broad audits unless explicitly requested.
+- Run strict preflight before producer execution.
+- Keep manual-source ingestion separate from automatable producer materialization.
+- Do not promote a production master until source coverage, lineage, and tests pass.
+- Use failure packets for execution failures:
+
+```text
+command:
+exit_code:
+last_40_lines:
+files_recently_changed:
+suspected_area:
+```
+
+## Documentation
+
+Primary documentation files include:
+
+```text
+docs/ARCHITECTURE.md
+docs/DATA_POLICY.md
+docs/MATERIALIZATION_RUNBOOK.md
+docs/MODULE_REDUCTION_PLAN.md
+docs/NGO_INTEGRATION.md
+HANDOFF.md
+STATUS.md
+SETUP.md
+```
+
+Some handoff files are historical audit artifacts. Current execution state should be
+checked in `reports/current_status.json` before starting a new repo vector.
+
+## Production Promotion Gate
+
+A Contract-Sweeper output should be considered production-ready only after:
+
+1. strict preflight reports zero structural errors;
+2. all targeted sources are materialized or explicitly excluded with reason codes;
+3. manual-source parsers pass schema and row-count validation;
+4. entity and alias review queues are resolved or bounded;
+5. lineage manifests connect every output row to a source artifact;
+6. tests pass;
+7. status reports and blockers are regenerated;
+8. the active vector is closed in the repo state files.
+
+Until those gates pass, outputs are diagnostic or staging artifacts, not definitive
+public-money intelligence products.
