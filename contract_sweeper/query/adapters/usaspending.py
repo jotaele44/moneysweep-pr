@@ -359,3 +359,45 @@ class EXIMBankAdapter(_USAspendingNarrowAdapter):
     source_id = "exim_bank"
     agency_name = "Export-Import Bank of the United States"
     type_codes = GRANT_TYPE_CODES + DIRECT_PAYMENT_TYPE_CODES + LOAN_TYPE_CODES
+
+
+# Agency + CFDA narrows mirroring the USASpending fallbacks in the bulk producers
+# (scripts/download_<source>.py). Each pins the awarding agency and, where the
+# producer fetches specific CFDA programs, the same program_numbers.
+
+
+class VABenefitsAdapter(_USAspendingNarrowAdapter):
+    source_id = "va_benefits"
+    agency_name = "Department of Veterans Affairs"
+    # VA awards span grants, contracts, and direct-payment benefits.
+    type_codes = GRANT_TYPE_CODES + CONTRACT_TYPE_CODES + DIRECT_PAYMENT_TYPE_CODES
+
+
+class WIOAAdapter(_USAspendingNarrowAdapter):
+    source_id = "wioa"
+    agency_name = "Department of Labor"
+    # WIOA Title I: Adult / Dislocated Worker / Youth.
+    program_numbers = ("17.258", "17.259", "17.278")
+    type_codes = GRANT_TYPE_CODES
+
+
+class WICAdapter(_USAspendingNarrowAdapter):
+    source_id = "wic"
+    agency_name = "Department of Agriculture"
+    program_numbers = ("10.557",)  # Special Supplemental Nutrition Program (WIC)
+    type_codes = GRANT_TYPE_CODES
+
+
+class SNAPNAPAdapter(_USAspendingNarrowAdapter):
+    source_id = "snap_nap"
+    agency_name = "Department of Agriculture"
+    # SNAP / Summer Food / NAP-adjacent USDA FNS programs.
+    program_numbers = ("10.551", "10.559", "10.568")
+    type_codes = GRANT_TYPE_CODES
+
+
+class HUDHCVSection8Adapter(_USAspendingNarrowAdapter):
+    source_id = "hud_hcv_section8"
+    agency_name = "Department of Housing and Urban Development"
+    program_numbers = ("14.871",)  # Housing Choice Vouchers (Section 8)
+    type_codes = GRANT_TYPE_CODES

@@ -43,12 +43,17 @@ from .usaspending import (
     EXIMBankAdapter,
     HAFAdapter,
     HHSGrantsAdapter,
+    HUDHCVSection8Adapter,
     OIAGrantsAdapter,
     SLFRFAdapter,
+    SNAPNAPAdapter,
     USAspendingGrantsAdapter,
     USAspendingPrimeAdapter,
     USAspendingSubawardsAdapter,
     USDAGrantsAdapter,
+    VABenefitsAdapter,
+    WICAdapter,
+    WIOAAdapter,
 )
 
 #: Concrete adapters keyed by their registry source_id.
@@ -79,6 +84,12 @@ ADAPTER_REGISTRY: dict[str, Type[SourceAdapter]] = {
     SLFRFAdapter.source_id: SLFRFAdapter,
     HAFAdapter.source_id: HAFAdapter,
     EXIMBankAdapter.source_id: EXIMBankAdapter,
+    # USAspending agency+CFDA narrows (benefit programs)
+    VABenefitsAdapter.source_id: VABenefitsAdapter,
+    WIOAAdapter.source_id: WIOAAdapter,
+    WICAdapter.source_id: WICAdapter,
+    SNAPNAPAdapter.source_id: SNAPNAPAdapter,
+    HUDHCVSection8Adapter.source_id: HUDHCVSection8Adapter,
     # New distinct-API adapters
     FDICInstitutionsAdapter.source_id: FDICInstitutionsAdapter,
     NonprofitsIRS990Adapter.source_id: NonprofitsIRS990Adapter,
