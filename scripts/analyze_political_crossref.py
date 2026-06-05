@@ -345,24 +345,168 @@ def build_lobbying_crossref(root: Path | None = None) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Cabildero / registrant crossref
+# ---------------------------------------------------------------------------
+
+CABILDERO_CROSSREF_COLUMNS = [
+    "normalized_name", "registrant_name", "source",
+    "lda_filing_count", "lda_total_income", "lda_clients_represented",
+    "lda_issue_codes", "lda_years_active",
+    "pr_clients_represented", "pr_registration_years",
+    "anchor_status", "anchor_source_dataset",
+    "award_recipient_name", "total_awards_obligated", "award_count",
+    "award_datasets", "award_years",
+]
+
+
+def _blank_cabildero_record(norm: str) -> dict:
+    rec = {col: "" for col in CABILDERO_CROSSREF_COLUMNS}
+    rec["normalized_name"] = norm
+    rec["lda_filing_count"] = 0
+    rec["lda_total_income"] = 0.0
+    rec["total_awards_obligated"] = 0
+    rec["award_count"] = 0
+    rec["_in_lda"] = False
+    rec["_in_pr"] = False
+    return rec
+
+
+def build_cabildero_crossref(root: Path | None = None) -> dict:
+    """Cross-reference lobbying *registrants* against the awards master.
+
+    ``build_lobbying_crossref`` handles LDA *clients* (entities that hire
+    lobbyists); this handles the lobbyists/registrants themselves — federal LDA
+    registrant firms and PR OEG state-level cabilderos. It unifies the federal and
+    PR-state lobbying universes (tagging ``source`` as ``federal_lda``, ``pr_oeg``,
+    or ``both``) and tags each registrant with an ``anchor_status`` so lobbyists
+    that *also* receive federal awards (dual-influence) surface explicitly.
+    """
+    root = Path(root) if root is not None else PROJECT_ROOT
+    processed_dir = root / "data" / "staging" / "processed"
+    logger = setup_logging("analyze_political_crossref.cabildero")
+
+    lda_path = processed_dir / "pr_lda_filings.csv"
+    cab_path = processed_dir / "pr_cabilderos.csv"
+    awards_path = processed_dir / "pr_all_awards_master.csv"
+    out_path = processed_dir / "pr_cabildero_crossref.csv"
+
+    if not lda_path.exists() and not cab_path.exists():
+        logger.error("  Neither pr_lda_filings.csv nor pr_cabilderos.csv present")
+        return {"rows": 0, "status": "MISSING_LOBBYING_SOURCES"}
+
+    records: dict[str, dict] = {}
+
+    # Federal LDA registrants.
+    if lda_path.exists():
+        lda = pd.read_csv(lda_path, dtype=str, low_memory=False)
+        if "registrant_name" in lda.columns:
+            lda["_norm"] = lda["registrant_name"].apply(_normalize)
+            for norm, grp in lda[lda["_norm"] != ""].groupby("_norm"):
+                rec = records.setdefault(norm, _blank_cabildero_record(norm))
+                rec["registrant_name"] = grp["registrant_name"].iloc[0]
+                rec["_in_lda"] = True
+                rec["lda_filing_count"] = (
+                    int(grp["filing_uuid"].nunique()) if "filing_uuid" in grp.columns else int(len(grp))
+                )
+                if "income" in grp.columns:
+                    rec["lda_total_income"] = float(
+                        pd.to_numeric(grp["income"], errors="coerce").fillna(0).sum()
+                    )
+                if "client_name" in grp.columns:
+                    rec["lda_clients_represented"] = _merge_pipe(grp["client_name"], 25)
+                if "general_issue_codes" in grp.columns:
+                    rec["lda_issue_codes"] = _merge_pipe(grp["general_issue_codes"], 15)
+                if "filing_year" in grp.columns:
+                    rec["lda_years_active"] = _year_range(grp["filing_year"])
+
+    # PR OEG state-level cabilderos.
+    if cab_path.exists():
+        cab = pd.read_csv(cab_path, dtype=str, low_memory=False)
+        if "lobbyist_name" in cab.columns:
+            cab["_norm"] = cab["lobbyist_name"].apply(_normalize)
+            for norm, grp in cab[cab["_norm"] != ""].groupby("_norm"):
+                rec = records.setdefault(norm, _blank_cabildero_record(norm))
+                rec["_in_pr"] = True
+                if not rec["registrant_name"]:
+                    rec["registrant_name"] = grp["lobbyist_name"].iloc[0]
+                if "client_name" in grp.columns:
+                    rec["pr_clients_represented"] = _merge_pipe(grp["client_name"], 25)
+                if "registration_year" in grp.columns:
+                    rec["pr_registration_years"] = _year_range(grp["registration_year"])
+
+    if not records:
+        pd.DataFrame(columns=CABILDERO_CROSSREF_COLUMNS).to_csv(out_path, index=False)
+        logger.info("  Cabildero crossref: 0 registrants")
+        return {"rows": 0, "status": "EMPTY", "path": str(out_path)}
+
+    anchors = _load_anchor_sets(processed_dir)
+    award_lookup: dict[str, dict] = {}
+    if awards_path.exists():
+        awards = pd.read_csv(awards_path, dtype=str, low_memory=False)
+        if "recipient_name" in awards.columns:
+            award_lookup = _build_award_index(awards).set_index("_norm").to_dict("index")
+
+    rows = []
+    for norm, rec in records.items():
+        rec["source"] = (
+            "both" if rec["_in_lda"] and rec["_in_pr"]
+            else "federal_lda" if rec["_in_lda"]
+            else "pr_oeg"
+        )
+        status, src = _classify_anchor(norm, anchors)
+        rec["anchor_status"] = status
+        rec["anchor_source_dataset"] = src
+        aw = award_lookup.get(norm, {})
+        rec["award_recipient_name"] = aw.get("award_recipient_name", "")
+        rec["total_awards_obligated"] = aw.get("total_awards_obligated", 0)
+        rec["award_count"] = aw.get("award_count", 0)
+        rec["award_datasets"] = aw.get("award_datasets", "")
+        rec["award_years"] = aw.get("award_years", "")
+        rows.append({col: rec[col] for col in CABILDERO_CROSSREF_COLUMNS})
+
+    df = pd.DataFrame(rows, columns=CABILDERO_CROSSREF_COLUMNS)
+    df["total_awards_obligated"] = pd.to_numeric(df["total_awards_obligated"], errors="coerce").fillna(0)
+    df = df.sort_values(["total_awards_obligated", "lda_filing_count"], ascending=False)
+    df.to_csv(out_path, index=False, encoding="utf-8")
+
+    dual = int((df["anchor_status"] != "unmatched_no_anchor").sum())
+    source_counts = df["source"].value_counts().to_dict()
+    logger.info(
+        f"  Cabildero crossref: {len(df):,} registrants → {out_path.name} | "
+        f"sources: {source_counts} | dual-influence (anchored): {dual}"
+    )
+    return {
+        "rows": len(df),
+        "status": "OK",
+        "path": str(out_path),
+        "sources": source_counts,
+        "dual_influence": dual,
+    }
+
+
+# ---------------------------------------------------------------------------
 # Combined entry point
 # ---------------------------------------------------------------------------
 
 def build_political_crossref(root: Path | None = None) -> dict:
-    """Run both FEC and lobbying crossrefs; return combined summary."""
+    """Run FEC, lobbying, and cabildero crossrefs; return combined summary."""
     fec = build_fec_crossref(root)
     lda = build_lobbying_crossref(root)
-    return {"fec": fec, "lda": lda}
+    cabildero = build_cabildero_crossref(root)
+    return {"fec": fec, "lda": lda, "cabildero": cabildero}
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Political-finance crossref analysis")
     parser.add_argument("--fec", action="store_true", help="Run FEC crossref only")
-    parser.add_argument("--lda", action="store_true", help="Run lobbying crossref only")
+    parser.add_argument("--lda", action="store_true", help="Run lobbying (client) crossref only")
+    parser.add_argument("--cabildero", action="store_true", help="Run cabildero/registrant crossref only")
     args = parser.parse_args()
 
-    run_fec = args.fec or not (args.fec or args.lda)
-    run_lda = args.lda or not (args.fec or args.lda)
+    selected = args.fec or args.lda or args.cabildero
+    run_fec = args.fec or not selected
+    run_lda = args.lda or not selected
+    run_cab = args.cabildero or not selected
 
     if run_fec:
         r = build_fec_crossref()
@@ -370,6 +514,9 @@ def main() -> int:
     if run_lda:
         r = build_lobbying_crossref()
         print(f"Lobbying crossref: {r['rows']:,} matched entities → {r.get('path', '')}")
+    if run_cab:
+        r = build_cabildero_crossref()
+        print(f"Cabildero crossref: {r['rows']:,} registrants → {r.get('path', '')}")
     return 0
 
 
