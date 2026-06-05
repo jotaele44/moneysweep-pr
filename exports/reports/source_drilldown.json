@@ -167,6 +167,17 @@
       "row_count": 78
     },
     {
+      "artifact": "docs/foia_letters",
+      "producer_script": "scripts/build_foia_letters.py",
+      "producer_phase": "TOP_FORM_FOIA_LETTERS",
+      "phase_label": "foia_letters",
+      "schemas": [],
+      "source_inputs": [
+        "reports/foia_priority_queue.csv",
+        "data/reference/foia_requester.json"
+      ]
+    },
+    {
       "artifact": "exports/gis/layer_manifest.json",
       "producer_script": "scripts/build_gis_layer_manifest.py",
       "producer_phase": "TOP_FORM_GIS_LAYER_MANIFEST",

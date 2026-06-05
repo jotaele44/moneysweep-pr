@@ -48,6 +48,7 @@ jobs:
         run: |
           python scripts/build_foia_tracker.py
           python scripts/build_foia_yield_tracking.py
+          python scripts/build_foia_letters.py
 
       - name: Regenerate gis layer
         run: |
