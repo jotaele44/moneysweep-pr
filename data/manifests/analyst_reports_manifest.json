@@ -19,10 +19,19 @@
     "exports/graph/nodes.csv",
     "exports/graph/edges.csv",
     "reports/foia_priority_queue.csv",
-    "reports/foia_yield_tracking.csv"
+    "reports/foia_yield_tracking.csv",
+    "docs/foia_letters/FOIA_c509296376f145b1.md",
+    "docs/foia_letters/FOIA_3429122f5837fd47.md",
+    "docs/foia_letters/FOIA_aef916ac9b8ed071.md",
+    "docs/foia_letters/FOIA_f7d5acaf207ff8a5.md",
+    "docs/foia_letters/FOIA_64d22dfe3108f7b1.md",
+    "docs/foia_letters/FOIA_95021847de4153af.md",
+    "docs/foia_letters/FOIA_7ef254a89545013c.md",
+    "docs/foia_letters/FOIA_220df26653119d96.md",
+    "docs/foia_letters/FOIA_7fef81739082ae00.md"
   ],
   "output": "exports/reports/analyst_reports_manifest.json",
-  "row_count": 17,
+  "row_count": 26,
   "gates": [
     "debt_fiscal",
     "entity_master",
@@ -31,5 +40,5 @@
     "graph_export",
     "influence"
   ],
-  "generated_at": "2026-06-05T13:15:16.506722+00:00"
+  "generated_at": "2026-06-05T14:47:32.957920+00:00"
 }

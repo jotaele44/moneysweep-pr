@@ -114,6 +114,18 @@ def test_yield_regenerates_identically(yield_rows):
 
 
 # --------------------------------------------------------------------------- #
+# submission state
+# --------------------------------------------------------------------------- #
+
+@pytest.mark.unit
+def test_foia_all_submitted(foia_rows):
+    for r in foia_rows:
+        assert r["request_status"] == "submitted", \
+            f"{r['request_id']} expected submitted, got {r['request_status']}"
+
+
+
+# --------------------------------------------------------------------------- #
 # request_templates
 # --------------------------------------------------------------------------- #
 
