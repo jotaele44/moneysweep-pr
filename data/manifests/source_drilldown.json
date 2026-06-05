@@ -1,0 +1,30 @@
+{
+  "producer_script": "scripts/build_source_drilldown.py",
+  "producer_phase": "TOP_FORM_SOURCE_DRILLDOWN",
+  "schema": "schemas/source_drilldown.schema.json",
+  "source_inputs": [
+    "data/manifests"
+  ],
+  "output": "exports/reports/source_drilldown.json",
+  "row_count": 20,
+  "phase_labels": [
+    "agency_master",
+    "creditor_mapping",
+    "debt_instruments",
+    "entity_aliases",
+    "entity_master",
+    "fiscal_control_events",
+    "foia_tracker",
+    "foia_yield_tracking",
+    "geo_reason_codes",
+    "gis_layer_manifest",
+    "graph_export",
+    "hq_bias_correction",
+    "influence_edges",
+    "municipality_crosswalk",
+    "parent_map",
+    "person_master",
+    "review_queue"
+  ],
+  "generated_at": "2026-06-05T13:15:16.448528+00:00"
+}

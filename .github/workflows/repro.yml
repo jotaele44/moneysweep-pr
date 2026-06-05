@@ -59,6 +59,12 @@ jobs:
       - name: Regenerate graph export
         run: python scripts/build_graph_export.py
 
+      - name: Regenerate dashboard layer
+        run: |
+          python scripts/build_source_drilldown.py
+          python scripts/build_analyst_reports_manifest.py
+          python scripts/build_dashboard_explorer.py
+
       - name: Assert the substantive outputs are reproducible
         # Manifests carry a generated_at timestamp (provenance, not data), so they
         # are excluded; the schemas, reference CSVs, and exports must be identical.

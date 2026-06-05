@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contract Sweeper — Top-Form Explorer</title>
+<style>
+  body { font: 14px/1.5 system-ui, sans-serif; margin: 0; color: #1b1f24; background: #f6f8fa; }
+  header { background: #0b3d63; color: #fff; padding: 16px 24px; }
+  header h1 { margin: 0; font-size: 18px; }
+  nav { display: flex; gap: 4px; padding: 0 24px; background: #0b3d63; }
+  nav button { background: #14507f; color: #fff; border: 0; padding: 8px 16px; cursor: pointer; font-size: 13px; }
+  nav button.active { background: #f6f8fa; color: #0b3d63; font-weight: 600; }
+  main { padding: 20px 24px; }
+  table { border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid #e1e4e8; vertical-align: top; }
+  th { background: #eef2f6; position: sticky; top: 0; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; }
+  .done { background: #d6f5dd; color: #0a6b2b; }
+  .blocked, .missing, .manual_required, .auth_required { background: #fde2e1; color: #9b1c17; }
+  .partial, .unknown { background: #fff3cd; color: #8a6d00; }
+  .muted { color: #6a737d; font-size: 12px; }
+  section { display: none; }
+  section.active { display: block; }
+</style>
+</head>
+<body>
+<header><h1>Contract Sweeper — Top-Form Explorer</h1>
+<div class="muted">Static, self-contained. All data embedded below; no network required.</div></header>
+<nav>
+  <button data-tab="reports" class="active">Reports</button>
+  <button data-tab="lineage">Lineage</button>
+  <button data-tab="gaps">Gap Matrix</button>
+</nav>
+<main>
+  <section id="reports" class="active"></section>
+  <section id="lineage"></section>
+  <section id="gaps"></section>
+</main>
+<script type="application/json" id="data">{
+  "gap_summary": {
+    "gates": {
+      "dashboard": {
+        "done": 3,
+        "total": 3
+      },
+      "debt_fiscal": {
+        "done": 3,
+        "total": 4
+      },
+      "entity_master": {
+        "done": 6,
+        "total": 6
+      },
+      "federal_procurement": {
+        "done": 0,
+        "total": 6
+      },
+      "foia": {
+        "done": 3,
+        "total": 3
+      },
+      "gis": {
+        "done": 4,
+        "total": 5
+      },
+      "graph_export": {
+        "done": 4,
+        "total": 4
+      },
+      "influence": {
+        "done": 1,
+        "total": 5
+      },
+      "local_contracts": {
+        "done": 0,
+        "total": 6
+      },
+      "required_sources": {
+        "done": 0,
+        "total": 9
+      },
+      "source_registry": {
+        "done": 0,
+        "total": 6
+      },
+      "testing": {
+        "done": 5,
+        "total": 5
+      }
+    },
+    "status_counts": {
+      "auth_required": 2,
+      "blocked": 4,
+      "done": 29,
+      "manual_required": 4,
+      "missing": 3,
+      "partial": 20
+    }
+  },
+  "lineage": [
+    {
+      "artifact": "data/reference/agency_master.csv",
+      "phase_label": "agency_master",
+      "producer_phase": "TOP_FORM_AGENCY_MASTER",
+      "producer_script": "scripts/build_agency_master.py",
+      "row_count": 95,
+      "schemas": [
+        "schemas/agency_master.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/pr_public_money_entities.csv",
+        "data/reference/pr_municipalities.csv"
+      ]
+    },
+    {
+      "artifact": "data/reference/creditor_mapping.csv",
+      "phase_label": "creditor_mapping",
+      "producer_phase": "TOP_FORM_CREDITOR_MAPPING",
+      "producer_script": "scripts/build_creditor_mapping.py",
+      "row_count": 14,
+      "schemas": [
+        "schemas/creditor_mapping.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/debt_instruments.csv"
+      ]
+    },
+    {
+      "artifact": "data/reference/debt_instruments.csv",
+      "phase_label": "debt_instruments",
+      "producer_phase": "TOP_FORM_DEBT_INSTRUMENTS",
+      "producer_script": "scripts/build_debt_instruments.py",
+      "row_count": 20,
+      "schemas": [
+        "schemas/debt_instrument.schema.json"
+      ],
+      "source_inputs": [
+        "data/canonical_v1/debt_instruments.csv",
+        "data/reference/entity_master.csv"
+      ]
+    },
+    {
+      "artifact": "data/reference/entity_aliases.csv",
+      "phase_label": "entity_aliases",
+      "producer_phase": "TOP_FORM_ENTITY_ALIASES",
+      "producer_script": "scripts/build_entity_aliases.py",
+      "row_count": 224,
+      "schemas": [
+        "schemas/entity_aliases.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/entity_master.csv",
+        "data/reference/agency_master.csv"
+      ]
+    },
+    {
+      "artifact": "data/reference/entity_master.csv",
+      "phase_label": "entity_master",
+      "producer_phase": "TOP_FORM_ENTITY_MASTER",
+      "producer_script": "scripts/build_entity_master.py",
+      "row_count": 26,
+      "schemas": [
+        "schemas/entity_master.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/pr_public_money_entities.csv"
+      ]
+    },
+    {
+      "artifact": "data/reference/entity_parent_map.csv",
+      "phase_label": "parent_map",
+      "producer_phase": "TOP_FORM_PARENT_MAP",
+      "producer_script": "scripts/build_entity_parent_map.py",
+      "row_count": 20,
+      "schemas": [
+        "schemas/entity_parent_map.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/entity_parent_map_seed.csv",
+        "data/reference/entity_master.csv"
+      ]
+    },
+    {
+      "artifact": "data/reference/fiscal_control_events.csv",
+      "phase_label": "fiscal_control_events",
+      "producer_phase": "TOP_FORM_FISCAL_CONTROL_EVENTS",
+      "producer_script": "scripts/build_fiscal_control_events.py",
+      "row_count": 12,
+      "schemas": [
+        "schemas/fiscal_control_event.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/fiscal_control_events_seed.csv",
+        "data/reference/entity_master.csv"
+      ]
+    },
+    {
+      "artifact": "data/reference/geo_reason_codes.csv",
+      "phase_label": "geo_reason_codes",
+      "producer_phase": "TOP_FORM_GEO_REASON_CODES",
+      "producer_script": "scripts/build_geo_reason_codes.py",
+      "row_count": 19,
+      "schemas": [
+        "schemas/geo_reason_codes.schema.json"
+      ],
+      "source_inputs": [
+        "scripts/run_contract_finance_geo_reasoning.py"
+      ]
+    },
+    {
+      "artifact": "data/reference/hq_bias_correction.csv",
+      "phase_label": "hq_bias_correction",
+      "producer_phase": "TOP_FORM_HQ_BIAS_CORRECTION",
+      "producer_script": "scripts/build_hq_bias_reference.py",
+      "row_count": 4,
+      "schemas": [
+        "schemas/hq_bias_correction.schema.json"
+      ],
+      "source_inputs": [
+        "scripts/run_contract_finance_geo_reasoning.py"
+      ]
+    },
+    {
+      "artifact": "data/reference/influence_edges.csv",
+      "phase_label": "influence_edges",
+      "producer_phase": "TOP_FORM_INFLUENCE_EDGES",
+      "producer_script": "scripts/build_influence_edges.py",
+      "row_count": 30,
+      "schemas": [
+        "schemas/influence_edges.schema.json"
+      ],
+      "source_inputs": [
+        "data/canonical_v1/lobbying_records.csv",
+        "data/canonical_v1/roles.csv",
+        "data/reference/entity_parent_map.csv",
+        "data/reference/entity_master.csv",
+        "data/reference/agency_master.csv",
+        "data/reference/person_master.csv"
+      ]
+    },
+    {
+      "artifact": "data/reference/person_master.csv",
+      "phase_label": "person_master",
+      "producer_phase": "TOP_FORM_PERSON_MASTER",
+      "producer_script": "scripts/build_person_master.py",
+      "row_count": 60,
+      "schemas": [
+        "schemas/person_master.schema.json"
+      ],
+      "source_inputs": [
+        "data/canonical_v1/people.csv"
+      ]
+    },
+    {
+      "artifact": "data/reference/pr_78_municipio_crosswalk.csv",
+      "phase_label": "municipality_crosswalk",
+      "producer_phase": "TOP_FORM_MUNICIPALITY_CROSSWALK",
+      "producer_script": "scripts/build_municipality_crosswalk.py",
+      "row_count": 78,
+      "schemas": [
+        "schemas/municipality_crosswalk.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/pr_78_municipio_crosswalk.csv"
+      ]
+    },
+    {
+      "artifact": "exports/gis/layer_manifest.json",
+      "phase_label": "gis_layer_manifest",
+      "producer_phase": "TOP_FORM_GIS_LAYER_MANIFEST",
+      "producer_script": "scripts/build_gis_layer_manifest.py",
+      "schemas": [
+        "schemas/gis_layer_manifest.schema.json"
+      ],
+      "source_inputs": []
+    },
+    {
+      "artifact": "exports/graph/edges.csv",
+      "phase_label": "graph_export",
+      "producer_phase": "TOP_FORM_GRAPH_EXPORT",
+      "producer_script": "scripts/build_graph_export.py",
+      "schemas": [
+        "schemas/graph_nodes.schema.json",
+        "schemas/graph_edges.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/entity_master.csv",
+        "data/reference/agency_master.csv",
+        "data/reference/person_master.csv",
+        "data/reference/entity_parent_map.csv",
+        "data/canonical_v1/lobbying_records.csv",
+        "data/canonical_v1/roles.csv"
+      ]
+    },
+    {
+      "artifact": "exports/graph/neo4j_edges.csv",
+      "phase_label": "graph_export",
+      "producer_phase": "TOP_FORM_GRAPH_EXPORT",
+      "producer_script": "scripts/build_graph_export.py",
+      "schemas": [
+        "schemas/graph_nodes.schema.json",
+        "schemas/graph_edges.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/entity_master.csv",
+        "data/reference/agency_master.csv",
+        "data/reference/person_master.csv",
+        "data/reference/entity_parent_map.csv",
+        "data/canonical_v1/lobbying_records.csv",
+        "data/canonical_v1/roles.csv"
+      ]
+    },
+    {
+      "artifact": "exports/graph/neo4j_nodes.csv",
+      "phase_label": "graph_export",
+      "producer_phase": "TOP_FORM_GRAPH_EXPORT",
+      "producer_script": "scripts/build_graph_export.py",
+      "schemas": [
+        "schemas/graph_nodes.schema.json",
+        "schemas/graph_edges.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/entity_master.csv",
+        "data/reference/agency_master.csv",
+        "data/reference/person_master.csv",
+        "data/reference/entity_parent_map.csv",
+        "data/canonical_v1/lobbying_records.csv",
+        "data/canonical_v1/roles.csv"
+      ]
+    },
+    {
+      "artifact": "exports/graph/nodes.csv",
+      "phase_label": "graph_export",
+      "producer_phase": "TOP_FORM_GRAPH_EXPORT",
+      "producer_script": "scripts/build_graph_export.py",
+      "schemas": [
+        "schemas/graph_nodes.schema.json",
+        "schemas/graph_edges.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/entity_master.csv",
+        "data/reference/agency_master.csv",
+        "data/reference/person_master.csv",
+        "data/reference/entity_parent_map.csv",
+        "data/canonical_v1/lobbying_records.csv",
+        "data/canonical_v1/roles.csv"
+      ]
+    },
+    {
+      "artifact": "reports/entity_resolution_review_queue.csv",
+      "phase_label": "review_queue",
+      "producer_phase": "TOP_FORM_REVIEW_QUEUE",
+      "producer_script": "scripts/build_entity_resolution_review_queue.py",
+      "row_count": 24,
+      "schemas": [
+        "schemas/canonical_v1/review_queue.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/person_master.csv"
+      ]
+    },
+    {
+      "artifact": "reports/foia_priority_queue.csv",
+      "phase_label": "foia_tracker",
+      "producer_phase": "TOP_FORM_FOIA_TRACKER",
+      "producer_script": "scripts/build_foia_tracker.py",
+      "row_count": 9,
+      "schemas": [
+        "schemas/foia_request.schema.json"
+      ],
+      "source_inputs": [
+        "data/reference/foia_priority_queue_seed.csv",
+        "reports/source_registry_status.csv"
+      ]
+    },
+    {
+      "artifact": "reports/foia_yield_tracking.csv",
+      "phase_label": "foia_yield_tracking",
+      "producer_phase": "TOP_FORM_FOIA_YIELD_TRACKING",
+      "producer_script": "scripts/build_foia_yield_tracking.py",
+      "row_count": 9,
+      "schemas": [
+        "schemas/foia_yield.schema.json"
+      ],
+      "source_inputs": [
+        "reports/foia_priority_queue.csv",
+        "reports/source_registry_status.csv"
+      ]
+    }
+  ],
+  "reports": [
+    {
+      "format": "csv",
+      "gate": "entity_master",
+      "path": "data/reference/entity_master.csv",
+      "producer_script": "scripts/build_entity_master.py",
+      "report_id": "RPT_355f79cb4ff16d91",
+      "row_count": 26,
+      "status": "done",
+      "title": "Entity Master"
+    },
+    {
+      "format": "csv",
+      "gate": "entity_master",
+      "path": "data/reference/agency_master.csv",
+      "producer_script": "scripts/build_agency_master.py",
+      "report_id": "RPT_f3ee1af690f5dd71",
+      "row_count": 95,
+      "status": "done",
+      "title": "Agency & Municipio Master"
+    },
+    {
+      "format": "csv",
+      "gate": "entity_master",
+      "path": "data/reference/person_master.csv",
+      "producer_script": "scripts/build_person_master.py",
+      "report_id": "RPT_fabd0f1b40985896",
+      "row_count": 60,
+      "status": "done",
+      "title": "Person Master"
+    },
+    {
+      "format": "csv",
+      "gate": "entity_master",
+      "path": "data/reference/entity_aliases.csv",
+      "producer_script": "scripts/build_entity_aliases.py",
+      "report_id": "RPT_024e2975d89dc663",
+      "row_count": 224,
+      "status": "done",
+      "title": "Entity Aliases"
+    },
+    {
+      "format": "csv",
+      "gate": "entity_master",
+      "path": "data/reference/entity_parent_map.csv",
+      "producer_script": "scripts/build_entity_parent_map.py",
+      "report_id": "RPT_3df7bf2784debeaa",
+      "row_count": 20,
+      "status": "done",
+      "title": "Entity Parent / Operator Map"
+    },
+    {
+      "format": "csv",
+      "gate": "entity_master",
+      "path": "reports/entity_resolution_review_queue.csv",
+      "producer_script": "scripts/build_entity_resolution_review_queue.py",
+      "report_id": "RPT_a8c88630f6ef4b08",
+      "row_count": 24,
+      "status": "done",
+      "title": "Entity Resolution Review Queue"
+    },
+    {
+      "format": "csv",
+      "gate": "influence",
+      "path": "data/reference/influence_edges.csv",
+      "producer_script": "scripts/build_influence_edges.py",
+      "report_id": "RPT_c8bc50879d6a8e5c",
+      "row_count": 30,
+      "status": "done",
+      "title": "Influence Edges"
+    },
+    {
+      "format": "csv",
+      "gate": "debt_fiscal",
+      "path": "data/reference/debt_instruments.csv",
+      "producer_script": "scripts/build_debt_instruments.py",
+      "report_id": "RPT_91e8490f4c97be50",
+      "row_count": 20,
+      "status": "done",
+      "title": "Debt Instruments"
+    },
+    {
+      "format": "csv",
+      "gate": "debt_fiscal",
+      "path": "data/reference/creditor_mapping.csv",
+      "producer_script": "scripts/build_creditor_mapping.py",
+      "report_id": "RPT_ba0481dcbf989076",
+      "row_count": 14,
+      "status": "done",
+      "title": "Creditor Mapping"
+    },
+    {
+      "format": "csv",
+      "gate": "debt_fiscal",
+      "path": "data/reference/fiscal_control_events.csv",
+      "producer_script": "scripts/build_fiscal_control_events.py",
+      "report_id": "RPT_25408420b68f17f4",
+      "row_count": 12,
+      "status": "done",
+      "title": "Fiscal Control Events Timeline"
+    },
+    {
+      "format": "csv",
+      "gate": "gis",
+      "path": "data/reference/geo_reason_codes.csv",
+      "producer_script": "scripts/build_geo_reason_codes.py",
+      "report_id": "RPT_87a6548e7f3000c6",
+      "row_count": 19,
+      "status": "done",
+      "title": "Geo Resolution Codes"
+    },
+    {
+      "format": "csv",
+      "gate": "gis",
+      "path": "data/reference/hq_bias_correction.csv",
+      "producer_script": "scripts/build_hq_bias_reference.py",
+      "report_id": "RPT_953907bd4f276872",
+      "row_count": 4,
+      "status": "done",
+      "title": "HQ Bias Correction Contract"
+    },
+    {
+      "format": "json",
+      "gate": "gis",
+      "path": "exports/gis/layer_manifest.json",
+      "producer_script": "scripts/build_gis_layer_manifest.py",
+      "report_id": "RPT_3514c68ea67886d5",
+      "row_count": 6,
+      "status": "done",
+      "title": "GIS Layer Manifest"
+    },
+    {
+      "format": "csv",
+      "gate": "graph_export",
+      "path": "exports/graph/nodes.csv",
+      "producer_script": "scripts/build_graph_export.py",
+      "report_id": "RPT_01cd853c9725edd0",
+      "row_count": 164,
+      "status": "done",
+      "title": "Graph Nodes"
+    },
+    {
+      "format": "csv",
+      "gate": "graph_export",
+      "path": "exports/graph/edges.csv",
+      "producer_script": "scripts/build_graph_export.py",
+      "report_id": "RPT_2168b573f213ff72",
+      "row_count": 30,
+      "status": "done",
+      "title": "Graph Edges"
+    },
+    {
+      "format": "csv",
+      "gate": "foia",
+      "path": "reports/foia_priority_queue.csv",
+      "producer_script": "scripts/build_foia_tracker.py",
+      "report_id": "RPT_27b6ec89af89b2be",
+      "row_count": 9,
+      "status": "done",
+      "title": "FOIA Priority Queue"
+    },
+    {
+      "format": "csv",
+      "gate": "foia",
+      "path": "reports/foia_yield_tracking.csv",
+      "producer_script": "scripts/build_foia_yield_tracking.py",
+      "report_id": "RPT_4c0f975db7527f36",
+      "row_count": 9,
+      "status": "done",
+      "title": "FOIA Yield Tracking"
+    }
+  ],
+  "title": "Contract Sweeper \u2014 Top-Form Explorer"
+}</script>
+<script>
+  var DATA = JSON.parse(document.getElementById("data").textContent);
+  function el(tag, html) { var e = document.createElement(tag); if (html != null) e.innerHTML = html; return e; }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>]/g, function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+  function table(cols, rows, cell) {
+    var t = el("table"), thead = el("thead"), tr = el("tr");
+    cols.forEach(function(c){ tr.appendChild(el("th", esc(c))); });
+    thead.appendChild(tr); t.appendChild(thead);
+    var tb = el("tbody");
+    rows.forEach(function(r){ tb.appendChild(cell(r)); });
+    t.appendChild(tb); return t;
+  }
+  function pill(s){ return '<span class="pill ' + esc(s) + '">' + esc(s) + '</span>'; }
+
+  // Reports tab
+  (function(){
+    var rows = DATA.reports || [];
+    var t = table(["Gate","Title","Format","Rows","Status","Path"], rows, function(r){
+      var tr = el("tr");
+      tr.appendChild(el("td", esc(r.gate)));
+      tr.appendChild(el("td", esc(r.title)));
+      tr.appendChild(el("td", esc(r.format)));
+      tr.appendChild(el("td", esc(r.row_count)));
+      tr.appendChild(el("td", pill(r.status)));
+      tr.appendChild(el("td", '<span class="muted">' + esc(r.path) + '</span>'));
+      return tr;
+    });
+    document.getElementById("reports").appendChild(t);
+  })();
+
+  // Lineage tab
+  (function(){
+    var rows = DATA.lineage || [];
+    var t = table(["Artifact","Producer","Phase","Source inputs"], rows, function(r){
+      var tr = el("tr");
+      tr.appendChild(el("td", esc(r.artifact)));
+      tr.appendChild(el("td", '<span class="muted">' + esc(r.producer_script) + '</span>'));
+      tr.appendChild(el("td", esc(r.phase_label)));
+      tr.appendChild(el("td", '<span class="muted">' + esc((r.source_inputs||[]).join(", ")) + '</span>'));
+      return tr;
+    });
+    document.getElementById("lineage").appendChild(t);
+  })();
+
+  // Gap matrix tab
+  (function(){
+    var gs = DATA.gap_summary || {status_counts:{}, gates:{}};
+    var s = document.getElementById("gaps");
+    s.appendChild(el("h3", "Status counts"));
+    var sc = Object.keys(gs.status_counts).map(function(k){ return {status:k, count:gs.status_counts[k]}; });
+    s.appendChild(table(["Status","Count"], sc, function(r){
+      var tr = el("tr"); tr.appendChild(el("td", pill(r.status))); tr.appendChild(el("td", esc(r.count))); return tr;
+    }));
+    s.appendChild(el("h3", "Per-gate completion"));
+    var gr = Object.keys(gs.gates).map(function(k){ return {gate:k, done:gs.gates[k].done, total:gs.gates[k].total}; });
+    s.appendChild(table(["Gate","Done","Total"], gr, function(r){
+      var tr = el("tr"); tr.appendChild(el("td", esc(r.gate)));
+      tr.appendChild(el("td", esc(r.done))); tr.appendChild(el("td", esc(r.total))); return tr;
+    }));
+  })();
+
+  // Tabs
+  var buttons = document.querySelectorAll("nav button");
+  buttons.forEach(function(b){
+    b.addEventListener("click", function(){
+      buttons.forEach(function(x){ x.classList.remove("active"); });
+      b.classList.add("active");
+      document.querySelectorAll("main section").forEach(function(sec){ sec.classList.remove("active"); });
+      document.getElementById(b.getAttribute("data-tab")).classList.add("active");
+    });
+  });
+</script>
+</body>
+</html>
