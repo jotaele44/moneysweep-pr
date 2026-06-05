@@ -4,7 +4,7 @@
 **Record type:** Disaster-recovery project tracker dataset  
 **Jurisdiction:** PR (PR Ley 141-2019)  
 **Priority:** P0  
-**Status:** planned  
+**Status:** submitted  
 
 ---
 

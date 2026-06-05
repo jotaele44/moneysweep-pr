@@ -80,7 +80,7 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
             "jurisdiction": (ref.get("jurisdiction") or "").strip(),
             "record_type": record_type,
             "statute": (ref.get("statute") or "").strip(),
-            "request_status": "planned",
+            "request_status": (ref.get("request_status") or "planned").strip(),
             "priority": (ref.get("priority") or "").strip(),
             "rationale": (ref.get("rationale") or "").strip(),
             "evidence_tier": EVIDENCE_TIER,

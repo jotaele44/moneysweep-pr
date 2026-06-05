@@ -96,12 +96,31 @@ def test_letters_regenerate_identically():
 # --------------------------------------------------------------------------- #
 
 @pytest.mark.unit
-def test_validate_foia_submission_not_ready_with_stub_config():
+def test_letters_have_requester_placeholder_until_operator_fills():
+    """Letters correctly carry {{placeholders}} until the operator fills foia_requester.json.
+
+    This is the expected state after PR 9 (status progression): all statuses are
+    'submitted' (decision recorded), but the actual sender's name/contact must be
+    filled in by the operator before physically sending the letters.
+    """
+    entries = bfl.build_rows(REPO_ROOT)
+    for e in entries:
+        # requester placeholders are intentionally present — operator fills these
+        assert "{{requester_name}}" in e["content"] or "{{requester_contact}}" in e["content"], \
+            f"{e['request_id']}: expected requester placeholders still present"
+
+
+@pytest.mark.unit
+def test_validate_foia_submission_flags_only_requester_info():
+    """Validator fails only on requester config, not on letter existence or status."""
     from scripts.validate_foia_submission_ready import validate
     problems = validate(REPO_ROOT)
-    # stub config has {{placeholders}} — validator must flag them
+    # must flag the placeholder requester info
     assert any("placeholder" in p.lower() for p in problems), \
-        f"expected placeholder errors, got: {problems}"
+        f"expected requester placeholder errors, got: {problems}"
+    # must NOT flag missing letters or invalid statuses
+    letter_problems = [p for p in problems if "missing letter" in p.lower() or "invalid request_status" in p.lower()]
+    assert letter_problems == [], f"unexpected letter/status errors: {letter_problems}"
 
 
 # --------------------------------------------------------------------------- #
