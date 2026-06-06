@@ -19,13 +19,20 @@ Usage:
 
 import argparse
 import sys
-import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
 import requests
+
+from contract_sweeper.runtime.base_downloader import (
+    HttpConfig,
+    PageResult,
+    build_session,
+    http_post_json,
+    paginate,
+)
 
 from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
 
@@ -87,11 +94,16 @@ RETRY_BACKOFF = [2, 4, 8]
 PAGE_SLEEP = 0.3
 RATE_LIMIT_SLEEP = 30
 
+_HTTP = HttpConfig(
+    user_agent="ContractSweeper/1.0",
+    max_retries=MAX_RETRIES,
+    page_sleep=PAGE_SLEEP,
+    rate_limit_sleep=RATE_LIMIT_SLEEP,
+)
+
 
 def _session():
-    s = requests.Session()
-    s.headers.update({"User-Agent": "ContractSweeper/1.0", "Accept": "application/json"})
-    return s
+    return build_session("ContractSweeper/1.0")
 
 
 def _derive_fiscal_year(date_str):
@@ -116,54 +128,24 @@ def _file_has_data(filepath):
 
 
 def _fetch_page(session, payload, logger):
-    last_err = None
-    for attempt in range(MAX_RETRIES):
-        try:
-            resp = session.post(USASPENDING_URL, json=payload, timeout=30)
-            if resp.status_code == 429:
-                logger.warning(f"  Rate limited — sleeping {RATE_LIMIT_SLEEP}s")
-                time.sleep(RATE_LIMIT_SLEEP)
-                resp = session.post(USASPENDING_URL, json=payload, timeout=30)
-            if 400 <= resp.status_code < 500:
-                logger.error(f"  HTTP {resp.status_code} — skipping: {resp.text[:300]}")
-                return None
-            resp.raise_for_status()
-            return resp.json()
-        except requests.HTTPError as e:
-            status = e.response.status_code if e.response is not None else 0
-            if 400 <= status < 500:
-                logger.error(f"  HTTP {status} — skipping: {e}")
-                return None
-            last_err = e
-        except requests.RequestException as e:
-            last_err = e
-        if attempt < MAX_RETRIES - 1:
-            wait = RETRY_BACKOFF[attempt]
-            logger.warning(f"  Attempt {attempt + 1} failed ({last_err}) — retrying in {wait}s")
-            time.sleep(wait)
-    logger.error(f"  All {MAX_RETRIES} attempts failed: {last_err}")
-    return None
+    return http_post_json(session, USASPENDING_URL, payload, logger=logger, config=_HTTP)
 
 
 def _paginate(session, base_payload, logger):
-    all_results = []
-    page = 1
-    while True:
+    def _fetch(page):
         payload = {**base_payload, "page": page}
         data = _fetch_page(session, payload, logger)
         if data is None:
-            break
+            return PageResult([], None)
         results = data.get("results", [])
         if not results:
-            break
-        all_results.extend(results)
+            return PageResult([], None)
         if page % 10 == 0:
-            logger.info(f"    Page {page} ({len(all_results)} records so far)")
-        if not data.get("page_metadata", {}).get("has_next_page", False):
-            break
-        page += 1
-        time.sleep(PAGE_SLEEP)
-    return all_results
+            logger.info(f"    Page {page}")
+        has_next = data.get("page_metadata", {}).get("has_next_page", False)
+        return PageResult(results, page + 1 if has_next else None)
+
+    return list(paginate(_fetch, start_marker=1))
 
 
 def _build_payload(filter_type, window):
