@@ -20,3 +20,17 @@ repos:
         entry: detect-private-key
         language: python
         types: [text]
+
+  - repo: local
+    hooks:
+      - id: regenerate-registry-json
+        name: Regenerate registries/*.json from YAML (audit Phase 2)
+        # Runs only when a registry YAML changes. The script overwrites the
+        # paired JSON; runtime modules under contract_sweeper.runtime.* read the
+        # JSON, so this hook is what keeps the wire format in sync with the
+        # YAML source of truth. See registries/README.md for the policy.
+        entry: python3 scripts/regenerate_registry_json.py
+        language: system
+        pass_filenames: false
+        files: ^registries/.*\.yaml$
+        stages: [commit]
