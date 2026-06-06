@@ -23,8 +23,8 @@ tests/test_download_ofac.py,6,external,external,included,false,filename referenc
 tests/test_download_sf133.py,10,external,external,included,false,filename references downloader or external source boundary tests
 tests/test_emma_mapper.py,10,external,external,included,false,filename references downloader or external source boundary tests
 tests/test_entity_universe_audit.py,2,unit,unit,included,false,filename suggests focused pure logic or mapper coverage
-tests/test_external_blocker_freeze_r49d.py,2,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
-tests/test_external_source_delivery_gate_r49c.py,2,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
+tests/test_external_blocker_freeze.py,2,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
+tests/test_external_source_delivery_gate.py,2,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
 tests/test_fdic_mapper.py,10,external,external,included,false,filename references downloader or external source boundary tests
 tests/test_final_source_recovery_pass_r48i.py,2,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
 tests/test_highergov_mapper.py,7,external,external,included,false,filename references downloader or external source boundary tests
@@ -40,15 +40,15 @@ tests/test_partial_master_rebuild_r49a.py,3,pipeline_gate,pipeline_gate|non_exec
 tests/test_production_status_gate.py,7,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
 tests/test_r48d_downloader_return_flow.py,4,pipeline_gate,pipeline_gate,included,false,filename references pause/recovery/backfill/phase gate behavior
 tests/test_r4_build_unified_master_guards.py,3,integration,integration|pipeline_gate,included,false,filename references pause/recovery/backfill/phase gate behavior; filename references multi-module or filesystem-backed behavior
-tests/test_repo_quality_audit_r49z_b.py,2,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
+tests/test_repo_quality_audit.py,2,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
 tests/test_sam_enrichment.py,14,integration,integration,included,false,filename references multi-module or filesystem-backed behavior
 tests/test_setup_directories.py,3,non_executing,non_executing,included,false,filename references audit/config/validation/status checks
 tests/test_source_coverage_audit.py,3,non_executing,non_executing,included,false,filename references audit/config/validation/status checks
-tests/test_source_delivery_handoff_r49e.py,2,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
-tests/test_source_delivery_watch_r49f.py,3,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
+tests/test_source_delivery_handoff.py,2,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
+tests/test_source_delivery_watch.py,3,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
 tests/test_source_input_recovery.py,3,non_executing,non_executing,included,false,filename references audit/config/validation/status checks
 tests/test_source_materialization_rebuild_retry_r49b.py,2,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
-tests/test_source_recovery_pause_lock_r49z.py,2,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
+tests/test_source_recovery_pause_lock.py,2,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
 tests/test_targeted_backfill_retry_r48d.py,3,pipeline_gate,pipeline_gate|non_executing,included,false,filename references pause/recovery/backfill/phase gate behavior; content asserts pause/status invariants without default execution changes
 tests/test_validate_coverage.py,11,non_executing,non_executing,included,false,filename references audit/config/validation/status checks
 tests/test_validate_downloads.py,7,non_executing,non_executing,included,false,filename references audit/config/validation/status checks
