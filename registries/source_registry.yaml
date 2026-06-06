@@ -481,15 +481,40 @@ sources:
   - source_id: lda
     family: lobbying
     required: true
-    authentication: api_key:LDA_API_KEY
-    endpoint_url: https://lda.senate.gov/api/v1/
-    producer_script: scripts/download_lda.py
+    authentication: none
+    endpoint_url: https://lda.gov/api/v1/
+    producer_script: scripts/sources/fetch_lda_gov.py
+    authority_level: api_authoritative
+    access_method: public_api
+    default_mode: dry_run
+    replaces_static_seed: true
+    static_seed_role_after_adapter: regression_fixture
+    evidence_tier_default: T1_or_T2
     expected_outputs:
+      - outputs/normalized/lda/lda_registrants.csv
+      - outputs/normalized/lda/lda_clients.csv
+      - outputs/normalized/lda/lda_lobbyists.csv
+      - outputs/normalized/lda/lda_filings.csv
+      - outputs/normalized/lda/lda_contributions.csv
+      - outputs/reference/lda/lda_ref_filing_types.csv
+      - outputs/reference/lda/lda_ref_lobbying_issues.csv
+      - outputs/reference/lda/lda_ref_government_entities.csv
+      - outputs/reference/lda/lda_ref_countries.csv
+      - outputs/reference/lda/lda_ref_states.csv
+      - outputs/reference/lda/lda_ref_lobbyist_prefixes.csv
+      - outputs/reference/lda/lda_ref_lobbyist_suffixes.csv
+      - outputs/reference/lda/lda_ref_contribution_item_types.csv
       - data/staging/processed/pr_lda_filings.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
     update_cadence: monthly
+    notes: |
+      API-authoritative federal LDA lobbying source via LDA.gov.
+      Canonical API provider alias: lda_gov.
+      Default mode is dry-run fixture mode; live API calls require --live.
+      No API key is required. Uploaded/static LDA snapshots are retained as
+      regression fixtures or archival snapshots after adapter materialization.
 
   - source_id: pr_cabilderos
     family: lobbying
