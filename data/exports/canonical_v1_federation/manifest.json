@@ -1,0 +1,13 @@
+{
+  "producer_script": "scripts/bridge_canonical_v1_federation.py",
+  "producer_phase": "CANONICAL_V1_FEDERATION_BRIDGE",
+  "gate": "NON_PRODUCTION_DIAGNOSTIC",
+  "stream_counts": {
+    "sources": 232,
+    "entities": 86,
+    "relationships": 15
+  },
+  "not_yet_federated_count": 49,
+  "edges_federated_pct": 23.44,
+  "generated_at": "2026-06-02T22:49:31.770814+00:00"
+}
