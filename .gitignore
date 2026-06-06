@@ -35,9 +35,15 @@ data/**
 !data/reference/
 !data/reports/
 !data/review_queue/
+!data/logs/
 !data/staging/
 !data/staging/expansion/
+!data/staging/raw/
+!data/staging/raw/**/
+!data/staging/processed/
+!data/staging/processed/**/
 !data/raw/
+!data/raw/**/
 !data/raw/act_transition/
 !data/raw/HigherGov/
 !data/raw/documents/
