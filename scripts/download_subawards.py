@@ -21,13 +21,20 @@ from __future__ import annotations
 
 import argparse
 import sys
-import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
 import requests
+
+from contract_sweeper.runtime.base_downloader import (
+    HttpConfig,
+    PageResult,
+    build_session,
+    http_post_json,
+    paginate,
+)
 
 from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
 
@@ -92,11 +99,16 @@ MAX_PAGES = 2000  # safety cap: ~200k records/window before forced stop
 # Session
 # ---------------------------------------------------------------------------
 
-def _session() -> requests.Session:
-    s = requests.Session()
-    s.headers.update({"User-Agent": "ContractSweeper/1.0", "Accept": "application/json"})
-    return s
+_HTTP = HttpConfig(
+    user_agent="ContractSweeper/1.0",
+    max_retries=MAX_RETRIES,
+    page_sleep=PAGE_SLEEP,
+    rate_limit_sleep=RATE_LIMIT_SLEEP,
+)
 
+
+def _session() -> requests.Session:
+    return build_session("ContractSweeper/1.0")
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -116,83 +128,24 @@ def _derive_fiscal_year(date_str) -> str:
 
 
 def _fetch_page(session: requests.Session, payload: dict, logger) -> dict | None:
-    """POST one page to the API with retry/backoff. Returns parsed JSON or None."""
-    last_err = None
-    for attempt in range(MAX_RETRIES):
-        try:
-            resp = session.post(USASPENDING_URL, json=payload, timeout=30)
-
-            if resp.status_code == 429:
-                logger.warning(f"  Rate limited (429) — sleeping {RATE_LIMIT_SLEEP}s then retrying once")
-                time.sleep(RATE_LIMIT_SLEEP)
-                resp = session.post(USASPENDING_URL, json=payload, timeout=30)
-
-            if 400 <= resp.status_code < 500:
-                logger.error(f"  HTTP {resp.status_code} (client error) — skipping: {resp.text[:300]}")
-                return None
-
-            resp.raise_for_status()
-            return resp.json()
-
-        except requests.HTTPError as e:
-            status = e.response.status_code if e.response is not None else 0
-            if 400 <= status < 500:
-                logger.error(f"  HTTP {status} (client error) — skipping: {e}")
-                return None
-            last_err = e
-        except requests.RequestException as e:
-            last_err = e
-
-        if attempt < MAX_RETRIES - 1:
-            wait = RETRY_BACKOFF[attempt]
-            logger.warning(f"  Attempt {attempt + 1} failed ({last_err}) — retrying in {wait}s")
-            time.sleep(wait)
-
-    logger.error(f"  All {MAX_RETRIES} attempts failed: {last_err}")
-    return None
-
+    return http_post_json(session, USASPENDING_URL, payload, logger=logger, config=_HTTP)
 
 def _paginate(session: requests.Session, base_payload: dict, logger) -> list[dict]:
-    """Paginate through all results for a given payload. Returns list of raw result dicts.
-
-    The spending_by_award endpoint reports continuation via ``page_metadata.hasNext``
-    (camelCase). Page-based paging can return a small overlap between adjacent pages
-    when many records share the sort value; callers dedupe on award_id downstream.
-    """
-    all_results = []
-    page = 1
-
-    while page <= MAX_PAGES:
-        payload = dict(base_payload)
-        payload["page"] = page
-
+    def _fetch(page):
+        payload = {**base_payload, "page": page}
         data = _fetch_page(session, payload, logger)
         if data is None:
-            break
-
+            return PageResult([], None)
         results = data.get("results", [])
         if not results:
-            break
-
-        all_results.extend(results)
-
+            return PageResult([], None)
         page_meta = data.get("page_metadata", {})
         has_next = page_meta.get("hasNext", page_meta.get("has_next_page", False))
-
         if page % 10 == 0:
-            logger.info(f"    Page {page} ({len(all_results)} records so far)")
+            logger.info(f"    Page {page}")
+        return PageResult(results, page + 1 if has_next else None)
 
-        if not has_next:
-            break
-
-        page += 1
-        time.sleep(PAGE_SLEEP)
-
-    if page > MAX_PAGES:
-        logger.warning(f"    Hit MAX_PAGES={MAX_PAGES} cap ({len(all_results)} records) — stopping")
-
-    return all_results
-
+    return list(paginate(_fetch, start_marker=1, max_pages=MAX_PAGES))
 
 def _build_payload(window: dict, type_codes: list) -> dict:
     """Build a spending_by_award subawards payload for the given time window and type group."""
