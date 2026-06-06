@@ -34,3 +34,26 @@ repos:
         pass_filenames: false
         files: ^registries/.*\.yaml$
         stages: [commit]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        name: mypy (non-blocking, runtime/ only)
+        # Audit #10 — start narrow: only contract_sweeper/runtime/ is in scope
+        # so the first run is small and we can widen the scope incrementally.
+        # `--ignore-missing-imports` keeps third-party stubs (pandas, requests)
+        # from blocking. `--no-strict-optional` matches the existing code style.
+        #
+        # Exclusion: geo_attribution.py has a pre-existing dict-item type bug at
+        # line 173 (return-type mismatch). Leave excluded for now and file as a
+        # follow-up so the hook lands green; remove the exclude when fixed.
+        args:
+          - --ignore-missing-imports
+          - --no-strict-optional
+          - --follow-imports=silent
+        files: ^contract_sweeper/runtime/
+        exclude: ^contract_sweeper/runtime/geo_attribution\.py$
+        pass_filenames: true
+        additional_dependencies:
+          - types-PyYAML
