@@ -23,7 +23,6 @@ from __future__ import annotations
 import argparse
 import os
 import sys
-import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -32,6 +31,13 @@ import pandas as pd
 import requests
 
 from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from contract_sweeper.runtime.base_downloader import (
+    HttpConfig,
+    PageResult,
+    build_session,
+    http_get_json,
+    paginate,
+)
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -42,6 +48,15 @@ PAGE_SIZE     = 25        # LDA API max
 PAGE_SLEEP    = 0.5       # seconds between pages
 MAX_RETRIES   = 3
 RETRY_BACKOFF = [10, 30, 60]
+
+_USER_AGENT = "ContractSweeper/1.0 (PR federal spending research)"
+_HTTP = HttpConfig(
+    user_agent=_USER_AGENT,
+    max_retries=MAX_RETRIES,
+    base_delay_seconds=10.0,
+    max_delay_seconds=60.0,
+    page_sleep=PAGE_SLEEP,
+)
 
 KNOWN_LDA_DATA = [
     {"filing_uuid": "pr-lda-seed-001", "filing_year": "2022", "filing_type": "Q4",
@@ -93,39 +108,12 @@ OUTPUT_COLUMNS = [
 # ---------------------------------------------------------------------------
 
 def _session(api_key: str | None) -> requests.Session:
-    s = requests.Session()
-    headers = {
-        "User-Agent": "ContractSweeper/1.0 (PR federal spending research)",
-        "Accept":     "application/json",
-    }
-    if api_key:
-        headers["Authorization"] = f"Token {api_key}"
-    s.headers.update(headers)
-    return s
+    extra = {"Authorization": f"Token {api_key}"} if api_key else None
+    return build_session(_USER_AGENT, extra)
 
 
 def _get(session: requests.Session, url: str, params: dict, logger) -> dict | None:
-    for attempt in range(MAX_RETRIES):
-        try:
-            resp = session.get(url, params=params, timeout=60)
-            if resp.status_code == 429:
-                logger.warning("  Rate limited — sleeping 60s")
-                time.sleep(60)
-                continue
-            if 400 <= resp.status_code < 500:
-                logger.error(f"  HTTP {resp.status_code}: {resp.text[:200]}")
-                return None
-            resp.raise_for_status()
-            time.sleep(PAGE_SLEEP)
-            return resp.json()
-        except requests.RequestException as exc:
-            if attempt < MAX_RETRIES - 1:
-                wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retry in {wait}s")
-                time.sleep(wait)
-            else:
-                logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
-    return None
+    return http_get_json(session, url, params, logger=logger, config=_HTTP)
 
 
 # ---------------------------------------------------------------------------
@@ -193,11 +181,9 @@ def _flatten(rec: dict) -> dict:
 
 def _fetch_pass(session: requests.Session, state_param: str, logger) -> list[dict]:
     """Fetch all filings for one state filter (client_state or registrant_state)."""
-    url  = f"{LDA_BASE}/filings/"
-    page = 1
-    records = []
+    url = f"{LDA_BASE}/filings/"
 
-    while True:
+    def _fetch(page: int) -> PageResult:
         params = {
             state_param: "PR",
             "page_size":  PAGE_SIZE,
@@ -206,25 +192,23 @@ def _fetch_pass(session: requests.Session, state_param: str, logger) -> list[dic
         data = _get(session, url, params, logger)
         if data is None:
             logger.warning(f"  [{state_param}=PR] Page {page} failed — stopping pass")
-            break
+            return PageResult([], None)
 
         results = data.get("results") or []
         if not results:
-            break
+            return PageResult([], None)
 
-        for rec in results:
-            records.append(_flatten(rec))
+        recs = [_flatten(rec) for rec in results]
 
         count = data.get("count", 0)
         if page == 1:
             total_pages = -(-count // PAGE_SIZE)  # ceiling division
             logger.info(f"  [{state_param}=PR] {count:,} total filings (~{total_pages} pages)")
 
-        if not data.get("next"):
-            break
-        page += 1
+        next_marker = page + 1 if data.get("next") else None
+        return PageResult(recs, next_marker)
 
-    return records
+    return list(paginate(_fetch, start_marker=1))
 
 
 # ---------------------------------------------------------------------------

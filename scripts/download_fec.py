@@ -22,7 +22,6 @@ from __future__ import annotations
 import argparse
 import os
 import sys
-import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -31,6 +30,15 @@ import pandas as pd
 import requests
 
 from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from contract_sweeper.runtime.base_downloader import (
+    HttpConfig,
+    PageResult,
+    build_session,
+    http_get_json,
+    paginate,
+)
+
+_USER_AGENT = "ContractSweeper/1.0 (PR federal spending research)"
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -77,38 +85,13 @@ OUTPUT_COLUMNS = [
 # ---------------------------------------------------------------------------
 
 def _session(api_key: str) -> requests.Session:
-    s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR federal spending research)",
-        "Accept": "application/json",
-        "X-Api-Key": api_key,
-    })
-    return s
+    return build_session(_USER_AGENT, {"X-Api-Key": api_key})
 
 
 def _get(session: requests.Session, url: str, params: dict, logger, sleep_s: float) -> dict | None:
     """GET with retry/backoff. Returns parsed JSON or None."""
-    for attempt in range(MAX_RETRIES):
-        try:
-            resp = session.get(url, params=params, timeout=60)
-            if resp.status_code == 429:
-                logger.warning("  Rate limited — sleeping 60s")
-                time.sleep(60)
-                continue
-            if 400 <= resp.status_code < 500:
-                logger.error(f"  HTTP {resp.status_code} — skipping: {resp.text[:200]}")
-                return None
-            resp.raise_for_status()
-            time.sleep(sleep_s)
-            return resp.json()
-        except requests.RequestException as e:
-            if attempt < MAX_RETRIES - 1:
-                wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt + 1} failed ({e}) — retrying in {wait}s")
-                time.sleep(wait)
-            else:
-                logger.error(f"  All {MAX_RETRIES} attempts failed: {e}")
-    return None
+    config = HttpConfig(user_agent=_USER_AGENT, max_retries=MAX_RETRIES, page_sleep=sleep_s)
+    return http_get_json(session, url, params, logger=logger, config=config)
 
 
 # ---------------------------------------------------------------------------
@@ -118,10 +101,8 @@ def _get(session: requests.Session, url: str, params: dict, logger, sleep_s: flo
 def _fetch_cycle(session: requests.Session, cycle: int, sleep_s: float, logger) -> list[dict]:
     """Fetch all Schedule A contributions from PR for one election cycle."""
     url = f"{FEC_BASE}/schedules/schedule_a/"
-    records = []
-    page = 1
 
-    while True:
+    def _fetch(page: int) -> PageResult:
         params = {
             "contributor_state": "PR",
             "two_year_transaction_period": cycle,
@@ -132,16 +113,17 @@ def _fetch_cycle(session: requests.Session, cycle: int, sleep_s: float, logger) 
         }
         data = _get(session, url, params, logger, sleep_s)
         if data is None:
-            break
+            return PageResult([], None)
 
         results = data.get("results", [])
         if not results:
-            break
+            return PageResult([], None)
 
+        recs = []
         for rec in results:
             committee = rec.get("committee") or {}
             candidate = rec.get("candidate") or {}
-            records.append({
+            recs.append({
                 "cycle":                       cycle,
                 "contributor_name":            rec.get("contributor_name", ""),
                 "contributor_city":            rec.get("contributor_city", ""),
@@ -167,11 +149,10 @@ def _fetch_cycle(session: requests.Session, cycle: int, sleep_s: float, logger) 
         if page == 1 and count:
             logger.info(f"  Cycle {cycle}: {count:,} total contributions")
 
-        if page >= total_pages:
-            break
-        page += 1
+        next_marker = None if page >= total_pages else page + 1
+        return PageResult(recs, next_marker)
 
-    return records
+    return list(paginate(_fetch, start_marker=1))
 
 
 # ---------------------------------------------------------------------------

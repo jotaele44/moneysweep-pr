@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import argparse
 import sys
-import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -31,6 +30,13 @@ import pandas as pd
 import requests
 
 from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from contract_sweeper.runtime.base_downloader import (
+    HttpConfig,
+    PageResult,
+    build_session,
+    http_get_json,
+    paginate,
+)
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -40,6 +46,12 @@ FDIC_BASE    = "https://banks.data.fdic.gov/api"
 PAGE_SLEEP   = 0.3
 MAX_RETRIES  = 3
 RETRY_BACKOFF = [5, 15, 30]
+
+_HTTP = HttpConfig(
+    user_agent="ContractSweeper/1.0 (PR banking research)",
+    max_retries=MAX_RETRIES,
+    page_sleep=PAGE_SLEEP,
+)
 
 INSTITUTION_FIELDS = ",".join([
     "CERT", "NAME", "CITY", "STALP", "STNAME",
@@ -98,65 +110,35 @@ KNOWN_FDIC_FINANCIALS = [
 # ---------------------------------------------------------------------------
 
 def _session() -> requests.Session:
-    s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR banking research)",
-        "Accept":     "application/json",
-    })
-    return s
+    return build_session(_HTTP.user_agent)
 
 
 def _get(session: requests.Session, url: str, params: dict, logger) -> dict | None:
-    for attempt in range(MAX_RETRIES):
-        try:
-            resp = session.get(url, params=params, timeout=60)
-            if resp.status_code == 429:
-                logger.warning("  Rate limited — sleeping 60s")
-                time.sleep(60)
-                continue
-            if 400 <= resp.status_code < 500:
-                logger.error(f"  HTTP {resp.status_code}: {resp.text[:200]}")
-                return None
-            resp.raise_for_status()
-            time.sleep(PAGE_SLEEP)
-            return resp.json()
-        except requests.RequestException as exc:
-            if attempt < MAX_RETRIES - 1:
-                wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retry in {wait}s")
-                time.sleep(wait)
-            else:
-                logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
-    return None
+    return http_get_json(session, url, params, logger=logger, config=_HTTP)
 
 
 def _paginate(session: requests.Session, endpoint: str, base_params: dict,
               data_key: str, logger) -> list[dict]:
-    url     = f"{FDIC_BASE}/{endpoint}"
-    offset  = 0
-    limit   = 1000
-    records = []
+    url   = f"{FDIC_BASE}/{endpoint}"
+    limit = 1000
 
-    while True:
+    def _fetch(offset: int) -> PageResult:
         params = {**base_params, "limit": limit, "offset": offset}
         data   = _get(session, url, params, logger)
         if data is None:
-            break
+            return PageResult([], None)
         batch = data.get("data") or []
         if not batch:
-            break
-        for item in batch:
-            records.append(item.get("data", item))
-
+            return PageResult([], None)
+        recs  = [item.get("data", item) for item in batch]
         meta  = data.get("meta", {})
-        total = meta.get("total", len(records))
+        total = meta.get("total", offset + len(recs))
         if offset == 0:
             logger.info(f"  FDIC {endpoint}: {total:,} total records")
-        if offset + limit >= total:
-            break
-        offset += limit
+        next_marker = None if offset + limit >= total else offset + limit
+        return PageResult(recs, next_marker)
 
-    return records
+    return list(paginate(_fetch, start_marker=0))
 
 
 # ---------------------------------------------------------------------------
