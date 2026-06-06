@@ -12,6 +12,7 @@ from contract_sweeper.runtime.base_downloader import (
     build_session,
     file_has_data,
     http_get_json,
+    http_post_json,
     write_csv,
 )
 
@@ -44,6 +45,13 @@ class _FakeSession:
 
     def get(self, url, params=None, timeout=None):
         self.calls.append((url, params))
+        item = self._responses.pop(0)
+        if isinstance(item, Exception):
+            raise item
+        return item
+
+    def post(self, url, json=None, timeout=None):
+        self.calls.append((url, json))
         item = self._responses.pop(0)
         if isinstance(item, Exception):
             raise item
@@ -114,6 +122,42 @@ def test_http_get_json_429_is_retried():
     assert out == {"ok": 1}
     assert len(session.calls) == 2
     # the 429 path triggered the long rate-limit sleep
+    assert cfg.rate_limit_sleep in sleeps
+
+
+# ---------------------------------------------------------------------------
+# http_post_json (USASpending-style POST query APIs)
+# ---------------------------------------------------------------------------
+
+def test_http_post_json_success_sends_payload_and_returns():
+    session = _FakeSession([_Resp(200, {"results": [{"a": 1}]})])
+    out = http_post_json(session, "http://x", {"q": "pr"}, logger=_Logger(), sleeper=_noop_sleep)
+    assert out == {"results": [{"a": 1}]}
+    # payload is forwarded as the json body
+    assert session.calls == [("http://x", {"q": "pr"})]
+
+
+def test_http_post_json_4xx_is_terminal_none_no_retry():
+    session = _FakeSession([_Resp(422)])
+    out = http_post_json(session, "http://x", {}, logger=_Logger(), sleeper=_noop_sleep)
+    assert out is None
+    assert len(session.calls) == 1
+
+
+def test_http_post_json_retries_5xx_then_succeeds():
+    session = _FakeSession([_Resp(500), _Resp(200, {"ok": True})])
+    cfg = HttpConfig(max_retries=3)
+    out = http_post_json(session, "http://x", {}, logger=_Logger(), config=cfg, sleeper=_noop_sleep)
+    assert out == {"ok": True}
+    assert len(session.calls) == 2
+
+
+def test_http_post_json_429_is_retried():
+    session = _FakeSession([_Resp(429), _Resp(200, {"ok": 1})])
+    cfg = HttpConfig(max_retries=3)
+    sleeps = []
+    out = http_post_json(session, "http://x", {}, logger=_Logger(), config=cfg, sleeper=sleeps.append)
+    assert out == {"ok": 1}
     assert cfg.rate_limit_sleep in sleeps
 
 

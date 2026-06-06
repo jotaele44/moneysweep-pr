@@ -46,6 +46,7 @@ __all__ = [
     "paginate",
     "build_session",
     "http_get_json",
+    "http_post_json",
     "file_has_data",
     "write_csv",
     "BaseDownloader",
@@ -85,25 +86,22 @@ def build_session(
     return s
 
 
-def http_get_json(
-    session: requests.Session,
-    url: str,
-    params: dict,
+def _http_json(
+    do_request: Callable[[], requests.Response],
     *,
     logger,
-    config: HttpConfig | None = None,
-    sleeper: Callable[[float], None] = time.sleep,
+    config: HttpConfig,
+    sleeper: Callable[[float], None],
 ) -> dict | None:
-    """GET ``url`` with retry; return parsed JSON, or ``None`` on 4xx / exhaustion.
+    """Shared retry core for :func:`http_get_json` / :func:`http_post_json`.
 
-    Mirrors the proven downloader loop: 429 -> long sleep then retry, 4xx ->
-    terminal ``None``, 5xx / transport error -> retry, success -> short
-    inter-page sleep then JSON. Built on :func:`with_retry`.
+    ``do_request`` performs one HTTP call and returns the ``Response``. The loop:
+    429 -> long sleep then retry, 4xx -> terminal ``None``, 5xx / transport error
+    -> retry, success -> short inter-page sleep then parsed JSON.
     """
-    config = config or HttpConfig()
 
     def _once() -> dict | None:
-        resp = session.get(url, params=params, timeout=config.timeout)
+        resp = do_request()
         if resp.status_code == 429:
             logger.warning("  Rate limited — sleeping %ss", config.rate_limit_sleep)
             sleeper(config.rate_limit_sleep)
@@ -130,6 +128,54 @@ def http_get_json(
     except RetryExhausted:
         logger.error("  All %d attempts failed", config.max_retries)
         return None
+
+
+def http_get_json(
+    session: requests.Session,
+    url: str,
+    params: dict,
+    *,
+    logger,
+    config: HttpConfig | None = None,
+    sleeper: Callable[[float], None] = time.sleep,
+) -> dict | None:
+    """GET ``url`` with retry; return parsed JSON, or ``None`` on 4xx / exhaustion.
+
+    Mirrors the proven downloader loop: 429 -> long sleep then retry, 4xx ->
+    terminal ``None``, 5xx / transport error -> retry, success -> short
+    inter-page sleep then JSON. Built on :func:`with_retry`.
+    """
+    config = config or HttpConfig()
+    return _http_json(
+        lambda: session.get(url, params=params, timeout=config.timeout),
+        logger=logger,
+        config=config,
+        sleeper=sleeper,
+    )
+
+
+def http_post_json(
+    session: requests.Session,
+    url: str,
+    payload: dict,
+    *,
+    logger,
+    config: HttpConfig | None = None,
+    sleeper: Callable[[float], None] = time.sleep,
+) -> dict | None:
+    """POST ``payload`` as JSON with retry; return parsed JSON, or ``None``.
+
+    The POST analogue of :func:`http_get_json` (the USASpending family and other
+    POST-query APIs). Same retry semantics; built on the shared :func:`_http_json`
+    core so there is a single retry implementation.
+    """
+    config = config or HttpConfig()
+    return _http_json(
+        lambda: session.post(url, json=payload, timeout=config.timeout),
+        logger=logger,
+        config=config,
+        sleeper=sleeper,
+    )
 
 
 def file_has_data(path: Path | str) -> bool:
@@ -206,6 +252,16 @@ class BaseDownloader:
             self.session(),
             url,
             params,
+            logger=self.logger,
+            config=self.http,
+            sleeper=self._sleeper,
+        )
+
+    def post(self, url: str, payload: dict) -> dict | None:
+        return http_post_json(
+            self.session(),
+            url,
+            payload,
             logger=self.logger,
             config=self.http,
             sleeper=self._sleeper,
