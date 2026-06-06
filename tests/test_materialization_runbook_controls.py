@@ -28,9 +28,9 @@ def test_materialization_operator_checklist_exists():
 def test_materialization_readiness_snapshot_matches_runbook_counts():
     snapshot = json.loads(Path("reports/materialization_readiness.json").read_text(encoding="utf-8"))
 
-    assert snapshot["total_sources"] == 84
-    assert snapshot["automatable_total"] == 54
-    assert snapshot["automatable_ready"] == 54
+    assert snapshot["total_sources"] == 85
+    assert snapshot["automatable_total"] == 55
+    assert snapshot["automatable_ready"] == 55
     assert snapshot["queued_excluded_total"] == 30
     assert snapshot["automatable_not_ready"] == []
 
