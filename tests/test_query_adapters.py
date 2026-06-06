@@ -185,7 +185,7 @@ def test_stub_adapter_raises_manual_only_with_producer_script():
     with pytest.raises(ManualOnlyError) as excinfo:
         adapter.fetch(Query())
     assert excinfo.value.source_id == "lda"
-    assert "download_lda.py" in str(excinfo.value)
+    assert "fetch_lda_gov.py" in str(excinfo.value)
 
 
 # ---------------------------------------------------------------------------
