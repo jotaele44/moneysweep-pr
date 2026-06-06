@@ -2,13 +2,33 @@
 
 ## Current Vector
 
-`CONTRACT_SWEEPER_100_PERCENT_COMPLETION_ROADMAP → TRANCHE_A_STATUS_TRUTH`
+`CONTRACT_SWEEPER_FEDERATION_READINESS_AUDIT`
 
-Tranche A is metadata/control-plane only. It reconciles status truth, readiness counts, source-intake backlog, top-form gap wording, README scope, and next-vector routing. It does not ingest, parse, OCR, transform, extract, materialize, scrape, or run live producers.
+This vector adds the Federation control-plane interface for Contract-Sweeper as the future `moneysweep-pr` node. It is metadata/documentation/control-plane only. It does not ingest, parse, OCR, transform, extract, scrape, materialize, or run live producers.
+
+## Completed In This Vector
+
+| Step | Status | Artifact |
+|---|---|---|
+| Create audit branch | Done | `gpt/federation-readiness-audit` |
+| Add Federation manifest | Done | `federation.json` |
+| Reconcile 84-source status | Done | `reports/federation_source_status_reconciliation.json` |
+| Map Hub callable commands | Done | `docs/FEDERATION_INTERFACE.md` |
+| Add readiness audit | Done | `reports/federation_readiness_audit.md` |
+| Prep Tranche B manual ingestion | Done | `docs/TRANCHE_B_MANUAL_SOURCE_INGESTION_PREP.md` |
+
+## Current Gate
+
+| Gate | Status |
+|---|---|
+| Hub discovery | Ready |
+| Live Hub execution | Not ready |
+| Producer execution | Requires strict preflight |
+| Production promotion | Blocked until materialization and validation |
 
 ## Next Vector
 
-`TRANCHE_B_MANUAL_SOURCE_INGESTION`
+`PREP_TRANCHE_B_MANUAL_SOURCE_INGESTION → IMPLEMENT_TRANCHE_B_MANUAL_SOURCE_INGESTION`
 
 ## Scope
 
@@ -29,3 +49,9 @@ Tranche B should create parsers, canonical outputs, schemas, and tests for the a
 ## Recommended Branch
 
 `gpt/manual-source-ingestion-tranche-b`
+
+## Execution String
+
+```text
+EXECUTE_NEXT_VECTOR: CREATE_BRANCH:gpt/manual-source-ingestion-tranche-b → IMPLEMENT_SHARED_MANUAL_INGESTION_HELPERS → PARSE_ACT_ACUDEN_PRASA_CABILDEROS_LDA_DCAA → VALIDATE_SCHEMAS_AND_TESTS → REGENERATE_READINESS_SURFACES
+```
