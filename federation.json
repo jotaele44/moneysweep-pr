@@ -1,0 +1,80 @@
+{
+  "schema_version": "repo_federation_manifest_v1",
+  "program_id": "moneysweep-pr",
+  "repository_full_name": "jotaele44/Contract-Sweeper",
+  "repository_legacy_name": "Contract-Sweeper",
+  "federation_role": "public_money_intelligence_node",
+  "hub_parent": "thehub-pr",
+  "jurisdiction": "Puerto Rico",
+  "active_vector": "CONTRACT_SWEEPER_FEDERATION_READINESS_AUDIT",
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "pause_lock_required": true,
+  "source_truth": {
+    "source_of_truth_file": "reports/materialization_readiness.json",
+    "total_sources": 84,
+    "automatable_total": 54,
+    "automatable_ready": 54,
+    "queued_excluded_total": 30,
+    "queued_excluded": {
+      "manual_export": 10,
+      "scraper_needed": 15,
+      "semantic_duplicate": 3,
+      "deferred_stub": 2,
+      "broken_producer": 0
+    },
+    "runtime_required_keys": [
+      "FEC_API_KEY",
+      "HIGHERGOV_API_KEY",
+      "LDA_API_KEY",
+      "OPENCORPORATES_API_TOKEN",
+      "SAM_API_KEY"
+    ]
+  },
+  "hub_callable_commands": {
+    "setup": "python3 run_all.py --only-setup",
+    "strict_preflight": "python3 run_all.py --only-setup --strict-preflight",
+    "full_pipeline": "python3 run_all.py --strict-preflight",
+    "materialization_matrix": "python3 scripts/build_source_recovery_matrix.py",
+    "gap_matrix": "python3 scripts/gap_analysis_builder.py",
+    "test_suite": "python3 -m pytest tests/ -q",
+    "dashboard_export": "python3 scripts/build_dashboard_explorer.py",
+    "foia_letters": "python3 scripts/build_foia_letters.py",
+    "ngo_layer": "python3 scripts/ngo_integration.py"
+  },
+  "canonical_outputs": {
+    "current_status": "reports/current_status.json",
+    "materialization_readiness": "reports/materialization_readiness.json",
+    "source_recovery_matrix_csv": "reports/source_recovery_matrix.csv",
+    "source_recovery_matrix_md": "reports/source_recovery_matrix.md",
+    "top_form_gap_matrix": "reports/top_form_gap_matrix.csv",
+    "federation_status_reconciliation": "reports/federation_source_status_reconciliation.json",
+    "readiness_audit": "reports/federation_readiness_audit.md",
+    "dashboard": "exports/dashboard/index.html",
+    "graph_nodes": "exports/graph/nodes.csv",
+    "graph_edges": "exports/graph/edges.csv"
+  },
+  "manual_ingestion_tranche_b": {
+    "branch": "gpt/manual-source-ingestion-tranche-b",
+    "status": "prepared_not_executed",
+    "scope": [
+      "ACT transition contracts",
+      "ACUDEN transition contracts",
+      "PRASA completed projects",
+      "PRASA FY2024 Consulting Engineer report",
+      "Puerto Rico cabilderos registry",
+      "Federal LDA registrants",
+      "DCAA active contractor listings"
+    ],
+    "promotion_gate": "No manual source is fully_materialized until parser, canonical output, schema validation, and regression tests pass."
+  },
+  "federation_readiness_gate": {
+    "ready_for_hub_discovery": true,
+    "ready_for_hub_live_execution": false,
+    "blocking_conditions": [
+      "manual-source Tranche B not materialized",
+      "PR-gov scraper-needed queue remains unresolved",
+      "runtime API keys must be supplied locally",
+      "source-count wording drift must stay reconciled to 84-source truth"
+    ]
+  }
+}
