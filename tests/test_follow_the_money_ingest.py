@@ -2,7 +2,7 @@
 
 Covers the pure transform functions and the full drop-file -> processed-CSV chain
 (4 output files). The ingester reads operator-delivered CSV exports from
-data/raw/Follow the Money/ — no network code — so all tests run fully offline.
+data/raw/follow_the_money/ — no network code — so all tests run fully offline.
 """
 from __future__ import annotations
 
@@ -110,7 +110,7 @@ def test_run_no_dropzone_returns_no_files(tmp_path: Path):
 
 @pytest.mark.integration
 def test_run_with_sf133_file_writes_all_four_outputs(tmp_path: Path):
-    drop = tmp_path / "data" / "raw" / "Follow the Money"
+    drop = tmp_path / "data" / "raw" / "follow_the_money"
     drop.mkdir(parents=True)
 
     # Minimal SF-133 file

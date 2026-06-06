@@ -621,9 +621,9 @@
       "validation_threshold": {
         "min_rows": 1
       },
-      "manual_drop_dir": "data/raw/Follow the Money/",
+      "manual_drop_dir": "data/raw/follow_the_money/",
       "update_cadence": "yearly",
-      "notes": "Follow the Money export data for PR. ingest_follow_the_money.py is a dropzone reader (no network code) producing 4 outputs from operator-delivered CSV exports in data/raw/Follow the Money/. Previously mislabeled with a phantom pr_follow_the_money.csv output that is never written."
+      "notes": "Follow the Money export data for PR. ingest_follow_the_money.py is a dropzone reader (no network code) producing 4 outputs from operator-delivered CSV exports in data/raw/follow_the_money/. Previously mislabeled with a phantom pr_follow_the_money.csv output that is never written."
     },
     {
       "source_id": "sba_loans",

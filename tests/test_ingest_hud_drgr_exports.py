@@ -41,7 +41,7 @@ def test_empty_manual_drop_returns_manual_required(tmp_path):
 def test_unrelated_raw_files_are_ignored(tmp_path):
     """A non-HUD CSV under data/raw/<subdir>/ must not be processed as HUD DRGR."""
     root = _make_tmp_root(tmp_path)
-    unrelated = root / "data" / "raw" / "Follow the Money"
+    unrelated = root / "data" / "raw" / "follow_the_money"
     unrelated.mkdir(parents=True)
     pd.DataFrame({"x": [1, 2, 3]}).to_csv(unrelated / "funding_flows_sf133.csv", index=False)
 
@@ -53,5 +53,5 @@ def test_looks_like_hud_drgr_filter():
     assert _looks_like_hud_drgr(Path("data/manual/hud_drgr/something.xlsx"))
     assert _looks_like_hud_drgr(Path("data/raw/HUD DRGR (all PR grantees).xls"))
     assert _looks_like_hud_drgr(Path("data/raw/anywhere/cdbg_dr_export.csv"))
-    assert not _looks_like_hud_drgr(Path("data/raw/Follow the Money/funding_flows_sf133.csv"))
+    assert not _looks_like_hud_drgr(Path("data/raw/follow_the_money/funding_flows_sf133.csv"))
     assert not _looks_like_hud_drgr(Path("data/raw/FEC/efile-2026.csv"))

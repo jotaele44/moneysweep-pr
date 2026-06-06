@@ -119,14 +119,14 @@ data/manifests/validation_report.json,validation_report.json,unknown,15,15,73858
 data/processed/alias_registry_top5.json,alias_registry_top5.json,unknown,4,4,4425,False,present,,,,64323fb5fab95459f967c300a8af777675ca9698866db98e761d49457a15bb47
 data/processed/entities_resolved_top5.csv,entities_resolved_top5.csv,unknown,5,13,1510,False,present,,1.0,0.0,cc0b26fb342d6c9825737e9d82b2fafa4317f05997b451a806d5c6262f45d8fd
 data/raw/FEC/efile-2026-05-05T06_41_38.csv,efile-2026-05-05T06_41_38.csv,unknown,23064,35,5353181,False,present,,,0.0,b8d4a880917a7ab9e2a92004915e79b6eb2d6b74cc532b01de8ca074ad0115b3
-data/raw/Follow the Money/EP_PR_PRBank_Summary_ByAccount.csv,EP_PR_PRBank_Summary_ByAccount.csv,unknown,5,3,236,False,present,,,0.0,e7c115e152f1e1e11ae889f4b8e984e6ca322e53db2a2848a0a1626192c880ef
-data/raw/Follow the Money/EP_PR_PRBank_Summary_ByEntity.csv,EP_PR_PRBank_Summary_ByEntity.csv,unknown,9,3,504,False,present,,,0.0,ce7134c43ef1eb1d5d0a257a21fb1fc8d16b130d918881cef6dcdd24b10bf3f9
-data/raw/Follow the Money/EP_PR_PRBank_Summary_ByYear.csv,EP_PR_PRBank_Summary_ByYear.csv,unknown,2,3,113,False,present,,,0.0,ef545755e3099b1b35bcd2efa144b2d7c84625916da10a46fa3682351ee831dd
-data/raw/Follow the Money/EP_PR_PRBank_Wire_Ledger_ALL.csv,EP_PR_PRBank_Wire_Ledger_ALL.csv,unknown,9,11,2238,False,present,,,0.0,ac7b747039a2de9361b9bc42732d931f25ed59b68262750578857b17d36aa688
-data/raw/Follow the Money/Municipal_Blind_Score_CORE6.csv,Municipal_Blind_Score_CORE6.csv,unknown,228,5,11296,False,present,,,0.0,03366f8e1850f38155ca4ea5b647c7c259fe7c8c7f7c21a3eddfeea4959382aa
-data/raw/Follow the Money/facility_matches_cross_exam.csv,facility_matches_cross_exam.csv,unknown,4,4,646,False,present,,,0.0,717a4c0238fa76f8af5ba12df9ea1ef95d2ad8728bc1572ccb7079b3e2f7d1dc
-data/raw/Follow the Money/funding_flows_sf133.csv,funding_flows_sf133.csv,unknown,226902,26,56140097,False,present,,,0.0,9678486d5ddf599c53123cd2dce229168432c6ecfadfc91fb29a42a091b6b838
-data/raw/Follow the Money/municipality_political_federal_bridge.csv,municipality_political_federal_bridge.csv,unknown,71,12,15220,False,present,,,0.0,a7613c0ca4f67f2b3c687a22e6299ea9cb79d283929c9a19b730c2802964873d
+data/raw/follow_the_money/EP_PR_PRBank_Summary_ByAccount.csv,EP_PR_PRBank_Summary_ByAccount.csv,unknown,5,3,236,False,present,,,0.0,e7c115e152f1e1e11ae889f4b8e984e6ca322e53db2a2848a0a1626192c880ef
+data/raw/follow_the_money/EP_PR_PRBank_Summary_ByEntity.csv,EP_PR_PRBank_Summary_ByEntity.csv,unknown,9,3,504,False,present,,,0.0,ce7134c43ef1eb1d5d0a257a21fb1fc8d16b130d918881cef6dcdd24b10bf3f9
+data/raw/follow_the_money/EP_PR_PRBank_Summary_ByYear.csv,EP_PR_PRBank_Summary_ByYear.csv,unknown,2,3,113,False,present,,,0.0,ef545755e3099b1b35bcd2efa144b2d7c84625916da10a46fa3682351ee831dd
+data/raw/follow_the_money/EP_PR_PRBank_Wire_Ledger_ALL.csv,EP_PR_PRBank_Wire_Ledger_ALL.csv,unknown,9,11,2238,False,present,,,0.0,ac7b747039a2de9361b9bc42732d931f25ed59b68262750578857b17d36aa688
+data/raw/follow_the_money/Municipal_Blind_Score_CORE6.csv,Municipal_Blind_Score_CORE6.csv,unknown,228,5,11296,False,present,,,0.0,03366f8e1850f38155ca4ea5b647c7c259fe7c8c7f7c21a3eddfeea4959382aa
+data/raw/follow_the_money/facility_matches_cross_exam.csv,facility_matches_cross_exam.csv,unknown,4,4,646,False,present,,,0.0,717a4c0238fa76f8af5ba12df9ea1ef95d2ad8728bc1572ccb7079b3e2f7d1dc
+data/raw/follow_the_money/funding_flows_sf133.csv,funding_flows_sf133.csv,unknown,226902,26,56140097,False,present,,,0.0,9678486d5ddf599c53123cd2dce229168432c6ecfadfc91fb29a42a091b6b838
+data/raw/follow_the_money/municipality_political_federal_bridge.csv,municipality_political_federal_bridge.csv,unknown,71,12,15220,False,present,,,0.0,a7613c0ca4f67f2b3c687a22e6299ea9cb79d283929c9a19b730c2802964873d
 data/reports/pr_report_summary.json,pr_report_summary.json,unknown,16,16,4668,False,present,,,,5efd05b06203f6abd1146889dc097dceda00ccf2b41441bcc441fc75d5928dfb
 data/review_queue/backfill_execution_blockers_r4_8a.csv,backfill_execution_blockers_r4_8a.csv,unknown,0,6,68,True,empty_or_header_only,,,,0337db723293d4d8e10cc450986983cb2ddfedc77d8d24750fd0bd1e799e7c8e
 data/review_queue/backfill_retry_order_r4_8c.csv,backfill_retry_order_r4_8c.csv,unknown,21,7,3212,False,present,,,0.0,7ddd74164b968685c29f4f0b07a5eca10fdce2c285d00433b79f1091113ac440
