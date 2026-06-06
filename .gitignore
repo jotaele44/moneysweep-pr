@@ -14,42 +14,83 @@ htmlcov/
 .env
 *.key
 
-# Data files (downloaded CSVs / normalized outputs — too large for git)
-data/staging/expansion/*.csv
-data/staging/processed/**
-data/staging/raw/**/*.csv
-data/raw/*.csv
-data/normalized/
+# Data — deny-all by default, then allow tracked artifact subtrees (RECS #2).
+# Previous path-by-path denylist let blobs slip through when paths contained
+# spaces or new nested dirs. The deny-all is the defensive posture; the
+# explicit allow-list below is the policy for what's deliberately tracked.
+#
+# IMPORTANT: gitignore rules are order-sensitive and *later wins*. The deny-all
+# `data/**` excludes subdirectories themselves, so every re-included subtree
+# needs BOTH the directory un-ignore (`!data/<dir>/`) AND the contents
+# un-ignore (`!data/<dir>/**`), and both must come AFTER `data/**`.
 
-# Large raw acquisitions (untracked blobs — keep out going forward). These are the
-# heavyweight raw drops; curated small CSVs and tracked reference PDFs under
-# data/raw/** stay tracked. Status reports are data-presence derived, so we only
-# untrack inputs that are NOT declared as any source's expected_output.
-data/raw/follow_the_money/funding_flows_sf133.csv
-data/raw/FEC/*.csv
+# Deny-all under data/ as the defensive posture
+data/**
 
-# Logs
-data/logs/*.log
+# Directory un-ignores (so git descends into these dirs; must come AFTER data/**)
+!data/canonical_v1/
+!data/exports/
+!data/manifests/
+!data/processed/
+!data/reference/
+!data/reports/
+!data/review_queue/
+!data/logs/
+!data/staging/
+!data/staging/expansion/
+!data/staging/raw/
+!data/staging/raw/**/
+!data/staging/processed/
+!data/staging/processed/**/
+!data/raw/
+!data/raw/**/
+!data/raw/act_transition/
+!data/raw/HigherGov/
+!data/raw/documents/
+!data/raw/follow_the_money/
+!data/raw/torres_rosa_consultation/
 
-# On-demand query cache (parquet bodies + sidecar manifests)
-data/cache/
-
-# Enrichment outputs (may contain vendor PII)
-data/staging/processed/enrichment/
-
-# Keep structure files
-!data/**/.gitkeep
-!data/staging/processed/.gitkeep
+# Content un-ignores for tracked artifact subtrees (small JSONs / manifests /
+# status reports that are part of the audit trail and intentionally committed).
+!data/canonical_v1/**
+!data/exports/**
+!data/manifests/**
+!data/processed/**
+!data/reference/**
+!data/reports/**
+!data/review_queue/**
 !data/staging/expansion/DOWNLOAD_INSTRUCTIONS.md
 !data/staging/expansion/manifest.json
-data/raw/Grants/*.xml
+!data/**/.gitkeep
 
-# Local raw source acquisitions
-/data/raw/USAS/
+# Specific tracked raw drops (manual-source intakes already in history)
+!data/raw/act_transition/**
+!data/raw/HigherGov/**
+!data/raw/documents/manifest.json
+!data/raw/documents/index.csv
+!data/raw/documents/**.csv
+!data/raw/follow_the_money/**.json
+!data/raw/follow_the_money/**.md
+!data/raw/follow_the_money/**.csv
+!data/raw/torres_rosa_consultation/**
 
-# Triaged document corpus — keep the manifest + index tracked, ignore binaries
-data/raw/documents/**/*.pdf
-data/raw/documents/**/*.txt
+# Spaces-in-name dir kept for ACT/ACUDES transition PDFs already in history
+# (#200's snake_case rename didn't reach this one). New files inside go through
+# the same deny-by-extension rules as the rest of data/raw/.
+!data/raw/Vigentes al Momento de Transición/
+!data/raw/Vigentes al Momento de Transición/**.pdf
+
+# Within allowed subtrees, still keep out enrichment outputs (may contain PII)
+data/staging/processed/enrichment/**
+
+# Re-block heavyweight follow_the_money acquisition (must come AFTER the
+# follow_the_money allowlist above so this specific file wins).
+data/raw/follow_the_money/funding_flows_sf133.csv
+
+# Logs and query cache stay out (specific .gitkeep allowance must follow)
+data/logs/**
+data/cache/**
+!data/logs/.gitkeep
 .claude/
 
 # Machine-specific cypher-shell discovery output emitted by PREPA load launchers
