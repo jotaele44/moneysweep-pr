@@ -14,9 +14,9 @@
   "recovered_input_count": 0,
   "rejected_artifact_candidate_count": 10,
   "rejected_artifact_candidates": [
-    "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByAccount.csv",
-    "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByEntity.csv",
-    "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByYear.csv",
+    "data/raw/follow_the_money/EP_PR_PRBank_Summary_ByAccount.csv",
+    "data/raw/follow_the_money/EP_PR_PRBank_Summary_ByEntity.csv",
+    "data/raw/follow_the_money/EP_PR_PRBank_Summary_ByYear.csv",
     "data/staging/processed/dominance_summary.json",
     "data/staging/processed/graph/entity_edges.csv",
     "data/staging/processed/graph/network_summary.json",

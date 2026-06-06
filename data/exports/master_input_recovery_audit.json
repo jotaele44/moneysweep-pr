@@ -4,9 +4,9 @@
   "expected_input_count": 21,
   "forbidden_candidate_count": 4,
   "forbidden_candidates": [
-    "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByAccount.csv",
-    "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByEntity.csv",
-    "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByYear.csv",
+    "data/raw/follow_the_money/EP_PR_PRBank_Summary_ByAccount.csv",
+    "data/raw/follow_the_money/EP_PR_PRBank_Summary_ByEntity.csv",
+    "data/raw/follow_the_money/EP_PR_PRBank_Summary_ByYear.csv",
     "data/staging/processed/graph/top_nodes.csv"
   ],
   "generated_at": "2026-05-08T12:54:17Z",

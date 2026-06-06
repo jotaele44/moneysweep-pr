@@ -1,7 +1,7 @@
 """
 Ingest Follow the Money CSV exports.
 
-Place exported CSV files into  data/raw/Follow the Money/
+Place exported CSV files into  data/raw/follow_the_money/
 
 Expected files:
   funding_flows_sf133.csv
@@ -35,7 +35,7 @@ import pandas as pd
 
 from scripts.config import PROJECT_ROOT, setup_logging
 
-RAW_DIR = PROJECT_ROOT / "data" / "raw" / "Follow the Money"
+RAW_DIR = PROJECT_ROOT / "data" / "raw" / "follow_the_money"
 
 # ---------------------------------------------------------------------------
 # Output column schemas
@@ -380,7 +380,7 @@ def run(root: Path = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)
-    raw_dir = root / "data" / "raw" / "Follow the Money"
+    raw_dir = root / "data" / "raw" / "follow_the_money"
     out_dir = root / "data" / "staging" / "processed"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -503,7 +503,7 @@ def run(root: Path = None, force: bool = False) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Ingest Follow the Money CSV exports from data/raw/Follow the Money/"
+        description="Ingest Follow the Money CSV exports from data/raw/follow_the_money/"
     )
     parser.add_argument(
         "--force", action="store_true", help="Re-ingest even if output exists"

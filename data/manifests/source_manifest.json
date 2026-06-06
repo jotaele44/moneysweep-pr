@@ -4260,7 +4260,7 @@
     },
     {
       "file_name": "EP_PR_PRBank_Summary_ByAccount.csv",
-      "relative_path": "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByAccount.csv",
+      "relative_path": "data/raw/follow_the_money/EP_PR_PRBank_Summary_ByAccount.csv",
       "extension": ".csv",
       "size_bytes": 236,
       "sha256": "e7c115e152f1e1e11ae889f4b8e984e6ca322e53db2a2848a0a1626192c880ef",
@@ -4291,7 +4291,7 @@
     },
     {
       "file_name": "EP_PR_PRBank_Summary_ByEntity.csv",
-      "relative_path": "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByEntity.csv",
+      "relative_path": "data/raw/follow_the_money/EP_PR_PRBank_Summary_ByEntity.csv",
       "extension": ".csv",
       "size_bytes": 504,
       "sha256": "ce7134c43ef1eb1d5d0a257a21fb1fc8d16b130d918881cef6dcdd24b10bf3f9",
@@ -4322,7 +4322,7 @@
     },
     {
       "file_name": "EP_PR_PRBank_Summary_ByYear.csv",
-      "relative_path": "data/raw/Follow the Money/EP_PR_PRBank_Summary_ByYear.csv",
+      "relative_path": "data/raw/follow_the_money/EP_PR_PRBank_Summary_ByYear.csv",
       "extension": ".csv",
       "size_bytes": 113,
       "sha256": "ef545755e3099b1b35bcd2efa144b2d7c84625916da10a46fa3682351ee831dd",
@@ -4355,7 +4355,7 @@
     },
     {
       "file_name": "EP_PR_PRBank_Wire_Ledger_ALL.csv",
-      "relative_path": "data/raw/Follow the Money/EP_PR_PRBank_Wire_Ledger_ALL.csv",
+      "relative_path": "data/raw/follow_the_money/EP_PR_PRBank_Wire_Ledger_ALL.csv",
       "extension": ".csv",
       "size_bytes": 2238,
       "sha256": "ac7b747039a2de9361b9bc42732d931f25ed59b68262750578857b17d36aa688",
@@ -4402,7 +4402,7 @@
     },
     {
       "file_name": "Municipal_Blind_Score_CORE6.csv",
-      "relative_path": "data/raw/Follow the Money/Municipal_Blind_Score_CORE6.csv",
+      "relative_path": "data/raw/follow_the_money/Municipal_Blind_Score_CORE6.csv",
       "extension": ".csv",
       "size_bytes": 11296,
       "sha256": "03366f8e1850f38155ca4ea5b647c7c259fe7c8c7f7c21a3eddfeea4959382aa",
@@ -4437,7 +4437,7 @@
     },
     {
       "file_name": "facility_matches_cross_exam.csv",
-      "relative_path": "data/raw/Follow the Money/facility_matches_cross_exam.csv",
+      "relative_path": "data/raw/follow_the_money/facility_matches_cross_exam.csv",
       "extension": ".csv",
       "size_bytes": 646,
       "sha256": "717a4c0238fa76f8af5ba12df9ea1ef95d2ad8728bc1572ccb7079b3e2f7d1dc",
@@ -4470,7 +4470,7 @@
     },
     {
       "file_name": "funding_flows_sf133.csv",
-      "relative_path": "data/raw/Follow the Money/funding_flows_sf133.csv",
+      "relative_path": "data/raw/follow_the_money/funding_flows_sf133.csv",
       "extension": ".csv",
       "size_bytes": 56140097,
       "sha256": "9678486d5ddf599c53123cd2dce229168432c6ecfadfc91fb29a42a091b6b838",
@@ -4549,7 +4549,7 @@
     },
     {
       "file_name": "municipality_political_federal_bridge.csv",
-      "relative_path": "data/raw/Follow the Money/municipality_political_federal_bridge.csv",
+      "relative_path": "data/raw/follow_the_money/municipality_political_federal_bridge.csv",
       "extension": ".csv",
       "size_bytes": 15220,
       "sha256": "a7613c0ca4f67f2b3c687a22e6299ea9cb79d283929c9a19b730c2802964873d",
