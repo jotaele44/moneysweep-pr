@@ -72,7 +72,7 @@ chip,federal,False,none,1,1,0,0,fully_materialized,4,1,data/staging/processed/pr
 cofina,territorial,False,none,1,1,0,0,fully_materialized,5,1,data/staging/processed/pr_cofina.csv,
 eqb_epa_icis,territorial,False,none,1,1,0,0,fully_materialized,3361,1,data/staging/processed/pr_eqb_permits.csv,PR Environmental Quality Board + EPA ICIS environmental permits.
 fcc_usf,federal,False,none,1,1,0,0,fully_materialized,4,1,data/staging/processed/pr_fcc_usf.csv,
-follow_the_money,political_finance,False,manual_export,4,4,0,0,fully_materialized,1522,1,data/staging/processed/pr_sf133_budget_execution.csv,Follow the Money export data for PR. ingest_follow_the_money.py is a dropzone reader (no network code) producing 4 outputs from operator-delivered CSV exports in data/raw/Follow the Money/. Previously
+follow_the_money,political_finance,False,manual_export,4,4,0,0,fully_materialized,1522,1,data/staging/processed/pr_sf133_budget_execution.csv,Follow the Money export data for PR. ingest_follow_the_money.py is a dropzone reader (no network code) producing 4 outputs from operator-delivered CSV exports in data/raw/follow_the_money/. Previously
 hacienda,territorial,False,none,1,1,0,0,fully_materialized,8,1,data/staging/processed/pr_hacienda_revenues.csv,
 hud_hcv_section8,federal,False,none,1,1,0,0,fully_materialized,2,1,data/staging/processed/pr_hud_hcv.csv,
 medicaid_fmap,federal,False,none,1,1,0,0,fully_materialized,89,1,data/staging/processed/pr_medicaid_fmap.csv,
