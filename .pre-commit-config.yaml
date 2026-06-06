@@ -20,3 +20,16 @@ repos:
         entry: detect-private-key
         language: python
         types: [text]
+
+  - repo: local
+    hooks:
+      - id: regenerate-registry-json
+        name: Regenerate registries/*.json from YAML (audit Phase 2)
+        # Runs only when a registry YAML changes. The script overwrites the
+        # paired JSON, which then gets re-staged via post-hook. See
+        # registries/README.md for the YAML-as-source-of-truth policy.
+        entry: python3 scripts/regenerate_registry_json.py
+        language: system
+        pass_filenames: false
+        files: ^registries/.*\.yaml$
+        stages: [commit]

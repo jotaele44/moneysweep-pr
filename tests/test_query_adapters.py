@@ -181,11 +181,15 @@ def test_fec_uses_explicit_api_key_when_provided():
 
 @pytest.mark.unit
 def test_stub_adapter_raises_manual_only_with_producer_script():
-    adapter = NotImplementedAdapter(root=REPO_ROOT, source_id="lda")
+    # `cor3` is a still-manual-only source (no concrete query adapter); LDA used
+    # to be the canonical example here, but PR #203 promoted LDA to a real
+    # adapter (`scripts/sources/fetch_lda_gov.py`) so the test had to switch to
+    # a source whose `producer_script` is still a `download_*.py` script.
+    adapter = NotImplementedAdapter(root=REPO_ROOT, source_id="cor3")
     with pytest.raises(ManualOnlyError) as excinfo:
         adapter.fetch(Query())
-    assert excinfo.value.source_id == "lda"
-    assert "download_lda.py" in str(excinfo.value)
+    assert excinfo.value.source_id == "cor3"
+    assert "download_cor3.py" in str(excinfo.value)
 
 
 # ---------------------------------------------------------------------------
