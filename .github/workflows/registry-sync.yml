@@ -1,0 +1,50 @@
+name: Registry sync
+
+# Asserts every registries/*.json file matches what scripts/regenerate_registry_json.py
+# produces from the corresponding registries/*.yaml. YAML is the human-editable
+# source of truth; JSON is the runtime wire format. This check stops anyone from
+# committing YAML edits without regenerating the JSON (audit-report Phase 2,
+# RECOMMENDATIONS.md item: pick a canonical registry format).
+
+on:
+  pull_request:
+    paths:
+      - "registries/**"
+      - "scripts/regenerate_registry_json.py"
+      - ".github/workflows/registry-sync.yml"
+  push:
+    paths:
+      - "registries/**"
+      - "scripts/regenerate_registry_json.py"
+      - ".github/workflows/registry-sync.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  registry-sync:
+    name: Registry JSON regenerates identically from YAML
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PyYAML
+        run: pip install PyYAML
+
+      - name: Regenerate registry JSONs from YAML
+        run: python scripts/regenerate_registry_json.py
+
+      - name: Assert no drift between YAML and JSON
+        run: |
+          if ! git diff --exit-code -- 'registries/*.json'; then
+            echo "::error::registries/*.json drifted from registries/*.yaml. Run python3 scripts/regenerate_registry_json.py locally and commit the regenerated JSON."
+            git status --porcelain -- 'registries/*.json'
+            exit 1
+          fi
