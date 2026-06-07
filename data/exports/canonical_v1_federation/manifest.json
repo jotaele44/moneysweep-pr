@@ -4,10 +4,10 @@
   "gate": "NON_PRODUCTION_DIAGNOSTIC",
   "stream_counts": {
     "sources": 232,
-    "entities": 86,
-    "relationships": 15
+    "entities": 200,
+    "relationships": 64
   },
-  "not_yet_federated_count": 49,
-  "edges_federated_pct": 23.44,
-  "generated_at": "2026-06-02T22:49:31.770814+00:00"
+  "not_yet_federated_count": 0,
+  "edges_federated_pct": 100.0,
+  "generated_at": "2026-06-07T01:08:53.891852+00:00"
 }

@@ -5,15 +5,20 @@ federation JSONL streams that validate against the stable schemas in
 ``schemas/contract_sweeper_{source,entity,relationship}.schema.json``:
 
 * **sources.jsonl**       — one row per canonical_v1 evidence row (``src_<32hex>``).
-* **entities.jsonl**      — canonical_v1 ``entities`` + ``people`` (``ent_<32hex>``),
-                            carrying the canonical_v1 id in ``external_ids``.
-* **relationships.jsonl** — canonical_v1 ``edges`` whose *both* endpoints map to a
-                            federation entity (Person/Entity) (``rel_<32hex>``).
+* **entities.jsonl**      — canonical_v1 ``entities`` + ``people`` PLUS the promoted
+                            non-entity nodes (municipalities, debt instruments,
+                            projects, properties, funding sources, contracts), each
+                            ``ent_<32hex>`` carrying its canonical_v1 id in
+                            ``external_ids`` (PR B / WS-Q).
+* **relationships.jsonl** — canonical_v1 ``edges`` whose both endpoints resolve to a
+                            federation entity (``rel_<32hex>``).
 
-Edges touching non-entity nodes (Contract/Debt/Project/FundingSource/Property/
-Municipality/LobbyingRecord) are reported as ``not_yet_federated`` rather than
-forced into the entity-only relationship schema. Every row carries a ``lineage``
-object and ``synthetic=false``. Stdlib only; deterministic and idempotent.
+PR A federated only Person/Entity↔Person/Entity edges; PR B promotes the remaining
+node types to entities so **every** edge federates (``edges_federated_pct == 100``,
+``not_yet_federated == []``). Non-entity node types are projected as entities with a
+descriptive ``entity_type`` (municipality / debt_instrument / project / property /
+funding_source / contract). Every row carries a ``lineage`` object and
+``synthetic=false``. Stdlib only; deterministic and idempotent.
 """
 from __future__ import annotations
 
@@ -33,7 +38,14 @@ PRODUCER = "contract_sweeper/federation/canonical_v1_bridge.py"
 PHASE = "CANONICAL_V1_FEDERATION_BRIDGE"
 
 # canonical_v1 edge endpoint node types that become federation entities.
-_ENTITY_NODE_TYPES = {"Person", "Entity"}
+# PR B (WS-Q): non-entity nodes (municipalities, debt instruments, projects,
+# properties, funding sources, contracts) are promoted to federation entities so
+# the edges touching them federate as entity->entity relationships instead of
+# being reported as not_yet_federated.
+_ENTITY_NODE_TYPES = {
+    "Person", "Entity", "Municipality", "DebtInstrument",
+    "Project", "Property", "FundingSource", "Contract",
+}
 
 # canonical_v1 entity_type -> federation entity_type vocabulary.
 _ENTITY_TYPE_MAP = {
@@ -44,6 +56,17 @@ _ENTITY_TYPE_MAP = {
     "nonprofit": "recipient",
     "other": "recipient",
 }
+
+# PR B: additional canonical_v1 node tables promoted to federation entities.
+# (table_key, id_column, name_column | None, federation_entity_type, source_csv)
+_NODE_TABLES = [
+    ("municipalities", "municipality_id", "name", "municipality", "data/canonical_v1/municipalities.csv"),
+    ("projects", "project_id", "project_name", "project", "data/canonical_v1/projects.csv"),
+    ("properties", "property_id", "property_name", "property", "data/canonical_v1/properties.csv"),
+    ("funding_sources", "funding_source_id", "program", "funding_source", "data/canonical_v1/funding_sources.csv"),
+    ("contracts", "contract_id", "contract_number", "contract", "data/canonical_v1/contracts.csv"),
+    ("debt_instruments", "debt_id", None, "debt_instrument", "data/canonical_v1/debt_instruments.csv"),
+]
 
 
 def _now() -> str:
@@ -135,6 +158,25 @@ def build_streams(root: Path | None = None) -> dict[str, Any]:
                      (per.get("jurisdiction") or "").strip(),
                      (per.get("evidence_id") or "").strip(),
                      per.get("confidence"), "data/canonical_v1/people.csv")
+
+    # --- PR B: promote non-entity canonical_v1 nodes to federation entities ---
+    for table_key, id_col, name_col, etype, source_csv in _NODE_TABLES:
+        for row in tables.get(table_key, []):
+            cid = (row.get(id_col) or "").strip()
+            if not cid:
+                continue
+            if name_col:
+                name = (row.get(name_col) or "").strip() or cid
+            else:  # debt_instruments has no single name column — compose a label
+                name = " ".join(p for p in (
+                    (row.get("debt_class") or "").strip(),
+                    (row.get("series") or "").strip(),
+                    (row.get("issue_year") or "").strip(),
+                ) if p) or cid
+            _emit_entity(cid, name, "", etype,
+                         (row.get("jurisdiction") or "").strip(),
+                         (row.get("evidence_id") or "").strip(),
+                         row.get("confidence"), source_csv)
 
     # --- relationships from edges with entity endpoints ---
     relationships: list[dict[str, Any]] = []

@@ -26,10 +26,17 @@ def test_streams_have_expected_shape(streams):
     tables = cv1.load_all_tables(REPO_ROOT)
     # one source per evidence row
     assert len(streams["sources"]) == len(tables["evidence"])
-    # entities = canonical entities + people
-    assert len(streams["entities"]) == len(tables["entities"]) + len(tables["people"])
+    # entities = canonical entities + people + promoted non-entity nodes (PR B)
+    base = len(tables["entities"]) + len(tables["people"])
+    promoted = sum(
+        sum(1 for r in tables[tk] if (r.get(idc) or "").strip())
+        for tk, idc, *_ in bridge._NODE_TABLES
+    )
+    assert len(streams["entities"]) == base + promoted
     # every edge is either federated or reported
     assert len(streams["relationships"]) + len(streams["not_yet_federated"]) == len(tables["edges"])
+    # PR C readiness gate: after PR B every edge federates (no non-entity orphans)
+    assert streams["not_yet_federated"] == [], streams["not_yet_federated"]
 
 
 @pytest.mark.unit
