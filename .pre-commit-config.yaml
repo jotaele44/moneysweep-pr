@@ -43,9 +43,12 @@ repos:
         # Lints only the files in the commit, so the repo-wide backlog (cleaned up
         # incrementally per docs/BUILD_EXECUTION_SEQUENCE.md Wave B) does not block
         # unrelated commits. Keep `rev` in sync with ruff in requirements-dev.txt.
-        # No --fix here: surface issues, let the author decide. ruff format is added
-        # later (Wave C) once the one-time reformat has landed.
+        # No --fix here: surface issues, let the author decide.
         args: [--no-fix]
+      - id: ruff-format
+        name: ruff format (changed files)
+        # The repo-wide reformat landed in Wave C; this keeps changed files
+        # formatted. The CI `ruff format --check .` job is the gating counterpart.
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.11.2
