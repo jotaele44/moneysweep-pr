@@ -1,8 +1,6 @@
 """Tests for fdic_mapper — deterministic FDIC bank data mapping."""
 
-import pytest
 import pandas as pd
-import numpy as np
 
 from scripts.fdic_mapper import (
     map_fdic_resource,

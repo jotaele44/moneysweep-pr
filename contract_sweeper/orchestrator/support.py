@@ -208,7 +208,7 @@ def print_summary(
     logger.info(f"  Year coverage:         {covered_years}")
     logger.info(f"  2007 gap status:       {gap_2007}")
     logger.info(f"  Timeline continuity:   {timeline}")
-    logger.info(f"  Expected record range: ~5,000–15,000+ (from ~1,500 baseline)")
+    logger.info("  Expected record range: ~5,000–15,000+ (from ~1,500 baseline)")
 
     if dedup_stats is not None:
         logger.info(

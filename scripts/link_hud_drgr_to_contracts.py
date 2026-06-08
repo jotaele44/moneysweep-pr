@@ -25,7 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 
 from scripts.build_unified_master import _normalize_name
-from scripts.parquet_utils import pq_read, pq_write
+from scripts.parquet_utils import pq_read
 from scripts.config import PROJECT_ROOT, setup_logging
 
 LINKED_DIR = PROJECT_ROOT / "data" / "linked"
@@ -104,7 +104,7 @@ def run(root=None, force=False):
     proc_dir = root / "data" / "staging" / "processed"
 
     df_orgs       = _load_parquet(norm_dir / "hud_drgr_responsible_orgs_resolved.parquet", logger)
-    df_activities = _load_parquet(norm_dir / "hud_drgr_activities.parquet", logger)
+    _load_parquet(norm_dir / "hud_drgr_activities.parquet", logger)
     df_contracts  = _load_csv(proc_dir / "pr_contracts_master.csv", logger)
     if df_contracts.empty:
         df_contracts = _load_csv(proc_dir / "pr_all_awards_master.csv", logger)

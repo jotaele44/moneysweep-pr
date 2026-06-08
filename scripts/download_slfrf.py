@@ -37,7 +37,7 @@ from contract_sweeper.runtime.base_downloader import (
     paginate,
 )
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 
 # ---------------------------------------------------------------------------
 # Constants

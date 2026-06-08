@@ -1,6 +1,5 @@
 """Tests for scripts/normalize_expansion_inputs.py — normalization logic."""
 
-import csv
 import sys
 from pathlib import Path
 

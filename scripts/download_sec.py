@@ -32,7 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -309,7 +309,7 @@ def run(root: Path = None, force: bool = False) -> dict:
         if not sub:
             continue
 
-        co_info = sub.get("entityType", "")
+        sub.get("entityType", "")
         sic     = str(sub.get("sic", ""))
         sic_desc = sub.get("sicDescription", "")
         state   = sub.get("stateOfIncorporation", "")
@@ -424,7 +424,7 @@ def run(root: Path = None, force: bool = False) -> dict:
             .drop_duplicates("cik")
             .sort_values("total_revenues", ascending=False, key=lambda s: pd.to_numeric(s, errors="coerce").fillna(0))
         )
-        logger.info(f"\n  Top 10 by latest revenue:")
+        logger.info("\n  Top 10 by latest revenue:")
         for _, row in df_latest.head(10).iterrows():
             rev = pd.to_numeric(row.get("total_revenues"), errors="coerce")
             rev_str = f"${rev / 1e9:>7.1f}B" if pd.notna(rev) and rev > 0 else "      N/A"

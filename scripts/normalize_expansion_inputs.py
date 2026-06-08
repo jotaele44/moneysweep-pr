@@ -14,8 +14,6 @@ import pandas as pd
 
 from scripts.config import (
     DOWNLOAD_MANIFEST,
-    EXPANSION_DIR,
-    PROCESSED_DIR,
     PROJECT_ROOT,
     STANDARD_COLUMNS,
     find_column,
@@ -61,7 +59,6 @@ def normalize_highergov_df(df: pd.DataFrame) -> pd.DataFrame:
     Attempts to detect date, amount, and vendor columns from noisy PDF-derived CSVs.
     Renames detected columns to standard names used downstream.
     """
-    import re
 
     n = len(df)
     if n == 0:

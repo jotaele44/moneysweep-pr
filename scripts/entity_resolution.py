@@ -23,7 +23,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from scripts.config import ENRICHMENT_OUTPUT_DIR, MASTER_PATH, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 from scripts.sam_enrichment import normalize_vendor, name_similarity
 
 # ---------------------------------------------------------------------------

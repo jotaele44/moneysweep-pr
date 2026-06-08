@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts.config import (
-    PROJECT_ROOT, PROCESSED_DIR, setup_logging,
+    PROJECT_ROOT, setup_logging,
     SOURCE_PRIORITY, EXPANSION_PRIORITY, REQUIRED_MASTER_COLUMNS, NULL_THRESHOLDS,
 )
 from contract_sweeper.runtime.post_ingest import apply_post_ingest
@@ -365,7 +365,6 @@ def run(
     # ------------------------------------------------------------------
     # 3b. Read expansion contracts (IDV, DoD, reconstruction)
     # ------------------------------------------------------------------
-    expansion_dir = root / "data" / "staging" / "expansion"
     for fname in EXPANSION_FILES:
         expected_rel = f"data/staging/expansion/{fname}"
         fpath, mapping_mode = _resolve_input_path(root, expected_rel, input_map)

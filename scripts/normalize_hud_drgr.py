@@ -142,7 +142,6 @@ def _build_responsible_orgs(df_activities, logger):
         return pd.DataFrame(columns=ORG_COLUMNS)
 
     org_col = "responsible_org"
-    norm_col = "responsible_org_normalized" if "responsible_org_normalized" in df_activities.columns else None
 
     rows = []
     for org, grp in df_activities.groupby(org_col):
@@ -184,7 +183,7 @@ def run(root=None, force=False):
     logger.info("Loading HUD DRGR inputs...")
     df_grants        = _load(norm_dir / "hud_drgr_grants.parquet", logger)
     df_activities    = _load(norm_dir / "hud_drgr_activities.parquet", logger)
-    df_drawdowns     = _load(norm_dir / "hud_drgr_drawdowns.parquet", logger)
+    _load(norm_dir / "hud_drgr_drawdowns.parquet", logger)
     df_appropriations = _load(norm_dir / "hud_drgr_appropriations.parquet", logger)
 
     # Normalize responsible org names in activities

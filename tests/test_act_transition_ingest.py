@@ -61,7 +61,7 @@ def test_run_with_no_drop_dir_is_clean_noop(tmp_path: Path):
 
 @pytest.mark.integration
 def test_run_materializes_processed_output_from_pdf(tmp_path: Path):
-    reportlab = pytest.importorskip("reportlab")
+    pytest.importorskip("reportlab")
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import letter
     from reportlab.platypus import SimpleDocTemplate, Table, TableStyle

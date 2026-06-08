@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 
 from scripts.build_unified_master import _normalize_name
-from scripts.parquet_utils import pq_read, pq_write
+from scripts.parquet_utils import pq_read
 from scripts.config import PROJECT_ROOT, setup_logging
 
 NORMALIZED_DIR = PROJECT_ROOT / "data" / "normalized"

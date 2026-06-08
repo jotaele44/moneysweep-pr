@@ -39,7 +39,7 @@ from contract_sweeper.runtime.base_downloader import (
     paginate,
 )
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -259,7 +259,7 @@ def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
     raw_dir.mkdir(parents=True, exist_ok=True)
 
     logger = setup_logging("download_dot")
-    logger.info(f"Starting DOT grants download for Puerto Rico...")
+    logger.info("Starting DOT grants download for Puerto Rico...")
 
     windows = TIME_WINDOWS
     if fy_start is not None:
@@ -312,7 +312,7 @@ def main() -> int:
     parser.add_argument("--fy-start", type=int, metavar="YEAR")
     args = parser.parse_args()
     summary = _run(force=args.force, fy_start=args.fy_start)
-    print(f"\nDOT download complete.")
+    print("\nDOT download complete.")
     print(f"  PoP rows:       {summary['raw_pop_rows']:,}")
     print(f"  Recipient rows: {summary['raw_recipient_rows']:,}")
     print(f"  Master rows:    {summary['master_rows']:,}")

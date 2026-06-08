@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 from scripts.build_unified_master import _normalize_name
 
 EMMA_BASE     = "https://emma.msrb.org"

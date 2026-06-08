@@ -13,7 +13,6 @@ import pandas as pd
 
 from scripts.config import (
     DOWNLOAD_MANIFEST,
-    PROCESSED_DIR,
     PROJECT_ROOT,
     get_normalized_filename,
     read_csv_safe,

@@ -44,7 +44,7 @@ import requests
 
 from contract_sweeper.runtime.alias_overrides import apply as apply_override
 from contract_sweeper.runtime.alias_overrides import load_overrides
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -456,7 +456,7 @@ def main() -> int:
     args = parser.parse_args()
 
     result = run(api_key=args.api_key, top_n=args.top_n, force=args.force)
-    print(f"\nLDA enrichment complete.")
+    print("\nLDA enrichment complete.")
     print(f"  Entities queried:  {result['entities_queried']:,}")
     print(f"  Entities matched:  {result['entities_matched']:,}")
     print(f"  Total lobby spend: ${result['total_spend']:,.0f}")

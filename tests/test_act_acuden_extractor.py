@@ -22,7 +22,6 @@ from scripts.extract_act_acuden_pdfs import (  # noqa: E402
     ACUDEN_COLUMNS,
     SOURCES,
     extract,
-    extract_source,
 )
 
 

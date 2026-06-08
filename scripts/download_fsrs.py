@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT
+from scripts.config import PROCESSED_DIR
 
 OUT_PATH = PROCESSED_DIR / "pr_fsrs_subawards.csv"
 SUBAWARD_MASTER = PROCESSED_DIR / "pr_subawards_master.csv"

@@ -1,8 +1,6 @@
 """Tests for highergov_mapper — deterministic HigherGov resource mapping."""
 
-import pytest
 import pandas as pd
-import numpy as np
 
 from scripts.highergov_mapper import (
     map_highergov_resource,

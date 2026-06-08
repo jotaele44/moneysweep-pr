@@ -1,7 +1,6 @@
 import json
 import subprocess
 import sys
-from pathlib import Path
 
 
 def test_route_pr_intake_cli_exports_derivative_csvs(tmp_path):

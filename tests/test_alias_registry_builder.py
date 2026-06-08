@@ -1,7 +1,6 @@
 """Tests for scripts/alias_registry_builder.py."""
 import csv
 import json
-from pathlib import Path
 
 import pytest
 
@@ -35,7 +34,7 @@ def alias_repo(tmp_path):
 
 @pytest.mark.unit
 def test_build_alias_registry_creates_json(alias_repo):
-    result = build_alias_registry(alias_repo)
+    build_alias_registry(alias_repo)
     out_path = (alias_repo / "data" / "staging" / "processed" /
                 "enrichment" / "alias_registry.json")
     assert out_path.exists()

@@ -27,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 from scripts.build_unified_master import _normalize_name
 
 # ---------------------------------------------------------------------------
@@ -114,7 +114,8 @@ def _download_and_extract(session: requests.Session, url: str,
 
 
 def _build_rows(df: pd.DataFrame, permit_type: str) -> list[dict]:
-    col = lambda *cands: next((c for c in cands if c in df.columns), None)
+    def col(*cands):
+        return next((c for c in cands if c in df.columns), None)
 
     pid     = col("NPDES_ID", "AIR_ID", "PERMIT_ID", "REGISTRY_ID")
     name    = col("FAC_NAME", "FACILITY_NAME", "NAME")

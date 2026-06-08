@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 
 FNS_DATA_BASE = "https://www.fns.usda.gov"
 FNS_CKAN_URL = "https://data.fns.usda.gov/api/3/action/package_search"

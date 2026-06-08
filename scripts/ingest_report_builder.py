@@ -225,7 +225,7 @@ def _parse_file(path, logger):
         pr_mask = pop_vals.isin({v.upper() for v in PR_STATE_VALUES})
         # Also check recipient state columns if pop_state doesn't yield PR records
         if pr_mask.sum() == 0:
-            logger.info(f"  No PR rows from pop_state; trying recipient state cols...")
+            logger.info("  No PR rows from pop_state; trying recipient state cols...")
             for cand in ["Vendor State Code", "Recipient State Code", "State Code",
                          "Legal Business Name State", "Vendor State"]:
                 src2 = _map_col(df.columns.tolist(), [cand])

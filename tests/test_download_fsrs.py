@@ -2,9 +2,7 @@
 
 import pytest
 import pandas as pd
-from pathlib import Path
-from unittest.mock import patch, MagicMock
-import tempfile
+from unittest.mock import patch
 
 from scripts.download_fsrs import run, _derive_from_subaward_master, FSRS_COLUMNS
 

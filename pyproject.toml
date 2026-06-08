@@ -26,3 +26,16 @@ extend-exclude = ["archive"]
 # ruff defaults: E4/E7/E9 (a safe pycodestyle subset) + F (pyflakes). Broader rule
 # families (I, UP, B, …) are enabled later in the sequence once the tree is clean.
 select = ["E4", "E7", "E9", "F"]
+
+[tool.ruff.lint.per-file-ignores]
+# E402 (import-not-at-top) is intentional in these files: each inserts the repo
+# root into sys.path before importing first-party modules, or (in the test files)
+# deliberately interleaves per-source imports between test groups for locality.
+# Reordering would break the sys.path bootstrap, so the rule is suppressed here
+# rather than "fixed".
+"run_all.py" = ["E402"]
+"scripts/run_export.py" = ["E402"]
+"scripts/smoke_export.py" = ["E402"]
+"scripts/build_export_streams.py" = ["E402"]
+"tests/test_new_downloaders.py" = ["E402"]
+"tests/test_ingest_manual_data.py" = ["E402"]

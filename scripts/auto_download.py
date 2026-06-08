@@ -29,7 +29,6 @@ from lxml import etree
 
 from scripts.config import (
     DOWNLOAD_MANIFEST,
-    EXPANSION_DIR,
     PROJECT_ROOT,
     read_csv_safe,
     setup_logging,
@@ -285,7 +284,7 @@ def download_usaspending(entry: dict, output_dir: Path, logger, session: request
     page = 1
     total_pages = None
 
-    logger.info(f"  Querying USASpending API...")
+    logger.info("  Querying USASpending API...")
 
     while True:
         payload["page"] = page
@@ -332,7 +331,7 @@ def download_usaspending(entry: dict, output_dir: Path, logger, session: request
     if not all_results:
         if result["status"] == "OK":
             result["status"] = "EMPTY"
-            logger.warning(f"  No results returned from USASpending API")
+            logger.warning("  No results returned from USASpending API")
         return result
 
     # Convert to DataFrame
@@ -647,7 +646,7 @@ def download_fpds(entry: dict, output_dir: Path, logger, session: requests.Sessi
     if not all_records:
         if result["status"] == "OK":
             result["status"] = "EMPTY"
-            logger.warning(f"  No FPDS records found")
+            logger.warning("  No FPDS records found")
         return result
 
     # Convert to DataFrame and save
@@ -669,7 +668,7 @@ def download_fsrs(entry: dict, output_dir: Path, logger, session: requests.Sessi
     fname = entry["filename"]
     result = {"filename": fname, "rows": 0, "status": "MANUAL", "error": None}
 
-    logger.info(f"  Attempting FSRS download...")
+    logger.info("  Attempting FSRS download...")
 
     # Try form POST
     try:
@@ -709,9 +708,9 @@ def download_fsrs(entry: dict, output_dir: Path, logger, session: requests.Sessi
         logger.debug(f"  FSRS auto-download failed: {e}")
 
     # Fallback: manual instructions
-    logger.info(f"  FSRS requires manual download:")
-    logger.info(f"    1. Go to https://www.fsrs.gov")
-    logger.info(f"    2. Search Sub-Awards → Place of Performance State = PR")
+    logger.info("  FSRS requires manual download:")
+    logger.info("    1. Go to https://www.fsrs.gov")
+    logger.info("    2. Search Sub-Awards → Place of Performance State = PR")
     logger.info(f"    3. Export as CSV → save as data/staging/expansion/{fname}")
     result["status"] = "MANUAL"
     return result

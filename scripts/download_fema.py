@@ -23,7 +23,6 @@ import urllib.parse
 import pandas as pd
 import time
 import argparse
-import json
 
 # ---------------------------------------------------------------------------
 # Constants

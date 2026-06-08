@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.parquet_utils import pq_read, pq_write
+from scripts.parquet_utils import pq_read
 from scripts.config import PROJECT_ROOT, setup_logging
 
 NORMALIZED_DIR  = PROJECT_ROOT / "data" / "normalized"
@@ -155,7 +155,7 @@ def run(root=None, force=False):
     logger = setup_logging("validate_fema_pa_coverage")
 
     if gap_path.exists() and not force:
-        logger.info(f"  Validation outputs exist — skipping. Use --force to re-run.")
+        logger.info("  Validation outputs exist — skipping. Use --force to re-run.")
         return {"pw_coverage": 0, "pw_target": PW_TARGET, "coverage_pass": False,
                 "gap_count": 0, "high_value_unresolved": 0, "status": "CACHED"}
 

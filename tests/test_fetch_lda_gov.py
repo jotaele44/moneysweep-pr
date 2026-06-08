@@ -4,7 +4,6 @@ import csv
 import json
 from pathlib import Path
 
-import pytest
 
 from scripts.sources import fetch_lda_gov as lda
 

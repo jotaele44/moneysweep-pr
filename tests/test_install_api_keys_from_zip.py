@@ -5,7 +5,6 @@ and verifies content + mode. No real keys touched. No network calls.
 """
 from __future__ import annotations
 
-import os
 import stat
 import zipfile
 from pathlib import Path

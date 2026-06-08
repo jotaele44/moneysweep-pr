@@ -36,7 +36,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 
 
 # ---------------------------------------------------------------------------
@@ -104,7 +104,7 @@ def build_profiles(root: Path = None) -> dict:
     # ------------------------------------------------------------------
     awards_path = processed_dir / "pr_all_awards_master.csv"
     if not awards_path.exists():
-        logger.error(f"  Awards master not found — run build_unified_master.py first")
+        logger.error("  Awards master not found — run build_unified_master.py first")
         return {"rows": 0, "status": "MISSING_AWARDS"}
 
     logger.info("Loading awards master...")
@@ -177,7 +177,6 @@ def build_profiles(root: Path = None) -> dict:
 
     # --- Medicare providers ---
     if df_med is not None and not df_med.empty:
-        name_col = None
         for c in ["provider_last_name", "provider_first_name"]:
             if c not in df_med.columns:
                 df_med[c] = ""
@@ -305,7 +304,7 @@ def build_profiles(root: Path = None) -> dict:
     bank_matched = int(flag_bank.sum())
     multi_match  = int(((flag_np.astype(int) + flag_med.astype(int) + flag_bank.astype(int)) >= 2).sum())
 
-    total_awards = float(merged["total_awards_obligated"].sum())
+    float(merged["total_awards_obligated"].sum())
     np_awards    = float(pd.to_numeric(merged.loc[flag_np, "total_awards_obligated"],
                                        errors="coerce").sum()) if np_matched else 0
     med_awards   = float(pd.to_numeric(merged.loc[flag_med, "total_awards_obligated"],
@@ -321,12 +320,15 @@ def build_profiles(root: Path = None) -> dict:
     logger.info(f"  Match in 2+ sources:             {multi_match:,}")
     logger.info(f"  Entities in supp. sources only:  {len(df_gaps) if gap_rows else 0:,}")
 
-    logger.info(f"\n  Top 10 by awards — with supplementary source flags:")
+    logger.info("\n  Top 10 by awards — with supplementary source flags:")
     for _, row in merged.head(10).iterrows():
         flags = []
-        if row.get("is_nonprofit")  is True or row.get("is_nonprofit")  == True:  flags.append("990")
-        if row.get("is_medicare_provider") is True or row.get("is_medicare_provider") == True: flags.append("CMS")
-        if row.get("is_fdic_bank") is True or row.get("is_fdic_bank") == True: flags.append("FDIC")
+        if row.get("is_nonprofit"):
+            flags.append("990")
+        if row.get("is_medicare_provider"):
+            flags.append("CMS")
+        if row.get("is_fdic_bank"):
+            flags.append("FDIC")
         flag_str = "[" + "|".join(flags) + "]" if flags else ""
         name  = str(row["recipient_name"])[:50]
         award = float(row["total_awards_obligated"])
