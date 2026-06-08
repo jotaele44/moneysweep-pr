@@ -35,6 +35,18 @@ repos:
         files: ^registries/.*\.yaml$
         stages: [commit]
 
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.8
+    hooks:
+      - id: ruff
+        name: ruff (lint, changed files)
+        # Lints only the files in the commit, so the repo-wide backlog (cleaned up
+        # incrementally per docs/BUILD_EXECUTION_SEQUENCE.md Wave B) does not block
+        # unrelated commits. Keep `rev` in sync with ruff in requirements-dev.txt.
+        # No --fix here: surface issues, let the author decide. ruff format is added
+        # later (Wave C) once the one-time reformat has landed.
+        args: [--no-fix]
+
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.11.2
     hooks:
