@@ -123,7 +123,7 @@ def check(manifest: dict[str, Any], root: Path | None = None) -> list[str]:
     layers = manifest.get("layers", [])
     if not layers:
         problems.append("no GIS layers in manifest")
-    ids = [l["layer_id"] for l in layers]
+    ids = [layer["layer_id"] for layer in layers]
     if len(set(ids)) != len(ids):
         problems.append("duplicate layer_id values present")
 
@@ -153,8 +153,8 @@ def build(root: Path | None = None) -> dict[str, Any]:
         "output": OUT,
         "layer_count": len(manifest["layers"]),
         "status_breakdown": {
-            s: sum(1 for l in manifest["layers"] if l["status"] == s)
-            for s in sorted({l["status"] for l in manifest["layers"]})
+            s: sum(1 for layer in manifest["layers"] if layer["status"] == s)
+            for s in sorted({layer["status"] for layer in manifest["layers"]})
         },
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }

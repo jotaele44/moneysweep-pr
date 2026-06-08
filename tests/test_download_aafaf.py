@@ -5,7 +5,6 @@ only the pure parse_records() transform, so they run fully offline.
 """
 from __future__ import annotations
 
-import pandas as pd
 import pytest
 
 from scripts.download_aafaf import AAFAF_COLUMNS, KNOWN_AAFAF_DATA, parse_records

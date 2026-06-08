@@ -43,7 +43,7 @@ from contract_sweeper.runtime.base_downloader import (
     paginate,
 )
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -325,7 +325,7 @@ def main() -> int:
     parser.add_argument("--fy-start", type=int, metavar="YEAR")
     args = parser.parse_args()
     summary = _run(force=args.force, fy_start=args.fy_start)
-    print(f"\nUSDA download complete.")
+    print("\nUSDA download complete.")
     print(f"  Master rows: {summary['master_rows']:,}")
     if summary["errors"]:
         for err in summary["errors"]:

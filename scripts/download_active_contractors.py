@@ -27,7 +27,7 @@ import pandas as pd
 import requests
 
 from scripts.build_unified_master import _normalize_name
-from scripts.config import PROJECT_ROOT, PROCESSED_DIR, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 
 RAW_DIRS = [
     PROJECT_ROOT / "data" / "raw" / "Active Contractor Listing",

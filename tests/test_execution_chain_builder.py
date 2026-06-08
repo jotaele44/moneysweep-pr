@@ -119,7 +119,7 @@ def test_build_chains_generated_internal_id_join(chain_repo):
 
 @pytest.mark.unit
 def test_build_chains_per_municipality(chain_repo):
-    result = build_execution_chains(chain_repo)
+    build_execution_chains(chain_repo)
     out = chain_repo / "data" / "staging" / "processed" / "execution"
     with (out / "execution_chain_per_municipality.csv").open(encoding="utf-8") as f:
         rows = list(csv.DictReader(f))

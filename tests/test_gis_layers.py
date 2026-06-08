@@ -84,7 +84,7 @@ def test_layer_manifest_valid():
     item_schema = schema["properties"]["layers"]["items"]
     for layer in manifest["layers"]:
         assert validate_row(layer, item_schema) == [], layer
-    statuses = {l["layer_id"]: l["status"] for l in manifest["layers"]}
+    statuses = {layer["layer_id"]: layer["status"] for layer in manifest["layers"]}
     assert statuses["municipality_density"] == "done"
     assert statuses["project_points"] == "blocked"  # no coordinates committed
 

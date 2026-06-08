@@ -31,7 +31,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 from scripts.build_unified_master import _normalize_name
 
 # ---------------------------------------------------------------------------
@@ -141,7 +141,6 @@ def _fetch_json_endpoint(session, endpoint: str, record_type: str,
 def _fetch_html_table(session, endpoint: str, logger) -> list[dict]:
     """Fall back to HTML table parsing if JSON endpoint is unavailable."""
     try:
-        from html.parser import HTMLParser
 
         url = COMPRAS_BASE + endpoint
         resp = _try_get(session, url, {}, logger)

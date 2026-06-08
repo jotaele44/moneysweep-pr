@@ -27,7 +27,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.federation.canonical_v1_bridge import REPO_ROOT, build_streams
+from contract_sweeper.federation.canonical_v1_bridge import build_streams
 
 OUT_DIR = "data/exports/canonical_v1_federation"
 SCHEMA_DIR = "schemas"

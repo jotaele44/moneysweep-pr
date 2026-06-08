@@ -5,7 +5,6 @@ cover only the pure parse_records() transform, so they run fully offline.
 """
 from __future__ import annotations
 
-import pandas as pd
 import pytest
 
 from scripts.download_p3 import KNOWN_P3_PROJECTS, P3_COLUMNS, parse_records

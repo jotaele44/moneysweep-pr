@@ -5,7 +5,6 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
-import pandas as pd
 import pytest
 
 from contract_sweeper.query.adapters._stub import NotImplementedAdapter

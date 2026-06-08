@@ -34,7 +34,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 
 OVERSIGHT_BOARD_BASE = "https://oversightboard.pr.gov"
 ERS_BASE = "https://www.retiro.pr.gov"

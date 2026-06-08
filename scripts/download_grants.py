@@ -42,7 +42,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -268,7 +268,7 @@ def _download_zip(
     logger,
 ) -> bool:
     """Stream-download the bulk ZIP file to disk. Returns True on success."""
-    logger.info(f"  Downloading ZIP...")
+    logger.info("  Downloading ZIP...")
     try:
         resp = session.get(file_url, timeout=(30, 1800), stream=True)
         resp.raise_for_status()
@@ -627,7 +627,7 @@ def main() -> int:
 
     summary = _run(force=args.force, only_pass=args.only_pass, fy_start=args.fy_start)
 
-    print(f"\nGrants bulk download complete.")
+    print("\nGrants bulk download complete.")
     print(f"  Raw rows:    {summary['raw_rows']:,}")
     print(f"  Master rows: {summary['master_rows']:,}")
     print(f"  Master path: {summary['master_path']}")

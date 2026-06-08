@@ -1,8 +1,6 @@
 """Tests for emma_mapper — deterministic EMMA bond data mapping."""
 
-import pytest
 import pandas as pd
-import numpy as np
 
 from scripts.emma_mapper import (
     map_emma_resource,

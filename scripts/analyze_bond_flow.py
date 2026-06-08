@@ -36,7 +36,7 @@ from contract_sweeper.runtime.maturity_gate import (
     load_source_maturity,
     unmaterialized_sources,
 )
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 from scripts.build_unified_master import _normalize_name
 from scripts.sam_enrichment import name_similarity
 
@@ -153,7 +153,7 @@ def run(root: Path = None, force: bool = False) -> dict:
     else:
         entity_df["_norm"] = ""
 
-    entity_norms = entity_df["_norm"]
+    entity_df["_norm"]
     entity_awards = {}
     for _, row in entity_df.iterrows():
         norm = str(row.get("_norm") or "")

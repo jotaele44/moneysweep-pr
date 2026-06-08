@@ -13,8 +13,6 @@ import pandas as pd
 import pytest
 
 from scripts.ingest_follow_the_money import (
-    FACILITY_COLUMNS,
-    MUNI_BRIDGE_COLUMNS,
     SF133_OUTPUT_COLUMNS,
     WIRE_COLUMNS,
     _build_sf133,

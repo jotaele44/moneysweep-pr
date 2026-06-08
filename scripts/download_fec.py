@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 from contract_sweeper.runtime.base_downloader import (
     HttpConfig,
     PageResult,
@@ -189,7 +189,7 @@ def _run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
     logger.info(f"Starting FEC Schedule A download for Puerto Rico (cycles {START_CYCLE}-{END_CYCLE})...")
 
     if not force and raw_path.exists():
-        logger.info(f"  Raw file exists — loading for master build")
+        logger.info("  Raw file exists — loading for master build")
         df = pd.read_csv(raw_path, dtype=str, low_memory=False)
         all_records = df.to_dict("records")
     else:

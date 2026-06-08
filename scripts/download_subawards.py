@@ -36,7 +36,7 @@ from contract_sweeper.runtime.base_downloader import (
     paginate,
 )
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -404,7 +404,7 @@ def main() -> int:
     args = parser.parse_args()
 
     summary = _run(force=args.force, fy_start=args.fy_start)
-    has_errors = bool(summary.get("errors"))
+    bool(summary.get("errors"))
     status = str(summary.get("status", "EMPTY"))
     rows_ingested = int(summary.get("master_rows", 0) or 0)
     retry_allowed_empty_success = bool(
@@ -416,7 +416,7 @@ def main() -> int:
         else ("EMPTY_OR_NONFATAL_RETRY" if retry_allowed_empty_success else "EMPTY")
     )
 
-    print(f"\nSubawards download complete.")
+    print("\nSubawards download complete.")
     print(f"  Raw rows:    {summary['raw_rows']:,}")
     print(f"  Master rows: {summary['master_rows']:,}")
     print(f"  Master path: {summary['master_path']}")

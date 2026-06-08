@@ -6,7 +6,6 @@ shared lifecycle depend on. All network is mocked; no real HTTP.
 from __future__ import annotations
 
 import pandas as pd
-import pytest
 from unittest.mock import patch
 
 import scripts.download_fec as fec

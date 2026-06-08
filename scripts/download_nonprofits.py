@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -172,7 +172,7 @@ def _fetch_detail(session: requests.Session, ein: str, logger) -> dict:
         return {}
     time.sleep(DETAIL_SLEEP)
 
-    org      = data.get("organization") or {}
+    data.get("organization") or {}
     filings  = data.get("filings_with_data") or []
 
     if not filings:
@@ -235,7 +235,7 @@ def run(root: Path = None, min_revenue: float = DEFAULT_MIN_REV, force: bool = F
     # Phase 1: load or fetch org list
     # ------------------------------------------------------------------
     if not force and raw_path.exists():
-        logger.info(f"  Org list exists — loading cached data")
+        logger.info("  Org list exists — loading cached data")
         df_raw = pd.read_csv(raw_path, dtype=str, low_memory=False)
         orgs   = df_raw.to_dict("records")
     else:
@@ -320,7 +320,7 @@ def run(root: Path = None, min_revenue: float = DEFAULT_MIN_REV, force: bool = F
     logger.info(f"  Written: {out_path.name}")
 
     if not df.empty:
-        logger.info(f"\n  Top 10 by revenue:")
+        logger.info("\n  Top 10 by revenue:")
         for _, row in df.head(10).iterrows():
             rev = row["total_revenue"]
             rev_str = f"${float(rev):>15,.0f}" if rev != "" else " " * 16 + "N/A"

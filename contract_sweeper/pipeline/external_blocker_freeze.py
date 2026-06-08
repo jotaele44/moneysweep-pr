@@ -185,7 +185,13 @@ def run_external_blocker_freeze(root: Path) -> dict[str, Any]:
 
         manual_row = manual_by_expected.get(expected_input, {})
         manual_r48i_row = manual_r48i_by_expected.get(expected_input, {})
-        physical_row = physical_by_expected.get(expected_input, {})
+        # NOTE: physical evidence (physical_validated_files_still_missing_r4_9c.csv)
+        # is looked up but not yet merged into the blocker record the way manual_row
+        # and retry_row are. This binding is retained — rather than the lookup chain
+        # deleted — to preserve the half-wired data flow for a follow-up that
+        # incorporates physical evidence into classify_blocker(). Tracked in
+        # docs/BUILD_EXECUTION_SEQUENCE.md (Wave M, runtime robustness).
+        physical_row = physical_by_expected.get(expected_input, {})  # noqa: F841
         retry_row = retry_by_expected.get(expected_input, {})
 
         blocker_class = classify_blocker(blocker)

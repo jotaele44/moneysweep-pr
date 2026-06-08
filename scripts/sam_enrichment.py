@@ -22,7 +22,6 @@ import argparse
 import csv
 import hashlib
 import json
-import os
 import re
 import sys
 import time
@@ -36,8 +35,6 @@ import requests as _requests
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from scripts.config import (
-    ENRICHMENT_OUTPUT_DIR,
-    MASTER_PATH,
     PROJECT_ROOT,
     get_sam_api_key,
     setup_logging,

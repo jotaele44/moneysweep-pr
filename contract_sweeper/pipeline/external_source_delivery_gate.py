@@ -22,7 +22,6 @@ from contract_sweeper.pipeline.delivered_source_validation import (
     resolve_abs,
     row_count,
     sha256,
-    split_pipe,
     validate_candidate,
 )
 

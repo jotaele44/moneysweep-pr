@@ -72,7 +72,7 @@ def _download_zip(session, logger):
             try:
                 resp = session.get(url, timeout=120)
                 if resp.status_code == 404:
-                    logger.warning(f"  404 — trying next URL")
+                    logger.warning("  404 — trying next URL")
                     break
                 resp.raise_for_status()
                 logger.info(f"  Downloaded {len(resp.content):,} bytes")
