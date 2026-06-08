@@ -89,10 +89,10 @@ _Highest-blast-radius modules first. Each new test file lets you raise the floor
 48. **(gate)** Raise `--cov-fail-under` to the new, higher post-33–47 baseline — ratchet up.
 
 ## WAVE H — Dependency & supply-chain automation (after dev-deps exist)
-49. Add `.github/dependabot.yml` (`pip` + `github-actions`, weekly) — #219; depends on 4.
-50. Add a CI check that `requirements.lock` is in sync with `requirements.txt` (fails on drift).
-51. Adopt `pip-tools` (or `uv`) to regenerate `requirements.lock` deterministically — depends on 50.
-52. Add a scheduled `pip-audit` CI job — operationalizes `docs/DEPENDENCY_SECURITY_AUDIT.md`.
+49. **[done]** Add `.github/dependabot.yml` (`pip` + `github-actions`, weekly, `repo-governance` label) — #219.
+50. **[done]** Add `.github/workflows/lockfile.yml` — gating check that re-compiles `requirements.lock` from `requirements.in` with uv and fails on drift.
+51. **[done]** `uv` already produces `requirements.lock` deterministically from `requirements.in`; the lockfile-drift check (50) enforces it. No `pip-tools` migration needed.
+52. **[done]** Add `.github/workflows/pip-audit.yml` — scheduled (+ dispatch) `pip-audit` against `requirements.lock`, report-only to start.
 
 ## WAVE I — Governance & community scaffolding (independent; low coupling)
 53. Add `LICENSE` (select a license suited to public-data redistribution) — #218.

@@ -1,0 +1,26 @@
+name: Lockfile drift
+
+# Gating: requirements.lock is compiled from requirements.in by uv. This re-runs
+# the compile and fails if the committed lock is stale, so a dependency change to
+# requirements.in can't merge without its lockfile update (and vice versa).
+on: [push, pull_request]
+
+jobs:
+  lock-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Recompile the lockfile
+        run: uv pip compile requirements.in --universal --python-version 3.10 -o requirements.lock
+
+      - name: Assert no drift
+        run: |
+          if ! git diff --exit-code requirements.lock; then
+            echo "::error::requirements.lock is out of date with requirements.in." \
+              "Run: uv pip compile requirements.in --universal --python-version 3.10 -o requirements.lock"
+            exit 1
+          fi
