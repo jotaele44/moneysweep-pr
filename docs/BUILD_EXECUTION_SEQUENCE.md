@@ -46,8 +46,8 @@ _`ruff format` rewrites 507 files. Keep it surgical and reviewable._
 ## WAVE D — Type-safety hardening (after lint/format; mypy widening)
 _Each step keeps the existing narrow mypy gate green while widening it._
 
-18. Fix the known `geo_attribution.py:173` dict-item return-type bug (already flagged in `.pre-commit-config.yaml`).
-19. Remove the `geo_attribution.py` exclude from the mypy pre-commit hook — depends on 18.
+18. **[done]** Fix the known `geo_attribution.py:172` dict-item return-type bug — annotation was `dict[str, dict[str, str]]` but the function returns `{by_fips, by_alias}` indexes (one more level of nesting).
+19. **[done]** Remove the `geo_attribution.py` exclude from the mypy pre-commit hook — `mypy contract_sweeper/runtime/` now clean across all 19 files.
 20. Annotate public signatures in `contract_sweeper/pipeline/*.py`. Prerequisite for 22.
 21. Annotate public signatures in `contract_sweeper/query/adapters/*.py`.
 22. Widen mypy `files` in `pyproject.toml` from `contract_sweeper` (runtime-focused) to include `pipeline/` + `query/` — depends on 20–21.
