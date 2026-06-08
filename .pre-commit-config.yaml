@@ -66,16 +66,11 @@ repos:
         #
         # `--ignore-missing-imports` keeps third-party stubs (pandas, requests)
         # from blocking. `--no-strict-optional` matches the existing code style.
-        #
-        # Exclusion: geo_attribution.py has a pre-existing dict-item type bug at
-        # line 173 (return-type mismatch). Leave excluded for now and file as a
-        # follow-up so the hook lands green; remove the exclude when fixed.
         args:
           - --ignore-missing-imports
           - --no-strict-optional
           - --follow-imports=silent
         files: ^contract_sweeper/runtime/
-        exclude: ^contract_sweeper/runtime/geo_attribution\.py$
         pass_filenames: true
         additional_dependencies:
           - types-PyYAML
