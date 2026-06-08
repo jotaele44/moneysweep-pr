@@ -20,6 +20,7 @@ Usage:
   python3 scripts/download_dot.py --force
   python3 scripts/download_dot.py --fy-start 2017
 """
+
 from __future__ import annotations
 
 import argparse
@@ -72,10 +73,20 @@ TIME_WINDOWS = [
 ]
 
 MASTER_COLUMNS = [
-    "award_id", "recipient_name", "recipient_uei", "awarding_agency",
-    "awarding_sub_agency", "obligated_amount", "award_date", "fiscal_year",
-    "pop_state", "pop_county", "description", "source_file",
-    "source_dataset", "award_category",
+    "award_id",
+    "recipient_name",
+    "recipient_uei",
+    "awarding_agency",
+    "awarding_sub_agency",
+    "obligated_amount",
+    "award_date",
+    "fiscal_year",
+    "pop_state",
+    "pop_county",
+    "description",
+    "source_file",
+    "source_dataset",
+    "award_category",
 ]
 
 MAX_RETRIES = 3
@@ -169,12 +180,17 @@ def _results_to_df(results: list[dict], source_file: str) -> pd.DataFrame:
         return pd.DataFrame(columns=MASTER_COLUMNS)
     df = pd.json_normalize(results)
     rename_map = {
-        "Award ID": "award_id", "Recipient Name": "recipient_name",
-        "recipient_uei": "recipient_uei", "Awarding Agency": "awarding_agency",
-        "Awarding Sub Agency": "awarding_sub_agency", "Award Amount": "obligated_amount",
-        "Start Date": "award_date", "Award Type": "award_category",
+        "Award ID": "award_id",
+        "Recipient Name": "recipient_name",
+        "recipient_uei": "recipient_uei",
+        "Awarding Agency": "awarding_agency",
+        "Awarding Sub Agency": "awarding_sub_agency",
+        "Award Amount": "obligated_amount",
+        "Start Date": "award_date",
+        "Award Type": "award_category",
         "Place of Performance State Code": "pop_state",
-        "Place of Performance County Name": "pop_county", "Description": "description",
+        "Place of Performance County Name": "pop_county",
+        "Description": "description",
     }
     df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
     df["fiscal_year"] = df.get("award_date", pd.Series(dtype=str)).apply(_derive_fiscal_year)
@@ -190,6 +206,7 @@ def _results_to_df(results: list[dict], source_file: str) -> pd.DataFrame:
 # Download + master build
 # ---------------------------------------------------------------------------
 
+
 def download_window(session, window, raw_dir, force, logger) -> dict:
     label = window["label"]
     stats = {"window": label, "pop_rows": 0, "recipient_rows": 0, "errors": []}
@@ -201,7 +218,9 @@ def download_window(session, window, raw_dir, force, logger) -> dict:
             logger.info(f"  Skipping {fname} (exists, {rows} rows)")
             stats[f"{filter_type}_rows"] = rows
             continue
-        logger.info(f"  Fetching {fname} ({window['start_date']} → {window['end_date']}, filter={filter_type})")
+        logger.info(
+            f"  Fetching {fname} ({window['start_date']} → {window['end_date']}, filter={filter_type})"
+        )
         results = _paginate(session, _build_payload(filter_type, window), logger)
         if not results:
             logger.warning(f"  No results for {fname}")
@@ -246,6 +265,7 @@ def build_master(raw_dir: Path, master_path: Path, logger) -> int:
 # Entry points
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None) -> dict:
     return _run(root=root, force=False, fy_start=None)
 
@@ -276,7 +296,12 @@ def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
             stats = download_window(session, window, raw_dir, force, logger)
         except Exception as e:
             logger.error(f"  Unexpected error on {window['label']}: {e}")
-            stats = {"window": window["label"], "pop_rows": 0, "recipient_rows": 0, "errors": [str(e)]}
+            stats = {
+                "window": window["label"],
+                "pop_rows": 0,
+                "recipient_rows": 0,
+                "errors": [str(e)],
+            }
         total_pop += stats["pop_rows"]
         total_rec += stats["recipient_rows"]
         all_errors.extend(stats["errors"])
@@ -289,9 +314,12 @@ def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
     master_rows = build_master(raw_dir, master_path, logger)
 
     summary = {
-        "raw_pop_rows": total_pop, "raw_recipient_rows": total_rec,
-        "master_rows": master_rows, "master_path": str(master_path),
-        "errors": all_errors, "windows": window_stats,
+        "raw_pop_rows": total_pop,
+        "raw_recipient_rows": total_rec,
+        "master_rows": master_rows,
+        "master_path": str(master_path),
+        "errors": all_errors,
+        "windows": window_stats,
     }
     logger.info("=" * 60)
     logger.info("DOT DOWNLOAD SUMMARY")

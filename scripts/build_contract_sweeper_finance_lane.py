@@ -5,6 +5,7 @@ Reads the PR-intake router's ``contract_sweeper_derivatives.csv`` and writes the
 normalized finance tables + review queues. Counterpart to
 ``scripts/build_spiderweb_spatial_lane.py``.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -22,10 +23,14 @@ from readiness.contract_sweeper_finance_lane import (  # noqa: E402
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", required=True,
-                        help="Directory containing contract_sweeper_derivatives.csv")
-    parser.add_argument("--out", default=None,
-                        help="Output directory for normalized lane artifacts; default: --input")
+    parser.add_argument(
+        "--input", required=True, help="Directory containing contract_sweeper_derivatives.csv"
+    )
+    parser.add_argument(
+        "--out",
+        default=None,
+        help="Output directory for normalized lane artifacts; default: --input",
+    )
     args = parser.parse_args(argv)
     try:
         report = build_contract_sweeper_finance_lane(args.input, args.out)

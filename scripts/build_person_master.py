@@ -22,6 +22,7 @@ CLI::
     python scripts/build_person_master.py            # write the CSV + manifest
     python scripts/build_person_master.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -45,11 +46,18 @@ SOURCE_ID = "canonical_v1_people"
 
 # Output column order (schema required fields + carried provenance/notes).
 PERSON_MASTER_COLUMNS = [
-    "person_id", "canonical_name", "normalized_name", "jurisdiction",
-    "source_person_id", "source_id", "evidence_tier", "confidence", "notes",
+    "person_id",
+    "canonical_name",
+    "normalized_name",
+    "jurisdiction",
+    "source_person_id",
+    "source_id",
+    "evidence_tier",
+    "confidence",
+    "notes",
 ]
 
-EVIDENCE_TIER = "T2"   # curated research registry (accepted rows), below official T1
+EVIDENCE_TIER = "T2"  # curated research registry (accepted rows), below official T1
 
 
 def _load_schema(root: Path) -> dict[str, Any]:
@@ -76,17 +84,19 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
             if (ref.get("review_status") or "").strip().lower() != "accepted":
                 continue
             suffix = source_pid.removeprefix("person_")
-            rows.append({
-                "person_id": f"ENT_PERSON_{suffix}",
-                "canonical_name": name,
-                "normalized_name": (ref.get("normalized_name") or "").strip(),
-                "jurisdiction": (ref.get("jurisdiction") or "").strip() or "PR",
-                "source_person_id": source_pid,
-                "source_id": SOURCE_ID,
-                "evidence_tier": EVIDENCE_TIER,
-                "confidence": _confidence(ref.get("confidence")),
-                "notes": (ref.get("notes") or "").strip(),
-            })
+            rows.append(
+                {
+                    "person_id": f"ENT_PERSON_{suffix}",
+                    "canonical_name": name,
+                    "normalized_name": (ref.get("normalized_name") or "").strip(),
+                    "jurisdiction": (ref.get("jurisdiction") or "").strip() or "PR",
+                    "source_person_id": source_pid,
+                    "source_id": SOURCE_ID,
+                    "evidence_tier": EVIDENCE_TIER,
+                    "confidence": _confidence(ref.get("confidence")),
+                    "notes": (ref.get("notes") or "").strip(),
+                }
+            )
     return rows
 
 
@@ -138,7 +148,9 @@ def build(root: Path | None = None) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Build the top-form Person Master reference table.")
+    parser = argparse.ArgumentParser(
+        description="Build the top-form Person Master reference table."
+    )
     parser.add_argument("--root", default=".")
     parser.add_argument("--check", action="store_true", help="Validate without writing.")
     args = parser.parse_args(argv)
@@ -146,7 +158,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

@@ -26,13 +26,9 @@ def main() -> int:
     print(f"r4_9f_candidate_files_found: {status.get('r4_9f_candidate_files_found')}")
     print(f"r4_9f_unfreeze_candidates: {status.get('r4_9f_unfreeze_candidates')}")
     print(f"r4_9f_sources_still_missing: {status.get('r4_9f_sources_still_missing')}")
+    print(f"r4_9f_retry_suppression_preserved: {status.get('r4_9f_retry_suppression_preserved')}")
     print(
-        "r4_9f_retry_suppression_preserved: "
-        f"{status.get('r4_9f_retry_suppression_preserved')}"
-    )
-    print(
-        "r4_9f_downstream_blockers_preserved: "
-        f"{status.get('r4_9f_downstream_blockers_preserved')}"
+        f"r4_9f_downstream_blockers_preserved: {status.get('r4_9f_downstream_blockers_preserved')}"
     )
     print(f"r4_9f_downloads_executed: {status.get('r4_9f_downloads_executed')}")
     print(f"r4_9f_rows_ingested: {status.get('r4_9f_rows_ingested')}")

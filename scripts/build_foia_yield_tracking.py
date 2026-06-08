@@ -18,6 +18,7 @@ CLI::
     python scripts/build_foia_yield_tracking.py            # write the CSV + manifest
     python scripts/build_foia_yield_tracking.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -53,8 +54,15 @@ YIELD_BY_REQUEST_STATUS = {
 }
 
 COLUMNS = [
-    "request_id", "target_source_id", "request_status", "records_received",
-    "yield_status", "unresolved_gap", "evidence_tier", "confidence", "notes",
+    "request_id",
+    "target_source_id",
+    "request_status",
+    "records_received",
+    "yield_status",
+    "unresolved_gap",
+    "evidence_tier",
+    "confidence",
+    "notes",
 ]
 
 
@@ -73,7 +81,7 @@ def _blocker_index(root: Path) -> dict[str, str]:
     for r in _read(root, SOURCE_STATUS):
         note = (r.get("blocker_notes") or "").strip()
         if not note:
-            note = f"pipeline_status={ (r.get('pipeline_status') or 'unknown').strip() }"
+            note = f"pipeline_status={(r.get('pipeline_status') or 'unknown').strip()}"
         index[r["source_id"]] = note
     return index
 
@@ -87,17 +95,19 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
         source_id = req["target_source_id"]
         req_status = req["request_status"]
         gap = blockers.get(source_id) or f"source {source_id} unmaterialized"
-        rows.append({
-            "request_id": req["request_id"],
-            "target_source_id": source_id,
-            "request_status": req_status,
-            "records_received": 0,
-            "yield_status": YIELD_BY_REQUEST_STATUS.get(req_status, "pending"),
-            "unresolved_gap": gap,
-            "evidence_tier": req.get("evidence_tier") or "T2",
-            "confidence": float(req.get("confidence") or 0.0),
-            "notes": "",
-        })
+        rows.append(
+            {
+                "request_id": req["request_id"],
+                "target_source_id": source_id,
+                "request_status": req_status,
+                "records_received": 0,
+                "yield_status": YIELD_BY_REQUEST_STATUS.get(req_status, "pending"),
+                "unresolved_gap": gap,
+                "evidence_tier": req.get("evidence_tier") or "T2",
+                "confidence": float(req.get("confidence") or 0.0),
+                "notes": "",
+            }
+        )
     return rows
 
 
@@ -144,7 +154,9 @@ def build(root: Path | None = None) -> dict[str, Any]:
         "source_inputs": [PRIORITY_QUEUE, SOURCE_STATUS],
         "output": OUT,
         "row_count": len(rows),
-        "open_gaps": sum(1 for r in rows if r["yield_status"] in ("pending", "partial", "no_response")),
+        "open_gaps": sum(
+            1 for r in rows if r["yield_status"] in ("pending", "partial", "no_response")
+        ),
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }
     manifest_path = root / MANIFEST_OUT
@@ -162,7 +174,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

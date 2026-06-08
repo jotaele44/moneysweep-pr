@@ -182,7 +182,9 @@ def _token_score(expected_name: str, dataset_label: str, candidate: Path) -> int
     score = 0
     if exp_stem == cand_stem:
         score += 30
-    tokens = [t for t in exp_stem.replace("-", "_").split("_") if t and t not in {"pr", "master", "csv"}]
+    tokens = [
+        t for t in exp_stem.replace("-", "_").split("_") if t and t not in {"pr", "master", "csv"}
+    ]
     for token in tokens:
         if token in cand_stem:
             score += 4
@@ -198,9 +200,15 @@ def _award_category(dataset_label: str) -> str:
     return "contract" if dataset_label in contracts_like else "assistance"
 
 
-def _apply_lineage(df: pd.DataFrame, source_system: str, source_relpath: str, mode: str, id_col: str) -> pd.DataFrame:
+def _apply_lineage(
+    df: pd.DataFrame, source_system: str, source_relpath: str, mode: str, id_col: str
+) -> pd.DataFrame:
     row_ids = pd.Series(range(1, len(df) + 1), index=df.index).astype(str)
-    base_ids = df[id_col].fillna("").astype(str).str.strip() if id_col in df.columns else pd.Series([""] * len(df), index=df.index)
+    base_ids = (
+        df[id_col].fillna("").astype(str).str.strip()
+        if id_col in df.columns
+        else pd.Series([""] * len(df), index=df.index)
+    )
     resolved_ids = base_ids.where(base_ids != "", "ROW_" + row_ids)
     df["source_system"] = source_system
     df["source_record_id"] = source_system + ":" + resolved_ids
@@ -211,18 +219,40 @@ def _apply_lineage(df: pd.DataFrame, source_system: str, source_relpath: str, mo
 
 def _to_canonical(df: pd.DataFrame, dataset_label: str, source_relpath: str) -> pd.DataFrame:
     out = pd.DataFrame(index=df.index)
-    out["award_id"] = _series_from_candidates(df, ("award_id", "contract_id", "id", "generated_internal_id", "Award ID", "PIID"))
-    out["recipient_name"] = _series_from_candidates(df, ("recipient_name", "vendor_name", "Recipient Name", "Vendor Name", "company_name"))
+    out["award_id"] = _series_from_candidates(
+        df, ("award_id", "contract_id", "id", "generated_internal_id", "Award ID", "PIID")
+    )
+    out["recipient_name"] = _series_from_candidates(
+        df, ("recipient_name", "vendor_name", "Recipient Name", "Vendor Name", "company_name")
+    )
     out["recipient_name_normalized"] = out["recipient_name"].apply(_normalize_name)
-    out["recipient_uei"] = _series_from_candidates(df, ("recipient_uei", "uei", "sam_uei", "Unique Entity ID (SAM)"))
-    out["awarding_agency"] = _series_from_candidates(df, ("awarding_agency", "agency_name", "Awarding Agency", "Awarding Agency Name"))
-    out["awarding_sub_agency"] = _series_from_candidates(df, ("awarding_sub_agency", "awarding_subagency", "Awarding Sub Agency"))
-    out["obligated_amount"] = _series_from_candidates(df, ("obligated_amount", "total_obligation", "Total Obligation", "Action Obligation"))
-    out["award_date"] = _series_from_candidates(df, ("award_date", "action_date", "Start Date", "Award Date", "Date Signed"))
-    out["fiscal_year"] = _series_from_candidates(df, ("fiscal_year", "year", "FY", "fiscal year", "award_year"))
-    out["pop_state"] = _series_from_candidates(df, ("pop_state", "Place of Performance State Code", "state", "state_code"))
-    out["pop_county"] = _series_from_candidates(df, ("pop_county", "Place of Performance City", "county", "municipality"))
-    out["description"] = _series_from_candidates(df, ("description", "Description", "Award Description", "Project Description"))
+    out["recipient_uei"] = _series_from_candidates(
+        df, ("recipient_uei", "uei", "sam_uei", "Unique Entity ID (SAM)")
+    )
+    out["awarding_agency"] = _series_from_candidates(
+        df, ("awarding_agency", "agency_name", "Awarding Agency", "Awarding Agency Name")
+    )
+    out["awarding_sub_agency"] = _series_from_candidates(
+        df, ("awarding_sub_agency", "awarding_subagency", "Awarding Sub Agency")
+    )
+    out["obligated_amount"] = _series_from_candidates(
+        df, ("obligated_amount", "total_obligation", "Total Obligation", "Action Obligation")
+    )
+    out["award_date"] = _series_from_candidates(
+        df, ("award_date", "action_date", "Start Date", "Award Date", "Date Signed")
+    )
+    out["fiscal_year"] = _series_from_candidates(
+        df, ("fiscal_year", "year", "FY", "fiscal year", "award_year")
+    )
+    out["pop_state"] = _series_from_candidates(
+        df, ("pop_state", "Place of Performance State Code", "state", "state_code")
+    )
+    out["pop_county"] = _series_from_candidates(
+        df, ("pop_county", "Place of Performance City", "county", "municipality")
+    )
+    out["description"] = _series_from_candidates(
+        df, ("description", "Description", "Award Description", "Project Description")
+    )
     out["source_file"] = Path(source_relpath).name
     out["source_dataset"] = dataset_label
     out["award_category"] = _award_category(dataset_label)
@@ -243,14 +273,28 @@ def _to_canonical(df: pd.DataFrame, dataset_label: str, source_relpath: str) -> 
 
 def _to_legacy_contracts(df: pd.DataFrame, source_relpath: str) -> pd.DataFrame:
     out = pd.DataFrame(index=df.index)
-    out["contract_id"] = _series_from_candidates(df, ("contract_id", "award_id", "Award ID", "PIID", "id"))
-    out["vendor_name"] = _series_from_candidates(df, ("vendor_name", "recipient_name", "Vendor Name", "Recipient Name", "company_name"))
-    out["agency_name"] = _series_from_candidates(df, ("agency_name", "awarding_agency", "Awarding Agency", "Awarding Agency Name"))
-    out["award_date"] = _series_from_candidates(df, ("award_date", "action_date", "Award Date", "Date Signed", "Start Date"))
-    out["obligated_amount"] = _series_from_candidates(df, ("obligated_amount", "total_obligation", "Total Obligation", "Action Obligation"))
-    out["pop_state"] = _series_from_candidates(df, ("pop_state", "Place of Performance State Code", "state", "state_code"))
+    out["contract_id"] = _series_from_candidates(
+        df, ("contract_id", "award_id", "Award ID", "PIID", "id")
+    )
+    out["vendor_name"] = _series_from_candidates(
+        df, ("vendor_name", "recipient_name", "Vendor Name", "Recipient Name", "company_name")
+    )
+    out["agency_name"] = _series_from_candidates(
+        df, ("agency_name", "awarding_agency", "Awarding Agency", "Awarding Agency Name")
+    )
+    out["award_date"] = _series_from_candidates(
+        df, ("award_date", "action_date", "Award Date", "Date Signed", "Start Date")
+    )
+    out["obligated_amount"] = _series_from_candidates(
+        df, ("obligated_amount", "total_obligation", "Total Obligation", "Action Obligation")
+    )
+    out["pop_state"] = _series_from_candidates(
+        df, ("pop_state", "Place of Performance State Code", "state", "state_code")
+    )
     out["source_file"] = Path(source_relpath).name
-    out["fiscal_year"] = _series_from_candidates(df, ("fiscal_year", "year", "FY", "fiscal year", "award_year"))
+    out["fiscal_year"] = _series_from_candidates(
+        df, ("fiscal_year", "year", "FY", "fiscal year", "award_year")
+    )
 
     out = _apply_lineage(
         out,
@@ -352,12 +396,18 @@ def run_recovery(root: Path) -> dict[str, Any]:
         expected_path = root / spec.expected_relpath
         expected_name = expected_path.name
 
-        if expected_path.exists() and expected_path.is_file() and expected_path.suffix.lower() == ".csv":
+        if (
+            expected_path.exists()
+            and expected_path.is_file()
+            and expected_path.suffix.lower() == ".csv"
+        ):
             # Existing expected input qualifies only when not stale artifact-like and has rows.
             rel_existing = _relpath(root, expected_path)
             if not _is_rejected_artifact(rel_existing):
                 try:
-                    existing_rows = max(len(pd.read_csv(expected_path, dtype=str, low_memory=False)), 0)
+                    existing_rows = max(
+                        len(pd.read_csv(expected_path, dtype=str, low_memory=False)), 0
+                    )
                 except Exception:
                     existing_rows = 0
                 if existing_rows > 0:
@@ -372,15 +422,16 @@ def run_recovery(root: Path) -> dict[str, Any]:
                             "recovered_from": rel_existing,
                             "source_rows": existing_rows,
                             "recovered_rows": existing_rows,
-                            "manifest_written": bool((expected_path.parent / "manifest.json").exists()),
+                            "manifest_written": bool(
+                                (expected_path.parent / "manifest.json").exists()
+                            ),
                             "notes": "existing canonical staging file retained",
                         }
                     )
                     continue
 
         scored = [
-            (cand, _token_score(expected_name, spec.dataset_label, cand))
-            for cand in candidates
+            (cand, _token_score(expected_name, spec.dataset_label, cand)) for cand in candidates
         ]
         scored = [pair for pair in scored if pair[1] > 0]
         scored.sort(key=lambda pair: (pair[1], pair[0].stat().st_size), reverse=True)
@@ -393,7 +444,9 @@ def run_recovery(root: Path) -> dict[str, Any]:
                     "dataset_label": spec.dataset_label,
                     "input_group": spec.input_group,
                     "reason": "no recoverable source file found in allowed roots",
-                    "recommended_action": _recommended_source_hint(spec.expected_relpath, spec.dataset_label),
+                    "recommended_action": _recommended_source_hint(
+                        spec.expected_relpath, spec.dataset_label
+                    ),
                     "producer_scripts": "|".join(_find_producer_scripts(root, expected_name)),
                 }
             )
@@ -435,7 +488,9 @@ def run_recovery(root: Path) -> dict[str, Any]:
             "dataset_label": spec.dataset_label,
             "input_group": spec.input_group,
         }
-        _write_json(expected_path.with_suffix(expected_path.suffix + ".manifest.json"), manifest_payload)
+        _write_json(
+            expected_path.with_suffix(expected_path.suffix + ".manifest.json"), manifest_payload
+        )
 
         recovered_count += 1
         audit_rows.append(

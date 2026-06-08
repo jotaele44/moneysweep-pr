@@ -16,6 +16,7 @@ Output:
 Usage:
   python3 scripts/download_hacienda.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -36,8 +37,13 @@ MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 HACIENDA_COLUMNS = [
-    "fiscal_year", "month", "revenue_type",
-    "amount", "yoy_change_pct", "ytd_amount", "source_doc",
+    "fiscal_year",
+    "month",
+    "revenue_type",
+    "amount",
+    "yoy_change_pct",
+    "ytd_amount",
+    "source_doc",
 ]
 
 HACIENDA_BULLETINS_URL = "https://hacienda.pr.gov/informes/boletines-estadisticos/"
@@ -46,48 +52,116 @@ PR_DATA_SEARCH = "https://data.pr.gov/api/3/action/package_search"
 
 # Known PR Hacienda revenue figures from FOMB-certified fiscal plans
 KNOWN_HACIENDA_DATA = [
-    {"fiscal_year": "2019", "month": "annual", "revenue_type": "IVU_sales_use_tax",
-     "amount": "2100000000", "yoy_change_pct": "", "ytd_amount": "2100000000",
-     "source_doc": "hacienda_fomb_fiscal_plan_2019"},
-    {"fiscal_year": "2019", "month": "annual", "revenue_type": "income_tax",
-     "amount": "4700000000", "yoy_change_pct": "", "ytd_amount": "4700000000",
-     "source_doc": "hacienda_fomb_fiscal_plan_2019"},
-    {"fiscal_year": "2020", "month": "annual", "revenue_type": "IVU_sales_use_tax",
-     "amount": "2200000000", "yoy_change_pct": "4.8", "ytd_amount": "2200000000",
-     "source_doc": "hacienda_fomb_fiscal_plan_2020"},
-    {"fiscal_year": "2020", "month": "annual", "revenue_type": "income_tax",
-     "amount": "4900000000", "yoy_change_pct": "4.3", "ytd_amount": "4900000000",
-     "source_doc": "hacienda_fomb_fiscal_plan_2020"},
-    {"fiscal_year": "2021", "month": "annual", "revenue_type": "IVU_sales_use_tax",
-     "amount": "2600000000", "yoy_change_pct": "18.2", "ytd_amount": "2600000000",
-     "source_doc": "hacienda_fomb_fiscal_plan_2021"},
-    {"fiscal_year": "2021", "month": "annual", "revenue_type": "income_tax",
-     "amount": "5500000000", "yoy_change_pct": "12.2", "ytd_amount": "5500000000",
-     "source_doc": "hacienda_fomb_fiscal_plan_2021"},
-    {"fiscal_year": "2022", "month": "annual", "revenue_type": "IVU_sales_use_tax",
-     "amount": "2800000000", "yoy_change_pct": "7.7", "ytd_amount": "2800000000",
-     "source_doc": "hacienda_fomb_fiscal_plan_2022"},
-    {"fiscal_year": "2022", "month": "annual", "revenue_type": "income_tax",
-     "amount": "6100000000", "yoy_change_pct": "10.9", "ytd_amount": "6100000000",
-     "source_doc": "hacienda_fomb_fiscal_plan_2022"},
+    {
+        "fiscal_year": "2019",
+        "month": "annual",
+        "revenue_type": "IVU_sales_use_tax",
+        "amount": "2100000000",
+        "yoy_change_pct": "",
+        "ytd_amount": "2100000000",
+        "source_doc": "hacienda_fomb_fiscal_plan_2019",
+    },
+    {
+        "fiscal_year": "2019",
+        "month": "annual",
+        "revenue_type": "income_tax",
+        "amount": "4700000000",
+        "yoy_change_pct": "",
+        "ytd_amount": "4700000000",
+        "source_doc": "hacienda_fomb_fiscal_plan_2019",
+    },
+    {
+        "fiscal_year": "2020",
+        "month": "annual",
+        "revenue_type": "IVU_sales_use_tax",
+        "amount": "2200000000",
+        "yoy_change_pct": "4.8",
+        "ytd_amount": "2200000000",
+        "source_doc": "hacienda_fomb_fiscal_plan_2020",
+    },
+    {
+        "fiscal_year": "2020",
+        "month": "annual",
+        "revenue_type": "income_tax",
+        "amount": "4900000000",
+        "yoy_change_pct": "4.3",
+        "ytd_amount": "4900000000",
+        "source_doc": "hacienda_fomb_fiscal_plan_2020",
+    },
+    {
+        "fiscal_year": "2021",
+        "month": "annual",
+        "revenue_type": "IVU_sales_use_tax",
+        "amount": "2600000000",
+        "yoy_change_pct": "18.2",
+        "ytd_amount": "2600000000",
+        "source_doc": "hacienda_fomb_fiscal_plan_2021",
+    },
+    {
+        "fiscal_year": "2021",
+        "month": "annual",
+        "revenue_type": "income_tax",
+        "amount": "5500000000",
+        "yoy_change_pct": "12.2",
+        "ytd_amount": "5500000000",
+        "source_doc": "hacienda_fomb_fiscal_plan_2021",
+    },
+    {
+        "fiscal_year": "2022",
+        "month": "annual",
+        "revenue_type": "IVU_sales_use_tax",
+        "amount": "2800000000",
+        "yoy_change_pct": "7.7",
+        "ytd_amount": "2800000000",
+        "source_doc": "hacienda_fomb_fiscal_plan_2022",
+    },
+    {
+        "fiscal_year": "2022",
+        "month": "annual",
+        "revenue_type": "income_tax",
+        "amount": "6100000000",
+        "yoy_change_pct": "10.9",
+        "ytd_amount": "6100000000",
+        "source_doc": "hacienda_fomb_fiscal_plan_2022",
+    },
 ]
 
 MONTH_MAP = {
-    "enero": "01", "febrero": "02", "marzo": "03", "abril": "04",
-    "mayo": "05", "junio": "06", "julio": "07", "agosto": "08",
-    "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12",
-    "january": "01", "february": "02", "march": "03", "april": "04",
-    "may": "05", "june": "06", "july": "07", "august": "08",
-    "september": "09", "october": "10", "november": "11", "december": "12",
+    "enero": "01",
+    "febrero": "02",
+    "marzo": "03",
+    "abril": "04",
+    "mayo": "05",
+    "junio": "06",
+    "julio": "07",
+    "agosto": "08",
+    "septiembre": "09",
+    "octubre": "10",
+    "noviembre": "11",
+    "diciembre": "12",
+    "january": "01",
+    "february": "02",
+    "march": "03",
+    "april": "04",
+    "may": "05",
+    "june": "06",
+    "july": "07",
+    "august": "08",
+    "september": "09",
+    "october": "10",
+    "november": "11",
+    "december": "12",
 }
 
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR Hacienda revenue research)",
-        "Accept": "text/html,application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR Hacienda revenue research)",
+            "Accept": "text/html,application/json",
+        }
+    )
     return s
 
 
@@ -107,7 +181,7 @@ def _get(session, url, params, logger):
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -118,7 +192,7 @@ def _parse_month_year(text: str):
     text_lower = text.lower()
     for month_name, month_num in MONTH_MAP.items():
         if month_name in text_lower:
-            year_match = re.search(r'\b(20\d{2})\b', text)
+            year_match = re.search(r"\b(20\d{2})\b", text)
             if year_match:
                 return year_match.group(1), month_num
     return "", ""
@@ -134,15 +208,18 @@ def _scrape_hacienda(session, logger) -> list[dict]:
     # Extract Excel/PDF bulletin links
     excel_links = re.findall(
         r'href=["\']([^"\']*(?:boletin|ingreso|recaudacion|revenue|estadistico)[^"\']*\.(?:xlsx|xls))["\']',
-        resp.text, re.IGNORECASE
+        resp.text,
+        re.IGNORECASE,
     )
     pdf_links = re.findall(
         r'href=["\']([^"\']*(?:boletin|ingreso|recaudacion|revenue)[^"\']*\.pdf)["\']',
-        resp.text, re.IGNORECASE
+        resp.text,
+        re.IGNORECASE,
     )
     all_links = excel_links[:10] + pdf_links[:5]
 
     import io
+
     for link in all_links:
         url = link if link.startswith("http") else f"https://hacienda.pr.gov{link}"
         if not link.lower().endswith((".xlsx", ".xls")):
@@ -173,20 +250,22 @@ def _scrape_hacienda(session, logger) -> list[dict]:
                     amount = ""
                     for val in row_vals[1:]:
                         clean = re.sub(r"[,$\s]", "", val)
-                        if re.match(r'^-?\d+\.?\d*$', clean):
+                        if re.match(r"^-?\d+\.?\d*$", clean):
                             amount = clean
                             break
                     if not amount:
                         continue
-                    rows.append({
-                        "fiscal_year": fy,
-                        "month": month,
-                        "revenue_type": rev_type,
-                        "amount": amount,
-                        "yoy_change_pct": row_vals[3] if len(row_vals) > 3 else "",
-                        "ytd_amount": row_vals[4] if len(row_vals) > 4 else "",
-                        "source_doc": url,
-                    })
+                    rows.append(
+                        {
+                            "fiscal_year": fy,
+                            "month": month,
+                            "revenue_type": rev_type,
+                            "amount": amount,
+                            "yoy_change_pct": row_vals[3] if len(row_vals) > 3 else "",
+                            "ytd_amount": row_vals[4] if len(row_vals) > 4 else "",
+                            "source_doc": url,
+                        }
+                    )
                 if rows:
                     logger.info(f"  Hacienda bulletin: {len(rows)} revenue rows")
                     return rows
@@ -217,6 +296,7 @@ def _fetch_pr_data_portal(session, logger) -> list[dict]:
                 continue
             try:
                 import io
+
                 if fmt in ("XLSX", "XLS"):
                     df = pd.read_excel(io.BytesIO(resp2.content), dtype=str)
                 elif fmt == "CSV":
@@ -225,15 +305,25 @@ def _fetch_pr_data_portal(session, logger) -> list[dict]:
                     df = pd.json_normalize(resp2.json())
                 for _, r in df.iterrows():
                     rd = r.to_dict()
-                    rows.append({
-                        "fiscal_year": str(rd.get("fiscal_year", rd.get("año", rd.get("año_fiscal", "")))),
-                        "month": str(rd.get("month", rd.get("mes", ""))),
-                        "revenue_type": str(rd.get("revenue_type", rd.get("tipo_ingreso", rd.get("concepto", "")))),
-                        "amount": str(rd.get("amount", rd.get("monto", rd.get("importe", "")))),
-                        "yoy_change_pct": str(rd.get("yoy_change_pct", rd.get("variacion_pct", ""))),
-                        "ytd_amount": str(rd.get("ytd_amount", rd.get("acumulado", ""))),
-                        "source_doc": url,
-                    })
+                    rows.append(
+                        {
+                            "fiscal_year": str(
+                                rd.get("fiscal_year", rd.get("año", rd.get("año_fiscal", "")))
+                            ),
+                            "month": str(rd.get("month", rd.get("mes", ""))),
+                            "revenue_type": str(
+                                rd.get(
+                                    "revenue_type", rd.get("tipo_ingreso", rd.get("concepto", ""))
+                                )
+                            ),
+                            "amount": str(rd.get("amount", rd.get("monto", rd.get("importe", "")))),
+                            "yoy_change_pct": str(
+                                rd.get("yoy_change_pct", rd.get("variacion_pct", ""))
+                            ),
+                            "ytd_amount": str(rd.get("ytd_amount", rd.get("acumulado", ""))),
+                            "source_doc": url,
+                        }
+                    )
                 if rows:
                     logger.info(f"  PR data portal Hacienda: {len(rows)} rows")
                     return rows
@@ -272,7 +362,9 @@ def run(root: Path = None, force: bool = False) -> dict:
 
     # Always include known seed data so the output is never empty when APIs are blocked
     logger.info(f"  Adding {len(KNOWN_HACIENDA_DATA)} known Hacienda seed rows...")
-    known_keys = {(r.get("fiscal_year", ""), r.get("month", ""), r.get("revenue_type", "")) for r in all_rows}
+    known_keys = {
+        (r.get("fiscal_year", ""), r.get("month", ""), r.get("revenue_type", "")) for r in all_rows
+    }
     for seed in KNOWN_HACIENDA_DATA:
         if (seed["fiscal_year"], seed["month"], seed["revenue_type"]) not in known_keys:
             all_rows.append(seed)

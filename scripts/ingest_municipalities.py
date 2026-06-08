@@ -14,6 +14,7 @@ CLI::
     python scripts/ingest_municipalities.py            # writes the canonical tables
     python scripts/ingest_municipalities.py --check     # validate coverage only
 """
+
 from __future__ import annotations
 
 import argparse
@@ -39,8 +40,16 @@ SOURCE_NAME = "data/reference/pr_municipalities.csv"
 EXPECTED_COUNT = 78
 
 MUNI_COLUMNS = [
-    "municipality_id", "name", "normalized_name", "region", "county_fips",
-    "aliases", "confidence", "evidence_id", "review_status", "notes",
+    "municipality_id",
+    "name",
+    "normalized_name",
+    "region",
+    "county_fips",
+    "aliases",
+    "confidence",
+    "evidence_id",
+    "review_status",
+    "notes",
 ]
 
 
@@ -79,18 +88,20 @@ def build_rows(root: Path | None = None) -> tuple[list[dict[str, Any]], list[Evi
                 review_status="accepted",
             )
             evidence_rows.append(ev)
-            muni_rows.append({
-                "municipality_id": municipality_id(name),
-                "name": name,
-                "normalized_name": normalize_name(name),
-                "region": (ref.get("region") or "").strip(),
-                "county_fips": county_fips,
-                "aliases": _aliases(ref),
-                "confidence": ev.confidence,
-                "evidence_id": ev.evidence_id,
-                "review_status": "accepted",
-                "notes": "",
-            })
+            muni_rows.append(
+                {
+                    "municipality_id": municipality_id(name),
+                    "name": name,
+                    "normalized_name": normalize_name(name),
+                    "region": (ref.get("region") or "").strip(),
+                    "county_fips": county_fips,
+                    "aliases": _aliases(ref),
+                    "confidence": ev.confidence,
+                    "evidence_id": ev.evidence_id,
+                    "review_status": "accepted",
+                    "notes": "",
+                }
+            )
     return muni_rows, evidence_rows
 
 
@@ -154,7 +165,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows, _ = build_rows(root)
         problems = check_coverage(rows)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
 
     manifest = ingest(root)

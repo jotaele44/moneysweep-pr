@@ -57,25 +57,19 @@ def test_account_relevance_large_budget():
     # Accounts >$1B are always tracked regardless of title
     budget = 2_000_000_000
     title = "generic appropriation with no keywords"
-    is_relevant = (
-        any(kw in title.lower() for kw in PR_KEYWORDS)
-        or budget > 1_000_000_000
-    )
+    is_relevant = any(kw in title.lower() for kw in PR_KEYWORDS) or budget > 1_000_000_000
     assert is_relevant is True
 
 
 def test_account_relevance_small_no_keywords():
     budget = 500_000
     title = "generic appropriation"
-    is_relevant = (
-        any(kw in title.lower() for kw in PR_KEYWORDS)
-        or budget > 1_000_000_000
-    )
+    is_relevant = any(kw in title.lower() for kw in PR_KEYWORDS) or budget > 1_000_000_000
     assert is_relevant is False
 
 
 def test_known_agency_codes_present():
-    assert "058" in PR_AGENCIES   # FEMA
-    assert "086" in PR_AGENCIES   # HUD
-    assert "069" in PR_AGENCIES   # DOT
-    assert "089" in PR_AGENCIES   # DOE
+    assert "058" in PR_AGENCIES  # FEMA
+    assert "086" in PR_AGENCIES  # HUD
+    assert "069" in PR_AGENCIES  # DOT
+    assert "089" in PR_AGENCIES  # DOE

@@ -16,6 +16,7 @@ never overwrite source columns, and re-running is a no-op):
     3. Currency canonicalization — ``<amount>_canonical`` numeric columns parsed
        from formatted money strings.
 """
+
 from __future__ import annotations
 
 import re
@@ -28,18 +29,39 @@ from contract_sweeper.runtime.name_normalization import normalize_name
 
 # Candidate entity-name columns across the source families, in priority order.
 ENTITY_NAME_COLUMNS = (
-    "recipient_name", "vendor_name", "awardee_or_recipient_legal",
-    "legal_entity_name", "prime_recipient_name", "subawardee_name",
-    "contributor_name", "registrant_name", "client_name", "lobbyist_name",
-    "applicant_name", "issuer_name", "issuer", "organization_name", "legal_name",
+    "recipient_name",
+    "vendor_name",
+    "awardee_or_recipient_legal",
+    "legal_entity_name",
+    "prime_recipient_name",
+    "subawardee_name",
+    "contributor_name",
+    "registrant_name",
+    "client_name",
+    "lobbyist_name",
+    "applicant_name",
+    "issuer_name",
+    "issuer",
+    "organization_name",
+    "legal_name",
 )
 
 # Money columns that should gain a parsed numeric ``<col>_canonical`` companion.
 AMOUNT_COLUMNS = (
-    "obligated_amount", "amount", "federal_action_obligation", "total_obligation",
-    "obligation_amount", "subaward_amount", "federal_share_obligated",
-    "project_amount", "contribution_receipt_amount", "eligible_amount",
-    "federal_share", "income", "expenses", "total_approved",
+    "obligated_amount",
+    "amount",
+    "federal_action_obligation",
+    "total_obligation",
+    "obligation_amount",
+    "subaward_amount",
+    "federal_share_obligated",
+    "project_amount",
+    "contribution_receipt_amount",
+    "eligible_amount",
+    "federal_share",
+    "income",
+    "expenses",
+    "total_approved",
 )
 
 _CURRENCY_STRIP = re.compile(r"[^0-9.\-]")

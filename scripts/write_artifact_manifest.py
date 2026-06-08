@@ -80,7 +80,11 @@ def write_artifact_manifest(
     if package_manifest_path.exists():
         package_manifest = json.loads(package_manifest_path.read_text(encoding="utf-8"))
 
-    version = export_version or package_manifest.get("export_contract_version") or package_manifest.get("export_version")
+    version = (
+        export_version
+        or package_manifest.get("export_contract_version")
+        or package_manifest.get("export_version")
+    )
 
     artifact_files: list[dict[str, Any]] = []
     for name in DEFAULT_STREAMS:
@@ -115,10 +119,19 @@ def write_artifact_manifest(
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Write artifact manifest for Contract-Sweeper export outputs.")
+    parser = argparse.ArgumentParser(
+        description="Write artifact manifest for Contract-Sweeper export outputs."
+    )
     parser.add_argument("--package-dir", required=True, help="Export package directory")
-    parser.add_argument("--out", default=None, help="Manifest output path; default: package/artifact_manifest.json")
-    parser.add_argument("--source-file", action="append", default=[], help="Optional source CSV/file to fingerprint; repeatable")
+    parser.add_argument(
+        "--out", default=None, help="Manifest output path; default: package/artifact_manifest.json"
+    )
+    parser.add_argument(
+        "--source-file",
+        action="append",
+        default=[],
+        help="Optional source CSV/file to fingerprint; repeatable",
+    )
     parser.add_argument("--export-version", default=None)
     args = parser.parse_args(argv)
     manifest = write_artifact_manifest(

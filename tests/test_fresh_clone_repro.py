@@ -5,6 +5,7 @@ that regenerates every top-form producer in a clean checkout and fails on any
 diff. This test keeps the workflow and the producer set in sync: every top-form
 ``build_*`` producer that writes a committed artifact must be invoked by the job.
 """
+
 from __future__ import annotations
 
 import pytest

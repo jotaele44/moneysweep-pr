@@ -1,4 +1,5 @@
 """Tests for the canonical_v1 -> federation bridge (WS-Q)."""
+
 import re
 
 import pytest
@@ -70,6 +71,9 @@ def test_relationship_endpoints_resolve_to_emitted_entities(streams):
 @pytest.mark.unit
 def test_bridge_is_idempotent(streams):
     again = bridge.build_streams(REPO_ROOT)
-    assert [e["entity_id"] for e in again["entities"]] == [e["entity_id"] for e in streams["entities"]]
-    assert [r["relationship_id"] for r in again["relationships"]] == \
-           [r["relationship_id"] for r in streams["relationships"]]
+    assert [e["entity_id"] for e in again["entities"]] == [
+        e["entity_id"] for e in streams["entities"]
+    ]
+    assert [r["relationship_id"] for r in again["relationships"]] == [
+        r["relationship_id"] for r in streams["relationships"]
+    ]

@@ -34,76 +34,130 @@ from scripts.config import PROJECT_ROOT, setup_logging
 
 # Canonical output schema (matches build_unified_master.py CANONICAL_COLUMNS)
 MASTER_COLUMNS = [
-    "award_id", "recipient_name", "recipient_name_normalized",
-    "recipient_uei", "awarding_agency", "awarding_sub_agency",
-    "obligated_amount", "award_date", "fiscal_year",
-    "pop_state", "pop_county", "description",
-    "source_file", "source_dataset", "award_category",
-    "naics_code", "psc_code",
+    "award_id",
+    "recipient_name",
+    "recipient_name_normalized",
+    "recipient_uei",
+    "awarding_agency",
+    "awarding_sub_agency",
+    "obligated_amount",
+    "award_date",
+    "fiscal_year",
+    "pop_state",
+    "pop_county",
+    "description",
+    "source_file",
+    "source_dataset",
+    "award_category",
+    "naics_code",
+    "psc_code",
 ]
 
 # Flexible column mapping: output_col → [candidate input column names]
 COL_MAP = {
     "recipient_name": [
-        "Vendor Name", "Recipient Name", "Awardee/Recipient Name",
-        "Contractor Name", "Legal Business Name", "vendorname",
-        "Awardee Name", "Company Name",
+        "Vendor Name",
+        "Recipient Name",
+        "Awardee/Recipient Name",
+        "Contractor Name",
+        "Legal Business Name",
+        "vendorname",
+        "Awardee Name",
+        "Company Name",
     ],
     "recipient_uei": [
-        "Unique Entity ID (SAM)", "UEI", "Unique Entity Identifier",
-        "DUNS Number", "Vendor DUNS Number", "DUNS",
+        "Unique Entity ID (SAM)",
+        "UEI",
+        "Unique Entity Identifier",
+        "DUNS Number",
+        "Vendor DUNS Number",
+        "DUNS",
     ],
     "award_id": [
-        "Award ID", "PIID", "Contract Number", "Award/Procurement ID",
-        "Procurement Instrument Identifier", "Transaction Number",
+        "Award ID",
+        "PIID",
+        "Contract Number",
+        "Award/Procurement ID",
+        "Procurement Instrument Identifier",
+        "Transaction Number",
     ],
     "obligated_amount": [
-        "Action Obligation", "Obligated Amount", "Total Obligated Amount",
-        "Base and All Options Value (Total Contract Value)", "Dollars Obligated",
-        "Obligated Amount ($ Dollars)", "Total Obligated",
+        "Action Obligation",
+        "Obligated Amount",
+        "Total Obligated Amount",
+        "Base and All Options Value (Total Contract Value)",
+        "Dollars Obligated",
+        "Obligated Amount ($ Dollars)",
+        "Total Obligated",
     ],
     "award_date": [
-        "Award Date", "Action Date", "Date Signed", "Effective Date",
-        "Date of Award", "Contract Award Date",
+        "Award Date",
+        "Action Date",
+        "Date Signed",
+        "Effective Date",
+        "Date of Award",
+        "Contract Award Date",
     ],
     "awarding_agency": [
-        "Awarding Agency Name", "Contracting Agency Name", "Department Name",
-        "Funding Agency Name", "Department/Ind. Agency",
+        "Awarding Agency Name",
+        "Contracting Agency Name",
+        "Department Name",
+        "Funding Agency Name",
+        "Department/Ind. Agency",
     ],
     "awarding_sub_agency": [
-        "Awarding Sub Agency Name", "Contracting Office Name",
-        "Sub Agency Name", "Contracting Agency Name", "CGAC Agency Code",
+        "Awarding Sub Agency Name",
+        "Contracting Office Name",
+        "Sub Agency Name",
+        "Contracting Agency Name",
+        "CGAC Agency Code",
     ],
     "pop_state": [
-        "Place of Performance State Code", "Place of Performance State",
+        "Place of Performance State Code",
+        "Place of Performance State",
         "Primary Place of Performance State Code",
         "Principal Place of Performance State Code",
-        "Pop State Code", "Performance State",
+        "Pop State Code",
+        "Performance State",
     ],
     "pop_county": [
-        "Place of Performance County Name", "Place of Performance City",
+        "Place of Performance County Name",
+        "Place of Performance City",
         "Primary Place of Performance County Name",
         "Pop County Name",
     ],
     "description": [
-        "Award Description", "Description of Requirement",
-        "Purpose of Modification", "Award/Contract Description",
-        "Description", "Project Description",
+        "Award Description",
+        "Description of Requirement",
+        "Purpose of Modification",
+        "Award/Contract Description",
+        "Description",
+        "Project Description",
     ],
     "award_category": [
-        "Award Type", "Type of Contract Pricing", "Award/IDV Type",
-        "Contract Award Type", "Type",
+        "Award Type",
+        "Type of Contract Pricing",
+        "Award/IDV Type",
+        "Contract Award Type",
+        "Type",
     ],
     "fiscal_year": [
-        "Fiscal Year", "FY of Action", "Action Fiscal Year",
-        "Fiscal Year (FY)", "FY",
+        "Fiscal Year",
+        "FY of Action",
+        "Action Fiscal Year",
+        "Fiscal Year (FY)",
+        "FY",
     ],
     "naics_code": [
-        "NAICS Code", "NAICS", "NAICS Description",
+        "NAICS Code",
+        "NAICS",
+        "NAICS Description",
         "Industry Code (NAICS)",
     ],
     "psc_code": [
-        "Product or Service Code", "PSC Code", "PSC",
+        "Product or Service Code",
+        "PSC Code",
+        "PSC",
         "Product/Service Code",
     ],
 }
@@ -114,8 +168,17 @@ PR_STATE_VALUES = {"PR", "72", "PUERTO RICO", "Puerto Rico"}
 _STRIP_RE = re.compile(r"[^\w\s]")
 _SPACE_RE = re.compile(r"\s+")
 _NAME_SUFFIXES = {
-    "INC", "LLC", "CORP", "LTD", "CO", "LP", "LLP",
-    "COMPANY", "CORPORATION", "INCORPORATED", "LIMITED",
+    "INC",
+    "LLC",
+    "CORP",
+    "LTD",
+    "CO",
+    "LP",
+    "LLP",
+    "COMPANY",
+    "CORPORATION",
+    "INCORPORATED",
+    "LIMITED",
 }
 
 
@@ -169,7 +232,9 @@ def _read_excel_file(path, logger):
         if best.empty:
             logger.warning(f"  No data found in {path.name}")
         else:
-            logger.info(f"  Read {len(best):,} rows from {path.name} (sheet count: {len(xl.sheet_names)})")
+            logger.info(
+                f"  Read {len(best):,} rows from {path.name} (sheet count: {len(xl.sheet_names)})"
+            )
         return best
     except Exception as e:
         logger.warning(f"  Failed to read {path.name}: {e}")
@@ -187,7 +252,9 @@ def _parse_file(path, logger):
             logger.info(f"  Read {len(df):,} rows from {path.name}")
         except Exception:
             try:
-                df = pd.read_csv(path, dtype=str, na_filter=False, encoding="latin-1", low_memory=False)
+                df = pd.read_csv(
+                    path, dtype=str, na_filter=False, encoding="latin-1", low_memory=False
+                )
                 logger.info(f"  Read {len(df):,} rows from {path.name} (latin-1)")
             except Exception as e:
                 logger.warning(f"  Failed to read {path.name}: {e}")
@@ -226,12 +293,21 @@ def _parse_file(path, logger):
         # Also check recipient state columns if pop_state doesn't yield PR records
         if pr_mask.sum() == 0:
             logger.info("  No PR rows from pop_state; trying recipient state cols...")
-            for cand in ["Vendor State Code", "Recipient State Code", "State Code",
-                         "Legal Business Name State", "Vendor State"]:
+            for cand in [
+                "Vendor State Code",
+                "Recipient State Code",
+                "State Code",
+                "Legal Business Name State",
+                "Vendor State",
+            ]:
                 src2 = _map_col(df.columns.tolist(), [cand])
                 if src2:
-                    mask2 = df[src2].astype(str).str.strip().str.upper().isin(
-                        {v.upper() for v in PR_STATE_VALUES}
+                    mask2 = (
+                        df[src2]
+                        .astype(str)
+                        .str.strip()
+                        .str.upper()
+                        .isin({v.upper() for v in PR_STATE_VALUES})
                     )
                     pr_mask = pr_mask | mask2
         result = result[pr_mask.values].copy()
@@ -302,7 +378,9 @@ def _run(root=None, force=False):
     files = _find_report_builder_files(raw_dir, logger)
     if not files:
         logger.warning("  No Report Builder files found in data/raw/")
-        logger.warning("  Expected: 'Report Builder FY20 Revised.xlsx', 'FY_2018_Federal_Procurement_*.xls[x]', etc.")
+        logger.warning(
+            "  Expected: 'Report Builder FY20 Revised.xlsx', 'FY_2018_Federal_Procurement_*.xls[x]', etc."
+        )
         out_path.parent.mkdir(parents=True, exist_ok=True)
         pd.DataFrame(columns=MASTER_COLUMNS).to_csv(out_path, index=False, encoding="utf-8")
         return {"rows": 0, "path": str(out_path), "errors": ["No Report Builder files found"]}
@@ -349,7 +427,9 @@ def _run(root=None, force=False):
     logger.info(f"  Files processed:      {len(all_dfs)}")
     logger.info(f"  Total PR rows:        {len(output):,}")
     logger.info(f"  Unique recipients:    {output['recipient_name_normalized'].nunique():,}")
-    logger.info(f"  Fiscal years:         {sorted(output['fiscal_year'].dropna().unique().tolist())}")
+    logger.info(
+        f"  Fiscal years:         {sorted(output['fiscal_year'].dropna().unique().tolist())}"
+    )
     logger.info(f"  Total obligated:      ${total:,.0f}")
 
     return {"rows": len(output), "path": str(out_path), "errors": errors}

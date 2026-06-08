@@ -29,7 +29,14 @@ def build_column_map(df_columns: list) -> dict:
     Returns: {standard_name: actual_col_name_or_None}
     """
     families = ["contract_id", "date", "vendor", "agency", "amount", "pop_state"]
-    standard_names = ["contract_id", "award_date", "vendor_name", "agency_name", "obligated_amount", "pop_state"]
+    standard_names = [
+        "contract_id",
+        "award_date",
+        "vendor_name",
+        "agency_name",
+        "obligated_amount",
+        "pop_state",
+    ]
 
     col_map = {}
     for family, std_name in zip(families, standard_names):
@@ -65,7 +72,12 @@ def normalize_highergov_df(df: pd.DataFrame) -> pd.DataFrame:
         return df
 
     # date patterns: YYYY-MM-DD, MM/DD/YYYY, Month DD, YYYY
-    date_patterns = [r"\d{4}-\d{2}-\d{2}", r"\d{1,2}/\d{1,2}/\d{4}", r"[A-Za-z]{3,9} \d{1,2}, \d{4}"]
+    date_patterns = [
+        r"\d{4}-\d{2}-\d{2}",
+        r"\d{1,2}/\d{1,2}/\d{4}",
+        r"[A-Za-z]{3,9} \d{1,2}, \d{4}",
+    ]
+
     def col_date_score(col):
         s = df[col].astype(str)
         score = 0
@@ -121,7 +133,9 @@ def normalize_highergov_df(df: pd.DataFrame) -> pd.DataFrame:
     # If award_date exists but in weird format, try to coerce with pandas
     if "award_date" in df.columns:
         try:
-            df["award_date"] = pd.to_datetime(df["award_date"], errors="coerce", infer_datetime_format=True)
+            df["award_date"] = pd.to_datetime(
+                df["award_date"], errors="coerce", infer_datetime_format=True
+            )
         except Exception:
             df["award_date"] = pd.NaT
 
@@ -202,11 +216,15 @@ def normalize_file(input_path: Path, output_dir: Path, logger) -> dict:
 
     # Convert amount to numeric
     if "obligated_amount" in df.columns:
-        raw_amounts = df["obligated_amount"].astype(str).str.replace(",", "").str.replace("$", "").str.strip()
+        raw_amounts = (
+            df["obligated_amount"].astype(str).str.replace(",", "").str.replace("$", "").str.strip()
+        )
         df["obligated_amount"] = pd.to_numeric(raw_amounts, errors="coerce")
         coerced = raw_amounts.notna().sum() - df["obligated_amount"].notna().sum()
         if coerced > 0:
-            logger.warning(f"  {input_path.name}: {coerced} non-numeric amount values coerced to NaN")
+            logger.warning(
+                f"  {input_path.name}: {coerced} non-numeric amount values coerced to NaN"
+            )
 
     # Derive fiscal year
     df["fiscal_year"] = derive_fiscal_year(df["award_date"])
@@ -260,7 +278,9 @@ def normalize_all(root: Path = None) -> list:
     except Exception:
         HIGHERGOV_MANIFEST = []
 
-    expected_files = [m["filename"] for m in DOWNLOAD_MANIFEST] + [m["filename"] for m in HIGHERGOV_MANIFEST]
+    expected_files = [m["filename"] for m in DOWNLOAD_MANIFEST] + [
+        m["filename"] for m in HIGHERGOV_MANIFEST
+    ]
 
     for fname in expected_files:
         input_path = expansion_dir / fname

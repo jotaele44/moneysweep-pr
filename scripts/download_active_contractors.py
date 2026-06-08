@@ -36,9 +36,14 @@ RAW_DIRS = [
 ]
 
 CONTRACTOR_COLUMNS = [
-    "entity_name", "entity_normalized",
-    "registration_id", "registration_date", "expiry_date",
-    "contractor_type", "naics_code", "municipality",
+    "entity_name",
+    "entity_normalized",
+    "registration_id",
+    "registration_date",
+    "expiry_date",
+    "contractor_type",
+    "naics_code",
+    "municipality",
     "status",
     "source_file",
 ]
@@ -61,24 +66,34 @@ RETRY_BACKOFF = [5, 15, 30]
 REQUEST_SLEEP = 1.0
 
 COL_MAP = {
-    "entity_name":       ["Nombre", "Company Name", "Vendor Name", "Suplidor", "entity_name", "name", "nombre"],
-    "registration_id":   ["Registro", "Registration ID", "ID", "registration_id", "num_registro"],
+    "entity_name": [
+        "Nombre",
+        "Company Name",
+        "Vendor Name",
+        "Suplidor",
+        "entity_name",
+        "name",
+        "nombre",
+    ],
+    "registration_id": ["Registro", "Registration ID", "ID", "registration_id", "num_registro"],
     "registration_date": ["Fecha de Registro", "Registration Date", "registration_date", "fecha"],
-    "expiry_date":       ["Fecha de Expiración", "Expiry Date", "expiry_date", "fecha_expiracion"],
-    "contractor_type":   ["Tipo", "Type", "Category", "contractor_type", "clase"],
-    "naics_code":        ["NAICS", "NAICS Code", "Código NAICS", "naics_code"],
-    "municipality":      ["Municipio", "Municipality", "City", "municipality"],
-    "status":            ["Estado", "Status", "Active", "status", "activo"],
+    "expiry_date": ["Fecha de Expiración", "Expiry Date", "expiry_date", "fecha_expiracion"],
+    "contractor_type": ["Tipo", "Type", "Category", "contractor_type", "clase"],
+    "naics_code": ["NAICS", "NAICS Code", "Código NAICS", "naics_code"],
+    "municipality": ["Municipio", "Municipality", "City", "municipality"],
+    "status": ["Estado", "Status", "Active", "status", "activo"],
 }
 
 
 def _session():
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0; PR procurement research)",
-        "Accept": "application/json, text/html, */*",
-        "Accept-Language": "es-PR,es;q=0.9,en;q=0.8",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0; PR procurement research)",
+            "Accept": "application/json, text/html, */*",
+            "Accept-Language": "es-PR,es;q=0.9,en;q=0.8",
+        }
+    )
     return s
 
 
@@ -116,7 +131,9 @@ def _try_json_endpoint(session, url, logger):
                 break
             page += 1
         elif isinstance(data, dict):
-            records = data.get("data", data.get("results", data.get("vendors", data.get("suplidores", []))))
+            records = data.get(
+                "data", data.get("results", data.get("vendors", data.get("suplidores", [])))
+            )
             if isinstance(records, list):
                 all_records.extend(records)
                 if len(records) < PAGE_SIZE:

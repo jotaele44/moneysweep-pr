@@ -24,10 +24,18 @@ def _write_csv(path: Path, rows: list[dict], fieldnames: list[str]) -> None:
 
 def _bootstrap(tmp_path: Path, *, forbidden_in_resume: bool) -> None:
     (tmp_path / "docs").mkdir(parents=True, exist_ok=True)
-    (tmp_path / "docs" / "OPERATOR_NEXT_ACTIONS_AFTER_R4_9Z.md").write_text("# operator", encoding="utf-8")
-    (tmp_path / "docs" / "SOURCE_RECOVERY_PAUSE_STATUS_R4_9Z.md").write_text("# pause", encoding="utf-8")
-    (tmp_path / "docs" / "SOURCE_DELIVERY_HANDOFF_R4_9E.md").write_text("# handoff", encoding="utf-8")
-    (tmp_path / "docs" / "EXTERNAL_BLOCKER_FREEZE_STATUS_R4_9E.md").write_text("# freeze", encoding="utf-8")
+    (tmp_path / "docs" / "OPERATOR_NEXT_ACTIONS_AFTER_R4_9Z.md").write_text(
+        "# operator", encoding="utf-8"
+    )
+    (tmp_path / "docs" / "SOURCE_RECOVERY_PAUSE_STATUS_R4_9Z.md").write_text(
+        "# pause", encoding="utf-8"
+    )
+    (tmp_path / "docs" / "SOURCE_DELIVERY_HANDOFF_R4_9E.md").write_text(
+        "# handoff", encoding="utf-8"
+    )
+    (tmp_path / "docs" / "EXTERNAL_BLOCKER_FREEZE_STATUS_R4_9E.md").write_text(
+        "# freeze", encoding="utf-8"
+    )
 
     _write_json(
         tmp_path / "data" / "exports" / "post_pause_hygiene_status_r4_9z_a.json",
@@ -82,8 +90,16 @@ def _bootstrap(tmp_path: Path, *, forbidden_in_resume: bool) -> None:
         },
     )
 
-    expected_template = "data/reports/investigative_source.csv" if forbidden_in_resume else "data/staging/processed/source_{idx}.csv"
-    output_template = "data/reports/investigative_source.csv" if forbidden_in_resume else "data/staging/processed/source_{idx}.csv"
+    expected_template = (
+        "data/reports/investigative_source.csv"
+        if forbidden_in_resume
+        else "data/staging/processed/source_{idx}.csv"
+    )
+    output_template = (
+        "data/reports/investigative_source.csv"
+        if forbidden_in_resume
+        else "data/staging/processed/source_{idx}.csv"
+    )
     resume_rows = []
     for idx in range(1, 22):
         resume_rows.append(

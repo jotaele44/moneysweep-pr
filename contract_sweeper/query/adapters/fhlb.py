@@ -6,6 +6,7 @@ outstanding) from the FDIC ``financials`` (SDI) endpoint by reporting year.
 
 No credentials required.
 """
+
 from __future__ import annotations
 
 from datetime import date
@@ -80,15 +81,17 @@ class FHLBAdvancesAdapter(SourceAdapter):
                 data = with_retry(
                     lambda p=params: self._get(session, FDIC_FINANCIALS_URL, p), policy=policy
                 )
-                for rec in (data.get("data") or []):
+                for rec in data.get("data") or []:
                     d = rec.get("data", rec)
-                    rows.append({
-                        "cert": cert,
-                        "institution_name": inst.get("INSTNAME", ""),
-                        "reporting_date": str(d.get("REPDTE", "")),
-                        "fiscal_year": str(year),
-                        "fhlb_advances_outstanding": d.get("FHLBADV"),
-                        "total_assets": d.get("ASSET"),
-                        "state": "PR",
-                    })
+                    rows.append(
+                        {
+                            "cert": cert,
+                            "institution_name": inst.get("INSTNAME", ""),
+                            "reporting_date": str(d.get("REPDTE", "")),
+                            "fiscal_year": str(year),
+                            "fhlb_advances_outstanding": d.get("FHLBADV"),
+                            "total_assets": d.get("ASSET"),
+                            "state": "PR",
+                        }
+                    )
         return pd.DataFrame(rows) if rows else pd.DataFrame()

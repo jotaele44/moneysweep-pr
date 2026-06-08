@@ -7,7 +7,14 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
-from contract_sweeper.pipeline.acquisition_package import read_csv, read_json, utc_now, write_csv, write_json, write_markdown
+from contract_sweeper.pipeline.acquisition_package import (
+    read_csv,
+    read_json,
+    utc_now,
+    write_csv,
+    write_json,
+    write_markdown,
+)
 
 FORBIDDEN_ARTIFACT_TOKENS = (
     "report",
@@ -32,7 +39,9 @@ REQUIRED_BLOCKED_PHASES = {
 SECRET_PATTERNS = (
     re.compile(r"AKIA[0-9A-Z]{16}"),
     re.compile(r"-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----"),
-    re.compile(r"(?i)(?:x-api-key|api[_-]?key|secret|token)\s*[:=]\s*['\"][A-Za-z0-9_\-]{20,}['\"]"),
+    re.compile(
+        r"(?i)(?:x-api-key|api[_-]?key|secret|token)\s*[:=]\s*['\"][A-Za-z0-9_\-]{20,}['\"]"
+    ),
 )
 
 
@@ -83,7 +92,18 @@ def _scan_secrets(root: Path) -> list[dict[str, str]]:
         path = root / rel
         if not path.exists() or not path.is_file():
             continue
-        if path.suffix.lower() in {".png", ".jpg", ".jpeg", ".gif", ".pdf", ".parquet", ".zip", ".gz", ".xz", ".bin"}:
+        if path.suffix.lower() in {
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".gif",
+            ".pdf",
+            ".parquet",
+            ".zip",
+            ".gz",
+            ".xz",
+            ".bin",
+        }:
             continue
         try:
             content = path.read_text(encoding="utf-8")
@@ -95,7 +115,10 @@ def _scan_secrets(root: Path) -> list[dict[str, str]]:
                 if pattern.search(line):
                     # avoid false positives from documented placeholders
                     lowered = line.lower()
-                    if any(token in lowered for token in ("example", "placeholder", "dummy", "test_", "fake_")):
+                    if any(
+                        token in lowered
+                        for token in ("example", "placeholder", "dummy", "test_", "fake_")
+                    ):
                         continue
                     findings.append(
                         {
@@ -202,11 +225,23 @@ def run_repo_quality_audit(root: Path) -> dict[str, Any]:
     if not downstream_blockers_active:
         downstream_blockers_active = REQUIRED_BLOCKED_PHASES.issubset(blocked_phase_codes)
 
-    unfreeze_candidates = int(rebuild_status.get("r4_9z_unfreeze_candidates", pause_status.get("r4_9z_unfreeze_candidates", 0)))
-    sources_still_missing = int(rebuild_status.get("r4_9z_sources_still_missing", pause_status.get("r4_9z_sources_still_missing", 0)))
+    unfreeze_candidates = int(
+        rebuild_status.get(
+            "r4_9z_unfreeze_candidates", pause_status.get("r4_9z_unfreeze_candidates", 0)
+        )
+    )
+    sources_still_missing = int(
+        rebuild_status.get(
+            "r4_9z_sources_still_missing", pause_status.get("r4_9z_sources_still_missing", 0)
+        )
+    )
 
     resume_conditions_written = len(resume_rows) > 0
-    pause_lock_active = bool(rebuild_status.get("r4_9z_pause_lock_active", pause_status.get("r4_9z_pause_lock_active", False)))
+    pause_lock_active = bool(
+        rebuild_status.get(
+            "r4_9z_pause_lock_active", pause_status.get("r4_9z_pause_lock_active", False)
+        )
+    )
 
     forbidden_ok, forbidden_findings = _scan_forbidden_artifact_paths(resume_rows)
     secret_findings = _scan_secrets(root)
@@ -255,19 +290,49 @@ def run_repo_quality_audit(root: Path) -> dict[str, Any]:
         )
 
     invariant_checks = [
-        ("production_status_lock", production_status == "NON_PRODUCTION_DIAGNOSTIC", "NON_PRODUCTION_DIAGNOSTIC", production_status),
+        (
+            "production_status_lock",
+            production_status == "NON_PRODUCTION_DIAGNOSTIC",
+            "NON_PRODUCTION_DIAGNOSTIC",
+            production_status,
+        ),
         ("phase_7_8_block_lock", phase_7_8_blocked is True, "True", str(phase_7_8_blocked)),
-        ("retry_suppression_active", retry_suppression_active is True, "True", str(retry_suppression_active)),
-        ("downstream_blockers_active", downstream_blockers_active is True, "True", str(downstream_blockers_active)),
+        (
+            "retry_suppression_active",
+            retry_suppression_active is True,
+            "True",
+            str(retry_suppression_active),
+        ),
+        (
+            "downstream_blockers_active",
+            downstream_blockers_active is True,
+            "True",
+            str(downstream_blockers_active),
+        ),
         ("unfreeze_candidates_zero", unfreeze_candidates == 0, "0", str(unfreeze_candidates)),
         ("sources_still_missing_21", sources_still_missing == 21, "21", str(sources_still_missing)),
-        ("resume_conditions_written", resume_conditions_written is True, "True", str(resume_conditions_written)),
+        (
+            "resume_conditions_written",
+            resume_conditions_written is True,
+            "True",
+            str(resume_conditions_written),
+        ),
         ("pause_lock_active", pause_lock_active is True, "True", str(pause_lock_active)),
         ("forbidden_artifact_usage", forbidden_ok is True, "False", str(not forbidden_ok)),
-        ("secret_scan", no_secrets_detected is True, "0 findings", f"{len(secret_findings)} findings"),
+        (
+            "secret_scan",
+            no_secrets_detected is True,
+            "0 findings",
+            f"{len(secret_findings)} findings",
+        ),
         ("downloads_executed", downloads_executed is False, "False", str(downloads_executed)),
         ("rows_ingested", rows_ingested == 0, "0", str(rows_ingested)),
-        ("production_inputs_staged", production_inputs_staged == 0, "0", str(production_inputs_staged)),
+        (
+            "production_inputs_staged",
+            production_inputs_staged == 0,
+            "0",
+            str(production_inputs_staged),
+        ),
     ]
     for name, passed, expected, actual in invariant_checks:
         matrix_rows.append(

@@ -25,6 +25,7 @@ CLI::
     python scripts/build_agency_master.py            # write the CSV + manifest
     python scripts/build_agency_master.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -49,8 +50,15 @@ SCHEMA = "schemas/agency_master.schema.json"
 
 # Output column order (schema required fields + aliases/notes).
 AGENCY_MASTER_COLUMNS = [
-    "agency_id", "agency_type", "canonical_name", "jurisdiction",
-    "aliases", "source_id", "evidence_tier", "confidence", "notes",
+    "agency_id",
+    "agency_type",
+    "canonical_name",
+    "jurisdiction",
+    "aliases",
+    "source_id",
+    "evidence_tier",
+    "confidence",
+    "notes",
 ]
 
 # Public-money source entity_type -> schema agency_type.
@@ -59,7 +67,7 @@ PUBLIC_MONEY_TYPE_MAP: dict[str, str] = {
     "utility": "public_corporation",
 }
 
-EVIDENCE_TIER = "T1"   # committed official/registry reference
+EVIDENCE_TIER = "T1"  # committed official/registry reference
 CONFIDENCE = 0.95
 
 
@@ -80,17 +88,19 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
             agency_type = PUBLIC_MONEY_TYPE_MAP.get(src_type)
             if not name or agency_type is None:
                 continue
-            rows.append({
-                "agency_id": f"ENT_AGENCY_{name_hash(name)}",
-                "agency_type": agency_type,
-                "canonical_name": name,
-                "jurisdiction": (ref.get("jurisdiction") or "").strip() or "PR",
-                "aliases": (ref.get("aliases") or "").strip(),
-                "source_id": "pr_public_money_entities",
-                "evidence_tier": EVIDENCE_TIER,
-                "confidence": CONFIDENCE,
-                "notes": (ref.get("description") or "").strip(),
-            })
+            rows.append(
+                {
+                    "agency_id": f"ENT_AGENCY_{name_hash(name)}",
+                    "agency_type": agency_type,
+                    "canonical_name": name,
+                    "jurisdiction": (ref.get("jurisdiction") or "").strip() or "PR",
+                    "aliases": (ref.get("aliases") or "").strip(),
+                    "source_id": "pr_public_money_entities",
+                    "evidence_tier": EVIDENCE_TIER,
+                    "confidence": CONFIDENCE,
+                    "notes": (ref.get("description") or "").strip(),
+                }
+            )
 
     # The 78 municipios as municipal authorities.
     with (root / MUNICIPALITIES).open(newline="", encoding="utf-8") as fh:
@@ -100,17 +110,19 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
             if not name or not code:
                 continue
             region = (ref.get("region") or "").strip()
-            rows.append({
-                "agency_id": f"ENT_MUNI_{code}",
-                "agency_type": "municipality",
-                "canonical_name": name,
-                "jurisdiction": "PR",
-                "aliases": (ref.get("aliases") or "").strip(),
-                "source_id": "pr_municipalities",
-                "evidence_tier": EVIDENCE_TIER,
-                "confidence": CONFIDENCE,
-                "notes": f"region={region}" if region else "",
-            })
+            rows.append(
+                {
+                    "agency_id": f"ENT_MUNI_{code}",
+                    "agency_type": "municipality",
+                    "canonical_name": name,
+                    "jurisdiction": "PR",
+                    "aliases": (ref.get("aliases") or "").strip(),
+                    "source_id": "pr_municipalities",
+                    "evidence_tier": EVIDENCE_TIER,
+                    "confidence": CONFIDENCE,
+                    "notes": f"region={region}" if region else "",
+                }
+            )
 
     return rows
 
@@ -164,7 +176,9 @@ def build(root: Path | None = None) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Build the top-form Agency Master reference table.")
+    parser = argparse.ArgumentParser(
+        description="Build the top-form Agency Master reference table."
+    )
     parser.add_argument("--root", default=".")
     parser.add_argument("--check", action="store_true", help="Validate without writing.")
     args = parser.parse_args(argv)
@@ -172,7 +186,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

@@ -42,10 +42,7 @@ def test_run_force_bypasses_cache(tmp_path):
 def test_run_usaspending_strategy_writes_file(tmp_path):
     """run() writes output and returns ok_usaspending_api when API succeeds."""
     out_path = tmp_path / "pr_fsrs_subawards.csv"
-    mock_df = pd.DataFrame([
-        {col: "x" for col in FSRS_COLUMNS}
-        for _ in range(5)
-    ])
+    mock_df = pd.DataFrame([{col: "x" for col in FSRS_COLUMNS} for _ in range(5)])
 
     with (
         patch("scripts.download_fsrs.OUT_PATH", out_path),
@@ -63,17 +60,21 @@ def test_run_derives_from_master_when_api_fails(tmp_path):
     """run() falls back to deriving from pr_subawards_master.csv when API fails."""
     out_path = tmp_path / "pr_fsrs_subawards.csv"
     master_path = tmp_path / "pr_subawards_master.csv"
-    pd.DataFrame([{
-        "subaward_id": "M1",
-        "prime_award_id": "PA1",
-        "prime_award_generated_internal_id": "CONT1",
-        "recipient_name": "Vendor A",
-        "sub_recipient_uei": "UEITEST01",
-        "sub_award_amount": "5000",
-        "sub_award_date": "2023-01-01",
-        "award_category": "subaward",
-        "place_of_performance_state": "PR",
-    }]).to_csv(master_path, index=False)
+    pd.DataFrame(
+        [
+            {
+                "subaward_id": "M1",
+                "prime_award_id": "PA1",
+                "prime_award_generated_internal_id": "CONT1",
+                "recipient_name": "Vendor A",
+                "sub_recipient_uei": "UEITEST01",
+                "sub_award_amount": "5000",
+                "sub_award_date": "2023-01-01",
+                "award_category": "subaward",
+                "place_of_performance_state": "PR",
+            }
+        ]
+    ).to_csv(master_path, index=False)
 
     with (
         patch("scripts.download_fsrs.OUT_PATH", out_path),

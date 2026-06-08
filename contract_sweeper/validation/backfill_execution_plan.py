@@ -159,7 +159,9 @@ def _render_markdown(status: dict[str, Any], rows: list[dict[str, Any]]) -> str:
     lines.append("## Guardrails")
     lines.append("")
     lines.append("- No fabricated/synthetic rows are allowed.")
-    lines.append("- Only raw/staging/normalized/exports/runtime sources may be used for recovery planning.")
+    lines.append(
+        "- Only raw/staging/normalized/exports/runtime sources may be used for recovery planning."
+    )
     lines.append("- Report/summary/graph/top-node artifacts are not valid data inputs.")
     lines.append("- Phase 7/8 remains blocked until recovery and downstream validation gates pass.")
     lines.append("")

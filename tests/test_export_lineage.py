@@ -1,4 +1,5 @@
 """Lineage, timestamp, and referential-integrity tests for the export validator."""
+
 import json
 import shutil
 from pathlib import Path
@@ -18,7 +19,9 @@ def _copy_fixture(tmp_path):
 
 
 def _read_jsonl(path):
-    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    return [
+        json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()
+    ]
 
 
 def _write_jsonl(path, rows):
@@ -72,37 +75,47 @@ def test_bad_extracted_at(tmp_path):
 def test_naive_timestamp_rejected(tmp_path):
     pkg = _copy_fixture(tmp_path)
     # No timezone offset -> not tz-aware -> rejected.
-    _mutate(pkg, "entities.jsonl", lambda rows: rows[0].__setitem__("created_at", "2024-01-15T12:00:00"))
+    _mutate(
+        pkg, "entities.jsonl", lambda rows: rows[0].__setitem__("created_at", "2024-01-15T12:00:00")
+    )
     assert "timestamp_invalid" in _codes(validate_package(pkg, mode="test"))
 
 
 @pytest.mark.unit
 def test_dangling_relationship_target(tmp_path):
     pkg = _copy_fixture(tmp_path)
-    _mutate(pkg, "relationships.jsonl",
-            lambda rows: rows[0].__setitem__("target_entity_id", "ent_" + "0" * 32))
+    _mutate(
+        pkg,
+        "relationships.jsonl",
+        lambda rows: rows[0].__setitem__("target_entity_id", "ent_" + "0" * 32),
+    )
     assert "dangling_entity_ref" in _codes(validate_package(pkg, mode="test"))
 
 
 @pytest.mark.unit
 def test_dangling_award_recipient(tmp_path):
     pkg = _copy_fixture(tmp_path)
-    _mutate(pkg, "funding_awards.jsonl",
-            lambda rows: rows[0].__setitem__("recipient_entity_id", "ent_" + "0" * 32))
+    _mutate(
+        pkg,
+        "funding_awards.jsonl",
+        lambda rows: rows[0].__setitem__("recipient_entity_id", "ent_" + "0" * 32),
+    )
     assert "dangling_entity_ref" in _codes(validate_package(pkg, mode="test"))
 
 
 @pytest.mark.unit
 def test_dangling_evidence_source(tmp_path):
     pkg = _copy_fixture(tmp_path)
-    _mutate(pkg, "relationships.jsonl",
-            lambda rows: rows[0].__setitem__("evidence_source_id", "src_" + "0" * 32))
+    _mutate(
+        pkg,
+        "relationships.jsonl",
+        lambda rows: rows[0].__setitem__("evidence_source_id", "src_" + "0" * 32),
+    )
     assert "dangling_entity_ref" in _codes(validate_package(pkg, mode="test"))
 
 
 @pytest.mark.unit
 def test_dangling_envelope_source(tmp_path):
     pkg = _copy_fixture(tmp_path)
-    _mutate(pkg, "entities.jsonl",
-            lambda rows: rows[0].__setitem__("source_id", "src_" + "0" * 32))
+    _mutate(pkg, "entities.jsonl", lambda rows: rows[0].__setitem__("source_id", "src_" + "0" * 32))
     assert "dangling_source_ref" in _codes(validate_package(pkg, mode="test"))

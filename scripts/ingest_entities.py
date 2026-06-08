@@ -22,6 +22,7 @@ CLI::
     python scripts/ingest_entities.py            # write entities + evidence
     python scripts/ingest_entities.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -48,8 +49,17 @@ SOURCE_NAME = "PR Public-Money Institutions (reference seed)"
 VALID_TYPES = {"agency", "firm", "fund", "nonprofit", "utility", "other"}
 
 ENTITY_COLUMNS = [
-    "entity_id", "name", "normalized_name", "entity_type", "parent_entity_id",
-    "jurisdiction", "registry_ids", "confidence", "evidence_id", "review_status", "notes",
+    "entity_id",
+    "name",
+    "normalized_name",
+    "entity_type",
+    "parent_entity_id",
+    "jurisdiction",
+    "registry_ids",
+    "confidence",
+    "evidence_id",
+    "review_status",
+    "notes",
 ]
 
 
@@ -76,19 +86,21 @@ def build_rows(root: Path | None = None) -> tuple[list[dict[str, Any]], list[Evi
                 review_status="accepted",
             )
             evidence_rows.append(ev)
-            entity_rows.append({
-                "entity_id": entity_id(name),
-                "name": name,
-                "normalized_name": normalize_name(name),
-                "entity_type": etype,
-                "parent_entity_id": "",
-                "jurisdiction": (ref.get("jurisdiction") or "").strip(),
-                "registry_ids": "",
-                "confidence": ev.confidence,
-                "evidence_id": ev.evidence_id,
-                "review_status": "accepted",
-                "notes": f"aliases={aliases}" if aliases else "",
-            })
+            entity_rows.append(
+                {
+                    "entity_id": entity_id(name),
+                    "name": name,
+                    "normalized_name": normalize_name(name),
+                    "entity_type": etype,
+                    "parent_entity_id": "",
+                    "jurisdiction": (ref.get("jurisdiction") or "").strip(),
+                    "registry_ids": "",
+                    "confidence": ev.confidence,
+                    "evidence_id": ev.evidence_id,
+                    "review_status": "accepted",
+                    "notes": f"aliases={aliases}" if aliases else "",
+                }
+            )
     return entity_rows, evidence_rows
 
 
@@ -137,7 +149,9 @@ def ingest(root: Path | None = None) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Seed PR public-money institutions into canonical_v1 entities.")
+    parser = argparse.ArgumentParser(
+        description="Seed PR public-money institutions into canonical_v1 entities."
+    )
     parser.add_argument("--root", default=".")
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
@@ -145,7 +159,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows, _ = build_rows(root)
         problems = check(rows)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(ingest(root), indent=2))
     return 0

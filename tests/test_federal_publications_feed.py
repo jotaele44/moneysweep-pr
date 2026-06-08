@@ -1,5 +1,6 @@
 """Tests for the federal-publications source feed composed into the
 canonical_v1 -> federation bridge export (Z6)."""
+
 import json
 
 import pytest
@@ -48,7 +49,9 @@ def test_merge_appends_publications(tmp_path):
     added = br.merge_external_sources(streams, root)
     assert added == 2
     assert len(streams["sources"]) == 2
-    assert all(s["lineage"]["producer_phase"] == br.FEDERAL_PUBLICATIONS_PHASE for s in streams["sources"])
+    assert all(
+        s["lineage"]["producer_phase"] == br.FEDERAL_PUBLICATIONS_PHASE for s in streams["sources"]
+    )
 
 
 @pytest.mark.unit
@@ -63,7 +66,9 @@ def test_merge_dedups_by_source_id(tmp_path):
 
 @pytest.mark.unit
 def test_merge_is_deterministic_sorted_order(tmp_path):
-    root = _write_feed(tmp_path, [_pub("src_" + "c" * 32), _pub("src_" + "a" * 32), _pub("src_" + "b" * 32)])
+    root = _write_feed(
+        tmp_path, [_pub("src_" + "c" * 32), _pub("src_" + "a" * 32), _pub("src_" + "b" * 32)]
+    )
     streams = _base()
     br.merge_external_sources(streams, root)
     ids = [s["source_id"] for s in streams["sources"]]
@@ -73,8 +78,12 @@ def test_merge_is_deterministic_sorted_order(tmp_path):
 @pytest.mark.unit
 def test_merge_only_touches_sources(tmp_path):
     root = _write_feed(tmp_path, [_pub("src_" + "a" * 32)])
-    streams = {"sources": [], "entities": [{"entity_id": "ent_x"}],
-               "relationships": [{"relationship_id": "rel_x"}], "not_yet_federated": []}
+    streams = {
+        "sources": [],
+        "entities": [{"entity_id": "ent_x"}],
+        "relationships": [{"relationship_id": "rel_x"}],
+        "not_yet_federated": [],
+    }
     br.merge_external_sources(streams, root)
     assert streams["entities"] == [{"entity_id": "ent_x"}]
     assert streams["relationships"] == [{"relationship_id": "rel_x"}]

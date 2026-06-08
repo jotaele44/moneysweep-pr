@@ -4,6 +4,7 @@ The actual implementation lives in :mod:`contract_sweeper.query.cli` so the
 package's ``__init__`` can re-export ``main`` without colliding with the
 ``runpy`` machinery that re-executes ``__main__`` modules.
 """
+
 from __future__ import annotations
 
 import sys

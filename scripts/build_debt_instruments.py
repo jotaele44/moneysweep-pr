@@ -16,6 +16,7 @@ CLI::
     python scripts/build_debt_instruments.py            # write the CSV + manifest
     python scripts/build_debt_instruments.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -41,9 +42,18 @@ SOURCE_ID = "canonical_v1_debt_instruments"
 EVIDENCE_TIER = "T2"  # EMMA known-bond reference seed; below official T1.
 
 COLUMNS = [
-    "debt_id", "issuer_entity_id", "issuer_name", "debt_class", "series",
-    "issue_year", "par_amount", "currency", "maturity_date",
-    "evidence_tier", "confidence", "notes",
+    "debt_id",
+    "issuer_entity_id",
+    "issuer_name",
+    "debt_class",
+    "series",
+    "issue_year",
+    "par_amount",
+    "currency",
+    "maturity_date",
+    "evidence_tier",
+    "confidence",
+    "notes",
 ]
 
 
@@ -74,21 +84,23 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
         issuer_id, issuer_name = index.get(suffix, ("", ""))
         par = r.get("par_amount") or ""
         year = r.get("issue_year") or ""
-        rows.append({
-            "debt_id": r["debt_id"],
-            "issuer_entity_id": issuer_id,
-            "issuer_name": issuer_name,
-            "debt_class": r["debt_class"],
-            "series": (r.get("series") or "").strip(),
-            "issue_year": int(year) if year else "",
-            "par_amount": float(par) if par else "",
-            "currency": r.get("currency") or "USD",
-            "maturity_date": (r.get("maturity_date") or "").strip(),
-            "evidence_tier": EVIDENCE_TIER,
-            "confidence": float(r.get("confidence") or 0.0),
-            "notes": (r.get("notes") or "").strip(),
-            "_source_issuer": r["issuer_entity_id"],
-        })
+        rows.append(
+            {
+                "debt_id": r["debt_id"],
+                "issuer_entity_id": issuer_id,
+                "issuer_name": issuer_name,
+                "debt_class": r["debt_class"],
+                "series": (r.get("series") or "").strip(),
+                "issue_year": int(year) if year else "",
+                "par_amount": float(par) if par else "",
+                "currency": r.get("currency") or "USD",
+                "maturity_date": (r.get("maturity_date") or "").strip(),
+                "evidence_tier": EVIDENCE_TIER,
+                "confidence": float(r.get("confidence") or 0.0),
+                "notes": (r.get("notes") or "").strip(),
+                "_source_issuer": r["issuer_entity_id"],
+            }
+        )
     return rows
 
 
@@ -108,7 +120,9 @@ def check(rows: list[dict[str, Any]], root: Path | None = None) -> list[str]:
     schema = _load_schema(root)
     for i, row in enumerate(rows, start=1):
         if not row["issuer_entity_id"]:
-            problems.append(f"row {i}: issuer {row.get('_source_issuer')!r} not resolved in entity_master")
+            problems.append(
+                f"row {i}: issuer {row.get('_source_issuer')!r} not resolved in entity_master"
+            )
         for msg in validate_row(_public_row(row), schema):
             problems.append(f"row {i} ({row.get('debt_id')}): {msg}")
     return problems
@@ -158,7 +172,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

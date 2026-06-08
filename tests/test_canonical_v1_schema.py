@@ -1,4 +1,5 @@
 """Tests for the Canonical Entity Relationship Model v1 schema + integrity validator."""
+
 import json
 from pathlib import Path
 
@@ -26,10 +27,15 @@ def test_schema_file_parses_and_is_wellformed(table):
 def test_templates_match_schema_required_columns():
     """Each CSV template header must contain every required column."""
     import csv as _csv
+
     for table, (_schema, csv_name, _pk) in cv1.TABLES.items():
         schema = cv1.load_schema(table, REPO_ROOT)
-        header = _csv.reader((REPO_ROOT / cv1.DATA_DIR / csv_name).read_text().splitlines()).__next__()
-        assert set(schema.get("required", [])) <= set(header), f"{table} header missing required cols"
+        header = _csv.reader(
+            (REPO_ROOT / cv1.DATA_DIR / csv_name).read_text().splitlines()
+        ).__next__()
+        assert set(schema.get("required", [])) <= set(header), (
+            f"{table} header missing required cols"
+        )
 
 
 @pytest.mark.unit
@@ -43,8 +49,13 @@ def test_validate_row_flags_missing_required():
 @pytest.mark.unit
 def test_validate_row_flags_bad_enum_pattern_and_range():
     schema = cv1.load_schema("entities", REPO_ROOT)
-    row = {"entity_id": "BADID", "name": "X", "normalized_name": "X",
-           "entity_type": "spaceship", "confidence": "1.5"}
+    row = {
+        "entity_id": "BADID",
+        "name": "X",
+        "normalized_name": "X",
+        "entity_type": "spaceship",
+        "confidence": "1.5",
+    }
     errors = cv1.validate_row(row, schema)
     assert any("entity_id" in e and "pattern" in e for e in errors)
     assert any("entity_type" in e and "enum" in e for e in errors)
@@ -54,24 +65,60 @@ def test_validate_row_flags_bad_enum_pattern_and_range():
 @pytest.mark.unit
 def test_valid_row_passes():
     schema = cv1.load_schema("entities", REPO_ROOT)
-    row = {"entity_id": "entity_abc123", "name": "PREPA", "normalized_name": "PREPA",
-           "entity_type": "utility", "confidence": "0.9"}
+    row = {
+        "entity_id": "entity_abc123",
+        "name": "PREPA",
+        "normalized_name": "PREPA",
+        "entity_type": "utility",
+        "confidence": "0.9",
+    }
     assert cv1.validate_row(row, schema) == []
 
 
 def _good_tables():
     return {
         "people": [],
-        "entities": [{"entity_id": "entity_a", "name": "A", "normalized_name": "A",
-                      "entity_type": "agency", "confidence": "0.9", "evidence_id": "evidence_x"}],
-        "roles": [], "contracts": [], "projects": [], "debt_instruments": [],
-        "lobbying_records": [], "funding_sources": [], "properties": [],
+        "entities": [
+            {
+                "entity_id": "entity_a",
+                "name": "A",
+                "normalized_name": "A",
+                "entity_type": "agency",
+                "confidence": "0.9",
+                "evidence_id": "evidence_x",
+            }
+        ],
+        "roles": [],
+        "contracts": [],
+        "projects": [],
+        "debt_instruments": [],
+        "lobbying_records": [],
+        "funding_sources": [],
+        "properties": [],
         "municipalities": [],
-        "edges": [{"edge_id": "edge_1", "source_node_type": "Entity", "source_node_id": "entity_a",
-                   "edge_type": "OWNS_OR_CONTROLS", "target_node_type": "Entity",
-                   "target_node_id": "entity_a", "confidence": "0.8", "evidence_id": "evidence_x"}],
-        "evidence": [{"evidence_id": "evidence_x", "source_type": "registry", "source_name": "S",
-                      "claim": "c", "evidence_tier": "T1", "confidence": "0.95", "review_status": "accepted"}],
+        "edges": [
+            {
+                "edge_id": "edge_1",
+                "source_node_type": "Entity",
+                "source_node_id": "entity_a",
+                "edge_type": "OWNS_OR_CONTROLS",
+                "target_node_type": "Entity",
+                "target_node_id": "entity_a",
+                "confidence": "0.8",
+                "evidence_id": "evidence_x",
+            }
+        ],
+        "evidence": [
+            {
+                "evidence_id": "evidence_x",
+                "source_type": "registry",
+                "source_name": "S",
+                "claim": "c",
+                "evidence_tier": "T1",
+                "confidence": "0.95",
+                "review_status": "accepted",
+            }
+        ],
         "review_queue": [],
     }
 

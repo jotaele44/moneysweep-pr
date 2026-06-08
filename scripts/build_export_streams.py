@@ -27,6 +27,7 @@ source identifiers actually referenced by the data.
 This module does not modify or re-run any pipeline stage; it only reads
 already-produced masters.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -88,14 +89,14 @@ class BuildReport:
 
     def as_dict(self) -> dict[str, Any]:
         return {
-            name: {"emitted": r.emitted, "skipped": r.skipped}
-            for name, r in self.streams.items()
+            name: {"emitted": r.emitted, "skipped": r.skipped} for name, r in self.streams.items()
         }
 
 
 # --------------------------------------------------------------------------- #
 # Parsing helpers (tolerant, fail-closed)                                      #
 # --------------------------------------------------------------------------- #
+
 
 def _read_csv(path: Path) -> list[dict[str, str]]:
     if not path.exists():
@@ -208,6 +209,7 @@ def _utc_now_iso() -> str:
 # Sources                                                                      #
 # --------------------------------------------------------------------------- #
 
+
 def _load_source_registry() -> dict[str, dict[str, Any]]:
     if not SOURCE_REGISTRY_PATH.exists():
         return {}
@@ -220,7 +222,9 @@ def _load_source_registry() -> dict[str, dict[str, Any]]:
     return out
 
 
-def _build_source_row(source_ref: str, registry: dict[str, dict[str, Any]], ts: str) -> dict[str, Any]:
+def _build_source_row(
+    source_ref: str, registry: dict[str, dict[str, Any]], ts: str
+) -> dict[str, Any]:
     reg = registry.get(source_ref)
     if reg is not None:
         source_type = reg.get("family", "external")
@@ -264,6 +268,7 @@ def _build_source_row(source_ref: str, registry: dict[str, dict[str, Any]], ts: 
 # Crosswalk                                                                    #
 # --------------------------------------------------------------------------- #
 
+
 class Crosswalk:
     """Resolves repo entity keys (uei, internal id, normalized name) to export ent_ids."""
 
@@ -289,6 +294,7 @@ class Crosswalk:
 # --------------------------------------------------------------------------- #
 # Entities (resolved + synthesized funding agencies)                           #
 # --------------------------------------------------------------------------- #
+
 
 def _entity_id_for(normalized_name: str, entity_type: str, jurisdiction: str) -> str:
     return _deterministic_id(
@@ -346,7 +352,9 @@ def _build_entities(
         if external_ids:
             entity_row["external_ids"] = external_ids
         out[ent_id] = entity_row
-        crosswalk.register(ent_id, row.get("entity_uei"), row.get("entity_id"), norm, row.get("entity_name"))
+        crosswalk.register(
+            ent_id, row.get("entity_uei"), row.get("entity_id"), norm, row.get("entity_name")
+        )
 
     # Synthesize funding-agency entities referenced by awards/flows.
     for raw_agency in agency_names:
@@ -388,6 +396,7 @@ def _build_entities(
 # Awards / transactions / relationships                                        #
 # --------------------------------------------------------------------------- #
 
+
 def _build_awards(
     rows: list[dict[str, str]],
     crosswalk: Crosswalk,
@@ -410,11 +419,15 @@ def _build_awards(
         if fiscal_year is None:
             rep.skip("bad_fiscal_year")
             continue
-        recipient = crosswalk.resolve(row.get("recipient_uei"), row.get("normalized_name"), row.get("recipient_name"))
+        recipient = crosswalk.resolve(
+            row.get("recipient_uei"), row.get("normalized_name"), row.get("recipient_name")
+        )
         if recipient is None:
             rep.skip("unresolved_recipient")
             continue
-        agency = crosswalk.resolve(normalize_name(row.get("awarding_agency")), row.get("awarding_agency"))
+        agency = crosswalk.resolve(
+            normalize_name(row.get("awarding_agency")), row.get("awarding_agency")
+        )
         if agency is None:
             rep.skip("unresolved_agency")
             continue
@@ -482,7 +495,9 @@ def _build_transactions(
         if payee is None:
             rep.skip("unresolved_payee")
             continue
-        payer = crosswalk.resolve(normalize_name(row.get("funding_source")), row.get("funding_source"))
+        payer = crosswalk.resolve(
+            normalize_name(row.get("funding_source")), row.get("funding_source")
+        )
         if payer is None:
             rep.skip("unresolved_payer")
             continue
@@ -579,6 +594,7 @@ def _build_relationships(
 # Orchestration                                                                #
 # --------------------------------------------------------------------------- #
 
+
 def _id_field(stream: str) -> str:
     return {
         "entities": "entity_id",
@@ -653,7 +669,9 @@ def build_streams(
     agency_names = [r.get("awarding_agency", "") for r in contract_rows] + [
         r.get("funding_source", "") for r in flow_rows
     ]
-    entity_rows = _build_entities(resolved_rows, agency_names, derived_source_id, crosswalk, ts, report)
+    entity_rows = _build_entities(
+        resolved_rows, agency_names, derived_source_id, crosswalk, ts, report
+    )
 
     award_rows = _build_awards(contract_rows, crosswalk, source_id_for, ts, report)
     txn_rows = _build_transactions(flow_rows, crosswalk, source_id_for, ts, report)

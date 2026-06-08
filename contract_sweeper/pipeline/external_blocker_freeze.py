@@ -70,7 +70,7 @@ def _build_validation_command(target_output_path: str, required_columns: str) ->
     target = str(target_output_path or "").strip()
     cols = ",".join(split_pipe(required_columns))
     return (
-        "python -c \"import pandas as pd; from pathlib import Path; "
+        'python -c "import pandas as pd; from pathlib import Path; '
         f"p=Path({target!r}); "
         "assert p.exists(), 'missing output'; "
         "df=pd.read_csv(p,dtype=str,low_memory=False); "
@@ -180,7 +180,9 @@ def run_external_blocker_freeze(root: Path) -> dict[str, Any]:
         expected_input = str(blocker.get("expected_input", "")).strip()
         source_family = str(blocker.get("source_family", "")).strip()
         target_output_path = str(blocker.get("target_output_path", "")).strip()
-        reason_blocked = str(blocker.get("blocker_reason", "")).strip() or "external_source_not_delivered"
+        reason_blocked = (
+            str(blocker.get("blocker_reason", "")).strip() or "external_source_not_delivered"
+        )
         next_action = str(blocker.get("next_action", "")).strip()
 
         manual_row = manual_by_expected.get(expected_input, {})
@@ -296,8 +298,12 @@ def run_external_blocker_freeze(root: Path) -> dict[str, Any]:
     )
     phase_7_8_blocked = bool(rebuild_status.get("phase_7_8_blocked", True))
 
-    all_classified = all(str(row.get("blocker_class", "")).strip() in VALID_BLOCKER_CLASSES for row in freeze_rows)
-    all_have_unfreeze = all(bool(str(row.get("unfreeze_condition", "")).strip()) for row in freeze_rows)
+    all_classified = all(
+        str(row.get("blocker_class", "")).strip() in VALID_BLOCKER_CLASSES for row in freeze_rows
+    )
+    all_have_unfreeze = all(
+        bool(str(row.get("unfreeze_condition", "")).strip()) for row in freeze_rows
+    )
 
     gate_passed = evaluate_completion_gate(
         blockers_total=blockers_total,

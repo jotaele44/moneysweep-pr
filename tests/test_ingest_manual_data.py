@@ -23,9 +23,16 @@ from scripts.ingest_report_builder import (
 
 
 def test_rb_master_columns_canonical():
-    for col in ("award_id", "recipient_name", "recipient_name_normalized",
-                "obligated_amount", "award_date", "awarding_agency",
-                "source_dataset", "fiscal_year"):
+    for col in (
+        "award_id",
+        "recipient_name",
+        "recipient_name_normalized",
+        "obligated_amount",
+        "award_date",
+        "awarding_agency",
+        "source_dataset",
+        "fiscal_year",
+    ):
         assert col in MASTER_COLUMNS
 
 
@@ -89,16 +96,19 @@ def test_rb_map_col_none_if_missing():
 def test_rb_source_dataset_is_report_builder(tmp_path):
     # Create a minimal CSV that looks like a Report Builder export
     csv_path = tmp_path / "Report Builder FY23 Revised.csv"
-    df = pd.DataFrame({
-        "Vendor Name": ["Test Corp PR", "Another LLC"],
-        "Action Obligation": ["100000", "200000"],
-        "PIID": ["PR-001", "PR-002"],
-        "Place of Performance State Code": ["PR", "PR"],
-        "Award Date": ["2023-01-15", "2023-03-20"],
-    })
+    df = pd.DataFrame(
+        {
+            "Vendor Name": ["Test Corp PR", "Another LLC"],
+            "Action Obligation": ["100000", "200000"],
+            "PIID": ["PR-001", "PR-002"],
+            "Place of Performance State Code": ["PR", "PR"],
+            "Award Date": ["2023-01-15", "2023-03-20"],
+        }
+    )
     df.to_csv(csv_path, index=False)
 
     import logging
+
     logger = logging.getLogger("test")
     logger.setLevel(logging.CRITICAL)
 
@@ -110,15 +120,18 @@ def test_rb_source_dataset_is_report_builder(tmp_path):
 
 def test_rb_pr_filter_excludes_non_pr(tmp_path):
     csv_path = tmp_path / "Report Builder FY22 Revised.csv"
-    df = pd.DataFrame({
-        "Vendor Name": ["Florida Corp", "PR Vendor LLC", "Texas Inc"],
-        "Action Obligation": ["100000", "200000", "300000"],
-        "PIID": ["FL-001", "PR-001", "TX-001"],
-        "Place of Performance State Code": ["FL", "PR", "TX"],
-    })
+    df = pd.DataFrame(
+        {
+            "Vendor Name": ["Florida Corp", "PR Vendor LLC", "Texas Inc"],
+            "Action Obligation": ["100000", "200000", "300000"],
+            "PIID": ["FL-001", "PR-001", "TX-001"],
+            "Place of Performance State Code": ["FL", "PR", "TX"],
+        }
+    )
     df.to_csv(csv_path, index=False)
 
     import logging
+
     logger = logging.getLogger("test")
     logger.setLevel(logging.CRITICAL)
 
@@ -129,6 +142,7 @@ def test_rb_pr_filter_excludes_non_pr(tmp_path):
 
 def test_rb_no_files_returns_zero(tmp_path):
     from scripts.ingest_report_builder import _run
+
     result = _run(root=tmp_path, force=True)
     assert result["rows"] == 0
     assert len(result["errors"]) > 0
@@ -147,9 +161,14 @@ from scripts.ingest_cabilderos import (
 
 
 def test_cabilderos_columns_complete():
-    for col in ("lobbyist_name", "lobbyist_normalized",
-                "client_name", "client_normalized",
-                "registration_year", "source_file"):
+    for col in (
+        "lobbyist_name",
+        "lobbyist_normalized",
+        "client_name",
+        "client_normalized",
+        "registration_year",
+        "source_file",
+    ):
         assert col in CABILDEROS_COLUMNS
 
 
@@ -168,12 +187,15 @@ def test_cab_normalize_handles_spanish_corp():
 
 
 def test_cab_parse_df_english_columns():
-    df = pd.DataFrame({
-        "Lobbyist Name": ["John Smith", "Jane Doe"],
-        "Client Name": ["PREPA", "Luma Energy LLC"],
-        "Registration Year": ["2022", "2023"],
-    })
+    df = pd.DataFrame(
+        {
+            "Lobbyist Name": ["John Smith", "Jane Doe"],
+            "Client Name": ["PREPA", "Luma Energy LLC"],
+            "Registration Year": ["2022", "2023"],
+        }
+    )
     import logging
+
     logger = logging.getLogger("test")
     logger.setLevel(logging.CRITICAL)
     result = cab_parse_df(df, "test.csv", logger)
@@ -182,12 +204,15 @@ def test_cab_parse_df_english_columns():
 
 
 def test_cab_parse_df_spanish_columns():
-    df = pd.DataFrame({
-        "Cabildero": ["Pedro Soto"],
-        "Cliente": ["Hospital Corp PR"],
-        "Año": ["2021"],
-    })
+    df = pd.DataFrame(
+        {
+            "Cabildero": ["Pedro Soto"],
+            "Cliente": ["Hospital Corp PR"],
+            "Año": ["2021"],
+        }
+    )
     import logging
+
     logger = logging.getLogger("test")
     logger.setLevel(logging.CRITICAL)
     result = cab_parse_df(df, "test_es.csv", logger)
@@ -196,11 +221,14 @@ def test_cab_parse_df_spanish_columns():
 
 
 def test_cab_parse_df_empty_client_filtered():
-    df = pd.DataFrame({
-        "Lobbyist Name": ["John Smith", ""],
-        "Client Name": ["", "Luma Energy"],
-    })
+    df = pd.DataFrame(
+        {
+            "Lobbyist Name": ["John Smith", ""],
+            "Client Name": ["", "Luma Energy"],
+        }
+    )
     import logging
+
     logger = logging.getLogger("test")
     logger.setLevel(logging.CRITICAL)
     result = cab_parse_df(df, "test.csv", logger)
@@ -210,6 +238,7 @@ def test_cab_parse_df_empty_client_filtered():
 
 def test_cab_no_files_returns_zero(tmp_path):
     from scripts.ingest_cabilderos import _run
+
     result = _run(root=tmp_path, force=True)
     assert result["rows"] == 0
 
@@ -227,8 +256,15 @@ from scripts.ingest_contralor import (
 
 
 def test_contralor_columns_complete():
-    for col in ("entity_name", "entity_normalized", "audit_id",
-                "audit_type", "finding_count", "status", "source_file"):
+    for col in (
+        "entity_name",
+        "entity_normalized",
+        "audit_id",
+        "audit_type",
+        "finding_count",
+        "status",
+        "source_file",
+    ):
         assert col in CONTRALOR_COLUMNS
 
 
@@ -241,14 +277,17 @@ def test_contralor_col_map_hallazgos():
 
 
 def test_cont_parse_df_spanish_columns():
-    df = pd.DataFrame({
-        "Entidad": ["Municipio de Ponce", "Departamento de Educación"],
-        "Número de Informe": ["A-23-001", "A-23-002"],
-        "Tipo de Informe": ["Operacional", "Fiscal"],
-        "Hallazgos": ["3", "1"],
-        "Estado": ["Abierto", "Cerrado"],
-    })
+    df = pd.DataFrame(
+        {
+            "Entidad": ["Municipio de Ponce", "Departamento de Educación"],
+            "Número de Informe": ["A-23-001", "A-23-002"],
+            "Tipo de Informe": ["Operacional", "Fiscal"],
+            "Hallazgos": ["3", "1"],
+            "Estado": ["Abierto", "Cerrado"],
+        }
+    )
     import logging
+
     logger = logging.getLogger("test")
     logger.setLevel(logging.CRITICAL)
     result = cont_parse_df(df, "contralor.csv", logger)
@@ -263,6 +302,7 @@ def test_cont_normalize_removes_de():
 
 def test_cont_no_files_returns_zero(tmp_path):
     from scripts.ingest_contralor import _run
+
     result = _run(root=tmp_path, force=True)
     assert result["rows"] == 0
 
@@ -280,8 +320,7 @@ from scripts.ingest_active_contractors import (
 
 
 def test_active_contractors_columns_complete():
-    for col in ("entity_name", "entity_normalized",
-                "registration_id", "status", "source_file"):
+    for col in ("entity_name", "entity_normalized", "registration_id", "status", "source_file"):
         assert col in CONTRACTOR_COLUMNS
 
 
@@ -291,12 +330,15 @@ def test_ac_col_map_has_suplidor():
 
 
 def test_ac_parse_df_english_cols():
-    df = pd.DataFrame({
-        "Vendor Name": ["ABC Engineering LLC", "XYZ Consulting Corp"],
-        "Registration Number": ["R-001", "R-002"],
-        "Status": ["Active", "Expired"],
-    })
+    df = pd.DataFrame(
+        {
+            "Vendor Name": ["ABC Engineering LLC", "XYZ Consulting Corp"],
+            "Registration Number": ["R-001", "R-002"],
+            "Status": ["Active", "Expired"],
+        }
+    )
     import logging
+
     logger = logging.getLogger("test")
     logger.setLevel(logging.CRITICAL)
     result = ac_parse_df(df, "contractors.csv", logger)
@@ -305,11 +347,14 @@ def test_ac_parse_df_english_cols():
 
 
 def test_ac_parse_df_filters_empty_name():
-    df = pd.DataFrame({
-        "Vendor Name": ["Valid Corp", ""],
-        "Registration Number": ["R-001", "R-002"],
-    })
+    df = pd.DataFrame(
+        {
+            "Vendor Name": ["Valid Corp", ""],
+            "Registration Number": ["R-001", "R-002"],
+        }
+    )
     import logging
+
     logger = logging.getLogger("test")
     logger.setLevel(logging.CRITICAL)
     result = ac_parse_df(df, "contractors.csv", logger)
@@ -324,6 +369,7 @@ def test_ac_normalize_strips_csp():
 
 def test_ac_no_files_returns_zero(tmp_path):
     from scripts.ingest_active_contractors import _run
+
     result = _run(root=tmp_path, force=True)
     assert result["rows"] == 0
 
@@ -341,8 +387,14 @@ from scripts.ingest_prasa import (
 
 
 def test_prasa_columns_complete():
-    for col in ("contract_id", "vendor_name", "vendor_normalized",
-                "contract_value", "status", "source_file"):
+    for col in (
+        "contract_id",
+        "vendor_name",
+        "vendor_normalized",
+        "contract_value",
+        "status",
+        "source_file",
+    ):
         assert col in PRASA_COLUMNS
 
 
@@ -355,13 +407,16 @@ def test_prasa_col_map_has_monto():
 
 
 def test_prasa_parse_df_basic():
-    df = pd.DataFrame({
-        "Contratista": ["Cobra Acquisitions LLC", "Fluor Corp"],
-        "Contrato": ["PRASA-001", "PRASA-002"],
-        "Monto": ["5000000", "12000000"],
-        "Estado": ["Completado", "Activo"],
-    })
+    df = pd.DataFrame(
+        {
+            "Contratista": ["Cobra Acquisitions LLC", "Fluor Corp"],
+            "Contrato": ["PRASA-001", "PRASA-002"],
+            "Monto": ["5000000", "12000000"],
+            "Estado": ["Completado", "Activo"],
+        }
+    )
     import logging
+
     logger = logging.getLogger("test")
     logger.setLevel(logging.CRITICAL)
     result = prasa_parse_df(df, "prasa.csv", logger)
@@ -370,13 +425,16 @@ def test_prasa_parse_df_basic():
 
 
 def test_prasa_parse_df_english_cols():
-    df = pd.DataFrame({
-        "Vendor Name": ["AECOM Technical Services Inc"],
-        "Contract Number": ["PRASA-ENG-001"],
-        "Amount": ["7500000"],
-        "Status": ["Active"],
-    })
+    df = pd.DataFrame(
+        {
+            "Vendor Name": ["AECOM Technical Services Inc"],
+            "Contract Number": ["PRASA-ENG-001"],
+            "Amount": ["7500000"],
+            "Status": ["Active"],
+        }
+    )
     import logging
+
     logger = logging.getLogger("test")
     logger.setLevel(logging.CRITICAL)
     result = prasa_parse_df(df, "prasa_eng.csv", logger)
@@ -392,5 +450,6 @@ def test_prasa_normalize_strips_llc():
 
 def test_prasa_no_files_returns_zero(tmp_path):
     from scripts.ingest_prasa import _run
+
     result = _run(root=tmp_path, force=True)
     assert result["rows"] == 0

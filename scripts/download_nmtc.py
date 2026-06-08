@@ -36,10 +36,15 @@ NMTC_URLS = [
 ]
 
 NMTC_COLUMNS = [
-    "allocatee_name", "allocatee_normalized", "ein",
-    "allocation_year", "allocation_amount",
-    "service_area_states", "pr_service_area",
-    "city", "state",
+    "allocatee_name",
+    "allocatee_normalized",
+    "ein",
+    "allocation_year",
+    "allocation_amount",
+    "service_area_states",
+    "pr_service_area",
+    "city",
+    "state",
 ]
 
 MAX_RETRIES = 3
@@ -57,10 +62,12 @@ def _normalize_name(name):
 
 def _session():
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0)",
-        "Accept": "*/*",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0)",
+            "Accept": "*/*",
+        }
+    )
     return s
 
 
@@ -119,7 +126,13 @@ def _filter_pr(df, logger):
         if not is_pr:
             for col in area_cols:
                 val = str(row.get(col, "")).upper()
-                if " PR" in val or ",PR" in val or "PR," in val or val.strip() == "PR" or "PUERTO RICO" in val:
+                if (
+                    " PR" in val
+                    or ",PR" in val
+                    or "PR," in val
+                    or val.strip() == "PR"
+                    or "PUERTO RICO" in val
+                ):
                     is_pr = True
                     break
         if is_pr:
@@ -188,7 +201,11 @@ def _run(root=None, force=False):
 
     # Check for manually placed file
     manual_dir = root / "data" / "staging" / "raw" / "nmtc"
-    manual_files = list(manual_dir.glob("*.xlsx")) + list(manual_dir.glob("*.xls")) if manual_dir.exists() else []
+    manual_files = (
+        list(manual_dir.glob("*.xlsx")) + list(manual_dir.glob("*.xls"))
+        if manual_dir.exists()
+        else []
+    )
 
     session = _session()
     content = _try_download_excel(session, logger)
@@ -200,7 +217,9 @@ def _run(root=None, force=False):
 
     if content is None:
         logger.warning("  Could not download NMTC data.")
-        logger.warning("  Manual: download allocatee list from https://www.cdfifund.gov/programs-training/programs/new-markets-tax-credit/allocatees")
+        logger.warning(
+            "  Manual: download allocatee list from https://www.cdfifund.gov/programs-training/programs/new-markets-tax-credit/allocatees"
+        )
         logger.warning("  Save as data/staging/raw/nmtc/nmtc_allocatees.xlsx")
         pd.DataFrame(columns=NMTC_COLUMNS).to_csv(out_path, index=False, encoding="utf-8")
         return {"rows": 0, "path": str(out_path), "errors": ["Download failed"]}

@@ -1,4 +1,5 @@
 """Tests for the name-normalization helper."""
+
 from __future__ import annotations
 
 import pytest
@@ -10,7 +11,10 @@ from contract_sweeper.runtime.name_normalization import normalize_name
 @pytest.mark.parametrize(
     "raw, expected",
     [
-        ("Autopistas Metropolitanas de Puerto Rico LLC", "AUTOPISTAS METROPOLITANAS DE PUERTO RICO"),
+        (
+            "Autopistas Metropolitanas de Puerto Rico LLC",
+            "AUTOPISTAS METROPOLITANAS DE PUERTO RICO",
+        ),
         ("LGA Strategies, LLC", "LGA STRATEGIES"),
         ("Ferrovial Agroman, S.A.", "FERROVIAL AGROMAN"),
         ("LBG Consulting LLC", "LBG CONSULTING"),
@@ -68,7 +72,10 @@ def test_normalize_name_municipio_bilingual_pairs_collapse():
     "raw, expected",
     [
         # "de Puerto Rico" mid-string is not a municipio prefix.
-        ("Autopistas Metropolitanas de Puerto Rico LLC", "AUTOPISTAS METROPOLITANAS DE PUERTO RICO"),
+        (
+            "Autopistas Metropolitanas de Puerto Rico LLC",
+            "AUTOPISTAS METROPOLITANAS DE PUERTO RICO",
+        ),
         # "Deportivo" starts with "De" but is not the standalone "de" connector.
         ("Municipio Deportivo XYZ", "MUNICIPIO DEPORTIVO XYZ"),
         # "Municipal" is not "Municipio"/"Municipality of".
@@ -101,6 +108,8 @@ def test_normalize_name_folds_accented_chars_to_ascii(raw, expected):
 @pytest.mark.unit
 def test_normalize_name_accent_fold_collapses_accented_unaccented_pair():
     """Accented and unaccented forms of the same name must normalize identically."""
-    assert normalize_name("Transporte Rodríguez Asfalto") == normalize_name("Transporte Rodriguez Asfalto")
+    assert normalize_name("Transporte Rodríguez Asfalto") == normalize_name(
+        "Transporte Rodriguez Asfalto"
+    )
     assert normalize_name("Juana Díaz") == normalize_name("Juana Diaz")
     assert normalize_name("José A. Batlle") == normalize_name("Jose A. Batlle")

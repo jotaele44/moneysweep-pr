@@ -16,6 +16,7 @@ CLI::
     python scripts/build_creditor_mapping.py            # write the CSV + manifest
     python scripts/build_creditor_mapping.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -39,8 +40,15 @@ SCHEMA = "schemas/creditor_mapping.schema.json"
 EVIDENCE_TIER = "T2"
 
 COLUMNS = [
-    "issuer_entity_id", "canonical_name", "debt_classes", "instrument_count",
-    "total_par", "currency", "evidence_tier", "confidence", "notes",
+    "issuer_entity_id",
+    "canonical_name",
+    "debt_classes",
+    "instrument_count",
+    "total_par",
+    "currency",
+    "evidence_tier",
+    "confidence",
+    "notes",
 ]
 
 
@@ -59,15 +67,18 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
     groups: dict[str, dict[str, Any]] = {}
     for r in _read(root, DEBT_INSTRUMENTS):
         issuer = r["issuer_entity_id"]
-        g = groups.setdefault(issuer, {
-            "issuer_entity_id": issuer,
-            "canonical_name": r["issuer_name"],
-            "_classes": set(),
-            "instrument_count": 0,
-            "total_par": 0.0,
-            "currency": r.get("currency") or "USD",
-            "_confidences": [],
-        })
+        g = groups.setdefault(
+            issuer,
+            {
+                "issuer_entity_id": issuer,
+                "canonical_name": r["issuer_name"],
+                "_classes": set(),
+                "instrument_count": 0,
+                "total_par": 0.0,
+                "currency": r.get("currency") or "USD",
+                "_confidences": [],
+            },
+        )
         g["_classes"].add(r["debt_class"])
         g["instrument_count"] += 1
         g["total_par"] += float(r["par_amount"]) if r.get("par_amount") else 0.0
@@ -76,17 +87,19 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for issuer in sorted(groups, key=lambda k: (-groups[k]["total_par"], k)):
         g = groups[issuer]
-        rows.append({
-            "issuer_entity_id": g["issuer_entity_id"],
-            "canonical_name": g["canonical_name"],
-            "debt_classes": "|".join(sorted(g["_classes"])),
-            "instrument_count": g["instrument_count"],
-            "total_par": g["total_par"],
-            "currency": g["currency"],
-            "evidence_tier": EVIDENCE_TIER,
-            "confidence": round(min(g["_confidences"]), 4) if g["_confidences"] else 0.0,
-            "notes": "",
-        })
+        rows.append(
+            {
+                "issuer_entity_id": g["issuer_entity_id"],
+                "canonical_name": g["canonical_name"],
+                "debt_classes": "|".join(sorted(g["_classes"])),
+                "instrument_count": g["instrument_count"],
+                "total_par": g["total_par"],
+                "currency": g["currency"],
+                "evidence_tier": EVIDENCE_TIER,
+                "confidence": round(min(g["_confidences"]), 4) if g["_confidences"] else 0.0,
+                "notes": "",
+            }
+        )
     return rows
 
 
@@ -147,7 +160,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

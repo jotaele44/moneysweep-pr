@@ -8,6 +8,7 @@ the entity-master, influence, debt_fiscal, gis, and graph_export gates.
 Fully offline. Each producer is regenerated into a temp path (never the real
 output) so the working tree is never touched.
 """
+
 from __future__ import annotations
 
 import importlib
@@ -49,7 +50,9 @@ def test_producer_regenerates_identically(module_path, out_attr, tmp_path):
     rows = mod.build_rows(REPO_ROOT)
     regenerated = tmp_path / "out.csv"
     mod._write(rows, regenerated)
-    assert regenerated.read_bytes() == committed, f"{module_path} drifted from {getattr(mod, out_attr)}"
+    assert regenerated.read_bytes() == committed, (
+        f"{module_path} drifted from {getattr(mod, out_attr)}"
+    )
 
 
 @pytest.mark.integration

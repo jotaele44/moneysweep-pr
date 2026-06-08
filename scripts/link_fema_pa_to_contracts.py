@@ -30,22 +30,55 @@ from scripts.parquet_utils import pq_read
 from scripts.config import PROJECT_ROOT, setup_logging
 
 NORMALIZED_DIR = PROJECT_ROOT / "data" / "normalized"
-LINKED_DIR     = PROJECT_ROOT / "data" / "linked"
-REVIEW_DIR     = PROJECT_ROOT / "data" / "review"
-PROCESSED_DIR  = PROJECT_ROOT / "data" / "staging" / "processed"
+LINKED_DIR = PROJECT_ROOT / "data" / "linked"
+REVIEW_DIR = PROJECT_ROOT / "data" / "review"
+PROCESSED_DIR = PROJECT_ROOT / "data" / "staging" / "processed"
 
 # FEMA Public Assistance work is organized into categories A-G. Classify each PW
 # into a coarse asset type from its category code/text and applicant, so funded
 # work can be rolled up by facility class (mirrors the HUD DRGR asset-type pass in
 # scripts/link_hud_drgr_to_assets.py).
 FEMA_ASSET_TYPE_KEYWORDS = {
-    "debris":        ["debris", "category a", "cat a", "cat. a"],
-    "emergency":     ["emergency protective", "protective measures", "category b", "cat b", "cat. b"],
+    "debris": ["debris", "category a", "cat a", "cat. a"],
+    "emergency": ["emergency protective", "protective measures", "category b", "cat b", "cat. b"],
     "roads_bridges": ["road", "bridge", "highway", "culvert", "category c", "cat c", "cat. c"],
-    "water_control": ["water control", "dam", "levee", "channel", "dike", "irrigation", "category d", "cat d", "cat. d"],
-    "buildings":     ["building", "equipment", "facility", "school", "hospital", "vehicle", "category e", "cat e", "cat. e"],
-    "utilities":     ["utility", "utilities", "power", "electric", "grid", "water system", "sewer", "wastewater", "treatment plant", "category f", "cat f", "cat. f"],
-    "parks_rec":     ["park", "recreation", "playground", "beach", "category g", "cat g", "cat. g"],
+    "water_control": [
+        "water control",
+        "dam",
+        "levee",
+        "channel",
+        "dike",
+        "irrigation",
+        "category d",
+        "cat d",
+        "cat. d",
+    ],
+    "buildings": [
+        "building",
+        "equipment",
+        "facility",
+        "school",
+        "hospital",
+        "vehicle",
+        "category e",
+        "cat e",
+        "cat. e",
+    ],
+    "utilities": [
+        "utility",
+        "utilities",
+        "power",
+        "electric",
+        "grid",
+        "water system",
+        "sewer",
+        "wastewater",
+        "treatment plant",
+        "category f",
+        "cat f",
+        "cat. f",
+    ],
+    "parks_rec": ["park", "recreation", "playground", "beach", "category g", "cat g", "cat. g"],
 }
 
 
@@ -81,20 +114,38 @@ def _municipality_of(v2_row, portal_row):
 
 
 LINKAGE_COLUMNS = [
-    "pw_number", "disaster_number",
-    "applicant_name", "applicant_normalized",
-    "v2_project_amount", "v2_federal_share_obligated",
-    "portal_eligible_amount", "portal_federal_share",
-    "cor3_project_id", "cor3_total_approved", "cor3_disbursement_rate",
-    "contract_id", "recipient_name",
+    "pw_number",
+    "disaster_number",
+    "applicant_name",
+    "applicant_normalized",
+    "v2_project_amount",
+    "v2_federal_share_obligated",
+    "portal_eligible_amount",
+    "portal_federal_share",
+    "cor3_project_id",
+    "cor3_total_approved",
+    "cor3_disbursement_rate",
+    "contract_id",
+    "recipient_name",
     "link_confidence",
-    "matched_cor3", "matched_contract", "matched_entity",
-    "county", "municipality", "category", "asset_type",
+    "matched_cor3",
+    "matched_contract",
+    "matched_entity",
+    "county",
+    "municipality",
+    "category",
+    "asset_type",
 ]
 
 UNMATCHED_COLUMNS = [
-    "pw_number", "disaster_number", "applicant_name",
-    "eligible_amount", "federal_share", "category", "status", "source_file",
+    "pw_number",
+    "disaster_number",
+    "applicant_name",
+    "eligible_amount",
+    "federal_share",
+    "category",
+    "status",
+    "source_file",
 ]
 
 
@@ -197,38 +248,52 @@ def _build_linkage(df_v2, df_portal, df_cor3, df_contracts, df_entity, logger):
             else:
                 link_confidence = "none"
 
-            rows.append({
-                "pw_number":               pw,
-                "disaster_number":         dis,
-                "applicant_name":          applicant,
-                "applicant_normalized":    norm_key,
-                "v2_project_amount":       r.get("project_amount", 0),
-                "v2_federal_share_obligated": r.get("federal_share_obligated", 0),
-                "portal_eligible_amount":  portal_row.get("eligible_amount", "") if portal_row else "",
-                "portal_federal_share":    portal_row.get("federal_share", "") if portal_row else "",
-                "cor3_project_id":         str(cor3_row.get("project_id", "")) if cor3_row else "",
-                "cor3_total_approved":     cor3_row.get("total_approved", "") if cor3_row else "",
-                "cor3_disbursement_rate":  cor3_row.get("disbursement_rate", "") if cor3_row else "",
-                "contract_id":             str(contract_row.get("award_id", "")) if contract_row else "",
-                "recipient_name":          str(contract_row.get("recipient_name", "")) if contract_row else "",
-                "link_confidence":         link_confidence,
-                "matched_cor3":            matched_cor3,
-                "matched_contract":        matched_contract,
-                "matched_entity":          matched_entity,
-                "county":                  r.get("county", ""),
-                "municipality":            _municipality_of(r, portal_row),
-                "category":                r.get("category", ""),
-                "asset_type":              _classify_asset_type(r.get("category", ""), applicant),
-            })
+            rows.append(
+                {
+                    "pw_number": pw,
+                    "disaster_number": dis,
+                    "applicant_name": applicant,
+                    "applicant_normalized": norm_key,
+                    "v2_project_amount": r.get("project_amount", 0),
+                    "v2_federal_share_obligated": r.get("federal_share_obligated", 0),
+                    "portal_eligible_amount": portal_row.get("eligible_amount", "")
+                    if portal_row
+                    else "",
+                    "portal_federal_share": portal_row.get("federal_share", "")
+                    if portal_row
+                    else "",
+                    "cor3_project_id": str(cor3_row.get("project_id", "")) if cor3_row else "",
+                    "cor3_total_approved": cor3_row.get("total_approved", "") if cor3_row else "",
+                    "cor3_disbursement_rate": cor3_row.get("disbursement_rate", "")
+                    if cor3_row
+                    else "",
+                    "contract_id": str(contract_row.get("award_id", "")) if contract_row else "",
+                    "recipient_name": str(contract_row.get("recipient_name", ""))
+                    if contract_row
+                    else "",
+                    "link_confidence": link_confidence,
+                    "matched_cor3": matched_cor3,
+                    "matched_contract": matched_contract,
+                    "matched_entity": matched_entity,
+                    "county": r.get("county", ""),
+                    "municipality": _municipality_of(r, portal_row),
+                    "category": r.get("category", ""),
+                    "asset_type": _classify_asset_type(r.get("category", ""), applicant),
+                }
+            )
 
-    df_out = pd.DataFrame(rows, columns=LINKAGE_COLUMNS) if rows else pd.DataFrame(columns=LINKAGE_COLUMNS)
+    df_out = (
+        pd.DataFrame(rows, columns=LINKAGE_COLUMNS)
+        if rows
+        else pd.DataFrame(columns=LINKAGE_COLUMNS)
+    )
     logger.info(f"  Linkage: {len(df_out):,} rows")
     return df_out
 
 
 def run(root=None, force=False):
     root = Path(root or PROJECT_ROOT)
-    linked_path   = root / "data" / "linked" / "fema_178_pw_linkage.csv"
+    linked_path = root / "data" / "linked" / "fema_178_pw_linkage.csv"
     unmatched_path = root / "data" / "review" / "fema_pa_unmatched_178_pws.csv"
     logger = setup_logging("link_fema_pa_to_contracts")
 
@@ -241,12 +306,18 @@ def run(root=None, force=False):
         return {"linkage_rows": rows, "unmatched_pws": 0, "matched_pct": 0.0, "status": "CACHED"}
 
     logger.info("Loading inputs...")
-    df_v2     = _load_parquet(root / "data" / "normalized" / "fema_pa_projects_v2.parquet", logger)
-    df_portal = _load_parquet(root / "data" / "normalized" / "fema_pa_portal_178_pws.parquet", logger)
-    df_cor3   = _load_csv(root / "data" / "staging" / "processed" / "pr_cor3_projects.csv", logger)
-    df_contracts = _load_csv(root / "data" / "staging" / "processed" / "pr_contracts_master.csv", logger)
+    df_v2 = _load_parquet(root / "data" / "normalized" / "fema_pa_projects_v2.parquet", logger)
+    df_portal = _load_parquet(
+        root / "data" / "normalized" / "fema_pa_portal_178_pws.parquet", logger
+    )
+    df_cor3 = _load_csv(root / "data" / "staging" / "processed" / "pr_cor3_projects.csv", logger)
+    df_contracts = _load_csv(
+        root / "data" / "staging" / "processed" / "pr_contracts_master.csv", logger
+    )
     if df_contracts.empty:
-        df_contracts = _load_csv(root / "data" / "staging" / "processed" / "pr_all_awards_master.csv", logger)
+        df_contracts = _load_csv(
+            root / "data" / "staging" / "processed" / "pr_all_awards_master.csv", logger
+        )
     df_entity = _load_csv(root / "data" / "staging" / "processed" / "entity_master.csv", logger)
 
     df_linkage = _build_linkage(df_v2, df_portal, df_cor3, df_contracts, df_entity, logger)
@@ -254,9 +325,7 @@ def run(root=None, force=False):
 
     # Unmatched portal PWs
     if not df_portal.empty:
-        matched_pws = set(
-            df_linkage[df_linkage["pw_number"] != ""]["pw_number"].astype(str)
-        )
+        matched_pws = set(df_linkage[df_linkage["pw_number"] != ""]["pw_number"].astype(str))
         portal_pws = set(df_portal.get("pw_number", pd.Series(dtype=str)).astype(str))
         unmatched_pws = portal_pws - matched_pws
         df_unmatched = df_portal[
@@ -276,8 +345,15 @@ def run(root=None, force=False):
     matched = (df_linkage["link_confidence"] != "none").sum() if total else 0
     matched_pct = round(matched / total * 100, 1) if total else 0.0
 
-    logger.info(f"  Linkage: {total:,} rows, {matched:,} matched ({matched_pct:.1f}%), {unmatched_count} unmatched portal PWs")
-    return {"linkage_rows": total, "unmatched_pws": unmatched_count, "matched_pct": matched_pct, "status": "OK"}
+    logger.info(
+        f"  Linkage: {total:,} rows, {matched:,} matched ({matched_pct:.1f}%), {unmatched_count} unmatched portal PWs"
+    )
+    return {
+        "linkage_rows": total,
+        "unmatched_pws": unmatched_count,
+        "matched_pct": matched_pct,
+        "status": "OK",
+    }
 
 
 def main():
@@ -285,7 +361,9 @@ def main():
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     result = run(force=args.force)
-    print(f"\nFEMA PA linkage: {result['linkage_rows']:,} rows, {result['matched_pct']:.1f}% matched")
+    print(
+        f"\nFEMA PA linkage: {result['linkage_rows']:,} rows, {result['matched_pct']:.1f}% matched"
+    )
     return 0
 
 

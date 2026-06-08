@@ -47,11 +47,7 @@ def _approved_target_match(
 ) -> bool:
     target_output = str(checklist.get("target_output_path", "")).strip()
     target_dropzone = str(checklist.get("target_dropzone_path", "")).strip()
-    allowed_exact = {
-        item
-        for item in (expected_input, target_output, target_dropzone)
-        if item
-    }
+    allowed_exact = {item for item in (expected_input, target_output, target_dropzone) if item}
     if candidate_relpath in allowed_exact:
         return True
     if target_dropzone and candidate_relpath.startswith(target_dropzone.rstrip("/") + "/"):
@@ -215,12 +211,16 @@ def run_scoped_unfreeze_materialization(root: Path) -> dict[str, Any]:
                     ).strip(),
                     required_columns=str(checklist.get("required_columns", "")).strip(),
                 )
-                candidate_sha = str(details.get("candidate_sha256", "")).strip() or sha256(candidate)
+                candidate_sha = str(details.get("candidate_sha256", "")).strip() or sha256(
+                    candidate
+                )
                 candidate_rows_count = safe_int(
                     details.get("candidate_row_count") or row.get("candidate_row_count")
                 )
-                validation_reason = "validated" if candidate_valid else (
-                    fail_reason or "candidate_validation_failed"
+                validation_reason = (
+                    "validated"
+                    if candidate_valid
+                    else (fail_reason or "candidate_validation_failed")
                 )
 
         if candidate_valid:
@@ -287,7 +287,9 @@ def run_scoped_unfreeze_materialization(root: Path) -> dict[str, Any]:
     every_candidate_accounted = candidates_loaded == candidates_validated + candidates_rejected
     unresolved_preserved = len(blocked_rows) >= len(still_missing_rows)
     if source_watch_still_missing:
-        unresolved_preserved = unresolved_preserved and len(blocked_rows) >= source_watch_still_missing
+        unresolved_preserved = (
+            unresolved_preserved and len(blocked_rows) >= source_watch_still_missing
+        )
 
     production_status = "NON_PRODUCTION_DIAGNOSTIC"
     phase_7_8_blocked = bool(rebuild_status.get("phase_7_8_blocked", True))

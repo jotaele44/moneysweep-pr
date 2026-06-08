@@ -15,24 +15,52 @@ from readiness.contract_sweeper_finance_lane import (  # noqa: E402
 
 # the real router derivative columns (from scripts/route_pr_intake.py output)
 DERIVATIVE_COLUMNS = [
-    "record_id", "source_item_id", "canonical_repo", "related_repo_record_id",
-    "source_name", "source_url", "published_at", "discovered_at", "title",
-    "summary_own_words", "agency_entity", "municipality_name", "location_text",
-    "domains", "output_tables", "evidence_tier", "confidence_level", "source_hash",
-    "content_hash", "dedupe_group_id", "final_status", "latitude", "longitude",
-    "asset_type", "dataset_type", "file_format", "target_repo",
+    "record_id",
+    "source_item_id",
+    "canonical_repo",
+    "related_repo_record_id",
+    "source_name",
+    "source_url",
+    "published_at",
+    "discovered_at",
+    "title",
+    "summary_own_words",
+    "agency_entity",
+    "municipality_name",
+    "location_text",
+    "domains",
+    "output_tables",
+    "evidence_tier",
+    "confidence_level",
+    "source_hash",
+    "content_hash",
+    "dedupe_group_id",
+    "final_status",
+    "latitude",
+    "longitude",
+    "asset_type",
+    "dataset_type",
+    "file_format",
+    "target_repo",
 ]
 
 
 def _row(**over):
     base = {c: "" for c in DERIVATIVE_COLUMNS}
-    base.update({
-        "record_id": "CS-1", "source_item_id": "RAW-1", "canonical_repo": "Contract-Sweeper",
-        "source_name": "DTOP", "title": "Award notice", "evidence_tier": "T2",
-        "confidence_level": "High", "target_repo": "Contract-Sweeper",
-        "domains": json.dumps(["public_funding"]),
-        "output_tables": json.dumps(["funding_event_leads", "verification_queue"]),
-    })
+    base.update(
+        {
+            "record_id": "CS-1",
+            "source_item_id": "RAW-1",
+            "canonical_repo": "Contract-Sweeper",
+            "source_name": "DTOP",
+            "title": "Award notice",
+            "evidence_tier": "T2",
+            "confidence_level": "High",
+            "target_repo": "Contract-Sweeper",
+            "domains": json.dumps(["public_funding"]),
+            "output_tables": json.dumps(["funding_event_leads", "verification_queue"]),
+        }
+    )
     base.update(over)
     return base
 
@@ -69,10 +97,14 @@ def test_multi_table_fanout(tmp_path):
     row = _row(
         record_id="CS-2",
         domains=json.dumps(["contracts", "public_funding"]),
-        output_tables=json.dumps([
-            "contracts_procurement_events", "funding_event_leads",
-            "contract_sweeper_crosswalk_queue", "verification_queue",
-        ]),
+        output_tables=json.dumps(
+            [
+                "contracts_procurement_events",
+                "funding_event_leads",
+                "contract_sweeper_crosswalk_queue",
+                "verification_queue",
+            ]
+        ),
     )
     report = build_contract_sweeper_finance_lane(_write(tmp_path, [row]), tmp_path / "out")
     assert report["by_table"]["contracts_procurement_events"] == 1
@@ -82,7 +114,9 @@ def test_multi_table_fanout(tmp_path):
 
 
 def test_empty_domains_goes_to_discrepancy(tmp_path):
-    report = build_contract_sweeper_finance_lane(_write(tmp_path, [_row(domains="[]")]), tmp_path / "out")
+    report = build_contract_sweeper_finance_lane(
+        _write(tmp_path, [_row(domains="[]")]), tmp_path / "out"
+    )
     assert report["discrepancy_count"] == 1 and report["zero_loss_pass"]
     disc = _read(tmp_path / "out" / "data" / "review" / "discrepancy_queue.csv")
     assert "empty array" in disc[0]["review_reason"]
@@ -90,12 +124,15 @@ def test_empty_domains_goes_to_discrepancy(tmp_path):
 
 def test_unrecognized_output_tables_goes_to_discrepancy(tmp_path):
     report = build_contract_sweeper_finance_lane(
-        _write(tmp_path, [_row(output_tables=json.dumps(["bogus_table"]))]), tmp_path / "out")
+        _write(tmp_path, [_row(output_tables=json.dumps(["bogus_table"]))]), tmp_path / "out"
+    )
     assert report["discrepancy_count"] == 1
 
 
 def test_missing_record_id_goes_to_discrepancy(tmp_path):
-    report = build_contract_sweeper_finance_lane(_write(tmp_path, [_row(record_id="")]), tmp_path / "out")
+    report = build_contract_sweeper_finance_lane(
+        _write(tmp_path, [_row(record_id="")]), tmp_path / "out"
+    )
     assert report["discrepancy_count"] == 1
 
 
@@ -103,8 +140,11 @@ def test_zero_loss_accounting(tmp_path):
     rows = [
         _row(record_id="A"),
         _row(record_id="B", domains="[]"),  # -> discrepancy
-        _row(record_id="C", domains=json.dumps(["politics"]),
-             output_tables=json.dumps(["politics_finance_items"])),
+        _row(
+            record_id="C",
+            domains=json.dumps(["politics"]),
+            output_tables=json.dumps(["politics_finance_items"]),
+        ),
     ]
     report = build_contract_sweeper_finance_lane(_write(tmp_path, rows), tmp_path / "out")
     assert report["input_rows"] == 3

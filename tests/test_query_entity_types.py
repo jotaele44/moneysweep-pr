@@ -1,4 +1,5 @@
 """Tests for the entity-mode Query types."""
+
 from __future__ import annotations
 
 import pytest
@@ -32,12 +33,14 @@ def test_supported_kinds_matches_literal():
 
 @pytest.mark.unit
 def test_entity_query_canonical_dict_sorts_and_dedups():
-    eq = EntityQuery(identifiers=(
-        EntityIdentifier(kind="name", value="Zeta"),
-        EntityIdentifier(kind="uei", value="ABC123"),
-        EntityIdentifier(kind="name", value="Alpha"),
-        EntityIdentifier(kind="name", value="Alpha"),  # duplicate
-    ))
+    eq = EntityQuery(
+        identifiers=(
+            EntityIdentifier(kind="name", value="Zeta"),
+            EntityIdentifier(kind="uei", value="ABC123"),
+            EntityIdentifier(kind="name", value="Alpha"),
+            EntityIdentifier(kind="name", value="Alpha"),  # duplicate
+        )
+    )
     out = eq.canonical_dict()["identifiers"]
     assert out == [
         {"kind": "name", "value": "Alpha"},
@@ -48,14 +51,18 @@ def test_entity_query_canonical_dict_sorts_and_dedups():
 
 @pytest.mark.unit
 def test_entity_query_hash_is_order_insensitive():
-    a = EntityQuery(identifiers=(
-        EntityIdentifier(kind="uei", value="A"),
-        EntityIdentifier(kind="name", value="X"),
-    ))
-    b = EntityQuery(identifiers=(
-        EntityIdentifier(kind="name", value="X"),
-        EntityIdentifier(kind="uei", value="A"),
-    ))
+    a = EntityQuery(
+        identifiers=(
+            EntityIdentifier(kind="uei", value="A"),
+            EntityIdentifier(kind="name", value="X"),
+        )
+    )
+    b = EntityQuery(
+        identifiers=(
+            EntityIdentifier(kind="name", value="X"),
+            EntityIdentifier(kind="uei", value="A"),
+        )
+    )
     assert a.canonical_hash() == b.canonical_hash()
 
 
@@ -68,12 +75,14 @@ def test_entity_query_hash_changes_with_different_identifiers():
 
 @pytest.mark.unit
 def test_entity_query_by_kind_filters_and_dedups():
-    eq = EntityQuery(identifiers=(
-        EntityIdentifier(kind="uei", value="A"),
-        EntityIdentifier(kind="uei", value="B"),
-        EntityIdentifier(kind="name", value="X"),
-        EntityIdentifier(kind="uei", value="A"),  # dup
-    ))
+    eq = EntityQuery(
+        identifiers=(
+            EntityIdentifier(kind="uei", value="A"),
+            EntityIdentifier(kind="uei", value="B"),
+            EntityIdentifier(kind="name", value="X"),
+            EntityIdentifier(kind="uei", value="A"),  # dup
+        )
+    )
     assert eq.by_kind("uei") == ["A", "B"]
     assert eq.by_kind("name") == ["X"]
     assert eq.by_kind("cage") == []

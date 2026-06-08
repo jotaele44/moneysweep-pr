@@ -3,6 +3,7 @@
 The live fetch needs egress (FOMB + P3 Authority pages). These tests cover only
 the pure parse_records() transform, so they run fully offline.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -19,18 +20,20 @@ def test_empty_records_returns_empty_df():
 
 @pytest.mark.unit
 def test_canonical_keys_pass_through():
-    records = [{
-        "contract_id": "LUMA-OM-2021",
-        "vendor_name": "Luma Energy LLC",
-        "contract_type": "O&M",
-        "contract_value": 1_500_000_000,
-        "start_date": "2021-06-01",
-        "end_date": "2036-06-01",
-        "status": "Active",
-        "description": "15-year T&D operation and maintenance agreement",
-        "source_doc": "FOMB PREPA Transformation",
-        "source_url": "https://oversightboard.pr.gov/prepa/",
-    }]
+    records = [
+        {
+            "contract_id": "LUMA-OM-2021",
+            "vendor_name": "Luma Energy LLC",
+            "contract_type": "O&M",
+            "contract_value": 1_500_000_000,
+            "start_date": "2021-06-01",
+            "end_date": "2036-06-01",
+            "status": "Active",
+            "description": "15-year T&D operation and maintenance agreement",
+            "source_doc": "FOMB PREPA Transformation",
+            "source_url": "https://oversightboard.pr.gov/prepa/",
+        }
+    ]
     df = parse_records(records)
     assert len(df) == 1
     assert list(df.columns) == PREPA_COLUMNS

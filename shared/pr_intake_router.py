@@ -20,8 +20,7 @@ try:
     import yaml
 except ImportError as exc:  # pragma: no cover - dependency guard
     raise RuntimeError(
-        "PyYAML is required to load pr_intake_domain_router.yaml. "
-        "Install with: pip install PyYAML"
+        "PyYAML is required to load pr_intake_domain_router.yaml. Install with: pip install PyYAML"
     ) from exc
 
 
@@ -247,9 +246,16 @@ def classify_raw_item(
     return domains, matched_rules, output_tables
 
 
-def _decide_route(domains: Set[str], config: RouterConfig) -> tuple[Optional[str], Optional[str], str, Optional[str]]:
+def _decide_route(
+    domains: Set[str], config: RouterConfig
+) -> tuple[Optional[str], Optional[str], str, Optional[str]]:
     if not domains:
-        return None, None, "manual_review_required", "No configured domain keywords matched raw item."
+        return (
+            None,
+            None,
+            "manual_review_required",
+            "No configured domain keywords matched raw item.",
+        )
 
     has_contract = bool(domains & CONTRACT_DOMAINS)
     has_spiderweb = bool(domains & SPIDERWEB_DOMAINS)
@@ -265,9 +271,19 @@ def _decide_route(domains: Set[str], config: RouterConfig) -> tuple[Optional[str
             canonical_repo = str(condition.get("canonical_repo") or "")
             derivative_repo = str(condition.get("derivative_repo") or "")
             if canonical_repo == CONTRACT_REPO:
-                return CONTRACT_REPO, derivative_repo or SPIDERWEB_REPO, "dual_routed_contract_primary", None
+                return (
+                    CONTRACT_REPO,
+                    derivative_repo or SPIDERWEB_REPO,
+                    "dual_routed_contract_primary",
+                    None,
+                )
             if canonical_repo == SPIDERWEB_REPO:
-                return SPIDERWEB_REPO, derivative_repo or CONTRACT_REPO, "dual_routed_spiderweb_primary", None
+                return (
+                    SPIDERWEB_REPO,
+                    derivative_repo or CONTRACT_REPO,
+                    "dual_routed_spiderweb_primary",
+                    None,
+                )
 
     # Mixed signal without an explicit configured condition. Prefer fiscal authority
     # when money/procurement is present; otherwise prefer the spatial record.
@@ -299,7 +315,12 @@ def _build_derivative(
     source_item_id = str(raw_item.get("source_item_id") or raw_item.get("item_id") or "UNKNOWN")
     source_url = raw_item.get("source_url") or raw_item.get("url") or ""
     title = raw_item.get("title") or ""
-    summary = raw_item.get("summary_own_words") or raw_item.get("summary") or raw_item.get("description") or ""
+    summary = (
+        raw_item.get("summary_own_words")
+        or raw_item.get("summary")
+        or raw_item.get("description")
+        or ""
+    )
 
     return {
         "record_id": _stable_id(target_repo, source_item_id, source_url, title),
@@ -319,7 +340,8 @@ def _build_derivative(
         "evidence_tier": raw_item.get("evidence_tier"),
         "confidence_level": raw_item.get("confidence_level"),
         "source_hash": raw_item.get("source_hash") or _hash_text(source_url),
-        "content_hash": raw_item.get("content_hash") or _hash_text(_normalized_search_text(raw_item)),
+        "content_hash": raw_item.get("content_hash")
+        or _hash_text(_normalized_search_text(raw_item)),
         "dedupe_group_id": raw_item.get("dedupe_group_id"),
         # Geocode / asset enrichment for the spiderweb-pr spatial lane. These pass
         # through whatever the raw item carries (empty when absent — degrade
@@ -358,7 +380,10 @@ def _validate_result(
             errors.append("Dual-routed result missing canonical_repo or derivative_repo")
 
     if result.canonical_repo == SPIDERWEB_REPO or result.derivative_repo == SPIDERWEB_REPO:
-        if "every_spatial_record_has_location_or_manual_geocode_required" in config.validation_gates:
+        if (
+            "every_spatial_record_has_location_or_manual_geocode_required"
+            in config.validation_gates
+        ):
             has_location = any(
                 raw_item.get(field)
                 for field in (
@@ -371,10 +396,14 @@ def _validate_result(
                 )
             ) or bool(raw_item.get("manual_geocode_required"))
             if not has_location:
-                errors.append("Spatial derivative missing location fields and manual_geocode_required")
+                errors.append(
+                    "Spatial derivative missing location fields and manual_geocode_required"
+                )
 
     if result.final_status in {"routed_contract_sweeper", "dual_routed_contract_primary"}:
-        if raw_item.get("verification_status") == "confirmed" and not raw_item.get("matched_t1_record_url"):
+        if raw_item.get("verification_status") == "confirmed" and not raw_item.get(
+            "matched_t1_record_url"
+        ):
             errors.append("Confirmed Contract-Sweeper item lacks matched_t1_record_url")
 
     result.validation_errors = errors
@@ -383,7 +412,9 @@ def _validate_result(
 
 
 def _status_override(raw_item: Mapping[str, Any]) -> Optional[str]:
-    status = str(raw_item.get("access_status") or raw_item.get("archive_status") or "").strip().lower()
+    status = (
+        str(raw_item.get("access_status") or raw_item.get("archive_status") or "").strip().lower()
+    )
     if status in INACCESSIBLE_STATUSES:
         return "source_inaccessible"
     if status in BLOCKED_STATUSES:
@@ -447,7 +478,9 @@ def _hash_text(value: str) -> str:
 
 def _stable_id(target_repo: str, source_item_id: str, source_url: str, title: str) -> str:
     prefix = "CS" if target_repo == CONTRACT_REPO else "SW"
-    digest = _hash_text(json.dumps([target_repo, source_item_id, source_url, title], sort_keys=True))[:12]
+    digest = _hash_text(
+        json.dumps([target_repo, source_item_id, source_url, title], sort_keys=True)
+    )[:12]
     return f"{prefix}-PRINTAKE-{digest}"
 
 

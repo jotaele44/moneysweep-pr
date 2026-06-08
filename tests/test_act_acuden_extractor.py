@@ -5,6 +5,7 @@ dependency) so the repo stays binary-clean. They contain a single tabular
 page with a header row and two data rows; that is enough to exercise the
 column-mapping, alias-override, and determinism contracts.
 """
+
 from __future__ import annotations
 
 import csv
@@ -107,6 +108,7 @@ def acuden_repo(tmp_path: Path) -> Path:
 # Schema contracts
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.unit
 def test_act_columns_match_registry() -> None:
     # Mirrors manual_export_registry.yaml act_transition_contracts schema.
@@ -135,6 +137,7 @@ def test_acuden_columns_match_registry() -> None:
 # ---------------------------------------------------------------------------
 # Integration: extractor end-to-end on synthetic PDFs
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.integration
 def test_extract_act_emits_canonical_columns(act_repo: Path) -> None:
@@ -184,15 +187,10 @@ def test_extractor_applies_alias_overrides(act_repo: Path, monkeypatch) -> None:
         "LPC CONTRACTORS": "LPC AND D",
         "SUPER ASPHALT PAVEMENT": "SUPER ASPHALT",
     }
-    monkeypatch.setattr(
-        "scripts.extract_act_acuden_pdfs.load_overrides", lambda: overrides
-    )
+    monkeypatch.setattr("scripts.extract_act_acuden_pdfs.load_overrides", lambda: overrides)
     summary = extract(source="act", root=act_repo)
     out_path = Path(summary["act"]["outputs"][0])
-    names = [
-        r["contractor_name"]
-        for r in csv.DictReader(out_path.open(encoding="utf-8"))
-    ]
+    names = [r["contractor_name"] for r in csv.DictReader(out_path.open(encoding="utf-8"))]
     assert "LPC AND D" in names
     assert "SUPER ASPHALT" in names
 

@@ -16,6 +16,7 @@ Outputs:
 Usage:
   python3 scripts/download_ssa.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -43,34 +44,83 @@ YEARS_TO_FETCH = list(range(2010, 2025))
 
 # Known PR SSA benefit figures from SSA Annual Statistical Supplement Table 5.J (OASDI)
 KNOWN_SSA_DATA = [
-    {"calendar_year": "2018", "month": "annual", "program_type": "OASDI",
-     "beneficiary_count": "641000", "total_payments": "8100000000", "avg_monthly_benefit": "1052",
-     "retired_workers_count": "400000", "disabled_workers_count": "150000", "survivors_count": "91000",
-     "source_doc": "ssa_statistical_supplement_2018"},
-    {"calendar_year": "2019", "month": "annual", "program_type": "OASDI",
-     "beneficiary_count": "648000", "total_payments": "8300000000", "avg_monthly_benefit": "1067",
-     "retired_workers_count": "405000", "disabled_workers_count": "148000", "survivors_count": "95000",
-     "source_doc": "ssa_statistical_supplement_2019"},
-    {"calendar_year": "2020", "month": "annual", "program_type": "OASDI",
-     "beneficiary_count": "651000", "total_payments": "8400000000", "avg_monthly_benefit": "1075",
-     "retired_workers_count": "408000", "disabled_workers_count": "146000", "survivors_count": "97000",
-     "source_doc": "ssa_statistical_supplement_2020"},
-    {"calendar_year": "2021", "month": "annual", "program_type": "OASDI",
-     "beneficiary_count": "655000", "total_payments": "8700000000", "avg_monthly_benefit": "1107",
-     "retired_workers_count": "412000", "disabled_workers_count": "144000", "survivors_count": "99000",
-     "source_doc": "ssa_statistical_supplement_2021"},
-    {"calendar_year": "2022", "month": "annual", "program_type": "OASDI",
-     "beneficiary_count": "658000", "total_payments": "9200000000", "avg_monthly_benefit": "1165",
-     "retired_workers_count": "416000", "disabled_workers_count": "142000", "survivors_count": "100000",
-     "source_doc": "ssa_statistical_supplement_2022"},
-    {"calendar_year": "2023", "month": "annual", "program_type": "OASDI",
-     "beneficiary_count": "660000", "total_payments": "9600000000", "avg_monthly_benefit": "1212",
-     "retired_workers_count": "420000", "disabled_workers_count": "140000", "survivors_count": "100000",
-     "source_doc": "ssa_statistical_supplement_2023"},
+    {
+        "calendar_year": "2018",
+        "month": "annual",
+        "program_type": "OASDI",
+        "beneficiary_count": "641000",
+        "total_payments": "8100000000",
+        "avg_monthly_benefit": "1052",
+        "retired_workers_count": "400000",
+        "disabled_workers_count": "150000",
+        "survivors_count": "91000",
+        "source_doc": "ssa_statistical_supplement_2018",
+    },
+    {
+        "calendar_year": "2019",
+        "month": "annual",
+        "program_type": "OASDI",
+        "beneficiary_count": "648000",
+        "total_payments": "8300000000",
+        "avg_monthly_benefit": "1067",
+        "retired_workers_count": "405000",
+        "disabled_workers_count": "148000",
+        "survivors_count": "95000",
+        "source_doc": "ssa_statistical_supplement_2019",
+    },
+    {
+        "calendar_year": "2020",
+        "month": "annual",
+        "program_type": "OASDI",
+        "beneficiary_count": "651000",
+        "total_payments": "8400000000",
+        "avg_monthly_benefit": "1075",
+        "retired_workers_count": "408000",
+        "disabled_workers_count": "146000",
+        "survivors_count": "97000",
+        "source_doc": "ssa_statistical_supplement_2020",
+    },
+    {
+        "calendar_year": "2021",
+        "month": "annual",
+        "program_type": "OASDI",
+        "beneficiary_count": "655000",
+        "total_payments": "8700000000",
+        "avg_monthly_benefit": "1107",
+        "retired_workers_count": "412000",
+        "disabled_workers_count": "144000",
+        "survivors_count": "99000",
+        "source_doc": "ssa_statistical_supplement_2021",
+    },
+    {
+        "calendar_year": "2022",
+        "month": "annual",
+        "program_type": "OASDI",
+        "beneficiary_count": "658000",
+        "total_payments": "9200000000",
+        "avg_monthly_benefit": "1165",
+        "retired_workers_count": "416000",
+        "disabled_workers_count": "142000",
+        "survivors_count": "100000",
+        "source_doc": "ssa_statistical_supplement_2022",
+    },
+    {
+        "calendar_year": "2023",
+        "month": "annual",
+        "program_type": "OASDI",
+        "beneficiary_count": "660000",
+        "total_payments": "9600000000",
+        "avg_monthly_benefit": "1212",
+        "retired_workers_count": "420000",
+        "disabled_workers_count": "140000",
+        "survivors_count": "100000",
+        "source_doc": "ssa_statistical_supplement_2023",
+    },
 ]
 
 SSA_COLUMNS = [
-    "calendar_year", "month",
+    "calendar_year",
+    "month",
     "program_type",
     "beneficiary_count",
     "total_payments",
@@ -84,10 +134,12 @@ SSA_COLUMNS = [
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR SSA benefits research)",
-        "Accept": "application/json, text/html",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR SSA benefits research)",
+            "Accept": "application/json, text/html",
+        }
+    )
     return s
 
 
@@ -108,7 +160,7 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed for {url}: {exc}")
@@ -126,8 +178,10 @@ def _fetch_ssa_open_data(session: requests.Session, logger) -> list[dict]:
 
         items = data if isinstance(data, list) else []
         pr_views = [
-            v for v in items
-            if isinstance(v, dict) and any(
+            v
+            for v in items
+            if isinstance(v, dict)
+            and any(
                 "state" in str(v.get(f, "")).lower() or "benefit" in str(v.get(f, "")).lower()
                 for f in ["name", "description"]
             )
@@ -142,7 +196,10 @@ def _fetch_ssa_open_data(session: requests.Session, logger) -> list[dict]:
             data = _get(session, data_url, {}, logger)
             if not data:
                 continue
-            cols = [c.get("fieldName", "") for c in data.get("meta", {}).get("view", {}).get("columns", [])]
+            cols = [
+                c.get("fieldName", "")
+                for c in data.get("meta", {}).get("view", {}).get("columns", [])
+            ]
             raw_rows = data.get("data", [])
             for r in raw_rows:
                 row_dict = dict(zip(cols, r))
@@ -175,7 +232,11 @@ def _fetch_ssa_state_tables(session: requests.Session, logger) -> list[dict]:
                     if resp.status_code != 200:
                         continue
                     content_type = resp.headers.get("content-type", "")
-                    if "excel" in content_type or "spreadsheet" in content_type or url.endswith((".xlsx", ".xls")):
+                    if (
+                        "excel" in content_type
+                        or "spreadsheet" in content_type
+                        or url.endswith((".xlsx", ".xls"))
+                    ):
                         df = pd.read_excel(pd.io.common.BytesIO(resp.content), header=None)
                     elif "html" in content_type:
                         tables = pd.read_html(resp.text)
@@ -192,7 +253,9 @@ def _fetch_ssa_state_tables(session: requests.Session, logger) -> list[dict]:
                             pr_df["program_type"] = program
                             pr_df["source_doc"] = url
                             rows.extend(pr_df.to_dict("records"))
-                            logger.info(f"  {program} {year}: {mask.sum()} PR rows from {url.split('/')[-1]}")
+                            logger.info(
+                                f"  {program} {year}: {mask.sum()} PR rows from {url.split('/')[-1]}"
+                            )
                             break
                     break
                 except Exception:

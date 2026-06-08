@@ -1,4 +1,5 @@
 """Unit tests for the shared downloader lifecycle (runtime.base_downloader)."""
+
 from __future__ import annotations
 
 import pandas as pd
@@ -20,6 +21,7 @@ from contract_sweeper.runtime.base_downloader import (
 # ---------------------------------------------------------------------------
 # Test doubles
 # ---------------------------------------------------------------------------
+
 
 class _Resp:
     def __init__(self, status=200, json_data=None, exc=None):
@@ -66,6 +68,7 @@ def _noop_sleep(_):
 # build_session
 # ---------------------------------------------------------------------------
 
+
 def test_build_session_sets_default_headers():
     s = build_session()
     assert s.headers["User-Agent"].startswith("ContractSweeper/")
@@ -84,6 +87,7 @@ def test_build_session_merges_extra_headers():
 # ---------------------------------------------------------------------------
 # http_get_json
 # ---------------------------------------------------------------------------
+
 
 def test_http_get_json_success_returns_payload():
     session = _FakeSession([_Resp(200, {"results": [1, 2]})])
@@ -118,7 +122,9 @@ def test_http_get_json_429_is_retried():
     session = _FakeSession([_Resp(429), _Resp(200, {"ok": 1})])
     cfg = HttpConfig(max_retries=3)
     sleeps = []
-    out = http_get_json(session, "http://x", {}, logger=_Logger(), config=cfg, sleeper=sleeps.append)
+    out = http_get_json(
+        session, "http://x", {}, logger=_Logger(), config=cfg, sleeper=sleeps.append
+    )
     assert out == {"ok": 1}
     assert len(session.calls) == 2
     # the 429 path triggered the long rate-limit sleep
@@ -128,6 +134,7 @@ def test_http_get_json_429_is_retried():
 # ---------------------------------------------------------------------------
 # http_post_json (USASpending-style POST query APIs)
 # ---------------------------------------------------------------------------
+
 
 def test_http_post_json_success_sends_payload_and_returns():
     session = _FakeSession([_Resp(200, {"results": [{"a": 1}]})])
@@ -156,7 +163,9 @@ def test_http_post_json_429_is_retried():
     session = _FakeSession([_Resp(429), _Resp(200, {"ok": 1})])
     cfg = HttpConfig(max_retries=3)
     sleeps = []
-    out = http_post_json(session, "http://x", {}, logger=_Logger(), config=cfg, sleeper=sleeps.append)
+    out = http_post_json(
+        session, "http://x", {}, logger=_Logger(), config=cfg, sleeper=sleeps.append
+    )
     assert out == {"ok": 1}
     assert cfg.rate_limit_sleep in sleeps
 
@@ -164,6 +173,7 @@ def test_http_post_json_429_is_retried():
 # ---------------------------------------------------------------------------
 # file_has_data / write_csv
 # ---------------------------------------------------------------------------
+
 
 def test_file_has_data(tmp_path):
     missing = tmp_path / "nope.csv"
@@ -190,6 +200,7 @@ def test_write_csv_roundtrip(tmp_path):
 # ---------------------------------------------------------------------------
 # BaseDownloader class
 # ---------------------------------------------------------------------------
+
 
 def test_base_downloader_paths(tmp_path):
     dl = BaseDownloader("demo", root=tmp_path, logger=_Logger(), sleeper=_noop_sleep)

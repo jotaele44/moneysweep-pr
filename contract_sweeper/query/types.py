@@ -1,4 +1,5 @@
 """Public data types for the on-demand query module."""
+
 from __future__ import annotations
 
 import hashlib

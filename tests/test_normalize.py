@@ -20,6 +20,7 @@ from scripts.normalize_expansion_inputs import (
 # derive_fiscal_year
 # ---------------------------------------------------------------------------
 
+
 class TestDeriveFiscalYear:
     def test_january_same_year(self):
         dates = pd.to_datetime(pd.Series(["2020-01-15"]))
@@ -69,10 +70,17 @@ class TestDeriveFiscalYear:
 # build_column_map
 # ---------------------------------------------------------------------------
 
+
 class TestBuildColumnMap:
     def test_fpds_columns(self):
-        cols = ["PIID", "Date Signed", "Vendor Name", "Contracting Agency Name",
-                "Dollars Obligated", "Place of Performance State"]
+        cols = [
+            "PIID",
+            "Date Signed",
+            "Vendor Name",
+            "Contracting Agency Name",
+            "Dollars Obligated",
+            "Place of Performance State",
+        ]
         cmap = build_column_map(cols)
         assert cmap["contract_id"] == "PIID"
         assert cmap["award_date"] == "Date Signed"
@@ -81,8 +89,14 @@ class TestBuildColumnMap:
         assert cmap["obligated_amount"] == "Dollars Obligated"
 
     def test_usaspending_columns(self):
-        cols = ["Award ID", "Start Date", "Recipient Name", "Awarding Agency",
-                "Award Amount", "Place of Performance State Code"]
+        cols = [
+            "Award ID",
+            "Start Date",
+            "Recipient Name",
+            "Awarding Agency",
+            "Award Amount",
+            "Place of Performance State Code",
+        ]
         cmap = build_column_map(cols)
         assert cmap["contract_id"] == "Award ID"
         assert cmap["award_date"] == "Start Date"
@@ -103,9 +117,11 @@ class TestBuildColumnMap:
 # normalize_file (end-to-end)
 # ---------------------------------------------------------------------------
 
+
 class TestNormalizeFile:
     def test_normalizes_fpds_csv(self, sample_fpds_csv, tmp_project):
         import logging
+
         logger = logging.getLogger("test_normalize")
         output_dir = tmp_project / "data" / "staging" / "processed"
 
@@ -128,6 +144,7 @@ class TestNormalizeFile:
 
     def test_normalizes_usaspending_csv(self, sample_usaspending_csv, tmp_project):
         import logging
+
         logger = logging.getLogger("test_normalize")
         output_dir = tmp_project / "data" / "staging" / "processed"
 
@@ -139,6 +156,7 @@ class TestNormalizeFile:
 
     def test_handles_empty_csv(self, tmp_project):
         import logging
+
         logger = logging.getLogger("test_normalize")
         empty_csv = tmp_project / "data" / "staging" / "expansion" / "empty.csv"
         empty_csv.write_text("col_a,col_b\n", encoding="utf-8")
@@ -152,11 +170,12 @@ class TestNormalizeFile:
     def test_amount_cleaning(self, tmp_project):
         """Dollar signs and commas should be stripped from amounts."""
         import logging
+
         logger = logging.getLogger("test_normalize")
         csv_path = tmp_project / "data" / "staging" / "expansion" / "amount_test.csv"
         csv_path.write_text(
             "Award ID,Date Signed,Vendor Name,Awarding Agency,Dollars Obligated,pop_state_code\n"
-            "C001,2020-05-01,VENDOR A,Agency A,\"$1,234,567.89\",PR\n"
+            'C001,2020-05-01,VENDOR A,Agency A,"$1,234,567.89",PR\n'
             "C002,2020-06-01,VENDOR B,Agency B,987654.32,PR\n",
             encoding="utf-8",
         )
@@ -177,16 +196,17 @@ class TestNormalizeFile:
 # rough edge that future normalization work could improve.
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.unit
 class TestCurrencyEdgeCasesHigherGov:
     @pytest.mark.parametrize(
         "raw, expected",
         [
             ("$1,234.56", "1234.56"),
-            ("(500)", "500"),                # limitation: sign lost
+            ("(500)", "500"),  # limitation: sign lost
             ("-1000", "-1000"),
-            ("NaN", ""),                     # all non-numeric stripped
-            ("1.23e6", "1.236"),             # limitation: 'e' stripped
+            ("NaN", ""),  # all non-numeric stripped
+            ("1.23e6", "1.236"),  # limitation: 'e' stripped
             ("1,000,000", "1000000"),
             ("", ""),
         ],
@@ -207,15 +227,17 @@ class TestCurrencyEdgeCasesMainline:
 
     def _run(self, tmp_project, amount_strings):
         import logging
+
         logger = logging.getLogger("test_normalize_currency")
         rows = "\n".join(
-            f"C{i:03d},2020-05-01,VENDOR{i},Agency,\"{amt}\",PR"
+            f'C{i:03d},2020-05-01,VENDOR{i},Agency,"{amt}",PR'
             for i, amt in enumerate(amount_strings)
         )
         csv_path = tmp_project / "data" / "staging" / "expansion" / "currency_edge.csv"
         csv_path.write_text(
             "Award ID,Date Signed,Vendor Name,Awarding Agency,Dollars Obligated,pop_state_code\n"
-            + rows + "\n",
+            + rows
+            + "\n",
             encoding="utf-8",
         )
         result = normalize_file(csv_path, tmp_project / "data" / "staging" / "processed", logger)
@@ -254,6 +276,7 @@ class TestDateFallbacks:
 
     def _run(self, tmp_project, date_string):
         import logging
+
         logger = logging.getLogger("test_normalize_dates")
         csv_path = tmp_project / "data" / "staging" / "expansion" / "date_edge.csv"
         csv_path.write_text(

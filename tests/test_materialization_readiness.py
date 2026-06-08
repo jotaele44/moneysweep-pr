@@ -6,6 +6,7 @@ This is the invariant that backs "fill all sources to 100%": the target is the
 sources must each carry an allowed *queued* reason so they are excluded from the
 target on purpose, not by accident.
 """
+
 from __future__ import annotations
 
 import json
@@ -32,7 +33,11 @@ def test_every_automatable_source_is_ready():
         r["source_id"]
         for r in ROWS
         if r["automatable"]
-        and not (r["ready"] and (r["has_adapter"] or r["producer_importable"]) and r["expected_outputs_count"] > 0)
+        and not (
+            r["ready"]
+            and (r["has_adapter"] or r["producer_importable"])
+            and r["expected_outputs_count"] > 0
+        )
     ]
     assert not_ready == [], f"automatable sources missing a deterministic path: {not_ready}"
 
@@ -64,8 +69,7 @@ def test_summary_counts_are_consistent():
     assert summary["automatable_ready"] == summary["automatable_total"]
     assert summary["automatable_not_ready"] == []
     assert (
-        summary["automatable_total"] + summary["queued_excluded_total"]
-        == summary["total_sources"]
+        summary["automatable_total"] + summary["queued_excluded_total"] == summary["total_sources"]
     )
 
 
@@ -121,6 +125,4 @@ def test_terminal_sources_never_appear_in_automatable_set():
     """No terminal source may slip into the automatable bucket."""
     automatable_ids = {r["source_id"] for r in ROWS if r["automatable"]}
     overlap = automatable_ids & _TERMINAL_SOURCES
-    assert overlap == set(), (
-        f"Terminal sources incorrectly marked automatable: {overlap}"
-    )
+    assert overlap == set(), f"Terminal sources incorrectly marked automatable: {overlap}"

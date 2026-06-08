@@ -15,6 +15,7 @@ Output:
 Usage:
   python3 scripts/download_medicare_advantage.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -36,18 +37,92 @@ MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 MA_COLUMNS = [
-    "contract_year", "plan_id", "plan_name", "organization_name",
-    "organization_normalized", "plan_type", "enrollment_count",
-    "capitation_rate", "total_payment", "county", "state", "source_doc",
+    "contract_year",
+    "plan_id",
+    "plan_name",
+    "organization_name",
+    "organization_normalized",
+    "plan_type",
+    "enrollment_count",
+    "capitation_rate",
+    "total_payment",
+    "county",
+    "state",
+    "source_doc",
 ]
 
 # Known PR Medicare Advantage plan data from CMS Landscape files
 KNOWN_MA_DATA = [
-    {"contract_year":"2022","plan_id":"H1337-001","plan_name":"Triple-S Advantage Gold","organization_name":"TRIPLE-S SALUD INC","organization_normalized":"TRIPLE-S SALUD","plan_type":"HMO","enrollment_count":"85000","capitation_rate":"1050","total_payment":"1071000000","county":"Statewide","state":"PR","source_doc":"CMS_MA_Landscape_2022"},
-    {"contract_year":"2022","plan_id":"H3810-001","plan_name":"MMM Healthcare Gold","organization_name":"MMM HEALTHCARE LLC","organization_normalized":"MMM HEALTHCARE","plan_type":"HMO","enrollment_count":"120000","capitation_rate":"1080","total_payment":"1555200000","county":"Statewide","state":"PR","source_doc":"CMS_MA_Landscape_2022"},
-    {"contract_year":"2023","plan_id":"H1337-001","plan_name":"Triple-S Advantage Gold","organization_name":"TRIPLE-S SALUD INC","organization_normalized":"TRIPLE-S SALUD","plan_type":"HMO","enrollment_count":"91000","capitation_rate":"1095","total_payment":"1196450000","county":"Statewide","state":"PR","source_doc":"CMS_MA_Landscape_2023"},
-    {"contract_year":"2023","plan_id":"H3810-001","plan_name":"MMM Healthcare Gold","organization_name":"MMM HEALTHCARE LLC","organization_normalized":"MMM HEALTHCARE","plan_type":"HMO","enrollment_count":"131000","capitation_rate":"1125","total_payment":"1760625000","county":"Statewide","state":"PR","source_doc":"CMS_MA_Landscape_2023"},
-    {"contract_year":"2023","plan_id":"H4009-001","plan_name":"Humana Gold Plus PR","organization_name":"HUMANA INSURANCE OF PUERTO RICO INC","organization_normalized":"HUMANA INSURANCE OF PUERTO RICO","plan_type":"HMO","enrollment_count":"28000","capitation_rate":"1050","total_payment":"352800000","county":"Statewide","state":"PR","source_doc":"CMS_MA_Landscape_2023"},
+    {
+        "contract_year": "2022",
+        "plan_id": "H1337-001",
+        "plan_name": "Triple-S Advantage Gold",
+        "organization_name": "TRIPLE-S SALUD INC",
+        "organization_normalized": "TRIPLE-S SALUD",
+        "plan_type": "HMO",
+        "enrollment_count": "85000",
+        "capitation_rate": "1050",
+        "total_payment": "1071000000",
+        "county": "Statewide",
+        "state": "PR",
+        "source_doc": "CMS_MA_Landscape_2022",
+    },
+    {
+        "contract_year": "2022",
+        "plan_id": "H3810-001",
+        "plan_name": "MMM Healthcare Gold",
+        "organization_name": "MMM HEALTHCARE LLC",
+        "organization_normalized": "MMM HEALTHCARE",
+        "plan_type": "HMO",
+        "enrollment_count": "120000",
+        "capitation_rate": "1080",
+        "total_payment": "1555200000",
+        "county": "Statewide",
+        "state": "PR",
+        "source_doc": "CMS_MA_Landscape_2022",
+    },
+    {
+        "contract_year": "2023",
+        "plan_id": "H1337-001",
+        "plan_name": "Triple-S Advantage Gold",
+        "organization_name": "TRIPLE-S SALUD INC",
+        "organization_normalized": "TRIPLE-S SALUD",
+        "plan_type": "HMO",
+        "enrollment_count": "91000",
+        "capitation_rate": "1095",
+        "total_payment": "1196450000",
+        "county": "Statewide",
+        "state": "PR",
+        "source_doc": "CMS_MA_Landscape_2023",
+    },
+    {
+        "contract_year": "2023",
+        "plan_id": "H3810-001",
+        "plan_name": "MMM Healthcare Gold",
+        "organization_name": "MMM HEALTHCARE LLC",
+        "organization_normalized": "MMM HEALTHCARE",
+        "plan_type": "HMO",
+        "enrollment_count": "131000",
+        "capitation_rate": "1125",
+        "total_payment": "1760625000",
+        "county": "Statewide",
+        "state": "PR",
+        "source_doc": "CMS_MA_Landscape_2023",
+    },
+    {
+        "contract_year": "2023",
+        "plan_id": "H4009-001",
+        "plan_name": "Humana Gold Plus PR",
+        "organization_name": "HUMANA INSURANCE OF PUERTO RICO INC",
+        "organization_normalized": "HUMANA INSURANCE OF PUERTO RICO",
+        "plan_type": "HMO",
+        "enrollment_count": "28000",
+        "capitation_rate": "1050",
+        "total_payment": "352800000",
+        "county": "Statewide",
+        "state": "PR",
+        "source_doc": "CMS_MA_Landscape_2023",
+    },
 ]
 
 CMS_SOCRATA_ENDPOINTS = [
@@ -63,10 +138,12 @@ CMS_LANDSCAPE_BASE = (
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (CMS Medicare Advantage PR research)",
-        "Accept": "application/json, text/html",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (CMS Medicare Advantage PR research)",
+            "Accept": "application/json, text/html",
+        }
+    )
     return s
 
 
@@ -86,7 +163,7 @@ def _get(session, url, params, logger):
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -98,7 +175,20 @@ def _normalize_name(name: str) -> str:
         return ""
     n = re.sub(r"[^\w\s]", " ", str(name).upper())
     n = re.sub(r"\s+", " ", n).strip()
-    suffixes = {"INC", "LLC", "LLP", "CORP", "CO", "LTD", "LP", "THE", "OF", "HEALTH", "PLAN", "PLANS"}
+    suffixes = {
+        "INC",
+        "LLC",
+        "LLP",
+        "CORP",
+        "CO",
+        "LTD",
+        "LP",
+        "THE",
+        "OF",
+        "HEALTH",
+        "PLAN",
+        "PLANS",
+    }
     tokens = n.split()
     while tokens and tokens[-1] in suffixes:
         tokens.pop()
@@ -127,21 +217,32 @@ def _fetch_socrata(session, logger) -> list[dict]:
             if not data:
                 break
             for r in data:
-                org = str(r.get("organization_name", r.get("organization_marketing_name", r.get("plan_name", ""))))
-                rows.append({
-                    "contract_year": str(r.get("contract_year", r.get("year", ""))),
-                    "plan_id": str(r.get("contract_id", r.get("plan_id", r.get("h_number", "")))),
-                    "plan_name": str(r.get("plan_name", r.get("plan_marketing_name", ""))),
-                    "organization_name": org,
-                    "organization_normalized": _normalize_name(org),
-                    "plan_type": str(r.get("plan_type", r.get("organization_type", ""))),
-                    "enrollment_count": str(r.get("enrollment", r.get("enrolled", r.get("beneficiaries", "")))),
-                    "capitation_rate": str(r.get("capitation_rate", r.get("payment_rate", ""))),
-                    "total_payment": str(r.get("total_payment", r.get("payment_amount", ""))),
-                    "county": str(r.get("county", r.get("county_name", ""))),
-                    "state": "PR",
-                    "source_doc": endpoint,
-                })
+                org = str(
+                    r.get(
+                        "organization_name",
+                        r.get("organization_marketing_name", r.get("plan_name", "")),
+                    )
+                )
+                rows.append(
+                    {
+                        "contract_year": str(r.get("contract_year", r.get("year", ""))),
+                        "plan_id": str(
+                            r.get("contract_id", r.get("plan_id", r.get("h_number", "")))
+                        ),
+                        "plan_name": str(r.get("plan_name", r.get("plan_marketing_name", ""))),
+                        "organization_name": org,
+                        "organization_normalized": _normalize_name(org),
+                        "plan_type": str(r.get("plan_type", r.get("organization_type", ""))),
+                        "enrollment_count": str(
+                            r.get("enrollment", r.get("enrolled", r.get("beneficiaries", "")))
+                        ),
+                        "capitation_rate": str(r.get("capitation_rate", r.get("payment_rate", ""))),
+                        "total_payment": str(r.get("total_payment", r.get("payment_amount", ""))),
+                        "county": str(r.get("county", r.get("county_name", ""))),
+                        "state": "PR",
+                        "source_doc": endpoint,
+                    }
+                )
             if len(data) < limit:
                 break
             offset += limit
@@ -193,20 +294,22 @@ def _fetch_landscape(session, logger) -> list[dict]:
                     break
         for _, r in df_pr.iterrows():
             org = str(r.get(mapped.get("organization_name", ""), ""))
-            rows.append({
-                "contract_year": str(year),
-                "plan_id": str(r.get(mapped.get("plan_id", ""), "")),
-                "plan_name": str(r.get(mapped.get("plan_name", ""), "")),
-                "organization_name": org,
-                "organization_normalized": _normalize_name(org),
-                "plan_type": str(r.get(mapped.get("plan_type", ""), "")),
-                "enrollment_count": str(r.get(mapped.get("enrollment_count", ""), "")),
-                "capitation_rate": str(r.get(mapped.get("capitation_rate", ""), "")),
-                "total_payment": "",
-                "county": str(r.get(mapped.get("county", ""), "")),
-                "state": "PR",
-                "source_doc": url,
-            })
+            rows.append(
+                {
+                    "contract_year": str(year),
+                    "plan_id": str(r.get(mapped.get("plan_id", ""), "")),
+                    "plan_name": str(r.get(mapped.get("plan_name", ""), "")),
+                    "organization_name": org,
+                    "organization_normalized": _normalize_name(org),
+                    "plan_type": str(r.get(mapped.get("plan_type", ""), "")),
+                    "enrollment_count": str(r.get(mapped.get("enrollment_count", ""), "")),
+                    "capitation_rate": str(r.get(mapped.get("capitation_rate", ""), "")),
+                    "total_payment": "",
+                    "county": str(r.get(mapped.get("county", ""), "")),
+                    "state": "PR",
+                    "source_doc": url,
+                }
+            )
         logger.info(f"  Landscape {year}: {len(df_pr)} PR rows")
         if rows:
             break

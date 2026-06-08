@@ -1,4 +1,5 @@
 """Tests for scripts/write_source_manifests.py."""
+
 import csv
 import json
 

@@ -13,6 +13,7 @@ Usage:
   python3 scripts/download_sbir.py
   python3 scripts/download_sbir.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -63,6 +64,7 @@ MASTER_COLUMNS = [
 # Session
 # ---------------------------------------------------------------------------
 
+
 def _session() -> requests.Session:
     s = requests.Session()
     s.headers.update({"User-Agent": "ContractSweeper/1.0", "Accept": "application/json"})
@@ -72,6 +74,7 @@ def _session() -> requests.Session:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _derive_fiscal_year(year_val) -> str:
     if not year_val or pd.isna(year_val):
@@ -115,8 +118,8 @@ def _paginate(session: requests.Session, logger) -> list[dict]:
     all_records = []
 
     for base_url, count_field, data_field, start_param, size_param, state_param in [
-        (SBIR_API_URL,    "totalCount", "data",    "start", "rows",  "state"),
-        (SBIR_SEARCH_URL, "total",      "results", "start", "count", "firm_state"),
+        (SBIR_API_URL, "totalCount", "data", "start", "rows", "state"),
+        (SBIR_SEARCH_URL, "total", "results", "start", "count", "firm_state"),
     ]:
         logger.info(f"  Trying endpoint: {base_url}")
         params = {state_param: "PR", size_param: PAGE_SIZE, "start": 0}
@@ -151,7 +154,9 @@ def _paginate(session: requests.Session, logger) -> list[dict]:
                 if isinstance(page_data, list):
                     page_records = page_data
                 else:
-                    page_records = page_data.get(data_field, []) or page_data.get("awards", []) or []
+                    page_records = (
+                        page_data.get(data_field, []) or page_data.get("awards", []) or []
+                    )
                 if not page_records:
                     break
                 all_records.extend(page_records)
@@ -180,22 +185,23 @@ def _records_to_df(records: list[dict], source_file: str) -> pd.DataFrame:
     # Build award_id from contract number or a composite
     contract = col("contract", "award_id", "solicitation_number")
     col("program", "program_name")
-    df["award_id"] = "SBIR-" + contract.where(contract.str.strip() != "",
-                                               other=df.index.astype(str))
+    df["award_id"] = "SBIR-" + contract.where(
+        contract.str.strip() != "", other=df.index.astype(str)
+    )
 
-    df["recipient_name"]      = col("firm", "company", "recipient_name")
-    df["recipient_uei"]       = col("uei", "recipient_uei")
-    df["awarding_agency"]     = col("agency", "awarding_agency")
+    df["recipient_name"] = col("firm", "company", "recipient_name")
+    df["recipient_uei"] = col("uei", "recipient_uei")
+    df["awarding_agency"] = col("agency", "awarding_agency")
     df["awarding_sub_agency"] = col("branch", "program_name")
-    df["obligated_amount"]    = col("amount", "award_amount")
-    df["award_date"]          = col("award_date", "date_signed")
-    df["fiscal_year"]         = col("award_year", "fiscal_year").apply(_derive_fiscal_year)
-    df["pop_state"]           = "PR"
-    df["pop_county"]          = col("place_name", "city")
-    df["description"]         = col("award_title", "abstract", "title")
-    df["source_file"]         = source_file
-    df["source_dataset"]      = "sbir"
-    df["award_category"]      = "grant"
+    df["obligated_amount"] = col("amount", "award_amount")
+    df["award_date"] = col("award_date", "date_signed")
+    df["fiscal_year"] = col("award_year", "fiscal_year").apply(_derive_fiscal_year)
+    df["pop_state"] = "PR"
+    df["pop_county"] = col("place_name", "city")
+    df["description"] = col("award_title", "abstract", "title")
+    df["source_file"] = source_file
+    df["source_dataset"] = "sbir"
+    df["award_category"] = "grant"
 
     for c in MASTER_COLUMNS:
         if c not in df.columns:
@@ -216,6 +222,7 @@ def _file_has_data(filepath: Path) -> bool:
 # ---------------------------------------------------------------------------
 # Entry points
 # ---------------------------------------------------------------------------
+
 
 def run(root: Path = None) -> dict:
     return _run(root=root, force=False)

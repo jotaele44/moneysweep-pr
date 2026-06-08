@@ -21,6 +21,7 @@ CLI::
     python scripts/build_dashboard_explorer.py            # write the HTML + manifest
     python scripts/build_dashboard_explorer.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -42,7 +43,14 @@ OUT = "exports/dashboard/index.html"
 MANIFEST_OUT = "data/manifests/dashboard_explorer.json"
 
 # Markers a valid render must contain (also asserted by the test).
-REQUIRED_MARKERS = ("Contract Sweeper", "id=\"reports\"", "id=\"lineage\"", "id=\"gaps\"", "id=\"letters\"", "application/json")
+REQUIRED_MARKERS = (
+    "Contract Sweeper",
+    'id="reports"',
+    'id="lineage"',
+    'id="gaps"',
+    'id="letters"',
+    "application/json",
+)
 
 
 def _read_json(root: Path, rel: str) -> Any:

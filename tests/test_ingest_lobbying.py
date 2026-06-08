@@ -1,4 +1,5 @@
 """Tests for the canonical_v1 lobbying ingester (WS-H)."""
+
 import pytest
 
 from contract_sweeper.validation import canonical_v1_schema as cv1
@@ -30,9 +31,9 @@ def test_rows_and_evidence_validate(built):
     evidence_ids = {e.evidence_id for e in built["evidence_rows"]}
     for row in built["lobbying_rows"]:
         assert cv1.validate_row(row, lob_schema) == [], row
-        assert row["lobbyist_entity_id"] in entity_ids        # no broken reference
+        assert row["lobbyist_entity_id"] in entity_ids  # no broken reference
         assert row["client_entity_id"] in entity_ids
-        assert row["evidence_id"] in evidence_ids             # no provenance -> no row
+        assert row["evidence_id"] in evidence_ids  # no provenance -> no row
     for ev in built["evidence_rows"]:
         assert cv1.validate_row(ev.as_row(), ev_schema) == [], ev
 

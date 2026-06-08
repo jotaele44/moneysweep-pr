@@ -13,9 +13,7 @@ from contract_sweeper.pipeline.source_recovery_pause_lock import run_source_reco
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Run R4.9Z source recovery pause and status lock"
-    )
+    parser = argparse.ArgumentParser(description="Run R4.9Z source recovery pause and status lock")
     parser.add_argument("--root", default=".", help="Project root")
     args = parser.parse_args()
 

@@ -210,9 +210,7 @@ def validate_all() -> list[str]:
 def main(argv: Iterable[str] | None = None) -> int:
     """CLI entrypoint."""
 
-    parser = argparse.ArgumentParser(
-        description="Validate top-form development control artifacts."
-    )
+    parser = argparse.ArgumentParser(description="Validate top-form development control artifacts.")
     parser.add_argument(
         "--json",
         action="store_true",

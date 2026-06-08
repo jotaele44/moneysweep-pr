@@ -16,6 +16,7 @@ CLI::
     python scripts/build_gis_layer_manifest.py            # write the manifest
     python scripts/build_gis_layer_manifest.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -173,7 +174,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         manifest = build_manifest(root)
         problems = check(manifest, root)
-        print(json.dumps({"ok": not problems, "layer_count": len(manifest["layers"]), "problems": problems}, indent=2))
+        print(
+            json.dumps(
+                {"ok": not problems, "layer_count": len(manifest["layers"]), "problems": problems},
+                indent=2,
+            )
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

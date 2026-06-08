@@ -12,6 +12,7 @@ Usage:
   python3 scripts/write_source_manifests.py --required-only
   python3 scripts/write_source_manifests.py --dry-run
 """
+
 from __future__ import annotations
 
 import argparse
@@ -52,12 +53,14 @@ def _profile_source(root: Path, src: dict) -> list[dict]:
                 )
             )
         except Exception as exc:
-            items.append({
-                "relative_path": p.relative_to(root).as_posix(),
-                "source_system": src["source_id"],
-                "validation_status": "error",
-                "error": str(exc),
-            })
+            items.append(
+                {
+                    "relative_path": p.relative_to(root).as_posix(),
+                    "source_system": src["source_id"],
+                    "validation_status": "error",
+                    "error": str(exc),
+                }
+            )
     return items
 
 

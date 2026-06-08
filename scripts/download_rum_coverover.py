@@ -31,10 +31,16 @@ import requests
 from scripts.config import PROJECT_ROOT, setup_logging
 
 RUM_COLUMNS = [
-    "fiscal_year", "rum_gallons_pr", "rum_proof_gallons_pr",
-    "excise_tax_rate_per_proof_gallon", "excise_tax_estimated",
-    "coverover_amount_pr", "allocation_prepa", "allocation_hta",
-    "allocation_general_fund", "source_doc",
+    "fiscal_year",
+    "rum_gallons_pr",
+    "rum_proof_gallons_pr",
+    "excise_tax_rate_per_proof_gallon",
+    "excise_tax_estimated",
+    "coverover_amount_pr",
+    "allocation_prepa",
+    "allocation_hta",
+    "allocation_general_fund",
+    "source_doc",
 ]
 
 # TTB statistics URLs (vary by year; try known patterns)
@@ -58,41 +64,90 @@ RETRY_BACKOFF = [2, 4, 8]
 # Known historical rum cover-over amounts (FY, based on public records and AAFAF reports)
 # Used as fallback when live data is unavailable
 KNOWN_COVEROVER = [
-    {"fiscal_year": "2017", "rum_gallons_pr": 28_500_000, "rum_proof_gallons_pr": 57_000_000,
-     "excise_tax_rate_per_proof_gallon": 13.25, "excise_tax_estimated": 755_250_000,
-     "coverover_amount_pr": 440_000_000, "allocation_prepa": 110_000_000,
-     "allocation_hta": 55_000_000, "allocation_general_fund": 275_000_000,
-     "source_doc": "AAFAF FY2017 Annual Report (estimated)"},
-    {"fiscal_year": "2018", "rum_gallons_pr": 26_000_000, "rum_proof_gallons_pr": 52_000_000,
-     "excise_tax_rate_per_proof_gallon": 13.25, "excise_tax_estimated": 689_000_000,
-     "coverover_amount_pr": 415_000_000, "allocation_prepa": 103_750_000,
-     "allocation_hta": 51_875_000, "allocation_general_fund": 259_375_000,
-     "source_doc": "AAFAF FY2018 Annual Report (estimated)"},
-    {"fiscal_year": "2019", "rum_gallons_pr": 29_000_000, "rum_proof_gallons_pr": 58_000_000,
-     "excise_tax_rate_per_proof_gallon": 13.25, "excise_tax_estimated": 768_500_000,
-     "coverover_amount_pr": 446_000_000, "allocation_prepa": 111_500_000,
-     "allocation_hta": 55_750_000, "allocation_general_fund": 278_750_000,
-     "source_doc": "AAFAF FY2019 Annual Report (estimated)"},
-    {"fiscal_year": "2020", "rum_gallons_pr": 31_000_000, "rum_proof_gallons_pr": 62_000_000,
-     "excise_tax_rate_per_proof_gallon": 13.25, "excise_tax_estimated": 821_500_000,
-     "coverover_amount_pr": 460_000_000, "allocation_prepa": 115_000_000,
-     "allocation_hta": 57_500_000, "allocation_general_fund": 287_500_000,
-     "source_doc": "AAFAF FY2020 Annual Report (estimated)"},
-    {"fiscal_year": "2021", "rum_gallons_pr": 33_000_000, "rum_proof_gallons_pr": 66_000_000,
-     "excise_tax_rate_per_proof_gallon": 13.25, "excise_tax_estimated": 874_500_000,
-     "coverover_amount_pr": 490_000_000, "allocation_prepa": 122_500_000,
-     "allocation_hta": 61_250_000, "allocation_general_fund": 306_250_000,
-     "source_doc": "AAFAF FY2021 Annual Report (estimated)"},
-    {"fiscal_year": "2022", "rum_gallons_pr": 34_000_000, "rum_proof_gallons_pr": 68_000_000,
-     "excise_tax_rate_per_proof_gallon": 13.25, "excise_tax_estimated": 901_000_000,
-     "coverover_amount_pr": 505_000_000, "allocation_prepa": 126_250_000,
-     "allocation_hta": 63_125_000, "allocation_general_fund": 315_625_000,
-     "source_doc": "AAFAF FY2022 Annual Report (estimated)"},
-    {"fiscal_year": "2023", "rum_gallons_pr": 35_000_000, "rum_proof_gallons_pr": 70_000_000,
-     "excise_tax_rate_per_proof_gallon": 13.25, "excise_tax_estimated": 927_500_000,
-     "coverover_amount_pr": 520_000_000, "allocation_prepa": 130_000_000,
-     "allocation_hta": 65_000_000, "allocation_general_fund": 325_000_000,
-     "source_doc": "AAFAF FY2023 Annual Report (estimated)"},
+    {
+        "fiscal_year": "2017",
+        "rum_gallons_pr": 28_500_000,
+        "rum_proof_gallons_pr": 57_000_000,
+        "excise_tax_rate_per_proof_gallon": 13.25,
+        "excise_tax_estimated": 755_250_000,
+        "coverover_amount_pr": 440_000_000,
+        "allocation_prepa": 110_000_000,
+        "allocation_hta": 55_000_000,
+        "allocation_general_fund": 275_000_000,
+        "source_doc": "AAFAF FY2017 Annual Report (estimated)",
+    },
+    {
+        "fiscal_year": "2018",
+        "rum_gallons_pr": 26_000_000,
+        "rum_proof_gallons_pr": 52_000_000,
+        "excise_tax_rate_per_proof_gallon": 13.25,
+        "excise_tax_estimated": 689_000_000,
+        "coverover_amount_pr": 415_000_000,
+        "allocation_prepa": 103_750_000,
+        "allocation_hta": 51_875_000,
+        "allocation_general_fund": 259_375_000,
+        "source_doc": "AAFAF FY2018 Annual Report (estimated)",
+    },
+    {
+        "fiscal_year": "2019",
+        "rum_gallons_pr": 29_000_000,
+        "rum_proof_gallons_pr": 58_000_000,
+        "excise_tax_rate_per_proof_gallon": 13.25,
+        "excise_tax_estimated": 768_500_000,
+        "coverover_amount_pr": 446_000_000,
+        "allocation_prepa": 111_500_000,
+        "allocation_hta": 55_750_000,
+        "allocation_general_fund": 278_750_000,
+        "source_doc": "AAFAF FY2019 Annual Report (estimated)",
+    },
+    {
+        "fiscal_year": "2020",
+        "rum_gallons_pr": 31_000_000,
+        "rum_proof_gallons_pr": 62_000_000,
+        "excise_tax_rate_per_proof_gallon": 13.25,
+        "excise_tax_estimated": 821_500_000,
+        "coverover_amount_pr": 460_000_000,
+        "allocation_prepa": 115_000_000,
+        "allocation_hta": 57_500_000,
+        "allocation_general_fund": 287_500_000,
+        "source_doc": "AAFAF FY2020 Annual Report (estimated)",
+    },
+    {
+        "fiscal_year": "2021",
+        "rum_gallons_pr": 33_000_000,
+        "rum_proof_gallons_pr": 66_000_000,
+        "excise_tax_rate_per_proof_gallon": 13.25,
+        "excise_tax_estimated": 874_500_000,
+        "coverover_amount_pr": 490_000_000,
+        "allocation_prepa": 122_500_000,
+        "allocation_hta": 61_250_000,
+        "allocation_general_fund": 306_250_000,
+        "source_doc": "AAFAF FY2021 Annual Report (estimated)",
+    },
+    {
+        "fiscal_year": "2022",
+        "rum_gallons_pr": 34_000_000,
+        "rum_proof_gallons_pr": 68_000_000,
+        "excise_tax_rate_per_proof_gallon": 13.25,
+        "excise_tax_estimated": 901_000_000,
+        "coverover_amount_pr": 505_000_000,
+        "allocation_prepa": 126_250_000,
+        "allocation_hta": 63_125_000,
+        "allocation_general_fund": 315_625_000,
+        "source_doc": "AAFAF FY2022 Annual Report (estimated)",
+    },
+    {
+        "fiscal_year": "2023",
+        "rum_gallons_pr": 35_000_000,
+        "rum_proof_gallons_pr": 70_000_000,
+        "excise_tax_rate_per_proof_gallon": 13.25,
+        "excise_tax_estimated": 927_500_000,
+        "coverover_amount_pr": 520_000_000,
+        "allocation_prepa": 130_000_000,
+        "allocation_hta": 65_000_000,
+        "allocation_general_fund": 325_000_000,
+        "source_doc": "AAFAF FY2023 Annual Report (estimated)",
+    },
 ]
 
 
@@ -181,10 +236,12 @@ def _run(root=None, force=False):
     if treasury_records:
         # Build DataFrame from Treasury API records
         df = pd.DataFrame(treasury_records)
-        df = df.rename(columns={
-            "record_fiscal_year": "fiscal_year",
-            "transaction_amount": "coverover_amount_pr",
-        })
+        df = df.rename(
+            columns={
+                "record_fiscal_year": "fiscal_year",
+                "transaction_amount": "coverover_amount_pr",
+            }
+        )
         df["source_doc"] = "Treasury FiscalData API (Section 7652)"
         for col in RUM_COLUMNS:
             if col not in df.columns:

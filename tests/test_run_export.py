@@ -5,6 +5,7 @@ production-valid v1.2.0 package from the committed sample master fixtures,
 independent of the (paused) production pipeline. This is what the scheduled
 `federation-export` workflow runs once real masters are available.
 """
+
 from __future__ import annotations
 
 import json

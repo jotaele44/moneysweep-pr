@@ -205,7 +205,11 @@ def _has_cache_guard(script_path: Path) -> bool:
     if not script_path.exists():
         return False
     text = script_path.read_text(encoding="utf-8", errors="replace")
-    return ("CACHED" in text) or ("already exists" in text and "--force" in text) or ("skipping" in text.lower() and "--force" in text)
+    return (
+        ("CACHED" in text)
+        or ("already exists" in text and "--force" in text)
+        or ("skipping" in text.lower() and "--force" in text)
+    )
 
 
 def build_artifact_lineage_rows(root: Path) -> list[dict[str, Any]]:
@@ -240,7 +244,9 @@ def build_artifact_lineage_rows(root: Path) -> list[dict[str, Any]]:
             was_recomputed = False
 
         cache_hit = bool(exists and cache_guard and not was_recomputed)
-        stale_candidate = bool(exists and input_max is not None and stat and stat.st_mtime < input_max)
+        stale_candidate = bool(
+            exists and input_max is not None and stat and stat.st_mtime < input_max
+        )
 
         rows.append(
             {
@@ -264,4 +270,3 @@ def build_artifact_lineage_rows(root: Path) -> list[dict[str, Any]]:
         )
 
     return rows
-

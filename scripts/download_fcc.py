@@ -20,6 +20,7 @@ Output:
 Usage:
   python3 scripts/download_fcc.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -42,38 +43,67 @@ MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 FCC_COLUMNS = [
-    "program_year", "program_type",
-    "recipient_name", "recipient_normalized",
-    "city", "state",
-    "funding_amount", "category",
-    "application_id", "source_doc",
+    "program_year",
+    "program_type",
+    "recipient_name",
+    "recipient_normalized",
+    "city",
+    "state",
+    "funding_amount",
+    "category",
+    "application_id",
+    "source_doc",
 ]
 
 KNOWN_FCC_DATA = [
-    {"program_year": "2023", "program_type": "E-Rate",
-     "recipient_name": "Puerto Rico Department of Education",
-     "recipient_normalized": "puerto rico department of education",
-     "city": "San Juan", "state": "PR", "funding_amount": "45000000",
-     "category": "Category 1 Telecommunications", "application_id": "FCC-PR-ERATE-2023-001",
-     "source_doc": "usac_erate_known_seed"},
-    {"program_year": "2023", "program_type": "Connect America Fund",
-     "recipient_name": "Liberty Puerto Rico",
-     "recipient_normalized": "liberty puerto rico",
-     "city": "San Juan", "state": "PR", "funding_amount": "28000000",
-     "category": "High-Cost Support", "application_id": "FCC-PR-CAF-2023-001",
-     "source_doc": "fcc_caf_known_seed"},
-    {"program_year": "2023", "program_type": "Rural Health Care",
-     "recipient_name": "San Juan VA Medical Center",
-     "recipient_normalized": "san juan va medical center",
-     "city": "San Juan", "state": "PR", "funding_amount": "1200000",
-     "category": "Healthcare Connect Fund", "application_id": "FCC-PR-RHC-2023-001",
-     "source_doc": "usac_rhc_known_seed"},
-    {"program_year": "2022", "program_type": "E-Rate",
-     "recipient_name": "University of Puerto Rico System",
-     "recipient_normalized": "university of puerto rico system",
-     "city": "San Juan", "state": "PR", "funding_amount": "8500000",
-     "category": "Category 2 Internal Connections", "application_id": "FCC-PR-ERATE-2022-001",
-     "source_doc": "usac_erate_known_seed"},
+    {
+        "program_year": "2023",
+        "program_type": "E-Rate",
+        "recipient_name": "Puerto Rico Department of Education",
+        "recipient_normalized": "puerto rico department of education",
+        "city": "San Juan",
+        "state": "PR",
+        "funding_amount": "45000000",
+        "category": "Category 1 Telecommunications",
+        "application_id": "FCC-PR-ERATE-2023-001",
+        "source_doc": "usac_erate_known_seed",
+    },
+    {
+        "program_year": "2023",
+        "program_type": "Connect America Fund",
+        "recipient_name": "Liberty Puerto Rico",
+        "recipient_normalized": "liberty puerto rico",
+        "city": "San Juan",
+        "state": "PR",
+        "funding_amount": "28000000",
+        "category": "High-Cost Support",
+        "application_id": "FCC-PR-CAF-2023-001",
+        "source_doc": "fcc_caf_known_seed",
+    },
+    {
+        "program_year": "2023",
+        "program_type": "Rural Health Care",
+        "recipient_name": "San Juan VA Medical Center",
+        "recipient_normalized": "san juan va medical center",
+        "city": "San Juan",
+        "state": "PR",
+        "funding_amount": "1200000",
+        "category": "Healthcare Connect Fund",
+        "application_id": "FCC-PR-RHC-2023-001",
+        "source_doc": "usac_rhc_known_seed",
+    },
+    {
+        "program_year": "2022",
+        "program_type": "E-Rate",
+        "recipient_name": "University of Puerto Rico System",
+        "recipient_normalized": "university of puerto rico system",
+        "city": "San Juan",
+        "state": "PR",
+        "funding_amount": "8500000",
+        "category": "Category 2 Internal Connections",
+        "application_id": "FCC-PR-ERATE-2022-001",
+        "source_doc": "usac_erate_known_seed",
+    },
 ]
 
 # Known USAC open data dataset identifiers (Socrata)
@@ -91,10 +121,12 @@ USAC_DATASETS = [
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR FCC USF telecom subsidy research)",
-        "Accept": "application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR FCC USF telecom subsidy research)",
+            "Accept": "application/json",
+        }
+    )
     return s
 
 
@@ -115,7 +147,7 @@ def _get_json(session: requests.Session, url: str, params: dict, logger) -> list
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -124,6 +156,7 @@ def _get_json(session: requests.Session, url: str, params: dict, logger) -> list
 
 def _normalize_name(name: str) -> str:
     import re
+
     if not name:
         return ""
     n = re.sub(r"[^\w\s]", " ", name.upper())
@@ -135,8 +168,9 @@ def _normalize_name(name: str) -> str:
     return " ".join(tokens)
 
 
-def _fetch_usac_dataset(session: requests.Session, url: str, program_type: str,
-                         state_field: str, logger) -> list[dict]:
+def _fetch_usac_dataset(
+    session: requests.Session, url: str, program_type: str, state_field: str, logger
+) -> list[dict]:
     rows = []
     limit = 1000
     offset = 0
@@ -166,9 +200,13 @@ def _fetch_usac_dataset(session: requests.Session, url: str, program_type: str,
                 data = _get_json(session, url, params, logger)
                 if not data or not isinstance(data, list):
                     break
-                pr_rows = [r for r in data
-                           if any(str(r.get(state_field, "")).upper() in ("PR", "PUERTO RICO")
-                                  for _ in [1])]
+                pr_rows = [
+                    r
+                    for r in data
+                    if any(
+                        str(r.get(state_field, "")).upper() in ("PR", "PUERTO RICO") for _ in [1]
+                    )
+                ]
                 rows.extend(pr_rows)
                 if len(data) < limit:
                     break
@@ -194,7 +232,10 @@ def _fetch_fcc_opendata(session: requests.Session, logger) -> list[dict]:
             return rows
         for view in data[:20]:
             name = str(view.get("name", "")).lower()
-            if not any(kw in name for kw in ["erate", "e-rate", "usf", "universal service", "usac", "lifeline"]):
+            if not any(
+                kw in name
+                for kw in ["erate", "e-rate", "usf", "universal service", "usac", "lifeline"]
+            ):
                 continue
             view_id = view.get("id", "")
             if not view_id:
@@ -225,23 +266,40 @@ def _normalize_records(all_rows: list[dict], logger) -> pd.DataFrame:
     rename = {}
     for col in df.columns:
         cl = col.lower().replace(" ", "_").replace("-", "_")
-        if ("year" in cl or "funding_year" in cl or "program_year" in cl) and "program_year" not in rename.values():
+        if (
+            "year" in cl or "funding_year" in cl or "program_year" in cl
+        ) and "program_year" not in rename.values():
             rename[col] = "program_year"
         elif "_program_type" == col and "program_type" not in rename.values():
             rename[col] = "program_type"
-        elif ("applicant" in cl or "recipient" in cl or "entity" in cl or "school" in cl
-              or "org" in cl) and "name" in cl and "recipient_name" not in rename.values():
+        elif (
+            (
+                "applicant" in cl
+                or "recipient" in cl
+                or "entity" in cl
+                or "school" in cl
+                or "org" in cl
+            )
+            and "name" in cl
+            and "recipient_name" not in rename.values()
+        ):
             rename[col] = "recipient_name"
         elif ("city" in cl or "urban" in cl) and "city" not in rename.values():
             rename[col] = "city"
-        elif col.lower() in ("state", "state_name", "state_abbreviation") and "state" not in rename.values():
+        elif (
+            col.lower() in ("state", "state_name", "state_abbreviation")
+            and "state" not in rename.values()
+        ):
             rename[col] = "state"
-        elif ("amount" in cl or "commitment" in cl or "disbursement" in cl or "funding" in cl
-              ) and "funding_amount" not in rename.values():
+        elif (
+            "amount" in cl or "commitment" in cl or "disbursement" in cl or "funding" in cl
+        ) and "funding_amount" not in rename.values():
             rename[col] = "funding_amount"
         elif ("category" in cl or "service" in cl) and "category" not in rename.values():
             rename[col] = "category"
-        elif ("application" in cl or "frn" in cl or "ben" in cl) and "application_id" not in rename.values():
+        elif (
+            "application" in cl or "frn" in cl or "ben" in cl
+        ) and "application_id" not in rename.values():
             rename[col] = "application_id"
 
     df = df.rename(columns=rename)

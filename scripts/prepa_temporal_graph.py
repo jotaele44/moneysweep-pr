@@ -66,7 +66,9 @@ def within_days(a: date, b: date, window_days: int) -> bool:
     return abs((a - b).days) <= window_days
 
 
-def build_temporal_edges(graph: dict[str, Any], milestones: list[dict[str, str]], window_days: int) -> list[dict[str, Any]]:
+def build_temporal_edges(
+    graph: dict[str, Any], milestones: list[dict[str, str]], window_days: int
+) -> list[dict[str, Any]]:
     parsed_milestones = []
     for milestone in milestones:
         milestone_date = parse_date(milestone.get("date"))
@@ -98,7 +100,9 @@ def build_temporal_edges(graph: dict[str, Any], milestones: list[dict[str, str]]
                         "confidence": flag.get("confidence"),
                     }
                 )
-    return sorted(edges, key=lambda item: (item["sector"], item["record_date"], item["normalized_name"]))
+    return sorted(
+        edges, key=lambda item: (item["sector"], item["record_date"], item["normalized_name"])
+    )
 
 
 def write_edges_csv(edges: list[dict[str, Any]], path: Path) -> None:
@@ -131,14 +135,18 @@ def write_sector_summary(edges: list[dict[str, Any]], path: Path) -> None:
 
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["sector", "temporal_edges", "milestone_type_breakdown"])
+        writer = csv.DictWriter(
+            handle, fieldnames=["sector", "temporal_edges", "milestone_type_breakdown"]
+        )
         writer.writeheader()
         for sector, count in sector_counter.most_common():
             writer.writerow(
                 {
                     "sector": sector,
                     "temporal_edges": count,
-                    "milestone_type_breakdown": json.dumps(dict(type_counter[sector]), sort_keys=True),
+                    "milestone_type_breakdown": json.dumps(
+                        dict(type_counter[sector]), sort_keys=True
+                    ),
                 }
             )
 
@@ -174,7 +182,17 @@ def main() -> int:
         encoding="utf-8",
     )
 
-    print(json.dumps({"temporal_edges": len(edges), "edges_csv": str(edges_csv), "sector_summary": str(sector_csv), "temporal_json": str(temporal_json)}, indent=2))
+    print(
+        json.dumps(
+            {
+                "temporal_edges": len(edges),
+                "edges_csv": str(edges_csv),
+                "sector_summary": str(sector_csv),
+                "temporal_json": str(temporal_json),
+            },
+            indent=2,
+        )
+    )
     return 0
 
 

@@ -4,6 +4,7 @@ Fully offline: the producer surfaces low-confidence master rows and validates
 against the existing ``schemas/canonical_v1/review_queue.schema.json`` via the
 stdlib canonical_v1 schema interpreter (no ``jsonschema`` dependency).
 """
+
 from __future__ import annotations
 
 import csv
@@ -84,7 +85,9 @@ def test_referential_integrity(rows):
 @pytest.mark.integration
 def test_regenerates_identically(rows):
     out_path = REPO_ROOT / brq.REVIEW_QUEUE_OUT
-    assert out_path.exists(), "review queue not written — run scripts/build_entity_resolution_review_queue.py"
+    assert out_path.exists(), (
+        "review queue not written — run scripts/build_entity_resolution_review_queue.py"
+    )
     with out_path.open(newline="", encoding="utf-8") as fh:
         committed = list(csv.DictReader(fh))
     assert len(committed) == len(rows)

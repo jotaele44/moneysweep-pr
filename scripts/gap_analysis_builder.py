@@ -12,6 +12,7 @@ Usage:
   python3 scripts/gap_analysis_builder.py
   python3 scripts/gap_analysis_builder.py --root /path/to/repo
 """
+
 from __future__ import annotations
 
 import argparse
@@ -22,6 +23,7 @@ from pathlib import Path
 from typing import Any
 
 import sys
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 MIN_ROWS_FOR_POPULATED = 1
@@ -78,8 +80,15 @@ def _source_status(root: Path, src: dict) -> str:
 
 
 STATUS_CSV_FIELDS = [
-    "source_id", "family", "required", "authentication", "producer_script",
-    "expected_outputs", "update_cadence", "pipeline_status", "blocker_notes",
+    "source_id",
+    "family",
+    "required",
+    "authentication",
+    "producer_script",
+    "expected_outputs",
+    "update_cadence",
+    "pipeline_status",
+    "blocker_notes",
 ]
 
 
@@ -94,17 +103,19 @@ def write_status_csv(root: Path, sources: list[dict] | None = None) -> Path:
         sources = _read_registry(root)
     rows = []
     for src in sources:
-        rows.append({
-            "source_id": src.get("source_id", ""),
-            "family": src.get("family", ""),
-            "required": bool(src.get("required", False)),
-            "authentication": src.get("authentication", ""),
-            "producer_script": src.get("producer_script", ""),
-            "expected_outputs": ";".join(src.get("expected_outputs", [])),
-            "update_cadence": src.get("update_cadence", ""),
-            "pipeline_status": _source_status(root, src),
-            "blocker_notes": " ".join((src.get("notes") or "").split()),
-        })
+        rows.append(
+            {
+                "source_id": src.get("source_id", ""),
+                "family": src.get("family", ""),
+                "required": bool(src.get("required", False)),
+                "authentication": src.get("authentication", ""),
+                "producer_script": src.get("producer_script", ""),
+                "expected_outputs": ";".join(src.get("expected_outputs", [])),
+                "update_cadence": src.get("update_cadence", ""),
+                "pipeline_status": _source_status(root, src),
+                "blocker_notes": " ".join((src.get("notes") or "").split()),
+            }
+        )
     out = root / "reports" / "source_registry_status.csv"
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", encoding="utf-8", newline="") as f:
@@ -118,9 +129,12 @@ def build_gap_analysis(root: Path) -> dict[str, Any]:
     sources = _read_registry(root)
     records: list[dict] = []
     summary: dict[str, int] = {
-        "total_sources": 0, "required_sources": 0,
-        "fully_materialized": 0, "partially_materialized": 0,
-        "not_materialized": 0, "optional_not_materialized": 0,
+        "total_sources": 0,
+        "required_sources": 0,
+        "fully_materialized": 0,
+        "partially_materialized": 0,
+        "not_materialized": 0,
+        "optional_not_materialized": 0,
     }
 
     for src in sources:
@@ -154,7 +168,9 @@ def build_gap_analysis(root: Path) -> dict[str, Any]:
             source_status = "partially_materialized"
         else:
             # All present — check min_rows for CSVs
-            under_threshold = [f for f in present if f["row_count"] != -1 and f["row_count"] < min_rows]
+            under_threshold = [
+                f for f in present if f["row_count"] != -1 and f["row_count"] < min_rows
+            ]
             source_status = "below_threshold" if under_threshold else "fully_materialized"
 
         if source_status == "fully_materialized":
@@ -169,29 +185,37 @@ def build_gap_analysis(root: Path) -> dict[str, Any]:
 
         total_rows = sum(f["row_count"] for f in present if f["row_count"] > 0)
 
-        records.append({
-            "source_id": sid,
-            "family": family,
-            "required": required,
-            "authentication": auth,
-            "expected_output_count": len(expected),
-            "present_count": len(present),
-            "missing_count": len(missing),
-            "empty_count": len(empty),
-            "source_status": source_status,
-            "total_rows_present": total_rows,
-            "min_rows_threshold": min_rows,
-            "first_expected_output": expected[0] if expected else "",
-            "blocker_notes": src.get("notes", "")[:200] if src.get("notes") else "",
-        })
+        records.append(
+            {
+                "source_id": sid,
+                "family": family,
+                "required": required,
+                "authentication": auth,
+                "expected_output_count": len(expected),
+                "present_count": len(present),
+                "missing_count": len(missing),
+                "empty_count": len(empty),
+                "source_status": source_status,
+                "total_rows_present": total_rows,
+                "min_rows_threshold": min_rows,
+                "first_expected_output": expected[0] if expected else "",
+                "blocker_notes": src.get("notes", "")[:200] if src.get("notes") else "",
+            }
+        )
 
-    records.sort(key=lambda r: (
-        0 if r["required"] else 1,
-        0 if r["source_status"] == "not_materialized" else
-        1 if r["source_status"] == "partially_materialized" else
-        2 if r["source_status"] == "below_threshold" else 3,
-        r["source_id"],
-    ))
+    records.sort(
+        key=lambda r: (
+            0 if r["required"] else 1,
+            0
+            if r["source_status"] == "not_materialized"
+            else 1
+            if r["source_status"] == "partially_materialized"
+            else 2
+            if r["source_status"] == "below_threshold"
+            else 3,
+            r["source_id"],
+        )
+    )
 
     reports_dir = root / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
@@ -205,10 +229,15 @@ def build_gap_analysis(root: Path) -> dict[str, Any]:
     else:
         csv_path.write_text("", encoding="utf-8")
 
-    coverage_rate = summary["fully_materialized"] / summary["total_sources"] if summary["total_sources"] else 0.0
+    coverage_rate = (
+        summary["fully_materialized"] / summary["total_sources"]
+        if summary["total_sources"]
+        else 0.0
+    )
     required_coverage = (
         (summary["required_sources"] - summary["not_materialized"]) / summary["required_sources"]
-        if summary["required_sources"] else 1.0
+        if summary["required_sources"]
+        else 1.0
     )
 
     result = {

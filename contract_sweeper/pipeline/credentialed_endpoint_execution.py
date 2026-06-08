@@ -155,7 +155,9 @@ def _validate_staged_output(
                 frame = pd.read_parquet(target_abs)
             else:
                 frame = pd.read_csv(target_abs, dtype=str, low_memory=False)
-            missing = [column for column in required_columns if column and column not in frame.columns]
+            missing = [
+                column for column in required_columns if column and column not in frame.columns
+            ]
         except Exception as exc:  # pragma: no cover - defensive
             return False, rows, digest, f"unable to validate required columns: {exc}"
 
@@ -191,7 +193,9 @@ def evaluate_credential_requests(
             forbidden_artifact_usage = True
 
         required_env_vars = _read_script_required_env_vars(root, producer_script)
-        missing_env_vars = [name for name in required_env_vars if not str(os.getenv(name, "")).strip()]
+        missing_env_vars = [
+            name for name in required_env_vars if not str(os.getenv(name, "")).strip()
+        ]
         credentials_available = len(missing_env_vars) == 0
 
         eval_row: dict[str, Any] = {
@@ -316,7 +320,9 @@ def run_credentialed_endpoint_retries(
             still_blocked.append({**result, "review_status": "pending_credentials"})
             continue
 
-        command = str(row.get("safe_retry_command_if_available", "")).strip() or SAFE_ENDPOINT_RETRY_COMMANDS.get(
+        command = str(
+            row.get("safe_retry_command_if_available", "")
+        ).strip() or SAFE_ENDPOINT_RETRY_COMMANDS.get(
             producer_script,
             "",
         )
@@ -408,7 +414,12 @@ def run_producer_patch_retries(
         source_family = str(row.get("source_family", "")).strip()
         producer_script = str(row.get("producer_script", "")).strip()
         failure_reason = str(row.get("failure_reason", "")).strip()
-        patch_safe_now = str(row.get("patch_safe_now", "")).strip().lower() in {"1", "true", "yes", "y"}
+        patch_safe_now = str(row.get("patch_safe_now", "")).strip().lower() in {
+            "1",
+            "true",
+            "yes",
+            "y",
+        }
         manual_source_required = str(row.get("manual_source_required", "")).strip().lower() in {
             "1",
             "true",
@@ -423,7 +434,9 @@ def run_producer_patch_retries(
         required_columns = str(manual_row.get("required_columns", "")).strip()
 
         required_env_vars_list = _read_script_required_env_vars(root, producer_script)
-        missing_env_vars_list = [name for name in required_env_vars_list if not str(os.getenv(name, "")).strip()]
+        missing_env_vars_list = [
+            name for name in required_env_vars_list if not str(os.getenv(name, "")).strip()
+        ]
 
         result: dict[str, Any] = {
             "priority": priority,

@@ -81,7 +81,9 @@ def _compute_parent_uei_coverage(root: Path) -> float:
     return _non_empty_ratio(values)
 
 
-def _detect_fixture_or_synthetic(report_summary: dict[str, Any], prime_sub_summary: dict[str, Any]) -> tuple[bool, list[str]]:
+def _detect_fixture_or_synthetic(
+    report_summary: dict[str, Any], prime_sub_summary: dict[str, Any]
+) -> tuple[bool, list[str]]:
     reasons: list[str] = []
 
     unique_entities = _safe_int(report_summary.get("awards", {}).get("unique_entities"))
@@ -113,7 +115,9 @@ def collect_gate_metrics(root: Path) -> dict[str, Any]:
 
     production_gate = artifact_audit.get("production_gate", {}) if artifact_audit else {}
     fixture_flag = artifact_audit.get("fixture_or_synthetic_data_detected", None)
-    fixture_reasons = artifact_audit.get("fixture_or_synthetic_reasons", []) if artifact_audit else []
+    fixture_reasons = (
+        artifact_audit.get("fixture_or_synthetic_reasons", []) if artifact_audit else []
+    )
 
     if fixture_flag is None:
         fixture_flag, detected = _detect_fixture_or_synthetic(report_summary, prime_sub_summary)
@@ -228,7 +232,11 @@ def load_current_status(root: Path) -> dict[str, Any]:
     status = payload.get("production_status")
     if status not in {STATUS_NON_PRODUCTION, STATUS_PARTIAL, STATUS_VALIDATED}:
         status = STATUS_NON_PRODUCTION
-    message = payload.get("status_message") or payload.get("production_status_message") or _status_message(status)
+    message = (
+        payload.get("status_message")
+        or payload.get("production_status_message")
+        or _status_message(status)
+    )
     return {"production_status": status, "status_message": message}
 
 
@@ -249,7 +257,9 @@ def _write_outputs(root: Path, payload: dict[str, Any], blockers: list[dict[str,
         writer.writerows(blockers)
 
 
-def _stamp_json(path: Path, status: str, generated_at: str, message: str, blocker_count: int) -> bool:
+def _stamp_json(
+    path: Path, status: str, generated_at: str, message: str, blocker_count: int
+) -> bool:
     payload = _read_json(path)
     if not payload:
         return False
@@ -283,7 +293,9 @@ def _stamp_report(path: Path, status: str, message: str) -> bool:
     return True
 
 
-def _stamp_existing_outputs(root: Path, status: str, generated_at: str, message: str, blocker_count: int) -> dict[str, Any]:
+def _stamp_existing_outputs(
+    root: Path, status: str, generated_at: str, message: str, blocker_count: int
+) -> dict[str, Any]:
     stamped_json = 0
     for rel in [REPORT_SUMMARY, POWER_SUMMARY, DOMINANCE_SUMMARY, GRAPH_SUMMARY, PRIME_SUB_SUMMARY]:
         if _stamp_json(root / rel, status, generated_at, message, blocker_count):

@@ -17,6 +17,7 @@ CLI::
     python scripts/ingest_debt.py            # write debt_instruments + evidence
     python scripts/ingest_debt.py --check     # summarize without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -43,9 +44,19 @@ SOURCE_NAME = "EMMA PR Municipal Bonds (known seed)"
 VALID_CLASSES = {"GO", "COFINA", "PREPA", "PRASA", "HTA", "other"}
 
 DEBT_COLUMNS = [
-    "debt_id", "issuer_entity_id", "debt_class", "series", "issue_year",
-    "par_amount", "currency", "maturity_date", "status", "confidence",
-    "evidence_id", "review_status", "notes",
+    "debt_id",
+    "issuer_entity_id",
+    "debt_class",
+    "series",
+    "issue_year",
+    "par_amount",
+    "currency",
+    "maturity_date",
+    "status",
+    "confidence",
+    "evidence_id",
+    "review_status",
+    "notes",
 ]
 
 
@@ -108,29 +119,33 @@ def build_rows(root: Path | None = None) -> dict[str, Any]:
             source_name=SOURCE_NAME,
             source_path_or_url="https://emma.msrb.org/",
             page_or_line_ref=f"CUSIP {cusip}",
-            claim=(f"{issuer} issued '{bond.get('description', '').strip()}' "
-                   f"(CUSIP {cusip}; par {bond.get('par_amount', '')}; "
-                   f"maturity {bond.get('maturity_date', '')})."),
+            claim=(
+                f"{issuer} issued '{bond.get('description', '').strip()}' "
+                f"(CUSIP {cusip}; par {bond.get('par_amount', '')}; "
+                f"maturity {bond.get('maturity_date', '')})."
+            ),
             extraction_method="manual",
             evidence_tier="T2",
             review_status="accepted",
         )
         evidence_rows.append(ev)
-        debt_rows.append({
-            "debt_id": did,
-            "issuer_entity_id": issuer_eid,
-            "debt_class": debt_class,
-            "series": series,
-            "issue_year": year,
-            "par_amount": (bond.get("par_amount") or "").strip(),
-            "currency": "USD",
-            "maturity_date": (bond.get("maturity_date") or "").strip(),
-            "status": "",
-            "confidence": ev.confidence,
-            "evidence_id": ev.evidence_id,
-            "review_status": "accepted",
-            "notes": f"cusip={cusip}; issuer={issuer}",
-        })
+        debt_rows.append(
+            {
+                "debt_id": did,
+                "issuer_entity_id": issuer_eid,
+                "debt_class": debt_class,
+                "series": series,
+                "issue_year": year,
+                "par_amount": (bond.get("par_amount") or "").strip(),
+                "currency": "USD",
+                "maturity_date": (bond.get("maturity_date") or "").strip(),
+                "status": "",
+                "confidence": ev.confidence,
+                "evidence_id": ev.evidence_id,
+                "review_status": "accepted",
+                "notes": f"cusip={cusip}; issuer={issuer}",
+            }
+        )
     return {"debt_rows": debt_rows, "evidence_rows": evidence_rows, "skipped": skipped}
 
 
@@ -185,7 +200,9 @@ def ingest(root: Path | None = None) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Ingest PR municipal bonds into canonical_v1 debt.")
+    parser = argparse.ArgumentParser(
+        description="Ingest PR municipal bonds into canonical_v1 debt."
+    )
     parser.add_argument("--root", default=".")
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
@@ -194,8 +211,17 @@ def main(argv: list[str] | None = None) -> int:
         built = build_rows(root)
         rows = built["debt_rows"]
         problems = check(rows)
-        print(json.dumps({"ok": not problems, "row_count": len(rows),
-                          "skipped": len(built["skipped"]), "problems": problems}, indent=2))
+        print(
+            json.dumps(
+                {
+                    "ok": not problems,
+                    "row_count": len(rows),
+                    "skipped": len(built["skipped"]),
+                    "problems": problems,
+                },
+                indent=2,
+            )
+        )
         return 0 if not problems else 1
     print(json.dumps(ingest(root), indent=2))
     return 0

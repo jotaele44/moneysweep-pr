@@ -102,7 +102,9 @@ def run_source_recovery_pause_lock(root: Path) -> dict[str, Any]:
         len(still_missing_rows),
     )
     retry_suppression_active = bool(watch_status.get("r4_9f_retry_suppression_preserved", False))
-    downstream_blockers_active = bool(watch_status.get("r4_9f_downstream_blockers_preserved", False))
+    downstream_blockers_active = bool(
+        watch_status.get("r4_9f_downstream_blockers_preserved", False)
+    )
     if not downstream_blockers_active:
         downstream_blockers_active = bool(downstream_rows) and all(
             _is_truthy(row.get("blocked")) for row in downstream_rows

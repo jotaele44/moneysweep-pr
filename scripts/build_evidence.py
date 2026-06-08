@@ -14,6 +14,7 @@ CLI::
 
     python scripts/build_evidence.py --claims claims.json --out data/canonical_v1/evidence.csv
 """
+
 from __future__ import annotations
 
 import argparse
@@ -35,9 +36,16 @@ from contract_sweeper.runtime.evidence_tiers import (
 )
 
 EVIDENCE_COLUMNS = [
-    "evidence_id", "source_type", "source_name", "source_path_or_url",
-    "page_or_line_ref", "claim", "evidence_tier", "extraction_method",
-    "confidence", "review_status",
+    "evidence_id",
+    "source_type",
+    "source_name",
+    "source_path_or_url",
+    "page_or_line_ref",
+    "claim",
+    "evidence_tier",
+    "extraction_method",
+    "confidence",
+    "review_status",
 ]
 
 
@@ -98,17 +106,19 @@ def from_claim_records(records: Iterable[dict[str, Any]]) -> list[Evidence]:
     """Build evidence rows from generic claim-record dicts (any source surface)."""
     out: list[Evidence] = []
     for rec in records:
-        out.append(make_evidence(
-            source_type=rec.get("source_type", "other"),
-            source_name=rec.get("source_name", ""),
-            claim=rec.get("claim", ""),
-            source_path_or_url=rec.get("source_path_or_url", ""),
-            page_or_line_ref=str(rec.get("page_or_line_ref", "")),
-            extraction_method=rec.get("extraction_method", "parser"),
-            evidence_tier=rec.get("evidence_tier"),
-            ocr_confidence=rec.get("ocr_confidence"),
-            review_status=rec.get("review_status", "pending"),
-        ))
+        out.append(
+            make_evidence(
+                source_type=rec.get("source_type", "other"),
+                source_name=rec.get("source_name", ""),
+                claim=rec.get("claim", ""),
+                source_path_or_url=rec.get("source_path_or_url", ""),
+                page_or_line_ref=str(rec.get("page_or_line_ref", "")),
+                extraction_method=rec.get("extraction_method", "parser"),
+                evidence_tier=rec.get("evidence_tier"),
+                ocr_confidence=rec.get("ocr_confidence"),
+                review_status=rec.get("review_status", "pending"),
+            )
+        )
     return out
 
 
@@ -127,14 +137,16 @@ def from_csv_source(
         reader = csv.DictReader(fh)
         for i, row in enumerate(reader, start=2):  # line 1 is the header
             claim = claim_template.format(line=i, row=json.dumps(row, ensure_ascii=False))
-            rows.append(make_evidence(
-                source_type=source_type,
-                source_name=source_name,
-                source_path_or_url=str(path),
-                page_or_line_ref=f"row {i}",
-                claim=claim,
-                extraction_method=extraction_method,
-            ))
+            rows.append(
+                make_evidence(
+                    source_type=source_type,
+                    source_name=source_name,
+                    source_path_or_url=str(path),
+                    page_or_line_ref=f"row {i}",
+                    claim=claim,
+                    extraction_method=extraction_method,
+                )
+            )
     return rows
 
 
@@ -150,18 +162,22 @@ def read_evidence(path: Path) -> list[Evidence]:
         for row in csv.DictReader(fh):
             if not (row.get("evidence_id") or "").strip():
                 continue
-            out.append(Evidence(
-                evidence_id=row.get("evidence_id", ""),
-                source_type=row.get("source_type", ""),
-                source_name=row.get("source_name", ""),
-                source_path_or_url=row.get("source_path_or_url", ""),
-                page_or_line_ref=row.get("page_or_line_ref", ""),
-                claim=row.get("claim", ""),
-                evidence_tier=row.get("evidence_tier", ""),
-                extraction_method=row.get("extraction_method", ""),
-                confidence=float(row["confidence"]) if (row.get("confidence") or "").strip() else 0.0,
-                review_status=row.get("review_status", "pending"),
-            ))
+            out.append(
+                Evidence(
+                    evidence_id=row.get("evidence_id", ""),
+                    source_type=row.get("source_type", ""),
+                    source_name=row.get("source_name", ""),
+                    source_path_or_url=row.get("source_path_or_url", ""),
+                    page_or_line_ref=row.get("page_or_line_ref", ""),
+                    claim=row.get("claim", ""),
+                    evidence_tier=row.get("evidence_tier", ""),
+                    extraction_method=row.get("extraction_method", ""),
+                    confidence=float(row["confidence"])
+                    if (row.get("confidence") or "").strip()
+                    else 0.0,
+                    review_status=row.get("review_status", "pending"),
+                )
+            )
     return out
 
 

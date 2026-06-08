@@ -21,6 +21,7 @@ CLI::
     python scripts/build_entity_aliases.py            # write the CSV + manifest
     python scripts/build_entity_aliases.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -46,8 +47,14 @@ SCHEMA = "schemas/entity_aliases.schema.json"
 ALIASES_PREFIX = "aliases="
 
 ENTITY_ALIASES_COLUMNS = [
-    "alias_id", "entity_id", "alias", "normalized_alias",
-    "source_id", "evidence_tier", "confidence", "notes",
+    "alias_id",
+    "entity_id",
+    "alias",
+    "normalized_alias",
+    "source_id",
+    "evidence_tier",
+    "confidence",
+    "notes",
 ]
 
 EVIDENCE_TIER = "T1"
@@ -85,16 +92,18 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
         if not alias or key in seen:
             return
         seen.add(key)
-        rows.append({
-            "alias_id": f"ENT_ALIAS_{name_hash(entity_id + '|' + normalized)}",
-            "entity_id": entity_id,
-            "alias": alias,
-            "normalized_alias": normalized,
-            "source_id": source_id,
-            "evidence_tier": EVIDENCE_TIER,
-            "confidence": CONFIDENCE,
-            "notes": "",
-        })
+        rows.append(
+            {
+                "alias_id": f"ENT_ALIAS_{name_hash(entity_id + '|' + normalized)}",
+                "entity_id": entity_id,
+                "alias": alias,
+                "normalized_alias": normalized,
+                "source_id": source_id,
+                "evidence_tier": EVIDENCE_TIER,
+                "confidence": CONFIDENCE,
+                "notes": "",
+            }
+        )
 
     # Organizations + agencies: aliases live in the notes column as ``aliases=...``.
     with (root / ENTITY_MASTER).open(newline="", encoding="utf-8") as fh:
@@ -102,7 +111,7 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
             notes = (ref.get("notes") or "").strip()
             if not notes.startswith(ALIASES_PREFIX):
                 continue
-            for alias in _split_aliases(notes[len(ALIASES_PREFIX):]):
+            for alias in _split_aliases(notes[len(ALIASES_PREFIX) :]):
                 _emit(ref["entity_id"], alias, (ref.get("source_id") or "").strip())
 
     # Municipios only (ENT_MUNI_): first-class aliases column on agency_master.
@@ -178,7 +187,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

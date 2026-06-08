@@ -10,15 +10,23 @@ from scripts.download_ofac import _parse_sdn_xml
 
 
 class _NullLogger:
-    def info(self, *a, **kw): pass
-    def warning(self, *a, **kw): pass
-    def error(self, *a, **kw): pass
-    def debug(self, *a, **kw): pass
+    def info(self, *a, **kw):
+        pass
+
+    def warning(self, *a, **kw):
+        pass
+
+    def error(self, *a, **kw):
+        pass
+
+    def debug(self, *a, **kw):
+        pass
 
 
 # ---------------------------------------------------------------------------
 # _parse_sdn_xml — namespace detection
 # ---------------------------------------------------------------------------
+
 
 class TestParseSdnXml:
     def test_no_namespace(self):

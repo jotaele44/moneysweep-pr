@@ -195,7 +195,9 @@ def build_backfill_retry_order_r48g(
                 "priority": safe_int(row.get("priority")),
                 "expected_input": expected_input,
                 "source_family": str(row.get("source_family", "")),
-                "next_action": str(row.get("recommended_endpoint_action", "endpoint_resolution_required")),
+                "next_action": str(
+                    row.get("recommended_endpoint_action", "endpoint_resolution_required")
+                ),
                 "reason": str(row.get("reason_blocked", "")),
             },
         )

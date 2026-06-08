@@ -18,6 +18,7 @@ Usage:
   python3 scripts/download_slfrf.py            # full run
   python3 scripts/download_slfrf.py --force    # re-download even if files exist
 """
+
 from __future__ import annotations
 
 import argparse
@@ -50,7 +51,7 @@ USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 #   direct_payments: 06             ← separate group from grants
 #   loans:           07, 08, F003, F004  (SLFRF to PR uses grants/direct only)
 AWARD_TYPE_GROUPS = [
-    ("grants",          ["02", "03", "04", "05"]),
+    ("grants", ["02", "03", "04", "05"]),
     ("direct_payments", ["06"]),
 ]
 
@@ -110,9 +111,11 @@ _HTTP = HttpConfig(
 def _session() -> requests.Session:
     return build_session("ContractSweeper/1.0")
 
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _derive_fiscal_year(date_str) -> str:
     """Derive US fiscal year from a date string. Oct-Dec → year+1."""
@@ -141,6 +144,7 @@ def _file_has_data(filepath: Path) -> bool:
 def _fetch_page(session: requests.Session, payload: dict, logger) -> dict | None:
     return http_post_json(session, USASPENDING_URL, payload, logger=logger, config=_HTTP)
 
+
 def _paginate(session: requests.Session, base_payload: dict, logger) -> list[dict]:
     def _fetch(page):
         payload = {**base_payload, "page": page}
@@ -158,6 +162,7 @@ def _paginate(session: requests.Session, base_payload: dict, logger) -> list[dic
 
     return list(paginate(_fetch, start_marker=1))
 
+
 def _build_payload(type_codes: list) -> dict:
     """Build a spending_by_award payload: Treasury awarding agency + PR recipient + SLFRF window.
 
@@ -167,7 +172,9 @@ def _build_payload(type_codes: list) -> dict:
     return {
         "filters": {
             "award_type_codes": type_codes,
-            "agencies": [{"type": "awarding", "tier": "toptier", "name": "Department of the Treasury"}],
+            "agencies": [
+                {"type": "awarding", "tier": "toptier", "name": "Department of the Treasury"}
+            ],
             "recipient_locations": [{"country": "USA", "state": "PR"}],
             "time_period": [{"start_date": SLFRF_START, "end_date": SLFRF_END}],
         },
@@ -215,6 +222,7 @@ def _results_to_df(results: list[dict], source_file: str) -> pd.DataFrame:
 # Master build
 # ---------------------------------------------------------------------------
 
+
 def build_master(raw_dir: Path, master_path: Path, logger) -> int:
     """Concatenate raw SLFRF files, deduplicate by award_id, write master."""
     files = sorted(raw_dir.glob("slfrf_*.csv"))
@@ -246,6 +254,7 @@ def build_master(raw_dir: Path, master_path: Path, logger) -> int:
 # ---------------------------------------------------------------------------
 # Entry points
 # ---------------------------------------------------------------------------
+
 
 def run(root: Path = None) -> dict:
     """Main entry point (no --force). Returns summary dict."""

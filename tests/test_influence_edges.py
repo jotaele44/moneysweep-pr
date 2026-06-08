@@ -5,6 +5,7 @@ relationships into one influence-edge table and validates against
 ``schemas/influence_edges.schema.json`` via the stdlib canonical_v1 schema
 interpreter (no ``jsonschema`` dependency).
 """
+
 from __future__ import annotations
 
 import csv
@@ -94,7 +95,9 @@ def test_every_edge_has_evidence(rows):
 @pytest.mark.integration
 def test_regenerates_identically(rows):
     out_path = REPO_ROOT / bie.OUT
-    assert out_path.exists(), "influence_edges.csv not written — run scripts/build_influence_edges.py"
+    assert out_path.exists(), (
+        "influence_edges.csv not written — run scripts/build_influence_edges.py"
+    )
     with out_path.open(newline="", encoding="utf-8") as fh:
         committed = list(csv.DictReader(fh))
     assert len(committed) == len(rows)

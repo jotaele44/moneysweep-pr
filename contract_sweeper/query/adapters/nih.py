@@ -8,6 +8,7 @@ NIH Reporter does not accept county- or municipality-level filters for PR,
 so the municipality narrowing in the caller's `Query` is applied
 client-side via `apply_post_ingest` in the dispatcher.
 """
+
 from __future__ import annotations
 
 from typing import Any

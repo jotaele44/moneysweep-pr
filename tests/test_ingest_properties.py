@@ -1,4 +1,5 @@
 """Tests for the canonical_v1 properties ingester (WS-K)."""
+
 import pytest
 
 from contract_sweeper.validation import canonical_v1_schema as cv1
@@ -31,9 +32,9 @@ def test_rows_and_evidence_validate(built):
     evidence_ids = {e.evidence_id for e in built["evidence_rows"]}
     for row in built["property_rows"]:
         assert cv1.validate_row(row, p_schema) == [], row
-        assert row["owner_entity_id"] in entity_ids        # no broken reference
+        assert row["owner_entity_id"] in entity_ids  # no broken reference
         assert row["municipality_id"] in muni_ids
-        assert row["evidence_id"] in evidence_ids          # no provenance -> no row
+        assert row["evidence_id"] in evidence_ids  # no provenance -> no row
     for ev in built["evidence_rows"]:
         assert cv1.validate_row(ev.as_row(), ev_schema) == [], ev
 

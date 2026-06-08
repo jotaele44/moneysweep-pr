@@ -5,6 +5,7 @@ Covers the pure header-mapping / name-normalization transform and the full
 drop-file -> processed-CSV chain. The ingester reads operator-delivered CSV/Excel
 procurement exports from a dropzone (no network), so these run fully offline.
 """
+
 from __future__ import annotations
 
 import csv
@@ -24,6 +25,7 @@ from scripts.ingest_prasa import (
 # Unit: pure transforms
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.unit
 def test_normalize_name_strips_punctuation_and_entity_suffixes():
     assert _normalize_name("Acueductos de PR, Inc.") == "ACUEDUCTOS DE PR"
@@ -33,15 +35,17 @@ def test_normalize_name_strips_punctuation_and_entity_suffixes():
 
 @pytest.mark.unit
 def test_parse_df_maps_spanish_headers_to_canonical_schema():
-    df = pd.DataFrame({
-        "Contratista": ["Acme LLC", "Municipio de Ponce"],
-        "Número de Contrato": ["P-24-15", "P-23-02"],
-        "Tipo de Contrato": ["Servicios", "Construcción"],
-        "Monto": ["1500000", "250000"],
-        "Fecha de Adjudicación": ["2024-01-15", "2023-06-01"],
-        "Estado": ["Activo", "Cerrado"],
-        "Municipio": ["San Juan", "Ponce"],
-    })
+    df = pd.DataFrame(
+        {
+            "Contratista": ["Acme LLC", "Municipio de Ponce"],
+            "Número de Contrato": ["P-24-15", "P-23-02"],
+            "Tipo de Contrato": ["Servicios", "Construcción"],
+            "Monto": ["1500000", "250000"],
+            "Fecha de Adjudicación": ["2024-01-15", "2023-06-01"],
+            "Estado": ["Activo", "Cerrado"],
+            "Municipio": ["San Juan", "Ponce"],
+        }
+    )
     out = _parse_df(df, "contratos_2024.csv", logger=_NullLogger())
     assert list(out.columns) == PRASA_COLUMNS
     assert len(out) == 2
@@ -56,8 +60,9 @@ def test_parse_df_maps_spanish_headers_to_canonical_schema():
 
 @pytest.mark.unit
 def test_parse_df_drops_rows_without_vendor():
-    df = pd.DataFrame({"Contratista": ["Real Vendor", "", "  "],
-                       "Número de Contrato": ["A1", "A2", "A3"]})
+    df = pd.DataFrame(
+        {"Contratista": ["Real Vendor", "", "  "], "Número de Contrato": ["A1", "A2", "A3"]}
+    )
     out = _parse_df(df, "f.csv", logger=_NullLogger())
     assert len(out) == 1
     assert out.iloc[0]["vendor_name"] == "Real Vendor"
@@ -66,6 +71,7 @@ def test_parse_df_drops_rows_without_vendor():
 # ---------------------------------------------------------------------------
 # Integration: full drop-file -> processed chain
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.integration
 def test_run_materializes_processed_output_from_dropzone(tmp_path: Path):

@@ -1,4 +1,5 @@
 """Tests for the lobbying anchor-tagging logic in analyze_political_crossref."""
+
 from __future__ import annotations
 
 import csv

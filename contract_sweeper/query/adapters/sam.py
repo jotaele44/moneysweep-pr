@@ -7,6 +7,7 @@ UEI, legalBusinessName, or CAGE — SAM has no bulk filter.
 ``SAM_API_KEY`` is required; :class:`CredentialMissing` is raised before
 any HTTP call. Rate limit: 1,000 requests/day per key.
 """
+
 from __future__ import annotations
 
 import os
@@ -54,10 +55,12 @@ class SAMEntitiesAdapter(EntityAdapter):
         import requests
 
         s = requests.Session()
-        s.headers.update({
-            "Accept": "application/json",
-            "User-Agent": "contract-sweeper-query/1",
-        })
+        s.headers.update(
+            {
+                "Accept": "application/json",
+                "User-Agent": "contract-sweeper-query/1",
+            }
+        )
         return s
 
     def _get(self, session, params: dict[str, Any]):
@@ -65,7 +68,9 @@ class SAMEntitiesAdapter(EntityAdapter):
         resp.raise_for_status()
         return resp.json()
 
-    def _lookup(self, session, api_key: str, kind: str, value: str, policy: RetryPolicy) -> list[dict]:
+    def _lookup(
+        self, session, api_key: str, kind: str, value: str, policy: RetryPolicy
+    ) -> list[dict]:
         param_name = PARAM_FOR_KIND[kind]
         params: dict[str, Any] = {
             "api_key": api_key,
@@ -78,24 +83,28 @@ class SAMEntitiesAdapter(EntityAdapter):
         entities = (data.get("entityData") or []) if isinstance(data, dict) else []
         rows: list[dict] = []
         for ent in entities:
-            reg = (ent.get("entityRegistration") or {})
-            core = (ent.get("coreData") or {})
-            parent = ((core.get("entityHierarchyInformation") or {}).get("immediateParentEntity") or {})
-            address = (core.get("physicalAddress") or {})
-            rows.append({
-                "lookup_kind": kind,
-                "lookup_value": value,
-                "uei": reg.get("ueiSAM", ""),
-                "cage": reg.get("cageCode", ""),
-                "duns": reg.get("ueiDUNS", "") or reg.get("dunsNumber", ""),
-                "legal_business_name": reg.get("legalBusinessName", ""),
-                "registration_status": reg.get("registrationStatus", ""),
-                "expiration_date": reg.get("registrationExpirationDate", ""),
-                "state": address.get("stateOrProvinceCode", ""),
-                "city": address.get("city", ""),
-                "parent_uei": parent.get("ueiSAM", ""),
-                "parent_name": parent.get("legalBusinessName", ""),
-            })
+            reg = ent.get("entityRegistration") or {}
+            core = ent.get("coreData") or {}
+            parent = (core.get("entityHierarchyInformation") or {}).get(
+                "immediateParentEntity"
+            ) or {}
+            address = core.get("physicalAddress") or {}
+            rows.append(
+                {
+                    "lookup_kind": kind,
+                    "lookup_value": value,
+                    "uei": reg.get("ueiSAM", ""),
+                    "cage": reg.get("cageCode", ""),
+                    "duns": reg.get("ueiDUNS", "") or reg.get("dunsNumber", ""),
+                    "legal_business_name": reg.get("legalBusinessName", ""),
+                    "registration_status": reg.get("registrationStatus", ""),
+                    "expiration_date": reg.get("registrationExpirationDate", ""),
+                    "state": address.get("stateOrProvinceCode", ""),
+                    "city": address.get("city", ""),
+                    "parent_uei": parent.get("ueiSAM", ""),
+                    "parent_name": parent.get("legalBusinessName", ""),
+                }
+            )
         return rows
 
     def fetch(self, query: EntityQuery) -> pd.DataFrame:

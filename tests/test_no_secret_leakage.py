@@ -1,4 +1,5 @@
 """Tests that no secrets are committed to the repo."""
+
 from __future__ import annotations
 
 import subprocess
@@ -36,7 +37,9 @@ def test_env_example_has_no_real_values():
     text = env_example.read_text(encoding="utf-8")
     forbidden_starts = ("SAM_API_KEY=sam-", "LDA_API_KEY=lda-", "FEC_API_KEY=fec-")
     for prefix in forbidden_starts:
-        assert prefix not in text, f".env.example contains a non-placeholder value (matched: {prefix!r})"
+        assert prefix not in text, (
+            f".env.example contains a non-placeholder value (matched: {prefix!r})"
+        )
 
 
 @pytest.mark.unit

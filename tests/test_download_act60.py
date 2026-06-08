@@ -3,6 +3,7 @@
 The live fetch needs egress (DDEC data.pr.gov API and Act 60 page). These tests
 cover only the pure parse_records() transform, so they run fully offline.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -19,18 +20,20 @@ def test_empty_records_returns_empty_df():
 
 @pytest.mark.unit
 def test_canonical_keys_pass_through():
-    records = [{
-        "decree_id": "ACT60-2022-0001",
-        "entity_name": "Luma Energy LLC",
-        "entity_normalized": "LUMA ENERGY LLC",
-        "decree_type": "Act 60",
-        "effective_date": "2022-01-01",
-        "expiry_date": "2037-01-01",
-        "individual_flag": "0",
-        "municipality": "San Juan",
-        "industry_code": "2211",
-        "source_url": "ddec_act60_registry",
-    }]
+    records = [
+        {
+            "decree_id": "ACT60-2022-0001",
+            "entity_name": "Luma Energy LLC",
+            "entity_normalized": "LUMA ENERGY LLC",
+            "decree_type": "Act 60",
+            "effective_date": "2022-01-01",
+            "expiry_date": "2037-01-01",
+            "individual_flag": "0",
+            "municipality": "San Juan",
+            "industry_code": "2211",
+            "source_url": "ddec_act60_registry",
+        }
+    ]
     df = parse_records(records)
     assert len(df) == 1
     assert list(df.columns) == ACT60_COLUMNS
@@ -78,12 +81,14 @@ def test_multiple_records_all_rows_present():
 
 @pytest.mark.unit
 def test_spanish_column_names_mapped():
-    records = [{
-        "nombre": "Empresa XYZ",
-        "municipio": "Mayaguez",
-        "tipo_decreto": "Act 60",
-        "fecha_efectiva": "2023-01-01",
-    }]
+    records = [
+        {
+            "nombre": "Empresa XYZ",
+            "municipio": "Mayaguez",
+            "tipo_decreto": "Act 60",
+            "fecha_efectiva": "2023-01-01",
+        }
+    ]
     df = parse_records(records)
     assert df.iloc[0]["entity_name"] == "Empresa XYZ"
     assert df.iloc[0]["municipality"] == "Mayaguez"

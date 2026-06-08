@@ -107,7 +107,6 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 
-
 from contract_sweeper.orchestrator.cli import build_arg_parser
 from contract_sweeper.orchestrator.support import (
     check_pandas,
@@ -137,6 +136,7 @@ def main() -> int:
     if not args.skip_preflight:
         try:
             from scripts.pipeline_preflight import run_pipeline_preflight
+
             preflight = run_pipeline_preflight(root, logger, strict=args.strict_preflight)
             if args.strict_preflight and not preflight["ok"]:
                 logger.error(
@@ -177,6 +177,7 @@ def main() -> int:
     logger.info("[Step 1/29] Setting up directories...")
     try:
         from scripts.setup_directories import main as setup_dirs
+
         setup_dirs(root)
         steps["dirs"] = True
         logger.info("[Step 1/29] Done.\n")
@@ -191,6 +192,7 @@ def main() -> int:
     logger.info("[Step 2/29] Generating download instructions...")
     try:
         from scripts.download_instructions import main as gen_instructions
+
         gen_instructions(root)
         steps["instructions"] = True
         logger.info("[Step 2/29] Done.\n")
@@ -202,8 +204,18 @@ def main() -> int:
     if args.only_setup:
         logger.info("--only-setup flag set. Stopping after steps 1-2.")
         elapsed = time.time() - start_time
-        return print_summary(logger, elapsed, steps, None, None, None, None, root,
-                             dedup_stats=None, enrichment_result=None)
+        return print_summary(
+            logger,
+            elapsed,
+            steps,
+            None,
+            None,
+            None,
+            None,
+            root,
+            dedup_stats=None,
+            enrichment_result=None,
+        )
 
     # ------------------------------------------------------------------
     # Step 3: Auto-download datasets
@@ -215,6 +227,7 @@ def main() -> int:
         logger.info("[Step 3/29] Auto-downloading datasets...")
         try:
             from scripts.auto_download import download_all, print_download_summary
+
             dl_results = download_all(root, force=args.force_download)
             print_download_summary(dl_results, logger)
             download_count = sum(1 for r in dl_results if r["status"] in ("OK", "SKIPPED"))
@@ -222,11 +235,18 @@ def main() -> int:
             try:
                 import os as _os
                 from scripts.config import _load_dotenv, PROJECT_ROOT as _root
-                hg_key = _os.environ.get("HIGHERGOV_API_KEY", "").strip() or _load_dotenv(_root / ".env").get("HIGHERGOV_API_KEY", "").strip()
+
+                hg_key = (
+                    _os.environ.get("HIGHERGOV_API_KEY", "").strip()
+                    or _load_dotenv(_root / ".env").get("HIGHERGOV_API_KEY", "").strip()
+                )
                 if hg_key:
-                    logger.info("[Step 3.1] HIGHERGOV_API_KEY found — fetching HigherGov exports...")
+                    logger.info(
+                        "[Step 3.1] HIGHERGOV_API_KEY found — fetching HigherGov exports..."
+                    )
                     try:
                         from scripts.fetch_highergov_api import main as _fetch_hg
+
                         res = _fetch_hg()
                         if res == 0:
                             logger.info("[Step 3.1] HigherGov fetch completed successfully.")
@@ -259,6 +279,7 @@ def main() -> int:
         logger.info("[Step 4/29] Validating downloaded files...")
         try:
             from scripts.validate_downloads import validate_all, print_report
+
             results = validate_all(root)
             print_report(results, logger)
 
@@ -290,32 +311,38 @@ def main() -> int:
         logger.info("[Step 4.1/29] SKIPPED (--skip-normalize)\n")
     else:
         try:
-            fdic_inst_path = (root / "data" / "staging" / "processed" / "pr_fdic_institutions.csv")
-            fdic_fin_path = (root / "data" / "staging" / "processed" / "pr_fdic_financials.csv")
-            
+            fdic_inst_path = root / "data" / "staging" / "processed" / "pr_fdic_institutions.csv"
+            fdic_fin_path = root / "data" / "staging" / "processed" / "pr_fdic_financials.csv"
+
             fdic_mapped = 0
             if fdic_inst_path.exists():
                 import pandas as pd
                 from scripts.fdic_mapper import map_fdic_resource
+
                 df = pd.read_csv(fdic_inst_path, low_memory=False)
                 _, report = map_fdic_resource(df, "institutions")
                 logger.info(f"[Step 4.1a] FDIC institutions: {report}")
                 if report.get("threshold_met"):
                     fdic_mapped += 1
                 else:
-                    logger.warning(f"[Step 4.1a] FDIC institutions validation below threshold: {report.get('failed_dates')} {report.get('failed_amounts')}")
-            
+                    logger.warning(
+                        f"[Step 4.1a] FDIC institutions validation below threshold: {report.get('failed_dates')} {report.get('failed_amounts')}"
+                    )
+
             if fdic_fin_path.exists():
                 import pandas as pd
                 from scripts.fdic_mapper import map_fdic_resource
+
                 df = pd.read_csv(fdic_fin_path, low_memory=False)
                 _, report = map_fdic_resource(df, "financials")
                 logger.info(f"[Step 4.1b] FDIC financials: {report}")
                 if report.get("threshold_met"):
                     fdic_mapped += 1
                 else:
-                    logger.warning(f"[Step 4.1b] FDIC financials validation below threshold: {report.get('failed_dates')} {report.get('failed_amounts')}")
-            
+                    logger.warning(
+                        f"[Step 4.1b] FDIC financials validation below threshold: {report.get('failed_dates')} {report.get('failed_amounts')}"
+                    )
+
             logger.info(f"[Step 4.1/29] Done ({fdic_mapped} FDIC datasets validated).\n")
         except Exception as e:
             logger.error(f"[Step 4.1/29] FAILED: {e}")
@@ -327,32 +354,38 @@ def main() -> int:
         logger.info("[Step 4.2/29] SKIPPED (--skip-normalize)\n")
     else:
         try:
-            emma_bonds_path = (root / "data" / "staging" / "processed" / "pr_emma_bonds.csv")
-            emma_uw_path = (root / "data" / "staging" / "processed" / "pr_emma_underwriters.csv")
-            
+            emma_bonds_path = root / "data" / "staging" / "processed" / "pr_emma_bonds.csv"
+            emma_uw_path = root / "data" / "staging" / "processed" / "pr_emma_underwriters.csv"
+
             emma_mapped = 0
             if emma_bonds_path.exists():
                 import pandas as pd
                 from scripts.emma_mapper import map_emma_resource
+
                 df = pd.read_csv(emma_bonds_path)
                 _, report = map_emma_resource(df, "bonds")
                 logger.info(f"[Step 4.2a] EMMA bonds: {report}")
                 if report.get("threshold_met"):
                     emma_mapped += 1
                 else:
-                    logger.warning(f"[Step 4.2a] EMMA bonds validation below threshold: {report.get('failed_dates')} {report.get('failed_amounts')}")
-            
+                    logger.warning(
+                        f"[Step 4.2a] EMMA bonds validation below threshold: {report.get('failed_dates')} {report.get('failed_amounts')}"
+                    )
+
             if emma_uw_path.exists():
                 import pandas as pd
                 from scripts.emma_mapper import map_emma_resource
+
                 df = pd.read_csv(emma_uw_path)
                 _, report = map_emma_resource(df, "underwriters")
                 logger.info(f"[Step 4.2b] EMMA underwriters: {report}")
                 if report.get("threshold_met"):
                     emma_mapped += 1
                 else:
-                    logger.warning(f"[Step 4.2b] EMMA underwriters validation below threshold: {report.get('failed_dates')} {report.get('failed_amounts')}")
-            
+                    logger.warning(
+                        f"[Step 4.2b] EMMA underwriters validation below threshold: {report.get('failed_dates')} {report.get('failed_amounts')}"
+                    )
+
             logger.info(f"[Step 4.2/29] Done ({emma_mapped} EMMA datasets validated).\n")
         except Exception as e:
             logger.error(f"[Step 4.2/29] FAILED: {e}")
@@ -364,32 +397,38 @@ def main() -> int:
         logger.info("[Step 4.3/29] SKIPPED (--skip-normalize)\n")
     else:
         try:
-            cms_op_path = (root / "data" / "staging" / "processed" / "pr_cms_open_payments.csv")
-            cms_med_path = (root / "data" / "staging" / "processed" / "pr_cms_medicare_providers.csv")
-            
+            cms_op_path = root / "data" / "staging" / "processed" / "pr_cms_open_payments.csv"
+            cms_med_path = root / "data" / "staging" / "processed" / "pr_cms_medicare_providers.csv"
+
             cms_mapped = 0
             if cms_op_path.exists():
                 import pandas as pd
                 from scripts.cms_mapper import map_cms_resource
+
                 df = pd.read_csv(cms_op_path)
                 _, report = map_cms_resource(df, "open_payments")
                 logger.info(f"[Step 4.3a] CMS open_payments: {report}")
                 if report.get("threshold_met"):
                     cms_mapped += 1
                 else:
-                    logger.warning(f"[Step 4.3a] CMS open_payments validation below threshold: {report.get('issues')}")
-            
+                    logger.warning(
+                        f"[Step 4.3a] CMS open_payments validation below threshold: {report.get('issues')}"
+                    )
+
             if cms_med_path.exists():
                 import pandas as pd
                 from scripts.cms_mapper import map_cms_resource
+
                 df = pd.read_csv(cms_med_path)
                 _, report = map_cms_resource(df, "medicare")
                 logger.info(f"[Step 4.3b] CMS medicare: {report}")
                 if report.get("threshold_met"):
                     cms_mapped += 1
                 else:
-                    logger.warning(f"[Step 4.3b] CMS medicare validation below threshold: {report.get('issues')}")
-            
+                    logger.warning(
+                        f"[Step 4.3b] CMS medicare validation below threshold: {report.get('issues')}"
+                    )
+
             logger.info(f"[Step 4.3/29] Done ({cms_mapped} CMS datasets validated).\n")
         except Exception as e:
             logger.error(f"[Step 4.3/29] FAILED: {e}")
@@ -402,7 +441,11 @@ def main() -> int:
     else:
         logger.info("[Step 5/29] Normalizing expansion inputs...")
         try:
-            from scripts.normalize_expansion_inputs import normalize_all, print_report as norm_report
+            from scripts.normalize_expansion_inputs import (
+                normalize_all,
+                print_report as norm_report,
+            )
+
             results = normalize_all(root)
             norm_report(results, logger)
             normalize_count = sum(1 for r in results if r["status"] in ("OK", "WARN"))
@@ -420,6 +463,7 @@ def main() -> int:
         logger.info("[Step 5.5/29] Building deduplicated master...")
         try:
             from scripts.deduplicate_master import main as build_master
+
             dedup_stats = build_master(root)
             if dedup_stats["master_rows"] > 0:
                 logger.info(
@@ -441,6 +485,7 @@ def main() -> int:
         logger.info("[Step 6/29] Validating expansion coverage...")
         try:
             from scripts.validate_expansion_coverage import main as validate_coverage
+
             coverage_result = validate_coverage(root)
             logger.info(f"[Step 6/29] Done (exit: {coverage_result}).\n")
         except Exception as e:
@@ -458,13 +503,19 @@ def main() -> int:
             _sf133_result = {"rows": 0}
             try:
                 from scripts.ingest_follow_the_money import run as ingest_ftm
+
                 _sf133_result = ingest_ftm(root=root)
                 if _sf133_result.get("rows", 0) > 0:
-                    logger.info(f"[Step 6b] Follow the Money ingest done — {_sf133_result['rows']:,} SF-133 rows\n")
+                    logger.info(
+                        f"[Step 6b] Follow the Money ingest done — {_sf133_result['rows']:,} SF-133 rows\n"
+                    )
             except Exception as _ftm_err:
-                logger.warning(f"[Step 6b] Follow the Money ingest failed ({_ftm_err}) — falling back to API")
+                logger.warning(
+                    f"[Step 6b] Follow the Money ingest failed ({_ftm_err}) — falling back to API"
+                )
             if _sf133_result.get("rows", 0) == 0:
                 from scripts.download_sf133 import run as run_sf133
+
                 _sf133_result = run_sf133(root=root)
                 logger.info(f"[Step 6b] API done — {_sf133_result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -479,6 +530,7 @@ def main() -> int:
         logger.info("[Step 6c] Downloading Dept of Education grants for PR...")
         try:
             from scripts.download_ed import run as run_ed
+
             result = run_ed(root=root)
             logger.info(f"[Step 6c] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -493,6 +545,7 @@ def main() -> int:
         logger.info("[Step 6d] Downloading HHS/HRSA/ACF grants for PR...")
         try:
             from scripts.download_hhs import run as run_hhs
+
             result = run_hhs(root=root)
             logger.info(f"[Step 6d] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -507,6 +560,7 @@ def main() -> int:
         logger.info("[Step 6e] Downloading DOJ grants for PR...")
         try:
             from scripts.download_doj_grants import run as run_doj_grants
+
             result = run_doj_grants(root=root)
             logger.info(f"[Step 6e] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -521,6 +575,7 @@ def main() -> int:
         logger.info("[Step 6f] Downloading OIA grants for PR...")
         try:
             from scripts.download_oia import run as run_oia
+
             result = run_oia(root=root)
             logger.info(f"[Step 6f] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -535,6 +590,7 @@ def main() -> int:
         logger.info("[Step 6g] Downloading Homeowner Assistance Fund data for PR...")
         try:
             from scripts.download_haf import run as run_haf
+
             result = run_haf(root=root)
             logger.info(f"[Step 6g] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -549,6 +605,7 @@ def main() -> int:
         logger.info("[Step 6h] Downloading Ex-Im Bank loans/guarantees for PR...")
         try:
             from scripts.download_exim import run as run_exim
+
             result = run_exim(root=root)
             logger.info(f"[Step 6h] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -563,6 +620,7 @@ def main() -> int:
         logger.info("[Step 6i] Downloading congressional earmarks for PR...")
         try:
             from scripts.download_earmarks import run as run_earmarks
+
             result = run_earmarks(root=root)
             logger.info(f"[Step 6i] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -577,6 +635,7 @@ def main() -> int:
         logger.info("[Step 6j] Ingesting FPDS Report Builder files (FY2018-2024)...")
         try:
             from scripts.ingest_report_builder import run as run_report_builder
+
             result = run_report_builder(root=root)
             logger.info(f"[Step 6j] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -591,8 +650,11 @@ def main() -> int:
         logger.info("[Step 6k] Downloading EPA grants and cooperative agreements for PR...")
         try:
             from scripts.download_epa import run as run_epa
+
             result = run_epa(root=root)
-            logger.info(f"[Step 6k] Done — {result.get('rows', result.get('master_rows', 0)):,} rows\n")
+            logger.info(
+                f"[Step 6k] Done — {result.get('rows', result.get('master_rows', 0)):,} rows\n"
+            )
         except Exception as e:
             logger.error(f"[Step 6k] FAILED: {e}")
 
@@ -605,8 +667,11 @@ def main() -> int:
         logger.info("[Step 6l] Downloading USACE civil works contracts and grants for PR...")
         try:
             from scripts.download_usace_civil import run as run_usace_civil
+
             result = run_usace_civil(root=root)
-            logger.info(f"[Step 6l] Done — {result.get('rows', result.get('master_rows', 0)):,} rows\n")
+            logger.info(
+                f"[Step 6l] Done — {result.get('rows', result.get('master_rows', 0)):,} rows\n"
+            )
         except Exception as e:
             logger.error(f"[Step 6l] FAILED: {e}")
 
@@ -619,6 +684,7 @@ def main() -> int:
         logger.info("[Step 6m] Downloading NIH research grants to PR institutions...")
         try:
             from scripts.download_nih import run as run_nih
+
             result = run_nih(root=root)
             logger.info(f"[Step 6m] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -632,6 +698,7 @@ def main() -> int:
     else:
         import os as _os
         from scripts.config import _load_dotenv, PROJECT_ROOT as _root
+
         has_key = bool(
             _os.environ.get("SAM_API_KEY", "").strip()
             or _load_dotenv(_root / ".env").get("SAM_API_KEY", "").strip()
@@ -647,6 +714,7 @@ def main() -> int:
             logger.info("[Step 7/29] Running SAM.gov UEI enrichment...")
             try:
                 from scripts.sam_enrichment import run as run_enrichment
+
                 summary = run_enrichment(root=root)
                 enrichment_result = (
                     f"{summary.get('vendors_resolved', 0)}/{summary.get('vendors_attempted', 0)} vendors resolved "
@@ -670,6 +738,7 @@ def main() -> int:
         logger.info("[Step 8/29] Resolving top 100 vendor entities...")
         try:
             from scripts.entity_resolution import run as run_entity
+
             run_entity(root=root)
             logger.info("[Step 8/29] Done.\n")
         except Exception as e:
@@ -696,6 +765,7 @@ def main() -> int:
         logger.info("[Step 10/29] Building network graph...")
         try:
             from scripts.network_graph import run as run_graph
+
             summary_g = run_graph(root=root)
             logger.info(
                 f"[Step 10/29] Done — {summary_g.get('total_nodes', 0)} nodes, "
@@ -712,19 +782,29 @@ def main() -> int:
     if args.skip_grants:
         logger.info("[Step 11/29] SKIPPED (--skip-grants)\n")
     else:
-        logger.info("[Step 11/29] Grants (Grants.gov XML ingest-first / USASpending API fallback)...")
+        logger.info(
+            "[Step 11/29] Grants (Grants.gov XML ingest-first / USASpending API fallback)..."
+        )
         try:
             _grants_xml_result = {"rows": 0}
             try:
                 from scripts.ingest_grants import run as ingest_grants_xml
+
                 _grants_xml_result = ingest_grants_xml(root=root)
                 if _grants_xml_result.get("rows", 0) > 0:
-                    logger.info(f"[Step 11/29] Grants.gov XML ingest done — {_grants_xml_result['rows']:,} opportunities\n")
+                    logger.info(
+                        f"[Step 11/29] Grants.gov XML ingest done — {_grants_xml_result['rows']:,} opportunities\n"
+                    )
             except Exception as _gx_err:
-                logger.warning(f"[Step 11/29] Grants XML ingest failed ({_gx_err}) — falling back to USASpending API")
+                logger.warning(
+                    f"[Step 11/29] Grants XML ingest failed ({_gx_err}) — falling back to USASpending API"
+                )
             from scripts.download_grants import run as run_grants
+
             g = run_grants(root=root)
-            logger.info(f"[Step 11/29] USASpending grants done — {g.get('master_rows', g.get('total_rows', 0)):,} award records\n")
+            logger.info(
+                f"[Step 11/29] USASpending grants done — {g.get('master_rows', g.get('total_rows', 0)):,} award records\n"
+            )
         except Exception as e:
             logger.error(f"[Step 11/29] FAILED: {e}")
 
@@ -737,8 +817,11 @@ def main() -> int:
         logger.info("[Step 12/29] Downloading subawards (USASpending)...")
         try:
             from scripts.download_subawards import run as run_subawards
+
             s = run_subawards(root=root)
-            logger.info(f"[Step 12/29] Done — {s.get('master_rows', s.get('total_rows', 0)):,} subaward records\n")
+            logger.info(
+                f"[Step 12/29] Done — {s.get('master_rows', s.get('total_rows', 0)):,} subaward records\n"
+            )
         except Exception as e:
             logger.error(f"[Step 12/29] FAILED: {e}")
 
@@ -751,8 +834,11 @@ def main() -> int:
         logger.info("[Step 13/29] Downloading FEMA Public Assistance + HMGP...")
         try:
             from scripts.download_fema import run as run_fema
+
             f = run_fema(root=root)
-            logger.info(f"[Step 13/29] Done — PA: {f.get('pa_rows', 0):,}, HMGP: {f.get('hmgp_rows', 0):,}\n")
+            logger.info(
+                f"[Step 13/29] Done — PA: {f.get('pa_rows', 0):,}, HMGP: {f.get('hmgp_rows', 0):,}\n"
+            )
         except Exception as e:
             logger.error(f"[Step 13/29] FAILED: {e}")
 
@@ -765,8 +851,11 @@ def main() -> int:
         logger.info("[Step 14/29] Downloading NIH + NSF research grants...")
         try:
             from scripts.download_research import run as run_research
+
             r = run_research(root=root)
-            logger.info(f"[Step 14/29] Done — NIH: {r.get('nih_rows', 0):,}, NSF: {r.get('nsf_rows', 0):,}\n")
+            logger.info(
+                f"[Step 14/29] Done — NIH: {r.get('nih_rows', 0):,}, NSF: {r.get('nsf_rows', 0):,}\n"
+            )
         except Exception as e:
             logger.error(f"[Step 14/29] FAILED: {e}")
 
@@ -776,18 +865,21 @@ def main() -> int:
     if args.skip_bulk_downloads:
         logger.info("[Step 15/29] SKIPPED (--skip-bulk-downloads)\n")
     else:
-        logger.info("[Step 15/29] Downloading SBA loans, SLFRF, CDBG-DR, SBIR, DOE, DOT, USDA, HUD-CPD...")
+        logger.info(
+            "[Step 15/29] Downloading SBA loans, SLFRF, CDBG-DR, SBIR, DOE, DOT, USDA, HUD-CPD..."
+        )
         for name, mod in [
-            ("SBA",     "download_sba"),
-            ("SLFRF",   "download_slfrf"),
+            ("SBA", "download_sba"),
+            ("SLFRF", "download_slfrf"),
             ("CDBG-DR", "download_cdbg_dr"),
-            ("SBIR",    "download_sbir"),
-            ("DOE",     "download_doe"),
-            ("DOT",     "download_dot"),
-            ("USDA",    "download_usda"),
+            ("SBIR", "download_sbir"),
+            ("DOE", "download_doe"),
+            ("DOT", "download_dot"),
+            ("USDA", "download_usda"),
         ]:
             try:
                 import importlib
+
                 m = importlib.import_module(f"scripts.{mod}")
                 result = m.run(root=root)
                 logger.info(f"  {name}: {result.get('rows', result.get('total_rows', 0)):,} rows")
@@ -804,6 +896,7 @@ def main() -> int:
         logger.info("[Step 15a] Downloading FSRS prime-to-sub reporting data...")
         try:
             from scripts.download_fsrs import run as run_fsrs
+
             result = run_fsrs(root=root)
             logger.info(f"[Step 15a] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -820,13 +913,19 @@ def main() -> int:
             _cor3_result = {"rows": 0}
             try:
                 from scripts.ingest_cor3 import run as ingest_cor3
+
                 _cor3_result = ingest_cor3(root=root)
                 if _cor3_result.get("rows", 0) > 0:
-                    logger.info(f"[Step 15b] Ingest done — {_cor3_result['rows']:,} rows from local Excel\n")
+                    logger.info(
+                        f"[Step 15b] Ingest done — {_cor3_result['rows']:,} rows from local Excel\n"
+                    )
             except Exception as _ingest_err:
-                logger.warning(f"[Step 15b] Local ingest failed ({_ingest_err}) — falling back to API")
+                logger.warning(
+                    f"[Step 15b] Local ingest failed ({_ingest_err}) — falling back to API"
+                )
             if _cor3_result.get("rows", 0) == 0:
                 from scripts.download_cor3 import run as run_cor3
+
                 _cor3_result = run_cor3(root=root)
                 logger.info(f"[Step 15b] API done — {_cor3_result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -841,8 +940,11 @@ def main() -> int:
         logger.info("[Step 15c] Scraping comprashpr.com RFPs and contract awards...")
         try:
             from scripts.download_compras import run as run_compras
+
             result = run_compras(root=root)
-            logger.info(f"[Step 15c] Done — {result.get('rows', result.get('award_rows', 0)):,} rows\n")
+            logger.info(
+                f"[Step 15c] Done — {result.get('rows', result.get('award_rows', 0)):,} rows\n"
+            )
         except Exception as e:
             logger.error(f"[Step 15c] FAILED: {e}")
 
@@ -855,6 +957,7 @@ def main() -> int:
         logger.info("[Step 15d] Downloading OpenFEMA PA v2 project records for PR...")
         try:
             from scripts.download_openfema_pa_projects import run as run_fema_pa_proj
+
             result = run_fema_pa_proj(root=root)
             logger.info(f"[Step 15d] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -869,6 +972,7 @@ def main() -> int:
         logger.info("[Step 15e] Ingesting FEMA PA portal 178-PW authorized export...")
         try:
             from scripts.ingest_fema_pa_portal_exports import run as run_fema_pa_portal
+
             result = run_fema_pa_portal(root=root)
             logger.info(f"[Step 15e] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -883,6 +987,7 @@ def main() -> int:
         logger.info("[Step 15f] Linking FEMA PA project worksheets to contracts and assets...")
         try:
             from scripts.link_fema_pa_to_contracts import run as run_fema_pa_link
+
             result = run_fema_pa_link(root=root)
             logger.info(f"[Step 15f] Done — {result.get('linkage_rows', 0):,} linkage rows\n")
         except Exception as e:
@@ -897,6 +1002,7 @@ def main() -> int:
         logger.info("[Step 15g] Validating FEMA PA coverage and v1/v2 diff...")
         try:
             from scripts.validate_fema_pa_coverage import run as run_fema_pa_val
+
             result = run_fema_pa_val(root=root)
             logger.info(f"[Step 15g] Done — status: {result.get('status', '?')}\n")
         except Exception as e:
@@ -911,8 +1017,11 @@ def main() -> int:
         logger.info("[Step 15i] Ingesting authorized HUD DRGR local export files...")
         try:
             from scripts.ingest_hud_drgr_exports import run as run_drgr_ingest
+
             result = run_drgr_ingest(root=root)
-            logger.info(f"[Step 15i] Done — {result.get('activity_rows', result.get('rows', 0)):,} activity rows\n")
+            logger.info(
+                f"[Step 15i] Done — {result.get('activity_rows', result.get('rows', 0)):,} activity rows\n"
+            )
         except Exception as e:
             logger.error(f"[Step 15i] FAILED: {e}")
 
@@ -925,8 +1034,11 @@ def main() -> int:
         logger.info("[Step 15j] Normalizing HUD DRGR grants, projects, and activities...")
         try:
             from scripts.normalize_hud_drgr import run as run_drgr_norm
+
             result = run_drgr_norm(root=root)
-            logger.info(f"[Step 15j] Done — {result.get('project_rows', 0):,} projects, {result.get('org_rows', 0):,} orgs\n")
+            logger.info(
+                f"[Step 15j] Done — {result.get('project_rows', 0):,} projects, {result.get('org_rows', 0):,} orgs\n"
+            )
         except Exception as e:
             logger.error(f"[Step 15j] FAILED: {e}")
 
@@ -939,6 +1051,7 @@ def main() -> int:
         logger.info("[Step 15k] Linking HUD DRGR responsible orgs to contract entities...")
         try:
             from scripts.link_hud_drgr_to_contracts import run as run_drgr_link
+
             result = run_drgr_link(root=root)
             logger.info(f"[Step 15k] Done — {result.get('linkage_rows', 0):,} linkage rows\n")
         except Exception as e:
@@ -950,12 +1063,17 @@ def main() -> int:
     if args.skip_drgr_assets:
         logger.info("[Step 15l] SKIPPED (--skip-drgr-assets)\n")
     else:
-        logger.info("[Step 15l] Linking HUD DRGR activities to physical assets and municipalities...")
+        logger.info(
+            "[Step 15l] Linking HUD DRGR activities to physical assets and municipalities..."
+        )
         try:
             from scripts.link_hud_drgr_to_assets import run as run_drgr_assets
+
             result = run_drgr_assets(root=root)
-            logger.info(f"[Step 15l] Done — {result.get('linkage_rows', 0):,} rows, "
-                        f"{result.get('municipalities_matched', 0):,} municipalities\n")
+            logger.info(
+                f"[Step 15l] Done — {result.get('linkage_rows', 0):,} rows, "
+                f"{result.get('municipalities_matched', 0):,} municipalities\n"
+            )
         except Exception as e:
             logger.error(f"[Step 15l] FAILED: {e}")
 
@@ -968,6 +1086,7 @@ def main() -> int:
         logger.info("[Step 15m] Running HUD DRGR coverage and entity-resolution validation...")
         try:
             from scripts.validate_hud_drgr_coverage import run as run_drgr_cov
+
             result = run_drgr_cov(root=root)
             logger.info(f"[Step 15m] Done — status: {result.get('status', '?')}\n")
         except Exception as e:
@@ -982,6 +1101,7 @@ def main() -> int:
         logger.info("[Step 15n] Reconciling HUD DRGR budget, drawdown, and obligation amounts...")
         try:
             from scripts.validate_hud_drgr_amounts import run as run_drgr_amts
+
             result = run_drgr_amts(root=root)
             logger.info(f"[Step 15n] Done — status: {result.get('status', '?')}\n")
         except Exception as e:
@@ -996,6 +1116,7 @@ def main() -> int:
         logger.info("[Step 15o] Building financial flows master (FEMA + HUD + procurement)...")
         try:
             from scripts.build_financial_flows_master import run as run_fin_flows
+
             result = run_fin_flows(root=root)
             logger.info(f"[Step 15o] Done — {result.get('rows', 0):,} flow records\n")
         except Exception as e:
@@ -1010,6 +1131,7 @@ def main() -> int:
         logger.info("[Step 16/29] Building unified awards master (all datasets)...")
         try:
             from scripts.build_unified_master import run as run_unified
+
             u = run_unified(root=root)
             logger.info(
                 f"[Step 16/29] Done — {u.get('total_rows', 0):,} total rows across "
@@ -1030,6 +1152,7 @@ def main() -> int:
             # Try manual export from data/raw/FEC/ first
             try:
                 from scripts.ingest_fec import run as ingest_fec
+
                 fec_result = ingest_fec(root=root)
                 if fec_result.get("rows", 0) > 0:
                     logger.info(
@@ -1043,6 +1166,7 @@ def main() -> int:
             if fec_result.get("rows", 0) == 0:
                 logger.info("[Step 17/29] No export data — downloading via FEC API...")
                 from scripts.download_fec import run as run_fec
+
                 fec_result = run_fec(root=root, api_key=args.fec_api_key)
                 logger.info(
                     f"[Step 17/29] API done — {fec_result.get('rows', 0):,} contribution records\n"
@@ -1059,6 +1183,7 @@ def main() -> int:
         logger.info("[Step 17b] Analyzing PR procurement RFP timing vs LDA lobbying...")
         try:
             from scripts.analyze_rfp_lobby import run as run_rfp_lobby
+
             result = run_rfp_lobby(root=root)
             logger.info(f"[Step 17b] Done — {result.get('rows', 0):,} RFP-lobby crossref rows\n")
         except Exception as e:
@@ -1073,6 +1198,7 @@ def main() -> int:
         logger.info("[Step 18/29] Downloading LDA lobbying filings for PR...")
         try:
             from scripts.download_lda import run as run_lda
+
             lda_result = run_lda(root=root, api_key=args.lda_api_key)
             logger.info(f"[Step 18/29] Done — {lda_result.get('rows', 0):,} filings\n")
         except Exception as e:
@@ -1087,6 +1213,7 @@ def main() -> int:
         logger.info("[Step 18b/29] Enriching award recipients with LDA lobbying data...")
         try:
             from scripts.lda_enrich import run as run_lda_enrich
+
             enrich_result = run_lda_enrich(root=root, api_key=args.lda_api_key)
             logger.info(
                 f"[Step 18b/29] Done — {enrich_result.get('entities_queried', 0):,} queried, "
@@ -1104,12 +1231,13 @@ def main() -> int:
     else:
         logger.info("[Step 19/29] Running FEC and lobbying cross-reference analyses...")
         for label, mod, fn in [
-            ("FEC crossref",      "analyze_political_crossref", "build_fec_crossref"),
+            ("FEC crossref", "analyze_political_crossref", "build_fec_crossref"),
             ("Lobbying crossref", "analyze_political_crossref", "build_lobbying_crossref"),
         ]:
             try:
                 import importlib
-                m  = importlib.import_module(f"scripts.{mod}")
+
+                m = importlib.import_module(f"scripts.{mod}")
                 cr = getattr(m, fn)(root=root)
                 logger.info(f"  {label}: {cr.get('rows', 0):,} matched entities")
             except Exception as e:
@@ -1125,6 +1253,7 @@ def main() -> int:
         logger.info("[Step 20/29] Downloading IRS 990 nonprofit data for PR...")
         try:
             from scripts.download_nonprofits import run as run_nonprofits
+
             np_result = run_nonprofits(root=root)
             logger.info(f"[Step 20/29] Done — {np_result.get('rows', 0):,} nonprofits\n")
         except Exception as e:
@@ -1139,6 +1268,7 @@ def main() -> int:
         logger.info("[Step 21/29] Downloading CMS Open Payments and Medicare data for PR...")
         try:
             from scripts.download_cms import run as run_cms
+
             cms_result = run_cms(root=root)
             logger.info(
                 f"[Step 21/29] Done — Open Payments: {cms_result.get('open_payments_rows', 0):,}, "
@@ -1156,6 +1286,7 @@ def main() -> int:
         logger.info("[Step 21b] Downloading Medicaid FMAP rates and PR CMS-64 expenditure data...")
         try:
             from scripts.download_medicaid_fmap import run as run_medicaid_fmap
+
             result = run_medicaid_fmap(root=root)
             logger.info(f"[Step 21b] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1170,6 +1301,7 @@ def main() -> int:
         logger.info("[Step 21c] Downloading SSA OASDI/SSI/SSDI benefit data for PR...")
         try:
             from scripts.download_ssa import run as run_ssa
+
             result = run_ssa(root=root)
             logger.info(f"[Step 21c] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1184,6 +1316,7 @@ def main() -> int:
         logger.info("[Step 21d] Downloading Medicare Part A and Part D data for PR...")
         try:
             from scripts.download_medicare_parts import run as run_medicare_parts
+
             result = run_medicare_parts(root=root)
             logger.info(f"[Step 21d] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1198,6 +1331,7 @@ def main() -> int:
         logger.info("[Step 21e] Downloading VA benefit payments and VAMC contract data for PR...")
         try:
             from scripts.download_va import run as run_va
+
             result = run_va(root=root)
             logger.info(f"[Step 21e] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1212,6 +1346,7 @@ def main() -> int:
         logger.info("[Step 21f] Downloading USDA FNS NAP nutrition assistance data for PR...")
         try:
             from scripts.download_snap_nap import run as run_snap_nap
+
             result = run_snap_nap(root=root)
             logger.info(f"[Step 21f] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1226,6 +1361,7 @@ def main() -> int:
         logger.info("[Step 21g] Downloading CMS Medicare Advantage plan payment data for PR...")
         try:
             from scripts.download_medicare_advantage import run as run_medicare_advantage
+
             result = run_medicare_advantage(root=root)
             logger.info(f"[Step 21g] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1240,6 +1376,7 @@ def main() -> int:
         logger.info("[Step 21h] Downloading CMS CHIP children's health insurance data for PR...")
         try:
             from scripts.download_chip import run as run_chip
+
             result = run_chip(root=root)
             logger.info(f"[Step 21h] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1254,6 +1391,7 @@ def main() -> int:
         logger.info("[Step 21i] Downloading USDA WIC nutrition program data for PR...")
         try:
             from scripts.download_wic import run as run_wic
+
             result = run_wic(root=root)
             logger.info(f"[Step 21i] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1268,6 +1406,7 @@ def main() -> int:
         logger.info("[Step 21j] Downloading DOL WIOA workforce development grants for PR...")
         try:
             from scripts.download_wioa import run as run_wioa
+
             result = run_wioa(root=root)
             logger.info(f"[Step 21j] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1282,6 +1421,7 @@ def main() -> int:
         logger.info("[Step 21k] Downloading HUD Section 8 / Housing Choice Voucher data for PR...")
         try:
             from scripts.download_hud_hcv import run as run_hud_hcv
+
             result = run_hud_hcv(root=root)
             logger.info(f"[Step 21k] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1296,6 +1436,7 @@ def main() -> int:
         logger.info("[Step 22/29] Downloading FDIC bank institution and financial data for PR...")
         try:
             from scripts.download_fdic import run as run_fdic
+
             fdic_result = run_fdic(root=root)
             logger.info(
                 f"[Step 22/29] Done — {fdic_result.get('institution_rows', 0):,} institutions, "
@@ -1313,6 +1454,7 @@ def main() -> int:
         logger.info("[Step 22b] Downloading NCUA credit union call report data for PR...")
         try:
             from scripts.download_ncua import run as run_ncua
+
             result = run_ncua(root=root)
             logger.info(f"[Step 22b] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1327,6 +1469,7 @@ def main() -> int:
         logger.info("[Step 23/29] Building enriched entity profiles...")
         try:
             from scripts.analyze_entity_profiles import build_profiles
+
             ep_result = build_profiles(root=root)
             logger.info(
                 f"[Step 23/29] Done — {ep_result.get('rows', 0):,} entities profiled, "
@@ -1346,6 +1489,7 @@ def main() -> int:
         logger.info("[Step 24/29] Downloading SEC EDGAR data for PR-significant companies...")
         try:
             from scripts.download_sec import run as run_sec
+
             sec_result = run_sec(root=root)
             logger.info(
                 f"[Step 24/29] Done — {sec_result.get('company_rows', 0):,} companies, "
@@ -1363,6 +1507,7 @@ def main() -> int:
         logger.info("[Step 25/29] Building integrated PR power/influence network...")
         try:
             from scripts.analyze_power_network import build_power_network
+
             pn_result = build_power_network(root=root)
             logger.info(
                 f"[Step 25/29] Done — {pn_result.get('rows', 0):,} entities ranked, "
@@ -1381,6 +1526,7 @@ def main() -> int:
         logger.info("[Step 25b] Downloading PR municipal fiscal health data...")
         try:
             from scripts.download_municipal import run as run_municipal
+
             result = run_municipal(root=root)
             logger.info(f"[Step 25b] Done — {result.get('rows', 0):,} municipality rows\n")
         except Exception as e:
@@ -1395,6 +1541,7 @@ def main() -> int:
         logger.info("[Step 25c] Downloading AAFAF PR government budget execution data...")
         try:
             from scripts.download_aafaf import run as run_aafaf
+
             result = run_aafaf(root=root)
             logger.info(f"[Step 25c] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1409,6 +1556,7 @@ def main() -> int:
         logger.info("[Step 25d] Downloading PR pension fund data (ERS/TRS/JRS)...")
         try:
             from scripts.download_pr_pensions import run as run_pr_pensions
+
             result = run_pr_pensions(root=root)
             logger.info(f"[Step 25d] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1423,6 +1571,7 @@ def main() -> int:
         logger.info("[Step 25e] Downloading PR Hacienda monthly tax revenue data...")
         try:
             from scripts.download_hacienda import run as run_hacienda
+
             result = run_hacienda(root=root)
             logger.info(f"[Step 25e] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1437,6 +1586,7 @@ def main() -> int:
         logger.info("[Step 25f] Downloading COFINA SUT revenue bond allocation data...")
         try:
             from scripts.download_cofina import run as run_cofina
+
             result = run_cofina(root=root)
             logger.info(f"[Step 25f] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1451,6 +1601,7 @@ def main() -> int:
         logger.info("[Step 26/29] Downloading PR municipal bond data from MSRB EMMA...")
         try:
             from scripts.download_emma import run as run_emma
+
             emma_result = run_emma(root=root)
             logger.info(
                 f"[Step 26/29] Done — {emma_result.get('bond_rows', 0):,} bonds, "
@@ -1469,6 +1620,7 @@ def main() -> int:
         logger.info("[Step 26b] Downloading MSRB RTRS secondary market trade data for PR CUSIPs...")
         try:
             from scripts.download_msrb_trades import run as run_msrb_trades
+
             result = run_msrb_trades(root=root)
             logger.info(f"[Step 26b] Done — {result.get('rows', 0):,} trade records\n")
         except Exception as e:
@@ -1483,9 +1635,12 @@ def main() -> int:
         logger.info("[Step 26c] Analyzing bond flow: underwriters and dealers vs entity master...")
         try:
             from scripts.analyze_bond_flow import run as run_bond_flow
+
             result = run_bond_flow(root=root)
-            logger.info(f"[Step 26c] Done — {result.get('rows', 0):,} entities, "
-                        f"{result.get('dual_role', 0):,} dual-role (bond + federal)\n")
+            logger.info(
+                f"[Step 26c] Done — {result.get('rows', 0):,} entities, "
+                f"{result.get('dual_role', 0):,} dual-role (bond + federal)\n"
+            )
         except Exception as e:
             logger.error(f"[Step 26c] FAILED: {e}")
 
@@ -1498,6 +1653,7 @@ def main() -> int:
         logger.info("[Step 26d] Downloading USACE Section 404/10 permit data for PR...")
         try:
             from scripts.download_usace_permits import run as run_usace
+
             result = run_usace(root=root)
             logger.info(f"[Step 26d] Done — {result.get('rows', 0):,} permits\n")
         except Exception as e:
@@ -1512,6 +1668,7 @@ def main() -> int:
         logger.info("[Step 26e] Downloading PR EQB / EPA ICIS environmental permit data...")
         try:
             from scripts.download_eqb import run as run_eqb
+
             result = run_eqb(root=root)
             logger.info(f"[Step 26e] Done — {result.get('rows', 0):,} permit records\n")
         except Exception as e:
@@ -1526,6 +1683,7 @@ def main() -> int:
         logger.info("[Step 26f] Downloading NFIP flood insurance claims for PR...")
         try:
             from scripts.download_nfip import run as run_nfip
+
             result = run_nfip(root=root)
             logger.info(f"[Step 26f] Done — {result.get('rows', 0):,} claims\n")
         except Exception as e:
@@ -1540,6 +1698,7 @@ def main() -> int:
         logger.info("[Step 26g] Downloading LIHTC low-income housing tax credit data for PR...")
         try:
             from scripts.download_lihtc import run as run_lihtc
+
             result = run_lihtc(root=root)
             logger.info(f"[Step 26g] Done — {result.get('rows', 0):,} LIHTC projects\n")
         except Exception as e:
@@ -1554,6 +1713,7 @@ def main() -> int:
         logger.info("[Step 26h] Downloading NMTC new markets tax credit allocations for PR...")
         try:
             from scripts.download_nmtc import run as run_nmtc
+
             result = run_nmtc(root=root)
             logger.info(f"[Step 26h] Done — {result.get('rows', 0):,} NMTC allocations\n")
         except Exception as e:
@@ -1568,6 +1728,7 @@ def main() -> int:
         logger.info("[Step 26i] Downloading PR Act 60 tax incentive decree data...")
         try:
             from scripts.download_act60 import run as run_act60
+
             result = run_act60(root=root)
             logger.info(f"[Step 26i] Done — {result.get('rows', 0):,} decrees\n")
         except Exception as e:
@@ -1582,6 +1743,7 @@ def main() -> int:
         logger.info("[Step 26j] Downloading rum cover-over excise tax revenue data...")
         try:
             from scripts.download_rum_coverover import run as run_rum
+
             result = run_rum(root=root)
             logger.info(f"[Step 26j] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1596,6 +1758,7 @@ def main() -> int:
         logger.info("[Step 26k] Downloading FHLB advances to PR financial institutions...")
         try:
             from scripts.download_fhlb import run as run_fhlb
+
             result = run_fhlb(root=root)
             logger.info(f"[Step 26k] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1610,6 +1773,7 @@ def main() -> int:
         logger.info("[Step 26l] Downloading PREPA/Luma/Genera contract data...")
         try:
             from scripts.download_prepa_contracts import run as run_prepa
+
             result = run_prepa(root=root)
             logger.info(f"[Step 26l] Done — {result.get('rows', 0):,} contracts\n")
         except Exception as e:
@@ -1624,6 +1788,7 @@ def main() -> int:
         logger.info("[Step 26m] Downloading PROMESA Title III creditor and recovery data...")
         try:
             from scripts.download_promesa_creditors import run as run_promesa
+
             result = run_promesa(root=root)
             logger.info(f"[Step 26m] Done — {result.get('rows', 0):,} creditor records\n")
         except Exception as e:
@@ -1639,6 +1804,7 @@ def main() -> int:
         _cab_result = {"rows": 0}
         try:
             from scripts.ingest_cabilderos import run as run_ingest_cab
+
             _cab_result = run_ingest_cab(root=root)
         except Exception as e:
             logger.warning(f"[Step 26n] ingest_cabilderos failed: {e}")
@@ -1654,6 +1820,7 @@ def main() -> int:
         _con_result = {"rows": 0}
         try:
             from scripts.ingest_contralor import run as run_ingest_con
+
             _con_result = run_ingest_con(root=root)
         except Exception as e:
             logger.warning(f"[Step 26o] ingest_contralor failed: {e}")
@@ -1669,12 +1836,14 @@ def main() -> int:
         _ac_result = {"rows": 0}
         try:
             from scripts.ingest_active_contractors import run as run_ingest_ac
+
             _ac_result = run_ingest_ac(root=root)
         except Exception as e:
             logger.warning(f"[Step 26p] ingest_active_contractors failed: {e}")
         if _ac_result.get("rows", 0) == 0:
             try:
                 from scripts.download_active_contractors import run as run_fetch_ac
+
                 _ac_result = run_fetch_ac(root=root)
             except Exception as e:
                 logger.error(f"[Step 26p] download_active_contractors FAILED: {e}")
@@ -1690,6 +1859,7 @@ def main() -> int:
         _prasa_result = {"rows": 0}
         try:
             from scripts.ingest_prasa import run as run_ingest_prasa
+
             _prasa_result = run_ingest_prasa(root=root)
         except Exception as e:
             logger.warning(f"[Step 26q] ingest_prasa failed: {e}")
@@ -1701,9 +1871,12 @@ def main() -> int:
     if args.skip_fcc:
         logger.info("[Step 26r] SKIPPED (--skip-fcc)\n")
     else:
-        logger.info("[Step 26r] Downloading FCC USF (E-Rate, Rural Health Care, High Cost) data for PR...")
+        logger.info(
+            "[Step 26r] Downloading FCC USF (E-Rate, Rural Health Care, High Cost) data for PR..."
+        )
         try:
             from scripts.download_fcc import run as run_fcc
+
             result = run_fcc(root=root)
             logger.info(f"[Step 26r] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1718,6 +1891,7 @@ def main() -> int:
         logger.info("[Step 26s] Downloading DOL wage-hour and OSHA enforcement data for PR...")
         try:
             from scripts.download_dol import run as run_dol
+
             result = run_dol(root=root)
             logger.info(f"[Step 26s] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1732,6 +1906,7 @@ def main() -> int:
         logger.info("[Step 26t] Downloading SEC 13F/N-PORT institutional PR bond holdings...")
         try:
             from scripts.download_sec_holdings import run as run_sec_holdings
+
             result = run_sec_holdings(root=root)
             logger.info(f"[Step 26t] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1746,6 +1921,7 @@ def main() -> int:
         logger.info("[Step 26u] Downloading GAO and Inspector General audit reports covering PR...")
         try:
             from scripts.download_gao_ig import run as run_gao_ig
+
             result = run_gao_ig(root=root)
             logger.info(f"[Step 26u] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1757,9 +1933,12 @@ def main() -> int:
     if args.skip_p3:
         logger.info("[Step 26v] SKIPPED (--skip-p3)\n")
     else:
-        logger.info("[Step 26v] Downloading PR P3 Authority public-private partnership contracts...")
+        logger.info(
+            "[Step 26v] Downloading PR P3 Authority public-private partnership contracts..."
+        )
         try:
             from scripts.download_p3 import run as run_p3
+
             result = run_p3(root=root)
             logger.info(f"[Step 26v] Done — {result.get('rows', 0):,} rows\n")
         except Exception as e:
@@ -1774,6 +1953,7 @@ def main() -> int:
         logger.info("[Step 27/29] Downloading OFAC SDN list and crossreffing against awards...")
         try:
             from scripts.download_ofac import run as run_ofac
+
             ofac_result = run_ofac(root=root)
             logger.info(
                 f"[Step 27/29] Done — {ofac_result.get('sdn_rows', 0):,} SDN entries, "
@@ -1791,6 +1971,7 @@ def main() -> int:
         logger.info("[Step 28/29] Downloading PR business entities from OpenCorporates...")
         try:
             from scripts.download_opencorporates import run as run_oc
+
             oc_result = run_oc(root=root, api_token=args.oc_api_token)
             logger.info(
                 f"[Step 28/29] Done — {oc_result.get('company_rows', 0):,} companies, "
@@ -1808,6 +1989,7 @@ def main() -> int:
         logger.info("[Step 28b] Building contractor project delivery scorecard...")
         try:
             from scripts.analyze_project_delivery import run as run_delivery
+
             result = run_delivery(root=root)
             logger.info(f"[Step 28b] Done — {result.get('rows', 0):,} entities scored\n")
         except Exception as e:
@@ -1830,8 +2012,11 @@ def main() -> int:
         logger.info("[Step 30] Generating PR investigation report...")
         try:
             from scripts.generate_report import run as run_report
+
             result = run_report(root=root)
-            logger.info(f"[Step 30] Done — report written to {result.get('path', 'data/output/')}\n")
+            logger.info(
+                f"[Step 30] Done — report written to {result.get('path', 'data/output/')}\n"
+            )
         except Exception as e:
             logger.error(f"[Step 30] FAILED: {e}")
 
@@ -1840,9 +2025,16 @@ def main() -> int:
     # ------------------------------------------------------------------
     elapsed = time.time() - start_time
     return print_summary(
-        logger, elapsed, steps, download_count, validation_result,
-        normalize_count, coverage_result, root,
-        dedup_stats=dedup_stats, enrichment_result=enrichment_result,
+        logger,
+        elapsed,
+        steps,
+        download_count,
+        validation_result,
+        normalize_count,
+        coverage_result,
+        root,
+        dedup_stats=dedup_stats,
+        enrichment_result=enrichment_result,
     )
 
 

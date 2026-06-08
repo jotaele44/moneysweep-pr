@@ -52,7 +52,9 @@ def cluster_edges(edges: list[dict[str, str]]) -> list[dict[str, Any]]:
             except ValueError:
                 pass
         avg_confidence = sum(confidence_values) / len(confidence_values) if confidence_values else 0
-        continuity_score = len(items) + (len(milestone_types) * 2) + (len(datasets) * 1.5) + avg_confidence
+        continuity_score = (
+            len(items) + (len(milestone_types) * 2) + (len(datasets) * 1.5) + avg_confidence
+        )
         clusters.append(
             {
                 "entity_id": key,
@@ -139,7 +141,17 @@ def main() -> int:
     write_markdown(clusters, output_md)
     output_json.write_text(json.dumps({"clusters": clusters}, indent=2), encoding="utf-8")
 
-    print(json.dumps({"clusters": len(clusters), "csv": str(output_csv), "report": str(output_md), "json": str(output_json)}, indent=2))
+    print(
+        json.dumps(
+            {
+                "clusters": len(clusters),
+                "csv": str(output_csv),
+                "report": str(output_md),
+                "json": str(output_json),
+            },
+            indent=2,
+        )
+    )
     return 0
 
 

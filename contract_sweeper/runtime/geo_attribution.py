@@ -18,6 +18,7 @@ Canonical geo columns attached:
 
 Reference data: ``data/reference/pr_municipalities.csv`` (78 rows).
 """
+
 from __future__ import annotations
 
 import functools
@@ -80,9 +81,7 @@ _WHITESPACE_RE = re.compile(r"\s+")
 
 
 def _strip_accents(text: str) -> str:
-    return "".join(
-        c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c)
-    )
+    return "".join(c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c))
 
 
 def _normalize_pr_name(value: object) -> str:
@@ -200,7 +199,11 @@ def _resolve_row(
     # Name match (exact canonical / normalized alias).
     if name_val_raw is None:
         return None, "", "unknown"
-    raw_str = "" if (isinstance(name_val_raw, float) and pd.isna(name_val_raw)) else str(name_val_raw).strip()
+    raw_str = (
+        ""
+        if (isinstance(name_val_raw, float) and pd.isna(name_val_raw))
+        else str(name_val_raw).strip()
+    )
     if not raw_str:
         return None, "", "unknown"
     # Exact match on the raw (case/accents) form first.
@@ -242,7 +245,9 @@ def attribute_geo(
     by_alias = ref["by_alias"]
 
     columns = list(out.columns)
-    fips_col = _pick_existing(columns, ("geo_municipality_code", "municipality_code", "county_fips"))
+    fips_col = _pick_existing(
+        columns, ("geo_municipality_code", "municipality_code", "county_fips")
+    )
     name_col = _pick_existing(columns, GEO_INPUT_PRIORITY[3:])  # skip the fips-ish names
     zip_col = _pick_existing(columns, ZIP_INPUT_PRIORITY)
     lat_col = _pick_existing(columns, LAT_INPUT_PRIORITY)
@@ -254,7 +259,11 @@ def attribute_geo(
             out[col] = ""
 
     # Resolve row-by-row. Pre-extract input series for speed.
-    fips_series = out[fips_col].map(_normalize_fips) if fips_col else pd.Series([""] * len(out), index=out.index)
+    fips_series = (
+        out[fips_col].map(_normalize_fips)
+        if fips_col
+        else pd.Series([""] * len(out), index=out.index)
+    )
     name_series = out[name_col] if name_col else pd.Series([None] * len(out), index=out.index)
 
     existing_code = out["geo_municipality_code"].astype(str).fillna("")
@@ -314,15 +323,11 @@ def attribute_geo(
     if lat_col:
         lat_in = out[lat_col]
         existing_lat = out["geo_lat"]
-        out["geo_lat"] = existing_lat.where(
-            existing_lat.astype(str).fillna("") != "", lat_in
-        )
+        out["geo_lat"] = existing_lat.where(existing_lat.astype(str).fillna("") != "", lat_in)
     if lon_col:
         lon_in = out[lon_col]
         existing_lon = out["geo_lon"]
-        out["geo_lon"] = existing_lon.where(
-            existing_lon.astype(str).fillna("") != "", lon_in
-        )
+        out["geo_lon"] = existing_lon.where(existing_lon.astype(str).fillna("") != "", lon_in)
 
     return out
 

@@ -15,6 +15,7 @@ CLI::
     python scripts/build_entity_resolution_review_queue.py            # write CSV + manifest
     python scripts/build_entity_resolution_review_queue.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -40,9 +41,17 @@ CONFIDENCE_THRESHOLD = 0.90
 
 # Schema column order (canonical_v1 review_queue item).
 REVIEW_QUEUE_COLUMNS = [
-    "review_id", "object_type", "object_id", "issue_type", "raw_value",
-    "candidate_match", "source_name", "source_ref", "severity",
-    "recommended_action", "status",
+    "review_id",
+    "object_type",
+    "object_id",
+    "issue_type",
+    "raw_value",
+    "candidate_match",
+    "source_name",
+    "source_ref",
+    "severity",
+    "recommended_action",
+    "status",
 ]
 
 
@@ -64,19 +73,21 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
                 continue
             object_id = (ref.get("person_id") or "").strip()
             issue_type = "low_confidence"
-            rows.append({
-                "review_id": f"review_{name_hash(object_id + '|' + issue_type)}",
-                "object_type": "person",
-                "object_id": object_id,
-                "issue_type": issue_type,
-                "raw_value": (ref.get("canonical_name") or "").strip(),
-                "candidate_match": "",
-                "source_name": (ref.get("source_id") or "").strip(),
-                "source_ref": (ref.get("source_person_id") or "").strip(),
-                "severity": "medium",
-                "recommended_action": "verify against a primary source before promotion",
-                "status": "open",
-            })
+            rows.append(
+                {
+                    "review_id": f"review_{name_hash(object_id + '|' + issue_type)}",
+                    "object_type": "person",
+                    "object_id": object_id,
+                    "issue_type": issue_type,
+                    "raw_value": (ref.get("canonical_name") or "").strip(),
+                    "candidate_match": "",
+                    "source_name": (ref.get("source_id") or "").strip(),
+                    "source_ref": (ref.get("source_person_id") or "").strip(),
+                    "severity": "medium",
+                    "recommended_action": "verify against a primary source before promotion",
+                    "status": "open",
+                }
+            )
     return rows
 
 
@@ -144,7 +155,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

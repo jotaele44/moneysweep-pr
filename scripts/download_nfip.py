@@ -34,20 +34,36 @@ RETRY_BACKOFF = [2, 4, 8]
 PAGE_SLEEP = 0.5
 
 NFIP_COLUMNS = [
-    "reportedCity", "reportedZipCode", "countyCode", "floodZone",
-    "occupancyType", "dateOfLoss", "yearOfLoss",
-    "totalBuildingInsuranceCoverage", "totalContentsInsuranceCoverage",
-    "amountPaidOnBuildingClaim", "amountPaidOnContentsClaim",
-    "buildingDamageAmount", "contentsDamageAmount",
+    "reportedCity",
+    "reportedZipCode",
+    "countyCode",
+    "floodZone",
+    "occupancyType",
+    "dateOfLoss",
+    "yearOfLoss",
+    "totalBuildingInsuranceCoverage",
+    "totalContentsInsuranceCoverage",
+    "amountPaidOnBuildingClaim",
+    "amountPaidOnContentsClaim",
+    "buildingDamageAmount",
+    "contentsDamageAmount",
     "originalNBDate",
 ]
 
 OUTPUT_COLUMNS = [
-    "reported_city", "reported_zip", "county_code", "flood_zone",
-    "occupancy_type", "date_of_loss", "year_of_loss",
-    "building_coverage", "contents_coverage",
-    "paid_building", "paid_contents",
-    "building_damage", "contents_damage",
+    "reported_city",
+    "reported_zip",
+    "county_code",
+    "flood_zone",
+    "occupancy_type",
+    "date_of_loss",
+    "year_of_loss",
+    "building_coverage",
+    "contents_coverage",
+    "paid_building",
+    "paid_contents",
+    "building_damage",
+    "contents_damage",
     "policy_start_date",
 ]
 
@@ -120,7 +136,9 @@ def _run(root=None, force=False):
 
     if not force and _file_has_data(out_path):
         rows = len(pd.read_csv(out_path, dtype=str, low_memory=False))
-        logger.info(f"  pr_nfip_claims.csv exists ({rows:,} rows) — skipping. Use --force to re-download.")
+        logger.info(
+            f"  pr_nfip_claims.csv exists ({rows:,} rows) — skipping. Use --force to re-download."
+        )
         return {"rows": rows, "path": str(out_path), "errors": []}
 
     session = _session()
@@ -170,8 +188,16 @@ def _run(root=None, force=False):
     paid_building = paid_contents = 0
     if all_frames:
         combined = pd.read_csv(out_path, dtype=str, low_memory=False)
-        paid_building = pd.to_numeric(combined.get("paid_building", pd.Series()), errors="coerce").fillna(0).sum()
-        paid_contents = pd.to_numeric(combined.get("paid_contents", pd.Series()), errors="coerce").fillna(0).sum()
+        paid_building = (
+            pd.to_numeric(combined.get("paid_building", pd.Series()), errors="coerce")
+            .fillna(0)
+            .sum()
+        )
+        paid_contents = (
+            pd.to_numeric(combined.get("paid_contents", pd.Series()), errors="coerce")
+            .fillna(0)
+            .sum()
+        )
         logger.info(f"  Total paid (building):  ${paid_building:,.0f}")
         logger.info(f"  Total paid (contents):  ${paid_contents:,.0f}")
 

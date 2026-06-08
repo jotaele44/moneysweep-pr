@@ -9,6 +9,7 @@ www.sbir.gov search endpoint when the api.sbir.gov endpoint is unavailable
 SBIR responses don't carry a county FIPS; municipality narrowing is
 applied client-side via `apply_post_ingest` in the dispatcher.
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -87,14 +88,18 @@ class SBIRAdapter(SourceAdapter):
                 # Some endpoints accept year filters; harmless if ignored.
                 params["year"] = sorted({int(y) for y in query.fiscal_years})
 
-            def fetch_page(marker, _params=params, _base=base_url, _start=start_param,
-                           _data=data_field, _count=count_field):
+            def fetch_page(
+                marker,
+                _params=params,
+                _base=base_url,
+                _start=start_param,
+                _data=data_field,
+                _count=count_field,
+            ):
                 start = int(marker) if marker else 0
                 page_params = dict(_params)
                 page_params[_start] = start
-                data = with_retry(
-                    lambda: self._get(session, _base, page_params), policy=policy
-                )
+                data = with_retry(lambda: self._get(session, _base, page_params), policy=policy)
                 records = _records_from_response(data, _data)
                 total = _total_from_response(data, _count)
                 next_marker = (

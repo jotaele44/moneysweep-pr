@@ -38,15 +38,27 @@ def test_r3_audit_detects_master_input_gap_and_blocks_phase_7_8(tmp_path: Path):
             "power_network": {"total_ranked": 18, "bond_actors_count": 0},
         },
     )
-    _write_json(tmp_path / "data" / "staging" / "processed" / "dominance_summary.json", {"total_rows": 4503, "unique_vendors": 18})
-    _write_json(tmp_path / "data" / "staging" / "processed" / "pr_all_awards_summary.json", {"total_rows": 4503, "unique_recipients": 18})
-    _write_json(tmp_path / "data" / "exports" / "rebuild_status.json", {"phase_7_8_blocked": True, "r2_gate_passed": False})
+    _write_json(
+        tmp_path / "data" / "staging" / "processed" / "dominance_summary.json",
+        {"total_rows": 4503, "unique_vendors": 18},
+    )
+    _write_json(
+        tmp_path / "data" / "staging" / "processed" / "pr_all_awards_summary.json",
+        {"total_rows": 4503, "unique_recipients": 18},
+    )
+    _write_json(
+        tmp_path / "data" / "exports" / "rebuild_status.json",
+        {"phase_7_8_blocked": True, "r2_gate_passed": False},
+    )
 
     result = run_audit(tmp_path)
 
     assert result["r3_gate_passed"] is False
     assert result["phase_7_8_blocked"] is True
-    assert result["r3_primary_collapse_cause"] == "build_unified_master_input_gap_with_stale_summary_replay"
+    assert (
+        result["r3_primary_collapse_cause"]
+        == "build_unified_master_input_gap_with_stale_summary_replay"
+    )
 
     assert (tmp_path / "data" / "exports" / "source_coverage_audit.csv").exists()
     assert (tmp_path / "data" / "exports" / "source_field_completeness.csv").exists()
@@ -95,10 +107,22 @@ def test_r3_audit_can_pass_with_full_coverage_for_custom_single_source(tmp_path:
         {"source": "single_source", "rows": 1},
     )
 
-    _write_json(tmp_path / "data" / "reports" / "pr_report_summary.json", {"awards": {"unique_entities": 150}})
-    _write_json(tmp_path / "data" / "staging" / "processed" / "dominance_summary.json", {"total_rows": 1000, "unique_vendors": 150})
-    _write_json(tmp_path / "data" / "staging" / "processed" / "pr_all_awards_summary.json", {"total_rows": 1000, "unique_recipients": 150})
-    _write_json(tmp_path / "data" / "exports" / "rebuild_status.json", {"phase_7_8_blocked": False, "r2_gate_passed": True})
+    _write_json(
+        tmp_path / "data" / "reports" / "pr_report_summary.json",
+        {"awards": {"unique_entities": 150}},
+    )
+    _write_json(
+        tmp_path / "data" / "staging" / "processed" / "dominance_summary.json",
+        {"total_rows": 1000, "unique_vendors": 150},
+    )
+    _write_json(
+        tmp_path / "data" / "staging" / "processed" / "pr_all_awards_summary.json",
+        {"total_rows": 1000, "unique_recipients": 150},
+    )
+    _write_json(
+        tmp_path / "data" / "exports" / "rebuild_status.json",
+        {"phase_7_8_blocked": False, "r2_gate_passed": True},
+    )
 
     monkeypatch.setattr(
         "contract_sweeper.validation.source_coverage.SOURCE_SPECS",
@@ -122,13 +146,21 @@ def test_r3_audit_can_pass_with_full_coverage_for_custom_single_source(tmp_path:
 
 def test_source_coverage_csv_has_required_columns(tmp_path: Path):
     (tmp_path / "scripts").mkdir(parents=True, exist_ok=True)
-    (tmp_path / "scripts" / "build_unified_master.py").write_text("NEW_MASTERS = []\nEXPANSION_FILES = []\n", encoding="utf-8")
+    (tmp_path / "scripts" / "build_unified_master.py").write_text(
+        "NEW_MASTERS = []\nEXPANSION_FILES = []\n", encoding="utf-8"
+    )
     (tmp_path / "scripts" / "deduplicate_master.py").write_text("print('ok')\n", encoding="utf-8")
     _write_json(tmp_path / "data" / "exports" / "rebuild_status.json", {})
 
     run_audit(tmp_path)
 
-    rows = list(csv.DictReader((tmp_path / "data" / "exports" / "source_coverage_audit.csv").open("r", encoding="utf-8")))
+    rows = list(
+        csv.DictReader(
+            (tmp_path / "data" / "exports" / "source_coverage_audit.csv").open(
+                "r", encoding="utf-8"
+            )
+        )
+    )
     assert rows
 
     required = {
