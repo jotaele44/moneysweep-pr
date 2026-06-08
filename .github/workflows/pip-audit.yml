@@ -1,0 +1,32 @@
+name: pip-audit (report-only)
+
+# Report-only: scans the pinned dependency set (requirements.lock) for known
+# vulnerabilities on a weekly schedule and on demand. Non-gating to start
+# (continue-on-error) so a newly-disclosed CVE surfaces as a visible signal
+# without blocking unrelated work; promote to gating once the baseline is clean.
+# Operationalizes docs/DEPENDENCY_SECURITY_AUDIT.md.
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Audit the locked dependency set
+        continue-on-error: true
+        run: pip-audit --requirement requirements.lock --strict --desc
