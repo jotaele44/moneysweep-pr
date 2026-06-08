@@ -3,11 +3,15 @@
   "producer_phase": "CANONICAL_V1_FEDERATION_BRIDGE",
   "gate": "NON_PRODUCTION_DIAGNOSTIC",
   "stream_counts": {
-    "sources": 232,
+    "sources": 4480,
     "entities": 200,
     "relationships": 64
   },
+  "source_feeds": {
+    "federal_publications": 4248,
+    "canonical_v1_evidence": 232
+  },
   "not_yet_federated_count": 0,
   "edges_federated_pct": 100.0,
-  "generated_at": "2026-06-07T01:08:53.891852+00:00"
+  "generated_at": "2026-06-08T11:00:22.151313+00:00"
 }

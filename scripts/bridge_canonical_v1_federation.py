@@ -6,6 +6,11 @@ writes ``sources.jsonl``, ``entities.jsonl``, ``relationships.jsonl`` under
 structurally validated against the required-field set of the matching federation
 schema (stdlib; no jsonschema dependency).
 
+The sources stream is composed of the canonical_v1 evidence sources PLUS the
+standalone federal-publications feed (``merge_external_sources`` — unreferenced
+evidence sources; entities/relationships and edges_federated_pct are unchanged).
+The manifest's ``source_feeds`` records the split.
+
 CLI::
 
     python scripts/bridge_canonical_v1_federation.py --root .
@@ -33,6 +38,43 @@ STREAMS = {
     "entities": ("contract_sweeper_entity.schema.json", "entities.jsonl"),
     "relationships": ("contract_sweeper_relationship.schema.json", "relationships.jsonl"),
 }
+
+# Standalone federal-publications source feed composed into the sources stream.
+# These are real, already-conformant federation `sources` rows (built by
+# scripts/ingest_federal_publications.py); they are UNREFERENCED — they carry no
+# entities or edges — so entities/relationships and edges_federated_pct are
+# unchanged. They reach the Hub aggregate as sources, filterable by
+# lineage.producer_phase == FEDERAL_PUBLICATIONS_PHASE.
+FEDERAL_PUBLICATIONS = "data/sources/federal_publications.jsonl"
+FEDERAL_PUBLICATIONS_PHASE = "FEDERAL_PUBLICATIONS_INGEST"
+
+
+def merge_external_sources(streams: dict[str, Any], root: Path) -> int:
+    """Compose the federal-publications feed into ``streams["sources"]``.
+
+    Reads ``FEDERAL_PUBLICATIONS`` (already-conformant federation source rows),
+    dedups by ``source_id`` against the canonical_v1 sources, appends the rest in
+    deterministic ``source_id`` order, and returns the number added. Only the
+    sources stream is touched — entities/relationships are left intact.
+    """
+    path = root / FEDERAL_PUBLICATIONS
+    if not path.is_file():
+        return 0
+    seen = {s["source_id"] for s in streams["sources"]}
+    pubs: list[dict[str, Any]] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        row = json.loads(line)
+        sid = row.get("source_id")
+        if not sid or sid in seen:
+            continue
+        seen.add(sid)
+        pubs.append(row)
+    pubs.sort(key=lambda r: r["source_id"])
+    streams["sources"].extend(pubs)
+    return len(pubs)
 
 
 def _required(schema_file: str, root: Path) -> set[str]:
@@ -66,6 +108,16 @@ def write_streams(streams: dict[str, Any], root: Path) -> dict[str, Any]:
         "producer_phase": "CANONICAL_V1_FEDERATION_BRIDGE",
         "gate": "NON_PRODUCTION_DIAGNOSTIC",
         "stream_counts": {s: len(streams[s]) for s in STREAMS},
+        "source_feeds": {
+            "federal_publications": sum(
+                1 for s in streams["sources"]
+                if (s.get("lineage") or {}).get("producer_phase") == FEDERAL_PUBLICATIONS_PHASE
+            ),
+            "canonical_v1_evidence": sum(
+                1 for s in streams["sources"]
+                if (s.get("lineage") or {}).get("producer_phase") != FEDERAL_PUBLICATIONS_PHASE
+            ),
+        },
         "not_yet_federated_count": len(streams["not_yet_federated"]),
         "edges_federated_pct": round(
             100.0 * len(streams["relationships"])
@@ -84,12 +136,14 @@ def main(argv: list[str] | None = None) -> int:
     root = Path(args.root).resolve()
 
     streams = build_streams(root)
+    n_pubs = merge_external_sources(streams, root)
     errors = validate_rows(streams, root)
     if errors:
         print(json.dumps({"ok": False, "errors": errors[:50]}, indent=2))
         return 1
     if args.check:
         print(json.dumps({"ok": True, "stream_counts": {s: len(streams[s]) for s in STREAMS},
+                          "federal_publications_added": n_pubs,
                           "not_yet_federated": len(streams["not_yet_federated"])}, indent=2))
         return 0
     print(json.dumps(write_streams(streams, root), indent=2))
