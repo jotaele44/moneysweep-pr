@@ -66,9 +66,8 @@ def deduplicate(df: pd.DataFrame, logger) -> pd.DataFrame:
     # Where the same contract appears in multiple source files, consolidate
     # the source_file column into a comma-joined string before dropping dupes.
     if "source_file" in df.columns and present_cols:
-        df["source_file"] = (
-            df.groupby(present_cols, sort=False)["source_file"]
-            .transform(lambda x: ",".join(sorted(set(x.dropna().astype(str)))))
+        df["source_file"] = df.groupby(present_cols, sort=False)["source_file"].transform(
+            lambda x: ",".join(sorted(set(x.dropna().astype(str))))
         )
 
     df = df.drop_duplicates(subset=present_cols, keep="first")
@@ -115,5 +114,7 @@ def main(root: Path = None) -> dict:
 
 if __name__ == "__main__":
     stats = main()
-    print(f"\nMaster: {stats['master_rows']:,} rows ({stats['duplicates_removed']:,} duplicates removed)")
+    print(
+        f"\nMaster: {stats['master_rows']:,} rows ({stats['duplicates_removed']:,} duplicates removed)"
+    )
     print(f"Output: {stats['output_path']}")

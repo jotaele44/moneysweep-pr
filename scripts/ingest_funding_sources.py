@@ -18,6 +18,7 @@ CLI::
     python scripts/ingest_funding_sources.py            # write funding_sources + evidence
     python scripts/ingest_funding_sources.py --check     # summarize without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -43,9 +44,17 @@ SOURCE_NAME = "PR Public Funding Sources (reference seed)"
 VALID_PROGRAMS = {"FEMA", "HUD", "EPA", "DOE", "CDBG-DR", "ARPA", "other"}
 
 FUNDING_COLUMNS = [
-    "funding_source_id", "program", "program_year", "administering_entity_id",
-    "jurisdiction", "total_allocation", "currency", "confidence", "evidence_id",
-    "review_status", "notes",
+    "funding_source_id",
+    "program",
+    "program_year",
+    "administering_entity_id",
+    "jurisdiction",
+    "total_allocation",
+    "currency",
+    "confidence",
+    "evidence_id",
+    "review_status",
+    "notes",
 ]
 
 
@@ -80,19 +89,21 @@ def build_rows(root: Path | None = None) -> dict[str, Any]:
                 review_status="accepted",
             )
             evidence_rows.append(ev)
-            funding_rows.append({
-                "funding_source_id": fid,
-                "program": program,
-                "program_year": year,
-                "administering_entity_id": "",
-                "jurisdiction": (rec.get("jurisdiction") or "").strip(),
-                "total_allocation": (rec.get("total_allocation") or "").strip(),
-                "currency": (rec.get("currency") or "").strip(),
-                "confidence": ev.confidence,
-                "evidence_id": ev.evidence_id,
-                "review_status": "accepted",
-                "notes": f"name={name}" if name else "",
-            })
+            funding_rows.append(
+                {
+                    "funding_source_id": fid,
+                    "program": program,
+                    "program_year": year,
+                    "administering_entity_id": "",
+                    "jurisdiction": (rec.get("jurisdiction") or "").strip(),
+                    "total_allocation": (rec.get("total_allocation") or "").strip(),
+                    "currency": (rec.get("currency") or "").strip(),
+                    "confidence": ev.confidence,
+                    "evidence_id": ev.evidence_id,
+                    "review_status": "accepted",
+                    "notes": f"name={name}" if name else "",
+                }
+            )
     return {"funding_rows": funding_rows, "evidence_rows": evidence_rows, "skipped": skipped}
 
 
@@ -154,8 +165,17 @@ def main(argv: list[str] | None = None) -> int:
         built = build_rows(root)
         rows = built["funding_rows"]
         problems = check(rows)
-        print(json.dumps({"ok": not problems, "row_count": len(rows),
-                          "skipped": len(built["skipped"]), "problems": problems}, indent=2))
+        print(
+            json.dumps(
+                {
+                    "ok": not problems,
+                    "row_count": len(rows),
+                    "skipped": len(built["skipped"]),
+                    "problems": problems,
+                },
+                indent=2,
+            )
+        )
         return 0 if not problems else 1
     print(json.dumps(ingest(root), indent=2))
     return 0

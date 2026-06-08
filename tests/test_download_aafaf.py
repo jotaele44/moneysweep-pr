@@ -3,6 +3,7 @@
 The live fetch needs egress (AAFAF reports index + CKAN API). These tests cover
 only the pure parse_records() transform, so they run fully offline.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -19,17 +20,19 @@ def test_empty_records_returns_empty_df():
 
 @pytest.mark.unit
 def test_canonical_keys_pass_through():
-    records = [{
-        "fiscal_year": "2024",
-        "month": "january",
-        "report_type": "general_fund",
-        "revenue_category": "total_revenues",
-        "revenue_amount": "13100000000",
-        "expenditure_category": "total_expenditures",
-        "expenditure_amount": "11600000000",
-        "cash_balance": "500000000",
-        "source_doc": "fomb_fiscal_plan_2024",
-    }]
+    records = [
+        {
+            "fiscal_year": "2024",
+            "month": "january",
+            "report_type": "general_fund",
+            "revenue_category": "total_revenues",
+            "revenue_amount": "13100000000",
+            "expenditure_category": "total_expenditures",
+            "expenditure_amount": "11600000000",
+            "cash_balance": "500000000",
+            "source_doc": "fomb_fiscal_plan_2024",
+        }
+    ]
     df = parse_records(records)
     assert len(df) == 1
     assert list(df.columns) == AAFAF_COLUMNS

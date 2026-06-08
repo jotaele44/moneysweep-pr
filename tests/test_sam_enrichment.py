@@ -20,6 +20,7 @@ from scripts.sam_enrichment import (
 # normalize_vendor
 # ---------------------------------------------------------------------------
 
+
 class TestNormalizeVendor:
     def test_uppercase(self):
         assert normalize_vendor("acme corp") == "ACME"
@@ -39,6 +40,7 @@ class TestNormalizeVendor:
 # ---------------------------------------------------------------------------
 # name_similarity
 # ---------------------------------------------------------------------------
+
 
 class TestNameSimilarity:
     def test_identical(self):
@@ -62,6 +64,7 @@ class TestNameSimilarity:
 # vendor_hash
 # ---------------------------------------------------------------------------
 
+
 class TestVendorHash:
     def test_stable_for_same_input(self):
         assert vendor_hash("Foo Inc.") == vendor_hash("Foo Inc.")
@@ -77,6 +80,7 @@ class TestVendorHash:
 # ---------------------------------------------------------------------------
 # load_targets — unified master fallback
 # ---------------------------------------------------------------------------
+
 
 class TestLoadTargetsFallback:
     def _make_dirs(self, root: Path) -> Path:

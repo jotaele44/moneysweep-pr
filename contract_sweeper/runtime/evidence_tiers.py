@@ -8,6 +8,7 @@ the confidence floor per tier, and the crosswalk to the claim tiers in
 
 Stdlib only.
 """
+
 from __future__ import annotations
 
 TIERS = ("T1", "T2", "T3", "T4")
@@ -73,8 +74,9 @@ def tier_confidence(tier: str) -> float:
     return _TIER_CONFIDENCE.get(tier, 0.35)
 
 
-def score_evidence(tier: str, extraction_method: str | None = None,
-                   ocr_confidence: float | None = None) -> float:
+def score_evidence(
+    tier: str, extraction_method: str | None = None, ocr_confidence: float | None = None
+) -> float:
     """Confidence in [0,1] for an evidence row.
 
     Starts at the tier floor; OCR-extracted evidence multiplies by the measured

@@ -10,6 +10,7 @@ Exit codes:
 * ``1`` — at least one outcome is ``error`` or output writing failed.
 * ``2`` — argparse rejected the arguments.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -123,14 +124,12 @@ def _build_parser() -> argparse.ArgumentParser:
         metavar=("START", "END"),
         help="ISO date range, e.g. --date-range 2023-01-01 2023-12-31.",
     )
-    p.add_argument("--agency", action="append", metavar="NAME", help="Awarding agency (repeatable).")
     p.add_argument(
-        "--agencies", action="append", metavar="CSV", help="Comma-separated agencies."
+        "--agency", action="append", metavar="NAME", help="Awarding agency (repeatable)."
     )
+    p.add_argument("--agencies", action="append", metavar="CSV", help="Comma-separated agencies.")
     p.add_argument("--uei", action="append", metavar="UEI", help="Recipient UEI (repeatable).")
-    p.add_argument(
-        "--recipient-ueis", action="append", metavar="CSV", help="Comma-separated UEIs."
-    )
+    p.add_argument("--recipient-ueis", action="append", metavar="CSV", help="Comma-separated UEIs.")
 
     p.add_argument(
         "--source",
@@ -138,9 +137,7 @@ def _build_parser() -> argparse.ArgumentParser:
         metavar="SID",
         help="Source-registry source_id to query (repeatable). Defaults to every registered adapter.",
     )
-    p.add_argument(
-        "--sources", action="append", metavar="CSV", help="Comma-separated source_ids."
-    )
+    p.add_argument("--sources", action="append", metavar="CSV", help="Comma-separated source_ids.")
 
     p.add_argument(
         "--output",

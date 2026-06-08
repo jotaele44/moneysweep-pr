@@ -2,6 +2,7 @@
 
 Reads API key from HIGHERGOV_API_KEY env var.
 """
+
 from __future__ import annotations
 import os
 import sys
@@ -20,10 +21,35 @@ API_BASE = "https://highergov.com/api-external"
 # resources to fetch: mapping to output filenames and params
 RESOURCES = {
     # include search_id and ordering values found inside PDFs to replicate the original exports
-    "opportunity": ("highergov_municipal_awards.csv", {"page_size": 400, "search_id": "r7RyFxqYkkbkG3M2GyPg-", "source_type": "sled", "ordering": "-posted_date"}),
-    "idv": ("highergov_idv_awards.csv", {"page_size": 2000, "search_id": "O1czhtUyFqdyKMpmMJNvm", "ordering": "-last_modified_date"}),
-    "contract": ("highergov_prime_awards.csv", {"page_size": 20000, "search_id": "O1czhtUyFqdyKMpmMJNvm", "ordering": "-last_modified_date"}),
-    "subcontract": ("highergov_sub_awards.csv", {"page_size": 800, "search_id": "O1czhtUyFqdyKMpmMJNvm", "ordering": "-last_modified_date"}),
+    "opportunity": (
+        "highergov_municipal_awards.csv",
+        {
+            "page_size": 400,
+            "search_id": "r7RyFxqYkkbkG3M2GyPg-",
+            "source_type": "sled",
+            "ordering": "-posted_date",
+        },
+    ),
+    "idv": (
+        "highergov_idv_awards.csv",
+        {
+            "page_size": 2000,
+            "search_id": "O1czhtUyFqdyKMpmMJNvm",
+            "ordering": "-last_modified_date",
+        },
+    ),
+    "contract": (
+        "highergov_prime_awards.csv",
+        {
+            "page_size": 20000,
+            "search_id": "O1czhtUyFqdyKMpmMJNvm",
+            "ordering": "-last_modified_date",
+        },
+    ),
+    "subcontract": (
+        "highergov_sub_awards.csv",
+        {"page_size": 800, "search_id": "O1czhtUyFqdyKMpmMJNvm", "ordering": "-last_modified_date"},
+    ),
 }
 
 
@@ -98,5 +124,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

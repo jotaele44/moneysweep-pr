@@ -18,6 +18,7 @@ Usage:
   python3 scripts/ingest_act_transition.py                 # both sources
   python3 scripts/ingest_act_transition.py --source act
 """
+
 from __future__ import annotations
 
 import argparse
@@ -76,15 +77,17 @@ def promote_rows(rows: list[dict], source_key: str) -> list[dict]:
         if key in seen:
             continue
         seen.add(key)
-        out.append({
-            "source_dataset": label,
-            "contractor_name": contractor,
-            "contract_number": contract,
-            "start_date": (row.get("start_date") or "").strip(),
-            "end_date": (row.get("end_date") or "").strip(),
-            "amount": (row.get("amount") or "").strip(),
-            "service_type": (row.get("service_type") or "").strip(),
-        })
+        out.append(
+            {
+                "source_dataset": label,
+                "contractor_name": contractor,
+                "contract_number": contract,
+                "start_date": (row.get("start_date") or "").strip(),
+                "end_date": (row.get("end_date") or "").strip(),
+                "amount": (row.get("amount") or "").strip(),
+                "service_type": (row.get("service_type") or "").strip(),
+            }
+        )
     return out
 
 
@@ -107,16 +110,16 @@ def _write_processed(rows: list[dict], out_path: Path) -> None:
         w.writerows(rows)
 
 
-def materialize_source(
-    root: Path, source_key: str, input_dir: Path | None, logger
-) -> dict:
+def materialize_source(root: Path, source_key: str, input_dir: Path | None, logger) -> dict:
     """Extract (if a PDF is present) then promote one source to its processed CSV."""
     # Lazy import — keeps module import (and the readiness preflight) free of pdfplumber.
     from contract_sweeper.runtime.alias_overrides import load_overrides
     from scripts.extract_act_acuden_pdfs import extract_source
 
     overrides = load_overrides()
-    extract_source(source_key, root, overrides, dry_run=False, input_override=input_dir, logger=logger)
+    extract_source(
+        source_key, root, overrides, dry_run=False, input_override=input_dir, logger=logger
+    )
     staged = _read_staged_rows(root, source_key)
     promoted = promote_rows(staged, source_key)
     out_path = root / PROCESSED_OUTPUTS[source_key]

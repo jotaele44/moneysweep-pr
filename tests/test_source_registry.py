@@ -1,4 +1,5 @@
 """Tests for the source registry loader."""
+
 from __future__ import annotations
 
 import json

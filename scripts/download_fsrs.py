@@ -17,6 +17,7 @@ Usage:
   python3 scripts/download_fsrs.py
   python3 scripts/download_fsrs.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -38,11 +39,19 @@ USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 MAX_PAGES = 50
 
 FSRS_COLUMNS = [
-    "subaward_id", "prime_award_id", "prime_award_generated_internal_id",
-    "prime_recipient_name", "sub_recipient_name", "sub_recipient_uei",
-    "sub_award_amount", "sub_award_date", "sub_award_type",
-    "place_of_performance_state", "place_of_performance_city",
-    "prime_agency_name", "cfda_number",
+    "subaward_id",
+    "prime_award_id",
+    "prime_award_generated_internal_id",
+    "prime_recipient_name",
+    "sub_recipient_name",
+    "sub_recipient_uei",
+    "sub_award_amount",
+    "sub_award_date",
+    "sub_award_type",
+    "place_of_performance_state",
+    "place_of_performance_city",
+    "prime_agency_name",
+    "cfda_number",
     "source_dataset",
 ]
 
@@ -62,22 +71,26 @@ def _paginate(session: requests.Session, payload: dict) -> list[dict]:
             logger.warning("USAspending request failed on page %d: %s", page, exc)
             break
         for result in body.get("results", []):
-            rows.append({
-                "subaward_id":                      result.get("Award ID") or result.get("award_id", ""),
-                "prime_award_id":                   result.get("prime_award_id", ""),
-                "prime_award_generated_internal_id": result.get("prime_award_generated_internal_id", ""),
-                "prime_recipient_name":             result.get("Recipient Name", ""),
-                "sub_recipient_name":               result.get("recipient_name", ""),
-                "sub_recipient_uei":                result.get("recipient_uei", ""),
-                "sub_award_amount":                 result.get("Award Amount", 0),
-                "sub_award_date":                   result.get("Start Date", ""),
-                "sub_award_type":                   result.get("Award Type", ""),
-                "place_of_performance_state":       result.get("Place of Performance State Code", ""),
-                "place_of_performance_city":        result.get("Place of Performance City Name", ""),
-                "prime_agency_name":                result.get("Awarding Agency", ""),
-                "cfda_number":                      result.get("cfda_number", ""),
-                "source_dataset":                   "fsrs_usaspending",
-            })
+            rows.append(
+                {
+                    "subaward_id": result.get("Award ID") or result.get("award_id", ""),
+                    "prime_award_id": result.get("prime_award_id", ""),
+                    "prime_award_generated_internal_id": result.get(
+                        "prime_award_generated_internal_id", ""
+                    ),
+                    "prime_recipient_name": result.get("Recipient Name", ""),
+                    "sub_recipient_name": result.get("recipient_name", ""),
+                    "sub_recipient_uei": result.get("recipient_uei", ""),
+                    "sub_award_amount": result.get("Award Amount", 0),
+                    "sub_award_date": result.get("Start Date", ""),
+                    "sub_award_type": result.get("Award Type", ""),
+                    "place_of_performance_state": result.get("Place of Performance State Code", ""),
+                    "place_of_performance_city": result.get("Place of Performance City Name", ""),
+                    "prime_agency_name": result.get("Awarding Agency", ""),
+                    "cfda_number": result.get("cfda_number", ""),
+                    "source_dataset": "fsrs_usaspending",
+                }
+            )
         meta = body.get("page_metadata", {})
         if not meta.get("hasNext"):
             break
@@ -93,9 +106,14 @@ def _fetch_via_usaspending(session: requests.Session) -> pd.DataFrame:
             "award_type_codes": ["02", "03", "04", "05", "A", "B", "C", "D"],
         },
         "fields": [
-            "Award ID", "Award Amount", "Award Type", "Recipient Name",
-            "Start Date", "Place of Performance State Code",
-            "Place of Performance City Name", "Awarding Agency",
+            "Award ID",
+            "Award Amount",
+            "Award Type",
+            "Recipient Name",
+            "Start Date",
+            "Place of Performance State Code",
+            "Place of Performance City Name",
+            "Awarding Agency",
         ],
         "subawards": True,
         "limit": 100,
@@ -124,7 +142,9 @@ def _derive_from_subaward_master() -> pd.DataFrame | None:
         out["sub_recipient_name"] = df.get("sub_recipient_name", df.get("recipient_name", ""))
         out["sub_recipient_uei"] = df.get("sub_recipient_uei", "")
         out["sub_award_amount"] = df.get("sub_award_amount", df.get("obligated_amount", 0))
-        out["sub_award_date"] = df.get("sub_award_date", df.get("period_of_performance_start_date", ""))
+        out["sub_award_date"] = df.get(
+            "sub_award_date", df.get("period_of_performance_start_date", "")
+        )
         out["sub_award_type"] = df.get("sub_award_type", df.get("award_category", "subaward"))
         out["place_of_performance_state"] = df.get("place_of_performance_state", "PR")
         out["place_of_performance_city"] = df.get("place_of_performance_city", "")
@@ -142,7 +162,10 @@ def run(force: bool = False) -> dict:
         try:
             df = pd.read_csv(OUT_PATH)
             if not df.empty:
-                logger.info("pr_fsrs_subawards.csv already present (%d rows). Use --force to refresh.", len(df))
+                logger.info(
+                    "pr_fsrs_subawards.csv already present (%d rows). Use --force to refresh.",
+                    len(df),
+                )
                 return {"rows": len(df), "status": "cached"}
         except Exception:
             pass

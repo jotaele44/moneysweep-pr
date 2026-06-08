@@ -7,6 +7,7 @@ producer's ``_download_institutions`` helper.
 
 No credentials required.
 """
+
 from __future__ import annotations
 
 from typing import Any

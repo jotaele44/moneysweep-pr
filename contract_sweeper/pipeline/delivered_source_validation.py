@@ -134,7 +134,9 @@ def discover_candidate_paths(root: Path, request: dict[str, Any]) -> list[Path]:
         if dropzone_abs.is_file():
             candidates.append(dropzone_abs)
         elif dropzone_abs.is_dir():
-            candidates.extend(sorted(path.resolve() for path in dropzone_abs.rglob("*") if path.is_file()))
+            candidates.extend(
+                sorted(path.resolve() for path in dropzone_abs.rglob("*") if path.is_file())
+            )
 
     dropzone_root = root / "data" / "manual_import_dropzone"
     processed_root = root / "data" / "staging" / "processed"
@@ -142,9 +144,13 @@ def discover_candidate_paths(root: Path, request: dict[str, Any]) -> list[Path]:
         if not basename:
             continue
         if dropzone_root.exists():
-            candidates.extend(sorted(path.resolve() for path in dropzone_root.rglob(basename) if path.is_file()))
+            candidates.extend(
+                sorted(path.resolve() for path in dropzone_root.rglob(basename) if path.is_file())
+            )
         if processed_root.exists():
-            candidates.extend(sorted(path.resolve() for path in processed_root.rglob(basename) if path.is_file()))
+            candidates.extend(
+                sorted(path.resolve() for path in processed_root.rglob(basename) if path.is_file())
+            )
 
     return [path for path in dedupe_paths(candidates) if path.exists() and path.is_file()]
 
@@ -178,7 +184,11 @@ def validate_candidate(
     cols_actual = read_columns(candidate)
     missing_cols = [col for col in cols_required if col and col not in cols_actual]
     if missing_cols:
-        return False, {"missing_columns": "|".join(missing_cols)}, "candidate_missing_required_columns"
+        return (
+            False,
+            {"missing_columns": "|".join(missing_cols)},
+            "candidate_missing_required_columns",
+        )
 
     candidate_sha = sha256(candidate)
     expected_sha = str(expected_sha256 or "").strip().lower()

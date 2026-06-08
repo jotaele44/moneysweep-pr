@@ -16,6 +16,7 @@ Usage:
   python3 scripts/sam_enrichment.py --dry-run     # validate config only
   python3 scripts/sam_enrichment.py --top 500     # first 500 vendors by value
 """
+
 from __future__ import annotations
 
 import argparse
@@ -49,19 +50,36 @@ USAS_BASE_URL = "https://api.usaspending.gov/api/v2/recipient/search/"
 
 BATCH_SIZE = 25
 RATE_DELAY = 0.4
-RETRY_MAX = 2        # was 3 — reduces timeout waste on failed lookups
-RETRY_DELAY = 1.0    # was 2.0
+RETRY_MAX = 2  # was 3 — reduces timeout waste on failed lookups
+RETRY_DELAY = 1.0  # was 2.0
 MATCH_THRESHOLD = 0.85
 COVERAGE_GATE = 0.60
 
 STRIP_SUFFIXES = [
-    r"\bINC\.?\b", r"\bCORP\.?\b", r"\bLLC\.?\b", r"\bLLP\.?\b",
-    r"\bL\.P\.?\b", r"\bS\.E\.?\b", r"\bS\.P\.?\b", r"\bPSC\.?\b",
-    r"\bLTD\.?\b", r"\bCO\.?\b", r"\bCOMPANY\b", r"\bCORPORATION\b",
-    r"\bINCORPORATED\b", r"\bLIMITED\b", r"\bAUTHORITY\b",
-    r"\bASSOCIATES\b", r"\bENTERPRISES\b", r"\bGROUP\b",
-    r"\bSERVICES\b", r"\bSOLUTIONS\b", r"\bINTERNATIONAL\b",
-    r"\bCONSTRUCTION\b", r"\bCONTRACTORS?\b", r"\bCONSULTANTS?\b",
+    r"\bINC\.?\b",
+    r"\bCORP\.?\b",
+    r"\bLLC\.?\b",
+    r"\bLLP\.?\b",
+    r"\bL\.P\.?\b",
+    r"\bS\.E\.?\b",
+    r"\bS\.P\.?\b",
+    r"\bPSC\.?\b",
+    r"\bLTD\.?\b",
+    r"\bCO\.?\b",
+    r"\bCOMPANY\b",
+    r"\bCORPORATION\b",
+    r"\bINCORPORATED\b",
+    r"\bLIMITED\b",
+    r"\bAUTHORITY\b",
+    r"\bASSOCIATES\b",
+    r"\bENTERPRISES\b",
+    r"\bGROUP\b",
+    r"\bSERVICES\b",
+    r"\bSOLUTIONS\b",
+    r"\bINTERNATIONAL\b",
+    r"\bCONSTRUCTION\b",
+    r"\bCONTRACTORS?\b",
+    r"\bCONSULTANTS?\b",
 ]
 
 # ---------------------------------------------------------------------------
@@ -70,10 +88,10 @@ STRIP_SUFFIXES = [
 
 _SUFFIX_EXPANSIONS = {
     r"\bINCORPORATED\b": "INC",
-    r"\bCORPORATION\b":  "CORP",
-    r"\bCOMPANY\b":      "CO",
-    r"\bLIMITED\b":      "LTD",
-    r"\bAUTHORITY\b":    "AUTH",
+    r"\bCORPORATION\b": "CORP",
+    r"\bCOMPANY\b": "CO",
+    r"\bLIMITED\b": "LTD",
+    r"\bAUTHORITY\b": "AUTH",
 }
 
 
@@ -104,6 +122,7 @@ def name_similarity(a: str, b: str) -> float:
 
     try:
         from rapidfuzz import fuzz
+
         # token_set_ratio handles subset/superset matches well (returns 0-100)
         fuzzy = fuzz.token_set_ratio(a, b) / 100.0
     except ImportError:
@@ -120,6 +139,7 @@ def vendor_hash(name: str) -> str:
 # ---------------------------------------------------------------------------
 # API calls
 # ---------------------------------------------------------------------------
+
 
 def sam_call(params: dict, api_key: str, timeout: tuple = (5, 7)):
     """GET SAM.gov entity-information API. Returns parsed JSON or None."""
@@ -194,13 +214,15 @@ def sam_lookup_by_name(vendor_name: str, api_key: str) -> dict | None:
 def usaspending_lookup(vendor_name: str) -> dict | None:
     """POST to USASpending recipient search as fallback. Returns result dict or None."""
     norm = normalize_vendor(vendor_name)
-    payload = json.dumps({
-        "search_text": norm,
-        "recipient_type_name": "business_types",
-        "order": "desc",
-        "sort": "amount",
-        "limit": 5,
-    }).encode()
+    payload = json.dumps(
+        {
+            "search_text": norm,
+            "recipient_type_name": "business_types",
+            "order": "desc",
+            "sort": "amount",
+            "limit": 5,
+        }
+    ).encode()
     req = urllib.request.Request(
         USAS_BASE_URL,
         data=payload,
@@ -240,6 +262,7 @@ def usaspending_lookup(vendor_name: str) -> dict | None:
 # Checkpoint / cache helpers
 # ---------------------------------------------------------------------------
 
+
 def _load_json(path: Path) -> dict:
     if path.exists():
         try:
@@ -266,6 +289,7 @@ def _load_existing_index(index_path: Path) -> dict:
 # Target loading
 # ---------------------------------------------------------------------------
 
+
 def load_targets(root: Path) -> list[dict]:
     """
     Derive vendor targets from the master CSV.
@@ -287,7 +311,8 @@ def load_targets(root: Path) -> list[dict]:
                 "total_value": float(r.get("total_value", 0) or 0),
                 "record_count": int(r.get("record_count", 1) or 1),
             }
-            for r in rows if r.get("vendor_name", "").strip()
+            for r in rows
+            if r.get("vendor_name", "").strip()
         ]
 
     # Determine which master to use and what the name column is called
@@ -321,10 +346,7 @@ def load_targets(root: Path) -> list[dict]:
             vendor_totals[vn]["total_value"] += amt
             vendor_totals[vn]["record_count"] += 1
 
-    targets = [
-        {"vendor_name": vn, **stats}
-        for vn, stats in vendor_totals.items()
-    ]
+    targets = [{"vendor_name": vn, **stats} for vn, stats in vendor_totals.items()]
     targets.sort(key=lambda x: x["total_value"], reverse=True)
 
     # Write for reuse
@@ -340,24 +362,39 @@ def load_targets(root: Path) -> list[dict]:
 # Index writer
 # ---------------------------------------------------------------------------
 
+
 def write_index(results: dict, output_dir: Path) -> None:
     fieldnames = [
-        "vendor_name", "normalized_name", "total_value", "uei", "cage", "duns",
-        "sam_name", "match_score", "status", "expiry", "state",
-        "parent_uei", "parent_name",
-        "source", "resolved_at",
+        "vendor_name",
+        "normalized_name",
+        "total_value",
+        "uei",
+        "cage",
+        "duns",
+        "sam_name",
+        "match_score",
+        "status",
+        "expiry",
+        "state",
+        "parent_uei",
+        "parent_name",
+        "source",
+        "resolved_at",
     ]
     index_path = output_dir / "vendor_uei_index.csv"
     with open(index_path, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
         w.writeheader()
-        for r in sorted(results.values(), key=lambda x: float(x.get("total_value", 0)), reverse=True):
+        for r in sorted(
+            results.values(), key=lambda x: float(x.get("total_value", 0)), reverse=True
+        ):
             w.writerow(r)
 
 
 # ---------------------------------------------------------------------------
 # Master merge
 # ---------------------------------------------------------------------------
+
 
 def merge_into_master(results: dict, root: Path, output_dir: Path, logger) -> None:
     """Patch master CSV with resolved UEI/CAGE/DUNS → master_enriched.csv."""
@@ -402,12 +439,15 @@ def merge_into_master(results: dict, root: Path, output_dir: Path, logger) -> No
         w.writerows(rows)
 
     pct = patched / max(len(rows), 1) * 100
-    logger.info(f"  Patched {patched:,}/{len(rows):,} master records ({pct:.1f}%) → {out_path.name}")
+    logger.info(
+        f"  Patched {patched:,}/{len(rows):,} master records ({pct:.1f}%) → {out_path.name}"
+    )
 
 
 # ---------------------------------------------------------------------------
 # Main pipeline
 # ---------------------------------------------------------------------------
+
 
 def run(root: Path = None, resume: bool = False, dry_run: bool = False, top_n: int = None) -> dict:
     if root is None:
@@ -429,7 +469,9 @@ def run(root: Path = None, resume: bool = False, dry_run: bool = False, top_n: i
         logger.info("[DRY RUN] Config validated.")
         logger.info(f"  SAM endpoint: {SAM_BASE_URL}")
         logger.info(f"  API key:      {api_key[:12]}...")
-        logger.info(f"  Master path:  {root / 'data' / 'staging' / 'processed' / 'pr_contracts_master.csv'}")
+        logger.info(
+            f"  Master path:  {root / 'data' / 'staging' / 'processed' / 'pr_contracts_master.csv'}"
+        )
         logger.info(f"  Output dir:   {output_dir}")
         return {"dry_run": True}
 
@@ -511,35 +553,42 @@ def run(root: Path = None, resume: bool = False, dry_run: bool = False, top_n: i
             cache[h] = sam_result
             resolved += 1
             logger.info(
-                f"  [{i+1}/{len(targets)}] {vendor[:50]}\n"
-                f"       UEI={sam_result['uei']} CAGE={sam_result.get('cage','')} "
-                f"score={sam_result.get('match_score','')}"
+                f"  [{i + 1}/{len(targets)}] {vendor[:50]}\n"
+                f"       UEI={sam_result['uei']} CAGE={sam_result.get('cage', '')} "
+                f"score={sam_result.get('match_score', '')}"
             )
         else:
             results[vendor] = {
                 "vendor_name": vendor,
                 "normalized_name": norm,
                 "total_value": target["total_value"],
-                "uei": "", "cage": "", "duns": "",
-                "sam_name": "", "match_score": 0,
+                "uei": "",
+                "cage": "",
+                "duns": "",
+                "sam_name": "",
+                "match_score": 0,
                 "status": "UNRESOLVED",
-                "parent_uei": "", "parent_name": "",
+                "parent_uei": "",
+                "parent_name": "",
                 "source": "NONE",
                 "resolved_at": datetime.now().isoformat(),
             }
             failed.append(vendor)
-            logger.info(f"  [{i+1}/{len(targets)}] {vendor[:50]} — not resolved")
+            logger.info(f"  [{i + 1}/{len(targets)}] {vendor[:50]} — not resolved")
 
         processed += 1
 
         if processed % BATCH_SIZE == 0:
             write_index(results, output_dir)
             _save_json(cache_path, cache)
-            _save_json(checkpoint_path, {
-                "last_idx": i + 1,
-                "resolved": resolved,
-                "ts": datetime.now().isoformat(),
-            })
+            _save_json(
+                checkpoint_path,
+                {
+                    "last_idx": i + 1,
+                    "resolved": resolved,
+                    "ts": datetime.now().isoformat(),
+                },
+            )
             coverage = resolved / max(processed, 1)
             logger.info(
                 f"  [CHECKPOINT] {resolved}/{processed} resolved ({coverage:.1%}) | "
@@ -579,8 +628,12 @@ def run(root: Path = None, resume: bool = False, dry_run: bool = False, top_n: i
     logger.info(f"\n{'=' * 60}")
     logger.info(f"[COMPLETE] {datetime.now().isoformat()}")
     logger.info(f"  Resolved:      {resolved:,} / {total_processed:,} ({coverage:.1%})")
-    logger.info(f"  Value covered: ${value_resolved:,.0f} / ${value_total:,.0f} ({summary['value_coverage_pct']:.1f}%)")
-    logger.info(f"  Gate:          {'PASS' if summary['coverage_gate_pass'] else 'FAIL — see failed_lookups.csv'}")
+    logger.info(
+        f"  Value covered: ${value_resolved:,.0f} / ${value_total:,.0f} ({summary['value_coverage_pct']:.1f}%)"
+    )
+    logger.info(
+        f"  Gate:          {'PASS' if summary['coverage_gate_pass'] else 'FAIL — see failed_lookups.csv'}"
+    )
 
     if not summary["coverage_gate_pass"]:
         logger.warning(

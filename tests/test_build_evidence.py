@@ -1,4 +1,5 @@
 """Tests for the canonical_v1 evidence pipeline (tiering + builder)."""
+
 import csv
 
 import pytest
@@ -11,7 +12,7 @@ from scripts import build_evidence as be
 @pytest.mark.unit
 def test_derive_tier_caps_by_method():
     assert et.derive_tier("registry", "manual") == "T1"
-    assert et.derive_tier("registry", "OCR") == "T3"      # method caps below source
+    assert et.derive_tier("registry", "OCR") == "T3"  # method caps below source
     assert et.derive_tier("csv", "parser") == "T2"
     assert et.derive_tier("web", "web") == "T3"
     assert et.derive_tier("mystery", None) == "T4"
@@ -26,19 +27,29 @@ def test_score_evidence_applies_ocr_confidence():
 @pytest.mark.unit
 def test_claim_tier_crosswalk():
     assert et.claim_tier_for("T1", "accepted") == "observed"
-    assert et.claim_tier_for("T1", "pending") == "linked"      # downgraded
+    assert et.claim_tier_for("T1", "pending") == "linked"  # downgraded
     assert et.claim_tier_for("T2", "rejected") == "blocked"
     assert et.claim_tier_for("T4", "accepted") == "inferred"
 
 
 @pytest.mark.unit
 def test_make_evidence_is_deterministic_and_derives_fields():
-    a = be.make_evidence(source_type="registry", source_name="PR Lobby Registry",
-                         claim="LGA represents Genera PR", page_or_line_ref="row 5",
-                         extraction_method="manual", review_status="accepted")
-    b = be.make_evidence(source_type="registry", source_name="PR Lobby Registry",
-                         claim="LGA represents Genera PR", page_or_line_ref="row 5",
-                         extraction_method="manual", review_status="accepted")
+    a = be.make_evidence(
+        source_type="registry",
+        source_name="PR Lobby Registry",
+        claim="LGA represents Genera PR",
+        page_or_line_ref="row 5",
+        extraction_method="manual",
+        review_status="accepted",
+    )
+    b = be.make_evidence(
+        source_type="registry",
+        source_name="PR Lobby Registry",
+        claim="LGA represents Genera PR",
+        page_or_line_ref="row 5",
+        extraction_method="manual",
+        review_status="accepted",
+    )
     assert a.evidence_id == b.evidence_id
     assert a.evidence_tier == "T1"
     assert a.confidence == 0.95
@@ -74,13 +85,21 @@ def test_from_csv_source_emits_one_row_per_data_row(tmp_path):
 
 @pytest.mark.integration
 def test_write_evidence_roundtrips_and_validates(tmp_path):
-    items = be.dedupe_evidence([
-        be.make_evidence(source_type="registry", source_name="S1", claim="claim one",
-                         page_or_line_ref="row 2", extraction_method="manual",
-                         review_status="accepted"),
-        be.make_evidence(source_type="csv", source_name="S2", claim="claim two",
-                         page_or_line_ref="row 3"),
-    ])
+    items = be.dedupe_evidence(
+        [
+            be.make_evidence(
+                source_type="registry",
+                source_name="S1",
+                claim="claim one",
+                page_or_line_ref="row 2",
+                extraction_method="manual",
+                review_status="accepted",
+            ),
+            be.make_evidence(
+                source_type="csv", source_name="S2", claim="claim two", page_or_line_ref="row 3"
+            ),
+        ]
+    )
     out = tmp_path / "evidence.csv"
     manifest = be.write_evidence(items, out)
     assert manifest["row_count"] == 2

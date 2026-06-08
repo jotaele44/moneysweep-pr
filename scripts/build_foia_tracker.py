@@ -17,6 +17,7 @@ CLI::
     python scripts/build_foia_tracker.py            # write the CSV + manifest
     python scripts/build_foia_tracker.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -44,9 +45,18 @@ EVIDENCE_TIER = "T2"
 CONFIDENCE = 0.8
 
 COLUMNS = [
-    "request_id", "target_source_id", "target_agency", "jurisdiction",
-    "record_type", "statute", "request_status", "priority", "rationale",
-    "evidence_tier", "confidence", "notes",
+    "request_id",
+    "target_source_id",
+    "target_agency",
+    "jurisdiction",
+    "record_type",
+    "statute",
+    "request_status",
+    "priority",
+    "rationale",
+    "evidence_tier",
+    "confidence",
+    "notes",
 ]
 
 
@@ -61,8 +71,9 @@ def _read(root: Path, rel: str) -> list[dict[str, str]]:
 
 def _source_status_index(root: Path) -> dict[str, str]:
     """Map source_id -> pipeline_status from the source registry status report."""
-    return {r["source_id"]: (r.get("pipeline_status") or "").strip()
-            for r in _read(root, SOURCE_STATUS)}
+    return {
+        r["source_id"]: (r.get("pipeline_status") or "").strip() for r in _read(root, SOURCE_STATUS)
+    }
 
 
 def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
@@ -73,21 +84,23 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
     for ref in _read(root, SEED):
         source_id = (ref.get("target_source_id") or "").strip()
         record_type = (ref.get("record_type") or "").strip()
-        rows.append({
-            "request_id": f"FOIA_{name_hash(source_id + '|' + record_type)}",
-            "target_source_id": source_id,
-            "target_agency": (ref.get("target_agency") or "").strip(),
-            "jurisdiction": (ref.get("jurisdiction") or "").strip(),
-            "record_type": record_type,
-            "statute": (ref.get("statute") or "").strip(),
-            "request_status": (ref.get("request_status") or "planned").strip(),
-            "priority": (ref.get("priority") or "").strip(),
-            "rationale": (ref.get("rationale") or "").strip(),
-            "evidence_tier": EVIDENCE_TIER,
-            "confidence": CONFIDENCE,
-            "notes": "",
-            "_source_status": status.get(source_id),
-        })
+        rows.append(
+            {
+                "request_id": f"FOIA_{name_hash(source_id + '|' + record_type)}",
+                "target_source_id": source_id,
+                "target_agency": (ref.get("target_agency") or "").strip(),
+                "jurisdiction": (ref.get("jurisdiction") or "").strip(),
+                "record_type": record_type,
+                "statute": (ref.get("statute") or "").strip(),
+                "request_status": (ref.get("request_status") or "planned").strip(),
+                "priority": (ref.get("priority") or "").strip(),
+                "rationale": (ref.get("rationale") or "").strip(),
+                "evidence_tier": EVIDENCE_TIER,
+                "confidence": CONFIDENCE,
+                "notes": "",
+                "_source_status": status.get(source_id),
+            }
+        )
     return rows
 
 
@@ -112,9 +125,13 @@ def check(rows: list[dict[str, Any]], root: Path | None = None) -> list[str]:
         # Referential integrity: only track real, unmet source gaps.
         st = row.get("_source_status")
         if st is None:
-            problems.append(f"row {i}: target {row['target_source_id']!r} not found in source registry status")
+            problems.append(
+                f"row {i}: target {row['target_source_id']!r} not found in source registry status"
+            )
         elif st == "fully_materialized":
-            problems.append(f"row {i}: target {row['target_source_id']!r} is already fully_materialized — not a gap")
+            problems.append(
+                f"row {i}: target {row['target_source_id']!r} is already fully_materialized — not a gap"
+            )
         for msg in validate_row(_public_row(row), schema):
             problems.append(f"row {i} ({row.get('target_source_id')!r}): {msg}")
     return problems
@@ -162,7 +179,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

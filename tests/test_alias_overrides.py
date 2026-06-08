@@ -1,4 +1,5 @@
 """Tests for contract_sweeper.runtime.alias_overrides and its wires."""
+
 from __future__ import annotations
 
 import csv
@@ -330,11 +331,17 @@ def test_shipped_overrides_collapse_maritime_transport_truncations() -> None:
         ("Unlimited Learning Center, Inc.", "Unlimited Lerning Center Inc."),
         ("JJ Investment Group LLC", "JJ Investmentt Group LLC"),
         ("All Access Academics LLC", "All Acess Academics LLC"),
-        ("Kiddiecare Pre-School and Tutoring Center LLC", "Kiddiecare Preschool and Tutoring Center LLC"),
+        (
+            "Kiddiecare Pre-School and Tutoring Center LLC",
+            "Kiddiecare Preschool and Tutoring Center LLC",
+        ),
         ("Adonai Day Care & Learning Center, Corp.", "Adonai Daycare and Learning Center Corp"),
         ("OCTAGON CONSULTANT GROUP, CORP.", "Octagon Consulting Group LLC"),
         ("CDI Emanuel, Inc.", "CDI Emmanuel Inc"),
-        ("Little Kids Adventure Day Care and Leaning Center Inc.", "Little Kids Adventure Day Care Learning Center Inc"),
+        (
+            "Little Kids Adventure Day Care and Leaning Center Inc.",
+            "Little Kids Adventure Day Care Learning Center Inc",
+        ),
         ("Topee-Topee, LLC", "Topeee Topee LLC"),
         ("Centro Cuidado Amor Inc.", "Centro de Cuidado Amor Inc"),
     ],

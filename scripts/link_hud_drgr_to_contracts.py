@@ -31,12 +31,16 @@ from scripts.config import PROJECT_ROOT, setup_logging
 LINKED_DIR = PROJECT_ROOT / "data" / "linked"
 
 LINKAGE_COLUMNS = [
-    "responsible_org", "responsible_org_normalized",
-    "matched_entity", "matched_entity_normalized",
+    "responsible_org",
+    "responsible_org_normalized",
+    "matched_entity",
+    "matched_entity_normalized",
     "link_confidence",
-    "matched_contract_count", "matched_contract_total",
+    "matched_contract_count",
+    "matched_contract_total",
     "grant_number_list",
-    "activity_count", "total_budget_managed",
+    "activity_count",
+    "total_budget_managed",
 ]
 
 FUZZY_THRESHOLD = 0.85
@@ -103,9 +107,9 @@ def run(root=None, force=False):
     norm_dir = root / "data" / "normalized"
     proc_dir = root / "data" / "staging" / "processed"
 
-    df_orgs       = _load_parquet(norm_dir / "hud_drgr_responsible_orgs_resolved.parquet", logger)
+    df_orgs = _load_parquet(norm_dir / "hud_drgr_responsible_orgs_resolved.parquet", logger)
     _load_parquet(norm_dir / "hud_drgr_activities.parquet", logger)
-    df_contracts  = _load_csv(proc_dir / "pr_contracts_master.csv", logger)
+    df_contracts = _load_csv(proc_dir / "pr_contracts_master.csv", logger)
     if df_contracts.empty:
         df_contracts = _load_csv(proc_dir / "pr_all_awards_master.csv", logger)
     df_entity = _load_csv(proc_dir / "entity_master.csv", logger)
@@ -126,7 +130,13 @@ def run(root=None, force=False):
     if name_col and not df_contracts.empty:
         for norm_key, grp in df_contracts.groupby(df_contracts[name_col].apply(_normalize_name)):
             if norm_key:
-                amt = pd.to_numeric(grp.get("obligated_amount", pd.Series(dtype=float)), errors="coerce").fillna(0).sum()
+                amt = (
+                    pd.to_numeric(
+                        grp.get("obligated_amount", pd.Series(dtype=float)), errors="coerce"
+                    )
+                    .fillna(0)
+                    .sum()
+                )
                 contract_exact[norm_key] = {
                     "recipient_name": grp[name_col].iloc[0],
                     "count": len(grp),
@@ -164,20 +174,26 @@ def run(root=None, force=False):
         else:
             matched_entity, count, total = "", 0, 0
 
-        rows.append({
-            "responsible_org":           org,
-            "responsible_org_normalized": org_norm,
-            "matched_entity":            matched_entity,
-            "matched_entity_normalized": matched_key,
-            "link_confidence":           confidence,
-            "matched_contract_count":    count,
-            "matched_contract_total":    total,
-            "grant_number_list":         org_row.get("grant_number_list", ""),
-            "activity_count":            org_row.get("activity_count", 0),
-            "total_budget_managed":      org_row.get("total_budget_managed", 0),
-        })
+        rows.append(
+            {
+                "responsible_org": org,
+                "responsible_org_normalized": org_norm,
+                "matched_entity": matched_entity,
+                "matched_entity_normalized": matched_key,
+                "link_confidence": confidence,
+                "matched_contract_count": count,
+                "matched_contract_total": total,
+                "grant_number_list": org_row.get("grant_number_list", ""),
+                "activity_count": org_row.get("activity_count", 0),
+                "total_budget_managed": org_row.get("total_budget_managed", 0),
+            }
+        )
 
-    df_out = pd.DataFrame(rows, columns=LINKAGE_COLUMNS) if rows else pd.DataFrame(columns=LINKAGE_COLUMNS)
+    df_out = (
+        pd.DataFrame(rows, columns=LINKAGE_COLUMNS)
+        if rows
+        else pd.DataFrame(columns=LINKAGE_COLUMNS)
+    )
     df_out.to_csv(out_path, index=False, encoding="utf-8")
 
     total = len(df_out)
@@ -193,7 +209,9 @@ def main():
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     result = run(force=args.force)
-    print(f"\nHUD DRGR linkage: {result['linkage_rows']:,} rows, {result['matched_pct']:.1f}% matched")
+    print(
+        f"\nHUD DRGR linkage: {result['linkage_rows']:,} rows, {result['matched_pct']:.1f}% matched"
+    )
     return 0
 
 

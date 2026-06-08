@@ -19,6 +19,7 @@ CLI::
     python scripts/build_source_drilldown.py            # write the index + manifest
     python scripts/build_source_drilldown.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -40,9 +41,14 @@ MANIFEST_OUT = "data/manifests/source_drilldown.json"
 SCHEMA = "schemas/source_drilldown.schema.json"
 
 # Manifests this producer writes itself — excluded to avoid self-reference.
-SELF_OUTPUTS = {OUT, MANIFEST_OUT, "exports/reports/analyst_reports_manifest.json",
-                "data/manifests/analyst_reports_manifest.json",
-                "exports/dashboard/index.html", "data/manifests/dashboard_explorer.json"}
+SELF_OUTPUTS = {
+    OUT,
+    MANIFEST_OUT,
+    "exports/reports/analyst_reports_manifest.json",
+    "data/manifests/analyst_reports_manifest.json",
+    "exports/dashboard/index.html",
+    "data/manifests/dashboard_explorer.json",
+}
 
 
 def _load_schema(root: Path) -> dict[str, Any]:
@@ -61,7 +67,9 @@ def _top_form_manifests(root: Path) -> list[dict[str, Any]]:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError):
             continue
-        if isinstance(data, dict) and str(data.get("producer_script", "")).startswith("scripts/build_"):
+        if isinstance(data, dict) and str(data.get("producer_script", "")).startswith(
+            "scripts/build_"
+        ):
             manifests.append(data)
     return manifests
 
@@ -146,7 +154,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         entries = build_entries(root)
         problems = check(entries, root)
-        print(json.dumps({"ok": not problems, "row_count": len(entries), "problems": problems}, indent=2))
+        print(
+            json.dumps(
+                {"ok": not problems, "row_count": len(entries), "problems": problems}, indent=2
+            )
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

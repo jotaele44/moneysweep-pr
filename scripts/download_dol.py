@@ -20,6 +20,7 @@ Output:
 Usage:
   python3 scripts/download_dol.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -52,47 +53,88 @@ RETRY_BACKOFF = [5, 15, 30]
 
 # Known DOL enforcement actions in Puerto Rico from public WHD database
 KNOWN_DOL_DATA = [
-    {"case_id": "PR2022-001", "enforcement_type": "WHD",
-     "employer_name": "Caribbean Hospitality Services", "employer_normalized": "CARIBBEAN HOSPITALITY SERVICES",
-     "city": "San Juan", "state": "PR", "naics_code": "7211",
-     "violation_type": "FLSA minimum wage", "penalty_amount": "0", "back_wages": "125000",
-     "investigation_start": "2022-01-15", "findings_date": "2022-06-30",
-     "employees_affected": "45", "source_doc": "dol_whd_pr_enforcement_2022"},
-    {"case_id": "PR2022-002", "enforcement_type": "OSHA",
-     "employer_name": "PR Construction Group", "employer_normalized": "PR CONSTRUCTION GROUP",
-     "city": "Bayamon", "state": "PR", "naics_code": "2361",
-     "violation_type": "Fall protection", "penalty_amount": "15625", "back_wages": "0",
-     "investigation_start": "2022-03-10", "findings_date": "2022-07-15",
-     "employees_affected": "12", "source_doc": "dol_osha_pr_enforcement_2022"},
-    {"case_id": "PR2023-001", "enforcement_type": "WHD",
-     "employer_name": "Island Retail Inc", "employer_normalized": "ISLAND RETAIL INC",
-     "city": "Ponce", "state": "PR", "naics_code": "4521",
-     "violation_type": "FLSA overtime", "penalty_amount": "0", "back_wages": "78000",
-     "investigation_start": "2023-02-01", "findings_date": "2023-08-15",
-     "employees_affected": "28", "source_doc": "dol_whd_pr_enforcement_2023"},
+    {
+        "case_id": "PR2022-001",
+        "enforcement_type": "WHD",
+        "employer_name": "Caribbean Hospitality Services",
+        "employer_normalized": "CARIBBEAN HOSPITALITY SERVICES",
+        "city": "San Juan",
+        "state": "PR",
+        "naics_code": "7211",
+        "violation_type": "FLSA minimum wage",
+        "penalty_amount": "0",
+        "back_wages": "125000",
+        "investigation_start": "2022-01-15",
+        "findings_date": "2022-06-30",
+        "employees_affected": "45",
+        "source_doc": "dol_whd_pr_enforcement_2022",
+    },
+    {
+        "case_id": "PR2022-002",
+        "enforcement_type": "OSHA",
+        "employer_name": "PR Construction Group",
+        "employer_normalized": "PR CONSTRUCTION GROUP",
+        "city": "Bayamon",
+        "state": "PR",
+        "naics_code": "2361",
+        "violation_type": "Fall protection",
+        "penalty_amount": "15625",
+        "back_wages": "0",
+        "investigation_start": "2022-03-10",
+        "findings_date": "2022-07-15",
+        "employees_affected": "12",
+        "source_doc": "dol_osha_pr_enforcement_2022",
+    },
+    {
+        "case_id": "PR2023-001",
+        "enforcement_type": "WHD",
+        "employer_name": "Island Retail Inc",
+        "employer_normalized": "ISLAND RETAIL INC",
+        "city": "Ponce",
+        "state": "PR",
+        "naics_code": "4521",
+        "violation_type": "FLSA overtime",
+        "penalty_amount": "0",
+        "back_wages": "78000",
+        "investigation_start": "2023-02-01",
+        "findings_date": "2023-08-15",
+        "employees_affected": "28",
+        "source_doc": "dol_whd_pr_enforcement_2023",
+    },
 ]
 
 DOL_COLUMNS = [
-    "case_id", "enforcement_type",
-    "employer_name", "employer_normalized",
-    "city", "state", "naics_code",
-    "violation_type", "penalty_amount", "back_wages",
-    "investigation_start", "findings_date",
-    "employees_affected", "source_doc",
+    "case_id",
+    "enforcement_type",
+    "employer_name",
+    "employer_normalized",
+    "city",
+    "state",
+    "naics_code",
+    "violation_type",
+    "penalty_amount",
+    "back_wages",
+    "investigation_start",
+    "findings_date",
+    "employees_affected",
+    "source_doc",
 ]
 
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR DOL enforcement research)",
-        "Accept": "application/json, text/csv, application/zip",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR DOL enforcement research)",
+            "Accept": "application/json, text/csv, application/zip",
+        }
+    )
     return s
 
 
-def _get(session: requests.Session, url: str, params: dict, logger,
-         stream: bool = False) -> requests.Response | None:
+def _get(
+    session: requests.Session, url: str, params: dict, logger, stream: bool = False
+) -> requests.Response | None:
     for attempt in range(MAX_RETRIES):
         try:
             resp = session.get(url, params=params, timeout=120, stream=stream)
@@ -108,7 +150,7 @@ def _get(session: requests.Session, url: str, params: dict, logger,
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -117,6 +159,7 @@ def _get(session: requests.Session, url: str, params: dict, logger,
 
 def _normalize_name(name: str) -> str:
     import re
+
     if not name:
         return ""
     n = re.sub(r"[^\w\s]", " ", name.upper())
@@ -142,8 +185,10 @@ def _fetch_whd_bulk(session: requests.Session, logger) -> list[dict]:
     resp = _get(session, f"{DOL_ENFORCE_BASE}/views/data_summary.php", {}, logger)
     if resp:
         import re
-        links = re.findall(r'href=["\']([^"\']*whd[^"\']*\.(?:csv|zip))["\']',
-                           resp.text, re.IGNORECASE)
+
+        links = re.findall(
+            r'href=["\']([^"\']*whd[^"\']*\.(?:csv|zip))["\']', resp.text, re.IGNORECASE
+        )
         for link in links[:3]:
             if not link.startswith("http"):
                 link = f"{DOL_ENFORCE_BASE}/{link.lstrip('/')}"
@@ -153,12 +198,15 @@ def _fetch_whd_bulk(session: requests.Session, logger) -> list[dict]:
                     continue
                 if link.endswith(".zip"):
                     import zipfile
+
                     with zipfile.ZipFile(io.BytesIO(file_resp.content)) as zf:
                         for name in zf.namelist():
                             if name.endswith(".csv"):
                                 df = pd.read_csv(
                                     io.BytesIO(zf.read(name)),
-                                    dtype=str, low_memory=False, encoding="latin-1"
+                                    dtype=str,
+                                    low_memory=False,
+                                    encoding="latin-1",
                                 )
                                 df = _filter_pr(df, ["state_cd", "state", "st_cd", "zip_cd"])
                                 if len(df) > 0:
@@ -168,8 +216,10 @@ def _fetch_whd_bulk(session: requests.Session, logger) -> list[dict]:
                                     logger.info(f"  WHD zip {name}: {len(df)} PR rows")
                 else:
                     df = pd.read_csv(
-                        io.BytesIO(file_resp.content), dtype=str, low_memory=False,
-                        encoding="latin-1"
+                        io.BytesIO(file_resp.content),
+                        dtype=str,
+                        low_memory=False,
+                        encoding="latin-1",
                     )
                     df = _filter_pr(df, ["state_cd", "state", "st_cd"])
                     if len(df) > 0:
@@ -194,12 +244,15 @@ def _fetch_osha_bulk(session: requests.Session, logger) -> list[dict]:
                 continue
             if url.endswith(".zip"):
                 import zipfile
+
                 with zipfile.ZipFile(io.BytesIO(resp.content)) as zf:
                     for name in zf.namelist():
                         if name.endswith(".csv"):
                             df = pd.read_csv(
-                                io.BytesIO(zf.read(name)), dtype=str, low_memory=False,
-                                encoding="latin-1"
+                                io.BytesIO(zf.read(name)),
+                                dtype=str,
+                                low_memory=False,
+                                encoding="latin-1",
                             )
                             df = _filter_pr(df, ["state", "site_state", "state_id"])
                             if len(df) > 0:
@@ -227,8 +280,12 @@ def _fetch_osha_bulk(session: requests.Session, logger) -> list[dict]:
 def _fetch_dol_opendata(session: requests.Session, logger) -> list[dict]:
     rows = []
     try:
-        resp = _get(session, DOL_OPENDATA_URL,
-                    {"q": "whd osha enforcement violations puerto rico", "rows": 10}, logger)
+        resp = _get(
+            session,
+            DOL_OPENDATA_URL,
+            {"q": "whd osha enforcement violations puerto rico", "rows": 10},
+            logger,
+        )
         if not resp:
             return rows
         data = resp.json()
@@ -242,8 +299,10 @@ def _fetch_dol_opendata(session: requests.Session, logger) -> list[dict]:
                         file_resp = session.get(url, timeout=120)
                         if file_resp.status_code == 200:
                             df = pd.read_csv(
-                                io.BytesIO(file_resp.content), dtype=str,
-                                low_memory=False, encoding="latin-1"
+                                io.BytesIO(file_resp.content),
+                                dtype=str,
+                                low_memory=False,
+                                encoding="latin-1",
                             )
                             df = _filter_pr(df, ["state", "state_cd", "state_id"])
                             if len(df) > 0:
@@ -266,12 +325,17 @@ def _normalize_records(all_rows: list[dict], logger) -> pd.DataFrame:
     rename = {}
     for col in df.columns:
         cl = col.lower().replace(" ", "_")
-        if ("case" in cl or "activity" in cl or "inspection" in cl) and "case_id" not in rename.values():
+        if (
+            "case" in cl or "activity" in cl or "inspection" in cl
+        ) and "case_id" not in rename.values():
             rename[col] = "case_id"
         elif "enforcement_type" == col:
             rename[col] = "enforcement_type"
-        elif ("employer" in cl or "establishment" in cl or "legal_name" in cl
-              ) and "name" in cl and "employer_name" not in rename.values():
+        elif (
+            ("employer" in cl or "establishment" in cl or "legal_name" in cl)
+            and "name" in cl
+            and "employer_name" not in rename.values()
+        ):
             rename[col] = "employer_name"
         elif ("city" in cl or "city_nm" in cl) and "city" not in rename.values():
             rename[col] = "city"
@@ -279,17 +343,27 @@ def _normalize_records(all_rows: list[dict], logger) -> pd.DataFrame:
             rename[col] = "state"
         elif "naics" in cl and "naics_code" not in rename.values():
             rename[col] = "naics_code"
-        elif ("violat" in cl or "finding" in cl) and "type" in cl and "violation_type" not in rename.values():
+        elif (
+            ("violat" in cl or "finding" in cl)
+            and "type" in cl
+            and "violation_type" not in rename.values()
+        ):
             rename[col] = "violation_type"
         elif "penalty" in cl and "penalty_amount" not in rename.values():
             rename[col] = "penalty_amount"
         elif ("back_wage" in cl or "bw_" in cl) and "back_wages" not in rename.values():
             rename[col] = "back_wages"
-        elif ("investigation" in cl or "open_date" in cl) and "investigation_start" not in rename.values():
+        elif (
+            "investigation" in cl or "open_date" in cl
+        ) and "investigation_start" not in rename.values():
             rename[col] = "investigation_start"
         elif ("findings" in cl or "close_date" in cl) and "findings_date" not in rename.values():
             rename[col] = "findings_date"
-        elif ("employee" in cl or "worker" in cl) and "count" in cl and "employees_affected" not in rename.values():
+        elif (
+            ("employee" in cl or "worker" in cl)
+            and "count" in cl
+            and "employees_affected" not in rename.values()
+        ):
             rename[col] = "employees_affected"
 
     df = df.rename(columns=rename)

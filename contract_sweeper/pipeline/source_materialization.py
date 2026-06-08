@@ -343,11 +343,15 @@ def run_source_materialization(root: Path) -> dict[str, Any]:
                 "copy_performed": copy_performed,
                 "candidate_used": candidate_used,
                 "candidate_source_path": candidate_source_path,
-                "target_exists": target_exists if status == "materialized_validated" else target_abs.exists(),
+                "target_exists": target_exists
+                if status == "materialized_validated"
+                else target_abs.exists(),
                 "target_row_count": target_rows,
                 "target_sha256": target_sha,
                 "hash_validated": status == "materialized_validated",
-                "row_validated_nonzero": target_rows > 0 if status == "materialized_validated" else False,
+                "row_validated_nonzero": target_rows > 0
+                if status == "materialized_validated"
+                else False,
                 "blocker_reason": blocker_reason,
             }
         )

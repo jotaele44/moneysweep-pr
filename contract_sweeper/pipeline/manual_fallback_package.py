@@ -109,7 +109,9 @@ def build_manual_fallback_package(
     manual_required_rows: list[dict[str, Any]] = []
     forbidden_artifact_usage = False
 
-    for row in sorted(manual_rows, key=lambda item: int(float(str(item.get("priority", "0") or "0")))):
+    for row in sorted(
+        manual_rows, key=lambda item: int(float(str(item.get("priority", "0") or "0")))
+    ):
         expected_input = str(row.get("expected_input", "")).strip()
         runner_row = runner_manifest_by_input.get(expected_input, {})
         retry_row = retry_results_by_input.get(expected_input, {})
@@ -121,9 +123,7 @@ def build_manual_fallback_package(
             or "unknown_source"
         ).strip()
         target_output_path = str(
-            row.get("target_output_path")
-            or runner_row.get("target_output_path")
-            or expected_input
+            row.get("target_output_path") or runner_row.get("target_output_path") or expected_input
         ).strip()
         required_columns = str(runner_row.get("expected_schema", "")).strip()
         validation_command = str(runner_row.get("validation_command", "")).strip()

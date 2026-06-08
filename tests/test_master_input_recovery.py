@@ -104,6 +104,8 @@ def test_r4_recovery_can_rebuild_with_full_gate_inputs(
     assert result["rebuild_succeeded"] is True
     assert result["rebuild_rows"] >= 1
 
-    summary = json.loads((tmp_path / "data" / "staging" / "processed" / "pr_all_awards_summary.json").read_text())
+    summary = json.loads(
+        (tmp_path / "data" / "staging" / "processed" / "pr_all_awards_summary.json").read_text()
+    )
     assert int(summary.get("total_rows", 0)) >= 1
     assert float(summary.get("source_lineage_coverage", 0.0)) > 0

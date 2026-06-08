@@ -3,6 +3,7 @@
 The live fetch needs egress (Prime Clerk docket). These tests cover only the pure
 parse_records() transform, so they run fully offline.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -19,16 +20,18 @@ def test_empty_records_returns_empty_df():
 
 @pytest.mark.unit
 def test_canonical_keys_pass_through():
-    records = [{
-        "creditor_name": "Aurelius Capital Management LP",
-        "creditor_type": "hedge_fund",
-        "bond_series": "GO",
-        "claim_amount_original": 1_300_000_000,
-        "recovery_amount": 585_000_000,
-        "recovery_rate": 0.45,
-        "sec_13f_flag": 1,
-        "source_doc": "PROMESA Plan of Adjustment",
-    }]
+    records = [
+        {
+            "creditor_name": "Aurelius Capital Management LP",
+            "creditor_type": "hedge_fund",
+            "bond_series": "GO",
+            "claim_amount_original": 1_300_000_000,
+            "recovery_amount": 585_000_000,
+            "recovery_rate": 0.45,
+            "sec_13f_flag": 1,
+            "source_doc": "PROMESA Plan of Adjustment",
+        }
+    ]
     df = parse_records(records)
     assert len(df) == 1
     assert list(df.columns) == PROMESA_COLUMNS

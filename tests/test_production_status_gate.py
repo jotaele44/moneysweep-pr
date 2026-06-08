@@ -104,9 +104,12 @@ def test_run_gate_writes_outputs_and_stamps_report(tmp_path: Path):
     assert (tmp_path / "data" / "exports" / "production_status.json").exists()
     assert (tmp_path / "data" / "review_queue" / "production_blockers.csv").exists()
 
-    report_text = (tmp_path / "data" / "reports" / "pr_investigative_report.md").read_text(encoding="utf-8")
+    report_text = (tmp_path / "data" / "reports" / "pr_investigative_report.md").read_text(
+        encoding="utf-8"
+    )
     assert report_text.startswith("> Production Status: NON_PRODUCTION_DIAGNOSTIC")
 
-    stamped_summary = json.loads((tmp_path / "data" / "reports" / "pr_report_summary.json").read_text(encoding="utf-8"))
+    stamped_summary = json.loads(
+        (tmp_path / "data" / "reports" / "pr_report_summary.json").read_text(encoding="utf-8")
+    )
     assert stamped_summary["production_status"] == STATUS_NON_PRODUCTION
-

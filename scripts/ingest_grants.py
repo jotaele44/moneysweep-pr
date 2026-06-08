@@ -11,6 +11,7 @@ Usage:
   python3 scripts/ingest_grants.py
   python3 scripts/ingest_grants.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -27,13 +28,20 @@ from scripts.config import PROJECT_ROOT, setup_logging
 RAW_DIR = PROJECT_ROOT / "data" / "raw" / "Grants"
 
 OUTPUT_COLUMNS = [
-    "opportunity_id", "opportunity_number", "opportunity_title",
-    "agency_code", "agency_name", "cfda_numbers",
-    "opportunity_category",   # "D" = Discretionary, "M" = Mandatory, etc.
+    "opportunity_id",
+    "opportunity_number",
+    "opportunity_title",
+    "agency_code",
+    "agency_name",
+    "cfda_numbers",
+    "opportunity_category",  # "D" = Discretionary, "M" = Mandatory, etc.
     "funding_instrument_type",  # "G" = Grant, "CA" = Cooperative Agreement, etc.
-    "award_ceiling", "award_floor", "estimated_total_funding",
+    "award_ceiling",
+    "award_floor",
+    "estimated_total_funding",
     "expected_award_count",
-    "post_date", "close_date",
+    "post_date",
+    "close_date",
     "eligible_applicants",
     "description",
     "record_type",  # "synopsis" or "forecast"
@@ -45,23 +53,23 @@ _SYNOPSIS_TAG = "OpportunitySynopsisDetail_1_0"
 _FORECAST_TAG = "OpportunityForecastDetail_1_0"
 
 _FIELD_MAP = {
-    "OpportunityID":                     "opportunity_id",
-    "OpportunityNumber":                 "opportunity_number",
-    "OpportunityTitle":                  "opportunity_title",
-    "AgencyCode":                        "agency_code",
-    "AgencyName":                        "agency_name",
-    "CFDANumbers":                       "cfda_numbers",
-    "OpportunityCategory":               "opportunity_category",
-    "FundingInstrumentType":             "funding_instrument_type",
-    "AwardCeiling":                      "award_ceiling",
-    "AwardFloor":                        "award_floor",
-    "EstimatedTotalProgramFunding":      "estimated_total_funding",
-    "ExpectedNumberOfAwards":            "expected_award_count",
-    "PostDate":                          "post_date",
-    "CloseDate":                         "close_date",
-    "EligibleApplicants":                "eligible_applicants",
+    "OpportunityID": "opportunity_id",
+    "OpportunityNumber": "opportunity_number",
+    "OpportunityTitle": "opportunity_title",
+    "AgencyCode": "agency_code",
+    "AgencyName": "agency_name",
+    "CFDANumbers": "cfda_numbers",
+    "OpportunityCategory": "opportunity_category",
+    "FundingInstrumentType": "funding_instrument_type",
+    "AwardCeiling": "award_ceiling",
+    "AwardFloor": "award_floor",
+    "EstimatedTotalProgramFunding": "estimated_total_funding",
+    "ExpectedNumberOfAwards": "expected_award_count",
+    "PostDate": "post_date",
+    "CloseDate": "close_date",
+    "EligibleApplicants": "eligible_applicants",
     "AdditionalInformationOnEligibility": None,  # not in output columns, skip
-    "Description":                       "description",
+    "Description": "description",
 }
 
 

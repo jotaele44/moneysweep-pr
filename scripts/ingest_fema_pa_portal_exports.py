@@ -9,6 +9,7 @@ Usage:
   python3 scripts/ingest_fema_pa_portal_exports.py
   python3 scripts/ingest_fema_pa_portal_exports.py --force
 """
+
 from __future__ import annotations
 
 import sys
@@ -36,68 +37,141 @@ NORMALIZED_DIR = PROJECT_ROOT / "data" / "normalized"
 OUTPUT_PATH = NORMALIZED_DIR / "fema_pa_portal_178_pws.parquet"
 
 PORTAL_COLUMNS = [
-    "pw_number", "disaster_number", "applicant_name", "applicant_normalized",
-    "pw_type", "site_name", "county", "municipality",
-    "eligible_amount", "federal_share", "state_share", "local_share",
-    "project_description", "category", "status",
-    "last_updated", "source_file",
+    "pw_number",
+    "disaster_number",
+    "applicant_name",
+    "applicant_normalized",
+    "pw_type",
+    "site_name",
+    "county",
+    "municipality",
+    "eligible_amount",
+    "federal_share",
+    "state_share",
+    "local_share",
+    "project_description",
+    "category",
+    "status",
+    "last_updated",
+    "source_file",
 ]
 
 # Flexible column mapping: canonical field → list of candidate column names (case-insensitive)
 COLUMN_CANDIDATES: dict[str, list[str]] = {
     "pw_number": [
-        "PW Number", "Project Worksheet Number", "Project Number", "PWNumber", "pw_number",
-        "ProjectWorksheetNumber", "PW#", "PW Num",
+        "PW Number",
+        "Project Worksheet Number",
+        "Project Number",
+        "PWNumber",
+        "pw_number",
+        "ProjectWorksheetNumber",
+        "PW#",
+        "PW Num",
     ],
     "disaster_number": [
-        "Disaster Number", "Disaster", "disaster_number", "DisasterNumber",
-        "FEMA Disaster Number", "Disaster No",
+        "Disaster Number",
+        "Disaster",
+        "disaster_number",
+        "DisasterNumber",
+        "FEMA Disaster Number",
+        "Disaster No",
     ],
     "applicant_name": [
-        "Applicant Name", "Applicant", "Entity Name", "applicant_name",
-        "Sub-Recipient Name", "SubRecipient", "Recipient Name",
+        "Applicant Name",
+        "Applicant",
+        "Entity Name",
+        "applicant_name",
+        "Sub-Recipient Name",
+        "SubRecipient",
+        "Recipient Name",
     ],
     "pw_type": [
-        "PW Type", "Project Type", "Type", "pw_type",
+        "PW Type",
+        "Project Type",
+        "Type",
+        "pw_type",
     ],
     "site_name": [
-        "Site Name", "Project Site", "Site", "site_name", "Location Name",
+        "Site Name",
+        "Project Site",
+        "Site",
+        "site_name",
+        "Location Name",
     ],
     "county": [
-        "County", "County Name", "county", "CountyName",
+        "County",
+        "County Name",
+        "county",
+        "CountyName",
     ],
     "municipality": [
-        "Municipality", "City", "community", "municipality", "Town", "Municipio",
+        "Municipality",
+        "City",
+        "community",
+        "municipality",
+        "Town",
+        "Municipio",
     ],
     "eligible_amount": [
-        "Eligible Amount", "Project Amount", "Total Eligible", "eligible_amount",
-        "projectAmount", "Total Project Amount", "Eligible Cost",
+        "Eligible Amount",
+        "Project Amount",
+        "Total Eligible",
+        "eligible_amount",
+        "projectAmount",
+        "Total Project Amount",
+        "Eligible Cost",
     ],
     "federal_share": [
-        "Federal Share", "Federal Share Obligated", "federal_share_obligated",
-        "Federal Amount", "Fed Share",
+        "Federal Share",
+        "Federal Share Obligated",
+        "federal_share_obligated",
+        "Federal Amount",
+        "Fed Share",
     ],
     "state_share": [
-        "State Share", "State Amount", "state_share", "Non-Federal State",
+        "State Share",
+        "State Amount",
+        "state_share",
+        "Non-Federal State",
     ],
     "local_share": [
-        "Local Share", "Local Amount", "local_share", "Non-Federal Local", "Applicant Share",
+        "Local Share",
+        "Local Amount",
+        "local_share",
+        "Non-Federal Local",
+        "Applicant Share",
     ],
     "project_description": [
-        "Project Description", "Description", "Scope of Work", "project_description",
-        "SOW", "Work Description",
+        "Project Description",
+        "Description",
+        "Scope of Work",
+        "project_description",
+        "SOW",
+        "Work Description",
     ],
     "category": [
-        "Category", "Work Category", "Damage Category", "category",
-        "Work Cat", "Cat",
+        "Category",
+        "Work Category",
+        "Damage Category",
+        "category",
+        "Work Cat",
+        "Cat",
     ],
     "status": [
-        "Status", "Project Status", "Current Status", "status",
-        "PW Status", "Award Status",
+        "Status",
+        "Project Status",
+        "Current Status",
+        "status",
+        "PW Status",
+        "Award Status",
     ],
     "last_updated": [
-        "Last Updated", "Last Modified", "Update Date", "last_updated",
-        "Modified Date", "Date Updated",
+        "Last Updated",
+        "Last Modified",
+        "Update Date",
+        "last_updated",
+        "Modified Date",
+        "Date Updated",
     ],
 }
 
@@ -105,6 +179,7 @@ COLUMN_CANDIDATES: dict[str, list[str]] = {
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _find_column(df_columns: list[str], candidates: list[str]) -> str | None:
     """Case-insensitive search for the first matching candidate in df_columns."""
@@ -154,8 +229,18 @@ def _looks_like_pw_file(filepath: Path) -> bool:
     Checks filename for keywords suggesting it contains PW data.
     """
     name_lower = filepath.name.lower()
-    pw_keywords = ["pw", "project_worksheet", "project worksheet", "178", "public_assist",
-                   "publicassist", "fema_pa", "pa_", "_pa_", "fema-pa"]
+    pw_keywords = [
+        "pw",
+        "project_worksheet",
+        "project worksheet",
+        "178",
+        "public_assist",
+        "publicassist",
+        "fema_pa",
+        "pa_",
+        "_pa_",
+        "fema-pa",
+    ]
     return any(kw in name_lower for kw in pw_keywords)
 
 
@@ -188,6 +273,7 @@ def _normalize_df(raw_df: pd.DataFrame, source_file: str, logger) -> pd.DataFram
 # ---------------------------------------------------------------------------
 # Public run() interface
 # ---------------------------------------------------------------------------
+
 
 def run(root=None, force=False) -> dict:
     logger = setup_logging("ingest_fema_pa_portal_exports")
@@ -275,7 +361,9 @@ def run(root=None, force=False) -> dict:
     combined = pd.concat([deduplicated_part, remainder], ignore_index=True)
     logger.info(
         "Deduplication: %d → %d rows (removed %d duplicates on pw_number+disaster_number).",
-        before_dedup, len(combined), before_dedup - len(combined),
+        before_dedup,
+        len(combined),
+        before_dedup - len(combined),
     )
 
     pq_write(combined, out_path)
@@ -287,11 +375,14 @@ def run(root=None, force=False) -> dict:
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Ingest FEMA PA portal export files and normalize to parquet."
     )
-    parser.add_argument("--force", action="store_true", help="Re-ingest even if output file exists.")
+    parser.add_argument(
+        "--force", action="store_true", help="Re-ingest even if output file exists."
+    )
     args = parser.parse_args()
 
     result = run(force=args.force)

@@ -11,6 +11,7 @@ calls this and then opens the cross-repo PR — the PR step needs a
 The copy operation is injectable so the logic is unit-testable without touching
 a real sibling checkout.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -22,7 +23,9 @@ SPIDERWEB_DERIVATIVE = "spiderweb_pr_derivatives.csv"
 SPIDERWEB_DROPZONE = "data/intake/pr_intake"
 
 
-def deliver(derivatives_dir, dropzone_dir, filename: str = SPIDERWEB_DERIVATIVE, copy=shutil.copy2) -> dict:
+def deliver(
+    derivatives_dir, dropzone_dir, filename: str = SPIDERWEB_DERIVATIVE, copy=shutil.copy2
+) -> dict:
     """Copy ``<derivatives_dir>/<filename>`` into ``<dropzone_dir>/<filename>``.
 
     Returns a result dict. Raises FileNotFoundError if the source is absent.
@@ -40,12 +43,19 @@ def deliver(derivatives_dir, dropzone_dir, filename: str = SPIDERWEB_DERIVATIVE,
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--derivatives-dir", required=True,
-                        help="Directory holding the router's *_derivatives.csv files")
-    parser.add_argument("--dropzone", required=True,
-                        help="Target sibling-repo intake dropzone directory")
-    parser.add_argument("--filename", default=SPIDERWEB_DERIVATIVE,
-                        help=f"Derivative file to deliver (default: {SPIDERWEB_DERIVATIVE})")
+    parser.add_argument(
+        "--derivatives-dir",
+        required=True,
+        help="Directory holding the router's *_derivatives.csv files",
+    )
+    parser.add_argument(
+        "--dropzone", required=True, help="Target sibling-repo intake dropzone directory"
+    )
+    parser.add_argument(
+        "--filename",
+        default=SPIDERWEB_DERIVATIVE,
+        help=f"Derivative file to deliver (default: {SPIDERWEB_DERIVATIVE})",
+    )
     args = parser.parse_args(argv)
     try:
         result = deliver(args.derivatives_dir, args.dropzone, args.filename)

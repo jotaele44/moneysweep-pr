@@ -45,6 +45,7 @@ def test_safe_float_bad_string():
 # _match_name
 # ---------------------------------------------------------------------------
 
+
 def test_match_name_exact_hit():
     df = pd.DataFrame({"name": ["ACME CORP", "OTHER INC"]})
     result = _match_name("ACME CORP", df, "name")
@@ -73,6 +74,7 @@ def test_match_name_no_hit():
 # _fema_score
 # ---------------------------------------------------------------------------
 
+
 def test_fema_score_neutral_on_empty():
     n, rate = _fema_score("ACME", pd.DataFrame())
     assert n == 0
@@ -80,20 +82,24 @@ def test_fema_score_neutral_on_empty():
 
 
 def test_fema_score_all_complete():
-    df = pd.DataFrame({
-        "recipient_name_normalized": ["ACME CORP", "ACME CORP"],
-        "project_status": ["completed", "closed"],
-    })
+    df = pd.DataFrame(
+        {
+            "recipient_name_normalized": ["ACME CORP", "ACME CORP"],
+            "project_status": ["completed", "closed"],
+        }
+    )
     n, rate = _fema_score("ACME CORP", df)
     assert n == 2
     assert rate == pytest.approx(1.0)
 
 
 def test_fema_score_partial_complete():
-    df = pd.DataFrame({
-        "recipient_name_normalized": ["ACME CORP", "ACME CORP", "ACME CORP", "ACME CORP"],
-        "project_status": ["completed", "open", "open", "open"],
-    })
+    df = pd.DataFrame(
+        {
+            "recipient_name_normalized": ["ACME CORP", "ACME CORP", "ACME CORP", "ACME CORP"],
+            "project_status": ["completed", "open", "open", "open"],
+        }
+    )
     n, rate = _fema_score("ACME CORP", df)
     assert n == 4
     assert rate == pytest.approx(0.25)
@@ -103,12 +109,13 @@ def test_fema_score_no_status_column():
     df = pd.DataFrame({"recipient_name_normalized": ["ACME CORP"]})
     n, rate = _fema_score("ACME CORP", df)
     assert n == 1
-    assert rate == 0.5   # neutral when status column absent
+    assert rate == 0.5  # neutral when status column absent
 
 
 # ---------------------------------------------------------------------------
 # _cor3_score
 # ---------------------------------------------------------------------------
+
 
 def test_cor3_score_neutral_on_empty():
     n, rate = _cor3_score("ACME", pd.DataFrame())
@@ -117,10 +124,12 @@ def test_cor3_score_neutral_on_empty():
 
 
 def test_cor3_score_computes_mean():
-    df = pd.DataFrame({
-        "applicant_normalized": ["ACME CORP", "ACME CORP"],
-        "disbursement_rate": ["0.80", "0.40"],
-    })
+    df = pd.DataFrame(
+        {
+            "applicant_normalized": ["ACME CORP", "ACME CORP"],
+            "disbursement_rate": ["0.80", "0.40"],
+        }
+    )
     n, rate = _cor3_score("ACME CORP", df)
     assert n == 2
     assert rate == pytest.approx(0.60)
@@ -130,37 +139,45 @@ def test_cor3_score_computes_mean():
 # _usace_ok
 # ---------------------------------------------------------------------------
 
+
 def test_usace_ok_neutral_on_empty():
     assert _usace_ok("ACME", pd.DataFrame()) == 1
 
 
 def test_usace_ok_active_permit():
-    df = pd.DataFrame({
-        "applicant_normalized": ["ACME CORP"],
-        "status": ["active"],
-    })
+    df = pd.DataFrame(
+        {
+            "applicant_normalized": ["ACME CORP"],
+            "status": ["active"],
+        }
+    )
     assert _usace_ok("ACME CORP", df) == 1
 
 
 def test_usace_ok_no_record():
-    df = pd.DataFrame({
-        "applicant_normalized": ["TOTALLY DIFFERENT"],
-        "status": ["active"],
-    })
+    df = pd.DataFrame(
+        {
+            "applicant_normalized": ["TOTALLY DIFFERENT"],
+            "status": ["active"],
+        }
+    )
     assert _usace_ok("ACME CORP", df) == 0
 
 
 def test_usace_ok_expired_permit():
-    df = pd.DataFrame({
-        "applicant_normalized": ["ACME CORP"],
-        "status": ["expired"],
-    })
+    df = pd.DataFrame(
+        {
+            "applicant_normalized": ["ACME CORP"],
+            "status": ["expired"],
+        }
+    )
     assert _usace_ok("ACME CORP", df) == 0
 
 
 # ---------------------------------------------------------------------------
 # _eqb_violations
 # ---------------------------------------------------------------------------
+
 
 def test_eqb_violations_neutral_on_empty():
     flag, count = _eqb_violations("ACME", pd.DataFrame())
@@ -169,20 +186,24 @@ def test_eqb_violations_neutral_on_empty():
 
 
 def test_eqb_violations_with_violations():
-    df = pd.DataFrame({
-        "facility_normalized": ["ACME CORP"],
-        "violation_count": ["3"],
-    })
+    df = pd.DataFrame(
+        {
+            "facility_normalized": ["ACME CORP"],
+            "violation_count": ["3"],
+        }
+    )
     flag, count = _eqb_violations("ACME CORP", df)
     assert flag == 1
     assert count == 3
 
 
 def test_eqb_violations_zero_violations():
-    df = pd.DataFrame({
-        "facility_normalized": ["ACME CORP"],
-        "violation_count": ["0"],
-    })
+    df = pd.DataFrame(
+        {
+            "facility_normalized": ["ACME CORP"],
+            "violation_count": ["0"],
+        }
+    )
     flag, count = _eqb_violations("ACME CORP", df)
     assert flag == 0
     assert count == 0
@@ -191,6 +212,7 @@ def test_eqb_violations_zero_violations():
 # ---------------------------------------------------------------------------
 # Risk tier thresholds
 # ---------------------------------------------------------------------------
+
 
 def test_risk_tier_boundary_values():
     assert RISK_HIGH < RISK_MEDIUM

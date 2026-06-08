@@ -15,6 +15,7 @@ Usage:
   python3 scripts/download_usace_permits.py
   python3 scripts/download_usace_permits.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -38,23 +39,30 @@ from scripts.build_unified_master import _normalize_name
 
 # EPA ECHO bulk data downloads — USACE/404 permit data
 # https://echo.epa.gov/tools/data-downloads (public, no auth)
-ECHO_PERMITS_URL = (
-    "https://echo.epa.gov/files/echodownloads/USACE_PERMITS.zip"
-)
+ECHO_PERMITS_URL = "https://echo.epa.gov/files/echodownloads/USACE_PERMITS.zip"
 
-MAX_RETRIES   = 3
+MAX_RETRIES = 3
 RETRY_BACKOFF = [10, 30, 60]
-STREAM_CHUNK  = 1024 * 1024  # 1MB chunks
+STREAM_CHUNK = 1024 * 1024  # 1MB chunks
 
 OUTPUT_COLUMNS = [
-    "permit_id", "permit_type", "applicant_name", "applicant_normalized",
-    "issued_date", "expiry_date", "project_description",
-    "state", "county", "status", "violation_flag",
+    "permit_id",
+    "permit_type",
+    "applicant_name",
+    "applicant_normalized",
+    "issued_date",
+    "expiry_date",
+    "project_description",
+    "state",
+    "county",
+    "status",
+    "violation_flag",
 ]
 
 # ---------------------------------------------------------------------------
 # Download helpers
 # ---------------------------------------------------------------------------
+
 
 def _session() -> requests.Session:
     s = requests.Session()
@@ -62,8 +70,7 @@ def _session() -> requests.Session:
     return s
 
 
-def _download_zip(session: requests.Session, url: str,
-                  raw_path: Path, logger) -> bytes | None:
+def _download_zip(session: requests.Session, url: str, raw_path: Path, logger) -> bytes | None:
     """Stream-download a ZIP and return contents of the largest CSV inside."""
     logger.info(f"  Downloading {url}...")
     for attempt in range(MAX_RETRIES):
@@ -83,7 +90,7 @@ def _download_zip(session: requests.Session, url: str,
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All retries failed: {exc}")
@@ -112,6 +119,7 @@ def _extract_csv_from_zip(content: bytes, logger) -> pd.DataFrame | None:
 # Transform
 # ---------------------------------------------------------------------------
 
+
 def _filter_pr(df: pd.DataFrame, logger) -> pd.DataFrame:
     """Keep only Puerto Rico records."""
     state_col = next(
@@ -128,37 +136,38 @@ def _filter_pr(df: pd.DataFrame, logger) -> pd.DataFrame:
 
 def _build_output(df: pd.DataFrame) -> pd.DataFrame:
     """Map raw ECHO columns to canonical schema."""
-    def col(*cands):
-        return next(
-            (c for c in cands if c in df.columns), None
-        )
 
-    permit_id   = col("PERMIT_ID", "ACTIVITY_ID", "permit_id", "PermitID")
+    def col(*cands):
+        return next((c for c in cands if c in df.columns), None)
+
+    permit_id = col("PERMIT_ID", "ACTIVITY_ID", "permit_id", "PermitID")
     permit_type = col("PERMIT_TYPE", "ACTIVITY_TYPE_CODE", "PermitType")
-    applicant   = col("APPLICANT_NAME", "OWNER_NAME", "ApplicantName")
-    issued      = col("ISSUED_DATE", "ISSUE_DATE", "IssuedDate")
-    expiry      = col("EXPIRATION_DATE", "EXPIRY_DATE", "ExpirationDate")
-    desc        = col("PROJECT_DESCRIPTION", "DESCRIPTION", "Description")
-    state       = col("STATE_CODE", "STATE", "State")
-    county      = col("COUNTY_NAME", "COUNTY", "County")
-    status      = col("PERMIT_STATUS", "STATUS", "Status")
+    applicant = col("APPLICANT_NAME", "OWNER_NAME", "ApplicantName")
+    issued = col("ISSUED_DATE", "ISSUE_DATE", "IssuedDate")
+    expiry = col("EXPIRATION_DATE", "EXPIRY_DATE", "ExpirationDate")
+    desc = col("PROJECT_DESCRIPTION", "DESCRIPTION", "Description")
+    state = col("STATE_CODE", "STATE", "State")
+    county = col("COUNTY_NAME", "COUNTY", "County")
+    status = col("PERMIT_STATUS", "STATUS", "Status")
 
     rows = []
     for _, r in df.iterrows():
         name = str(r[applicant] if applicant else "")
-        rows.append({
-            "permit_id":           str(r[permit_id] if permit_id else ""),
-            "permit_type":         str(r[permit_type] if permit_type else ""),
-            "applicant_name":      name,
-            "applicant_normalized": _normalize_name(name),
-            "issued_date":         str(r[issued] if issued else ""),
-            "expiry_date":         str(r[expiry] if expiry else ""),
-            "project_description": str(r[desc] if desc else "")[:200],
-            "state":               str(r[state] if state else ""),
-            "county":              str(r[county] if county else ""),
-            "status":              str(r[status] if status else ""),
-            "violation_flag":      0,
-        })
+        rows.append(
+            {
+                "permit_id": str(r[permit_id] if permit_id else ""),
+                "permit_type": str(r[permit_type] if permit_type else ""),
+                "applicant_name": name,
+                "applicant_normalized": _normalize_name(name),
+                "issued_date": str(r[issued] if issued else ""),
+                "expiry_date": str(r[expiry] if expiry else ""),
+                "project_description": str(r[desc] if desc else "")[:200],
+                "state": str(r[state] if state else ""),
+                "county": str(r[county] if county else ""),
+                "status": str(r[status] if status else ""),
+                "violation_flag": 0,
+            }
+        )
     return pd.DataFrame(rows, columns=OUTPUT_COLUMNS)
 
 
@@ -166,9 +175,10 @@ def _build_output(df: pd.DataFrame) -> pd.DataFrame:
 # Core
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None, force: bool = False) -> dict:
     root = Path(root or PROJECT_ROOT)
-    raw_dir  = root / "data" / "staging" / "raw" / "usace"
+    raw_dir = root / "data" / "staging" / "raw" / "usace"
     out_path = root / "data" / "staging" / "processed" / "pr_usace_permits.csv"
     raw_dir.mkdir(parents=True, exist_ok=True)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -211,6 +221,7 @@ def run(root: Path = None, force: bool = False) -> dict:
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Download USACE permit data for Puerto Rico")

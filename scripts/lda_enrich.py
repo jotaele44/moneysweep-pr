@@ -27,6 +27,7 @@ Usage:
   python3 scripts/lda_enrich.py --force          # ignore cached entity queries
   python3 scripts/lda_enrich.py --api-key TOKEN
 """
+
 from __future__ import annotations
 
 import argparse
@@ -50,41 +51,74 @@ from scripts.config import PROJECT_ROOT, setup_logging
 # Constants
 # ---------------------------------------------------------------------------
 
-LDA_BASE      = "https://lda.senate.gov/api/v1"
-PAGE_SIZE     = 25        # LDA API max per page
-PAGE_SLEEP    = 0.5       # seconds between pages (120 req/min with token)
-QUERY_SLEEP   = 0.6       # seconds between entity queries
-MAX_RETRIES   = 3
+LDA_BASE = "https://lda.senate.gov/api/v1"
+PAGE_SIZE = 25  # LDA API max per page
+PAGE_SLEEP = 0.5  # seconds between pages (120 req/min with token)
+QUERY_SLEEP = 0.6  # seconds between entity queries
+MAX_RETRIES = 3
 RETRY_BACKOFF = [10, 30, 60]
-TOP_N_DEFAULT = 500       # top entities by total_obligated to query
+TOP_N_DEFAULT = 500  # top entities by total_obligated to query
 
 _STRIP_RE = re.compile(r"[^\w\s]")
 _SPACE_RE = re.compile(r"\s+")
 _SUFFIXES = {
-    "INC", "LLC", "LLP", "CORP", "CO", "LTD", "LP", "PC",
-    "PLLC", "DBA", "THE", "AND", "OF", "SA", "SRL",
-    "HOSPITAL", "HEALTH", "CENTER", "CENTRE",
+    "INC",
+    "LLC",
+    "LLP",
+    "CORP",
+    "CO",
+    "LTD",
+    "LP",
+    "PC",
+    "PLLC",
+    "DBA",
+    "THE",
+    "AND",
+    "OF",
+    "SA",
+    "SRL",
+    "HOSPITAL",
+    "HEALTH",
+    "CENTER",
+    "CENTRE",
 }
 
 _OVERRIDES = load_overrides()
 
 CROSSREF_COLUMNS = [
-    "entity_key", "canonical_name", "total_awards_obligated", "award_count",
-    "filing_uuid", "filing_year", "filing_type", "period_of_report",
-    "registrant_name", "registrant_state", "client_name", "client_state",
-    "income", "expenses", "general_issue_codes", "issue_descriptions",
+    "entity_key",
+    "canonical_name",
+    "total_awards_obligated",
+    "award_count",
+    "filing_uuid",
+    "filing_year",
+    "filing_type",
+    "period_of_report",
+    "registrant_name",
+    "registrant_state",
+    "client_name",
+    "client_state",
+    "income",
+    "expenses",
+    "general_issue_codes",
+    "issue_descriptions",
     "lobbyist_names",
 ]
 
 LDA_ENRICH_COLUMNS = [
-    "lda_flag", "lda_total_spend", "lda_registrants",
-    "lda_issues", "lda_filing_years", "lda_filing_count",
+    "lda_flag",
+    "lda_total_spend",
+    "lda_registrants",
+    "lda_issues",
+    "lda_filing_years",
+    "lda_filing_count",
 ]
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _normalize(name: str) -> str:
     if not name or pd.isna(name):
@@ -113,7 +147,7 @@ def _session(api_key: str | None) -> requests.Session:
     s = requests.Session()
     headers = {
         "User-Agent": "ContractSweeper/1.0 (PR federal spending research)",
-        "Accept":     "application/json",
+        "Accept": "application/json",
     }
     if api_key:
         headers["Authorization"] = f"Token {api_key}"
@@ -124,6 +158,7 @@ def _session(api_key: str | None) -> requests.Session:
 # ---------------------------------------------------------------------------
 # API fetch
 # ---------------------------------------------------------------------------
+
 
 def _get(session: requests.Session, url: str, params: dict, logger) -> dict | None:
     for attempt in range(MAX_RETRIES):
@@ -156,15 +191,15 @@ def _fetch_filings_for_entity(
     logger,
 ) -> list[dict]:
     """Fetch all LDA filings where client_name matches the entity."""
-    url  = f"{LDA_BASE}/filings/"
+    url = f"{LDA_BASE}/filings/"
     page = 1
     records = []
 
     while True:
         params = {
             "client_name": canonical_name,
-            "page_size":   PAGE_SIZE,
-            "page":        page,
+            "page_size": PAGE_SIZE,
+            "page": page,
         }
         data = _get(session, url, params, logger)
         if data is None:
@@ -191,9 +226,10 @@ def _fetch_filings_for_entity(
 # Flatten one LDA filing record
 # ---------------------------------------------------------------------------
 
+
 def _flatten(rec: dict) -> dict:
     registrant = rec.get("registrant") or {}
-    client     = rec.get("client") or {}
+    client = rec.get("client") or {}
 
     activities = rec.get("lobbying_activities") or []
     issue_codes, issue_descs, lobbyist_names = [], [], []
@@ -213,19 +249,19 @@ def _flatten(rec: dict) -> dict:
     cli_address = client.get("address") or {}
 
     return {
-        "filing_uuid":        rec.get("filing_uuid", ""),
-        "filing_year":        rec.get("filing_year", ""),
-        "filing_type":        rec.get("filing_type", ""),
-        "period_of_report":   rec.get("period_of_report", ""),
-        "registrant_name":    registrant.get("name", ""),
-        "registrant_state":   registrant.get("state") or reg_address.get("state") or "",
-        "client_name":        client.get("name", ""),
-        "client_state":       client.get("state") or cli_address.get("state") or "",
-        "income":             rec.get("income", ""),
-        "expenses":           rec.get("expenses", ""),
+        "filing_uuid": rec.get("filing_uuid", ""),
+        "filing_year": rec.get("filing_year", ""),
+        "filing_type": rec.get("filing_type", ""),
+        "period_of_report": rec.get("period_of_report", ""),
+        "registrant_name": registrant.get("name", ""),
+        "registrant_state": registrant.get("state") or reg_address.get("state") or "",
+        "client_name": client.get("name", ""),
+        "client_state": client.get("state") or cli_address.get("state") or "",
+        "income": rec.get("income", ""),
+        "expenses": rec.get("expenses", ""),
         "general_issue_codes": "|".join(issue_codes[:10]),
-        "issue_descriptions":  "|".join(issue_descs[:5]),
-        "lobbyist_names":      "|".join(lobbyist_names[:15]),
+        "issue_descriptions": "|".join(issue_descs[:5]),
+        "lobbyist_names": "|".join(lobbyist_names[:15]),
     }
 
 
@@ -233,14 +269,16 @@ def _flatten(rec: dict) -> dict:
 # Core run
 # ---------------------------------------------------------------------------
 
-def run(root: Path = None, api_key: str | None = None,
-        top_n: int = TOP_N_DEFAULT, force: bool = False) -> dict:
+
+def run(
+    root: Path = None, api_key: str | None = None, top_n: int = TOP_N_DEFAULT, force: bool = False
+) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)
 
     processed_dir = root / "data" / "staging" / "processed"
-    cache_dir     = root / "data" / "staging" / "raw" / "lda" / "entity_queries"
+    cache_dir = root / "data" / "staging" / "raw" / "lda" / "entity_queries"
     cache_dir.mkdir(parents=True, exist_ok=True)
     processed_dir.mkdir(parents=True, exist_ok=True)
 
@@ -259,23 +297,32 @@ def run(root: Path = None, api_key: str | None = None,
     if not entity_path.exists():
         logger.error(f"  entity_master.csv not found at {entity_path}")
         logger.error("  Run build_unified_master.py first.")
-        return {"entities_queried": 0, "entities_matched": 0, "total_spend": 0.0, "status": "NO_INPUT"}
+        return {
+            "entities_queried": 0,
+            "entities_matched": 0,
+            "total_spend": 0.0,
+            "status": "NO_INPUT",
+        }
 
     df_entities = pd.read_csv(entity_path, dtype=str, low_memory=False)
     logger.info(f"  Loaded entity_master: {len(df_entities):,} entities")
 
     # Sort by total_obligated descending, take top N
-    df_entities["_oblig_num"] = pd.to_numeric(df_entities.get("total_obligated", pd.Series(dtype=str)), errors="coerce").fillna(0.0)
-    df_entities = df_entities.sort_values("_oblig_num", ascending=False).head(top_n).reset_index(drop=True)
+    df_entities["_oblig_num"] = pd.to_numeric(
+        df_entities.get("total_obligated", pd.Series(dtype=str)), errors="coerce"
+    ).fillna(0.0)
+    df_entities = (
+        df_entities.sort_values("_oblig_num", ascending=False).head(top_n).reset_index(drop=True)
+    )
     logger.info(f"  Querying top {len(df_entities):,} entities by total obligation")
 
     session = _session(api_key)
     crossref_rows: list[dict] = []
-    enrich_rows:   list[dict] = []
+    enrich_rows: list[dict] = []
     entities_matched = 0
 
     for idx, ent in df_entities.iterrows():
-        entity_key     = str(ent.get("entity_key", "") or "")
+        entity_key = str(ent.get("entity_key", "") or "")
         canonical_name = str(ent.get("canonical_name", "") or "")
         if not canonical_name.strip():
             continue
@@ -299,22 +346,24 @@ def run(root: Path = None, api_key: str | None = None,
             time.sleep(QUERY_SLEEP)
 
         if not raw_filings:
-            enrich_rows.append({
-                "entity_key":     entity_key,
-                "lda_flag":       0,
-                "lda_total_spend": 0.0,
-                "lda_registrants": "",
-                "lda_issues":      "",
-                "lda_filing_years": "",
-                "lda_filing_count": 0,
-            })
+            enrich_rows.append(
+                {
+                    "entity_key": entity_key,
+                    "lda_flag": 0,
+                    "lda_total_spend": 0.0,
+                    "lda_registrants": "",
+                    "lda_issues": "",
+                    "lda_filing_years": "",
+                    "lda_filing_count": 0,
+                }
+            )
             continue
 
         # Aggregate across filings
-        total_spend   = 0.0
-        registrants   = []
-        issues        = []
-        filing_years  = set()
+        total_spend = 0.0
+        registrants = []
+        issues = []
+        filing_years = set()
 
         for rec in raw_filings:
             flat = _flatten(rec)
@@ -338,28 +387,34 @@ def run(root: Path = None, api_key: str | None = None,
                 filing_years.add(yr)
 
             # Add to crossref
-            crossref_rows.append({
-                "entity_key":            entity_key,
-                "canonical_name":        canonical_name,
-                "total_awards_obligated": float(ent.get("_oblig_num", 0)),
-                "award_count":           ent.get("award_count", ""),
-                **flat,
-            })
+            crossref_rows.append(
+                {
+                    "entity_key": entity_key,
+                    "canonical_name": canonical_name,
+                    "total_awards_obligated": float(ent.get("_oblig_num", 0)),
+                    "award_count": ent.get("award_count", ""),
+                    **flat,
+                }
+            )
 
         entities_matched += 1
-        enrich_rows.append({
-            "entity_key":       entity_key,
-            "lda_flag":         1,
-            "lda_total_spend":  round(total_spend, 2),
-            "lda_registrants":  "|".join(registrants[:10]),
-            "lda_issues":       "|".join(issues[:20]),
-            "lda_filing_years": "|".join(sorted(filing_years)),
-            "lda_filing_count": len(raw_filings),
-        })
+        enrich_rows.append(
+            {
+                "entity_key": entity_key,
+                "lda_flag": 1,
+                "lda_total_spend": round(total_spend, 2),
+                "lda_registrants": "|".join(registrants[:10]),
+                "lda_issues": "|".join(issues[:20]),
+                "lda_filing_years": "|".join(sorted(filing_years)),
+                "lda_filing_count": len(raw_filings),
+            }
+        )
 
         if (idx + 1) % 50 == 0:
-            logger.info(f"  Progress: {idx + 1:,}/{len(df_entities):,} entities queried, "
-                        f"{entities_matched:,} with LDA filings")
+            logger.info(
+                f"  Progress: {idx + 1:,}/{len(df_entities):,} entities queried, "
+                f"{entities_matched:,} with LDA filings"
+            )
 
     session.close()
 
@@ -375,14 +430,16 @@ def run(root: Path = None, api_key: str | None = None,
             on="entity_key",
             how="left",
         )
-        df_enriched["lda_flag"]        = df_enriched["lda_flag"].fillna(0).astype(int)
+        df_enriched["lda_flag"] = df_enriched["lda_flag"].fillna(0).astype(int)
         df_enriched["lda_total_spend"] = df_enriched["lda_total_spend"].fillna(0.0)
         df_enriched["lda_filing_count"] = df_enriched["lda_filing_count"].fillna(0).astype(int)
         for col in ["lda_registrants", "lda_issues", "lda_filing_years"]:
             df_enriched[col] = df_enriched[col].fillna("")
     else:
         for col in LDA_ENRICH_COLUMNS:
-            df_enriched[col] = "" if col not in ("lda_flag", "lda_total_spend", "lda_filing_count") else 0
+            df_enriched[col] = (
+                "" if col not in ("lda_flag", "lda_total_spend", "lda_filing_count") else 0
+            )
 
     enriched_path = processed_dir / "entity_lda_enriched.csv"
     df_enriched.to_csv(enriched_path, index=False, encoding="utf-8")
@@ -410,7 +467,9 @@ def run(root: Path = None, api_key: str | None = None,
     logger.info("LDA ENRICHMENT SUMMARY")
     logger.info("=" * 60)
     logger.info(f"  Entities queried:   {len(df_entities):,}")
-    logger.info(f"  Entities matched:   {entities_matched:,} ({entities_matched / max(len(df_entities), 1):.1%})")
+    logger.info(
+        f"  Entities matched:   {entities_matched:,} ({entities_matched / max(len(df_entities), 1):.1%})"
+    )
     logger.info(f"  Total lobby spend:  ${total_spend:,.0f}")
     logger.info(f"  Filing matches:     {len(df_crossref):,}")
 
@@ -431,11 +490,11 @@ def run(root: Path = None, api_key: str | None = None,
     return {
         "entities_queried": len(df_entities),
         "entities_matched": entities_matched,
-        "total_spend":      total_spend,
-        "filing_matches":   len(df_crossref),
-        "enriched_path":    str(enriched_path),
-        "crossref_path":    str(crossref_path),
-        "status":           "OK",
+        "total_spend": total_spend,
+        "filing_matches": len(df_crossref),
+        "enriched_path": str(enriched_path),
+        "crossref_path": str(crossref_path),
+        "status": "OK",
     }
 
 
@@ -443,16 +502,21 @@ def run(root: Path = None, api_key: str | None = None,
 # CLI entry point
 # ---------------------------------------------------------------------------
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Enrich award recipients with LDA lobbying data (client_name lookup)"
     )
-    parser.add_argument("--api-key", default=None,
-                        help="LDA API token (default: LDA_API_KEY env var)")
-    parser.add_argument("--top-n", type=int, default=TOP_N_DEFAULT,
-                        help=f"Top N entities by obligation to query (default: {TOP_N_DEFAULT})")
-    parser.add_argument("--force", action="store_true",
-                        help="Ignore cached entity query results")
+    parser.add_argument(
+        "--api-key", default=None, help="LDA API token (default: LDA_API_KEY env var)"
+    )
+    parser.add_argument(
+        "--top-n",
+        type=int,
+        default=TOP_N_DEFAULT,
+        help=f"Top N entities by obligation to query (default: {TOP_N_DEFAULT})",
+    )
+    parser.add_argument("--force", action="store_true", help="Ignore cached entity query results")
     args = parser.parse_args()
 
     result = run(api_key=args.api_key, top_n=args.top_n, force=args.force)

@@ -18,6 +18,7 @@ Usage:
   python3 scripts/download_cdbg_dr.py            # full run
   python3 scripts/download_cdbg_dr.py --force    # re-download even if file exists
 """
+
 from __future__ import annotations
 
 import argparse
@@ -90,33 +91,61 @@ RETRY_BACKOFF = [2, 4, 8]
 
 # Known major CDBG-DR grants to Puerto Rico (from HUD Federal Register allocations)
 KNOWN_CDBG_DR_DATA = [
-    {"award_id": "B-17-DG-72-0001", "recipient_name": "Puerto Rico Department of Housing",
-     "recipient_uei": "", "awarding_agency": "Department of Housing and Urban Development",
-     "awarding_sub_agency": "Community Planning and Development",
-     "obligated_amount": "1507179000", "award_date": "2018-02-09",
-     "fiscal_year": "2018", "pop_state": "PR", "pop_county": "Statewide",
-     "description": "CDBG-DR Hurricane Maria Round 1 allocation",
-     "source_file": "hud_federal_register_2018", "source_dataset": "cdbg_dr", "award_category": "Grant"},
-    {"award_id": "B-17-DG-72-0002", "recipient_name": "Puerto Rico Department of Housing",
-     "recipient_uei": "", "awarding_agency": "Department of Housing and Urban Development",
-     "awarding_sub_agency": "Community Planning and Development",
-     "obligated_amount": "8215000000", "award_date": "2018-08-30",
-     "fiscal_year": "2018", "pop_state": "PR", "pop_county": "Statewide",
-     "description": "CDBG-DR Hurricane Maria Round 2 allocation",
-     "source_file": "hud_federal_register_2018", "source_dataset": "cdbg_dr", "award_category": "Grant"},
-    {"award_id": "B-18-DG-72-0001", "recipient_name": "Puerto Rico Department of Housing",
-     "recipient_uei": "", "awarding_agency": "Department of Housing and Urban Development",
-     "awarding_sub_agency": "Community Planning and Development",
-     "obligated_amount": "8282000000", "award_date": "2019-09-04",
-     "fiscal_year": "2019", "pop_state": "PR", "pop_county": "Statewide",
-     "description": "CDBG-DR Hurricane Maria Round 3 (CDBG-MIT) allocation",
-     "source_file": "hud_federal_register_2019", "source_dataset": "cdbg_dr", "award_category": "Grant"},
+    {
+        "award_id": "B-17-DG-72-0001",
+        "recipient_name": "Puerto Rico Department of Housing",
+        "recipient_uei": "",
+        "awarding_agency": "Department of Housing and Urban Development",
+        "awarding_sub_agency": "Community Planning and Development",
+        "obligated_amount": "1507179000",
+        "award_date": "2018-02-09",
+        "fiscal_year": "2018",
+        "pop_state": "PR",
+        "pop_county": "Statewide",
+        "description": "CDBG-DR Hurricane Maria Round 1 allocation",
+        "source_file": "hud_federal_register_2018",
+        "source_dataset": "cdbg_dr",
+        "award_category": "Grant",
+    },
+    {
+        "award_id": "B-17-DG-72-0002",
+        "recipient_name": "Puerto Rico Department of Housing",
+        "recipient_uei": "",
+        "awarding_agency": "Department of Housing and Urban Development",
+        "awarding_sub_agency": "Community Planning and Development",
+        "obligated_amount": "8215000000",
+        "award_date": "2018-08-30",
+        "fiscal_year": "2018",
+        "pop_state": "PR",
+        "pop_county": "Statewide",
+        "description": "CDBG-DR Hurricane Maria Round 2 allocation",
+        "source_file": "hud_federal_register_2018",
+        "source_dataset": "cdbg_dr",
+        "award_category": "Grant",
+    },
+    {
+        "award_id": "B-18-DG-72-0001",
+        "recipient_name": "Puerto Rico Department of Housing",
+        "recipient_uei": "",
+        "awarding_agency": "Department of Housing and Urban Development",
+        "awarding_sub_agency": "Community Planning and Development",
+        "obligated_amount": "8282000000",
+        "award_date": "2019-09-04",
+        "fiscal_year": "2019",
+        "pop_state": "PR",
+        "pop_county": "Statewide",
+        "description": "CDBG-DR Hurricane Maria Round 3 (CDBG-MIT) allocation",
+        "source_file": "hud_federal_register_2019",
+        "source_dataset": "cdbg_dr",
+        "award_category": "Grant",
+    },
 ]
 
 
 # ---------------------------------------------------------------------------
 # Session
 # ---------------------------------------------------------------------------
+
 
 def _session() -> requests.Session:
     s = requests.Session()
@@ -127,6 +156,7 @@ def _session() -> requests.Session:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _derive_fiscal_year(date_str) -> str:
     """Derive US fiscal year from a date string. Oct-Dec → year+1."""
@@ -186,6 +216,7 @@ def _file_has_data(filepath: Path) -> bool:
 # Source A: USASpending prime awards
 # ---------------------------------------------------------------------------
 
+
 def _build_usaspending_payload(filter_type: str, page: int) -> dict:
     """
     Build the spending_by_award POST payload.
@@ -204,13 +235,9 @@ def _build_usaspending_payload(filter_type: str, page: int) -> dict:
     }
 
     if filter_type == "pop":
-        base_filters["place_of_performance_locations"] = [
-            {"country": "USA", "state": "PR"}
-        ]
+        base_filters["place_of_performance_locations"] = [{"country": "USA", "state": "PR"}]
     else:
-        base_filters["recipient_locations"] = [
-            {"country": "USA", "state": "PR"}
-        ]
+        base_filters["recipient_locations"] = [{"country": "USA", "state": "PR"}]
 
     return {
         "filters": base_filters,
@@ -295,22 +322,26 @@ def _normalize_usaspending(records: list[dict], source_file: str) -> pd.DataFram
     rows = []
     for r in records:
         award_date = r.get("Start Date", "")
-        rows.append({
-            "award_id": r.get("Award ID", ""),
-            "recipient_name": r.get("Recipient Name", ""),
-            "recipient_uei": r.get("recipient_uei", ""),
-            "awarding_agency": r.get("Awarding Agency", "Department of Housing and Urban Development"),
-            "awarding_sub_agency": r.get("Awarding Sub Agency", ""),
-            "obligated_amount": r.get("Total Obligation", ""),
-            "award_date": award_date,
-            "fiscal_year": _derive_fiscal_year(award_date),
-            "pop_state": "PR",
-            "pop_county": "",
-            "description": r.get("Description", ""),
-            "source_file": source_file,
-            "source_dataset": "cdbg_dr",
-            "award_category": "grant",
-        })
+        rows.append(
+            {
+                "award_id": r.get("Award ID", ""),
+                "recipient_name": r.get("Recipient Name", ""),
+                "recipient_uei": r.get("recipient_uei", ""),
+                "awarding_agency": r.get(
+                    "Awarding Agency", "Department of Housing and Urban Development"
+                ),
+                "awarding_sub_agency": r.get("Awarding Sub Agency", ""),
+                "obligated_amount": r.get("Total Obligation", ""),
+                "award_date": award_date,
+                "fiscal_year": _derive_fiscal_year(award_date),
+                "pop_state": "PR",
+                "pop_county": "",
+                "description": r.get("Description", ""),
+                "source_file": source_file,
+                "source_dataset": "cdbg_dr",
+                "award_category": "grant",
+            }
+        )
 
     return pd.DataFrame(rows, columns=MASTER_COLUMNS)
 
@@ -318,6 +349,7 @@ def _normalize_usaspending(records: list[dict], source_file: str) -> pd.DataFram
 # ---------------------------------------------------------------------------
 # Source B: COR3 transparency API
 # ---------------------------------------------------------------------------
+
 
 def _fetch_cor3(session: requests.Session, logger) -> list[dict]:
     """
@@ -333,7 +365,9 @@ def _fetch_cor3(session: requests.Session, logger) -> list[dict]:
                 continue
             content_type = resp.headers.get("Content-Type", "")
             if "json" not in content_type.lower():
-                logger.info(f"  COR3 response is not JSON (Content-Type: {content_type}) — skipping")
+                logger.info(
+                    f"  COR3 response is not JSON (Content-Type: {content_type}) — skipping"
+                )
                 continue
             data = resp.json()
             # Data might be a list or a dict with a 'data'/'results' key
@@ -361,42 +395,52 @@ def _normalize_cor3(records: list[dict], source_file: str) -> pd.DataFrame:
     for i, r in enumerate(records):
         # COR3 field names vary; try multiple candidates
         recipient_name = (
-            r.get("subrecipient_name") or r.get("recipient_name") or
-            r.get("contractor") or r.get("applicant") or r.get("entity_name") or ""
+            r.get("subrecipient_name")
+            or r.get("recipient_name")
+            or r.get("contractor")
+            or r.get("applicant")
+            or r.get("entity_name")
+            or ""
         )
         description = (
-            r.get("project_name") or r.get("project_title") or
-            r.get("description") or r.get("category") or ""
+            r.get("project_name")
+            or r.get("project_title")
+            or r.get("description")
+            or r.get("category")
+            or ""
         )
         obligated_amount = (
-            r.get("obligated_amount") or r.get("total_obligation") or
-            r.get("amount") or r.get("grant_amount") or r.get("federal_amount") or ""
+            r.get("obligated_amount")
+            or r.get("total_obligation")
+            or r.get("amount")
+            or r.get("grant_amount")
+            or r.get("federal_amount")
+            or ""
         )
         award_date = (
-            r.get("award_date") or r.get("start_date") or
-            r.get("date") or r.get("period") or ""
+            r.get("award_date") or r.get("start_date") or r.get("date") or r.get("period") or ""
         )
-        award_id_raw = (
-            r.get("award_id") or r.get("project_id") or r.get("id") or str(i)
-        )
+        award_id_raw = r.get("award_id") or r.get("project_id") or r.get("id") or str(i)
         award_id = f"CDBG-COR3-{award_id_raw}"
 
-        rows.append({
-            "award_id": award_id,
-            "recipient_name": str(recipient_name).strip(),
-            "recipient_uei": str(r.get("uei", r.get("sam_uei", ""))).strip(),
-            "awarding_agency": "Department of Housing and Urban Development",
-            "awarding_sub_agency": "",
-            "obligated_amount": str(obligated_amount).strip(),
-            "award_date": str(award_date).strip() if award_date else "",
-            "fiscal_year": _derive_fiscal_year(award_date),
-            "pop_state": "PR",
-            "pop_county": str(r.get("municipality", r.get("county", ""))).strip(),
-            "description": str(description).strip(),
-            "source_file": source_file,
-            "source_dataset": "cdbg_dr",
-            "award_category": "grant",
-        })
+        rows.append(
+            {
+                "award_id": award_id,
+                "recipient_name": str(recipient_name).strip(),
+                "recipient_uei": str(r.get("uei", r.get("sam_uei", ""))).strip(),
+                "awarding_agency": "Department of Housing and Urban Development",
+                "awarding_sub_agency": "",
+                "obligated_amount": str(obligated_amount).strip(),
+                "award_date": str(award_date).strip() if award_date else "",
+                "fiscal_year": _derive_fiscal_year(award_date),
+                "pop_state": "PR",
+                "pop_county": str(r.get("municipality", r.get("county", ""))).strip(),
+                "description": str(description).strip(),
+                "source_file": source_file,
+                "source_dataset": "cdbg_dr",
+                "award_category": "grant",
+            }
+        )
 
     return pd.DataFrame(rows, columns=MASTER_COLUMNS)
 
@@ -404,6 +448,7 @@ def _normalize_cor3(records: list[dict], source_file: str) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 # Source C: Pre-existing local files
 # ---------------------------------------------------------------------------
+
 
 def _load_local_files(raw_dir: Path, logger) -> pd.DataFrame:
     """
@@ -420,6 +465,7 @@ def _load_local_files(raw_dir: Path, logger) -> pd.DataFrame:
                 if fpath.suffix.lower() == ".xlsx":
                     try:
                         import openpyxl  # noqa: F401
+
                         df = pd.read_excel(fpath, dtype=str, engine="openpyxl")
                     except ImportError:
                         logger.warning(
@@ -469,34 +515,31 @@ def _normalize_local_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
         "Award ID", "award_id", "Contract Number", "Project ID", "project_id"
     )
     recipient_series = find_col(
-        "Recipient Name", "recipient_name", "Vendor Name", "Contractor",
-        "Subrecipient", "Applicant", "Entity Name"
+        "Recipient Name",
+        "recipient_name",
+        "Vendor Name",
+        "Contractor",
+        "Subrecipient",
+        "Applicant",
+        "Entity Name",
     )
     uei_series = find_col("recipient_uei", "UEI", "SAM UEI")
-    agency_series = find_col(
-        "Awarding Agency", "awarding_agency", "Agency"
-    )
-    sub_agency_series = find_col(
-        "Awarding Sub Agency", "awarding_sub_agency", "Sub Agency"
-    )
+    agency_series = find_col("Awarding Agency", "awarding_agency", "Agency")
+    sub_agency_series = find_col("Awarding Sub Agency", "awarding_sub_agency", "Sub Agency")
     amount_series = find_col(
-        "Total Obligation", "obligated_amount", "Award Amount",
-        "Amount Obligated", "Federal Amount", "Grant Amount"
+        "Total Obligation",
+        "obligated_amount",
+        "Award Amount",
+        "Amount Obligated",
+        "Federal Amount",
+        "Grant Amount",
     )
-    date_series = find_col(
-        "Start Date", "award_date", "Date Signed", "Approval Date"
-    )
-    state_series = find_col(
-        "pop_state", "Place of Performance State Code",
-        "State Code", "State"
-    )
+    date_series = find_col("Start Date", "award_date", "Date Signed", "Approval Date")
+    state_series = find_col("pop_state", "Place of Performance State Code", "State Code", "State")
     county_series = find_col(
-        "pop_county", "Place of Performance County Name",
-        "County", "Municipality"
+        "pop_county", "Place of Performance County Name", "County", "Municipality"
     )
-    desc_series = find_col(
-        "Description", "description", "Project Name", "Project Title"
-    )
+    desc_series = find_col("Description", "description", "Project Name", "Project Title")
 
     rows = []
     for i in range(len(df)):
@@ -510,26 +553,35 @@ def _normalize_local_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
         if state_val in ("nan", ""):
             state_val = "PR"
 
-        rows.append({
-            "award_id": award_id_val,
-            "recipient_name": str(recipient_series.iloc[i]).strip() if len(recipient_series) > i else "",
-            "recipient_uei": str(uei_series.iloc[i]).strip() if len(uei_series) > i else "",
-            "awarding_agency": (
-                str(agency_series.iloc[i]).strip()
-                if len(agency_series) > i and str(agency_series.iloc[i]).strip() not in ("nan", "")
-                else "Department of Housing and Urban Development"
-            ),
-            "awarding_sub_agency": str(sub_agency_series.iloc[i]).strip() if len(sub_agency_series) > i else "",
-            "obligated_amount": str(amount_series.iloc[i]).strip() if len(amount_series) > i else "",
-            "award_date": award_date_val,
-            "fiscal_year": _derive_fiscal_year(award_date_val),
-            "pop_state": state_val,
-            "pop_county": str(county_series.iloc[i]).strip() if len(county_series) > i else "",
-            "description": str(desc_series.iloc[i]).strip() if len(desc_series) > i else "",
-            "source_file": source_file,
-            "source_dataset": "cdbg_dr",
-            "award_category": "grant",
-        })
+        rows.append(
+            {
+                "award_id": award_id_val,
+                "recipient_name": str(recipient_series.iloc[i]).strip()
+                if len(recipient_series) > i
+                else "",
+                "recipient_uei": str(uei_series.iloc[i]).strip() if len(uei_series) > i else "",
+                "awarding_agency": (
+                    str(agency_series.iloc[i]).strip()
+                    if len(agency_series) > i
+                    and str(agency_series.iloc[i]).strip() not in ("nan", "")
+                    else "Department of Housing and Urban Development"
+                ),
+                "awarding_sub_agency": str(sub_agency_series.iloc[i]).strip()
+                if len(sub_agency_series) > i
+                else "",
+                "obligated_amount": str(amount_series.iloc[i]).strip()
+                if len(amount_series) > i
+                else "",
+                "award_date": award_date_val,
+                "fiscal_year": _derive_fiscal_year(award_date_val),
+                "pop_state": state_val,
+                "pop_county": str(county_series.iloc[i]).strip() if len(county_series) > i else "",
+                "description": str(desc_series.iloc[i]).strip() if len(desc_series) > i else "",
+                "source_file": source_file,
+                "source_dataset": "cdbg_dr",
+                "award_category": "grant",
+            }
+        )
 
     return pd.DataFrame(rows, columns=MASTER_COLUMNS)
 
@@ -537,6 +589,7 @@ def _normalize_local_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 # Entry points
 # ---------------------------------------------------------------------------
+
 
 def run(root: Path = None) -> dict:
     """Main entry point (no --force). Returns summary dict."""
@@ -567,9 +620,7 @@ def _run(root: Path = None, force: bool = False) -> dict:
         logger.info(f"  USASpending raw file exists ({raw_usa_path.name}) — loading")
         try:
             df_usa_raw = pd.read_csv(raw_usa_path, dtype=str, low_memory=False)
-            df_usa = _normalize_usaspending(
-                df_usa_raw.to_dict("records"), raw_usa_path.name
-            )
+            df_usa = _normalize_usaspending(df_usa_raw.to_dict("records"), raw_usa_path.name)
         except Exception as e:
             logger.error(f"  Failed to load existing USASpending raw file: {e}")
             df_usa = pd.DataFrame(columns=MASTER_COLUMNS)
@@ -630,9 +681,7 @@ def _run(root: Path = None, force: bool = False) -> dict:
         # Deduplicate by award_id (keep first occurrence)
         before_dedup = len(master)
         master = master.drop_duplicates(subset=["award_id"], keep="first")
-        logger.info(
-            f"  Combined: {before_dedup:,} rows → {len(master):,} after deduplication"
-        )
+        logger.info(f"  Combined: {before_dedup:,} rows → {len(master):,} after deduplication")
     else:
         logger.warning(MANUAL_DOWNLOAD_MSG)
         master = pd.DataFrame(columns=MASTER_COLUMNS)
@@ -664,9 +713,7 @@ def _run(root: Path = None, force: bool = False) -> dict:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Download HUD CDBG-DR data for Puerto Rico"
-    )
+    parser = argparse.ArgumentParser(description="Download HUD CDBG-DR data for Puerto Rico")
     parser.add_argument(
         "--force",
         action="store_true",

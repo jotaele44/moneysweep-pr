@@ -77,7 +77,15 @@ def test_r45_recovers_contract_and_canonical_staging_with_lineage(tmp_path: Path
                 "pop_state": "PR",
             }
         ],
-        ["contract_id", "vendor_name", "agency_name", "award_date", "obligated_amount", "fiscal_year", "pop_state"],
+        [
+            "contract_id",
+            "vendor_name",
+            "agency_name",
+            "award_date",
+            "obligated_amount",
+            "fiscal_year",
+            "pop_state",
+        ],
     )
     _write_csv(
         tmp_path / "data" / "raw" / "pr_grants_seed.csv",
@@ -92,7 +100,15 @@ def test_r45_recovers_contract_and_canonical_staging_with_lineage(tmp_path: Path
                 "pop_state": "PR",
             }
         ],
-        ["award_id", "recipient_name", "awarding_agency", "obligated_amount", "award_date", "fiscal_year", "pop_state"],
+        [
+            "award_id",
+            "recipient_name",
+            "awarding_agency",
+            "obligated_amount",
+            "award_date",
+            "fiscal_year",
+            "pop_state",
+        ],
     )
 
     result = run_recovery(tmp_path)
@@ -130,6 +146,8 @@ def test_r45_outputs_required_status_files(tmp_path: Path):
     assert (tmp_path / "data" / "exports" / "source_input_recovery_audit.csv").exists()
     assert (tmp_path / "data" / "exports" / "source_input_recovery_status.json").exists()
     assert (tmp_path / "data" / "review_queue" / "manual_source_download_queue.csv").exists()
-    status = json.loads((tmp_path / "data" / "exports" / "source_input_recovery_status.json").read_text())
+    status = json.loads(
+        (tmp_path / "data" / "exports" / "source_input_recovery_status.json").read_text()
+    )
     assert "phase_7_8_blocked" in status
     assert status["phase_7_8_blocked"] is True

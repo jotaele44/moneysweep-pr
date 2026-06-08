@@ -7,6 +7,7 @@ the existing bulk producer at ``scripts/download_opencorporates.py``.
 at a lower rate limit. Unlike :class:`FECPRAdapter`, this adapter does
 NOT raise :class:`CredentialMissing` when the token is unset.
 """
+
 from __future__ import annotations
 
 import os

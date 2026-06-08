@@ -9,6 +9,7 @@ Usage:
   python3 scripts/entity_resolution.py --top 50      # top 50
   python3 scripts/entity_resolution.py --resume      # resume from cache
 """
+
 from __future__ import annotations
 
 import argparse
@@ -41,10 +42,12 @@ TOP_N_DEFAULT = 10_000  # analyze all significant entities, not just top 100
 # API helpers
 # ---------------------------------------------------------------------------
 
+
 def _http_post(url: str, payload: dict, timeout: int = 12) -> dict | None:
     data = json.dumps(payload).encode()
     req = urllib.request.Request(
-        url, data=data,
+        url,
+        data=data,
         headers={"Content-Type": "application/json", "Accept": "application/json"},
         method="POST",
     )
@@ -102,6 +105,7 @@ def get_recipient_detail(recipient_id: str) -> dict | None:
 # ---------------------------------------------------------------------------
 # Load inputs
 # ---------------------------------------------------------------------------
+
 
 def load_vendor_rankings(root: Path, top_n: int) -> list[dict]:
     """Load top vendors from master CSV, ranked by total obligation."""
@@ -161,6 +165,7 @@ def load_sam_index(root: Path) -> dict[str, dict]:
 # ---------------------------------------------------------------------------
 # Resolution
 # ---------------------------------------------------------------------------
+
 
 def resolve_vendor(vendor: dict, sam_index: dict, cache: dict, logger) -> dict:
     """Resolve a vendor to its parent entity. Returns enriched dict."""
@@ -253,6 +258,7 @@ def resolve_vendor(vendor: dict, sam_index: dict, cache: dict, logger) -> dict:
 # Main
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None, top_n: int = TOP_N_DEFAULT, resume: bool = False) -> Path:
     if root is None:
         root = PROJECT_ROOT
@@ -280,16 +286,25 @@ def run(root: Path = None, top_n: int = TOP_N_DEFAULT, resume: bool = False) -> 
         if result.get("parent_uei") or result.get("parent_name"):
             resolved_count += 1
         if rank % 25 == 0:
-            logger.info(f"  [PROGRESS] {rank}/{len(vendors)} processed, {resolved_count} with parent entity")
+            logger.info(
+                f"  [PROGRESS] {rank}/{len(vendors)} processed, {resolved_count} with parent entity"
+            )
 
     # Save cache
     cache_path.write_text(json.dumps(cache, indent=2), encoding="utf-8")
 
     # Write hierarchy CSV
     fieldnames = [
-        "rank", "vendor_name", "total_obligation", "record_count",
-        "uei", "parent_uei", "parent_name", "business_types",
-        "match_confidence", "source",
+        "rank",
+        "vendor_name",
+        "total_obligation",
+        "record_count",
+        "uei",
+        "parent_uei",
+        "parent_name",
+        "business_types",
+        "match_confidence",
+        "source",
     ]
     with open(out_path, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")

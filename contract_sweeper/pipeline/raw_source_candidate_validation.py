@@ -22,13 +22,23 @@ DERIVABLE_CANONICAL_COLUMNS = {
 }
 
 USAS_CANONICAL_COLUMN_MAP = {
-    "award_id": {"contract_id", "award_id", "generated_unique_award_id", "assistance_award_unique_key"},
+    "award_id": {
+        "contract_id",
+        "award_id",
+        "generated_unique_award_id",
+        "assistance_award_unique_key",
+    },
     "recipient_name": {"vendor_name", "recipient_name", "legal_business_name"},
     "recipient_name_normalized": {"normalized_vendor", "recipient_name_normalized"},
     "recipient_uei": {"recipient_uei", "recipient_unique_id", "uei"},
     "awarding_agency": {"agency_name", "awarding_agency", "awarding_agency_name"},
     "awarding_sub_agency": {"sub_agency", "awarding_sub_agency", "awarding_subagency_name"},
-    "obligated_amount": {"amount_usd", "obligated_amount", "federal_action_obligation", "total_obligation"},
+    "obligated_amount": {
+        "amount_usd",
+        "obligated_amount",
+        "federal_action_obligation",
+        "total_obligation",
+    },
     "award_date": {"award_date", "action_date", "start_date", "period_of_performance_start_date"},
     "fiscal_year": {"fiscal_year"},
     "pop_state": {"pop_state", "place_of_performance_state_code", "place_of_performance_state"},
@@ -155,16 +165,10 @@ def validate_raw_candidate(
     target_row: dict[str, str],
     inventory_row: dict[str, Any],
 ) -> dict[str, Any]:
-    columns = [
-        piece
-        for piece in str(inventory_row.get("columns", "")).split("|")
-        if piece.strip()
-    ]
+    columns = [piece for piece in str(inventory_row.get("columns", "")).split("|") if piece.strip()]
     actual = normalized_columns(columns)
     required = split_pipe(
-        target_row.get("required_columns")
-        or target_row.get("required_columns/profile")
-        or ""
+        target_row.get("required_columns") or target_row.get("required_columns/profile") or ""
     )
     required_norm = [column.strip().lower() for column in required if column.strip()]
 
@@ -200,9 +204,8 @@ def validate_raw_candidate(
                     missing_columns.append(required_column)
 
             if missing_columns:
-                validation_reason = (
-                    "raw_missing_required_or_mappable_columns:"
-                    + "|".join(sorted(missing_columns))
+                validation_reason = "raw_missing_required_or_mappable_columns:" + "|".join(
+                    sorted(missing_columns)
                 )
                 mapping_profile = "unmappable_raw_export"
             else:

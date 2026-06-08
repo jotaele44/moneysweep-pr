@@ -1,4 +1,5 @@
 """Tests for the canonical_v1 projects ingester (WS-G)."""
+
 import pytest
 
 from contract_sweeper.validation import canonical_v1_schema as cv1
@@ -31,8 +32,8 @@ def test_rows_and_evidence_validate(built):
     evidence_ids = {e.evidence_id for e in built["evidence_rows"]}
     for row in built["project_rows"]:
         assert cv1.validate_row(row, proj_schema) == [], row
-        assert row["lead_entity_id"] in entity_ids        # no broken reference
-        assert row["evidence_id"] in evidence_ids         # no provenance -> no row
+        assert row["lead_entity_id"] in entity_ids  # no broken reference
+        assert row["evidence_id"] in evidence_ids  # no provenance -> no row
         if row["municipality_id"]:
             assert row["municipality_id"] in muni_ids
     for ev in built["evidence_rows"]:

@@ -1,4 +1,5 @@
 """Schema-contract tests for the federation export JSON Schemas."""
+
 import json
 from pathlib import Path
 
@@ -9,32 +10,82 @@ SCHEMAS_DIR = REPO_ROOT / "schemas"
 
 EXPECTED_REQUIRED = {
     "contract_sweeper_entity.schema.json": {
-        "entity_id", "source_id", "name", "normalized_name", "entity_type",
-        "jurisdiction", "confidence", "lineage", "synthetic", "created_at",
+        "entity_id",
+        "source_id",
+        "name",
+        "normalized_name",
+        "entity_type",
+        "jurisdiction",
+        "confidence",
+        "lineage",
+        "synthetic",
+        "created_at",
         "extracted_at",
     },
     "contract_sweeper_source.schema.json": {
-        "source_id", "source_type", "source_name", "confidence", "lineage",
-        "synthetic", "created_at", "extracted_at",
+        "source_id",
+        "source_type",
+        "source_name",
+        "confidence",
+        "lineage",
+        "synthetic",
+        "created_at",
+        "extracted_at",
     },
     "contract_sweeper_funding_award.schema.json": {
-        "award_id", "source_id", "recipient_entity_id", "funding_agency_entity_id",
-        "amount", "currency", "fiscal_year", "award_type", "award_date",
-        "confidence", "lineage", "synthetic", "created_at", "extracted_at",
+        "award_id",
+        "source_id",
+        "recipient_entity_id",
+        "funding_agency_entity_id",
+        "amount",
+        "currency",
+        "fiscal_year",
+        "award_type",
+        "award_date",
+        "confidence",
+        "lineage",
+        "synthetic",
+        "created_at",
+        "extracted_at",
     },
     "contract_sweeper_transaction.schema.json": {
-        "transaction_id", "source_id", "payer_entity_id", "payee_entity_id",
-        "amount", "currency", "transaction_date", "transaction_type",
-        "confidence", "lineage", "synthetic", "created_at", "extracted_at",
+        "transaction_id",
+        "source_id",
+        "payer_entity_id",
+        "payee_entity_id",
+        "amount",
+        "currency",
+        "transaction_date",
+        "transaction_type",
+        "confidence",
+        "lineage",
+        "synthetic",
+        "created_at",
+        "extracted_at",
     },
     "contract_sweeper_relationship.schema.json": {
-        "relationship_id", "source_id", "source_entity_id", "target_entity_id",
-        "relationship_type", "evidence_source_id", "confidence", "lineage",
-        "synthetic", "created_at", "extracted_at",
+        "relationship_id",
+        "source_id",
+        "source_entity_id",
+        "target_entity_id",
+        "relationship_type",
+        "evidence_source_id",
+        "confidence",
+        "lineage",
+        "synthetic",
+        "created_at",
+        "extracted_at",
     },
     "contract_sweeper_export_manifest.schema.json": {
-        "package_id", "producer", "producer_version", "export_contract_version",
-        "mode", "created_at", "extracted_at", "federation", "files",
+        "package_id",
+        "producer",
+        "producer_version",
+        "export_contract_version",
+        "mode",
+        "created_at",
+        "extracted_at",
+        "federation",
+        "files",
     },
 }
 
@@ -71,7 +122,10 @@ def test_manifest_schema_requires_federation_handshake():
     )
     federation = data["properties"]["federation"]
     assert set(federation["required"]) == {
-        "producer_repo", "consumer_repo", "consumer_component", "contract",
+        "producer_repo",
+        "consumer_repo",
+        "consumer_component",
+        "contract",
     }
     assert federation["properties"]["consumer_repo"]["const"] == "spiderweb-pr"
     assert federation["properties"]["consumer_component"]["const"] == "query-hub"

@@ -44,10 +44,17 @@ SUBTIER_NAME = "U.S. Army Corps of Engineers"
 AWARD_TYPE_CODES = ["02", "03", "04", "05", "A", "B", "C", "D"]
 
 FIELDS = [
-    "Award ID", "Recipient Name", "recipient_uei",
-    "Awarding Agency", "Awarding Sub Agency", "Award Amount",
-    "Start Date", "Award Type",
-    "Place of Performance State Code", "Place of Performance County Name", "Description",
+    "Award ID",
+    "Recipient Name",
+    "recipient_uei",
+    "Awarding Agency",
+    "Awarding Sub Agency",
+    "Award Amount",
+    "Start Date",
+    "Award Type",
+    "Place of Performance State Code",
+    "Place of Performance County Name",
+    "Description",
 ]
 
 TIME_WINDOWS = [
@@ -58,34 +65,71 @@ TIME_WINDOWS = [
 ]
 
 MASTER_COLUMNS = [
-    "award_id", "recipient_name", "recipient_uei", "awarding_agency",
-    "awarding_sub_agency", "obligated_amount", "award_date", "fiscal_year",
-    "pop_state", "pop_county", "description", "source_file",
-    "source_dataset", "award_category",
+    "award_id",
+    "recipient_name",
+    "recipient_uei",
+    "awarding_agency",
+    "awarding_sub_agency",
+    "obligated_amount",
+    "award_date",
+    "fiscal_year",
+    "pop_state",
+    "pop_county",
+    "description",
+    "source_file",
+    "source_dataset",
+    "award_category",
 ]
 
 KNOWN_USACE_DATA = [
-    {"award_id": "USACE-PR-2022-001", "recipient_name": "Luma Energy LLC",
-     "recipient_uei": "", "awarding_agency": "Department of Defense",
-     "awarding_sub_agency": "U.S. Army Corps of Engineers",
-     "obligated_amount": "450000000", "award_date": "2022-01-15", "fiscal_year": "2022",
-     "pop_state": "PR", "pop_county": "San Juan",
-     "description": "Puerto Rico T&D system rehabilitation USACE",
-     "source_file": "usace_civil_known_seed", "source_dataset": "usace_civil", "award_category": "A"},
-    {"award_id": "USACE-PR-2021-001", "recipient_name": "Consolidated Edison Development",
-     "recipient_uei": "", "awarding_agency": "Department of Defense",
-     "awarding_sub_agency": "U.S. Army Corps of Engineers",
-     "obligated_amount": "188000000", "award_date": "2021-06-01", "fiscal_year": "2021",
-     "pop_state": "PR", "pop_county": "Ponce",
-     "description": "HMGP hazard mitigation civil works Puerto Rico",
-     "source_file": "usace_civil_known_seed", "source_dataset": "usace_civil", "award_category": "A"},
-    {"award_id": "USACE-PR-2023-001", "recipient_name": "Kiewit Infrastructure West Co",
-     "recipient_uei": "", "awarding_agency": "Department of Defense",
-     "awarding_sub_agency": "U.S. Army Corps of Engineers",
-     "obligated_amount": "95000000", "award_date": "2023-03-01", "fiscal_year": "2023",
-     "pop_state": "PR", "pop_county": "Arecibo",
-     "description": "Puerto Rico flood risk management civil works",
-     "source_file": "usace_civil_known_seed", "source_dataset": "usace_civil", "award_category": "A"},
+    {
+        "award_id": "USACE-PR-2022-001",
+        "recipient_name": "Luma Energy LLC",
+        "recipient_uei": "",
+        "awarding_agency": "Department of Defense",
+        "awarding_sub_agency": "U.S. Army Corps of Engineers",
+        "obligated_amount": "450000000",
+        "award_date": "2022-01-15",
+        "fiscal_year": "2022",
+        "pop_state": "PR",
+        "pop_county": "San Juan",
+        "description": "Puerto Rico T&D system rehabilitation USACE",
+        "source_file": "usace_civil_known_seed",
+        "source_dataset": "usace_civil",
+        "award_category": "A",
+    },
+    {
+        "award_id": "USACE-PR-2021-001",
+        "recipient_name": "Consolidated Edison Development",
+        "recipient_uei": "",
+        "awarding_agency": "Department of Defense",
+        "awarding_sub_agency": "U.S. Army Corps of Engineers",
+        "obligated_amount": "188000000",
+        "award_date": "2021-06-01",
+        "fiscal_year": "2021",
+        "pop_state": "PR",
+        "pop_county": "Ponce",
+        "description": "HMGP hazard mitigation civil works Puerto Rico",
+        "source_file": "usace_civil_known_seed",
+        "source_dataset": "usace_civil",
+        "award_category": "A",
+    },
+    {
+        "award_id": "USACE-PR-2023-001",
+        "recipient_name": "Kiewit Infrastructure West Co",
+        "recipient_uei": "",
+        "awarding_agency": "Department of Defense",
+        "awarding_sub_agency": "U.S. Army Corps of Engineers",
+        "obligated_amount": "95000000",
+        "award_date": "2023-03-01",
+        "fiscal_year": "2023",
+        "pop_state": "PR",
+        "pop_county": "Arecibo",
+        "description": "Puerto Rico flood risk management civil works",
+        "source_file": "usace_civil_known_seed",
+        "source_dataset": "usace_civil",
+        "award_category": "A",
+    },
 ]
 
 MAX_RETRIES = 3
@@ -178,12 +222,17 @@ def _results_to_df(results, source_file):
         return pd.DataFrame(columns=MASTER_COLUMNS)
     df = pd.json_normalize(results)
     rename_map = {
-        "Award ID": "award_id", "Recipient Name": "recipient_name",
-        "recipient_uei": "recipient_uei", "Awarding Agency": "awarding_agency",
-        "Awarding Sub Agency": "awarding_sub_agency", "Award Amount": "obligated_amount",
-        "Start Date": "award_date", "Award Type": "award_category",
+        "Award ID": "award_id",
+        "Recipient Name": "recipient_name",
+        "recipient_uei": "recipient_uei",
+        "Awarding Agency": "awarding_agency",
+        "Awarding Sub Agency": "awarding_sub_agency",
+        "Award Amount": "obligated_amount",
+        "Start Date": "award_date",
+        "Award Type": "award_category",
         "Place of Performance State Code": "pop_state",
-        "Place of Performance County Name": "pop_county", "Description": "description",
+        "Place of Performance County Name": "pop_county",
+        "Description": "description",
     }
     df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
     df["fiscal_year"] = df.get("award_date", pd.Series(dtype=str)).apply(_derive_fiscal_year)
@@ -272,7 +321,12 @@ def _run(root=None, force=False, fy_start=None):
             stats = download_window(session, window, raw_dir, force, logger)
         except Exception as e:
             logger.error(f"  Unexpected error on {window['label']}: {e}")
-            stats = {"window": window["label"], "pop_rows": 0, "recipient_rows": 0, "errors": [str(e)]}
+            stats = {
+                "window": window["label"],
+                "pop_rows": 0,
+                "recipient_rows": 0,
+                "errors": [str(e)],
+            }
         total_pop += stats["pop_rows"]
         total_rec += stats["recipient_rows"]
         all_errors.extend(stats["errors"])
@@ -288,9 +342,12 @@ def _run(root=None, force=False, fy_start=None):
         seed_df.to_csv(master_path, index=False, encoding="utf-8")
         master_rows = len(seed_df)
     summary = {
-        "raw_pop_rows": total_pop, "raw_recipient_rows": total_rec,
-        "master_rows": master_rows, "master_path": str(master_path),
-        "errors": all_errors, "windows": window_stats,
+        "raw_pop_rows": total_pop,
+        "raw_recipient_rows": total_rec,
+        "master_rows": master_rows,
+        "master_path": str(master_path),
+        "errors": all_errors,
+        "windows": window_stats,
         "rows": master_rows,
         "status": "OK" if int(master_rows) > 0 else "EMPTY",
     }

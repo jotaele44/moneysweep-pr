@@ -1,4 +1,5 @@
 """Tests for the additive post-ingest enrichment steps."""
+
 import pandas as pd
 import pytest
 
@@ -21,7 +22,7 @@ def test_normalize_entities_adds_clustering_key():
     out = pi.normalize_entities(df)
     assert "entity_normalized" in out.columns
     assert out.loc[0, "entity_normalized"] == "ACME"  # legal suffix stripped
-    assert out.loc[2, "entity_normalized"] == ""      # None -> empty
+    assert out.loc[2, "entity_normalized"] == ""  # None -> empty
 
 
 @pytest.mark.unit
@@ -44,16 +45,20 @@ def test_canonicalize_currency_is_additive_and_idempotent():
     assert pd.isna(out.loc[2, "obligated_amount_canonical"])
     # Idempotent: existing canonical column not recomputed.
     out2 = pi.canonicalize_currency(out)
-    assert (out2["obligated_amount_canonical"].fillna(0) == out["obligated_amount_canonical"].fillna(0)).all()
+    assert (
+        out2["obligated_amount_canonical"].fillna(0) == out["obligated_amount_canonical"].fillna(0)
+    ).all()
 
 
 @pytest.mark.unit
 def test_apply_post_ingest_runs_all_steps(tmp_path):
-    df = pd.DataFrame({
-        "recipient_name": ["Acme Corp"],
-        "obligated_amount": ["$5,000"],
-        "recipient_city": ["San Juan"],
-    })
+    df = pd.DataFrame(
+        {
+            "recipient_name": ["Acme Corp"],
+            "obligated_amount": ["$5,000"],
+            "recipient_city": ["San Juan"],
+        }
+    )
     out = pi.apply_post_ingest(df, source_id="usaspending_prime", root=None)
     assert "entity_normalized" in out.columns
     assert out.loc[0, "obligated_amount_canonical"] == 5000.0

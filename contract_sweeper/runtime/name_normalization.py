@@ -4,6 +4,7 @@ Strips legal suffixes, normalizes '&', collapses whitespace, drops
 non-alphanumeric characters. Used to cluster aliases and join entities
 across federal, territorial, lobbying, and political-finance datasets.
 """
+
 from __future__ import annotations
 
 import re

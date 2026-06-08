@@ -1,4 +1,5 @@
 """Tests for the canonical_v1 roles ingester (WS-L), using synthetic data only."""
+
 import csv
 from pathlib import Path
 
@@ -17,24 +18,84 @@ def _seed_root(tmp_path: Path) -> Path:
     d.mkdir(parents=True)
     with (d / "people.csv").open("w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
-        w.writerow(["person_id", "full_name", "normalized_name", "aliases",
-                    "primary_role", "primary_entity_id", "jurisdiction",
-                    "confidence", "evidence_id", "review_status", "notes"])
-        w.writerow([person_id("Alice Verified"), "Alice Verified", "ALICE VERIFIED",
-                    "", "", "", "", "0.9", "", "accepted", ""])
+        w.writerow(
+            [
+                "person_id",
+                "full_name",
+                "normalized_name",
+                "aliases",
+                "primary_role",
+                "primary_entity_id",
+                "jurisdiction",
+                "confidence",
+                "evidence_id",
+                "review_status",
+                "notes",
+            ]
+        )
+        w.writerow(
+            [
+                person_id("Alice Verified"),
+                "Alice Verified",
+                "ALICE VERIFIED",
+                "",
+                "",
+                "",
+                "",
+                "0.9",
+                "",
+                "accepted",
+                "",
+            ]
+        )
     with (d / "entities.csv").open("w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
-        w.writerow(["entity_id", "name", "normalized_name", "entity_type",
-                    "parent_entity_id", "jurisdiction", "registry_ids",
-                    "confidence", "evidence_id", "review_status", "notes"])
-        w.writerow([entity_id("Test Utility Authority"), "Test Utility Authority",
-                    "TEST UTILITY AUTHORITY", "utility", "", "PR", "",
-                    "0.9", "", "accepted", ""])
+        w.writerow(
+            [
+                "entity_id",
+                "name",
+                "normalized_name",
+                "entity_type",
+                "parent_entity_id",
+                "jurisdiction",
+                "registry_ids",
+                "confidence",
+                "evidence_id",
+                "review_status",
+                "notes",
+            ]
+        )
+        w.writerow(
+            [
+                entity_id("Test Utility Authority"),
+                "Test Utility Authority",
+                "TEST UTILITY AUTHORITY",
+                "utility",
+                "",
+                "PR",
+                "",
+                "0.9",
+                "",
+                "accepted",
+                "",
+            ]
+        )
     # municipalities.csv is read by the shared resolver; an empty table is fine
     with (d / "municipalities.csv").open("w", newline="", encoding="utf-8") as fh:
-        csv.writer(fh).writerow(["municipality_id", "name", "normalized_name",
-                                 "region", "county_fips", "aliases", "confidence",
-                                 "evidence_id", "review_status", "notes"])
+        csv.writer(fh).writerow(
+            [
+                "municipality_id",
+                "name",
+                "normalized_name",
+                "region",
+                "county_fips",
+                "aliases",
+                "confidence",
+                "evidence_id",
+                "review_status",
+                "notes",
+            ]
+        )
     return tmp_path
 
 
@@ -61,7 +122,7 @@ def test_role_rows_and_evidence_validate(built):
     evidence_ids = {e.evidence_id for e in built["evidence_rows"]}
     for row in built["role_rows"]:
         assert cv1.validate_row(row, role_schema) == [], row
-        assert row["evidence_id"] in evidence_ids        # no provenance -> no row
+        assert row["evidence_id"] in evidence_ids  # no provenance -> no row
         assert row["role_category"] in ir.VALID_CATEGORIES
     for ev in built["evidence_rows"]:
         assert cv1.validate_row(ev.as_row(), ev_schema) == [], ev

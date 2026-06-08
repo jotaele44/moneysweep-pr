@@ -1,4 +1,5 @@
 """sha256 file hashing — used by manifests and validation."""
+
 from __future__ import annotations
 
 import hashlib

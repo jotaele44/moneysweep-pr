@@ -14,6 +14,7 @@ from scripts.lda_enrich import _normalize, _token_overlap
 # _normalize
 # ---------------------------------------------------------------------------
 
+
 class TestNormalize:
     def test_empty_string(self):
         assert _normalize("") == ""
@@ -48,6 +49,7 @@ class TestNormalize:
 # _token_overlap
 # ---------------------------------------------------------------------------
 
+
 class TestTokenOverlap:
     def test_identical(self):
         assert _token_overlap("FOO BAR", "FOO BAR") == 1.0
@@ -74,7 +76,10 @@ class TestTokenOverlap:
         # entity:  "UNIVERSITY OF PUERTO RICO"
         # client:  "UNIVERSITY OF PUERTO RICO MEDICAL SCIENCES CAMPUS"
         # All 4 tokens of entity name appear in client -> 1.0
-        assert _token_overlap(
-            "UNIVERSITY OF PUERTO RICO",
-            "UNIVERSITY OF PUERTO RICO MEDICAL SCIENCES CAMPUS",
-        ) >= 0.80
+        assert (
+            _token_overlap(
+                "UNIVERSITY OF PUERTO RICO",
+                "UNIVERSITY OF PUERTO RICO MEDICAL SCIENCES CAMPUS",
+            )
+            >= 0.80
+        )

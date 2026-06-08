@@ -20,6 +20,7 @@ CLI::
     python scripts/build_foia_letters.py            # write all letters + manifest
     python scripts/build_foia_letters.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -144,16 +145,18 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
         request_id = row["request_id"]
         path = f"{OUT_DIR}/{request_id}.md"
         content = _render_letter(row, config)
-        entries.append({
-            "request_id": request_id,
-            "target_source_id": row["target_source_id"],
-            "target_agency": row["target_agency"],
-            "jurisdiction": row["jurisdiction"],
-            "priority": row["priority"],
-            "request_status": row["request_status"],
-            "path": path,
-            "content": content,
-        })
+        entries.append(
+            {
+                "request_id": request_id,
+                "target_source_id": row["target_source_id"],
+                "target_agency": row["target_agency"],
+                "jurisdiction": row["jurisdiction"],
+                "priority": row["priority"],
+                "request_status": row["request_status"],
+                "path": path,
+                "content": content,
+            }
+        )
     return entries
 
 
@@ -220,7 +223,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         entries = build_rows(root)
         problems = check(entries, root)
-        print(json.dumps({"ok": not problems, "letter_count": len(entries), "problems": problems}, indent=2))
+        print(
+            json.dumps(
+                {"ok": not problems, "letter_count": len(entries), "problems": problems}, indent=2
+            )
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

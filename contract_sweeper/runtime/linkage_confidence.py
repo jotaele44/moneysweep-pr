@@ -7,6 +7,7 @@ documented inline; the function is deterministic and returns values in
 `requires_manual_review` is a derived bool used to route low-confidence
 joins to the review queue.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass

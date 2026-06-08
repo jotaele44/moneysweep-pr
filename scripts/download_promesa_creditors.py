@@ -32,14 +32,15 @@ import requests
 from scripts.config import PROJECT_ROOT, setup_logging
 
 PROMESA_COLUMNS = [
-    "creditor_name", "creditor_normalized",
-    "creditor_type",          # "hedge_fund", "mutual_fund", "insurer", "individual", "bank"
-    "bond_series",            # e.g. "GO", "COFINA", "HTA", "PREPA", "ERS"
+    "creditor_name",
+    "creditor_normalized",
+    "creditor_type",  # "hedge_fund", "mutual_fund", "insurer", "individual", "bank"
+    "bond_series",  # e.g. "GO", "COFINA", "HTA", "PREPA", "ERS"
     "claim_amount_original",  # face value of bonds held (USD)
-    "recovery_amount",        # recovery under Plan of Adjustment (USD)
-    "recovery_rate",          # recovery_amount / claim_amount_original
-    "new_bond_cusip",         # replacement bond CUSIP if issued
-    "sec_13f_flag",           # 1 if reported in SEC 13F filing pre-restructuring
+    "recovery_amount",  # recovery under Plan of Adjustment (USD)
+    "recovery_rate",  # recovery_amount / claim_amount_original
+    "new_bond_cusip",  # replacement bond CUSIP if issued
+    "sec_13f_flag",  # 1 if reported in SEC 13F filing pre-restructuring
     "source_doc",
 ]
 
@@ -223,7 +224,9 @@ def _normalize_name(name):
     if not name or pd.isna(name):
         return ""
     n = str(name).upper().strip()
-    n = re.sub(r"\b(INC\.?|LLC\.?|CORP\.?|LTD\.?|CO\.?|LP\.?|L\.P\.?|L\.L\.C\.?|MUNICIPAL)\b", "", n)
+    n = re.sub(
+        r"\b(INC\.?|LLC\.?|CORP\.?|LTD\.?|CO\.?|LP\.?|L\.P\.?|L\.L\.C\.?|MUNICIPAL)\b", "", n
+    )
     n = re.sub(r"[^A-Z0-9 ]", " ", n)
     return re.sub(r"\s+", " ", n).strip()
 
@@ -248,10 +251,12 @@ def parse_records(records: list[dict]) -> pd.DataFrame:
 
 def _session():
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0)",
-        "Accept": "text/html,application/json,*/*",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0)",
+            "Accept": "text/html,application/json,*/*",
+        }
+    )
     return s
 
 
@@ -264,8 +269,7 @@ def _try_prime_clerk(session, logger):
             text = resp.text
             # Look for links to Plan of Adjustment exhibits or creditor lists
             exhibit_links = re.findall(
-                r'href=["\']([^"\']*(?:exhibit|creditor|plan.*adjust)[^"\']*)["\']',
-                text, re.I
+                r'href=["\']([^"\']*(?:exhibit|creditor|plan.*adjust)[^"\']*)["\']', text, re.I
             )
             if exhibit_links:
                 logger.info(f"  Found {len(exhibit_links)} exhibit/creditor links on Prime Clerk")

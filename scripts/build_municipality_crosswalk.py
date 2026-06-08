@@ -15,6 +15,7 @@ CLI::
     python scripts/build_municipality_crosswalk.py            # validate + write manifest
     python scripts/build_municipality_crosswalk.py --check     # validate only
 """
+
 from __future__ import annotations
 
 import argparse
@@ -62,7 +63,9 @@ def check(rows: list[dict[str, Any]], root: Path | None = None) -> list[str]:
         for msg in validate_row(row, schema):
             problems.append(f"row {i} ({row.get('municipality_geoid')}): {msg}")
         if row["municipality_geoid"] != row["municipality_code"]:
-            problems.append(f"row {i}: geoid {row['municipality_geoid']} != code {row['municipality_code']}")
+            problems.append(
+                f"row {i}: geoid {row['municipality_geoid']} != code {row['municipality_code']}"
+            )
     return problems
 
 
@@ -80,8 +83,10 @@ def build(root: Path | None = None) -> dict[str, Any]:
         "source_inputs": [CROSSWALK],
         "output": CROSSWALK,
         "row_count": len(rows),
-        "geoid_range": [min(r["municipality_geoid"] for r in rows),
-                        max(r["municipality_geoid"] for r in rows)],
+        "geoid_range": [
+            min(r["municipality_geoid"] for r in rows),
+            max(r["municipality_geoid"] for r in rows),
+        ],
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }
     manifest_path = root / MANIFEST_OUT
@@ -99,7 +104,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

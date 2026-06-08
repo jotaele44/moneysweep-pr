@@ -16,6 +16,7 @@ CLI::
     python scripts/build_entity_parent_map.py            # write the CSV + manifest
     python scripts/build_entity_parent_map.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -40,8 +41,14 @@ SCHEMA = "schemas/entity_parent_map.schema.json"
 SOURCE_ID = "entity_parent_map_seed"
 
 PARENT_MAP_COLUMNS = [
-    "relation_id", "parent_entity_id", "child_entity_id", "relationship_type",
-    "source_id", "evidence_tier", "confidence", "notes",
+    "relation_id",
+    "parent_entity_id",
+    "child_entity_id",
+    "relationship_type",
+    "source_id",
+    "evidence_tier",
+    "confidence",
+    "notes",
 ]
 
 
@@ -71,18 +78,20 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
             parent_id = index.get(parent_name, "")
             child_id = index.get(child_name, "")
             # Unresolved names are surfaced by check(); keep the row so the error is reported.
-            rows.append({
-                "relation_id": f"REL_PARENT_{name_hash(parent_id + '|' + child_id + '|' + rel_type)}",
-                "parent_entity_id": parent_id,
-                "child_entity_id": child_id,
-                "relationship_type": rel_type,
-                "source_id": SOURCE_ID,
-                "evidence_tier": (ref.get("evidence_tier") or "").strip(),
-                "confidence": float(ref.get("confidence") or 0.0),
-                "notes": (ref.get("claim") or "").strip(),
-                "_parent_name": parent_name,
-                "_child_name": child_name,
-            })
+            rows.append(
+                {
+                    "relation_id": f"REL_PARENT_{name_hash(parent_id + '|' + child_id + '|' + rel_type)}",
+                    "parent_entity_id": parent_id,
+                    "child_entity_id": child_id,
+                    "relationship_type": rel_type,
+                    "source_id": SOURCE_ID,
+                    "evidence_tier": (ref.get("evidence_tier") or "").strip(),
+                    "confidence": float(ref.get("confidence") or 0.0),
+                    "notes": (ref.get("claim") or "").strip(),
+                    "_parent_name": parent_name,
+                    "_child_name": child_name,
+                }
+            )
     return rows
 
 
@@ -102,9 +111,13 @@ def check(rows: list[dict[str, Any]], root: Path | None = None) -> list[str]:
         problems.append("duplicate relation_id values present")
     for i, row in enumerate(rows, start=1):
         if not row["parent_entity_id"]:
-            problems.append(f"row {i}: parent name {row.get('_parent_name')!r} not found in entity_master")
+            problems.append(
+                f"row {i}: parent name {row.get('_parent_name')!r} not found in entity_master"
+            )
         if not row["child_entity_id"]:
-            problems.append(f"row {i}: child name {row.get('_child_name')!r} not found in entity_master")
+            problems.append(
+                f"row {i}: child name {row.get('_child_name')!r} not found in entity_master"
+            )
         if row["parent_entity_id"] and row["parent_entity_id"] == row["child_entity_id"]:
             problems.append(f"row {i}: self-referential relationship ({row['parent_entity_id']})")
     schema = _load_schema(root)
@@ -155,7 +168,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

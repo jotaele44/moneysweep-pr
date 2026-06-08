@@ -17,6 +17,7 @@ CLI::
     python scripts/build_analyst_reports_manifest.py            # write the catalog + manifest
     python scripts/build_analyst_reports_manifest.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -41,32 +42,188 @@ SCHEMA = "schemas/analyst_reports_manifest.schema.json"
 # Curated catalog of the analyst-facing deliverables: (path, title, gate, format,
 # producer_script). row_count + status are filled live by the producer.
 CATALOG: list[tuple[str, str, str, str, str]] = [
-    ("data/reference/entity_master.csv", "Entity Master", "entity_master", "csv", "scripts/build_entity_master.py"),
-    ("data/reference/agency_master.csv", "Agency & Municipio Master", "entity_master", "csv", "scripts/build_agency_master.py"),
-    ("data/reference/person_master.csv", "Person Master", "entity_master", "csv", "scripts/build_person_master.py"),
-    ("data/reference/entity_aliases.csv", "Entity Aliases", "entity_master", "csv", "scripts/build_entity_aliases.py"),
-    ("data/reference/entity_parent_map.csv", "Entity Parent / Operator Map", "entity_master", "csv", "scripts/build_entity_parent_map.py"),
-    ("reports/entity_resolution_review_queue.csv", "Entity Resolution Review Queue", "entity_master", "csv", "scripts/build_entity_resolution_review_queue.py"),
-    ("data/reference/influence_edges.csv", "Influence Edges", "influence", "csv", "scripts/build_influence_edges.py"),
-    ("data/reference/debt_instruments.csv", "Debt Instruments", "debt_fiscal", "csv", "scripts/build_debt_instruments.py"),
-    ("data/reference/creditor_mapping.csv", "Creditor Mapping", "debt_fiscal", "csv", "scripts/build_creditor_mapping.py"),
-    ("data/reference/fiscal_control_events.csv", "Fiscal Control Events Timeline", "debt_fiscal", "csv", "scripts/build_fiscal_control_events.py"),
-    ("data/reference/geo_reason_codes.csv", "Geo Resolution Codes", "gis", "csv", "scripts/build_geo_reason_codes.py"),
-    ("data/reference/hq_bias_correction.csv", "HQ Bias Correction Contract", "gis", "csv", "scripts/build_hq_bias_reference.py"),
-    ("exports/gis/layer_manifest.json", "GIS Layer Manifest", "gis", "json", "scripts/build_gis_layer_manifest.py"),
-    ("exports/graph/nodes.csv", "Graph Nodes", "graph_export", "csv", "scripts/build_graph_export.py"),
-    ("exports/graph/edges.csv", "Graph Edges", "graph_export", "csv", "scripts/build_graph_export.py"),
-    ("reports/foia_priority_queue.csv", "FOIA Priority Queue", "foia", "csv", "scripts/build_foia_tracker.py"),
-    ("reports/foia_yield_tracking.csv", "FOIA Yield Tracking", "foia", "csv", "scripts/build_foia_yield_tracking.py"),
-    ("docs/foia_letters/FOIA_c509296376f145b1.md", "FOIA Letter — HUD DRGR", "foia", "md", "scripts/build_foia_letters.py"),
-    ("docs/foia_letters/FOIA_3429122f5837fd47.md", "FOIA Letter — PRASA", "foia", "md", "scripts/build_foia_letters.py"),
-    ("docs/foia_letters/FOIA_aef916ac9b8ed071.md", "FOIA Letter — OCPR", "foia", "md", "scripts/build_foia_letters.py"),
-    ("docs/foia_letters/FOIA_f7d5acaf207ff8a5.md", "FOIA Letter — COR3", "foia", "md", "scripts/build_foia_letters.py"),
-    ("docs/foia_letters/FOIA_64d22dfe3108f7b1.md", "FOIA Letter — GSA FSRS", "foia", "md", "scripts/build_foia_letters.py"),
-    ("docs/foia_letters/FOIA_95021847de4153af.md", "FOIA Letter — SAM.gov", "foia", "md", "scripts/build_foia_letters.py"),
-    ("docs/foia_letters/FOIA_7ef254a89545013c.md", "FOIA Letter — OEG (Cabilderos)", "foia", "md", "scripts/build_foia_letters.py"),
-    ("docs/foia_letters/FOIA_220df26653119d96.md", "FOIA Letter — CEE (Donaciones)", "foia", "md", "scripts/build_foia_letters.py"),
-    ("docs/foia_letters/FOIA_7fef81739082ae00.md", "FOIA Letter — compras.pr.gov", "foia", "md", "scripts/build_foia_letters.py"),
+    (
+        "data/reference/entity_master.csv",
+        "Entity Master",
+        "entity_master",
+        "csv",
+        "scripts/build_entity_master.py",
+    ),
+    (
+        "data/reference/agency_master.csv",
+        "Agency & Municipio Master",
+        "entity_master",
+        "csv",
+        "scripts/build_agency_master.py",
+    ),
+    (
+        "data/reference/person_master.csv",
+        "Person Master",
+        "entity_master",
+        "csv",
+        "scripts/build_person_master.py",
+    ),
+    (
+        "data/reference/entity_aliases.csv",
+        "Entity Aliases",
+        "entity_master",
+        "csv",
+        "scripts/build_entity_aliases.py",
+    ),
+    (
+        "data/reference/entity_parent_map.csv",
+        "Entity Parent / Operator Map",
+        "entity_master",
+        "csv",
+        "scripts/build_entity_parent_map.py",
+    ),
+    (
+        "reports/entity_resolution_review_queue.csv",
+        "Entity Resolution Review Queue",
+        "entity_master",
+        "csv",
+        "scripts/build_entity_resolution_review_queue.py",
+    ),
+    (
+        "data/reference/influence_edges.csv",
+        "Influence Edges",
+        "influence",
+        "csv",
+        "scripts/build_influence_edges.py",
+    ),
+    (
+        "data/reference/debt_instruments.csv",
+        "Debt Instruments",
+        "debt_fiscal",
+        "csv",
+        "scripts/build_debt_instruments.py",
+    ),
+    (
+        "data/reference/creditor_mapping.csv",
+        "Creditor Mapping",
+        "debt_fiscal",
+        "csv",
+        "scripts/build_creditor_mapping.py",
+    ),
+    (
+        "data/reference/fiscal_control_events.csv",
+        "Fiscal Control Events Timeline",
+        "debt_fiscal",
+        "csv",
+        "scripts/build_fiscal_control_events.py",
+    ),
+    (
+        "data/reference/geo_reason_codes.csv",
+        "Geo Resolution Codes",
+        "gis",
+        "csv",
+        "scripts/build_geo_reason_codes.py",
+    ),
+    (
+        "data/reference/hq_bias_correction.csv",
+        "HQ Bias Correction Contract",
+        "gis",
+        "csv",
+        "scripts/build_hq_bias_reference.py",
+    ),
+    (
+        "exports/gis/layer_manifest.json",
+        "GIS Layer Manifest",
+        "gis",
+        "json",
+        "scripts/build_gis_layer_manifest.py",
+    ),
+    (
+        "exports/graph/nodes.csv",
+        "Graph Nodes",
+        "graph_export",
+        "csv",
+        "scripts/build_graph_export.py",
+    ),
+    (
+        "exports/graph/edges.csv",
+        "Graph Edges",
+        "graph_export",
+        "csv",
+        "scripts/build_graph_export.py",
+    ),
+    (
+        "reports/foia_priority_queue.csv",
+        "FOIA Priority Queue",
+        "foia",
+        "csv",
+        "scripts/build_foia_tracker.py",
+    ),
+    (
+        "reports/foia_yield_tracking.csv",
+        "FOIA Yield Tracking",
+        "foia",
+        "csv",
+        "scripts/build_foia_yield_tracking.py",
+    ),
+    (
+        "docs/foia_letters/FOIA_c509296376f145b1.md",
+        "FOIA Letter — HUD DRGR",
+        "foia",
+        "md",
+        "scripts/build_foia_letters.py",
+    ),
+    (
+        "docs/foia_letters/FOIA_3429122f5837fd47.md",
+        "FOIA Letter — PRASA",
+        "foia",
+        "md",
+        "scripts/build_foia_letters.py",
+    ),
+    (
+        "docs/foia_letters/FOIA_aef916ac9b8ed071.md",
+        "FOIA Letter — OCPR",
+        "foia",
+        "md",
+        "scripts/build_foia_letters.py",
+    ),
+    (
+        "docs/foia_letters/FOIA_f7d5acaf207ff8a5.md",
+        "FOIA Letter — COR3",
+        "foia",
+        "md",
+        "scripts/build_foia_letters.py",
+    ),
+    (
+        "docs/foia_letters/FOIA_64d22dfe3108f7b1.md",
+        "FOIA Letter — GSA FSRS",
+        "foia",
+        "md",
+        "scripts/build_foia_letters.py",
+    ),
+    (
+        "docs/foia_letters/FOIA_95021847de4153af.md",
+        "FOIA Letter — SAM.gov",
+        "foia",
+        "md",
+        "scripts/build_foia_letters.py",
+    ),
+    (
+        "docs/foia_letters/FOIA_7ef254a89545013c.md",
+        "FOIA Letter — OEG (Cabilderos)",
+        "foia",
+        "md",
+        "scripts/build_foia_letters.py",
+    ),
+    (
+        "docs/foia_letters/FOIA_220df26653119d96.md",
+        "FOIA Letter — CEE (Donaciones)",
+        "foia",
+        "md",
+        "scripts/build_foia_letters.py",
+    ),
+    (
+        "docs/foia_letters/FOIA_7fef81739082ae00.md",
+        "FOIA Letter — compras.pr.gov",
+        "foia",
+        "md",
+        "scripts/build_foia_letters.py",
+    ),
 ]
 
 
@@ -99,16 +256,18 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for path, title, gate, fmt, producer in CATALOG:
         p = root / path
-        rows.append({
-            "report_id": f"RPT_{name_hash(path)}",
-            "title": title,
-            "gate": gate,
-            "path": path,
-            "format": fmt,
-            "producer_script": producer,
-            "status": "done" if p.exists() else "missing",
-            "row_count": _row_count(p, fmt),
-        })
+        rows.append(
+            {
+                "report_id": f"RPT_{name_hash(path)}",
+                "title": title,
+                "gate": gate,
+                "path": path,
+                "format": fmt,
+                "producer_script": producer,
+                "status": "done" if p.exists() else "missing",
+                "row_count": _row_count(p, fmt),
+            }
+        )
     return rows
 
 
@@ -167,7 +326,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

@@ -11,6 +11,7 @@ Usage:
   python3 scripts/build_risk_signals.py
   python3 scripts/build_risk_signals.py --root /path/to/repo
 """
+
 from __future__ import annotations
 
 import argparse
@@ -50,30 +51,38 @@ def run(root: Path) -> dict:
     logger.info("Computing risk signals from R5 data (root=%s)", root)
     result = compute_signals(root)
 
-    signals            = result["signals"]
-    entity_scores      = result["entity_scores"]
-    project_scores     = result["project_scores"]
+    signals = result["signals"]
+    entity_scores = result["entity_scores"]
+    project_scores = result["project_scores"]
     municipality_scores = result["municipality_scores"]
-    metadata           = result["metadata"]
+    metadata = result["metadata"]
 
     out_base = root / RISK_OUT
 
-    n_sig  = _write_csv(out_base / "risk_signals_master.csv",   signals,            SIGNAL_COLUMNS)
-    n_ent  = _write_csv(out_base / "entity_risk_scores.csv",    entity_scores,      ENTITY_SCORE_COLUMNS)
-    n_proj = _write_csv(out_base / "project_risk_scores.csv",   project_scores,     PROJECT_SCORE_COLUMNS)
-    n_muni = _write_csv(out_base / "municipality_risk_scores.csv", municipality_scores, MUNICIPALITY_SCORE_COLUMNS)
+    n_sig = _write_csv(out_base / "risk_signals_master.csv", signals, SIGNAL_COLUMNS)
+    n_ent = _write_csv(out_base / "entity_risk_scores.csv", entity_scores, ENTITY_SCORE_COLUMNS)
+    n_proj = _write_csv(out_base / "project_risk_scores.csv", project_scores, PROJECT_SCORE_COLUMNS)
+    n_muni = _write_csv(
+        out_base / "municipality_risk_scores.csv", municipality_scores, MUNICIPALITY_SCORE_COLUMNS
+    )
 
     logger.info(
         "  Signals: %d | Entities: %d | Projects: %d | Municipalities: %d",
-        n_sig, n_ent, n_proj, n_muni,
+        n_sig,
+        n_ent,
+        n_proj,
+        n_muni,
     )
 
-    manifest = {**metadata, "output_rows": {
-        "risk_signals_master":      n_sig,
-        "entity_risk_scores":       n_ent,
-        "project_risk_scores":      n_proj,
-        "municipality_risk_scores": n_muni,
-    }}
+    manifest = {
+        **metadata,
+        "output_rows": {
+            "risk_signals_master": n_sig,
+            "entity_risk_scores": n_ent,
+            "project_risk_scores": n_proj,
+            "municipality_risk_scores": n_muni,
+        },
+    }
 
     manifest_dir = root / MANIFESTS_OUT
     manifest_dir.mkdir(parents=True, exist_ok=True)

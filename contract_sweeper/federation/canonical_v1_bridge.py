@@ -20,6 +20,7 @@ descriptive ``entity_type`` (municipality / debt_instrument / project / property
 funding_source / contract). Every row carries a ``lineage`` object and
 ``synthetic=false``. Stdlib only; deterministic and idempotent.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -43,8 +44,14 @@ PHASE = "CANONICAL_V1_FEDERATION_BRIDGE"
 # the edges touching them federate as entity->entity relationships instead of
 # being reported as not_yet_federated.
 _ENTITY_NODE_TYPES = {
-    "Person", "Entity", "Municipality", "DebtInstrument",
-    "Project", "Property", "FundingSource", "Contract",
+    "Person",
+    "Entity",
+    "Municipality",
+    "DebtInstrument",
+    "Project",
+    "Property",
+    "FundingSource",
+    "Contract",
 }
 
 # canonical_v1 entity_type -> federation entity_type vocabulary.
@@ -60,12 +67,30 @@ _ENTITY_TYPE_MAP = {
 # PR B: additional canonical_v1 node tables promoted to federation entities.
 # (table_key, id_column, name_column | None, federation_entity_type, source_csv)
 _NODE_TABLES = [
-    ("municipalities", "municipality_id", "name", "municipality", "data/canonical_v1/municipalities.csv"),
+    (
+        "municipalities",
+        "municipality_id",
+        "name",
+        "municipality",
+        "data/canonical_v1/municipalities.csv",
+    ),
     ("projects", "project_id", "project_name", "project", "data/canonical_v1/projects.csv"),
     ("properties", "property_id", "property_name", "property", "data/canonical_v1/properties.csv"),
-    ("funding_sources", "funding_source_id", "program", "funding_source", "data/canonical_v1/funding_sources.csv"),
+    (
+        "funding_sources",
+        "funding_source_id",
+        "program",
+        "funding_source",
+        "data/canonical_v1/funding_sources.csv",
+    ),
     ("contracts", "contract_id", "contract_number", "contract", "data/canonical_v1/contracts.csv"),
-    ("debt_instruments", "debt_id", None, "debt_instrument", "data/canonical_v1/debt_instruments.csv"),
+    (
+        "debt_instruments",
+        "debt_id",
+        None,
+        "debt_instrument",
+        "data/canonical_v1/debt_instruments.csv",
+    ),
 ]
 
 
@@ -104,60 +129,81 @@ def build_streams(root: Path | None = None) -> dict[str, Any]:
             continue
         sid = fed_source_id(ceid)
         evidence_to_src[ceid] = sid
-        sources.append({
-            "source_id": sid,
-            "source_type": (ev.get("source_type") or "other").strip() or "other",
-            "source_name": (ev.get("source_name") or "").strip(),
-            "source_ref": ceid,
-            "confidence": _norm_conf(ev.get("confidence")),
-            "lineage": _lineage("data/canonical_v1/evidence.csv"),
-            "synthetic": False,
-            "created_at": now,
-            "extracted_at": now,
-        })
+        sources.append(
+            {
+                "source_id": sid,
+                "source_type": (ev.get("source_type") or "other").strip() or "other",
+                "source_name": (ev.get("source_name") or "").strip(),
+                "source_ref": ceid,
+                "confidence": _norm_conf(ev.get("confidence")),
+                "lineage": _lineage("data/canonical_v1/evidence.csv"),
+                "synthetic": False,
+                "created_at": now,
+                "extracted_at": now,
+            }
+        )
 
     # --- entities from canonical_v1 entities + people ---
     entities: list[dict[str, Any]] = []
     node_to_ent: dict[str, str] = {}
 
-    def _emit_entity(cid: str, name: str, normalized: str, etype: str,
-                     jurisdiction: str, ev_id: str, conf: str, source_csv: str) -> None:
+    def _emit_entity(
+        cid: str,
+        name: str,
+        normalized: str,
+        etype: str,
+        jurisdiction: str,
+        ev_id: str,
+        conf: str,
+        source_csv: str,
+    ) -> None:
         eid = fed_entity_id(cid)
         node_to_ent[cid] = eid
-        entities.append({
-            "entity_id": eid,
-            "source_id": evidence_to_src.get(ev_id, fed_source_id(ev_id)),
-            "name": name,
-            "normalized_name": normalized or name.upper(),
-            "entity_type": etype,
-            "jurisdiction": jurisdiction or "PR",
-            "external_ids": {"canonical_v1_id": cid},
-            "confidence": _norm_conf(conf),
-            "lineage": _lineage(source_csv),
-            "synthetic": False,
-            "created_at": now,
-            "extracted_at": now,
-        })
+        entities.append(
+            {
+                "entity_id": eid,
+                "source_id": evidence_to_src.get(ev_id, fed_source_id(ev_id)),
+                "name": name,
+                "normalized_name": normalized or name.upper(),
+                "entity_type": etype,
+                "jurisdiction": jurisdiction or "PR",
+                "external_ids": {"canonical_v1_id": cid},
+                "confidence": _norm_conf(conf),
+                "lineage": _lineage(source_csv),
+                "synthetic": False,
+                "created_at": now,
+                "extracted_at": now,
+            }
+        )
 
     for ent in tables.get("entities", []):
         cid = (ent.get("entity_id") or "").strip()
         if not cid:
             continue
-        _emit_entity(cid, (ent.get("name") or "").strip(),
-                     (ent.get("normalized_name") or "").strip(),
-                     _ENTITY_TYPE_MAP.get((ent.get("entity_type") or "").strip(), "recipient"),
-                     (ent.get("jurisdiction") or "").strip(),
-                     (ent.get("evidence_id") or "").strip(),
-                     ent.get("confidence"), "data/canonical_v1/entities.csv")
+        _emit_entity(
+            cid,
+            (ent.get("name") or "").strip(),
+            (ent.get("normalized_name") or "").strip(),
+            _ENTITY_TYPE_MAP.get((ent.get("entity_type") or "").strip(), "recipient"),
+            (ent.get("jurisdiction") or "").strip(),
+            (ent.get("evidence_id") or "").strip(),
+            ent.get("confidence"),
+            "data/canonical_v1/entities.csv",
+        )
     for per in tables.get("people", []):
         cid = (per.get("person_id") or "").strip()
         if not cid:
             continue
-        _emit_entity(cid, (per.get("full_name") or "").strip(),
-                     (per.get("normalized_name") or "").strip(), "person",
-                     (per.get("jurisdiction") or "").strip(),
-                     (per.get("evidence_id") or "").strip(),
-                     per.get("confidence"), "data/canonical_v1/people.csv")
+        _emit_entity(
+            cid,
+            (per.get("full_name") or "").strip(),
+            (per.get("normalized_name") or "").strip(),
+            "person",
+            (per.get("jurisdiction") or "").strip(),
+            (per.get("evidence_id") or "").strip(),
+            per.get("confidence"),
+            "data/canonical_v1/people.csv",
+        )
 
     # --- PR B: promote non-entity canonical_v1 nodes to federation entities ---
     for table_key, id_col, name_col, etype, source_csv in _NODE_TABLES:
@@ -168,15 +214,28 @@ def build_streams(root: Path | None = None) -> dict[str, Any]:
             if name_col:
                 name = (row.get(name_col) or "").strip() or cid
             else:  # debt_instruments has no single name column — compose a label
-                name = " ".join(p for p in (
-                    (row.get("debt_class") or "").strip(),
-                    (row.get("series") or "").strip(),
-                    (row.get("issue_year") or "").strip(),
-                ) if p) or cid
-            _emit_entity(cid, name, "", etype,
-                         (row.get("jurisdiction") or "").strip(),
-                         (row.get("evidence_id") or "").strip(),
-                         row.get("confidence"), source_csv)
+                name = (
+                    " ".join(
+                        p
+                        for p in (
+                            (row.get("debt_class") or "").strip(),
+                            (row.get("series") or "").strip(),
+                            (row.get("issue_year") or "").strip(),
+                        )
+                        if p
+                    )
+                    or cid
+                )
+            _emit_entity(
+                cid,
+                name,
+                "",
+                etype,
+                (row.get("jurisdiction") or "").strip(),
+                (row.get("evidence_id") or "").strip(),
+                row.get("confidence"),
+                source_csv,
+            )
 
     # --- relationships from edges with entity endpoints ---
     relationships: list[dict[str, Any]] = []
@@ -188,25 +247,35 @@ def build_streams(root: Path | None = None) -> dict[str, Any]:
         tid = (e.get("target_node_id") or "").strip()
         etype = (e.get("edge_type") or "").strip()
         ceid = (e.get("evidence_id") or "").strip()
-        if s_type in _ENTITY_NODE_TYPES and t_type in _ENTITY_NODE_TYPES \
-                and sid in node_to_ent and tid in node_to_ent:
-            relationships.append({
-                "relationship_id": fed_relationship_id(sid, etype, tid),
-                "source_id": evidence_to_src.get(ceid, fed_source_id(ceid)),
-                "source_entity_id": node_to_ent[sid],
-                "target_entity_id": node_to_ent[tid],
-                "relationship_type": etype,
-                "evidence_source_id": evidence_to_src.get(ceid, fed_source_id(ceid)),
-                "confidence": _norm_conf(e.get("confidence")),
-                "lineage": _lineage("data/canonical_v1/edges.csv"),
-                "synthetic": False,
-                "created_at": now,
-                "extracted_at": now,
-            })
+        if (
+            s_type in _ENTITY_NODE_TYPES
+            and t_type in _ENTITY_NODE_TYPES
+            and sid in node_to_ent
+            and tid in node_to_ent
+        ):
+            relationships.append(
+                {
+                    "relationship_id": fed_relationship_id(sid, etype, tid),
+                    "source_id": evidence_to_src.get(ceid, fed_source_id(ceid)),
+                    "source_entity_id": node_to_ent[sid],
+                    "target_entity_id": node_to_ent[tid],
+                    "relationship_type": etype,
+                    "evidence_source_id": evidence_to_src.get(ceid, fed_source_id(ceid)),
+                    "confidence": _norm_conf(e.get("confidence")),
+                    "lineage": _lineage("data/canonical_v1/edges.csv"),
+                    "synthetic": False,
+                    "created_at": now,
+                    "extracted_at": now,
+                }
+            )
         else:
-            not_yet.append({"edge_id": (e.get("edge_id") or "").strip(),
-                            "edge_type": etype,
-                            "reason": f"non-entity endpoint ({s_type}->{t_type})"})
+            not_yet.append(
+                {
+                    "edge_id": (e.get("edge_id") or "").strip(),
+                    "edge_type": etype,
+                    "reason": f"non-entity endpoint ({s_type}->{t_type})",
+                }
+            )
 
     return {
         "sources": sources,

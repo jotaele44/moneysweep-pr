@@ -4,6 +4,7 @@ Reads `registries/schema_registry.json`. Resolves canonical-column
 references and validates that every column referenced by a table actually
 exists in `canonical_columns`.
 """
+
 from __future__ import annotations
 
 import argparse

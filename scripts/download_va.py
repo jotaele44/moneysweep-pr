@@ -16,6 +16,7 @@ Outputs:
 Usage:
   python3 scripts/download_va.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -42,34 +43,62 @@ RETRY_BACKOFF = [5, 15, 30]
 PAGE_SIZE = 100
 
 KNOWN_VA_DATA = [
-    {"fiscal_year": "2023", "benefit_type": "Compensation",
-     "recipient_name": "PR Veterans Benefits Administration",
-     "recipient_normalized": "pr veterans benefits administration",
-     "recipient_count": "88000", "total_expenditure": "1800000000",
-     "avg_benefit": "20454", "facility_name": "San Juan VA Regional Office",
-     "contract_id": "", "obligation_date": "2023-09-30",
-     "source_system": "va_known_seed", "source_doc": "va_fy2023_expenditures"},
-    {"fiscal_year": "2023", "benefit_type": "Pension",
-     "recipient_name": "PR Veterans Benefits Administration",
-     "recipient_normalized": "pr veterans benefits administration",
-     "recipient_count": "12000", "total_expenditure": "120000000",
-     "avg_benefit": "10000", "facility_name": "San Juan VA Regional Office",
-     "contract_id": "", "obligation_date": "2023-09-30",
-     "source_system": "va_known_seed", "source_doc": "va_fy2023_expenditures"},
-    {"fiscal_year": "2023", "benefit_type": "Education GI Bill",
-     "recipient_name": "PR Veterans Education Benefits",
-     "recipient_normalized": "pr veterans education benefits",
-     "recipient_count": "5500", "total_expenditure": "72000000",
-     "avg_benefit": "13090", "facility_name": "",
-     "contract_id": "", "obligation_date": "2023-09-30",
-     "source_system": "va_known_seed", "source_doc": "va_fy2023_expenditures"},
-    {"fiscal_year": "2023", "benefit_type": "Healthcare VAMC",
-     "recipient_name": "San Juan VA Medical Center",
-     "recipient_normalized": "san juan va medical center",
-     "recipient_count": "60000", "total_expenditure": "650000000",
-     "avg_benefit": "10833", "facility_name": "San Juan VA Medical Center",
-     "contract_id": "", "obligation_date": "2023-09-30",
-     "source_system": "va_known_seed", "source_doc": "va_fy2023_expenditures"},
+    {
+        "fiscal_year": "2023",
+        "benefit_type": "Compensation",
+        "recipient_name": "PR Veterans Benefits Administration",
+        "recipient_normalized": "pr veterans benefits administration",
+        "recipient_count": "88000",
+        "total_expenditure": "1800000000",
+        "avg_benefit": "20454",
+        "facility_name": "San Juan VA Regional Office",
+        "contract_id": "",
+        "obligation_date": "2023-09-30",
+        "source_system": "va_known_seed",
+        "source_doc": "va_fy2023_expenditures",
+    },
+    {
+        "fiscal_year": "2023",
+        "benefit_type": "Pension",
+        "recipient_name": "PR Veterans Benefits Administration",
+        "recipient_normalized": "pr veterans benefits administration",
+        "recipient_count": "12000",
+        "total_expenditure": "120000000",
+        "avg_benefit": "10000",
+        "facility_name": "San Juan VA Regional Office",
+        "contract_id": "",
+        "obligation_date": "2023-09-30",
+        "source_system": "va_known_seed",
+        "source_doc": "va_fy2023_expenditures",
+    },
+    {
+        "fiscal_year": "2023",
+        "benefit_type": "Education GI Bill",
+        "recipient_name": "PR Veterans Education Benefits",
+        "recipient_normalized": "pr veterans education benefits",
+        "recipient_count": "5500",
+        "total_expenditure": "72000000",
+        "avg_benefit": "13090",
+        "facility_name": "",
+        "contract_id": "",
+        "obligation_date": "2023-09-30",
+        "source_system": "va_known_seed",
+        "source_doc": "va_fy2023_expenditures",
+    },
+    {
+        "fiscal_year": "2023",
+        "benefit_type": "Healthcare VAMC",
+        "recipient_name": "San Juan VA Medical Center",
+        "recipient_normalized": "san juan va medical center",
+        "recipient_count": "60000",
+        "total_expenditure": "650000000",
+        "avg_benefit": "10833",
+        "facility_name": "San Juan VA Medical Center",
+        "contract_id": "",
+        "obligation_date": "2023-09-30",
+        "source_system": "va_known_seed",
+        "source_doc": "va_fy2023_expenditures",
+    },
 ]
 
 VA_COLUMNS = [
@@ -90,11 +119,13 @@ VA_COLUMNS = [
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR VA benefits research)",
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR VA benefits research)",
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
+    )
     return s
 
 
@@ -115,7 +146,7 @@ def _post(session: requests.Session, url: str, payload: dict, logger) -> dict | 
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -151,12 +182,24 @@ def _fetch_usaspending_va(session: requests.Session, logger) -> list[dict]:
     while True:
         payload = {
             "filters": {
-                "agencies": [{"type": "awarding", "tier": "toptier", "name": "Department of Veterans Affairs"}],
+                "agencies": [
+                    {
+                        "type": "awarding",
+                        "tier": "toptier",
+                        "name": "Department of Veterans Affairs",
+                    }
+                ],
                 "place_of_performance_locations": [{"country": "USA", "state": "PR"}],
             },
             "fields": [
-                "Award ID", "Recipient Name", "Award Amount", "Awarding Agency",
-                "Awarding Sub Agency", "Award Date", "Award Type", "Description",
+                "Award ID",
+                "Recipient Name",
+                "Award Amount",
+                "Awarding Agency",
+                "Awarding Sub Agency",
+                "Award Date",
+                "Award Type",
+                "Description",
                 "Place of Performance State Code",
             ],
             "page": page,
@@ -201,7 +244,10 @@ def _fetch_va_open_data(session: requests.Session, logger) -> list[dict]:
             vdata = _get(session, data_url, {}, logger)
             if not vdata:
                 continue
-            cols = [c.get("fieldName", "") for c in vdata.get("meta", {}).get("view", {}).get("columns", [])]
+            cols = [
+                c.get("fieldName", "")
+                for c in vdata.get("meta", {}).get("view", {}).get("columns", [])
+            ]
             for r in vdata.get("data", []):
                 row_dict = dict(zip(cols, r))
                 state_val = str(row_dict.get("state", row_dict.get("state_name", ""))).upper()
@@ -227,19 +273,29 @@ def _normalize_records(records: list[dict], source_system: str, logger) -> pd.Da
             rename[col] = "fiscal_year"
         elif "benefit_type" in cl and "benefit_type" not in rename.values():
             rename[col] = "benefit_type"
-        elif ("recipient" in cl or "vendor" in cl or "awardee" in cl) and "name" in cl and "recipient_name" not in rename.values():
+        elif (
+            ("recipient" in cl or "vendor" in cl or "awardee" in cl)
+            and "name" in cl
+            and "recipient_name" not in rename.values()
+        ):
             rename[col] = "recipient_name"
         elif "count" in cl and "recipient" in cl and "recipient_count" not in rename.values():
             rename[col] = "recipient_count"
-        elif ("amount" in cl or "expenditure" in cl or "obligation" in cl) and "total_expenditure" not in rename.values():
+        elif (
+            "amount" in cl or "expenditure" in cl or "obligation" in cl
+        ) and "total_expenditure" not in rename.values():
             rename[col] = "total_expenditure"
         elif "avg" in cl and "benefit" in cl:
             rename[col] = "avg_benefit"
         elif "facility" in cl and "name" in cl:
             rename[col] = "facility_name"
-        elif ("award_id" in cl or "contract_id" in cl or "piid" in cl) and "contract_id" not in rename.values():
+        elif (
+            "award_id" in cl or "contract_id" in cl or "piid" in cl
+        ) and "contract_id" not in rename.values():
             rename[col] = "contract_id"
-        elif ("award_date" in cl or "obligation_date" in cl) and "obligation_date" not in rename.values():
+        elif (
+            "award_date" in cl or "obligation_date" in cl
+        ) and "obligation_date" not in rename.values():
             rename[col] = "obligation_date"
 
     df = df.rename(columns=rename)

@@ -14,7 +14,7 @@ from scripts.download_cms import (
 
 @pytest.mark.skipif(
     not Path("data/staging/processed/pr_cms_open_payments.csv").exists(),
-    reason="CMS Open Payments file not present"
+    reason="CMS Open Payments file not present",
 )
 def test_cms_open_payments_csv_exists_and_readable():
     """Integration: CMS Open Payments CSV exists and is readable."""
@@ -26,7 +26,7 @@ def test_cms_open_payments_csv_exists_and_readable():
 
 @pytest.mark.skipif(
     not Path("data/staging/processed/pr_cms_medicare_providers.csv").exists(),
-    reason="CMS Medicare providers file not present"
+    reason="CMS Medicare providers file not present",
 )
 def test_cms_medicare_providers_csv_exists_and_readable():
     """Integration: CMS Medicare providers CSV exists and is readable."""
@@ -104,7 +104,6 @@ def test_cms_connection_error_handled(mock_session_class):
     """CMS downloader handles connection errors."""
     mock_session = MagicMock()
     mock_session.get.side_effect = Exception("Connection refused")
-    
+
     with pytest.raises(Exception):
         mock_session.get("https://data.cms.gov/data-api/v1/dataset")
-

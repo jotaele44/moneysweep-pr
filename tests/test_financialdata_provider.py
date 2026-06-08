@@ -8,6 +8,7 @@ Hard contract enforced here:
   - Match routing is deterministic + dependency-free.
   - CLI dry-run produces every declared output, even when entity list is empty.
 """
+
 from __future__ import annotations
 
 import csv
@@ -37,6 +38,7 @@ from scripts.enrichment.enrich_financialdata_entities import (
 # ---------------------------------------------------------------------------
 # Provider readiness / gating
 # ---------------------------------------------------------------------------
+
 
 def test_provider_skips_without_api_key():
     """No key + no license → status='missing_both', ready_for_live=False."""
@@ -82,6 +84,7 @@ def test_provider_ready_only_with_both():
 # Network safety: no live call in any test path
 # ---------------------------------------------------------------------------
 
+
 def test_default_transport_refuses_without_configuration():
     """Calling _request() with no transport + no config must raise loudly."""
     p = FinancialDataNetProvider(api_key=None, license_approved=False)
@@ -117,6 +120,7 @@ def test_transport_injection_bypasses_default():
 # ---------------------------------------------------------------------------
 # Match routing
 # ---------------------------------------------------------------------------
+
 
 def test_deterministic_cusip_match():
     entity = {"name": "AECOM", "cusip": "00766T100"}
@@ -184,6 +188,7 @@ def test_normalize_name_strips_suffixes_and_punctuation():
 # Schema-shape validation (without requiring jsonschema dependency)
 # ---------------------------------------------------------------------------
 
+
 def _required_schema_fields() -> set[str]:
     schema_path = Path("schemas/canonical_v1/financialdata_enrichment.schema.json")
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
@@ -200,8 +205,9 @@ def test_schema_required_keys_present_in_row():
     entity = {"source_entity_id": "ent_aecom", "name": "AECOM", "cusip": "00766T100"}
     candidates = SYNTHETIC_CANDIDATES["AECOM"]
     result = route_match(entity, candidates)
-    row = build_output_row(entity, result, license_status="not_approved",
-                           retrieved_at="2026-06-04T00:00:00Z")
+    row = build_output_row(
+        entity, result, license_status="not_approved", retrieved_at="2026-06-04T00:00:00Z"
+    )
     for required in _required_schema_fields():
         assert required in row, f"missing required schema field: {required}"
     assert row["provider"] == _schema_provider_const()
@@ -218,8 +224,10 @@ def test_schema_enums_respected_for_match_methods():
     cases = [
         ({"name": "AECOM", "cusip": "00766T100"}, SYNTHETIC_CANDIDATES["AECOM"]),
         ({"name": "ACME Corporation"}, SYNTHETIC_CANDIDATES["ACME"]),
-        ({"name": "Black and Veatch Infrastructure Inc"},
-         SYNTHETIC_CANDIDATES["BLACK AND VEATCH INFRASTRUCTURE"]),
+        (
+            {"name": "Black and Veatch Infrastructure Inc"},
+            SYNTHETIC_CANDIDATES["BLACK AND VEATCH INFRASTRUCTURE"],
+        ),
         ({"name": "Local Family LLC"}, []),
     ]
     for entity, candidates in cases:
@@ -234,6 +242,7 @@ def test_schema_enums_respected_for_match_methods():
 # CLI dry-run end-to-end (no network)
 # ---------------------------------------------------------------------------
 
+
 def test_cli_dry_run_writes_expected_outputs(tmp_path, monkeypatch):
     """Dry-run mode with the synthetic fixture writes all four declared outputs."""
     # Force the readiness/config helpers to "no key, no license" regardless of host env.
@@ -242,6 +251,7 @@ def test_cli_dry_run_writes_expected_outputs(tmp_path, monkeypatch):
 
     # Redirect the readiness JSON path to the tmp dir so we don't write to the real repo.
     from scripts.enrichment import enrich_financialdata_entities as cli_mod
+
     readiness_target = tmp_path / "reports" / "financialdata_enrichment_readiness.json"
     monkeypatch.setattr(cli_mod, "READINESS_PATH", readiness_target)
 
@@ -258,7 +268,7 @@ def test_cli_dry_run_writes_expected_outputs(tmp_path, monkeypatch):
     # Synthetic fixture contains: 3 deterministic (AECOM/Fluor/Parsons),
     # 1 ambiguous (ACME), 1 fuzzy (B&V), 1 unmatched (Local Family).
     assert summary["matched"] >= 3
-    assert summary["review"] >= 2     # ACME + B&V
+    assert summary["review"] >= 2  # ACME + B&V
     assert summary["unmatched"] >= 1  # Local Family
 
     # All declared output files exist
@@ -289,12 +299,16 @@ def test_cli_dry_run_no_network_call(tmp_path, monkeypatch):
     monkeypatch.delenv("FINANCIALDATA_LICENSE_APPROVED", raising=False)
 
     from scripts.enrichment import enrich_financialdata_entities as cli_mod
-    monkeypatch.setattr(cli_mod, "READINESS_PATH",
-                        tmp_path / "reports" / "financialdata_enrichment_readiness.json")
+
+    monkeypatch.setattr(
+        cli_mod, "READINESS_PATH", tmp_path / "reports" / "financialdata_enrichment_readiness.json"
+    )
 
     fixture = Path("tests/fixtures/financialdata_synthetic_entities.csv")
-    with patch("requests.get", side_effect=AssertionError("no network in tests")), \
-         patch("requests.post", side_effect=AssertionError("no network in tests")):
+    with (
+        patch("requests.get", side_effect=AssertionError("no network in tests")),
+        patch("requests.post", side_effect=AssertionError("no network in tests")),
+    ):
         summary = run(input_path=fixture, output_dir=tmp_path / "outputs", dry_run=True)
     assert summary["entity_count"] == 6
 

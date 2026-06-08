@@ -10,6 +10,7 @@ The dispatcher and cache machinery treat :class:`EntityQuery` and
 registries so callers can't accidentally route a geographic source through
 an entity-mode call (or vice-versa).
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -51,9 +52,7 @@ class EntityQuery:
     def canonical_dict(self) -> dict[str, Any]:
         seen = {ident.canonical() for ident in self.identifiers}
         return {
-            "identifiers": [
-                {"kind": k, "value": v} for (k, v) in sorted(seen)
-            ],
+            "identifiers": [{"kind": k, "value": v} for (k, v) in sorted(seen)],
         }
 
     def canonical_hash(self) -> str:
@@ -63,8 +62,6 @@ class EntityQuery:
     def by_kind(self, *kinds: str) -> list[str]:
         """Return all identifier values whose kind is in ``kinds`` (deduped, sorted)."""
         wanted = set(kinds)
-        return sorted({
-            str(ident.value).strip()
-            for ident in self.identifiers
-            if ident.kind in wanted
-        })
+        return sorted(
+            {str(ident.value).strip() for ident in self.identifiers if ident.kind in wanted}
+        )

@@ -1,4 +1,5 @@
 """Tests for scripts/influence_graph_builder.py."""
+
 import csv
 import json
 from pathlib import Path
@@ -14,21 +15,40 @@ def graph_repo(tmp_path):
     proc.mkdir(parents=True)
 
     awards = [
-        {"award_id": "AW001", "recipient_name": "Prime Corp", "recipient_uei": "PUEI001",
-         "parent_uei": "PAR001", "obligated_amount": "5000000",
-         "awarding_agency": "FEMA", "pop_county": "San Juan"},
-        {"award_id": "AW002", "recipient_name": "Beta LLC", "recipient_uei": "PUEI002",
-         "parent_uei": "", "obligated_amount": "2000000",
-         "awarding_agency": "HUD", "pop_county": "Ponce"},
+        {
+            "award_id": "AW001",
+            "recipient_name": "Prime Corp",
+            "recipient_uei": "PUEI001",
+            "parent_uei": "PAR001",
+            "obligated_amount": "5000000",
+            "awarding_agency": "FEMA",
+            "pop_county": "San Juan",
+        },
+        {
+            "award_id": "AW002",
+            "recipient_name": "Beta LLC",
+            "recipient_uei": "PUEI002",
+            "parent_uei": "",
+            "obligated_amount": "2000000",
+            "awarding_agency": "HUD",
+            "pop_county": "Ponce",
+        },
     ]
     _write_csv(proc / "pr_all_awards_master.csv", awards)
 
     exec_dir = proc / "execution"
     exec_dir.mkdir(parents=True)
     chains = [
-        {"chain_id": "C001", "prime_name": "Prime Corp", "sub_name": "Sub LLC",
-         "award_id": "AW001", "subaward_amount": "250000",
-         "link_confidence": "0.8", "municipality": "San Juan", "asset_id": ""},
+        {
+            "chain_id": "C001",
+            "prime_name": "Prime Corp",
+            "sub_name": "Sub LLC",
+            "award_id": "AW001",
+            "subaward_amount": "250000",
+            "link_confidence": "0.8",
+            "municipality": "San Juan",
+            "asset_id": "",
+        },
     ]
     _write_csv(exec_dir / "execution_chain_master.csv", chains)
 
@@ -46,8 +66,14 @@ def _write_csv(path: Path, rows: list[dict]) -> None:
 @pytest.mark.unit
 def test_build_graph_returns_summary_keys(graph_repo):
     result = build_graph(graph_repo)
-    for key in ("node_count", "edge_count", "graphml_written", "gexf_written",
-                "top_25_written", "outputs"):
+    for key in (
+        "node_count",
+        "edge_count",
+        "graphml_written",
+        "gexf_written",
+        "top_25_written",
+        "outputs",
+    ):
         assert key in result
 
 
@@ -103,7 +129,9 @@ def test_build_graph_top25_has_25_or_fewer(graph_repo):
 @pytest.mark.unit
 def test_build_graph_summary_json_written(graph_repo):
     build_graph(graph_repo)
-    summary_path = graph_repo / "data" / "staging" / "processed" / "graphs" / "influence_graph_summary.json"
+    summary_path = (
+        graph_repo / "data" / "staging" / "processed" / "graphs" / "influence_graph_summary.json"
+    )
     assert summary_path.exists()
     payload = json.loads(summary_path.read_text())
     assert "node_count" in payload
@@ -124,8 +152,19 @@ def test_add_edge_skips_empty_nodes():
 def test_add_edge_creates_node_entries():
     edges: list = []
     nodes: dict = {}
-    _add_edge(edges, nodes, "Agency A", "Prime B", "awards_to", 1000, "test.csv", "E1",
-              0.9, "agency", "prime")
+    _add_edge(
+        edges,
+        nodes,
+        "Agency A",
+        "Prime B",
+        "awards_to",
+        1000,
+        "test.csv",
+        "E1",
+        0.9,
+        "agency",
+        "prime",
+    )
     assert "Agency A" in nodes
     assert "Prime B" in nodes
     assert nodes["Agency A"]["node_type"] == "agency"
@@ -138,19 +177,46 @@ def test_add_edge_creates_node_entries():
 def graph_repo_with_ngos(graph_repo):
     ngo_dir = graph_repo / "data" / "staging" / "processed" / "ngos"
     ngo_dir.mkdir(parents=True)
-    _write_csv(ngo_dir / "ngo_funding_edges.csv", [
-        {"edge_id": "NE1", "source_entity": "FEMA", "target_ngo_id": "ngo_aaa",
-         "target_name": "Fundacion Comunitaria", "award_id": "AW001", "amount": "125000",
-         "municipality": "San Juan", "confidence": "90"},
-    ])
-    _write_csv(ngo_dir / "ngo_asset_edges.csv", [
-        {"ngo_id": "ngo_aaa", "asset_id": "PW-100", "municipality": "San Juan",
-         "relationship_type": "executes", "evidence_class": "award_id_match", "confidence": "80"},
-    ])
-    _write_csv(ngo_dir / "ngo_fiscal_sponsor_edges.csv", [
-        {"sponsor_ngo_id": "ngo_central", "sponsored_entity": "ngo_aaa",
-         "relationship_type": "group_exemption", "source_file": "irs_eo_bmf:x.csv", "confidence": "70"},
-    ])
+    _write_csv(
+        ngo_dir / "ngo_funding_edges.csv",
+        [
+            {
+                "edge_id": "NE1",
+                "source_entity": "FEMA",
+                "target_ngo_id": "ngo_aaa",
+                "target_name": "Fundacion Comunitaria",
+                "award_id": "AW001",
+                "amount": "125000",
+                "municipality": "San Juan",
+                "confidence": "90",
+            },
+        ],
+    )
+    _write_csv(
+        ngo_dir / "ngo_asset_edges.csv",
+        [
+            {
+                "ngo_id": "ngo_aaa",
+                "asset_id": "PW-100",
+                "municipality": "San Juan",
+                "relationship_type": "executes",
+                "evidence_class": "award_id_match",
+                "confidence": "80",
+            },
+        ],
+    )
+    _write_csv(
+        ngo_dir / "ngo_fiscal_sponsor_edges.csv",
+        [
+            {
+                "sponsor_ngo_id": "ngo_central",
+                "sponsored_entity": "ngo_aaa",
+                "relationship_type": "group_exemption",
+                "source_file": "irs_eo_bmf:x.csv",
+                "confidence": "70",
+            },
+        ],
+    )
     return graph_repo
 
 
@@ -183,8 +249,13 @@ def test_build_graph_ngo_edges_absent_when_no_files(graph_repo):
 def test_compute_metrics_contract_value_weight():
     nodes = {"A": {"node_type": "agency"}, "B": {"node_type": "prime"}}
     edges = [
-        {"source": "A", "target": "B", "edge_type": "awards_to",
-         "weight": 5000000.0, "manual_review_required": False},
+        {
+            "source": "A",
+            "target": "B",
+            "edge_type": "awards_to",
+            "weight": 5000000.0,
+            "manual_review_required": False,
+        },
     ]
     metrics = _compute_metrics(nodes, edges)
     by_node = {m["node"]: m for m in metrics}

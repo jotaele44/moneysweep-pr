@@ -1,4 +1,5 @@
 """Tests for the canonical_v1 entities seed ingester (WS-E)."""
+
 import pytest
 
 from contract_sweeper.runtime.canonical_ids import entity_id
@@ -38,6 +39,7 @@ def test_seed_has_core_institutions(built):
 def test_gdb_alias_covers_bond_issuer_spelling(built):
     """The GDB bond's issuer name resolves to the existing GDB entity via alias."""
     from scripts.build_edges import build_resolver, resolve
+
     resolver = build_resolver(REPO_ROOT)
     canonical = resolve(resolver, "Entity", "Government Development Bank for Puerto Rico")
     bond_spelling = resolve(resolver, "Entity", "Puerto Rico Government Development Bank")

@@ -19,6 +19,7 @@ Vocabulary alignment:
 When a claim depends on multiple datasets, the *worst* tier wins:
 ``blocked`` > ``linked`` > ``observed``.
 """
+
 from __future__ import annotations
 
 import csv
@@ -57,9 +58,7 @@ def load_source_maturity(root: Path, status_csv: str = DEFAULT_STATUS_CSV) -> di
     return out
 
 
-def load_dataset_to_source_map(
-    root: Path, status_csv: str = DEFAULT_STATUS_CSV
-) -> dict[str, str]:
+def load_dataset_to_source_map(root: Path, status_csv: str = DEFAULT_STATUS_CSV) -> dict[str, str]:
     """Return ``{output_filename: source_id}`` derived from expected_outputs.
 
     The status CSV stores expected_outputs as a semicolon-separated list of
@@ -104,9 +103,7 @@ def claim_tier(
             continue
         saw_any = True
         leaf = Path(ds).name
-        source_id = dataset_map.get(leaf) or (
-            ds if ds in maturity else None
-        )
+        source_id = dataset_map.get(leaf) or (ds if ds in maturity else None)
         if source_id is None:
             tier = "blocked"
         else:

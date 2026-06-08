@@ -17,6 +17,7 @@ CLI::
     python scripts/ingest_properties.py            # write properties + evidence
     python scripts/ingest_properties.py --check     # summarize without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -43,9 +44,19 @@ SOURCE_NAME = "PR Public Properties (reference seed)"
 VALID_TYPES = {"hotel", "land", "concession", "facility", "other"}
 
 PROPERTY_COLUMNS = [
-    "property_id", "property_name", "property_type", "owner_entity_id",
-    "municipality_id", "address", "parcel_or_concession_id", "value", "currency",
-    "confidence", "evidence_id", "review_status", "notes",
+    "property_id",
+    "property_name",
+    "property_type",
+    "owner_entity_id",
+    "municipality_id",
+    "address",
+    "parcel_or_concession_id",
+    "value",
+    "currency",
+    "confidence",
+    "evidence_id",
+    "review_status",
+    "notes",
 ]
 
 
@@ -91,21 +102,23 @@ def build_rows(root: Path | None = None) -> dict[str, Any]:
                 review_status="accepted",
             )
             evidence_rows.append(ev)
-            rows.append({
-                "property_id": pid,
-                "property_name": name,
-                "property_type": ptype,
-                "owner_entity_id": owner_id or "",
-                "municipality_id": muni_id or "",
-                "address": (rec.get("address") or "").strip(),
-                "parcel_or_concession_id": (rec.get("parcel_or_concession_id") or "").strip(),
-                "value": (rec.get("value") or "").strip(),
-                "currency": (rec.get("currency") or "").strip(),
-                "confidence": ev.confidence,
-                "evidence_id": ev.evidence_id,
-                "review_status": "accepted",
-                "notes": f"owner={owner}" if owner else "",
-            })
+            rows.append(
+                {
+                    "property_id": pid,
+                    "property_name": name,
+                    "property_type": ptype,
+                    "owner_entity_id": owner_id or "",
+                    "municipality_id": muni_id or "",
+                    "address": (rec.get("address") or "").strip(),
+                    "parcel_or_concession_id": (rec.get("parcel_or_concession_id") or "").strip(),
+                    "value": (rec.get("value") or "").strip(),
+                    "currency": (rec.get("currency") or "").strip(),
+                    "confidence": ev.confidence,
+                    "evidence_id": ev.evidence_id,
+                    "review_status": "accepted",
+                    "notes": f"owner={owner}" if owner else "",
+                }
+            )
     return {"property_rows": rows, "evidence_rows": evidence_rows, "skipped": skipped}
 
 
@@ -170,8 +183,17 @@ def main(argv: list[str] | None = None) -> int:
         built = build_rows(root)
         rows = built["property_rows"]
         problems = check(rows)
-        print(json.dumps({"ok": not problems, "row_count": len(rows),
-                          "skipped": len(built["skipped"]), "problems": problems}, indent=2))
+        print(
+            json.dumps(
+                {
+                    "ok": not problems,
+                    "row_count": len(rows),
+                    "skipped": len(built["skipped"]),
+                    "problems": problems,
+                },
+                indent=2,
+            )
+        )
         return 0 if not problems else 1
     print(json.dumps(ingest(root), indent=2))
     return 0

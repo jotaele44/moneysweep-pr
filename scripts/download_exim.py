@@ -35,13 +35,20 @@ from scripts.config import PROJECT_ROOT, setup_logging
 USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 
 AGENCY_NAME = "Export-Import Bank of the United States"
-GRANT_TYPE_CODES = ["07", "08"]   # direct loans + guaranteed loans
+GRANT_TYPE_CODES = ["07", "08"]  # direct loans + guaranteed loans
 
 FIELDS = [
-    "Award ID", "Recipient Name", "recipient_uei",
-    "Awarding Agency", "Awarding Sub Agency", "Award Amount",
-    "Start Date", "Award Type",
-    "Place of Performance State Code", "Place of Performance County Name", "Description",
+    "Award ID",
+    "Recipient Name",
+    "recipient_uei",
+    "Awarding Agency",
+    "Awarding Sub Agency",
+    "Award Amount",
+    "Start Date",
+    "Award Type",
+    "Place of Performance State Code",
+    "Place of Performance County Name",
+    "Description",
 ]
 
 TIME_WINDOWS = [
@@ -52,10 +59,20 @@ TIME_WINDOWS = [
 ]
 
 MASTER_COLUMNS = [
-    "award_id", "recipient_name", "recipient_uei", "awarding_agency",
-    "awarding_sub_agency", "obligated_amount", "award_date", "fiscal_year",
-    "pop_state", "pop_county", "description", "source_file",
-    "source_dataset", "award_category",
+    "award_id",
+    "recipient_name",
+    "recipient_uei",
+    "awarding_agency",
+    "awarding_sub_agency",
+    "obligated_amount",
+    "award_date",
+    "fiscal_year",
+    "pop_state",
+    "pop_county",
+    "description",
+    "source_file",
+    "source_dataset",
+    "award_category",
 ]
 
 MAX_RETRIES = 3
@@ -74,6 +91,7 @@ _HTTP = HttpConfig(
 
 def _session():
     return build_session("ContractSweeper/1.0")
+
 
 def _derive_fiscal_year(date_str):
     if not date_str or pd.isna(date_str):
@@ -99,6 +117,7 @@ def _file_has_data(filepath):
 def _fetch_page(session, payload, logger):
     return http_post_json(session, USASPENDING_URL, payload, logger=logger, config=_HTTP)
 
+
 def _paginate(session, base_payload, logger):
     def _fetch(page):
         payload = {**base_payload, "page": page}
@@ -113,6 +132,7 @@ def _paginate(session, base_payload, logger):
         return PageResult(results, page + 1 if has_next else None)
 
     return list(paginate(_fetch, start_marker=1))
+
 
 def _build_payload(filter_type, window):
     time_period = [{"start_date": window["start_date"], "end_date": window["end_date"]}]
@@ -142,12 +162,17 @@ def _results_to_df(results, source_file):
         return pd.DataFrame(columns=MASTER_COLUMNS)
     df = pd.json_normalize(results)
     rename_map = {
-        "Award ID": "award_id", "Recipient Name": "recipient_name",
-        "recipient_uei": "recipient_uei", "Awarding Agency": "awarding_agency",
-        "Awarding Sub Agency": "awarding_sub_agency", "Award Amount": "obligated_amount",
-        "Start Date": "award_date", "Award Type": "award_category",
+        "Award ID": "award_id",
+        "Recipient Name": "recipient_name",
+        "recipient_uei": "recipient_uei",
+        "Awarding Agency": "awarding_agency",
+        "Awarding Sub Agency": "awarding_sub_agency",
+        "Award Amount": "obligated_amount",
+        "Start Date": "award_date",
+        "Award Type": "award_category",
         "Place of Performance State Code": "pop_state",
-        "Place of Performance County Name": "pop_county", "Description": "description",
+        "Place of Performance County Name": "pop_county",
+        "Description": "description",
     }
     df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
     df["fiscal_year"] = df.get("award_date", pd.Series(dtype=str)).apply(_derive_fiscal_year)
@@ -232,8 +257,12 @@ def _run(root=None, force=False, fy_start=None):
     logger.info(f"  PoP rows:    {total_pop:,}")
     logger.info(f"  Recip rows:  {total_rec:,}")
     logger.info(f"  Master rows: {master_rows:,}")
-    return {"raw_pop_rows": total_pop, "raw_recipient_rows": total_rec,
-            "master_rows": master_rows, "errors": all_errors}
+    return {
+        "raw_pop_rows": total_pop,
+        "raw_recipient_rows": total_rec,
+        "master_rows": master_rows,
+        "errors": all_errors,
+    }
 
 
 def main():

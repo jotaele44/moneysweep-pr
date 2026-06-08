@@ -15,6 +15,7 @@ Output:
 Usage:
   python3 scripts/download_wic.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -35,9 +36,15 @@ MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 WIC_COLUMNS = [
-    "fiscal_year", "month",
-    "total_participants", "women_count", "infants_count", "children_count",
-    "total_food_cost", "total_program_cost", "source_doc",
+    "fiscal_year",
+    "month",
+    "total_participants",
+    "women_count",
+    "infants_count",
+    "children_count",
+    "total_food_cost",
+    "total_program_cost",
+    "source_doc",
 ]
 
 FNS_WIC_URLS = [
@@ -50,19 +57,61 @@ USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 
 # Known PR WIC annual participation and cost data from USDA FNS public reports
 KNOWN_WIC_DATA = [
-    {"fiscal_year":"2020","month":"annual","total_participants":"178000","women_count":"52000","infants_count":"42000","children_count":"84000","total_food_cost":"98000000","total_program_cost":"125000000","source_doc":"USDA_FNS_WIC_PR_2020"},
-    {"fiscal_year":"2021","month":"annual","total_participants":"162000","women_count":"47000","infants_count":"38000","children_count":"77000","total_food_cost":"91000000","total_program_cost":"118000000","source_doc":"USDA_FNS_WIC_PR_2021"},
-    {"fiscal_year":"2022","month":"annual","total_participants":"151000","women_count":"44000","infants_count":"35000","children_count":"72000","total_food_cost":"95000000","total_program_cost":"122000000","source_doc":"USDA_FNS_WIC_PR_2022"},
-    {"fiscal_year":"2023","month":"annual","total_participants":"143000","women_count":"41000","infants_count":"33000","children_count":"69000","total_food_cost":"99000000","total_program_cost":"127000000","source_doc":"USDA_FNS_WIC_PR_2023"},
+    {
+        "fiscal_year": "2020",
+        "month": "annual",
+        "total_participants": "178000",
+        "women_count": "52000",
+        "infants_count": "42000",
+        "children_count": "84000",
+        "total_food_cost": "98000000",
+        "total_program_cost": "125000000",
+        "source_doc": "USDA_FNS_WIC_PR_2020",
+    },
+    {
+        "fiscal_year": "2021",
+        "month": "annual",
+        "total_participants": "162000",
+        "women_count": "47000",
+        "infants_count": "38000",
+        "children_count": "77000",
+        "total_food_cost": "91000000",
+        "total_program_cost": "118000000",
+        "source_doc": "USDA_FNS_WIC_PR_2021",
+    },
+    {
+        "fiscal_year": "2022",
+        "month": "annual",
+        "total_participants": "151000",
+        "women_count": "44000",
+        "infants_count": "35000",
+        "children_count": "72000",
+        "total_food_cost": "95000000",
+        "total_program_cost": "122000000",
+        "source_doc": "USDA_FNS_WIC_PR_2022",
+    },
+    {
+        "fiscal_year": "2023",
+        "month": "annual",
+        "total_participants": "143000",
+        "women_count": "41000",
+        "infants_count": "33000",
+        "children_count": "69000",
+        "total_food_cost": "99000000",
+        "total_program_cost": "127000000",
+        "source_doc": "USDA_FNS_WIC_PR_2023",
+    },
 ]
 
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (USDA WIC PR research)",
-        "Accept": "application/json, text/html",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (USDA WIC PR research)",
+            "Accept": "application/json, text/html",
+        }
+    )
     return s
 
 
@@ -82,7 +131,7 @@ def _get(session, url, params, logger):
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -117,40 +166,58 @@ def _fetch_fns_excel(session, logger) -> list[dict]:
                         for _, r in df_pr.iterrows():
                             row_dict = r.to_dict()
                             if data_type == "participation":
-                                rows.append({
-                                    "fiscal_year": str(sheet),
-                                    "month": "",
-                                    "total_participants": str(row_dict.get("Total", row_dict.get("TOTAL", ""))),
-                                    "women_count": str(row_dict.get("Women", row_dict.get("WOMEN", ""))),
-                                    "infants_count": str(row_dict.get("Infants", row_dict.get("INFANTS", ""))),
-                                    "children_count": str(row_dict.get("Children", row_dict.get("CHILDREN", ""))),
-                                    "total_food_cost": "",
-                                    "total_program_cost": "",
-                                    "source_doc": url,
-                                })
+                                rows.append(
+                                    {
+                                        "fiscal_year": str(sheet),
+                                        "month": "",
+                                        "total_participants": str(
+                                            row_dict.get("Total", row_dict.get("TOTAL", ""))
+                                        ),
+                                        "women_count": str(
+                                            row_dict.get("Women", row_dict.get("WOMEN", ""))
+                                        ),
+                                        "infants_count": str(
+                                            row_dict.get("Infants", row_dict.get("INFANTS", ""))
+                                        ),
+                                        "children_count": str(
+                                            row_dict.get("Children", row_dict.get("CHILDREN", ""))
+                                        ),
+                                        "total_food_cost": "",
+                                        "total_program_cost": "",
+                                        "source_doc": url,
+                                    }
+                                )
                             else:
                                 if rows:
                                     # Merge cost into existing participation row
                                     for existing_row in rows:
                                         if existing_row.get("fiscal_year") == str(sheet):
                                             existing_row["total_food_cost"] = str(
-                                                row_dict.get("Food Cost", row_dict.get("FOOD COST", ""))
+                                                row_dict.get(
+                                                    "Food Cost", row_dict.get("FOOD COST", "")
+                                                )
                                             )
                                             existing_row["total_program_cost"] = str(
-                                                row_dict.get("Total Cost", row_dict.get("TOTAL COST", ""))
+                                                row_dict.get(
+                                                    "Total Cost", row_dict.get("TOTAL COST", "")
+                                                )
                                             )
                                 else:
-                                    rows.append({
-                                        "fiscal_year": str(sheet),
-                                        "month": "",
-                                        "total_participants": "",
-                                        "women_count": "",
-                                        "infants_count": "",
-                                        "children_count": "",
-                                        "total_food_cost": str(row_dict.get("Food Cost", "")),
-                                        "total_program_cost": str(row_dict.get("Total Cost", "")),
-                                        "source_doc": url,
-                                    })
+                                    rows.append(
+                                        {
+                                            "fiscal_year": str(sheet),
+                                            "month": "",
+                                            "total_participants": "",
+                                            "women_count": "",
+                                            "infants_count": "",
+                                            "children_count": "",
+                                            "total_food_cost": str(row_dict.get("Food Cost", "")),
+                                            "total_program_cost": str(
+                                                row_dict.get("Total Cost", "")
+                                            ),
+                                            "source_doc": url,
+                                        }
+                                    )
         except Exception as e:
             logger.warning(f"  Could not parse FNS WIC Excel {url}: {e}")
     if rows:
@@ -191,17 +258,25 @@ def _fetch_data_gov(session, logger) -> list[dict]:
                     continue
                 for _, r in df.iterrows():
                     rd = r.to_dict()
-                    rows.append({
-                        "fiscal_year": str(rd.get("fiscal_year", rd.get("year", ""))),
-                        "month": str(rd.get("month", "")),
-                        "total_participants": str(rd.get("total_participants", rd.get("total", ""))),
-                        "women_count": str(rd.get("women", rd.get("women_count", ""))),
-                        "infants_count": str(rd.get("infants", rd.get("infants_count", ""))),
-                        "children_count": str(rd.get("children", rd.get("children_count", ""))),
-                        "total_food_cost": str(rd.get("food_cost", rd.get("total_food_cost", ""))),
-                        "total_program_cost": str(rd.get("program_cost", rd.get("total_cost", ""))),
-                        "source_doc": url,
-                    })
+                    rows.append(
+                        {
+                            "fiscal_year": str(rd.get("fiscal_year", rd.get("year", ""))),
+                            "month": str(rd.get("month", "")),
+                            "total_participants": str(
+                                rd.get("total_participants", rd.get("total", ""))
+                            ),
+                            "women_count": str(rd.get("women", rd.get("women_count", ""))),
+                            "infants_count": str(rd.get("infants", rd.get("infants_count", ""))),
+                            "children_count": str(rd.get("children", rd.get("children_count", ""))),
+                            "total_food_cost": str(
+                                rd.get("food_cost", rd.get("total_food_cost", ""))
+                            ),
+                            "total_program_cost": str(
+                                rd.get("program_cost", rd.get("total_cost", ""))
+                            ),
+                            "source_doc": url,
+                        }
+                    )
                 if rows:
                     logger.info(f"  data.gov WIC: {len(rows)} PR rows")
                     return rows
@@ -219,11 +294,22 @@ def _fetch_usaspending(session, logger) -> list[dict]:
             "place_of_performance_locations": [{"country": "USA", "state": "PR"}],
         },
         "fields": [
-            "Award ID", "Recipient Name", "recipient_uei", "Awarding Agency",
-            "Awarding Sub Agency", "Award Amount", "Start Date", "Award Type",
-            "Place of Performance State Code", "Description",
+            "Award ID",
+            "Recipient Name",
+            "recipient_uei",
+            "Awarding Agency",
+            "Awarding Sub Agency",
+            "Award Amount",
+            "Start Date",
+            "Award Type",
+            "Place of Performance State Code",
+            "Description",
         ],
-        "page": 1, "limit": 100, "sort": "Award Amount", "order": "desc", "subawards": False,
+        "page": 1,
+        "limit": 100,
+        "sort": "Award Amount",
+        "order": "desc",
+        "subawards": False,
     }
     page = 1
     while True:
@@ -239,17 +325,19 @@ def _fetch_usaspending(session, logger) -> list[dict]:
         if not results:
             break
         for r in results:
-            rows.append({
-                "fiscal_year": str(r.get("Start Date", ""))[:4] if r.get("Start Date") else "",
-                "month": "",
-                "total_participants": "",
-                "women_count": "",
-                "infants_count": "",
-                "children_count": "",
-                "total_food_cost": "",
-                "total_program_cost": str(r.get("Award Amount", "")),
-                "source_doc": "usaspending_cfda_10.557",
-            })
+            rows.append(
+                {
+                    "fiscal_year": str(r.get("Start Date", ""))[:4] if r.get("Start Date") else "",
+                    "month": "",
+                    "total_participants": "",
+                    "women_count": "",
+                    "infants_count": "",
+                    "children_count": "",
+                    "total_food_cost": "",
+                    "total_program_cost": str(r.get("Award Amount", "")),
+                    "source_doc": "usaspending_cfda_10.557",
+                }
+            )
         if not data.get("page_metadata", {}).get("has_next_page", False):
             break
         page += 1

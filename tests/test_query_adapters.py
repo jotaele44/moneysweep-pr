@@ -1,4 +1,5 @@
 """Adapter tests with injected fake sessions (no real HTTP)."""
+
 from __future__ import annotations
 
 import json
@@ -9,7 +10,10 @@ import pytest
 
 from contract_sweeper.query.adapters._stub import NotImplementedAdapter
 from contract_sweeper.query.adapters.fec import FECPRAdapter
-from contract_sweeper.query.adapters.nih import NIHReporterAdapter, build_payload as nih_build_payload
+from contract_sweeper.query.adapters.nih import (
+    NIHReporterAdapter,
+    build_payload as nih_build_payload,
+)
 from contract_sweeper.query.adapters.openfema import (
     OpenFEMAHmgpAdapter,
     OpenFEMAPaAdapter,
@@ -69,7 +73,9 @@ def test_usaspending_payload_includes_pr_state_and_county_suffix():
     )
     locations = payload["filters"]["place_of_performance_locations"]
     assert {"country": "USA", "state": "PR", "county": "127"} in locations
-    assert payload["filters"]["time_period"] == [{"start_date": "2023-10-01", "end_date": "2024-09-30"}]
+    assert payload["filters"]["time_period"] == [
+        {"start_date": "2023-10-01", "end_date": "2024-09-30"}
+    ]
 
 
 @pytest.mark.unit
@@ -86,15 +92,29 @@ def test_usaspending_fetch_paginates_and_returns_dataframe():
         _mock_response(
             {
                 "results": [
-                    {"Award ID": "1", "Recipient Name": "A", "Place of Performance City": "SAN JUAN"},
-                    {"Award ID": "2", "Recipient Name": "B", "Place of Performance City": "SAN JUAN"},
+                    {
+                        "Award ID": "1",
+                        "Recipient Name": "A",
+                        "Place of Performance City": "SAN JUAN",
+                    },
+                    {
+                        "Award ID": "2",
+                        "Recipient Name": "B",
+                        "Place of Performance City": "SAN JUAN",
+                    },
                 ],
                 "page_metadata": {"hasNext": True},
             }
         ),
         _mock_response(
             {
-                "results": [{"Award ID": "3", "Recipient Name": "C", "Place of Performance City": "SAN JUAN"}],
+                "results": [
+                    {
+                        "Award ID": "3",
+                        "Recipient Name": "C",
+                        "Place of Performance City": "SAN JUAN",
+                    }
+                ],
                 "page_metadata": {"hasNext": False},
             }
         ),
@@ -163,7 +183,10 @@ def test_fec_raises_credential_missing_when_env_unset(monkeypatch):
 def test_fec_uses_explicit_api_key_when_provided():
     session = MagicMock()
     session.get.return_value = _mock_response(
-        {"results": [{"sub_id": "1", "contributor_city": "SAN JUAN"}], "pagination": {"page": 1, "pages": 1}}
+        {
+            "results": [{"sub_id": "1", "contributor_city": "SAN JUAN"}],
+            "pagination": {"page": 1, "pages": 1},
+        }
     )
     adapter = FECPRAdapter(root=REPO_ROOT, session=session, api_key="testkey")
     df = adapter.fetch(Query())
@@ -201,7 +224,9 @@ def test_usaspending_subawards_payload_includes_subawards_flag():
         subawards=True,
     )
     assert filters["subawards"] is True
-    assert {"country": "USA", "state": "PR", "county": "127"} in filters["place_of_performance_locations"]
+    assert {"country": "USA", "state": "PR", "county": "127"} in filters[
+        "place_of_performance_locations"
+    ]
 
 
 @pytest.mark.unit
@@ -209,7 +234,13 @@ def test_usaspending_subawards_adapter_fetches_with_subaward_fields():
     session = MagicMock()
     session.post.return_value = _mock_response(
         {
-            "results": [{"Sub-Award ID": "SUB-1", "Sub-Awardee Name": "X", "Place of Performance City": "SAN JUAN"}],
+            "results": [
+                {
+                    "Sub-Award ID": "SUB-1",
+                    "Sub-Awardee Name": "X",
+                    "Place of Performance City": "SAN JUAN",
+                }
+            ],
             "page_metadata": {"hasNext": False},
         }
     )
@@ -397,7 +428,9 @@ def test_lda_build_params_includes_state_param_and_page_size():
 
 @pytest.mark.unit
 def test_lda_build_params_with_fiscal_years_sets_filing_year():
-    params = lda_build_params(Query(fiscal_years=(2022, 2024, 2023)), state_param="registrant_state", page=1)
+    params = lda_build_params(
+        Query(fiscal_years=(2022, 2024, 2023)), state_param="registrant_state", page=1
+    )
     assert params["registrant_state"] == "PR"
     assert params["filing_year"] == 2024  # most recent
 
@@ -608,8 +641,7 @@ def test_fdic_adapter_sends_stalp_pr_filter_and_offset_paginates():
         assert params["filters"] == "STALP:PR"
     # Offsets should advance.
     offsets = [
-        (ca.kwargs.get("params") or ca[1]["params"])["offset"]
-        for ca in session.get.call_args_list
+        (ca.kwargs.get("params") or ca[1]["params"])["offset"] for ca in session.get.call_args_list
     ]
     assert offsets == [0, 1000]
 
@@ -645,8 +677,7 @@ def test_nonprofits_adapter_sends_state_pr_and_page_paginates():
     df = adapter.fetch(Query())
     assert len(df) == 26
     pages = [
-        (ca.kwargs.get("params") or ca[1]["params"])["page"]
-        for ca in session.get.call_args_list
+        (ca.kwargs.get("params") or ca[1]["params"])["page"] for ca in session.get.call_args_list
     ]
     assert pages == [0, 1, 2]
     for ca in session.get.call_args_list:
@@ -694,14 +725,18 @@ from contract_sweeper.query.adapters.sba import (  # noqa: E402
 def test_sba_adapter_discovers_resource_and_filters_state(adapter_cls, expected_state_field):
     session = MagicMock()
     session.get.side_effect = [
-        _mock_response({
-            "success": True,
-            "result": {"resources": [{"id": "abc-resource", "format": "CSV"}]},
-        }),
-        _mock_response({
-            "success": True,
-            "result": {"records": [{"LoanID": "1", expected_state_field: "PR"}], "total": 1},
-        }),
+        _mock_response(
+            {
+                "success": True,
+                "result": {"resources": [{"id": "abc-resource", "format": "CSV"}]},
+            }
+        ),
+        _mock_response(
+            {
+                "success": True,
+                "result": {"records": [{"LoanID": "1", expected_state_field: "PR"}], "total": 1},
+            }
+        ),
         _mock_response({"success": True, "result": {"records": [], "total": 1}}),
     ]
     adapter = adapter_cls(root=REPO_ROOT, session=session)
@@ -744,7 +779,9 @@ from contract_sweeper.query.adapters.opencorporates import (  # noqa: E402
 def test_opencorporates_sends_jurisdiction_us_pr_and_paginates_to_total_pages():
     page1 = {
         "results": {
-            "companies": [{"company": {"company_number": str(i), "name": f"CO_{i}"}} for i in range(100)],
+            "companies": [
+                {"company": {"company_number": str(i), "name": f"CO_{i}"}} for i in range(100)
+            ],
             "total_pages": 2,
         }
     }
@@ -760,8 +797,7 @@ def test_opencorporates_sends_jurisdiction_us_pr_and_paginates_to_total_pages():
     df = adapter.fetch(Query())
     assert len(df) == 101
     pages = [
-        (ca.kwargs.get("params") or ca[1]["params"])["page"]
-        for ca in session.get.call_args_list
+        (ca.kwargs.get("params") or ca[1]["params"])["page"] for ca in session.get.call_args_list
     ]
     assert pages == [1, 2]
     for ca in session.get.call_args_list:
@@ -774,9 +810,11 @@ def test_opencorporates_sends_jurisdiction_us_pr_and_paginates_to_total_pages():
 def test_opencorporates_attaches_api_token_when_env_set(monkeypatch):
     monkeypatch.setenv("OPENCORPORATES_API_TOKEN", "test-token")
     session = MagicMock()
-    session.get.return_value = _mock_response({
-        "results": {"companies": [], "total_pages": 1},
-    })
+    session.get.return_value = _mock_response(
+        {
+            "results": {"companies": [], "total_pages": 1},
+        }
+    )
     adapter = OpenCorporatesAdapter(root=REPO_ROOT, session=session)
     adapter.fetch(Query())
     params = session.get.call_args.kwargs.get("params") or session.get.call_args[1]["params"]
@@ -788,9 +826,11 @@ def test_opencorporates_calls_api_without_token_when_env_unset(monkeypatch):
     """No CredentialMissing — adapter must still call the API unauthenticated."""
     monkeypatch.delenv("OPENCORPORATES_API_TOKEN", raising=False)
     session = MagicMock()
-    session.get.return_value = _mock_response({
-        "results": {"companies": [], "total_pages": 1},
-    })
+    session.get.return_value = _mock_response(
+        {
+            "results": {"companies": [], "total_pages": 1},
+        }
+    )
     adapter = OpenCorporatesAdapter(root=REPO_ROOT, session=session)
     adapter.fetch(Query())  # Must NOT raise.
     params = session.get.call_args.kwargs.get("params") or session.get.call_args[1]["params"]
@@ -800,9 +840,11 @@ def test_opencorporates_calls_api_without_token_when_env_unset(monkeypatch):
 @pytest.mark.unit
 def test_opencorporates_terminates_on_empty_page():
     session = MagicMock()
-    session.get.return_value = _mock_response({
-        "results": {"companies": [], "total_pages": 5},
-    })
+    session.get.return_value = _mock_response(
+        {
+            "results": {"companies": [], "total_pages": 5},
+        }
+    )
     adapter = OpenCorporatesAdapter(root=REPO_ROOT, session=session)
     df = adapter.fetch(Query())
     assert df.empty
@@ -886,8 +928,7 @@ def test_highergov_paginates_until_short_page(monkeypatch):
     df = adapter.fetch(Query())
     assert len(df) == HIGHERGOV_PAGE_SIZE + 1
     pages = [
-        (ca.kwargs.get("params") or ca[1]["params"])["page"]
-        for ca in session.get.call_args_list
+        (ca.kwargs.get("params") or ca[1]["params"])["page"] for ca in session.get.call_args_list
     ]
     assert pages == [1, 2]
 
@@ -900,6 +941,7 @@ def test_highergov_paginates_until_short_page(monkeypatch):
 @pytest.mark.unit
 def test_adapter_registry_size_matches_concrete_count():
     from contract_sweeper.query.adapters import ADAPTER_REGISTRY
+
     # 33 original + 5 USASpending agency+CFDA benefit narrows
     # (va_benefits, wioa, wic, snap_nap, hud_hcv_section8)
     # + usace_civil_works (sub-agency narrow) + fhlb (FDIC SDI).

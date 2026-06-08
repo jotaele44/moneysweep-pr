@@ -1,4 +1,5 @@
 """Tests for scripts/link_fema_pa_to_contracts.py."""
+
 import logging
 
 import pandas as pd
@@ -14,15 +15,28 @@ def _logger():
 @pytest.mark.unit
 def test_municipality_prefers_portal_field_over_county():
     # v2 carries only county; the matched portal row carries a real municipality.
-    df_v2 = pd.DataFrame([{
-        "pw_number": "100", "disaster_number": "4339",
-        "applicant_name": "Municipality of Ponce", "county": "Ponce",
-    }])
-    df_portal = pd.DataFrame([{
-        "pw_number": "100", "disaster_number": "4339",
-        "municipality": "Ponce Pueblo", "county": "Ponce",
-        "eligible_amount": "1000", "federal_share": "900",
-    }])
+    df_v2 = pd.DataFrame(
+        [
+            {
+                "pw_number": "100",
+                "disaster_number": "4339",
+                "applicant_name": "Municipality of Ponce",
+                "county": "Ponce",
+            }
+        ]
+    )
+    df_portal = pd.DataFrame(
+        [
+            {
+                "pw_number": "100",
+                "disaster_number": "4339",
+                "municipality": "Ponce Pueblo",
+                "county": "Ponce",
+                "eligible_amount": "1000",
+                "federal_share": "900",
+            }
+        ]
+    )
     empty = pd.DataFrame()
     out = mod._build_linkage(df_v2, df_portal, empty, empty, empty, _logger())
     row = out.iloc[0]
@@ -33,10 +47,16 @@ def test_municipality_prefers_portal_field_over_county():
 @pytest.mark.unit
 def test_municipality_falls_back_to_county_when_no_portal_match():
     # No portal row for this PW: county is the PR municipio, used as fallback.
-    df_v2 = pd.DataFrame([{
-        "pw_number": "200", "disaster_number": "4339",
-        "applicant_name": "Municipality of Adjuntas", "county": "Adjuntas",
-    }])
+    df_v2 = pd.DataFrame(
+        [
+            {
+                "pw_number": "200",
+                "disaster_number": "4339",
+                "applicant_name": "Municipality of Adjuntas",
+                "county": "Adjuntas",
+            }
+        ]
+    )
     empty = pd.DataFrame()
     out = mod._build_linkage(df_v2, empty, empty, empty, empty, _logger())
     row = out.iloc[0]
@@ -49,17 +69,33 @@ def test_contract_and_cor3_matches_set_confidence():
     # Regression: lookups previously stored pandas Series, so bool(row)/if row
     # raised "truth value ambiguous" whenever a PW actually matched. Storing
     # dicts makes matched_* flags and link_confidence work.
-    df_v2 = pd.DataFrame([{
-        "pw_number": "300", "disaster_number": "4339",
-        "applicant_name": "City of Caguas", "county": "Caguas",
-    }])
-    df_cor3 = pd.DataFrame([{
-        "applicant_normalized": mod._norm("City of Caguas"),
-        "project_id": "COR3-1", "total_approved": "500",
-    }])
-    df_contracts = pd.DataFrame([{
-        "recipient_name": "City of Caguas", "award_id": "AW-9",
-    }])
+    df_v2 = pd.DataFrame(
+        [
+            {
+                "pw_number": "300",
+                "disaster_number": "4339",
+                "applicant_name": "City of Caguas",
+                "county": "Caguas",
+            }
+        ]
+    )
+    df_cor3 = pd.DataFrame(
+        [
+            {
+                "applicant_normalized": mod._norm("City of Caguas"),
+                "project_id": "COR3-1",
+                "total_approved": "500",
+            }
+        ]
+    )
+    df_contracts = pd.DataFrame(
+        [
+            {
+                "recipient_name": "City of Caguas",
+                "award_id": "AW-9",
+            }
+        ]
+    )
     empty = pd.DataFrame()
     out = mod._build_linkage(df_v2, empty, df_cor3, df_contracts, empty, _logger())
     row = out.iloc[0]
@@ -81,11 +117,17 @@ def test_asset_type_classification():
 
 @pytest.mark.unit
 def test_asset_type_in_linkage_output():
-    df_v2 = pd.DataFrame([{
-        "pw_number": "400", "disaster_number": "4339",
-        "applicant_name": "Municipality of Loiza", "county": "Loiza",
-        "category": "Category C - Roads and Bridges",
-    }])
+    df_v2 = pd.DataFrame(
+        [
+            {
+                "pw_number": "400",
+                "disaster_number": "4339",
+                "applicant_name": "Municipality of Loiza",
+                "county": "Loiza",
+                "category": "Category C - Roads and Bridges",
+            }
+        ]
+    )
     empty = pd.DataFrame()
     out = mod._build_linkage(df_v2, empty, empty, empty, empty, _logger())
     assert out.loc[0, "asset_type"] == "roads_bridges"
@@ -95,5 +137,8 @@ def test_asset_type_in_linkage_output():
 def test_municipality_helper_priority():
     assert mod._municipality_of({"county": "Ponce"}, {"municipality": "Real Muni"}) == "Real Muni"
     assert mod._municipality_of({"county": "Ponce"}, {}) == "Ponce"
-    assert mod._municipality_of({"municipality": "Vega Baja", "county": "Vega Baja"}, {}) == "Vega Baja"
+    assert (
+        mod._municipality_of({"municipality": "Vega Baja", "county": "Vega Baja"}, {})
+        == "Vega Baja"
+    )
     assert mod._municipality_of({}, None) == ""

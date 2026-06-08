@@ -35,13 +35,29 @@ EXPECTED_EXPORTS = (
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Produce PR News raw intake and route it into repo derivatives.")
-    parser.add_argument("--incoming", default=str(DEFAULT_INCOMING), help="Incoming PR News JSONL/JSON/CSV path.")
-    parser.add_argument("--raw-output", default=str(DEFAULT_RAW), help="Router-ready raw JSONL output path.")
+    parser = argparse.ArgumentParser(
+        description="Produce PR News raw intake and route it into repo derivatives."
+    )
+    parser.add_argument(
+        "--incoming", default=str(DEFAULT_INCOMING), help="Incoming PR News JSONL/JSON/CSV path."
+    )
+    parser.add_argument(
+        "--raw-output", default=str(DEFAULT_RAW), help="Router-ready raw JSONL output path."
+    )
     parser.add_argument("--manifest", default=str(DEFAULT_MANIFEST), help="Producer manifest path.")
-    parser.add_argument("--export-dir", default=str(DEFAULT_EXPORT_DIR), help="Router export directory.")
-    parser.add_argument("--strict-missing-input", action="store_true", help="Fail if incoming PR News input is missing.")
-    parser.add_argument("--fail-on-validation-errors", action="store_true", help="Router exits non-zero if validation errors exist.")
+    parser.add_argument(
+        "--export-dir", default=str(DEFAULT_EXPORT_DIR), help="Router export directory."
+    )
+    parser.add_argument(
+        "--strict-missing-input",
+        action="store_true",
+        help="Fail if incoming PR News input is missing.",
+    )
+    parser.add_argument(
+        "--fail-on-validation-errors",
+        action="store_true",
+        help="Router exits non-zero if validation errors exist.",
+    )
     return parser.parse_args(argv)
 
 
@@ -65,7 +81,7 @@ def main_with_args(argv: Sequence[str] | None = None) -> int:
             str(args.raw_output),
             "--manifest",
             str(args.manifest),
-            *( ["--strict-missing-input"] if args.strict_missing_input else [] ),
+            *(["--strict-missing-input"] if args.strict_missing_input else []),
         ]
     )
     if producer_rc not in (0,):

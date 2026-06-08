@@ -23,6 +23,7 @@ Tests:
     without a configured key+license, so a forgotten patch in a test will fail
     loudly rather than reach the network.
 """
+
 from __future__ import annotations
 
 import time
@@ -43,9 +44,9 @@ DEFAULT_PAGE_SIZE = 100
 # Endpoint path table — single source of truth for relative paths.
 # Paths are placeholders; confirm against vendor docs before first live call.
 ENDPOINTS: dict[str, str] = {
-    "company_information":            "/company",
-    "securities_information":         "/securities",
-    "institutional_holdings":         "/institutional-holdings",
+    "company_information": "/company",
+    "securities_information": "/securities",
+    "institutional_holdings": "/institutional-holdings",
     "investment_adviser_information": "/investment-advisers",
 }
 
@@ -54,7 +55,9 @@ ENDPOINTS: dict[str, str] = {
 Transport = Callable[[str, str, dict, dict, int], Optional[dict]]
 
 
-def _disabled_transport(method: str, url: str, params: dict, headers: dict, timeout: int) -> Optional[dict]:
+def _disabled_transport(
+    method: str, url: str, params: dict, headers: dict, timeout: int
+) -> Optional[dict]:
     """Refuse to make a network call when the provider is not configured."""
     raise RuntimeError(
         "FinancialData.net live transport invoked without a configured key+license. "
@@ -66,6 +69,7 @@ def _disabled_transport(method: str, url: str, params: dict, headers: dict, time
 @dataclass
 class FinancialDataNetProvider:
     """Adapter for FinancialData.net. Default-disabled; injectable for tests."""
+
     api_key: str | None = None
     license_approved: bool = False
     base_url: str = BASE_URL
@@ -99,7 +103,7 @@ class FinancialDataNetProvider:
             status=status,
             license_status="approved" if license_approved else "not_approved",
             details={
-                "base_url":  self.base_url,
+                "base_url": self.base_url,
                 "endpoints": list(ENDPOINTS.keys()),
             },
         )
@@ -139,7 +143,9 @@ class FinancialDataNetProvider:
         last_err: Exception | None = None
         for attempt in range(self.retries):
             try:
-                return transport("GET", url, dict(params or {}), self._build_headers(), self.timeout)
+                return transport(
+                    "GET", url, dict(params or {}), self._build_headers(), self.timeout
+                )
             except Exception as exc:
                 last_err = exc
                 if attempt < self.retries - 1:
@@ -149,12 +155,15 @@ class FinancialDataNetProvider:
             raise last_err
         return None
 
-    def _paginate(self, endpoint_key: str, params: dict | None = None,
-                  max_pages: int = 50) -> Iterable[dict]:
+    def _paginate(
+        self, endpoint_key: str, params: dict | None = None, max_pages: int = 50
+    ) -> Iterable[dict]:
         """Yield records across paginated responses. Transport must respect page/page_size."""
         page = 1
         while page <= max_pages:
-            payload = self._request(endpoint_key, {**(params or {}), "page": page, "page_size": self.page_size})
+            payload = self._request(
+                endpoint_key, {**(params or {}), "page": page, "page_size": self.page_size}
+            )
             if not payload:
                 return
             records = payload.get("data") or payload.get("results") or []
@@ -181,14 +190,17 @@ class FinancialDataNetProvider:
         return self._request("investment_adviser_information", {"identifier": identifier, **extra})
 
 
-def from_config(api_key: str | None = None,
-                license_approved: bool | None = None,
-                transport: Transport | None = None) -> FinancialDataNetProvider:
+def from_config(
+    api_key: str | None = None,
+    license_approved: bool | None = None,
+    transport: Transport | None = None,
+) -> FinancialDataNetProvider:
     """Convenience constructor that reads from scripts.config if args are omitted."""
     if api_key is None or license_approved is None:
         # Imported lazily so that this module is importable in environments
         # without the full scripts package.
         from scripts.config import get_financialdata_api_key, is_financialdata_license_approved
+
         if api_key is None:
             api_key = get_financialdata_api_key()
         if license_approved is None:

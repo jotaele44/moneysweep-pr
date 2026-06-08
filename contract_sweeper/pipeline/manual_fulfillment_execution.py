@@ -5,7 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from contract_sweeper.pipeline.manual_import_dropzone import process_manual_import_dropzones, safe_int
+from contract_sweeper.pipeline.manual_import_dropzone import (
+    process_manual_import_dropzones,
+    safe_int,
+)
 
 
 def _normalize_manual_rows(rows: list[dict[str, str]]) -> list[dict[str, str]]:
@@ -43,9 +46,11 @@ def run_manual_fulfillment_execution(
 
     normalized_rows = _normalize_manual_rows(manual_request_rows)
 
-    inventory_rows, still_required_rows, new_manifests, metrics, forbidden = process_manual_import_dropzones(
-        Path(root),
-        manual_rows=normalized_rows,
+    inventory_rows, still_required_rows, new_manifests, metrics, forbidden = (
+        process_manual_import_dropzones(
+            Path(root),
+            manual_rows=normalized_rows,
+        )
     )
 
     return {

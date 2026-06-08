@@ -29,59 +29,114 @@ import pandas as pd
 from scripts.config import PROJECT_ROOT, setup_logging
 
 CONTRALOR_COLUMNS = [
-    "entity_name", "entity_normalized",
-    "audit_id", "audit_type",
-    "audit_year", "audit_date",
-    "finding_count", "finding_type",
-    "contract_amount", "municipality",
-    "recommendation", "status",
+    "entity_name",
+    "entity_normalized",
+    "audit_id",
+    "audit_type",
+    "audit_year",
+    "audit_date",
+    "finding_count",
+    "finding_type",
+    "contract_amount",
+    "municipality",
+    "recommendation",
+    "status",
     "source_file",
 ]
 
 COL_MAP = {
     "entity_name": [
-        "Entidad", "Entity", "Nombre", "Agencia", "Agency",
-        "Nombre de la Entidad", "Organization", "nombre_entidad",
-        "Municipio", "Municipality", "Corporación", "Corporation",
+        "Entidad",
+        "Entity",
+        "Nombre",
+        "Agencia",
+        "Agency",
+        "Nombre de la Entidad",
+        "Organization",
+        "nombre_entidad",
+        "Municipio",
+        "Municipality",
+        "Corporación",
+        "Corporation",
     ],
     "audit_id": [
-        "Número de Informe", "Report Number", "Informe", "Audit ID",
-        "Número", "numero_informe", "ID", "Referencia",
+        "Número de Informe",
+        "Report Number",
+        "Informe",
+        "Audit ID",
+        "Número",
+        "numero_informe",
+        "ID",
+        "Referencia",
     ],
     "audit_type": [
-        "Tipo de Informe", "Report Type", "Tipo", "Audit Type",
-        "Clasificación", "tipo_informe",
+        "Tipo de Informe",
+        "Report Type",
+        "Tipo",
+        "Audit Type",
+        "Clasificación",
+        "tipo_informe",
     ],
     "audit_year": [
-        "Año", "Year", "Fiscal Year", "Año Fiscal", "anio",
-        "Periodo", "Period",
+        "Año",
+        "Year",
+        "Fiscal Year",
+        "Año Fiscal",
+        "anio",
+        "Periodo",
+        "Period",
     ],
     "audit_date": [
-        "Fecha", "Date", "Fecha del Informe", "Report Date",
-        "fecha_informe", "Issue Date",
+        "Fecha",
+        "Date",
+        "Fecha del Informe",
+        "Report Date",
+        "fecha_informe",
+        "Issue Date",
     ],
     "finding_count": [
-        "Hallazgos", "Findings", "Número de Hallazgos", "Finding Count",
-        "hallazgos", "Num Findings",
+        "Hallazgos",
+        "Findings",
+        "Número de Hallazgos",
+        "Finding Count",
+        "hallazgos",
+        "Num Findings",
     ],
     "finding_type": [
-        "Tipo de Hallazgo", "Finding Type", "Categoría", "Category",
+        "Tipo de Hallazgo",
+        "Finding Type",
+        "Categoría",
+        "Category",
         "tipo_hallazgo",
     ],
     "contract_amount": [
-        "Monto", "Amount", "Valor", "Contract Value", "Cantidad",
-        "Total", "monto",
+        "Monto",
+        "Amount",
+        "Valor",
+        "Contract Value",
+        "Cantidad",
+        "Total",
+        "monto",
     ],
     "municipality": [
-        "Municipio", "Municipality", "Pueblo", "Ciudad",
+        "Municipio",
+        "Municipality",
+        "Pueblo",
+        "Ciudad",
         "municipio",
     ],
     "recommendation": [
-        "Recomendación", "Recommendation", "Acción Correctiva",
-        "Corrective Action", "recomendacion",
+        "Recomendación",
+        "Recommendation",
+        "Acción Correctiva",
+        "Corrective Action",
+        "recomendacion",
     ],
     "status": [
-        "Estado", "Status", "Estatus", "Disposition",
+        "Estado",
+        "Status",
+        "Estatus",
+        "Disposition",
         "estado",
     ],
 }
@@ -89,7 +144,14 @@ COL_MAP = {
 _STRIP_RE = re.compile(r"[^\w\s]")
 _SPACE_RE = re.compile(r"\s+")
 _NAME_SUFFIXES = {
-    "INC", "LLC", "CORP", "LTD", "CO", "LP", "DE", "PR",
+    "INC",
+    "LLC",
+    "CORP",
+    "LTD",
+    "CO",
+    "LP",
+    "DE",
+    "PR",
 }
 
 
@@ -133,7 +195,9 @@ def _read_file(path, logger):
         elif suffix == ".csv":
             for enc in ("utf-8", "latin-1", "utf-8-sig"):
                 try:
-                    df = pd.read_csv(path, dtype=str, na_filter=False, encoding=enc, low_memory=False)
+                    df = pd.read_csv(
+                        path, dtype=str, na_filter=False, encoding=enc, low_memory=False
+                    )
                     logger.info(f"  Read {len(df):,} rows from {path.name}")
                     return df
                 except UnicodeDecodeError:
@@ -172,8 +236,11 @@ def _find_files(raw_dir, logger):
     if not folder.exists():
         logger.warning(f"  Contralor folder not found: {folder}")
         return []
-    files = [f for f in sorted(folder.iterdir())
-             if f.suffix.lower() in (".csv", ".xlsx", ".xls") and not f.name.startswith("~")]
+    files = [
+        f
+        for f in sorted(folder.iterdir())
+        if f.suffix.lower() in (".csv", ".xlsx", ".xls") and not f.name.startswith("~")
+    ]
     logger.info(f"  Found {len(files)} Contralor file(s) in {folder}")
     return files
 

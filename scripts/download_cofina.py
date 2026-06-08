@@ -16,6 +16,7 @@ Output:
 Usage:
   python3 scripts/download_cofina.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -36,9 +37,14 @@ MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 COFINA_COLUMNS = [
-    "fiscal_year", "month", "sut_collections",
-    "cofina_allocation", "senior_bond_service", "subordinate_bond_service",
-    "residual_to_commonwealth", "source_doc",
+    "fiscal_year",
+    "month",
+    "sut_collections",
+    "cofina_allocation",
+    "senior_bond_service",
+    "subordinate_bond_service",
+    "residual_to_commonwealth",
+    "source_doc",
 ]
 
 AAFAF_COFINA_URL = "https://www.aafaf.pr.gov/cofina/"
@@ -50,7 +56,8 @@ OVERSIGHT_BOARD_URL = "https://oversightboard.pr.gov/"
 # Source: COFINA Plan of Adjustment (2019) and annual trustee reports
 KNOWN_COFINA_DATA = [
     {
-        "fiscal_year": "2020", "month": "annual",
+        "fiscal_year": "2020",
+        "month": "annual",
         "sut_collections": "2150000000",
         "cofina_allocation": "787000000",
         "senior_bond_service": "635000000",
@@ -59,7 +66,8 @@ KNOWN_COFINA_DATA = [
         "source_doc": "cofina_plan_of_adjustment_2019",
     },
     {
-        "fiscal_year": "2021", "month": "annual",
+        "fiscal_year": "2021",
+        "month": "annual",
         "sut_collections": "2300000000",
         "cofina_allocation": "787000000",
         "senior_bond_service": "635000000",
@@ -68,7 +76,8 @@ KNOWN_COFINA_DATA = [
         "source_doc": "cofina_plan_of_adjustment_2019",
     },
     {
-        "fiscal_year": "2022", "month": "annual",
+        "fiscal_year": "2022",
+        "month": "annual",
         "sut_collections": "2600000000",
         "cofina_allocation": "787000000",
         "senior_bond_service": "635000000",
@@ -77,7 +86,8 @@ KNOWN_COFINA_DATA = [
         "source_doc": "cofina_plan_of_adjustment_2019",
     },
     {
-        "fiscal_year": "2023", "month": "annual",
+        "fiscal_year": "2023",
+        "month": "annual",
         "sut_collections": "2800000000",
         "cofina_allocation": "787000000",
         "senior_bond_service": "635000000",
@@ -86,7 +96,8 @@ KNOWN_COFINA_DATA = [
         "source_doc": "cofina_plan_of_adjustment_2019",
     },
     {
-        "fiscal_year": "2024", "month": "annual",
+        "fiscal_year": "2024",
+        "month": "annual",
         "sut_collections": "2900000000",
         "cofina_allocation": "787000000",
         "senior_bond_service": "635000000",
@@ -99,10 +110,12 @@ KNOWN_COFINA_DATA = [
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (COFINA SUT bond flow research)",
-        "Accept": "text/html,application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (COFINA SUT bond flow research)",
+            "Accept": "text/html,application/json",
+        }
+    )
     return s
 
 
@@ -122,7 +135,7 @@ def _get(session, url, params, logger):
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -137,14 +150,11 @@ def _scrape_aafaf_cofina(session, logger) -> list[dict]:
         return rows
 
     import io
+
     xlsx_links = re.findall(
-        r'href=["\']([^"\']*cofina[^"\']*\.(?:xlsx|xls|csv))["\']',
-        resp.text, re.IGNORECASE
+        r'href=["\']([^"\']*cofina[^"\']*\.(?:xlsx|xls|csv))["\']', resp.text, re.IGNORECASE
     )
-    re.findall(
-        r'href=["\']([^"\']*cofina[^"\']*\.pdf)["\']',
-        resp.text, re.IGNORECASE
-    )
+    re.findall(r'href=["\']([^"\']*cofina[^"\']*\.pdf)["\']', resp.text, re.IGNORECASE)
 
     for link in xlsx_links[:5]:
         url = link if link.startswith("http") else f"https://www.aafaf.pr.gov{link}"
@@ -156,7 +166,7 @@ def _scrape_aafaf_cofina(session, logger) -> list[dict]:
             xl = pd.ExcelFile(io.BytesIO(resp2.content))
             for sheet in xl.sheet_names[:3]:
                 df = xl.parse(sheet, dtype=str, header=None)
-                fy_match = re.search(r'\b(20\d{2})\b', sheet + " " + link)
+                fy_match = re.search(r"\b(20\d{2})\b", sheet + " " + link)
                 fy = fy_match.group(1) if fy_match else ""
                 for _, row in df.iterrows():
                     row_vals = [str(v) for v in row.values if pd.notna(v) and str(v).strip()]
@@ -166,19 +176,24 @@ def _scrape_aafaf_cofina(session, logger) -> list[dict]:
                     amount_str = ""
                     for val in row_vals[1:]:
                         clean = re.sub(r"[,$\s()]", "", val)
-                        if re.match(r'^-?\d+\.?\d*$', clean):
+                        if re.match(r"^-?\d+\.?\d*$", clean):
                             amount_str = clean
                             break
                     if not amount_str:
                         continue
                     if any(kw in label for kw in ["sut", "ivu", "sales tax", "impuesto"]):
-                        rows.append({
-                            "fiscal_year": fy, "month": "",
-                            "sut_collections": amount_str,
-                            "cofina_allocation": "", "senior_bond_service": "",
-                            "subordinate_bond_service": "", "residual_to_commonwealth": "",
-                            "source_doc": url,
-                        })
+                        rows.append(
+                            {
+                                "fiscal_year": fy,
+                                "month": "",
+                                "sut_collections": amount_str,
+                                "cofina_allocation": "",
+                                "senior_bond_service": "",
+                                "subordinate_bond_service": "",
+                                "residual_to_commonwealth": "",
+                                "source_doc": url,
+                            }
+                        )
                     elif any(kw in label for kw in ["cofina", "allocation", "asignacion"]):
                         if rows:
                             rows[-1]["cofina_allocation"] = amount_str
@@ -209,16 +224,18 @@ def _fetch_emma_cofina(session, logger) -> list[dict]:
         desc = str(s.get("description", s.get("securityDescription", ""))).upper()
         if "COFINA" not in desc and "SALES TAX" not in desc:
             continue
-        rows.append({
-            "fiscal_year": str(s.get("issueDate", ""))[:4],
-            "month": "",
-            "sut_collections": "",
-            "cofina_allocation": str(s.get("parAmount", s.get("amount", ""))),
-            "senior_bond_service": str(s.get("interestRate", s.get("couponRate", ""))),
-            "subordinate_bond_service": "",
-            "residual_to_commonwealth": "",
-            "source_doc": EMMA_ISSUER_URL,
-        })
+        rows.append(
+            {
+                "fiscal_year": str(s.get("issueDate", ""))[:4],
+                "month": "",
+                "sut_collections": "",
+                "cofina_allocation": str(s.get("parAmount", s.get("amount", ""))),
+                "senior_bond_service": str(s.get("interestRate", s.get("couponRate", ""))),
+                "subordinate_bond_service": "",
+                "residual_to_commonwealth": "",
+                "source_doc": EMMA_ISSUER_URL,
+            }
+        )
     if rows:
         logger.info(f"  EMMA COFINA: {len(rows)} securities")
     return rows

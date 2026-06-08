@@ -37,10 +37,24 @@ LIHTC_ZIP_URLS = [
 ]
 
 LIHTC_COLUMNS = [
-    "hud_id", "proj_nm", "proj_add", "proj_cty", "proj_zip",
-    "county", "yr_pis", "n_units", "n_lihtc_units", "type",
-    "allocamt", "proj_own_nm", "dev_nm", "gen_contractor_nm", "syndicator_nm",
-    "proj_own_nm_normalized", "dev_nm_normalized", "gen_contractor_nm_normalized",
+    "hud_id",
+    "proj_nm",
+    "proj_add",
+    "proj_cty",
+    "proj_zip",
+    "county",
+    "yr_pis",
+    "n_units",
+    "n_lihtc_units",
+    "type",
+    "allocamt",
+    "proj_own_nm",
+    "dev_nm",
+    "gen_contractor_nm",
+    "syndicator_nm",
+    "proj_own_nm_normalized",
+    "dev_nm_normalized",
+    "gen_contractor_nm_normalized",
 ]
 
 MAX_RETRIES = 3
@@ -58,10 +72,12 @@ def _normalize_name(name):
 
 def _session():
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0)",
-        "Accept": "*/*",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0)",
+            "Accept": "*/*",
+        }
+    )
     return s
 
 
@@ -133,7 +149,12 @@ def _build_output(df, logger):
         "allocamt": ["allocamt", "ALLOCAMT", "allocation_amount", "alloc_amt"],
         "proj_own_nm": ["proj_own_nm", "PROJ_OWN_NM", "owner_name", "owner"],
         "dev_nm": ["dev_nm", "DEV_NM", "developer_name", "developer"],
-        "gen_contractor_nm": ["gen_contractor_nm", "GEN_CONTRACTOR_NM", "general_contractor", "gc_name"],
+        "gen_contractor_nm": [
+            "gen_contractor_nm",
+            "GEN_CONTRACTOR_NM",
+            "general_contractor",
+            "gc_name",
+        ],
         "syndicator_nm": ["syndicator_nm", "SYNDICATOR_NM", "syndicator"],
     }
     out = pd.DataFrame()
@@ -177,7 +198,9 @@ def _run(root=None, force=False):
 
     if not force and _file_has_data(out_path):
         rows = len(pd.read_csv(out_path, dtype=str, low_memory=False))
-        logger.info(f"  pr_lihtc_projects.csv exists ({rows:,} rows) — skipping. Use --force to re-download.")
+        logger.info(
+            f"  pr_lihtc_projects.csv exists ({rows:,} rows) — skipping. Use --force to re-download."
+        )
         return {"rows": rows, "path": str(out_path), "errors": []}
 
     session = _session()

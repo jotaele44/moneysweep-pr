@@ -4,6 +4,7 @@ This adapter normalizes the public LDA.gov API into reproducible CSV outputs.
 Default execution uses deterministic synthetic fixtures and performs no network
 calls. Live HTTP access is only used when ``--live`` is explicitly supplied.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -48,13 +49,22 @@ OUTPUTS: dict[str, tuple[str, str]] = {
     "filings": ("outputs/normalized/lda/lda_filings.csv", "T1"),
     "contributions": ("outputs/normalized/lda/lda_contributions.csv", "T1"),
     "constants/filing/filingtypes": ("outputs/reference/lda/lda_ref_filing_types.csv", "T1"),
-    "constants/filing/lobbyingactivityissues": ("outputs/reference/lda/lda_ref_lobbying_issues.csv", "T1"),
-    "constants/filing/governmententities": ("outputs/reference/lda/lda_ref_government_entities.csv", "T1"),
+    "constants/filing/lobbyingactivityissues": (
+        "outputs/reference/lda/lda_ref_lobbying_issues.csv",
+        "T1",
+    ),
+    "constants/filing/governmententities": (
+        "outputs/reference/lda/lda_ref_government_entities.csv",
+        "T1",
+    ),
     "constants/general/countries": ("outputs/reference/lda/lda_ref_countries.csv", "T1"),
     "constants/general/states": ("outputs/reference/lda/lda_ref_states.csv", "T1"),
     "constants/lobbyist/prefixes": ("outputs/reference/lda/lda_ref_lobbyist_prefixes.csv", "T1"),
     "constants/lobbyist/suffixes": ("outputs/reference/lda/lda_ref_lobbyist_suffixes.csv", "T1"),
-    "constants/contribution/itemtypes": ("outputs/reference/lda/lda_ref_contribution_item_types.csv", "T1"),
+    "constants/contribution/itemtypes": (
+        "outputs/reference/lda/lda_ref_contribution_item_types.csv",
+        "T1",
+    ),
 }
 
 SYNTHETIC_ROOT = {
@@ -143,13 +153,19 @@ SYNTHETIC_FIXTURES: dict[str, Any] = {
         ],
     },
     "constants/filing/filingtypes": [{"id": "Q1", "code": "Q1", "name": "1st Quarter - Report"}],
-    "constants/filing/lobbyingactivityissues": [{"id": "BUD", "code": "BUD", "name": "Budget/Appropriations"}],
-    "constants/filing/governmententities": [{"id": "SENATE", "code": "SENATE", "name": "U.S. Senate"}],
+    "constants/filing/lobbyingactivityissues": [
+        {"id": "BUD", "code": "BUD", "name": "Budget/Appropriations"}
+    ],
+    "constants/filing/governmententities": [
+        {"id": "SENATE", "code": "SENATE", "name": "U.S. Senate"}
+    ],
     "constants/general/countries": [{"id": "US", "code": "US", "name": "United States"}],
     "constants/general/states": [{"id": "PR", "code": "PR", "name": "Puerto Rico"}],
     "constants/lobbyist/prefixes": [{"id": "MS", "code": "Ms.", "name": "Ms."}],
     "constants/lobbyist/suffixes": [{"id": "JR", "code": "Jr.", "name": "Jr."}],
-    "constants/contribution/itemtypes": [{"id": "CONTRIB", "code": "CONTRIB", "name": "Contribution"}],
+    "constants/contribution/itemtypes": [
+        {"id": "CONTRIB", "code": "CONTRIB", "name": "Contribution"}
+    ],
 }
 
 Fetcher = Callable[[str], Any]
@@ -201,25 +217,34 @@ def pipe_join(value: Any) -> str:
     return str(value)
 
 
-def http_json_fetcher(url: str, *, timeout: int = DEFAULT_TIMEOUT_SECONDS, retries: int = DEFAULT_RETRIES) -> Any:
+def http_json_fetcher(
+    url: str, *, timeout: int = DEFAULT_TIMEOUT_SECONDS, retries: int = DEFAULT_RETRIES
+) -> Any:
     last_error: Exception | None = None
     for attempt in range(retries):
         try:
-            req = Request(url, headers={"Accept": "application/json", "User-Agent": "Contract-Sweeper-LDA/1.0"})
+            req = Request(
+                url,
+                headers={"Accept": "application/json", "User-Agent": "Contract-Sweeper-LDA/1.0"},
+            )
             with urlopen(req, timeout=timeout) as resp:  # noqa: S310 - public read-only API endpoint
                 return json.loads(resp.read().decode("utf-8"))
         except (HTTPError, URLError, TimeoutError, json.JSONDecodeError) as exc:
             last_error = exc
             if attempt < retries - 1:
-                time.sleep(0.5 * (2 ** attempt))
+                time.sleep(0.5 * (2**attempt))
     raise RuntimeError(f"LDA fetch failed after {retries} attempts for {url}: {last_error}")
 
 
-def discover_endpoints(*, live: bool = False, fetcher: Fetcher | None = None) -> tuple[dict[str, str], list[str]]:
+def discover_endpoints(
+    *, live: bool = False, fetcher: Fetcher | None = None
+) -> tuple[dict[str, str], list[str]]:
     if not live:
         return dict(SYNTHETIC_ROOT), []
     data = (fetcher or http_json_fetcher)(endpoint_url("", fmt="json"))
-    endpoints = {key: str(data[key]) for key in EXPECTED_ENDPOINTS if isinstance(data, dict) and key in data}
+    endpoints = {
+        key: str(data[key]) for key in EXPECTED_ENDPOINTS if isinstance(data, dict) and key in data
+    }
     missing = sorted(set(EXPECTED_ENDPOINTS) - set(endpoints))
     for key in missing:
         endpoints[key] = endpoint_url(EXPECTED_ENDPOINTS[key])
@@ -236,7 +261,9 @@ def _records_from_payload(payload: Any) -> list[dict[str, Any]]:
     return []
 
 
-def collect_records(endpoint_key: str, url: str, *, live: bool, limit: int | None, fetcher: Fetcher | None = None) -> list[dict[str, Any]]:
+def collect_records(
+    endpoint_key: str, url: str, *, live: bool, limit: int | None, fetcher: Fetcher | None = None
+) -> list[dict[str, Any]]:
     if not live:
         return _records_from_payload(SYNTHETIC_FIXTURES[endpoint_key])[:limit]
 
@@ -252,8 +279,25 @@ def collect_records(endpoint_key: str, url: str, *, live: bool, limit: int | Non
     return out
 
 
-def metadata(record: dict[str, Any], endpoint_key: str, url: str, retrieved_at: str, *, evidence_tier: str, include_raw: bool) -> dict[str, Any]:
-    api_id = coalesce(record, "id", "uuid", "filing_uuid", "filing_id", "registrant_id", "client_id", default=stable_hash(record)[:16])
+def metadata(
+    record: dict[str, Any],
+    endpoint_key: str,
+    url: str,
+    retrieved_at: str,
+    *,
+    evidence_tier: str,
+    include_raw: bool,
+) -> dict[str, Any]:
+    api_id = coalesce(
+        record,
+        "id",
+        "uuid",
+        "filing_uuid",
+        "filing_id",
+        "registrant_id",
+        "client_id",
+        default=stable_hash(record)[:16],
+    )
     meta = {
         "source_id": SOURCE_ID,
         "source_family": SOURCE_FAMILY,
@@ -270,16 +314,37 @@ def metadata(record: dict[str, Any], endpoint_key: str, url: str, retrieved_at: 
     return meta
 
 
-def normalize_record(endpoint_key: str, record: dict[str, Any], url: str, retrieved_at: str, *, evidence_tier: str, include_raw: bool = False) -> dict[str, Any]:
-    meta = metadata(record, endpoint_key, url, retrieved_at, evidence_tier=evidence_tier, include_raw=include_raw)
+def normalize_record(
+    endpoint_key: str,
+    record: dict[str, Any],
+    url: str,
+    retrieved_at: str,
+    *,
+    evidence_tier: str,
+    include_raw: bool = False,
+) -> dict[str, Any]:
+    meta = metadata(
+        record,
+        endpoint_key,
+        url,
+        retrieved_at,
+        evidence_tier=evidence_tier,
+        include_raw=include_raw,
+    )
 
     if endpoint_key == "registrants":
         row = {
             "registrant_id": coalesce(record, "registrant_id", "id"),
             "registrant_name": coalesce(record, "registrant_name", "name"),
-            "registrant_ppb_country": coalesce(record, "registrant_ppb_country", "ppb_country", "country"),
+            "registrant_ppb_country": coalesce(
+                record, "registrant_ppb_country", "ppb_country", "country"
+            ),
             "registrant_ppb_state": coalesce(record, "registrant_ppb_state", "ppb_state", "state"),
-            "registrant_address": " ".join(filter(None, [coalesce(record, "address_1", "address"), coalesce(record, "address_2")])).strip(),
+            "registrant_address": " ".join(
+                filter(
+                    None, [coalesce(record, "address_1", "address"), coalesce(record, "address_2")]
+                )
+            ).strip(),
             "registrant_city": coalesce(record, "city", "registrant_city"),
             "registrant_zip": coalesce(record, "zip", "zip_code", "registrant_zip"),
         }
@@ -289,7 +354,11 @@ def normalize_record(endpoint_key: str, record: dict[str, Any], url: str, retrie
             "client_name": coalesce(record, "client_name", "name"),
             "client_country": coalesce(record, "client_country", "country"),
             "client_state": coalesce(record, "client_state", "state"),
-            "client_address": " ".join(filter(None, [coalesce(record, "address_1", "address"), coalesce(record, "address_2")])).strip(),
+            "client_address": " ".join(
+                filter(
+                    None, [coalesce(record, "address_1", "address"), coalesce(record, "address_2")]
+                )
+            ).strip(),
             "client_city": coalesce(record, "city", "client_city"),
             "client_zip": coalesce(record, "zip", "zip_code", "client_zip"),
         }
@@ -317,7 +386,9 @@ def normalize_record(endpoint_key: str, record: dict[str, Any], url: str, retrie
             "client_id": coalesce(record, "client_id", default=nested_id(client)),
             "client_name": coalesce(record, "client_name", default=nested_name(client)),
             "amount_reported": coalesce(record, "amount_reported", "income", "expenses"),
-            "lobbying_issues": pipe_join(record.get("lobbying_issues") or record.get("general_issue_codes")),
+            "lobbying_issues": pipe_join(
+                record.get("lobbying_issues") or record.get("general_issue_codes")
+            ),
             "government_entities": pipe_join(record.get("government_entities")),
         }
     elif endpoint_key == "contributions":
@@ -337,7 +408,9 @@ def normalize_record(endpoint_key: str, record: dict[str, Any], url: str, retrie
         }
     else:
         row = {
-            "reference_id": coalesce(record, "id", "code", "value", default=stable_hash(record)[:16]),
+            "reference_id": coalesce(
+                record, "id", "code", "value", default=stable_hash(record)[:16]
+            ),
             "code": coalesce(record, "code", "value", "name"),
             "name": coalesce(record, "name", "label", "description"),
             "description": coalesce(record, "description"),
@@ -371,7 +444,13 @@ def write_checkpoint(root: Path, payload: dict[str, Any]) -> None:
     write_json(checkpoint, payload)
 
 
-def build_static_seed_report(root: Path, endpoints: dict[str, str], normalized_outputs: list[str], reference_outputs: list[str], created_at: str) -> dict[str, Any]:
+def build_static_seed_report(
+    root: Path,
+    endpoints: dict[str, str],
+    normalized_outputs: list[str],
+    reference_outputs: list[str],
+    created_at: str,
+) -> dict[str, Any]:
     replacement_decision = {
         "uploaded_static_lda_registrant_client_filing_snapshots": "replaced_by_api",
         "Registrants.pdf": "retained_as_fixture",
@@ -390,7 +469,14 @@ def build_static_seed_report(root: Path, endpoints: dict[str, str], normalized_o
     }
 
 
-def run(*, output_dir: Path, live: bool = False, limit: int | None = None, include_raw: bool = False, fetcher: Fetcher | None = None) -> dict[str, Any]:
+def run(
+    *,
+    output_dir: Path,
+    live: bool = False,
+    limit: int | None = None,
+    include_raw: bool = False,
+    fetcher: Fetcher | None = None,
+) -> dict[str, Any]:
     retrieved_at = utc_now_iso()
     blockers: list[str] = []
     root_discovery_ok: bool | str | None = "skipped_dry_run"
@@ -415,7 +501,17 @@ def run(*, output_dir: Path, live: bool = False, limit: int | None = None, inclu
         url = endpoints.get(endpoint_key) or endpoint_url(EXPECTED_ENDPOINTS[endpoint_key])
         try:
             records = collect_records(endpoint_key, url, live=live, limit=limit, fetcher=fetcher)
-            rows = [normalize_record(endpoint_key, r, url, retrieved_at, evidence_tier=evidence_tier, include_raw=include_raw) for r in records]
+            rows = [
+                normalize_record(
+                    endpoint_key,
+                    r,
+                    url,
+                    retrieved_at,
+                    evidence_tier=evidence_tier,
+                    include_raw=include_raw,
+                )
+                for r in records
+            ]
         except Exception as exc:  # noqa: BLE001 - endpoint-level warning, keep unrelated endpoints alive
             normalization_ok = False
             blockers.append(f"{endpoint_key}:{exc}")
@@ -453,31 +549,55 @@ def run(*, output_dir: Path, live: bool = False, limit: int | None = None, inclu
     }
     write_json(output_dir / "reports/lda_api_readiness.json", readiness)
 
-    replacement = build_static_seed_report(output_dir, endpoints, normalized_outputs, reference_outputs, retrieved_at)
+    replacement = build_static_seed_report(
+        output_dir, endpoints, normalized_outputs, reference_outputs, retrieved_at
+    )
     write_json(output_dir / "reports/lda_static_seed_replacement_report.json", replacement)
-    outputs_created.extend([
-        "reports/lda_api_readiness.json",
-        "reports/lda_static_seed_replacement_report.json",
-    ])
+    outputs_created.extend(
+        [
+            "reports/lda_api_readiness.json",
+            "reports/lda_static_seed_replacement_report.json",
+        ]
+    )
     readiness["outputs_created"] = outputs_created
     write_json(output_dir / "reports/lda_api_readiness.json", readiness)
-    write_checkpoint(output_dir, {"last_run_at": retrieved_at, "live": live, "outputs_created": outputs_created})
+    write_checkpoint(
+        output_dir, {"last_run_at": retrieved_at, "live": live, "outputs_created": outputs_created}
+    )
     return readiness
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Fetch and normalize LDA.gov API data")
-    parser.add_argument("--live", action="store_true", help="Perform live LDA.gov API calls. Default is dry-run fixture mode.")
-    parser.add_argument("--dry-run", action="store_true", default=True, help="Use synthetic fixtures and make no network calls. Default behavior.")
+    parser.add_argument(
+        "--live",
+        action="store_true",
+        help="Perform live LDA.gov API calls. Default is dry-run fixture mode.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=True,
+        help="Use synthetic fixtures and make no network calls. Default behavior.",
+    )
     parser.add_argument("--limit", type=int, default=None, help="Maximum records per endpoint.")
-    parser.add_argument("--output-dir", type=Path, default=Path("."), help="Repository root/output root.")
-    parser.add_argument("--include-raw", action="store_true", help="Include raw JSON in CSV rows. Default false.")
+    parser.add_argument(
+        "--output-dir", type=Path, default=Path("."), help="Repository root/output root."
+    )
+    parser.add_argument(
+        "--include-raw", action="store_true", help="Include raw JSON in CSV rows. Default false."
+    )
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    readiness = run(output_dir=args.output_dir, live=bool(args.live), limit=args.limit, include_raw=bool(args.include_raw))
+    readiness = run(
+        output_dir=args.output_dir,
+        live=bool(args.live),
+        limit=args.limit,
+        include_raw=bool(args.include_raw),
+    )
     print(json.dumps(readiness, indent=2, sort_keys=True))
     return 0 if not readiness["blockers"] else 2
 

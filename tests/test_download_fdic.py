@@ -13,7 +13,7 @@ from scripts.download_fdic import (
 
 @pytest.mark.skipif(
     not Path("data/staging/processed/pr_fdic_institutions.csv").exists(),
-    reason="FDIC institutions file not present"
+    reason="FDIC institutions file not present",
 )
 def test_fdic_institutions_csv_exists_and_readable():
     """Integration: FDIC institutions CSV exists and is readable."""
@@ -25,7 +25,7 @@ def test_fdic_institutions_csv_exists_and_readable():
 
 @pytest.mark.skipif(
     not Path("data/staging/processed/pr_fdic_financials.csv").exists(),
-    reason="FDIC financials file not present"
+    reason="FDIC financials file not present",
 )
 def test_fdic_financials_csv_exists_and_readable():
     """Integration: FDIC financials CSV exists and is readable."""
@@ -48,9 +48,9 @@ def test_download_institutions_handles_api_failure(mock_paginate):
     mock_paginate.return_value = []
     session = MagicMock()
     logger = MagicMock()
-    
+
     result = _download_institutions(session, logger)
-    
+
     assert result is not None
     assert isinstance(result, pd.DataFrame)
 
@@ -68,12 +68,11 @@ def test_download_institutions_with_data(mock_paginate):
         }
     ]
     mock_paginate.return_value = mock_data
-    
+
     session = MagicMock()
     logger = MagicMock()
-    
+
     result = _download_institutions(session, logger)
-    
+
     assert result is not None
     assert len(result) >= 0
-

@@ -189,7 +189,9 @@ def run_source_delivery_watch(root: Path) -> dict[str, Any]:
                     "candidate_row_count": candidate_rows,
                     "candidate_sha256": candidate_sha,
                     "validation_result": "valid" if candidate_valid else "rejected",
-                    "validation_reason": "validated" if candidate_valid else (fail_reason or "rejected"),
+                    "validation_reason": "validated"
+                    if candidate_valid
+                    else (fail_reason or "rejected"),
                     "watch_status": "unfreeze_candidate" if candidate_valid else "still_missing",
                     "unfreeze_candidate": candidate_valid,
                 }

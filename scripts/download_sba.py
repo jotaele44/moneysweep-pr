@@ -13,6 +13,7 @@ Usage:
   python3 scripts/download_sba.py            # full run
   python3 scripts/download_sba.py --force    # re-download even if file exists
 """
+
 from __future__ import annotations
 
 import argparse
@@ -77,6 +78,7 @@ MASTER_COLUMNS = [
 # Session
 # ---------------------------------------------------------------------------
 
+
 def _session() -> requests.Session:
     s = requests.Session()
     s.headers.update({"User-Agent": "ContractSweeper/1.0", "Accept": "application/json"})
@@ -86,6 +88,7 @@ def _session() -> requests.Session:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _derive_fiscal_year(date_str) -> str:
     """Derive US fiscal year from a date string. Oct-Dec → year+1."""
@@ -237,8 +240,15 @@ def _read_excel_best_sheet(path: Path, logger) -> pd.DataFrame:
     xl = pd.ExcelFile(path)
     logger.info(f"  Excel sheets: {xl.sheet_names}")
 
-    state_cols = {"State", "state", "BorrowerState", "BORROWERSTATE",
-                  "Borrower State", "State Code", "StateCode"}
+    state_cols = {
+        "State",
+        "state",
+        "BorrowerState",
+        "BORROWERSTATE",
+        "Borrower State",
+        "State Code",
+        "StateCode",
+    }
     best: pd.DataFrame = pd.DataFrame()
 
     for sheet in xl.sheet_names:
@@ -263,7 +273,9 @@ def _read_excel_best_sheet(path: Path, logger) -> pd.DataFrame:
         # Last resort: just read the first sheet as-is and log columns
         try:
             best = xl.parse(xl.sheet_names[0], dtype=str)
-            logger.warning(f"  Fallback first sheet: {len(best):,} rows, cols={list(best.columns[:8])}")
+            logger.warning(
+                f"  Fallback first sheet: {len(best):,} rows, cols={list(best.columns[:8])}"
+            )
         except Exception as e:
             logger.warning(f"  Could not read any sheet: {e}")
     else:
@@ -327,39 +339,61 @@ def _records_to_df(records: list[dict], source_file: str) -> pd.DataFrame:
         return pd.Series("", index=df.index)
 
     import logging as _logging
+
     _log = _logging.getLogger("download_sba")
     _log.info(f"  Raw columns ({len(df.columns)}): {list(df.columns[:12])}")
 
     # Try to find a state column; if none found keep all rows (CKAN already pre-filtered to PR)
     state_col_found = next(
-        (c for c in ("State", "state", "BorrowerState", "BORROWERSTATE",
-                     "Borrower State", "StateCode", "State Code")
-         if c in df.columns),
+        (
+            c
+            for c in (
+                "State",
+                "state",
+                "BorrowerState",
+                "BORROWERSTATE",
+                "Borrower State",
+                "StateCode",
+                "State Code",
+            )
+            if c in df.columns
+        ),
         None,
     )
     if state_col_found:
         state_series = df[state_col_found].fillna("").str.strip().str.upper()
-        _log.info(f"  State column '{state_col_found}' unique values (top 10): {sorted(state_series.unique())[:10]}")
+        _log.info(
+            f"  State column '{state_col_found}' unique values (top 10): {sorted(state_series.unique())[:10]}"
+        )
         mask = state_series.isin({"PR", "PUERTO RICO", "72"})
         df = df[mask].copy()
         _log.info(f"  After PR filter: {len(df):,} rows")
     else:
-        _log.warning("  No state column found — keeping all rows (assuming CKAN pre-filtered to PR)")
+        _log.warning(
+            "  No state column found — keeping all rows (assuming CKAN pre-filtered to PR)"
+        )
 
     if df.empty:
         return pd.DataFrame(columns=MASTER_COLUMNS)
 
     # award_id: prefer ApplicationNumber → LoanNumber → index
     app_num = col(df, "ApplicationNumber", "AppNumber", "LoanNumber", "LoanApplicationNumber")
-    df["award_id"] = "SBA-" + app_num.where(
-        app_num.str.strip() != "", other=df.reset_index(drop=True).index.astype(str)
-    ).astype(str).str.strip()
+    df["award_id"] = (
+        "SBA-"
+        + app_num.where(
+            app_num.str.strip() != "", other=df.reset_index(drop=True).index.astype(str)
+        )
+        .astype(str)
+        .str.strip()
+    )
 
     df["recipient_name"] = col(df, "BorrowerName", "BusinessName", "RecipientName", "borrower_name")
     df["recipient_uei"] = ""
     df["awarding_agency"] = "Small Business Administration"
     df["awarding_sub_agency"] = ""
-    df["obligated_amount"] = col(df, "LoanAmount", "ApprovedAmount", "GrossApproval", "LoanApprovedAmount")
+    df["obligated_amount"] = col(
+        df, "LoanAmount", "ApprovedAmount", "GrossApproval", "LoanApprovedAmount"
+    )
     df["award_date"] = col(df, "DateApproved", "LoanApprovedDate", "ApprovalDate", "date_approved")
     df["fiscal_year"] = df["award_date"].apply(_derive_fiscal_year)
     df["pop_state"] = col(df, "State", "state", "BorrowerState")
@@ -395,6 +429,7 @@ def _file_has_data(filepath: Path) -> bool:
 # ---------------------------------------------------------------------------
 # Entry points
 # ---------------------------------------------------------------------------
+
 
 def run(root: Path = None) -> dict:
     """Main entry point (no --force). Returns summary dict."""
@@ -505,9 +540,7 @@ def _run(root: Path = None, force: bool = False) -> dict:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Download SBA Disaster Loan data for Puerto Rico"
-    )
+    parser = argparse.ArgumentParser(description="Download SBA Disaster Loan data for Puerto Rico")
     parser.add_argument(
         "--force",
         action="store_true",

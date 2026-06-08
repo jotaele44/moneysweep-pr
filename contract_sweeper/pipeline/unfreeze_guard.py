@@ -24,7 +24,10 @@ def retry_suppression_preserved(
     # Requirement: preserve suppression unless valid unfreeze candidates exist.
     if unfreeze_candidates > 0:
         return True
-    return suppressed >= checklist_rows_checked and len(retry_suppression_rows) >= checklist_rows_checked
+    return (
+        suppressed >= checklist_rows_checked
+        and len(retry_suppression_rows) >= checklist_rows_checked
+    )
 
 
 def downstream_blockers_preserved(

@@ -6,6 +6,7 @@ from harmless fragments (e.g. ``"sk-" + "rest..."``) so that no literal in
 this source file matches the scanner's own regexes — otherwise the
 repo-wide `test_no_secret_leakage` check would flag this file.
 """
+
 from __future__ import annotations
 
 import io
@@ -24,10 +25,10 @@ from scripts.scan_for_secrets import main, scan
 # Synthetic, runtime-assembled credential-shaped strings. Each fragment alone
 # is short enough that it does NOT match the scanner's regexes; only the
 # concatenated value (which lives in tmp_path test fixtures) does.
-_SK = "sk-" + "realsecretvalue" + "1234567890abcdef"           # sk-* pattern
-_AKIA = "AKIA" + "0123456789ABCDEF"                            # AWS access key
-_GHP = "ghp_" + "abcdefghijklmnopqrstuvwxyz0123456789"         # GitHub PAT
-_BEARER_VAL = "abcdefghijklmnopqrstuvwxyz"                     # Bearer token body
+_SK = "sk-" + "realsecretvalue" + "1234567890abcdef"  # sk-* pattern
+_AKIA = "AKIA" + "0123456789ABCDEF"  # AWS access key
+_GHP = "ghp_" + "abcdefghijklmnopqrstuvwxyz0123456789"  # GitHub PAT
+_BEARER_VAL = "abcdefghijklmnopqrstuvwxyz"  # Bearer token body
 
 
 def _write(path: Path, content: str) -> None:

@@ -25,9 +25,17 @@ DEFAULT_MANIFEST = Path("data/intake/pr_news/raw_items_latest_manifest.json")
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Normalize PR News intake into router-ready JSONL.")
-    parser.add_argument("--input", default=str(DEFAULT_INPUT), help="Input JSONL, JSON, or CSV from PR News capture.")
-    parser.add_argument("--output", default=str(DEFAULT_OUTPUT), help="Canonical router-ready JSONL output path.")
+    parser = argparse.ArgumentParser(
+        description="Normalize PR News intake into router-ready JSONL."
+    )
+    parser.add_argument(
+        "--input",
+        default=str(DEFAULT_INPUT),
+        help="Input JSONL, JSON, or CSV from PR News capture.",
+    )
+    parser.add_argument(
+        "--output", default=str(DEFAULT_OUTPUT), help="Canonical router-ready JSONL output path."
+    )
     parser.add_argument("--manifest", default=str(DEFAULT_MANIFEST), help="Run manifest JSON path.")
     parser.add_argument(
         "--strict-missing-input",
@@ -88,13 +96,34 @@ def infer_evidence_tier(item: Mapping[str, Any]) -> str:
     source_type = coalesce(item, "source_type", "platform", "document_type").lower()
     source_name = coalesce(item, "source_name", "agency_or_entity", "author_or_entity").lower()
     url = coalesce(item, "source_url", "url", "link").lower()
-    if any(token in source_type for token in ("contract", "dataset", "registry", "procurement", "official record")):
+    if any(
+        token in source_type
+        for token in ("contract", "dataset", "registry", "procurement", "official record")
+    ):
         return "T1"
     if any(token in source_type for token in ("official", "press release", "government", "agency")):
         return "T2"
     if any(token in source_type for token in ("image", "video", "screenshot", "signage")):
         return "T3"
-    if any(token in source_name for token in ("gobierno", "fortaleza", "cor3", "fema", "hacienda", "ogp", "dtop", "prasa", "aaa", "prepa", "aee", "noaa", "usgs", "epa")):
+    if any(
+        token in source_name
+        for token in (
+            "gobierno",
+            "fortaleza",
+            "cor3",
+            "fema",
+            "hacienda",
+            "ogp",
+            "dtop",
+            "prasa",
+            "aaa",
+            "prepa",
+            "aee",
+            "noaa",
+            "usgs",
+            "epa",
+        )
+    ):
         return "T2"
     if ".gov" in url or ".pr.gov" in url:
         return "T2"
@@ -114,13 +143,17 @@ def infer_confidence(item: Mapping[str, Any]) -> str:
 
 def normalize_item(item: Mapping[str, Any], *, index: int, discovered_at: str) -> Dict[str, Any]:
     source_url = coalesce(item, "source_url", "url", "link")
-    source_name = coalesce(item, "source_name", "agency_or_entity", "author_or_entity", default="unknown_source")
+    source_name = coalesce(
+        item, "source_name", "agency_or_entity", "author_or_entity", default="unknown_source"
+    )
     title = coalesce(item, "title", "headline", "name", default="untitled")
     summary = coalesce(item, "summary_own_words", "summary", "description", "caption", "excerpt")
     content = coalesce(item, "content", "text", "body")
     published_at = coalesce(item, "published_at", "date_posted", "date", "created_at")
     municipality = coalesce(item, "municipality_name", "municipality", "municipio")
-    location_text = coalesce(item, "location_text", "location", "ubicacion", "ubicación", default=municipality)
+    location_text = coalesce(
+        item, "location_text", "location", "ubicacion", "ubicación", default=municipality
+    )
 
     source_item_id = coalesce(item, "source_item_id", "item_id")
     if not source_item_id:
@@ -142,8 +175,12 @@ def normalize_item(item: Mapping[str, Any], *, index: int, discovered_at: str) -
             "location_text": location_text,
             "evidence_tier": coalesce(item, "evidence_tier", default=infer_evidence_tier(item)),
             "confidence_level": coalesce(item, "confidence_level", default=infer_confidence(item)),
-            "source_hash": coalesce(item, "source_hash", default=stable_hash(source_url, source_name)),
-            "content_hash": coalesce(item, "content_hash", default=stable_hash(title, summary, content, source_url)),
+            "source_hash": coalesce(
+                item, "source_hash", default=stable_hash(source_url, source_name)
+            ),
+            "content_hash": coalesce(
+                item, "content_hash", default=stable_hash(title, summary, content, source_url)
+            ),
             "dedupe_group_id": coalesce(item, "dedupe_group_id", default=""),
             "producer": "pr_news_raw_intake",
             "producer_index": index,
@@ -161,7 +198,9 @@ def write_jsonl(path: Path, rows: Iterable[Mapping[str, Any]]) -> None:
 
 def write_manifest(path: Path, manifest: Mapping[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(dict(manifest), indent=2, ensure_ascii=False, sort_keys=True), encoding="utf-8")
+    path.write_text(
+        json.dumps(dict(manifest), indent=2, ensure_ascii=False, sort_keys=True), encoding="utf-8"
+    )
 
 
 def main_with_args(argv: Sequence[str] | None = None) -> int:
@@ -189,7 +228,10 @@ def main_with_args(argv: Sequence[str] | None = None) -> int:
         return 2 if args.strict_missing_input else 0
 
     raw_items = load_items(input_path)
-    normalized = [normalize_item(item, index=i + 1, discovered_at=discovered_at) for i, item in enumerate(raw_items)]
+    normalized = [
+        normalize_item(item, index=i + 1, discovered_at=discovered_at)
+        for i, item in enumerate(raw_items)
+    ]
 
     write_jsonl(output_path, normalized)
     manifest = {

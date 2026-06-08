@@ -1,4 +1,5 @@
 """Tests for the canonical_v1 municipalities ingester (WS-K)."""
+
 import pytest
 
 from contract_sweeper.validation import canonical_v1_schema as cv1

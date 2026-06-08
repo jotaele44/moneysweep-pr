@@ -9,6 +9,7 @@ Public API:
     run_pipeline_preflight(root, logger, strict=False, write_report=False) -> dict
     classify_source_readiness(root, source) -> dict
 """
+
 from __future__ import annotations
 
 import importlib
@@ -111,9 +112,7 @@ def classify_source_readiness(root: Path, source: dict[str, Any]) -> dict[str, A
         issues.append(f"import of {module_name} failed: {type(exc).__name__}: {exc}")
         return result
 
-    entrypoint = next(
-        (n for n in ENTRYPOINT_NAMES if callable(getattr(module, n, None))), None
-    )
+    entrypoint = next((n for n in ENTRYPOINT_NAMES if callable(getattr(module, n, None))), None)
     if entrypoint is None:
         result["readiness_status"] = "missing_callable"
         issues.append("no callable entrypoint found (" + "/".join(ENTRYPOINT_NAMES) + ")")
@@ -202,9 +201,7 @@ def run_pipeline_preflight(
         if _api_key_present(env_var, dotenv):
             logger.info(f"  [OK]      {sid} ({env_var})")
         else:
-            logger.warning(
-                f"  [MISSING] {sid} ({env_var}) — source will be skipped/limited"
-            )
+            logger.warning(f"  [MISSING] {sid} ({env_var}) — source will be skipped/limited")
             missing_keys.append({"source_id": sid, "env_var": env_var})
 
     # --- Per-source readiness classification ---
@@ -226,10 +223,7 @@ def run_pipeline_preflight(
         else:
             logger.debug(line)
 
-    logger.info(
-        "  Readiness: "
-        + ", ".join(f"{k}={v}" for k, v in sorted(status_counts.items()))
-    )
+    logger.info("  Readiness: " + ", ".join(f"{k}={v}" for k, v in sorted(status_counts.items())))
     logger.info(
         f"  {len(sources)} sources checked — "
         f"{len(structural_errors)} structural error(s), "
@@ -244,8 +238,7 @@ def run_pipeline_preflight(
             logger.error(f"  [preflight] strict mode: structural errors → {joined}")
         else:
             logger.warning(
-                f"  [preflight] structural errors present "
-                f"(non-fatal in non-strict mode): {joined}"
+                f"  [preflight] structural errors present (non-fatal in non-strict mode): {joined}"
             )
     if missing_keys:
         logger.info("  [preflight] missing API keys are non-fatal — sources skip or run limited.")
