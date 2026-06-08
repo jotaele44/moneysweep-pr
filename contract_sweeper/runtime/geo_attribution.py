@@ -132,10 +132,11 @@ def _normalize_fips(value: object) -> str:
 
 
 @functools.lru_cache(maxsize=4)
-def _load_reference(root_str: str) -> dict[str, dict[str, str]]:
+def _load_reference(root_str: str) -> dict[str, dict[str, dict[str, str]]]:
     """Load the PR municipality reference table.
 
-    Returns a dict with two indexes:
+    Returns a dict with two indexes (each maps a key to a record dict, hence the
+    three levels of nesting: index_name -> key -> {field: value}):
         by_fips:    {municipality_code: row_dict}
         by_alias:   {normalized_alias: row_dict}  (includes canonical name)
 
