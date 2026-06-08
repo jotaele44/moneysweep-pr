@@ -11,3 +11,18 @@ no_implicit_optional = true
 # Pipeline/CLI scripts are not yet annotated; focus checking on the package.
 files = ["contract_sweeper"]
 exclude = "(^archive/|^scripts/|tests/)"
+
+[tool.ruff]
+# Lint adoption is INTENTIONALLY NON-GATING to start (see .github/workflows/lint.yml,
+# which sets continue-on-error). The current tree has a known lint backlog; it is
+# cleaned up incrementally per docs/BUILD_EXECUTION_SEQUENCE.md (Wave B) before the
+# CI job is flipped to blocking (Wave B, task 13). Keep the rule set here aligned
+# with ruff's defaults so the measured baseline stays stable.
+line-length = 100
+target-version = "py310"
+extend-exclude = ["archive"]
+
+[tool.ruff.lint]
+# ruff defaults: E4/E7/E9 (a safe pycodestyle subset) + F (pyflakes). Broader rule
+# families (I, UP, B, …) are enabled later in the sequence once the tree is clean.
+select = ["E4", "E7", "E9", "F"]

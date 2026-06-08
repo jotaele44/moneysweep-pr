@@ -1,0 +1,14 @@
+# Development & CI tooling (lint, type-check, test). Runtime deps live in
+# requirements.txt; this file is the single source for the quality-gate tooling
+# referenced by .github/workflows/lint.yml, mypy.yml, tests.yml and
+# .pre-commit-config.yaml. Keep ruff's version in sync with the pre-commit `rev`.
+-r requirements.txt
+
+ruff==0.15.8
+mypy==1.11.2
+pytest
+pytest-cov
+
+# Type stubs (expand as ignore_missing_imports is dropped — see
+# docs/BUILD_EXECUTION_SEQUENCE.md Wave D).
+types-PyYAML

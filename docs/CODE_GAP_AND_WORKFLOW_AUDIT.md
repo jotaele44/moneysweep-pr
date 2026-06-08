@@ -98,24 +98,29 @@ Recorded here so they are not mistaken for gaps:
 
 ## B. Repository workflow audit
 
-### B1 — Export contract **version drift** across producers (priority: high)
-Two export producers declare different contract versions:
-- `scripts/build_export_package.py:33` → `EXPORT_CONTRACT_VERSION = "1.2.0"` —
-  matches `schemas/contract_sweeper_export_manifest.schema.json` (`const: "1.2.0"`)
-  and is asserted by `tests/test_run_export.py` (`manifest["export_contract_version"] == "1.2.0"`).
-- `readiness/contract_sweeper_finance_lane.py:28` → `EXPORT_CONTRACT_VERSION = "1.0.0"` —
-  the newer cross-repo finance-delivery lane (added via #114/#212). This value is
-  **not** asserted against the manifest schema, so the finance lane can emit a
-  contract version that diverges from the canonical schema/consumer (`spiderweb-pr`)
-  without any test failing.
+### B1 — Finance-lane report is unschematized (priority: medium) — _corrected 2026-06-08_
+> **Correction.** An earlier draft of this audit (and tracking issue #216) framed the
+> two `EXPORT_CONTRACT_VERSION` constants as a single contract that had "drifted." That
+> was wrong, and closer reading proves it. The two constants version **two independent
+> cross-repo contracts**, so they legitimately differ:
+> - `scripts/build_export_package.py:33` → `1.2.0` — the **federation export package
+>   manifest** (entities/sources/funding_awards/transactions/relationships → `spiderweb-pr`
+>   query-hub). Validated by `schemas/contract_sweeper_export_manifest.schema.json`
+>   (`const: "1.2.0"`) and asserted in `tests/test_run_export.py`.
+> - `readiness/contract_sweeper_finance_lane.py:28` → `1.0.0` — the **PR-intake finance
+>   lane** (issue #114), a different boundary that consumes `contract_sweeper_derivatives.csv`
+>   and emits its own report (`contract_sweeper_finance_lane_report.json`,
+>   `"producer": "pr-intake-router"`). It never references the federation manifest schema.
+>
+> Forcing the finance lane to `1.2.0` would therefore have **corrupted a correct version**.
+> #216 is closed as a false positive.
 
-_Recommendation:_ single-source the version constant (import one shared value), and
-add a finance-lane test that validates its manifest against
-`schemas/contract_sweeper_export_manifest.schema.json` (and asserts the version),
-closing the cross-repo handshake gap noted in `RECOMMENDATIONS.md`.
-_(Correction to RECOMMENDATIONS: contract tests **do** exist — `test_export_manifest.py`,
-`test_export_schema.py`, `test_run_export.py`, `test_canonical_v1_schema.py` — the
-gap is specifically the un-asserted finance-lane path and the drifted constant.)_
+The **real, smaller** residual gap: the finance-lane report has **no JSON Schema** and no
+test validating its shape/version, whereas the federation package does. _Recommendation:_
+add `schemas/contract_sweeper_finance_lane_report.schema.json` + a test that validates the
+emitted report and asserts `export_contract_version == "1.0.0"`, and add a one-line
+provenance comment at each constant naming which contract it versions (so the two are never
+again mistaken for one). Tracked as WAVE E in `docs/BUILD_EXECUTION_SEQUENCE.md`.
 
 ### B2 — Missing governance / community files (priority: medium)
 Absent: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `LICENSE`, `CODEOWNERS`, and a PR
@@ -157,7 +162,7 @@ history rewrite.
 | Pri | ID | Finding | Area |
 |-----|----|---------|------|
 | High | A1 | Test security-sensitive untested pipeline modules + external-API adapters | tests |
-| High | B1 | Export contract version drift (1.0.0 vs 1.2.0); finance lane lacks schema assertion | cross-repo |
+| ~~High~~ Med | B1 | ~~Version drift~~ **(corrected)** — two independent contracts; real gap is the unschematized finance-lane report | cross-repo |
 | Medium | A2/B5 | Add lint (ruff); make mypy gating + widen scope; add coverage floor | tooling/CI |
 | Medium | B2 | Add governance files (CONTRIBUTING, CODEOWNERS, LICENSE, PR template) | workflow |
 | Medium | B3 | Add `dependabot.yml` for dependency/security updates | workflow |
