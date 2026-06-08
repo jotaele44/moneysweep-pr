@@ -11,7 +11,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pandas as pd
-import pytest
 
 from scripts.ingest_hud_drgr_exports import _looks_like_hud_drgr, run
 

@@ -2,7 +2,6 @@
 
 import pytest
 import pandas as pd
-import numpy as np
 
 from scripts.cms_mapper import (
     map_cms_resource,

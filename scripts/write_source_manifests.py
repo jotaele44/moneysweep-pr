@@ -32,7 +32,6 @@ from contract_sweeper.runtime.source_registry import (
     all_sources,
     expected_outputs_for,
     required_sources,
-    source_by_id,
 )
 
 

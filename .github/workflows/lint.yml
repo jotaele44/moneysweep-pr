@@ -1,9 +1,9 @@
-name: Lint (report-only)
+name: Lint
 
-# Report-only: this workflow surfaces ruff lint findings but never blocks a merge
-# (continue-on-error). The tree has a known lint backlog that is cleaned up
-# incrementally per docs/BUILD_EXECUTION_SEQUENCE.md (Wave B); promote this to a
-# gating check (remove continue-on-error) once `ruff check .` is clean.
+# Gating: the tree is clean under the configured rule set (see pyproject.toml
+# [tool.ruff]), so this check blocks merges on new lint regressions. The
+# adoption was staged per docs/BUILD_EXECUTION_SEQUENCE.md (Wave A introduced it
+# report-only; Wave B cleaned the backlog and flipped it gating here).
 on: [push, pull_request]
 
 jobs:
@@ -20,6 +20,5 @@ jobs:
       - name: Install dev tooling
         run: pip install -r requirements-dev.txt
 
-      - name: Run ruff lint (report-only)
-        continue-on-error: true
+      - name: Run ruff lint
         run: ruff check --output-format=github .

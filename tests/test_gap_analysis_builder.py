@@ -1,7 +1,6 @@
 """Tests for scripts/gap_analysis_builder.py."""
 import csv
 import json
-from pathlib import Path
 
 import pytest
 

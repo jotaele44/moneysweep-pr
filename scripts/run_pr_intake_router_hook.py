@@ -8,7 +8,6 @@ refactor without embedding router logic in the main pipeline orchestrator.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 from scripts import route_pr_intake
 

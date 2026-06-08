@@ -98,14 +98,8 @@ Project delivery + final report:
   --skip-report              Step 30  generate PR investigation report
 """
 
-import argparse
-import importlib.abc
-import importlib.util
-import json
-import logging
 import sys
 import time
-from datetime import datetime
 from pathlib import Path
 
 # Ensure project root is on sys.path for all imports
@@ -116,7 +110,6 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from contract_sweeper.orchestrator.cli import build_arg_parser
 from contract_sweeper.orchestrator.support import (
-    archived_producer_modules,
     check_pandas,
     install_archived_source_skip,
     print_banner,
@@ -176,7 +169,7 @@ def main() -> int:
     if not check_pandas():
         return 1
 
-    from scripts.config import DOWNLOAD_MANIFEST, EXPANSION_DIR
+    from scripts.config import DOWNLOAD_MANIFEST
 
     # ------------------------------------------------------------------
     # Step 1: Setup directories
@@ -660,7 +653,7 @@ def main() -> int:
                     f"({summary.get('coverage_pct', 0):.1f}%) — "
                     f"{'PASS' if summary.get('coverage_gate_pass') else 'BELOW GATE'}"
                 )
-                logger.info(f"[Step 7/29] Done.\n")
+                logger.info("[Step 7/29] Done.\n")
             except Exception as e:
                 logger.error(f"[Step 7/29] FAILED: {e}")
                 enrichment_result = f"FAILED: {e}"

@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 from scripts.build_unified_master import _normalize_name
 
 # ---------------------------------------------------------------------------
@@ -128,9 +128,10 @@ def _filter_pr(df: pd.DataFrame, logger) -> pd.DataFrame:
 
 def _build_output(df: pd.DataFrame) -> pd.DataFrame:
     """Map raw ECHO columns to canonical schema."""
-    col = lambda *cands: next(
-        (c for c in cands if c in df.columns), None
-    )
+    def col(*cands):
+        return next(
+            (c for c in cands if c in df.columns), None
+        )
 
     permit_id   = col("PERMIT_ID", "ACTIVITY_ID", "permit_id", "PermitID")
     permit_type = col("PERMIT_TYPE", "ACTIVITY_TYPE_CODE", "PermitType")

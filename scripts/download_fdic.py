@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 from contract_sweeper.runtime.base_downloader import (
     HttpConfig,
     PageResult,
@@ -259,7 +259,7 @@ def run(root: Path = None, force: bool = False) -> dict:
     # Institutions
     # ------------------------------------------------------------------
     if not force and inst_raw_path.exists():
-        logger.info(f"  Institution file exists — loading cached")
+        logger.info("  Institution file exists — loading cached")
         df_inst = pd.read_csv(inst_raw_path, dtype=str, low_memory=False)
     else:
         df_inst = _download_institutions(session, logger)
@@ -271,7 +271,7 @@ def run(root: Path = None, force: bool = False) -> dict:
     # Financials
     # ------------------------------------------------------------------
     if not force and fin_raw_path.exists():
-        logger.info(f"  Financials file exists — loading cached")
+        logger.info("  Financials file exists — loading cached")
         df_fin = pd.read_csv(fin_raw_path, dtype=str, low_memory=False)
     else:
         df_fin = _download_financials(session, certs, logger)
@@ -315,7 +315,7 @@ def run(root: Path = None, force: bool = False) -> dict:
     logger.info(f"  Written: {inst_out_path.name}, {fin_out_path.name}")
 
     if not df_inst.empty:
-        logger.info(f"\n  Institutions by total assets:")
+        logger.info("\n  Institutions by total assets:")
         for _, row in df_inst.head(10).iterrows():
             assets = row.get("total_assets", "")
             assets_str = f"${float(assets) / 1e6:>8,.0f}M" if assets not in ("", None) else "      N/A "

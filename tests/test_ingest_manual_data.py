@@ -5,7 +5,6 @@ normalization logic, column mapping, and graceful no-file handling.
 """
 
 import pandas as pd
-import pytest
 from pathlib import Path
 
 

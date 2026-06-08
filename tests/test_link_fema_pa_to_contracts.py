@@ -1,6 +1,5 @@
 """Tests for scripts/link_fema_pa_to_contracts.py."""
 import logging
-from pathlib import Path
 
 import pandas as pd
 import pytest

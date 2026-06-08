@@ -36,7 +36,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 from scripts.build_unified_master import _normalize_name
 
 # ---------------------------------------------------------------------------
@@ -176,7 +176,7 @@ def _fetch_per_cusip(session, cusips: list[str], logger) -> list[dict]:
 
     for i, cusip in enumerate(cusips):
         if consecutive_failures >= 3:
-            logger.info(f"    3 consecutive failures — endpoint likely unavailable; stopping")
+            logger.info("    3 consecutive failures — endpoint likely unavailable; stopping")
             break
         data = _get_json(session, url, {"cusip": cusip}, logger)
         if data is None:

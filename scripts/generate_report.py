@@ -138,8 +138,8 @@ def _section_awards(entity_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
         f"**Total obligated (all datasets):** {_fmt_usd(total)}  ",
         f"**Unique award recipients:** {n_entities:,}  ",
         f"**Top-10 concentration:** {top10_share:.1%} of total  \n",
-        f"| # | Entity | Total Obligated | Awards | Datasets | FY Range |",
-        f"|---|--------|----------------|--------|----------|----------|",
+        "| # | Entity | Total Obligated | Awards | Datasets | FY Range |",
+        "|---|--------|----------------|--------|----------|----------|",
     ]
     for i, (_, row) in enumerate(top.iterrows(), 1):
         datasets = str(row.get("source_datasets") or "")
@@ -185,16 +185,21 @@ def _section_power_network(net_df: pd.DataFrame, top_n: int) -> tuple[str, dict]
         f"**Entities ranked:** {len(net_df):,}  ",
         f"**Full-loop entities** (awards + FEC + lobbying): {len(full_loop):,}  ",
         f"**Bond market actors in network:** {len(bond_actors):,}  \n",
-        f"| Rank | Entity | Score | Awards | Sources | Bond Par |",
-        f"|------|--------|-------|--------|---------|----------|",
+        "| Rank | Entity | Score | Awards | Sources | Bond Par |",
+        "|------|--------|-------|--------|---------|----------|",
     ]
     for _, row in top.iterrows():
         sources = []
-        if float(row.get("fec_total_contributions") or 0) > 0: sources.append("FEC")
-        if float(row.get("lda_lobbying_total") or 0) > 0:      sources.append("LDA")
-        if float(row.get("np_revenue") or 0) > 0:              sources.append("990")
-        if float(row.get("cms_medicare_payment") or 0) > 0:    sources.append("CMS")
-        if float(row.get("bond_total_par") or 0) > 0:          sources.append("Bond")
+        if float(row.get("fec_total_contributions") or 0) > 0:
+            sources.append("FEC")
+        if float(row.get("lda_lobbying_total") or 0) > 0:
+            sources.append("LDA")
+        if float(row.get("np_revenue") or 0) > 0:
+            sources.append("990")
+        if float(row.get("cms_medicare_payment") or 0) > 0:
+            sources.append("CMS")
+        if float(row.get("bond_total_par") or 0) > 0:
+            sources.append("Bond")
         bond_par = _fmt_usd(row.get("bond_total_par") or 0)
         lines.append(
             f"| {int(row.get('rank',0))} "
@@ -253,8 +258,8 @@ def _section_prime_sub(ps_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
         f"**Total subcontract flow:** {_fmt_usd(total_flow)}  ",
         f"**Unique prime contractors:** {unique_primes:,}  ",
         f"**Unique subcontractors:** {unique_subs:,}  \n",
-        f"| Prime | Subcontractor | Flow | Contracts |",
-        f"|-------|--------------|------|-----------|",
+        "| Prime | Subcontractor | Flow | Contracts |",
+        "|-------|--------------|------|-----------|",
     ]
     for _, row in top.iterrows():
         lines.append(
@@ -398,7 +403,7 @@ def _section_ofac(ofac_df: pd.DataFrame) -> tuple[str, dict]:
     if ofac_df.empty:
         return _pending("OFAC SDN sanctions cross-reference"), {}
 
-    matches = ofac_df[_num(ofac_df, "obligated_amount") > 0] if "obligated_amount" in ofac_df.columns else ofac_df
+    ofac_df[_num(ofac_df, "obligated_amount") > 0] if "obligated_amount" in ofac_df.columns else ofac_df
 
     lines = [f"**SDN matches against award recipients:** {len(ofac_df):,}  \n"]
     if not ofac_df.empty:
@@ -435,9 +440,9 @@ def _section_sf133(sf_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
         f"**Total budget authority:** {_fmt_usd(total_budget)}  ",
         f"**Total obligations:** {_fmt_usd(total_obligations)}  ",
         f"**Average obligation rate:** {avg_rate:.1%}  \n",
-        f"**Low-obligation accounts (<50% obligated) — largest unspent balances:**\n",
-        f"| Agency | Account | Budget | Obligation Rate | Unobligated |",
-        f"|--------|---------|--------|----------------|-------------|",
+        "**Low-obligation accounts (<50% obligated) — largest unspent balances:**\n",
+        "| Agency | Account | Budget | Obligation Rate | Unobligated |",
+        "|--------|---------|--------|----------------|-------------|",
     ]
     for _, row in low_obl.iterrows():
         lines.append(
@@ -623,7 +628,7 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
     logger = setup_logging("generate_report", log_dir=root / "data" / "logs")
 
     if report_path.exists() and not force:
-        logger.info(f"  Report exists — skipping (use --force to regenerate).")
+        logger.info("  Report exists — skipping (use --force to regenerate).")
         return {"status": "CACHED", "report_path": str(report_path)}
 
     logger.info("Loading pipeline outputs...")

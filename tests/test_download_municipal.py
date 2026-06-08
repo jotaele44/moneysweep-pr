@@ -5,7 +5,6 @@ parse_records() transform, so they run fully offline.
 """
 from __future__ import annotations
 
-import pandas as pd
 import pytest
 
 from scripts.download_municipal import KNOWN_MUNICIPAL_DATA, OUTPUT_COLUMNS, parse_records

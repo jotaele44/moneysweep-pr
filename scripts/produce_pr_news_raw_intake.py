@@ -13,7 +13,6 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import sys
 import hashlib
 from datetime import datetime, timezone
 from pathlib import Path

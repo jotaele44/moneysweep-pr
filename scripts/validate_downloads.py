@@ -10,8 +10,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from scripts.config import (
     DOWNLOAD_MANIFEST,
-    EXPANSION_DIR,
-    LOGS_DIR,
     PROJECT_ROOT,
     find_column,
     read_csv_safe,

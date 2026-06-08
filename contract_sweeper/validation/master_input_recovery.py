@@ -348,7 +348,6 @@ def run_recovery_and_rebuild(root: Path, *, allow_partial_rebuild: bool = False)
     resolved = resolve_builder_input_map(root)
 
     # Build should fail closed unless explicitly overridden.
-    build_result: dict[str, Any] = {}
     build_error = ""
     rebuild_attempted = False
     rebuild_succeeded = False
@@ -362,7 +361,7 @@ def run_recovery_and_rebuild(root: Path, *, allow_partial_rebuild: bool = False)
         try:
             from scripts.build_unified_master import run as run_unified
 
-            build_result = run_unified(
+            run_unified(
                 root=root,
                 input_map=resolved["input_map"],
                 require_all_inputs=(not allow_partial_rebuild),

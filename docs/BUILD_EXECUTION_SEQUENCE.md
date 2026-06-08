@@ -27,13 +27,13 @@ breaks nothing._
 ## WAVE B — Mechanical lint cleanup (enabled by A; must precede any lint gate)
 _Bring the tree to zero lint errors before flipping the gate, so the gate goes green on day one._
 
-7. Apply `ruff check --fix` safe autofixes (≈263: F401 unused-import ×211, F541 f-string ×52). Mechanical. **(big-diff)**
-8. Resolve remaining **F841** unused-variable (≈34) by hand — not auto-fixed.
-9. Resolve **E402** module-import-not-at-top (≈26) — add scoped `# noqa: E402` only where a sys.path shim is genuinely required, fix the rest.
-10. Resolve **E701/E702** multiple-statements-on-one-line (≈18) — split.
-11. Resolve **E712/E731/E741** (≈9) — `== True` → truthiness, named funcs over lambdas, rename ambiguous `l/O/I`.
-12. Re-run `ruff check .` → confirm 0 errors (or a small, commented `noqa` set).
-13. **(gate)** Flip the ruff lint CI job to blocking (remove `continue-on-error`). Safe only because 12 is clean.
+7. **[done]** Apply `ruff check --fix` safe autofixes (248: F401 unused-import, F541 f-string). Mechanical. **(big-diff)**
+8. **[done]** Resolve remaining **F841** unused-variable via `--unsafe-fixes` (binding dropped, side-effecting calls kept) + manual cleanup of no-op leftovers. One half-wired case (`external_blocker_freeze.py` physical evidence) retained with `# noqa: F841` + a follow-up note rather than silently deleted.
+9. **[done]** Resolve **E402** module-import-not-at-top — `[tool.ruff.lint.per-file-ignores]` for the 6 files with intentional `sys.path` bootstraps / deliberately interleaved test imports.
+10. **[done]** Resolve **E701/E702** multiple-statements-on-one-line — split (analyze_entity_profiles, analyze_power_network, generate_report, test_validation_gates).
+11. **[done]** Resolve **E712/E731/E741** — `== True` → truthiness, lambdas → defs, `l` → `layer`.
+12. **[done]** `ruff check .` → **All checks passed!**; full suite 1616 passed (1 pre-existing env-only failure unrelated to lint).
+13. **[done] (gate)** Flipped the ruff lint CI job to blocking (removed `continue-on-error` in `lint.yml`).
 
 ## WAVE C — Formatting (isolated; do after lint so the two don't interleave)
 _`ruff format` rewrites 507 files. Keep it surgical and reviewable._

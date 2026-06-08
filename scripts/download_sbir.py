@@ -25,7 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -179,7 +179,7 @@ def _records_to_df(records: list[dict], source_file: str) -> pd.DataFrame:
 
     # Build award_id from contract number or a composite
     contract = col("contract", "award_id", "solicitation_number")
-    program = col("program", "program_name")
+    col("program", "program_name")
     df["award_id"] = "SBIR-" + contract.where(contract.str.strip() != "",
                                                other=df.index.astype(str))
 
@@ -236,7 +236,7 @@ def _run(root: Path = None, force: bool = False) -> dict:
     logger.info("Starting SBIR/STTR download for Puerto Rico...")
 
     if not force and _file_has_data(raw_path):
-        logger.info(f"  Raw file exists — loading for master build")
+        logger.info("  Raw file exists — loading for master build")
         records = pd.read_csv(raw_path, dtype=str, low_memory=False).to_dict("records")
     else:
         session = _session()
@@ -295,7 +295,7 @@ def main() -> int:
         if status == "OK"
         else ("EMPTY_OR_NONFATAL_RETRY" if retry_allowed_empty_success else "EMPTY")
     )
-    print(f"\nSBIR download complete.")
+    print("\nSBIR download complete.")
     print(f"  Raw rows:    {summary['raw_rows']:,}")
     print(f"  Master rows: {summary['rows']:,}")
     print(f"  Status:      {summary['status']}")

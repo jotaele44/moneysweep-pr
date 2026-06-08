@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 from scripts.run_pr_intake_router_hook import run
 

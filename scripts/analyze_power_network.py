@@ -39,7 +39,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import numpy as np
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 from contract_sweeper.validation.production_status import load_current_status
 
 
@@ -220,7 +220,6 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
     # ------------------------------------------------------------------
     df_cms = _load(pdir / "pr_cms_medicare_providers.csv", logger)
     if df_cms is not None and not df_cms.empty:
-        name_parts = []
         for c in ["provider_last_name", "provider_first_name"]:
             df_cms[c] = df_cms.get(c, pd.Series(dtype=str)).fillna("")
         df_cms["_full"] = (df_cms["provider_last_name"] + " " + df_cms["provider_first_name"]).str.strip()
@@ -329,11 +328,16 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
             "source_presence": int(row["source_presence"]),
             "sources":         [],
         }
-        if row["awards_total"] > 0:           entry["sources"].append("awards")
-        if row.get("fec_total_contributions", 0) > 0: entry["sources"].append("fec")
-        if row.get("lda_lobbying_total", 0) > 0:      entry["sources"].append("lda")
-        if row.get("np_revenue", 0) > 0:              entry["sources"].append("nonprofit_990")
-        if row.get("cms_medicare_payment", 0) > 0:    entry["sources"].append("medicare")
+        if row["awards_total"] > 0:
+            entry["sources"].append("awards")
+        if row.get("fec_total_contributions", 0) > 0:
+            entry["sources"].append("fec")
+        if row.get("lda_lobbying_total", 0) > 0:
+            entry["sources"].append("lda")
+        if row.get("np_revenue", 0) > 0:
+            entry["sources"].append("nonprofit_990")
+        if row.get("cms_medicare_payment", 0) > 0:
+            entry["sources"].append("medicare")
         top_entities.append(entry)
 
     total_awards_val = float(merged["awards_total"].sum())
@@ -371,20 +375,24 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
     logger.info(f"  Total entities ranked:       {len(merged):,}")
     logger.info(f"  Multi-source (≥2 datasets):  {multi_source:,}")
     logger.info(f"  Full-loop entities           {loop_entities:,}")
-    logger.info(f"    (awards + FEC + lobbying)")
+    logger.info("    (awards + FEC + lobbying)")
     logger.info(f"  Total federal awards:        ${total_awards_val:,.0f}")
     logger.info(f"  Data sources included:       {', '.join(sorted(sources_present))}")
-    logger.info(f"\n  Score weights: " +
+    logger.info("\n  Score weights: " +
                 ", ".join(f"{k}={v:.0%}" for k, v in WEIGHTS.items()))
-    logger.info(f"\n  TOP 20 ENTITIES BY INFLUENCE SCORE:")
+    logger.info("\n  TOP 20 ENTITIES BY INFLUENCE SCORE:")
     logger.info(f"  {'Rank':<5} {'Score':>6}  {'Entity':<52}  {'Awards':>14}  Src")
     logger.info(f"  {'-'*4} {'-'*6}  {'-'*52}  {'-'*14}  ---")
     for _, row in merged.head(20).iterrows():
         sources = []
-        if row.get("fec_total_contributions", 0) > 0: sources.append("F")
-        if row.get("lda_lobbying_total", 0) > 0:      sources.append("L")
-        if row.get("np_revenue", 0) > 0:              sources.append("N")
-        if row.get("cms_medicare_payment", 0) > 0:    sources.append("M")
+        if row.get("fec_total_contributions", 0) > 0:
+            sources.append("F")
+        if row.get("lda_lobbying_total", 0) > 0:
+            sources.append("L")
+        if row.get("np_revenue", 0) > 0:
+            sources.append("N")
+        if row.get("cms_medicare_payment", 0) > 0:
+            sources.append("M")
         src_str = "".join(sources) or "·"
         logger.info(
             f"  {int(row['rank']):<5} {row['influence_score']:>6.1f}  "

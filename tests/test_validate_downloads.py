@@ -1,6 +1,5 @@
 """Tests for scripts/validate_downloads.py — download validation."""
 
-import csv
 import logging
 import sys
 from pathlib import Path

@@ -31,7 +31,7 @@ except ImportError:
 
 import pandas as pd
 
-from scripts.config import MASTER_PATH, PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 from contract_sweeper.validation.production_status import load_current_status
 
 MIN_OBLIGATION_DEFAULT = 0
@@ -241,7 +241,7 @@ def run(root: Path = None, min_obligation: float = MIN_OBLIGATION_DEFAULT, top_n
     summary_path = graph_dir / "network_summary.json"
     summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
 
-    logger.info(f"\nGraph summary:")
+    logger.info("\nGraph summary:")
     logger.info(f"  Vendor nodes:  {len(vendor_nodes)}")
     logger.info(f"  Agency nodes:  {len(agency_nodes)}")
     logger.info(f"  Parent nodes:  {len(parent_nodes)}")

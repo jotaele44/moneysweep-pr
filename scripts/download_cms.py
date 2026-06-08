@@ -36,7 +36,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROJECT_ROOT, setup_logging
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -463,7 +463,7 @@ def run(root: Path = None, skip_open_payments: bool = False,
         result["medicare_path"] = str(med_out_path)
 
         if not df_med.empty:
-            logger.info(f"\n  Top 10 PR Medicare providers by total payment:")
+            logger.info("\n  Top 10 PR Medicare providers by total payment:")
             df_top = df_med.copy()
             df_top["_pay"] = pd.to_numeric(df_top.get("total_medicare_payment", ""),
                                            errors="coerce").fillna(0)

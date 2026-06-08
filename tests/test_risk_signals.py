@@ -2,8 +2,6 @@
 from __future__ import annotations
 
 import csv
-import json
-from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -347,7 +345,7 @@ def test_compute_entity_scores_risk_in_0_1():
 @pytest.mark.unit
 def test_compute_project_scores_chains_included():
     chains = _chains_df()
-    awards = _awards_df()
+    _awards_df()
     sigs = rs._signals_subaward_opacity(chains)
     scores = rs._compute_project_scores(sigs, chains)
     assert len(scores) == len(chains)

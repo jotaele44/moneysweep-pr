@@ -115,7 +115,6 @@ def test_hhs_grant_type_codes_standard():
 # --- DOJ ---
 from scripts.download_doj_grants import (
     AGENCY_NAME as DOJ_AGENCY,
-    GRANT_TYPE_CODES as DOJ_GRANT_CODES,
     MASTER_COLUMNS as DOJ_MASTER_COLS,
     _build_payload as doj_build_payload,
 )
@@ -140,7 +139,6 @@ def test_doj_build_payload_pr_filter():
 from scripts.download_oia import (
     AGENCY_NAME as OIA_AGENCY,
     SUBTIER_AGENCY as OIA_SUBTIER,
-    MASTER_COLUMNS as OIA_MASTER_COLS,
     _build_payload as oia_build_payload,
 )
 
@@ -248,7 +246,6 @@ def test_earmarks_results_to_df_keyword_detection():
 
 # --- NFIP ---
 from scripts.download_nfip import (
-    NFIP_COLUMNS,
     OUTPUT_COLUMNS as NFIP_OUTPUT_COLS,
     _records_to_df as nfip_records_to_df,
 )

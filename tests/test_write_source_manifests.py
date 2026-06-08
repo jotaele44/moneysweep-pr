@@ -1,8 +1,6 @@
 """Tests for scripts/write_source_manifests.py."""
 import csv
 import json
-import shutil
-from pathlib import Path
 
 import pytest
 
