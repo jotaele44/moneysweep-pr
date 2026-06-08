@@ -12,6 +12,7 @@ unauthenticated at a lower rate limit. Unlike credential-gated
 adapters (e.g. FEC, SAM), this adapter does NOT raise
 :class:`CredentialMissing` when the token is unset.
 """
+
 from __future__ import annotations
 
 import os
@@ -57,10 +58,12 @@ class _CMSSocrataAdapter(SourceAdapter):
         import requests
 
         s = requests.Session()
-        s.headers.update({
-            "Accept": "application/json",
-            "User-Agent": "contract-sweeper-query/1",
-        })
+        s.headers.update(
+            {
+                "Accept": "application/json",
+                "User-Agent": "contract-sweeper-query/1",
+            }
+        )
         token = self._resolved_app_token()
         if token:
             s.headers["X-App-Token"] = token

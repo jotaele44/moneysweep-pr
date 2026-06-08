@@ -5,6 +5,7 @@ optional JSON extensions from `registries/source_registry_extensions/*.json`.
 YAML is the human-editable source of truth; JSON siblings are regenerated via
 `scripts/regenerate_registry_json.py`.
 """
+
 from __future__ import annotations
 
 import argparse

@@ -1,4 +1,5 @@
 """Unit tests for the R7 risk signal engine and gates."""
+
 from __future__ import annotations
 
 import csv
@@ -11,6 +12,7 @@ import contract_sweeper.runtime.risk_signal_gates as rsg
 
 
 # ---------- Fixtures ----------
+
 
 def _awards_df(**kwargs) -> pd.DataFrame:
     defaults = {
@@ -88,6 +90,7 @@ def _fec_df(**kwargs) -> pd.DataFrame:
 
 # ---------- Helper constants tests ----------
 
+
 @pytest.mark.unit
 def test_concentration_threshold_is_positive():
     assert rs.CONCENTRATION_THRESHOLD > 0
@@ -110,6 +113,7 @@ def test_signal_columns_count():
 
 # ---------- _normalize tests ----------
 
+
 @pytest.mark.unit
 def test_normalize_strips_llc():
     assert rs._normalize("ACME LLC") == "ACME"
@@ -127,6 +131,7 @@ def test_normalize_empty():
 
 # ---------- _to_float tests ----------
 
+
 @pytest.mark.unit
 def test_to_float_basic():
     assert rs._to_float("1,000,000") == 1_000_000.0
@@ -138,6 +143,7 @@ def test_to_float_bad_returns_default():
 
 
 # ---------- Concentration signal tests ----------
+
 
 @pytest.mark.unit
 def test_signals_concentration_fires_on_dominant_entity():
@@ -161,7 +167,9 @@ def test_signals_concentration_high_severity_above_40pct():
         recipient_name_normalized=["MEGA CORP"],
         obligated_amount=["5000000"],
         pop_county=["SAN JUAN"],
-        source_lineage_path=["f"], source_dataset=["x"], source_record_id=["1"],
+        source_lineage_path=["f"],
+        source_dataset=["x"],
+        source_record_id=["1"],
     )
     sigs = rs._signals_concentration(awards)
     assert sigs[0]["severity"] == "high"
@@ -169,31 +177,37 @@ def test_signals_concentration_high_severity_above_40pct():
 
 # ---------- Repeat awards tests ----------
 
+
 @pytest.mark.unit
 def test_signals_repeat_awards_fires_for_acme():
-    awards = pd.DataFrame({
-        "award_id": ["A001", "A002", "A003"],
-        "recipient_name": ["ACME CORP", "ACME CORP", "ACME CORP"],
-        "recipient_name_normalized": ["ACME CORP", "ACME CORP", "ACME CORP"],
-        "obligated_amount": ["500000", "500000", "500000"],
-    })
+    awards = pd.DataFrame(
+        {
+            "award_id": ["A001", "A002", "A003"],
+            "recipient_name": ["ACME CORP", "ACME CORP", "ACME CORP"],
+            "recipient_name_normalized": ["ACME CORP", "ACME CORP", "ACME CORP"],
+            "obligated_amount": ["500000", "500000", "500000"],
+        }
+    )
     sigs = rs._signals_repeat_awards(awards)
     assert any(s["signal_family"] == "repeat_awards" and "ACME" in s["entity_name"] for s in sigs)
 
 
 @pytest.mark.unit
 def test_signals_repeat_awards_respects_threshold():
-    awards = pd.DataFrame({
-        "award_id": ["A1", "A2"],
-        "recipient_name": ["SOLO CORP", "SOLO CORP"],
-        "obligated_amount": ["100", "200"],
-    })
+    awards = pd.DataFrame(
+        {
+            "award_id": ["A1", "A2"],
+            "recipient_name": ["SOLO CORP", "SOLO CORP"],
+            "obligated_amount": ["100", "200"],
+        }
+    )
     sigs = rs._signals_repeat_awards(awards)
     # 2 awards < threshold of 3
     assert not any(s["signal_family"] == "repeat_awards" for s in sigs)
 
 
 # ---------- Subaward opacity tests ----------
+
 
 @pytest.mark.unit
 def test_signals_subaward_opacity_missing_sub_uei():
@@ -214,6 +228,7 @@ def test_signals_subaward_opacity_low_confidence():
 
 # ---------- Parent-sub mismatch tests ----------
 
+
 @pytest.mark.unit
 def test_signals_parent_sub_mismatch_fires_on_shared_uei():
     chains = _chains_df()
@@ -232,6 +247,7 @@ def test_signals_parent_sub_mismatch_no_fire_empty_uei():
 
 
 # ---------- Political overlap tests ----------
+
 
 @pytest.mark.unit
 def test_signals_political_overlap_lda_match():
@@ -253,11 +269,14 @@ def test_signals_political_overlap_fec_employer_match():
 
 @pytest.mark.unit
 def test_signals_political_overlap_empty_sources():
-    sigs = rs._signals_political_overlap(pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame())
+    sigs = rs._signals_political_overlap(
+        pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+    )
     assert sigs == []
 
 
 # ---------- Bond-contract overlap tests ----------
+
 
 @pytest.mark.unit
 def test_signals_bond_contract_overlap_fires():
@@ -277,6 +296,7 @@ def test_signals_bond_contract_overlap_empty_emma():
 
 # ---------- Geographic clustering tests ----------
 
+
 @pytest.mark.unit
 def test_signals_geographic_clustering_fires_for_san_juan():
     awards = _awards_df()
@@ -293,6 +313,7 @@ def test_signals_geographic_clustering_empty():
 
 # ---------- Stale lineage tests ----------
 
+
 @pytest.mark.unit
 def test_signals_stale_lineage_fires_on_missing_fields():
     awards = _awards_df()
@@ -304,20 +325,23 @@ def test_signals_stale_lineage_fires_on_missing_fields():
 
 @pytest.mark.unit
 def test_signals_stale_lineage_no_fire_when_complete():
-    awards = pd.DataFrame({
-        "award_id": ["A1"],
-        "recipient_name": ["ACME CORP"],
-        "source_lineage_path": ["file.csv"],
-        "source_dataset": ["usaspending"],
-        "source_record_id": ["R999"],
-        "obligated_amount": ["1000"],
-        "pop_county": ["SAN JUAN"],
-    })
+    awards = pd.DataFrame(
+        {
+            "award_id": ["A1"],
+            "recipient_name": ["ACME CORP"],
+            "source_lineage_path": ["file.csv"],
+            "source_dataset": ["usaspending"],
+            "source_record_id": ["R999"],
+            "obligated_amount": ["1000"],
+            "pop_county": ["SAN JUAN"],
+        }
+    )
     sigs = rs._signals_stale_lineage(awards)
     assert not any(s["signal_family"] == "stale_lineage" for s in sigs)
 
 
 # ---------- Score aggregation tests ----------
+
 
 @pytest.mark.unit
 def test_compute_entity_scores_returns_sorted_desc():
@@ -361,11 +385,17 @@ def test_compute_municipality_scores_structure():
 
 # ---------- compute_signals integration test ----------
 
+
 @pytest.mark.unit
 def test_compute_signals_with_no_data_returns_dict(tmp_path):
     result = rs.compute_signals(tmp_path)
-    assert set(result.keys()) == {"signals", "entity_scores", "project_scores",
-                                   "municipality_scores", "metadata"}
+    assert set(result.keys()) == {
+        "signals",
+        "entity_scores",
+        "project_scores",
+        "municipality_scores",
+        "metadata",
+    }
     assert result["metadata"]["schema_version"] == rs.SCHEMA_VERSION
 
 
@@ -404,6 +434,7 @@ def test_compute_signals_with_seed_data(tmp_path):
 
 
 # ---------- R7 gate tests ----------
+
 
 @pytest.mark.unit
 def test_gate_signal_schema_valid_no_file(tmp_path):

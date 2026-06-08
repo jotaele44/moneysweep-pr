@@ -13,9 +13,7 @@ from contract_sweeper.pipeline.repo_quality_audit import run_repo_quality_audit
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Run R4.9Z-B repo quality and CI hardening audit"
-    )
+    parser = argparse.ArgumentParser(description="Run R4.9Z-B repo quality and CI hardening audit")
     parser.add_argument("--root", default=".", help="Project root")
     args = parser.parse_args()
 

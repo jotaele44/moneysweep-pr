@@ -14,6 +14,7 @@ Two concrete adapters share the same base:
 If discovery fails (the package has been retired or renamed), the
 adapter returns an empty DataFrame rather than raising.
 """
+
 from __future__ import annotations
 
 import json

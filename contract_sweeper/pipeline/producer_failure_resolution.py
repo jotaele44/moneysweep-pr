@@ -25,7 +25,9 @@ def _classify_producer_failure(
     if status == "failed_no_data":
         return "requires_manual_source"
 
-    if any(token in reason for token in ("timeout", "connection", "ssl", "dns", "service unavailable")):
+    if any(
+        token in reason for token in ("timeout", "connection", "ssl", "dns", "service unavailable")
+    ):
         return "requires_endpoint_review"
 
     if status == "failed_command":
@@ -117,7 +119,11 @@ def review_producer_failures(
         }
         report_rows.append(report_row)
 
-        if classification in {"patchable_now", "requires_endpoint_review", "leave_blocked_with_reason"}:
+        if classification in {
+            "patchable_now",
+            "requires_endpoint_review",
+            "leave_blocked_with_reason",
+        }:
             queue_row = dict(report_row)
             queue_row["review_status"] = "pending"
             patch_remaining_rows.append(queue_row)

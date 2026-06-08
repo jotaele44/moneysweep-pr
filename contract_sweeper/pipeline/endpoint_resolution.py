@@ -10,7 +10,9 @@ from typing import Any
 
 def _classify_from_text(reason: str) -> str:
     text = str(reason or "").lower()
-    if any(token in text for token in ("401", "403", "unauthorized", "forbidden", "api key", "token")):
+    if any(
+        token in text for token in ("401", "403", "unauthorized", "forbidden", "api key", "token")
+    ):
         return "endpoint_requires_auth"
     if any(token in text for token in ("deprecated", "sunset", "410", "gone")):
         return "endpoint_deprecated"
@@ -80,7 +82,9 @@ def _classify_from_probe(probe_ok: bool, status_code: int, probe_error: str) -> 
         return "endpoint_requires_parameters"
 
     lowered = str(probe_error or "").lower()
-    if any(token in lowered for token in ("timeout", "refused", "name or service", "temporary failure")):
+    if any(
+        token in lowered for token in ("timeout", "refused", "name or service", "temporary failure")
+    ):
         return "endpoint_down"
     return "unknown_endpoint_failure"
 
@@ -118,7 +122,9 @@ def review_endpoint_failures(
         failure_reason = str(row.get("failure_reason") or row.get("reason") or "").strip()
         source_url_or_portal = str(runner_row.get("source_url_or_portal", "")).strip()
 
-        probe_attempted = bool(enable_probes and source_url_or_portal.startswith(("http://", "https://")))
+        probe_attempted = bool(
+            enable_probes and source_url_or_portal.startswith(("http://", "https://"))
+        )
         probe_ok = False
         probe_status_code = 0
         probe_error = ""

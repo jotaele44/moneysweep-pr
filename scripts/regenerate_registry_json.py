@@ -4,6 +4,7 @@ YAML is the human-editable source of truth in `registries/*.yaml`.
 JSON is the runtime wire format read by `contract_sweeper.runtime.*`.
 Run this after editing any YAML registry.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -15,8 +16,7 @@ try:
     import yaml
 except ImportError:
     print(
-        "PyYAML is required to regenerate registry JSONs. "
-        "Install with: pip install PyYAML",
+        "PyYAML is required to regenerate registry JSONs. Install with: pip install PyYAML",
         file=sys.stderr,
     )
     sys.exit(2)

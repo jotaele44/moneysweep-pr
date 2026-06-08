@@ -39,22 +39,32 @@ from scripts.config import (
 # ---------------------------------------------------------------------------
 
 USASPENDING_BASE = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
-USASPENDING_BULK_BASE   = "https://api.usaspending.gov/api/v2/bulk_download/awards/"
+USASPENDING_BULK_BASE = "https://api.usaspending.gov/api/v2/bulk_download/awards/"
 USASPENDING_BULK_STATUS = "https://api.usaspending.gov/api/v2/bulk_download/status/"
 FPDS_BASE = "https://www.fpds.gov/ezsearch/fpdsportal"
 
 # USASpending API: earliest supported start_date for spending_by_award
 USASPENDING_MIN_YEAR = 2007
 
-BULK_POLL_INTERVAL = 15   # seconds between status polls
-BULK_TIMEOUT_SECS  = 600  # 10-minute ceiling for async job completion
+BULK_POLL_INTERVAL = 15  # seconds between status polls
+BULK_TIMEOUT_SECS = 600  # 10-minute ceiling for async job completion
 
 USASPENDING_FIELDS = [
-    "Award ID", "Recipient Name", "Recipient State Code",
-    "Awarding Agency", "Awarding Sub Agency", "Award Amount",
-    "Total Obligation", "Start Date", "End Date", "Award Type",
-    "Place of Performance State Code", "Place of Performance City",
-    "Description", "Contract Award Type", "NAICS Code",
+    "Award ID",
+    "Recipient Name",
+    "Recipient State Code",
+    "Awarding Agency",
+    "Awarding Sub Agency",
+    "Award Amount",
+    "Total Obligation",
+    "Start Date",
+    "End Date",
+    "Award Type",
+    "Place of Performance State Code",
+    "Place of Performance City",
+    "Description",
+    "Contract Award Type",
+    "NAICS Code",
     "generated_internal_id",
 ]
 
@@ -62,7 +72,14 @@ USASPENDING_FIELDS = [
 _CONTRACT_TYPE_CODES = ["A", "B", "C", "D"]
 
 _IDV_TYPE_CODES = [
-    "IDV_A", "IDV_B", "IDV_B_A", "IDV_B_B", "IDV_B_C", "IDV_C", "IDV_D", "IDV_E",
+    "IDV_A",
+    "IDV_B",
+    "IDV_B_A",
+    "IDV_B_B",
+    "IDV_B_C",
+    "IDV_C",
+    "IDV_D",
+    "IDV_E",
 ]
 
 FPDS_NS = {
@@ -78,13 +95,16 @@ RETRY_BACKOFF = [2, 4, 8]
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _session() -> requests.Session:
     """Create a requests session with proper headers."""
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (Federal Contract Research)",
-        "Accept": "application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (Federal Contract Research)",
+            "Accept": "application/json",
+        }
+    )
     return s
 
 
@@ -134,6 +154,7 @@ def _file_exists_with_data(filepath: Path) -> int:
 # USASpending Downloads
 # ---------------------------------------------------------------------------
 
+
 def _build_usaspending_payload(entry: dict) -> tuple:
     """Build USASpending API payload from manifest entry.
 
@@ -170,16 +191,17 @@ def _build_usaspending_payload(entry: dict) -> tuple:
         payload_filters["award_type_codes"] = _CONTRACT_TYPE_CODES
         # FEMA and USACE are subtier agencies; HUD, DOT, VA are toptier
         _agency_map = {
-            "FEMA":  {"tier": "subtier",  "name": "Federal Emergency Management Agency"},
-            "HUD":   {"tier": "toptier",  "name": "Department of Housing and Urban Development"},
-            "DOT":   {"tier": "toptier",  "name": "Department of Transportation"},
-            "USACE": {"tier": "subtier",  "name": "U.S. Army Corps of Engineers"},
-            "VA":    {"tier": "toptier",  "name": "Department of Veterans Affairs"},
+            "FEMA": {"tier": "subtier", "name": "Federal Emergency Management Agency"},
+            "HUD": {"tier": "toptier", "name": "Department of Housing and Urban Development"},
+            "DOT": {"tier": "toptier", "name": "Department of Transportation"},
+            "USACE": {"tier": "subtier", "name": "U.S. Army Corps of Engineers"},
+            "VA": {"tier": "toptier", "name": "Department of Veterans Affairs"},
         }
         raw_agencies = filters.get("Agencies", [])
         payload_filters["agencies"] = [
             {"type": "awarding", "tier": _agency_map[a]["tier"], "name": _agency_map[a]["name"]}
-            for a in raw_agencies if a in _agency_map
+            for a in raw_agencies
+            if a in _agency_map
         ]
         keywords = filters.get("Keywords", ["Puerto Rico"])
         payload_filters["keywords"] = keywords
@@ -219,7 +241,7 @@ def _build_bulk_payload(entry: dict, fy_start: int, fy_end: int) -> dict:
         "date_type": "action_date",
         "date_range": {
             "start_date": f"{fy_start - 1}-10-01",
-            "end_date":   f"{fy_end}-09-30",
+            "end_date": f"{fy_end}-09-30",
         },
     }
 
@@ -246,17 +268,18 @@ def _build_bulk_payload(entry: dict, fy_start: int, fy_end: int) -> dict:
 
     elif ftype == "reconstruction":
         _agency_map = {
-            "FEMA":  {"tier": "subtier", "name": "Federal Emergency Management Agency"},
-            "HUD":   {"tier": "toptier", "name": "Department of Housing and Urban Development"},
-            "DOT":   {"tier": "toptier", "name": "Department of Transportation"},
+            "FEMA": {"tier": "subtier", "name": "Federal Emergency Management Agency"},
+            "HUD": {"tier": "toptier", "name": "Department of Housing and Urban Development"},
+            "DOT": {"tier": "toptier", "name": "Department of Transportation"},
             "USACE": {"tier": "subtier", "name": "U.S. Army Corps of Engineers"},
-            "VA":    {"tier": "toptier", "name": "Department of Veterans Affairs"},
+            "VA": {"tier": "toptier", "name": "Department of Veterans Affairs"},
         }
         raw_agencies = filters.get("Agencies", [])
         payload_filters["award_type_codes"] = _CONTRACT_TYPE_CODES
         payload_filters["agencies"] = [
             {"type": "awarding", "tier": _agency_map[a]["tier"], "name": _agency_map[a]["name"]}
-            for a in raw_agencies if a in _agency_map
+            for a in raw_agencies
+            if a in _agency_map
         ]
         payload_filters["keywords"] = filters.get("Keywords", ["Puerto Rico"])
 
@@ -356,6 +379,7 @@ def download_usaspending(entry: dict, output_dir: Path, logger, session: request
 # USASpending Bulk Download (async, supports FY2000+)
 # ---------------------------------------------------------------------------
 
+
 def download_usaspending_bulk(
     entry: dict,
     output_dir: Path,
@@ -373,16 +397,16 @@ def download_usaspending_bulk(
     result = {"filename": fname, "rows": 0, "status": "OK", "error": None}
 
     fy_s = fy_start if fy_start is not None else entry["year_start"]
-    fy_e = fy_end   if fy_end   is not None else entry["year_end"]
+    fy_e = fy_end if fy_end is not None else entry["year_end"]
 
     payload = _build_bulk_payload(entry, fy_s, fy_e)
     logger.info(
-        f"  Submitting bulk_download for FY{fy_s}-{fy_e} "
-        f"(filter_type={entry['filter_type']})..."
+        f"  Submitting bulk_download for FY{fy_s}-{fy_e} (filter_type={entry['filter_type']})..."
     )
 
     # --- Step 1: Submit job ---
     import json as _json
+
     logger.debug(f"  bulk_download payload: {_json.dumps(payload, indent=2)}")
     try:
         resp = _retry_request(session, "POST", USASPENDING_BULK_BASE, json=payload, timeout=30)
@@ -390,7 +414,9 @@ def download_usaspending_bulk(
     except requests.HTTPError as e:
         body = e.response.text[:800] if e.response is not None else ""
         result["status"] = "FAILED"
-        result["error"] = f"bulk_download POST HTTP {getattr(e.response,'status_code','?')}: {body}"
+        result["error"] = (
+            f"bulk_download POST HTTP {getattr(e.response, 'status_code', '?')}: {body}"
+        )
         logger.error(f"  bulk_download POST failed: {e}")
         logger.error(f"  Response body: {body!r}")
         return result
@@ -417,8 +443,11 @@ def download_usaspending_bulk(
         time.sleep(BULK_POLL_INTERVAL)
         try:
             status_resp = _retry_request(
-                session, "GET", USASPENDING_BULK_STATUS,
-                params={"file_name": file_name}, timeout=15,
+                session,
+                "GET",
+                USASPENDING_BULK_STATUS,
+                params={"file_name": file_name},
+                timeout=15,
             )
             status_data = status_resp.json()
         except Exception as e:
@@ -512,6 +541,7 @@ def download_usaspending_bulk(
 # FPDS Downloads
 # ---------------------------------------------------------------------------
 
+
 def _build_fpds_query(entry: dict) -> str:
     """Build FPDS Atom feed query string from manifest entry."""
     ftype = entry["filter_type"]
@@ -574,10 +604,12 @@ def download_fpds(entry: dict, output_dir: Path, logger, session: requests.Sessi
 
     # Set Accept header for XML
     xml_session = requests.Session()
-    xml_session.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (Federal Contract Research)",
-        "Accept": "application/atom+xml",
-    })
+    xml_session.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (Federal Contract Research)",
+            "Accept": "application/atom+xml",
+        }
+    )
 
     while True:
         url = (
@@ -598,7 +630,9 @@ def download_fpds(entry: dict, output_dir: Path, logger, session: requests.Sessi
         if b"<!doctype" in content_start or b"<html" in content_start:
             result["status"] = "MANUAL"
             result["error"] = "FPDS Atom API is defunct — manual browser download required"
-            logger.warning(f"  FPDS returned HTML (Atom feed defunct); USASpending fallback will be attempted for post-{USASPENDING_MIN_YEAR} windows")
+            logger.warning(
+                f"  FPDS returned HTML (Atom feed defunct); USASpending fallback will be attempted for post-{USASPENDING_MIN_YEAR} windows"
+            )
             break
 
         # Parse XML — recover=True tolerates minor malformations (e.g. unescaped &)
@@ -663,6 +697,7 @@ def download_fpds(entry: dict, output_dir: Path, logger, session: requests.Sessi
 # FSRS Downloads
 # ---------------------------------------------------------------------------
 
+
 def download_fsrs(entry: dict, output_dir: Path, logger, session: requests.Session) -> dict:
     """Attempt FSRS download. Falls back to manual instructions."""
     fname = entry["filename"]
@@ -720,7 +755,10 @@ def download_fsrs(entry: dict, output_dir: Path, logger, session: requests.Sessi
 # Orchestrator
 # ---------------------------------------------------------------------------
 
-def download_single(entry: dict, output_dir: Path, logger, session: requests.Session, force: bool = False) -> dict:
+
+def download_single(
+    entry: dict, output_dir: Path, logger, session: requests.Session, force: bool = False
+) -> dict:
     """Download a single file, dispatching by source type."""
     fname = entry["filename"]
     filepath = output_dir / fname
@@ -764,7 +802,12 @@ def download_single(entry: dict, output_dir: Path, logger, session: requests.Ses
         return download_fsrs(entry, output_dir, logger, session)
     else:
         logger.warning(f"  Unknown source: {source}")
-        return {"filename": fname, "rows": 0, "status": "FAILED", "error": f"Unknown source: {source}"}
+        return {
+            "filename": fname,
+            "rows": 0,
+            "status": "FAILED",
+            "error": f"Unknown source: {source}",
+        }
 
 
 def download_all(root: Path = None, force: bool = False, only: str = None) -> list:

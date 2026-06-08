@@ -20,6 +20,7 @@ Usage:
   python3 scripts/analyze_bond_flow.py
   python3 scripts/analyze_bond_flow.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -44,23 +45,29 @@ from scripts.sam_enrichment import name_similarity
 # Constants
 # ---------------------------------------------------------------------------
 
-MATCH_THRESHOLD = 0.75   # name similarity threshold for entity matching
-UW_SPREAD_EST   = 0.005  # estimated underwriter gross spread (0.5% of par)
+MATCH_THRESHOLD = 0.75  # name similarity threshold for entity matching
+UW_SPREAD_EST = 0.005  # estimated underwriter gross spread (0.5% of par)
 
 BOND_FLOW_COLUMNS = [
-    "entity_key", "canonical_name",
+    "entity_key",
+    "canonical_name",
     # Issuer side
-    "bond_issuer_flag", "bonds_issued_count", "bonds_issued_par",
+    "bond_issuer_flag",
+    "bonds_issued_count",
+    "bonds_issued_par",
     # Underwriter side
-    "bond_underwriter_flag", "bonds_underwritten_count",
-    "bonds_underwritten_par", "estimated_underwriter_fee",
+    "bond_underwriter_flag",
+    "bonds_underwritten_count",
+    "bonds_underwritten_par",
+    "estimated_underwriter_fee",
     # Dealer side
-    "bond_dealer_flag", "dealer_volume_par",
+    "bond_dealer_flag",
+    "dealer_volume_par",
     # Cross-role flags
-    "is_dual_role",           # federal award recipient AND underwriter/dealer
+    "is_dual_role",  # federal award recipient AND underwriter/dealer
     "is_issuer_and_awardee",  # bond issuer AND federal award recipient
-    "dual_role_awards",       # total federal awards for dual-role entities
-    "claim_tier",             # observed | linked | blocked (per maturity gate)
+    "dual_role_awards",  # total federal awards for dual-role entities
+    "claim_tier",  # observed | linked | blocked (per maturity gate)
 ]
 
 BOND_SOURCE_DATASETS = [
@@ -72,6 +79,7 @@ BOND_SOURCE_DATASETS = [
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _load(path: Path, label: str, logger) -> pd.DataFrame:
     if not path.exists():
@@ -106,6 +114,7 @@ def _match_to_entity(name_norm: str, entity_norms: pd.Series) -> bool:
 # Core
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None, force: bool = False) -> dict:
     root = Path(root or PROJECT_ROOT)
     proc = root / "data" / "staging" / "processed"
@@ -133,10 +142,10 @@ def run(root: Path = None, force: bool = False) -> dict:
         return {"status": "CACHED", "rows": rows, "claim_tier": bond_tier}
 
     # Load inputs
-    bonds_df  = _load(proc / "pr_emma_bonds.csv",        "EMMA bonds",       logger)
-    uw_df     = _load(proc / "pr_emma_underwriters.csv",  "EMMA underwriters", logger)
-    trades_df = _load(proc / "pr_msrb_trades.csv",        "MSRB trades",      logger)
-    entity_df = _load(proc / "entity_master.csv",         "entity_master",    logger)
+    bonds_df = _load(proc / "pr_emma_bonds.csv", "EMMA bonds", logger)
+    uw_df = _load(proc / "pr_emma_underwriters.csv", "EMMA underwriters", logger)
+    trades_df = _load(proc / "pr_msrb_trades.csv", "MSRB trades", logger)
+    entity_df = _load(proc / "entity_master.csv", "entity_master", logger)
 
     if entity_df.empty:
         logger.warning("  entity_master.csv missing — run build_unified_master.py first")
@@ -158,8 +167,9 @@ def run(root: Path = None, force: bool = False) -> dict:
     for _, row in entity_df.iterrows():
         norm = str(row.get("_norm") or "")
         if norm:
-            entity_awards[norm] = _safe_float(row.get("total_obligated") or
-                                               row.get("total_obligation") or 0)
+            entity_awards[norm] = _safe_float(
+                row.get("total_obligated") or row.get("total_obligation") or 0
+            )
 
     # ------------------------------------------------------------------
     # Build bond-side entity sets
@@ -173,9 +183,11 @@ def run(root: Path = None, force: bool = False) -> dict:
             if not iss_norm:
                 continue
             issuer_stats[iss_norm] = {
-                "name":       str(grp["issuer_name"].iloc[0]) if "issuer_name" in grp.columns else iss_norm,
-                "count":      len(grp),
-                "par":        float(grp["_par"].sum()),
+                "name": str(grp["issuer_name"].iloc[0])
+                if "issuer_name" in grp.columns
+                else iss_norm,
+                "count": len(grp),
+                "par": float(grp["_par"].sum()),
             }
 
     # --- Underwriters from underwriter aggregates (preferred) ---
@@ -186,20 +198,23 @@ def run(root: Path = None, force: bool = False) -> dict:
             if not uw_norm:
                 continue
             uw_stats[uw_norm] = {
-                "name":   str(row.get("underwriter_name") or uw_norm),
-                "count":  int(_safe_float(row.get("deal_count") or 0)),
-                "par":    _safe_float(row.get("total_par_amount") or 0),
+                "name": str(row.get("underwriter_name") or uw_norm),
+                "count": int(_safe_float(row.get("deal_count") or 0)),
+                "par": _safe_float(row.get("total_par_amount") or 0),
             }
     elif not bonds_df.empty and "underwriter_normalized" in bonds_df.columns:
         # Fall back to aggregation from bond rows
-        valid = bonds_df[bonds_df["underwriter_normalized"].notna() &
-                         (bonds_df["underwriter_normalized"] != "")]
+        valid = bonds_df[
+            bonds_df["underwriter_normalized"].notna() & (bonds_df["underwriter_normalized"] != "")
+        ]
         bonds_df["_par"] = pd.to_numeric(bonds_df.get("par_amount"), errors="coerce").fillna(0)
         for uw_norm, grp in valid.groupby("underwriter_normalized"):
             uw_stats[uw_norm] = {
-                "name":   str(grp["underwriter_name"].iloc[0]) if "underwriter_name" in grp.columns else uw_norm,
-                "count":  int(grp["cusip"].nunique()) if "cusip" in grp.columns else len(grp),
-                "par":    float(grp["_par"].sum()),
+                "name": str(grp["underwriter_name"].iloc[0])
+                if "underwriter_name" in grp.columns
+                else uw_norm,
+                "count": int(grp["cusip"].nunique()) if "cusip" in grp.columns else len(grp),
+                "par": float(grp["_par"].sum()),
             }
 
     # --- Dealers from trade data ---
@@ -210,8 +225,10 @@ def run(root: Path = None, force: bool = False) -> dict:
             if not dl_norm:
                 continue
             dealer_stats[dl_norm] = {
-                "name": str(grp["dealer_name"].iloc[0]) if "dealer_name" in grp.columns else dl_norm,
-                "par":  float(grp["_par"].sum()),
+                "name": str(grp["dealer_name"].iloc[0])
+                if "dealer_name" in grp.columns
+                else dl_norm,
+                "par": float(grp["_par"].sum()),
             }
 
     logger.info(
@@ -227,36 +244,36 @@ def run(root: Path = None, force: bool = False) -> dict:
     issuer_awardee_count = 0
 
     for _, ent in entity_df.iterrows():
-        entity_key  = str(ent.get("entity_key") or ent.get("canonical_name") or "")
-        canonical   = str(ent.get("canonical_name") or entity_key)
-        ent_norm    = str(ent.get("_norm") or "")
-        awards_val  = entity_awards.get(ent_norm, 0.0)
+        entity_key = str(ent.get("entity_key") or ent.get("canonical_name") or "")
+        canonical = str(ent.get("canonical_name") or entity_key)
+        ent_norm = str(ent.get("_norm") or "")
+        awards_val = entity_awards.get(ent_norm, 0.0)
 
         # Match entity against issuer / underwriter / dealer norms
         def _match_dict(stats_dict: dict) -> tuple[bool, dict | None]:
             best_score = 0.0
-            best_key   = None
+            best_key = None
             for bond_norm in stats_dict:
                 sc = name_similarity(ent_norm, bond_norm)
                 if sc > best_score:
                     best_score = sc
-                    best_key   = bond_norm
+                    best_key = bond_norm
             if best_score >= MATCH_THRESHOLD and best_key:
                 return True, stats_dict[best_key]
             return False, None
 
-        is_issuer,      iss_data = _match_dict(issuer_stats)
-        is_underwriter, uw_data  = _match_dict(uw_stats)
-        is_dealer,      dl_data  = _match_dict(dealer_stats)
+        is_issuer, iss_data = _match_dict(issuer_stats)
+        is_underwriter, uw_data = _match_dict(uw_stats)
+        is_dealer, dl_data = _match_dict(dealer_stats)
 
-        bonds_issued_count   = iss_data["count"] if iss_data else 0
-        bonds_issued_par     = iss_data["par"]   if iss_data else 0.0
-        uw_count             = uw_data["count"]  if uw_data  else 0
-        uw_par               = uw_data["par"]    if uw_data  else 0.0
-        estimated_uw_fee     = round(uw_par * UW_SPREAD_EST, 2)
-        dealer_vol           = dl_data["par"]    if dl_data  else 0.0
+        bonds_issued_count = iss_data["count"] if iss_data else 0
+        bonds_issued_par = iss_data["par"] if iss_data else 0.0
+        uw_count = uw_data["count"] if uw_data else 0
+        uw_par = uw_data["par"] if uw_data else 0.0
+        estimated_uw_fee = round(uw_par * UW_SPREAD_EST, 2)
+        dealer_vol = dl_data["par"] if dl_data else 0.0
 
-        is_dual_role          = int((is_underwriter or is_dealer) and awards_val > 0)
+        is_dual_role = int((is_underwriter or is_dealer) and awards_val > 0)
         is_issuer_and_awardee = int(is_issuer and awards_val > 0)
 
         if is_dual_role:
@@ -264,23 +281,25 @@ def run(root: Path = None, force: bool = False) -> dict:
         if is_issuer_and_awardee:
             issuer_awardee_count += 1
 
-        rows.append({
-            "entity_key":              entity_key,
-            "canonical_name":          canonical,
-            "bond_issuer_flag":        int(is_issuer),
-            "bonds_issued_count":      bonds_issued_count,
-            "bonds_issued_par":        bonds_issued_par,
-            "bond_underwriter_flag":   int(is_underwriter),
-            "bonds_underwritten_count": uw_count,
-            "bonds_underwritten_par":  uw_par,
-            "estimated_underwriter_fee": estimated_uw_fee,
-            "bond_dealer_flag":        int(is_dealer),
-            "dealer_volume_par":       dealer_vol,
-            "is_dual_role":            is_dual_role,
-            "is_issuer_and_awardee":   is_issuer_and_awardee,
-            "dual_role_awards":        awards_val if is_dual_role else 0.0,
-            "claim_tier":              bond_tier,
-        })
+        rows.append(
+            {
+                "entity_key": entity_key,
+                "canonical_name": canonical,
+                "bond_issuer_flag": int(is_issuer),
+                "bonds_issued_count": bonds_issued_count,
+                "bonds_issued_par": bonds_issued_par,
+                "bond_underwriter_flag": int(is_underwriter),
+                "bonds_underwritten_count": uw_count,
+                "bonds_underwritten_par": uw_par,
+                "estimated_underwriter_fee": estimated_uw_fee,
+                "bond_dealer_flag": int(is_dealer),
+                "dealer_volume_par": dealer_vol,
+                "is_dual_role": is_dual_role,
+                "is_issuer_and_awardee": is_issuer_and_awardee,
+                "dual_role_awards": awards_val if is_dual_role else 0.0,
+                "claim_tier": bond_tier,
+            }
+        )
 
     df_out = pd.DataFrame(rows, columns=BOND_FLOW_COLUMNS)
     df_out = df_out.sort_values(["is_dual_role", "bonds_underwritten_par"], ascending=False)
@@ -304,18 +323,19 @@ def run(root: Path = None, force: bool = False) -> dict:
             )
 
     return {
-        "status":                "OK",
-        "rows":                  n,
-        "dual_role_count":       dual_role_count,
-        "issuer_awardee_count":  issuer_awardee_count,
-        "claim_tier":            bond_tier,
-        "blocked_bond_sources":  blocked_bond_sources,
+        "status": "OK",
+        "rows": n,
+        "dual_role_count": dual_role_count,
+        "issuer_awardee_count": issuer_awardee_count,
+        "claim_tier": bond_tier,
+        "blocked_bond_sources": blocked_bond_sources,
     }
 
 
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(

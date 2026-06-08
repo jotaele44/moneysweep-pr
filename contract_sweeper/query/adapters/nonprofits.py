@@ -8,6 +8,7 @@ Adds an optional ``PROPUBLICA_API_KEY`` header when set, mirroring the
 producer's unauthenticated default with an upgrade path for higher rate
 limits.
 """
+
 from __future__ import annotations
 
 import os
@@ -39,10 +40,12 @@ class NonprofitsIRS990Adapter(SourceAdapter):
         import requests
 
         s = requests.Session()
-        s.headers.update({
-            "Accept": "application/json",
-            "User-Agent": "contract-sweeper-query/1",
-        })
+        s.headers.update(
+            {
+                "Accept": "application/json",
+                "User-Agent": "contract-sweeper-query/1",
+            }
+        )
         api_key = os.environ.get("PROPUBLICA_API_KEY")
         if api_key:
             s.headers["X-API-Key"] = api_key

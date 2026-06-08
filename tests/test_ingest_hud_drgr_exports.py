@@ -6,6 +6,7 @@ returns a clean manual_required status. Also verifies that unrelated files
 under data/raw/ (e.g. Follow the Money, FEC, documents) are filtered out and
 not misclassified as HUD DRGR exports.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -31,9 +32,11 @@ def test_empty_manual_drop_returns_manual_required(tmp_path):
     assert result["drawdown_rows"] == 0
     assert result["appropriation_rows"] == 0
     # expected_outputs should exist as empty parquets so downstream is happy.
-    for name in ("hud_drgr_activities.parquet",
-                 "hud_drgr_drawdowns.parquet",
-                 "hud_drgr_appropriations.parquet"):
+    for name in (
+        "hud_drgr_activities.parquet",
+        "hud_drgr_drawdowns.parquet",
+        "hud_drgr_appropriations.parquet",
+    ):
         assert (root / "data" / "normalized" / name).exists()
 
 

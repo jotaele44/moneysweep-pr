@@ -1,4 +1,5 @@
 """Tests for the R5 validation gates."""
+
 from __future__ import annotations
 
 import csv
@@ -20,7 +21,9 @@ def _build_tmp_repo(tmp_path: Path) -> None:
     for name in ("source_registry.json", "schema_registry.json"):
         shutil.copy(repo_root / "registries" / name, tmp_path / "registries" / name)
     (tmp_path / "scripts").mkdir(parents=True, exist_ok=True)
-    shutil.copy(repo_root / "scripts" / "scan_for_secrets.py", tmp_path / "scripts" / "scan_for_secrets.py")
+    shutil.copy(
+        repo_root / "scripts" / "scan_for_secrets.py", tmp_path / "scripts" / "scan_for_secrets.py"
+    )
     # Copy every producer_script as an empty placeholder so registry validation passes
     reg = json.loads((tmp_path / "registries" / "source_registry.json").read_text())
     for src in reg.get("sources", []):
@@ -117,11 +120,22 @@ def test_high_value_review_gate_passes_when_queue_populated(tmp_path):
     # Write review_queue with both entity_ids present
     _write_csv_simple(rq / "pr2_unresolved_entities.csv", hvu_rows)
     # Also write a minimal entities_resolved so the gate doesn't return early
-    _write_csv_simple(proc / "entities_resolved.csv", [
-        {"entity_id": "A1", "entity_type": "corporate", "parent_uei": "", "parent_name": "", "total_obligation": "2000000"},
-    ])
+    _write_csv_simple(
+        proc / "entities_resolved.csv",
+        [
+            {
+                "entity_id": "A1",
+                "entity_type": "corporate",
+                "parent_uei": "",
+                "parent_name": "",
+                "total_obligation": "2000000",
+            },
+        ],
+    )
     er = vg.gate_entity_resolution(tmp_path)
-    rv_gate = next((r for r in er["records"] if r["gate"] == "high_value_unresolved_review_rate"), None)
+    rv_gate = next(
+        (r for r in er["records"] if r["gate"] == "high_value_unresolved_review_rate"), None
+    )
     assert rv_gate is not None
     assert rv_gate["passed"] is True
     assert rv_gate["observed"] == 1.0
@@ -129,6 +143,7 @@ def test_high_value_review_gate_passes_when_queue_populated(tmp_path):
 
 def _write_csv_simple(path: Path, rows: list[dict]) -> None:
     import csv
+
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
@@ -161,14 +176,21 @@ def test_entity_resolution_gate_passes_low_rate_pr_data(tmp_path):
         {"entity_id": f"E{i:04d}", "entity_type": "government", "parent_uei": "", "parent_name": ""}
         for i in range(995)
     ] + [
-        {"entity_id": f"C{i:04d}", "entity_type": "corporate", "parent_uei": f"PUEI{i}", "parent_name": f"Parent {i}"}
+        {
+            "entity_id": f"C{i:04d}",
+            "entity_type": "corporate",
+            "parent_uei": f"PUEI{i}",
+            "parent_name": f"Parent {i}",
+        }
         for i in range(5)
     ]
     _write_csv_simple(proc / "entities_resolved.csv", rows)
     er = vg.gate_entity_resolution(tmp_path)
     rate_gate = next(r for r in er["records"] if r["gate"] == "entity_resolution_rate")
     # 5/1000 = 0.005 > threshold 0.001 → must pass
-    assert rate_gate["passed"] is True, f"entity_resolution_rate should pass at 0.005 (threshold 0.001); got {rate_gate}"
+    assert rate_gate["passed"] is True, (
+        f"entity_resolution_rate should pass at 0.005 (threshold 0.001); got {rate_gate}"
+    )
 
 
 @pytest.mark.unit
@@ -194,7 +216,9 @@ def test_source_coverage_gate_passes_at_85_percent(tmp_path):
     """12 of 14 required sources materialized (85.7 %) must pass the gate."""
     _build_tmp_repo(tmp_path)
     reg = json.loads((tmp_path / "registries" / "source_registry.json").read_text())
-    required = [s for s in reg.get("sources", []) if s.get("required") and s.get("expected_outputs")]
+    required = [
+        s for s in reg.get("sources", []) if s.get("required") and s.get("expected_outputs")
+    ]
     # Plant real-looking output files for 12 of the required sources
     for src in required[:12]:
         fake = tmp_path / src["expected_outputs"][0]
@@ -216,10 +240,14 @@ def test_execution_chain_linkage_gate_passes_with_seed(tmp_path):
     chain_path = exec_dir / "execution_chain_master.csv"
     rows = [
         {
-            "chain_id": f"chain-{i}", "funding_source": "DHS/FEMA",
-            "prime_name": "PRIME CORP", "sub_name": "SUB LLC",
-            "award_id": f"AWD-{i:04d}", "prime_uei": "TESTPRIME01",
-            "sub_uei": "TESTSUB0001", "obligation_amount": "1000000",
+            "chain_id": f"chain-{i}",
+            "funding_source": "DHS/FEMA",
+            "prime_name": "PRIME CORP",
+            "sub_name": "SUB LLC",
+            "award_id": f"AWD-{i:04d}",
+            "prime_uei": "TESTPRIME01",
+            "sub_uei": "TESTSUB0001",
+            "obligation_amount": "1000000",
         }
         for i in range(3)
     ]
@@ -274,8 +302,16 @@ def test_duplicate_rate_gate_skips_review_queue_and_exports(tmp_path):
     _build_tmp_repo(tmp_path)
     (tmp_path / "data" / "manifests").mkdir(parents=True, exist_ok=True)
     entries = [
-        {"relative_path": "data/review_queue/suspect_entities.csv", "source_system": "unknown", "duplicate_rate": 0.5},
-        {"relative_path": "data/exports/rebuild_status.csv", "source_system": "unknown", "duplicate_rate": 0.3},
+        {
+            "relative_path": "data/review_queue/suspect_entities.csv",
+            "source_system": "unknown",
+            "duplicate_rate": 0.5,
+        },
+        {
+            "relative_path": "data/exports/rebuild_status.csv",
+            "source_system": "unknown",
+            "duplicate_rate": 0.3,
+        },
     ]
     (tmp_path / "data" / "manifests" / "source_manifest.json").write_text(
         json.dumps({"files": entries}), encoding="utf-8"
@@ -292,7 +328,9 @@ def test_manifest_gate_fires_only_for_materialized_sources(tmp_path):
     _build_tmp_repo(tmp_path)
     reg = json.loads((tmp_path / "registries" / "source_registry.json").read_text())
     # Find a required source with at least one expected_output and plant a fake file there
-    required = [s for s in reg.get("sources", []) if s.get("required") and s.get("expected_outputs")]
+    required = [
+        s for s in reg.get("sources", []) if s.get("required") and s.get("expected_outputs")
+    ]
     assert required, "need at least one required source with expected_outputs for this test"
     src = required[0]
     fake_output = tmp_path / src["expected_outputs"][0]

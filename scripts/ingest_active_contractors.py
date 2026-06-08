@@ -29,44 +29,86 @@ import pandas as pd
 from scripts.config import PROJECT_ROOT, setup_logging
 
 CONTRACTOR_COLUMNS = [
-    "entity_name", "entity_normalized",
-    "registration_id", "registration_date", "expiry_date",
-    "contractor_type", "naics_code", "municipality",
-    "status", "source_file",
+    "entity_name",
+    "entity_normalized",
+    "registration_id",
+    "registration_date",
+    "expiry_date",
+    "contractor_type",
+    "naics_code",
+    "municipality",
+    "status",
+    "source_file",
 ]
 
 COL_MAP = {
     "entity_name": [
-        "Nombre", "Name", "Vendor Name", "Contractor Name", "Business Name",
-        "Nombre del Suplidor", "Suplidor", "Empresa", "Company",
-        "nombre", "Razón Social",
+        "Nombre",
+        "Name",
+        "Vendor Name",
+        "Contractor Name",
+        "Business Name",
+        "Nombre del Suplidor",
+        "Suplidor",
+        "Empresa",
+        "Company",
+        "nombre",
+        "Razón Social",
     ],
     "registration_id": [
-        "ID", "Registro", "Registration Number", "Número de Registro",
-        "Vendor ID", "CFSE", "AS", "Registro Único",
+        "ID",
+        "Registro",
+        "Registration Number",
+        "Número de Registro",
+        "Vendor ID",
+        "CFSE",
+        "AS",
+        "Registro Único",
     ],
     "registration_date": [
-        "Fecha de Registro", "Registration Date", "Fecha",
-        "Start Date", "fecha_registro",
+        "Fecha de Registro",
+        "Registration Date",
+        "Fecha",
+        "Start Date",
+        "fecha_registro",
     ],
     "expiry_date": [
-        "Fecha de Expiración", "Expiry Date", "Expiration Date",
-        "End Date", "fecha_expiracion",
+        "Fecha de Expiración",
+        "Expiry Date",
+        "Expiration Date",
+        "End Date",
+        "fecha_expiracion",
     ],
     "contractor_type": [
-        "Tipo", "Type", "Categoría", "Category", "Clasificación",
-        "Contractor Type", "tipo",
+        "Tipo",
+        "Type",
+        "Categoría",
+        "Category",
+        "Clasificación",
+        "Contractor Type",
+        "tipo",
     ],
     "naics_code": [
-        "NAICS", "NAICS Code", "Código NAICS", "Industry Code",
+        "NAICS",
+        "NAICS Code",
+        "Código NAICS",
+        "Industry Code",
         "naics",
     ],
     "municipality": [
-        "Municipio", "Municipality", "Ciudad", "City", "Location",
+        "Municipio",
+        "Municipality",
+        "Ciudad",
+        "City",
+        "Location",
         "municipio",
     ],
     "status": [
-        "Estado", "Status", "Estatus", "Active", "Activo",
+        "Estado",
+        "Status",
+        "Estatus",
+        "Active",
+        "Activo",
         "estado",
     ],
 }
@@ -74,9 +116,19 @@ COL_MAP = {
 _STRIP_RE = re.compile(r"[^\w\s]")
 _SPACE_RE = re.compile(r"\s+")
 _NAME_SUFFIXES = {
-    "INC", "LLC", "CORP", "LTD", "CO", "LP", "LLP",
-    "COMPANY", "CORPORATION", "INCORPORATED", "LIMITED",
-    "CSP", "SE",
+    "INC",
+    "LLC",
+    "CORP",
+    "LTD",
+    "CO",
+    "LP",
+    "LLP",
+    "COMPANY",
+    "CORPORATION",
+    "INCORPORATED",
+    "LIMITED",
+    "CSP",
+    "SE",
 }
 
 
@@ -120,7 +172,9 @@ def _read_file(path, logger):
         elif suffix == ".csv":
             for enc in ("utf-8", "latin-1", "utf-8-sig"):
                 try:
-                    df = pd.read_csv(path, dtype=str, na_filter=False, encoding=enc, low_memory=False)
+                    df = pd.read_csv(
+                        path, dtype=str, na_filter=False, encoding=enc, low_memory=False
+                    )
                     logger.info(f"  Read {len(df):,} rows from {path.name}")
                     return df
                 except UnicodeDecodeError:
@@ -159,8 +213,11 @@ def _find_files(raw_dir, logger):
     if not folder.exists():
         logger.warning(f"  Active Contractor Listing folder not found: {folder}")
         return []
-    files = [f for f in sorted(folder.iterdir())
-             if f.suffix.lower() in (".csv", ".xlsx", ".xls") and not f.name.startswith("~")]
+    files = [
+        f
+        for f in sorted(folder.iterdir())
+        if f.suffix.lower() in (".csv", ".xlsx", ".xls") and not f.name.startswith("~")
+    ]
     logger.info(f"  Found {len(files)} Active Contractor file(s) in {folder}")
     return files
 
@@ -171,6 +228,7 @@ def parse_records(df: "pd.DataFrame", source_file: str = "fixture") -> "pd.DataF
     data/raw/Active Contractor Listing/ (see manual_drop_dir in source registry).
     """
     import logging
+
     return _parse_df(df, source_file, logging.getLogger("ingest_active_contractors"))
 
 
@@ -202,7 +260,9 @@ def _run(root=None, force=False):
 
     files = _find_files(raw_dir, logger)
     if not files:
-        logger.warning("  No Active Contractor files found. Place files in 'data/raw/Active Contractor Listing/'")
+        logger.warning(
+            "  No Active Contractor files found. Place files in 'data/raw/Active Contractor Listing/'"
+        )
         out_path.parent.mkdir(parents=True, exist_ok=True)
         pd.DataFrame(columns=CONTRACTOR_COLUMNS).to_csv(out_path, index=False, encoding="utf-8")
         return {"rows": 0, "path": str(out_path), "errors": ["No Active Contractor files found"]}

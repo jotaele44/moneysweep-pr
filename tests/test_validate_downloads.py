@@ -53,8 +53,7 @@ class TestValidateFile:
     def test_missing_columns_warns(self, tmp_path, logger):
         p = tmp_path / "partial.csv"
         p.write_text(
-            "random_col_a,random_col_b\n"
-            + ("x,y\n" * 60),
+            "random_col_a,random_col_b\n" + ("x,y\n" * 60),
             encoding="utf-8",
         )
         result = validate_file(p, logger)

@@ -1,4 +1,5 @@
 """Tests for the row-level contract-finance geo reasoning producer."""
+
 from __future__ import annotations
 
 import csv
@@ -26,6 +27,7 @@ MUNI_REF = REPO_ROOT / "data" / "reference" / "pr_municipalities.csv"
 # --------------------------------------------------------------------------- #
 # Crosswalk (Task 4)                                                           #
 # --------------------------------------------------------------------------- #
+
 
 @pytest.mark.unit
 def test_crosswalk_has_78_rows_with_unique_codes():
@@ -70,6 +72,7 @@ def test_crosswalk_collapses_accent_ascii_aliases(tmp_path, accented, ascii_form
 # Per-row classification (Task 3)                                             #
 # --------------------------------------------------------------------------- #
 
+
 @pytest.fixture(scope="module")
 def crosswalk(tmp_path_factory):
     path = tmp_path_factory.mktemp("ref") / "cw.csv"
@@ -83,7 +86,9 @@ def _classify(crosswalk, **geo):
 
 @pytest.mark.unit
 def test_place_of_performance_exact(crosswalk):
-    r = _classify(crosswalk, raw_code="72127", raw_name="San Juan", attribution_source="place_of_performance")
+    r = _classify(
+        crosswalk, raw_code="72127", raw_name="San Juan", attribution_source="place_of_performance"
+    )
     assert r["geo_resolution_reason"] == "place_of_performance_exact"
     assert r["jurisdiction_class"] == "PR_MUNICIPIO"
     assert r["municipality_code_canonical"] == "72127"
@@ -192,6 +197,7 @@ def test_all_reasons_and_classes_are_in_vocabulary(crosswalk):
 # End-to-end pipeline (Tasks 5-9)                                             #
 # --------------------------------------------------------------------------- #
 
+
 def _write_master(path: Path, header: list[str], rows: list[dict]):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as f:
@@ -205,45 +211,98 @@ def _write_master(path: Path, header: list[str], rows: list[dict]):
 def synthetic_inputs(tmp_path):
     processed = tmp_path / "processed"
     contracts_header = [
-        "award_id", "recipient_name", "normalized_name", "awarding_agency",
-        "obligation_amount", "award_date", "fiscal_year", "municipality",
-        "geo_municipality_code", "geo_municipality_name", "geo_county_fips",
-        "geo_attribution_source", "geo_attribution_confidence", "source_system",
+        "award_id",
+        "recipient_name",
+        "normalized_name",
+        "awarding_agency",
+        "obligation_amount",
+        "award_date",
+        "fiscal_year",
+        "municipality",
+        "geo_municipality_code",
+        "geo_municipality_name",
+        "geo_county_fips",
+        "geo_attribution_source",
+        "geo_attribution_confidence",
+        "source_system",
     ]
     contracts = [
         # Clean PR place-of-performance.
-        dict(award_id="A1", recipient_name="Acme", awarding_agency="FEMA",
-             obligation_amount="1000000", award_date="2023-01-01", fiscal_year="2023",
-             geo_municipality_code="72127", geo_municipality_name="San Juan",
-             geo_attribution_source="place_of_performance", geo_attribution_confidence="0.97",
-             source_system="usaspending"),
+        dict(
+            award_id="A1",
+            recipient_name="Acme",
+            awarding_agency="FEMA",
+            obligation_amount="1000000",
+            award_date="2023-01-01",
+            fiscal_year="2023",
+            geo_municipality_code="72127",
+            geo_municipality_name="San Juan",
+            geo_attribution_source="place_of_performance",
+            geo_attribution_confidence="0.97",
+            source_system="usaspending",
+        ),
         # San Juan HQ bias row.
-        dict(award_id="A2", recipient_name="Beta", awarding_agency="FEMA",
-             obligation_amount="200000", award_date="2023-02-01", fiscal_year="2023",
-             geo_municipality_code="72127", geo_municipality_name="San Juan",
-             geo_attribution_source="headquarters", geo_attribution_confidence="0.5",
-             source_system="usaspending"),
+        dict(
+            award_id="A2",
+            recipient_name="Beta",
+            awarding_agency="FEMA",
+            obligation_amount="200000",
+            award_date="2023-02-01",
+            fiscal_year="2023",
+            geo_municipality_code="72127",
+            geo_municipality_name="San Juan",
+            geo_attribution_source="headquarters",
+            geo_attribution_confidence="0.5",
+            source_system="usaspending",
+        ),
         # Missing location.
-        dict(award_id="A3", recipient_name="Gamma", awarding_agency="DoD",
-             obligation_amount="50000", award_date="2023-03-01", fiscal_year="2023",
-             source_system="fpds"),
+        dict(
+            award_id="A3",
+            recipient_name="Gamma",
+            awarding_agency="DoD",
+            obligation_amount="50000",
+            award_date="2023-03-01",
+            fiscal_year="2023",
+            source_system="fpds",
+        ),
         # False PR municipio code.
-        dict(award_id="A4", recipient_name="Delta", awarding_agency="DoD",
-             obligation_amount="25000", award_date="2023-04-01", fiscal_year="2023",
-             geo_municipality_code="72999", source_system="fpds"),
+        dict(
+            award_id="A4",
+            recipient_name="Delta",
+            awarding_agency="DoD",
+            obligation_amount="25000",
+            award_date="2023-04-01",
+            fiscal_year="2023",
+            geo_municipality_code="72999",
+            source_system="fpds",
+        ),
     ]
     _write_master(processed / "contracts_master.csv", contracts_header, contracts)
 
     flows_header = [
-        "flow_id", "funding_source", "recipient_entity_id", "amount", "flow_date",
-        "municipality", "geo_municipality_code", "geo_municipality_name",
-        "geo_attribution_confidence", "source_system",
+        "flow_id",
+        "funding_source",
+        "recipient_entity_id",
+        "amount",
+        "flow_date",
+        "municipality",
+        "geo_municipality_code",
+        "geo_municipality_name",
+        "geo_attribution_confidence",
+        "source_system",
     ]
     flows = [
-        dict(flow_id="F1", funding_source="FEMA", recipient_entity_id="Acme",
-             amount="300000", flow_date="2023-05-01", geo_municipality_code="72097",
-             geo_municipality_name="Mayaguez", geo_attribution_confidence="0.9",
-             source_system="usaspending"),
+        dict(
+            flow_id="F1",
+            funding_source="FEMA",
+            recipient_entity_id="Acme",
+            amount="300000",
+            flow_date="2023-05-01",
+            geo_municipality_code="72097",
+            geo_municipality_name="Mayaguez",
+            geo_attribution_confidence="0.9",
+            source_system="usaspending",
+        ),
     ]
     _write_master(processed / "financial_flows_master.csv", flows_header, flows)
     return processed
@@ -278,7 +337,12 @@ def test_pipeline_produces_all_outputs(tmp_path, synthetic_inputs):
 @pytest.mark.integration
 def test_density_has_required_columns(tmp_path, synthetic_inputs):
     out = tmp_path / "out"
-    run(processed_dir=synthetic_inputs, output_dir=out, crosswalk_path=tmp_path / "cw.csv", build_crosswalk=True)
+    run(
+        processed_dir=synthetic_inputs,
+        output_dir=out,
+        crosswalk_path=tmp_path / "cw.csv",
+        build_crosswalk=True,
+    )
     with (out / "municipality_funding_density.csv").open() as f:
         header = next(csv.reader(f))
     assert header == DENSITY_COLUMNS
@@ -287,7 +351,12 @@ def test_density_has_required_columns(tmp_path, synthetic_inputs):
 @pytest.mark.integration
 def test_unknown_decomposition_classifies_rows(tmp_path, synthetic_inputs):
     out = tmp_path / "out"
-    run(processed_dir=synthetic_inputs, output_dir=out, crosswalk_path=tmp_path / "cw.csv", build_crosswalk=True)
+    run(
+        processed_dir=synthetic_inputs,
+        output_dir=out,
+        crosswalk_path=tmp_path / "cw.csv",
+        build_crosswalk=True,
+    )
     summary = json.loads((out / "unknown_decomposition_summary.json").read_text())
     by_reason = summary["by_reason"]
     assert "missing_location" in by_reason
@@ -298,7 +367,12 @@ def test_unknown_decomposition_classifies_rows(tmp_path, synthetic_inputs):
 @pytest.mark.integration
 def test_san_juan_bias_flags_hq_row(tmp_path, synthetic_inputs):
     out = tmp_path / "out"
-    run(processed_dir=synthetic_inputs, output_dir=out, crosswalk_path=tmp_path / "cw.csv", build_crosswalk=True)
+    run(
+        processed_dir=synthetic_inputs,
+        output_dir=out,
+        crosswalk_path=tmp_path / "cw.csv",
+        build_crosswalk=True,
+    )
     summary = json.loads((out / "san_juan_hq_bias_summary.json").read_text())
     assert summary["biased_record_count"] == 1  # the A2 headquarters row
     rows = list(csv.DictReader((out / "san_juan_hq_bias_report.csv").open()))
@@ -310,7 +384,12 @@ def test_graphml_edges_carry_metadata(tmp_path, synthetic_inputs):
     import networkx as nx
 
     out = tmp_path / "out"
-    run(processed_dir=synthetic_inputs, output_dir=out, crosswalk_path=tmp_path / "cw.csv", build_crosswalk=True)
+    run(
+        processed_dir=synthetic_inputs,
+        output_dir=out,
+        crosswalk_path=tmp_path / "cw.csv",
+        build_crosswalk=True,
+    )
     g = nx.read_graphml(out / "entity_graph.graphml")
     assert g.number_of_edges() > 0
     for _, _, data in g.edges(data=True):
@@ -340,7 +419,12 @@ def test_readiness_gate_fails_on_false_pr_code(tmp_path, synthetic_inputs, monke
         return enriched
 
     monkeypatch.setattr(mod, "classify_rows", poisoned)
-    run(processed_dir=synthetic_inputs, output_dir=out, crosswalk_path=tmp_path / "cw.csv", build_crosswalk=True)
+    run(
+        processed_dir=synthetic_inputs,
+        output_dir=out,
+        crosswalk_path=tmp_path / "cw.csv",
+        build_crosswalk=True,
+    )
     readiness = json.loads((out / "spiderweb_engine_readiness_reassessment.json").read_text())
     assert readiness["passed"] is False
     false_pr = next(c for c in readiness["checks"] if c["check"] == "no_false_pr_municipio_code")
@@ -350,7 +434,12 @@ def test_readiness_gate_fails_on_false_pr_code(tmp_path, synthetic_inputs, monke
 @pytest.mark.integration
 def test_readiness_gate_passes_on_clean_inputs(tmp_path, synthetic_inputs):
     out = tmp_path / "out"
-    run(processed_dir=synthetic_inputs, output_dir=out, crosswalk_path=tmp_path / "cw.csv", build_crosswalk=True)
+    run(
+        processed_dir=synthetic_inputs,
+        output_dir=out,
+        crosswalk_path=tmp_path / "cw.csv",
+        build_crosswalk=True,
+    )
     readiness = json.loads((out / "spiderweb_engine_readiness_reassessment.json").read_text())
     recon = next(c for c in readiness["checks"] if c["check"] == "totals_reconciled")
     assert recon["passed"] is True

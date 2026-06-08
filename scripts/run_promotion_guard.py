@@ -18,7 +18,9 @@ from contract_sweeper.validation.promotion_guard import run_guard
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Guard master promotion against non-validated builds")
+    parser = argparse.ArgumentParser(
+        description="Guard master promotion against non-validated builds"
+    )
     parser.add_argument("--root", default=".", help="Project root directory")
     parser.add_argument("--json", action="store_true", help="Emit the full result as JSON")
     args = parser.parse_args()

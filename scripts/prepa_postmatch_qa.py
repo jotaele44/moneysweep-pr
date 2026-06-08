@@ -20,17 +20,77 @@ from pathlib import Path
 from typing import Any
 
 ADDRESS_TERMS = {
-    "ATTN", "ATTENTION", "ADDRESS", "FILE", "ST", "STREET", "AVE", "AVENUE", "ROAD", "RD",
-    "CARR", "CARRETERA", "SUITE", "STE", "OFICINA", "OFFICE", "PLAZA", "BLDG", "BUILDING",
-    "CHICAGO", "RALEIGH", "IL", "NC", "PR", "ZIP", "PO", "BOX", "C", "O", "RE", "RES", "TO",
-    "PAYSHPERE", "PAYSPHERE", "CIRCLE", "CENTRO", "INTERNACIONAL", "MUNDO", "BORI", "URB",
-    "ALTURAS", "PENUELAS", "SCOTIABANK", "ROOSEVELT", "ELEONOR"
+    "ATTN",
+    "ATTENTION",
+    "ADDRESS",
+    "FILE",
+    "ST",
+    "STREET",
+    "AVE",
+    "AVENUE",
+    "ROAD",
+    "RD",
+    "CARR",
+    "CARRETERA",
+    "SUITE",
+    "STE",
+    "OFICINA",
+    "OFFICE",
+    "PLAZA",
+    "BLDG",
+    "BUILDING",
+    "CHICAGO",
+    "RALEIGH",
+    "IL",
+    "NC",
+    "PR",
+    "ZIP",
+    "PO",
+    "BOX",
+    "C",
+    "O",
+    "RE",
+    "RES",
+    "TO",
+    "PAYSHPERE",
+    "PAYSPHERE",
+    "CIRCLE",
+    "CENTRO",
+    "INTERNACIONAL",
+    "MUNDO",
+    "BORI",
+    "URB",
+    "ALTURAS",
+    "PENUELAS",
+    "SCOTIABANK",
+    "ROOSEVELT",
+    "ELEONOR",
 }
 
 GENERIC_TERMS = {
-    "GENERAL", "SERVICES", "SERVICE", "CONTRACTOR", "CONTRACTORS", "CONSTRUCTION", "SUPPLIES",
-    "PUERTO", "RICO", "CARIBE", "INC", "LLC", "LP", "LLP", "PSC", "CORP", "COMPANY", "CO",
-    "BLACK", "CAL", "CHECK", "MOTRIZ", "MACHINERY"
+    "GENERAL",
+    "SERVICES",
+    "SERVICE",
+    "CONTRACTOR",
+    "CONTRACTORS",
+    "CONSTRUCTION",
+    "SUPPLIES",
+    "PUERTO",
+    "RICO",
+    "CARIBE",
+    "INC",
+    "LLC",
+    "LP",
+    "LLP",
+    "PSC",
+    "CORP",
+    "COMPANY",
+    "CO",
+    "BLACK",
+    "CAL",
+    "CHECK",
+    "MOTRIZ",
+    "MACHINERY",
 }
 
 PUBLIC_AUTHORITY_TERMS = {
@@ -60,9 +120,11 @@ CANONICAL_PATTERNS = [
     ("FISCAL AGENCY AND FINANCIAL ADVISORY AUTHORITY", "AAFAF"),
 ]
 
+
 def norm(value: str) -> str:
     value = re.sub(r"[^A-Za-z0-9 &]+", " ", str(value).upper())
     return re.sub(r"\s+", " ", value).strip()
+
 
 def strip_metadata(name: str) -> str:
     toks = norm(name).split()
@@ -75,6 +137,7 @@ def strip_metadata(name: str) -> str:
         kept = [t for t in toks[:5] if not t.isdigit()]
     return " ".join(kept).strip()
 
+
 def canonical_name(name: str) -> str:
     cleaned = strip_metadata(name)
     compact = cleaned.replace("&", "AND")
@@ -83,11 +146,13 @@ def canonical_name(name: str) -> str:
             return canon
     return cleaned
 
+
 def generic_ratio(name: str) -> float:
     toks = norm(name).split()
     if not toks:
         return 1.0
     return sum(1 for t in toks if t in GENERIC_TERMS or t in ADDRESS_TERMS) / len(toks)
+
 
 def classify_status(row: dict[str, str], canon: str, cleaned: str) -> tuple[str, str]:
     raw = norm(row.get("normalized_name") or row.get("entity_name") or "")
@@ -115,9 +180,11 @@ def classify_status(row: dict[str, str], canon: str, cleaned: str) -> tuple[str,
         return "validated", "multi_dataset_or_high_temporal_support"
     return "review", "needs_corrob_or_alias_resolution"
 
+
 def read_csv(path: Path) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8-sig", newline="") as f:
         return list(csv.DictReader(f))
+
 
 def write_csv(path: Path, rows: list[dict[str, Any]], fields: list[str]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -125,6 +192,7 @@ def write_csv(path: Path, rows: list[dict[str, Any]], fields: list[str]) -> None
         w = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
         w.writeheader()
         w.writerows(rows)
+
 
 def main() -> int:
     ap = argparse.ArgumentParser()
@@ -152,13 +220,21 @@ def main() -> int:
     suppressed_rows = []
 
     for canon, items in grouped.items():
+
         def num(row: dict[str, str], key: str) -> float:
             try:
                 return float(row.get(key, 0) or 0)
             except ValueError:
                 return 0.0
 
-        best = max(items, key=lambda r: (num(r, "continuity_score"), num(r, "temporal_edges"), num(r, "match_count")))
+        best = max(
+            items,
+            key=lambda r: (
+                num(r, "continuity_score"),
+                num(r, "temporal_edges"),
+                num(r, "match_count"),
+            ),
+        )
         total_edges = sum(num(r, "temporal_edges") for r in items)
         max_score = max(num(r, "continuity_score") for r in items)
         datasets = set()
@@ -187,10 +263,22 @@ def main() -> int:
             suppressed_rows.extend(items)
 
     args.outdir.mkdir(parents=True, exist_ok=True)
-    fields = sorted(set().union(*(r.keys() for r in canonical_rows + review_rows + suppressed_rows))) if rows else []
-    write_csv(args.outdir / "prepa_top100_validated.csv", sorted(canonical_rows, key=lambda r: float(r.get("continuity_score", 0) or 0), reverse=True)[:100], fields)
+    fields = (
+        sorted(set().union(*(r.keys() for r in canonical_rows + review_rows + suppressed_rows)))
+        if rows
+        else []
+    )
+    write_csv(
+        args.outdir / "prepa_top100_validated.csv",
+        sorted(
+            canonical_rows, key=lambda r: float(r.get("continuity_score", 0) or 0), reverse=True
+        )[:100],
+        fields,
+    )
     write_csv(args.outdir / "prepa_review_queue.csv", review_rows, fields)
-    write_csv(args.outdir / "prepa_suppressed_false_positive_candidates.csv", suppressed_rows, fields)
+    write_csv(
+        args.outdir / "prepa_suppressed_false_positive_candidates.csv", suppressed_rows, fields
+    )
 
     summary = {
         "input_rows": len(rows),
@@ -200,12 +288,15 @@ def main() -> int:
         "outputs": {
             "validated": str(args.outdir / "prepa_top100_validated.csv"),
             "review": str(args.outdir / "prepa_review_queue.csv"),
-            "suppressed": str(args.outdir / "prepa_suppressed_false_positive_candidates.csv")
-        }
+            "suppressed": str(args.outdir / "prepa_suppressed_false_positive_candidates.csv"),
+        },
     }
-    (args.outdir / "prepa_postmatch_qa_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    (args.outdir / "prepa_postmatch_qa_summary.json").write_text(
+        json.dumps(summary, indent=2), encoding="utf-8"
+    )
     print(json.dumps(summary, indent=2))
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())

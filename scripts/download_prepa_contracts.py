@@ -32,11 +32,17 @@ import requests
 from scripts.config import PROJECT_ROOT, setup_logging
 
 PREPA_COLUMNS = [
-    "contract_id", "vendor_name", "vendor_normalized",
-    "contract_type",        # "O&M", "Generation", "Construction", "Consulting", "Fuel"
-    "contract_value",       # total contract value in USD
-    "start_date", "end_date", "status",
-    "description", "source_doc", "source_url",
+    "contract_id",
+    "vendor_name",
+    "vendor_normalized",
+    "contract_type",  # "O&M", "Generation", "Construction", "Consulting", "Fuel"
+    "contract_value",  # total contract value in USD
+    "start_date",
+    "end_date",
+    "status",
+    "description",
+    "source_doc",
+    "source_url",
 ]
 
 # Known major PREPA contracts (curated from public records, FOMB filings, P3 disclosures)
@@ -170,10 +176,12 @@ def parse_records(records: list[dict]) -> pd.DataFrame:
 
 def _session():
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0)",
-        "Accept": "text/html,application/json,*/*",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0)",
+            "Accept": "text/html,application/json,*/*",
+        }
+    )
     return s
 
 
@@ -187,10 +195,7 @@ def _try_p3_authority(session, logger):
             # Look for JSON data embedded in page or table data
             text = resp.text
             # Search for project entries
-            project_names = re.findall(
-                r'<h[23][^>]*>([^<]{10,80})</h[23]>',
-                text
-            )
+            project_names = re.findall(r"<h[23][^>]*>([^<]{10,80})</h[23]>", text)
             if project_names:
                 logger.info(f"  Found {len(project_names)} project headings on P3 page")
                 return project_names
@@ -208,7 +213,9 @@ def _try_fomb_prepa(session, logger):
         if resp.status_code == 200:
             # Look for PDF/Excel links referencing contracts
             text = resp.text
-            doc_links = re.findall(r'href=["\']([^"\']*(?:contract|agreement|luma|genera)[^"\']*)["\']', text, re.I)
+            doc_links = re.findall(
+                r'href=["\']([^"\']*(?:contract|agreement|luma|genera)[^"\']*)["\']', text, re.I
+            )
             if doc_links:
                 logger.info(f"  Found {len(doc_links)} contract-related document links")
                 return doc_links[:5]  # Return top 5

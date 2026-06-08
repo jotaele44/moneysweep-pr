@@ -59,36 +59,63 @@ MASTER_COLUMNS = [
 ]
 
 KNOWN_RESEARCH_DATA = [
-    {"award_id": "NIH-UPR-2023-001",
-     "recipient_name": "University of Puerto Rico Medical Sciences",
-     "recipient_uei": "", "awarding_agency": "National Institutes of Health",
-     "awarding_sub_agency": "NIMHD", "obligated_amount": "2800000",
-     "award_date": "2023-04-01", "fiscal_year": "2023", "pop_state": "PR",
-     "pop_county": "San Juan", "description": "Puerto Rico RCMI Program NIH",
-     "pi_name": "Rodriguez-Orengo, Jose F",
-     "source_file": "research_known_seed", "source_dataset": "nih", "award_category": "04"},
-    {"award_id": "NIH-PONCE-2023-001",
-     "recipient_name": "Ponce Health Sciences University",
-     "recipient_uei": "", "awarding_agency": "National Institutes of Health",
-     "awarding_sub_agency": "NIMHD", "obligated_amount": "4100000",
-     "award_date": "2023-09-01", "fiscal_year": "2023", "pop_state": "PR",
-     "pop_county": "Ponce", "description": "Hispanic Center of Excellence NIH",
-     "pi_name": "Velez, Rafael",
-     "source_file": "research_known_seed", "source_dataset": "nih", "award_category": "04"},
-    {"award_id": "NSF-UPR-2022-001",
-     "recipient_name": "University of Puerto Rico Mayaguez",
-     "recipient_uei": "", "awarding_agency": "National Science Foundation",
-     "awarding_sub_agency": "Division of Engineering Education",
-     "obligated_amount": "1200000", "award_date": "2022-08-15", "fiscal_year": "2022",
-     "pop_state": "PR", "pop_county": "Mayaguez",
-     "description": "UPRM STEM education grants NSF",
-     "pi_name": "Garcia, Carlos",
-     "source_file": "research_known_seed", "source_dataset": "nsf", "award_category": "04"},
+    {
+        "award_id": "NIH-UPR-2023-001",
+        "recipient_name": "University of Puerto Rico Medical Sciences",
+        "recipient_uei": "",
+        "awarding_agency": "National Institutes of Health",
+        "awarding_sub_agency": "NIMHD",
+        "obligated_amount": "2800000",
+        "award_date": "2023-04-01",
+        "fiscal_year": "2023",
+        "pop_state": "PR",
+        "pop_county": "San Juan",
+        "description": "Puerto Rico RCMI Program NIH",
+        "pi_name": "Rodriguez-Orengo, Jose F",
+        "source_file": "research_known_seed",
+        "source_dataset": "nih",
+        "award_category": "04",
+    },
+    {
+        "award_id": "NIH-PONCE-2023-001",
+        "recipient_name": "Ponce Health Sciences University",
+        "recipient_uei": "",
+        "awarding_agency": "National Institutes of Health",
+        "awarding_sub_agency": "NIMHD",
+        "obligated_amount": "4100000",
+        "award_date": "2023-09-01",
+        "fiscal_year": "2023",
+        "pop_state": "PR",
+        "pop_county": "Ponce",
+        "description": "Hispanic Center of Excellence NIH",
+        "pi_name": "Velez, Rafael",
+        "source_file": "research_known_seed",
+        "source_dataset": "nih",
+        "award_category": "04",
+    },
+    {
+        "award_id": "NSF-UPR-2022-001",
+        "recipient_name": "University of Puerto Rico Mayaguez",
+        "recipient_uei": "",
+        "awarding_agency": "National Science Foundation",
+        "awarding_sub_agency": "Division of Engineering Education",
+        "obligated_amount": "1200000",
+        "award_date": "2022-08-15",
+        "fiscal_year": "2022",
+        "pop_state": "PR",
+        "pop_county": "Mayaguez",
+        "description": "UPRM STEM education grants NSF",
+        "pi_name": "Garcia, Carlos",
+        "source_file": "research_known_seed",
+        "source_dataset": "nsf",
+        "award_category": "04",
+    },
 ]
 
 # ---------------------------------------------------------------------------
 # Path helpers
 # ---------------------------------------------------------------------------
+
 
 def _raw_research_dir(root: Path) -> Path:
     """Return data/staging/raw/research/, creating it if needed."""
@@ -107,6 +134,7 @@ def _processed_dir(root: Path) -> Path:
 # ---------------------------------------------------------------------------
 # Date helpers
 # ---------------------------------------------------------------------------
+
 
 def _strip_date(value) -> str:
     """
@@ -153,6 +181,7 @@ def _safe_float(value, default: float = 0.0) -> float:
 # ---------------------------------------------------------------------------
 # NIH RePORTER downloader
 # ---------------------------------------------------------------------------
+
 
 def download_nih(root: Path, force: bool, logger) -> pd.DataFrame:
     """
@@ -299,6 +328,7 @@ def download_nih(root: Path, force: bool, logger) -> pd.DataFrame:
 # NSF Awards downloader
 # ---------------------------------------------------------------------------
 
+
 def download_nsf(root: Path, force: bool, logger) -> pd.DataFrame:
     """
     Download all NSF Awards for Puerto Rico institutions (stateCode=PR, 2000-2025).
@@ -434,6 +464,7 @@ def download_nsf(root: Path, force: bool, logger) -> pd.DataFrame:
 # Combine + deduplicate
 # ---------------------------------------------------------------------------
 
+
 def build_master(nih_df: pd.DataFrame, nsf_df: pd.DataFrame, root: Path, logger) -> pd.DataFrame:
     """
     Combine NIH and NSF DataFrames into a deduplicated master CSV.
@@ -476,6 +507,7 @@ def build_master(nih_df: pd.DataFrame, nsf_df: pd.DataFrame, root: Path, logger)
 # ---------------------------------------------------------------------------
 # Main entry points
 # ---------------------------------------------------------------------------
+
 
 def run(root: Path = None) -> dict:
     """

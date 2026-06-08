@@ -3,6 +3,7 @@
 The live fetch needs egress (P3 Authority portal + AAFAF P3 page). These tests
 cover only the pure parse_records() transform, so they run fully offline.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -19,20 +20,22 @@ def test_empty_records_returns_empty_df():
 
 @pytest.mark.unit
 def test_canonical_keys_pass_through():
-    records = [{
-        "project_id": "P3-001",
-        "project_name": "Luis Muñoz Marín Airport",
-        "sector": "transport",
-        "concessionaire_name": "Aerostar Airport Holdings LLC",
-        "concessionaire_normalized": "",
-        "contract_value": "2400000000",
-        "term_years": "40",
-        "award_date": "2013-02-27",
-        "financial_close_date": "2013-02-27",
-        "federal_funding_flag": "Y",
-        "status": "active",
-        "source_doc": "known_p3_seed",
-    }]
+    records = [
+        {
+            "project_id": "P3-001",
+            "project_name": "Luis Muñoz Marín Airport",
+            "sector": "transport",
+            "concessionaire_name": "Aerostar Airport Holdings LLC",
+            "concessionaire_normalized": "",
+            "contract_value": "2400000000",
+            "term_years": "40",
+            "award_date": "2013-02-27",
+            "financial_close_date": "2013-02-27",
+            "federal_funding_flag": "Y",
+            "status": "active",
+            "source_doc": "known_p3_seed",
+        }
+    ]
     df = parse_records(records)
     assert len(df) == 1
     assert list(df.columns) == P3_COLUMNS

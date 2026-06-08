@@ -26,6 +26,7 @@ Usage:
   python3 scripts/generate_report.py --force
   python3 scripts/generate_report.py --top 25
 """
+
 from __future__ import annotations
 
 import argparse
@@ -58,6 +59,7 @@ CURRENCY_THRESHOLD = 1_000_000  # only show entities with >$1M in awards
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _load(path: Path, label: str, logger) -> pd.DataFrame:
     if not path.exists():
         logger.info(f"  {label}: not found — section will show pending status")
@@ -80,11 +82,11 @@ def _fmt_usd(v) -> str:
     except (TypeError, ValueError):
         return "N/A"
     if v >= 1e9:
-        return f"${v/1e9:.2f}B"
+        return f"${v / 1e9:.2f}B"
     if v >= 1e6:
-        return f"${v/1e6:.1f}M"
+        return f"${v / 1e6:.1f}M"
     if v >= 1e3:
-        return f"${v/1e3:.0f}K"
+        return f"${v / 1e3:.0f}K"
     return f"${v:,.0f}"
 
 
@@ -94,8 +96,8 @@ def _pending(label: str) -> str:
 
 _TIER_PREFIX = {
     "observed": "_Claim tier: **observed** — record shows; sources fully materialized._",
-    "linked":   "_Claim tier: **linked** — matched to; sources partially materialized._",
-    "blocked":  "_Claim tier: **blocked / unvalidated** — not validated; required sources not materialized._",
+    "linked": "_Claim tier: **linked** — matched to; sources partially materialized._",
+    "blocked": "_Claim tier: **blocked / unvalidated** — not validated; required sources not materialized._",
 }
 
 
@@ -119,6 +121,7 @@ def _tier_marker(
 # ---------------------------------------------------------------------------
 # Section builders
 # ---------------------------------------------------------------------------
+
 
 def _section_awards(entity_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
     if entity_df.empty:
@@ -145,11 +148,11 @@ def _section_awards(entity_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
         datasets = str(row.get("source_datasets") or "")
         n_ds = len([d for d in datasets.split("|") if d])
         lines.append(
-            f"| {i} | {str(row.get('canonical_name',''))[:55]} "
+            f"| {i} | {str(row.get('canonical_name', ''))[:55]} "
             f"| {_fmt_usd(row['_obl'])} "
             f"| {int(row['_cnt']):,} "
             f"| {n_ds} "
-            f"| {row.get('fiscal_year_range','?')} |"
+            f"| {row.get('fiscal_year_range', '?')} |"
         )
 
     summary = {
@@ -157,7 +160,7 @@ def _section_awards(entity_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
         "unique_entities": n_entities,
         "top10_share": round(float(top10_share), 4),
         "top_entities": [
-            {"name": str(r.get("canonical_name","")), "obligated": float(r["_obl"])}
+            {"name": str(r.get("canonical_name", "")), "obligated": float(r["_obl"])}
             for _, r in top.head(10).iterrows()
         ],
     }
@@ -175,11 +178,15 @@ def _section_power_network(net_df: pd.DataFrame, top_n: int) -> tuple[str, dict]
 
     top = net_df.nlargest(top_n, "_score")
     full_loop = net_df[
-        (_num(net_df, "fec_total_contributions") > 0) &
-        (_num(net_df, "lda_lobbying_total") > 0) &
-        (net_df["_awards"] > 0)
+        (_num(net_df, "fec_total_contributions") > 0)
+        & (_num(net_df, "lda_lobbying_total") > 0)
+        & (net_df["_awards"] > 0)
     ]
-    bond_actors = net_df[_num(net_df, "bond_total_par") > 0] if "bond_total_par" in net_df.columns else pd.DataFrame()
+    bond_actors = (
+        net_df[_num(net_df, "bond_total_par") > 0]
+        if "bond_total_par" in net_df.columns
+        else pd.DataFrame()
+    )
 
     lines = [
         f"**Entities ranked:** {len(net_df):,}  ",
@@ -202,8 +209,8 @@ def _section_power_network(net_df: pd.DataFrame, top_n: int) -> tuple[str, dict]
             sources.append("Bond")
         bond_par = _fmt_usd(row.get("bond_total_par") or 0)
         lines.append(
-            f"| {int(row.get('rank',0))} "
-            f"| {str(row.get('canonical_name',''))[:52]} "
+            f"| {int(row.get('rank', 0))} "
+            f"| {str(row.get('canonical_name', ''))[:52]} "
             f"| {float(row['_score']):.1f} "
             f"| {_fmt_usd(row['_awards'])} "
             f"| {', '.join(sources) or '—'} "
@@ -218,7 +225,7 @@ def _section_power_network(net_df: pd.DataFrame, top_n: int) -> tuple[str, dict]
         ]
         for _, row in full_loop.nlargest(10, "_awards").iterrows():
             lines.append(
-                f"| {str(row.get('canonical_name',''))[:50]} "
+                f"| {str(row.get('canonical_name', ''))[:50]} "
                 f"| {_fmt_usd(row['_awards'])} "
                 f"| {_fmt_usd(row.get('fec_total_contributions') or 0)} "
                 f"| {_fmt_usd(row.get('lda_lobbying_total') or 0)} |"
@@ -250,7 +257,7 @@ def _section_prime_sub(ps_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
 
     total_flow = ps_df["_flow"].sum()
     unique_primes = ps_df["prime_recipient"].nunique() if "prime_recipient" in ps_df.columns else 0
-    unique_subs   = ps_df["sub_recipient"].nunique()   if "sub_recipient" in ps_df.columns else 0
+    unique_subs = ps_df["sub_recipient"].nunique() if "sub_recipient" in ps_df.columns else 0
 
     top = ps_df.nlargest(top_n, "_flow")
 
@@ -263,10 +270,10 @@ def _section_prime_sub(ps_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
     ]
     for _, row in top.iterrows():
         lines.append(
-            f"| {str(row.get('prime_recipient',''))[:40]} "
-            f"| {str(row.get('sub_recipient',''))[:40]} "
+            f"| {str(row.get('prime_recipient', ''))[:40]} "
+            f"| {str(row.get('sub_recipient', ''))[:40]} "
             f"| {_fmt_usd(row['_flow'])} "
-            f"| {int(float(row.get('contract_count',0)))} |"
+            f"| {int(float(row.get('contract_count', 0)))} |"
         )
 
     summary = {
@@ -292,7 +299,7 @@ def _section_delivery(delivery_df: pd.DataFrame, top_n: int) -> tuple[str, dict]
     delivery_df = delivery_df.copy()
     delivery_df["_score"] = _num(delivery_df, "delivery_score")
 
-    high_risk   = delivery_df[delivery_df.get("risk_tier", pd.Series()) == "high"]
+    high_risk = delivery_df[delivery_df.get("risk_tier", pd.Series()) == "high"]
     medium_risk = delivery_df[delivery_df.get("risk_tier", pd.Series()) == "medium"]
 
     lines = [
@@ -306,9 +313,14 @@ def _section_delivery(delivery_df: pd.DataFrame, top_n: int) -> tuple[str, dict]
             "| Entity | Score | FEMA Rate | COR3 Rate | USACE OK | EQB Violations |",
             "|--------|-------|-----------|-----------|----------|----------------|",
         ]
-        for _, row in high_risk.nlargest(top_n, "total_awards_obligated" if "total_awards_obligated" in delivery_df.columns else "_score").iterrows():
+        for _, row in high_risk.nlargest(
+            top_n,
+            "total_awards_obligated"
+            if "total_awards_obligated" in delivery_df.columns
+            else "_score",
+        ).iterrows():
             lines.append(
-                f"| {str(row.get('canonical_name',''))[:45]} "
+                f"| {str(row.get('canonical_name', ''))[:45]} "
                 f"| {float(row['_score']):.0f} "
                 f"| {float(row.get('fema_completion_rate') or 0):.0%} "
                 f"| {float(row.get('cor3_disbursement_rate') or 0):.0%} "
@@ -320,7 +332,9 @@ def _section_delivery(delivery_df: pd.DataFrame, top_n: int) -> tuple[str, dict]
         "total_scored": len(delivery_df),
         "high_risk_count": len(high_risk),
         "medium_risk_count": len(medium_risk),
-        "high_risk_entities": [str(r.get("canonical_name","")) for _, r in high_risk.head(10).iterrows()],
+        "high_risk_entities": [
+            str(r.get("canonical_name", "")) for _, r in high_risk.head(10).iterrows()
+        ],
     }
     return "\n".join(lines) + "\n", summary
 
@@ -335,7 +349,7 @@ def _section_rfp_lobby(rfp_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
 
     lines = [
         f"**Total RFPs analyzed:** {len(rfp_df):,}  ",
-        f"**RFPs with prior winner lobbying:** {len(flagged):,} ({len(flagged)/len(rfp_df):.1%})  \n",
+        f"**RFPs with prior winner lobbying:** {len(flagged):,} ({len(flagged) / len(rfp_df):.1%})  \n",
     ]
     if not flagged.empty:
         lines += [
@@ -344,18 +358,18 @@ def _section_rfp_lobby(rfp_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
         ]
         for _, row in flagged.nlargest(top_n, "_iscore").iterrows():
             lines.append(
-                f"| {str(row.get('title',''))[:45]} "
-                f"| {str(row.get('agency',''))[:30]} "
-                f"| {str(row.get('awarded_vendor',''))[:35]} "
+                f"| {str(row.get('title', ''))[:45]} "
+                f"| {str(row.get('agency', ''))[:30]} "
+                f"| {str(row.get('awarded_vendor', ''))[:35]} "
                 f"| {float(row['_iscore']):.3f} "
-                f"| {row.get('lobby_lead_days','?')} "
+                f"| {row.get('lobby_lead_days', '?')} "
                 f"| {_fmt_usd(row.get('lda_spend_prior_window') or 0)} |"
             )
 
     summary = {
         "total_rfps": len(rfp_df),
         "flagged_rfps": len(flagged),
-        "flagged_share": round(len(flagged)/len(rfp_df), 4) if rfp_df.shape[0] > 0 else 0,
+        "flagged_share": round(len(flagged) / len(rfp_df), 4) if rfp_df.shape[0] > 0 else 0,
     }
     return "\n".join(lines) + "\n", summary
 
@@ -370,7 +384,7 @@ def _section_bond_flow(bond_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
     uw = bond_df[_num(bond_df, "bond_underwriter_flag") > 0]
 
     lines = [
-        f"**Entities with bond market presence:** {(bond_df[['bond_issuer_flag','bond_underwriter_flag','bond_dealer_flag']].apply(lambda c: _num(bond_df, c.name) > 0).any(axis=1)).sum():,}  ",
+        f"**Entities with bond market presence:** {(bond_df[['bond_issuer_flag', 'bond_underwriter_flag', 'bond_dealer_flag']].apply(lambda c: _num(bond_df, c.name) > 0).any(axis=1)).sum():,}  ",
         f"**Dual-role** (federal contractor + bond market): {len(dual):,}  ",
         f"**Bond issuers** in entity master: {len(issuers):,}  ",
         f"**Underwriters** in entity master: {len(uw):,}  \n",
@@ -383,7 +397,7 @@ def _section_bond_flow(bond_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
         ]
         for _, row in dual.nlargest(top_n, "dual_role_awards").iterrows():
             lines.append(
-                f"| {str(row.get('canonical_name',''))[:50]} "
+                f"| {str(row.get('canonical_name', ''))[:50]} "
                 f"| {_fmt_usd(row.get('dual_role_awards') or 0)} "
                 f"| {_fmt_usd(row.get('bonds_underwritten_par') or 0)} "
                 f"| {_fmt_usd(row.get('dealer_volume_par') or 0)} "
@@ -394,7 +408,9 @@ def _section_bond_flow(bond_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
         "dual_role_count": len(dual),
         "issuer_count": len(issuers),
         "underwriter_count": len(uw),
-        "dual_role_entities": [str(r.get("canonical_name","")) for _, r in dual.head(10).iterrows()],
+        "dual_role_entities": [
+            str(r.get("canonical_name", "")) for _, r in dual.head(10).iterrows()
+        ],
     }
     return "\n".join(lines) + "\n", summary
 
@@ -403,7 +419,9 @@ def _section_ofac(ofac_df: pd.DataFrame) -> tuple[str, dict]:
     if ofac_df.empty:
         return _pending("OFAC SDN sanctions cross-reference"), {}
 
-    ofac_df[_num(ofac_df, "obligated_amount") > 0] if "obligated_amount" in ofac_df.columns else ofac_df
+    ofac_df[
+        _num(ofac_df, "obligated_amount") > 0
+    ] if "obligated_amount" in ofac_df.columns else ofac_df
 
     lines = [f"**SDN matches against award recipients:** {len(ofac_df):,}  \n"]
     if not ofac_df.empty:
@@ -413,8 +431,8 @@ def _section_ofac(ofac_df: pd.DataFrame) -> tuple[str, dict]:
         ]
         for _, row in ofac_df.head(20).iterrows():
             lines.append(
-                f"| {str(row.get('recipient_name',''))[:45]} "
-                f"| {str(row.get('sdn_name', row.get('name','?')))[:40]} "
+                f"| {str(row.get('recipient_name', ''))[:45]} "
+                f"| {str(row.get('sdn_name', row.get('name', '?')))[:40]} "
                 f"| {_fmt_usd(row.get('obligated_amount') or 0)} "
                 f"| {float(row.get('match_score') or 0):.2f} |"
             )
@@ -429,7 +447,7 @@ def _section_sf133(sf_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
 
     sf_df = sf_df.copy()
     sf_df["_obl_rate"] = _num(sf_df, "obligation_rate")
-    sf_df["_budget"]   = _num(sf_df, "budget_authority")
+    sf_df["_budget"] = _num(sf_df, "budget_authority")
 
     low_obl = sf_df[sf_df["_obl_rate"] < 0.5].nlargest(top_n, "_budget")
     total_budget = sf_df["_budget"].sum()
@@ -446,8 +464,8 @@ def _section_sf133(sf_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
     ]
     for _, row in low_obl.iterrows():
         lines.append(
-            f"| {str(row.get('agency_name',''))[:10]} "
-            f"| {str(row.get('account_title',''))[:50]} "
+            f"| {str(row.get('agency_name', ''))[:10]} "
+            f"| {str(row.get('account_title', ''))[:50]} "
             f"| {_fmt_usd(row['_budget'])} "
             f"| {float(row['_obl_rate']):.1%} "
             f"| {_fmt_usd(row.get('unobligated_balance') or 0)} |"
@@ -462,16 +480,21 @@ def _section_sf133(sf_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
     return "\n".join(lines) + "\n", summary
 
 
-def _section_tax_incentive(act60_df: pd.DataFrame, lihtc_df: pd.DataFrame,
-                            entity_df: pd.DataFrame, net_df: pd.DataFrame,
-                            top_n: int) -> tuple[str, dict]:
+def _section_tax_incentive(
+    act60_df: pd.DataFrame,
+    lihtc_df: pd.DataFrame,
+    entity_df: pd.DataFrame,
+    net_df: pd.DataFrame,
+    top_n: int,
+) -> tuple[str, dict]:
     if act60_df.empty and lihtc_df.empty:
         return _pending("PR tax incentive dual-benefit analysis (Act 60 + LIHTC)"), {}
 
     import re as _re
+
     _strip = _re.compile(r"[^\w\s]")
     _space = _re.compile(r"\s+")
-    _sfx = {"INC","LLC","CORP","LTD","CO","LP","LLP","CSP","SE"}
+    _sfx = {"INC", "LLC", "CORP", "LTD", "CO", "LP", "LLP", "CSP", "SE"}
 
     def _norm(name):
         if not name or pd.isna(name):
@@ -487,23 +510,29 @@ def _section_tax_incentive(act60_df: pd.DataFrame, lihtc_df: pd.DataFrame,
     rows = []
     if not act60_df.empty and "entity_name" in act60_df.columns:
         for _, r in act60_df.iterrows():
-            rows.append({
-                "entity_name": str(r.get("entity_name", "")),
-                "norm_key":    _norm(str(r.get("entity_normalized", r.get("entity_name", "")))),
-                "source":      "Act 60",
-                "decree_type": str(r.get("decree_type", "")),
-                "amount":      _num(act60_df, "allocation_amount")[r.name] if "allocation_amount" in act60_df.columns else 0,
-            })
+            rows.append(
+                {
+                    "entity_name": str(r.get("entity_name", "")),
+                    "norm_key": _norm(str(r.get("entity_normalized", r.get("entity_name", "")))),
+                    "source": "Act 60",
+                    "decree_type": str(r.get("decree_type", "")),
+                    "amount": _num(act60_df, "allocation_amount")[r.name]
+                    if "allocation_amount" in act60_df.columns
+                    else 0,
+                }
+            )
     if not lihtc_df.empty:
         for _, r in lihtc_df.iterrows():
             nm = str(r.get("dev_nm", r.get("proj_own_nm", "")))
-            rows.append({
-                "entity_name": nm,
-                "norm_key":    _norm(str(r.get("dev_nm_normalized", nm))),
-                "source":      "LIHTC",
-                "decree_type": "Low-Income Housing Tax Credit",
-                "amount":      float(r.get("allocamt", 0) or 0),
-            })
+            rows.append(
+                {
+                    "entity_name": nm,
+                    "norm_key": _norm(str(r.get("dev_nm_normalized", nm))),
+                    "source": "LIHTC",
+                    "decree_type": "Low-Income Housing Tax Credit",
+                    "amount": float(r.get("allocamt", 0) or 0),
+                }
+            )
 
     if not rows:
         return _pending("PR tax incentive dual-benefit analysis (Act 60 + LIHTC)"), {}
@@ -518,7 +547,9 @@ def _section_tax_incentive(act60_df: pd.DataFrame, lihtc_df: pd.DataFrame,
         ti_df["is_dual"] = ti_df["norm_key"].isin(dual_keys)
         dual = ti_df[ti_df["is_dual"]].copy()
 
-    dual_count = len(dual["norm_key"].unique()) if not dual.empty and "norm_key" in dual.columns else 0
+    dual_count = (
+        len(dual["norm_key"].unique()) if not dual.empty and "norm_key" in dual.columns else 0
+    )
 
     lines = [
         f"**Tax incentive records:** {len(ti_df):,}  ",
@@ -532,9 +563,9 @@ def _section_tax_incentive(act60_df: pd.DataFrame, lihtc_df: pd.DataFrame,
     display = dual.head(top_n) if not dual.empty else ti_df.head(top_n)
     for _, row in display.iterrows():
         lines.append(
-            f"| {str(row.get('entity_name',''))[:45]} "
-            f"| {row.get('source','')}"
-            f"| {str(row.get('decree_type',''))[:35]} "
+            f"| {str(row.get('entity_name', ''))[:45]} "
+            f"| {row.get('source', '')}"
+            f"| {str(row.get('decree_type', ''))[:35]} "
             f"| {_fmt_usd(row.get('amount', 0))} |"
         )
 
@@ -545,8 +576,9 @@ def _section_tax_incentive(act60_df: pd.DataFrame, lihtc_df: pd.DataFrame,
     return "\n".join(lines) + "\n", summary
 
 
-def _section_promesa(promesa_df: pd.DataFrame, fec_df: pd.DataFrame,
-                     lda_df: pd.DataFrame, top_n: int) -> tuple[str, dict]:
+def _section_promesa(
+    promesa_df: pd.DataFrame, fec_df: pd.DataFrame, lda_df: pd.DataFrame, top_n: int
+) -> tuple[str, dict]:
     if promesa_df.empty:
         return _pending("PROMESA Title III creditor influence analysis"), {}
 
@@ -569,9 +601,11 @@ def _section_promesa(promesa_df: pd.DataFrame, fec_df: pd.DataFrame,
         return any(n[:15] in x or x[:15] in n for x in name_set)
 
     promesa_df["fec_flag"] = promesa_df.get("creditor_name", pd.Series(dtype=str)).apply(
-        lambda x: _flag(x, fec_names))
+        lambda x: _flag(x, fec_names)
+    )
     promesa_df["lda_flag"] = promesa_df.get("creditor_name", pd.Series(dtype=str)).apply(
-        lambda x: _flag(x, lda_names))
+        lambda x: _flag(x, lda_names)
+    )
     promesa_df["influence_flag"] = promesa_df["fec_flag"] | promesa_df["lda_flag"]
 
     influenced = promesa_df[promesa_df["influence_flag"]]
@@ -592,12 +626,20 @@ def _section_promesa(promesa_df: pd.DataFrame, fec_df: pd.DataFrame,
     ]
     display = promesa_df.sort_values("influence_flag", ascending=False).head(top_n)
     for _, row in display.iterrows():
-        claim = _num(promesa_df, "claim_amount_original")[row.name] if "claim_amount_original" in promesa_df.columns else 0
-        rate  = _num(promesa_df, "recovery_rate")[row.name] if "recovery_rate" in promesa_df.columns else 0
+        claim = (
+            _num(promesa_df, "claim_amount_original")[row.name]
+            if "claim_amount_original" in promesa_df.columns
+            else 0
+        )
+        rate = (
+            _num(promesa_df, "recovery_rate")[row.name]
+            if "recovery_rate" in promesa_df.columns
+            else 0
+        )
         lines.append(
-            f"| {str(row.get('creditor_name',''))[:40]} "
-            f"| {str(row.get('creditor_type',''))[:12]} "
-            f"| {str(row.get('bond_series',''))[:15]} "
+            f"| {str(row.get('creditor_name', ''))[:40]} "
+            f"| {str(row.get('creditor_type', ''))[:12]} "
+            f"| {str(row.get('bond_series', ''))[:15]} "
             f"| {_fmt_usd(claim)} "
             f"| {float(rate):.1%} "
             f"| {'✅' if row.get('fec_flag') else '—'} "
@@ -616,13 +658,14 @@ def _section_promesa(promesa_df: pd.DataFrame, fec_df: pd.DataFrame,
 # Core
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> dict:
     root = Path(root or PROJECT_ROOT)
     proc = root / "data" / "staging" / "processed"
     reports_dir = root / "data" / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
 
-    report_path  = reports_dir / "pr_investigative_report.md"
+    report_path = reports_dir / "pr_investigative_report.md"
     summary_path = reports_dir / "pr_report_summary.json"
 
     logger = setup_logging("generate_report", log_dir=root / "data" / "logs")
@@ -632,19 +675,19 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
         return {"status": "CACHED", "report_path": str(report_path)}
 
     logger.info("Loading pipeline outputs...")
-    entity_df   = _load(proc / "entity_master.csv",             "entity_master",       logger)
-    net_df      = _load(proc / "pr_power_network.csv",          "power_network",       logger)
-    ps_df       = _load(proc / "pr_prime_sub_relationships.csv","prime_sub",           logger)
-    delivery_df = _load(proc / "pr_delivery_scorecard.csv",     "delivery_scorecard",  logger)
-    rfp_df      = _load(proc / "pr_rfp_lobby_crossref.csv",     "rfp_lobby_crossref",  logger)
-    bond_df     = _load(proc / "pr_bond_flow.csv",              "bond_flow",           logger)
-    ofac_df     = _load(proc / "pr_ofac_matches.csv",           "ofac_matches",        logger)
-    sf133_df    = _load(proc / "pr_sf133_budget_execution.csv", "sf133",               logger)
-    act60_df    = _load(proc / "pr_act60_decrees.csv",          "act60",               logger)
-    lihtc_df    = _load(proc / "pr_lihtc_projects.csv",         "lihtc",               logger)
-    promesa_df  = _load(proc / "pr_promesa_creditors.csv",      "promesa_creditors",   logger)
-    fec_df      = _load(proc / "pr_fec_contributions.csv",      "fec_contributions",   logger)
-    lda_df      = _load(proc / "pr_lda_filings.csv",            "lda_filings",         logger)
+    entity_df = _load(proc / "entity_master.csv", "entity_master", logger)
+    net_df = _load(proc / "pr_power_network.csv", "power_network", logger)
+    ps_df = _load(proc / "pr_prime_sub_relationships.csv", "prime_sub", logger)
+    delivery_df = _load(proc / "pr_delivery_scorecard.csv", "delivery_scorecard", logger)
+    rfp_df = _load(proc / "pr_rfp_lobby_crossref.csv", "rfp_lobby_crossref", logger)
+    bond_df = _load(proc / "pr_bond_flow.csv", "bond_flow", logger)
+    ofac_df = _load(proc / "pr_ofac_matches.csv", "ofac_matches", logger)
+    sf133_df = _load(proc / "pr_sf133_budget_execution.csv", "sf133", logger)
+    act60_df = _load(proc / "pr_act60_decrees.csv", "act60", logger)
+    lihtc_df = _load(proc / "pr_lihtc_projects.csv", "lihtc", logger)
+    promesa_df = _load(proc / "pr_promesa_creditors.csv", "promesa_creditors", logger)
+    fec_df = _load(proc / "pr_fec_contributions.csv", "fec_contributions", logger)
+    lda_df = _load(proc / "pr_lda_filings.csv", "lda_filings", logger)
 
     # Maturity gate inputs — applied as a markdown prefix per section so that
     # claims read with the right CLAIM_LANGUAGE_POLICY tier even before the
@@ -656,38 +699,47 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
         return _tier_marker(section_sources, maturity, dataset_map) + body
 
     # Build each section
-    s_awards,   j_awards   = _section_awards(entity_df, top_n)
-    s_network,  j_network  = _section_power_network(net_df, top_n)
+    s_awards, j_awards = _section_awards(entity_df, top_n)
+    s_network, j_network = _section_power_network(net_df, top_n)
     s_primesub, j_primesub = _section_prime_sub(ps_df, top_n)
     s_delivery, j_delivery = _section_delivery(delivery_df, top_n)
-    s_rfplob,   j_rfplob   = _section_rfp_lobby(rfp_df, top_n)
-    s_bond,     j_bond     = _section_bond_flow(bond_df, top_n)
-    s_ofac,     j_ofac     = _section_ofac(ofac_df)
-    s_sf133,    j_sf133    = _section_sf133(sf133_df, top_n)
-    s_taxinc,   j_taxinc   = _section_tax_incentive(act60_df, lihtc_df, entity_df, net_df, top_n)
-    s_promesa,  j_promesa  = _section_promesa(promesa_df, fec_df, lda_df, top_n)
+    s_rfplob, j_rfplob = _section_rfp_lobby(rfp_df, top_n)
+    s_bond, j_bond = _section_bond_flow(bond_df, top_n)
+    s_ofac, j_ofac = _section_ofac(ofac_df)
+    s_sf133, j_sf133 = _section_sf133(sf133_df, top_n)
+    s_taxinc, j_taxinc = _section_tax_incentive(act60_df, lihtc_df, entity_df, net_df, top_n)
+    s_promesa, j_promesa = _section_promesa(promesa_df, fec_df, lda_df, top_n)
 
-    s_awards   = tag(["pr_all_awards_master.csv", "pr_contracts_master.csv"], s_awards)
-    s_network  = tag(["pr_lda_filings.csv", "pr_fec_contributions.csv"], s_network)
+    s_awards = tag(["pr_all_awards_master.csv", "pr_contracts_master.csv"], s_awards)
+    s_network = tag(["pr_lda_filings.csv", "pr_fec_contributions.csv"], s_network)
     s_primesub = tag(["pr_subawards_master.csv"], s_primesub)
     s_delivery = tag(["pr_fema_pa_master.csv", "pr_eqb_permits.csv"], s_delivery)
-    s_rfplob   = tag(["pr_compras_rfps.csv", "pr_lda_filings.csv"], s_rfplob)
-    s_bond     = tag(["pr_emma_bonds.csv", "pr_msrb_rtrs_trades.csv"], s_bond)
-    s_sf133    = tag(["pr_sf133_budget_execution.csv"], s_sf133)
-    s_taxinc   = tag(["pr_act60_decrees.csv"], s_taxinc)
-    s_promesa  = tag(["pr_promesa_creditors.csv", "pr_fec_contributions.csv", "pr_lda_filings.csv"], s_promesa)
+    s_rfplob = tag(["pr_compras_rfps.csv", "pr_lda_filings.csv"], s_rfplob)
+    s_bond = tag(["pr_emma_bonds.csv", "pr_msrb_rtrs_trades.csv"], s_bond)
+    s_sf133 = tag(["pr_sf133_budget_execution.csv"], s_sf133)
+    s_taxinc = tag(["pr_act60_decrees.csv"], s_taxinc)
+    s_promesa = tag(
+        ["pr_promesa_creditors.csv", "pr_fec_contributions.csv", "pr_lda_filings.csv"], s_promesa
+    )
 
     generated_at = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
     status_payload = load_current_status(root)
     production_status = status_payload["production_status"]
     production_status_message = status_payload["status_message"]
-    data_layers = sum([
-        not entity_df.empty, not net_df.empty, not ps_df.empty,
-        not delivery_df.empty, not rfp_df.empty, not bond_df.empty,
-        not ofac_df.empty, not sf133_df.empty,
-        not act60_df.empty or not lihtc_df.empty,
-        not promesa_df.empty,
-    ])
+    data_layers = sum(
+        [
+            not entity_df.empty,
+            not net_df.empty,
+            not ps_df.empty,
+            not delivery_df.empty,
+            not rfp_df.empty,
+            not bond_df.empty,
+            not ofac_df.empty,
+            not sf133_df.empty,
+            not act60_df.empty or not lihtc_df.empty,
+            not promesa_df.empty,
+        ]
+    )
 
     # Assemble markdown report
     report = f"""# Puerto Rico Federal Contract Ecosystem — Investigative Report
@@ -753,16 +805,16 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
 
 | Layer | Status |
 |-------|--------|
-| Federal awards master | {'✅' if not entity_df.empty else '⏳ pending Mac run'} |
-| Power network (8-axis) | {'✅' if not net_df.empty else '⏳ pending Mac run'} |
-| Prime-sub relationships | {'✅' if not ps_df.empty else '⏳ pending Mac run'} |
-| Delivery scorecard | {'✅' if not delivery_df.empty else '⏳ pending Mac run'} |
-| RFP-lobby crossref | {'✅' if not rfp_df.empty else '⏳ pending Mac run'} |
-| Bond financial flow | {'✅' if not bond_df.empty else '⏳ pending Mac run'} |
-| OFAC sanctions | {'✅' if not ofac_df.empty else '⏳ pending Mac run'} |
-| SF-133 budget execution | {'✅' if not sf133_df.empty else '⏳ pending Mac run'} |
-| Tax incentive (Act 60 / LIHTC) | {'✅' if not act60_df.empty or not lihtc_df.empty else '⏳ pending Mac run'} |
-| PROMESA creditors | {'✅' if not promesa_df.empty else '⏳ pending Mac run'} |
+| Federal awards master | {"✅" if not entity_df.empty else "⏳ pending Mac run"} |
+| Power network (8-axis) | {"✅" if not net_df.empty else "⏳ pending Mac run"} |
+| Prime-sub relationships | {"✅" if not ps_df.empty else "⏳ pending Mac run"} |
+| Delivery scorecard | {"✅" if not delivery_df.empty else "⏳ pending Mac run"} |
+| RFP-lobby crossref | {"✅" if not rfp_df.empty else "⏳ pending Mac run"} |
+| Bond financial flow | {"✅" if not bond_df.empty else "⏳ pending Mac run"} |
+| OFAC sanctions | {"✅" if not ofac_df.empty else "⏳ pending Mac run"} |
+| SF-133 budget execution | {"✅" if not sf133_df.empty else "⏳ pending Mac run"} |
+| Tax incentive (Act 60 / LIHTC) | {"✅" if not act60_df.empty or not lihtc_df.empty else "⏳ pending Mac run"} |
+| PROMESA creditors | {"✅" if not promesa_df.empty else "⏳ pending Mac run"} |
 
 *To populate all layers: `python3 run_all.py --skip-download` from a machine with unrestricted network access.*
 """
@@ -771,32 +823,46 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
     logger.info(f"  Written: {report_path.name}")
 
     claim_tiers = {
-        "awards":        claim_tier(["pr_all_awards_master.csv", "pr_contracts_master.csv"], maturity, dataset_map),
-        "power_network": claim_tier(["pr_lda_filings.csv", "pr_fec_contributions.csv"], maturity, dataset_map),
-        "prime_sub":     claim_tier(["pr_subawards_master.csv"], maturity, dataset_map),
-        "delivery":      claim_tier(["pr_fema_pa_master.csv", "pr_eqb_permits.csv"], maturity, dataset_map),
-        "rfp_lobby":     claim_tier(["pr_compras_rfps.csv", "pr_lda_filings.csv"], maturity, dataset_map),
-        "bond_flow":     claim_tier(["pr_emma_bonds.csv", "pr_msrb_rtrs_trades.csv"], maturity, dataset_map),
-        "sf133":         claim_tier(["pr_sf133_budget_execution.csv"], maturity, dataset_map),
+        "awards": claim_tier(
+            ["pr_all_awards_master.csv", "pr_contracts_master.csv"], maturity, dataset_map
+        ),
+        "power_network": claim_tier(
+            ["pr_lda_filings.csv", "pr_fec_contributions.csv"], maturity, dataset_map
+        ),
+        "prime_sub": claim_tier(["pr_subawards_master.csv"], maturity, dataset_map),
+        "delivery": claim_tier(
+            ["pr_fema_pa_master.csv", "pr_eqb_permits.csv"], maturity, dataset_map
+        ),
+        "rfp_lobby": claim_tier(
+            ["pr_compras_rfps.csv", "pr_lda_filings.csv"], maturity, dataset_map
+        ),
+        "bond_flow": claim_tier(
+            ["pr_emma_bonds.csv", "pr_msrb_rtrs_trades.csv"], maturity, dataset_map
+        ),
+        "sf133": claim_tier(["pr_sf133_budget_execution.csv"], maturity, dataset_map),
         "tax_incentive": claim_tier(["pr_act60_decrees.csv"], maturity, dataset_map),
-        "promesa":       claim_tier(["pr_promesa_creditors.csv", "pr_fec_contributions.csv", "pr_lda_filings.csv"], maturity, dataset_map),
+        "promesa": claim_tier(
+            ["pr_promesa_creditors.csv", "pr_fec_contributions.csv", "pr_lda_filings.csv"],
+            maturity,
+            dataset_map,
+        ),
     }
     summary = {
-        "generated_at":    generated_at,
+        "generated_at": generated_at,
         "production_status": production_status,
         "production_status_message": production_status_message,
-        "data_layers":     data_layers,
-        "claim_tiers":     claim_tiers,
-        "awards":          j_awards,
-        "power_network":   j_network,
-        "prime_sub":       j_primesub,
-        "delivery":        j_delivery,
-        "rfp_lobby":       j_rfplob,
-        "bond_flow":       j_bond,
-        "ofac":            j_ofac,
-        "sf133":           j_sf133,
-        "tax_incentive":   j_taxinc,
-        "promesa":         j_promesa,
+        "data_layers": data_layers,
+        "claim_tiers": claim_tiers,
+        "awards": j_awards,
+        "power_network": j_network,
+        "prime_sub": j_primesub,
+        "delivery": j_delivery,
+        "rfp_lobby": j_rfplob,
+        "bond_flow": j_bond,
+        "ofac": j_ofac,
+        "sf133": j_sf133,
+        "tax_incentive": j_taxinc,
+        "promesa": j_promesa,
     }
     summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
     logger.info(f"  Written: {summary_path.name}")
@@ -804,9 +870,9 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
     logger.info(f"  Report complete — {data_layers}/10 data layers populated")
 
     return {
-        "status":       "OK",
-        "data_layers":  data_layers,
-        "report_path":  str(report_path),
+        "status": "OK",
+        "data_layers": data_layers,
+        "report_path": str(report_path),
         "summary_path": str(summary_path),
     }
 
@@ -815,19 +881,25 @@ def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> d
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Generate PR investigative report from all pipeline outputs"
     )
-    parser.add_argument("--force", action="store_true",
-                        help="Regenerate even if report already exists")
-    parser.add_argument("--top", type=int, default=TOP_N_DEFAULT,
-                        help=f"Number of top entities per section (default: {TOP_N_DEFAULT})")
+    parser.add_argument(
+        "--force", action="store_true", help="Regenerate even if report already exists"
+    )
+    parser.add_argument(
+        "--top",
+        type=int,
+        default=TOP_N_DEFAULT,
+        help=f"Number of top entities per section (default: {TOP_N_DEFAULT})",
+    )
     args = parser.parse_args()
     result = run(force=args.force, top_n=args.top)
     if result.get("status") in ("OK", "CACHED"):
-        print(f"\nReport: {result.get('report_path','')}")
-        print(f"Summary: {result.get('summary_path','')}")
+        print(f"\nReport: {result.get('report_path', '')}")
+        print(f"Summary: {result.get('summary_path', '')}")
         if result.get("data_layers") is not None:
             print(f"Data layers: {result['data_layers']}/10")
     return 0 if result.get("status") in ("OK", "CACHED") else 1

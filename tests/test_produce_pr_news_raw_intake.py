@@ -22,7 +22,9 @@ def test_pr_news_raw_intake_producer_writes_router_ready_jsonl(tmp_path):
         encoding="utf-8",
     )
 
-    rc = main_with_args(["--input", str(input_path), "--output", str(output_path), "--manifest", str(manifest_path)])
+    rc = main_with_args(
+        ["--input", str(input_path), "--output", str(output_path), "--manifest", str(manifest_path)]
+    )
 
     assert rc == 0
     rows = [json.loads(line) for line in output_path.read_text(encoding="utf-8").splitlines()]
@@ -44,7 +46,9 @@ def test_pr_news_raw_intake_missing_input_writes_empty_latest(tmp_path):
     output_path = tmp_path / "raw_items_latest.jsonl"
     manifest_path = tmp_path / "manifest.json"
 
-    rc = main_with_args(["--input", str(input_path), "--output", str(output_path), "--manifest", str(manifest_path)])
+    rc = main_with_args(
+        ["--input", str(input_path), "--output", str(output_path), "--manifest", str(manifest_path)]
+    )
 
     assert rc == 0
     assert output_path.exists()

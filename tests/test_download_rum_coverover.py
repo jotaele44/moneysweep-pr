@@ -3,6 +3,7 @@
 The live fetch needs egress (TTB + Treasury FiscalData API). These tests cover only
 the pure parse_records() transform, so they run fully offline.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -19,18 +20,20 @@ def test_empty_records_returns_empty_df():
 
 @pytest.mark.unit
 def test_canonical_keys_pass_through():
-    records = [{
-        "fiscal_year": "2023",
-        "rum_gallons_pr": 35_000_000,
-        "rum_proof_gallons_pr": 70_000_000,
-        "excise_tax_rate_per_proof_gallon": 13.25,
-        "excise_tax_estimated": 927_500_000,
-        "coverover_amount_pr": 520_000_000,
-        "allocation_prepa": 130_000_000,
-        "allocation_hta": 65_000_000,
-        "allocation_general_fund": 325_000_000,
-        "source_doc": "AAFAF FY2023 Annual Report (estimated)",
-    }]
+    records = [
+        {
+            "fiscal_year": "2023",
+            "rum_gallons_pr": 35_000_000,
+            "rum_proof_gallons_pr": 70_000_000,
+            "excise_tax_rate_per_proof_gallon": 13.25,
+            "excise_tax_estimated": 927_500_000,
+            "coverover_amount_pr": 520_000_000,
+            "allocation_prepa": 130_000_000,
+            "allocation_hta": 65_000_000,
+            "allocation_general_fund": 325_000_000,
+            "source_doc": "AAFAF FY2023 Annual Report (estimated)",
+        }
+    ]
     df = parse_records(records)
     assert len(df) == 1
     assert list(df.columns) == RUM_COLUMNS

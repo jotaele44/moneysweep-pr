@@ -1,4 +1,5 @@
 """Abstract base class for entity-mode on-demand adapters."""
+
 from __future__ import annotations
 
 import abc

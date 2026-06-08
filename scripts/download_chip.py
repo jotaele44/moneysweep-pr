@@ -15,6 +15,7 @@ Output:
 Usage:
   python3 scripts/download_chip.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -34,9 +35,14 @@ MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 CHIP_COLUMNS = [
-    "fiscal_year", "quarter", "enrollment_count",
-    "federal_expenditure", "state_expenditure", "total_expenditure",
-    "fmap_rate", "source_doc",
+    "fiscal_year",
+    "quarter",
+    "enrollment_count",
+    "federal_expenditure",
+    "state_expenditure",
+    "total_expenditure",
+    "fmap_rate",
+    "source_doc",
 ]
 
 MEDICAID_GOV_API = "https://data.medicaid.gov/api/1/metastore/schemas/dataset/items"
@@ -45,19 +51,57 @@ DATA_GOV_SEARCH = "https://catalog.data.gov/api/3/action/package_search"
 
 # Known PR CHIP annual enrollment and expenditure data from CMS public reports
 KNOWN_CHIP_DATA = [
-    {"fiscal_year":"2020","quarter":"annual","enrollment_count":"172000","federal_expenditure":"380000000","state_expenditure":"0","total_expenditure":"380000000","fmap_rate":"100.0","source_doc":"CMS_CHIP_PR_FY2020"},
-    {"fiscal_year":"2021","quarter":"annual","enrollment_count":"185000","federal_expenditure":"410000000","state_expenditure":"0","total_expenditure":"410000000","fmap_rate":"100.0","source_doc":"CMS_CHIP_PR_FY2021"},
-    {"fiscal_year":"2022","quarter":"annual","enrollment_count":"191000","federal_expenditure":"445000000","state_expenditure":"0","total_expenditure":"445000000","fmap_rate":"100.0","source_doc":"CMS_CHIP_PR_FY2022"},
-    {"fiscal_year":"2023","quarter":"annual","enrollment_count":"195000","federal_expenditure":"480000000","state_expenditure":"0","total_expenditure":"480000000","fmap_rate":"100.0","source_doc":"CMS_CHIP_PR_FY2023"},
+    {
+        "fiscal_year": "2020",
+        "quarter": "annual",
+        "enrollment_count": "172000",
+        "federal_expenditure": "380000000",
+        "state_expenditure": "0",
+        "total_expenditure": "380000000",
+        "fmap_rate": "100.0",
+        "source_doc": "CMS_CHIP_PR_FY2020",
+    },
+    {
+        "fiscal_year": "2021",
+        "quarter": "annual",
+        "enrollment_count": "185000",
+        "federal_expenditure": "410000000",
+        "state_expenditure": "0",
+        "total_expenditure": "410000000",
+        "fmap_rate": "100.0",
+        "source_doc": "CMS_CHIP_PR_FY2021",
+    },
+    {
+        "fiscal_year": "2022",
+        "quarter": "annual",
+        "enrollment_count": "191000",
+        "federal_expenditure": "445000000",
+        "state_expenditure": "0",
+        "total_expenditure": "445000000",
+        "fmap_rate": "100.0",
+        "source_doc": "CMS_CHIP_PR_FY2022",
+    },
+    {
+        "fiscal_year": "2023",
+        "quarter": "annual",
+        "enrollment_count": "195000",
+        "federal_expenditure": "480000000",
+        "state_expenditure": "0",
+        "total_expenditure": "480000000",
+        "fmap_rate": "100.0",
+        "source_doc": "CMS_CHIP_PR_FY2023",
+    },
 ]
 
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (CMS CHIP PR research)",
-        "Accept": "application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (CMS CHIP PR research)",
+            "Accept": "application/json",
+        }
+    )
     return s
 
 
@@ -77,7 +121,7 @@ def _get(session, url, params, logger):
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -127,16 +171,31 @@ def _fetch_medicaid_gov(session, logger) -> list[dict]:
             if not results:
                 break
             for r in results:
-                rows.append({
-                    "fiscal_year": str(r.get("fiscal_year", r.get("year", r.get("fy", "")))),
-                    "quarter": str(r.get("quarter", r.get("reporting_quarter", ""))),
-                    "enrollment_count": str(r.get("enrollment", r.get("enrollees", r.get("chip_enrollment", "")))),
-                    "federal_expenditure": str(r.get("federal_expenditure", r.get("federal_share", r.get("chip_federal_expenditure", "")))),
-                    "state_expenditure": str(r.get("state_expenditure", r.get("state_share", ""))),
-                    "total_expenditure": str(r.get("total_expenditure", r.get("total_computable", ""))),
-                    "fmap_rate": str(r.get("fmap_rate", r.get("e_fmap", r.get("chip_fmap", "")))),
-                    "source_doc": query_url,
-                })
+                rows.append(
+                    {
+                        "fiscal_year": str(r.get("fiscal_year", r.get("year", r.get("fy", "")))),
+                        "quarter": str(r.get("quarter", r.get("reporting_quarter", ""))),
+                        "enrollment_count": str(
+                            r.get("enrollment", r.get("enrollees", r.get("chip_enrollment", "")))
+                        ),
+                        "federal_expenditure": str(
+                            r.get(
+                                "federal_expenditure",
+                                r.get("federal_share", r.get("chip_federal_expenditure", "")),
+                            )
+                        ),
+                        "state_expenditure": str(
+                            r.get("state_expenditure", r.get("state_share", ""))
+                        ),
+                        "total_expenditure": str(
+                            r.get("total_expenditure", r.get("total_computable", ""))
+                        ),
+                        "fmap_rate": str(
+                            r.get("fmap_rate", r.get("e_fmap", r.get("chip_fmap", "")))
+                        ),
+                        "source_doc": query_url,
+                    }
+                )
             if len(results) < limit:
                 break
             offset += limit
@@ -170,29 +229,40 @@ def _fetch_data_gov(session, logger) -> list[dict]:
                 try:
                     if url.endswith(".csv"):
                         df = pd.read_csv(
-                            pd.io.common.StringIO(resp2.text),
-                            dtype=str, low_memory=False
+                            pd.io.common.StringIO(resp2.text), dtype=str, low_memory=False
                         )
                     else:
                         data = resp2.json()
                         df = pd.json_normalize(data if isinstance(data, list) else [])
                     state_cols = [c for c in df.columns if "state" in c.lower()]
                     if state_cols:
-                        df = df[df[state_cols[0]].str.upper().str.contains("PR|PUERTO RICO", na=False)]
+                        df = df[
+                            df[state_cols[0]].str.upper().str.contains("PR|PUERTO RICO", na=False)
+                        ]
                     if df.empty:
                         continue
                     for _, r in df.iterrows():
                         r_dict = r.to_dict()
-                        rows.append({
-                            "fiscal_year": str(r_dict.get("fiscal_year", r_dict.get("year", ""))),
-                            "quarter": str(r_dict.get("quarter", "")),
-                            "enrollment_count": str(r_dict.get("enrollment", r_dict.get("enrollees", ""))),
-                            "federal_expenditure": str(r_dict.get("federal_expenditure", r_dict.get("federal_share", ""))),
-                            "state_expenditure": str(r_dict.get("state_expenditure", "")),
-                            "total_expenditure": str(r_dict.get("total_expenditure", "")),
-                            "fmap_rate": str(r_dict.get("fmap_rate", r_dict.get("e_fmap", ""))),
-                            "source_doc": url,
-                        })
+                        rows.append(
+                            {
+                                "fiscal_year": str(
+                                    r_dict.get("fiscal_year", r_dict.get("year", ""))
+                                ),
+                                "quarter": str(r_dict.get("quarter", "")),
+                                "enrollment_count": str(
+                                    r_dict.get("enrollment", r_dict.get("enrollees", ""))
+                                ),
+                                "federal_expenditure": str(
+                                    r_dict.get(
+                                        "federal_expenditure", r_dict.get("federal_share", "")
+                                    )
+                                ),
+                                "state_expenditure": str(r_dict.get("state_expenditure", "")),
+                                "total_expenditure": str(r_dict.get("total_expenditure", "")),
+                                "fmap_rate": str(r_dict.get("fmap_rate", r_dict.get("e_fmap", ""))),
+                                "source_doc": url,
+                            }
+                        )
                     if rows:
                         logger.info(f"  data.gov: {len(rows)} PR CHIP rows from {url[:60]}")
                         return rows

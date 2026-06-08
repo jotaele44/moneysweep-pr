@@ -28,6 +28,7 @@ Usage:
   python3 scripts/download_grants.py --force           # re-download existing
   python3 scripts/download_grants.py --pass grants_pop # single pass only
 """
+
 from __future__ import annotations
 
 import argparse
@@ -49,60 +50,67 @@ from scripts.config import PROJECT_ROOT, setup_logging
 # ---------------------------------------------------------------------------
 
 BULK_DOWNLOAD_URL = "https://api.usaspending.gov/api/v2/bulk_download/awards/"
-BULK_STATUS_URL   = "https://api.usaspending.gov/api/v2/bulk_download/status/"
+BULK_STATUS_URL = "https://api.usaspending.gov/api/v2/bulk_download/status/"
 
 # API constraint: date_range must be within one year (≤ 365/366 days per job).
 # We use one job per fiscal year (Oct 1 → Sep 30).
-START_FY = 2000   # FY2000 = Oct 1999 - Sep 2000
+START_FY = 2000  # FY2000 = Oct 1999 - Sep 2000
+
+
 # Dynamically track the current fiscal year so new data is always included
 def _current_fy() -> int:
     from datetime import date
+
     d = date.today()
     return d.year + 1 if d.month >= 10 else d.year
+
+
 END_FY = _current_fy()
+
 
 def _fy_windows(start_fy: int = START_FY, end_fy: int = END_FY) -> list[dict]:
     """Generate one dict per fiscal year: {label, start_date, end_date}."""
     return [
         {
-            "label":      str(fy),
+            "label": str(fy),
             "start_date": f"{fy - 1}-10-01",
-            "end_date":   f"{fy}-09-30",
+            "end_date": f"{fy}-09-30",
         }
         for fy in range(start_fy, end_fy + 1)
     ]
 
+
 POLL_INTERVAL_S = 15
-MAX_POLL_S      = 1800  # 30 minutes
+MAX_POLL_S = 1800  # 30 minutes
 
-MAX_RETRIES    = 3
-RETRY_BACKOFF  = [30, 60, 120]  # generous backoff — USASpending drops connections when flooded
+MAX_RETRIES = 3
+RETRY_BACKOFF = [30, 60, 120]  # generous backoff — USASpending drops connections when flooded
 
-CIRCUIT_BREAKER_THRESHOLD = 3     # consecutive failures before pausing
-CIRCUIT_BREAKER_SLEEP_S   = 2700  # 45 minutes — full USASpending rate-limit reset window
+CIRCUIT_BREAKER_THRESHOLD = 3  # consecutive failures before pausing
+CIRCUIT_BREAKER_SLEEP_S = 2700  # 45 minutes — full USASpending rate-limit reset window
 
 # (output_prefix, prime_award_types numeric codes, filter_type)
 # bulk_download uses prime_award_types with the same numeric codes as spending_by_award
 PASSES = [
-    ("grants_pop",       ["02", "03", "04", "05"], "pop"),
+    ("grants_pop", ["02", "03", "04", "05"], "pop"),
     ("grants_recipient", ["02", "03", "04", "05"], "recipient"),
-    ("direct_recipient", ["06"],                   "recipient"),
-    ("loans_recipient",  ["07", "08"],             "recipient"),
+    ("direct_recipient", ["06"], "recipient"),
+    ("loans_recipient", ["07", "08"], "recipient"),
 ]
 
 # Bulk download CSVs use snake_case column names (different from spending_by_award fields)
 BULK_RENAME = {
-    "award_id_fain":                              "award_id",
-    "recipient_name":                             "recipient_name",
-    "recipient_uei":                              "recipient_uei",
-    "awarding_agency_name":                       "awarding_agency",
-    "awarding_sub_agency_name":                   "awarding_sub_agency",
-    "total_obligated_amount":                     "obligated_amount",
-    "period_of_performance_start_date":           "award_date",
-    "primary_place_of_performance_state_name":    "pop_state",
-    "primary_place_of_performance_county_name":   "pop_county",
-    "transaction_description":                    "description",
-    "assistance_type_description":                "award_category",
+    "award_id_fain": "award_id",
+    "recipient_name": "recipient_name",
+    "recipient_uei": "recipient_uei",
+    "awarding_agency_name": "awarding_agency",
+    "awarding_sub_agency_name": "awarding_sub_agency",
+    "total_obligated_amount": "obligated_amount",
+    "period_of_performance_start_date": "award_date",
+    "primary_place_of_performance_state_name": "pop_state",
+    "primary_place_of_performance_county_name": "pop_county",
+    "transaction_description": "description",
+    "assistance_type_description": "award_category",
 }
 
 MASTER_COLUMNS = [
@@ -127,6 +135,7 @@ MASTER_COLUMNS = [
 # Session
 # ---------------------------------------------------------------------------
 
+
 def _session() -> requests.Session:
     s = requests.Session()
     s.headers.update({"User-Agent": "ContractSweeper/1.0", "Accept": "application/json"})
@@ -136,6 +145,7 @@ def _session() -> requests.Session:
 # ---------------------------------------------------------------------------
 # Helpers (unchanged)
 # ---------------------------------------------------------------------------
+
 
 def _derive_fiscal_year(date_str) -> str:
     """Derive fiscal year from a date string (YYYY-MM-DD). Oct-Dec → year+1."""
@@ -164,6 +174,7 @@ def _file_has_data(filepath: Path) -> bool:
 # ---------------------------------------------------------------------------
 # Bulk download network layer
 # ---------------------------------------------------------------------------
+
 
 def _build_bulk_payload(prime_award_types: list, filter_type: str, window: dict) -> dict:
     """Build a bulk_download/awards/ request body for one pass + FY window."""
@@ -208,7 +219,9 @@ def _submit_bulk_job(
             last_err = e
         if attempt < MAX_RETRIES - 1:
             wait = RETRY_BACKOFF[attempt]
-            logger.warning(f"  Submission attempt {attempt + 1} failed ({last_err}) — retrying in {wait}s")
+            logger.warning(
+                f"  Submission attempt {attempt + 1} failed ({last_err}) — retrying in {wait}s"
+            )
             time.sleep(wait)
     logger.error(f"  Job submission failed after {MAX_RETRIES} attempts: {last_err}")
     return None
@@ -316,10 +329,11 @@ def _normalize_bulk_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
         return pd.DataFrame(columns=MASTER_COLUMNS)
 
     # Apply rename map for known columns; warn about any missing expected fields
-    matched   = {k for k in BULK_RENAME if k in df.columns}
+    matched = {k for k in BULK_RENAME if k in df.columns}
     unmatched = set(BULK_RENAME) - matched
     if unmatched:
         import logging
+
         logging.getLogger("download_grants").warning(
             f"  BULK_RENAME: {len(unmatched)} expected columns not found: {sorted(unmatched)}"
         )
@@ -342,7 +356,7 @@ def _normalize_bulk_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
     else:
         df["fiscal_year"] = ""
 
-    df["source_file"]    = source_file
+    df["source_file"] = source_file
     df["source_dataset"] = "grants"
 
     for col in MASTER_COLUMNS:
@@ -356,6 +370,7 @@ def _normalize_bulk_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
 # Per-pass downloader
 # ---------------------------------------------------------------------------
 
+
 def _run_one_window(
     session: requests.Session,
     prefix: str,
@@ -367,8 +382,8 @@ def _run_one_window(
     logger,
 ) -> dict:
     """Submit, poll, download, and extract one FY window for one pass."""
-    fy     = window["label"]
-    fname  = f"{prefix}_fy{fy}.csv"
+    fy = window["label"]
+    fname = f"{prefix}_fy{fy}.csv"
     csv_path = raw_dir / fname
     zip_path = raw_dir / f"{prefix}_fy{fy}.zip"
     result = {"fy": fy, "rows": 0, "error": None, "skipped": False}
@@ -390,8 +405,8 @@ def _run_one_window(
         return result
 
     file_name = job.get("file_name") or job.get("file_url", "").split("/")[-1]
-    status    = job.get("status", "")
-    file_url  = job.get("file_url") or job.get("download_url")
+    status = job.get("status", "")
+    file_url = job.get("file_url") or job.get("download_url")
 
     if status != "finished" or not file_url:
         file_url = _poll_job(session, file_name, logger)
@@ -466,8 +481,14 @@ def download_pass(
             consecutive_failures = 0
 
         result = _run_one_window(
-            session, prefix, type_codes, filter_type,
-            window, raw_dir, force, logger,
+            session,
+            prefix,
+            type_codes,
+            filter_type,
+            window,
+            raw_dir,
+            force,
+            logger,
         )
         stats["rows"] += result["rows"]
         prev_was_api_call = not result.get("skipped", False)
@@ -484,6 +505,7 @@ def download_pass(
 # ---------------------------------------------------------------------------
 # Master build (unchanged)
 # ---------------------------------------------------------------------------
+
 
 def build_master(raw_dir: Path, master_path: Path, logger) -> int:
     """Concatenate all raw CSVs, deduplicate by award_id, write master."""
@@ -524,6 +546,7 @@ def build_master(raw_dir: Path, master_path: Path, logger) -> int:
 # Entry points
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None) -> dict:
     """Main entry point (no --force). Returns summary dict."""
     return _run(root=root, force=False, only_pass=None, fy_start=None)
@@ -538,7 +561,7 @@ def _run(
     if root is None:
         root = PROJECT_ROOT
 
-    raw_dir     = root / "data" / "staging" / "raw" / "grants"
+    raw_dir = root / "data" / "staging" / "raw" / "grants"
     master_path = root / "data" / "staging" / "processed" / "pr_grants_master.csv"
     raw_dir.mkdir(parents=True, exist_ok=True)
 
@@ -565,8 +588,14 @@ def _run(
         logger.info(f"\n[Pass: {prefix}] types={type_codes}, filter={filter_type}")
         try:
             stats = download_pass(
-                session, prefix, type_codes, filter_type,
-                raw_dir, force, logger, fy_start=fy_start,
+                session,
+                prefix,
+                type_codes,
+                filter_type,
+                raw_dir,
+                force,
+                logger,
+                fy_start=fy_start,
             )
         except Exception as e:
             logger.error(f"  Unexpected error on {prefix}: {e}")
@@ -582,12 +611,12 @@ def _run(
     master_rows = build_master(raw_dir, master_path, logger)
 
     summary = {
-        "raw_rows":    total_rows,
+        "raw_rows": total_rows,
         "master_rows": master_rows,
         "master_path": str(master_path),
-        "raw_dir":     str(raw_dir),
-        "errors":      all_errors,
-        "passes":      pass_stats,
+        "raw_dir": str(raw_dir),
+        "errors": all_errors,
+        "passes": pass_stats,
     }
 
     logger.info("=" * 60)

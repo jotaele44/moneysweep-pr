@@ -18,6 +18,7 @@ from scripts.build_unified_master import (
 # _normalize_name
 # ---------------------------------------------------------------------------
 
+
 class TestNormalizeName:
     def test_empty_string(self):
         assert _normalize_name("") == ""
@@ -48,6 +49,7 @@ class TestNormalizeName:
 # ---------------------------------------------------------------------------
 # _derive_fiscal_year
 # ---------------------------------------------------------------------------
+
 
 class TestDeriveFiscalYear:
     def test_january_is_same_fy(self):
@@ -83,6 +85,7 @@ class TestDeriveFiscalYear:
 # ---------------------------------------------------------------------------
 # _standardize_pop_state
 # ---------------------------------------------------------------------------
+
 
 class TestStandardizePopState:
     def test_full_name_to_pr(self):

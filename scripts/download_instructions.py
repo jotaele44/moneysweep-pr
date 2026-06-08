@@ -94,7 +94,7 @@ def _generate_usaspending_dod_instructions(entry: dict, idx: int) -> str:
     filters = entry["filters"]
     time_period = filters.get("Time Period", "")
     keywords = filters.get("Keywords", [])
-    kw_str = ", ".join(f'`{k}`' for k in keywords)
+    kw_str = ", ".join(f"`{k}`" for k in keywords)
 
     return f"""### File {idx}: `{fname}`
 
@@ -129,7 +129,7 @@ def _generate_reconstruction_instructions(entry: dict, idx: int) -> str:
     agencies = filters.get("Agencies", [])
     keywords = filters.get("Keywords", [])
     ag_str = ", ".join(f"**{a}**" for a in agencies)
-    kw_str = ", ".join(f'`{k}`' for k in keywords)
+    kw_str = ", ".join(f"`{k}`" for k in keywords)
 
     return f"""### File {idx}: `{fname}`
 
@@ -237,7 +237,11 @@ def generate_instructions(root: Path = None) -> Path:
         elif source == "USASpending" and ftype == "dod" and current_section != "usaspending_dod":
             lines.append("## USASpending — DoD Corridor (2 files)\n\n")
             current_section = "usaspending_dod"
-        elif source == "USASpending" and ftype == "reconstruction" and current_section != "reconstruction":
+        elif (
+            source == "USASpending"
+            and ftype == "reconstruction"
+            and current_section != "reconstruction"
+        ):
             lines.append("## Reconstruction Layer (1 file)\n\n")
             current_section = "reconstruction"
         elif source == "FSRS" and current_section != "fsrs":

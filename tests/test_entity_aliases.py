@@ -4,6 +4,7 @@ Fully offline: the producer explodes aliases from the committed master tables an
 validates against ``schemas/entity_aliases.schema.json`` via the stdlib
 canonical_v1 schema interpreter (no ``jsonschema`` dependency).
 """
+
 from __future__ import annotations
 
 import csv

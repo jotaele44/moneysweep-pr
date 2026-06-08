@@ -32,7 +32,7 @@ def accepted_patterns_for(source_family: str) -> str:
 def validation_command_for(target_output_path: str, required_columns: list[str]) -> str:
     req = ",".join(required_columns)
     return (
-        "python -c \"import pandas as pd; from pathlib import Path; "
+        'python -c "import pandas as pd; from pathlib import Path; '
         f"p=Path('{target_output_path}'); assert p.exists(), 'missing output'; "
         "df=pd.read_csv(p,dtype=str,low_memory=False); "
         "assert len(df)>0, 'empty output'; "

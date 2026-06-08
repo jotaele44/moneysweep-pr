@@ -18,6 +18,7 @@ sources correctly remain ``not_materialized`` in gap analysis.
 Usage:
   python3 scripts/download_nara_nextgen.py [--source <source_id>]
 """
+
 from __future__ import annotations
 
 import argparse

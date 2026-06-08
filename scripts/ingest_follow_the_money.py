@@ -23,6 +23,7 @@ Usage:
   python3 scripts/ingest_follow_the_money.py
   python3 scripts/ingest_follow_the_money.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -90,6 +91,7 @@ FACILITY_COLUMNS = [
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _to_numeric(series: pd.Series) -> pd.Series:
     """Convert a series of strings to numeric, coercing errors to NaN."""
     return pd.to_numeric(
@@ -109,6 +111,7 @@ def _normalize_muni(name: str) -> str:
 # Output 1: SF-133 budget execution
 # ---------------------------------------------------------------------------
 
+
 def _build_sf133(df: pd.DataFrame, logger) -> pd.DataFrame:
     """
     Pivot SF-133 raw rows into one row per (fiscal_year, agency, account) with
@@ -117,11 +120,7 @@ def _build_sf133(df: pd.DataFrame, logger) -> pd.DataFrame:
     # Normalise the is_obligation column — accepts True/False/"True"/"False"/"1"/"0"/1/0
     df = df.copy()
     df["_is_obligation"] = (
-        df["is_obligation"]
-        .astype(str)
-        .str.strip()
-        .str.lower()
-        .isin(["true", "1", "yes"])
+        df["is_obligation"].astype(str).str.strip().str.lower().isin(["true", "1", "yes"])
     )
 
     # total_annual is the authoritative amount column
@@ -147,14 +146,14 @@ def _build_sf133(df: pd.DataFrame, logger) -> pd.DataFrame:
 
     merged = pd.merge(ba_df, oblig_df, on=group_keys, how="outer")
 
-    merged["fiscal_year"]         = merged["report_year"].astype(str)
-    merged["agency_code"]         = ""
-    merged["agency_name"]         = merged["agency"].astype(str)
-    merged["account_number"]      = merged["omb_account"].astype(str)
-    merged["account_title"]       = merged["account"].astype(str)
-    merged["budget_authority"]    = merged["budget_authority"].fillna(0)
-    merged["obligations"]         = merged["obligations"].fillna(0)
-    merged["outlays"]             = ""
+    merged["fiscal_year"] = merged["report_year"].astype(str)
+    merged["agency_code"] = ""
+    merged["agency_name"] = merged["agency"].astype(str)
+    merged["account_number"] = merged["omb_account"].astype(str)
+    merged["account_title"] = merged["account"].astype(str)
+    merged["budget_authority"] = merged["budget_authority"].fillna(0)
+    merged["obligations"] = merged["obligations"].fillna(0)
+    merged["outlays"] = ""
     merged["unobligated_balance"] = ""
 
     ba = merged["budget_authority"]
@@ -163,7 +162,7 @@ def _build_sf133(df: pd.DataFrame, logger) -> pd.DataFrame:
     merged.loc[merged["obligation_rate"] == "nan", "obligation_rate"] = ""
 
     merged["budget_authority"] = merged["budget_authority"].astype(str)
-    merged["obligations"]      = merged["obligations"].astype(str)
+    merged["obligations"] = merged["obligations"].astype(str)
 
     logger.info(f"    SF-133: {len(merged):,} aggregated rows")
     return merged[SF133_OUTPUT_COLUMNS]
@@ -172,6 +171,7 @@ def _build_sf133(df: pd.DataFrame, logger) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 # Output 2: PR bank wire ledger
 # ---------------------------------------------------------------------------
+
 
 def _build_wire_ledger(
     ledger_df: pd.DataFrame,
@@ -191,13 +191,13 @@ def _build_wire_ledger(
         ld = ledger_df.copy()
         row = pd.DataFrame(
             {
-                "source_file":        ld.get("file", "EP_PR_PRBank_Wire_Ledger_ALL"),
-                "txn_date":           ld.get("txn_date", ""),
-                "entity_raw":         ld.get("entity_raw", ""),
-                "destination_bank":   ld.get("destination_bank", ""),
+                "source_file": ld.get("file", "EP_PR_PRBank_Wire_Ledger_ALL"),
+                "txn_date": ld.get("txn_date", ""),
+                "entity_raw": ld.get("entity_raw", ""),
+                "destination_bank": ld.get("destination_bank", ""),
                 "destination_account": ld.get("destination_account", ""),
-                "amount_usd":         ld.get("amount_usd", ""),
-                "year":               "",
+                "amount_usd": ld.get("amount_usd", ""),
+                "year": "",
             }
         )
         frames.append(row)
@@ -208,13 +208,13 @@ def _build_wire_ledger(
         ed = entity_df.copy()
         row = pd.DataFrame(
             {
-                "source_file":        "EP_PR_PRBank_Summary_ByEntity",
-                "txn_date":           "",
-                "entity_raw":         ed.get("entity_clean", ""),
-                "destination_bank":   ed.get("destination_bank", ""),
+                "source_file": "EP_PR_PRBank_Summary_ByEntity",
+                "txn_date": "",
+                "entity_raw": ed.get("entity_clean", ""),
+                "destination_bank": ed.get("destination_bank", ""),
                 "destination_account": "",
-                "amount_usd":         ed.get("amount_usd", ""),
-                "year":               "",
+                "amount_usd": ed.get("amount_usd", ""),
+                "year": "",
             }
         )
         frames.append(row)
@@ -225,13 +225,13 @@ def _build_wire_ledger(
         ad = account_df.copy()
         row = pd.DataFrame(
             {
-                "source_file":        "EP_PR_PRBank_Summary_ByAccount",
-                "txn_date":           "",
-                "entity_raw":         "",
-                "destination_bank":   ad.get("destination_bank", ""),
+                "source_file": "EP_PR_PRBank_Summary_ByAccount",
+                "txn_date": "",
+                "entity_raw": "",
+                "destination_bank": ad.get("destination_bank", ""),
                 "destination_account": ad.get("destination_account", ""),
-                "amount_usd":         ad.get("amount_usd", ""),
-                "year":               "",
+                "amount_usd": ad.get("amount_usd", ""),
+                "year": "",
             }
         )
         frames.append(row)
@@ -242,13 +242,13 @@ def _build_wire_ledger(
         yd = year_df.copy()
         row = pd.DataFrame(
             {
-                "source_file":        "EP_PR_PRBank_Summary_ByYear",
-                "txn_date":           "",
-                "entity_raw":         "",
-                "destination_bank":   yd.get("destination_bank", ""),
+                "source_file": "EP_PR_PRBank_Summary_ByYear",
+                "txn_date": "",
+                "entity_raw": "",
+                "destination_bank": yd.get("destination_bank", ""),
                 "destination_account": "",
-                "amount_usd":         yd.get("amount_usd", ""),
-                "year":               yd.get("year", ""),
+                "amount_usd": yd.get("amount_usd", ""),
+                "year": yd.get("year", ""),
             }
         )
         frames.append(row)
@@ -268,6 +268,7 @@ def _build_wire_ledger(
 # Output 3: Municipal bridge
 # ---------------------------------------------------------------------------
 
+
 def _build_muni_bridge(
     blind_df: pd.DataFrame,
     bridge_df: pd.DataFrame,
@@ -285,9 +286,9 @@ def _build_muni_bridge(
         blind["_muni_key"] = blind["Municipality"].apply(_normalize_muni)
         blind = blind.rename(
             columns={
-                "Municipality":      "_muni_raw_blind",
-                "Node_Count":        "node_count",
-                "Domain_Diversity":  "domain_diversity",
+                "Municipality": "_muni_raw_blind",
+                "Node_Count": "node_count",
+                "Domain_Diversity": "domain_diversity",
                 "Blind_Score_0_100": "blind_score",
             }
         )
@@ -303,14 +304,14 @@ def _build_muni_bridge(
             bridge["_muni_key"] = bridge["municipality"].apply(_normalize_muni)
         bridge = bridge.rename(
             columns={
-                "municipality":            "_muni_raw_bridge",
-                "city_norm":               "_city_norm",
-                "total_donated":           "total_donated",
-                "num_donors":              "num_donors",
-                "federal_rows":            "federal_rows",
-                "federal_amount":          "federal_amount",
-                "federal_unique_targets":  "federal_unique_targets",
-                "political_nodes":         "political_nodes",
+                "municipality": "_muni_raw_bridge",
+                "city_norm": "_city_norm",
+                "total_donated": "total_donated",
+                "num_donors": "num_donors",
+                "federal_rows": "federal_rows",
+                "federal_amount": "federal_amount",
+                "federal_unique_targets": "federal_unique_targets",
+                "political_nodes": "political_nodes",
                 "political_federal_ratio": "political_federal_ratio",
             }
         )
@@ -329,14 +330,19 @@ def _build_muni_bridge(
         merged = blind.copy()
         merged["municipality"] = merged["_muni_raw_blind"]
         for col in [
-            "total_donated", "num_donors", "federal_rows", "federal_amount",
-            "federal_unique_targets", "political_nodes", "political_federal_ratio",
+            "total_donated",
+            "num_donors",
+            "federal_rows",
+            "federal_amount",
+            "federal_unique_targets",
+            "political_nodes",
+            "political_federal_ratio",
         ]:
             merged[col] = ""
     else:
         merged = pd.merge(blind, bridge, on="_muni_key", how="outer")
         # Use blind name where available, else bridge name
-        blind_name  = merged.get("_muni_raw_blind",  pd.Series([""] * len(merged)))
+        blind_name = merged.get("_muni_raw_blind", pd.Series([""] * len(merged)))
         bridge_name = merged.get("_muni_raw_bridge", pd.Series([""] * len(merged)))
         merged["municipality"] = blind_name.fillna("").where(
             blind_name.fillna("") != "", bridge_name.fillna("")
@@ -355,13 +361,14 @@ def _build_muni_bridge(
 # Output 4: Facility matches (pass-through)
 # ---------------------------------------------------------------------------
 
+
 def _build_facility(df: pd.DataFrame, logger) -> pd.DataFrame:
     """Rename raw columns to FACILITY_COLUMNS schema and pass through."""
     col_map = {
-        "Facility Cluster":    "facility_cluster",
-        "Matched Contracts":   "matched_contracts",
-        "Matched Obligation":  "matched_obligation",
-        "Top Vendors":         "top_vendors",
+        "Facility Cluster": "facility_cluster",
+        "Matched Contracts": "matched_contracts",
+        "Matched Obligation": "matched_obligation",
+        "Top Vendors": "top_vendors",
     }
     out = df.rename(columns=col_map)
     for col in FACILITY_COLUMNS:
@@ -375,6 +382,7 @@ def _build_facility(df: pd.DataFrame, logger) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 # Main run()
 # ---------------------------------------------------------------------------
+
 
 def run(root: Path = None, force: bool = False) -> dict:
     if root is None:
@@ -419,19 +427,27 @@ def run(root: Path = None, force: bool = False) -> dict:
             logger.warning(f"  Could not read {filename}: {exc}")
             return None
 
-    sf133_df      = _read("funding_flows_sf133.csv")
-    ledger_df     = _read("EP_PR_PRBank_Wire_Ledger_ALL.csv")
-    entity_df     = _read("EP_PR_PRBank_Summary_ByEntity.csv")
-    account_df    = _read("EP_PR_PRBank_Summary_ByAccount.csv")
-    year_df       = _read("EP_PR_PRBank_Summary_ByYear.csv")
-    blind_df      = _read("Municipal_Blind_Score_CORE6.csv")
-    bridge_df     = _read("municipality_political_federal_bridge.csv")
-    facility_df   = _read("facility_matches_cross_exam.csv")
+    sf133_df = _read("funding_flows_sf133.csv")
+    ledger_df = _read("EP_PR_PRBank_Wire_Ledger_ALL.csv")
+    entity_df = _read("EP_PR_PRBank_Summary_ByEntity.csv")
+    account_df = _read("EP_PR_PRBank_Summary_ByAccount.csv")
+    year_df = _read("EP_PR_PRBank_Summary_ByYear.csv")
+    blind_df = _read("Municipal_Blind_Score_CORE6.csv")
+    bridge_df = _read("municipality_political_federal_bridge.csv")
+    facility_df = _read("facility_matches_cross_exam.csv")
 
     all_missing = all(
         df is None
-        for df in [sf133_df, ledger_df, entity_df, account_df,
-                   year_df, blind_df, bridge_df, facility_df]
+        for df in [
+            sf133_df,
+            ledger_df,
+            entity_df,
+            account_df,
+            year_df,
+            blind_df,
+            bridge_df,
+            facility_df,
+        ]
     )
     if all_missing:
         logger.warning("  No readable Follow the Money files found")
@@ -501,13 +517,12 @@ def run(root: Path = None, force: bool = False) -> dict:
 # CLI entry point
 # ---------------------------------------------------------------------------
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Ingest Follow the Money CSV exports from data/raw/follow_the_money/"
     )
-    parser.add_argument(
-        "--force", action="store_true", help="Re-ingest even if output exists"
-    )
+    parser.add_argument("--force", action="store_true", help="Re-ingest even if output exists")
     args = parser.parse_args()
     result = run(force=args.force)
     print(f"\nFollow the Money ingest: {result['rows']:,} rows — {result['status']}")

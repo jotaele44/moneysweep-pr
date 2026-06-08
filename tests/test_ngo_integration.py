@@ -106,14 +106,16 @@ def test_canonical_source_bonus_lifts_bmf_only_rows(monkeypatch, tmp_path):
     # alone; the canonical IRS-BMF provenance bonus (+15) lifts it into the
     # strong_probable band.
     pd.DataFrame(
-        [{
-            "EIN": "660000123",
-            "Organization Name": "Centro Comunitario de Ponce",
-            "State": "PR",
-            "City": "Ponce",
-            "Subsection": "03",
-            "Address": "10 Calle Sol, Ponce, PR",
-        }]
+        [
+            {
+                "EIN": "660000123",
+                "Organization Name": "Centro Comunitario de Ponce",
+                "State": "PR",
+                "City": "Ponce",
+                "Subsection": "03",
+                "Address": "10 Calle Sol, Ponce, PR",
+            }
+        ]
     ).to_csv(irs_dir / "eo_bmf_pr.csv", index=False)
 
     ngo.run_pipeline()
@@ -132,14 +134,20 @@ def test_fiscal_sponsor_edges_from_group_exemption(monkeypatch, tmp_path):
     pd.DataFrame(
         [
             {
-                "EIN": "660000900", "Organization Name": "Umbrella Central Inc",
-                "State": "PR", "City": "San Juan",
-                "Group Exemption Number": "1234", "Affiliation": "6",
+                "EIN": "660000900",
+                "Organization Name": "Umbrella Central Inc",
+                "State": "PR",
+                "City": "San Juan",
+                "Group Exemption Number": "1234",
+                "Affiliation": "6",
             },
             {
-                "EIN": "660000901", "Organization Name": "Subordinate Chapter San Juan",
-                "State": "PR", "City": "San Juan",
-                "Group Exemption Number": "1234", "Affiliation": "9",
+                "EIN": "660000901",
+                "Organization Name": "Subordinate Chapter San Juan",
+                "State": "PR",
+                "City": "San Juan",
+                "Group Exemption Number": "1234",
+                "Affiliation": "9",
             },
         ]
     ).to_csv(irs_dir / "eo_bmf_pr.csv", index=False)
@@ -162,23 +170,31 @@ def test_asset_edges_link_funded_ngo_to_asset(monkeypatch, tmp_path):
     processed.mkdir(parents=True, exist_ok=True)
 
     pd.DataFrame(
-        [{
-            "EIN": "660000001", "Organization Name": "Fundacion Comunitaria Puerto Rico",
-            "State": "PR", "City": "San Juan", "Address": "123 Calle Principal, San Juan, PR",
-        }]
+        [
+            {
+                "EIN": "660000001",
+                "Organization Name": "Fundacion Comunitaria Puerto Rico",
+                "State": "PR",
+                "City": "San Juan",
+                "Address": "123 Calle Principal, San Juan, PR",
+            }
+        ]
     ).to_csv(irs_dir / "eo_bmf_pr.csv", index=False)
 
     # Award row carries both an award_id (funding edge) and an asset_id (asset link).
     pd.DataFrame(
-        [{
-            "Award ID": "FAKE-AWARD-001",
-            "Recipient Name": "Fundacion Comunitaria Puerto Rico",
-            "Awarding Agency Name": "Federal Emergency Management Agency",
-            "Federal Action Obligation": "125000.50",
-            "Award Description": "Disaster recovery community services",
-            "Recipient City Name": "San Juan", "Recipient State Code": "PR",
-            "asset_id": "PW-555",
-        }]
+        [
+            {
+                "Award ID": "FAKE-AWARD-001",
+                "Recipient Name": "Fundacion Comunitaria Puerto Rico",
+                "Awarding Agency Name": "Federal Emergency Management Agency",
+                "Federal Action Obligation": "125000.50",
+                "Award Description": "Disaster recovery community services",
+                "Recipient City Name": "San Juan",
+                "Recipient State Code": "PR",
+                "asset_id": "PW-555",
+            }
+        ]
     ).to_csv(processed / "pr_contracts_master.csv", index=False)
 
     summary = ngo.run_pipeline()
@@ -198,17 +214,26 @@ def test_parquet_and_schema_outputs_written(monkeypatch, tmp_path):
     processed.mkdir(parents=True, exist_ok=True)
 
     pd.DataFrame(
-        [{
-            "EIN": "660000001", "Organization Name": "Fundacion Comunitaria Puerto Rico",
-            "State": "PR", "City": "San Juan",
-        }]
+        [
+            {
+                "EIN": "660000001",
+                "Organization Name": "Fundacion Comunitaria Puerto Rico",
+                "State": "PR",
+                "City": "San Juan",
+            }
+        ]
     ).to_csv(irs_dir / "eo_bmf_pr.csv", index=False)
 
     ngo.run_pipeline()
     out = ngo.NGO_OUT_DIR
     # pq_write emits .parquet when pyarrow is present, else a .csv fallback.
-    for stem in ["ngos_master", "ngo_funding_edges", "ngo_municipal_coverage",
-                 "ngo_asset_edges", "ngo_fiscal_sponsor_edges"]:
+    for stem in [
+        "ngos_master",
+        "ngo_funding_edges",
+        "ngo_municipal_coverage",
+        "ngo_asset_edges",
+        "ngo_fiscal_sponsor_edges",
+    ]:
         assert (out / f"{stem}.parquet").exists() or (out / f"{stem}.csv").exists()
     for schema in ["ngo_asset_edges.schema.json", "ngo_fiscal_sponsor_edges.schema.json"]:
         assert (ngo.SCHEMA_OUT_DIR / schema).exists()

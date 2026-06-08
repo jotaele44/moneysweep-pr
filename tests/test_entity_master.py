@@ -4,6 +4,7 @@ Fully offline: the producer reads only the committed public reference CSV and
 validates against ``schemas/entity_master.schema.json`` via the stdlib
 canonical_v1 schema interpreter (no ``jsonschema`` dependency).
 """
+
 from __future__ import annotations
 
 import csv

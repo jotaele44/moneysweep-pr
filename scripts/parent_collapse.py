@@ -12,6 +12,7 @@ Usage:
   python3 scripts/parent_collapse.py
   python3 scripts/parent_collapse.py --root /path/to/repo
 """
+
 from __future__ import annotations
 
 import argparse
@@ -22,6 +23,7 @@ from pathlib import Path
 from typing import Any
 
 import sys
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from contract_sweeper.runtime.alias_overrides import apply as apply_override
@@ -29,37 +31,71 @@ from contract_sweeper.runtime.alias_overrides import load_overrides
 from contract_sweeper.runtime.name_normalization import normalize_name
 
 NAME_FIELDS = [
-    "recipient_name", "vendor_name", "award_recipient_name",
-    "prime_recipient_name", "sub_recipient_name", "contractor", "applicant",
+    "recipient_name",
+    "vendor_name",
+    "award_recipient_name",
+    "prime_recipient_name",
+    "sub_recipient_name",
+    "contractor",
+    "applicant",
 ]
 
 # Entity-type classification keyword sets (checked in priority order)
-_AGGREGATE = frozenset(["MULTIPLE RECIPIENTS", "VARIOUS RECIPIENTS", "ALL RECIPIENTS", "UNDISCLOSED"])
-_GOVT = frozenset([
-    "DEPARTMENT OF", "DEPARTAMENTO DE", "DEPT OF",
-    "ADMINISTRACION", "ADMINISTRACIÓN", "ADMINISTRATION OF",
-    "AUTORIDAD", "AUTHORITY OF",
-    "MUNICIPIO", "MUNICIPALITY OF", "MUNICIPALIDAD",
-    "GOVERNMENT OF", "GOBIERNO DE",
-    "GOVERNOR'S",
-    "COMMONWEALTH OF", "ESTADO LIBRE ASOCIADO",
-    "SECRETARIA", "SECRETARÍA", "SECRETARIAT",
-    "JUNTA DE", "JUNTA OF",
-    "OFICINA DE", "OFICINA DEL",
-    "TRIBUNAL",
-    "POLICIA", "POLICE DEPARTMENT",
-    "HACIENDA",
-    "CONSEJO DE",
-    "DEPARTAMENTO",
-    "AGENCIA",
-])
-_NONPROFIT = frozenset([
-    "UNIVERSITY", "UNIVERSIDAD", "COLLEGE", "ESCUELA GRADUADA",
-    "FOUNDATION", "FUNDACION", "FUNDACIÓN",
-    "IGLESIA", "CHURCH", "CATHEDRAL",
-    "NONPROFIT", "NON-PROFIT",
-    "COOPERATIVE", "COOPERATIVA",
-])
+_AGGREGATE = frozenset(
+    ["MULTIPLE RECIPIENTS", "VARIOUS RECIPIENTS", "ALL RECIPIENTS", "UNDISCLOSED"]
+)
+_GOVT = frozenset(
+    [
+        "DEPARTMENT OF",
+        "DEPARTAMENTO DE",
+        "DEPT OF",
+        "ADMINISTRACION",
+        "ADMINISTRACIÓN",
+        "ADMINISTRATION OF",
+        "AUTORIDAD",
+        "AUTHORITY OF",
+        "MUNICIPIO",
+        "MUNICIPALITY OF",
+        "MUNICIPALIDAD",
+        "GOVERNMENT OF",
+        "GOBIERNO DE",
+        "GOVERNOR'S",
+        "COMMONWEALTH OF",
+        "ESTADO LIBRE ASOCIADO",
+        "SECRETARIA",
+        "SECRETARÍA",
+        "SECRETARIAT",
+        "JUNTA DE",
+        "JUNTA OF",
+        "OFICINA DE",
+        "OFICINA DEL",
+        "TRIBUNAL",
+        "POLICIA",
+        "POLICE DEPARTMENT",
+        "HACIENDA",
+        "CONSEJO DE",
+        "DEPARTAMENTO",
+        "AGENCIA",
+    ]
+)
+_NONPROFIT = frozenset(
+    [
+        "UNIVERSITY",
+        "UNIVERSIDAD",
+        "COLLEGE",
+        "ESCUELA GRADUADA",
+        "FOUNDATION",
+        "FUNDACION",
+        "FUNDACIÓN",
+        "IGLESIA",
+        "CHURCH",
+        "CATHEDRAL",
+        "NONPROFIT",
+        "NON-PROFIT",
+        "COOPERATIVE",
+        "COOPERATIVA",
+    ]
+)
 
 
 def _classify_entity_type(name: str) -> str:
@@ -81,19 +117,30 @@ def _classify_entity_type(name: str) -> str:
         parts = n.split(",", 1)
         left, right = parts[0].strip(), parts[1].strip()
         biz_suffixes = {"LLC", "INC", "CORP", "SA", "CSP", "LTD", "PSC", "CO", "S.A.", "SRL"}
-        if not any(s in right for s in biz_suffixes) and len(left.split()) <= 2 and len(right.split()) <= 3:
+        if (
+            not any(s in right for s in biz_suffixes)
+            and len(left.split()) <= 2
+            and len(right.split()) <= 3
+        ):
             return "individual"
     return "corporate"
+
+
 UEI_FIELDS = ["recipient_uei", "uei", "entity_uei", "prime_uei", "sub_uei"]
 PARENT_UEI_FIELDS = ["parent_uei", "ultimate_parent_uei", "immediate_parent_uei"]
 PARENT_NAME_FIELDS = ["parent_name", "ultimate_parent_name", "immediate_parent_name"]
 AMOUNT_FIELDS = [
-    "obligated_amount", "total_obligation", "obligation_amount",
-    "amount", "subaward_amount",
+    "obligated_amount",
+    "total_obligation",
+    "obligation_amount",
+    "amount",
+    "subaward_amount",
 ]
 HIGH_VALUE_THRESHOLD = 1_000_000.0
 _SKIP_FILENAMES = {
-    "entities_resolved.csv", "high_value_unresolved.csv", "parent_conflict_queue.csv",
+    "entities_resolved.csv",
+    "high_value_unresolved.csv",
+    "parent_conflict_queue.csv",
 }
 
 
@@ -167,7 +214,7 @@ def build_entities(root: Path) -> dict[str, Any]:
     ents: dict[str, dict] = {}
     conflicts: list[dict] = []
 
-    for path in (processed.rglob("*.csv") if processed.exists() else []):
+    for path in processed.rglob("*.csv") if processed.exists() else []:
         if path.name in _SKIP_FILENAMES:
             continue
         for row in _read_csv(path):
@@ -179,20 +226,23 @@ def build_entities(root: Path) -> dict[str, Any]:
             if not norm and not uei:
                 continue
             key = uei or norm
-            e = ents.setdefault(key, {
-                "entity_id": key,
-                "normalized_name": norm,
-                "entity_name": raw_name,
-                "entity_uei": uei,
-                "entity_type": _classify_entity_type(raw_name or norm),
-                "parent_uei": "",
-                "parent_name": "",
-                "resolution_method": "alias_override" if was_overridden else "observed_only",
-                "match_confidence": 0.85 if was_overridden else 0.0,
-                "total_obligation": 0.0,
-                "record_count": 0,
-                "source_files": set(),
-            })
+            e = ents.setdefault(
+                key,
+                {
+                    "entity_id": key,
+                    "normalized_name": norm,
+                    "entity_name": raw_name,
+                    "entity_uei": uei,
+                    "entity_type": _classify_entity_type(raw_name or norm),
+                    "parent_uei": "",
+                    "parent_name": "",
+                    "resolution_method": "alias_override" if was_overridden else "observed_only",
+                    "match_confidence": 0.85 if was_overridden else 0.0,
+                    "total_obligation": 0.0,
+                    "record_count": 0,
+                    "source_files": set(),
+                },
+            )
             if was_overridden and e["resolution_method"] == "observed_only":
                 e["resolution_method"] = "alias_override"
                 e["match_confidence"] = max(e["match_confidence"], 0.85)
@@ -213,13 +263,15 @@ def build_entities(root: Path) -> dict[str, Any]:
 
             if parent_uei or parent_name:
                 if e["parent_uei"] and parent_uei and e["parent_uei"] != parent_uei:
-                    conflicts.append({
-                        "entity_id": key,
-                        "entity_name": e["entity_name"],
-                        "existing_parent_uei": e["parent_uei"],
-                        "candidate_parent_uei": parent_uei,
-                        "source_file": path.name,
-                    })
+                    conflicts.append(
+                        {
+                            "entity_id": key,
+                            "entity_name": e["entity_name"],
+                            "existing_parent_uei": e["parent_uei"],
+                            "candidate_parent_uei": parent_uei,
+                            "source_file": path.name,
+                        }
+                    )
                 e["parent_uei"] = e["parent_uei"] or parent_uei
                 e["parent_name"] = e["parent_name"] or parent_name
                 e["resolution_method"] = "parent_field_or_sam_index"
@@ -239,7 +291,8 @@ def build_entities(root: Path) -> dict[str, Any]:
 
     rows.sort(key=lambda r: (-r["total_obligation"], r["normalized_name"]))
     unresolved = [
-        r for r in rows
+        r
+        for r in rows
         if r["manual_review_required"] and r["total_obligation"] >= HIGH_VALUE_THRESHOLD
     ]
 

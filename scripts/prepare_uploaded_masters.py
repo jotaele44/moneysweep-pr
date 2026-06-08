@@ -158,7 +158,14 @@ def _entity_key(name: str, uei: str = "") -> tuple[str, str]:
     return entity_id, norm
 
 
-def _add_entity(entities: dict[str, dict[str, str]], name: Any, *, uei: Any = "", source: str, entity_type: str = "organization") -> str:
+def _add_entity(
+    entities: dict[str, dict[str, str]],
+    name: Any,
+    *,
+    uei: Any = "",
+    source: str,
+    entity_type: str = "organization",
+) -> str:
     raw_name = _clean(name)
     if not raw_name:
         raw_name = "UNKNOWN"
@@ -205,100 +212,144 @@ def prepare_uploaded_masters(
     for row in awards_rows:
         recipient = _clean(row.get("recipient_name")) or "UNKNOWN"
         recipient_norm = _clean(row.get("recipient_name_normalized")) or _norm(recipient)
-        agency = _clean(row.get("awarding_agency")) or _clean(row.get("awarding_sub_agency")) or "UNKNOWN AGENCY"
-        _add_entity(entities, recipient_norm or recipient, uei=row.get("recipient_uei"), source=awards_master.name)
+        agency = (
+            _clean(row.get("awarding_agency"))
+            or _clean(row.get("awarding_sub_agency"))
+            or "UNKNOWN AGENCY"
+        )
+        _add_entity(
+            entities,
+            recipient_norm or recipient,
+            uei=row.get("recipient_uei"),
+            source=awards_master.name,
+        )
         _add_entity(entities, agency, source=awards_master.name, entity_type="funding_agency")
         municipality = _clean(row.get("pop_county"))
         fy = _clean(row.get("fiscal_year"))
-        canonical_contracts.append({
-            "source_system": _clean(row.get("source_dataset")) or "uploaded_awards_master",
-            "recipient_name": recipient,
-            "normalized_name": recipient_norm,
-            "recipient_uei": _clean(row.get("recipient_uei")),
-            "awarding_agency": agency,
-            "funding_source": _clean(row.get("award_category")) or _clean(row.get("source_dataset")) or "award",
-            "obligation_amount": _amount(row.get("obligated_amount")),
-            "award_date": _date_or_fiscal_year(row.get("award_date"), fy),
-            "fiscal_year": fy or "1970",
-            "link_confidence": "0.85",
-            "municipality": municipality,
-            "geo_municipality_name": municipality,
-            "geo_municipality_code": "",
-            "geo_lat": "",
-            "geo_lon": "",
-            "geo_attribution_source": "uploaded_awards_master.pop_county" if municipality else "",
-            "geo_attribution_confidence": "0.6" if municipality else "",
-        })
-        edges.append({
-            "source": recipient_norm,
-            "target": _norm(agency),
-            "edge_type": "award_recipient",
-            "source_dataset": _clean(row.get("source_dataset")) or "uploaded_awards_master",
-            "confidence": "0.85",
-        })
+        canonical_contracts.append(
+            {
+                "source_system": _clean(row.get("source_dataset")) or "uploaded_awards_master",
+                "recipient_name": recipient,
+                "normalized_name": recipient_norm,
+                "recipient_uei": _clean(row.get("recipient_uei")),
+                "awarding_agency": agency,
+                "funding_source": _clean(row.get("award_category"))
+                or _clean(row.get("source_dataset"))
+                or "award",
+                "obligation_amount": _amount(row.get("obligated_amount")),
+                "award_date": _date_or_fiscal_year(row.get("award_date"), fy),
+                "fiscal_year": fy or "1970",
+                "link_confidence": "0.85",
+                "municipality": municipality,
+                "geo_municipality_name": municipality,
+                "geo_municipality_code": "",
+                "geo_lat": "",
+                "geo_lon": "",
+                "geo_attribution_source": "uploaded_awards_master.pop_county"
+                if municipality
+                else "",
+                "geo_attribution_confidence": "0.6" if municipality else "",
+            }
+        )
+        edges.append(
+            {
+                "source": recipient_norm,
+                "target": _norm(agency),
+                "edge_type": "award_recipient",
+                "source_dataset": _clean(row.get("source_dataset")) or "uploaded_awards_master",
+                "confidence": "0.85",
+            }
+        )
 
     # Contract master -> financial_flows input; preserves local production run behavior.
     for row in contracts_rows:
         vendor = _clean(row.get("normalized_vendor")) or _clean(row.get("vendor_name")) or "UNKNOWN"
-        agency = _clean(row.get("normalized_agency")) or _clean(row.get("agency_name")) or "UNKNOWN AGENCY"
-        vendor_id = _add_entity(entities, vendor, uei=row.get("recipient_uei"), source=contracts_master.name)
+        agency = (
+            _clean(row.get("normalized_agency"))
+            or _clean(row.get("agency_name"))
+            or "UNKNOWN AGENCY"
+        )
+        vendor_id = _add_entity(
+            entities, vendor, uei=row.get("recipient_uei"), source=contracts_master.name
+        )
         _add_entity(entities, agency, source=contracts_master.name, entity_type="funding_agency")
         fy = _clean(row.get("fiscal_year"))
-        flows.append({
-            "source_system": _clean(row.get("dataset")) or "uploaded_contracts_master",
-            "recipient_entity_id": vendor_id,
-            "funding_source": agency,
-            "amount": _amount(row.get("amount_usd") or row.get("total_obligated")),
-            "flow_date": _date_or_fiscal_year(row.get("award_date"), fy),
-            "link_confidence": "0.9" if _clean(row.get("evidence_tier")).startswith("T1") else "0.75",
-            "municipality": "",
-            "geo_municipality_name": "",
-            "geo_municipality_code": "",
-            "geo_lat": "",
-            "geo_lon": "",
-            "geo_attribution_source": "",
-            "geo_attribution_confidence": "",
-        })
-        edges.append({
-            "source": vendor,
-            "target": agency,
-            "edge_type": "contract_awarded_by",
-            "source_dataset": _clean(row.get("dataset")) or "uploaded_contracts_master",
-            "confidence": "0.85",
-        })
+        flows.append(
+            {
+                "source_system": _clean(row.get("dataset")) or "uploaded_contracts_master",
+                "recipient_entity_id": vendor_id,
+                "funding_source": agency,
+                "amount": _amount(row.get("amount_usd") or row.get("total_obligated")),
+                "flow_date": _date_or_fiscal_year(row.get("award_date"), fy),
+                "link_confidence": "0.9"
+                if _clean(row.get("evidence_tier")).startswith("T1")
+                else "0.75",
+                "municipality": "",
+                "geo_municipality_name": "",
+                "geo_municipality_code": "",
+                "geo_lat": "",
+                "geo_lon": "",
+                "geo_attribution_source": "",
+                "geo_attribution_confidence": "",
+            }
+        )
+        edges.append(
+            {
+                "source": vendor,
+                "target": agency,
+                "edge_type": "contract_awarded_by",
+                "source_dataset": _clean(row.get("dataset")) or "uploaded_contracts_master",
+                "confidence": "0.85",
+            }
+        )
 
     # LDA summary -> financial_flows context input.
     for row in lda_rows:
         client = _clean(row.get("canonical_client")) or "UNKNOWN"
         client_id = _add_entity(entities, client, source=lda_summary.name)
-        flows.append({
-            "source_system": "uploaded_lda_summary",
-            "recipient_entity_id": client_id,
-            "funding_source": "LOBBYING DISCLOSURE ACT",
-            "amount": _amount(row.get("total_lobbying_amount")),
-            "flow_date": _date_or_fiscal_year("", row.get("last_year")),
-            "link_confidence": "0.7",
-            "municipality": "",
-            "geo_municipality_name": "",
-            "geo_municipality_code": "",
-            "geo_lat": "",
-            "geo_lon": "",
-            "geo_attribution_source": "",
-            "geo_attribution_confidence": "",
-        })
-        edges.append({
-            "source": client,
-            "target": "LOBBYING DISCLOSURE ACT",
-            "edge_type": "lobbying_client_context",
-            "source_dataset": "uploaded_lda_summary",
-            "confidence": "0.7",
-        })
-        _add_entity(entities, "LOBBYING DISCLOSURE ACT", source=lda_summary.name, entity_type="funding_agency")
+        flows.append(
+            {
+                "source_system": "uploaded_lda_summary",
+                "recipient_entity_id": client_id,
+                "funding_source": "LOBBYING DISCLOSURE ACT",
+                "amount": _amount(row.get("total_lobbying_amount")),
+                "flow_date": _date_or_fiscal_year("", row.get("last_year")),
+                "link_confidence": "0.7",
+                "municipality": "",
+                "geo_municipality_name": "",
+                "geo_municipality_code": "",
+                "geo_lat": "",
+                "geo_lon": "",
+                "geo_attribution_source": "",
+                "geo_attribution_confidence": "",
+            }
+        )
+        edges.append(
+            {
+                "source": client,
+                "target": "LOBBYING DISCLOSURE ACT",
+                "edge_type": "lobbying_client_context",
+                "source_dataset": "uploaded_lda_summary",
+                "confidence": "0.7",
+            }
+        )
+        _add_entity(
+            entities,
+            "LOBBYING DISCLOSURE ACT",
+            source=lda_summary.name,
+            entity_type="funding_agency",
+        )
 
     counts = {
-        "entities_resolved.csv": _write_csv(output_dir / "entities_resolved.csv", ENTITY_FIELDS, entities.values()),
-        "contracts_master.csv": _write_csv(output_dir / "contracts_master.csv", CONTRACT_FIELDS, canonical_contracts),
-        "financial_flows_master.csv": _write_csv(output_dir / "financial_flows_master.csv", FLOW_FIELDS, flows),
+        "entities_resolved.csv": _write_csv(
+            output_dir / "entities_resolved.csv", ENTITY_FIELDS, entities.values()
+        ),
+        "contracts_master.csv": _write_csv(
+            output_dir / "contracts_master.csv", CONTRACT_FIELDS, canonical_contracts
+        ),
+        "financial_flows_master.csv": _write_csv(
+            output_dir / "financial_flows_master.csv", FLOW_FIELDS, flows
+        ),
         "entity_edges.csv": _write_csv(output_dir / "entity_edges.csv", EDGE_FIELDS, edges),
     }
     report = {
@@ -316,18 +367,24 @@ def prepare_uploaded_masters(
         },
         "output_rows": counts,
     }
-    (output_dir / "uploaded_master_mapping_report.json").write_text(json.dumps(report, indent=2, sort_keys=True), encoding="utf-8")
+    (output_dir / "uploaded_master_mapping_report.json").write_text(
+        json.dumps(report, indent=2, sort_keys=True), encoding="utf-8"
+    )
     return report
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Map uploaded raw masters into canonical processed export inputs.")
+    parser = argparse.ArgumentParser(
+        description="Map uploaded raw masters into canonical processed export inputs."
+    )
     parser.add_argument("--contracts-master", required=True, help="pr_contracts_master_v2 CSV")
     parser.add_argument("--awards-master", required=True, help="pr_all_awards_master CSV")
     parser.add_argument("--lda-summary", required=True, help="lda_canonical_client_summary_all CSV")
     parser.add_argument("--output-dir", required=True, help="Canonical processed output directory")
     args = parser.parse_args(argv)
-    report = prepare_uploaded_masters(args.contracts_master, args.awards_master, args.lda_summary, args.output_dir)
+    report = prepare_uploaded_masters(
+        args.contracts_master, args.awards_master, args.lda_summary, args.output_dir
+    )
     print(json.dumps(report, indent=2, sort_keys=True))
     return 0
 

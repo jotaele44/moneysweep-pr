@@ -61,13 +61,19 @@ def test_status_csv_regenerates_identically():
     """
     committed = subprocess.run(
         ["git", "show", f"HEAD:{STATUS_REL}"],
-        cwd=REPO_ROOT, capture_output=True, text=True, check=True,
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
     ).stdout
     with tempfile.TemporaryDirectory() as td:
         worktree = Path(td) / "wt"
         subprocess.run(
             ["git", "worktree", "add", "--detach", "-f", str(worktree), "HEAD"],
-            cwd=REPO_ROOT, capture_output=True, text=True, check=True,
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
         )
         try:
             write_status_csv(worktree)
@@ -75,7 +81,9 @@ def test_status_csv_regenerates_identically():
         finally:
             subprocess.run(
                 ["git", "worktree", "remove", "--force", str(worktree)],
-                cwd=REPO_ROOT, capture_output=True, text=True,
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
             )
     assert regenerated == committed, (
         "reports/source_registry_status.csv is stale — "
@@ -87,6 +95,4 @@ def test_archived_producers_are_optional_only():
     for src in all_sources(REPO_ROOT):
         archived = str(src.get("producer_script", "")).startswith("archive/")
         if src.get("required"):
-            assert not archived, (
-                f"{src['source_id']}: required source must not point into archive/"
-            )
+            assert not archived, f"{src['source_id']}: required source must not point into archive/"

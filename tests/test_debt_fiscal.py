@@ -4,6 +4,7 @@ Covers the three schema-locked producers — debt instruments, creditor mapping,
 and the fiscal-control-events timeline. Fully offline; validation uses the
 stdlib canonical_v1 schema interpreter (no ``jsonschema`` dependency).
 """
+
 from __future__ import annotations
 
 import csv
@@ -31,6 +32,7 @@ def _committed(rel: str):
 # --------------------------------------------------------------------------- #
 # debt_instruments
 # --------------------------------------------------------------------------- #
+
 
 @pytest.fixture(scope="module")
 def debt_rows():
@@ -72,6 +74,7 @@ def test_debt_regenerates_identically(debt_rows):
 # creditor_mapping
 # --------------------------------------------------------------------------- #
 
+
 @pytest.fixture(scope="module")
 def creditor_rows():
     return bcm.build_rows(REPO_ROOT)
@@ -110,6 +113,7 @@ def test_creditor_regenerates_identically(creditor_rows):
 # fiscal_control_events
 # --------------------------------------------------------------------------- #
 
+
 @pytest.fixture(scope="module")
 def event_rows():
     return bfe.build_rows(REPO_ROOT)
@@ -124,6 +128,7 @@ def test_events_check_passes(event_rows):
 def test_events_schema_and_ids(event_rows):
     schema = _schema(bfe.SCHEMA)
     import re
+
     pattern = schema["properties"]["event_id"]["pattern"]
     ids = [r["event_id"] for r in event_rows]
     assert len(set(ids)) == len(ids)

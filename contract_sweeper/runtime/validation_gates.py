@@ -23,6 +23,7 @@ Deprecated (PR2.6): global parent_uei_rate ≥ 0.90 gate removed.
 
 Returns non-zero exit code if any gate fails, unless --allow-failed is set.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -54,12 +55,12 @@ SOURCE_COVERAGE_TARGET = 0.85
 # corporate_parent_uei_rate (PASS).  This threshold is a canary only.
 ENTITY_RESOLUTION_TARGET = 0.001
 # PR2.6: replaced global PARENT_UEI_TARGET with entity-type-aware gates below
-ENTITY_TYPE_ASSIGNMENT_TARGET = 0.80   # fraction of entities with assigned type (non-unknown)
+ENTITY_TYPE_ASSIGNMENT_TARGET = 0.80  # fraction of entities with assigned type (non-unknown)
 # PR dataset: most corporate entities are small PR SMEs with no corporate parent.
 # Only large mainland primes (AECOM, Fluor, Parsons…) have parent UEIs.
 # Target = 0.2% initially; raise once full USAspending/SAM extract completes.
-CORPORATE_PARENT_UEI_TARGET = 0.002    # fraction of corporate entities with parent_uei
-HIGH_VALUE_REVIEW_TARGET = 0.90        # fraction of high-value unresolved in review_queue
+CORPORATE_PARENT_UEI_TARGET = 0.002  # fraction of corporate entities with parent_uei
+HIGH_VALUE_REVIEW_TARGET = 0.90  # fraction of high-value unresolved in review_queue
 SUBAWARD_LINKAGE_TARGET = 0.90
 EXECUTION_CHAIN_LINKAGE_TARGET = 0.90
 DUPLICATE_RATE_LIMIT = 0.05
@@ -195,37 +196,45 @@ def gate_entity_resolution(root: Path) -> dict[str, Any]:
                 "passed": rr >= ENTITY_RESOLUTION_TARGET,
                 "observed": round(rr, 4),
                 "threshold": ENTITY_RESOLUTION_TARGET,
-                "action": "ok" if rr >= ENTITY_RESOLUTION_TARGET else "resolve_aliases_and_sam_parent",
+                "action": "ok"
+                if rr >= ENTITY_RESOLUTION_TARGET
+                else "resolve_aliases_and_sam_parent",
             },
             {
                 "gate": "entity_type_assignment_rate",
                 "passed": type_rate >= ENTITY_TYPE_ASSIGNMENT_TARGET,
                 "observed": round(type_rate, 4),
                 "threshold": ENTITY_TYPE_ASSIGNMENT_TARGET,
-                "action": "ok" if type_rate >= ENTITY_TYPE_ASSIGNMENT_TARGET else "run_parent_collapse_with_entity_type_classifier",
+                "action": "ok"
+                if type_rate >= ENTITY_TYPE_ASSIGNMENT_TARGET
+                else "run_parent_collapse_with_entity_type_classifier",
             },
             {
                 "gate": "corporate_parent_uei_rate",
                 "passed": corp_rate >= CORPORATE_PARENT_UEI_TARGET,
                 "observed": round(corp_rate, 4),
                 "threshold": CORPORATE_PARENT_UEI_TARGET,
-                "action": "ok" if corp_rate >= CORPORATE_PARENT_UEI_TARGET else "complete_usaspending_enrichment",
+                "action": "ok"
+                if corp_rate >= CORPORATE_PARENT_UEI_TARGET
+                else "complete_usaspending_enrichment",
             },
             {
                 "gate": "high_value_unresolved_review_rate",
                 "passed": review_rate >= HIGH_VALUE_REVIEW_TARGET,
                 "observed": round(review_rate, 4),
                 "threshold": HIGH_VALUE_REVIEW_TARGET,
-                "action": "ok" if review_rate >= HIGH_VALUE_REVIEW_TARGET else "populate_review_queue",
+                "action": "ok"
+                if review_rate >= HIGH_VALUE_REVIEW_TARGET
+                else "populate_review_queue",
             },
         ],
     }
 
 
 def gate_subaward_linkage(root: Path) -> dict[str, Any]:
-    rows = _csv_rows(root / "data/staging/processed/execution/execution_chain_master.csv") or _csv_rows(
-        root / "data/staging/processed/pr_prime_sub_relationships.csv"
-    )
+    rows = _csv_rows(
+        root / "data/staging/processed/execution/execution_chain_master.csv"
+    ) or _csv_rows(root / "data/staging/processed/pr_prime_sub_relationships.csv")
     if not rows:
         return {
             "linkage_rate": 0.0,
@@ -255,7 +264,9 @@ def gate_subaward_linkage(root: Path) -> dict[str, Any]:
                 "passed": rate >= SUBAWARD_LINKAGE_TARGET,
                 "observed": round(rate, 4),
                 "threshold": SUBAWARD_LINKAGE_TARGET,
-                "action": "ok" if rate >= SUBAWARD_LINKAGE_TARGET else "rebuild_execution_chain_master",
+                "action": "ok"
+                if rate >= SUBAWARD_LINKAGE_TARGET
+                else "rebuild_execution_chain_master",
             }
         ],
     }
@@ -292,7 +303,9 @@ def gate_execution_chain_linkage(root: Path) -> dict[str, Any]:
                 "passed": rate >= EXECUTION_CHAIN_LINKAGE_TARGET,
                 "observed": round(rate, 4),
                 "threshold": EXECUTION_CHAIN_LINKAGE_TARGET,
-                "action": "ok" if rate >= EXECUTION_CHAIN_LINKAGE_TARGET else "improve_chain_join_evidence",
+                "action": "ok"
+                if rate >= EXECUTION_CHAIN_LINKAGE_TARGET
+                else "improve_chain_join_evidence",
             }
         ],
     }
@@ -306,7 +319,9 @@ def gate_manifests_present(root: Path) -> dict[str, Any]:
         # Unmaterialized sources already fail required_source_nonempty; counting
         # them here too is double-penalising sources that haven't been run yet.
         expected = src.get("expected_outputs") or []
-        has_any_output = any((root / p).exists() and (root / p).stat().st_size > 0 for p in expected)
+        has_any_output = any(
+            (root / p).exists() and (root / p).stat().st_size > 0 for p in expected
+        )
         if not has_any_output:
             continue
         manifest_dir = root / "data" / "manifests" / sid
@@ -430,7 +445,13 @@ def evaluate(root: Path) -> dict[str, Any]:
     dup = gate_duplicate_rate(root)
     sec = gate_secret_leakage(root)
     records = (
-        sc["records"] + er["records"] + sl["records"] + ecl["records"] + mp["records"] + dup["records"] + sec["records"]
+        sc["records"]
+        + er["records"]
+        + sl["records"]
+        + ecl["records"]
+        + mp["records"]
+        + dup["records"]
+        + sec["records"]
     )
     passed = all(bool(r.get("passed")) for r in records)
     return {
@@ -467,7 +488,16 @@ def write_report(root: Path, report: dict[str, Any]) -> dict[str, Path]:
     json_path = out_dir / "validation_report.json"
     json_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
     csv_path = out_dir / "validation_gate_report.csv"
-    fields = ["gate", "source_id", "required", "passed", "observed", "threshold", "evidence", "action"]
+    fields = [
+        "gate",
+        "source_id",
+        "required",
+        "passed",
+        "observed",
+        "threshold",
+        "evidence",
+        "action",
+    ]
     with csv_path.open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
         writer.writeheader()

@@ -16,6 +16,7 @@ Outputs:
 Usage:
   python3 scripts/download_medicaid_fmap.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -31,16 +32,68 @@ import requests
 from scripts.config import PROJECT_ROOT, setup_logging
 
 MEDICAID_DATA_BASE = "https://data.medicaid.gov"
-FMAP_PAGE_URL = "https://www.medicaid.gov/medicaid/finance/state-expenditure-reporting/fmap/index.html"
+FMAP_PAGE_URL = (
+    "https://www.medicaid.gov/medicaid/finance/state-expenditure-reporting/fmap/index.html"
+)
 CMS64_INDEX_URL = "https://www.medicaid.gov/medicaid/finance/state-expenditure-reporting/expenditure-reports/index.html"
 
 # Known PR Medicaid FMAP rates and CMS-64 expenditure data from public CMS reports
 KNOWN_MEDICAID_DATA = [
-    {"fiscal_year":"2020","quarter":"annual","fmap_rate":"55.00","total_expenditure":"3200000000","federal_share":"1760000000","state_share":"1440000000","dsh_allotment":"360000000","managed_care_expenditure":"2100000000","source_doc":"CMS64_PR_FY2020"},
-    {"fiscal_year":"2021","quarter":"annual","fmap_rate":"76.00","total_expenditure":"3650000000","federal_share":"2774000000","state_share":"876000000","dsh_allotment":"360000000","managed_care_expenditure":"2400000000","source_doc":"CMS64_PR_FY2021_COVID"},
-    {"fiscal_year":"2022","quarter":"annual","fmap_rate":"83.00","total_expenditure":"4100000000","federal_share":"3403000000","state_share":"697000000","dsh_allotment":"360000000","managed_care_expenditure":"2750000000","source_doc":"CMS64_PR_FY2022_COVID"},
-    {"fiscal_year":"2023","quarter":"annual","fmap_rate":"55.00","total_expenditure":"3800000000","federal_share":"2090000000","state_share":"1710000000","dsh_allotment":"360000000","managed_care_expenditure":"2500000000","source_doc":"CMS64_PR_FY2023"},
-    {"fiscal_year":"2024","quarter":"annual","fmap_rate":"55.00","total_expenditure":"4050000000","federal_share":"2227500000","state_share":"1822500000","dsh_allotment":"360000000","managed_care_expenditure":"2650000000","source_doc":"CMS64_PR_FY2024_est"},
+    {
+        "fiscal_year": "2020",
+        "quarter": "annual",
+        "fmap_rate": "55.00",
+        "total_expenditure": "3200000000",
+        "federal_share": "1760000000",
+        "state_share": "1440000000",
+        "dsh_allotment": "360000000",
+        "managed_care_expenditure": "2100000000",
+        "source_doc": "CMS64_PR_FY2020",
+    },
+    {
+        "fiscal_year": "2021",
+        "quarter": "annual",
+        "fmap_rate": "76.00",
+        "total_expenditure": "3650000000",
+        "federal_share": "2774000000",
+        "state_share": "876000000",
+        "dsh_allotment": "360000000",
+        "managed_care_expenditure": "2400000000",
+        "source_doc": "CMS64_PR_FY2021_COVID",
+    },
+    {
+        "fiscal_year": "2022",
+        "quarter": "annual",
+        "fmap_rate": "83.00",
+        "total_expenditure": "4100000000",
+        "federal_share": "3403000000",
+        "state_share": "697000000",
+        "dsh_allotment": "360000000",
+        "managed_care_expenditure": "2750000000",
+        "source_doc": "CMS64_PR_FY2022_COVID",
+    },
+    {
+        "fiscal_year": "2023",
+        "quarter": "annual",
+        "fmap_rate": "55.00",
+        "total_expenditure": "3800000000",
+        "federal_share": "2090000000",
+        "state_share": "1710000000",
+        "dsh_allotment": "360000000",
+        "managed_care_expenditure": "2500000000",
+        "source_doc": "CMS64_PR_FY2023",
+    },
+    {
+        "fiscal_year": "2024",
+        "quarter": "annual",
+        "fmap_rate": "55.00",
+        "total_expenditure": "4050000000",
+        "federal_share": "2227500000",
+        "state_share": "1822500000",
+        "dsh_allotment": "360000000",
+        "managed_care_expenditure": "2650000000",
+        "source_doc": "CMS64_PR_FY2024_est",
+    },
 ]
 
 PAGE_SLEEP = 0.5
@@ -48,7 +101,8 @@ MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 MEDICAID_COLUMNS = [
-    "fiscal_year", "quarter",
+    "fiscal_year",
+    "quarter",
     "fmap_rate",
     "total_expenditure",
     "federal_share",
@@ -61,10 +115,12 @@ MEDICAID_COLUMNS = [
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR Medicaid research)",
-        "Accept": "application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR Medicaid research)",
+            "Accept": "application/json",
+        }
+    )
     return s
 
 
@@ -85,7 +141,7 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed for {url}: {exc}")
@@ -104,17 +160,22 @@ def _fetch_medicaid_data_api(session: requests.Session, logger) -> list[dict]:
 
         items = data if isinstance(data, list) else data.get("data", [])
         pr_datasets = [
-            d for d in items
-            if isinstance(d, dict) and any(
-                "puerto rico" in str(d.get(f, "")).lower() or "expenditure" in str(d.get(f, "")).lower()
+            d
+            for d in items
+            if isinstance(d, dict)
+            and any(
+                "puerto rico" in str(d.get(f, "")).lower()
+                or "expenditure" in str(d.get(f, "")).lower()
                 for f in ["title", "description", "keyword"]
             )
         ]
-        logger.info(f"  Found {len(pr_datasets)} potentially relevant datasets on data.medicaid.gov")
+        logger.info(
+            f"  Found {len(pr_datasets)} potentially relevant datasets on data.medicaid.gov"
+        )
 
         for ds in pr_datasets[:5]:
             dist = ds.get("distribution", [])
-            for d in (dist if isinstance(dist, list) else []):
+            for d in dist if isinstance(dist, list) else []:
                 dl_url = d.get("downloadURL", "")
                 if dl_url and dl_url.endswith(".csv"):
                     try:

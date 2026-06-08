@@ -1,4 +1,5 @@
 """Financial-integrity, confidence, dedup, and synthetic-mode tests."""
+
 import json
 import shutil
 from pathlib import Path
@@ -18,7 +19,9 @@ def _copy_fixture(tmp_path):
 
 
 def _read_jsonl(path):
-    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    return [
+        json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()
+    ]
 
 
 def _write_jsonl(path, rows):
@@ -99,16 +102,20 @@ def test_duplicate_award_id(tmp_path):
 @pytest.mark.unit
 def test_invalid_latitude(tmp_path):
     pkg = _copy_fixture(tmp_path)
-    _mutate(pkg, "funding_awards.jsonl",
-            lambda rows: rows[0]["location"].__setitem__("latitude", 999.0))
+    _mutate(
+        pkg, "funding_awards.jsonl", lambda rows: rows[0]["location"].__setitem__("latitude", 999.0)
+    )
     assert "location_invalid" in _codes(validate_package(pkg, mode="test"))
 
 
 @pytest.mark.unit
 def test_invalid_attribution_confidence(tmp_path):
     pkg = _copy_fixture(tmp_path)
-    _mutate(pkg, "transactions.jsonl",
-            lambda rows: rows[0]["location"].__setitem__("attribution_confidence", 2.0))
+    _mutate(
+        pkg,
+        "transactions.jsonl",
+        lambda rows: rows[0]["location"].__setitem__("attribution_confidence", 2.0),
+    )
     assert "location_invalid" in _codes(validate_package(pkg, mode="test"))
 
 

@@ -3,6 +3,7 @@
 Stdlib only. No secrets ever logged. Used by future ingestion scripts that
 hit external endpoints; behavior is configurable per call.
 """
+
 from __future__ import annotations
 
 import logging

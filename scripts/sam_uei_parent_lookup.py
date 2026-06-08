@@ -16,6 +16,7 @@ Usage:
   python3 scripts/sam_uei_parent_lookup.py --dry-run      # extract UEIs only, no API calls
   python3 scripts/sam_uei_parent_lookup.py --limit 100    # cap queries (for testing)
 """
+
 from __future__ import annotations
 
 import argparse
@@ -53,9 +54,9 @@ def _get_sam_api_key() -> str:
 
 
 SAM_ENTITY_URL = "https://api.sam.gov/entity-information/v2/entities"
-PAGE_SIZE = 1          # one UEI per call; batch endpoint not available on free tier
-SLEEP_KEY = 0.25       # 4 req/s with API key → well under 1000/hr limit
-SLEEP_NO_KEY = 3.0     # 20 req/min without key → conservative
+PAGE_SIZE = 1  # one UEI per call; batch endpoint not available on free tier
+SLEEP_KEY = 0.25  # 4 req/s with API key → well under 1000/hr limit
+SLEEP_NO_KEY = 3.0  # 20 req/min without key → conservative
 MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
@@ -83,8 +84,9 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler(PROJECT_ROOT / "data" / "logs" / "sam_uei_parent_lookup.log",
-                            encoding="utf-8"),
+        logging.FileHandler(
+            PROJECT_ROOT / "data" / "logs" / "sam_uei_parent_lookup.log", encoding="utf-8"
+        ),
     ],
 )
 log = logging.getLogger(__name__)
@@ -119,10 +121,12 @@ def _query_sam(uei: str, api_key: str) -> dict | None:
     import urllib.parse
     import urllib.error
 
-    params = urllib.parse.urlencode({
-        "ueiSAM": uei,
-        "api_key": api_key,
-    })
+    params = urllib.parse.urlencode(
+        {
+            "ueiSAM": uei,
+            "api_key": api_key,
+        }
+    )
     url = f"{SAM_ENTITY_URL}?{params}"
     for attempt in range(MAX_RETRIES):
         try:
@@ -155,8 +159,7 @@ def _query_sam(uei: str, api_key: str) -> dict | None:
                 "ultimate_parent_name": parent.get("ultimateParentName", ""),
                 "entity_type": reg.get("entityStructureCode", ""),
                 "business_type_codes": ";".join(
-                    bt.get("businessTypeCode", "") for bt in btypes
-                    if bt.get("businessTypeCode")
+                    bt.get("businessTypeCode", "") for bt in btypes if bt.get("businessTypeCode")
                 ),
                 "resolved_at": datetime.now(timezone.utc).isoformat(),
             }
@@ -247,7 +250,11 @@ def run(
 
         if i % checkpoint_every == 0:
             _flush_csv(out_csv, list(resolved.values()))
-            pct = sum(1 for r in resolved.values() if r.get("immediate_parent_uei") or r.get("ultimate_parent_uei")) / max(len(resolved), 1)
+            pct = sum(
+                1
+                for r in resolved.values()
+                if r.get("immediate_parent_uei") or r.get("ultimate_parent_uei")
+            ) / max(len(resolved), 1)
             log.info(f"  [CHECKPOINT] {len(resolved)} resolved, parent_uei rate={pct:.1%}")
 
     _flush_csv(out_csv, list(resolved.values()))
@@ -257,6 +264,7 @@ def run(
         try:
             import pyarrow.csv as pac
             import pyarrow.parquet as pq
+
             t = pac.read_csv(str(out_csv))
             pq.write_table(t, str(out_csv.with_suffix(".parquet")))
             log.info(f"wrote {out_csv.with_suffix('.parquet')}")
@@ -266,7 +274,8 @@ def run(
             log.warning(f"parquet write failed: {exc}")
 
     parent_resolved = sum(
-        1 for r in resolved.values()
+        1
+        for r in resolved.values()
         if r.get("immediate_parent_uei") or r.get("ultimate_parent_uei")
     )
     summary = {

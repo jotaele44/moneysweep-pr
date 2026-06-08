@@ -7,7 +7,9 @@ import hashlib
 import json
 from pathlib import Path
 
-from contract_sweeper.pipeline.external_source_delivery_gate import run_external_source_delivery_gate
+from contract_sweeper.pipeline.external_source_delivery_gate import (
+    run_external_source_delivery_gate,
+)
 
 
 def _sha256(path: Path) -> str:

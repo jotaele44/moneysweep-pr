@@ -19,6 +19,7 @@ Usage:
   python3 scripts/download_opencorporates.py [--force] [--api-token TOKEN]
   # TOKEN from env var OPENCORPORATES_API_TOKEN if not provided
 """
+
 from __future__ import annotations
 
 import argparse
@@ -35,61 +36,129 @@ import requests
 
 from scripts.config import PROJECT_ROOT, setup_logging
 
-OC_BASE       = "https://api.opencorporates.com/v0.4"
-JURISDICTION  = "us_pr"
-PER_PAGE      = 100          # max per request
-PAGE_SLEEP    = 0.5
-MAX_RETRIES   = 3
+OC_BASE = "https://api.opencorporates.com/v0.4"
+JURISDICTION = "us_pr"
+PER_PAGE = 100  # max per request
+PAGE_SLEEP = 0.5
+MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
-MAX_PAGES     = 2000         # safety cap; PR registry unlikely to exceed 200k companies
+MAX_PAGES = 2000  # safety cap; PR registry unlikely to exceed 200k companies
 
 # Known PR-registered entities from public sources (for seed fallback)
 KNOWN_PR_COMPANIES = [
-    {"company_number": "15110", "name": "Popular Inc", "jurisdiction_code": "us_pr",
-     "company_type": "Corporation", "incorporation_date": "1984-08-01",
-     "dissolution_date": "", "current_status": "Active",
-     "registered_address": "Popular Center, 208 Ave Ponce de Leon, San Juan PR 00918",
-     "agent_name": "", "agent_address": "", "source_url": "opencorporates_seed"},
-    {"company_number": "9134", "name": "First BanCorp Puerto Rico", "jurisdiction_code": "us_pr",
-     "company_type": "Corporation", "incorporation_date": "1948-01-01",
-     "dissolution_date": "", "current_status": "Active",
-     "registered_address": "1519 Ave Ponce de Leon, San Juan PR 00908",
-     "agent_name": "", "agent_address": "", "source_url": "opencorporates_seed"},
-    {"company_number": "25340", "name": "Triple-S Management Corporation", "jurisdiction_code": "us_pr",
-     "company_type": "Corporation", "incorporation_date": "2000-05-01",
-     "dissolution_date": "", "current_status": "Active",
-     "registered_address": "1441 FD Roosevelt Ave, Guaynabo PR 00968",
-     "agent_name": "", "agent_address": "", "source_url": "opencorporates_seed"},
-    {"company_number": "31200", "name": "Luma Energy LLC", "jurisdiction_code": "us_pr",
-     "company_type": "Limited Liability Company", "incorporation_date": "2020-01-01",
-     "dissolution_date": "", "current_status": "Active",
-     "registered_address": "San Juan PR 00901", "agent_name": "", "agent_address": "",
-     "source_url": "opencorporates_seed"},
-    {"company_number": "35100", "name": "Genera PR LLC", "jurisdiction_code": "us_pr",
-     "company_type": "Limited Liability Company", "incorporation_date": "2021-01-01",
-     "dissolution_date": "", "current_status": "Active",
-     "registered_address": "Ponce PR 00717", "agent_name": "", "agent_address": "",
-     "source_url": "opencorporates_seed"},
+    {
+        "company_number": "15110",
+        "name": "Popular Inc",
+        "jurisdiction_code": "us_pr",
+        "company_type": "Corporation",
+        "incorporation_date": "1984-08-01",
+        "dissolution_date": "",
+        "current_status": "Active",
+        "registered_address": "Popular Center, 208 Ave Ponce de Leon, San Juan PR 00918",
+        "agent_name": "",
+        "agent_address": "",
+        "source_url": "opencorporates_seed",
+    },
+    {
+        "company_number": "9134",
+        "name": "First BanCorp Puerto Rico",
+        "jurisdiction_code": "us_pr",
+        "company_type": "Corporation",
+        "incorporation_date": "1948-01-01",
+        "dissolution_date": "",
+        "current_status": "Active",
+        "registered_address": "1519 Ave Ponce de Leon, San Juan PR 00908",
+        "agent_name": "",
+        "agent_address": "",
+        "source_url": "opencorporates_seed",
+    },
+    {
+        "company_number": "25340",
+        "name": "Triple-S Management Corporation",
+        "jurisdiction_code": "us_pr",
+        "company_type": "Corporation",
+        "incorporation_date": "2000-05-01",
+        "dissolution_date": "",
+        "current_status": "Active",
+        "registered_address": "1441 FD Roosevelt Ave, Guaynabo PR 00968",
+        "agent_name": "",
+        "agent_address": "",
+        "source_url": "opencorporates_seed",
+    },
+    {
+        "company_number": "31200",
+        "name": "Luma Energy LLC",
+        "jurisdiction_code": "us_pr",
+        "company_type": "Limited Liability Company",
+        "incorporation_date": "2020-01-01",
+        "dissolution_date": "",
+        "current_status": "Active",
+        "registered_address": "San Juan PR 00901",
+        "agent_name": "",
+        "agent_address": "",
+        "source_url": "opencorporates_seed",
+    },
+    {
+        "company_number": "35100",
+        "name": "Genera PR LLC",
+        "jurisdiction_code": "us_pr",
+        "company_type": "Limited Liability Company",
+        "incorporation_date": "2021-01-01",
+        "dissolution_date": "",
+        "current_status": "Active",
+        "registered_address": "Ponce PR 00717",
+        "agent_name": "",
+        "agent_address": "",
+        "source_url": "opencorporates_seed",
+    },
 ]
 
 COMPANY_COLUMNS = [
-    "company_number", "name", "jurisdiction_code", "company_type",
-    "incorporation_date", "dissolution_date", "current_status",
-    "registered_address", "agent_name", "agent_address",
+    "company_number",
+    "name",
+    "jurisdiction_code",
+    "company_type",
+    "incorporation_date",
+    "dissolution_date",
+    "current_status",
+    "registered_address",
+    "agent_name",
+    "agent_address",
     "source_url",
 ]
 
 OFFICER_COLUMNS = [
-    "company_number", "company_name", "officer_name",
-    "officer_position", "start_date", "end_date", "inactive",
+    "company_number",
+    "company_name",
+    "officer_name",
+    "officer_position",
+    "start_date",
+    "end_date",
+    "inactive",
 ]
 
 _STRIP_RE = re.compile(r"[^\w\s]")
 _SPACE_RE = re.compile(r"\s+")
 _SUFFIXES = {
-    "INC", "LLC", "LLP", "CORP", "CO", "LTD", "LP", "PC",
-    "PLLC", "DBA", "THE", "AND", "OF", "SA", "SRL",
-    "HOSPITAL", "HEALTH", "CENTER", "CENTRE",
+    "INC",
+    "LLC",
+    "LLP",
+    "CORP",
+    "CO",
+    "LTD",
+    "LP",
+    "PC",
+    "PLLC",
+    "DBA",
+    "THE",
+    "AND",
+    "OF",
+    "SA",
+    "SRL",
+    "HOSPITAL",
+    "HEALTH",
+    "CENTER",
+    "CENTRE",
 }
 
 
@@ -107,10 +176,12 @@ def _normalize(name: str) -> str:
 
 def _session(api_token: str | None) -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR corporate registry research)",
-        "Accept":     "application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR corporate registry research)",
+            "Accept": "application/json",
+        }
+    )
     if api_token:
         s.headers["Authorization"] = f"Token {api_token}"
     return s
@@ -125,7 +196,9 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
                 time.sleep(90)
                 continue
             if resp.status_code == 401:
-                logger.warning("  OpenCorporates: 401 unauthorized — using unauthenticated rate limit")
+                logger.warning(
+                    "  OpenCorporates: 401 unauthorized — using unauthenticated rate limit"
+                )
                 time.sleep(2)
                 return None
             if 400 <= resp.status_code < 500:
@@ -137,7 +210,7 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -145,14 +218,14 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
 
 
 def _fetch_companies(session: requests.Session, logger) -> list[dict]:
-    url       = f"{OC_BASE}/companies/search"
+    url = f"{OC_BASE}/companies/search"
     all_items = []
 
     for page in range(1, MAX_PAGES + 1):
         params = {
             "jurisdiction_code": JURISDICTION,
-            "per_page":          PER_PAGE,
-            "page":              page,
+            "per_page": PER_PAGE,
+            "page": page,
         }
         data = _get(session, url, params, logger)
         if data is None:
@@ -180,29 +253,32 @@ def _fetch_companies(session: requests.Session, logger) -> list[dict]:
     return all_items
 
 
-def _fetch_officers_for_company(session: requests.Session, company_number: str,
-                                company_name: str, logger) -> list[dict]:
-    url    = f"{OC_BASE}/companies/{JURISDICTION}/{company_number}/officers"
-    data   = _get(session, url, {"per_page": 100}, logger)
+def _fetch_officers_for_company(
+    session: requests.Session, company_number: str, company_name: str, logger
+) -> list[dict]:
+    url = f"{OC_BASE}/companies/{JURISDICTION}/{company_number}/officers"
+    data = _get(session, url, {"per_page": 100}, logger)
     if data is None:
         return []
 
-    results  = data.get("results", {})
+    results = data.get("results", {})
     officers = results.get("officers", {})
-    items    = officers.get("items", []) if isinstance(officers, dict) else officers
+    items = officers.get("items", []) if isinstance(officers, dict) else officers
 
     rows = []
     for item in items:
         o = item.get("officer", item)
-        rows.append({
-            "company_number":   company_number,
-            "company_name":     company_name,
-            "officer_name":     o.get("name", ""),
-            "officer_position": o.get("position", ""),
-            "start_date":       o.get("start_date", ""),
-            "end_date":         o.get("end_date", ""),
-            "inactive":         o.get("inactive", False),
-        })
+        rows.append(
+            {
+                "company_number": company_number,
+                "company_name": company_name,
+                "officer_name": o.get("name", ""),
+                "officer_position": o.get("position", ""),
+                "start_date": o.get("start_date", ""),
+                "end_date": o.get("end_date", ""),
+                "inactive": o.get("inactive", False),
+            }
+        )
     return rows
 
 
@@ -214,19 +290,23 @@ def _companies_to_df(items: list[dict]) -> pd.DataFrame:
     for c in items:
         addr = c.get("registered_address") or {}
         agent = c.get("registered_agent") or {}
-        rows.append({
-            "company_number":   c.get("company_number", ""),
-            "name":             c.get("name", ""),
-            "jurisdiction_code": c.get("jurisdiction_code", JURISDICTION),
-            "company_type":     c.get("company_type", ""),
-            "incorporation_date": c.get("incorporation_date", ""),
-            "dissolution_date": c.get("dissolution_date", ""),
-            "current_status":   c.get("current_status", ""),
-            "registered_address": addr.get("street_address", "") if isinstance(addr, dict) else str(addr),
-            "agent_name":       agent.get("name", "") if isinstance(agent, dict) else str(agent),
-            "agent_address":    agent.get("address", "") if isinstance(agent, dict) else "",
-            "source_url":       c.get("opencorporates_url", ""),
-        })
+        rows.append(
+            {
+                "company_number": c.get("company_number", ""),
+                "name": c.get("name", ""),
+                "jurisdiction_code": c.get("jurisdiction_code", JURISDICTION),
+                "company_type": c.get("company_type", ""),
+                "incorporation_date": c.get("incorporation_date", ""),
+                "dissolution_date": c.get("dissolution_date", ""),
+                "current_status": c.get("current_status", ""),
+                "registered_address": addr.get("street_address", "")
+                if isinstance(addr, dict)
+                else str(addr),
+                "agent_name": agent.get("name", "") if isinstance(agent, dict) else str(agent),
+                "agent_address": agent.get("address", "") if isinstance(agent, dict) else "",
+                "source_url": c.get("opencorporates_url", ""),
+            }
+        )
 
     df = pd.DataFrame(rows, columns=COMPANY_COLUMNS)
     return df
@@ -234,24 +314,25 @@ def _companies_to_df(items: list[dict]) -> pd.DataFrame:
 
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None, force: bool = False, api_token: str | None = None) -> dict:
     if root is None:
         root = PROJECT_ROOT
     if api_token is None:
         api_token = os.getenv("OPENCORPORATES_API_TOKEN")
 
-    root    = Path(root)
+    root = Path(root)
     raw_dir = root / "data" / "staging" / "raw" / "opencorporates"
     raw_dir.mkdir(parents=True, exist_ok=True)
     out_dir = root / "data" / "staging" / "processed"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    raw_path      = raw_dir / "pr_companies_raw.csv"
+    raw_path = raw_dir / "pr_companies_raw.csv"
     companies_path = out_dir / "pr_opencorporates_companies.csv"
-    officers_path  = out_dir / "pr_opencorporates_officers.csv"
-    awards_path    = out_dir / "pr_all_awards_master.csv"
+    officers_path = out_dir / "pr_opencorporates_officers.csv"
+    awards_path = out_dir / "pr_all_awards_master.csv"
 
-    logger  = setup_logging("download_opencorporates")
+    logger = setup_logging("download_opencorporates")
     session = _session(api_token)
 
     if api_token:
@@ -291,17 +372,15 @@ def run(root: Path = None, force: bool = False, api_token: str | None = None) ->
     if awards_path.exists() and not df_companies.empty:
         logger.info("  Crossreffing against awards master for officer lookup...")
         awards = pd.read_csv(awards_path, dtype=str, low_memory=False)
-        award_norms = set(
-            _normalize(n) for n in awards["recipient_name"].dropna().unique()
+        award_norms = set(_normalize(n) for n in awards["recipient_name"].dropna().unique())
+
+        matched_companies = df_companies[df_companies["name"].apply(_normalize).isin(award_norms)]
+        logger.info(
+            f"  {len(matched_companies):,} companies match awards master — fetching officers..."
         )
 
-        matched_companies = df_companies[
-            df_companies["name"].apply(_normalize).isin(award_norms)
-        ]
-        logger.info(f"  {len(matched_companies):,} companies match awards master — fetching officers...")
-
         for _, row in matched_companies.head(500).iterrows():
-            num  = str(row.get("company_number", "")).strip()
+            num = str(row.get("company_number", "")).strip()
             name = str(row.get("name", "")).strip()
             if not num:
                 continue
@@ -313,23 +392,43 @@ def run(root: Path = None, force: bool = False, api_token: str | None = None) ->
 
     if not officer_rows:
         officer_rows = [
-            {"company_number": "15110", "company_name": "Popular Inc",
-             "officer_name": "Ignacio Alvarez", "officer_position": "Chief Executive Officer",
-             "start_date": "2017-01-01", "end_date": "", "inactive": False},
-            {"company_number": "9134", "company_name": "First BanCorp Puerto Rico",
-             "officer_name": "Aurelio Aleman",
-             "officer_position": "President and Chief Executive Officer",
-             "start_date": "2016-01-01", "end_date": "", "inactive": False},
-            {"company_number": "31200", "company_name": "Luma Energy LLC",
-             "officer_name": "Wayne Stensby", "officer_position": "Chief Executive Officer",
-             "start_date": "2021-06-01", "end_date": "", "inactive": False},
+            {
+                "company_number": "15110",
+                "company_name": "Popular Inc",
+                "officer_name": "Ignacio Alvarez",
+                "officer_position": "Chief Executive Officer",
+                "start_date": "2017-01-01",
+                "end_date": "",
+                "inactive": False,
+            },
+            {
+                "company_number": "9134",
+                "company_name": "First BanCorp Puerto Rico",
+                "officer_name": "Aurelio Aleman",
+                "officer_position": "President and Chief Executive Officer",
+                "start_date": "2016-01-01",
+                "end_date": "",
+                "inactive": False,
+            },
+            {
+                "company_number": "31200",
+                "company_name": "Luma Energy LLC",
+                "officer_name": "Wayne Stensby",
+                "officer_position": "Chief Executive Officer",
+                "start_date": "2021-06-01",
+                "end_date": "",
+                "inactive": False,
+            },
         ]
     df_officers = pd.DataFrame(officer_rows, columns=OFFICER_COLUMNS)
     df_officers.to_csv(officers_path, index=False, encoding="utf-8")
     logger.info(f"  Written: {officers_path.name} ({len(df_officers):,} officer records)")
 
-    active_ct = int((df_companies["current_status"].str.upper() == "ACTIVE").sum()) \
-                if not df_companies.empty else 0
+    active_ct = (
+        int((df_companies["current_status"].str.upper() == "ACTIVE").sum())
+        if not df_companies.empty
+        else 0
+    )
 
     logger.info("=" * 60)
     logger.info("OPENCORPORATES SUMMARY")
@@ -341,9 +440,9 @@ def run(root: Path = None, force: bool = False, api_token: str | None = None) ->
     return {
         "company_rows": len(df_companies),
         "officer_rows": len(df_officers),
-        "status":       "OK" if len(df_companies) > 0 else "EMPTY",
+        "status": "OK" if len(df_companies) > 0 else "EMPTY",
         "companies_path": str(companies_path),
-        "officers_path":  str(officers_path),
+        "officers_path": str(officers_path),
     }
 
 
@@ -351,13 +450,19 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Download PR business entities from OpenCorporates"
     )
-    parser.add_argument("--force",     action="store_true", help="Re-download even if cached")
-    parser.add_argument("--api-token", dest="api_token", default=None,
-                        help="OpenCorporates API token (default: OPENCORPORATES_API_TOKEN env var)")
+    parser.add_argument("--force", action="store_true", help="Re-download even if cached")
+    parser.add_argument(
+        "--api-token",
+        dest="api_token",
+        default=None,
+        help="OpenCorporates API token (default: OPENCORPORATES_API_TOKEN env var)",
+    )
     args = parser.parse_args()
     result = run(force=args.force, api_token=args.api_token)
-    print(f"\nOpenCorporates complete: {result['company_rows']:,} companies, "
-          f"{result['officer_rows']:,} officer records.")
+    print(
+        f"\nOpenCorporates complete: {result['company_rows']:,} companies, "
+        f"{result['officer_rows']:,} officer records."
+    )
     return 0 if result["status"] in ("OK", "EMPTY") else 1
 
 

@@ -99,7 +99,9 @@ def report_coverage(matrix: dict, logger) -> dict:
     # --- Per-file summary ---
     logger.info("")
     logger.info("File Status:")
-    logger.info(f"{'Normalized File':<55} {'Exists':>6} {'Rows':>8} {'FY Min':>7} {'FY Max':>7} {'Status':>6}")
+    logger.info(
+        f"{'Normalized File':<55} {'Exists':>6} {'Rows':>8} {'FY Min':>7} {'FY Max':>7} {'Status':>6}"
+    )
     logger.info("-" * 95)
 
     for fname, info in matrix.items():

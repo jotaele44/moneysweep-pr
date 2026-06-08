@@ -357,7 +357,9 @@ def process_manual_import_dropzones(
             )
             continue
 
-        missing_columns = [column for column in required_columns if column and column not in frame.columns]
+        missing_columns = [
+            column for column in required_columns if column and column not in frame.columns
+        ]
         if missing_columns:
             inventory["failure_reason"] = "missing_required_columns:" + "|".join(missing_columns)
             inventory_rows.append(inventory)

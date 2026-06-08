@@ -1,4 +1,5 @@
 """Tests for the canonical-master -> export-stream mapper."""
+
 import json
 from pathlib import Path
 
@@ -27,7 +28,9 @@ def _build(dest):
 
 
 def _read_jsonl(path):
-    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    return [
+        json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()
+    ]
 
 
 @pytest.mark.unit
@@ -41,7 +44,7 @@ def test_streams_validate_in_production_mode(tmp_path):
 @pytest.mark.unit
 def test_emitted_counts(tmp_path):
     _, report = _build(tmp_path)
-    assert report["entities"]["emitted"] == 4          # 2 resolved + FEMA + DoD
+    assert report["entities"]["emitted"] == 4  # 2 resolved + FEMA + DoD
     assert report["sources"]["emitted"] == 5
     assert report["funding_awards"]["emitted"] == 2
     assert report["transactions"]["emitted"] == 2

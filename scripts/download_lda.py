@@ -18,6 +18,7 @@ Usage:
   python3 scripts/download_lda.py --api-key YOUR_TOKEN
   python3 scripts/download_lda.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -43,10 +44,10 @@ from contract_sweeper.runtime.base_downloader import (
 # Constants
 # ---------------------------------------------------------------------------
 
-LDA_BASE      = "https://lda.senate.gov/api/v1"
-PAGE_SIZE     = 25        # LDA API max
-PAGE_SLEEP    = 0.5       # seconds between pages
-MAX_RETRIES   = 3
+LDA_BASE = "https://lda.senate.gov/api/v1"
+PAGE_SIZE = 25  # LDA API max
+PAGE_SLEEP = 0.5  # seconds between pages
+MAX_RETRIES = 3
 RETRY_BACKOFF = [10, 30, 60]
 
 _USER_AGENT = "ContractSweeper/1.0 (PR federal spending research)"
@@ -59,27 +60,63 @@ _HTTP = HttpConfig(
 )
 
 KNOWN_LDA_DATA = [
-    {"filing_uuid": "pr-lda-seed-001", "filing_year": "2022", "filing_type": "Q4",
-     "period_of_report": "2022-12-31", "registrant_id": "100001", "registrant_name": "Tarplin, Downs & Young",
-     "registrant_state": "DC", "client_id": "200001", "client_name": "Puerto Rico Electric Power Authority",
-     "client_state": "PR", "client_description": "Electric utility lobbying re PREPA restructuring",
-     "income": "40000", "expenses": "40000", "general_issue_codes": "ENG|FIN",
-     "issue_descriptions": "PREPA restructuring under PROMESA; energy policy",
-     "lobbyist_names": "Tarplin, James", "dt_posted": "2023-01-20"},
-    {"filing_uuid": "pr-lda-seed-002", "filing_year": "2022", "filing_type": "Q4",
-     "period_of_report": "2022-12-31", "registrant_id": "100002", "registrant_name": "Squire Patton Boggs",
-     "registrant_state": "DC", "client_id": "200002", "client_name": "Government of Puerto Rico",
-     "client_state": "PR", "client_description": "PR government federal affairs lobbying",
-     "income": "180000", "expenses": "180000", "general_issue_codes": "GOV|BUD|FIN",
-     "issue_descriptions": "PROMESA Oversight Board; federal appropriations for PR",
-     "lobbyist_names": "Carey, Jr., John; Becker, Benjamin", "dt_posted": "2023-01-22"},
-    {"filing_uuid": "pr-lda-seed-003", "filing_year": "2023", "filing_type": "Q2",
-     "period_of_report": "2023-06-30", "registrant_id": "100003", "registrant_name": "Greenberg Traurig LLP",
-     "registrant_state": "DC", "client_id": "200003", "client_name": "Luma Energy LLC",
-     "client_state": "PR", "client_description": "Power transmission and distribution operator",
-     "income": "60000", "expenses": "60000", "general_issue_codes": "ENG|REG",
-     "issue_descriptions": "Energy grid modernization; federal infrastructure funding for PR T&D",
-     "lobbyist_names": "West, Brian; Collins, Jane", "dt_posted": "2023-07-15"},
+    {
+        "filing_uuid": "pr-lda-seed-001",
+        "filing_year": "2022",
+        "filing_type": "Q4",
+        "period_of_report": "2022-12-31",
+        "registrant_id": "100001",
+        "registrant_name": "Tarplin, Downs & Young",
+        "registrant_state": "DC",
+        "client_id": "200001",
+        "client_name": "Puerto Rico Electric Power Authority",
+        "client_state": "PR",
+        "client_description": "Electric utility lobbying re PREPA restructuring",
+        "income": "40000",
+        "expenses": "40000",
+        "general_issue_codes": "ENG|FIN",
+        "issue_descriptions": "PREPA restructuring under PROMESA; energy policy",
+        "lobbyist_names": "Tarplin, James",
+        "dt_posted": "2023-01-20",
+    },
+    {
+        "filing_uuid": "pr-lda-seed-002",
+        "filing_year": "2022",
+        "filing_type": "Q4",
+        "period_of_report": "2022-12-31",
+        "registrant_id": "100002",
+        "registrant_name": "Squire Patton Boggs",
+        "registrant_state": "DC",
+        "client_id": "200002",
+        "client_name": "Government of Puerto Rico",
+        "client_state": "PR",
+        "client_description": "PR government federal affairs lobbying",
+        "income": "180000",
+        "expenses": "180000",
+        "general_issue_codes": "GOV|BUD|FIN",
+        "issue_descriptions": "PROMESA Oversight Board; federal appropriations for PR",
+        "lobbyist_names": "Carey, Jr., John; Becker, Benjamin",
+        "dt_posted": "2023-01-22",
+    },
+    {
+        "filing_uuid": "pr-lda-seed-003",
+        "filing_year": "2023",
+        "filing_type": "Q2",
+        "period_of_report": "2023-06-30",
+        "registrant_id": "100003",
+        "registrant_name": "Greenberg Traurig LLP",
+        "registrant_state": "DC",
+        "client_id": "200003",
+        "client_name": "Luma Energy LLC",
+        "client_state": "PR",
+        "client_description": "Power transmission and distribution operator",
+        "income": "60000",
+        "expenses": "60000",
+        "general_issue_codes": "ENG|REG",
+        "issue_descriptions": "Energy grid modernization; federal infrastructure funding for PR T&D",
+        "lobbyist_names": "West, Brian; Collins, Jane",
+        "dt_posted": "2023-07-15",
+    },
 ]
 
 OUTPUT_COLUMNS = [
@@ -107,6 +144,7 @@ OUTPUT_COLUMNS = [
 # Network helpers
 # ---------------------------------------------------------------------------
 
+
 def _session(api_key: str | None) -> requests.Session:
     extra = {"Authorization": f"Token {api_key}"} if api_key else None
     return build_session(_USER_AGENT, extra)
@@ -120,9 +158,10 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
 # Record flattening
 # ---------------------------------------------------------------------------
 
+
 def _flatten(rec: dict) -> dict:
     registrant = rec.get("registrant") or {}
-    client     = rec.get("client") or {}
+    client = rec.get("client") or {}
 
     activities = rec.get("lobbying_activities") or []
     issue_codes = []
@@ -143,41 +182,34 @@ def _flatten(rec: dict) -> dict:
     reg_address = registrant.get("address") or {}
     cli_address = client.get("address") or {}
 
-    reg_state = (
-        registrant.get("state")
-        or reg_address.get("state")
-        or ""
-    )
-    cli_state = (
-        client.get("state")
-        or cli_address.get("state")
-        or ""
-    )
+    reg_state = registrant.get("state") or reg_address.get("state") or ""
+    cli_state = client.get("state") or cli_address.get("state") or ""
 
     return {
-        "filing_uuid":       rec.get("filing_uuid", ""),
-        "filing_year":       rec.get("filing_year", ""),
-        "filing_type":       rec.get("filing_type", ""),
-        "period_of_report":  rec.get("period_of_report", ""),
-        "registrant_id":     registrant.get("id", ""),
-        "registrant_name":   registrant.get("name", ""),
-        "registrant_state":  reg_state,
-        "client_id":         client.get("id", ""),
-        "client_name":       client.get("name", ""),
-        "client_state":      cli_state,
+        "filing_uuid": rec.get("filing_uuid", ""),
+        "filing_year": rec.get("filing_year", ""),
+        "filing_type": rec.get("filing_type", ""),
+        "period_of_report": rec.get("period_of_report", ""),
+        "registrant_id": registrant.get("id", ""),
+        "registrant_name": registrant.get("name", ""),
+        "registrant_state": reg_state,
+        "client_id": client.get("id", ""),
+        "client_name": client.get("name", ""),
+        "client_state": cli_state,
         "client_description": (client.get("general_description") or "")[:200],
-        "income":            rec.get("income", ""),
-        "expenses":          rec.get("expenses", ""),
+        "income": rec.get("income", ""),
+        "expenses": rec.get("expenses", ""),
         "general_issue_codes": "|".join(issue_codes[:10]),
-        "issue_descriptions":  "|".join(issue_descs[:5]),
-        "lobbyist_names":      "|".join(lobbyist_names[:15]),
-        "dt_posted":          rec.get("dt_posted", ""),
+        "issue_descriptions": "|".join(issue_descs[:5]),
+        "lobbyist_names": "|".join(lobbyist_names[:15]),
+        "dt_posted": rec.get("dt_posted", ""),
     }
 
 
 # ---------------------------------------------------------------------------
 # Fetch one pass (one state filter)
 # ---------------------------------------------------------------------------
+
 
 def _fetch_pass(session: requests.Session, state_param: str, logger) -> list[dict]:
     """Fetch all filings for one state filter (client_state or registrant_state)."""
@@ -186,8 +218,8 @@ def _fetch_pass(session: requests.Session, state_param: str, logger) -> list[dic
     def _fetch(page: int) -> PageResult:
         params = {
             state_param: "PR",
-            "page_size":  PAGE_SIZE,
-            "page":       page,
+            "page_size": PAGE_SIZE,
+            "page": page,
         }
         data = _get(session, url, params, logger)
         if data is None:
@@ -215,14 +247,15 @@ def _fetch_pass(session: requests.Session, state_param: str, logger) -> list[dic
 # Entry point
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 
-    root        = Path(root)
-    raw_dir     = root / "data" / "staging" / "raw" / "lda"
-    raw_path    = raw_dir / "lda_pr_filings.csv"
-    out_path    = root / "data" / "staging" / "processed" / "pr_lda_filings.csv"
+    root = Path(root)
+    raw_dir = root / "data" / "staging" / "raw" / "lda"
+    raw_path = raw_dir / "lda_pr_filings.csv"
+    out_path = root / "data" / "staging" / "processed" / "pr_lda_filings.csv"
     raw_dir.mkdir(parents=True, exist_ok=True)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -283,17 +316,19 @@ def run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
     before = len(df)
     df = df.drop_duplicates(subset=["filing_uuid"], keep="first")
     if len(df) < before:
-        logger.info(f"  Removed {before - len(df):,} duplicate filings (same UUID from both passes)")
+        logger.info(
+            f"  Removed {before - len(df):,} duplicate filings (same UUID from both passes)"
+        )
 
     # Numeric income/expenses for summary
-    df["_income_num"]   = pd.to_numeric(df["income"],   errors="coerce").fillna(0)
+    df["_income_num"] = pd.to_numeric(df["income"], errors="coerce").fillna(0)
     df["_expenses_num"] = pd.to_numeric(df["expenses"], errors="coerce").fillna(0)
 
     df.to_csv(out_path, index=False, encoding="utf-8")
 
-    total_income   = df["_income_num"].sum()
+    total_income = df["_income_num"].sum()
     total_expenses = df["_expenses_num"].sum()
-    client_pr  = (df["client_state"] == "PR").sum()
+    client_pr = (df["client_state"] == "PR").sum()
     registrant_pr = (df["registrant_state"] == "PR").sum()
 
     df.drop(columns=["_income_num", "_expenses_num"], inplace=True, errors="ignore")
@@ -309,18 +344,22 @@ def run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
     logger.info(f"  Written: {out_path.name}")
 
     return {
-        "rows":   len(df),
+        "rows": len(df),
         "status": "OK" if len(df) > 0 else "EMPTY",
-        "path":   str(out_path),
-        "client_pr_filings":     int(client_pr),
+        "path": str(out_path),
+        "client_pr_filings": int(client_pr),
         "registrant_pr_filings": int(registrant_pr),
     }
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Download LDA lobbying filings for Puerto Rico")
-    parser.add_argument("--api-key", dest="api_key", default=None,
-                        help="LDA API token (default: LDA_API_KEY env var)")
+    parser.add_argument(
+        "--api-key",
+        dest="api_key",
+        default=None,
+        help="LDA API token (default: LDA_API_KEY env var)",
+    )
     parser.add_argument("--force", action="store_true", help="Re-download even if raw file exists")
     args = parser.parse_args()
     result = run(api_key=args.api_key, force=args.force)

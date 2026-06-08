@@ -3,6 +3,7 @@
 Hermetic: builds a synthetic API_KEYS.zip in tmp_path, installs to a tmp .env,
 and verifies content + mode. No real keys touched. No network calls.
 """
+
 from __future__ import annotations
 
 import stat
@@ -38,10 +39,10 @@ def test_read_keys_and_normalize_casing(tmp_path):
         tmp_path / "keys.zip",
         {
             "API KEYS/SAM_API_KEY.txt": DUMMY_SAM,
-            "API KEYS/HigherGOV_API_KEY.txt": DUMMY_HG,        # mixed case stem
+            "API KEYS/HigherGOV_API_KEY.txt": DUMMY_HG,  # mixed case stem
             "API KEYS/LDA_API_KEY.txt": DUMMY_LDA,
             "__MACOSX/API KEYS/._SAM_API_KEY.txt": "<macos-resource-fork>",
-            "API KEYS/README.txt": "not a key",                  # ignored
+            "API KEYS/README.txt": "not a key",  # ignored
         },
     )
     keys = read_keys_from_zip(z)

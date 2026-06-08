@@ -14,6 +14,7 @@ only under `data/cache/`. The R4.9Z source-recovery freeze (which guards
 `data/staging/processed/` and the manual_import_dropzone) is out of scope
 for on-demand queries by construction.
 """
+
 from __future__ import annotations
 
 from .cli import main

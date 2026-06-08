@@ -5,6 +5,7 @@ Covers the pure column-mapping transform and the full drop-file -> processed-CSV
 chain. The ingester reads operator-delivered CSV exports from
 data/raw/Donaciones/ — no network code — so these run fully offline.
 """
+
 from __future__ import annotations
 
 import csv
@@ -20,6 +21,7 @@ from scripts.ingest_donaciones import OUTPUT_COLUMNS, _map_col, _parse_df, run
 # Unit: pure transforms
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.unit
 def test_map_col_matches_spanish_header_case_insensitively():
     df = pd.DataFrame({"Cantidad": [1], "Candidato": ["X"]})
@@ -29,13 +31,15 @@ def test_map_col_matches_spanish_header_case_insensitively():
 
 @pytest.mark.unit
 def test_parse_df_maps_spanish_headers_to_canonical_schema():
-    df = pd.DataFrame({
-        "nombre_donante": ["Juan Perez", "Maria Lopez"],
-        "cantidad": ["500", "1000"],
-        "fecha_donacion": ["2024-03-01", "2024-03-15"],
-        "candidato": ["Pedro Pierluisi", "Jenniffer Gonzalez"],
-        "partido": ["PNP", "PNP"],
-    })
+    df = pd.DataFrame(
+        {
+            "nombre_donante": ["Juan Perez", "Maria Lopez"],
+            "cantidad": ["500", "1000"],
+            "fecha_donacion": ["2024-03-01", "2024-03-15"],
+            "candidato": ["Pedro Pierluisi", "Jenniffer Gonzalez"],
+            "partido": ["PNP", "PNP"],
+        }
+    )
     out = _parse_df(df, "cee_2024.csv")
     assert list(out.columns) == OUTPUT_COLUMNS
     assert len(out) == 2
@@ -50,10 +54,12 @@ def test_parse_df_maps_spanish_headers_to_canonical_schema():
 
 @pytest.mark.unit
 def test_parse_df_drops_rows_without_donor_name():
-    df = pd.DataFrame({
-        "nombre_donante": ["Juan Perez", "", "  "],
-        "cantidad": ["500", "200", "300"],
-    })
+    df = pd.DataFrame(
+        {
+            "nombre_donante": ["Juan Perez", "", "  "],
+            "cantidad": ["500", "200", "300"],
+        }
+    )
     out = _parse_df(df, "f.csv")
     assert len(out) == 1
     assert out.iloc[0]["donor_name"] == "Juan Perez"
@@ -71,6 +77,7 @@ def test_parse_df_fills_missing_columns_with_empty_string():
 # ---------------------------------------------------------------------------
 # Integration: full drop-file -> processed chain
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.integration
 def test_run_materializes_processed_output_from_dropzone(tmp_path: Path):

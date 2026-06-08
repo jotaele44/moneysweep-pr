@@ -11,6 +11,7 @@ The LDA API works without authentication but is heavily rate-limited.
 When the `LDA_API_KEY` env var is set, the adapter sends it as a
 `Authorization: Token <key>` header (matches the producer pattern).
 """
+
 from __future__ import annotations
 
 import os

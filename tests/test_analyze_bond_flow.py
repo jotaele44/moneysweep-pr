@@ -29,6 +29,7 @@ def test_safe_float_bad():
 # _best_match
 # ---------------------------------------------------------------------------
 
+
 def test_best_match_exact():
     candidates = pd.Series(["GOLDMAN SACHS", "CITI GROUP"])
     score = _best_match("GOLDMAN SACHS", candidates)
@@ -62,6 +63,7 @@ def test_best_match_no_good_match():
 # _match_to_entity
 # ---------------------------------------------------------------------------
 
+
 def test_match_to_entity_true_on_exact():
     norms = pd.Series(["GOLDMAN SACHS"])
     assert _match_to_entity("GOLDMAN SACHS", norms) is True
@@ -79,6 +81,7 @@ def test_match_to_entity_empty_norms():
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
+
 
 def test_match_threshold_in_range():
     assert 0.5 < MATCH_THRESHOLD < 1.0
@@ -98,6 +101,7 @@ def test_bond_flow_columns_has_dual_role():
 # ---------------------------------------------------------------------------
 # Dual-role logic (arithmetic)
 # ---------------------------------------------------------------------------
+
 
 def test_dual_role_requires_both_sides():
     # Dual-role = awards > 0 AND (underwriter OR dealer)

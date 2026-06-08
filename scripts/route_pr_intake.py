@@ -28,10 +28,22 @@ from shared.pr_intake_router import (  # noqa: E402
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Route Puerto Rico raw intake items into repo-specific derivative outputs.")
-    parser.add_argument("--input", required=True, help="Input JSONL, JSON array, or CSV file containing raw intake items.")
-    parser.add_argument("--config", default="config/pr_intake_domain_router.yaml", help="Router YAML config path.")
-    parser.add_argument("--out-dir", default="data/exports/pr_intake_router", help="Directory for exported route outputs.")
+    parser = argparse.ArgumentParser(
+        description="Route Puerto Rico raw intake items into repo-specific derivative outputs."
+    )
+    parser.add_argument(
+        "--input",
+        required=True,
+        help="Input JSONL, JSON array, or CSV file containing raw intake items.",
+    )
+    parser.add_argument(
+        "--config", default="config/pr_intake_domain_router.yaml", help="Router YAML config path."
+    )
+    parser.add_argument(
+        "--out-dir",
+        default="data/exports/pr_intake_router",
+        help="Directory for exported route outputs.",
+    )
     parser.add_argument(
         "--strict",
         action="store_true",
@@ -167,7 +179,8 @@ def main_with_args(argv: Sequence[str] | None = None) -> int:
         "spiderweb_pr_derivative_count": len(spiderweb_rows),
         "review_queue_count": len(review_rows),
         "status_counts": status_counts,
-        "zero_loss_pass": len(raw_items) == len(results) and all(row.get("final_status") for row in results),
+        "zero_loss_pass": len(raw_items) == len(results)
+        and all(row.get("final_status") for row in results),
         "validation_error_count": sum(1 for row in results if row.get("validation_errors")),
     }
 
@@ -175,7 +188,9 @@ def main_with_args(argv: Sequence[str] | None = None) -> int:
     write_csv(out_dir / "contract_sweeper_derivatives.csv", contract_rows)
     write_csv(out_dir / "spiderweb_pr_derivatives.csv", spiderweb_rows)
     write_csv(out_dir / "manual_review_queue.csv", review_rows)
-    (out_dir / "routing_summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
+    (out_dir / "routing_summary.json").write_text(
+        json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
 
     if not summary["zero_loss_pass"]:
         print(json.dumps(summary, indent=2, ensure_ascii=False), file=sys.stderr)

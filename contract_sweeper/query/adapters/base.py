@@ -1,4 +1,5 @@
 """Abstract base class for on-demand source adapters."""
+
 from __future__ import annotations
 
 import abc

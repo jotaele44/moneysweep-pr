@@ -44,13 +44,32 @@ from scripts.config import PROJECT_ROOT, setup_logging
 NORMALIZED_DIR = PROJECT_ROOT / "data" / "normalized"
 
 FLOW_COLUMNS = [
-    "flow_id", "flow_type", "source_system", "source_file",
-    "funding_source", "appropriation", "grant_number", "disaster_number",
-    "pw_number", "activity_id", "project_id",
-    "applicant_or_grantee", "responsible_organization", "prime_vendor", "sub_vendor",
-    "amount_type", "amount", "obligation_date", "drawdown_date", "award_date",
-    "municipality", "asset_id", "contract_id", "parent_uei",
-    "link_confidence", "evidence_path",
+    "flow_id",
+    "flow_type",
+    "source_system",
+    "source_file",
+    "funding_source",
+    "appropriation",
+    "grant_number",
+    "disaster_number",
+    "pw_number",
+    "activity_id",
+    "project_id",
+    "applicant_or_grantee",
+    "responsible_organization",
+    "prime_vendor",
+    "sub_vendor",
+    "amount_type",
+    "amount",
+    "obligation_date",
+    "drawdown_date",
+    "award_date",
+    "municipality",
+    "asset_id",
+    "contract_id",
+    "parent_uei",
+    "link_confidence",
+    "evidence_path",
 ]
 
 TODAY = str(date.today())
@@ -104,29 +123,31 @@ def _ingest_fema_pa(df_v2, df_portal, df_linkage, logger):
                 linkage_lookup[(pw, dis)] = r
 
     for _, r in df_v2.iterrows():
-        pw  = str(r.get("pw_number", "")).strip()
+        pw = str(r.get("pw_number", "")).strip()
         dis = str(r.get("disaster_number", "")).strip()
         link = linkage_lookup.get((pw, dis), {})
 
-        rows.append(_row(
-            flow_id            = _fid(),
-            flow_type          = "federal_disaster_grant",
-            source_system      = "openfema_v2",
-            source_file        = "fema_pa_projects_v2.parquet",
-            funding_source     = "FEMA_PA",
-            disaster_number    = dis,
-            pw_number          = pw,
-            applicant_or_grantee = str(r.get("applicant_name", "")).strip(),
-            responsible_organization = str(r.get("applicant_name", "")).strip(),
-            prime_vendor       = str(link.get("recipient_name", "")) if link else "",
-            amount_type        = "federal_share_obligated",
-            amount             = str(r.get("federal_share_obligated", "")),
-            obligation_date    = str(r.get("obligation_date", r.get("pw_date", ""))),
-            municipality       = str(r.get("county", "")),
-            contract_id        = str(link.get("contract_id", "")) if link else "",
-            link_confidence    = str(link.get("link_confidence", "none")) if link else "none",
-            evidence_path      = "fema_pa_projects_v2.parquet",
-        ))
+        rows.append(
+            _row(
+                flow_id=_fid(),
+                flow_type="federal_disaster_grant",
+                source_system="openfema_v2",
+                source_file="fema_pa_projects_v2.parquet",
+                funding_source="FEMA_PA",
+                disaster_number=dis,
+                pw_number=pw,
+                applicant_or_grantee=str(r.get("applicant_name", "")).strip(),
+                responsible_organization=str(r.get("applicant_name", "")).strip(),
+                prime_vendor=str(link.get("recipient_name", "")) if link else "",
+                amount_type="federal_share_obligated",
+                amount=str(r.get("federal_share_obligated", "")),
+                obligation_date=str(r.get("obligation_date", r.get("pw_date", ""))),
+                municipality=str(r.get("county", "")),
+                contract_id=str(link.get("contract_id", "")) if link else "",
+                link_confidence=str(link.get("link_confidence", "none")) if link else "none",
+                evidence_path="fema_pa_projects_v2.parquet",
+            )
+        )
 
     logger.info(f"  FEMA PA: {len(rows):,} flow rows")
     return rows
@@ -139,56 +160,62 @@ def _ingest_hud_drgr(df_projects, df_activities, df_drawdowns, logger):
     if not df_projects.empty:
         for _, r in df_projects.iterrows():
             gn = str(r.get("grant_number", "")).strip()
-            rows.append(_row(
-                flow_id            = _fid(),
-                flow_type          = "federal_cdbg_grant",
-                source_system      = "hud_drgr",
-                source_file        = "hud_drgr_projects.parquet",
-                funding_source     = str(r.get("program_type", "HUD_CDBG_DR")).strip(),
-                grant_number       = gn,
-                disaster_number    = str(r.get("disaster_number", "")),
-                applicant_or_grantee = str(r.get("grantee_name", "")).strip(),
-                amount_type        = "grant_amount",
-                amount             = str(r.get("grant_amount", "")),
-                evidence_path      = "hud_drgr_projects.parquet",
-            ))
+            rows.append(
+                _row(
+                    flow_id=_fid(),
+                    flow_type="federal_cdbg_grant",
+                    source_system="hud_drgr",
+                    source_file="hud_drgr_projects.parquet",
+                    funding_source=str(r.get("program_type", "HUD_CDBG_DR")).strip(),
+                    grant_number=gn,
+                    disaster_number=str(r.get("disaster_number", "")),
+                    applicant_or_grantee=str(r.get("grantee_name", "")).strip(),
+                    amount_type="grant_amount",
+                    amount=str(r.get("grant_amount", "")),
+                    evidence_path="hud_drgr_projects.parquet",
+                )
+            )
 
     # Activity-level flows
     if not df_activities.empty:
         for _, r in df_activities.iterrows():
             gn = str(r.get("grant_number", "")).strip()
-            rows.append(_row(
-                flow_id            = _fid(),
-                flow_type          = "hud_drgr_activity",
-                source_system      = "hud_drgr",
-                source_file        = "hud_drgr_activities.parquet",
-                funding_source     = "HUD_DRGR",
-                grant_number       = gn,
-                activity_id        = str(r.get("activity_id", "")).strip(),
-                applicant_or_grantee = "",
-                responsible_organization = str(r.get("responsible_org", "")).strip(),
-                amount_type        = "activity_budget",
-                amount             = str(r.get("total_budget", "")),
-                municipality       = str(r.get("municipality", r.get("county", ""))),
-                evidence_path      = "hud_drgr_activities.parquet",
-            ))
+            rows.append(
+                _row(
+                    flow_id=_fid(),
+                    flow_type="hud_drgr_activity",
+                    source_system="hud_drgr",
+                    source_file="hud_drgr_activities.parquet",
+                    funding_source="HUD_DRGR",
+                    grant_number=gn,
+                    activity_id=str(r.get("activity_id", "")).strip(),
+                    applicant_or_grantee="",
+                    responsible_organization=str(r.get("responsible_org", "")).strip(),
+                    amount_type="activity_budget",
+                    amount=str(r.get("total_budget", "")),
+                    municipality=str(r.get("municipality", r.get("county", ""))),
+                    evidence_path="hud_drgr_activities.parquet",
+                )
+            )
 
     # Drawdown-level flows
     if not df_drawdowns.empty:
         for _, r in df_drawdowns.iterrows():
-            rows.append(_row(
-                flow_id            = _fid(),
-                flow_type          = "hud_drgr_drawdown",
-                source_system      = "hud_drgr",
-                source_file        = "hud_drgr_drawdowns.parquet",
-                funding_source     = "HUD_DRGR",
-                grant_number       = str(r.get("grant_number", "")),
-                activity_id        = str(r.get("activity_id", "")),
-                amount_type        = "drawdown",
-                amount             = str(r.get("drawdown_amount", "")),
-                drawdown_date      = str(r.get("drawdown_date", "")),
-                evidence_path      = "hud_drgr_drawdowns.parquet",
-            ))
+            rows.append(
+                _row(
+                    flow_id=_fid(),
+                    flow_type="hud_drgr_drawdown",
+                    source_system="hud_drgr",
+                    source_file="hud_drgr_drawdowns.parquet",
+                    funding_source="HUD_DRGR",
+                    grant_number=str(r.get("grant_number", "")),
+                    activity_id=str(r.get("activity_id", "")),
+                    amount_type="drawdown",
+                    amount=str(r.get("drawdown_amount", "")),
+                    drawdown_date=str(r.get("drawdown_date", "")),
+                    evidence_path="hud_drgr_drawdowns.parquet",
+                )
+            )
 
     logger.info(f"  HUD DRGR: {len(rows):,} flow rows")
     return rows
@@ -199,21 +226,23 @@ def _ingest_cor3(df_cor3, logger):
     if df_cor3.empty:
         return rows
     for _, r in df_cor3.iterrows():
-        rows.append(_row(
-            flow_id            = _fid(),
-            flow_type          = "pr_recovery_project",
-            source_system      = "cor3",
-            source_file        = "pr_cor3_projects.csv",
-            funding_source     = str(r.get("program", "FEMA_PA")).strip(),
-            project_id         = str(r.get("project_id", "")),
-            applicant_or_grantee = str(r.get("applicant_name", "")),
-            responsible_organization = str(r.get("applicant_name", "")),
-            amount_type        = "total_approved",
-            amount             = str(r.get("total_approved", "")),
-            drawdown_date      = str(r.get("last_updated", "")),
-            municipality       = str(r.get("municipality", "")),
-            evidence_path      = "pr_cor3_projects.csv",
-        ))
+        rows.append(
+            _row(
+                flow_id=_fid(),
+                flow_type="pr_recovery_project",
+                source_system="cor3",
+                source_file="pr_cor3_projects.csv",
+                funding_source=str(r.get("program", "FEMA_PA")).strip(),
+                project_id=str(r.get("project_id", "")),
+                applicant_or_grantee=str(r.get("applicant_name", "")),
+                responsible_organization=str(r.get("applicant_name", "")),
+                amount_type="total_approved",
+                amount=str(r.get("total_approved", "")),
+                drawdown_date=str(r.get("last_updated", "")),
+                municipality=str(r.get("municipality", "")),
+                evidence_path="pr_cor3_projects.csv",
+            )
+        )
     logger.info(f"  COR3: {len(rows):,} flow rows")
     return rows
 
@@ -221,31 +250,43 @@ def _ingest_cor3(df_cor3, logger):
 def _ingest_pr_procurement(df_prasa, df_compras, logger):
     rows = []
     for df, source_label, source_file in [
-        (df_prasa,  "PRASA",   "pr_prasa_contracts.csv"),
+        (df_prasa, "PRASA", "pr_prasa_contracts.csv"),
         (df_compras, "Compras", "pr_compras_awards.csv"),
     ]:
         if df.empty:
             continue
-        vendor_col = next((c for c in ["vendor_name", "awarded_vendor", "recipient_name"] if c in df.columns), None)
-        amount_col = next((c for c in ["contract_value", "awarded_amount", "obligated_amount"] if c in df.columns), None)
-        date_col   = next((c for c in ["award_date", "action_date"] if c in df.columns), None)
-        id_col     = next((c for c in ["contract_id", "rfp_id", "award_id"] if c in df.columns), None)
-        muni_col   = next((c for c in ["municipality", "pop_county"] if c in df.columns), None)
+        vendor_col = next(
+            (c for c in ["vendor_name", "awarded_vendor", "recipient_name"] if c in df.columns),
+            None,
+        )
+        amount_col = next(
+            (
+                c
+                for c in ["contract_value", "awarded_amount", "obligated_amount"]
+                if c in df.columns
+            ),
+            None,
+        )
+        date_col = next((c for c in ["award_date", "action_date"] if c in df.columns), None)
+        id_col = next((c for c in ["contract_id", "rfp_id", "award_id"] if c in df.columns), None)
+        muni_col = next((c for c in ["municipality", "pop_county"] if c in df.columns), None)
         for _, r in df.iterrows():
-            rows.append(_row(
-                flow_id            = _fid(),
-                flow_type          = "pr_procurement",
-                source_system      = source_label.lower(),
-                source_file        = source_file,
-                funding_source     = "PR_GOVERNMENT",
-                prime_vendor       = str(r.get(vendor_col, "")) if vendor_col else "",
-                amount_type        = "contract_value",
-                amount             = str(r.get(amount_col, "")) if amount_col else "",
-                award_date         = str(r.get(date_col, "")) if date_col else "",
-                contract_id        = str(r.get(id_col, "")) if id_col else "",
-                municipality       = str(r.get(muni_col, "")) if muni_col else "",
-                evidence_path      = source_file,
-            ))
+            rows.append(
+                _row(
+                    flow_id=_fid(),
+                    flow_type="pr_procurement",
+                    source_system=source_label.lower(),
+                    source_file=source_file,
+                    funding_source="PR_GOVERNMENT",
+                    prime_vendor=str(r.get(vendor_col, "")) if vendor_col else "",
+                    amount_type="contract_value",
+                    amount=str(r.get(amount_col, "")) if amount_col else "",
+                    award_date=str(r.get(date_col, "")) if date_col else "",
+                    contract_id=str(r.get(id_col, "")) if id_col else "",
+                    municipality=str(r.get(muni_col, "")) if muni_col else "",
+                    evidence_path=source_file,
+                )
+            )
     logger.info(f"  PR Procurement: {len(rows):,} flow rows")
     return rows
 
@@ -255,23 +296,25 @@ def _ingest_contracts(df_contracts, logger):
     if df_contracts.empty:
         return rows
     for _, r in df_contracts.iterrows():
-        rows.append(_row(
-            flow_id            = _fid(),
-            flow_type          = "federal_contract",
-            source_system      = str(r.get("source_dataset", "usaspending")).strip(),
-            source_file        = "pr_contracts_master.csv",
-            funding_source     = "FEDERAL",
-            applicant_or_grantee = "",
-            responsible_organization = "",
-            prime_vendor       = str(r.get("recipient_name", "")),
-            amount_type        = "obligated_amount",
-            amount             = str(r.get("obligated_amount", "")),
-            award_date         = str(r.get("award_date", "")),
-            contract_id        = str(r.get("award_id", "")),
-            municipality       = str(r.get("pop_county", "")),
-            parent_uei         = str(r.get("recipient_uei", "")),
-            evidence_path      = "pr_contracts_master.csv",
-        ))
+        rows.append(
+            _row(
+                flow_id=_fid(),
+                flow_type="federal_contract",
+                source_system=str(r.get("source_dataset", "usaspending")).strip(),
+                source_file="pr_contracts_master.csv",
+                funding_source="FEDERAL",
+                applicant_or_grantee="",
+                responsible_organization="",
+                prime_vendor=str(r.get("recipient_name", "")),
+                amount_type="obligated_amount",
+                amount=str(r.get("obligated_amount", "")),
+                award_date=str(r.get("award_date", "")),
+                contract_id=str(r.get("award_id", "")),
+                municipality=str(r.get("pop_county", "")),
+                parent_uei=str(r.get("recipient_uei", "")),
+                evidence_path="pr_contracts_master.csv",
+            )
+        )
     logger.info(f"  Contracts: {len(rows):,} flow rows")
     return rows
 
@@ -292,16 +335,16 @@ def run(root=None, force=False):
         return {"rows": rows, "status": "CACHED"}
 
     logger.info("Loading upstream inputs...")
-    df_fema_v2      = _load_parquet(norm_dir / "fema_pa_projects_v2.parquet", logger)
-    df_fema_portal  = _load_parquet(norm_dir / "fema_pa_portal_178_pws.parquet", logger)
+    df_fema_v2 = _load_parquet(norm_dir / "fema_pa_projects_v2.parquet", logger)
+    df_fema_portal = _load_parquet(norm_dir / "fema_pa_portal_178_pws.parquet", logger)
     df_fema_linkage = _load_csv(linked_dir / "fema_178_pw_linkage.csv", logger)
     df_hud_projects = _load_parquet(norm_dir / "hud_drgr_projects.parquet", logger)
-    df_hud_acts     = _load_parquet(norm_dir / "hud_drgr_activities.parquet", logger)
-    df_hud_draws    = _load_parquet(norm_dir / "hud_drgr_drawdowns.parquet", logger)
-    df_cor3         = _load_csv(proc_dir / "pr_cor3_projects.csv", logger)
-    df_prasa        = _load_csv(proc_dir / "pr_prasa_contracts.csv", logger)
-    df_compras      = _load_csv(proc_dir / "pr_compras_awards.csv", logger)
-    df_contracts    = _load_csv(proc_dir / "pr_contracts_master.csv", logger)
+    df_hud_acts = _load_parquet(norm_dir / "hud_drgr_activities.parquet", logger)
+    df_hud_draws = _load_parquet(norm_dir / "hud_drgr_drawdowns.parquet", logger)
+    df_cor3 = _load_csv(proc_dir / "pr_cor3_projects.csv", logger)
+    df_prasa = _load_csv(proc_dir / "pr_prasa_contracts.csv", logger)
+    df_compras = _load_csv(proc_dir / "pr_compras_awards.csv", logger)
+    df_contracts = _load_csv(proc_dir / "pr_contracts_master.csv", logger)
     if df_contracts.empty:
         df_contracts = _load_csv(proc_dir / "pr_all_awards_master.csv", logger)
 
@@ -340,8 +383,10 @@ def main():
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     result = run(force=args.force)
-    print(f"\nFinancial flows master: {result['rows']:,} rows, "
-          f"${result.get('total_amount', 0):,.0f} total")
+    print(
+        f"\nFinancial flows master: {result['rows']:,} rows, "
+        f"${result.get('total_amount', 0):,.0f} total"
+    )
     return 0
 
 

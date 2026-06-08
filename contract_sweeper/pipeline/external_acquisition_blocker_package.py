@@ -40,7 +40,8 @@ def _manual_blocker_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "expected_input": str(row.get("expected_input", "")).strip(),
                 "target_output_path": str(row.get("target_output_path", "")).strip(),
                 "required_action": "Provide validated manual file in dropzone",
-                "reason": str(row.get("failure_reason", "")).strip() or "manual file still required",
+                "reason": str(row.get("failure_reason", "")).strip()
+                or "manual file still required",
                 "review_status": str(row.get("review_status", "")).strip() or "pending_manual_file",
                 "source_url_or_portal": str(row.get("source_url_or_portal", "")).strip(),
             }

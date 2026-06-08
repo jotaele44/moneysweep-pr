@@ -14,6 +14,7 @@ Usage:
   python3 scripts/download_nonprofits.py --min-revenue 100000
   python3 scripts/download_nonprofits.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -32,46 +33,105 @@ from scripts.config import PROJECT_ROOT, setup_logging
 # Constants
 # ---------------------------------------------------------------------------
 
-PROPUBLICA_BASE  = "https://projects.propublica.org/nonprofits/api/v2"
-PAGE_SLEEP       = 0.8    # ProPublica asks for polite crawling
-DETAIL_SLEEP     = 0.5
-MAX_RETRIES      = 3
-RETRY_BACKOFF    = [5, 15, 30]
-DEFAULT_MIN_REV  = 500_000   # only fetch detail for orgs with ≥ $500K revenue
+PROPUBLICA_BASE = "https://projects.propublica.org/nonprofits/api/v2"
+PAGE_SLEEP = 0.8  # ProPublica asks for polite crawling
+DETAIL_SLEEP = 0.5
+MAX_RETRIES = 3
+RETRY_BACKOFF = [5, 15, 30]
+DEFAULT_MIN_REV = 500_000  # only fetch detail for orgs with ≥ $500K revenue
 
 # Known top PR nonprofits from IRS SOI data and Guidestar public profiles
 KNOWN_NONPROFITS = [
-    {"ein": "660201895", "name": "Ponce Health Sciences University", "city": "Ponce", "state": "PR",
-     "ntee_code": "B42", "ntee_category": "Education", "subsection_code": "3",
-     "ruling_year": "1967", "latest_filing_year": "2022", "total_revenue": "148000000",
-     "total_expenses": "132000000", "total_assets": "165000000", "total_liabilities": "42000000",
-     "grants_received": "12000000", "grants_paid": "0", "officer_compensation": "1800000",
-     "employee_count": "850", "revenue_trend": "growing"},
-    {"ein": "660315830", "name": "Universidad Interamericana de Puerto Rico", "city": "San Juan", "state": "PR",
-     "ntee_code": "B43", "ntee_category": "Education", "subsection_code": "3",
-     "ruling_year": "1912", "latest_filing_year": "2022", "total_revenue": "210000000",
-     "total_expenses": "195000000", "total_assets": "290000000", "total_liabilities": "85000000",
-     "grants_received": "35000000", "grants_paid": "0", "officer_compensation": "3200000",
-     "employee_count": "3400", "revenue_trend": "stable"},
-    {"ein": "660426090", "name": "Fundacion Angel Ramos", "city": "San Juan", "state": "PR",
-     "ntee_code": "T20", "ntee_category": "Philanthropy", "subsection_code": "3",
-     "ruling_year": "1984", "latest_filing_year": "2022", "total_revenue": "18000000",
-     "total_expenses": "14000000", "total_assets": "280000000", "total_liabilities": "2000000",
-     "grants_received": "0", "grants_paid": "10000000", "officer_compensation": "480000",
-     "employee_count": "25", "revenue_trend": "stable"},
+    {
+        "ein": "660201895",
+        "name": "Ponce Health Sciences University",
+        "city": "Ponce",
+        "state": "PR",
+        "ntee_code": "B42",
+        "ntee_category": "Education",
+        "subsection_code": "3",
+        "ruling_year": "1967",
+        "latest_filing_year": "2022",
+        "total_revenue": "148000000",
+        "total_expenses": "132000000",
+        "total_assets": "165000000",
+        "total_liabilities": "42000000",
+        "grants_received": "12000000",
+        "grants_paid": "0",
+        "officer_compensation": "1800000",
+        "employee_count": "850",
+        "revenue_trend": "growing",
+    },
+    {
+        "ein": "660315830",
+        "name": "Universidad Interamericana de Puerto Rico",
+        "city": "San Juan",
+        "state": "PR",
+        "ntee_code": "B43",
+        "ntee_category": "Education",
+        "subsection_code": "3",
+        "ruling_year": "1912",
+        "latest_filing_year": "2022",
+        "total_revenue": "210000000",
+        "total_expenses": "195000000",
+        "total_assets": "290000000",
+        "total_liabilities": "85000000",
+        "grants_received": "35000000",
+        "grants_paid": "0",
+        "officer_compensation": "3200000",
+        "employee_count": "3400",
+        "revenue_trend": "stable",
+    },
+    {
+        "ein": "660426090",
+        "name": "Fundacion Angel Ramos",
+        "city": "San Juan",
+        "state": "PR",
+        "ntee_code": "T20",
+        "ntee_category": "Philanthropy",
+        "subsection_code": "3",
+        "ruling_year": "1984",
+        "latest_filing_year": "2022",
+        "total_revenue": "18000000",
+        "total_expenses": "14000000",
+        "total_assets": "280000000",
+        "total_liabilities": "2000000",
+        "grants_received": "0",
+        "grants_paid": "10000000",
+        "officer_compensation": "480000",
+        "employee_count": "25",
+        "revenue_trend": "stable",
+    },
 ]
 
 # NTEE major group labels (first letter of NTEE code)
 NTEE_LABELS = {
-    "A": "Arts/Culture", "B": "Education", "C": "Environment",
-    "D": "Animal-Related", "E": "Health", "F": "Mental Health",
-    "G": "Disease/Disorder", "H": "Medical Research", "I": "Crime/Legal",
-    "J": "Employment", "K": "Food/Agriculture", "L": "Housing",
-    "M": "Public Safety", "N": "Recreation/Sports", "O": "Youth Dev",
-    "P": "Human Services", "Q": "International", "R": "Civil Rights",
-    "S": "Community Improvement", "T": "Philanthropy/Voluntarism",
-    "U": "Science/Tech", "V": "Social Science", "W": "Public/Society",
-    "X": "Religion", "Y": "Mutual Benefit", "Z": "Unknown",
+    "A": "Arts/Culture",
+    "B": "Education",
+    "C": "Environment",
+    "D": "Animal-Related",
+    "E": "Health",
+    "F": "Mental Health",
+    "G": "Disease/Disorder",
+    "H": "Medical Research",
+    "I": "Crime/Legal",
+    "J": "Employment",
+    "K": "Food/Agriculture",
+    "L": "Housing",
+    "M": "Public Safety",
+    "N": "Recreation/Sports",
+    "O": "Youth Dev",
+    "P": "Human Services",
+    "Q": "International",
+    "R": "Civil Rights",
+    "S": "Community Improvement",
+    "T": "Philanthropy/Voluntarism",
+    "U": "Science/Tech",
+    "V": "Social Science",
+    "W": "Public/Society",
+    "X": "Religion",
+    "Y": "Mutual Benefit",
+    "Z": "Unknown",
 }
 
 OUTPUT_COLUMNS = [
@@ -100,12 +160,15 @@ OUTPUT_COLUMNS = [
 # Network helpers
 # ---------------------------------------------------------------------------
 
+
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR nonprofit research; not-for-profit)",
-        "Accept":     "application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR nonprofit research; not-for-profit)",
+            "Accept": "application/json",
+        }
+    )
     return s
 
 
@@ -138,14 +201,15 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
 # Phase 1: list all PR nonprofits
 # ---------------------------------------------------------------------------
 
+
 def _list_orgs(session: requests.Session, logger) -> list[dict]:
-    url  = f"{PROPUBLICA_BASE}/organizations/search.json"
+    url = f"{PROPUBLICA_BASE}/organizations/search.json"
     page = 0
     orgs = []
 
     while True:
         params = {"state[id]": "PR", "page": page}
-        data   = _get(session, url, params, logger)
+        data = _get(session, url, params, logger)
         if data is None:
             break
         batch = data.get("organizations") or []
@@ -165,15 +229,16 @@ def _list_orgs(session: requests.Session, logger) -> list[dict]:
 # Phase 2: fetch detailed 990 filing for one org
 # ---------------------------------------------------------------------------
 
+
 def _fetch_detail(session: requests.Session, ein: str, logger) -> dict:
-    url  = f"{PROPUBLICA_BASE}/organizations/{ein}.json"
+    url = f"{PROPUBLICA_BASE}/organizations/{ein}.json"
     data = _get(session, url, {}, logger)
     if not data:
         return {}
     time.sleep(DETAIL_SLEEP)
 
     data.get("organization") or {}
-    filings  = data.get("filings_with_data") or []
+    filings = data.get("filings_with_data") or []
 
     if not filings:
         return {}
@@ -192,15 +257,15 @@ def _fetch_detail(session: requests.Session, ein: str, logger) -> dict:
 
     return {
         "latest_filing_year": latest.get("tax_prd_yr") or str(latest.get("tax_prd", ""))[:4],
-        "total_revenue":      _num(latest.get("totrevenue")),
-        "total_expenses":     _num(latest.get("totfuncexpns")),
-        "total_assets":       _num(latest.get("totassetsend")),
-        "total_liabilities":  _num(latest.get("totliabend")),
-        "grants_received":    _num(latest.get("grscontrbgivingelc") or latest.get("totcntrbgfts")),
-        "grants_paid":        _num(latest.get("grntspaidnfchr") or latest.get("totgrnts")),
+        "total_revenue": _num(latest.get("totrevenue")),
+        "total_expenses": _num(latest.get("totfuncexpns")),
+        "total_assets": _num(latest.get("totassetsend")),
+        "total_liabilities": _num(latest.get("totliabend")),
+        "grants_received": _num(latest.get("grscontrbgivingelc") or latest.get("totcntrbgfts")),
+        "grants_paid": _num(latest.get("grntspaidnfchr") or latest.get("totgrnts")),
         "officer_compensation": _num(latest.get("compnsatncurrofcr")),
-        "employee_count":     latest.get("noemployees") or "",
-        "revenue_trend":      trend,
+        "employee_count": latest.get("noemployees") or "",
+        "revenue_trend": trend,
     }
 
 
@@ -217,18 +282,19 @@ def _num(val) -> float | str:
 # Entry point
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None, min_revenue: float = DEFAULT_MIN_REV, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 
-    root    = Path(root)
+    root = Path(root)
     raw_dir = root / "data" / "staging" / "raw" / "nonprofits"
     raw_path = raw_dir / "pr_nonprofits_raw.csv"
     out_path = root / "data" / "staging" / "processed" / "pr_nonprofits.csv"
     raw_dir.mkdir(parents=True, exist_ok=True)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    logger  = setup_logging("download_nonprofits")
+    logger = setup_logging("download_nonprofits")
     session = _session()
 
     # ------------------------------------------------------------------
@@ -237,7 +303,7 @@ def run(root: Path = None, min_revenue: float = DEFAULT_MIN_REV, force: bool = F
     if not force and raw_path.exists():
         logger.info("  Org list exists — loading cached data")
         df_raw = pd.read_csv(raw_path, dtype=str, low_memory=False)
-        orgs   = df_raw.to_dict("records")
+        orgs = df_raw.to_dict("records")
     else:
         logger.info("Phase 1: Listing all PR nonprofits from ProPublica...")
         orgs = _list_orgs(session, logger)
@@ -253,36 +319,36 @@ def run(root: Path = None, min_revenue: float = DEFAULT_MIN_REV, force: bool = F
     # ------------------------------------------------------------------
     rows = []
     for org in orgs:
-        ein          = str(org.get("ein", "")).strip()
-        name         = str(org.get("name", ""))
-        city         = str(org.get("city", ""))
-        state        = str(org.get("state", ""))
-        ntee_code    = str(org.get("ntee_code", ""))
-        subsection   = str(org.get("subsection_code", ""))
-        ruling_year  = str(org.get("ruling_year_month", ""))[:4]
-        revenue_amt  = _num(org.get("revenue_amt") or org.get("income_amt"))
+        ein = str(org.get("ein", "")).strip()
+        name = str(org.get("name", ""))
+        city = str(org.get("city", ""))
+        state = str(org.get("state", ""))
+        ntee_code = str(org.get("ntee_code", ""))
+        subsection = str(org.get("subsection_code", ""))
+        ruling_year = str(org.get("ruling_year_month", ""))[:4]
+        revenue_amt = _num(org.get("revenue_amt") or org.get("income_amt"))
 
         ntee_cat = NTEE_LABELS.get((ntee_code[:1] if ntee_code else ""), "Unknown")
 
         base = {
-            "ein":             ein,
-            "name":            name,
-            "city":            city,
-            "state":           state,
-            "ntee_code":       ntee_code,
-            "ntee_category":   ntee_cat,
+            "ein": ein,
+            "name": name,
+            "city": city,
+            "state": state,
+            "ntee_code": ntee_code,
+            "ntee_category": ntee_cat,
             "subsection_code": subsection,
-            "ruling_year":     ruling_year,
+            "ruling_year": ruling_year,
             "latest_filing_year": "",
-            "total_revenue":   revenue_amt,
-            "total_expenses":  "",
-            "total_assets":    "",
+            "total_revenue": revenue_amt,
+            "total_expenses": "",
+            "total_assets": "",
             "total_liabilities": "",
             "grants_received": "",
-            "grants_paid":     "",
+            "grants_paid": "",
             "officer_compensation": "",
-            "employee_count":  "",
-            "revenue_trend":   "",
+            "employee_count": "",
+            "revenue_trend": "",
         }
 
         # Fetch detail only for orgs meeting revenue threshold
@@ -301,13 +367,18 @@ def run(root: Path = None, min_revenue: float = DEFAULT_MIN_REV, force: bool = F
             df[col] = ""
     df = df[OUTPUT_COLUMNS]
     df = df.drop_duplicates(subset=["ein"], keep="first")
-    df = df.sort_values("total_revenue", ascending=False, key=lambda s: pd.to_numeric(s, errors="coerce").fillna(0))
+    df = df.sort_values(
+        "total_revenue", ascending=False, key=lambda s: pd.to_numeric(s, errors="coerce").fillna(0)
+    )
 
     df.to_csv(out_path, index=False, encoding="utf-8")
 
-    above_threshold = sum(1 for o in orgs
-                         if isinstance(_num(o.get("revenue_amt") or o.get("income_amt")), float)
-                         and _num(o.get("revenue_amt") or o.get("income_amt")) >= min_revenue)
+    above_threshold = sum(
+        1
+        for o in orgs
+        if isinstance(_num(o.get("revenue_amt") or o.get("income_amt")), float)
+        and _num(o.get("revenue_amt") or o.get("income_amt")) >= min_revenue
+    )
 
     total_rev = pd.to_numeric(df["total_revenue"], errors="coerce").sum()
 
@@ -327,16 +398,20 @@ def run(root: Path = None, min_revenue: float = DEFAULT_MIN_REV, force: bool = F
             logger.info(f"    {str(row['name'])[:55]:<55} {rev_str}  [{row['ntee_category']}]")
 
     return {
-        "rows":   len(df),
+        "rows": len(df),
         "status": "OK" if len(df) > 0 else "EMPTY",
-        "path":   str(out_path),
+        "path": str(out_path),
     }
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Download PR nonprofit 990 data via ProPublica")
-    parser.add_argument("--min-revenue", type=float, default=DEFAULT_MIN_REV,
-                        help=f"Minimum revenue to fetch 990 detail (default: ${DEFAULT_MIN_REV:,.0f})")
+    parser.add_argument(
+        "--min-revenue",
+        type=float,
+        default=DEFAULT_MIN_REV,
+        help=f"Minimum revenue to fetch 990 detail (default: ${DEFAULT_MIN_REV:,.0f})",
+    )
     parser.add_argument("--force", action="store_true", help="Re-fetch org list even if cached")
     args = parser.parse_args()
     result = run(min_revenue=args.min_revenue, force=args.force)

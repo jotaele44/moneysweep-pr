@@ -16,6 +16,7 @@ import pandas as pd
 
 try:
     import pyarrow  # noqa: F401
+
     _PARQUET_OK = True
 except ImportError:
     _PARQUET_OK = False
@@ -54,8 +55,9 @@ def pq_read(path: Path, columns=None) -> pd.DataFrame:
     csv_path = path.with_suffix(".csv")
     if csv_path.exists():
         try:
-            return pd.read_csv(csv_path, dtype=str, low_memory=False,
-                               usecols=columns if columns else None)
+            return pd.read_csv(
+                csv_path, dtype=str, low_memory=False, usecols=columns if columns else None
+            )
         except Exception:
             pass
     return pd.DataFrame()

@@ -3,6 +3,7 @@
 Pins the run()/_session/_fetch_pass contract and the cursor-pagination path.
 All network is mocked; no real HTTP.
 """
+
 from __future__ import annotations
 
 import pandas as pd
@@ -45,10 +46,12 @@ def test_run_dedupes_by_filing_uuid(tmp_path):
 
 def test_fetch_pass_walks_next_cursor():
     pages = [
-        {"results": [{"filing_uuid": "u1", "client": {"state": "PR"}}],
-         "count": 2, "next": "http://next"},
-        {"results": [{"filing_uuid": "u2", "client": {"state": "PR"}}],
-         "count": 2, "next": None},
+        {
+            "results": [{"filing_uuid": "u1", "client": {"state": "PR"}}],
+            "count": 2,
+            "next": "http://next",
+        },
+        {"results": [{"filing_uuid": "u2", "client": {"state": "PR"}}], "count": 2, "next": None},
     ]
     with patch.object(lda, "_get", side_effect=pages) as mock_get:
         recs = lda._fetch_pass(session=None, state_param="client_state", logger=_Logger())

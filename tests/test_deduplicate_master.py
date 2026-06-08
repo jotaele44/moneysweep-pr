@@ -22,23 +22,27 @@ def logger():
 
 class TestDeduplicate:
     def test_removes_cross_file_duplicates(self, logger):
-        df = pd.DataFrame({
-            "contract_id": ["C001", "C001", "C002"],
-            "award_date": ["2020-01-01", "2020-01-01", "2021-06-15"],
-            "vendor_name": ["ACME INC", "ACME INC", "BETA LLC"],
-            "obligated_amount": ["1000.00", "1000.00", "2000.00"],
-            "source_file": ["fpds_direct", "fpds_vendor", "fpds_direct"],
-        })
+        df = pd.DataFrame(
+            {
+                "contract_id": ["C001", "C001", "C002"],
+                "award_date": ["2020-01-01", "2020-01-01", "2021-06-15"],
+                "vendor_name": ["ACME INC", "ACME INC", "BETA LLC"],
+                "obligated_amount": ["1000.00", "1000.00", "2000.00"],
+                "source_file": ["fpds_direct", "fpds_vendor", "fpds_direct"],
+            }
+        )
         result = deduplicate(df, logger)
         assert len(result) == 2
 
     def test_no_duplicates_unchanged(self, logger):
-        df = pd.DataFrame({
-            "contract_id": ["C001", "C002", "C003"],
-            "award_date": ["2020-01-01", "2021-06-15", "2022-03-10"],
-            "vendor_name": ["ACME INC", "BETA LLC", "GAMMA CORP"],
-            "obligated_amount": ["1000.00", "2000.00", "3000.00"],
-        })
+        df = pd.DataFrame(
+            {
+                "contract_id": ["C001", "C002", "C003"],
+                "award_date": ["2020-01-01", "2021-06-15", "2022-03-10"],
+                "vendor_name": ["ACME INC", "BETA LLC", "GAMMA CORP"],
+                "obligated_amount": ["1000.00", "2000.00", "3000.00"],
+            }
+        )
         result = deduplicate(df, logger)
         assert len(result) == 3
 
@@ -53,13 +57,15 @@ class TestDeduplicate:
         assert len(result) == 3
 
     def test_source_file_consolidated(self, logger):
-        df = pd.DataFrame({
-            "contract_id": ["C001", "C001"],
-            "award_date": ["2020-01-01", "2020-01-01"],
-            "vendor_name": ["ACME INC", "ACME INC"],
-            "obligated_amount": ["1000.00", "1000.00"],
-            "source_file": ["fpds_direct", "fpds_vendor"],
-        })
+        df = pd.DataFrame(
+            {
+                "contract_id": ["C001", "C001"],
+                "award_date": ["2020-01-01", "2020-01-01"],
+                "vendor_name": ["ACME INC", "ACME INC"],
+                "obligated_amount": ["1000.00", "1000.00"],
+                "source_file": ["fpds_direct", "fpds_vendor"],
+            }
+        )
         result = deduplicate(df, logger)
         assert len(result) == 1
         # Source files should be merged into a comma-joined string
@@ -76,12 +82,14 @@ class TestLoadAllNormalized:
     def test_loads_multiple_files(self, tmp_project, logger):
         processed = tmp_project / "data" / "staging" / "processed"
         for i in range(3):
-            df = pd.DataFrame({
-                "contract_id": [f"C{i:03d}"],
-                "vendor_name": [f"VENDOR {i}"],
-                "award_date": ["2020-01-01"],
-                "obligated_amount": [str(1000 * (i + 1))],
-            })
+            df = pd.DataFrame(
+                {
+                    "contract_id": [f"C{i:03d}"],
+                    "vendor_name": [f"VENDOR {i}"],
+                    "award_date": ["2020-01-01"],
+                    "obligated_amount": [str(1000 * (i + 1))],
+                }
+            )
             df.to_csv(processed / f"normalized_expansion_file{i}.csv", index=False)
 
         result = load_all_normalized(tmp_project, logger)
@@ -98,22 +106,26 @@ class TestMain:
     def test_builds_master(self, tmp_project):
         processed = tmp_project / "data" / "staging" / "processed"
         # File a: C001 (shared) + C002 (unique)
-        pd.DataFrame({
-            "contract_id": ["C001", "C002"],
-            "award_date": ["2020-01-01", "2021-05-10"],
-            "vendor_name": ["ACME INC", "GAMMA LLC"],
-            "obligated_amount": ["5000.00", "8000.00"],
-            "source_file": ["normalized_expansion_a", "normalized_expansion_a"],
-        }).to_csv(processed / "normalized_expansion_a.csv", index=False)
+        pd.DataFrame(
+            {
+                "contract_id": ["C001", "C002"],
+                "award_date": ["2020-01-01", "2021-05-10"],
+                "vendor_name": ["ACME INC", "GAMMA LLC"],
+                "obligated_amount": ["5000.00", "8000.00"],
+                "source_file": ["normalized_expansion_a", "normalized_expansion_a"],
+            }
+        ).to_csv(processed / "normalized_expansion_a.csv", index=False)
 
         # File b: C001 (shared, duplicate) + C003 (unique)
-        pd.DataFrame({
-            "contract_id": ["C001", "C003"],
-            "award_date": ["2020-01-01", "2022-03-15"],
-            "vendor_name": ["ACME INC", "DELTA CORP"],
-            "obligated_amount": ["5000.00", "3000.00"],
-            "source_file": ["normalized_expansion_b", "normalized_expansion_b"],
-        }).to_csv(processed / "normalized_expansion_b.csv", index=False)
+        pd.DataFrame(
+            {
+                "contract_id": ["C001", "C003"],
+                "award_date": ["2020-01-01", "2022-03-15"],
+                "vendor_name": ["ACME INC", "DELTA CORP"],
+                "obligated_amount": ["5000.00", "3000.00"],
+                "source_file": ["normalized_expansion_b", "normalized_expansion_b"],
+            }
+        ).to_csv(processed / "normalized_expansion_b.csv", index=False)
 
         stats = dedup_main(tmp_project)
         # 4 rows in, C001 duplicated once → 3 unique rows
@@ -131,99 +143,116 @@ class TestMain:
 # that as the current contract so future normalization changes are explicit.
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.unit
 class TestDedupEdgeCases:
     def test_vendor_name_trailing_whitespace_not_collapsed(self, logger):
-        df = pd.DataFrame({
-            "contract_id": ["C001", "C001"],
-            "award_date": ["2020-01-01", "2020-01-01"],
-            "vendor_name": ["ACME", "ACME "],
-            "obligated_amount": ["1000", "1000"],
-            "source_file": ["a", "b"],
-        })
+        df = pd.DataFrame(
+            {
+                "contract_id": ["C001", "C001"],
+                "award_date": ["2020-01-01", "2020-01-01"],
+                "vendor_name": ["ACME", "ACME "],
+                "obligated_amount": ["1000", "1000"],
+                "source_file": ["a", "b"],
+            }
+        )
         result = deduplicate(df, logger)
         assert len(result) == 2
 
     def test_vendor_name_case_variance_not_collapsed(self, logger):
-        df = pd.DataFrame({
-            "contract_id": ["C001", "C001"],
-            "award_date": ["2020-01-01", "2020-01-01"],
-            "vendor_name": ["acme inc", "ACME INC"],
-            "obligated_amount": ["1000", "1000"],
-            "source_file": ["a", "b"],
-        })
+        df = pd.DataFrame(
+            {
+                "contract_id": ["C001", "C001"],
+                "award_date": ["2020-01-01", "2020-01-01"],
+                "vendor_name": ["acme inc", "ACME INC"],
+                "obligated_amount": ["1000", "1000"],
+                "source_file": ["a", "b"],
+            }
+        )
         result = deduplicate(df, logger)
         assert len(result) == 2
 
     def test_amount_string_format_variance_not_collapsed(self, logger):
-        df = pd.DataFrame({
-            "contract_id": ["C001", "C001"],
-            "award_date": ["2020-01-01", "2020-01-01"],
-            "vendor_name": ["ACME", "ACME"],
-            "obligated_amount": ["1000", "1000.00"],
-            "source_file": ["a", "b"],
-        })
+        df = pd.DataFrame(
+            {
+                "contract_id": ["C001", "C001"],
+                "award_date": ["2020-01-01", "2020-01-01"],
+                "vendor_name": ["ACME", "ACME"],
+                "obligated_amount": ["1000", "1000.00"],
+                "source_file": ["a", "b"],
+            }
+        )
         result = deduplicate(df, logger)
         assert len(result) == 2
 
     def test_amount_with_currency_symbols_not_collapsed(self, logger):
-        df = pd.DataFrame({
-            "contract_id": ["C001", "C001"],
-            "award_date": ["2020-01-01", "2020-01-01"],
-            "vendor_name": ["ACME", "ACME"],
-            "obligated_amount": ["$1,000.00", "1000"],
-            "source_file": ["a", "b"],
-        })
+        df = pd.DataFrame(
+            {
+                "contract_id": ["C001", "C001"],
+                "award_date": ["2020-01-01", "2020-01-01"],
+                "vendor_name": ["ACME", "ACME"],
+                "obligated_amount": ["$1,000.00", "1000"],
+                "source_file": ["a", "b"],
+            }
+        )
         result = deduplicate(df, logger)
         assert len(result) == 2
 
     def test_nan_in_dedup_key_kept_separate(self, logger):
-        df = pd.DataFrame({
-            "contract_id": ["C001", "C001"],
-            "award_date": ["2020-01-01", "2020-01-01"],
-            "vendor_name": ["ACME", "ACME"],
-            "obligated_amount": [np.nan, np.nan],
-            "source_file": ["a", "b"],
-        })
+        df = pd.DataFrame(
+            {
+                "contract_id": ["C001", "C001"],
+                "award_date": ["2020-01-01", "2020-01-01"],
+                "vendor_name": ["ACME", "ACME"],
+                "obligated_amount": [np.nan, np.nan],
+                "source_file": ["a", "b"],
+            }
+        )
         result = deduplicate(df, logger)
         # pandas drop_duplicates treats NaN as equal under default semantics,
         # so these rows collapse to one. Pinning current behavior.
         assert len(result) == 1
 
     def test_source_file_aggregation_with_null_one_side(self, logger):
-        df = pd.DataFrame({
-            "contract_id": ["C001", "C001"],
-            "award_date": ["2020-01-01", "2020-01-01"],
-            "vendor_name": ["ACME", "ACME"],
-            "obligated_amount": ["1000", "1000"],
-            "source_file": ["a", None],
-        })
+        df = pd.DataFrame(
+            {
+                "contract_id": ["C001", "C001"],
+                "award_date": ["2020-01-01", "2020-01-01"],
+                "vendor_name": ["ACME", "ACME"],
+                "obligated_amount": ["1000", "1000"],
+                "source_file": ["a", None],
+            }
+        )
         result = deduplicate(df, logger)
         assert len(result) == 1
         # null side is dropped, not joined as "a,"
         assert result.iloc[0]["source_file"] == "a"
 
     def test_source_file_aggregation_deduplicates_within_group(self, logger):
-        df = pd.DataFrame({
-            "contract_id": ["C001", "C001", "C001"],
-            "award_date": ["2020-01-01", "2020-01-01", "2020-01-01"],
-            "vendor_name": ["ACME", "ACME", "ACME"],
-            "obligated_amount": ["1000", "1000", "1000"],
-            "source_file": ["a", "b", "a"],
-        })
+        df = pd.DataFrame(
+            {
+                "contract_id": ["C001", "C001", "C001"],
+                "award_date": ["2020-01-01", "2020-01-01", "2020-01-01"],
+                "vendor_name": ["ACME", "ACME", "ACME"],
+                "obligated_amount": ["1000", "1000", "1000"],
+                "source_file": ["a", "b", "a"],
+            }
+        )
         result = deduplicate(df, logger)
         assert len(result) == 1
         # set-based, sorted
         assert result.iloc[0]["source_file"] == "a,b"
 
     def test_malformed_award_date_compared_as_string(self, logger):
-        df = pd.DataFrame({
-            "contract_id": ["C001", "C001"],
-            "award_date": ["not-a-date", "not-a-date"],
-            "vendor_name": ["ACME", "ACME"],
-            "obligated_amount": ["1000", "1000"],
-            "source_file": ["a", "b"],
-        })
+        df = pd.DataFrame(
+            {
+                "contract_id": ["C001", "C001"],
+                "award_date": ["not-a-date", "not-a-date"],
+                "vendor_name": ["ACME", "ACME"],
+                "obligated_amount": ["1000", "1000"],
+                "source_file": ["a", "b"],
+            }
+        )
         result = deduplicate(df, logger)
         # bytewise-identical strings → collapse
         assert len(result) == 1

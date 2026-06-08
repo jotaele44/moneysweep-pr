@@ -1,4 +1,5 @@
 """Tests for the canonical_v1 edge builder (WS-M)."""
+
 from pathlib import Path
 
 import pytest
@@ -20,9 +21,16 @@ def test_builds_all_seeded_edge_types():
     assert built["skipped"] == []
     # 10 entity->muni + 5 project->muni LOCATED_IN
     # LOCATED_IN: 10 entity->muni + 5 project->muni + 4 property->muni
-    assert by_type == {"LOCATED_IN": 19, "HOLDS_ROLE_IN": 7, "HOLDS_DEBT": 20,
-                       "ADVISES": 5, "OWNS_OR_CONTROLS": 3, "FUNDED_BY": 4,
-                       "RECEIVES_CONTRACT": 3, "LOBBIES_FOR": 3}
+    assert by_type == {
+        "LOCATED_IN": 19,
+        "HOLDS_ROLE_IN": 7,
+        "HOLDS_DEBT": 20,
+        "ADVISES": 5,
+        "OWNS_OR_CONTROLS": 3,
+        "FUNDED_BY": 4,
+        "RECEIVES_CONTRACT": 3,
+        "LOBBIES_FOR": 3,
+    }
     assert len(built["edge_rows"]) == 64
 
 
@@ -32,8 +40,11 @@ def test_property_located_in_edges():
     tables = cv1.load_all_tables(REPO_ROOT)
     property_ids = {r["property_id"] for r in tables["properties"]}
     muni_ids = {r["municipality_id"] for r in tables["municipalities"]}
-    prop_edges = [e for e in built["edge_rows"]
-                  if e["edge_type"] == "LOCATED_IN" and e["source_node_type"] == "Property"]
+    prop_edges = [
+        e
+        for e in built["edge_rows"]
+        if e["edge_type"] == "LOCATED_IN" and e["source_node_type"] == "Property"
+    ]
     assert len(prop_edges) == len(tables["properties"])
     for e in prop_edges:
         assert e["source_node_id"] in property_ids
@@ -111,8 +122,11 @@ def test_project_located_in_edges():
     tables = cv1.load_all_tables(REPO_ROOT)
     project_ids = {r["project_id"] for r in tables["projects"]}
     muni_ids = {r["municipality_id"] for r in tables["municipalities"]}
-    proj_edges = [e for e in built["edge_rows"]
-                  if e["edge_type"] == "LOCATED_IN" and e["source_node_type"] == "Project"]
+    proj_edges = [
+        e
+        for e in built["edge_rows"]
+        if e["edge_type"] == "LOCATED_IN" and e["source_node_type"] == "Project"
+    ]
     assert len(proj_edges) == len(tables["projects"])
     for e in proj_edges:
         assert e["source_node_id"] in project_ids
@@ -161,8 +175,8 @@ def test_edges_validate_and_endpoints_resolve():
     evidence_ids |= {r["evidence_id"] for r in tables["evidence"]}
     for e in built["edge_rows"]:
         assert cv1.validate_row(e, edge_schema) == [], e
-        assert e["evidence_id"] in evidence_ids          # no provenance -> no edge
-        assert e["edge_type"] in cv1.EDGE_TYPES          # controlled vocab
+        assert e["evidence_id"] in evidence_ids  # no provenance -> no edge
+        assert e["edge_type"] in cv1.EDGE_TYPES  # controlled vocab
         if e["edge_type"] == "LOCATED_IN":
             # LOCATED_IN sources are Entity, Project, or Property; targets are munis
             property_ids = {r["property_id"] for r in tables["properties"]}
@@ -210,7 +224,7 @@ def test_uncontrolled_verb_and_unresolved_endpoints_are_skipped(monkeypatch, tmp
     monkeypatch.setattr(be, "PROPERTIES_TABLE_IN", str(tmp_path / "no_properties.csv"))
     monkeypatch.setattr(be, "FUNDING_LINKS", str(tmp_path / "no_funding_links.csv"))
     built = be.build_edges(REPO_ROOT)
-    assert len(built["edge_rows"]) == 1                  # only the valid PREPA->San Juan row
+    assert len(built["edge_rows"]) == 1  # only the valid PREPA->San Juan row
     reasons = " ".join(s["reason"] for s in built["skipped"])
     assert "uncontrolled edge_type" in reasons
     assert "unresolved source" in reasons

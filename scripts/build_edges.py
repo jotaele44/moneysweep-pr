@@ -19,6 +19,7 @@ CLI::
     python scripts/build_edges.py            # build edges from the seed
     python scripts/build_edges.py --check     # resolve + report without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -52,9 +53,19 @@ MANIFEST_OUT = "data/manifests/canonical_v1/edges.json"
 SOURCE_NAME = "PR Public-Money Relationships (reference seed)"
 
 EDGE_COLUMNS = [
-    "edge_id", "source_node_type", "source_node_id", "edge_type",
-    "target_node_type", "target_node_id", "start_date", "end_date",
-    "amount", "currency", "confidence", "evidence_id", "notes",
+    "edge_id",
+    "source_node_type",
+    "source_node_id",
+    "edge_type",
+    "target_node_type",
+    "target_node_id",
+    "start_date",
+    "end_date",
+    "amount",
+    "currency",
+    "confidence",
+    "evidence_id",
+    "notes",
 ]
 
 # node type -> (csv, id column, display-name column, aliases column, person?)
@@ -65,7 +76,13 @@ _NODE_LOOKUP = {
     "Project": ("projects.csv", "project_id", "project_name", None, False),
     "FundingSource": ("funding_sources.csv", "funding_source_id", "program", None, False),
     "Contract": ("contracts.csv", "contract_id", "contract_number", None, False),
-    "LobbyingRecord": ("lobbying_records.csv", "lobbying_record_id", "registration_number", None, False),
+    "LobbyingRecord": (
+        "lobbying_records.csv",
+        "lobbying_record_id",
+        "registration_number",
+        None,
+        False,
+    ),
     "Property": ("properties.csv", "property_id", "property_name", None, False),
 }
 
@@ -95,9 +112,9 @@ def build_resolver(root: Path) -> dict[str, dict[str, str]]:
                 # funding sources keep their display name as "name=...".
                 notes = row.get("notes", "") or ""
                 if notes.startswith("aliases="):
-                    names.extend(notes[len("aliases="):].split("|"))
+                    names.extend(notes[len("aliases=") :].split("|"))
                 elif notes.startswith("name="):
-                    names.append(notes[len("name="):])
+                    names.append(notes[len("name=") :])
                 for n in names:
                     key = _norm(n, person)
                     if key:
@@ -157,21 +174,23 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
             if eid in seen:
                 continue
             seen.add(eid)
-            edge_rows.append({
-                "edge_id": eid,
-                "source_node_type": s_type,
-                "source_node_id": sid,
-                "edge_type": etype,
-                "target_node_type": t_type,
-                "target_node_id": tid,
-                "start_date": (rel.get("start_date") or "").strip(),
-                "end_date": (rel.get("end_date") or "").strip(),
-                "amount": (rel.get("amount") or "").strip(),
-                "currency": (rel.get("currency") or "").strip(),
-                "confidence": ev.confidence,
-                "evidence_id": ev.evidence_id,
-                "notes": "",
-            })
+            edge_rows.append(
+                {
+                    "edge_id": eid,
+                    "source_node_type": s_type,
+                    "source_node_id": sid,
+                    "edge_type": etype,
+                    "target_node_type": t_type,
+                    "target_node_id": tid,
+                    "start_date": (rel.get("start_date") or "").strip(),
+                    "end_date": (rel.get("end_date") or "").strip(),
+                    "amount": (rel.get("amount") or "").strip(),
+                    "currency": (rel.get("currency") or "").strip(),
+                    "confidence": ev.confidence,
+                    "evidence_id": ev.evidence_id,
+                    "notes": "",
+                }
+            )
 
     # Derive HOLDS_ROLE_IN edges from roles.csv (single-writer: edges.csv is only
     # written here). Each role row already carries a resolved person_id, entity_id,
@@ -186,21 +205,23 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
         if eid in seen:
             continue
         seen.add(eid)
-        edge_rows.append({
-            "edge_id": eid,
-            "source_node_type": "Person",
-            "source_node_id": pid,
-            "edge_type": "HOLDS_ROLE_IN",
-            "target_node_type": "Entity",
-            "target_node_id": eid_entity,
-            "start_date": (role.get("start_date") or "").strip(),
-            "end_date": (role.get("end_date") or "").strip(),
-            "amount": "",
-            "currency": "",
-            "confidence": (role.get("confidence") or "").strip(),
-            "evidence_id": ev_id,
-            "notes": (role.get("role_title") or "").strip(),
-        })
+        edge_rows.append(
+            {
+                "edge_id": eid,
+                "source_node_type": "Person",
+                "source_node_id": pid,
+                "edge_type": "HOLDS_ROLE_IN",
+                "target_node_type": "Entity",
+                "target_node_id": eid_entity,
+                "start_date": (role.get("start_date") or "").strip(),
+                "end_date": (role.get("end_date") or "").strip(),
+                "amount": "",
+                "currency": "",
+                "confidence": (role.get("confidence") or "").strip(),
+                "evidence_id": ev_id,
+                "notes": (role.get("role_title") or "").strip(),
+            }
+        )
 
     # Derive HOLDS_DEBT edges from debt_instruments.csv: the issuer entity holds
     # (issues) the instrument. The issuer name is carried in the debt row notes as
@@ -217,21 +238,23 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
         if eid in seen:
             continue
         seen.add(eid)
-        edge_rows.append({
-            "edge_id": eid,
-            "source_node_type": "Entity",
-            "source_node_id": issuer_eid,
-            "edge_type": "HOLDS_DEBT",
-            "target_node_type": "DebtInstrument",
-            "target_node_id": did,
-            "start_date": "",
-            "end_date": (debt.get("maturity_date") or "").strip(),
-            "amount": (debt.get("par_amount") or "").strip(),
-            "currency": (debt.get("currency") or "").strip(),
-            "confidence": (debt.get("confidence") or "").strip(),
-            "evidence_id": ev_id,
-            "notes": (debt.get("debt_class") or "").strip(),
-        })
+        edge_rows.append(
+            {
+                "edge_id": eid,
+                "source_node_type": "Entity",
+                "source_node_id": issuer_eid,
+                "edge_type": "HOLDS_DEBT",
+                "target_node_type": "DebtInstrument",
+                "target_node_id": did,
+                "start_date": "",
+                "end_date": (debt.get("maturity_date") or "").strip(),
+                "amount": (debt.get("par_amount") or "").strip(),
+                "currency": (debt.get("currency") or "").strip(),
+                "confidence": (debt.get("confidence") or "").strip(),
+                "evidence_id": ev_id,
+                "notes": (debt.get("debt_class") or "").strip(),
+            }
+        )
 
     # Derive LOCATED_IN edges from projects.csv: a project located in a
     # municipality. The project row already carries a resolved municipality_id and
@@ -246,21 +269,23 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
         if eid in seen:
             continue
         seen.add(eid)
-        edge_rows.append({
-            "edge_id": eid,
-            "source_node_type": "Project",
-            "source_node_id": pid,
-            "edge_type": "LOCATED_IN",
-            "target_node_type": "Municipality",
-            "target_node_id": muni_id,
-            "start_date": "",
-            "end_date": "",
-            "amount": "",
-            "currency": "",
-            "confidence": (proj.get("confidence") or "").strip(),
-            "evidence_id": ev_id,
-            "notes": (proj.get("project_type") or "").strip(),
-        })
+        edge_rows.append(
+            {
+                "edge_id": eid,
+                "source_node_type": "Project",
+                "source_node_id": pid,
+                "edge_type": "LOCATED_IN",
+                "target_node_type": "Municipality",
+                "target_node_id": muni_id,
+                "start_date": "",
+                "end_date": "",
+                "amount": "",
+                "currency": "",
+                "confidence": (proj.get("confidence") or "").strip(),
+                "evidence_id": ev_id,
+                "notes": (proj.get("project_type") or "").strip(),
+            }
+        )
 
     # Derive FUNDED_BY edges (Project -> FundingSource) from the funding-links
     # seed. Supports many-to-many (a project can draw on multiple programs). Each
@@ -274,10 +299,17 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
                 pid = resolve(resolver, "Project", proj_name)
                 fid = resolve(resolver, "FundingSource", fund_name)
                 if pid is None:
-                    skipped.append({"row": f"funding_link:{i}", "reason": f"unresolved project {proj_name!r}"})
+                    skipped.append(
+                        {"row": f"funding_link:{i}", "reason": f"unresolved project {proj_name!r}"}
+                    )
                     continue
                 if fid is None:
-                    skipped.append({"row": f"funding_link:{i}", "reason": f"unresolved funding source {fund_name!r}"})
+                    skipped.append(
+                        {
+                            "row": f"funding_link:{i}",
+                            "reason": f"unresolved funding source {fund_name!r}",
+                        }
+                    )
                     continue
                 ev = make_evidence(
                     source_type=(link.get("source_type") or "web").strip(),
@@ -294,21 +326,23 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
                     continue
                 seen.add(eid)
                 evidence_rows.append(ev)
-                edge_rows.append({
-                    "edge_id": eid,
-                    "source_node_type": "Project",
-                    "source_node_id": pid,
-                    "edge_type": "FUNDED_BY",
-                    "target_node_type": "FundingSource",
-                    "target_node_id": fid,
-                    "start_date": "",
-                    "end_date": "",
-                    "amount": "",
-                    "currency": "",
-                    "confidence": ev.confidence,
-                    "evidence_id": ev.evidence_id,
-                    "notes": "",
-                })
+                edge_rows.append(
+                    {
+                        "edge_id": eid,
+                        "source_node_type": "Project",
+                        "source_node_id": pid,
+                        "edge_type": "FUNDED_BY",
+                        "target_node_type": "FundingSource",
+                        "target_node_id": fid,
+                        "start_date": "",
+                        "end_date": "",
+                        "amount": "",
+                        "currency": "",
+                        "confidence": ev.confidence,
+                        "evidence_id": ev.evidence_id,
+                        "notes": "",
+                    }
+                )
 
     # Derive RECEIVES_CONTRACT edges (Contractor Entity -> Contract) from
     # contracts.csv rows that carry a contractor_entity_id, reusing the contract's
@@ -323,21 +357,23 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
         if eid in seen:
             continue
         seen.add(eid)
-        edge_rows.append({
-            "edge_id": eid,
-            "source_node_type": "Entity",
-            "source_node_id": contractor_id,
-            "edge_type": "RECEIVES_CONTRACT",
-            "target_node_type": "Contract",
-            "target_node_id": cid,
-            "start_date": (contract.get("start_date") or "").strip(),
-            "end_date": (contract.get("end_date") or "").strip(),
-            "amount": (contract.get("award_amount") or "").strip(),
-            "currency": (contract.get("currency") or "").strip(),
-            "confidence": (contract.get("confidence") or "").strip(),
-            "evidence_id": ev_id,
-            "notes": (contract.get("service_type") or "").strip(),
-        })
+        edge_rows.append(
+            {
+                "edge_id": eid,
+                "source_node_type": "Entity",
+                "source_node_id": contractor_id,
+                "edge_type": "RECEIVES_CONTRACT",
+                "target_node_type": "Contract",
+                "target_node_id": cid,
+                "start_date": (contract.get("start_date") or "").strip(),
+                "end_date": (contract.get("end_date") or "").strip(),
+                "amount": (contract.get("award_amount") or "").strip(),
+                "currency": (contract.get("currency") or "").strip(),
+                "confidence": (contract.get("confidence") or "").strip(),
+                "evidence_id": ev_id,
+                "notes": (contract.get("service_type") or "").strip(),
+            }
+        )
 
     # Derive LOBBIES_FOR edges (lobbyist Entity -> client Entity) from
     # lobbying_records.csv rows that carry both a lobbyist and a client entity,
@@ -352,21 +388,23 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
         if eid in seen:
             continue
         seen.add(eid)
-        edge_rows.append({
-            "edge_id": eid,
-            "source_node_type": "Entity",
-            "source_node_id": lobbyist_id,
-            "edge_type": "LOBBIES_FOR",
-            "target_node_type": "Entity",
-            "target_node_id": client_id,
-            "start_date": "",
-            "end_date": "",
-            "amount": "",
-            "currency": "",
-            "confidence": (lob.get("confidence") or "").strip(),
-            "evidence_id": ev_id,
-            "notes": (lob.get("subject_matter") or "").strip(),
-        })
+        edge_rows.append(
+            {
+                "edge_id": eid,
+                "source_node_type": "Entity",
+                "source_node_id": lobbyist_id,
+                "edge_type": "LOBBIES_FOR",
+                "target_node_type": "Entity",
+                "target_node_id": client_id,
+                "start_date": "",
+                "end_date": "",
+                "amount": "",
+                "currency": "",
+                "confidence": (lob.get("confidence") or "").strip(),
+                "evidence_id": ev_id,
+                "notes": (lob.get("subject_matter") or "").strip(),
+            }
+        )
 
     # Derive LOCATED_IN edges from properties.csv: a property located in a
     # municipality. The property row already carries a resolved municipality_id and
@@ -381,21 +419,23 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
         if eid in seen:
             continue
         seen.add(eid)
-        edge_rows.append({
-            "edge_id": eid,
-            "source_node_type": "Property",
-            "source_node_id": pid,
-            "edge_type": "LOCATED_IN",
-            "target_node_type": "Municipality",
-            "target_node_id": muni_id,
-            "start_date": "",
-            "end_date": "",
-            "amount": "",
-            "currency": "",
-            "confidence": (prop.get("confidence") or "").strip(),
-            "evidence_id": ev_id,
-            "notes": (prop.get("property_type") or "").strip(),
-        })
+        edge_rows.append(
+            {
+                "edge_id": eid,
+                "source_node_type": "Property",
+                "source_node_id": pid,
+                "edge_type": "LOCATED_IN",
+                "target_node_type": "Municipality",
+                "target_node_id": muni_id,
+                "start_date": "",
+                "end_date": "",
+                "amount": "",
+                "currency": "",
+                "confidence": (prop.get("confidence") or "").strip(),
+                "evidence_id": ev_id,
+                "notes": (prop.get("property_type") or "").strip(),
+            }
+        )
 
     return {"edge_rows": edge_rows, "evidence_rows": evidence_rows, "skipped": skipped}
 
@@ -454,8 +494,6 @@ def _read_debt(root: Path) -> list[dict[str, str]]:
         return [r for r in csv.DictReader(fh) if (r.get("debt_id") or "").strip()]
 
 
-
-
 def _write(rows: list[dict[str, Any]], out_path: Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", newline="", encoding="utf-8") as fh:
@@ -490,15 +528,20 @@ def ingest(root: Path | None = None) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Build canonical_v1 edges from the relationships seed.")
+    parser = argparse.ArgumentParser(
+        description="Build canonical_v1 edges from the relationships seed."
+    )
     parser.add_argument("--root", default=".")
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
     root = Path(args.root).resolve()
     if args.check:
         built = build_edges(root)
-        print(json.dumps({"edge_count": len(built["edge_rows"]),
-                          "skipped": built["skipped"]}, indent=2))
+        print(
+            json.dumps(
+                {"edge_count": len(built["edge_rows"]), "skipped": built["skipped"]}, indent=2
+            )
+        )
         return 0
     print(json.dumps(ingest(root), indent=2))
     return 0

@@ -14,6 +14,7 @@ in a later batch.
 raised before any HTTP call when the env var is unset, matching
 :class:`FECPRAdapter`.
 """
+
 from __future__ import annotations
 
 import os

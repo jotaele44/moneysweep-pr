@@ -127,13 +127,23 @@ def _read_tabular_profile_from_zip_member(
     if suffix == ".parquet":
         try:
             frame = pd.read_parquet(io.BytesIO(data))
-            return [str(column) for column in frame.columns], int(len(frame)), digest, "parquet_inspected"
+            return (
+                [str(column) for column in frame.columns],
+                int(len(frame)),
+                digest,
+                "parquet_inspected",
+            )
         except Exception as exc:
             return [], 0, digest, f"parquet_inspection_failed:{type(exc).__name__}"
     if suffix in {".xlsx", ".xls"}:
         try:
             frame = pd.read_excel(io.BytesIO(data), dtype=str)
-            return [str(column) for column in frame.columns], int(len(frame)), digest, "excel_inspected"
+            return (
+                [str(column) for column in frame.columns],
+                int(len(frame)),
+                digest,
+                "excel_inspected",
+            )
         except Exception as exc:
             return [], 0, digest, f"excel_inspection_failed:{type(exc).__name__}"
     return [], 0, digest, "unsupported_zip_member_extension"
@@ -256,7 +266,9 @@ def discover_raw_usaspending_files(root: Path, generated_at: str) -> list[dict[s
 
 def _still_blocked_targets(root: Path) -> list[dict[str, str]]:
     blocked_rows = read_csv(root / "data" / "review_queue" / "sources_still_blocked_r4_9g.csv")
-    checklist_rows = read_csv(root / "data" / "review_queue" / "source_delivery_checklist_r4_9e.csv")
+    checklist_rows = read_csv(
+        root / "data" / "review_queue" / "source_delivery_checklist_r4_9e.csv"
+    )
     checklist_lookup = {
         str(row.get("expected_input", "")).strip(): row
         for row in checklist_rows

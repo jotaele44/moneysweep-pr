@@ -13,6 +13,7 @@ Usage:
   python3 scripts/download_eqb.py
   python3 scripts/download_eqb.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -37,23 +38,30 @@ from scripts.build_unified_master import _normalize_name
 # EPA ECHO ICIS bulk data (public, no auth required)
 # https://echo.epa.gov/tools/data-downloads
 ECHO_SOURCES = {
-    "air":   "https://echo.epa.gov/files/echodownloads/ICIS-AIR_downloads.zip",
+    "air": "https://echo.epa.gov/files/echodownloads/ICIS-AIR_downloads.zip",
     "water": "https://echo.epa.gov/files/echodownloads/npdes_downloads.zip",
 }
 
-MAX_RETRIES   = 3
+MAX_RETRIES = 3
 RETRY_BACKOFF = [10, 30, 60]
-STREAM_CHUNK  = 1024 * 1024
+STREAM_CHUNK = 1024 * 1024
 
 OUTPUT_COLUMNS = [
-    "permit_id", "facility_name", "facility_normalized",
-    "permit_type", "issued_date", "expiry_date",
-    "violation_count", "inspection_count", "state",
+    "permit_id",
+    "facility_name",
+    "facility_normalized",
+    "permit_type",
+    "issued_date",
+    "expiry_date",
+    "violation_count",
+    "inspection_count",
+    "state",
 ]
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _session() -> requests.Session:
     s = requests.Session()
@@ -61,8 +69,9 @@ def _session() -> requests.Session:
     return s
 
 
-def _download_and_extract(session: requests.Session, url: str,
-                          permit_type: str, logger) -> pd.DataFrame | None:
+def _download_and_extract(
+    session: requests.Session, url: str, permit_type: str, logger
+) -> pd.DataFrame | None:
     """Download EPA ECHO ZIP and extract the facilities/permits CSV for PR."""
     logger.info(f"  Downloading {permit_type} data: {url}")
     for attempt in range(MAX_RETRIES):
@@ -92,9 +101,9 @@ def _download_and_extract(session: requests.Session, url: str,
             if not csv_files:
                 return None
             # Prefer facilities file; otherwise largest CSV
-            fac_file = next(
-                (n for n in csv_files if "facilit" in n.lower()), None
-            ) or max(csv_files, key=lambda n: zf.getinfo(n).file_size)
+            fac_file = next((n for n in csv_files if "facilit" in n.lower()), None) or max(
+                csv_files, key=lambda n: zf.getinfo(n).file_size
+            )
             logger.info(f"  Extracting {fac_file}...")
             with zf.open(fac_file) as f:
                 df = pd.read_csv(f, dtype=str, low_memory=False)
@@ -117,28 +126,32 @@ def _build_rows(df: pd.DataFrame, permit_type: str) -> list[dict]:
     def col(*cands):
         return next((c for c in cands if c in df.columns), None)
 
-    pid     = col("NPDES_ID", "AIR_ID", "PERMIT_ID", "REGISTRY_ID")
-    name    = col("FAC_NAME", "FACILITY_NAME", "NAME")
-    issued  = col("PERMIT_ISSUE_DATE", "AIR_PROGRAM_CODE", "ISSUE_DATE")
-    expiry  = col("PERMIT_EXPIRATION_DATE", "EXPIRATION_DATE")
-    viols   = col("VIOL_CNT", "VIOLATION_COUNT", "NUM_VIOLATIONS")
-    insps   = col("INSP_CNT", "INSPECTION_COUNT", "NUM_INSPECTIONS")
-    state   = col("FAC_STATE", "STATE_CODE", "STATE")
+    pid = col("NPDES_ID", "AIR_ID", "PERMIT_ID", "REGISTRY_ID")
+    name = col("FAC_NAME", "FACILITY_NAME", "NAME")
+    issued = col("PERMIT_ISSUE_DATE", "AIR_PROGRAM_CODE", "ISSUE_DATE")
+    expiry = col("PERMIT_EXPIRATION_DATE", "EXPIRATION_DATE")
+    viols = col("VIOL_CNT", "VIOLATION_COUNT", "NUM_VIOLATIONS")
+    insps = col("INSP_CNT", "INSPECTION_COUNT", "NUM_INSPECTIONS")
+    state = col("FAC_STATE", "STATE_CODE", "STATE")
 
     rows = []
     for _, r in df.iterrows():
         facility = str(r[name] if name else "")
-        rows.append({
-            "permit_id":          str(r[pid] if pid else ""),
-            "facility_name":      facility,
-            "facility_normalized": _normalize_name(facility),
-            "permit_type":        permit_type,
-            "issued_date":        str(r[issued] if issued else ""),
-            "expiry_date":        str(r[expiry] if expiry else ""),
-            "violation_count":    int(float(r[viols] or 0)) if viols and pd.notna(r[viols]) else 0,
-            "inspection_count":   int(float(r[insps] or 0)) if insps and pd.notna(r[insps]) else 0,
-            "state":              str(r[state] if state else "PR"),
-        })
+        rows.append(
+            {
+                "permit_id": str(r[pid] if pid else ""),
+                "facility_name": facility,
+                "facility_normalized": _normalize_name(facility),
+                "permit_type": permit_type,
+                "issued_date": str(r[issued] if issued else ""),
+                "expiry_date": str(r[expiry] if expiry else ""),
+                "violation_count": int(float(r[viols] or 0)) if viols and pd.notna(r[viols]) else 0,
+                "inspection_count": int(float(r[insps] or 0))
+                if insps and pd.notna(r[insps])
+                else 0,
+                "state": str(r[state] if state else "PR"),
+            }
+        )
     return rows
 
 
@@ -156,6 +169,7 @@ def parse_records(raw_df: "pd.DataFrame | None", permit_type: str = "air") -> pd
 # ---------------------------------------------------------------------------
 # Core
 # ---------------------------------------------------------------------------
+
 
 def run(root: Path = None, force: bool = False) -> dict:
     root = Path(root or PROJECT_ROOT)
@@ -200,6 +214,7 @@ def run(root: Path = None, force: bool = False) -> dict:
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Download PR EQB environmental permit data")

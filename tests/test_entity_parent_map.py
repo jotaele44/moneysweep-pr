@@ -4,6 +4,7 @@ Fully offline: the producer resolves a curated seed against the committed
 entity master and validates against ``schemas/entity_parent_map.schema.json`` via
 the stdlib canonical_v1 schema interpreter (no ``jsonschema`` dependency).
 """
+
 from __future__ import annotations
 
 import csv
@@ -90,7 +91,9 @@ def test_expected_relationships(rows):
 @pytest.mark.integration
 def test_regenerates_identically(rows):
     out_path = REPO_ROOT / bpm.PARENT_MAP_OUT
-    assert out_path.exists(), "entity_parent_map.csv not written — run scripts/build_entity_parent_map.py"
+    assert out_path.exists(), (
+        "entity_parent_map.csv not written — run scripts/build_entity_parent_map.py"
+    )
     with out_path.open(newline="", encoding="utf-8") as fh:
         committed = list(csv.DictReader(fh))
     assert len(committed) == len(rows)

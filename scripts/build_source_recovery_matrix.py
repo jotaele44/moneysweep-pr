@@ -22,6 +22,7 @@ Outputs (under ``reports/``, deterministic / byte-identical on re-run):
 
 Read-only triage: no network, no writes outside ``reports/``, no registry edits.
 """
+
 from __future__ import annotations
 
 import csv
@@ -47,11 +48,21 @@ ADAPTER_SOURCE_IDS = set(ADAPTER_REGISTRY) | set(ENTITY_ADAPTER_REGISTRY)
 # fetcher. Queued for a dedicated scraping-adapter design pass (out of scope of
 # the automatable fill). Curated domain knowledge — kept explicit on purpose.
 SCRAPER_NEEDED = {
-    "compras_pr", "aafaf", "hacienda", "cofina", "prepa_luma_genera",
-    "cor3", "p3_authority",
-    "pr_act_60_decrees", "promesa_creditors", "rum_cover_over",
-    "municipal_finance", "pr_pensions", "eqb_epa_icis",
-    "emma_bonds", "msrb_rtrs_trades",
+    "compras_pr",
+    "aafaf",
+    "hacienda",
+    "cofina",
+    "prepa_luma_genera",
+    "cor3",
+    "p3_authority",
+    "pr_act_60_decrees",
+    "promesa_creditors",
+    "rum_cover_over",
+    "municipal_finance",
+    "pr_pensions",
+    "eqb_epa_icis",
+    "emma_bonds",
+    "msrb_rtrs_trades",
 }
 
 # Sources fully covered by a sibling source; they never materialize independently.
@@ -97,8 +108,11 @@ PATH_TYPES = {
 }
 
 QUEUED_PATH_TYPES = (
-    "manual_export", "scraper_needed", "deferred_stub",
-    "semantic_duplicate", "broken_producer",
+    "manual_export",
+    "scraper_needed",
+    "deferred_stub",
+    "semantic_duplicate",
+    "broken_producer",
 )
 
 
@@ -152,22 +166,24 @@ def build_rows() -> list[dict]:
         producer_importable = preflight not in STRUCTURAL_STATUSES
         # Structurally ready = automatable, has a working entrypoint, and declares outputs.
         ready = bool(automatable and (has_adapter or producer_importable) and total > 0)
-        rows.append({
-            "source_id": sid,
-            "required": bool(src.get("required", False)),
-            "path_type": path_type,
-            "automatable": automatable,
-            "ready": ready,
-            "needs_key": needs_key,
-            "has_adapter": has_adapter,
-            "producer_importable": producer_importable,
-            "producer_script": src.get("producer_script", ""),
-            "expected_outputs_count": total,
-            "outputs_present_count": present,
-            "min_rows": min_rows,
-            "dropzone_path": src.get("manual_drop_dir", "") or "",
-            "recommended_action": action,
-        })
+        rows.append(
+            {
+                "source_id": sid,
+                "required": bool(src.get("required", False)),
+                "path_type": path_type,
+                "automatable": automatable,
+                "ready": ready,
+                "needs_key": needs_key,
+                "has_adapter": has_adapter,
+                "producer_importable": producer_importable,
+                "producer_script": src.get("producer_script", ""),
+                "expected_outputs_count": total,
+                "outputs_present_count": present,
+                "min_rows": min_rows,
+                "dropzone_path": src.get("manual_drop_dir", "") or "",
+                "recommended_action": action,
+            }
+        )
     rows.sort(key=lambda r: (not r["automatable"], r["path_type"], r["source_id"]))
     return rows
 
@@ -218,9 +234,7 @@ def _write_md(rows: list[dict], summary: dict) -> None:
     lines.append("| path_type | automatable | count | recommended_action |")
     lines.append("| --- | --- | --- | --- |")
     for pt in sorted(counts, key=lambda b: (not PATH_TYPES[b][0], -counts[b], b)):
-        lines.append(
-            f"| `{pt}` | {PATH_TYPES[pt][0]} | {counts[pt]} | {PATH_TYPES[pt][1]} |"
-        )
+        lines.append(f"| `{pt}` | {PATH_TYPES[pt][0]} | {counts[pt]} | {PATH_TYPES[pt][1]} |")
     lines.append("")
     if summary["automatable_required_keys"]:
         lines.append(

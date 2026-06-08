@@ -20,6 +20,7 @@ Outputs:
 
 Stdlib only.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -153,9 +154,7 @@ def _csv_completeness_and_matches(path: Path) -> dict[str, Any]:
                             pk_keys.add(key)
     except Exception as exc:  # pragma: no cover
         return {"error": str(exc)}
-    field_completeness = {
-        k: (nonempty[k] / seen[k]) if seen[k] else 0.0 for k in fields
-    }
+    field_completeness = {k: (nonempty[k] / seen[k]) if seen[k] else 0.0 for k in fields}
     return {
         "field_completeness_pct_by_column": field_completeness,
         "entity_match_rate_pct": (entity_normalized / entity_total) if entity_total else None,
@@ -256,7 +255,13 @@ def profile_file(
     elif path.suffix.lower() in (".json", ".jsonl"):
         item.update(_json_profile(path))
     else:
-        item.update({"row_count": None, "column_count": None, "empty_or_header_only": path.stat().st_size == 0})
+        item.update(
+            {
+                "row_count": None,
+                "column_count": None,
+                "empty_or_header_only": path.stat().st_size == 0,
+            }
+        )
 
     # year coverage %
     actual = item.get("actual_years") or []
@@ -283,11 +288,7 @@ def scan_repo(root: Path) -> list[dict[str, Any]]:
         if not base.exists():
             continue
         for p in base.rglob("*"):
-            if (
-                p.is_file()
-                and p.suffix.lower() in DATA_EXTS
-                and not p.name.startswith("._")
-            ):
+            if p.is_file() and p.suffix.lower() in DATA_EXTS and not p.name.startswith("._"):
                 try:
                     files.append(profile_file(p, root=root))
                 except Exception as exc:  # pragma: no cover
@@ -368,7 +369,9 @@ def write_canonical_manifest(root: Path, files: list[dict[str, Any]]) -> dict[st
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=REPO_ROOT)
-    parser.add_argument("--dry-run", action="store_true", help="Scan + write manifest without further side-effects")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Scan + write manifest without further side-effects"
+    )
     args = parser.parse_args(argv)
     files = scan_repo(args.root)
     paths = write_canonical_manifest(args.root, files)

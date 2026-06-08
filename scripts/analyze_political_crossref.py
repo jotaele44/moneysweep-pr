@@ -42,8 +42,22 @@ from scripts.config import PROJECT_ROOT, setup_logging
 _STRIP_RE = re.compile(r"[^\w\s]")
 _SPACE_RE = re.compile(r"\s+")
 _SUFFIXES = {
-    "INC", "LLC", "LLP", "CORP", "CO", "LTD", "LP", "PC",
-    "PLLC", "DBA", "THE", "AND", "OF", "SA", "SL", "SRL",
+    "INC",
+    "LLC",
+    "LLP",
+    "CORP",
+    "CO",
+    "LTD",
+    "LP",
+    "PC",
+    "PLLC",
+    "DBA",
+    "THE",
+    "AND",
+    "OF",
+    "SA",
+    "SL",
+    "SRL",
 }
 
 _OVERRIDES = load_overrides()
@@ -89,6 +103,7 @@ def _merge_pipe(series: pd.Series, limit: int) -> str:
 # Awards index (shared by both crossrefs)
 # ---------------------------------------------------------------------------
 
+
 def _build_award_index(awards: pd.DataFrame) -> pd.DataFrame:
     awards = awards.copy()
     awards["_norm"] = awards["recipient_name"].apply(_normalize)
@@ -110,6 +125,7 @@ def _build_award_index(awards: pd.DataFrame) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 # FEC crossref
 # ---------------------------------------------------------------------------
+
 
 def build_fec_crossref(root: Path | None = None) -> dict:
     """Cross-reference FEC campaign contributions against the awards master."""
@@ -143,8 +159,14 @@ def build_fec_crossref(root: Path | None = None) -> dict:
             fec_contributor_name=("contributor_name", "first"),
             total_contributions=("_amt", "sum"),
             contribution_count=("contribution_receipt_amount", "count"),
-            committees_funded=("committee_name", lambda x: "|".join(sorted(x.dropna().unique())[:10])),
-            candidates_funded=("candidate_name", lambda x: "|".join(sorted(x[x != ""].dropna().unique())[:10])),
+            committees_funded=(
+                "committee_name",
+                lambda x: "|".join(sorted(x.dropna().unique())[:10]),
+            ),
+            candidates_funded=(
+                "candidate_name",
+                lambda x: "|".join(sorted(x[x != ""].dropna().unique())[:10]),
+            ),
             latest_contribution=("contribution_receipt_date", "max"),
             earliest_contribution=("contribution_receipt_date", "min"),
         )
@@ -154,24 +176,40 @@ def build_fec_crossref(root: Path | None = None) -> dict:
     merged = award_index.merge(fec_index, on="_norm", how="inner")
     if merged.empty:
         logger.warning("  No FEC cross-reference matches found.")
-        merged = pd.DataFrame(columns=[
-            "normalized_name", "award_recipient_name", "fec_contributor_name",
-            "total_awards_obligated", "total_contributions", "award_count",
-            "contribution_count", "award_datasets", "award_years", "committees_funded",
-            "candidates_funded", "latest_contribution", "earliest_contribution",
-        ])
+        merged = pd.DataFrame(
+            columns=[
+                "normalized_name",
+                "award_recipient_name",
+                "fec_contributor_name",
+                "total_awards_obligated",
+                "total_contributions",
+                "award_count",
+                "contribution_count",
+                "award_datasets",
+                "award_years",
+                "committees_funded",
+                "candidates_funded",
+                "latest_contribution",
+                "earliest_contribution",
+            ]
+        )
     else:
         merged = merged.rename(columns={"_norm": "normalized_name"})
         merged = merged.sort_values("total_awards_obligated", ascending=False)
 
     merged.to_csv(out_path, index=False, encoding="utf-8")
     logger.info(f"  FEC crossref: {len(merged):,} matched entities → {out_path.name}")
-    return {"rows": len(merged), "status": "OK" if not merged.empty else "EMPTY", "path": str(out_path)}
+    return {
+        "rows": len(merged),
+        "status": "OK" if not merged.empty else "EMPTY",
+        "path": str(out_path),
+    }
 
 
 # ---------------------------------------------------------------------------
 # Lobbying crossref
 # ---------------------------------------------------------------------------
+
 
 def _normalized_name_set(df: pd.DataFrame, columns: list[str]) -> set[str]:
     """Return the set of non-empty _normalize results across the given columns."""
@@ -265,7 +303,9 @@ def build_lobbying_crossref(root: Path | None = None) -> dict:
     award_index = _build_award_index(awards)
     anchors = _load_anchor_sets(processed_dir)
 
-    lda_clients = lda[lda["client_state"] == "PR"].copy() if "client_state" in lda.columns else lda.copy()
+    lda_clients = (
+        lda[lda["client_state"] == "PR"].copy() if "client_state" in lda.columns else lda.copy()
+    )
     if lda_clients.empty:
         lda_clients = lda.copy()
 
@@ -275,10 +315,7 @@ def build_lobbying_crossref(root: Path | None = None) -> dict:
 
     # Capture one evidence filing per client for the unmatched rows.
     evidence_filings = (
-        lda_clients[lda_clients["_norm"] != ""]
-        .groupby("_norm")["filing_uuid"]
-        .first()
-        .to_dict()
+        lda_clients[lda_clients["_norm"] != ""].groupby("_norm")["filing_uuid"].first().to_dict()
         if "filing_uuid" in lda_clients.columns
         else {}
     )
@@ -289,16 +326,31 @@ def build_lobbying_crossref(root: Path | None = None) -> dict:
         .agg(
             lda_client_name=("client_name", "first"),
             lda_client_description=(
-                "client_description" if "client_description" in lda_clients.columns else "client_name",
+                "client_description"
+                if "client_description" in lda_clients.columns
+                else "client_name",
                 "first",
             ),
-            filing_count=("filing_uuid", "nunique") if "filing_uuid" in lda_clients.columns else ("client_name", "count"),
+            filing_count=("filing_uuid", "nunique")
+            if "filing_uuid" in lda_clients.columns
+            else ("client_name", "count"),
             total_registrant_income=("_income", "sum"),
             total_client_expenses=("_expense", "sum"),
-            years_active=("filing_year", _year_range) if "filing_year" in lda_clients.columns else ("client_name", "first"),
-            issue_codes=("general_issue_codes", lambda x: _merge_pipe(x, 15)) if "general_issue_codes" in lda_clients.columns else ("client_name", "first"),
-            lobbyists_hired=("lobbyist_names", lambda x: _merge_pipe(x, 20)) if "lobbyist_names" in lda_clients.columns else ("client_name", "first"),
-            registrants_used=("registrant_name", lambda x: "|".join(sorted(x.dropna().unique())[:10])) if "registrant_name" in lda_clients.columns else ("client_name", "first"),
+            years_active=("filing_year", _year_range)
+            if "filing_year" in lda_clients.columns
+            else ("client_name", "first"),
+            issue_codes=("general_issue_codes", lambda x: _merge_pipe(x, 15))
+            if "general_issue_codes" in lda_clients.columns
+            else ("client_name", "first"),
+            lobbyists_hired=("lobbyist_names", lambda x: _merge_pipe(x, 20))
+            if "lobbyist_names" in lda_clients.columns
+            else ("client_name", "first"),
+            registrants_used=(
+                "registrant_name",
+                lambda x: "|".join(sorted(x.dropna().unique())[:10]),
+            )
+            if "registrant_name" in lda_clients.columns
+            else ("client_name", "first"),
         )
         .reset_index()
     )
@@ -326,7 +378,11 @@ def build_lobbying_crossref(root: Path | None = None) -> dict:
         if col in merged.columns:
             merged[col] = pd.to_numeric(merged[col], errors="coerce").fillna(0)
 
-    sort_col = "total_awards_obligated" if "total_awards_obligated" in merged.columns else "total_registrant_income"
+    sort_col = (
+        "total_awards_obligated"
+        if "total_awards_obligated" in merged.columns
+        else "total_registrant_income"
+    )
     merged = merged.sort_values(sort_col, ascending=False)
 
     merged.to_csv(out_path, index=False, encoding="utf-8")
@@ -349,13 +405,23 @@ def build_lobbying_crossref(root: Path | None = None) -> dict:
 # ---------------------------------------------------------------------------
 
 CABILDERO_CROSSREF_COLUMNS = [
-    "normalized_name", "registrant_name", "source",
-    "lda_filing_count", "lda_total_income", "lda_clients_represented",
-    "lda_issue_codes", "lda_years_active",
-    "pr_clients_represented", "pr_registration_years",
-    "anchor_status", "anchor_source_dataset",
-    "award_recipient_name", "total_awards_obligated", "award_count",
-    "award_datasets", "award_years",
+    "normalized_name",
+    "registrant_name",
+    "source",
+    "lda_filing_count",
+    "lda_total_income",
+    "lda_clients_represented",
+    "lda_issue_codes",
+    "lda_years_active",
+    "pr_clients_represented",
+    "pr_registration_years",
+    "anchor_status",
+    "anchor_source_dataset",
+    "award_recipient_name",
+    "total_awards_obligated",
+    "award_count",
+    "award_datasets",
+    "award_years",
 ]
 
 
@@ -406,7 +472,9 @@ def build_cabildero_crossref(root: Path | None = None) -> dict:
                 rec["registrant_name"] = grp["registrant_name"].iloc[0]
                 rec["_in_lda"] = True
                 rec["lda_filing_count"] = (
-                    int(grp["filing_uuid"].nunique()) if "filing_uuid" in grp.columns else int(len(grp))
+                    int(grp["filing_uuid"].nunique())
+                    if "filing_uuid" in grp.columns
+                    else int(len(grp))
                 )
                 if "income" in grp.columns:
                     rec["lda_total_income"] = float(
@@ -449,8 +517,10 @@ def build_cabildero_crossref(root: Path | None = None) -> dict:
     rows = []
     for norm, rec in records.items():
         rec["source"] = (
-            "both" if rec["_in_lda"] and rec["_in_pr"]
-            else "federal_lda" if rec["_in_lda"]
+            "both"
+            if rec["_in_lda"] and rec["_in_pr"]
+            else "federal_lda"
+            if rec["_in_lda"]
             else "pr_oeg"
         )
         status, src = _classify_anchor(norm, anchors)
@@ -465,7 +535,9 @@ def build_cabildero_crossref(root: Path | None = None) -> dict:
         rows.append({col: rec[col] for col in CABILDERO_CROSSREF_COLUMNS})
 
     df = pd.DataFrame(rows, columns=CABILDERO_CROSSREF_COLUMNS)
-    df["total_awards_obligated"] = pd.to_numeric(df["total_awards_obligated"], errors="coerce").fillna(0)
+    df["total_awards_obligated"] = pd.to_numeric(
+        df["total_awards_obligated"], errors="coerce"
+    ).fillna(0)
     df = df.sort_values(["total_awards_obligated", "lda_filing_count"], ascending=False)
     df.to_csv(out_path, index=False, encoding="utf-8")
 
@@ -488,6 +560,7 @@ def build_cabildero_crossref(root: Path | None = None) -> dict:
 # Combined entry point
 # ---------------------------------------------------------------------------
 
+
 def build_political_crossref(root: Path | None = None) -> dict:
     """Run FEC, lobbying, and cabildero crossrefs; return combined summary."""
     fec = build_fec_crossref(root)
@@ -500,7 +573,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Political-finance crossref analysis")
     parser.add_argument("--fec", action="store_true", help="Run FEC crossref only")
     parser.add_argument("--lda", action="store_true", help="Run lobbying (client) crossref only")
-    parser.add_argument("--cabildero", action="store_true", help="Run cabildero/registrant crossref only")
+    parser.add_argument(
+        "--cabildero", action="store_true", help="Run cabildero/registrant crossref only"
+    )
     args = parser.parse_args()
 
     selected = args.fec or args.lda or args.cabildero

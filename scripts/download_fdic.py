@@ -18,6 +18,7 @@ Usage:
   python3 scripts/download_fdic.py
   python3 scripts/download_fdic.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -42,9 +43,9 @@ from contract_sweeper.runtime.base_downloader import (
 # Constants
 # ---------------------------------------------------------------------------
 
-FDIC_BASE    = "https://banks.data.fdic.gov/api"
-PAGE_SLEEP   = 0.3
-MAX_RETRIES  = 3
+FDIC_BASE = "https://banks.data.fdic.gov/api"
+PAGE_SLEEP = 0.3
+MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 _HTTP = HttpConfig(
@@ -53,61 +54,248 @@ _HTTP = HttpConfig(
     page_sleep=PAGE_SLEEP,
 )
 
-INSTITUTION_FIELDS = ",".join([
-    "CERT", "NAME", "CITY", "STALP", "STNAME",
-    "ACTIVE", "ESTYMD", "ENDEFYMD",
-    "ASSET", "DEP", "LNLSNET", "SC", "NETINC",
-    "RBCT1J", "ROA", "ROE",
-    "INSTCAT", "SPECGRP", "CHARTER",
-    "REPDTE", "HCTMULT",
-])
+INSTITUTION_FIELDS = ",".join(
+    [
+        "CERT",
+        "NAME",
+        "CITY",
+        "STALP",
+        "STNAME",
+        "ACTIVE",
+        "ESTYMD",
+        "ENDEFYMD",
+        "ASSET",
+        "DEP",
+        "LNLSNET",
+        "SC",
+        "NETINC",
+        "RBCT1J",
+        "ROA",
+        "ROE",
+        "INSTCAT",
+        "SPECGRP",
+        "CHARTER",
+        "REPDTE",
+        "HCTMULT",
+    ]
+)
 
-FINANCIAL_FIELDS = ",".join([
-    "CERT", "REPDTE", "REPYEAR",
-    "ASSET", "DEP", "LNLSNET", "SC", "NETINC",
-    "INTINC", "NONII", "NONIX",
-    "RBCT1J", "ROA", "ROE",
-    "LNLSDEPR", "NETCHARGE",
-    "EQTOT", "LIABR",
-])
+FINANCIAL_FIELDS = ",".join(
+    [
+        "CERT",
+        "REPDTE",
+        "REPYEAR",
+        "ASSET",
+        "DEP",
+        "LNLSNET",
+        "SC",
+        "NETINC",
+        "INTINC",
+        "NONII",
+        "NONIX",
+        "RBCT1J",
+        "ROA",
+        "ROE",
+        "LNLSDEPR",
+        "NETCHARGE",
+        "EQTOT",
+        "LIABR",
+    ]
+)
 
 INST_OUTPUT_COLUMNS = [
-    "cert", "name", "city", "state", "active",
-    "established_date", "end_date",
-    "total_assets", "total_deposits", "net_loans",
-    "securities", "net_income",
-    "tier1_capital_ratio", "roa", "roe",
-    "institution_category", "charter_type",
+    "cert",
+    "name",
+    "city",
+    "state",
+    "active",
+    "established_date",
+    "end_date",
+    "total_assets",
+    "total_deposits",
+    "net_loans",
+    "securities",
+    "net_income",
+    "tier1_capital_ratio",
+    "roa",
+    "roe",
+    "institution_category",
+    "charter_type",
     "latest_report_date",
 ]
 
 FIN_OUTPUT_COLUMNS = [
-    "cert", "report_date", "report_year",
-    "total_assets", "total_deposits", "net_loans",
-    "securities", "net_income",
-    "interest_income", "noninterest_income", "noninterest_expense",
-    "tier1_capital_ratio", "roa", "roe",
-    "loan_loss_provision", "net_chargeoffs",
-    "total_equity", "total_liabilities",
+    "cert",
+    "report_date",
+    "report_year",
+    "total_assets",
+    "total_deposits",
+    "net_loans",
+    "securities",
+    "net_income",
+    "interest_income",
+    "noninterest_income",
+    "noninterest_expense",
+    "tier1_capital_ratio",
+    "roa",
+    "roe",
+    "loan_loss_provision",
+    "net_chargeoffs",
+    "total_equity",
+    "total_liabilities",
 ]
 
 KNOWN_FDIC_INSTITUTIONS = [
-    {"cert": "32473", "name": "BANCO POPULAR DE PUERTO RICO", "city": "SAN JUAN", "state": "PR", "active": "1", "established_date": "", "end_date": "", "total_assets": "68000000000", "total_deposits": "55000000000", "net_loans": "", "securities": "", "net_income": "", "tier1_capital_ratio": "", "roa": "", "roe": "", "institution_category": "", "charter_type": "SM", "latest_report_date": "2023-12-31"},
-    {"cert": "33063", "name": "FIRSTBANKPR", "city": "SAN JUAN", "state": "PR", "active": "1", "established_date": "", "end_date": "", "total_assets": "12500000000", "total_deposits": "10200000000", "net_loans": "", "securities": "", "net_income": "", "tier1_capital_ratio": "", "roa": "", "roe": "", "institution_category": "", "charter_type": "SM", "latest_report_date": "2023-12-31"},
-    {"cert": "57506", "name": "ORIENTAL BANK", "city": "SAN JUAN", "state": "PR", "active": "1", "established_date": "", "end_date": "", "total_assets": "8100000000", "total_deposits": "6800000000", "net_loans": "", "securities": "", "net_income": "", "tier1_capital_ratio": "", "roa": "", "roe": "", "institution_category": "", "charter_type": "SM", "latest_report_date": "2023-12-31"},
-    {"cert": "57148", "name": "EUROBANCSHARES INC DBA EUROBANK", "city": "SAN JUAN", "state": "PR", "active": "1", "established_date": "", "end_date": "", "total_assets": "1800000000", "total_deposits": "1500000000", "net_loans": "", "securities": "", "net_income": "", "tier1_capital_ratio": "", "roa": "", "roe": "", "institution_category": "", "charter_type": "NM", "latest_report_date": "2023-12-31"},
+    {
+        "cert": "32473",
+        "name": "BANCO POPULAR DE PUERTO RICO",
+        "city": "SAN JUAN",
+        "state": "PR",
+        "active": "1",
+        "established_date": "",
+        "end_date": "",
+        "total_assets": "68000000000",
+        "total_deposits": "55000000000",
+        "net_loans": "",
+        "securities": "",
+        "net_income": "",
+        "tier1_capital_ratio": "",
+        "roa": "",
+        "roe": "",
+        "institution_category": "",
+        "charter_type": "SM",
+        "latest_report_date": "2023-12-31",
+    },
+    {
+        "cert": "33063",
+        "name": "FIRSTBANKPR",
+        "city": "SAN JUAN",
+        "state": "PR",
+        "active": "1",
+        "established_date": "",
+        "end_date": "",
+        "total_assets": "12500000000",
+        "total_deposits": "10200000000",
+        "net_loans": "",
+        "securities": "",
+        "net_income": "",
+        "tier1_capital_ratio": "",
+        "roa": "",
+        "roe": "",
+        "institution_category": "",
+        "charter_type": "SM",
+        "latest_report_date": "2023-12-31",
+    },
+    {
+        "cert": "57506",
+        "name": "ORIENTAL BANK",
+        "city": "SAN JUAN",
+        "state": "PR",
+        "active": "1",
+        "established_date": "",
+        "end_date": "",
+        "total_assets": "8100000000",
+        "total_deposits": "6800000000",
+        "net_loans": "",
+        "securities": "",
+        "net_income": "",
+        "tier1_capital_ratio": "",
+        "roa": "",
+        "roe": "",
+        "institution_category": "",
+        "charter_type": "SM",
+        "latest_report_date": "2023-12-31",
+    },
+    {
+        "cert": "57148",
+        "name": "EUROBANCSHARES INC DBA EUROBANK",
+        "city": "SAN JUAN",
+        "state": "PR",
+        "active": "1",
+        "established_date": "",
+        "end_date": "",
+        "total_assets": "1800000000",
+        "total_deposits": "1500000000",
+        "net_loans": "",
+        "securities": "",
+        "net_income": "",
+        "tier1_capital_ratio": "",
+        "roa": "",
+        "roe": "",
+        "institution_category": "",
+        "charter_type": "NM",
+        "latest_report_date": "2023-12-31",
+    },
 ]
 
 KNOWN_FDIC_FINANCIALS = [
-    {"cert": "32473", "report_date": "20231231", "report_year": "2023", "total_assets": "68000000000", "total_deposits": "55000000000", "net_loans": "", "securities": "", "net_income": "850000000", "interest_income": "", "noninterest_income": "", "noninterest_expense": "", "tier1_capital_ratio": "", "roa": "1.25", "roe": "11.8", "loan_loss_provision": "", "net_chargeoffs": "", "total_equity": "7200000000", "total_liabilities": ""},
-    {"cert": "33063", "report_date": "20231231", "report_year": "2023", "total_assets": "12500000000", "total_deposits": "10200000000", "net_loans": "", "securities": "", "net_income": "210000000", "interest_income": "", "noninterest_income": "", "noninterest_expense": "", "tier1_capital_ratio": "", "roa": "1.68", "roe": "15.6", "loan_loss_provision": "", "net_chargeoffs": "", "total_equity": "1350000000", "total_liabilities": ""},
-    {"cert": "57506", "report_date": "20231231", "report_year": "2023", "total_assets": "8100000000", "total_deposits": "6800000000", "net_loans": "", "securities": "", "net_income": "145000000", "interest_income": "", "noninterest_income": "", "noninterest_expense": "", "tier1_capital_ratio": "", "roa": "1.79", "roe": "15.3", "loan_loss_provision": "", "net_chargeoffs": "", "total_equity": "950000000", "total_liabilities": ""},
+    {
+        "cert": "32473",
+        "report_date": "20231231",
+        "report_year": "2023",
+        "total_assets": "68000000000",
+        "total_deposits": "55000000000",
+        "net_loans": "",
+        "securities": "",
+        "net_income": "850000000",
+        "interest_income": "",
+        "noninterest_income": "",
+        "noninterest_expense": "",
+        "tier1_capital_ratio": "",
+        "roa": "1.25",
+        "roe": "11.8",
+        "loan_loss_provision": "",
+        "net_chargeoffs": "",
+        "total_equity": "7200000000",
+        "total_liabilities": "",
+    },
+    {
+        "cert": "33063",
+        "report_date": "20231231",
+        "report_year": "2023",
+        "total_assets": "12500000000",
+        "total_deposits": "10200000000",
+        "net_loans": "",
+        "securities": "",
+        "net_income": "210000000",
+        "interest_income": "",
+        "noninterest_income": "",
+        "noninterest_expense": "",
+        "tier1_capital_ratio": "",
+        "roa": "1.68",
+        "roe": "15.6",
+        "loan_loss_provision": "",
+        "net_chargeoffs": "",
+        "total_equity": "1350000000",
+        "total_liabilities": "",
+    },
+    {
+        "cert": "57506",
+        "report_date": "20231231",
+        "report_year": "2023",
+        "total_assets": "8100000000",
+        "total_deposits": "6800000000",
+        "net_loans": "",
+        "securities": "",
+        "net_income": "145000000",
+        "interest_income": "",
+        "noninterest_income": "",
+        "noninterest_expense": "",
+        "tier1_capital_ratio": "",
+        "roa": "1.79",
+        "roe": "15.3",
+        "loan_loss_provision": "",
+        "net_chargeoffs": "",
+        "total_equity": "950000000",
+        "total_liabilities": "",
+    },
 ]
 
 
 # ---------------------------------------------------------------------------
 # Network helpers
 # ---------------------------------------------------------------------------
+
 
 def _session() -> requests.Session:
     return build_session(_HTTP.user_agent)
@@ -117,21 +305,22 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
     return http_get_json(session, url, params, logger=logger, config=_HTTP)
 
 
-def _paginate(session: requests.Session, endpoint: str, base_params: dict,
-              data_key: str, logger) -> list[dict]:
-    url   = f"{FDIC_BASE}/{endpoint}"
+def _paginate(
+    session: requests.Session, endpoint: str, base_params: dict, data_key: str, logger
+) -> list[dict]:
+    url = f"{FDIC_BASE}/{endpoint}"
     limit = 1000
 
     def _fetch(offset: int) -> PageResult:
         params = {**base_params, "limit": limit, "offset": offset}
-        data   = _get(session, url, params, logger)
+        data = _get(session, url, params, logger)
         if data is None:
             return PageResult([], None)
         batch = data.get("data") or []
         if not batch:
             return PageResult([], None)
-        recs  = [item.get("data", item) for item in batch]
-        meta  = data.get("meta", {})
+        recs = [item.get("data", item) for item in batch]
+        meta = data.get("meta", {})
         total = meta.get("total", offset + len(recs))
         if offset == 0:
             logger.info(f"  FDIC {endpoint}: {total:,} total records")
@@ -145,14 +334,21 @@ def _paginate(session: requests.Session, endpoint: str, base_params: dict,
 # Institution download
 # ---------------------------------------------------------------------------
 
+
 def _download_institutions(session: requests.Session, logger) -> pd.DataFrame:
     logger.info("Fetching PR bank institution profiles...")
-    records = _paginate(session, "institutions", {
-        "filters": "STALP:PR",
-        "fields":  INSTITUTION_FIELDS,
-        "sort_by": "ASSET",
-        "sort_order": "DESC",
-    }, "data", logger)
+    records = _paginate(
+        session,
+        "institutions",
+        {
+            "filters": "STALP:PR",
+            "fields": INSTITUTION_FIELDS,
+            "sort_by": "ASSET",
+            "sort_order": "DESC",
+        },
+        "data",
+        logger,
+    )
 
     if not records:
         return pd.DataFrame(columns=INST_OUTPUT_COLUMNS)
@@ -160,24 +356,24 @@ def _download_institutions(session: requests.Session, logger) -> pd.DataFrame:
     df = pd.DataFrame(records)
 
     rename = {
-        "CERT":    "cert",
-        "NAME":    "name",
-        "CITY":    "city",
-        "STALP":   "state",
-        "ACTIVE":  "active",
-        "ESTYMD":  "established_date",
+        "CERT": "cert",
+        "NAME": "name",
+        "CITY": "city",
+        "STALP": "state",
+        "ACTIVE": "active",
+        "ESTYMD": "established_date",
         "ENDEFYMD": "end_date",
-        "ASSET":   "total_assets",
-        "DEP":     "total_deposits",
+        "ASSET": "total_assets",
+        "DEP": "total_deposits",
         "LNLSNET": "net_loans",
-        "SC":      "securities",
-        "NETINC":  "net_income",
-        "RBCT1J":  "tier1_capital_ratio",
-        "ROA":     "roa",
-        "ROE":     "roe",
+        "SC": "securities",
+        "NETINC": "net_income",
+        "RBCT1J": "tier1_capital_ratio",
+        "ROA": "roa",
+        "ROE": "roe",
         "INSTCAT": "institution_category",
         "CHARTER": "charter_type",
-        "REPDTE":  "latest_report_date",
+        "REPDTE": "latest_report_date",
     }
     df = df.rename(columns={k: v for k, v in rename.items() if k in df.columns})
     for col in INST_OUTPUT_COLUMNS:
@@ -190,16 +386,23 @@ def _download_institutions(session: requests.Session, logger) -> pd.DataFrame:
 # Financial history download
 # ---------------------------------------------------------------------------
 
+
 def _download_financials(session: requests.Session, certs: list[str], logger) -> pd.DataFrame:
     logger.info("Fetching PR bank financial history (call reports)...")
 
     # FDIC financials endpoint filters by STALP, not CERT list
-    records = _paginate(session, "financials", {
-        "filters":    "STALP:PR",
-        "fields":     FINANCIAL_FIELDS,
-        "sort_by":    "REPDTE",
-        "sort_order": "DESC",
-    }, "data", logger)
+    records = _paginate(
+        session,
+        "financials",
+        {
+            "filters": "STALP:PR",
+            "fields": FINANCIAL_FIELDS,
+            "sort_by": "REPDTE",
+            "sort_order": "DESC",
+        },
+        "data",
+        logger,
+    )
 
     if not records:
         return pd.DataFrame(columns=FIN_OUTPUT_COLUMNS)
@@ -207,24 +410,24 @@ def _download_financials(session: requests.Session, certs: list[str], logger) ->
     df = pd.DataFrame(records)
 
     rename = {
-        "CERT":      "cert",
-        "REPDTE":    "report_date",
-        "REPYEAR":   "report_year",
-        "ASSET":     "total_assets",
-        "DEP":       "total_deposits",
-        "LNLSNET":   "net_loans",
-        "SC":        "securities",
-        "NETINC":    "net_income",
-        "INTINC":    "interest_income",
-        "NONII":     "noninterest_income",
-        "NONIX":     "noninterest_expense",
-        "RBCT1J":    "tier1_capital_ratio",
-        "ROA":       "roa",
-        "ROE":       "roe",
-        "LNLSDEPR":  "loan_loss_provision",
-        "NETCHARGE":  "net_chargeoffs",
-        "EQTOT":     "total_equity",
-        "LIABR":     "total_liabilities",
+        "CERT": "cert",
+        "REPDTE": "report_date",
+        "REPYEAR": "report_year",
+        "ASSET": "total_assets",
+        "DEP": "total_deposits",
+        "LNLSNET": "net_loans",
+        "SC": "securities",
+        "NETINC": "net_income",
+        "INTINC": "interest_income",
+        "NONII": "noninterest_income",
+        "NONIX": "noninterest_expense",
+        "RBCT1J": "tier1_capital_ratio",
+        "ROA": "roa",
+        "ROE": "roe",
+        "LNLSDEPR": "loan_loss_provision",
+        "NETCHARGE": "net_chargeoffs",
+        "EQTOT": "total_equity",
+        "LIABR": "total_liabilities",
     }
     df = df.rename(columns={k: v for k, v in rename.items() if k in df.columns})
     for col in FIN_OUTPUT_COLUMNS:
@@ -237,22 +440,23 @@ def _download_financials(session: requests.Session, certs: list[str], logger) ->
 # Entry point
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 
-    root    = Path(root)
+    root = Path(root)
     raw_dir = root / "data" / "staging" / "raw" / "fdic"
     raw_dir.mkdir(parents=True, exist_ok=True)
     out_dir = root / "data" / "staging" / "processed"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     inst_raw_path = raw_dir / "pr_fdic_institutions.csv"
-    fin_raw_path  = raw_dir / "pr_fdic_financials.csv"
+    fin_raw_path = raw_dir / "pr_fdic_financials.csv"
     inst_out_path = out_dir / "pr_fdic_institutions.csv"
-    fin_out_path  = out_dir / "pr_fdic_financials.csv"
+    fin_out_path = out_dir / "pr_fdic_financials.csv"
 
-    logger  = setup_logging("download_fdic")
+    logger = setup_logging("download_fdic")
     session = _session()
 
     # ------------------------------------------------------------------
@@ -281,7 +485,9 @@ def run(root: Path = None, force: bool = False) -> dict:
 
     # Always include known seed data so outputs are never empty when APIs are blocked
     logger.info(f"  Adding {len(KNOWN_FDIC_INSTITUTIONS)} known FDIC institution seed rows...")
-    known_inst_certs = set(df_inst["cert"].dropna().tolist()) if "cert" in df_inst.columns else set()
+    known_inst_certs = (
+        set(df_inst["cert"].dropna().tolist()) if "cert" in df_inst.columns else set()
+    )
     seed_inst_rows = [s for s in KNOWN_FDIC_INSTITUTIONS if s["cert"] not in known_inst_certs]
     if seed_inst_rows:
         df_inst = pd.concat([df_inst, pd.DataFrame(seed_inst_rows)], ignore_index=True)
@@ -301,7 +507,7 @@ def run(root: Path = None, force: bool = False) -> dict:
         df_fin = df_fin[FIN_OUTPUT_COLUMNS]
 
     df_inst.to_csv(inst_out_path, index=False, encoding="utf-8")
-    df_fin.to_csv(fin_out_path,  index=False, encoding="utf-8")
+    df_fin.to_csv(fin_out_path, index=False, encoding="utf-8")
 
     total_assets = pd.to_numeric(df_inst["total_assets"], errors="coerce").sum()
     active_count = (df_inst["active"] == "1").sum() if "active" in df_inst.columns else len(df_inst)
@@ -318,16 +524,18 @@ def run(root: Path = None, force: bool = False) -> dict:
         logger.info("\n  Institutions by total assets:")
         for _, row in df_inst.head(10).iterrows():
             assets = row.get("total_assets", "")
-            assets_str = f"${float(assets) / 1e6:>8,.0f}M" if assets not in ("", None) else "      N/A "
+            assets_str = (
+                f"${float(assets) / 1e6:>8,.0f}M" if assets not in ("", None) else "      N/A "
+            )
             status = "ACTIVE" if str(row.get("active")) == "1" else "closed"
             logger.info(f"    {str(row.get('name', ''))[:50]:<50} {assets_str}  [{status}]")
 
     return {
         "institution_rows": len(df_inst),
-        "financial_rows":   len(df_fin),
-        "status":           "OK" if len(df_inst) > 0 else "EMPTY",
-        "inst_path":        str(inst_out_path),
-        "fin_path":         str(fin_out_path),
+        "financial_rows": len(df_fin),
+        "status": "OK" if len(df_inst) > 0 else "EMPTY",
+        "inst_path": str(inst_out_path),
+        "fin_path": str(fin_out_path),
     }
 
 
@@ -336,8 +544,10 @@ def main() -> int:
     parser.add_argument("--force", action="store_true", help="Re-download even if files exist")
     args = parser.parse_args()
     result = run(force=args.force)
-    print(f"\nFDIC download complete. {result['institution_rows']:,} institutions, "
-          f"{result['financial_rows']:,} financial report rows.")
+    print(
+        f"\nFDIC download complete. {result['institution_rows']:,} institutions, "
+        f"{result['financial_rows']:,} financial report rows."
+    )
     return 0 if result["status"] in ("OK", "EMPTY") else 1
 
 

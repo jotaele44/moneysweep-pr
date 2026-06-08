@@ -21,6 +21,7 @@ Outputs:
 Usage:
   python3 scripts/download_pr_pensions.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -66,35 +67,77 @@ FUND_NAMES = ["ERS", "TRS", "JRS", "Sistema de Retiro", "Retiro Magisterial"]
 
 # Known PR pension figures from FOMB pension analysis (publicly disclosed)
 KNOWN_PENSION_DATA = [
-    {"fiscal_year": "2019", "fund_name": "ERS", "total_assets": "2100000000",
-     "total_liabilities": "33000000000", "net_position": "-30900000000", "funded_ratio": "0.064",
-     "benefit_payments": "2200000000", "employer_contributions": "0", "employee_contributions": "380000000",
-     "investment_return_pct": "0.07", "active_members": "96000", "retirees_count": "137000",
-     "source_doc": "fomb_pension_analysis_2019"},
-    {"fiscal_year": "2020", "fund_name": "ERS", "total_assets": "1700000000",
-     "total_liabilities": "32000000000", "net_position": "-30300000000", "funded_ratio": "0.053",
-     "benefit_payments": "2100000000", "employer_contributions": "0", "employee_contributions": "360000000",
-     "investment_return_pct": "0.05", "active_members": "90000", "retirees_count": "139000",
-     "source_doc": "fomb_pension_analysis_2020"},
-    {"fiscal_year": "2021", "fund_name": "ERS", "total_assets": "1300000000",
-     "total_liabilities": "31000000000", "net_position": "-29700000000", "funded_ratio": "0.042",
-     "benefit_payments": "2050000000", "employer_contributions": "0", "employee_contributions": "340000000",
-     "investment_return_pct": "0.08", "active_members": "85000", "retirees_count": "140000",
-     "source_doc": "fomb_pension_analysis_2021"},
-    {"fiscal_year": "2022", "fund_name": "ERS", "total_assets": "1100000000",
-     "total_liabilities": "30500000000", "net_position": "-29400000000", "funded_ratio": "0.036",
-     "benefit_payments": "2000000000", "employer_contributions": "0", "employee_contributions": "320000000",
-     "investment_return_pct": "0.06", "active_members": "80000", "retirees_count": "141000",
-     "source_doc": "fomb_pension_analysis_2022"},
+    {
+        "fiscal_year": "2019",
+        "fund_name": "ERS",
+        "total_assets": "2100000000",
+        "total_liabilities": "33000000000",
+        "net_position": "-30900000000",
+        "funded_ratio": "0.064",
+        "benefit_payments": "2200000000",
+        "employer_contributions": "0",
+        "employee_contributions": "380000000",
+        "investment_return_pct": "0.07",
+        "active_members": "96000",
+        "retirees_count": "137000",
+        "source_doc": "fomb_pension_analysis_2019",
+    },
+    {
+        "fiscal_year": "2020",
+        "fund_name": "ERS",
+        "total_assets": "1700000000",
+        "total_liabilities": "32000000000",
+        "net_position": "-30300000000",
+        "funded_ratio": "0.053",
+        "benefit_payments": "2100000000",
+        "employer_contributions": "0",
+        "employee_contributions": "360000000",
+        "investment_return_pct": "0.05",
+        "active_members": "90000",
+        "retirees_count": "139000",
+        "source_doc": "fomb_pension_analysis_2020",
+    },
+    {
+        "fiscal_year": "2021",
+        "fund_name": "ERS",
+        "total_assets": "1300000000",
+        "total_liabilities": "31000000000",
+        "net_position": "-29700000000",
+        "funded_ratio": "0.042",
+        "benefit_payments": "2050000000",
+        "employer_contributions": "0",
+        "employee_contributions": "340000000",
+        "investment_return_pct": "0.08",
+        "active_members": "85000",
+        "retirees_count": "140000",
+        "source_doc": "fomb_pension_analysis_2021",
+    },
+    {
+        "fiscal_year": "2022",
+        "fund_name": "ERS",
+        "total_assets": "1100000000",
+        "total_liabilities": "30500000000",
+        "net_position": "-29400000000",
+        "funded_ratio": "0.036",
+        "benefit_payments": "2000000000",
+        "employer_contributions": "0",
+        "employee_contributions": "320000000",
+        "investment_return_pct": "0.06",
+        "active_members": "80000",
+        "retirees_count": "141000",
+        "source_doc": "fomb_pension_analysis_2022",
+    },
 ]
 
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR pension fund research)",
-        "Accept": "text/html,application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR pension fund research)",
+            "Accept": "text/html,application/json",
+        }
+    )
     return s
 
 
@@ -114,14 +157,16 @@ def _get(session: requests.Session, url: str, logger) -> requests.Response | Non
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
     return None
 
 
-def _find_download_links(html: str, base_url: str, extensions: tuple = (".xlsx", ".xls", ".csv")) -> list[str]:
+def _find_download_links(
+    html: str, base_url: str, extensions: tuple = (".xlsx", ".xls", ".csv")
+) -> list[str]:
     """Extract file download links from HTML."""
     ext_pattern = "|".join(re.escape(e) for e in extensions)
     pattern = rf'href=["\']([^"\']*(?:{ext_pattern}))["\']'
@@ -132,6 +177,7 @@ def _find_download_links(html: str, base_url: str, extensions: tuple = (".xlsx",
             result.append(link)
         elif link.startswith("/"):
             from urllib.parse import urlparse
+
             parsed = urlparse(base_url)
             result.append(f"{parsed.scheme}://{parsed.netloc}{link}")
     return list(dict.fromkeys(result))  # deduplicate preserving order
@@ -142,9 +188,19 @@ def _parse_pension_excel(content: bytes, url: str, fund_hint: str, logger) -> li
     rows = []
     try:
         all_sheets = pd.read_excel(pd.io.common.BytesIO(content), sheet_name=None, header=None)
-        for sheet_name, raw_df in (all_sheets.items() if isinstance(all_sheets, dict) else [("Sheet1", all_sheets)]):
+        for sheet_name, raw_df in (
+            all_sheets.items() if isinstance(all_sheets, dict) else [("Sheet1", all_sheets)]
+        ):
             text_flat = raw_df.astype(str).values.flatten()
-            pension_keywords = ["assets", "liabilities", "funded", "contributions", "activos", "pasivos", "beneficiarios"]
+            pension_keywords = [
+                "assets",
+                "liabilities",
+                "funded",
+                "contributions",
+                "activos",
+                "pasivos",
+                "beneficiarios",
+            ]
             if not any(kw in str(v).lower() for v in text_flat for kw in pension_keywords):
                 continue
             try:
@@ -154,7 +210,11 @@ def _parse_pension_excel(content: bytes, url: str, fund_hint: str, logger) -> li
                 # Try to detect fiscal year column
                 fy_col = None
                 for col in df.columns:
-                    if "year" in str(col).lower() or "año" in str(col).lower() or "fiscal" in str(col).lower():
+                    if (
+                        "year" in str(col).lower()
+                        or "año" in str(col).lower()
+                        or "fiscal" in str(col).lower()
+                    ):
                         fy_col = col
                         break
                 record = {"source_doc": url, "fund_name": fund_hint, "report_type": "annual_report"}
@@ -191,7 +251,9 @@ def _parse_pension_excel(content: bytes, url: str, fund_hint: str, logger) -> li
                         record["retirees_count"] = int(last_val)
                 if len(record) > 3:
                     rows.append(record)
-                    logger.info(f"  Parsed pension metrics from {url.split('/')[-1]} sheet '{sheet_name}'")
+                    logger.info(
+                        f"  Parsed pension metrics from {url.split('/')[-1]} sheet '{sheet_name}'"
+                    )
             except Exception as e:
                 logger.debug(f"  Sheet parse failed: {e}")
     except Exception as e:
@@ -199,7 +261,9 @@ def _parse_pension_excel(content: bytes, url: str, fund_hint: str, logger) -> li
     return rows
 
 
-def _fetch_from_site(session: requests.Session, base_url: str, fund_name: str, logger) -> list[dict]:
+def _fetch_from_site(
+    session: requests.Session, base_url: str, fund_name: str, logger
+) -> list[dict]:
     """Fetch pension data from a specific agency website."""
     rows = []
     resp = _get(session, base_url, logger)

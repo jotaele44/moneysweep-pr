@@ -1,4 +1,5 @@
 """Tests for the canonical_v1 funding-sources ingester (WS-I)."""
+
 import pytest
 
 from contract_sweeper.runtime.canonical_ids import funding_id
@@ -29,7 +30,7 @@ def test_rows_and_evidence_validate(built):
     evidence_ids = {e.evidence_id for e in built["evidence_rows"]}
     for row in built["funding_rows"]:
         assert cv1.validate_row(row, fs_schema) == [], row
-        assert row["evidence_id"] in evidence_ids        # no provenance -> no row
+        assert row["evidence_id"] in evidence_ids  # no provenance -> no row
         assert row["currency"] == "USD"
     for ev in built["evidence_rows"]:
         assert cv1.validate_row(ev.as_row(), ev_schema) == [], ev

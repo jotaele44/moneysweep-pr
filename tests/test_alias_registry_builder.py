@@ -1,4 +1,5 @@
 """Tests for scripts/alias_registry_builder.py."""
+
 import csv
 import json
 
@@ -13,16 +14,19 @@ def alias_repo(tmp_path):
     processed = tmp_path / "data" / "staging" / "processed"
     processed.mkdir(parents=True)
     rows = [
-        {"award_id": "A1", "recipient_name": "LGA Strategies, LLC",
-         "obligated_amount": "500000"},
-        {"award_id": "A2", "recipient_name": "LGA Strategies LLC",
-         "obligated_amount": "300000"},
-        {"award_id": "A3", "recipient_name": "Autopistas Metropolitanas de Puerto Rico LLC",
-         "obligated_amount": "10000000"},
-        {"award_id": "A4", "recipient_name": "Ferrovial Agroman, S.A.",
-         "obligated_amount": "2000000"},
-        {"award_id": "A5", "recipient_name": "Brown & Sons Inc",
-         "obligated_amount": "100000"},
+        {"award_id": "A1", "recipient_name": "LGA Strategies, LLC", "obligated_amount": "500000"},
+        {"award_id": "A2", "recipient_name": "LGA Strategies LLC", "obligated_amount": "300000"},
+        {
+            "award_id": "A3",
+            "recipient_name": "Autopistas Metropolitanas de Puerto Rico LLC",
+            "obligated_amount": "10000000",
+        },
+        {
+            "award_id": "A4",
+            "recipient_name": "Ferrovial Agroman, S.A.",
+            "obligated_amount": "2000000",
+        },
+        {"award_id": "A5", "recipient_name": "Brown & Sons Inc", "obligated_amount": "100000"},
     ]
     path = processed / "sample_contracts.csv"
     with path.open("w", newline="") as f:
@@ -35,8 +39,7 @@ def alias_repo(tmp_path):
 @pytest.mark.unit
 def test_build_alias_registry_creates_json(alias_repo):
     build_alias_registry(alias_repo)
-    out_path = (alias_repo / "data" / "staging" / "processed" /
-                "enrichment" / "alias_registry.json")
+    out_path = alias_repo / "data" / "staging" / "processed" / "enrichment" / "alias_registry.json"
     assert out_path.exists()
     data = json.loads(out_path.read_text())
     assert data["entry_count"] > 0

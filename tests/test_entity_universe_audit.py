@@ -32,8 +32,14 @@ def test_r2_audit_blocks_phase_7_8_for_18_entity_universe(tmp_path: Path):
             "power_network": {"total_ranked": 18, "bond_actors_count": 0},
         },
     )
-    _write_json(tmp_path / "data/staging/processed/dominance_summary.json", {"total_rows": 4503, "unique_vendors": 18})
-    _write_json(tmp_path / "data/staging/processed/pr_all_awards_summary.json", {"total_rows": 4503, "unique_recipients": 18})
+    _write_json(
+        tmp_path / "data/staging/processed/dominance_summary.json",
+        {"total_rows": 4503, "unique_vendors": 18},
+    )
+    _write_json(
+        tmp_path / "data/staging/processed/pr_all_awards_summary.json",
+        {"total_rows": 4503, "unique_recipients": 18},
+    )
     _write_json(
         tmp_path / "data/staging/processed/pr_power_network_summary.json",
         {
@@ -43,8 +49,13 @@ def test_r2_audit_blocks_phase_7_8_for_18_entity_universe(tmp_path: Path):
             ]
         },
     )
-    _write_json(tmp_path / "data/staging/processed/pr_prime_sub_summary.json", {"prime_count": 18, "sub_count": 18, "pair_count": 268})
-    _write_json(tmp_path / "data/staging/processed/graph/network_summary.json", {"vendor_nodes": 18})
+    _write_json(
+        tmp_path / "data/staging/processed/pr_prime_sub_summary.json",
+        {"prime_count": 18, "sub_count": 18, "pair_count": 268},
+    )
+    _write_json(
+        tmp_path / "data/staging/processed/graph/network_summary.json", {"vendor_nodes": 18}
+    )
 
     _write_csv(
         tmp_path / "data/staging/processed/graph/top_nodes.csv",
@@ -63,7 +74,10 @@ def test_r2_audit_blocks_phase_7_8_for_18_entity_universe(tmp_path: Path):
         ],
         fieldnames=["source_entity", "contract_count"],
     )
-    _write_json(tmp_path / "data/exports/rebuild_status.json", {"phase_7_8_blocked": True, "r1_gate_passed": False})
+    _write_json(
+        tmp_path / "data/exports/rebuild_status.json",
+        {"phase_7_8_blocked": True, "r1_gate_passed": False},
+    )
 
     result = run_audit(tmp_path)
 
@@ -99,17 +113,45 @@ def test_r2_audit_can_pass_when_minimum_thresholds_are_met(tmp_path: Path):
     _write_csv(
         tmp_path / "data/staging/processed/entity_master.csv",
         rows,
-        fieldnames=["canonical_name", "entity_key", "parent_uei", "parent_name", "award_count", "total_obligated", "source_datasets"],
+        fieldnames=[
+            "canonical_name",
+            "entity_key",
+            "parent_uei",
+            "parent_name",
+            "award_count",
+            "total_obligated",
+            "source_datasets",
+        ],
     )
-    _write_json(tmp_path / "data/staging/processed/dominance_summary.json", {"total_rows": 2000, "unique_vendors": 120})
-    _write_json(tmp_path / "data/staging/processed/pr_all_awards_summary.json", {"total_rows": 2000, "unique_recipients": 120})
-    _write_json(tmp_path / "data/staging/processed/graph/network_summary.json", {"vendor_nodes": 120})
-    _write_json(tmp_path / "data/staging/processed/pr_power_network_summary.json", {"top_entities": []})
-    _write_json(tmp_path / "data/staging/processed/pr_prime_sub_summary.json", {"prime_count": 120, "sub_count": 100, "pair_count": 200})
+    _write_json(
+        tmp_path / "data/staging/processed/dominance_summary.json",
+        {"total_rows": 2000, "unique_vendors": 120},
+    )
+    _write_json(
+        tmp_path / "data/staging/processed/pr_all_awards_summary.json",
+        {"total_rows": 2000, "unique_recipients": 120},
+    )
+    _write_json(
+        tmp_path / "data/staging/processed/graph/network_summary.json", {"vendor_nodes": 120}
+    )
+    _write_json(
+        tmp_path / "data/staging/processed/pr_power_network_summary.json", {"top_entities": []}
+    )
+    _write_json(
+        tmp_path / "data/staging/processed/pr_prime_sub_summary.json",
+        {"prime_count": 120, "sub_count": 100, "pair_count": 200},
+    )
 
     top_nodes = [{"node": f"Entity {i} LLC", "node_type": "vendor"} for i in range(120)]
-    _write_csv(tmp_path / "data/staging/processed/graph/top_nodes.csv", top_nodes, fieldnames=["node", "node_type"])
-    _write_json(tmp_path / "data/exports/rebuild_status.json", {"phase_7_8_blocked": False, "r1_gate_passed": True})
+    _write_csv(
+        tmp_path / "data/staging/processed/graph/top_nodes.csv",
+        top_nodes,
+        fieldnames=["node", "node_type"],
+    )
+    _write_json(
+        tmp_path / "data/exports/rebuild_status.json",
+        {"phase_7_8_blocked": False, "r1_gate_passed": True},
+    )
 
     result = run_audit(tmp_path)
     assert result["r2_gate_passed"] is True
@@ -118,4 +160,3 @@ def test_r2_audit_can_pass_when_minimum_thresholds_are_met(tmp_path: Path):
     assert result["parent_uei_coverage"] > 0
     assert result["high_value_overcollapse_suspect_count"] == 0
     assert result["high_value_unresolved_count"] == 0
-

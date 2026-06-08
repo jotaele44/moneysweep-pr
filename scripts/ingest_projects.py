@@ -20,6 +20,7 @@ CLI::
     python scripts/ingest_projects.py            # write projects + evidence
     python scripts/ingest_projects.py --check     # summarize without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -46,10 +47,22 @@ SOURCE_NAME = "PR Infrastructure Projects (reference seed)"
 VALID_TYPES = {"infrastructure", "recovery", "ppp", "real_estate", "other"}
 
 PROJECT_COLUMNS = [
-    "project_id", "project_name", "project_number", "project_type",
-    "lead_entity_id", "municipality_id", "funding_source_id", "total_value",
-    "currency", "status", "start_date", "end_date", "confidence",
-    "evidence_id", "review_status", "notes",
+    "project_id",
+    "project_name",
+    "project_number",
+    "project_type",
+    "lead_entity_id",
+    "municipality_id",
+    "funding_source_id",
+    "total_value",
+    "currency",
+    "status",
+    "start_date",
+    "end_date",
+    "confidence",
+    "evidence_id",
+    "review_status",
+    "notes",
 ]
 
 
@@ -95,24 +108,26 @@ def build_rows(root: Path | None = None) -> dict[str, Any]:
                 review_status="accepted",
             )
             evidence_rows.append(ev)
-            project_rows.append({
-                "project_id": pid,
-                "project_name": name,
-                "project_number": number,
-                "project_type": ptype,
-                "lead_entity_id": lead_id,
-                "municipality_id": muni_id or "",
-                "funding_source_id": "",
-                "total_value": (rec.get("total_value") or "").strip(),
-                "currency": (rec.get("currency") or "").strip(),
-                "status": (rec.get("status") or "").strip(),
-                "start_date": (rec.get("start_date") or "").strip(),
-                "end_date": (rec.get("end_date") or "").strip(),
-                "confidence": ev.confidence,
-                "evidence_id": ev.evidence_id,
-                "review_status": "accepted",
-                "notes": f"lead={lead}",
-            })
+            project_rows.append(
+                {
+                    "project_id": pid,
+                    "project_name": name,
+                    "project_number": number,
+                    "project_type": ptype,
+                    "lead_entity_id": lead_id,
+                    "municipality_id": muni_id or "",
+                    "funding_source_id": "",
+                    "total_value": (rec.get("total_value") or "").strip(),
+                    "currency": (rec.get("currency") or "").strip(),
+                    "status": (rec.get("status") or "").strip(),
+                    "start_date": (rec.get("start_date") or "").strip(),
+                    "end_date": (rec.get("end_date") or "").strip(),
+                    "confidence": ev.confidence,
+                    "evidence_id": ev.evidence_id,
+                    "review_status": "accepted",
+                    "notes": f"lead={lead}",
+                }
+            )
     return {"project_rows": project_rows, "evidence_rows": evidence_rows, "skipped": skipped}
 
 
@@ -167,7 +182,9 @@ def ingest(root: Path | None = None) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Ingest PR infrastructure projects into canonical_v1.")
+    parser = argparse.ArgumentParser(
+        description="Ingest PR infrastructure projects into canonical_v1."
+    )
     parser.add_argument("--root", default=".")
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
@@ -176,8 +193,17 @@ def main(argv: list[str] | None = None) -> int:
         built = build_rows(root)
         rows = built["project_rows"]
         problems = check(rows)
-        print(json.dumps({"ok": not problems, "row_count": len(rows),
-                          "skipped": len(built["skipped"]), "problems": problems}, indent=2))
+        print(
+            json.dumps(
+                {
+                    "ok": not problems,
+                    "row_count": len(rows),
+                    "skipped": len(built["skipped"]),
+                    "problems": problems,
+                },
+                indent=2,
+            )
+        )
         return 0 if not problems else 1
     print(json.dumps(ingest(root), indent=2))
     return 0

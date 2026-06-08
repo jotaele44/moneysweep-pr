@@ -1,4 +1,5 @@
 """Top-level query dispatcher: routes a Query across the registered adapters."""
+
 from __future__ import annotations
 
 import logging

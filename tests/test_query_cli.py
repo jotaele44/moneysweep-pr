@@ -1,4 +1,5 @@
 """Tests for the ``python -m contract_sweeper.query`` CLI."""
+
 from __future__ import annotations
 
 import io
@@ -100,13 +101,19 @@ def test_quiet_suppresses_stdout(tmp_path):
 def test_output_writes_combined_file_for_each_supported_format(tmp_path, ext):
     out_path = tmp_path / f"results.{ext}"
     with patch.dict(ADAPTER_REGISTRY, {"usaspending_prime": _StaticAdapter}, clear=False):
-        code, _, _ = _run([
-            "--source", "usaspending_prime",
-            "--municipality", "San Juan",
-            "--root", str(tmp_path),
-            "--output", str(out_path),
-            "--quiet",
-        ])
+        code, _, _ = _run(
+            [
+                "--source",
+                "usaspending_prime",
+                "--municipality",
+                "San Juan",
+                "--root",
+                str(tmp_path),
+                "--output",
+                str(out_path),
+                "--quiet",
+            ]
+        )
     assert code == 0
     assert out_path.exists() and out_path.stat().st_size > 0
     if ext == "parquet":
@@ -125,14 +132,21 @@ def test_output_writes_combined_file_for_each_supported_format(tmp_path, ext):
 def test_output_dir_writes_per_source_files(tmp_path):
     out_dir = tmp_path / "by_source"
     with patch.dict(ADAPTER_REGISTRY, {"usaspending_prime": _StaticAdapter}, clear=False):
-        code, _, _ = _run([
-            "--source", "usaspending_prime",
-            "--municipality", "San Juan",
-            "--root", str(tmp_path),
-            "--output-dir", str(out_dir),
-            "--format", "csv",
-            "--quiet",
-        ])
+        code, _, _ = _run(
+            [
+                "--source",
+                "usaspending_prime",
+                "--municipality",
+                "San Juan",
+                "--root",
+                str(tmp_path),
+                "--output-dir",
+                str(out_dir),
+                "--format",
+                "csv",
+                "--quiet",
+            ]
+        )
     assert code == 0
     written = list(out_dir.glob("*.csv"))
     assert [p.name for p in written] == ["usaspending_prime.csv"]
@@ -141,12 +155,17 @@ def test_output_dir_writes_per_source_files(tmp_path):
 @pytest.mark.unit
 def test_output_dir_skips_manual_only_outcomes(tmp_path):
     out_dir = tmp_path / "by_source"
-    code, _, _ = _run([
-        "--source", "sam_entities",
-        "--root", str(tmp_path),
-        "--output-dir", str(out_dir),
-        "--quiet",
-    ])
+    code, _, _ = _run(
+        [
+            "--source",
+            "sam_entities",
+            "--root",
+            str(tmp_path),
+            "--output-dir",
+            str(out_dir),
+            "--quiet",
+        ]
+    )
     assert code == 0
     assert not out_dir.exists() or list(out_dir.iterdir()) == []
 
@@ -155,13 +174,19 @@ def test_output_dir_skips_manual_only_outcomes(tmp_path):
 def test_unsupported_output_extension_returns_exit_code_one(tmp_path):
     out_path = tmp_path / "results.xlsx"
     with patch.dict(ADAPTER_REGISTRY, {"usaspending_prime": _StaticAdapter}, clear=False):
-        code, _, stderr = _run([
-            "--source", "usaspending_prime",
-            "--municipality", "San Juan",
-            "--root", str(tmp_path),
-            "--output", str(out_path),
-            "--quiet",
-        ])
+        code, _, stderr = _run(
+            [
+                "--source",
+                "usaspending_prime",
+                "--municipality",
+                "San Juan",
+                "--root",
+                str(tmp_path),
+                "--output",
+                str(out_path),
+                "--quiet",
+            ]
+        )
     assert code == 1
     assert "unsupported output extension" in stderr
 
@@ -175,23 +200,33 @@ def test_adapter_error_exits_one(tmp_path):
             raise RuntimeError("upstream 500")
 
     with patch.dict(ADAPTER_REGISTRY, {"usaspending_prime": _BrokenAdapter}, clear=False):
-        code, stdout, _ = _run([
-            "--source", "usaspending_prime",
-            "--root", str(tmp_path),
-            "--quiet",
-        ])
+        code, stdout, _ = _run(
+            [
+                "--source",
+                "usaspending_prime",
+                "--root",
+                str(tmp_path),
+                "--quiet",
+            ]
+        )
     assert code == 1
 
 
 @pytest.mark.unit
 def test_summary_payload_lists_each_outcome(tmp_path):
     with patch.dict(ADAPTER_REGISTRY, {"usaspending_prime": _StaticAdapter}, clear=False):
-        code, stdout, _ = _run([
-            "--source", "usaspending_prime",
-            "--source", "sam_entities",
-            "--municipality", "San Juan",
-            "--root", str(tmp_path),
-        ])
+        code, stdout, _ = _run(
+            [
+                "--source",
+                "usaspending_prime",
+                "--source",
+                "sam_entities",
+                "--municipality",
+                "San Juan",
+                "--root",
+                str(tmp_path),
+            ]
+        )
     assert code == 0
     payload = json.loads(stdout)
     ids = [o["source_id"] for o in payload["outcomes"]]

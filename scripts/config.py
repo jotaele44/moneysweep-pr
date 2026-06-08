@@ -2,6 +2,7 @@
 Shared configuration for the Puerto Rico Federal Contracts Data Pipeline.
 Single source of truth for paths, file manifest, column families, and helpers.
 """
+
 from __future__ import annotations
 
 import logging
@@ -41,9 +42,15 @@ RAW_SLFRF_DIR = DATA_DIR / "raw" / "slfrf"
 RAW_CDBG_DR_DIR = DATA_DIR / "raw" / "cdbg_dr"
 
 EXPANDED_RAW_DIRS = [
-    RAW_GRANTS_DIR, RAW_SUBAWARDS_DIR, RAW_FEMA_PA_DIR,
-    RAW_FEMA_HMGP_DIR, RAW_RESEARCH_DIR, RAW_HIGHERGOV_DIR, RAW_SBA_DIR,
-    RAW_SLFRF_DIR, RAW_CDBG_DR_DIR,
+    RAW_GRANTS_DIR,
+    RAW_SUBAWARDS_DIR,
+    RAW_FEMA_PA_DIR,
+    RAW_FEMA_HMGP_DIR,
+    RAW_RESEARCH_DIR,
+    RAW_HIGHERGOV_DIR,
+    RAW_SBA_DIR,
+    RAW_SLFRF_DIR,
+    RAW_CDBG_DR_DIR,
 ]
 
 # Dataset master paths
@@ -58,39 +65,74 @@ CDBG_DR_MASTER_PATH = PROCESSED_DIR / "pr_cdbg_dr_master.csv"
 UNIFIED_MASTER_PATH = PROCESSED_DIR / "pr_all_awards_master.csv"
 
 ALL_DATASET_MASTERS = [
-    GRANTS_MASTER_PATH, SUBAWARDS_MASTER_PATH, FEMA_PA_MASTER_PATH,
-    FEMA_HMGP_MASTER_PATH, RESEARCH_MASTER_PATH, SBA_MASTER_PATH,
-    SLFRF_MASTER_PATH, CDBG_DR_MASTER_PATH,
+    GRANTS_MASTER_PATH,
+    SUBAWARDS_MASTER_PATH,
+    FEMA_PA_MASTER_PATH,
+    FEMA_HMGP_MASTER_PATH,
+    RESEARCH_MASTER_PATH,
+    SBA_MASTER_PATH,
+    SLFRF_MASTER_PATH,
+    CDBG_DR_MASTER_PATH,
 ]
 
 CANONICAL_COLUMNS = [
-    "award_id", "recipient_name", "recipient_uei", "awarding_agency",
-    "awarding_sub_agency", "obligated_amount", "award_date", "fiscal_year",
-    "pop_state", "pop_county", "description", "source_file",
-    "source_dataset", "award_category",
+    "award_id",
+    "recipient_name",
+    "recipient_uei",
+    "awarding_agency",
+    "awarding_sub_agency",
+    "obligated_amount",
+    "award_date",
+    "fiscal_year",
+    "pop_state",
+    "pop_county",
+    "description",
+    "source_file",
+    "source_dataset",
+    "award_category",
 ]
 
 # Source priority for deterministic deduplication (lower = higher priority)
 SOURCE_PRIORITY = {
-    "contracts": 1, "grants": 1, "subawards": 1,
-    "fema_pa": 1, "fema_hmgp": 1, "research": 1,
-    "sba_loans": 1, "slfrf": 1, "cdbg_dr": 1,
-    "dot": 1, "usda": 1, "doe": 1, "hud": 1,
+    "contracts": 1,
+    "grants": 1,
+    "subawards": 1,
+    "fema_pa": 1,
+    "fema_hmgp": 1,
+    "research": 1,
+    "sba_loans": 1,
+    "slfrf": 1,
+    "cdbg_dr": 1,
+    "dot": 1,
+    "usda": 1,
+    "doe": 1,
+    "hud": 1,
     "sbir": 2,
 }
 EXPANSION_PRIORITY = 3  # expansion/ files (IDV, DoD, reconstruction)
 
 REQUIRED_MASTER_COLUMNS = [
-    "award_id", "recipient_name", "obligated_amount",
-    "award_date", "source_dataset", "award_category",
+    "award_id",
+    "recipient_name",
+    "obligated_amount",
+    "award_date",
+    "source_dataset",
+    "award_category",
 ]
 NULL_THRESHOLDS = {
-    "award_id":         0.00,
-    "recipient_name":   0.05,
+    "award_id": 0.00,
+    "recipient_name": 0.05,
     "obligated_amount": 0.20,
 }
 
-ALL_DIRS = [DATA_DIR, STAGING_DIR, EXPANSION_DIR, PROCESSED_DIR, RAW_DIR, LOGS_DIR] + EXPANDED_RAW_DIRS
+ALL_DIRS = [
+    DATA_DIR,
+    STAGING_DIR,
+    EXPANSION_DIR,
+    PROCESSED_DIR,
+    RAW_DIR,
+    LOGS_DIR,
+] + EXPANDED_RAW_DIRS
 
 # ---------------------------------------------------------------------------
 # Download manifest — the 13 expected expansion files
@@ -403,6 +445,7 @@ STANDARD_COLUMNS = [
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def clean_column_name(col: str) -> str:
     """Strip whitespace, BOM markers, and normalize newlines in a column name."""
     return col.strip().lstrip("\ufeff").replace("\n", " ").replace("\r", "")
@@ -523,6 +566,7 @@ def _load_dotenv(path: Path) -> dict:
 def get_sam_api_key() -> str:
     """Return SAM.gov API key from SAM_API_KEY env var or .env file. Raises if missing."""
     import os
+
     key = os.environ.get("SAM_API_KEY", "").strip()
     if key:
         return key
@@ -547,6 +591,7 @@ def get_financialdata_api_key() -> str | None:
     readiness signal rather than crashing.
     """
     import os
+
     key = os.environ.get("FINANCIALDATA_API_KEY", "").strip()
     if key:
         return key
@@ -563,6 +608,7 @@ def is_financialdata_license_approved() -> bool:
     acknowledgement in addition to the API key — see docs/financialdata_provider.md.
     """
     import os
+
     val = os.environ.get("FINANCIALDATA_LICENSE_APPROVED", "").strip()
     if not val:
         parsed = _load_dotenv(PROJECT_ROOT / ".env")

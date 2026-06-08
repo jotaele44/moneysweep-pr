@@ -43,7 +43,9 @@ def write_csv(path: Path, rows: list[dict[str, Any]], fields: list[str]) -> None
         writer.writerows(rows)
 
 
-def build_neo4j_nodes(graph: dict[str, Any], clusters: list[dict[str, str]]) -> list[dict[str, Any]]:
+def build_neo4j_nodes(
+    graph: dict[str, Any], clusters: list[dict[str, str]]
+) -> list[dict[str, Any]]:
     cluster_by_id = {row.get("entity_id"): row for row in clusters}
     rows: list[dict[str, Any]] = []
     for node in graph.get("nodes", []):
@@ -65,10 +67,15 @@ def build_neo4j_nodes(graph: dict[str, Any], clusters: list[dict[str, str]]) -> 
     return rows
 
 
-def build_neo4j_edges(graph: dict[str, Any], temporal_edges: list[dict[str, str]]) -> list[dict[str, Any]]:
+def build_neo4j_edges(
+    graph: dict[str, Any], temporal_edges: list[dict[str, str]]
+) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for flag in graph.get("correlation_flags", []):
-        record_id = flag.get("matched_record_id") or f"record:{flag.get('matched_dataset')}:{flag.get('entity_id')}"
+        record_id = (
+            flag.get("matched_record_id")
+            or f"record:{flag.get('matched_dataset')}:{flag.get('entity_id')}"
+        )
         rows.append(
             {
                 ":START_ID": flag.get("entity_id", ""),
@@ -80,7 +87,12 @@ def build_neo4j_edges(graph: dict[str, Any], temporal_edges: list[dict[str, str]
             }
         )
     for edge in temporal_edges:
-        milestone_id = "milestone:" + edge.get("milestone_date", "") + ":" + edge.get("milestone_name", "").replace(" ", "_")
+        milestone_id = (
+            "milestone:"
+            + edge.get("milestone_date", "")
+            + ":"
+            + edge.get("milestone_name", "").replace(" ", "_")
+        )
         rows.append(
             {
                 ":START_ID": edge.get("entity_id", ""),
@@ -94,7 +106,9 @@ def build_neo4j_edges(graph: dict[str, Any], temporal_edges: list[dict[str, str]
     return rows
 
 
-def build_gis_entities(graph: dict[str, Any], clusters: list[dict[str, str]]) -> list[dict[str, Any]]:
+def build_gis_entities(
+    graph: dict[str, Any], clusters: list[dict[str, str]]
+) -> list[dict[str, Any]]:
     cluster_by_id = {row.get("entity_id"): row for row in clusters}
     rows: list[dict[str, Any]] = []
     for node in graph.get("nodes", []):
@@ -165,10 +179,59 @@ def main() -> int:
         "manifest": args.outdir / "graph_export_manifest.json",
     }
 
-    write_csv(files["neo4j_nodes"], neo4j_nodes, ["id:ID", ":LABEL", "raw_name", "normalized_name", "sector", "source_document", "evidence_tier", "continuity_score:float", "temporal_edges:int"])
-    write_csv(files["neo4j_edges"], neo4j_edges, [":START_ID", ":END_ID", ":TYPE", "matched_dataset", "confidence:float", "evidence_tiers"])
-    write_csv(files["gis_entities"], gis_entities, ["entity_id", "normalized_name", "sector", "address_or_service_metadata", "emails", "latitude", "longitude", "geocode_status", "continuity_score"])
-    write_csv(files["gis_edges"], gis_edges, ["entity_id", "normalized_name", "sector", "record_date", "milestone_date", "milestone_type", "milestone_name", "days_delta", "confidence", "latitude", "longitude", "geocode_status"])
+    write_csv(
+        files["neo4j_nodes"],
+        neo4j_nodes,
+        [
+            "id:ID",
+            ":LABEL",
+            "raw_name",
+            "normalized_name",
+            "sector",
+            "source_document",
+            "evidence_tier",
+            "continuity_score:float",
+            "temporal_edges:int",
+        ],
+    )
+    write_csv(
+        files["neo4j_edges"],
+        neo4j_edges,
+        [":START_ID", ":END_ID", ":TYPE", "matched_dataset", "confidence:float", "evidence_tiers"],
+    )
+    write_csv(
+        files["gis_entities"],
+        gis_entities,
+        [
+            "entity_id",
+            "normalized_name",
+            "sector",
+            "address_or_service_metadata",
+            "emails",
+            "latitude",
+            "longitude",
+            "geocode_status",
+            "continuity_score",
+        ],
+    )
+    write_csv(
+        files["gis_edges"],
+        gis_edges,
+        [
+            "entity_id",
+            "normalized_name",
+            "sector",
+            "record_date",
+            "milestone_date",
+            "milestone_type",
+            "milestone_name",
+            "days_delta",
+            "confidence",
+            "latitude",
+            "longitude",
+            "geocode_status",
+        ],
+    )
 
     manifest = {
         "neo4j_nodes": str(files["neo4j_nodes"]),

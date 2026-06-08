@@ -21,6 +21,7 @@ Usage:
   python3 scripts/analyze_project_delivery.py
   python3 scripts/analyze_project_delivery.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -39,27 +40,36 @@ from scripts.sam_enrichment import name_similarity
 # ---------------------------------------------------------------------------
 
 # Scoring weights (sum to 1.0)
-WEIGHT_FEMA_COMPLETION    = 0.35
-WEIGHT_COR3_DISBURSEMENT  = 0.30
-WEIGHT_USACE_PERMIT       = 0.20
-WEIGHT_EQB_COMPLIANCE     = 0.15
+WEIGHT_FEMA_COMPLETION = 0.35
+WEIGHT_COR3_DISBURSEMENT = 0.30
+WEIGHT_USACE_PERMIT = 0.20
+WEIGHT_EQB_COMPLIANCE = 0.15
 
-RISK_HIGH   = 40   # score < 40 → high risk
-RISK_MEDIUM = 70   # score < 70 → medium risk
+RISK_HIGH = 40  # score < 40 → high risk
+RISK_MEDIUM = 70  # score < 70 → medium risk
 
 MATCH_THRESHOLD = 0.75  # vendor name match threshold
 
 OUTPUT_COLUMNS = [
-    "entity_key", "canonical_name", "total_awards_obligated", "award_count",
-    "fema_projects_count", "fema_completion_rate",
-    "cor3_projects_count", "cor3_disbursement_rate",
-    "usace_permit_ok", "eqb_violation_flag", "eqb_violations",
-    "delivery_score", "risk_tier",
+    "entity_key",
+    "canonical_name",
+    "total_awards_obligated",
+    "award_count",
+    "fema_projects_count",
+    "fema_completion_rate",
+    "cor3_projects_count",
+    "cor3_disbursement_rate",
+    "usace_permit_ok",
+    "eqb_violation_flag",
+    "eqb_violations",
+    "delivery_score",
+    "risk_tier",
 ]
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _load(path: Path, label: str, logger) -> pd.DataFrame:
     if not path.exists():
@@ -89,14 +99,19 @@ def _match_name(entity_norm: str, df: pd.DataFrame, name_col: str) -> pd.DataFra
 # Sub-scorers
 # ---------------------------------------------------------------------------
 
+
 def _fema_score(entity_norm: str, fema_df: pd.DataFrame) -> tuple[int, float]:
     """Return (project_count, completion_rate 0–1)."""
     if fema_df.empty:
         return 0, 0.5  # neutral if no FEMA data
 
     name_col = next(
-        (c for c in ["recipient_name_normalized", "vendor_name", "recipient_name"]
-         if c in fema_df.columns), None,
+        (
+            c
+            for c in ["recipient_name_normalized", "vendor_name", "recipient_name"]
+            if c in fema_df.columns
+        ),
+        None,
     )
     if not name_col:
         return 0, 0.5
@@ -108,9 +123,12 @@ def _fema_score(entity_norm: str, fema_df: pd.DataFrame) -> tuple[int, float]:
     n = len(matched)
     status_col = next((c for c in ["project_status", "status"] if c in matched.columns), None)
     if status_col:
-        completed = matched[status_col].str.lower().str.contains(
-            "complete|closed|obligated|approved", na=False
-        ).sum()
+        completed = (
+            matched[status_col]
+            .str.lower()
+            .str.contains("complete|closed|obligated|approved", na=False)
+            .sum()
+        )
         rate = completed / n if n > 0 else 0.5
     else:
         rate = 0.5
@@ -144,9 +162,9 @@ def _usace_ok(entity_norm: str, usace_df: pd.DataFrame) -> int:
 
     status_col = next((c for c in ["status", "permit_status"] if c in matched.columns), None)
     if status_col:
-        active = matched[status_col].str.lower().str.contains(
-            "active|issued|valid|open", na=False
-        ).any()
+        active = (
+            matched[status_col].str.lower().str.contains("active|issued|valid|open", na=False).any()
+        )
         return 1 if active else 0
     return 1
 
@@ -170,6 +188,7 @@ def _eqb_violations(entity_norm: str, eqb_df: pd.DataFrame) -> tuple[int, int]:
 # Core
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None, force: bool = False) -> dict:
     root = Path(root or PROJECT_ROOT)
     proc = root / "data" / "staging" / "processed"
@@ -185,10 +204,10 @@ def run(root: Path = None, force: bool = False) -> dict:
 
     # Load all inputs
     entity_df = _load(proc / "entity_master.csv", "entity_master", logger)
-    fema_df   = _load(proc / "pr_fema_pa_master.csv", "FEMA PA", logger)
-    cor3_df   = _load(proc / "pr_cor3_projects.csv", "COR3", logger)
-    usace_df  = _load(proc / "pr_usace_permits.csv", "USACE permits", logger)
-    eqb_df    = _load(proc / "pr_eqb_permits.csv", "EQB permits", logger)
+    fema_df = _load(proc / "pr_fema_pa_master.csv", "FEMA PA", logger)
+    cor3_df = _load(proc / "pr_cor3_projects.csv", "COR3", logger)
+    usace_df = _load(proc / "pr_usace_permits.csv", "USACE permits", logger)
+    eqb_df = _load(proc / "pr_eqb_permits.csv", "EQB permits", logger)
 
     if entity_df.empty:
         logger.warning("  entity_master.csv missing — run build_unified_master.py first")
@@ -199,25 +218,27 @@ def run(root: Path = None, force: bool = False) -> dict:
 
     rows = []
     for _, ent in entity_df.iterrows():
-        entity_key   = str(ent.get("entity_key") or ent.get("canonical_name") or "")
-        canonical    = str(ent.get("canonical_name") or ent.get("recipient_name_normalized") or "")
-        entity_norm  = canonical  # already normalized in entity_master
+        entity_key = str(ent.get("entity_key") or ent.get("canonical_name") or "")
+        canonical = str(ent.get("canonical_name") or ent.get("recipient_name_normalized") or "")
+        entity_norm = canonical  # already normalized in entity_master
 
-        total_obligated = _safe_float(ent.get("total_obligated") or ent.get("total_obligation") or 0)
-        award_count     = int(_safe_float(ent.get("award_count") or 0))
+        total_obligated = _safe_float(
+            ent.get("total_obligated") or ent.get("total_obligation") or 0
+        )
+        award_count = int(_safe_float(ent.get("award_count") or 0))
 
         # Sub-scores
-        fema_n, fema_rate   = _fema_score(entity_norm, fema_df)
-        cor3_n, cor3_rate   = _cor3_score(entity_norm, cor3_df)
-        usace_ok            = _usace_ok(entity_norm, usace_df)
+        fema_n, fema_rate = _fema_score(entity_norm, fema_df)
+        cor3_n, cor3_rate = _cor3_score(entity_norm, cor3_df)
+        usace_ok = _usace_ok(entity_norm, usace_df)
         eqb_flag, eqb_viols = _eqb_violations(entity_norm, eqb_df)
 
         # Composite score (0–100)
         score = (
-            WEIGHT_FEMA_COMPLETION   * fema_rate  * 100
-            + WEIGHT_COR3_DISBURSEMENT * cor3_rate  * 100
-            + WEIGHT_USACE_PERMIT      * usace_ok   * 100
-            + WEIGHT_EQB_COMPLIANCE    * (1 - eqb_flag) * 100
+            WEIGHT_FEMA_COMPLETION * fema_rate * 100
+            + WEIGHT_COR3_DISBURSEMENT * cor3_rate * 100
+            + WEIGHT_USACE_PERMIT * usace_ok * 100
+            + WEIGHT_EQB_COMPLIANCE * (1 - eqb_flag) * 100
         )
         score = round(score, 1)
 
@@ -228,21 +249,23 @@ def run(root: Path = None, force: bool = False) -> dict:
         else:
             risk_tier = "low"
 
-        rows.append({
-            "entity_key":             entity_key,
-            "canonical_name":         canonical,
-            "total_awards_obligated": total_obligated,
-            "award_count":            award_count,
-            "fema_projects_count":    fema_n,
-            "fema_completion_rate":   fema_rate,
-            "cor3_projects_count":    cor3_n,
-            "cor3_disbursement_rate": cor3_rate,
-            "usace_permit_ok":        usace_ok,
-            "eqb_violation_flag":     eqb_flag,
-            "eqb_violations":         eqb_viols,
-            "delivery_score":         score,
-            "risk_tier":              risk_tier,
-        })
+        rows.append(
+            {
+                "entity_key": entity_key,
+                "canonical_name": canonical,
+                "total_awards_obligated": total_obligated,
+                "award_count": award_count,
+                "fema_projects_count": fema_n,
+                "fema_completion_rate": fema_rate,
+                "cor3_projects_count": cor3_n,
+                "cor3_disbursement_rate": cor3_rate,
+                "usace_permit_ok": usace_ok,
+                "eqb_violation_flag": eqb_flag,
+                "eqb_violations": eqb_viols,
+                "delivery_score": score,
+                "risk_tier": risk_tier,
+            }
+        )
 
     df_out = pd.DataFrame(rows, columns=OUTPUT_COLUMNS)
     df_out = df_out.sort_values("delivery_score", ascending=False)
@@ -250,7 +273,9 @@ def run(root: Path = None, force: bool = False) -> dict:
 
     n = len(df_out)
     high_risk = (df_out["risk_tier"] == "high").sum()
-    logger.info(f"  Delivery scorecard: {n:,} entities scored, {high_risk:,} high-risk → {out_path.name}")
+    logger.info(
+        f"  Delivery scorecard: {n:,} entities scored, {high_risk:,} high-risk → {out_path.name}"
+    )
 
     return {"status": "OK", "rows": n, "high_risk_count": int(high_risk)}
 
@@ -258,6 +283,7 @@ def run(root: Path = None, force: bool = False) -> dict:
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Score contractor project delivery performance")

@@ -14,6 +14,7 @@ Usage:
   python3 scripts/ingest_cor3.py
   python3 scripts/ingest_cor3.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -30,36 +31,116 @@ from scripts.config import PROJECT_ROOT, setup_logging
 RAW_DIR = PROJECT_ROOT / "data" / "raw" / "COR3"
 
 OUTPUT_COLUMNS = [
-    "project_id", "applicant_name", "applicant_normalized",
-    "program", "category", "municipality",
-    "total_approved", "total_disbursed", "disbursement_rate",
-    "status", "last_updated",
+    "project_id",
+    "applicant_name",
+    "applicant_normalized",
+    "program",
+    "category",
+    "municipality",
+    "total_approved",
+    "total_disbursed",
+    "disbursement_rate",
+    "status",
+    "last_updated",
 ]
 
 COL_MAP = {
-    "project_id":      ["Project ID", "project_id", "ID", "Project Number", "Project #",
-                        "Project No", "Num", "Number", "PA Project Number", "PW Number",
-                        "Contract Number", "Contract No", "Contract #"],
-    "applicant_name":  ["Applicant", "Applicant Name", "Subrecipient", "Subrecipient Name",
-                        "Contractor", "Contractor Name", "Vendor", "Vendor Name",
-                        "Prime Contractor", "Awardee", "Organization", "Entity Name"],
-    "program":         ["Program", "Program Type", "Fund", "Funding Source",
-                        "FEMA Program", "Grant Program", "Funding Program",
-                        "Program Name", "Source of Funds"],
-    "category":        ["Category", "Work Type", "Project Category", "Category of Work",
-                        "Type of Work", "Work Category", "Project Type", "Type",
-                        "Category Name", "Procurement Category"],
-    "municipality":    ["Municipality", "Municipio", "Location", "City", "Jurisdiccion",
-                        "Jurisdiction", "Town", "Place of Performance"],
-    "total_approved":  ["Total Approved", "Approved Amount", "Total Award", "Award Amount",
-                        "Contract Value", "Obligated Amount", "Eligible Cost",
-                        "Total Eligible", "Authorized Amount", "Budget"],
-    "total_disbursed": ["Total Disbursed", "Disbursed", "Paid", "Total Paid",
-                        "Amount Paid", "Payments", "Drawn", "Amount Drawn",
-                        "Total Drawn", "Disbursements"],
-    "status":          ["Status", "Project Status", "Estado", "Current Status"],
-    "last_updated":    ["Last Updated", "Date", "Updated", "Report Date",
-                        "As of Date", "Data Date", "Date Updated"],
+    "project_id": [
+        "Project ID",
+        "project_id",
+        "ID",
+        "Project Number",
+        "Project #",
+        "Project No",
+        "Num",
+        "Number",
+        "PA Project Number",
+        "PW Number",
+        "Contract Number",
+        "Contract No",
+        "Contract #",
+    ],
+    "applicant_name": [
+        "Applicant",
+        "Applicant Name",
+        "Subrecipient",
+        "Subrecipient Name",
+        "Contractor",
+        "Contractor Name",
+        "Vendor",
+        "Vendor Name",
+        "Prime Contractor",
+        "Awardee",
+        "Organization",
+        "Entity Name",
+    ],
+    "program": [
+        "Program",
+        "Program Type",
+        "Fund",
+        "Funding Source",
+        "FEMA Program",
+        "Grant Program",
+        "Funding Program",
+        "Program Name",
+        "Source of Funds",
+    ],
+    "category": [
+        "Category",
+        "Work Type",
+        "Project Category",
+        "Category of Work",
+        "Type of Work",
+        "Work Category",
+        "Project Type",
+        "Type",
+        "Category Name",
+        "Procurement Category",
+    ],
+    "municipality": [
+        "Municipality",
+        "Municipio",
+        "Location",
+        "City",
+        "Jurisdiccion",
+        "Jurisdiction",
+        "Town",
+        "Place of Performance",
+    ],
+    "total_approved": [
+        "Total Approved",
+        "Approved Amount",
+        "Total Award",
+        "Award Amount",
+        "Contract Value",
+        "Obligated Amount",
+        "Eligible Cost",
+        "Total Eligible",
+        "Authorized Amount",
+        "Budget",
+    ],
+    "total_disbursed": [
+        "Total Disbursed",
+        "Disbursed",
+        "Paid",
+        "Total Paid",
+        "Amount Paid",
+        "Payments",
+        "Drawn",
+        "Amount Drawn",
+        "Total Drawn",
+        "Disbursements",
+    ],
+    "status": ["Status", "Project Status", "Estado", "Current Status"],
+    "last_updated": [
+        "Last Updated",
+        "Date",
+        "Updated",
+        "Report Date",
+        "As of Date",
+        "Data Date",
+        "Date Updated",
+    ],
 }
 
 _STRIP_RE = re.compile(r"[^\w\s]")
@@ -116,18 +197,20 @@ def _parse_sheet(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
     out_df["applicant_normalized"] = out_df["applicant_name"].apply(_normalize_name)
 
     # Compute disbursement rate
-    approved  = _to_numeric(out_df["total_approved"])
+    approved = _to_numeric(out_df["total_approved"])
     disbursed = _to_numeric(out_df["total_disbursed"])
-    out_df["total_approved"]  = approved.fillna(0).astype(str)
+    out_df["total_approved"] = approved.fillna(0).astype(str)
     out_df["total_disbursed"] = disbursed.fillna(0).astype(str)
     rate = (disbursed / approved.replace(0, pd.NA)).round(4)
     out_df["disbursement_rate"] = rate.astype(str)
 
     # Drop rows where all key fields are blank/zero
     key_cols = ["project_id", "applicant_name", "total_approved"]
-    mask = out_df[key_cols].apply(
-        lambda col: col.str.strip().isin(["", "0", "0.0", "nan"])
-    ).all(axis=1)
+    mask = (
+        out_df[key_cols]
+        .apply(lambda col: col.str.strip().isin(["", "0", "0.0", "nan"]))
+        .all(axis=1)
+    )
     out_df = out_df[~mask]
 
     for col in OUTPUT_COLUMNS:

@@ -22,6 +22,7 @@ Output:
 Usage:
   python3 scripts/download_p3.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -45,54 +46,85 @@ MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 P3_COLUMNS = [
-    "project_id", "project_name", "sector",
-    "concessionaire_name", "concessionaire_normalized",
-    "contract_value", "term_years",
-    "award_date", "financial_close_date",
-    "federal_funding_flag", "status",
+    "project_id",
+    "project_name",
+    "sector",
+    "concessionaire_name",
+    "concessionaire_normalized",
+    "contract_value",
+    "term_years",
+    "award_date",
+    "financial_close_date",
+    "federal_funding_flag",
+    "status",
     "source_doc",
 ]
 
 # Known P3 projects with verified data (used as seed if scraping fails)
 KNOWN_P3_PROJECTS = [
     {
-        "project_id": "P3-001", "project_name": "Luis Muñoz Marín Airport",
-        "sector": "transport", "concessionaire_name": "Aerostar Airport Holdings LLC",
-        "contract_value": "2400000000", "term_years": "40",
-        "award_date": "2013-02-27", "financial_close_date": "2013-02-27",
-        "federal_funding_flag": "Y", "status": "active",
+        "project_id": "P3-001",
+        "project_name": "Luis Muñoz Marín Airport",
+        "sector": "transport",
+        "concessionaire_name": "Aerostar Airport Holdings LLC",
+        "contract_value": "2400000000",
+        "term_years": "40",
+        "award_date": "2013-02-27",
+        "financial_close_date": "2013-02-27",
+        "federal_funding_flag": "Y",
+        "status": "active",
         "source_doc": "known_p3_seed",
     },
     {
-        "project_id": "P3-002", "project_name": "PR-22 and PR-5 Highway",
-        "sector": "transport", "concessionaire_name": "Metropistas",
-        "contract_value": "1100000000", "term_years": "40",
-        "award_date": "2011-01-01", "financial_close_date": "2011-01-01",
-        "federal_funding_flag": "Y", "status": "active",
+        "project_id": "P3-002",
+        "project_name": "PR-22 and PR-5 Highway",
+        "sector": "transport",
+        "concessionaire_name": "Metropistas",
+        "contract_value": "1100000000",
+        "term_years": "40",
+        "award_date": "2011-01-01",
+        "financial_close_date": "2011-01-01",
+        "federal_funding_flag": "Y",
+        "status": "active",
         "source_doc": "known_p3_seed",
     },
     {
-        "project_id": "P3-003", "project_name": "PRASA O&M Agreement",
-        "sector": "water", "concessionaire_name": "Veolia Water Puerto Rico",
-        "contract_value": "500000000", "term_years": "10",
-        "award_date": "2009-01-01", "financial_close_date": "2009-01-01",
-        "federal_funding_flag": "Y", "status": "expired",
+        "project_id": "P3-003",
+        "project_name": "PRASA O&M Agreement",
+        "sector": "water",
+        "concessionaire_name": "Veolia Water Puerto Rico",
+        "contract_value": "500000000",
+        "term_years": "10",
+        "award_date": "2009-01-01",
+        "financial_close_date": "2009-01-01",
+        "federal_funding_flag": "Y",
+        "status": "expired",
         "source_doc": "known_p3_seed",
     },
     {
-        "project_id": "P3-004", "project_name": "LUMA Energy T&D System",
-        "sector": "energy", "concessionaire_name": "LUMA Energy LLC",
-        "contract_value": "2000000000", "term_years": "15",
-        "award_date": "2020-06-22", "financial_close_date": "2021-06-01",
-        "federal_funding_flag": "Y", "status": "active",
+        "project_id": "P3-004",
+        "project_name": "LUMA Energy T&D System",
+        "sector": "energy",
+        "concessionaire_name": "LUMA Energy LLC",
+        "contract_value": "2000000000",
+        "term_years": "15",
+        "award_date": "2020-06-22",
+        "financial_close_date": "2021-06-01",
+        "federal_funding_flag": "Y",
+        "status": "active",
         "source_doc": "known_p3_seed",
     },
     {
-        "project_id": "P3-005", "project_name": "PREPA Generation Privatization",
-        "sector": "energy", "concessionaire_name": "Genera PR LLC",
-        "contract_value": "3500000000", "term_years": "20",
-        "award_date": "2023-01-01", "financial_close_date": "2023-06-01",
-        "federal_funding_flag": "Y", "status": "active",
+        "project_id": "P3-005",
+        "project_name": "PREPA Generation Privatization",
+        "sector": "energy",
+        "concessionaire_name": "Genera PR LLC",
+        "contract_value": "3500000000",
+        "term_years": "20",
+        "award_date": "2023-01-01",
+        "financial_close_date": "2023-06-01",
+        "federal_funding_flag": "Y",
+        "status": "active",
         "source_doc": "known_p3_seed",
     },
 ]
@@ -122,10 +154,12 @@ def parse_records(records: list[dict]) -> pd.DataFrame:
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR P3 Authority contract research)",
-        "Accept": "text/html,application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR P3 Authority contract research)",
+            "Accept": "text/html,application/json",
+        }
+    )
     return s
 
 
@@ -145,7 +179,7 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> requests.
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -178,33 +212,39 @@ def _scrape_p3_portal(session: requests.Session, logger) -> list[dict]:
         # Extract project names and links
         links = re.findall(
             r'<a[^>]+href=["\']([^"\']*(?:project|transaction|proyecto)[^"\']*)["\'][^>]*>([^<]{5,200})</a>',
-            resp.text, re.IGNORECASE
+            resp.text,
+            re.IGNORECASE,
         )
-        values = re.findall(r'\$[\d,]+(?:\.\d+)?(?:\s*[BM](?:illion)?)?', resp.text)
+        values = re.findall(r"\$[\d,]+(?:\.\d+)?(?:\s*[BM](?:illion)?)?", resp.text)
         sectors = re.findall(
-            r'\b(transport|water|energy|education|health|housing|airport|highway|telecom)\b',
-            resp.text, re.IGNORECASE
+            r"\b(transport|water|energy|education|health|housing|airport|highway|telecom)\b",
+            resp.text,
+            re.IGNORECASE,
         )
         logger.info(f"  P3 portal {url.split('/')[-2]}: {len(links)} project links found")
         for i, (href, title) in enumerate(links[:30]):
-            title = re.sub(r'\s+', ' ', title).strip()
+            title = re.sub(r"\s+", " ", title).strip()
             if len(title) < 5:
                 continue
             project_url = href if href.startswith("http") else f"{P3_BASE}{href}"
-            rows.append({
-                "project_id": f"P3-PORTAL-{i+1:03d}",
-                "project_name": title,
-                "sector": sectors[i] if i < len(sectors) else "",
-                "concessionaire_name": "",
-                "concessionaire_normalized": "",
-                "contract_value": values[i].replace("$", "").replace(",", "") if i < len(values) else "",
-                "term_years": "",
-                "award_date": "",
-                "financial_close_date": "",
-                "federal_funding_flag": "",
-                "status": "active",
-                "source_doc": project_url,
-            })
+            rows.append(
+                {
+                    "project_id": f"P3-PORTAL-{i + 1:03d}",
+                    "project_name": title,
+                    "sector": sectors[i] if i < len(sectors) else "",
+                    "concessionaire_name": "",
+                    "concessionaire_normalized": "",
+                    "contract_value": values[i].replace("$", "").replace(",", "")
+                    if i < len(values)
+                    else "",
+                    "term_years": "",
+                    "award_date": "",
+                    "financial_close_date": "",
+                    "federal_funding_flag": "",
+                    "status": "active",
+                    "source_doc": project_url,
+                }
+            )
         if rows:
             break
         time.sleep(PAGE_SLEEP)
@@ -238,8 +278,9 @@ def run(root: Path = None, force: bool = False) -> dict:
     logger.info(f"  Adding {len(KNOWN_P3_PROJECTS)} known P3 projects (seed data)...")
     for seed in KNOWN_P3_PROJECTS:
         # Only add if not already captured from portal
-        if not any(r.get("project_name", "").lower() == seed["project_name"].lower()
-                   for r in all_rows):
+        if not any(
+            r.get("project_name", "").lower() == seed["project_name"].lower() for r in all_rows
+        ):
             all_rows.append(seed)
 
     session.close()

@@ -17,6 +17,7 @@ Output:
 Usage:
   python3 scripts/download_sec_holdings.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -41,33 +42,75 @@ RETRY_BACKOFF = [5, 15, 30]
 
 # Known historical PR municipal bond holdings from public 13F filings (pre-2022 peak exposure)
 KNOWN_PR_HOLDINGS = [
-    {"filing_date": "2016-12-31", "fiscal_year_end": "2016",
-     "filer_name": "OppenheimerFunds", "filer_cik": "0000049071", "filer_type": "mutual_fund",
-     "security_name": "Puerto Rico GO Bonds", "cusip": "745145TN0", "issuer_name": "Commonwealth of Puerto Rico",
-     "shares_or_principal": "100000000", "market_value": "85000000",
-     "holding_type": "13F", "source_doc": "sec_edgar_13f_oppenheimer_2016"},
-    {"filing_date": "2016-12-31", "fiscal_year_end": "2016",
-     "filer_name": "Franklin Advisers", "filer_cik": "0000042888", "filer_type": "mutual_fund",
-     "security_name": "Puerto Rico Sales Tax Financing Corp (COFINA)", "cusip": "74526QAC1", "issuer_name": "COFINA",
-     "shares_or_principal": "200000000", "market_value": "160000000",
-     "holding_type": "13F", "source_doc": "sec_edgar_13f_franklin_2016"},
-    {"filing_date": "2021-12-31", "fiscal_year_end": "2021",
-     "filer_name": "Nuveen Asset Management", "filer_cik": "0000101232", "filer_type": "mutual_fund",
-     "security_name": "Puerto Rico HTA Revenue Bonds", "cusip": "745190AB2", "issuer_name": "PR Highways and Transportation Authority",
-     "shares_or_principal": "50000000", "market_value": "42000000",
-     "holding_type": "13F", "source_doc": "sec_edgar_13f_nuveen_2021"},
-    {"filing_date": "2022-03-31", "fiscal_year_end": "2022",
-     "filer_name": "Fidelity Management", "filer_cik": "0000049498", "filer_type": "mutual_fund",
-     "security_name": "Puerto Rico COFINA Senior Bonds", "cusip": "74526QBB2", "issuer_name": "COFINA",
-     "shares_or_principal": "75000000", "market_value": "70000000",
-     "holding_type": "13F", "source_doc": "sec_edgar_13f_fidelity_2022"},
+    {
+        "filing_date": "2016-12-31",
+        "fiscal_year_end": "2016",
+        "filer_name": "OppenheimerFunds",
+        "filer_cik": "0000049071",
+        "filer_type": "mutual_fund",
+        "security_name": "Puerto Rico GO Bonds",
+        "cusip": "745145TN0",
+        "issuer_name": "Commonwealth of Puerto Rico",
+        "shares_or_principal": "100000000",
+        "market_value": "85000000",
+        "holding_type": "13F",
+        "source_doc": "sec_edgar_13f_oppenheimer_2016",
+    },
+    {
+        "filing_date": "2016-12-31",
+        "fiscal_year_end": "2016",
+        "filer_name": "Franklin Advisers",
+        "filer_cik": "0000042888",
+        "filer_type": "mutual_fund",
+        "security_name": "Puerto Rico Sales Tax Financing Corp (COFINA)",
+        "cusip": "74526QAC1",
+        "issuer_name": "COFINA",
+        "shares_or_principal": "200000000",
+        "market_value": "160000000",
+        "holding_type": "13F",
+        "source_doc": "sec_edgar_13f_franklin_2016",
+    },
+    {
+        "filing_date": "2021-12-31",
+        "fiscal_year_end": "2021",
+        "filer_name": "Nuveen Asset Management",
+        "filer_cik": "0000101232",
+        "filer_type": "mutual_fund",
+        "security_name": "Puerto Rico HTA Revenue Bonds",
+        "cusip": "745190AB2",
+        "issuer_name": "PR Highways and Transportation Authority",
+        "shares_or_principal": "50000000",
+        "market_value": "42000000",
+        "holding_type": "13F",
+        "source_doc": "sec_edgar_13f_nuveen_2021",
+    },
+    {
+        "filing_date": "2022-03-31",
+        "fiscal_year_end": "2022",
+        "filer_name": "Fidelity Management",
+        "filer_cik": "0000049498",
+        "filer_type": "mutual_fund",
+        "security_name": "Puerto Rico COFINA Senior Bonds",
+        "cusip": "74526QBB2",
+        "issuer_name": "COFINA",
+        "shares_or_principal": "75000000",
+        "market_value": "70000000",
+        "holding_type": "13F",
+        "source_doc": "sec_edgar_13f_fidelity_2022",
+    },
 ]
 
 SEC_HOLDINGS_COLUMNS = [
-    "filing_date", "fiscal_year_end",
-    "filer_name", "filer_cik", "filer_type",
-    "security_name", "cusip", "issuer_name",
-    "shares_or_principal", "market_value",
+    "filing_date",
+    "fiscal_year_end",
+    "filer_name",
+    "filer_cik",
+    "filer_type",
+    "security_name",
+    "cusip",
+    "issuer_name",
+    "shares_or_principal",
+    "market_value",
     "holding_type",
     "source_doc",
 ]
@@ -84,10 +127,12 @@ KNOWN_BOND_FUND_CIKS = [
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR bond holdings research) contact@example.com",
-        "Accept": "application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR bond holdings research) contact@example.com",
+            "Accept": "application/json",
+        }
+    )
     return s
 
 
@@ -108,7 +153,7 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | li
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -137,20 +182,22 @@ def _fetch_13f_filings(session: requests.Session, logger) -> list[dict]:
 
     for hit in hits[:50]:
         src = hit.get("_source", {})
-        rows.append({
-            "filing_date": str(src.get("file_date", "")),
-            "fiscal_year_end": str(src.get("period_of_report", "")),
-            "filer_name": str(src.get("entity_name", "")),
-            "filer_cik": str(src.get("file_num", "")),
-            "filer_type": "13F_filer",
-            "security_name": "Puerto Rico municipal bonds",
-            "cusip": "",
-            "issuer_name": "Puerto Rico",
-            "shares_or_principal": "",
-            "market_value": "",
-            "holding_type": "13F",
-            "source_doc": EDGAR_EFTS_URL,
-        })
+        rows.append(
+            {
+                "filing_date": str(src.get("file_date", "")),
+                "fiscal_year_end": str(src.get("period_of_report", "")),
+                "filer_name": str(src.get("entity_name", "")),
+                "filer_cik": str(src.get("file_num", "")),
+                "filer_type": "13F_filer",
+                "security_name": "Puerto Rico municipal bonds",
+                "cusip": "",
+                "issuer_name": "Puerto Rico",
+                "shares_or_principal": "",
+                "market_value": "",
+                "holding_type": "13F",
+                "source_doc": EDGAR_EFTS_URL,
+            }
+        )
     return rows
 
 
@@ -176,20 +223,22 @@ def _fetch_nport_filings(session: requests.Session, logger) -> list[dict]:
 
     for hit in hits[:50]:
         src = hit.get("_source", {})
-        rows.append({
-            "filing_date": str(src.get("file_date", "")),
-            "fiscal_year_end": str(src.get("period_of_report", "")),
-            "filer_name": str(src.get("entity_name", "")),
-            "filer_cik": str(src.get("file_num", "")),
-            "filer_type": "mutual_fund",
-            "security_name": "Puerto Rico municipal",
-            "cusip": "",
-            "issuer_name": "Puerto Rico",
-            "shares_or_principal": "",
-            "market_value": "",
-            "holding_type": "N-PORT",
-            "source_doc": EDGAR_EFTS_URL,
-        })
+        rows.append(
+            {
+                "filing_date": str(src.get("file_date", "")),
+                "fiscal_year_end": str(src.get("period_of_report", "")),
+                "filer_name": str(src.get("entity_name", "")),
+                "filer_cik": str(src.get("file_num", "")),
+                "filer_type": "mutual_fund",
+                "security_name": "Puerto Rico municipal",
+                "cusip": "",
+                "issuer_name": "Puerto Rico",
+                "shares_or_principal": "",
+                "market_value": "",
+                "holding_type": "N-PORT",
+                "source_doc": EDGAR_EFTS_URL,
+            }
+        )
     return rows
 
 
@@ -208,22 +257,26 @@ def _fetch_known_fund_submissions(session: requests.Session, logger) -> list[dic
         for form, date, accession in zip(forms, dates, accessions):
             if form not in ("13F-HR", "N-PORT", "N-PORT/A"):
                 continue
-            rows.append({
-                "filing_date": str(date),
-                "fiscal_year_end": "",
-                "filer_name": name,
-                "filer_cik": cik,
-                "filer_type": "mutual_fund" if "N-PORT" in form else "13F_filer",
-                "security_name": "PR bonds (fund with known PR exposure)",
-                "cusip": "",
-                "issuer_name": "Puerto Rico",
-                "shares_or_principal": "",
-                "market_value": "",
-                "holding_type": "13F" if "13F" in form else "N-PORT",
-                "source_doc": url,
-            })
+            rows.append(
+                {
+                    "filing_date": str(date),
+                    "fiscal_year_end": "",
+                    "filer_name": name,
+                    "filer_cik": cik,
+                    "filer_type": "mutual_fund" if "N-PORT" in form else "13F_filer",
+                    "security_name": "PR bonds (fund with known PR exposure)",
+                    "cusip": "",
+                    "issuer_name": "Puerto Rico",
+                    "shares_or_principal": "",
+                    "market_value": "",
+                    "holding_type": "13F" if "13F" in form else "N-PORT",
+                    "source_doc": url,
+                }
+            )
         if rows:
-            logger.info(f"  CIK {cik} ({name}): {len([r for r in rows if r['filer_cik'] == cik])} filings")
+            logger.info(
+                f"  CIK {cik} ({name}): {len([r for r in rows if r['filer_cik'] == cik])} filings"
+            )
     return rows
 
 
@@ -262,7 +315,9 @@ def run(root: Path = None, force: bool = False) -> dict:
 
     # Always include known seed data so the output is never empty when APIs are blocked
     logger.info(f"  Adding {len(KNOWN_PR_HOLDINGS)} known PR bond holding seed rows...")
-    known_keys = {(r.get("filer_cik", ""), r.get("filing_date", ""), r.get("cusip", "")) for r in all_rows}
+    known_keys = {
+        (r.get("filer_cik", ""), r.get("filing_date", ""), r.get("cusip", "")) for r in all_rows
+    }
     for seed in KNOWN_PR_HOLDINGS:
         if (seed["filer_cik"], seed["filing_date"], seed["cusip"]) not in known_keys:
             all_rows.append(seed)

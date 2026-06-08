@@ -3,6 +3,7 @@
 Adds an entry per concrete adapter. Sources without a concrete adapter
 are served by :class:`NotImplementedAdapter` via :func:`get_adapter`.
 """
+
 from __future__ import annotations
 
 from pathlib import Path

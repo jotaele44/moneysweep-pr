@@ -18,6 +18,7 @@ Output:
 Usage:
   python3 scripts/download_gao_ig.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -44,60 +45,102 @@ RETRY_BACKOFF = [5, 15, 30]
 
 # Known major GAO and IG audit reports covering Puerto Rico federal programs
 KNOWN_GAO_IG_DATA = [
-    {"report_date": "2017-02-01", "report_id": "GAO-17-101",
-     "agency": "GAO", "report_source": "GAO",
-     "title": "Puerto Rico: Information on How Statehood Would Potentially Affect Selected Federal Programs",
-     "program_area": "Federal Programs", "finding_type": "informational",
-     "recommendation_count": "0", "dollar_amount_questioned": "0",
-     "status": "closed", "url": "https://www.gao.gov/products/gao-17-101",
-     "source_doc": "gao_report_gao-17-101"},
-    {"report_date": "2019-07-01", "report_id": "GAO-19-525",
-     "agency": "GAO", "report_source": "GAO",
-     "title": "Puerto Rico: Factors Contributing to the Debt Crisis and Potential Federal Actions to Address Them",
-     "program_area": "PROMESA Fiscal", "finding_type": "management_weakness",
-     "recommendation_count": "5", "dollar_amount_questioned": "0",
-     "status": "closed", "url": "https://www.gao.gov/products/gao-19-525",
-     "source_doc": "gao_report_gao-19-525"},
-    {"report_date": "2022-06-01", "report_id": "GAO-22-105291",
-     "agency": "GAO", "report_source": "GAO",
-     "title": "Puerto Rico: Actions Needed to Improve Accountability for Hurricane Recovery Funds",
-     "program_area": "FEMA Disaster Recovery", "finding_type": "fraud",
-     "recommendation_count": "8", "dollar_amount_questioned": "245000000",
-     "status": "open", "url": "https://www.gao.gov/products/gao-22-105291",
-     "source_doc": "gao_report_gao-22-105291"},
-    {"report_date": "2021-03-15", "report_id": "HUD-OIG-2021-PR-001",
-     "agency": "HUD", "report_source": "HUD_OIG",
-     "title": "HUD Did Not Effectively Monitor Puerto Rico CDBG-DR Program",
-     "program_area": "CDBG-DR", "finding_type": "management_weakness",
-     "recommendation_count": "6", "dollar_amount_questioned": "180000000",
-     "status": "partially_closed", "url": "https://www.hudoig.gov/reports-publications",
-     "source_doc": "hud_oig_2021_pr_cdbg"},
-    {"report_date": "2020-08-20", "report_id": "FEMA-OIG-20-76",
-     "agency": "FEMA", "report_source": "FEMA_OIG",
-     "title": "FEMA Needs to Address Deficiencies in Puerto Rico Public Assistance Grant Management",
-     "program_area": "FEMA PA", "finding_type": "management_weakness",
-     "recommendation_count": "4", "dollar_amount_questioned": "89000000",
-     "status": "partially_closed", "url": "https://www.oig.dhs.gov/reports",
-     "source_doc": "fema_oig_20_76"},
+    {
+        "report_date": "2017-02-01",
+        "report_id": "GAO-17-101",
+        "agency": "GAO",
+        "report_source": "GAO",
+        "title": "Puerto Rico: Information on How Statehood Would Potentially Affect Selected Federal Programs",
+        "program_area": "Federal Programs",
+        "finding_type": "informational",
+        "recommendation_count": "0",
+        "dollar_amount_questioned": "0",
+        "status": "closed",
+        "url": "https://www.gao.gov/products/gao-17-101",
+        "source_doc": "gao_report_gao-17-101",
+    },
+    {
+        "report_date": "2019-07-01",
+        "report_id": "GAO-19-525",
+        "agency": "GAO",
+        "report_source": "GAO",
+        "title": "Puerto Rico: Factors Contributing to the Debt Crisis and Potential Federal Actions to Address Them",
+        "program_area": "PROMESA Fiscal",
+        "finding_type": "management_weakness",
+        "recommendation_count": "5",
+        "dollar_amount_questioned": "0",
+        "status": "closed",
+        "url": "https://www.gao.gov/products/gao-19-525",
+        "source_doc": "gao_report_gao-19-525",
+    },
+    {
+        "report_date": "2022-06-01",
+        "report_id": "GAO-22-105291",
+        "agency": "GAO",
+        "report_source": "GAO",
+        "title": "Puerto Rico: Actions Needed to Improve Accountability for Hurricane Recovery Funds",
+        "program_area": "FEMA Disaster Recovery",
+        "finding_type": "fraud",
+        "recommendation_count": "8",
+        "dollar_amount_questioned": "245000000",
+        "status": "open",
+        "url": "https://www.gao.gov/products/gao-22-105291",
+        "source_doc": "gao_report_gao-22-105291",
+    },
+    {
+        "report_date": "2021-03-15",
+        "report_id": "HUD-OIG-2021-PR-001",
+        "agency": "HUD",
+        "report_source": "HUD_OIG",
+        "title": "HUD Did Not Effectively Monitor Puerto Rico CDBG-DR Program",
+        "program_area": "CDBG-DR",
+        "finding_type": "management_weakness",
+        "recommendation_count": "6",
+        "dollar_amount_questioned": "180000000",
+        "status": "partially_closed",
+        "url": "https://www.hudoig.gov/reports-publications",
+        "source_doc": "hud_oig_2021_pr_cdbg",
+    },
+    {
+        "report_date": "2020-08-20",
+        "report_id": "FEMA-OIG-20-76",
+        "agency": "FEMA",
+        "report_source": "FEMA_OIG",
+        "title": "FEMA Needs to Address Deficiencies in Puerto Rico Public Assistance Grant Management",
+        "program_area": "FEMA PA",
+        "finding_type": "management_weakness",
+        "recommendation_count": "4",
+        "dollar_amount_questioned": "89000000",
+        "status": "partially_closed",
+        "url": "https://www.oig.dhs.gov/reports",
+        "source_doc": "fema_oig_20_76",
+    },
 ]
 
 GAO_IG_COLUMNS = [
-    "report_date", "report_id",
-    "agency", "report_source",
-    "title", "program_area",
+    "report_date",
+    "report_id",
+    "agency",
+    "report_source",
+    "title",
+    "program_area",
     "finding_type",
-    "recommendation_count", "dollar_amount_questioned",
+    "recommendation_count",
+    "dollar_amount_questioned",
     "status",
-    "url", "source_doc",
+    "url",
+    "source_doc",
 ]
 
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR GAO/IG audit report research)",
-        "Accept": "application/json, text/html",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR GAO/IG audit report research)",
+            "Accept": "application/json, text/html",
+        }
+    )
     return s
 
 
@@ -117,7 +160,7 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> requests.
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -161,20 +204,22 @@ def _fetch_gao(session: requests.Session, logger) -> list[dict]:
             break
         for r in reports:
             title = str(r.get("title", r.get("report_title", "")))
-            rows.append({
-                "report_date": str(r.get("date_released", r.get("published_date", ""))),
-                "report_id": str(r.get("report_number", r.get("id", ""))),
-                "agency": str(r.get("agency", "")),
-                "report_source": "GAO",
-                "title": title,
-                "program_area": str(r.get("topic", r.get("category", ""))),
-                "finding_type": _detect_finding_type(title),
-                "recommendation_count": str(r.get("recommendation_count", "")),
-                "dollar_amount_questioned": str(r.get("financial_benefit_total", "")),
-                "status": str(r.get("status", "closed")),
-                "url": str(r.get("url", r.get("report_url", ""))),
-                "source_doc": GAO_API_URL,
-            })
+            rows.append(
+                {
+                    "report_date": str(r.get("date_released", r.get("published_date", ""))),
+                    "report_id": str(r.get("report_number", r.get("id", ""))),
+                    "agency": str(r.get("agency", "")),
+                    "report_source": "GAO",
+                    "title": title,
+                    "program_area": str(r.get("topic", r.get("category", ""))),
+                    "finding_type": _detect_finding_type(title),
+                    "recommendation_count": str(r.get("recommendation_count", "")),
+                    "dollar_amount_questioned": str(r.get("financial_benefit_total", "")),
+                    "status": str(r.get("status", "closed")),
+                    "url": str(r.get("url", r.get("report_url", ""))),
+                    "source_doc": GAO_API_URL,
+                }
+            )
         total = data.get("total_count", data.get("total", 0))
         logger.info(f"  GAO page {page}: {len(rows)} of {total} total reports")
         if page * 50 >= total or page >= 20:
@@ -200,37 +245,40 @@ def _scrape_hud_oig(session: requests.Session, logger) -> list[dict]:
         # Extract report links from HTML
         titles = re.findall(
             r'<a[^>]+href=["\']([^"\']*report[^"\']*)["\'][^>]*>([^<]{10,200})</a>',
-            resp.text, re.IGNORECASE
+            resp.text,
+            re.IGNORECASE,
         )
-        dates = re.findall(
-            r'(\d{1,2}/\d{1,2}/\d{4}|\d{4}-\d{2}-\d{2})',
-            resp.text
-        )
+        dates = re.findall(r"(\d{1,2}/\d{1,2}/\d{4}|\d{4}-\d{2}-\d{2})", resp.text)
         if not titles:
             break
         date_idx = 0
         for url_path, title in titles[:20]:
-            title = re.sub(r'\s+', ' ', title).strip()
+            title = re.sub(r"\s+", " ", title).strip()
             if "puerto rico" not in title.lower() and "pr" not in url_path.lower():
                 continue
-            report_url = url_path if url_path.startswith("http") else f"https://www.hudoig.gov{url_path}"
+            report_url = (
+                url_path if url_path.startswith("http") else f"https://www.hudoig.gov{url_path}"
+            )
             date = dates[date_idx] if date_idx < len(dates) else ""
             date_idx += 1
-            rows.append({
-                "report_date": date,
-                "report_id": re.search(r'(\d{4}-[A-Z]{2}-\d{4}|[A-Z]{2}\d{4})', url_path, re.I) and
-                              re.search(r'(\d{4}-[A-Z]{2}-\d{4}|[A-Z]{2}\d{4})', url_path, re.I).group(1) or "",
-                "agency": "HUD",
-                "report_source": "HUD_OIG",
-                "title": title,
-                "program_area": "HUD Programs",
-                "finding_type": _detect_finding_type(title),
-                "recommendation_count": "",
-                "dollar_amount_questioned": "",
-                "status": "closed",
-                "url": report_url,
-                "source_doc": HUD_OIG_URL,
-            })
+            rows.append(
+                {
+                    "report_date": date,
+                    "report_id": re.search(r"(\d{4}-[A-Z]{2}-\d{4}|[A-Z]{2}\d{4})", url_path, re.I)
+                    and re.search(r"(\d{4}-[A-Z]{2}-\d{4}|[A-Z]{2}\d{4})", url_path, re.I).group(1)
+                    or "",
+                    "agency": "HUD",
+                    "report_source": "HUD_OIG",
+                    "title": title,
+                    "program_area": "HUD Programs",
+                    "finding_type": _detect_finding_type(title),
+                    "recommendation_count": "",
+                    "dollar_amount_questioned": "",
+                    "status": "closed",
+                    "url": report_url,
+                    "source_doc": HUD_OIG_URL,
+                }
+            )
         if len(rows) >= 200 or len(titles) < 5:
             break
         time.sleep(PAGE_SLEEP)
@@ -247,28 +295,31 @@ def _scrape_dhs_oig(session: requests.Session, logger) -> list[dict]:
     if not resp:
         return rows
     titles = re.findall(
-        r'<a[^>]+href=["\']([^"\']+)["\'][^>]*>\s*([^<]{20,300})\s*</a>',
-        resp.text, re.IGNORECASE
+        r'<a[^>]+href=["\']([^"\']+)["\'][^>]*>\s*([^<]{20,300})\s*</a>', resp.text, re.IGNORECASE
     )
     for url_path, title in titles[:50]:
-        title = re.sub(r'\s+', ' ', title).strip()
+        title = re.sub(r"\s+", " ", title).strip()
         if not any(kw in title.lower() for kw in ["puerto rico", "fema", "maria", "disaster"]):
             continue
-        report_url = url_path if url_path.startswith("http") else f"https://www.oig.dhs.gov{url_path}"
-        rows.append({
-            "report_date": "",
-            "report_id": "",
-            "agency": "DHS/FEMA",
-            "report_source": "FEMA_OIG",
-            "title": title,
-            "program_area": "FEMA Programs",
-            "finding_type": _detect_finding_type(title),
-            "recommendation_count": "",
-            "dollar_amount_questioned": "",
-            "status": "closed",
-            "url": report_url,
-            "source_doc": DHS_OIG_URL,
-        })
+        report_url = (
+            url_path if url_path.startswith("http") else f"https://www.oig.dhs.gov{url_path}"
+        )
+        rows.append(
+            {
+                "report_date": "",
+                "report_id": "",
+                "agency": "DHS/FEMA",
+                "report_source": "FEMA_OIG",
+                "title": title,
+                "program_area": "FEMA Programs",
+                "finding_type": _detect_finding_type(title),
+                "recommendation_count": "",
+                "dollar_amount_questioned": "",
+                "status": "closed",
+                "url": report_url,
+                "source_doc": DHS_OIG_URL,
+            }
+        )
     if rows:
         logger.info(f"  DHS/FEMA OIG: {len(rows)} PR-related reports")
     return rows

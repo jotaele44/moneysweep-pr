@@ -10,6 +10,7 @@ FIPS, so municipality narrowing happens client-side via the dispatcher's
 `apply_post_ingest` call. The registry's source_id for NSF awards is
 `research_grants`.
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -83,7 +84,9 @@ class NSFAwardsAdapter(SourceAdapter):
             records = response.get("award", []) or []
             # NSF API doesn't return a total; we stop when a page comes back short.
             has_more = len(records) == PAGE_SIZE
-            return PageResult(records=records, next_marker=(offset + PAGE_SIZE) if has_more else None)
+            return PageResult(
+                records=records, next_marker=(offset + PAGE_SIZE) if has_more else None
+            )
 
         rows = list(paginate(fetch_page, start_marker=1, max_pages=MAX_PAGES))
         if not rows:

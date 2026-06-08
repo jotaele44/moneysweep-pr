@@ -9,6 +9,7 @@ Usage:
   python3 scripts/download_fema.py --hmgp-only # only Hazard Mitigation
   python3 scripts/download_fema.py --force     # re-download even if file exists
 """
+
 from __future__ import annotations
 
 import sys
@@ -81,6 +82,7 @@ MASTER_COLUMNS = [
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _get_with_retry(url: str, logger) -> dict | None:
     """
     GET the given pre-built URL (OData params already in the URL string),
@@ -92,7 +94,10 @@ def _get_with_retry(url: str, logger) -> dict | None:
             if resp.status_code in (429, 503):
                 logger.warning(
                     "HTTP %s from %s (attempt %d), sleeping %ds then retrying...",
-                    resp.status_code, url, attempt, RETRY_SLEEP,
+                    resp.status_code,
+                    url,
+                    attempt,
+                    RETRY_SLEEP,
                 )
                 if attempt == 1:
                     time.sleep(RETRY_SLEEP)
@@ -114,8 +119,9 @@ def _get_with_retry(url: str, logger) -> dict | None:
     return None
 
 
-def _paginate(endpoint: str, data_key: str, params: dict, logger,
-              simple_params: dict | None = None) -> list[dict]:
+def _paginate(
+    endpoint: str, data_key: str, params: dict, logger, simple_params: dict | None = None
+) -> list[dict]:
     """
     Paginate through an OpenFEMA endpoint using $top/$skip.
     Builds raw URL strings so OData $ operators are not percent-encoded.
@@ -138,7 +144,9 @@ def _paginate(endpoint: str, data_key: str, params: dict, logger,
             raw_url += f"&$orderby={orderby_clause}"
         if simple_params:
             for k, v in simple_params.items():
-                raw_url += f"&{urllib.parse.quote(str(k), safe='')}={urllib.parse.quote(str(v), safe='')}"
+                raw_url += (
+                    f"&{urllib.parse.quote(str(k), safe='')}={urllib.parse.quote(str(v), safe='')}"
+                )
 
         logger.info("  Fetching %s (skip=%d, top=%d)...", endpoint.split("/")[-1], skip, PAGE_SIZE)
 
@@ -195,6 +203,7 @@ def _derive_fiscal_year(date_str) -> int | None:
 # Public Assistance Funded Projects
 # ---------------------------------------------------------------------------
 
+
 def _get_pr_disaster_numbers(logger) -> list[int]:
     """
     Fetch all FEMA disaster numbers for Puerto Rico using DisasterDeclarationsSummaries,
@@ -227,7 +236,7 @@ def _fetch_pa_records(logger) -> list[dict]:
     all_records = []
     total_batches = (len(disaster_nums) + PA_DISASTER_BATCH - 1) // PA_DISASTER_BATCH
     for i, batch_start in enumerate(range(0, len(disaster_nums), PA_DISASTER_BATCH), 1):
-        batch = disaster_nums[batch_start: batch_start + PA_DISASTER_BATCH]
+        batch = disaster_nums[batch_start : batch_start + PA_DISASTER_BATCH]
         filter_expr = " or ".join(f"disasterNumber eq {n}" for n in batch)
         logger.info("  PA batch %d/%d: disaster numbers %s...", i, total_batches, batch[:3])
         records = _paginate(PA_ENDPOINT, PA_DATA_KEY, {"$filter": filter_expr}, logger)
@@ -259,22 +268,24 @@ def _normalize_pa(records: list[dict], source_file: str) -> pd.DataFrame:
         state_raw = r.get("state", "")
         pop_state = "PR" if "puerto rico" in str(state_raw).lower() else state_raw
 
-        rows.append({
-            "award_id": award_id,
-            "recipient_name": r.get("applicantName", ""),
-            "recipient_uei": "",
-            "awarding_agency": "Federal Emergency Management Agency",
-            "awarding_sub_agency": "",
-            "obligated_amount": amount,
-            "award_date": award_date,
-            "fiscal_year": _derive_fiscal_year(award_date),
-            "pop_state": pop_state,
-            "pop_county": r.get("county", ""),
-            "description": description,
-            "source_file": source_file,
-            "source_dataset": "fema_pa",
-            "award_category": "disaster_assistance",
-        })
+        rows.append(
+            {
+                "award_id": award_id,
+                "recipient_name": r.get("applicantName", ""),
+                "recipient_uei": "",
+                "awarding_agency": "Federal Emergency Management Agency",
+                "awarding_sub_agency": "",
+                "obligated_amount": amount,
+                "award_date": award_date,
+                "fiscal_year": _derive_fiscal_year(award_date),
+                "pop_state": pop_state,
+                "pop_county": r.get("county", ""),
+                "description": description,
+                "source_file": source_file,
+                "source_dataset": "fema_pa",
+                "award_category": "disaster_assistance",
+            }
+        )
 
     df = pd.DataFrame(rows, columns=MASTER_COLUMNS)
     return df
@@ -286,7 +297,10 @@ def download_pa(force: bool, logger) -> tuple[int, str]:
     Returns (row_count, master_path_str).
     """
     if PA_MASTER_PATH.exists() and not force:
-        logger.info("PA master already exists at %s — skipping (use --force to re-download).", PA_MASTER_PATH)
+        logger.info(
+            "PA master already exists at %s — skipping (use --force to re-download).",
+            PA_MASTER_PATH,
+        )
         existing = pd.read_csv(PA_MASTER_PATH, dtype=str)
         return len(existing), str(PA_MASTER_PATH)
 
@@ -316,6 +330,7 @@ def download_pa(force: bool, logger) -> tuple[int, str]:
 # ---------------------------------------------------------------------------
 # Hazard Mitigation Grant Program
 # ---------------------------------------------------------------------------
+
 
 def _fetch_hmgp_records(logger) -> tuple[list[dict], str]:
     """
@@ -375,16 +390,10 @@ def _normalize_hmgp(records: list[dict], dataset_label: str, source_file: str) -
         else:
             # HazardMitigationGrantProgramDisasterSummaries fields
             recipient_name = (
-                r.get("applicantName")
-                or r.get("subrecipientName")
-                or r.get("programTitle")
-                or ""
+                r.get("applicantName") or r.get("subrecipientName") or r.get("programTitle") or ""
             )
             description = (
-                r.get("projectTitle")
-                or r.get("programTitle")
-                or r.get("projectDescription")
-                or ""
+                r.get("projectTitle") or r.get("programTitle") or r.get("projectDescription") or ""
             )
             amount = (
                 r.get("projectAmount")
@@ -411,24 +420,30 @@ def _normalize_hmgp(records: list[dict], dataset_label: str, source_file: str) -
         award_id = f"{award_id_suffix}-{sub_num}" if sub_num else award_id_suffix
 
         state_raw = r.get("stateName") or r.get("state") or ""
-        pop_state = "PR" if "puerto rico" in str(state_raw).lower() or str(state_raw).upper() == "PR" else state_raw
+        pop_state = (
+            "PR"
+            if "puerto rico" in str(state_raw).lower() or str(state_raw).upper() == "PR"
+            else state_raw
+        )
 
-        rows.append({
-            "award_id": award_id,
-            "recipient_name": recipient_name,
-            "recipient_uei": "",
-            "awarding_agency": "Federal Emergency Management Agency",
-            "awarding_sub_agency": "",
-            "obligated_amount": amount,
-            "award_date": award_date,
-            "fiscal_year": _derive_fiscal_year(award_date),
-            "pop_state": pop_state,
-            "pop_county": county,
-            "description": description,
-            "source_file": source_file,
-            "source_dataset": "fema_hmgp",
-            "award_category": "grant",
-        })
+        rows.append(
+            {
+                "award_id": award_id,
+                "recipient_name": recipient_name,
+                "recipient_uei": "",
+                "awarding_agency": "Federal Emergency Management Agency",
+                "awarding_sub_agency": "",
+                "obligated_amount": amount,
+                "award_date": award_date,
+                "fiscal_year": _derive_fiscal_year(award_date),
+                "pop_state": pop_state,
+                "pop_county": county,
+                "description": description,
+                "source_file": source_file,
+                "source_dataset": "fema_hmgp",
+                "award_category": "grant",
+            }
+        )
 
     df = pd.DataFrame(rows, columns=MASTER_COLUMNS)
     return df
@@ -470,6 +485,7 @@ def download_hmgp(force: bool, logger) -> tuple[int, str]:
 # ---------------------------------------------------------------------------
 # Main entry point
 # ---------------------------------------------------------------------------
+
 
 def run(root: Path = None) -> dict:
     """
@@ -534,9 +550,7 @@ def main() -> int:
         hmgp_rows, hmgp_path = download_hmgp(force=args.force, logger=logger)
         logger.info("HMGP complete: %d rows → %s", hmgp_rows, hmgp_path)
 
-    logger.info(
-        "All done. PA rows: %d, HMGP rows: %d", pa_rows, hmgp_rows
-    )
+    logger.info("All done. PA rows: %d, HMGP rows: %d", pa_rows, hmgp_rows)
     return 0
 
 

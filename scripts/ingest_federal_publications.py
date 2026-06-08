@@ -11,6 +11,7 @@ sources for the money-intelligence node.
 This is additive and standalone — it does NOT modify the canonical_v1 bridge or
 its committed tables. Source xlsx lives outside the repo; pass ``--src`` to override.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -45,13 +46,16 @@ def build_sources(rows: list) -> list:
         created = _created(r.get("Year"))
         row = {
             "source_id": _sid(key),
-            "source_type": (r.get("Doc Type") or "federal_publication").strip() or "federal_publication",
+            "source_type": (r.get("Doc Type") or "federal_publication").strip()
+            or "federal_publication",
             "source_name": title[:300],
             "confidence": 1.0,
             "lineage": {
                 "producer_script": "scripts/ingest_federal_publications.py",
                 "producer_phase": "FEDERAL_PUBLICATIONS_INGEST",
-                "source_inputs": ["Puerto_Rico_Federal_Publications_Master_v7.xlsx#All Publications"],
+                "source_inputs": [
+                    "Puerto_Rico_Federal_Publications_Master_v7.xlsx#All Publications"
+                ],
                 "extraction_method": "xlsx_row_projection",
             },
             "synthetic": False,

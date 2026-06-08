@@ -47,7 +47,9 @@ def validate_file(filepath: Path, logger) -> dict:
     # File size sanity check (< 100 bytes is almost certainly empty or truncated)
     file_size = filepath.stat().st_size
     if file_size < 100:
-        result["warnings"].append(f"Suspiciously small file: {file_size} bytes (possible truncated download)")
+        result["warnings"].append(
+            f"Suspiciously small file: {file_size} bytes (possible truncated download)"
+        )
 
     # Try to read the CSV
     try:
@@ -79,7 +81,8 @@ def validate_file(filepath: Path, logger) -> dict:
 
     # Check at least one row has non-null values in key fields
     data_cols = [
-        c for c in [result["vendor_col"], result["agency_col"], result["amount_col"]]
+        c
+        for c in [result["vendor_col"], result["agency_col"], result["amount_col"]]
         if c is not None
     ]
     if data_cols:

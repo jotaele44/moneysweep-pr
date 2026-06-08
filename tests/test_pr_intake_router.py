@@ -204,11 +204,11 @@ def test_spiderweb_derivative_carries_geocode_and_asset_enrichment():
     assert deriv["latitude"] == 18.0111
     assert deriv["longitude"] == -66.6141
     assert deriv["location_text"] == "Ponce, Puerto Rico"
-    assert deriv["municipality_name"] == "Ponce"   # aliased from `municipality`
+    assert deriv["municipality_name"] == "Ponce"  # aliased from `municipality`
     assert deriv["asset_type"] == "hydrology_dataset"
     assert deriv["dataset_type"] == "lidar_dem"
     assert deriv["file_format"] == "GeoTIFF"
-    assert deriv["agency_entity"] == "USGS"          # aliased from `agency`
+    assert deriv["agency_entity"] == "USGS"  # aliased from `agency`
 
 
 def test_spiderweb_derivative_enrichment_absent_degrades_gracefully():
@@ -230,7 +230,14 @@ def test_spiderweb_derivative_enrichment_absent_degrades_gracefully():
     deriv = result.spiderweb_pr_derivative
 
     assert deriv is not None
-    for key in ("latitude", "longitude", "municipality_name", "asset_type",
-                "dataset_type", "file_format", "agency_entity"):
+    for key in (
+        "latitude",
+        "longitude",
+        "municipality_name",
+        "asset_type",
+        "dataset_type",
+        "file_format",
+        "agency_entity",
+    ):
         assert key in deriv
         assert not deriv[key]

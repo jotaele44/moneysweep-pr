@@ -15,6 +15,7 @@ the network, or stage new inputs. It is enrichment-in-place on existing
 files, so it does not violate the R4.9Z pause-lock rule prohibiting
 download retries while `unfreeze_candidates == 0`.
 """
+
 from __future__ import annotations
 
 import argparse

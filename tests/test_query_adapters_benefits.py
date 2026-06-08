@@ -1,4 +1,5 @@
 """Tests for the USASpending agency+CFDA benefit-program adapters (queue C)."""
+
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -18,8 +19,13 @@ from contract_sweeper.query.types import Query
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 BENEFIT_SOURCE_IDS = [
-    "va_benefits", "wioa", "wic", "snap_nap", "hud_hcv_section8",
-    "usace_civil_works", "fhlb",
+    "va_benefits",
+    "wioa",
+    "wic",
+    "snap_nap",
+    "hud_hcv_section8",
+    "usace_civil_works",
+    "fhlb",
 ]
 
 
@@ -86,7 +92,11 @@ def test_usace_pins_dod_toptier_and_corps_subtier():
     payload = USACECivilWorksAdapter(root=REPO_ROOT)._payload(Query(fiscal_years=(2024,)), 1)
     agencies = payload["filters"]["agencies"]
     assert {"type": "awarding", "tier": "toptier", "name": "Department of Defense"} in agencies
-    assert {"type": "awarding", "tier": "subtier", "name": "U.S. Army Corps of Engineers"} in agencies
+    assert {
+        "type": "awarding",
+        "tier": "subtier",
+        "name": "U.S. Army Corps of Engineers",
+    } in agencies
     # Grants + contracts.
     assert set(payload["filters"]["award_type_codes"]) >= {"02", "A"}
 
@@ -106,8 +116,20 @@ def test_fhlb_two_step_fdic_sdi_fetch():
     # 1st GET: PR institutions; subsequent GETs: per-CERT financials.
     session.get.side_effect = [
         _mock_response({"data": [{"data": {"CERT": "30387", "INSTNAME": "Banco Popular"}}]}),
-        _mock_response({"data": [{"data": {"CERT": "30387", "REPDTE": "20231231",
-                                           "FHLBADV": 850000000, "ASSET": 60000000000}}]}),
+        _mock_response(
+            {
+                "data": [
+                    {
+                        "data": {
+                            "CERT": "30387",
+                            "REPDTE": "20231231",
+                            "FHLBADV": 850000000,
+                            "ASSET": 60000000000,
+                        }
+                    }
+                ]
+            }
+        ),
     ]
     adapter = FHLBAdvancesAdapter(root=REPO_ROOT, session=session)
     df = adapter.fetch(Query(fiscal_years=(2023,)))

@@ -5,6 +5,7 @@ the geo-resolution vocabulary, the layer manifest, and the HQ-bias correction
 contract. Fully offline; validation uses the stdlib canonical_v1 schema
 interpreter (no ``jsonschema`` dependency).
 """
+
 from __future__ import annotations
 
 import csv
@@ -34,6 +35,7 @@ def _schema(rel: str):
 # municipality_crosswalk
 # --------------------------------------------------------------------------- #
 
+
 @pytest.mark.unit
 def test_crosswalk_locks_78_municipios():
     rows = bmc.build_rows(REPO_ROOT)
@@ -52,6 +54,7 @@ def test_crosswalk_locks_78_municipios():
 # --------------------------------------------------------------------------- #
 # geo_reason_codes
 # --------------------------------------------------------------------------- #
+
 
 @pytest.mark.unit
 def test_geo_reason_codes_match_resolver():
@@ -75,6 +78,7 @@ def test_geo_reason_codes_have_descriptions():
 # --------------------------------------------------------------------------- #
 # layer_manifest
 # --------------------------------------------------------------------------- #
+
 
 @pytest.mark.unit
 def test_layer_manifest_valid():
@@ -101,6 +105,7 @@ def test_layer_manifest_written_and_matches():
 # --------------------------------------------------------------------------- #
 # hq_bias_correction
 # --------------------------------------------------------------------------- #
+
 
 @pytest.mark.unit
 def test_hq_bias_contract_locked_to_resolver():

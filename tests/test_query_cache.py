@@ -1,4 +1,5 @@
 """Tests for the on-demand query FileCache."""
+
 from __future__ import annotations
 
 import json
@@ -44,7 +45,9 @@ def test_get_returns_none_when_no_entry(cache, sample_query):
 @pytest.mark.unit
 def test_put_then_get_roundtrip(cache, sample_query):
     df = pd.DataFrame({"award_id": ["1", "2"], "amount": ["10", "20"]})
-    cache.put("usaspending_prime", sample_query.canonical_hash(), df, query=sample_query, ttl_seconds=3600)
+    cache.put(
+        "usaspending_prime", sample_query.canonical_hash(), df, query=sample_query, ttl_seconds=3600
+    )
     hit = cache.get("usaspending_prime", sample_query.canonical_hash(), ttl_seconds=3600)
     assert hit is not None
     out_df, meta = hit
@@ -78,7 +81,13 @@ def test_get_with_corrupt_sidecar_returns_none(cache, sample_query, tmp_path):
 @pytest.mark.unit
 def test_put_creates_source_subdirectory(cache, sample_query, tmp_path):
     df = pd.DataFrame({"x": ["1"]})
-    cache.put("a_brand_new_source", sample_query.canonical_hash(), df, query=sample_query, ttl_seconds=3600)
+    cache.put(
+        "a_brand_new_source",
+        sample_query.canonical_hash(),
+        df,
+        query=sample_query,
+        ttl_seconds=3600,
+    )
     assert (tmp_path / "data" / "cache" / "a_brand_new_source").is_dir()
 
 

@@ -70,16 +70,10 @@ def unfreeze_condition(
             f"{expected_input} with matching manifest-compatible hash and nonzero rows."
         )
     if blocker_class == BLOCKER_ENDPOINT:
-        return (
-            "Restore endpoint access/credential path, deliver source file, and re-run delivery validation."
-        )
+        return "Restore endpoint access/credential path, deliver source file, and re-run delivery validation."
     if blocker_class == BLOCKER_PRODUCER:
-        return (
-            "Patch producer delivery path, regenerate source file, and pass source validation with manifest linkage."
-        )
-    return (
-        "Provide externally delivered source file and supporting provenance needed to validate and stage the expected input."
-    )
+        return "Patch producer delivery path, regenerate source file, and pass source validation with manifest linkage."
+    return "Provide externally delivered source file and supporting provenance needed to validate and stage the expected input."
 
 
 def evaluate_completion_gate(

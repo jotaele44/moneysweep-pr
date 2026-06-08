@@ -31,46 +31,86 @@ import requests
 from scripts.config import PROJECT_ROOT, setup_logging
 
 ACT60_COLUMNS = [
-    "decree_id", "entity_name", "entity_normalized",
-    "decree_type",       # "Act 20", "Act 22", "Act 60", "Act 73", etc.
-    "effective_date", "expiry_date",
-    "individual_flag",   # 1 if individual, 0 if corporate
-    "municipality", "industry_code", "source_url",
+    "decree_id",
+    "entity_name",
+    "entity_normalized",
+    "decree_type",  # "Act 20", "Act 22", "Act 60", "Act 73", etc.
+    "effective_date",
+    "expiry_date",
+    "individual_flag",  # 1 if individual, 0 if corporate
+    "municipality",
+    "industry_code",
+    "source_url",
 ]
 
 # CKAN API endpoints for data.pr.gov
 DATA_PR_GOV_URLS = [
-    "https://data.pr.gov/resource/fmnn-uqb7.json",   # incentives dataset (if exists)
+    "https://data.pr.gov/resource/fmnn-uqb7.json",  # incentives dataset (if exists)
     "https://data.pr.gov/resource/act60-decrees.json",
 ]
 
 # Known major Act 20/22/60 holders from SEC filings and DDEC annual reports
 KNOWN_ACT60_DATA = [
-    {"decree_id": "ACT20-2019-0001", "entity_name": "Popular Inc",
-     "entity_normalized": "POPULAR INC", "decree_type": "Act 20",
-     "effective_date": "2019-01-01", "expiry_date": "2034-01-01",
-     "individual_flag": "0", "municipality": "San Juan", "industry_code": "5220",
-     "source_url": "ddec_act20_registry"},
-    {"decree_id": "ACT22-2021-0001", "entity_name": "Triple-S Management Corp",
-     "entity_normalized": "TRIPLE S MANAGEMENT CORP", "decree_type": "Act 22",
-     "effective_date": "2021-06-01", "expiry_date": "2031-06-01",
-     "individual_flag": "0", "municipality": "San Juan", "industry_code": "5241",
-     "source_url": "ddec_act22_registry"},
-    {"decree_id": "ACT60-2020-0001", "entity_name": "FirstBancorp Puerto Rico",
-     "entity_normalized": "FIRSTBANCORP PUERTO RICO", "decree_type": "Act 60",
-     "effective_date": "2020-03-01", "expiry_date": "2035-03-01",
-     "individual_flag": "0", "municipality": "San Juan", "industry_code": "5221",
-     "source_url": "ddec_act60_registry"},
-    {"decree_id": "ACT60-2022-0001", "entity_name": "Luma Energy LLC",
-     "entity_normalized": "LUMA ENERGY LLC", "decree_type": "Act 60",
-     "effective_date": "2022-01-01", "expiry_date": "2037-01-01",
-     "individual_flag": "0", "municipality": "San Juan", "industry_code": "2211",
-     "source_url": "ddec_act60_registry"},
-    {"decree_id": "ACT60-2022-0002", "entity_name": "Genera PR LLC",
-     "entity_normalized": "GENERA PR LLC", "decree_type": "Act 60",
-     "effective_date": "2022-06-01", "expiry_date": "2037-06-01",
-     "individual_flag": "0", "municipality": "Ponce", "industry_code": "2211",
-     "source_url": "ddec_act60_registry"},
+    {
+        "decree_id": "ACT20-2019-0001",
+        "entity_name": "Popular Inc",
+        "entity_normalized": "POPULAR INC",
+        "decree_type": "Act 20",
+        "effective_date": "2019-01-01",
+        "expiry_date": "2034-01-01",
+        "individual_flag": "0",
+        "municipality": "San Juan",
+        "industry_code": "5220",
+        "source_url": "ddec_act20_registry",
+    },
+    {
+        "decree_id": "ACT22-2021-0001",
+        "entity_name": "Triple-S Management Corp",
+        "entity_normalized": "TRIPLE S MANAGEMENT CORP",
+        "decree_type": "Act 22",
+        "effective_date": "2021-06-01",
+        "expiry_date": "2031-06-01",
+        "individual_flag": "0",
+        "municipality": "San Juan",
+        "industry_code": "5241",
+        "source_url": "ddec_act22_registry",
+    },
+    {
+        "decree_id": "ACT60-2020-0001",
+        "entity_name": "FirstBancorp Puerto Rico",
+        "entity_normalized": "FIRSTBANCORP PUERTO RICO",
+        "decree_type": "Act 60",
+        "effective_date": "2020-03-01",
+        "expiry_date": "2035-03-01",
+        "individual_flag": "0",
+        "municipality": "San Juan",
+        "industry_code": "5221",
+        "source_url": "ddec_act60_registry",
+    },
+    {
+        "decree_id": "ACT60-2022-0001",
+        "entity_name": "Luma Energy LLC",
+        "entity_normalized": "LUMA ENERGY LLC",
+        "decree_type": "Act 60",
+        "effective_date": "2022-01-01",
+        "expiry_date": "2037-01-01",
+        "individual_flag": "0",
+        "municipality": "San Juan",
+        "industry_code": "2211",
+        "source_url": "ddec_act60_registry",
+    },
+    {
+        "decree_id": "ACT60-2022-0002",
+        "entity_name": "Genera PR LLC",
+        "entity_normalized": "GENERA PR LLC",
+        "decree_type": "Act 60",
+        "effective_date": "2022-06-01",
+        "expiry_date": "2037-06-01",
+        "individual_flag": "0",
+        "municipality": "Ponce",
+        "industry_code": "2211",
+        "source_url": "ddec_act60_registry",
+    },
 ]
 
 # DDEC direct page
@@ -94,10 +134,12 @@ def _normalize_name(name):
 
 def _session():
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0)",
-        "Accept": "application/json, text/html, */*",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0)",
+            "Accept": "application/json, text/html, */*",
+        }
+    )
     return s
 
 
@@ -106,7 +148,9 @@ def _try_data_pr_gov(session, logger):
         logger.info(f"  Trying data.pr.gov: {url}")
         try:
             resp = session.get(url, params={"$limit": 50000}, timeout=30)
-            if resp.status_code in (200, 201) and resp.headers.get("Content-Type", "").startswith("application/json"):
+            if resp.status_code in (200, 201) and resp.headers.get("Content-Type", "").startswith(
+                "application/json"
+            ):
                 data = resp.json()
                 if isinstance(data, list) and len(data) > 0:
                     logger.info(f"  Got {len(data)} records from data.pr.gov")
@@ -261,9 +305,11 @@ def _run(root=None, force=False):
             resp.raise_for_status()
             if link_type == "csv_link":
                 import io
+
                 df_raw = pd.read_csv(io.StringIO(resp.text), dtype=str, low_memory=False)
             else:
                 import io
+
                 df_raw = pd.read_excel(io.BytesIO(resp.content), dtype=str)
             df_out = _records_to_df(df_raw.to_dict("records"), full_url)
             out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -284,7 +330,11 @@ def _run(root=None, force=False):
     df_seed = _records_to_df(KNOWN_ACT60_DATA, "known_seed_data")
     df_seed.to_csv(out_path, index=False, encoding="utf-8")
     logger.info(f"  Written {len(df_seed):,} seed decree records")
-    return {"rows": len(df_seed), "path": str(out_path), "errors": errors or ["No live data source succeeded — seed data written"]}
+    return {
+        "rows": len(df_seed),
+        "path": str(out_path),
+        "errors": errors or ["No live data source succeeded — seed data written"],
+    }
 
 
 def _log_summary(df, logger):
