@@ -18,9 +18,14 @@ from pathlib import Path
 
 import pandas as pd
 
+from typing import TYPE_CHECKING
+
 from contract_sweeper.runtime.file_hash_runtime import sha256_file
 
 from .types import Query
+
+if TYPE_CHECKING:
+    from .entity_types import EntityQuery
 
 # update_cadence → TTL in seconds.
 _DAY = 86_400
@@ -97,7 +102,7 @@ class FileCache:
         query_hash: str,
         df: pd.DataFrame,
         *,
-        query: Query,
+        query: Query | EntityQuery,
         ttl_seconds: int,
     ) -> Path:
         body, manifest = self._paths(source_id, query_hash)

@@ -1,13 +1,17 @@
 [tool.mypy]
-# Lenient, gradually-typed baseline. Type checking runs report-only in CI
-# (see .github/workflows/mypy.yml) so it surfaces issues without blocking merges.
-# Tighten incrementally (drop ignore_missing_imports, add modules to strict) as
-# annotations land.
+# Gradually-typed baseline. As of Wave D (docs/BUILD_EXECUTION_SEQUENCE.md) the
+# contract_sweeper/ package type-checks clean and .github/workflows/mypy.yml is a
+# GATING check. Tighten incrementally (drop ignore_missing_imports, add modules to
+# strict) as annotations land.
 python_version = "3.10"
 ignore_missing_imports = true
 warn_unused_ignores = false
 warn_redundant_casts = true
 no_implicit_optional = true
+# follow_imports=silent type-checks only the listed package; modules reached by
+# import (e.g. scripts/) are followed for symbols but their own errors are not
+# reported yet. scripts/ is brought into scope later (sequence task 24).
+follow_imports = "silent"
 # Pipeline/CLI scripts are not yet annotated; focus checking on the package.
 files = ["contract_sweeper"]
 exclude = "(^archive/|^scripts/|tests/)"

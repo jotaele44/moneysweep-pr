@@ -129,14 +129,14 @@ def _write_manifest(
     request: dict[str, Any],
     target_abs: Path,
     resolved_source_path: str,
-) -> dict[str, str]:
+) -> dict[str, Any]:
     target_output_path = str(request.get("target_output_path", "")).strip()
     row_cnt = row_count(target_abs)
     file_sha = sha256(target_abs)
     manifest_rel = _manifest_relpath(target_output_path or str(request.get("expected_input", "")))
     manifest_abs = root / manifest_rel
 
-    payload = {
+    payload: dict[str, Any] = {
         "source_system": str(request.get("source_family", "")).strip(),
         "source_file": resolved_source_path,
         "target_output_path": target_output_path,

@@ -9,6 +9,8 @@ mypy==1.11.2
 pytest
 pytest-cov
 
-# Type stubs (expand as ignore_missing_imports is dropped — see
-# docs/BUILD_EXECUTION_SEQUENCE.md Wave D).
+# Type stubs. `requests` ships no inline types; mypy emits import-untyped (which
+# ignore_missing_imports does NOT suppress) unless these are installed, so they
+# are required for the gating mypy check. Expand as more typed deps are added.
 types-PyYAML
+types-requests

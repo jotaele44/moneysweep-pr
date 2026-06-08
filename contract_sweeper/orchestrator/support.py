@@ -122,8 +122,8 @@ def print_summary(
     normalize_count: int,
     coverage_result: int,
     root: Path,
-    dedup_stats: dict = None,
-    enrichment_result: str = None,
+    dedup_stats: dict | None = None,
+    enrichment_result: str | None = None,
 ) -> int:
     """Print final pipeline summary (Section 10 success metrics). Returns exit code."""
     # Gather coverage info if available
