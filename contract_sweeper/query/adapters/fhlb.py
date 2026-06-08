@@ -79,7 +79,7 @@ class FHLBAdvancesAdapter(SourceAdapter):
                     "format": "json",
                 }
                 data = with_retry(
-                    lambda p=params: self._get(session, FDIC_FINANCIALS_URL, p), policy=policy
+                    lambda: self._get(session, FDIC_FINANCIALS_URL, params), policy=policy
                 )
                 for rec in data.get("data") or []:
                     d = rec.get("data", rec)

@@ -74,7 +74,7 @@ class _SBACKANAdapter(SourceAdapter):
     def _discover_resource_id(self, session, policy) -> str | None:
         for pkg_id in self.package_ids:
             data = with_retry(
-                lambda pid=pkg_id: self._get(session, CKAN_PACKAGE_URL, {"id": pid}),
+                lambda: self._get(session, CKAN_PACKAGE_URL, {"id": pkg_id}),
                 policy=policy,
             )
             if data and data.get("success"):

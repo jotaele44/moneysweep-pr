@@ -48,12 +48,10 @@ _Each step keeps the existing narrow mypy gate green while widening it._
 
 18. **[done]** Fix the known `geo_attribution.py:172` dict-item return-type bug — annotation was `dict[str, dict[str, str]]` but the function returns `{by_fips, by_alias}` indexes (one more level of nesting).
 19. **[done]** Remove the `geo_attribution.py` exclude from the mypy pre-commit hook — `mypy contract_sweeper/runtime/` now clean across all 19 files.
-20. Annotate public signatures in `contract_sweeper/pipeline/*.py`. Prerequisite for 22.
-21. Annotate public signatures in `contract_sweeper/query/adapters/*.py`.
-22. Widen mypy `files` in `pyproject.toml` from `contract_sweeper` (runtime-focused) to include `pipeline/` + `query/` — depends on 20–21.
-23. Add `types-requests` / `pandas-stubs` and start dropping `ignore_missing_imports` per-module.
-24. Bring `scripts/` into mypy scope (currently excluded) — depends on annotations + 4.
-25. **(gate)** Flip `.github/workflows/mypy.yml` from `continue-on-error: true` to blocking — depends on a clean baseline across 18–24.
+20–22. **[done]** Type-clean `contract_sweeper/` (pipeline/ + query/ are already inside the `files=["contract_sweeper"]` scope). Fixed ~15 errors: implicit-`Optional` defaults, `str | None` coercion in the canonical_v1 bridge, a `Query | EntityQuery` union for `FileCache.put`/`QueryResult` (via `TYPE_CHECKING`), default-arg-lambda inference, and a few annotations. All behavior-preserving (suite still 1616 passed).
+23. **[done]** Added `types-requests` to `requirements-dev.txt` — required because mypy's `import-untyped` (stubs available on PyPI) is **not** suppressed by `ignore_missing_imports`. Dropping `ignore_missing_imports` per-module is still future work.
+24. _Pending_ — bring `scripts/` into mypy scope. Currently deferred via `follow_imports = "silent"`, so script errors are followed-for-symbols but not reported.
+25. **[done] (gate)** Flipped `.github/workflows/mypy.yml` to gating (removed `continue-on-error`); `python -m mypy` → clean across 92 files under the pinned mypy 1.11.2.
 
 ## WAVE E — Cross-repo contract hardening (corrects the #216 false positive)
 _See `docs/CODE_GAP_AND_WORKFLOW_AUDIT.md` §B1 correction._
