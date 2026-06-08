@@ -57,7 +57,9 @@ def write_heatmap(nodes: list[Any], flags: list[Any], output_csv: Path) -> None:
             )
 
 
-def write_markdown_summary(nodes: list[Any], flags: list[Any], heatmap_csv: Path, output_md: Path) -> None:
+def write_markdown_summary(
+    nodes: list[Any], flags: list[Any], heatmap_csv: Path, output_md: Path
+) -> None:
     top_flags = sorted(flags, key=lambda flag: flag.confidence, reverse=True)[:25]
     sector_counts = Counter(node.sector.value for node in nodes)
 
@@ -83,24 +85,28 @@ def write_markdown_summary(nodes: list[Any], flags: list[Any], heatmap_csv: Path
     for sector, count in sector_counts.most_common():
         lines.append(f"| {sector} | {count} |")
 
-    lines.extend([
-        "",
-        "## Top Confidence Flags",
-        "",
-        "| Rank | Entity | Flag | Dataset | Confidence |",
-        "|---:|---|---|---|---:|",
-    ])
+    lines.extend(
+        [
+            "",
+            "## Top Confidence Flags",
+            "",
+            "| Rank | Entity | Flag | Dataset | Confidence |",
+            "|---:|---|---|---|---:|",
+        ]
+    )
     for idx, flag in enumerate(top_flags, start=1):
         lines.append(
             f"| {idx} | {flag.normalized_name} | {flag.flag_type.value} | {flag.matched_dataset} | {flag.confidence:.3f} |"
         )
 
-    lines.extend([
-        "",
-        "## Analytic Constraint",
-        "",
-        "A PREPA Title III service-matrix appearance means the party was noticed or otherwise listed in a procedural stakeholder matrix. Any investigative conclusion requires corroboration from contract records, procurement files, fiscal plans, litigation dockets, or agency disclosures.",
-    ])
+    lines.extend(
+        [
+            "",
+            "## Analytic Constraint",
+            "",
+            "A PREPA Title III service-matrix appearance means the party was noticed or otherwise listed in a procedural stakeholder matrix. Any investigative conclusion requires corroboration from contract records, procurement files, fiscal plans, litigation dockets, or agency disclosures.",
+        ]
+    )
 
     output_md.parent.mkdir(parents=True, exist_ok=True)
     output_md.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -108,8 +114,12 @@ def write_markdown_summary(nodes: list[Any], flags: list[Any], heatmap_csv: Path
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run PREPA service-matrix overlap pipeline")
-    parser.add_argument("--prepa-text", required=True, type=Path, help="Text/OCR dump from PREPA service matrix PDF")
-    parser.add_argument("--datasets", nargs="+", required=True, help="Normalized FPDS/USASpending/FSRS CSV files")
+    parser.add_argument(
+        "--prepa-text", required=True, type=Path, help="Text/OCR dump from PREPA service matrix PDF"
+    )
+    parser.add_argument(
+        "--datasets", nargs="+", required=True, help="Normalized FPDS/USASpending/FSRS CSV files"
+    )
     parser.add_argument("--outdir", default=Path("outputs/prepa_titleiii"), type=Path)
     args = parser.parse_args()
 

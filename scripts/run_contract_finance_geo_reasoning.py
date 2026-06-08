@@ -33,6 +33,7 @@ Outputs (under ``--output-dir``, default ``outputs/contract_finance``):
   entity_graph_qa_report.json
   spiderweb_engine_readiness_reassessment.json
 """
+
 from __future__ import annotations
 
 import argparse
@@ -133,6 +134,7 @@ REQUIRED_ALIAS_PAIRS = (
 # Small IO / parsing helpers                                                   #
 # --------------------------------------------------------------------------- #
 
+
 def _clean(value: Any) -> str:
     if value is None:
         return ""
@@ -209,6 +211,7 @@ def _lineage(source_inputs: list[str], method: str) -> dict[str, Any]:
 # --------------------------------------------------------------------------- #
 # Crosswalk (Task 4)                                                           #
 # --------------------------------------------------------------------------- #
+
 
 def build_crosswalk_rows(ref_path: Path = MUNICIPALITIES_REF) -> list[dict[str, str]]:
     """Derive the 78-municipio crosswalk from ``pr_municipalities.csv``.
@@ -374,7 +377,9 @@ def classify_geo(geo: dict[str, Any], crosswalk: Crosswalk) -> dict[str, Any]:
         sj_flag = _compute_san_juan_bias_flag(code, reason, source, geo)
         unknown_reason = ""
         if jclass in UNKNOWN_JURISDICTIONS:
-            unknown_reason = reason if reason in UNKNOWN_REASONS else "unknown_unclassified_row_level"
+            unknown_reason = (
+                reason if reason in UNKNOWN_REASONS else "unknown_unclassified_row_level"
+            )
         return {
             "geo_resolution_method": method,
             "geo_resolution_reason": reason,
@@ -473,12 +478,16 @@ def _compute_san_juan_bias_flag(code: str, reason: str, source: str, geo: dict[s
 
 def crosswalk_name_is_san_juan(geo: dict[str, Any]) -> bool:
     text = _normalize_pr_name(_clean(geo.get("raw_name")) or _clean(geo.get("raw_municipality")))
-    return text in {_normalize_pr_name(n) for n in ("San Juan", "SAN JUAN", "SJU", "Rio Piedras", "Hato Rey", "Santurce")}
+    return text in {
+        _normalize_pr_name(n)
+        for n in ("San Juan", "SAN JUAN", "SJU", "Rio Piedras", "Hato Rey", "Santurce")
+    }
 
 
 # --------------------------------------------------------------------------- #
 # Input extraction (Task 3a / 3b)                                             #
 # --------------------------------------------------------------------------- #
+
 
 def _extract_from_master_award(row: dict[str, str]) -> dict[str, Any]:
     return {
@@ -524,7 +533,9 @@ def _extract_from_export(row: dict[str, Any], record_type: str) -> dict[str, Any
     loc = row.get("location") or {}
     return {
         "record_type": record_type,
-        "record_id": _clean(row.get("award_id") if record_type == "award" else row.get("transaction_id")),
+        "record_id": _clean(
+            row.get("award_id") if record_type == "award" else row.get("transaction_id")
+        ),
         "amount": _parse_amount(row.get("amount")),
         "event_date": _clean(row.get("award_date") or row.get("transaction_date")),
         "recipient": _clean(row.get("recipient_entity_id") or row.get("payee_entity_id")),
@@ -542,7 +553,9 @@ def _extract_from_export(row: dict[str, Any], record_type: str) -> dict[str, Any
     }
 
 
-def load_rows(processed_dir: Path, export_dir: Path | None) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+def load_rows(
+    processed_dir: Path, export_dir: Path | None
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Load row-level award + transaction rows, preferring export streams."""
     provenance: dict[str, Any] = {}
     candidate = export_dir
@@ -556,8 +569,14 @@ def load_rows(processed_dir: Path, export_dir: Path | None) -> tuple[list[dict[s
             rows += [_extract_from_export(r, "transaction") for r in _read_jsonl(txn_p)]
             provenance = {
                 "input_mode": "export_streams",
-                "source_inputs": [str(awards_p.relative_to(REPO_ROOT)) if awards_p.is_relative_to(REPO_ROOT) else str(awards_p),
-                                  str(txn_p.relative_to(REPO_ROOT)) if txn_p.is_relative_to(REPO_ROOT) else str(txn_p)],
+                "source_inputs": [
+                    str(awards_p.relative_to(REPO_ROOT))
+                    if awards_p.is_relative_to(REPO_ROOT)
+                    else str(awards_p),
+                    str(txn_p.relative_to(REPO_ROOT))
+                    if txn_p.is_relative_to(REPO_ROOT)
+                    else str(txn_p),
+                ],
             }
             return rows, provenance
 
@@ -576,6 +595,7 @@ def load_rows(processed_dir: Path, export_dir: Path | None) -> tuple[list[dict[s
 # Orchestration                                                                #
 # --------------------------------------------------------------------------- #
 
+
 def classify_rows(rows: list[dict[str, Any]], crosswalk: Crosswalk) -> list[dict[str, Any]]:
     enriched: list[dict[str, Any]] = []
     for geo in rows:
@@ -588,7 +608,9 @@ def classify_rows(rows: list[dict[str, Any]], crosswalk: Crosswalk) -> list[dict
 def _decompose_unknown(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     unknown_rows = [r for r in rows if r["jurisdiction_class"] in UNKNOWN_JURISDICTIONS]
     decomp_rows = []
-    by_reason: dict[str, dict[str, float]] = defaultdict(lambda: {"record_count": 0, "total_amount": 0.0})
+    by_reason: dict[str, dict[str, float]] = defaultdict(
+        lambda: {"record_count": 0, "total_amount": 0.0}
+    )
     for r in unknown_rows:
         reason = r.get("unknown_reason") or "unknown_unclassified_row_level"
         decomp_rows.append(
@@ -624,7 +646,9 @@ def _decompose_unknown(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]]
     return decomp_rows, summary
 
 
-def _san_juan_bias_report(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+def _san_juan_bias_report(
+    rows: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     sj_rows = [
         r
         for r in rows
@@ -813,7 +837,9 @@ def _build_graph(rows: list[dict[str, Any]], provenance: dict[str, Any]):
     return g, edge_records
 
 
-def _edge_attrs(r: dict[str, Any], rel: str, source_inputs: list[str], include_loc: bool) -> dict[str, Any]:
+def _edge_attrs(
+    r: dict[str, Any], rel: str, source_inputs: list[str], include_loc: bool
+) -> dict[str, Any]:
     is_award = r.get("record_type") == "award"
     lineage = _lineage(source_inputs, "row_level_contract_finance")
     return {
@@ -856,7 +882,9 @@ def _edge_audit(edge_records: list[dict[str, Any]]) -> tuple[list[dict[str, Any]
             "transaction_id": e["transaction_id"],
             "populated_fields": "|".join(populated),
             "metadata_field_count": len(populated),
-            "metadata_complete": e["relationship_type"] != "" and bool(e.get("lineage")) and "confidence" in e,
+            "metadata_complete": e["relationship_type"] != ""
+            and bool(e.get("lineage"))
+            and "confidence" in e,
         }
         audit_rows.append(row)
     total = len(edge_records) or 1
@@ -947,7 +975,8 @@ def _readiness_gate(
     checks.append(
         {
             "check": "edges_have_lineage_and_confidence",
-            "passed": graph_qa["edges_missing_lineage"] == 0 and graph_qa["edges_missing_confidence"] == 0,
+            "passed": graph_qa["edges_missing_lineage"] == 0
+            and graph_qa["edges_missing_confidence"] == 0,
             "edges_missing_lineage": graph_qa["edges_missing_lineage"],
             "edges_missing_confidence": graph_qa["edges_missing_confidence"],
         }
@@ -1121,14 +1150,18 @@ def run(
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--processed-dir", default=str(DEFAULT_PROCESSED_DIR))
     parser.add_argument("--export-dir", default=None)
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
     parser.add_argument("--crosswalk", default=str(DEFAULT_CROSSWALK))
     parser.add_argument("--build-crosswalk", action="store_true")
     parser.add_argument("--san-juan-threshold", type=float, default=DEFAULT_SAN_JUAN_THRESHOLD)
-    parser.add_argument("--unknown-amount-threshold", type=float, default=DEFAULT_UNKNOWN_AMOUNT_THRESHOLD)
+    parser.add_argument(
+        "--unknown-amount-threshold", type=float, default=DEFAULT_UNKNOWN_AMOUNT_THRESHOLD
+    )
     args = parser.parse_args(argv)
 
     result = run(

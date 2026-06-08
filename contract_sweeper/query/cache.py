@@ -9,6 +9,7 @@ The sidecar manifest carries `fetched_at` (UTC ISO), `ttl_seconds`, the
 canonical query dict, the row count, and the sha256 of the parquet body.
 `get()` honors the manifest's TTL — expired entries are reported as misses.
 """
+
 from __future__ import annotations
 
 import json

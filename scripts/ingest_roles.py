@@ -17,6 +17,7 @@ CLI::
     python scripts/ingest_roles.py            # write roles + evidence
     python scripts/ingest_roles.py --check     # resolve + report without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -43,9 +44,18 @@ SOURCE_NAME = "FOMB Board Membership (reference seed)"
 VALID_CATEGORIES = {"executive", "board", "officer", "agent", "advisor", "lobbyist", "other"}
 
 ROLES_COLUMNS = [
-    "role_id", "person_id", "entity_id", "role_title", "role_category",
-    "start_date", "end_date", "current", "confidence", "evidence_id",
-    "review_status", "notes",
+    "role_id",
+    "person_id",
+    "entity_id",
+    "role_title",
+    "role_category",
+    "start_date",
+    "end_date",
+    "current",
+    "confidence",
+    "evidence_id",
+    "review_status",
+    "notes",
 ]
 
 
@@ -96,20 +106,22 @@ def build_records(root: Path | None = None) -> dict[str, Any]:
                 continue
             seen.add(rid)
             evidence_rows.append(ev)
-            role_rows.append({
-                "role_id": rid,
-                "person_id": pid,
-                "entity_id": eid,
-                "role_title": title,
-                "role_category": category,
-                "start_date": (rel.get("start_date") or "").strip(),
-                "end_date": (rel.get("end_date") or "").strip(),
-                "current": (rel.get("current") or "").strip().lower(),
-                "confidence": ev.confidence,
-                "evidence_id": ev.evidence_id,
-                "review_status": "accepted",
-                "notes": "",
-            })
+            role_rows.append(
+                {
+                    "role_id": rid,
+                    "person_id": pid,
+                    "entity_id": eid,
+                    "role_title": title,
+                    "role_category": category,
+                    "start_date": (rel.get("start_date") or "").strip(),
+                    "end_date": (rel.get("end_date") or "").strip(),
+                    "current": (rel.get("current") or "").strip().lower(),
+                    "confidence": ev.confidence,
+                    "evidence_id": ev.evidence_id,
+                    "review_status": "accepted",
+                    "notes": "",
+                }
+            )
 
     return {"role_rows": role_rows, "evidence_rows": evidence_rows, "skipped": skipped}
 
@@ -151,7 +163,11 @@ def main(argv: list[str] | None = None) -> int:
     root = Path(args.root).resolve()
     if args.check:
         built = build_records(root)
-        print(json.dumps({"row_count": len(built["role_rows"]), "skipped": built["skipped"]}, indent=2))
+        print(
+            json.dumps(
+                {"row_count": len(built["role_rows"]), "skipped": built["skipped"]}, indent=2
+            )
+        )
         return 0
     print(json.dumps(ingest(root), indent=2))
     return 0

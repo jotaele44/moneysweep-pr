@@ -31,6 +31,7 @@ def test_parse_dates_invalid_coerced():
 # _match_vendor_to_lda
 # ---------------------------------------------------------------------------
 
+
 def _make_lda(names):
     return pd.DataFrame({"client_name_normalized": names})
 
@@ -69,6 +70,7 @@ def test_match_vendor_missing_column():
 # Influence score formula
 # ---------------------------------------------------------------------------
 
+
 def _influence_score(lda_flag, lobby_lead_days, lda_spend, window_days=WINDOW_DAYS):
     """Replicate the influence score formula from analyze_rfp_lobby.run()."""
     if lda_flag and lobby_lead_days is not None:
@@ -102,20 +104,21 @@ def test_influence_score_capped_at_one():
 
 
 def test_influence_score_increases_with_spend():
-    low  = _influence_score(1, 30, 0)
+    low = _influence_score(1, 30, 0)
     high = _influence_score(1, 30, 500_000)
     assert high > low
 
 
 def test_influence_score_increases_with_recency():
-    recent = _influence_score(1, 5,   0)   # lobbied 5 days before RFP
-    old    = _influence_score(1, 170, 0)   # lobbied 170 days before RFP
+    recent = _influence_score(1, 5, 0)  # lobbied 5 days before RFP
+    old = _influence_score(1, 170, 0)  # lobbied 170 days before RFP
     assert recent > old
 
 
 # ---------------------------------------------------------------------------
 # Constants sanity
 # ---------------------------------------------------------------------------
+
 
 def test_window_days_positive():
     assert WINDOW_DAYS > 0

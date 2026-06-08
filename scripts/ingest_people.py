@@ -22,6 +22,7 @@ CLI::
     python scripts/ingest_people.py            # build committed + pending tables
     python scripts/ingest_people.py --check     # summarize classification only
 """
+
 from __future__ import annotations
 
 import argparse
@@ -52,14 +53,30 @@ MANIFEST_OUT = "data/manifests/canonical_v1/people.json"
 VERIFIED_TIERS = frozenset({"T1", "T2"})
 
 PEOPLE_COLUMNS = [
-    "person_id", "full_name", "normalized_name", "aliases", "primary_role",
-    "primary_entity_id", "jurisdiction", "confidence", "evidence_id",
-    "review_status", "notes",
+    "person_id",
+    "full_name",
+    "normalized_name",
+    "aliases",
+    "primary_role",
+    "primary_entity_id",
+    "jurisdiction",
+    "confidence",
+    "evidence_id",
+    "review_status",
+    "notes",
 ]
 REVIEW_COLUMNS = [
-    "review_id", "object_type", "object_id", "issue_type", "raw_value",
-    "candidate_match", "source_name", "source_ref", "severity",
-    "recommended_action", "status",
+    "review_id",
+    "object_type",
+    "object_id",
+    "issue_type",
+    "raw_value",
+    "candidate_match",
+    "source_name",
+    "source_ref",
+    "severity",
+    "recommended_action",
+    "status",
 ]
 
 
@@ -88,11 +105,20 @@ def _aggregate(path: Path) -> dict[str, dict[str, Any]]:
                 score = int(float(row.get("flow_score") or 0))
             except ValueError:
                 score = 0
-            rec = people.setdefault(key, {
-                "display_name": name, "tiers": set(), "flows": set(),
-                "evidence_tiers": [], "max_score": -1, "any_verified": False,
-                "ambiguous": False, "first_line": line_no, "display_names": set(),
-            })
+            rec = people.setdefault(
+                key,
+                {
+                    "display_name": name,
+                    "tiers": set(),
+                    "flows": set(),
+                    "evidence_tiers": [],
+                    "max_score": -1,
+                    "any_verified": False,
+                    "ambiguous": False,
+                    "first_line": line_no,
+                    "display_names": set(),
+                },
+            )
             rec["display_names"].add(name)
             # prefer the highest-scoring spelling as the display name
             if score > rec["max_score"]:
@@ -139,27 +165,31 @@ def build_records(path: Path) -> dict[str, Any]:
                 source_name=SOURCE_NAME,
                 source_path_or_url=SOURCE,
                 page_or_line_ref=f"row {rec['first_line']}",
-                claim=(f"Registry lists '{name}' as a Puerto Rico public-money actor "
-                       f"(tiers {'/'.join(sorted(t for t in rec['tiers'] if t))}; "
-                       f"flows {_flows_str(rec)}); source-confirmed."),
+                claim=(
+                    f"Registry lists '{name}' as a Puerto Rico public-money actor "
+                    f"(tiers {'/'.join(sorted(t for t in rec['tiers'] if t))}; "
+                    f"flows {_flows_str(rec)}); source-confirmed."
+                ),
                 extraction_method="manual",
                 evidence_tier=best_tier,
                 review_status="accepted",
             )
             evidence_rows.append(ev)
-            people_rows.append({
-                "person_id": pid,
-                "full_name": name,
-                "normalized_name": normalize_person_name(name),
-                "aliases": "|".join(sorted(n for n in rec["display_names"] if n != name)),
-                "primary_role": "",
-                "primary_entity_id": "",
-                "jurisdiction": "",
-                "confidence": tier_confidence(best_tier),
-                "evidence_id": ev.evidence_id,
-                "review_status": "accepted",
-                "notes": _notes(rec),
-            })
+            people_rows.append(
+                {
+                    "person_id": pid,
+                    "full_name": name,
+                    "normalized_name": normalize_person_name(name),
+                    "aliases": "|".join(sorted(n for n in rec["display_names"] if n != name)),
+                    "primary_role": "",
+                    "primary_entity_id": "",
+                    "jurisdiction": "",
+                    "confidence": tier_confidence(best_tier),
+                    "evidence_id": ev.evidence_id,
+                    "review_status": "accepted",
+                    "notes": _notes(rec),
+                }
+            )
         else:
             if rec["ambiguous"]:
                 issue, severity = "ambiguous", "high"
@@ -169,19 +199,21 @@ def build_records(path: Path) -> dict[str, Any]:
                 issue, severity = "low_confidence", "low"
             else:
                 issue, severity = "unverified", "medium"
-            pending_rows.append({
-                "review_id": f"review_people_{name_hash(name, person=True)}",
-                "object_type": "Person",
-                "object_id": pid,
-                "issue_type": issue,
-                "raw_value": name,
-                "candidate_match": "",
-                "source_name": SOURCE_NAME,
-                "source_ref": f"row {rec['first_line']}",
-                "severity": severity,
-                "recommended_action": "verify against a primary source before promotion to people.csv",
-                "status": "open",
-            })
+            pending_rows.append(
+                {
+                    "review_id": f"review_people_{name_hash(name, person=True)}",
+                    "object_type": "Person",
+                    "object_id": pid,
+                    "issue_type": issue,
+                    "raw_value": name,
+                    "candidate_match": "",
+                    "source_name": SOURCE_NAME,
+                    "source_ref": f"row {rec['first_line']}",
+                    "severity": severity,
+                    "recommended_action": "verify against a primary source before promotion to people.csv",
+                    "status": "open",
+                }
+            )
 
     # Light dedup/merge-candidate detection among accepted nodes (first+last token).
     pending_rows.extend(_merge_candidates(people_rows))
@@ -193,7 +225,9 @@ def build_records(path: Path) -> dict[str, Any]:
         "counts": {
             "input_persons": len(people),
             "verified_accepted": len(people_rows),
-            "pending_unverified": sum(1 for r in pending_rows if r["issue_type"] != "ambiguous_merge"),
+            "pending_unverified": sum(
+                1 for r in pending_rows if r["issue_type"] != "ambiguous_merge"
+            ),
         },
     }
 
@@ -211,19 +245,21 @@ def _merge_candidates(people_rows: list[dict[str, Any]]) -> list[dict[str, Any]]
             names = sorted(r["full_name"] for r in rows)
             for r in rows:
                 others = [n for n in names if n != r["full_name"]]
-                out.append({
-                    "review_id": f"review_merge_{name_hash(r['full_name'], person=True)}",
-                    "object_type": "Person",
-                    "object_id": r["person_id"],
-                    "issue_type": "ambiguous_merge",
-                    "raw_value": r["full_name"],
-                    "candidate_match": "|".join(others),
-                    "source_name": SOURCE_NAME,
-                    "source_ref": "",
-                    "severity": "medium",
-                    "recommended_action": "confirm whether these spellings are the same person; merge if so",
-                    "status": "open",
-                })
+                out.append(
+                    {
+                        "review_id": f"review_merge_{name_hash(r['full_name'], person=True)}",
+                        "object_type": "Person",
+                        "object_id": r["person_id"],
+                        "issue_type": "ambiguous_merge",
+                        "raw_value": r["full_name"],
+                        "candidate_match": "|".join(others),
+                        "source_name": SOURCE_NAME,
+                        "source_ref": "",
+                        "severity": "medium",
+                        "recommended_action": "confirm whether these spellings are the same person; merge if so",
+                        "status": "open",
+                    }
+                )
     return out
 
 
@@ -260,9 +296,13 @@ def ingest(root: Path | None = None) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Ingest Top250 power registry into canonical_v1 people.")
+    parser = argparse.ArgumentParser(
+        description="Ingest Top250 power registry into canonical_v1 people."
+    )
     parser.add_argument("--root", default=".")
-    parser.add_argument("--check", action="store_true", help="Summarize classification without writing.")
+    parser.add_argument(
+        "--check", action="store_true", help="Summarize classification without writing."
+    )
     args = parser.parse_args(argv)
     root = Path(args.root).resolve()
 

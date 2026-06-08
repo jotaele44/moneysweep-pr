@@ -29,43 +29,130 @@ from scripts.config import PROJECT_ROOT, setup_logging
 LINKED_DIR = PROJECT_ROOT / "data" / "linked"
 
 ASSET_LINKAGE_COLUMNS = [
-    "activity_id", "grant_number", "activity_name",
-    "municipality", "municipality_matched",
+    "activity_id",
+    "grant_number",
+    "activity_name",
+    "municipality",
+    "municipality_matched",
     "county",
-    "cor3_project_id", "cor3_total_approved",
+    "cor3_project_id",
+    "cor3_total_approved",
     "municipal_finance_grade",
     "asset_type",
-    "total_budget", "amount_drawn",
+    "total_budget",
+    "amount_drawn",
 ]
 
 PR_MUNICIPALITIES = {
-    "ADJUNTAS", "AGUADA", "AGUADILLA", "AGUAS BUENAS", "AIBONITO",
-    "ANASCO", "ARECIBO", "ARROYO", "BARCELONETA", "BARRANQUITAS",
-    "BAYAMON", "CABO ROJO", "CAGUAS", "CAMUY", "CANOVANAS",
-    "CAROLINA", "CATANO", "CAYEY", "CEIBA", "CIALES",
-    "CIDRA", "COAMO", "COMERIO", "COROZAL", "CULEBRA",
-    "DORADO", "FAJARDO", "FLORIDA", "GUANICA", "GUAYAMA",
-    "GUAYANILLA", "GUAYNABO", "GURABO", "HATILLO", "HORMIGUEROS",
-    "HUMACAO", "ISABELA", "JAYUYA", "JUANA DIAZ", "JUNCOS",
-    "LAJAS", "LARES", "LAS MARIAS", "LAS PIEDRAS", "LOIZA",
-    "LUQUILLO", "MANATI", "MARICAO", "MAUNABO", "MAYAGUEZ",
-    "MOCA", "MOROVIS", "NAGUABO", "NARANJITO", "OROCOVIS",
-    "PATILLAS", "PENUELAS", "PONCE", "QUEBRADILLAS", "RINCON",
-    "RIO GRANDE", "SABANA GRANDE", "SALINAS", "SAN GERMAN", "SAN JUAN",
-    "SAN LORENZO", "SAN SEBASTIAN", "SANTA ISABEL", "TOA ALTA", "TOA BAJA",
-    "TRUJILLO ALTO", "UTUADO", "VEGA ALTA", "VEGA BAJA", "VIEQUES",
-    "VILLALBA", "YABUCOA", "YAUCO",
+    "ADJUNTAS",
+    "AGUADA",
+    "AGUADILLA",
+    "AGUAS BUENAS",
+    "AIBONITO",
+    "ANASCO",
+    "ARECIBO",
+    "ARROYO",
+    "BARCELONETA",
+    "BARRANQUITAS",
+    "BAYAMON",
+    "CABO ROJO",
+    "CAGUAS",
+    "CAMUY",
+    "CANOVANAS",
+    "CAROLINA",
+    "CATANO",
+    "CAYEY",
+    "CEIBA",
+    "CIALES",
+    "CIDRA",
+    "COAMO",
+    "COMERIO",
+    "COROZAL",
+    "CULEBRA",
+    "DORADO",
+    "FAJARDO",
+    "FLORIDA",
+    "GUANICA",
+    "GUAYAMA",
+    "GUAYANILLA",
+    "GUAYNABO",
+    "GURABO",
+    "HATILLO",
+    "HORMIGUEROS",
+    "HUMACAO",
+    "ISABELA",
+    "JAYUYA",
+    "JUANA DIAZ",
+    "JUNCOS",
+    "LAJAS",
+    "LARES",
+    "LAS MARIAS",
+    "LAS PIEDRAS",
+    "LOIZA",
+    "LUQUILLO",
+    "MANATI",
+    "MARICAO",
+    "MAUNABO",
+    "MAYAGUEZ",
+    "MOCA",
+    "MOROVIS",
+    "NAGUABO",
+    "NARANJITO",
+    "OROCOVIS",
+    "PATILLAS",
+    "PENUELAS",
+    "PONCE",
+    "QUEBRADILLAS",
+    "RINCON",
+    "RIO GRANDE",
+    "SABANA GRANDE",
+    "SALINAS",
+    "SAN GERMAN",
+    "SAN JUAN",
+    "SAN LORENZO",
+    "SAN SEBASTIAN",
+    "SANTA ISABEL",
+    "TOA ALTA",
+    "TOA BAJA",
+    "TRUJILLO ALTO",
+    "UTUADO",
+    "VEGA ALTA",
+    "VEGA BAJA",
+    "VIEQUES",
+    "VILLALBA",
+    "YABUCOA",
+    "YAUCO",
 }
 
 ASSET_TYPE_KEYWORDS = {
-    "housing":        ["housing", "home", "residential", "homeowner", "rental", "dwelling", "lihtc"],
-    "infrastructure": ["infrastructure", "road", "water", "sewer", "electric", "power", "grid", "utility", "bridge", "drainage"],
-    "economic":       ["economic", "business", "commercial", "industry", "job", "employment", "workforce"],
-    "planning":       ["planning", "design", "study", "assessment", "management", "administration"],
+    "housing": ["housing", "home", "residential", "homeowner", "rental", "dwelling", "lihtc"],
+    "infrastructure": [
+        "infrastructure",
+        "road",
+        "water",
+        "sewer",
+        "electric",
+        "power",
+        "grid",
+        "utility",
+        "bridge",
+        "drainage",
+    ],
+    "economic": [
+        "economic",
+        "business",
+        "commercial",
+        "industry",
+        "job",
+        "employment",
+        "workforce",
+    ],
+    "planning": ["planning", "design", "study", "assessment", "management", "administration"],
 }
 
-_ACCENTS = str.maketrans("áéíóúàèìòùâêîôûäëïöüñÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÄËÏÖÜÑ",
-                          "aeiouaeiouaeiouaeiounAEIOUAEIOUAEIOUAEIOUN")
+_ACCENTS = str.maketrans(
+    "áéíóúàèìòùâêîôûäëïöüñÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÄËÏÖÜÑ", "aeiouaeiouaeiouaeiounAEIOUAEIOUAEIOUAEIOUN"
+)
 
 
 def _clean_muni(name):
@@ -147,7 +234,9 @@ def run(root=None, force=False):
                 for _, r in df_municipal.iterrows():
                     key = _clean_muni(r.get(col, ""))
                     if key:
-                        muni_grade_lookup[key] = str(r.get("abre_grade", r.get("grade", ""))).strip()
+                        muni_grade_lookup[key] = str(
+                            r.get("abre_grade", r.get("grade", ""))
+                        ).strip()
                 break
 
     # Build COR3 lookup by municipality
@@ -174,35 +263,53 @@ def run(root=None, force=False):
                 act.get("activity_name", ""), act.get("activity_type", "")
             )
 
-            rows.append({
-                "activity_id":          act.get("activity_id", ""),
-                "grant_number":         act.get("grant_number", ""),
-                "activity_name":        act.get("activity_name", ""),
-                "municipality":         str(raw_muni).strip(),
-                "municipality_matched": muni_matched,
-                "county":               act.get("county", ""),
-                "cor3_project_id":      str(cor3_row.get("project_id", "")) if cor3_row else "",
-                "cor3_total_approved":  str(cor3_row.get("total_approved", "")) if cor3_row else "",
-                "municipal_finance_grade": grade,
-                "asset_type":           asset_type,
-                "total_budget":         act.get("total_budget", ""),
-                "amount_drawn":         act.get("amount_drawn", ""),
-            })
+            rows.append(
+                {
+                    "activity_id": act.get("activity_id", ""),
+                    "grant_number": act.get("grant_number", ""),
+                    "activity_name": act.get("activity_name", ""),
+                    "municipality": str(raw_muni).strip(),
+                    "municipality_matched": muni_matched,
+                    "county": act.get("county", ""),
+                    "cor3_project_id": str(cor3_row.get("project_id", "")) if cor3_row else "",
+                    "cor3_total_approved": str(cor3_row.get("total_approved", ""))
+                    if cor3_row
+                    else "",
+                    "municipal_finance_grade": grade,
+                    "asset_type": asset_type,
+                    "total_budget": act.get("total_budget", ""),
+                    "amount_drawn": act.get("amount_drawn", ""),
+                }
+            )
 
-    df_out = pd.DataFrame(rows, columns=ASSET_LINKAGE_COLUMNS) if rows else pd.DataFrame(columns=ASSET_LINKAGE_COLUMNS)
+    df_out = (
+        pd.DataFrame(rows, columns=ASSET_LINKAGE_COLUMNS)
+        if rows
+        else pd.DataFrame(columns=ASSET_LINKAGE_COLUMNS)
+    )
     df_out.to_csv(out_path, index=False, encoding="utf-8")
 
-    logger.info(f"  Asset linkage: {len(df_out):,} rows, {len(municipalities_matched)} unique municipalities matched")
-    return {"linkage_rows": len(df_out), "municipalities_matched": len(municipalities_matched), "status": "OK"}
+    logger.info(
+        f"  Asset linkage: {len(df_out):,} rows, {len(municipalities_matched)} unique municipalities matched"
+    )
+    return {
+        "linkage_rows": len(df_out),
+        "municipalities_matched": len(municipalities_matched),
+        "status": "OK",
+    }
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Link HUD DRGR activities to assets/municipalities")
+    parser = argparse.ArgumentParser(
+        description="Link HUD DRGR activities to assets/municipalities"
+    )
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     result = run(force=args.force)
-    print(f"\nHUD DRGR asset linkage: {result['linkage_rows']:,} rows, "
-          f"{result['municipalities_matched']} municipalities matched")
+    print(
+        f"\nHUD DRGR asset linkage: {result['linkage_rows']:,} rows, "
+        f"{result['municipalities_matched']} municipalities matched"
+    )
     return 0
 
 

@@ -8,6 +8,7 @@ Supports three styles common to USAspending / OpenFEMA / FEC / LDA:
 Stdlib only. The fetcher callable is provided by the ingestion script and
 must return a tuple of (records, next_marker). next_marker is None to stop.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass

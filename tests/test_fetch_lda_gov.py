@@ -17,8 +17,18 @@ def test_api_root_fixture_discovers_expected_endpoints():
 
 def test_drf_paginated_response_normalizes_correctly():
     pages = {
-        "page1": {"count": 2, "next": "page2", "previous": None, "results": [{"id": "A", "name": "Alpha LLC"}]},
-        "page2": {"count": 2, "next": None, "previous": "page1", "results": [{"id": "B", "name": "Beta LLC"}]},
+        "page1": {
+            "count": 2,
+            "next": "page2",
+            "previous": None,
+            "results": [{"id": "A", "name": "Alpha LLC"}],
+        },
+        "page2": {
+            "count": 2,
+            "next": None,
+            "previous": "page1",
+            "results": [{"id": "B", "name": "Beta LLC"}],
+        },
     }
 
     def fetcher(url: str):
@@ -26,7 +36,9 @@ def test_drf_paginated_response_normalizes_correctly():
 
     records = lda.collect_records("registrants", "page1", live=True, limit=None, fetcher=fetcher)
     rows = [
-        lda.normalize_record("registrants", record, "page1", "2026-01-01T00:00:00Z", evidence_tier="T1")
+        lda.normalize_record(
+            "registrants", record, "page1", "2026-01-01T00:00:00Z", evidence_tier="T1"
+        )
         for record in records
     ]
     assert [r["registrant_id"] for r in rows] == ["A", "B"]
@@ -108,7 +120,9 @@ def test_all_normalized_rows_contain_required_provenance_fields(tmp_path: Path):
 
 
 def test_raw_payload_stored_defaults_false():
-    row = lda.normalize_record("clients", {"id": "C1", "name": "Client"}, "url", "now", evidence_tier="T1")
+    row = lda.normalize_record(
+        "clients", {"id": "C1", "name": "Client"}, "url", "now", evidence_tier="T1"
+    )
     assert row["raw_payload_stored"] is False
     assert "raw_payload_json" not in row
 
@@ -118,7 +132,10 @@ def test_static_seed_replacement_report_marks_static_sources(tmp_path: Path):
     report = json.loads((tmp_path / "reports/lda_static_seed_replacement_report.json").read_text())
     assert report["source_id"] == "lda_gov"
     assert report["static_seed_role_after_adapter"] == "regression_fixture"
-    assert report["replacement_decision"]["uploaded_static_lda_registrant_client_filing_snapshots"] == "replaced_by_api"
+    assert (
+        report["replacement_decision"]["uploaded_static_lda_registrant_client_filing_snapshots"]
+        == "replaced_by_api"
+    )
     assert report["replacement_decision"]["Registrants.pdf"] == "retained_as_fixture"
 
 

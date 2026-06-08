@@ -221,7 +221,9 @@ def _token_score(expected_name: str, candidate_name: str) -> int:
     if expected_name.lower() == candidate_name.lower():
         score += 25
 
-    tokens = [t for t in exp_stem.replace("-", "_").split("_") if t and t not in {"pr", "master", "csv"}]
+    tokens = [
+        t for t in exp_stem.replace("-", "_").split("_") if t and t not in {"pr", "master", "csv"}
+    ]
     for token in tokens:
         if token in cand_stem:
             score += 3
@@ -321,8 +323,16 @@ def resolve_builder_input_map(root: Path) -> dict[str, Any]:
                 "mapped_input": mapped_rel,
                 "mapped_exists": bool(mapped_abs and mapped_abs.exists()),
                 "row_count": rows,
-                "manifest_exists": _manifest_exists(mapped_abs) if mapped_abs and mapped_abs.exists() else False,
-                "forbidden_candidate_count": len([p for p in forbidden_candidates if Path(p).name == Path(spec.expected_relpath).name]),
+                "manifest_exists": _manifest_exists(mapped_abs)
+                if mapped_abs and mapped_abs.exists()
+                else False,
+                "forbidden_candidate_count": len(
+                    [
+                        p
+                        for p in forbidden_candidates
+                        if Path(p).name == Path(spec.expected_relpath).name
+                    ]
+                ),
                 "notes": notes,
             }
         )
@@ -422,7 +432,9 @@ def run_recovery_and_rebuild(root: Path, *, allow_partial_rebuild: bool = False)
         "observed_summary_unique_entities": observed_summary_entities,
         "r4_gate_passed": r4_gate_passed,
         "phase_7_8_blocked": phase_7_8_blocked,
-        "phase_7_8_block_reason": "; ".join(block_reasons) if block_reasons else "R4+R5+R6 gates passed",
+        "phase_7_8_block_reason": "; ".join(block_reasons)
+        if block_reasons
+        else "R4+R5+R6 gates passed",
         "r4_outputs": {
             "master_input_recovery_audit": "data/exports/master_input_recovery_audit.csv",
             "master_input_recovery_status": "data/exports/master_input_recovery_audit.json",

@@ -2,6 +2,7 @@
 
 Hermetic: no network calls, no producer execution, no file writes.
 """
+
 from __future__ import annotations
 
 import logging

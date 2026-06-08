@@ -1,4 +1,5 @@
 """Tests for scripts/parent_collapse.py."""
+
 import csv
 
 import pytest
@@ -12,12 +13,30 @@ def entity_repo(tmp_path):
     processed = tmp_path / "data" / "staging" / "processed"
     processed.mkdir(parents=True)
     rows = [
-        {"award_id": "A1", "recipient_name": "Acme Corp", "recipient_uei": "UEI001",
-         "parent_uei": "PUEI001", "parent_name": "Acme Parent", "obligated_amount": "5000000"},
-        {"award_id": "A2", "recipient_name": "Beta LLC", "recipient_uei": "UEI002",
-         "parent_uei": "", "parent_name": "", "obligated_amount": "200000"},
-        {"award_id": "A3", "recipient_name": "Gamma Inc", "recipient_uei": "UEI003",
-         "parent_uei": "PUEI001", "parent_name": "Acme Parent", "obligated_amount": "3000000"},
+        {
+            "award_id": "A1",
+            "recipient_name": "Acme Corp",
+            "recipient_uei": "UEI001",
+            "parent_uei": "PUEI001",
+            "parent_name": "Acme Parent",
+            "obligated_amount": "5000000",
+        },
+        {
+            "award_id": "A2",
+            "recipient_name": "Beta LLC",
+            "recipient_uei": "UEI002",
+            "parent_uei": "",
+            "parent_name": "",
+            "obligated_amount": "200000",
+        },
+        {
+            "award_id": "A3",
+            "recipient_name": "Gamma Inc",
+            "recipient_uei": "UEI003",
+            "parent_uei": "PUEI001",
+            "parent_name": "Acme Parent",
+            "obligated_amount": "3000000",
+        },
     ]
     path = processed / "sample_awards.csv"
     with path.open("w", newline="") as f:
@@ -64,9 +83,16 @@ def test_build_entities_high_value_unresolved(entity_repo):
 @pytest.mark.unit
 def test_build_entities_returns_summary_keys(entity_repo):
     result = build_entities(entity_repo)
-    for key in ("entity_count", "parent_resolved_count", "resolution_rate",
-                "high_value_unresolved_count", "parent_conflict_count",
-                "entity_type_counts", "corporate_entity_count", "corporate_parent_uei_rate"):
+    for key in (
+        "entity_count",
+        "parent_resolved_count",
+        "resolution_rate",
+        "high_value_unresolved_count",
+        "parent_conflict_count",
+        "entity_type_counts",
+        "corporate_entity_count",
+        "corporate_parent_uei_rate",
+    ):
         assert key in result
 
 
@@ -120,13 +146,17 @@ def test_corporate_parent_uei_rate_excludes_government(entity_repo):
     """corporate_parent_uei_rate must only count corporate entities."""
     # Add a government row to the fixture
     govt_row = {
-        "award_id": "A4", "recipient_name": "Department of Housing of Puerto Rico",
+        "award_id": "A4",
+        "recipient_name": "Department of Housing of Puerto Rico",
         "recipient_uei": "GOVUEI000001",
-        "parent_uei": "", "parent_name": "", "obligated_amount": "50000000",
+        "parent_uei": "",
+        "parent_name": "",
+        "obligated_amount": "50000000",
     }
     csv_path = entity_repo / "data" / "staging" / "processed" / "sample_awards.csv"
     with csv_path.open("a", newline="", encoding="utf-8") as f:
         import csv as _csv
+
         w = _csv.DictWriter(f, fieldnames=list(govt_row.keys()))
         w.writerow(govt_row)
     result = build_entities(entity_repo)

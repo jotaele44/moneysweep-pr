@@ -5,6 +5,7 @@ review queue — for referential integrity: every alias and relationship resolve
 to a known master id, aliases resolve uniquely, and no review item is an orphan.
 Fully offline (reads committed CSVs only).
 """
+
 from __future__ import annotations
 
 import csv
@@ -45,7 +46,9 @@ def test_aliases_resolve_to_masters(master_ids):
     rows = _read("data/reference/entity_aliases.csv")
     assert rows
     for r in rows:
-        assert r["entity_id"] in master_ids, f"alias {r['alias']!r} -> unknown entity {r['entity_id']}"
+        assert r["entity_id"] in master_ids, (
+            f"alias {r['alias']!r} -> unknown entity {r['entity_id']}"
+        )
 
 
 @pytest.mark.unit
@@ -81,7 +84,9 @@ def test_review_queue_objects_are_not_orphans():
     assert rows
     for r in rows:
         if r["object_type"] == "person":
-            assert r["object_id"] in person_ids, f"review item references unknown person {r['object_id']}"
+            assert r["object_id"] in person_ids, (
+                f"review item references unknown person {r['object_id']}"
+            )
 
 
 @pytest.mark.unit

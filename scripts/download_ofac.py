@@ -13,6 +13,7 @@ Outputs:
 Usage:
   python3 scripts/download_ofac.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -29,24 +30,46 @@ import requests
 
 from scripts.config import PROJECT_ROOT, setup_logging
 
-OFAC_SDN_XML  = "https://www.treasury.gov/ofac/downloads/sdn.xml"
-MAX_RETRIES   = 3
+OFAC_SDN_XML = "https://www.treasury.gov/ofac/downloads/sdn.xml"
+MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 SDN_COLUMNS = ["uid", "name", "sdn_type", "programs", "aka_names"]
 
 MATCH_COLUMNS = [
-    "normalized_name", "recipient_name", "total_awards_obligated",
-    "award_count", "source_dataset", "sdn_uid", "sdn_name",
-    "sdn_type", "sdn_programs",
+    "normalized_name",
+    "recipient_name",
+    "total_awards_obligated",
+    "award_count",
+    "source_dataset",
+    "sdn_uid",
+    "sdn_name",
+    "sdn_type",
+    "sdn_programs",
 ]
 
 _STRIP_RE = re.compile(r"[^\w\s]")
 _SPACE_RE = re.compile(r"\s+")
 _SUFFIXES = {
-    "INC", "LLC", "LLP", "CORP", "CO", "LTD", "LP", "PC",
-    "PLLC", "DBA", "THE", "AND", "OF", "SA", "SRL",
-    "HOSPITAL", "HEALTH", "CENTER", "CENTRE",
+    "INC",
+    "LLC",
+    "LLP",
+    "CORP",
+    "CO",
+    "LTD",
+    "LP",
+    "PC",
+    "PLLC",
+    "DBA",
+    "THE",
+    "AND",
+    "OF",
+    "SA",
+    "SRL",
+    "HOSPITAL",
+    "HEALTH",
+    "CENTER",
+    "CENTRE",
 }
 
 
@@ -64,10 +87,12 @@ def _normalize(name: str) -> str:
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR sanctions research)",
-        "Accept":     "application/xml,text/xml",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR sanctions research)",
+            "Accept": "application/xml,text/xml",
+        }
+    )
     return s
 
 
@@ -83,7 +108,7 @@ def _download_xml(session: requests.Session, url: str, logger) -> bytes | None:
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -113,16 +138,12 @@ def _parse_sdn_xml(content: bytes, logger) -> pd.DataFrame:
 
     def _findall(el, path):
         results = el.findall(path)
-        ns_path = "/".join(
-            f"{{{NS}}}{p}" if not p.startswith("{") else p
-            for p in path.split("/")
-        )
+        ns_path = "/".join(f"{{{NS}}}{p}" if not p.startswith("{") else p for p in path.split("/"))
         if not results:
             results = el.findall(ns_path)
         if not results and _actual_ns and _actual_ns != NS:
             ns_path2 = "/".join(
-                f"{{{_actual_ns}}}{p}" if not p.startswith("{") else p
-                for p in path.split("/")
+                f"{{{_actual_ns}}}{p}" if not p.startswith("{") else p for p in path.split("/")
             )
             results = el.findall(ns_path2)
         return results
@@ -141,33 +162,44 @@ def _parse_sdn_xml(content: bytes, logger) -> pd.DataFrame:
 
     rows = []
     for entry in entries:
-        uid      = _text(entry, "uid")
-        last     = _text(entry, "lastName")
-        first    = _text(entry, "firstName")
-        name     = f"{last}, {first}".strip(", ") if first else last
+        uid = _text(entry, "uid")
+        last = _text(entry, "lastName")
+        first = _text(entry, "firstName")
+        name = f"{last}, {first}".strip(", ") if first else last
         sdn_type = _text(entry, "sdnType")
 
         prog_els = (
             entry.findall(".//program")
             or entry.findall(f".//{{{NS}}}program")
-            or (entry.findall(f".//{{{_actual_ns}}}program") if _actual_ns and _actual_ns != NS else [])
+            or (
+                entry.findall(f".//{{{_actual_ns}}}program")
+                if _actual_ns and _actual_ns != NS
+                else []
+            )
         )
         programs = "|".join(sorted({p.text.strip() for p in prog_els if p.text}))
 
         aka_els = (
-            entry.findall(".//aka/lastName") + entry.findall(".//aka/firstName")
+            entry.findall(".//aka/lastName")
+            + entry.findall(".//aka/firstName")
             + entry.findall(f".//{{{NS}}}aka/{{{NS}}}lastName")
             + entry.findall(f".//{{{NS}}}aka/{{{NS}}}firstName")
         )
         if not aka_els and _actual_ns and _actual_ns != NS:
-            aka_els = (
-                entry.findall(f".//{{{_actual_ns}}}aka/{{{_actual_ns}}}lastName")
-                + entry.findall(f".//{{{_actual_ns}}}aka/{{{_actual_ns}}}firstName")
-            )
+            aka_els = entry.findall(
+                f".//{{{_actual_ns}}}aka/{{{_actual_ns}}}lastName"
+            ) + entry.findall(f".//{{{_actual_ns}}}aka/{{{_actual_ns}}}firstName")
         akas = "|".join(sorted({el.text.strip() for el in aka_els if el.text}))
 
-        rows.append({"uid": uid, "name": name, "sdn_type": sdn_type,
-                     "programs": programs, "aka_names": akas})
+        rows.append(
+            {
+                "uid": uid,
+                "name": name,
+                "sdn_type": sdn_type,
+                "programs": programs,
+                "aka_names": akas,
+            }
+        )
 
     logger.info(f"  Parsed {len(rows):,} SDN entries")
     return pd.DataFrame(rows, columns=SDN_COLUMNS)
@@ -188,10 +220,10 @@ def _crossref(df_sdn: pd.DataFrame, awards_path: Path, logger) -> pd.DataFrame:
     entity_agg = (
         awards.groupby("_norm")
         .agg(
-            recipient_name         = ("recipient_name",  "first"),
-            total_awards_obligated = ("_amount",         "sum"),
-            award_count            = ("award_id",        "nunique"),
-            source_dataset         = ("source_dataset",  lambda x: "|".join(sorted(x.dropna().unique()))),
+            recipient_name=("recipient_name", "first"),
+            total_awards_obligated=("_amount", "sum"),
+            award_count=("award_id", "nunique"),
+            source_dataset=("source_dataset", lambda x: "|".join(sorted(x.dropna().unique()))),
         )
         .reset_index()
         .rename(columns={"_norm": "normalized_name"})
@@ -210,41 +242,48 @@ def _crossref(df_sdn: pd.DataFrame, awards_path: Path, logger) -> pd.DataFrame:
     for _, ent in entity_agg.iterrows():
         hit = sdn_index.get(ent["normalized_name"])
         if hit:
-            matches.append({
-                "normalized_name":       ent["normalized_name"],
-                "recipient_name":        ent["recipient_name"],
-                "total_awards_obligated": ent["total_awards_obligated"],
-                "award_count":           ent["award_count"],
-                "source_dataset":        ent["source_dataset"],
-                "sdn_uid":               hit["uid"],
-                "sdn_name":              hit["name"],
-                "sdn_type":              hit["sdn_type"],
-                "sdn_programs":          hit["programs"],
-            })
+            matches.append(
+                {
+                    "normalized_name": ent["normalized_name"],
+                    "recipient_name": ent["recipient_name"],
+                    "total_awards_obligated": ent["total_awards_obligated"],
+                    "award_count": ent["award_count"],
+                    "source_dataset": ent["source_dataset"],
+                    "sdn_uid": hit["uid"],
+                    "sdn_name": hit["name"],
+                    "sdn_type": hit["sdn_type"],
+                    "sdn_programs": hit["programs"],
+                }
+            )
 
-    df = pd.DataFrame(matches, columns=MATCH_COLUMNS) if matches else pd.DataFrame(columns=MATCH_COLUMNS)
+    df = (
+        pd.DataFrame(matches, columns=MATCH_COLUMNS)
+        if matches
+        else pd.DataFrame(columns=MATCH_COLUMNS)
+    )
     logger.info(f"  {len(df):,} awards-master entities matched to SDN list")
     return df
 
 
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 
-    root    = Path(root)
+    root = Path(root)
     raw_dir = root / "data" / "staging" / "raw" / "ofac"
     raw_dir.mkdir(parents=True, exist_ok=True)
     out_dir = root / "data" / "staging" / "processed"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    raw_path    = raw_dir / "sdn.xml"
-    sdn_path    = out_dir / "pr_ofac_sdn.csv"
-    match_path  = out_dir / "pr_ofac_matches.csv"
+    raw_path = raw_dir / "sdn.xml"
+    sdn_path = out_dir / "pr_ofac_sdn.csv"
+    match_path = out_dir / "pr_ofac_matches.csv"
     awards_path = out_dir / "pr_all_awards_master.csv"
 
-    logger  = setup_logging("download_ofac")
+    logger = setup_logging("download_ofac")
     session = _session()
 
     if not force and raw_path.exists():
@@ -270,7 +309,7 @@ def run(root: Path = None, force: bool = False) -> dict:
     logger.info(f"  Written: {match_path.name} ({len(df_matches):,} matches)")
 
     entity_ct = int((df_sdn["sdn_type"] == "Entity").sum())
-    indiv_ct  = int((df_sdn["sdn_type"] == "Individual").sum())
+    indiv_ct = int((df_sdn["sdn_type"] == "Individual").sum())
 
     logger.info("=" * 60)
     logger.info("OFAC SDN SUMMARY")
@@ -290,21 +329,25 @@ def run(root: Path = None, force: bool = False) -> dict:
             logger.info(f"    {str(row['recipient_name'])[:50]:<50}  {row['sdn_programs']}")
 
     return {
-        "sdn_rows":   len(df_sdn),
+        "sdn_rows": len(df_sdn),
         "match_rows": len(df_matches),
-        "status":     "OK" if len(df_sdn) > 0 else "EMPTY",
-        "sdn_path":   str(sdn_path),
+        "status": "OK" if len(df_sdn) > 0 else "EMPTY",
+        "sdn_path": str(sdn_path),
         "match_path": str(match_path),
     }
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Download OFAC SDN list and crossref against PR awards")
+    parser = argparse.ArgumentParser(
+        description="Download OFAC SDN list and crossref against PR awards"
+    )
     parser.add_argument("--force", action="store_true", help="Re-download even if cached")
     args = parser.parse_args()
     result = run(force=args.force)
-    print(f"\nOFAC complete: {result['sdn_rows']:,} SDN entries, "
-          f"{result['match_rows']:,} awards master matches.")
+    print(
+        f"\nOFAC complete: {result['sdn_rows']:,} SDN entries, "
+        f"{result['match_rows']:,} awards master matches."
+    )
     return 0 if result["status"] in ("OK", "EMPTY") else 1
 
 

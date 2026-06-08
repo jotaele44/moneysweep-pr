@@ -22,6 +22,7 @@ Evidence            ``evidence_<source>_<ref>_<hash>``
 All generated IDs match ``^<prefix>_[A-Za-z0-9_]+$`` (the canonical_v1
 schema patterns). Stdlib only.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -60,6 +61,7 @@ def name_hash(name: str | None, *, person: bool = False) -> str:
 # --------------------------------------------------------------------------- #
 # Node IDs
 # --------------------------------------------------------------------------- #
+
 
 def person_id(full_name: str | None) -> str:
     return f"person_{name_hash(full_name, person=True)}"
@@ -102,6 +104,7 @@ def property_id(name: str | None, owner: str | None = None) -> str:
 # Edge / evidence IDs
 # --------------------------------------------------------------------------- #
 
+
 def edge_id(source_node_id: str | None, edge_type: str | None, target_node_id: str | None) -> str:
     """Stable edge id from the (source, verb, target) triple."""
     payload = f"{source_node_id or ''}|{edge_type or ''}|{target_node_id or ''}"
@@ -119,6 +122,7 @@ def evidence_id(source: str | None, ref: str | None, payload: str | None = None)
 # These match the federation schema patterns ^(ent|src|rel)_[a-f0-9]{32}$.
 # --------------------------------------------------------------------------- #
 
+
 def fed_source_id(canonical_evidence_id: str | None) -> str:
     """Federation src_<32hex> derived from a canonical_v1 evidence_id."""
     return "src_" + _hash("source|" + (canonical_evidence_id or ""), 32)
@@ -129,9 +133,11 @@ def fed_entity_id(canonical_node_id: str | None) -> str:
     return "ent_" + _hash("entity|" + (canonical_node_id or ""), 32)
 
 
-def fed_relationship_id(source_node_id: str | None, edge_type: str | None,
-                        target_node_id: str | None) -> str:
+def fed_relationship_id(
+    source_node_id: str | None, edge_type: str | None, target_node_id: str | None
+) -> str:
     """Federation rel_<32hex> derived from a canonical_v1 edge triple."""
-    payload = "rel|" + (source_node_id or "") + "|" + (edge_type or "") + "|" + (target_node_id or "")
+    payload = (
+        "rel|" + (source_node_id or "") + "|" + (edge_type or "") + "|" + (target_node_id or "")
+    )
     return "rel_" + _hash(payload, 32)
-

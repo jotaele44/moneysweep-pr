@@ -39,10 +39,17 @@ AGENCY_NAME = "Department of Education"
 GRANT_TYPE_CODES = ["02", "03", "04", "05"]
 
 FIELDS = [
-    "Award ID", "Recipient Name", "recipient_uei",
-    "Awarding Agency", "Awarding Sub Agency", "Award Amount",
-    "Start Date", "Award Type",
-    "Place of Performance State Code", "Place of Performance County Name", "Description",
+    "Award ID",
+    "Recipient Name",
+    "recipient_uei",
+    "Awarding Agency",
+    "Awarding Sub Agency",
+    "Award Amount",
+    "Start Date",
+    "Award Type",
+    "Place of Performance State Code",
+    "Place of Performance County Name",
+    "Description",
 ]
 
 TIME_WINDOWS = [
@@ -53,10 +60,20 @@ TIME_WINDOWS = [
 ]
 
 MASTER_COLUMNS = [
-    "award_id", "recipient_name", "recipient_uei", "awarding_agency",
-    "awarding_sub_agency", "obligated_amount", "award_date", "fiscal_year",
-    "pop_state", "pop_county", "description", "source_file",
-    "source_dataset", "award_category",
+    "award_id",
+    "recipient_name",
+    "recipient_uei",
+    "awarding_agency",
+    "awarding_sub_agency",
+    "obligated_amount",
+    "award_date",
+    "fiscal_year",
+    "pop_state",
+    "pop_county",
+    "description",
+    "source_file",
+    "source_dataset",
+    "award_category",
 ]
 
 MAX_RETRIES = 3
@@ -146,12 +163,17 @@ def _results_to_df(results, source_file):
         return pd.DataFrame(columns=MASTER_COLUMNS)
     df = pd.json_normalize(results)
     rename_map = {
-        "Award ID": "award_id", "Recipient Name": "recipient_name",
-        "recipient_uei": "recipient_uei", "Awarding Agency": "awarding_agency",
-        "Awarding Sub Agency": "awarding_sub_agency", "Award Amount": "obligated_amount",
-        "Start Date": "award_date", "Award Type": "award_category",
+        "Award ID": "award_id",
+        "Recipient Name": "recipient_name",
+        "recipient_uei": "recipient_uei",
+        "Awarding Agency": "awarding_agency",
+        "Awarding Sub Agency": "awarding_sub_agency",
+        "Award Amount": "obligated_amount",
+        "Start Date": "award_date",
+        "Award Type": "award_category",
         "Place of Performance State Code": "pop_state",
-        "Place of Performance County Name": "pop_county", "Description": "description",
+        "Place of Performance County Name": "pop_county",
+        "Description": "description",
     }
     df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
     df["fiscal_year"] = df.get("award_date", pd.Series(dtype=str)).apply(_derive_fiscal_year)
@@ -174,7 +196,9 @@ def download_window(session, window, raw_dir, force, logger):
             logger.info(f"  Skipping {fname} (exists, {rows} rows)")
             stats[f"{filter_type}_rows"] = rows
             continue
-        logger.info(f"  Fetching {fname} ({window['start_date']} → {window['end_date']}, filter={filter_type})")
+        logger.info(
+            f"  Fetching {fname} ({window['start_date']} → {window['end_date']}, filter={filter_type})"
+        )
         results = _paginate(session, _build_payload(filter_type, window), logger)
         if not results:
             logger.warning(f"  No results for {fname}")
@@ -240,7 +264,12 @@ def _run(root=None, force=False, fy_start=None):
             stats = download_window(session, window, raw_dir, force, logger)
         except Exception as e:
             logger.error(f"  Unexpected error on {window['label']}: {e}")
-            stats = {"window": window["label"], "pop_rows": 0, "recipient_rows": 0, "errors": [str(e)]}
+            stats = {
+                "window": window["label"],
+                "pop_rows": 0,
+                "recipient_rows": 0,
+                "errors": [str(e)],
+            }
         total_pop += stats["pop_rows"]
         total_rec += stats["recipient_rows"]
         all_errors.extend(stats["errors"])
@@ -250,9 +279,12 @@ def _run(root=None, force=False, fy_start=None):
     logger.info("Building ED master...")
     master_rows = build_master(raw_dir, master_path, logger)
     summary = {
-        "raw_pop_rows": total_pop, "raw_recipient_rows": total_rec,
-        "master_rows": master_rows, "master_path": str(master_path),
-        "errors": all_errors, "windows": window_stats,
+        "raw_pop_rows": total_pop,
+        "raw_recipient_rows": total_rec,
+        "master_rows": master_rows,
+        "master_path": str(master_path),
+        "errors": all_errors,
+        "windows": window_stats,
     }
     logger.info("=" * 60)
     logger.info("ED DOWNLOAD SUMMARY")
@@ -267,7 +299,9 @@ def _run(root=None, force=False, fy_start=None):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Download Department of Education grants for Puerto Rico")
+    parser = argparse.ArgumentParser(
+        description="Download Department of Education grants for Puerto Rico"
+    )
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--fy-start", type=int, metavar="YEAR")
     args = parser.parse_args()

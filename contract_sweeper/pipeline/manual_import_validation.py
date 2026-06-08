@@ -67,12 +67,19 @@ def build_manual_import_slots(
             "slot_id": str(row.get("slot_id", "")) or f"slot_{Path(expected_input).stem}",
             "source_family": str(row.get("source_family", "unknown")),
             "expected_input": expected_input,
-            "dropzone_path": str(row.get("dropzone_path", "")) or _default_dropzone(str(row.get("source_family", "unknown")), expected_input),
-            "accepted_file_patterns": str(row.get("accepted_file_patterns", "")) or _default_patterns(str(row.get("target_output_path") or expected_input)),
+            "dropzone_path": str(row.get("dropzone_path", ""))
+            or _default_dropzone(str(row.get("source_family", "unknown")), expected_input),
+            "accepted_file_patterns": str(row.get("accepted_file_patterns", ""))
+            or _default_patterns(str(row.get("target_output_path") or expected_input)),
             "required_columns": str(row.get("required_columns", "")),
             "target_output_path": str(row.get("target_output_path") or expected_input),
-            "manifest_output_path": str(row.get("manifest_output_path") or f"{str(row.get('target_output_path') or expected_input)}.manifest.json"),
-            "source_classification": str(row.get("source_classification", "manual_import_required")),
+            "manifest_output_path": str(
+                row.get("manifest_output_path")
+                or f"{str(row.get('target_output_path') or expected_input)}.manifest.json"
+            ),
+            "source_classification": str(
+                row.get("source_classification", "manual_import_required")
+            ),
         }
 
     for row in manifest_rows:
@@ -114,7 +121,9 @@ def _read_tabular(path: Path) -> pd.DataFrame:
     raise ValueError(f"unsupported manual import format: {path}")
 
 
-def validate_manual_import_slots(root: Path, slots: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+def validate_manual_import_slots(
+    root: Path, slots: list[dict[str, Any]]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     root = Path(root)
 
     validation_rows: list[dict[str, Any]] = []
@@ -138,7 +147,9 @@ def validate_manual_import_slots(root: Path, slots: list[dict[str, Any]]) -> tup
             "required_columns": str(slot.get("required_columns", "")),
             "target_output_path": target_output,
             "manifest_output_path": str(slot.get("manifest_output_path", "")),
-            "source_classification": str(slot.get("source_classification", "manual_import_required")),
+            "source_classification": str(
+                slot.get("source_classification", "manual_import_required")
+            ),
             "slot_status": "pending_manual_file",
             "validation_passed": False,
             "error_reason": "",
@@ -170,7 +181,9 @@ def validate_manual_import_slots(root: Path, slots: list[dict[str, Any]]) -> tup
             error_rows.append(row.copy())
             continue
 
-        if patterns and not any(fnmatch.fnmatch(dropzone_abs.name, pattern) for pattern in patterns):
+        if patterns and not any(
+            fnmatch.fnmatch(dropzone_abs.name, pattern) for pattern in patterns
+        ):
             row["slot_status"] = "invalid_filename"
             row["error_reason"] = "dropzone file does not match accepted_file_patterns"
             validation_rows.append(row)

@@ -26,6 +26,7 @@ Usage:
   python3 scripts/analyze_power_network.py
   python3 scripts/analyze_power_network.py --top 100
 """
+
 from __future__ import annotations
 
 import argparse
@@ -48,12 +49,12 @@ from contract_sweeper.validation.production_status import load_current_status
 # ---------------------------------------------------------------------------
 
 WEIGHTS = {
-    "awards":    0.35,
-    "fec":       0.15,
-    "lobbying":  0.15,
+    "awards": 0.35,
+    "fec": 0.15,
+    "lobbying": 0.15,
     "nonprofit": 0.10,
-    "medicare":  0.10,
-    "presence":  0.15,
+    "medicare": 0.10,
+    "presence": 0.15,
 }
 assert abs(sum(WEIGHTS.values()) - 1.0) < 1e-9, "Weights must sum to 1"
 
@@ -65,8 +66,21 @@ assert abs(sum(WEIGHTS.values()) - 1.0) < 1e-9, "Weights must sum to 1"
 _STRIP_RE = re.compile(r"[^\w\s]")
 _SPACE_RE = re.compile(r"\s+")
 _SUFFIXES = {
-    "INC", "LLC", "LLP", "CORP", "CO", "LTD", "LP", "PC",
-    "PLLC", "DBA", "THE", "AND", "OF", "SA", "SRL",
+    "INC",
+    "LLC",
+    "LLP",
+    "CORP",
+    "CO",
+    "LTD",
+    "LP",
+    "PC",
+    "PLLC",
+    "DBA",
+    "THE",
+    "AND",
+    "OF",
+    "SA",
+    "SRL",
 }
 
 
@@ -86,6 +100,7 @@ def _normalize(name: str) -> str:
 # Min-max normalization to 0–100
 # ---------------------------------------------------------------------------
 
+
 def _minmax(series: pd.Series) -> pd.Series:
     lo, hi = series.min(), series.max()
     if hi == lo:
@@ -96,6 +111,7 @@ def _minmax(series: pd.Series) -> pd.Series:
 # ---------------------------------------------------------------------------
 # Safe file loader
 # ---------------------------------------------------------------------------
+
 
 def _load(path: Path, logger) -> pd.DataFrame | None:
     if not path.exists():
@@ -116,13 +132,14 @@ def _num(df: pd.DataFrame, col: str) -> pd.Series:
 # Core
 # ---------------------------------------------------------------------------
 
+
 def build_power_network(root: Path = None, top_n: int = 50) -> dict:
     if root is None:
         root = PROJECT_ROOT
 
-    root    = Path(root)
-    pdir    = root / "data" / "staging" / "processed"
-    logger  = setup_logging("analyze_power_network")
+    root = Path(root)
+    pdir = root / "data" / "staging" / "processed"
+    logger = setup_logging("analyze_power_network")
 
     logger.info("Building integrated PR power network...")
 
@@ -135,18 +152,18 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
         return {"rows": 0, "status": "MISSING_AWARDS"}
 
     awards = pd.read_csv(awards_path, dtype=str, low_memory=False)
-    awards["_norm"]   = awards["recipient_name"].apply(_normalize)
+    awards["_norm"] = awards["recipient_name"].apply(_normalize)
     awards["_amount"] = _num(awards, "obligated_amount")
 
     spine = (
         awards[awards["_norm"] != ""]
         .groupby("_norm")
         .agg(
-            canonical_name         = ("recipient_name",  "first"),
-            awards_total           = ("_amount",         "sum"),
-            awards_count           = ("award_id",        "nunique"),
-            awards_datasets        = ("source_dataset",  lambda x: "|".join(sorted(x.dropna().unique()))),
-            awards_fiscal_years    = ("fiscal_year",     lambda x: _yr_range(x)),
+            canonical_name=("recipient_name", "first"),
+            awards_total=("_amount", "sum"),
+            awards_count=("award_id", "nunique"),
+            awards_datasets=("source_dataset", lambda x: "|".join(sorted(x.dropna().unique()))),
+            awards_fiscal_years=("fiscal_year", lambda x: _yr_range(x)),
         )
         .reset_index()
         .rename(columns={"_norm": "norm_key"})
@@ -158,15 +175,17 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
     # ------------------------------------------------------------------
     fec_xref = _load(pdir / "pr_fec_crossref.csv", logger)
     if fec_xref is not None and not fec_xref.empty:
-        fec_xref["norm_key"] = fec_xref.get("normalized_name",
-                               fec_xref.get("fec_contributor_name", pd.Series(dtype=str))).apply(_normalize)
+        fec_xref["norm_key"] = fec_xref.get(
+            "normalized_name", fec_xref.get("fec_contributor_name", pd.Series(dtype=str))
+        ).apply(_normalize)
         fec_agg = (
             fec_xref.groupby("norm_key")
             .agg(fec_total_contributions=("total_contributions", "sum"))
             .reset_index()
         )
         fec_agg["fec_total_contributions"] = pd.to_numeric(
-            fec_agg["fec_total_contributions"], errors="coerce").fillna(0)
+            fec_agg["fec_total_contributions"], errors="coerce"
+        ).fillna(0)
     else:
         fec_agg = None
 
@@ -175,20 +194,23 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
     # ------------------------------------------------------------------
     lda_xref = _load(pdir / "pr_lobbying_crossref.csv", logger)
     if lda_xref is not None and not lda_xref.empty:
-        lda_xref["norm_key"] = lda_xref.get("normalized_name",
-                               lda_xref.get("lda_client_name", pd.Series(dtype=str))).apply(_normalize)
+        lda_xref["norm_key"] = lda_xref.get(
+            "normalized_name", lda_xref.get("lda_client_name", pd.Series(dtype=str))
+        ).apply(_normalize)
         lda_agg = (
             lda_xref.groupby("norm_key")
             .agg(
-                lda_client_expenses   = ("total_client_expenses",   "sum"),
-                lda_registrant_income = ("total_registrant_income", "sum"),
-                lda_filing_count      = ("filing_count",            "sum"),
+                lda_client_expenses=("total_client_expenses", "sum"),
+                lda_registrant_income=("total_registrant_income", "sum"),
+                lda_filing_count=("filing_count", "sum"),
             )
             .reset_index()
         )
         for col in ["lda_client_expenses", "lda_registrant_income"]:
             lda_agg[col] = pd.to_numeric(lda_agg[col], errors="coerce").fillna(0)
-        lda_agg["lda_lobbying_total"] = lda_agg["lda_client_expenses"] + lda_agg["lda_registrant_income"]
+        lda_agg["lda_lobbying_total"] = (
+            lda_agg["lda_client_expenses"] + lda_agg["lda_registrant_income"]
+        )
     else:
         lda_agg = None
 
@@ -198,20 +220,27 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
     df_990 = _load(pdir / "pr_nonprofits.csv", logger)
     if df_990 is not None and not df_990.empty:
         df_990["norm_key"] = df_990["name"].apply(_normalize)
-        np_agg = (
-            df_990.drop_duplicates("norm_key")
-            [["norm_key", "ein", "ntee_category", "total_revenue", "total_assets",
-              "grants_paid", "revenue_trend"]]
-            .copy()
-        )
+        np_agg = df_990.drop_duplicates("norm_key")[
+            [
+                "norm_key",
+                "ein",
+                "ntee_category",
+                "total_revenue",
+                "total_assets",
+                "grants_paid",
+                "revenue_trend",
+            ]
+        ].copy()
         for col in ["total_revenue", "total_assets", "grants_paid"]:
             np_agg[col] = pd.to_numeric(np_agg[col], errors="coerce").fillna(0)
-        np_agg = np_agg.rename(columns={
-            "total_revenue": "np_revenue",
-            "total_assets":  "np_assets",
-            "grants_paid":   "np_grants_paid",
-            "revenue_trend": "np_revenue_trend",
-        })
+        np_agg = np_agg.rename(
+            columns={
+                "total_revenue": "np_revenue",
+                "total_assets": "np_assets",
+                "grants_paid": "np_grants_paid",
+                "revenue_trend": "np_revenue_trend",
+            }
+        )
     else:
         np_agg = None
 
@@ -222,20 +251,25 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
     if df_cms is not None and not df_cms.empty:
         for c in ["provider_last_name", "provider_first_name"]:
             df_cms[c] = df_cms.get(c, pd.Series(dtype=str)).fillna("")
-        df_cms["_full"] = (df_cms["provider_last_name"] + " " + df_cms["provider_first_name"]).str.strip()
+        df_cms["_full"] = (
+            df_cms["provider_last_name"] + " " + df_cms["provider_first_name"]
+        ).str.strip()
         df_cms["norm_key"] = df_cms["_full"].apply(_normalize)
         cms_agg = (
             df_cms[df_cms["norm_key"] != ""]
-            .drop_duplicates("norm_key")
-            [["norm_key", "provider_type", "total_medicare_payment", "total_unique_benes"]]
+            .drop_duplicates("norm_key")[
+                ["norm_key", "provider_type", "total_medicare_payment", "total_unique_benes"]
+            ]
             .copy()
         )
         for col in ["total_medicare_payment", "total_unique_benes"]:
             cms_agg[col] = pd.to_numeric(cms_agg[col], errors="coerce").fillna(0)
-        cms_agg = cms_agg.rename(columns={
-            "total_medicare_payment": "cms_medicare_payment",
-            "total_unique_benes":     "cms_patient_count",
-        })
+        cms_agg = cms_agg.rename(
+            columns={
+                "total_medicare_payment": "cms_medicare_payment",
+                "total_unique_benes": "cms_patient_count",
+            }
+        )
     else:
         cms_agg = None
 
@@ -270,8 +304,12 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
         merged["cms_medicare_payment"] = 0.0
 
     # Fill numeric NaN
-    for col in ["fec_total_contributions", "lda_lobbying_total",
-                "np_revenue", "cms_medicare_payment"]:
+    for col in [
+        "fec_total_contributions",
+        "lda_lobbying_total",
+        "np_revenue",
+        "cms_medicare_payment",
+    ]:
         if col in merged.columns:
             merged[col] = pd.to_numeric(merged[col], errors="coerce").fillna(0.0)
         else:
@@ -281,30 +319,42 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
     # Cross-source presence score (0–5 = number of datasets entity appears in)
     # ------------------------------------------------------------------
     merged["source_presence"] = (
-        (merged["awards_total"] > 0).astype(int) +
-        (merged.get("fec_total_contributions", pd.Series([0]*len(merged))).fillna(0) > 0).astype(int) +
-        (merged.get("lda_lobbying_total",       pd.Series([0]*len(merged))).fillna(0) > 0).astype(int) +
-        (merged.get("np_revenue",               pd.Series([0]*len(merged))).fillna(0) > 0).astype(int) +
-        (merged.get("cms_medicare_payment",     pd.Series([0]*len(merged))).fillna(0) > 0).astype(int)
+        (merged["awards_total"] > 0).astype(int)
+        + (
+            merged.get("fec_total_contributions", pd.Series([0] * len(merged))).fillna(0) > 0
+        ).astype(int)
+        + (merged.get("lda_lobbying_total", pd.Series([0] * len(merged))).fillna(0) > 0).astype(int)
+        + (merged.get("np_revenue", pd.Series([0] * len(merged))).fillna(0) > 0).astype(int)
+        + (merged.get("cms_medicare_payment", pd.Series([0] * len(merged))).fillna(0) > 0).astype(
+            int
+        )
     )
 
     # ------------------------------------------------------------------
     # Normalize each axis and compute composite score
     # ------------------------------------------------------------------
-    merged["score_awards"]    = _minmax(merged["awards_total"])
-    merged["score_fec"]       = _minmax(merged.get("fec_total_contributions", pd.Series([0]*len(merged))).fillna(0))
-    merged["score_lobbying"]  = _minmax(merged.get("lda_lobbying_total", pd.Series([0]*len(merged))).fillna(0))
-    merged["score_nonprofit"] = _minmax(merged.get("np_revenue", pd.Series([0]*len(merged))).fillna(0))
-    merged["score_medicare"]  = _minmax(merged.get("cms_medicare_payment", pd.Series([0]*len(merged))).fillna(0))
-    merged["score_presence"]  = merged["source_presence"] / 5 * 100
+    merged["score_awards"] = _minmax(merged["awards_total"])
+    merged["score_fec"] = _minmax(
+        merged.get("fec_total_contributions", pd.Series([0] * len(merged))).fillna(0)
+    )
+    merged["score_lobbying"] = _minmax(
+        merged.get("lda_lobbying_total", pd.Series([0] * len(merged))).fillna(0)
+    )
+    merged["score_nonprofit"] = _minmax(
+        merged.get("np_revenue", pd.Series([0] * len(merged))).fillna(0)
+    )
+    merged["score_medicare"] = _minmax(
+        merged.get("cms_medicare_payment", pd.Series([0] * len(merged))).fillna(0)
+    )
+    merged["score_presence"] = merged["source_presence"] / 5 * 100
 
     merged["influence_score"] = (
-        merged["score_awards"]    * WEIGHTS["awards"] +
-        merged["score_fec"]       * WEIGHTS["fec"] +
-        merged["score_lobbying"]  * WEIGHTS["lobbying"] +
-        merged["score_nonprofit"] * WEIGHTS["nonprofit"] +
-        merged["score_medicare"]  * WEIGHTS["medicare"] +
-        merged["score_presence"]  * WEIGHTS["presence"]
+        merged["score_awards"] * WEIGHTS["awards"]
+        + merged["score_fec"] * WEIGHTS["fec"]
+        + merged["score_lobbying"] * WEIGHTS["lobbying"]
+        + merged["score_nonprofit"] * WEIGHTS["nonprofit"]
+        + merged["score_medicare"] * WEIGHTS["medicare"]
+        + merged["score_presence"] * WEIGHTS["presence"]
     ).round(2)
 
     merged = merged.sort_values("influence_score", ascending=False).reset_index(drop=True)
@@ -321,12 +371,12 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
     top_entities = []
     for _, row in merged.head(top_n).iterrows():
         entry = {
-            "rank":            int(row["rank"]),
-            "name":            str(row["canonical_name"]),
+            "rank": int(row["rank"]),
+            "name": str(row["canonical_name"]),
             "influence_score": float(row["influence_score"]),
-            "awards_total":    float(row["awards_total"]),
+            "awards_total": float(row["awards_total"]),
             "source_presence": int(row["source_presence"]),
-            "sources":         [],
+            "sources": [],
         }
         if row["awards_total"] > 0:
             entry["sources"].append("awards")
@@ -341,24 +391,26 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
         top_entities.append(entry)
 
     total_awards_val = float(merged["awards_total"].sum())
-    multi_source     = int((merged["source_presence"] >= 2).sum())
-    loop_entities    = int((
-        (merged.get("fec_total_contributions", 0) > 0) &
-        (merged.get("lda_lobbying_total", 0) > 0) &
-        (merged["awards_total"] > 0)
-    ).sum())
+    multi_source = int((merged["source_presence"] >= 2).sum())
+    loop_entities = int(
+        (
+            (merged.get("fec_total_contributions", 0) > 0)
+            & (merged.get("lda_lobbying_total", 0) > 0)
+            & (merged["awards_total"] > 0)
+        ).sum()
+    )
     status_payload = load_current_status(root)
 
     summary = {
-        "total_entities":     len(merged),
-        "total_awards_usd":   total_awards_val,
+        "total_entities": len(merged),
+        "total_awards_usd": total_awards_val,
         "multi_source_count": multi_source,
-        "full_loop_count":    loop_entities,
+        "full_loop_count": loop_entities,
         "production_status": status_payload["production_status"],
         "production_status_message": status_payload["status_message"],
-        "sources_included":   sorted(sources_present),
-        "score_weights":      WEIGHTS,
-        "top_entities":       top_entities,
+        "sources_included": sorted(sources_present),
+        "score_weights": WEIGHTS,
+        "top_entities": top_entities,
     }
 
     summary_path = pdir / "pr_power_network_summary.json"
@@ -378,11 +430,10 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
     logger.info("    (awards + FEC + lobbying)")
     logger.info(f"  Total federal awards:        ${total_awards_val:,.0f}")
     logger.info(f"  Data sources included:       {', '.join(sorted(sources_present))}")
-    logger.info("\n  Score weights: " +
-                ", ".join(f"{k}={v:.0%}" for k, v in WEIGHTS.items()))
+    logger.info("\n  Score weights: " + ", ".join(f"{k}={v:.0%}" for k, v in WEIGHTS.items()))
     logger.info("\n  TOP 20 ENTITIES BY INFLUENCE SCORE:")
     logger.info(f"  {'Rank':<5} {'Score':>6}  {'Entity':<52}  {'Awards':>14}  Src")
-    logger.info(f"  {'-'*4} {'-'*6}  {'-'*52}  {'-'*14}  ---")
+    logger.info(f"  {'-' * 4} {'-' * 6}  {'-' * 52}  {'-' * 14}  ---")
     for _, row in merged.head(20).iterrows():
         sources = []
         if row.get("fec_total_contributions", 0) > 0:
@@ -402,12 +453,12 @@ def build_power_network(root: Path = None, top_n: int = 50) -> dict:
     logger.info("  (F=FEC  L=Lobbying  N=Nonprofit  M=Medicare)")
 
     return {
-        "rows":           len(merged),
-        "multi_source":   multi_source,
-        "full_loop":      loop_entities,
-        "status":         "OK",
-        "network_path":   str(net_path),
-        "summary_path":   str(summary_path),
+        "rows": len(merged),
+        "multi_source": multi_source,
+        "full_loop": loop_entities,
+        "status": "OK",
+        "network_path": str(net_path),
+        "summary_path": str(summary_path),
     }
 
 
@@ -421,12 +472,18 @@ def _yr_range(series: pd.Series) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build PR integrated power network analysis")
-    parser.add_argument("--top", type=int, default=50,
-                        help="Number of top entities to include in summary JSON (default: 50)")
+    parser.add_argument(
+        "--top",
+        type=int,
+        default=50,
+        help="Number of top entities to include in summary JSON (default: 50)",
+    )
     args = parser.parse_args()
     result = build_power_network(top_n=args.top)
-    print(f"\nPower network complete: {result['rows']:,} entities ranked, "
-          f"{result['full_loop']:,} full-loop entities → {result.get('network_path', '')}")
+    print(
+        f"\nPower network complete: {result['rows']:,} entities ranked, "
+        f"{result['full_loop']:,} full-loop entities → {result.get('network_path', '')}"
+    )
     return 0
 
 

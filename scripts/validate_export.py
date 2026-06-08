@@ -11,6 +11,7 @@ Public API::
 
 Returns ``[]`` on a clean package. CLI wraps this and exits 1 on any error.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -110,11 +111,7 @@ def _parse_tz_aware(value: Any) -> datetime | None:
 
 
 def _is_finite_number(value: Any) -> bool:
-    return (
-        isinstance(value, (int, float))
-        and not isinstance(value, bool)
-        and math.isfinite(value)
-    )
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
 
 def _check_location(location: Any, loc: str) -> list[ValidationError]:

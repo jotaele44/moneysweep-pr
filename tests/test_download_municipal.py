@@ -3,6 +3,7 @@
 The live fetch needs egress (USASpending API). These tests cover only the pure
 parse_records() transform, so they run fully offline.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -19,14 +20,16 @@ def test_empty_records_returns_empty_df():
 
 @pytest.mark.unit
 def test_canonical_keys_pass_through():
-    records = [{
-        "municipality": "San Juan",
-        "fiscal_year": "2023",
-        "federal_awards_count": "4200",
-        "federal_awards_obligated": "1850000000",
-        "federal_transfers_per_capita": "5900",
-        "data_source": "usaspending_known_seed",
-    }]
+    records = [
+        {
+            "municipality": "San Juan",
+            "fiscal_year": "2023",
+            "federal_awards_count": "4200",
+            "federal_awards_obligated": "1850000000",
+            "federal_transfers_per_capita": "5900",
+            "data_source": "usaspending_known_seed",
+        }
+    ]
     df = parse_records(records)
     assert len(df) == 1
     assert list(df.columns) == OUTPUT_COLUMNS
@@ -59,7 +62,11 @@ def test_multiple_records_all_rows_present():
     records = [
         {"municipality": "Caguas", "fiscal_year": "2022", "federal_awards_obligated": "230000000"},
         {"municipality": "Humacao", "fiscal_year": "2022", "federal_awards_obligated": "85000000"},
-        {"municipality": "Mayaguez", "fiscal_year": "2022", "federal_awards_obligated": "120000000"},
+        {
+            "municipality": "Mayaguez",
+            "fiscal_year": "2022",
+            "federal_awards_obligated": "120000000",
+        },
     ]
     df = parse_records(records)
     assert len(df) == 3

@@ -16,6 +16,7 @@ Usage:
   python3 scripts/enrichment/enrich_financialdata_entities.py --input <path>
   python3 scripts/enrichment/enrich_financialdata_entities.py --output-dir <path>
 """
+
 from __future__ import annotations
 
 import argparse
@@ -50,12 +51,30 @@ REVIEW_PATH = "review/financialdata_match_review_queue.csv"
 READINESS_PATH = PROJECT_ROOT / "reports" / "financialdata_enrichment_readiness.json"
 
 OUTPUT_COLUMNS = [
-    "source_entity_id", "source_entity_name", "source_family",
-    "provider", "provider_endpoint", "provider_identifier",
-    "matched_name", "ticker", "cik", "lei", "cusip", "isin", "figi",
-    "security_type", "industry", "website", "country",
-    "match_method", "confidence", "review_required",
-    "evidence_tier", "retrieved_at", "license_status", "raw_payload_stored",
+    "source_entity_id",
+    "source_entity_name",
+    "source_family",
+    "provider",
+    "provider_endpoint",
+    "provider_identifier",
+    "matched_name",
+    "ticker",
+    "cik",
+    "lei",
+    "cusip",
+    "isin",
+    "figi",
+    "security_type",
+    "industry",
+    "website",
+    "country",
+    "match_method",
+    "confidence",
+    "review_required",
+    "evidence_tier",
+    "retrieved_at",
+    "license_status",
+    "raw_payload_stored",
 ]
 
 DETERMINISTIC_IDENTIFIERS = ("cusip", "isin", "figi", "lei", "cik", "ticker")
@@ -70,37 +89,62 @@ DETERMINISTIC_IDENTIFIERS = ("cusip", "isin", "figi", "lei", "cik", "ticker")
 # normalize_name(name).
 SYNTHETIC_CANDIDATES: dict[str, list[dict]] = {
     # normalize_name("AECOM") -> "AECOM"
-    "AECOM": [{
-        "matched_name": "AECOM",
-        "ticker": "ACM", "cik": "0000868857", "cusip": "00766T100",
-        "isin": "US00766T1007", "figi": "BBG000C2LZP3",
-        "security_type": "common_stock", "industry": "engineering_services",
-        "website": "https://aecom.com", "country": "US",
-        "endpoint": "company_information",
-    }],
+    "AECOM": [
+        {
+            "matched_name": "AECOM",
+            "ticker": "ACM",
+            "cik": "0000868857",
+            "cusip": "00766T100",
+            "isin": "US00766T1007",
+            "figi": "BBG000C2LZP3",
+            "security_type": "common_stock",
+            "industry": "engineering_services",
+            "website": "https://aecom.com",
+            "country": "US",
+            "endpoint": "company_information",
+        }
+    ],
     # normalize_name("Fluor Corp") -> "FLUOR"
-    "FLUOR": [{
-        "matched_name": "Fluor Corp",
-        "ticker": "FLR", "cik": "0001124198", "cusip": "343412102",
-        "isin": "US3434121022", "figi": "BBG000BLT2W3",
-        "security_type": "common_stock", "industry": "construction",
-        "website": "https://fluor.com", "country": "US",
-        "endpoint": "company_information",
-    }],
+    "FLUOR": [
+        {
+            "matched_name": "Fluor Corp",
+            "ticker": "FLR",
+            "cik": "0001124198",
+            "cusip": "343412102",
+            "isin": "US3434121022",
+            "figi": "BBG000BLT2W3",
+            "security_type": "common_stock",
+            "industry": "construction",
+            "website": "https://fluor.com",
+            "country": "US",
+            "endpoint": "company_information",
+        }
+    ],
     # normalize_name("Parsons Corp") -> "PARSONS"
-    "PARSONS": [{
-        "matched_name": "Parsons Corp",
-        "ticker": "PSN", "cik": "0001658766", "cusip": "70202L102",
-        "isin": "US70202L1026", "figi": "BBG00P0QQXY7",
-        "security_type": "common_stock", "industry": "engineering_services",
-        "website": "https://parsons.com", "country": "US",
-        "endpoint": "company_information",
-    }],
+    "PARSONS": [
+        {
+            "matched_name": "Parsons Corp",
+            "ticker": "PSN",
+            "cik": "0001658766",
+            "cusip": "70202L102",
+            "isin": "US70202L1026",
+            "figi": "BBG00P0QQXY7",
+            "security_type": "common_stock",
+            "industry": "engineering_services",
+            "website": "https://parsons.com",
+            "country": "US",
+            "endpoint": "company_information",
+        }
+    ],
     # normalize_name("ACME Corporation") -> "ACME". Ambiguous: two candidates,
     # no disambiguating identifier on input → routes to review queue.
     "ACME": [
         {"matched_name": "ACME Corp (TX)", "ticker": "ACMEX", "endpoint": "company_information"},
-        {"matched_name": "Acme Corp Holdings (NV)", "ticker": "ACMEH", "endpoint": "company_information"},
+        {
+            "matched_name": "Acme Corp Holdings (NV)",
+            "ticker": "ACMEH",
+            "endpoint": "company_information",
+        },
     ],
     # normalize_name("Black and Veatch Infrastructure Inc") -> "BLACK AND VEATCH INFRASTRUCTURE".
     # Fuzzy: candidate name doesn't exactly match input → routes to review queue.
@@ -135,12 +179,12 @@ def _has_identifier(record: dict, key: str) -> bool:
 
 @dataclass
 class MatchResult:
-    method: str           # see schema enum
+    method: str  # see schema enum
     confidence: float
     review_required: bool
-    evidence_tier: str    # T1/T2/T3/T4
-    chosen: dict | None   # the candidate record we picked, or None
-    endpoint: str         # provider_endpoint value
+    evidence_tier: str  # T1/T2/T3/T4
+    chosen: dict | None  # the candidate record we picked, or None
+    endpoint: str  # provider_endpoint value
 
 
 def route_match(entity: dict, candidates: list[dict]) -> MatchResult:
@@ -225,34 +269,38 @@ def route_match(entity: dict, candidates: list[dict]) -> MatchResult:
 # Row assembly
 # ----------------------------------------------------------------------------
 
-def build_output_row(entity: dict, result: MatchResult, license_status: str,
-                     retrieved_at: str) -> dict:
+
+def build_output_row(
+    entity: dict, result: MatchResult, license_status: str, retrieved_at: str
+) -> dict:
     chosen = result.chosen or {}
     row = {
-        "source_entity_id":    str(entity.get("source_entity_id") or entity.get("entity_id") or ""),
-        "source_entity_name":  str(entity.get("name") or entity.get("source_entity_name") or ""),
-        "source_family":       str(entity.get("source_family") or entity.get("family") or ""),
-        "provider":            PROVIDER_NAME,
-        "provider_endpoint":   result.endpoint,
-        "provider_identifier": str(chosen.get("provider_identifier") or chosen.get("ticker") or chosen.get("cik") or ""),
-        "matched_name":        str(chosen.get("matched_name") or ""),
-        "ticker":              str(chosen.get("ticker") or ""),
-        "cik":                 str(chosen.get("cik") or ""),
-        "lei":                 str(chosen.get("lei") or ""),
-        "cusip":               str(chosen.get("cusip") or ""),
-        "isin":                str(chosen.get("isin") or ""),
-        "figi":                str(chosen.get("figi") or ""),
-        "security_type":       str(chosen.get("security_type") or ""),
-        "industry":            str(chosen.get("industry") or ""),
-        "website":             str(chosen.get("website") or ""),
-        "country":             str(chosen.get("country") or ""),
-        "match_method":        result.method,
-        "confidence":          round(float(result.confidence), 4),
-        "review_required":     bool(result.review_required),
-        "evidence_tier":       result.evidence_tier,
-        "retrieved_at":        retrieved_at,
-        "license_status":      license_status,
-        "raw_payload_stored":  False,
+        "source_entity_id": str(entity.get("source_entity_id") or entity.get("entity_id") or ""),
+        "source_entity_name": str(entity.get("name") or entity.get("source_entity_name") or ""),
+        "source_family": str(entity.get("source_family") or entity.get("family") or ""),
+        "provider": PROVIDER_NAME,
+        "provider_endpoint": result.endpoint,
+        "provider_identifier": str(
+            chosen.get("provider_identifier") or chosen.get("ticker") or chosen.get("cik") or ""
+        ),
+        "matched_name": str(chosen.get("matched_name") or ""),
+        "ticker": str(chosen.get("ticker") or ""),
+        "cik": str(chosen.get("cik") or ""),
+        "lei": str(chosen.get("lei") or ""),
+        "cusip": str(chosen.get("cusip") or ""),
+        "isin": str(chosen.get("isin") or ""),
+        "figi": str(chosen.get("figi") or ""),
+        "security_type": str(chosen.get("security_type") or ""),
+        "industry": str(chosen.get("industry") or ""),
+        "website": str(chosen.get("website") or ""),
+        "country": str(chosen.get("country") or ""),
+        "match_method": result.method,
+        "confidence": round(float(result.confidence), 4),
+        "review_required": bool(result.review_required),
+        "evidence_tier": result.evidence_tier,
+        "retrieved_at": retrieved_at,
+        "license_status": license_status,
+        "raw_payload_stored": False,
     }
     return row
 
@@ -261,6 +309,7 @@ def build_output_row(entity: dict, result: MatchResult, license_status: str,
 # Input loading
 # ----------------------------------------------------------------------------
 
+
 def load_input_entities(path: Path) -> list[dict]:
     """Read CSV input entities. Returns list of dicts with normalized keys."""
     with path.open("r", encoding="utf-8", newline="") as f:
@@ -268,8 +317,9 @@ def load_input_entities(path: Path) -> list[dict]:
     return rows
 
 
-def lookup_candidates(entity: dict, *, dry_run: bool,
-                      provider: FinancialDataNetProvider | None = None) -> list[dict]:
+def lookup_candidates(
+    entity: dict, *, dry_run: bool, provider: FinancialDataNetProvider | None = None
+) -> list[dict]:
     """
     Resolve candidates for an entity.
 
@@ -294,6 +344,7 @@ def lookup_candidates(entity: dict, *, dry_run: bool,
 # Output writing
 # ----------------------------------------------------------------------------
 
+
 def _write_csv(path: Path, rows: list[dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as f:
@@ -308,18 +359,19 @@ def _write_csv(path: Path, rows: list[dict]) -> None:
 
 
 def write_outputs(rows: list[dict], readiness: dict, output_dir: Path) -> dict[str, Path]:
-    matched = [r for r in rows if not r["review_required"] and r["match_method"] != "not_public_market_resolved"]
+    matched = [
+        r
+        for r in rows
+        if not r["review_required"] and r["match_method"] != "not_public_market_resolved"
+    ]
     review = [r for r in rows if r["review_required"]]
     # Crosswalk = matched rows that carry at least one identifier
-    crosswalk = [
-        r for r in matched
-        if any((r.get(k) or "") for k in DETERMINISTIC_IDENTIFIERS)
-    ]
+    crosswalk = [r for r in matched if any((r.get(k) or "") for k in DETERMINISTIC_IDENTIFIERS)]
     paths = {
-        "crosswalk":  output_dir / CROSSWALK_PATH,
-        "matches":    output_dir / MATCHES_PATH,
-        "review":     output_dir / REVIEW_PATH,
-        "readiness":  READINESS_PATH,
+        "crosswalk": output_dir / CROSSWALK_PATH,
+        "matches": output_dir / MATCHES_PATH,
+        "review": output_dir / REVIEW_PATH,
+        "readiness": READINESS_PATH,
     }
     _write_csv(paths["crosswalk"], crosswalk)
     _write_csv(paths["matches"], matched)
@@ -333,10 +385,13 @@ def write_outputs(rows: list[dict], readiness: dict, output_dir: Path) -> dict[s
 # Orchestration
 # ----------------------------------------------------------------------------
 
-def run(input_path: Path | None = None,
-        output_dir: Path | None = None,
-        dry_run: bool = True,
-        provider: FinancialDataNetProvider | None = None) -> dict:
+
+def run(
+    input_path: Path | None = None,
+    output_dir: Path | None = None,
+    dry_run: bool = True,
+    provider: FinancialDataNetProvider | None = None,
+) -> dict:
     if input_path is None:
         if DEFAULT_INPUT_CANONICAL.exists():
             input_path = DEFAULT_INPUT_CANONICAL
@@ -376,16 +431,20 @@ def run(input_path: Path | None = None,
     paths = write_outputs(rows, readiness_dict, output_dir)
 
     summary = {
-        "status":           "OK" if readiness_obj.ready_for_live else "SKIPPED_OPTIONAL",
-        "dry_run":          bool(dry_run),
-        "input_path":       str(input_path),
-        "output_dir":       str(output_dir),
-        "entity_count":     len(entities),
-        "matched":          sum(1 for r in rows if not r["review_required"] and r["match_method"] != "not_public_market_resolved"),
-        "review":           sum(1 for r in rows if r["review_required"]),
-        "unmatched":        sum(1 for r in rows if r["match_method"] == "not_public_market_resolved"),
-        "readiness":        readiness_dict,
-        "outputs":          {k: str(v) for k, v in paths.items()},
+        "status": "OK" if readiness_obj.ready_for_live else "SKIPPED_OPTIONAL",
+        "dry_run": bool(dry_run),
+        "input_path": str(input_path),
+        "output_dir": str(output_dir),
+        "entity_count": len(entities),
+        "matched": sum(
+            1
+            for r in rows
+            if not r["review_required"] and r["match_method"] != "not_public_market_resolved"
+        ),
+        "review": sum(1 for r in rows if r["review_required"]),
+        "unmatched": sum(1 for r in rows if r["match_method"] == "not_public_market_resolved"),
+        "readiness": readiness_dict,
+        "outputs": {k: str(v) for k, v in paths.items()},
     }
     return summary
 
@@ -396,9 +455,12 @@ def main() -> int:
     )
     parser.add_argument("--input", default=None, help="Path to canonical entity CSV")
     parser.add_argument("--output-dir", default=None, help="Output dir (default: outputs/)")
-    parser.add_argument("--live", action="store_true",
-                        help="Attempt live calls (requires FINANCIALDATA_API_KEY and "
-                             "FINANCIALDATA_LICENSE_APPROVED). Default is dry-run.")
+    parser.add_argument(
+        "--live",
+        action="store_true",
+        help="Attempt live calls (requires FINANCIALDATA_API_KEY and "
+        "FINANCIALDATA_LICENSE_APPROVED). Default is dry-run.",
+    )
     args = parser.parse_args()
 
     result = run(

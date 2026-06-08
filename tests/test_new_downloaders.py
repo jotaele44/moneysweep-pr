@@ -53,7 +53,9 @@ def test_ed_derive_fiscal_year_invalid():
 
 
 def test_ed_build_payload_contains_agency():
-    payload = ed_build_payload("grants_only", {"label": "2017f2021", "start_date": "2017-01-01", "end_date": "2021-12-31"})
+    payload = ed_build_payload(
+        "grants_only", {"label": "2017f2021", "start_date": "2017-01-01", "end_date": "2021-12-31"}
+    )
     agencies = [a["name"] for a in payload.get("filters", {}).get("agencies", [])]
     assert any("Education" in n for n in agencies)
 
@@ -93,15 +95,20 @@ def test_hhs_subtier_includes_acf():
 
 
 def test_hhs_build_payload_toptier_only():
-    payload = hhs_build_payload("grants_only", {"label": "2020f2024", "start_date": "2020-01-01", "end_date": "2024-12-31"})
+    payload = hhs_build_payload(
+        "grants_only", {"label": "2020f2024", "start_date": "2020-01-01", "end_date": "2024-12-31"}
+    )
     agencies = payload.get("filters", {}).get("agencies", [])
     toptier = [a for a in agencies if a["tier"] == "toptier"]
     assert len(toptier) >= 1
 
 
 def test_hhs_build_payload_subtier_added():
-    payload = hhs_build_payload("grants_only", {"label": "2020f2024", "start_date": "2020-01-01", "end_date": "2024-12-31"},
-                                subtier="Health Resources and Services Administration")
+    payload = hhs_build_payload(
+        "grants_only",
+        {"label": "2020f2024", "start_date": "2020-01-01", "end_date": "2024-12-31"},
+        subtier="Health Resources and Services Administration",
+    )
     agencies = payload.get("filters", {}).get("agencies", [])
     subtier = [a for a in agencies if a["tier"] == "subtier"]
     assert len(subtier) == 1
@@ -129,10 +136,13 @@ def test_doj_master_columns_source_dataset():
 
 
 def test_doj_build_payload_pr_filter():
-    payload = doj_build_payload("grants_only", {"label": "2020f2024", "start_date": "2020-01-01", "end_date": "2024-12-31"})
+    payload = doj_build_payload(
+        "grants_only", {"label": "2020f2024", "start_date": "2020-01-01", "end_date": "2024-12-31"}
+    )
     recipient_locations = payload.get("filters", {}).get("recipient_locations", [])
-    assert any(loc.get("country") == "USA" and loc.get("state") == "PR"
-               for loc in recipient_locations), "PR filter missing"
+    assert any(
+        loc.get("country") == "USA" and loc.get("state") == "PR" for loc in recipient_locations
+    ), "PR filter missing"
 
 
 # --- OIA ---
@@ -152,7 +162,9 @@ def test_oia_subtier_is_oia():
 
 
 def test_oia_build_payload_includes_subtier():
-    payload = oia_build_payload("grants_only", {"label": "2020f2024", "start_date": "2020-01-01", "end_date": "2024-12-31"})
+    payload = oia_build_payload(
+        "grants_only", {"label": "2020f2024", "start_date": "2020-01-01", "end_date": "2024-12-31"}
+    )
     agencies = payload.get("filters", {}).get("agencies", [])
     subtier_names = [a["name"] for a in agencies if a["tier"] == "subtier"]
     assert any("Insular" in n for n in subtier_names)
@@ -175,7 +187,9 @@ def test_haf_program_numbers_contains_cfda():
 
 
 def test_haf_build_payload_has_program_filter():
-    payload = haf_build_payload("grants_only", {"label": "2021f2026", "start_date": "2021-01-01", "end_date": "2026-12-31"})
+    payload = haf_build_payload(
+        "grants_only", {"label": "2021f2026", "start_date": "2021-01-01", "end_date": "2026-12-31"}
+    )
     assert "21.026" in str(payload.get("filters", payload))
 
 
@@ -233,12 +247,14 @@ def test_earmarks_results_to_df_empty():
 
 
 def test_earmarks_results_to_df_keyword_detection():
-    rows = [{
-        "recipient_name": "City of San Juan",
-        "award_description": "Community Project Funding for flood control infrastructure",
-        "total_obligated_amount": "2000000",
-        "award_id": "W001",
-    }]
+    rows = [
+        {
+            "recipient_name": "City of San Juan",
+            "award_description": "Community Project Funding for flood control infrastructure",
+            "total_obligated_amount": "2000000",
+            "award_id": "W001",
+        }
+    ]
     df = earmarks_results_to_df(rows, "earmarks_raw_dummy.csv")
     assert len(df) == 1
     assert df.iloc[0]["earmark_keyword_matched"] != ""
@@ -262,15 +278,17 @@ def test_nfip_records_to_df_empty():
 
 
 def test_nfip_records_to_df_basic():
-    records = [{
-        "reportedCity": "San Juan",
-        "reportedZipCode": "00907",
-        "dateOfLoss": "2017-09-20",
-        "amountPaidOnBuildingClaim": "45000",
-        "amountPaidOnContentsClaim": "5000",
-        "yearOfLoss": "2017",
-        "floodZone": "AE",
-    }]
+    records = [
+        {
+            "reportedCity": "San Juan",
+            "reportedZipCode": "00907",
+            "dateOfLoss": "2017-09-20",
+            "amountPaidOnBuildingClaim": "45000",
+            "amountPaidOnContentsClaim": "5000",
+            "yearOfLoss": "2017",
+            "floodZone": "AE",
+        }
+    ]
     df = nfip_records_to_df(records)
     assert len(df) == 1
     assert float(df.iloc[0]["paid_building"]) == pytest.approx(45000.0)
@@ -297,10 +315,12 @@ def test_lihtc_normalize_strips_llc():
 
 
 def test_lihtc_filter_pr_keeps_pr_rows():
-    df = pd.DataFrame({
-        "st": ["PR", "FL", "PR", "TX"],
-        "proj_nm": ["Project A", "Project B", "Project C", "Project D"],
-    })
+    df = pd.DataFrame(
+        {
+            "st": ["PR", "FL", "PR", "TX"],
+            "proj_nm": ["Project A", "Project B", "Project C", "Project D"],
+        }
+    )
     filtered = _filter_pr(df, _make_logger())
     assert len(filtered) == 2
 
@@ -312,15 +332,17 @@ def test_lihtc_filter_pr_empty():
 
 
 def test_lihtc_build_output_normalizes_names():
-    df = pd.DataFrame({
-        "proj_nm": ["Residencial Las Palmas"],
-        "proj_own_nm": ["Example Inc"],
-        "dev_nm": ["Builder LLC"],
-        "gen_contractor_nm": ["General Corp"],
-        "st": ["PR"],
-        "allocamt": ["500000"],
-        "yr_pis": ["2019"],
-    })
+    df = pd.DataFrame(
+        {
+            "proj_nm": ["Residencial Las Palmas"],
+            "proj_own_nm": ["Example Inc"],
+            "dev_nm": ["Builder LLC"],
+            "gen_contractor_nm": ["General Corp"],
+            "st": ["PR"],
+            "allocamt": ["500000"],
+            "yr_pis": ["2019"],
+        }
+    )
     out = lihtc_build_output(df, _make_logger())
     assert "proj_own_nm_normalized" in out.columns
     assert "INC" not in out.iloc[0]["proj_own_nm_normalized"]
@@ -347,30 +369,36 @@ def test_nmtc_normalize_removes_corp():
 
 
 def test_nmtc_filter_pr_state_column():
-    df = pd.DataFrame({
-        "state": ["PR", "NY", "PR"],
-        "allocatee_name": ["A", "B", "C"],
-    })
+    df = pd.DataFrame(
+        {
+            "state": ["PR", "NY", "PR"],
+            "allocatee_name": ["A", "B", "C"],
+        }
+    )
     filtered = nmtc_filter_pr(df, _make_logger())
     assert len(filtered) == 2
 
 
 def test_nmtc_filter_pr_service_area_column():
-    df = pd.DataFrame({
-        "service_area_states": ["PR, VI", "CA, NY", "PR"],
-        "allocatee_name": ["A", "B", "C"],
-    })
+    df = pd.DataFrame(
+        {
+            "service_area_states": ["PR, VI", "CA, NY", "PR"],
+            "allocatee_name": ["A", "B", "C"],
+        }
+    )
     filtered = nmtc_filter_pr(df, _make_logger())
     assert len(filtered) >= 2
 
 
 def test_nmtc_build_output_returns_all_columns():
-    df = pd.DataFrame({
-        "allocatee_name": ["Example CDE LLC"],
-        "allocation_year": ["2021"],
-        "allocation_amount": ["10000000"],
-        "state": ["PR"],
-    })
+    df = pd.DataFrame(
+        {
+            "allocatee_name": ["Example CDE LLC"],
+            "allocation_year": ["2021"],
+            "allocation_amount": ["10000000"],
+            "state": ["PR"],
+        }
+    )
     out = nmtc_build_output(df, _make_logger())
     for col in NMTC_COLUMNS:
         assert col in out.columns, f"Missing column: {col}"
@@ -446,7 +474,9 @@ def test_rum_known_coverover_years_sequential():
 
 def test_rum_known_coverover_allocations_sum_to_coverover():
     for rec in KNOWN_COVEROVER:
-        total_alloc = rec["allocation_prepa"] + rec["allocation_hta"] + rec["allocation_general_fund"]
+        total_alloc = (
+            rec["allocation_prepa"] + rec["allocation_hta"] + rec["allocation_general_fund"]
+        )
         assert abs(total_alloc - rec["coverover_amount_pr"]) < 1, (
             f"FY{rec['fiscal_year']}: allocations {total_alloc} != coverover {rec['coverover_amount_pr']}"
         )
@@ -476,8 +506,13 @@ from scripts.download_fhlb import (
 
 
 def test_fhlb_columns_complete():
-    for col in ("institution_name", "institution_normalized", "fdic_cert",
-                "reporting_date", "advances_outstanding"):
+    for col in (
+        "institution_name",
+        "institution_normalized",
+        "fdic_cert",
+        "reporting_date",
+        "advances_outstanding",
+    ):
         assert col in FHLB_COLUMNS
 
 
@@ -516,8 +551,14 @@ from scripts.download_prepa_contracts import (
 
 
 def test_prepa_columns_complete():
-    for col in ("contract_id", "vendor_name", "vendor_normalized", "contract_type",
-                "contract_value", "status"):
+    for col in (
+        "contract_id",
+        "vendor_name",
+        "vendor_normalized",
+        "contract_type",
+        "contract_value",
+        "status",
+    ):
         assert col in PREPA_COLUMNS
 
 
@@ -537,7 +578,9 @@ def test_prepa_known_contracts_has_whitefish():
 
 
 def test_prepa_luma_contract_value_over_1b():
-    luma = next(c for c in KNOWN_CONTRACTS if "Luma" in c["vendor_name"] and c["contract_type"] == "O&M")
+    luma = next(
+        c for c in KNOWN_CONTRACTS if "Luma" in c["vendor_name"] and c["contract_type"] == "O&M"
+    )
     assert luma["contract_value"] >= 1_000_000_000
 
 
@@ -574,8 +617,15 @@ from scripts.download_promesa_creditors import (
 
 
 def test_promesa_columns_complete():
-    for col in ("creditor_name", "creditor_normalized", "creditor_type",
-                "bond_series", "claim_amount_original", "recovery_amount", "recovery_rate"):
+    for col in (
+        "creditor_name",
+        "creditor_normalized",
+        "creditor_type",
+        "bond_series",
+        "claim_amount_original",
+        "recovery_amount",
+        "recovery_rate",
+    ):
         assert col in PROMESA_COLUMNS
 
 
@@ -634,7 +684,11 @@ def test_promesa_normalize_removes_lp():
 
 def test_promesa_assurance_guaranteed_insurer():
     assured = next(
-        (c for c in KNOWN_CREDITORS if "Assured" in c["creditor_name"] and c["creditor_type"] == "insurer"),
+        (
+            c
+            for c in KNOWN_CREDITORS
+            if "Assured" in c["creditor_name"] and c["creditor_type"] == "insurer"
+        ),
         None,
     )
     assert assured is not None
@@ -653,8 +707,10 @@ def test_promesa_franklin_has_sec_flag():
 # Shared helper
 # ---------------------------------------------------------------------------
 
+
 def _make_logger():
     import logging
+
     logger = logging.getLogger("test_logger")
     logger.setLevel(logging.CRITICAL)
     return logger

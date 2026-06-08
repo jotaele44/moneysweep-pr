@@ -1,4 +1,5 @@
 """Fallback adapter for the 79 sources without on-demand implementations."""
+
 from __future__ import annotations
 
 import pandas as pd

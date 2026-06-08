@@ -22,6 +22,7 @@ CLI::
 
     python -m contract_sweeper.validation.canonical_v1_schema --root . [--allow-failed] [--json]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -45,7 +46,11 @@ TABLES: dict[str, tuple[str, str, str]] = {
     "contracts": ("contracts.schema.json", "contracts.csv", "contract_id"),
     "projects": ("projects.schema.json", "projects.csv", "project_id"),
     "debt_instruments": ("debt_instruments.schema.json", "debt_instruments.csv", "debt_id"),
-    "lobbying_records": ("lobbying_records.schema.json", "lobbying_records.csv", "lobbying_record_id"),
+    "lobbying_records": (
+        "lobbying_records.schema.json",
+        "lobbying_records.csv",
+        "lobbying_record_id",
+    ),
     "funding_sources": ("funding_sources.schema.json", "funding_sources.csv", "funding_source_id"),
     "properties": ("properties.schema.json", "properties.csv", "property_id"),
     "municipalities": ("municipalities.schema.json", "municipalities.csv", "municipality_id"),
@@ -60,20 +65,29 @@ FOREIGN_KEYS: dict[str, dict[str, str]] = {
     "entities": {"parent_entity_id": "entities", "evidence_id": "evidence"},
     "roles": {"person_id": "people", "entity_id": "entities", "evidence_id": "evidence"},
     "contracts": {
-        "awarding_entity_id": "entities", "contractor_entity_id": "entities",
-        "project_id": "projects", "evidence_id": "evidence",
+        "awarding_entity_id": "entities",
+        "contractor_entity_id": "entities",
+        "project_id": "projects",
+        "evidence_id": "evidence",
     },
     "projects": {
-        "lead_entity_id": "entities", "municipality_id": "municipalities",
-        "funding_source_id": "funding_sources", "evidence_id": "evidence",
+        "lead_entity_id": "entities",
+        "municipality_id": "municipalities",
+        "funding_source_id": "funding_sources",
+        "evidence_id": "evidence",
     },
     "debt_instruments": {"issuer_entity_id": "entities", "evidence_id": "evidence"},
     "lobbying_records": {
-        "lobbyist_entity_id": "entities", "client_entity_id": "entities",
+        "lobbyist_entity_id": "entities",
+        "client_entity_id": "entities",
         "evidence_id": "evidence",
     },
     "funding_sources": {"administering_entity_id": "entities", "evidence_id": "evidence"},
-    "properties": {"owner_entity_id": "entities", "municipality_id": "municipalities", "evidence_id": "evidence"},
+    "properties": {
+        "owner_entity_id": "entities",
+        "municipality_id": "municipalities",
+        "evidence_id": "evidence",
+    },
     "municipalities": {"evidence_id": "evidence"},
     "edges": {"evidence_id": "evidence"},
 }
@@ -92,9 +106,18 @@ NODE_TYPE_TABLE: dict[str, str] = {
 }
 
 EDGE_TYPES: tuple[str, ...] = (
-    "HOLDS_ROLE_IN", "OWNS_OR_CONTROLS", "REPRESENTS", "ADVISES",
-    "RECEIVES_CONTRACT", "FUNDED_BY", "LOCATED_IN", "HOLDS_DEBT",
-    "NEGOTIATES_WITH", "SHARES_PERSONNEL_WITH", "LOBBIES_FOR", "BENEFITS_FROM",
+    "HOLDS_ROLE_IN",
+    "OWNS_OR_CONTROLS",
+    "REPRESENTS",
+    "ADVISES",
+    "RECEIVES_CONTRACT",
+    "FUNDED_BY",
+    "LOCATED_IN",
+    "HOLDS_DEBT",
+    "NEGOTIATES_WITH",
+    "SHARES_PERSONNEL_WITH",
+    "LOBBIES_FOR",
+    "BENEFITS_FROM",
 )
 
 
@@ -113,12 +136,18 @@ class ValidationReport:
         self.errors.append(message)
 
     def to_dict(self) -> dict[str, Any]:
-        return {"ok": self.ok, "error_count": len(self.errors), "row_counts": self.counts, "errors": self.errors}
+        return {
+            "ok": self.ok,
+            "error_count": len(self.errors),
+            "row_counts": self.counts,
+            "errors": self.errors,
+        }
 
 
 # --------------------------------------------------------------------------- #
 # JSON-Schema subset interpreter
 # --------------------------------------------------------------------------- #
+
 
 def load_schema(table: str, root: Path | None = None) -> dict[str, Any]:
     root = root or REPO_ROOT
@@ -187,6 +216,7 @@ def validate_row(row: dict[str, str], schema: dict[str, Any]) -> list[str]:
 # CSV loading + table-level validation
 # --------------------------------------------------------------------------- #
 
+
 def _read_csv(path: Path) -> list[dict[str, str]]:
     if not path.exists():
         return []
@@ -199,8 +229,9 @@ def load_all_tables(root: Path | None = None) -> dict[str, list[dict[str, str]]]
     return {t: _read_csv(root / DATA_DIR / TABLES[t][1]) for t in TABLES}
 
 
-def validate_schema(tables: dict[str, list[dict[str, str]]], report: ValidationReport,
-                    root: Path | None = None) -> None:
+def validate_schema(
+    tables: dict[str, list[dict[str, str]]], report: ValidationReport, root: Path | None = None
+) -> None:
     for table, rows in tables.items():
         schema = load_schema(table, root)
         report.counts[table] = len(rows)
@@ -209,10 +240,13 @@ def validate_schema(tables: dict[str, list[dict[str, str]]], report: ValidationR
                 report.add(f"[{table}:{i}] {msg}")
 
 
-def validate_referential_integrity(tables: dict[str, list[dict[str, str]]],
-                                   report: ValidationReport) -> None:
+def validate_referential_integrity(
+    tables: dict[str, list[dict[str, str]]], report: ValidationReport
+) -> None:
     pks: dict[str, set[str]] = {
-        t: {(r.get(TABLES[t][2]) or "").strip() for r in rows if (r.get(TABLES[t][2]) or "").strip()}
+        t: {
+            (r.get(TABLES[t][2]) or "").strip() for r in rows if (r.get(TABLES[t][2]) or "").strip()
+        }
         for t, rows in tables.items()
     }
     # Declared single-target foreign keys.
@@ -224,7 +258,10 @@ def validate_referential_integrity(tables: dict[str, list[dict[str, str]]],
                     report.add(f"[{table}:{i}] broken reference '{col}'={val!r} -> {target}")
     # Edge endpoints resolve against the table named by their node_type.
     for i, row in enumerate(tables.get("edges", []), start=1):
-        for type_col, id_col in (("source_node_type", "source_node_id"), ("target_node_type", "target_node_id")):
+        for type_col, id_col in (
+            ("source_node_type", "source_node_id"),
+            ("target_node_type", "target_node_id"),
+        ):
             ntype = (row.get(type_col) or "").strip()
             nid = (row.get(id_col) or "").strip()
             if not ntype or not nid:
@@ -236,8 +273,9 @@ def validate_referential_integrity(tables: dict[str, list[dict[str, str]]],
                 report.add(f"[edges:{i}] broken endpoint {id_col}={nid!r} -> {target}")
 
 
-def validate_controlled_vocab(tables: dict[str, list[dict[str, str]]],
-                              report: ValidationReport) -> list[dict[str, str]]:
+def validate_controlled_vocab(
+    tables: dict[str, list[dict[str, str]]], report: ValidationReport
+) -> list[dict[str, str]]:
     """Flag edges whose verb is outside the controlled vocabulary.
 
     Returns the offending rows so callers can route them to review_queue.
@@ -251,8 +289,9 @@ def validate_controlled_vocab(tables: dict[str, list[dict[str, str]]],
     return offenders
 
 
-def validate_evidence_presence(tables: dict[str, list[dict[str, str]]],
-                               report: ValidationReport) -> None:
+def validate_evidence_presence(
+    tables: dict[str, list[dict[str, str]]], report: ValidationReport
+) -> None:
     """Enforce 'no provenance -> no edge': every edge needs a resolvable evidence_id."""
     evidence_ids = {(r.get("evidence_id") or "").strip() for r in tables.get("evidence", [])}
     for i, row in enumerate(tables.get("edges", []), start=1):
@@ -278,11 +317,15 @@ def validate_all(root: Path | None = None) -> ValidationReport:
 # CLI
 # --------------------------------------------------------------------------- #
 
+
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Validate Canonical Entity Relationship Model v1 tables.")
+    parser = argparse.ArgumentParser(
+        description="Validate Canonical Entity Relationship Model v1 tables."
+    )
     parser.add_argument("--root", default=".", help="Repository root.")
-    parser.add_argument("--allow-failed", action="store_true",
-                        help="Report errors but exit 0 (bootstrap mode).")
+    parser.add_argument(
+        "--allow-failed", action="store_true", help="Report errors but exit 0 (bootstrap mode)."
+    )
     parser.add_argument("--json", action="store_true", help="Emit a JSON report.")
     args = parser.parse_args(argv)
 
@@ -291,8 +334,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         print(json.dumps(report.to_dict(), indent=2))
     else:
-        print(f"canonical_v1 validation: {'PASS' if report.ok else 'FAIL'} "
-              f"({len(report.errors)} error(s); rows={report.counts})")
+        print(
+            f"canonical_v1 validation: {'PASS' if report.ok else 'FAIL'} "
+            f"({len(report.errors)} error(s); rows={report.counts})"
+        )
         for err in report.errors[:200]:
             print(f"  - {err}")
         if len(report.errors) > 200:

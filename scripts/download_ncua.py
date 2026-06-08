@@ -15,6 +15,7 @@ Output:
 Usage:
   python3 scripts/download_ncua.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -36,16 +37,77 @@ MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 NCUA_COLUMNS = [
-    "reporting_period", "cu_number", "cu_name", "cu_normalized",
-    "total_assets", "total_shares", "total_loans", "net_worth",
-    "members_count", "city", "state", "source_doc",
+    "reporting_period",
+    "cu_number",
+    "cu_name",
+    "cu_normalized",
+    "total_assets",
+    "total_shares",
+    "total_loans",
+    "net_worth",
+    "members_count",
+    "city",
+    "state",
+    "source_doc",
 ]
 
 KNOWN_NCUA_DATA = [
-    {"reporting_period": "2023Q4", "cu_number": "68340", "cu_name": "COOPERATIVA DE AHORRO Y CREDITO DE AGUADA", "cu_normalized": "COOPERATIVA DE AHORRO Y CREDITO DE AGUADA", "total_assets": "285000000", "total_shares": "245000000", "total_loans": "180000000", "net_worth": "38000000", "members_count": "45000", "city": "AGUADA", "state": "PR", "source_doc": "NCUA_5300_Call_Report_2023Q4"},
-    {"reporting_period": "2023Q4", "cu_number": "68401", "cu_name": "COOPERATIVA DE AHORRO Y CREDITO DE CIALES", "cu_normalized": "COOPERATIVA DE AHORRO Y CREDITO DE CIALES", "total_assets": "120000000", "total_shares": "102000000", "total_loans": "75000000", "net_worth": "16000000", "members_count": "18500", "city": "CIALES", "state": "PR", "source_doc": "NCUA_5300_Call_Report_2023Q4"},
-    {"reporting_period": "2023Q4", "cu_number": "3728", "cu_name": "ORIENTAL FEDERAL CREDIT UNION", "cu_normalized": "ORIENTAL FEDERAL CREDIT UNION", "total_assets": "950000000", "total_shares": "820000000", "total_loans": "620000000", "net_worth": "125000000", "members_count": "75000", "city": "SAN JUAN", "state": "PR", "source_doc": "NCUA_5300_Call_Report_2023Q4"},
-    {"reporting_period": "2023Q4", "cu_number": "ALL_PR", "cu_name": "ALL PUERTO RICO CREDIT UNIONS AGGREGATE", "cu_normalized": "ALL PUERTO RICO CREDIT UNIONS", "total_assets": "13800000000", "total_shares": "11900000000", "total_loans": "8200000000", "net_worth": "1850000000", "members_count": "1050000", "city": "STATEWIDE", "state": "PR", "source_doc": "NCUA_Quarterly_Data_Summary_2023Q4"},
+    {
+        "reporting_period": "2023Q4",
+        "cu_number": "68340",
+        "cu_name": "COOPERATIVA DE AHORRO Y CREDITO DE AGUADA",
+        "cu_normalized": "COOPERATIVA DE AHORRO Y CREDITO DE AGUADA",
+        "total_assets": "285000000",
+        "total_shares": "245000000",
+        "total_loans": "180000000",
+        "net_worth": "38000000",
+        "members_count": "45000",
+        "city": "AGUADA",
+        "state": "PR",
+        "source_doc": "NCUA_5300_Call_Report_2023Q4",
+    },
+    {
+        "reporting_period": "2023Q4",
+        "cu_number": "68401",
+        "cu_name": "COOPERATIVA DE AHORRO Y CREDITO DE CIALES",
+        "cu_normalized": "COOPERATIVA DE AHORRO Y CREDITO DE CIALES",
+        "total_assets": "120000000",
+        "total_shares": "102000000",
+        "total_loans": "75000000",
+        "net_worth": "16000000",
+        "members_count": "18500",
+        "city": "CIALES",
+        "state": "PR",
+        "source_doc": "NCUA_5300_Call_Report_2023Q4",
+    },
+    {
+        "reporting_period": "2023Q4",
+        "cu_number": "3728",
+        "cu_name": "ORIENTAL FEDERAL CREDIT UNION",
+        "cu_normalized": "ORIENTAL FEDERAL CREDIT UNION",
+        "total_assets": "950000000",
+        "total_shares": "820000000",
+        "total_loans": "620000000",
+        "net_worth": "125000000",
+        "members_count": "75000",
+        "city": "SAN JUAN",
+        "state": "PR",
+        "source_doc": "NCUA_5300_Call_Report_2023Q4",
+    },
+    {
+        "reporting_period": "2023Q4",
+        "cu_number": "ALL_PR",
+        "cu_name": "ALL PUERTO RICO CREDIT UNIONS AGGREGATE",
+        "cu_normalized": "ALL PUERTO RICO CREDIT UNIONS",
+        "total_assets": "13800000000",
+        "total_shares": "11900000000",
+        "total_loans": "8200000000",
+        "net_worth": "1850000000",
+        "members_count": "1050000",
+        "city": "STATEWIDE",
+        "state": "PR",
+        "source_doc": "NCUA_Quarterly_Data_Summary_2023Q4",
+    },
 ]
 
 NCUA_CALL_REPORT_BASE = "https://www.ncua.gov/files/publications/analysis"
@@ -55,10 +117,12 @@ NCUA_DATA_DOWNLOAD = "https://www.ncua.gov/analysis/credit-union-corporate-call-
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (NCUA credit union PR research)",
-        "Accept": "application/json, text/html",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (NCUA credit union PR research)",
+            "Accept": "application/json, text/html",
+        }
+    )
     return s
 
 
@@ -78,7 +142,7 @@ def _get(session, url, params, logger):
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -112,20 +176,32 @@ def _fetch_ncua_search_api(session, logger) -> list[dict]:
     cu_list = data if isinstance(data, list) else data.get("creditUnions", data.get("data", []))
     for cu in cu_list:
         name = str(cu.get("CreditUnionName", cu.get("name", cu.get("cu_name", ""))))
-        rows.append({
-            "reporting_period": str(cu.get("reportingPeriod", cu.get("quarter", ""))),
-            "cu_number": str(cu.get("CUNumber", cu.get("cu_number", cu.get("charterNumber", "")))),
-            "cu_name": name,
-            "cu_normalized": _normalize_name(name),
-            "total_assets": str(cu.get("TotalAssets", cu.get("total_assets", cu.get("assets", "")))),
-            "total_shares": str(cu.get("TotalShares", cu.get("total_shares", cu.get("shares", "")))),
-            "total_loans": str(cu.get("TotalLoans", cu.get("total_loans", cu.get("loans", "")))),
-            "net_worth": str(cu.get("NetWorth", cu.get("net_worth", ""))),
-            "members_count": str(cu.get("MemberCount", cu.get("members_count", cu.get("members", "")))),
-            "city": str(cu.get("City", cu.get("city", ""))),
-            "state": "PR",
-            "source_doc": NCUA_SEARCH_API,
-        })
+        rows.append(
+            {
+                "reporting_period": str(cu.get("reportingPeriod", cu.get("quarter", ""))),
+                "cu_number": str(
+                    cu.get("CUNumber", cu.get("cu_number", cu.get("charterNumber", "")))
+                ),
+                "cu_name": name,
+                "cu_normalized": _normalize_name(name),
+                "total_assets": str(
+                    cu.get("TotalAssets", cu.get("total_assets", cu.get("assets", "")))
+                ),
+                "total_shares": str(
+                    cu.get("TotalShares", cu.get("total_shares", cu.get("shares", "")))
+                ),
+                "total_loans": str(
+                    cu.get("TotalLoans", cu.get("total_loans", cu.get("loans", "")))
+                ),
+                "net_worth": str(cu.get("NetWorth", cu.get("net_worth", ""))),
+                "members_count": str(
+                    cu.get("MemberCount", cu.get("members_count", cu.get("members", "")))
+                ),
+                "city": str(cu.get("City", cu.get("city", ""))),
+                "state": "PR",
+                "source_doc": NCUA_SEARCH_API,
+            }
+        )
     if rows:
         logger.info(f"  NCUA search API: {len(rows)} PR credit unions")
     return rows
@@ -152,6 +228,7 @@ def _fetch_ncua_bulk(session, logger) -> list[dict]:
                 continue
             try:
                 import zipfile
+
                 zf = zipfile.ZipFile(io.BytesIO(resp.content))
                 csv_files = [f for f in zf.namelist() if f.lower().endswith(".csv")]
                 for csv_name in csv_files:
@@ -159,29 +236,61 @@ def _fetch_ncua_bulk(session, logger) -> list[dict]:
                         continue
                     with zf.open(csv_name) as f:
                         df = pd.read_csv(f, dtype=str, low_memory=False)
-                    state_cols = [c for c in df.columns if c.upper() in ("STATE", "STATE_CODE", "CU_STATE")]
+                    state_cols = [
+                        c for c in df.columns if c.upper() in ("STATE", "STATE_CODE", "CU_STATE")
+                    ]
                     if not state_cols:
                         continue
-                    df_pr = df[df[state_cols[0]].str.upper().str.contains("PR|PUERTO RICO|72", na=False)]
+                    df_pr = df[
+                        df[state_cols[0]].str.upper().str.contains("PR|PUERTO RICO|72", na=False)
+                    ]
                     if df_pr.empty:
                         continue
                     for _, r in df_pr.iterrows():
                         rd = r.to_dict()
-                        name = str(rd.get("CU_NAME", rd.get("cu_name", rd.get("CreditUnionName", ""))))
-                        rows.append({
-                            "reporting_period": f"{quarter} {year}",
-                            "cu_number": str(rd.get("CU_NUMBER", rd.get("cu_number", rd.get("CUNumber", "")))),
-                            "cu_name": name,
-                            "cu_normalized": _normalize_name(name),
-                            "total_assets": str(rd.get("TOTAL_ASSETS", rd.get("total_assets", rd.get("ACCT_010", "")))),
-                            "total_shares": str(rd.get("TOTAL_SHARES", rd.get("total_shares", rd.get("ACCT_018", "")))),
-                            "total_loans": str(rd.get("TOTAL_LOANS", rd.get("total_loans", rd.get("ACCT_025B", "")))),
-                            "net_worth": str(rd.get("NET_WORTH", rd.get("net_worth", rd.get("ACCT_997", "")))),
-                            "members_count": str(rd.get("MEMBER_COUNT", rd.get("members_count", rd.get("ACCT_083", "")))),
-                            "city": str(rd.get("CITY", rd.get("city", ""))),
-                            "state": "PR",
-                            "source_doc": url,
-                        })
+                        name = str(
+                            rd.get("CU_NAME", rd.get("cu_name", rd.get("CreditUnionName", "")))
+                        )
+                        rows.append(
+                            {
+                                "reporting_period": f"{quarter} {year}",
+                                "cu_number": str(
+                                    rd.get("CU_NUMBER", rd.get("cu_number", rd.get("CUNumber", "")))
+                                ),
+                                "cu_name": name,
+                                "cu_normalized": _normalize_name(name),
+                                "total_assets": str(
+                                    rd.get(
+                                        "TOTAL_ASSETS",
+                                        rd.get("total_assets", rd.get("ACCT_010", "")),
+                                    )
+                                ),
+                                "total_shares": str(
+                                    rd.get(
+                                        "TOTAL_SHARES",
+                                        rd.get("total_shares", rd.get("ACCT_018", "")),
+                                    )
+                                ),
+                                "total_loans": str(
+                                    rd.get(
+                                        "TOTAL_LOANS",
+                                        rd.get("total_loans", rd.get("ACCT_025B", "")),
+                                    )
+                                ),
+                                "net_worth": str(
+                                    rd.get("NET_WORTH", rd.get("net_worth", rd.get("ACCT_997", "")))
+                                ),
+                                "members_count": str(
+                                    rd.get(
+                                        "MEMBER_COUNT",
+                                        rd.get("members_count", rd.get("ACCT_083", "")),
+                                    )
+                                ),
+                                "city": str(rd.get("CITY", rd.get("city", ""))),
+                                "state": "PR",
+                                "source_doc": url,
+                            }
+                        )
                 if rows:
                     logger.info(f"  NCUA bulk {quarter} {year}: {len(rows)} PR rows")
                     return rows

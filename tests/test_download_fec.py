@@ -3,6 +3,7 @@
 These pin the run()/_session/_fetch_cycle contract that run_all.py and the
 shared lifecycle depend on. All network is mocked; no real HTTP.
 """
+
 from __future__ import annotations
 
 import pandas as pd
@@ -65,10 +66,14 @@ def test_run_empty_when_no_records(tmp_path):
 def test_fetch_cycle_paginates_via_get():
     """_fetch_cycle should walk pages until pagination.pages is reached."""
     pages = [
-        {"results": [{"contributor_name": "A", "entity_type": "IND"}],
-         "pagination": {"pages": 2, "count": 2}},
-        {"results": [{"contributor_name": "B", "entity_type": "ORG"}],
-         "pagination": {"pages": 2, "count": 2}},
+        {
+            "results": [{"contributor_name": "A", "entity_type": "IND"}],
+            "pagination": {"pages": 2, "count": 2},
+        },
+        {
+            "results": [{"contributor_name": "B", "entity_type": "ORG"}],
+            "pagination": {"pages": 2, "count": 2},
+        },
     ]
     with patch.object(fec, "_get", side_effect=pages) as mock_get:
         recs = fec._fetch_cycle(session=None, cycle=2020, sleep_s=0, logger=_Logger())

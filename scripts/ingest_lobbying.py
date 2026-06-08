@@ -17,6 +17,7 @@ CLI::
     python scripts/ingest_lobbying.py            # write lobbying_records + evidence
     python scripts/ingest_lobbying.py --check     # summarize without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -44,10 +45,21 @@ VALID_JURISDICTIONS = {"PR", "federal"}
 VALID_FILING_TYPES = {"LDA", "PR_cabildero"}
 
 LOBBYING_COLUMNS = [
-    "lobbying_record_id", "jurisdiction", "registration_number", "period",
-    "lobbyist_entity_id", "client_entity_id", "authorized_personnel",
-    "subject_matter", "amount", "currency", "filing_type", "confidence",
-    "evidence_id", "review_status", "notes",
+    "lobbying_record_id",
+    "jurisdiction",
+    "registration_number",
+    "period",
+    "lobbyist_entity_id",
+    "client_entity_id",
+    "authorized_personnel",
+    "subject_matter",
+    "amount",
+    "currency",
+    "filing_type",
+    "confidence",
+    "evidence_id",
+    "review_status",
+    "notes",
 ]
 
 
@@ -95,23 +107,25 @@ def build_rows(root: Path | None = None) -> dict[str, Any]:
                 review_status="accepted",
             )
             evidence_rows.append(ev)
-            rows.append({
-                "lobbying_record_id": lid,
-                "jurisdiction": jurisdiction,
-                "registration_number": reg,
-                "period": period,
-                "lobbyist_entity_id": lobbyist_id or "",
-                "client_entity_id": client_id or "",
-                "authorized_personnel": (rec.get("authorized_personnel") or "").strip(),
-                "subject_matter": (rec.get("subject_matter") or "").strip(),
-                "amount": (rec.get("amount") or "").strip(),
-                "currency": (rec.get("currency") or "").strip(),
-                "filing_type": filing,
-                "confidence": ev.confidence,
-                "evidence_id": ev.evidence_id,
-                "review_status": "accepted",
-                "notes": f"lobbyist={lobbyist}; client={client}",
-            })
+            rows.append(
+                {
+                    "lobbying_record_id": lid,
+                    "jurisdiction": jurisdiction,
+                    "registration_number": reg,
+                    "period": period,
+                    "lobbyist_entity_id": lobbyist_id or "",
+                    "client_entity_id": client_id or "",
+                    "authorized_personnel": (rec.get("authorized_personnel") or "").strip(),
+                    "subject_matter": (rec.get("subject_matter") or "").strip(),
+                    "amount": (rec.get("amount") or "").strip(),
+                    "currency": (rec.get("currency") or "").strip(),
+                    "filing_type": filing,
+                    "confidence": ev.confidence,
+                    "evidence_id": ev.evidence_id,
+                    "review_status": "accepted",
+                    "notes": f"lobbyist={lobbyist}; client={client}",
+                }
+            )
     return {"lobbying_rows": rows, "evidence_rows": evidence_rows, "skipped": skipped}
 
 
@@ -175,8 +189,17 @@ def main(argv: list[str] | None = None) -> int:
         built = build_rows(root)
         rows = built["lobbying_rows"]
         problems = check(rows)
-        print(json.dumps({"ok": not problems, "row_count": len(rows),
-                          "skipped": len(built["skipped"]), "problems": problems}, indent=2))
+        print(
+            json.dumps(
+                {
+                    "ok": not problems,
+                    "row_count": len(rows),
+                    "skipped": len(built["skipped"]),
+                    "problems": problems,
+                },
+                indent=2,
+            )
+        )
         return 0 if not problems else 1
     print(json.dumps(ingest(root), indent=2))
     return 0

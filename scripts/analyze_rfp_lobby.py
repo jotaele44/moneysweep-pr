@@ -19,6 +19,7 @@ Usage:
   python3 scripts/analyze_rfp_lobby.py
   python3 scripts/analyze_rfp_lobby.py --window-days 180
 """
+
 from __future__ import annotations
 
 import argparse
@@ -37,20 +38,30 @@ from scripts.sam_enrichment import name_similarity
 # Constants
 # ---------------------------------------------------------------------------
 
-WINDOW_DAYS = 180   # lobbying activity window before RFP posting
-MIN_SCORE   = 0.70  # min vendor name match score to link RFP award to LDA entity
+WINDOW_DAYS = 180  # lobbying activity window before RFP posting
+MIN_SCORE = 0.70  # min vendor name match score to link RFP award to LDA entity
 
 OUTPUT_COLUMNS = [
-    "rfp_id", "title", "agency", "posted_date", "due_date",
-    "awarded_vendor", "awarded_vendor_normalized",
-    "lda_flag", "lobby_lead_days", "lda_spend_prior_window",
-    "lda_registrants_prior", "lda_issues_prior",
-    "lda_filings_prior_count", "influence_score",
+    "rfp_id",
+    "title",
+    "agency",
+    "posted_date",
+    "due_date",
+    "awarded_vendor",
+    "awarded_vendor_normalized",
+    "lda_flag",
+    "lobby_lead_days",
+    "lda_spend_prior_window",
+    "lda_registrants_prior",
+    "lda_issues_prior",
+    "lda_filings_prior_count",
+    "influence_score",
 ]
 
 # ---------------------------------------------------------------------------
 # Load helpers
 # ---------------------------------------------------------------------------
+
 
 def _load_csv(path: Path, label: str, logger) -> pd.DataFrame | None:
     if not path.exists():
@@ -65,6 +76,7 @@ def _load_csv(path: Path, label: str, logger) -> pd.DataFrame | None:
 # Core analysis
 # ---------------------------------------------------------------------------
 
+
 def _parse_dates(df: pd.DataFrame, col: str) -> pd.Series:
     return pd.to_datetime(df[col], errors="coerce", format="mixed")
 
@@ -73,7 +85,11 @@ def _match_vendor_to_lda(vendor_norm: str, lda_df: pd.DataFrame) -> pd.DataFrame
     """Return LDA filings whose client name is a strong match for the vendor."""
     if not vendor_norm or lda_df.empty:
         return pd.DataFrame()
-    client_norms = lda_df["client_name_normalized"] if "client_name_normalized" in lda_df.columns else pd.Series([], dtype=str)
+    client_norms = (
+        lda_df["client_name_normalized"]
+        if "client_name_normalized" in lda_df.columns
+        else pd.Series([], dtype=str)
+    )
     if client_norms.empty:
         return pd.DataFrame()
     scores = client_norms.apply(lambda cn: name_similarity(vendor_norm, cn))
@@ -89,9 +105,9 @@ def run(root: Path = None, window_days: int = WINDOW_DAYS) -> dict:
     logger = setup_logging("analyze_rfp_lobby", log_dir=root / "data" / "logs")
 
     # Load inputs
-    rfp_df   = _load_csv(proc / "pr_compras_rfps.csv",   "Compras RFPs",   logger)
+    rfp_df = _load_csv(proc / "pr_compras_rfps.csv", "Compras RFPs", logger)
     award_df = _load_csv(proc / "pr_compras_awards.csv", "Compras awards", logger)
-    lda_df   = _load_csv(proc / "pr_lda_filings.csv",    "LDA filings",    logger)
+    lda_df = _load_csv(proc / "pr_lda_filings.csv", "LDA filings", logger)
 
     # If no RFPs, write empty and exit
     if rfp_df is None or rfp_df.empty:
@@ -108,7 +124,8 @@ def run(root: Path = None, window_days: int = WINDOW_DAYS) -> dict:
     if award_df is not None and not award_df.empty:
         merged = rfp_df.merge(
             award_df[["rfp_id", "awarded_vendor", "awarded_vendor_normalized"]],
-            on="rfp_id", how="left",
+            on="rfp_id",
+            how="left",
         )
     else:
         merged = rfp_df.copy()
@@ -167,6 +184,7 @@ def run(root: Path = None, window_days: int = WINDOW_DAYS) -> dict:
 
         # Influence score: flag × (1 / max(lead_days,1)) × log(spend+1)
         import math
+
         if lda_flag and lobby_lead_days is not None:
             recency = max(1, window_days - lobby_lead_days) / window_days
             spend_weight = math.log1p(lda_spend_prior) / math.log1p(1_000_000)
@@ -174,29 +192,33 @@ def run(root: Path = None, window_days: int = WINDOW_DAYS) -> dict:
         else:
             influence_score = 0.0
 
-        rows.append({
-            "rfp_id":                   rfp.get("rfp_id", ""),
-            "title":                    rfp.get("title", ""),
-            "agency":                   rfp.get("agency", ""),
-            "posted_date":              rfp.get("posted_date", ""),
-            "due_date":                 rfp.get("due_date", ""),
-            "awarded_vendor":           rfp.get("awarded_vendor", ""),
-            "awarded_vendor_normalized": vendor_norm,
-            "lda_flag":                 lda_flag,
-            "lobby_lead_days":          lobby_lead_days if lobby_lead_days is not None else "",
-            "lda_spend_prior_window":   round(lda_spend_prior, 2),
-            "lda_registrants_prior":    lda_registrants,
-            "lda_issues_prior":         lda_issues,
-            "lda_filings_prior_count":  lda_filings_count,
-            "influence_score":          influence_score,
-        })
+        rows.append(
+            {
+                "rfp_id": rfp.get("rfp_id", ""),
+                "title": rfp.get("title", ""),
+                "agency": rfp.get("agency", ""),
+                "posted_date": rfp.get("posted_date", ""),
+                "due_date": rfp.get("due_date", ""),
+                "awarded_vendor": rfp.get("awarded_vendor", ""),
+                "awarded_vendor_normalized": vendor_norm,
+                "lda_flag": lda_flag,
+                "lobby_lead_days": lobby_lead_days if lobby_lead_days is not None else "",
+                "lda_spend_prior_window": round(lda_spend_prior, 2),
+                "lda_registrants_prior": lda_registrants,
+                "lda_issues_prior": lda_issues,
+                "lda_filings_prior_count": lda_filings_count,
+                "influence_score": influence_score,
+            }
+        )
 
     df_out = pd.DataFrame(rows, columns=OUTPUT_COLUMNS)
     df_out = df_out.sort_values("influence_score", ascending=False)
     df_out.to_csv(out_path, index=False)
 
     n = len(df_out)
-    logger.info(f"  RFP-lobby crossref: {n:,} RFPs, {flagged:,} with prior lobbying → {out_path.name}")
+    logger.info(
+        f"  RFP-lobby crossref: {n:,} RFPs, {flagged:,} with prior lobbying → {out_path.name}"
+    )
 
     return {"status": "OK", "rows": n, "flagged_rfps": flagged}
 
@@ -205,10 +227,15 @@ def run(root: Path = None, window_days: int = WINDOW_DAYS) -> dict:
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Cross-reference RFPs with LDA lobbying")
-    parser.add_argument("--window-days", type=int, default=WINDOW_DAYS,
-                        help=f"Days before RFP posting to search for lobbying (default: {WINDOW_DAYS})")
+    parser.add_argument(
+        "--window-days",
+        type=int,
+        default=WINDOW_DAYS,
+        help=f"Days before RFP posting to search for lobbying (default: {WINDOW_DAYS})",
+    )
     args = parser.parse_args()
     result = run(window_days=args.window_days)
     return 0 if result.get("status") in ("OK", "SKIPPED") else 1

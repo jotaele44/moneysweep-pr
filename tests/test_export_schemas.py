@@ -6,6 +6,7 @@ GIS layer manifest — against their JSON schemas, independently of the producer
 that wrote them. This is the consumer-side guard: whatever is on disk must
 satisfy the published contract. Fully offline.
 """
+
 from __future__ import annotations
 
 import csv
@@ -32,6 +33,7 @@ def _read_csv(rel: str):
 # --------------------------------------------------------------------------- #
 # graph_export
 # --------------------------------------------------------------------------- #
+
 
 @pytest.mark.integration
 def test_graph_nodes_on_disk_validate():
@@ -70,6 +72,7 @@ def test_neo4j_exports_have_typed_headers():
 # --------------------------------------------------------------------------- #
 # gis_export
 # --------------------------------------------------------------------------- #
+
 
 @pytest.mark.integration
 def test_gis_layer_manifest_on_disk_validates():

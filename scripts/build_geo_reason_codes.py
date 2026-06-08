@@ -16,6 +16,7 @@ CLI::
     python scripts/build_geo_reason_codes.py            # write the CSV + manifest
     python scripts/build_geo_reason_codes.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -78,19 +79,23 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
     """Return one row per resolver code (reasons then jurisdiction classes)."""
     rows: list[dict[str, Any]] = []
     for code in GEO_RESOLUTION_REASONS:
-        rows.append({
-            "code": code,
-            "kind": "geo_resolution_reason",
-            "is_unknown": "true" if code in UNKNOWN_REASONS else "false",
-            "description": REASON_DESCRIPTIONS.get(code, ""),
-        })
+        rows.append(
+            {
+                "code": code,
+                "kind": "geo_resolution_reason",
+                "is_unknown": "true" if code in UNKNOWN_REASONS else "false",
+                "description": REASON_DESCRIPTIONS.get(code, ""),
+            }
+        )
     for code in JURISDICTION_CLASSES:
-        rows.append({
-            "code": code,
-            "kind": "jurisdiction_class",
-            "is_unknown": "true" if code in UNKNOWN_JURISDICTIONS else "false",
-            "description": JURISDICTION_DESCRIPTIONS.get(code, ""),
-        })
+        rows.append(
+            {
+                "code": code,
+                "kind": "jurisdiction_class",
+                "is_unknown": "true" if code in UNKNOWN_JURISDICTIONS else "false",
+                "description": JURISDICTION_DESCRIPTIONS.get(code, ""),
+            }
+        )
     return rows
 
 
@@ -158,7 +163,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

@@ -38,10 +38,10 @@ _Bring the tree to zero lint errors before flipping the gate, so the gate goes g
 ## WAVE C — Formatting (isolated; do after lint so the two don't interleave)
 _`ruff format` rewrites 507 files. Keep it surgical and reviewable._
 
-14. Decide & document the format-adoption strategy (one big-bang vs. dir-by-dir) in this file. Prerequisite for 15.
-15. Apply `ruff format .` in a **dedicated PR**, formatting only — no logic changes. **(big-diff)**
-16. Add the format-changing commit SHA to `.git-blame-ignore-revs` so blame stays readable.
-17. **(gate)** Add ruff-format pre-commit hook + gating `ruff format --check` CI step — depends on 15.
+14. **[done]** Strategy: one big-bang `ruff format .` in a dedicated PR (maintainer-approved), merged with a **merge commit** (not squash) so the format SHA persists for blame-ignore.
+15. **[done]** Applied `ruff format .` (428 files, formatting only) — full suite still 1616 passed. **(big-diff)**
+16. **[done]** Added the format commit SHA to `.git-blame-ignore-revs`.
+17. **[done] (gate)** Added `ruff-format` pre-commit hook + gating `ruff format --check .` CI step.
 
 ## WAVE D — Type-safety hardening (after lint/format; mypy widening)
 _Each step keeps the existing narrow mypy gate green while widening it._

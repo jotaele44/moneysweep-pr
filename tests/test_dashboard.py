@@ -4,6 +4,7 @@ Covers the source-provenance drilldown index, the analyst-reports catalog, and
 the self-contained static HTML explorer. Fully offline; the producers read
 committed artifacts and the schema validator is the stdlib interpreter.
 """
+
 from __future__ import annotations
 
 import json
@@ -25,6 +26,7 @@ def _schema(rel: str):
 # --------------------------------------------------------------------------- #
 # source_drilldown
 # --------------------------------------------------------------------------- #
+
 
 @pytest.mark.unit
 def test_source_drilldown_check_and_schema():
@@ -53,6 +55,7 @@ def test_source_drilldown_regenerates_identically():
 # analyst_reports
 # --------------------------------------------------------------------------- #
 
+
 @pytest.mark.unit
 def test_analyst_reports_check_and_live_counts():
     rows = bar.build_rows(REPO_ROOT)
@@ -79,6 +82,7 @@ def test_analyst_reports_regenerates_identically():
 # --------------------------------------------------------------------------- #
 # dashboard_app (static HTML explorer)
 # --------------------------------------------------------------------------- #
+
 
 @pytest.mark.unit
 def test_dashboard_html_is_deterministic_and_valid():

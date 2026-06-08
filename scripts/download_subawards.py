@@ -17,6 +17,7 @@ Usage:
   python3 scripts/download_subawards.py --force          # re-download existing
   python3 scripts/download_subawards.py --fy-start 2017  # only FY2017+
 """
+
 from __future__ import annotations
 
 import argparse
@@ -110,9 +111,11 @@ _HTTP = HttpConfig(
 def _session() -> requests.Session:
     return build_session("ContractSweeper/1.0")
 
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _derive_fiscal_year(date_str) -> str:
     """Derive fiscal year from a date string (YYYY-MM-DD). Oct-Dec → year+1."""
@@ -130,6 +133,7 @@ def _derive_fiscal_year(date_str) -> str:
 def _fetch_page(session: requests.Session, payload: dict, logger) -> dict | None:
     return http_post_json(session, USASPENDING_URL, payload, logger=logger, config=_HTTP)
 
+
 def _paginate(session: requests.Session, base_payload: dict, logger) -> list[dict]:
     def _fetch(page):
         payload = {**base_payload, "page": page}
@@ -146,6 +150,7 @@ def _paginate(session: requests.Session, base_payload: dict, logger) -> list[dic
         return PageResult(results, page + 1 if has_next else None)
 
     return list(paginate(_fetch, start_marker=1, max_pages=MAX_PAGES))
+
 
 def _build_payload(window: dict, type_codes: list) -> dict:
     """Build a spending_by_award subawards payload for the given time window and type group."""
@@ -218,6 +223,7 @@ def _file_has_data(filepath: Path) -> bool:
 # Core download logic
 # ---------------------------------------------------------------------------
 
+
 def download_window(
     session: requests.Session,
     window: dict,
@@ -271,6 +277,7 @@ def download_window(
 # Master build
 # ---------------------------------------------------------------------------
 
+
 def build_master(raw_dir: Path, master_path: Path, logger) -> int:
     """Concatenate all raw subaward CSVs, deduplicate by award_id, write master."""
     files = sorted(raw_dir.glob("subawards_*.csv"))
@@ -311,6 +318,7 @@ def build_master(raw_dir: Path, master_path: Path, logger) -> int:
 # Entry points
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None) -> dict:
     """Main entry point. Returns summary dict."""
     return _run(root=root, force=False, fy_start=None)
@@ -346,7 +354,12 @@ def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
             stats = download_window(session, window, raw_dir, force, logger)
         except Exception as e:
             logger.error(f"  Unexpected error on window {window['label']}: {e}")
-            stats = {"window": window["label"], "grant_rows": 0, "contract_rows": 0, "errors": [str(e)]}
+            stats = {
+                "window": window["label"],
+                "grant_rows": 0,
+                "contract_rows": 0,
+                "errors": [str(e)],
+            }
 
         total_rows += stats.get("grant_rows", 0) + stats.get("contract_rows", 0)
         all_errors.extend(stats["errors"])
@@ -382,9 +395,7 @@ def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Download USASpending subawards for Puerto Rico"
-    )
+    parser = argparse.ArgumentParser(description="Download USASpending subawards for Puerto Rico")
     parser.add_argument(
         "--force",
         action="store_true",

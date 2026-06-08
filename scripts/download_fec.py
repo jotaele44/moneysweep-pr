@@ -17,6 +17,7 @@ Usage:
   python3 scripts/download_fec.py --api-key YOUR_KEY
   python3 scripts/download_fec.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -46,18 +47,23 @@ _USER_AGENT = "ContractSweeper/1.0 (PR federal spending research)"
 
 FEC_BASE = "https://api.open.fec.gov/v1"
 PAGE_SIZE = 100
-PAGE_SLEEP_DEMO = 2.5   # stay well under 30 req/hour with DEMO_KEY
-PAGE_SLEEP_KEY  = 0.2   # with a real key (1,000 req/hour)
-MAX_RETRIES    = 3
-RETRY_BACKOFF  = [5, 15, 30]
+PAGE_SLEEP_DEMO = 2.5  # stay well under 30 req/hour with DEMO_KEY
+PAGE_SLEEP_KEY = 0.2  # with a real key (1,000 req/hour)
+MAX_RETRIES = 3
+RETRY_BACKOFF = [5, 15, 30]
 
 # Election cycles covered (FEC uses even years: the cycle ending that year)
 START_CYCLE = 2000
+
+
 # FEC cycles are even years; dynamically include the current cycle
 def _current_fec_cycle() -> int:
     from datetime import date
+
     y = date.today().year
     return y if y % 2 == 0 else y + 1
+
+
 END_CYCLE = _current_fec_cycle()
 
 OUTPUT_COLUMNS = [
@@ -84,6 +90,7 @@ OUTPUT_COLUMNS = [
 # Network helpers
 # ---------------------------------------------------------------------------
 
+
 def _session(api_key: str) -> requests.Session:
     return build_session(_USER_AGENT, {"X-Api-Key": api_key})
 
@@ -97,6 +104,7 @@ def _get(session: requests.Session, url: str, params: dict, logger, sleep_s: flo
 # ---------------------------------------------------------------------------
 # FEC Schedule A fetcher
 # ---------------------------------------------------------------------------
+
 
 def _fetch_cycle(session: requests.Session, cycle: int, sleep_s: float, logger) -> list[dict]:
     """Fetch all Schedule A contributions from PR for one election cycle."""
@@ -123,24 +131,26 @@ def _fetch_cycle(session: requests.Session, cycle: int, sleep_s: float, logger) 
         for rec in results:
             committee = rec.get("committee") or {}
             candidate = rec.get("candidate") or {}
-            recs.append({
-                "cycle":                       cycle,
-                "contributor_name":            rec.get("contributor_name", ""),
-                "contributor_city":            rec.get("contributor_city", ""),
-                "contributor_zip_code":        rec.get("contributor_zip_code", ""),
-                "contributor_employer":        rec.get("contributor_employer", ""),
-                "contributor_occupation":      rec.get("contributor_occupation", ""),
-                "contribution_receipt_amount": rec.get("contribution_receipt_amount", ""),
-                "contribution_receipt_date":   rec.get("contribution_receipt_date", ""),
-                "committee_id":                rec.get("committee_id", ""),
-                "committee_name":              committee.get("name", rec.get("committee_name", "")),
-                "candidate_id":                rec.get("candidate_id", ""),
-                "candidate_name":              candidate.get("name", ""),
-                "report_year":                 rec.get("report_year", ""),
-                "election_type":               rec.get("election_type", ""),
-                "memo_text":                   rec.get("memo_text", ""),
-                "is_individual":               rec.get("entity_type", "") == "IND",
-            })
+            recs.append(
+                {
+                    "cycle": cycle,
+                    "contributor_name": rec.get("contributor_name", ""),
+                    "contributor_city": rec.get("contributor_city", ""),
+                    "contributor_zip_code": rec.get("contributor_zip_code", ""),
+                    "contributor_employer": rec.get("contributor_employer", ""),
+                    "contributor_occupation": rec.get("contributor_occupation", ""),
+                    "contribution_receipt_amount": rec.get("contribution_receipt_amount", ""),
+                    "contribution_receipt_date": rec.get("contribution_receipt_date", ""),
+                    "committee_id": rec.get("committee_id", ""),
+                    "committee_name": committee.get("name", rec.get("committee_name", "")),
+                    "candidate_id": rec.get("candidate_id", ""),
+                    "candidate_name": candidate.get("name", ""),
+                    "report_year": rec.get("report_year", ""),
+                    "election_type": rec.get("election_type", ""),
+                    "memo_text": rec.get("memo_text", ""),
+                    "is_individual": rec.get("entity_type", "") == "IND",
+                }
+            )
 
         pagination = data.get("pagination", {})
         total_pages = pagination.get("pages", 1)
@@ -159,6 +169,7 @@ def _fetch_cycle(session: requests.Session, cycle: int, sleep_s: float, logger) 
 # Entry points
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
     return _run(root=root, api_key=api_key, force=force)
 
@@ -167,8 +178,8 @@ def _run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 
-    raw_dir     = root / "data" / "staging" / "raw" / "fec"
-    raw_path    = raw_dir / "fec_pr_contributions.csv"
+    raw_dir = root / "data" / "staging" / "raw" / "fec"
+    raw_path = raw_dir / "fec_pr_contributions.csv"
     master_path = root / "data" / "staging" / "processed" / "pr_fec_contributions.csv"
     raw_dir.mkdir(parents=True, exist_ok=True)
     master_path.parent.mkdir(parents=True, exist_ok=True)
@@ -186,14 +197,16 @@ def _run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
             "for a free key from https://api.data.gov/signup/"
         )
 
-    logger.info(f"Starting FEC Schedule A download for Puerto Rico (cycles {START_CYCLE}-{END_CYCLE})...")
+    logger.info(
+        f"Starting FEC Schedule A download for Puerto Rico (cycles {START_CYCLE}-{END_CYCLE})..."
+    )
 
     if not force and raw_path.exists():
         logger.info("  Raw file exists — loading for master build")
         df = pd.read_csv(raw_path, dtype=str, low_memory=False)
         all_records = df.to_dict("records")
     else:
-        session   = _session(api_key)
+        session = _session(api_key)
         all_records = []
         cycles = list(range(START_CYCLE, END_CYCLE + 2, 2))  # 2000, 2002, ..., 2024
 
@@ -213,7 +226,11 @@ def _run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
         df_raw.to_csv(raw_path, index=False, encoding="utf-8")
         logger.info(f"  Raw: {len(df_raw):,} records → {raw_path.name}")
 
-    df = pd.DataFrame(all_records) if isinstance(all_records[0], dict) else pd.read_csv(raw_path, dtype=str)
+    df = (
+        pd.DataFrame(all_records)
+        if isinstance(all_records[0], dict)
+        else pd.read_csv(raw_path, dtype=str)
+    )
 
     # Ensure all output columns present
     for col in OUTPUT_COLUMNS:
@@ -224,7 +241,12 @@ def _run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
     # Deduplicate on (contributor_name, committee_id, contribution_receipt_date, amount)
     before = len(df)
     df = df.drop_duplicates(
-        subset=["contributor_name", "committee_id", "contribution_receipt_date", "contribution_receipt_amount"],
+        subset=[
+            "contributor_name",
+            "committee_id",
+            "contribution_receipt_date",
+            "contribution_receipt_amount",
+        ],
         keep="first",
     )
     if len(df) < before:
@@ -234,10 +256,10 @@ def _run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
     logger.info(f"  Master written: {len(df):,} rows → {master_path.name}")
 
     summary = {
-        "rows":       len(df),
-        "raw_rows":   before,
+        "rows": len(df),
+        "raw_rows": before,
         "master_path": str(master_path),
-        "status":     "OK" if len(df) > 0 else "EMPTY",
+        "status": "OK" if len(df) > 0 else "EMPTY",
     }
 
     logger.info("=" * 60)
@@ -250,9 +272,15 @@ def _run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Download FEC Schedule A contributions from Puerto Rico")
-    parser.add_argument("--api-key", dest="api_key", default=None,
-                        help="FEC API key (default: FEC_API_KEY env var or DEMO_KEY)")
+    parser = argparse.ArgumentParser(
+        description="Download FEC Schedule A contributions from Puerto Rico"
+    )
+    parser.add_argument(
+        "--api-key",
+        dest="api_key",
+        default=None,
+        help="FEC API key (default: FEC_API_KEY env var or DEMO_KEY)",
+    )
     parser.add_argument("--force", action="store_true", help="Re-download even if raw file exists")
     args = parser.parse_args()
     summary = _run(api_key=args.api_key, force=args.force)

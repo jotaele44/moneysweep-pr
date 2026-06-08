@@ -202,9 +202,7 @@ def test_r49f_passes_with_missing_sources_queued(tmp_path: Path):
         tmp_path / "data" / "review_queue" / "source_delivery_still_missing_r4_9f.csv"
     )
     assert len(missing_rows) == 2
-    unfreeze_rows = _csv_rows(
-        tmp_path / "data" / "review_queue" / "unfreeze_candidates_r4_9f.csv"
-    )
+    unfreeze_rows = _csv_rows(tmp_path / "data" / "review_queue" / "unfreeze_candidates_r4_9f.csv")
     assert len(unfreeze_rows) == 0
 
 
@@ -266,9 +264,7 @@ def test_r49f_detects_unfreeze_candidate_without_materializing(tmp_path: Path):
     assert status["production_status"] == "NON_PRODUCTION_DIAGNOSTIC"
     assert status["phase_7_8_blocked"] is True
 
-    unfreeze_rows = _csv_rows(
-        tmp_path / "data" / "review_queue" / "unfreeze_candidates_r4_9f.csv"
-    )
+    unfreeze_rows = _csv_rows(tmp_path / "data" / "review_queue" / "unfreeze_candidates_r4_9f.csv")
     assert len(unfreeze_rows) == 1
     assert unfreeze_rows[0]["expected_input"] == "data/staging/processed/pr_contracts_master.csv"
 

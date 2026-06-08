@@ -16,6 +16,7 @@ Usage:
   python3 scripts/ingest_donaciones.py
   python3 scripts/ingest_donaciones.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -50,48 +51,102 @@ OUTPUT_COLUMNS = [
 # Column name candidates for each output field (tried in order, first match wins)
 COL_MAP = {
     "cycle": [
-        "ciclo", "cycle", "año_eleccion", "ano_eleccion", "election_year",
-        "año electoral", "anio_electoral",
+        "ciclo",
+        "cycle",
+        "año_eleccion",
+        "ano_eleccion",
+        "election_year",
+        "año electoral",
+        "anio_electoral",
     ],
     "donor_name": [
-        "nombre_donante", "nombre donante", "donante", "donor_name",
-        "nombre_contribuyente", "contribuyente", "nombre",
+        "nombre_donante",
+        "nombre donante",
+        "donante",
+        "donor_name",
+        "nombre_contribuyente",
+        "contribuyente",
+        "nombre",
     ],
     "donor_city": [
-        "ciudad_donante", "ciudad", "city", "donor_city", "municipio",
+        "ciudad_donante",
+        "ciudad",
+        "city",
+        "donor_city",
+        "municipio",
     ],
     "donor_zip_code": [
-        "zip_donante", "zip", "codigo_postal", "postal_code", "donor_zip",
+        "zip_donante",
+        "zip",
+        "codigo_postal",
+        "postal_code",
+        "donor_zip",
     ],
     "donor_employer": [
-        "patrono", "empleador", "employer", "donor_employer", "empleo",
+        "patrono",
+        "empleador",
+        "employer",
+        "donor_employer",
+        "empleo",
     ],
     "donor_occupation": [
-        "ocupacion", "ocupación", "occupation", "donor_occupation", "profesion",
+        "ocupacion",
+        "ocupación",
+        "occupation",
+        "donor_occupation",
+        "profesion",
     ],
     "amount": [
-        "cantidad", "monto", "amount", "contribucion", "contribution_amount",
-        "donativo", "donación",
+        "cantidad",
+        "monto",
+        "amount",
+        "contribucion",
+        "contribution_amount",
+        "donativo",
+        "donación",
     ],
     "contribution_date": [
-        "fecha_donacion", "fecha donacion", "fecha", "date", "contribution_date",
+        "fecha_donacion",
+        "fecha donacion",
+        "fecha",
+        "date",
+        "contribution_date",
         "fecha_contribucion",
     ],
     "candidate_or_committee": [
-        "candidato_comite", "candidato", "comite", "candidate", "committee",
-        "candidato_o_comite", "nombre_comite",
+        "candidato_comite",
+        "candidato",
+        "comite",
+        "candidate",
+        "committee",
+        "candidato_o_comite",
+        "nombre_comite",
     ],
     "party": [
-        "partido", "party", "partido_politico",
+        "partido",
+        "party",
+        "partido_politico",
     ],
     "office_sought": [
-        "cargo", "puesto", "office", "office_sought", "posicion",
+        "cargo",
+        "puesto",
+        "office",
+        "office_sought",
+        "posicion",
     ],
     "election_type": [
-        "tipo_eleccion", "tipo eleccion", "election_type", "tipo", "eleccion",
+        "tipo_eleccion",
+        "tipo eleccion",
+        "election_type",
+        "tipo",
+        "eleccion",
     ],
     "report_type": [
-        "tipo_informe", "informe", "report_type", "report", "tipo_reporte",
+        "tipo_informe",
+        "informe",
+        "report_type",
+        "report",
+        "tipo_reporte",
     ],
 }
 
@@ -145,7 +200,8 @@ def run(root: Path = None, force: bool = False) -> dict:
         return {"rows": 0, "path": str(out_path), "status": "NO_FILES"}
 
     csv_files = sorted(
-        f for f in raw_dir.iterdir()
+        f
+        for f in raw_dir.iterdir()
         if f.suffix.lower() in (".csv", ".xlsx", ".xls") and not f.name.startswith("~")
     )
     if not csv_files:

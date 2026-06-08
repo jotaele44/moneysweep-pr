@@ -11,15 +11,21 @@ Usage:
   python3 scripts/build_unified_master.py          # build unified master
   python3 scripts/build_unified_master.py --force  # rebuild even if exists
 """
+
 from __future__ import annotations
 
 import re
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts.config import (
-    PROJECT_ROOT, setup_logging,
-    SOURCE_PRIORITY, EXPANSION_PRIORITY, REQUIRED_MASTER_COLUMNS, NULL_THRESHOLDS,
+    PROJECT_ROOT,
+    setup_logging,
+    SOURCE_PRIORITY,
+    EXPANSION_PRIORITY,
+    REQUIRED_MASTER_COLUMNS,
+    NULL_THRESHOLDS,
 )
 from contract_sweeper.runtime.post_ingest import apply_post_ingest
 import pandas as pd
@@ -69,22 +75,22 @@ FORBIDDEN_INPUT_TOKENS = (
 # ---------------------------------------------------------------------------
 
 NEW_MASTERS = [
-    ("pr_grants_master.csv",    "grants"),
+    ("pr_grants_master.csv", "grants"),
     ("pr_subawards_master.csv", "subawards"),
-    ("pr_fema_pa_master.csv",   "fema_pa"),
+    ("pr_fema_pa_master.csv", "fema_pa"),
     ("pr_fema_hmgp_master.csv", "fema_hmgp"),
-    ("pr_research_master.csv",  "research"),
+    ("pr_research_master.csv", "research"),
     ("pr_sba_loans_master.csv", "sba_loans"),
-    ("pr_slfrf_master.csv",     "slfrf"),
-    ("pr_cdbg_dr_master.csv",   "cdbg_dr"),
-    ("pr_dot_master.csv",       "dot"),
-    ("pr_usda_master.csv",      "usda"),
-    ("pr_doe_master.csv",       "doe"),
-    ("pr_hud_master.csv",       "hud"),
-    ("pr_sbir_master.csv",      "sbir"),
-    ("pr_epa_master.csv",         "epa"),
+    ("pr_slfrf_master.csv", "slfrf"),
+    ("pr_cdbg_dr_master.csv", "cdbg_dr"),
+    ("pr_dot_master.csv", "dot"),
+    ("pr_usda_master.csv", "usda"),
+    ("pr_doe_master.csv", "doe"),
+    ("pr_hud_master.csv", "hud"),
+    ("pr_sbir_master.csv", "sbir"),
+    ("pr_epa_master.csv", "epa"),
     ("pr_usace_civil_master.csv", "usace_civil"),
-    ("pr_wioa_grants.csv",        "wioa"),
+    ("pr_wioa_grants.csv", "wioa"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -101,16 +107,16 @@ EXPANSION_FILES = [
 ]
 
 EXPANSION_RENAME = {
-    "Award ID":                        "award_id",
-    "Recipient Name":                  "recipient_name",
-    "Awarding Agency":                 "awarding_agency",
-    "Awarding Sub Agency":             "awarding_sub_agency",
-    "Total Obligation":                "obligated_amount",
-    "Start Date":                      "award_date",
+    "Award ID": "award_id",
+    "Recipient Name": "recipient_name",
+    "Awarding Agency": "awarding_agency",
+    "Awarding Sub Agency": "awarding_sub_agency",
+    "Total Obligation": "obligated_amount",
+    "Start Date": "award_date",
     "Place of Performance State Code": "pop_state",
-    "Place of Performance City":       "pop_county",
-    "Description":                     "description",
-    "generated_internal_id":           "_fallback_id",
+    "Place of Performance City": "pop_county",
+    "Description": "description",
+    "generated_internal_id": "_fallback_id",
 }
 
 # ---------------------------------------------------------------------------
@@ -120,9 +126,25 @@ EXPANSION_RENAME = {
 _STRIP_RE = re.compile(r"[^\w\s]")
 _SPACE_RE = re.compile(r"\s+")
 _NAME_SUFFIXES = {
-    "INC", "LLC", "LLP", "CORP", "CO", "LTD", "LP", "PC",
-    "PLLC", "DBA", "THE", "AND", "OF", "SA", "SRL",
-    "HOSPITAL", "HEALTH", "CENTER", "CENTRE",
+    "INC",
+    "LLC",
+    "LLP",
+    "CORP",
+    "CO",
+    "LTD",
+    "LP",
+    "PC",
+    "PLLC",
+    "DBA",
+    "THE",
+    "AND",
+    "OF",
+    "SA",
+    "SRL",
+    "HOSPITAL",
+    "HEALTH",
+    "CENTER",
+    "CENTRE",
 }
 
 
@@ -146,11 +168,13 @@ _POP_STATE_MAP = {
 
 def _standardize_pop_state(series: pd.Series) -> pd.Series:
     """Normalize pop_state: 'Puerto Rico' → 'PR', '72' → 'PR'. Others unchanged."""
+
     def _norm(val):
         if pd.isna(val) or str(val).strip() == "":
             return val
         lowered = str(val).strip().lower()
         return _POP_STATE_MAP.get(lowered, str(val).strip())
+
     return series.map(_norm)
 
 
@@ -162,7 +186,11 @@ def _derive_fiscal_year(date_series: pd.Series) -> pd.Series:
     """
     dates = pd.to_datetime(date_series, errors="coerce")
     fy = dates.apply(
-        lambda d: str(d.year + 1) if (not pd.isna(d) and d.month >= 10) else (str(d.year) if not pd.isna(d) else "")
+        lambda d: (
+            str(d.year + 1)
+            if (not pd.isna(d) and d.month >= 10)
+            else (str(d.year) if not pd.isna(d) else "")
+        )
     )
     return fy
 
@@ -201,9 +229,7 @@ def _apply_lineage(
     fallback_ids = pd.Series(range(1, len(df) + 1), index=df.index).astype(str)
     award_ids = df["award_id"].fillna("").astype(str).str.strip()
     has_award = award_ids != ""
-    df["source_record_id"] = (
-        source_system + ":" + award_ids.where(has_award, "ROW_" + fallback_ids)
-    )
+    df["source_record_id"] = source_system + ":" + award_ids.where(has_award, "ROW_" + fallback_ids)
     df["source_system"] = source_system
     df["source_lineage_path"] = lineage_path
     df["source_lineage_mode"] = lineage_mode
@@ -213,6 +239,7 @@ def _apply_lineage(
 # ---------------------------------------------------------------------------
 # Core logic
 # ---------------------------------------------------------------------------
+
 
 def run(
     root=None,
@@ -262,23 +289,23 @@ def run(
             df_c = pd.read_csv(contracts_path, dtype=str, low_memory=False)
             # Remap legacy columns → canonical
             df_canon = pd.DataFrame()
-            df_canon["award_id"]          = df_c.get("contract_id", pd.Series(dtype=str))
-            df_canon["recipient_name"]    = df_c.get("vendor_name",  pd.Series(dtype=str))
-            df_canon["awarding_agency"]   = df_c.get("agency_name",  pd.Series(dtype=str))
-            df_canon["award_date"]        = df_c.get("award_date",   pd.Series(dtype=str))
-            df_canon["obligated_amount"]  = df_c.get("obligated_amount", pd.Series(dtype=str))
-            df_canon["pop_state"]         = df_c.get("pop_state",    pd.Series(dtype=str))
-            df_canon["source_file"]       = df_c.get("source_file",  pd.Series(dtype=str))
-            df_canon["fiscal_year"]       = df_c.get("fiscal_year",  pd.Series(dtype=str))
+            df_canon["award_id"] = df_c.get("contract_id", pd.Series(dtype=str))
+            df_canon["recipient_name"] = df_c.get("vendor_name", pd.Series(dtype=str))
+            df_canon["awarding_agency"] = df_c.get("agency_name", pd.Series(dtype=str))
+            df_canon["award_date"] = df_c.get("award_date", pd.Series(dtype=str))
+            df_canon["obligated_amount"] = df_c.get("obligated_amount", pd.Series(dtype=str))
+            df_canon["pop_state"] = df_c.get("pop_state", pd.Series(dtype=str))
+            df_canon["source_file"] = df_c.get("source_file", pd.Series(dtype=str))
+            df_canon["fiscal_year"] = df_c.get("fiscal_year", pd.Series(dtype=str))
             # Fixed values
-            df_canon["source_dataset"]    = "contracts"
-            df_canon["award_category"]    = "contract"
+            df_canon["source_dataset"] = "contracts"
+            df_canon["award_category"] = "contract"
             # Blank placeholders
-            df_canon["recipient_uei"]     = ""
+            df_canon["recipient_uei"] = ""
             df_canon["awarding_sub_agency"] = ""
-            df_canon["pop_county"]        = ""
-            df_canon["description"]       = ""
-            df_canon["source_system"]     = "contracts"
+            df_canon["pop_county"] = ""
+            df_canon["description"] = ""
+            df_canon["source_system"] = "contracts"
             df_canon = _apply_lineage(
                 df_canon,
                 source_system="contracts",
@@ -319,7 +346,9 @@ def run(
                             df_canon["recipient_name"].map(uei_map).fillna("")
                         )
                         resolved = (df_canon["recipient_uei"] != "").sum()
-                        logger.info(f"  UEI enrichment: {resolved:,} of {len(df_canon):,} rows resolved")
+                        logger.info(
+                            f"  UEI enrichment: {resolved:,} of {len(df_canon):,} rows resolved"
+                        )
                     else:
                         logger.warning(
                             f"  master_enriched.csv found but missing expected columns "
@@ -381,13 +410,15 @@ def run(
             if df_exp.empty:
                 logger.info(f"  {fname}: empty")
                 continue
-            df_exp = df_exp.rename(columns={k: v for k, v in EXPANSION_RENAME.items() if k in df_exp.columns})
+            df_exp = df_exp.rename(
+                columns={k: v for k, v in EXPANSION_RENAME.items() if k in df_exp.columns}
+            )
             # award_id: prefer Award ID rename; fall back to generated_internal_id
             if "award_id" not in df_exp.columns or df_exp["award_id"].isna().all():
                 if "_fallback_id" in df_exp.columns:
                     df_exp["award_id"] = df_exp["_fallback_id"]
             df_exp.drop(columns=["_fallback_id"], inplace=True, errors="ignore")
-            df_exp["source_file"]    = fname
+            df_exp["source_file"] = fname
             df_exp["source_dataset"] = "contracts"
             df_exp["award_category"] = "contract"
             for col in CANONICAL_COLUMNS:
@@ -444,19 +475,25 @@ def run(
     after_dedup = len(unified)
     removed = before_dedup - after_dedup
     if removed:
-        logger.info(f"  Deduplication: removed {removed:,} within-dataset duplicates ({after_dedup:,} rows remain)")
+        logger.info(
+            f"  Deduplication: removed {removed:,} within-dataset duplicates ({after_dedup:,} rows remain)"
+        )
 
     # ------------------------------------------------------------------
     # 5a. Global award_id dedup — priority-based (lower number wins)
     # ------------------------------------------------------------------
-    unified["_priority"] = unified["source_dataset"].map(SOURCE_PRIORITY).fillna(EXPANSION_PRIORITY).astype(int)
+    unified["_priority"] = (
+        unified["source_dataset"].map(SOURCE_PRIORITY).fillna(EXPANSION_PRIORITY).astype(int)
+    )
     unified = unified.sort_values(["award_id", "_priority"], na_position="last")
     before_global = len(unified)
     unified = unified.drop_duplicates(subset=["award_id"], keep="first")
     unified = unified.drop(columns=["_priority"])
     removed_global = before_global - len(unified)
     if removed_global:
-        logger.info(f"  Priority dedup: removed {removed_global:,} lower-priority duplicates ({len(unified):,} rows remain)")
+        logger.info(
+            f"  Priority dedup: removed {removed_global:,} lower-priority duplicates ({len(unified):,} rows remain)"
+        )
 
     # ------------------------------------------------------------------
     # 5b. Compute recipient_name_normalized
@@ -508,8 +545,9 @@ def run(
             f"({n_unique:,} unique / {n_deduped:,} non-empty rows)"
         )
         top_dups = (
-            n_nonempty[n_nonempty["award_id"].duplicated(keep=False)]
-            ["award_id"].value_counts().head(5)
+            n_nonempty[n_nonempty["award_id"].duplicated(keep=False)]["award_id"]
+            .value_counts()
+            .head(5)
         )
         logger.error(f"  Top duplicate IDs: {top_dups.to_dict()}")
     else:
@@ -537,7 +575,8 @@ def run(
 
     # Fiscal year gap detection
     fy_present = set(
-        str(int(float(y))) for y in unified["fiscal_year"].dropna()
+        str(int(float(y)))
+        for y in unified["fiscal_year"].dropna()
         if str(y).strip() not in ("", "nan")
     )
     fy_expected = set(str(y) for y in range(2000, 2026))
@@ -564,8 +603,14 @@ def run(
     total_rows = len(unified)
     total_obligation = float(unified["_amount_num"].sum())
     unique_recipients = int(unified["recipient_name"].dropna().nunique())
-    unique_normalized_entities = int(unified["recipient_name_normalized"].replace("", pd.NA).dropna().nunique())
-    lineage_non_empty = int(unified["source_record_id"].replace("", pd.NA).dropna().shape[0]) if "source_record_id" in unified.columns else 0
+    unique_normalized_entities = int(
+        unified["recipient_name_normalized"].replace("", pd.NA).dropna().nunique()
+    )
+    lineage_non_empty = (
+        int(unified["source_record_id"].replace("", pd.NA).dropna().shape[0])
+        if "source_record_id" in unified.columns
+        else 0
+    )
     lineage_coverage = float(lineage_non_empty / total_rows) if total_rows > 0 else 0.0
 
     by_dataset = {}
@@ -609,7 +654,9 @@ def run(
     # ------------------------------------------------------------------
     # 10b. Write entity_master.csv — one row per unique normalized entity
     # ------------------------------------------------------------------
-    unified["_amount_num2"] = pd.to_numeric(unified["obligated_amount"], errors="coerce").fillna(0.0)
+    unified["_amount_num2"] = pd.to_numeric(unified["obligated_amount"], errors="coerce").fillna(
+        0.0
+    )
 
     def _yr_range(series):
         vals = pd.to_numeric(series, errors="coerce").dropna()
@@ -622,15 +669,18 @@ def run(
         unified[unified["recipient_name_normalized"] != ""]
         .groupby("recipient_name_normalized")
         .agg(
-            canonical_name    = ("recipient_name",     "first"),
-            recipient_uei     = ("recipient_uei",      "first"),
-            total_obligated   = ("_amount_num2",       "sum"),
-            award_count       = ("award_id",           "nunique"),
-            source_datasets   = ("source_dataset",     lambda x: "|".join(sorted(x.dropna().unique()))),
-            awarding_agencies = ("awarding_agency",    lambda x: "|".join(sorted(x.dropna().unique())[:5])),
-            first_award_date  = ("award_date",         lambda x: x.dropna().min() if x.notna().any() else ""),
-            last_award_date   = ("award_date",         lambda x: x.dropna().max() if x.notna().any() else ""),
-            fiscal_year_range = ("fiscal_year",        _yr_range),
+            canonical_name=("recipient_name", "first"),
+            recipient_uei=("recipient_uei", "first"),
+            total_obligated=("_amount_num2", "sum"),
+            award_count=("award_id", "nunique"),
+            source_datasets=("source_dataset", lambda x: "|".join(sorted(x.dropna().unique()))),
+            awarding_agencies=(
+                "awarding_agency",
+                lambda x: "|".join(sorted(x.dropna().unique())[:5]),
+            ),
+            first_award_date=("award_date", lambda x: x.dropna().min() if x.notna().any() else ""),
+            last_award_date=("award_date", lambda x: x.dropna().max() if x.notna().any() else ""),
+            fiscal_year_range=("fiscal_year", _yr_range),
         )
         .reset_index()
         .rename(columns={"recipient_name_normalized": "entity_key"})
@@ -639,7 +689,9 @@ def run(
     )
     entity_master_path = processed_dir / "entity_master.csv"
     entity_master.to_csv(entity_master_path, index=False, encoding="utf-8")
-    logger.info(f"  Entity master: {entity_master_path.name} ({len(entity_master):,} unique entities)")
+    logger.info(
+        f"  Entity master: {entity_master_path.name} ({len(entity_master):,} unique entities)"
+    )
 
     summary["outputs"]["entity_master"] = str(entity_master_path)
     unified.drop(columns=["_amount_num2"], inplace=True, errors="ignore")
@@ -662,6 +714,7 @@ def run(
 # CLI entry point
 # ---------------------------------------------------------------------------
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Build unified awards master CSV from all dataset masters."
@@ -679,10 +732,7 @@ def main() -> int:
 
     output_path = processed_dir / "pr_all_awards_master.csv"
     if output_path.exists() and not args.force:
-        logger.info(
-            f"Unified master already exists: {output_path}\n"
-            "Use --force to rebuild."
-        )
+        logger.info(f"Unified master already exists: {output_path}\nUse --force to rebuild.")
         return 0
 
     logger.info("Building unified awards master...")

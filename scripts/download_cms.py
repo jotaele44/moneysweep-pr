@@ -24,6 +24,7 @@ Usage:
   python3 scripts/download_cms.py --skip-medicare
   python3 scripts/download_cms.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -42,12 +43,12 @@ from scripts.config import PROJECT_ROOT, setup_logging
 # Constants
 # ---------------------------------------------------------------------------
 
-OPEN_PAYMENTS_BASE  = "https://openpaymentsdata.cms.gov/api/1"
-CMS_DATA_BASE       = "https://data.cms.gov/data-api/v1/dataset"
+OPEN_PAYMENTS_BASE = "https://openpaymentsdata.cms.gov/api/1"
+CMS_DATA_BASE = "https://data.cms.gov/data-api/v1/dataset"
 
-PAGE_SIZE    = 5000
-PAGE_SLEEP   = 0.4
-MAX_RETRIES  = 3
+PAGE_SIZE = 5000
+PAGE_SLEEP = 0.4
+MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 # Open Payments catalog tag to filter for the General Payments dataset
@@ -63,38 +64,84 @@ MEDICARE_DATASET_IDS = [
 
 # Known CMS PR Open Payments seed rows (major pharmaceutical payments to PR physicians)
 KNOWN_OPEN_PAYMENTS = [
-    {"payment_year": "2022", "payer_name": "AbbVie Inc", "payer_state": "IL",
-     "recipient_type": "Covered Recipient Physician", "covered_recipient_npi": "1700000001",
-     "recipient_name": "Juan Rodriguez Morales", "recipient_specialty": "Internal Medicine",
-     "recipient_city": "San Juan", "recipient_state": "PR", "total_amount": "12500",
-     "payment_nature": "Compensation for services", "payment_form": "Cash or cash equivalent",
-     "product_type": "Drug", "product_category": "Cardiovascular", "product_name": "Humira",
-     "dispute_status": "Not Disputed"},
-    {"payment_year": "2022", "payer_name": "Pfizer Inc", "payer_state": "NY",
-     "recipient_type": "Covered Recipient Physician", "covered_recipient_npi": "1700000002",
-     "recipient_name": "Maria Santos Rivera", "recipient_specialty": "Oncology",
-     "recipient_city": "Bayamon", "recipient_state": "PR", "total_amount": "8750",
-     "payment_nature": "Speaker program", "payment_form": "Cash or cash equivalent",
-     "product_type": "Drug", "product_category": "Oncology", "product_name": "Ibrance",
-     "dispute_status": "Not Disputed"},
+    {
+        "payment_year": "2022",
+        "payer_name": "AbbVie Inc",
+        "payer_state": "IL",
+        "recipient_type": "Covered Recipient Physician",
+        "covered_recipient_npi": "1700000001",
+        "recipient_name": "Juan Rodriguez Morales",
+        "recipient_specialty": "Internal Medicine",
+        "recipient_city": "San Juan",
+        "recipient_state": "PR",
+        "total_amount": "12500",
+        "payment_nature": "Compensation for services",
+        "payment_form": "Cash or cash equivalent",
+        "product_type": "Drug",
+        "product_category": "Cardiovascular",
+        "product_name": "Humira",
+        "dispute_status": "Not Disputed",
+    },
+    {
+        "payment_year": "2022",
+        "payer_name": "Pfizer Inc",
+        "payer_state": "NY",
+        "recipient_type": "Covered Recipient Physician",
+        "covered_recipient_npi": "1700000002",
+        "recipient_name": "Maria Santos Rivera",
+        "recipient_specialty": "Oncology",
+        "recipient_city": "Bayamon",
+        "recipient_state": "PR",
+        "total_amount": "8750",
+        "payment_nature": "Speaker program",
+        "payment_form": "Cash or cash equivalent",
+        "product_type": "Drug",
+        "product_category": "Oncology",
+        "product_name": "Ibrance",
+        "dispute_status": "Not Disputed",
+    },
 ]
 
 # Known CMS PR Medicare provider seed rows (from CMS public data)
 KNOWN_MEDICARE_PROVIDERS = [
-    {"npi": "1700000001", "provider_last_name": "Rodriguez", "provider_first_name": "Juan",
-     "provider_credentials": "MD", "provider_gender": "M", "provider_entity_type": "I",
-     "provider_city": "San Juan", "provider_state": "PR", "provider_zip": "00901",
-     "provider_type": "Internal Medicine", "total_submitted_charges": "450000",
-     "total_medicare_allowed": "180000", "total_medicare_payment": "144000",
-     "total_medicare_standardized": "140000", "total_services": "2400",
-     "total_unique_benes": "320", "drug_suppress_indicator": ""},
-    {"npi": "1700000002", "provider_last_name": "Santos", "provider_first_name": "Maria",
-     "provider_credentials": "MD", "provider_gender": "F", "provider_entity_type": "I",
-     "provider_city": "Bayamon", "provider_state": "PR", "provider_zip": "00961",
-     "provider_type": "Oncology", "total_submitted_charges": "920000",
-     "total_medicare_allowed": "380000", "total_medicare_payment": "304000",
-     "total_medicare_standardized": "298000", "total_services": "1800",
-     "total_unique_benes": "210", "drug_suppress_indicator": ""},
+    {
+        "npi": "1700000001",
+        "provider_last_name": "Rodriguez",
+        "provider_first_name": "Juan",
+        "provider_credentials": "MD",
+        "provider_gender": "M",
+        "provider_entity_type": "I",
+        "provider_city": "San Juan",
+        "provider_state": "PR",
+        "provider_zip": "00901",
+        "provider_type": "Internal Medicine",
+        "total_submitted_charges": "450000",
+        "total_medicare_allowed": "180000",
+        "total_medicare_payment": "144000",
+        "total_medicare_standardized": "140000",
+        "total_services": "2400",
+        "total_unique_benes": "320",
+        "drug_suppress_indicator": "",
+    },
+    {
+        "npi": "1700000002",
+        "provider_last_name": "Santos",
+        "provider_first_name": "Maria",
+        "provider_credentials": "MD",
+        "provider_gender": "F",
+        "provider_entity_type": "I",
+        "provider_city": "Bayamon",
+        "provider_state": "PR",
+        "provider_zip": "00961",
+        "provider_type": "Oncology",
+        "total_submitted_charges": "920000",
+        "total_medicare_allowed": "380000",
+        "total_medicare_payment": "304000",
+        "total_medicare_standardized": "298000",
+        "total_services": "1800",
+        "total_unique_benes": "210",
+        "drug_suppress_indicator": "",
+    },
 ]
 
 OPEN_PAYMENTS_COLUMNS = [
@@ -141,17 +188,26 @@ MEDICARE_COLUMNS = [
 # Network helpers
 # ---------------------------------------------------------------------------
 
+
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR healthcare spending research)",
-        "Accept":     "application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR healthcare spending research)",
+            "Accept": "application/json",
+        }
+    )
     return s
 
 
-def _get(session: requests.Session, url: str, params: dict, logger,
-         method: str = "GET", json_body: dict = None) -> dict | list | None:
+def _get(
+    session: requests.Session,
+    url: str,
+    params: dict,
+    logger,
+    method: str = "GET",
+    json_body: dict = None,
+) -> dict | list | None:
     for attempt in range(MAX_RETRIES):
         try:
             if method == "POST":
@@ -184,9 +240,10 @@ def _get(session: requests.Session, url: str, params: dict, logger,
 # Open Payments
 # ---------------------------------------------------------------------------
 
+
 def _discover_open_payments_datasets(session: requests.Session, logger) -> list[str]:
     """Return resource UUIDs for all Open Payments 'General' payment datasets."""
-    url  = f"{OPEN_PAYMENTS_BASE}/metastore/schemas/dataset/items"
+    url = f"{OPEN_PAYMENTS_BASE}/metastore/schemas/dataset/items"
     data = _get(session, url, {"limit": 500, "offset": 0}, logger)
     if not data:
         return []
@@ -196,7 +253,7 @@ def _discover_open_payments_datasets(session: requests.Session, logger) -> list[
         if not isinstance(item, dict):
             continue
         title = (item.get("title") or "").lower()
-        tags  = [t.get("data", "").lower() for t in (item.get("keyword") or [])]
+        tags = [t.get("data", "").lower() for t in (item.get("keyword") or [])]
         # Target: general payment datasets (not research/ownership)
         if "general payment" in title and "open payments" in tags:
             identifier = item.get("identifier") or ""
@@ -209,16 +266,16 @@ def _discover_open_payments_datasets(session: requests.Session, logger) -> list[
 
 def _fetch_open_payments_dataset(session: requests.Session, uuid: str, logger) -> list[dict]:
     """Fetch all PR rows from one Open Payments dataset resource."""
-    url     = f"{OPEN_PAYMENTS_BASE}/datastore/query/{uuid}/0"
-    offset  = 0
+    url = f"{OPEN_PAYMENTS_BASE}/datastore/query/{uuid}/0"
+    offset = 0
     records = []
 
     while True:
         params = {
             "conditions[0][property]": "Recipient_State",
-            "conditions[0][value]":    "PR",
+            "conditions[0][value]": "PR",
             "conditions[0][operator]": "=",
-            "limit":  PAGE_SIZE,
+            "limit": PAGE_SIZE,
             "offset": offset,
         }
         data = _get(session, url, params, logger)
@@ -247,29 +304,29 @@ def _normalize_open_payments(records: list[dict]) -> pd.DataFrame:
     df.columns = [c.lower().replace(" ", "_") for c in df.columns]
 
     col_map = {
-        "program_year":                     "payment_year",
+        "program_year": "payment_year",
         "applicable_manufacturer_or_applicable_gpo_making_payment_name": "payer_name",
         "applicable_manufacturer_or_applicable_gpo_making_payment_state": "payer_state",
-        "covered_recipient_type":           "recipient_type",
-        "covered_recipient_npi":            "covered_recipient_npi",
-        "covered_recipient_last_name":      "_last",
-        "covered_recipient_first_name":     "_first",
+        "covered_recipient_type": "recipient_type",
+        "covered_recipient_npi": "covered_recipient_npi",
+        "covered_recipient_last_name": "_last",
+        "covered_recipient_first_name": "_first",
         "covered_recipient_primary_type_1": "recipient_specialty",
-        "recipient_city":                   "recipient_city",
-        "recipient_state_code":             "recipient_state",
+        "recipient_city": "recipient_city",
+        "recipient_state_code": "recipient_state",
         "total_amount_of_payment_usdollars": "total_amount",
         "nature_of_payment_or_transfer_of_value": "payment_nature",
-        "form_of_payment_or_transfer_of_value":   "payment_form",
-        "product_type_1":                   "product_type",
+        "form_of_payment_or_transfer_of_value": "payment_form",
+        "product_type_1": "product_type",
         "name_of_drug_or_biological_or_device_or_medical_supply_1": "product_name",
-        "dispute_status_for_publication":   "dispute_status",
+        "dispute_status_for_publication": "dispute_status",
         "indicate_drug_or_biological_or_device_or_medical_supply_1": "product_category",
     }
     df = df.rename(columns={k: v for k, v in col_map.items() if k in df.columns})
 
     # Combine name fields if present
     if "_last" in df.columns or "_first" in df.columns:
-        last  = df.get("_last",  pd.Series([""] * len(df)))
+        last = df.get("_last", pd.Series([""] * len(df)))
         first = df.get("_first", pd.Series([""] * len(df)))
         df["recipient_name"] = (first.fillna("") + " " + last.fillna("")).str.strip()
         df = df.drop(columns=["_last", "_first"], errors="ignore")
@@ -280,8 +337,9 @@ def _normalize_open_payments(records: list[dict]) -> pd.DataFrame:
     return df[OPEN_PAYMENTS_COLUMNS]
 
 
-def download_open_payments(session: requests.Session, raw_path: Path, logger,
-                           force: bool) -> pd.DataFrame:
+def download_open_payments(
+    session: requests.Session, raw_path: Path, logger, force: bool
+) -> pd.DataFrame:
     if not force and raw_path.exists():
         logger.info("  Open Payments raw file exists — loading cached")
         return pd.read_csv(raw_path, dtype=str, low_memory=False)
@@ -313,17 +371,17 @@ def download_open_payments(session: requests.Session, raw_path: Path, logger,
 # Medicare Part B Provider Payments
 # ---------------------------------------------------------------------------
 
-def _fetch_medicare_dataset(session: requests.Session, dataset_id: str,
-                             logger) -> list[dict]:
+
+def _fetch_medicare_dataset(session: requests.Session, dataset_id: str, logger) -> list[dict]:
     """Fetch PR rows from one CMS Medicare Part B dataset."""
-    url     = f"{CMS_DATA_BASE}/{dataset_id}/data"
-    offset  = 0
+    url = f"{CMS_DATA_BASE}/{dataset_id}/data"
+    offset = 0
     records = []
 
     while True:
         params = {
             "filter[Rndrng_Prvdr_State_Abrvtn]": "PR",
-            "size":   PAGE_SIZE,
+            "size": PAGE_SIZE,
             "offset": offset,
         }
         data = _get(session, url, params, logger)
@@ -349,23 +407,23 @@ def _normalize_medicare(records: list[dict]) -> pd.DataFrame:
     df.columns = [c.lower() for c in df.columns]
 
     col_map = {
-        "rndrng_npi":                  "npi",
-        "rndrng_prvdr_last_org_name":  "provider_last_name",
-        "rndrng_prvdr_first_name":     "provider_first_name",
-        "rndrng_prvdr_crdntls":        "provider_credentials",
-        "rndrng_prvdr_gndr":           "provider_gender",
-        "rndrng_prvdr_ent_cd":         "provider_entity_type",
-        "rndrng_prvdr_city":           "provider_city",
-        "rndrng_prvdr_state_abrvtn":   "provider_state",
-        "rndrng_prvdr_zip5":           "provider_zip",
-        "rndrng_prvdr_type":           "provider_type",
-        "tot_sbmtd_chrgs":             "total_submitted_charges",
-        "tot_mdcr_alowd_amt":          "total_medicare_allowed",
-        "tot_mdcr_pymt_amt":           "total_medicare_payment",
-        "tot_mdcr_stdzd_amt":          "total_medicare_standardized",
-        "tot_srvcs":                   "total_services",
-        "tot_benes":                   "total_unique_benes",
-        "drug_suprsr_ind":             "drug_suppress_indicator",
+        "rndrng_npi": "npi",
+        "rndrng_prvdr_last_org_name": "provider_last_name",
+        "rndrng_prvdr_first_name": "provider_first_name",
+        "rndrng_prvdr_crdntls": "provider_credentials",
+        "rndrng_prvdr_gndr": "provider_gender",
+        "rndrng_prvdr_ent_cd": "provider_entity_type",
+        "rndrng_prvdr_city": "provider_city",
+        "rndrng_prvdr_state_abrvtn": "provider_state",
+        "rndrng_prvdr_zip5": "provider_zip",
+        "rndrng_prvdr_type": "provider_type",
+        "tot_sbmtd_chrgs": "total_submitted_charges",
+        "tot_mdcr_alowd_amt": "total_medicare_allowed",
+        "tot_mdcr_pymt_amt": "total_medicare_payment",
+        "tot_mdcr_stdzd_amt": "total_medicare_standardized",
+        "tot_srvcs": "total_services",
+        "tot_benes": "total_unique_benes",
+        "drug_suprsr_ind": "drug_suppress_indicator",
     }
     df = df.rename(columns={k: v for k, v in col_map.items() if k in df.columns})
     for col in MEDICARE_COLUMNS:
@@ -374,8 +432,9 @@ def _normalize_medicare(records: list[dict]) -> pd.DataFrame:
     return df[MEDICARE_COLUMNS]
 
 
-def download_medicare(session: requests.Session, raw_path: Path, logger,
-                      force: bool) -> pd.DataFrame:
+def download_medicare(
+    session: requests.Session, raw_path: Path, logger, force: bool
+) -> pd.DataFrame:
     if not force and raw_path.exists():
         logger.info("  Medicare raw file exists — loading cached")
         return pd.read_csv(raw_path, dtype=str, low_memory=False)
@@ -393,11 +452,21 @@ def download_medicare(session: requests.Session, raw_path: Path, logger,
 
     # Aggregate by NPI across years: sum payments, keep latest profile
     if not df.empty and "npi" in df.columns:
-        for col in ["total_submitted_charges", "total_medicare_allowed",
-                    "total_medicare_payment", "total_services", "total_unique_benes"]:
+        for col in [
+            "total_submitted_charges",
+            "total_medicare_allowed",
+            "total_medicare_payment",
+            "total_services",
+            "total_unique_benes",
+        ]:
             df[col] = pd.to_numeric(df[col], errors="coerce")
-        num_cols = ["total_submitted_charges", "total_medicare_allowed",
-                    "total_medicare_payment", "total_services", "total_unique_benes"]
+        num_cols = [
+            "total_submitted_charges",
+            "total_medicare_allowed",
+            "total_medicare_payment",
+            "total_services",
+            "total_unique_benes",
+        ]
         str_cols = [c for c in MEDICARE_COLUMNS if c not in num_cols and c != "npi"]
         agg = {c: "sum" for c in num_cols if c in df.columns}
         agg.update({c: "first" for c in str_cols if c in df.columns})
@@ -411,24 +480,29 @@ def download_medicare(session: requests.Session, raw_path: Path, logger,
 # Entry point
 # ---------------------------------------------------------------------------
 
-def run(root: Path = None, skip_open_payments: bool = False,
-        skip_medicare: bool = False, force: bool = False) -> dict:
+
+def run(
+    root: Path = None,
+    skip_open_payments: bool = False,
+    skip_medicare: bool = False,
+    force: bool = False,
+) -> dict:
     if root is None:
         root = PROJECT_ROOT
 
-    root    = Path(root)
+    root = Path(root)
     raw_dir = root / "data" / "staging" / "raw" / "cms"
     out_dir = root / "data" / "staging" / "processed"
     raw_dir.mkdir(parents=True, exist_ok=True)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    logger  = setup_logging("download_cms")
+    logger = setup_logging("download_cms")
     session = _session()
-    result  = {"status": "OK"}
+    result = {"status": "OK"}
 
     # Open Payments
-    op_out_path  = out_dir / "pr_cms_open_payments.csv"
-    op_raw_path  = raw_dir / "pr_open_payments.csv"
+    op_out_path = out_dir / "pr_cms_open_payments.csv"
+    op_raw_path = raw_dir / "pr_open_payments.csv"
     if skip_open_payments:
         logger.info("Open Payments: SKIPPED (--skip-open-payments)")
         result["open_payments_rows"] = 0
@@ -438,9 +512,12 @@ def run(root: Path = None, skip_open_payments: bool = False,
             logger.info(f"  Adding {len(KNOWN_OPEN_PAYMENTS)} known Open Payments seed rows...")
             df_op = pd.DataFrame(KNOWN_OPEN_PAYMENTS, columns=OPEN_PAYMENTS_COLUMNS)
         df_op.to_csv(op_out_path, index=False, encoding="utf-8")
-        total_op = pd.to_numeric(df_op.get("total_amount", pd.Series(dtype=float)),
-                                 errors="coerce").sum()
-        logger.info(f"  Open Payments: {len(df_op):,} rows, ${total_op:,.0f} total payments to PR providers")
+        total_op = pd.to_numeric(
+            df_op.get("total_amount", pd.Series(dtype=float)), errors="coerce"
+        ).sum()
+        logger.info(
+            f"  Open Payments: {len(df_op):,} rows, ${total_op:,.0f} total payments to PR providers"
+        )
         result["open_payments_rows"] = len(df_op)
         result["open_payments_path"] = str(op_out_path)
 
@@ -453,26 +530,35 @@ def run(root: Path = None, skip_open_payments: bool = False,
     else:
         df_med = download_medicare(session, med_raw_path, logger, force)
         if df_med.empty:
-            logger.info(f"  Adding {len(KNOWN_MEDICARE_PROVIDERS)} known Medicare provider seed rows...")
+            logger.info(
+                f"  Adding {len(KNOWN_MEDICARE_PROVIDERS)} known Medicare provider seed rows..."
+            )
             df_med = pd.DataFrame(KNOWN_MEDICARE_PROVIDERS, columns=MEDICARE_COLUMNS)
         df_med.to_csv(med_out_path, index=False, encoding="utf-8")
-        total_med = pd.to_numeric(df_med.get("total_medicare_payment", pd.Series(dtype=float)),
-                                  errors="coerce").sum()
-        logger.info(f"  Medicare Part B: {len(df_med):,} providers, ${total_med:,.0f} total payments")
+        total_med = pd.to_numeric(
+            df_med.get("total_medicare_payment", pd.Series(dtype=float)), errors="coerce"
+        ).sum()
+        logger.info(
+            f"  Medicare Part B: {len(df_med):,} providers, ${total_med:,.0f} total payments"
+        )
         result["medicare_rows"] = len(df_med)
         result["medicare_path"] = str(med_out_path)
 
         if not df_med.empty:
             logger.info("\n  Top 10 PR Medicare providers by total payment:")
             df_top = df_med.copy()
-            df_top["_pay"] = pd.to_numeric(df_top.get("total_medicare_payment", ""),
-                                           errors="coerce").fillna(0)
+            df_top["_pay"] = pd.to_numeric(
+                df_top.get("total_medicare_payment", ""), errors="coerce"
+            ).fillna(0)
             df_top = df_top.sort_values("_pay", ascending=False).head(10)
             for _, row in df_top.iterrows():
-                name = (str(row.get("provider_last_name", "")) + ", " +
-                        str(row.get("provider_first_name", ""))).strip(", ")
+                name = (
+                    str(row.get("provider_last_name", ""))
+                    + ", "
+                    + str(row.get("provider_first_name", ""))
+                ).strip(", ")
                 ptype = str(row.get("provider_type", ""))[:30]
-                pay   = row["_pay"]
+                pay = row["_pay"]
                 logger.info(f"    {name[:45]:<45}  ${pay:>12,.0f}  [{ptype}]")
 
     session.close()
@@ -487,13 +573,18 @@ def run(root: Path = None, skip_open_payments: bool = False,
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Download CMS Open Payments and Medicare data for PR")
+    parser = argparse.ArgumentParser(
+        description="Download CMS Open Payments and Medicare data for PR"
+    )
     parser.add_argument("--skip-open-payments", action="store_true")
-    parser.add_argument("--skip-medicare",       action="store_true")
+    parser.add_argument("--skip-medicare", action="store_true")
     parser.add_argument("--force", action="store_true", help="Re-download even if cached")
     args = parser.parse_args()
-    result = run(skip_open_payments=args.skip_open_payments,
-                 skip_medicare=args.skip_medicare, force=args.force)
+    result = run(
+        skip_open_payments=args.skip_open_payments,
+        skip_medicare=args.skip_medicare,
+        force=args.force,
+    )
     total = result.get("open_payments_rows", 0) + result.get("medicare_rows", 0)
     print(f"\nCMS download complete. {total:,} total rows.")
     return 0

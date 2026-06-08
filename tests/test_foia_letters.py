@@ -7,6 +7,7 @@ Covers:
 - Pre-submission validator rejects stub requester config
 - Dashboard payload includes letter entries for the foia gate
 """
+
 from __future__ import annotations
 
 
@@ -22,6 +23,7 @@ REPO_ROOT = bft.REPO_ROOT
 # --------------------------------------------------------------------------- #
 # letter existence and content
 # --------------------------------------------------------------------------- #
+
 
 @pytest.mark.unit
 def test_letter_files_exist_for_all_requests():
@@ -39,7 +41,9 @@ def test_letters_use_correct_template_per_jurisdiction():
         jur = e["jurisdiction"].strip().upper()
         if jur == "PR":
             assert "Ley 141-2019" in content, f"{e['request_id']}: PR letter missing Ley 141-2019"
-            assert "Oficial de Acceso" in content, f"{e['request_id']}: PR letter missing Oficial de Acceso"
+            assert "Oficial de Acceso" in content, (
+                f"{e['request_id']}: PR letter missing Oficial de Acceso"
+            )
         elif jur == "US":
             assert "5 U.S.C." in content, f"{e['request_id']}: US letter missing 5 U.S.C."
             assert "FOIA Officer" in content, f"{e['request_id']}: US letter missing FOIA Officer"
@@ -54,7 +58,9 @@ def test_letters_have_required_substitutions():
         assert e["request_id"] in content, f"{e['request_id']}: request_id not in letter body"
         # no un-replaced data placeholders (requester placeholders are expected until PR 9)
         for key in ("target_agency", "record_type", "request_id"):
-            assert "{{" + key + "}}" not in content, f"{e['request_id']}: {{{{{key}}}}} not replaced"
+            assert "{{" + key + "}}" not in content, (
+                f"{e['request_id']}: {{{{{key}}}}} not replaced"
+            )
 
 
 @pytest.mark.unit
@@ -82,17 +88,21 @@ def test_letter_count_matches_queue():
 # deterministic regeneration
 # --------------------------------------------------------------------------- #
 
+
 @pytest.mark.integration
 def test_letters_regenerate_identically():
     entries = bfl.build_rows(REPO_ROOT)
     for e in entries:
         committed = (REPO_ROOT / e["path"]).read_text(encoding="utf-8")
-        assert committed == e["content"], f"{e['request_id']}: committed letter differs from generated"
+        assert committed == e["content"], (
+            f"{e['request_id']}: committed letter differs from generated"
+        )
 
 
 # --------------------------------------------------------------------------- #
 # pre-submission validator
 # --------------------------------------------------------------------------- #
+
 
 @pytest.mark.unit
 def test_letters_have_requester_placeholder_until_operator_fills():
@@ -105,26 +115,34 @@ def test_letters_have_requester_placeholder_until_operator_fills():
     entries = bfl.build_rows(REPO_ROOT)
     for e in entries:
         # requester placeholders are intentionally present — operator fills these
-        assert "{{requester_name}}" in e["content"] or "{{requester_contact}}" in e["content"], \
+        assert "{{requester_name}}" in e["content"] or "{{requester_contact}}" in e["content"], (
             f"{e['request_id']}: expected requester placeholders still present"
+        )
 
 
 @pytest.mark.unit
 def test_validate_foia_submission_flags_only_requester_info():
     """Validator fails only on requester config, not on letter existence or status."""
     from scripts.validate_foia_submission_ready import validate
+
     problems = validate(REPO_ROOT)
     # must flag the placeholder requester info
-    assert any("placeholder" in p.lower() for p in problems), \
+    assert any("placeholder" in p.lower() for p in problems), (
         f"expected requester placeholder errors, got: {problems}"
+    )
     # must NOT flag missing letters or invalid statuses
-    letter_problems = [p for p in problems if "missing letter" in p.lower() or "invalid request_status" in p.lower()]
+    letter_problems = [
+        p
+        for p in problems
+        if "missing letter" in p.lower() or "invalid request_status" in p.lower()
+    ]
     assert letter_problems == [], f"unexpected letter/status errors: {letter_problems}"
 
 
 # --------------------------------------------------------------------------- #
 # dashboard includes letter entries
 # --------------------------------------------------------------------------- #
+
 
 @pytest.mark.unit
 def test_dashboard_payload_includes_foia_letters():

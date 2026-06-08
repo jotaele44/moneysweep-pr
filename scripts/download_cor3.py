@@ -20,6 +20,7 @@ Usage:
   python3 scripts/download_cor3.py
   python3 scripts/download_cor3.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -58,30 +59,40 @@ COR3_DATA_EXPORTS = [
     "/en/files/projects_data.json",
 ]
 
-PAGE_SIZE    = 500
-PAGE_SLEEP   = 0.5
-MAX_RETRIES  = 3
+PAGE_SIZE = 500
+PAGE_SLEEP = 0.5
+MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 OUTPUT_COLUMNS = [
-    "project_id", "applicant_name", "applicant_normalized",
-    "program", "category", "municipality",
-    "total_approved", "total_disbursed", "disbursement_rate",
-    "status", "last_updated",
+    "project_id",
+    "applicant_name",
+    "applicant_normalized",
+    "program",
+    "category",
+    "municipality",
+    "total_approved",
+    "total_disbursed",
+    "disbursement_rate",
+    "status",
+    "last_updated",
 ]
 
 # ---------------------------------------------------------------------------
 # HTTP helpers
 # ---------------------------------------------------------------------------
 
+
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0; PR recovery research)",
-        "Accept": "application/json, text/html, */*",
-        "Accept-Language": "en-US,en;q=0.9,es;q=0.8",
-        "Referer": COR3_BASE + "/en/transparencia",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0; PR recovery research)",
+            "Accept": "application/json, text/html, */*",
+            "Accept-Language": "en-US,en;q=0.9,es;q=0.8",
+            "Referer": COR3_BASE + "/en/transparencia",
+        }
+    )
     return s
 
 
@@ -106,6 +117,7 @@ def _get(session, url, params, logger) -> requests.Response | None:
 # Try API endpoints
 # ---------------------------------------------------------------------------
 
+
 def _try_json_endpoint(session, endpoint, logger) -> list[dict]:
     """Attempt to fetch JSON project list from a COR3 API endpoint."""
     url = COR3_BASE + endpoint
@@ -125,8 +137,11 @@ def _try_json_endpoint(session, endpoint, logger) -> list[dict]:
             break
         elif isinstance(data, dict):
             items = (
-                data.get("data") or data.get("results") or
-                data.get("projects") or data.get("items") or []
+                data.get("data")
+                or data.get("results")
+                or data.get("projects")
+                or data.get("items")
+                or []
             )
             all_records.extend(items)
             if len(items) < PAGE_SIZE or not data.get("next"):
@@ -154,8 +169,10 @@ def _try_csv_export(session, path, logger) -> list[dict]:
 # Transform
 # ---------------------------------------------------------------------------
 
+
 def _normalize_record(r: dict) -> dict:
     """Map raw COR3 record to canonical schema."""
+
     def _f(*keys):
         for k in keys:
             v = r.get(k) or r.get(k.lower()) or r.get(k.upper())
@@ -164,11 +181,11 @@ def _normalize_record(r: dict) -> dict:
         return ""
 
     applicant = _f("applicant_name", "applicant", "subrecipient", "name", "entity_name")
-    approved  = _f("total_approved", "approved_amount", "obligated_amount", "grant_amount")
+    approved = _f("total_approved", "approved_amount", "obligated_amount", "grant_amount")
     disbursed = _f("total_disbursed", "disbursed_amount", "paid_amount", "reimbursed_amount")
 
     try:
-        approved_f  = float(approved.replace(",", "").replace("$", "")) if approved else 0.0
+        approved_f = float(approved.replace(",", "").replace("$", "")) if approved else 0.0
     except ValueError:
         approved_f = 0.0
     try:
@@ -179,17 +196,17 @@ def _normalize_record(r: dict) -> dict:
     rate = round(disbursed_f / approved_f, 4) if approved_f > 0 else 0.0
 
     return {
-        "project_id":           _f("project_id", "id", "project_number", "dsr_id"),
-        "applicant_name":       applicant,
+        "project_id": _f("project_id", "id", "project_number", "dsr_id"),
+        "applicant_name": applicant,
         "applicant_normalized": _normalize_name(applicant),
-        "program":              _f("program", "program_name", "fund_type", "program_type"),
-        "category":             _f("category", "work_category", "project_category"),
-        "municipality":         _f("municipality", "city", "location", "community"),
-        "total_approved":       approved_f,
-        "total_disbursed":      disbursed_f,
-        "disbursement_rate":    rate,
-        "status":               _f("status", "project_status", "current_status"),
-        "last_updated":         _f("last_updated", "updated_at", "modified_date"),
+        "program": _f("program", "program_name", "fund_type", "program_type"),
+        "category": _f("category", "work_category", "project_category"),
+        "municipality": _f("municipality", "city", "location", "community"),
+        "total_approved": approved_f,
+        "total_disbursed": disbursed_f,
+        "disbursement_rate": rate,
+        "status": _f("status", "project_status", "current_status"),
+        "last_updated": _f("last_updated", "updated_at", "modified_date"),
     }
 
 
@@ -204,18 +221,21 @@ def parse_records(raw_records: list[dict]) -> pd.DataFrame:
     df = pd.DataFrame(normalized, columns=OUTPUT_COLUMNS)
     if df.empty:
         return df
-    return df.drop_duplicates(subset=["project_id"]).sort_values(
-        "total_approved", ascending=False
-    ).reset_index(drop=True)
+    return (
+        df.drop_duplicates(subset=["project_id"])
+        .sort_values("total_approved", ascending=False)
+        .reset_index(drop=True)
+    )
 
 
 # ---------------------------------------------------------------------------
 # Core
 # ---------------------------------------------------------------------------
 
+
 def run(root: Path = None, force: bool = False) -> dict:
     root = Path(root or PROJECT_ROOT)
-    raw_dir  = root / "data" / "staging" / "raw" / "cor3"
+    raw_dir = root / "data" / "staging" / "raw" / "cor3"
     out_path = root / "data" / "staging" / "processed" / "pr_cor3_projects.csv"
     raw_dir.mkdir(parents=True, exist_ok=True)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -268,15 +288,18 @@ def run(root: Path = None, force: bool = False) -> dict:
     df.to_csv(out_path, index=False)
 
     n = len(df)
-    total_approved  = df["total_approved"].sum()
+    total_approved = df["total_approved"].sum()
     total_disbursed = df["total_disbursed"].sum()
     avg_rate = round(total_disbursed / total_approved, 3) if total_approved > 0 else 0
 
     logger.info(f"  COR3: {n:,} projects → {out_path.name}")
-    logger.info(f"  Approved: ${total_approved:,.0f}, Disbursed: ${total_disbursed:,.0f} ({avg_rate:.1%})")
+    logger.info(
+        f"  Approved: ${total_approved:,.0f}, Disbursed: ${total_disbursed:,.0f} ({avg_rate:.1%})"
+    )
 
     return {
-        "status": "OK", "rows": n,
+        "status": "OK",
+        "rows": n,
         "total_approved": total_approved,
         "total_disbursed": total_disbursed,
         "avg_disbursement_rate": avg_rate,
@@ -286,6 +309,7 @@ def run(root: Path = None, force: bool = False) -> dict:
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Download COR3 recovery project data")

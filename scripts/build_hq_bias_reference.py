@@ -20,6 +20,7 @@ CLI::
     python scripts/build_hq_bias_reference.py            # write the CSV + manifest
     python scripts/build_hq_bias_reference.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -101,7 +102,9 @@ def check(rows: list[dict[str, Any]], root: Path | None = None) -> list[str]:
     if jclass not in JURISDICTION_CLASSES:
         problems.append("jurisdiction_class drifted from resolver JURISDICTION_CLASSES")
     if jclass not in UNKNOWN_JURISDICTIONS:
-        problems.append("HEADQUARTERS_ONLY must be an unknown jurisdiction (not a place of performance)")
+        problems.append(
+            "HEADQUARTERS_ONLY must be an unknown jurisdiction (not a place of performance)"
+        )
     for code in by_aspect.get("place_precedence", "").split(">"):
         if code and code not in GEO_RESOLUTION_REASONS:
             problems.append(f"place_precedence references unknown reason {code!r}")
@@ -153,7 +156,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

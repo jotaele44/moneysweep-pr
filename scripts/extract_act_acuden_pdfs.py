@@ -34,6 +34,7 @@ Usage:
 Pause-lock note: this script writes only under ``data/staging/raw/`` — it does
 NOT touch ``data/staging/processed/``.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -103,6 +104,7 @@ LAYOUT_PROFILES: dict[str, dict] = {
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _sha256(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -158,9 +160,7 @@ def _rows_from_tables(
         if profile:
             pdf_cols = profile["pdf_columns"]
             data_rows = table
-            if _looks_like_header(table[0], columns) or _looks_like_header(
-                table[0], pdf_cols
-            ):
+            if _looks_like_header(table[0], columns) or _looks_like_header(table[0], pdf_cols):
                 data_rows = table[1:]
             for raw in data_rows:
                 if all(not cell for cell in raw):
@@ -177,9 +177,7 @@ def _rows_from_tables(
                     if token in h:
                         col_index[col] = idx
                         break
-            data_rows = (
-                table[1:] if _looks_like_header(header, columns) else table
-            )
+            data_rows = table[1:] if _looks_like_header(header, columns) else table
             for raw in data_rows:
                 if all(not cell for cell in raw):
                     continue
@@ -222,6 +220,7 @@ def _write_csv(rows: list[dict[str, str]], columns: list[str], path: Path) -> No
 # ---------------------------------------------------------------------------
 # Per-source driver
 # ---------------------------------------------------------------------------
+
 
 def extract_source(
     source_key: str,
@@ -288,6 +287,7 @@ def extract_source(
 # Combined entry point
 # ---------------------------------------------------------------------------
 
+
 def extract(
     source: str = "all",
     root: Path | None = None,
@@ -305,9 +305,7 @@ def extract(
 
     summary: dict[str, dict] = {}
     for key in keys:
-        summary[key] = extract_source(
-            key, root, overrides, dry_run, input_dir, logger
-        )
+        summary[key] = extract_source(key, root, overrides, dry_run, input_dir, logger)
     return summary
 
 

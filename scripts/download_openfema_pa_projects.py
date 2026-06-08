@@ -10,6 +10,7 @@ Usage:
   python3 scripts/download_openfema_pa_projects.py
   python3 scripts/download_openfema_pa_projects.py --force
 """
+
 from __future__ import annotations
 
 import sys
@@ -53,18 +54,33 @@ NORMALIZED_DIR = PROJECT_ROOT / "data" / "normalized"
 OUTPUT_PATH = NORMALIZED_DIR / "fema_pa_projects_v2.parquet"
 
 PA_V2_COLUMNS = [
-    "disaster_number", "pw_number", "applicant_id", "applicant_name", "applicant_normalized",
-    "county", "county_fips", "state_code",
-    "category", "application_title", "damage_category",
-    "project_amount", "federal_share_obligated", "total_obligated",
-    "obligation_date", "pw_date", "closed_date",
-    "latitude", "longitude",
-    "source_system", "pull_date",
+    "disaster_number",
+    "pw_number",
+    "applicant_id",
+    "applicant_name",
+    "applicant_normalized",
+    "county",
+    "county_fips",
+    "state_code",
+    "category",
+    "application_title",
+    "damage_category",
+    "project_amount",
+    "federal_share_obligated",
+    "total_obligated",
+    "obligation_date",
+    "pw_date",
+    "closed_date",
+    "latitude",
+    "longitude",
+    "source_system",
+    "pull_date",
 ]
 
 # ---------------------------------------------------------------------------
 # Helpers (replicated from download_fema.py to be self-contained)
 # ---------------------------------------------------------------------------
+
 
 def _get_with_retry(url: str, logger) -> dict | None:
     """GET a pre-built URL with one retry on 429/503."""
@@ -74,7 +90,10 @@ def _get_with_retry(url: str, logger) -> dict | None:
             if resp.status_code in (429, 503):
                 logger.warning(
                     "HTTP %s from %s (attempt %d), sleeping %ds then retrying...",
-                    resp.status_code, url, attempt, RETRY_SLEEP,
+                    resp.status_code,
+                    url,
+                    attempt,
+                    RETRY_SLEEP,
                 )
                 if attempt == 1:
                     time.sleep(RETRY_SLEEP)
@@ -96,8 +115,9 @@ def _get_with_retry(url: str, logger) -> dict | None:
     return None
 
 
-def _paginate(endpoint: str, data_key: str, params: dict, logger,
-              simple_params: dict | None = None) -> list[dict]:
+def _paginate(
+    endpoint: str, data_key: str, params: dict, logger, simple_params: dict | None = None
+) -> list[dict]:
     """
     Paginate an OpenFEMA endpoint using $top/$skip.
     Builds raw URL strings to avoid OData $ percent-encoding issues.
@@ -117,8 +137,7 @@ def _paginate(endpoint: str, data_key: str, params: dict, logger,
         if simple_params:
             for k, v in simple_params.items():
                 raw_url += (
-                    f"&{urllib.parse.quote(str(k), safe='')}="
-                    f"{urllib.parse.quote(str(v), safe='')}"
+                    f"&{urllib.parse.quote(str(k), safe='')}={urllib.parse.quote(str(v), safe='')}"
                 )
 
         logger.info("  Fetching %s (skip=%d, top=%d)...", endpoint.split("/")[-1], skip, PAGE_SIZE)
@@ -168,37 +187,39 @@ def _get_pr_disaster_numbers(logger) -> list[int]:
 # Field mapping
 # ---------------------------------------------------------------------------
 
+
 def _map_record(r: dict, source_system: str, pull_date: str) -> dict:
     """Map a raw API record to the canonical PA v2 schema."""
     applicant_name = r.get("applicantName", "") or ""
     return {
-        "disaster_number":        str(r.get("disasterNumber", "") or ""),
-        "pw_number":              str(r.get("pwNumber", "") or ""),
-        "applicant_id":           str(r.get("applicantId", "") or ""),
-        "applicant_name":         applicant_name,
-        "applicant_normalized":   _normalize_name(applicant_name),
-        "county":                 str(r.get("county", r.get("countyName", "")) or ""),
-        "county_fips":            str(r.get("countyFips", "") or ""),
-        "state_code":             str(r.get("stateNumberCode", r.get("state", "")) or ""),
-        "category":               str(r.get("category", r.get("damageCategory", "")) or ""),
-        "application_title":      str(r.get("applicationTitle", "") or ""),
-        "damage_category":        str(r.get("damageCategory", "") or ""),
-        "project_amount":         r.get("projectAmount"),
+        "disaster_number": str(r.get("disasterNumber", "") or ""),
+        "pw_number": str(r.get("pwNumber", "") or ""),
+        "applicant_id": str(r.get("applicantId", "") or ""),
+        "applicant_name": applicant_name,
+        "applicant_normalized": _normalize_name(applicant_name),
+        "county": str(r.get("county", r.get("countyName", "")) or ""),
+        "county_fips": str(r.get("countyFips", "") or ""),
+        "state_code": str(r.get("stateNumberCode", r.get("state", "")) or ""),
+        "category": str(r.get("category", r.get("damageCategory", "")) or ""),
+        "application_title": str(r.get("applicationTitle", "") or ""),
+        "damage_category": str(r.get("damageCategory", "") or ""),
+        "project_amount": r.get("projectAmount"),
         "federal_share_obligated": r.get("federalShareObligated"),
-        "total_obligated":        r.get("totalObligated"),
-        "obligation_date":        str(r.get("obligatedDate", "") or ""),
-        "pw_date":                str(r.get("projectWorksheetDate", "") or ""),
-        "closed_date":            str(r.get("closedProjectWorksheetDate", "") or ""),
-        "latitude":               r.get("latitude"),
-        "longitude":              r.get("longitude"),
-        "source_system":          source_system,
-        "pull_date":              pull_date,
+        "total_obligated": r.get("totalObligated"),
+        "obligation_date": str(r.get("obligatedDate", "") or ""),
+        "pw_date": str(r.get("projectWorksheetDate", "") or ""),
+        "closed_date": str(r.get("closedProjectWorksheetDate", "") or ""),
+        "latitude": r.get("latitude"),
+        "longitude": r.get("longitude"),
+        "source_system": source_system,
+        "pull_date": pull_date,
     }
 
 
 # ---------------------------------------------------------------------------
 # Fetch logic
 # ---------------------------------------------------------------------------
+
 
 def _fetch_pa_v2_records(logger) -> list[dict]:
     """Fetch PA v2 records for PR by batching disaster numbers."""
@@ -214,7 +235,8 @@ def _fetch_pa_v2_records(logger) -> list[dict]:
     ]
     logger.info(
         "Fetching PA v2 records in %d batch(es) of up to %d disaster numbers each.",
-        len(batches), PA_DISASTER_BATCH,
+        len(batches),
+        PA_DISASTER_BATCH,
     )
 
     for idx, batch in enumerate(batches, start=1):
@@ -228,7 +250,9 @@ def _fetch_pa_v2_records(logger) -> list[dict]:
                 logger,
             )
             all_records.extend(records)
-            logger.info("Batch %d: got %d records (total so far: %d).", idx, len(records), len(all_records))
+            logger.info(
+                "Batch %d: got %d records (total so far: %d).", idx, len(records), len(all_records)
+            )
         except Exception as exc:
             logger.error("Batch %d failed: %s", idx, exc)
 
@@ -255,6 +279,7 @@ def _fetch_pa_applicants(logger) -> list[dict]:
 # ---------------------------------------------------------------------------
 # Public run() interface
 # ---------------------------------------------------------------------------
+
 
 def run(root=None, force=False) -> dict:
     logger = setup_logging("download_openfema_pa_projects")
@@ -325,9 +350,14 @@ def run(root=None, force=False) -> dict:
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Download OpenFEMA PA v2 projects for Puerto Rico.")
-    parser.add_argument("--force", action="store_true", help="Re-download even if output file exists.")
+    parser = argparse.ArgumentParser(
+        description="Download OpenFEMA PA v2 projects for Puerto Rico."
+    )
+    parser.add_argument(
+        "--force", action="store_true", help="Re-download even if output file exists."
+    )
     args = parser.parse_args()
 
     result = run(force=args.force)

@@ -30,51 +30,105 @@ import pandas as pd
 from scripts.config import PROJECT_ROOT, setup_logging
 
 PRASA_COLUMNS = [
-    "contract_id", "vendor_name", "vendor_normalized",
-    "contract_type", "contract_value",
-    "award_date", "start_date", "end_date", "status",
-    "description", "municipality", "source_file",
+    "contract_id",
+    "vendor_name",
+    "vendor_normalized",
+    "contract_type",
+    "contract_value",
+    "award_date",
+    "start_date",
+    "end_date",
+    "status",
+    "description",
+    "municipality",
+    "source_file",
 ]
 
 COL_MAP = {
     "contract_id": [
-        "Contract ID", "Contrato", "Número de Contrato", "Contract Number",
-        "ID", "Número", "PIID", "contrato_id",
+        "Contract ID",
+        "Contrato",
+        "Número de Contrato",
+        "Contract Number",
+        "ID",
+        "Número",
+        "PIID",
+        "contrato_id",
     ],
     "vendor_name": [
-        "Vendor Name", "Contratista", "Suplidor", "Contractor", "Nombre",
-        "Business Name", "Proveedor", "Company", "vendor_name",
+        "Vendor Name",
+        "Contratista",
+        "Suplidor",
+        "Contractor",
+        "Nombre",
+        "Business Name",
+        "Proveedor",
+        "Company",
+        "vendor_name",
     ],
     "contract_type": [
-        "Type", "Tipo", "Contract Type", "Tipo de Contrato",
-        "Award Type", "tipo",
+        "Type",
+        "Tipo",
+        "Contract Type",
+        "Tipo de Contrato",
+        "Award Type",
+        "tipo",
     ],
     "contract_value": [
-        "Amount", "Monto", "Contract Value", "Total", "Valor",
-        "Obligated Amount", "Total Contract Value", "monto",
+        "Amount",
+        "Monto",
+        "Contract Value",
+        "Total",
+        "Valor",
+        "Obligated Amount",
+        "Total Contract Value",
+        "monto",
     ],
     "award_date": [
-        "Award Date", "Fecha de Adjudicación", "Fecha", "Date",
-        "Contract Date", "fecha_adjudicacion",
+        "Award Date",
+        "Fecha de Adjudicación",
+        "Fecha",
+        "Date",
+        "Contract Date",
+        "fecha_adjudicacion",
     ],
     "start_date": [
-        "Start Date", "Fecha de Inicio", "Begin Date", "Inicio",
+        "Start Date",
+        "Fecha de Inicio",
+        "Begin Date",
+        "Inicio",
         "fecha_inicio",
     ],
     "end_date": [
-        "End Date", "Fecha de Terminación", "Expiration Date", "Fin",
-        "Termination Date", "fecha_fin",
+        "End Date",
+        "Fecha de Terminación",
+        "Expiration Date",
+        "Fin",
+        "Termination Date",
+        "fecha_fin",
     ],
     "status": [
-        "Status", "Estado", "Estatus", "Active", "Activo",
-        "Contract Status", "estado",
+        "Status",
+        "Estado",
+        "Estatus",
+        "Active",
+        "Activo",
+        "Contract Status",
+        "estado",
     ],
     "description": [
-        "Description", "Descripción", "Scope", "Purpose",
-        "Description of Work", "descripcion",
+        "Description",
+        "Descripción",
+        "Scope",
+        "Purpose",
+        "Description of Work",
+        "descripcion",
     ],
     "municipality": [
-        "Municipality", "Municipio", "Location", "Lugar",
+        "Municipality",
+        "Municipio",
+        "Location",
+        "Lugar",
         "municipio",
     ],
 }
@@ -82,9 +136,19 @@ COL_MAP = {
 _STRIP_RE = re.compile(r"[^\w\s]")
 _SPACE_RE = re.compile(r"\s+")
 _NAME_SUFFIXES = {
-    "INC", "LLC", "CORP", "LTD", "CO", "LP", "LLP",
-    "COMPANY", "CORPORATION", "INCORPORATED", "LIMITED",
-    "CSP", "SE",
+    "INC",
+    "LLC",
+    "CORP",
+    "LTD",
+    "CO",
+    "LP",
+    "LLP",
+    "COMPANY",
+    "CORPORATION",
+    "INCORPORATED",
+    "LIMITED",
+    "CSP",
+    "SE",
 }
 
 
@@ -128,7 +192,9 @@ def _read_file(path, logger):
         elif suffix == ".csv":
             for enc in ("utf-8", "latin-1", "utf-8-sig"):
                 try:
-                    df = pd.read_csv(path, dtype=str, na_filter=False, encoding=enc, low_memory=False)
+                    df = pd.read_csv(
+                        path, dtype=str, na_filter=False, encoding=enc, low_memory=False
+                    )
                     logger.info(f"  Read {len(df):,} rows from {path.name}")
                     return df
                 except UnicodeDecodeError:
@@ -167,8 +233,11 @@ def _find_files(raw_dir, logger):
     if not folder.exists():
         logger.warning(f"  PRASA folder not found: {folder}")
         return []
-    files = [f for f in sorted(folder.iterdir())
-             if f.suffix.lower() in (".csv", ".xlsx", ".xls") and not f.name.startswith("~")]
+    files = [
+        f
+        for f in sorted(folder.iterdir())
+        if f.suffix.lower() in (".csv", ".xlsx", ".xls") and not f.name.startswith("~")
+    ]
     logger.info(f"  Found {len(files)} PRASA file(s) in {folder}")
     return files
 

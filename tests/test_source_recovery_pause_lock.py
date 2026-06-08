@@ -48,7 +48,9 @@ def _still_missing_rows(count: int) -> list[dict]:
 
 def _bootstrap(tmp_path: Path, *, missing_count: int, unfreeze_count: int) -> None:
     (tmp_path / "docs").mkdir(parents=True, exist_ok=True)
-    (tmp_path / "docs" / "SOURCE_DELIVERY_HANDOFF_R4_9E.md").write_text("# handoff", encoding="utf-8")
+    (tmp_path / "docs" / "SOURCE_DELIVERY_HANDOFF_R4_9E.md").write_text(
+        "# handoff", encoding="utf-8"
+    )
     (tmp_path / "docs" / "EXTERNAL_BLOCKER_FREEZE_STATUS_R4_9E.md").write_text(
         "# freeze",
         encoding="utf-8",
@@ -209,13 +211,17 @@ def test_r49z_pause_lock_passes(tmp_path: Path):
     assert status["production_status"] == "NON_PRODUCTION_DIAGNOSTIC"
     assert status["phase_7_8_blocked"] is True
 
-    pause_matrix = _csv_rows(tmp_path / "data" / "exports" / "source_recovery_pause_matrix_r4_9z.csv")
+    pause_matrix = _csv_rows(
+        tmp_path / "data" / "exports" / "source_recovery_pause_matrix_r4_9z.csv"
+    )
     assert len(pause_matrix) == 21
     resume_rows = _csv_rows(
         tmp_path / "data" / "review_queue" / "source_recovery_resume_conditions_r4_9z.csv"
     )
     assert len(resume_rows) == 21
-    blockers_rows = _csv_rows(tmp_path / "data" / "review_queue" / "downstream_phase_blockers_r4_9z.csv")
+    blockers_rows = _csv_rows(
+        tmp_path / "data" / "review_queue" / "downstream_phase_blockers_r4_9z.csv"
+    )
     assert len(blockers_rows) == 2
 
     assert (tmp_path / "docs" / "SOURCE_RECOVERY_PAUSE_STATUS_R4_9Z.md").exists()

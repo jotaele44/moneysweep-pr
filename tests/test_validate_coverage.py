@@ -31,10 +31,12 @@ class TestCheckFileCoverage:
 
     def test_file_with_fiscal_years(self, tmp_path):
         p = tmp_path / "data.csv"
-        df = pd.DataFrame({
-            "fiscal_year": [2005, 2006, 2007, 2008, 2005],
-            "vendor_name": ["A", "B", "C", "D", "E"],
-        })
+        df = pd.DataFrame(
+            {
+                "fiscal_year": [2005, 2006, 2007, 2008, 2005],
+                "vendor_name": ["A", "B", "C", "D", "E"],
+            }
+        )
         df.to_csv(p, index=False)
         result = check_file_coverage(p)
         assert result["exists"] is True
@@ -43,10 +45,12 @@ class TestCheckFileCoverage:
 
     def test_filters_out_of_range_years(self, tmp_path):
         p = tmp_path / "outliers.csv"
-        df = pd.DataFrame({
-            "fiscal_year": [1990, 2005, 2030],
-            "vendor_name": ["A", "B", "C"],
-        })
+        df = pd.DataFrame(
+            {
+                "fiscal_year": [1990, 2005, 2030],
+                "vendor_name": ["A", "B", "C"],
+            }
+        )
         df.to_csv(p, index=False)
         result = check_file_coverage(p)
         # Only 2005 is within 2000-2026 range

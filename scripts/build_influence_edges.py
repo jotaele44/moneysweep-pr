@@ -25,6 +25,7 @@ CLI::
     python scripts/build_influence_edges.py            # write the CSV + manifest
     python scripts/build_influence_edges.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -54,10 +55,20 @@ MANIFEST_OUT = "data/manifests/influence_edges.json"
 SCHEMA = "schemas/influence_edges.schema.json"
 
 COLUMNS = [
-    "edge_id", "source_id", "source_type",
-    "from_entity_id", "from_entity_type", "to_entity_id", "to_entity_type",
-    "relationship_type", "relationship_subtype", "filing_year", "jurisdiction",
-    "evidence_tier", "confidence", "notes",
+    "edge_id",
+    "source_id",
+    "source_type",
+    "from_entity_id",
+    "from_entity_type",
+    "to_entity_id",
+    "to_entity_type",
+    "relationship_type",
+    "relationship_subtype",
+    "filing_year",
+    "jurisdiction",
+    "evidence_tier",
+    "confidence",
+    "notes",
 ]
 
 # entity_parent_map.relationship_type -> influence relationship_type + direction.
@@ -97,10 +108,21 @@ def _type_index(root: Path) -> dict[str, str]:
     return index
 
 
-def _edge(source_id: str, source_type: str, from_id: str, from_type: str,
-          to_id: str, to_type: str, rel: str, subtype: str, filing_year: str,
-          jurisdiction: str, evidence_tier: str, confidence: float,
-          notes: str) -> dict[str, Any]:
+def _edge(
+    source_id: str,
+    source_type: str,
+    from_id: str,
+    from_type: str,
+    to_id: str,
+    to_type: str,
+    rel: str,
+    subtype: str,
+    filing_year: str,
+    jurisdiction: str,
+    evidence_tier: str,
+    confidence: float,
+    notes: str,
+) -> dict[str, Any]:
     return {
         "edge_id": f"INF_{name_hash(from_id + '|' + to_id + '|' + rel)}",
         "source_id": source_id,
@@ -132,13 +154,23 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
         to = by_suffix.get(_suffix(r["client_entity_id"]))
         if not frm or not to:
             continue
-        rows.append(_edge(
-            "canonical_v1_lobbying_records", "pr_cabilderos",
-            frm, types.get(frm, ""), to, types.get(to, ""),
-            "LOBBIES_FOR", (r.get("filing_type") or "").strip(),
-            (r.get("period") or "").strip(), (r.get("jurisdiction") or "PR").strip(),
-            "T3", float(r.get("confidence") or 0.0), (r.get("notes") or "").strip(),
-        ))
+        rows.append(
+            _edge(
+                "canonical_v1_lobbying_records",
+                "pr_cabilderos",
+                frm,
+                types.get(frm, ""),
+                to,
+                types.get(to, ""),
+                "LOBBIES_FOR",
+                (r.get("filing_type") or "").strip(),
+                (r.get("period") or "").strip(),
+                (r.get("jurisdiction") or "PR").strip(),
+                "T3",
+                float(r.get("confidence") or 0.0),
+                (r.get("notes") or "").strip(),
+            )
+        )
 
     # Board / role memberships: person BOARD_MEMBER_OF entity.
     for r in _read(root, ROLES):
@@ -146,13 +178,23 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
         to = by_suffix.get(_suffix(r["entity_id"]))
         if not frm or not to:
             continue
-        rows.append(_edge(
-            "canonical_v1_roles", "registry",
-            frm, types.get(frm, ""), to, types.get(to, ""),
-            "BOARD_MEMBER_OF", (r.get("role_category") or "").strip(),
-            (r.get("start_date") or "").strip(), "PR",
-            "T2", float(r.get("confidence") or 0.0), (r.get("role_title") or "").strip(),
-        ))
+        rows.append(
+            _edge(
+                "canonical_v1_roles",
+                "registry",
+                frm,
+                types.get(frm, ""),
+                to,
+                types.get(to, ""),
+                "BOARD_MEMBER_OF",
+                (r.get("role_category") or "").strip(),
+                (r.get("start_date") or "").strip(),
+                "PR",
+                "T2",
+                float(r.get("confidence") or 0.0),
+                (r.get("role_title") or "").strip(),
+            )
+        )
 
     # Parent / operator control (already master ids): child -> parent.
     for r in _read(root, PARENT_MAP):
@@ -162,12 +204,23 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
             continue
         rel_out, _direction = mapped
         child, parent = r["child_entity_id"], r["parent_entity_id"]
-        rows.append(_edge(
-            "entity_parent_map", "registry",
-            child, types.get(child, ""), parent, types.get(parent, ""),
-            rel_out, rel_in, "", "PR",
-            r["evidence_tier"], float(r["confidence"]), (r.get("notes") or "").strip(),
-        ))
+        rows.append(
+            _edge(
+                "entity_parent_map",
+                "registry",
+                child,
+                types.get(child, ""),
+                parent,
+                types.get(parent, ""),
+                rel_out,
+                rel_in,
+                "",
+                "PR",
+                r["evidence_tier"],
+                float(r["confidence"]),
+                (r.get("notes") or "").strip(),
+            )
+        )
 
     return rows
 
@@ -241,7 +294,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

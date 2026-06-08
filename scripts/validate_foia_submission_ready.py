@@ -16,6 +16,7 @@ CLI::
     python scripts/validate_foia_submission_ready.py
     python scripts/validate_foia_submission_ready.py --root /path/to/repo
 """
+
 from __future__ import annotations
 
 import argparse
@@ -33,8 +34,14 @@ REQUESTER_CONFIG = "data/reference/foia_requester.json"
 LETTERS_DIR = "docs/foia_letters"
 
 VALID_STATUSES = {
-    "planned", "drafted", "submitted", "awaiting_response",
-    "partial_yield", "fulfilled", "denied", "appealed",
+    "planned",
+    "drafted",
+    "submitted",
+    "awaiting_response",
+    "partial_yield",
+    "fulfilled",
+    "denied",
+    "appealed",
 }
 
 
@@ -51,7 +58,9 @@ def validate(root: Path | None = None) -> list[str]:
         cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
         for key, val in cfg.items():
             if "{{" in str(val):
-                problems.append(f"requester config field '{key}' still contains a placeholder: {val!r}")
+                problems.append(
+                    f"requester config field '{key}' still contains a placeholder: {val!r}"
+                )
 
     # 2. All letter files must exist.
     queue: list[dict[str, str]] = []
@@ -80,16 +89,18 @@ def _print_table(root: Path) -> None:
     requester_filled = cfg_path.exists() and "{{" not in cfg_path.read_text(encoding="utf-8")
     letters_dir = root / LETTERS_DIR
 
-    print(f"{'Request ID':<26} {'Priority':<8} {'Jurisdiction':<12} {'Status':<22} {'Letter':<8} {'Requester'}")
+    print(
+        f"{'Request ID':<26} {'Priority':<8} {'Jurisdiction':<12} {'Status':<22} {'Letter':<8} {'Requester'}"
+    )
     print("-" * 95)
     with (root / PRIORITY_QUEUE).open(newline="", encoding="utf-8") as fh:
         for row in csv.DictReader(fh):
             letter_ok = (letters_dir / f"{row['request_id']}.md").exists()
             print(
                 f"{row['request_id']:<26} "
-                f"{row.get('priority',''):<8} "
-                f"{row.get('jurisdiction',''):<12} "
-                f"{row.get('request_status',''):<22} "
+                f"{row.get('priority', ''):<8} "
+                f"{row.get('jurisdiction', ''):<12} "
+                f"{row.get('request_status', ''):<22} "
                 f"{'yes' if letter_ok else 'MISSING':<8} "
                 f"{'filled' if requester_filled else 'PLACEHOLDER'}"
             )

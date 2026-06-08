@@ -294,7 +294,9 @@ def test_r49d_freeze_gate_passes(tmp_path: Path):
 
 def test_r49d_forbidden_artifact_blocks_gate(tmp_path: Path):
     _bootstrap(tmp_path)
-    blockers_path = tmp_path / "data" / "review_queue" / "external_source_delivery_blockers_r4_9c.csv"
+    blockers_path = (
+        tmp_path / "data" / "review_queue" / "external_source_delivery_blockers_r4_9c.csv"
+    )
     rows = _load_csv_rows(blockers_path)
     rows[0]["expected_input"] = "data/reports/investigative_report.csv"
     rows[0]["target_output_path"] = "data/reports/investigative_report.csv"

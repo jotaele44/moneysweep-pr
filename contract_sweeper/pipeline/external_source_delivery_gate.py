@@ -106,7 +106,9 @@ def _build_manual_requests(
                 "source_file": str(row.get("source_file", "")).strip() or target_output_path,
                 "manifest_path": str(manifest_row.get("manifest_path", "")).strip(),
                 "target_dropzone_path": str(row.get("target_dropzone_path", "")).strip(),
-                "accepted_filename_patterns": str(row.get("accepted_filename_patterns", "")).strip(),
+                "accepted_filename_patterns": str(
+                    row.get("accepted_filename_patterns", "")
+                ).strip(),
                 "required_columns": str(row.get("required_columns", "")).strip(),
                 "expected_row_count": safe_int(manifest_row.get("row_count")),
                 "expected_sha256": str(manifest_row.get("sha256", "")).strip(),
@@ -175,8 +177,12 @@ def run_external_source_delivery_gate(root: Path) -> dict[str, Any]:
         for row in manifest_rows
         if str(row.get("target_output_path", "")).strip()
     }
-    requests = _build_validated_requests(manifest_rows) + _build_manual_requests(manual_rows, manifest_by_target)
-    requests = sorted(requests, key=lambda row: (safe_int(row.get("priority")), str(row.get("request_id", ""))))
+    requests = _build_validated_requests(manifest_rows) + _build_manual_requests(
+        manual_rows, manifest_by_target
+    )
+    requests = sorted(
+        requests, key=lambda row: (safe_int(row.get("priority")), str(row.get("request_id", "")))
+    )
 
     results_rows: list[dict[str, Any]] = []
     validation_rows: list[dict[str, Any]] = []
@@ -204,7 +210,8 @@ def run_external_source_delivery_gate(root: Path) -> dict[str, Any]:
         validation_status = str(request.get("validation_status", "")).strip()
         manifest_type = str(request.get("manifest_type", "")).strip()
         if request_type == "validated_manifest_delivery" and (
-            not _status_is_validated(validation_status) or manifest_type.lower() != VALIDATED_MANIFEST_TYPE
+            not _status_is_validated(validation_status)
+            or manifest_type.lower() != VALIDATED_MANIFEST_TYPE
         ):
             blocker_reason = "invalid_validated_manifest_metadata"
             blocker_rows.append(
@@ -274,7 +281,9 @@ def run_external_source_delivery_gate(root: Path) -> dict[str, Any]:
                 root=root,
                 candidate=candidate,
                 expected_sha256=expected_sha,
-                accepted_filename_patterns=accepted_patterns if request.get("is_manual_request") else "",
+                accepted_filename_patterns=accepted_patterns
+                if request.get("is_manual_request")
+                else "",
                 required_columns=required_columns,
             )
             validation_rows.append(
@@ -375,11 +384,15 @@ def run_external_source_delivery_gate(root: Path) -> dict[str, Any]:
                         "priority": safe_int(request.get("priority")),
                         "source_family": str(request.get("source_family", "")).strip(),
                         "expected_input": expected_input,
-                        "target_dropzone_path": str(request.get("target_dropzone_path", "")).strip(),
+                        "target_dropzone_path": str(
+                            request.get("target_dropzone_path", "")
+                        ).strip(),
                         "target_output_path": target_output_path,
                         "accepted_filename_patterns": accepted_patterns,
                         "required_columns": required_columns,
-                        "source_url_or_portal": str(request.get("source_url_or_portal", "")).strip(),
+                        "source_url_or_portal": str(
+                            request.get("source_url_or_portal", "")
+                        ).strip(),
                         "failure_reason": reason,
                         "review_status": "pending_manual_file",
                     }
@@ -425,7 +438,9 @@ def run_external_source_delivery_gate(root: Path) -> dict[str, Any]:
         target = str(row.get("target_output_path", "")).strip()
         if target:
             inventory_by_target[target] = dict(row)
-    merged_inventory_rows = sorted(inventory_by_target.values(), key=lambda row: str(row.get("target_output_path", "")))
+    merged_inventory_rows = sorted(
+        inventory_by_target.values(), key=lambda row: str(row.get("target_output_path", ""))
+    )
     validated_source_manifests_total = len(merged_inventory_rows)
     new_validated_source_manifests = len(new_manifest_rows)
     rows_available_total = sum(safe_int(row.get("row_count")) for row in merged_inventory_rows)

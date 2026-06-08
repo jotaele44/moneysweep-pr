@@ -15,6 +15,7 @@ and it returns a machine-readable report dict.
 Finance records intentionally carry no geometry (lat/lon/CRS); spatial routing
 is the spiderweb lane's job.
 """
+
 from __future__ import annotations
 
 import csv
@@ -40,7 +41,7 @@ REVIEW_TABLES = (
     "verification_queue.csv",
     "contract_sweeper_crosswalk_queue.csv",
 )
-_NORMALIZED_SET = {t[:-4] for t in NORMALIZED_TABLES}   # strip .csv
+_NORMALIZED_SET = {t[:-4] for t in NORMALIZED_TABLES}  # strip .csv
 _REVIEW_SET = {t[:-4] for t in REVIEW_TABLES}
 
 # Finance record columns (a finance-relevant projection of the derivative — no
@@ -154,11 +155,13 @@ def build_contract_sweeper_finance_lane(input_dir, output_dir=None) -> dict[str,
     for row in rows:
         record, normalized_targets, review_targets, errors = _classify(row)
         if errors:
-            discrepancy.append({
-                "source_item_id": row.get("source_item_id", ""),
-                "record_id": row.get("record_id", ""),
-                "review_reason": "; ".join(errors),
-            })
+            discrepancy.append(
+                {
+                    "source_item_id": row.get("source_item_id", ""),
+                    "record_id": row.get("record_id", ""),
+                    "review_reason": "; ".join(errors),
+                }
+            )
             continue
         for table in normalized_targets:
             tables[table].append(record)
@@ -173,10 +176,16 @@ def build_contract_sweeper_finance_lane(input_dir, output_dir=None) -> dict[str,
 
     for table in NORMALIZED_TABLES:
         name = table[:-4]
-        _write_csv(normalized_dir / table, sorted(tables[name], key=lambda r: r["record_id"]), FINANCE_FIELDS)
+        _write_csv(
+            normalized_dir / table,
+            sorted(tables[name], key=lambda r: r["record_id"]),
+            FINANCE_FIELDS,
+        )
     for queue in REVIEW_TABLES:
         name = queue[:-4]
-        _write_csv(review_dir / queue, sorted(review[name], key=lambda r: r["record_id"]), FINANCE_FIELDS)
+        _write_csv(
+            review_dir / queue, sorted(review[name], key=lambda r: r["record_id"]), FINANCE_FIELDS
+        )
     _write_csv(review_dir / "discrepancy_queue.csv", discrepancy, DISCREPANCY_FIELDS)
 
     routed = sum(1 for r in rows) - len(discrepancy)
@@ -199,7 +208,8 @@ def build_contract_sweeper_finance_lane(input_dir, output_dir=None) -> dict[str,
         "zero_loss_pass": routed + len(discrepancy) == len(rows),
         "outputs": {
             "normalized": [f"data/normalized/{t}" for t in NORMALIZED_TABLES],
-            "review": [f"data/review/{t}" for t in REVIEW_TABLES] + ["data/review/discrepancy_queue.csv"],
+            "review": [f"data/review/{t}" for t in REVIEW_TABLES]
+            + ["data/review/discrepancy_queue.csv"],
             "daily_report": "reports/daily/politics_finance_update_report.md",
             "lane_report": REPORT_FILENAME,
         },
@@ -222,5 +232,7 @@ def build_contract_sweeper_finance_lane(input_dir, output_dir=None) -> dict[str,
     lines.append(f"- `discrepancy_queue`: {report['discrepancy_count']}")
     lines.append("")
     (daily_dir / "politics_finance_update_report.md").write_text("\n".join(lines), encoding="utf-8")
-    (out / REPORT_FILENAME).write_text(json.dumps(report, indent=2, sort_keys=True), encoding="utf-8")
+    (out / REPORT_FILENAME).write_text(
+        json.dumps(report, indent=2, sort_keys=True), encoding="utf-8"
+    )
     return report

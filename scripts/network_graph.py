@@ -14,6 +14,7 @@ Usage:
   python3 scripts/network_graph.py
   python3 scripts/network_graph.py --min-obligation 100000   # filter small contracts
 """
+
 from __future__ import annotations
 
 import argparse
@@ -40,8 +41,8 @@ TOP_NODES_DEFAULT = 30
 
 def load_master(root: Path) -> pd.DataFrame:
     enriched = root / "data" / "staging" / "processed" / "enrichment" / "master_enriched.csv"
-    plain    = root / "data" / "staging" / "processed" / "pr_contracts_master.csv"
-    unified  = root / "data" / "staging" / "processed" / "pr_all_awards_master.csv"
+    plain = root / "data" / "staging" / "processed" / "pr_contracts_master.csv"
+    unified = root / "data" / "staging" / "processed" / "pr_all_awards_master.csv"
     path = enriched if enriched.exists() else (plain if plain.exists() else unified)
     if not path.exists():
         raise FileNotFoundError(f"No master CSV at {path}")
@@ -53,7 +54,9 @@ def load_master(root: Path) -> pd.DataFrame:
     else:
         df["vendor_name"] = df["vendor_name"].fillna("").str.strip()
     if "agency_name" not in df.columns:
-        df["agency_name"] = df.get("awarding_agency", pd.Series(dtype=str)).fillna("UNKNOWN").str.strip()
+        df["agency_name"] = (
+            df.get("awarding_agency", pd.Series(dtype=str)).fillna("UNKNOWN").str.strip()
+        )
     else:
         df["agency_name"] = df["agency_name"].fillna("UNKNOWN").str.strip()
     return df
@@ -66,7 +69,9 @@ def load_hierarchy(root: Path) -> pd.DataFrame | None:
     return pd.read_csv(path, dtype=str, low_memory=False, keep_default_na=False)
 
 
-def build_graph(df: pd.DataFrame, hierarchy: pd.DataFrame | None, min_obligation: float) -> nx.DiGraph:
+def build_graph(
+    df: pd.DataFrame, hierarchy: pd.DataFrame | None, min_obligation: float
+) -> nx.DiGraph:
     G = nx.DiGraph()
 
     # Vendor → Agency edges
@@ -93,7 +98,8 @@ def build_graph(df: pd.DataFrame, hierarchy: pd.DataFrame | None, min_obligation
             G.add_node(agency, node_type="agency", label=agency[:60])
 
         G.add_edge(
-            vendor, agency,
+            vendor,
+            agency,
             weight=round(weight, 2),
             contract_count=int(row["contract_count"]),
             fy_min=int(row["fy_min"]) if pd.notna(row["fy_min"]) else 0,
@@ -153,7 +159,11 @@ def compute_metrics(G: nx.DiGraph) -> dict[str, dict]:
     return metrics
 
 
-def run(root: Path = None, min_obligation: float = MIN_OBLIGATION_DEFAULT, top_nodes: int = TOP_NODES_DEFAULT) -> dict:
+def run(
+    root: Path = None,
+    min_obligation: float = MIN_OBLIGATION_DEFAULT,
+    top_nodes: int = TOP_NODES_DEFAULT,
+) -> dict:
     if root is None:
         root = PROJECT_ROOT
 
@@ -187,15 +197,17 @@ def run(root: Path = None, min_obligation: float = MIN_OBLIGATION_DEFAULT, top_n
     # Flat CSV export of all edges for tabular analysis
     edge_rows = []
     for u, v, data in G.edges(data=True):
-        edge_rows.append({
-            "source_entity":    u,
-            "target":           v,
-            "total_obligation": data.get("weight", 0),
-            "contract_count":   data.get("contract_count", 0),
-            "fy_min":           data.get("fy_min", ""),
-            "fy_max":           data.get("fy_max", ""),
-            "edge_type":        data.get("edge_type", ""),
-        })
+        edge_rows.append(
+            {
+                "source_entity": u,
+                "target": v,
+                "total_obligation": data.get("weight", 0),
+                "contract_count": data.get("contract_count", 0),
+                "fy_min": data.get("fy_min", ""),
+                "fy_max": data.get("fy_max", ""),
+                "edge_type": data.get("edge_type", ""),
+            }
+        )
     edges_path = graph_dir / "entity_edges.csv"
     pd.DataFrame(edge_rows).to_csv(edges_path, index=False, encoding="utf-8")
     logger.info(f"  Entity edges: {edges_path.name} ({len(edge_rows):,} edges)")
@@ -204,6 +216,7 @@ def run(root: Path = None, min_obligation: float = MIN_OBLIGATION_DEFAULT, top_n
     if metrics:
         top = sorted(metrics.values(), key=lambda x: x["pagerank"], reverse=True)[:top_nodes]
         import csv
+
         top_path = graph_dir / "top_nodes.csv"
         with open(top_path, "w", newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=list(top[0].keys()))
@@ -236,7 +249,7 @@ def run(root: Path = None, min_obligation: float = MIN_OBLIGATION_DEFAULT, top_n
             "top_nodes": str(graph_dir / "top_nodes.csv"),
             "entity_edges": str(edges_path),
             "summary": str(graph_dir / "network_summary.json"),
-        }
+        },
     }
     summary_path = graph_dir / "network_summary.json"
     summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
@@ -253,10 +266,15 @@ def run(root: Path = None, min_obligation: float = MIN_OBLIGATION_DEFAULT, top_n
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build vendor-agency network graph")
-    parser.add_argument("--min-obligation", type=float, default=MIN_OBLIGATION_DEFAULT,
-                        help="Minimum obligation to include an edge")
-    parser.add_argument("--top-nodes", type=int, default=TOP_NODES_DEFAULT,
-                        help="Number of top nodes to export")
+    parser.add_argument(
+        "--min-obligation",
+        type=float,
+        default=MIN_OBLIGATION_DEFAULT,
+        help="Minimum obligation to include an edge",
+    )
+    parser.add_argument(
+        "--top-nodes", type=int, default=TOP_NODES_DEFAULT, help="Number of top nodes to export"
+    )
     args = parser.parse_args()
     run(min_obligation=args.min_obligation, top_nodes=args.top_nodes)
     return 0

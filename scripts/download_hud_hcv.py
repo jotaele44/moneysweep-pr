@@ -15,6 +15,7 @@ Output:
 Usage:
   python3 scripts/download_hud_hcv.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -35,24 +36,43 @@ MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 HCV_COLUMNS = [
-    "year", "program", "total_units", "people_per_unit",
-    "total_households", "pct_minority", "avg_annual_income",
-    "avg_rent_burden", "total_annual_cost", "source_doc",
+    "year",
+    "program",
+    "total_units",
+    "people_per_unit",
+    "total_households",
+    "pct_minority",
+    "avg_annual_income",
+    "avg_rent_burden",
+    "total_annual_cost",
+    "source_doc",
 ]
 
 KNOWN_HCV_DATA = [
-    {"year": "2022", "program": "Housing Choice Voucher",
-     "total_units": "28000", "people_per_unit": "2.8",
-     "total_households": "28000", "pct_minority": "99",
-     "avg_annual_income": "9600", "avg_rent_burden": "35",
-     "total_annual_cost": "420000000",
-     "source_doc": "hud_picture_subsidized_housing_2022"},
-    {"year": "2021", "program": "Housing Choice Voucher",
-     "total_units": "27500", "people_per_unit": "2.8",
-     "total_households": "27500", "pct_minority": "99",
-     "avg_annual_income": "9200", "avg_rent_burden": "34",
-     "total_annual_cost": "400000000",
-     "source_doc": "hud_picture_subsidized_housing_2021"},
+    {
+        "year": "2022",
+        "program": "Housing Choice Voucher",
+        "total_units": "28000",
+        "people_per_unit": "2.8",
+        "total_households": "28000",
+        "pct_minority": "99",
+        "avg_annual_income": "9600",
+        "avg_rent_burden": "35",
+        "total_annual_cost": "420000000",
+        "source_doc": "hud_picture_subsidized_housing_2022",
+    },
+    {
+        "year": "2021",
+        "program": "Housing Choice Voucher",
+        "total_units": "27500",
+        "people_per_unit": "2.8",
+        "total_households": "27500",
+        "pct_minority": "99",
+        "avg_annual_income": "9200",
+        "avg_rent_burden": "34",
+        "total_annual_cost": "400000000",
+        "source_doc": "hud_picture_subsidized_housing_2021",
+    },
 ]
 
 HUD_USER_BASE = "https://www.huduser.gov/portal/datasets/assthsg.html"
@@ -67,10 +87,12 @@ USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (HUD HCV PR research)",
-        "Accept": "application/json, text/html",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (HUD HCV PR research)",
+            "Accept": "application/json, text/html",
+        }
+    )
     return s
 
 
@@ -90,7 +112,7 @@ def _get(session, url, params, logger):
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -118,7 +140,9 @@ def _fetch_hud_pic(session, logger) -> list[dict]:
             logger.warning(f"  Could not parse HUD PIC {year}: {e}")
             continue
 
-        state_cols = [c for c in df.columns if "state" in c.lower() or c.upper() in ("ST", "STATE_CD")]
+        state_cols = [
+            c for c in df.columns if "state" in c.lower() or c.upper() in ("ST", "STATE_CD")
+        ]
         if not state_cols:
             continue
         pr_mask = df[state_cols[0]].str.upper().str.contains("PR|PUERTO RICO|72", na=False)
@@ -131,18 +155,28 @@ def _fetch_hud_pic(session, logger) -> list[dict]:
             program = str(rd.get("Program", rd.get("program", rd.get("PROGRAM", "HCV"))))
             if not any(kw in program.upper() for kw in ["VOUCHER", "HCV", "SECTION 8", "HOUSING"]):
                 continue
-            rows.append({
-                "year": str(year),
-                "program": program,
-                "total_units": str(rd.get("Units Available", rd.get("total_units", rd.get("UNITS", "")))),
-                "people_per_unit": str(rd.get("People Per Unit", rd.get("persons_per_unit", ""))),
-                "total_households": str(rd.get("Total Households", rd.get("households", ""))),
-                "pct_minority": str(rd.get("Percent Minority", rd.get("pct_minority", ""))),
-                "avg_annual_income": str(rd.get("Average Annual Income", rd.get("avg_income", ""))),
-                "avg_rent_burden": str(rd.get("Average Rent Burden", rd.get("avg_rent_burden", ""))),
-                "total_annual_cost": str(rd.get("Total Annual Cost", rd.get("total_cost", ""))),
-                "source_doc": url,
-            })
+            rows.append(
+                {
+                    "year": str(year),
+                    "program": program,
+                    "total_units": str(
+                        rd.get("Units Available", rd.get("total_units", rd.get("UNITS", "")))
+                    ),
+                    "people_per_unit": str(
+                        rd.get("People Per Unit", rd.get("persons_per_unit", ""))
+                    ),
+                    "total_households": str(rd.get("Total Households", rd.get("households", ""))),
+                    "pct_minority": str(rd.get("Percent Minority", rd.get("pct_minority", ""))),
+                    "avg_annual_income": str(
+                        rd.get("Average Annual Income", rd.get("avg_income", ""))
+                    ),
+                    "avg_rent_burden": str(
+                        rd.get("Average Rent Burden", rd.get("avg_rent_burden", ""))
+                    ),
+                    "total_annual_cost": str(rd.get("Total Annual Cost", rd.get("total_cost", ""))),
+                    "source_doc": url,
+                }
+            )
         if rows:
             logger.info(f"  HUD PIC {year}: {len(rows)} PR HCV rows")
             return rows
@@ -158,7 +192,10 @@ def _fetch_hud_socrata(session, logger) -> list[dict]:
     ]
     for endpoint in endpoints:
         logger.info(f"  Trying HUD Socrata: {endpoint}")
-        params = {"$where": "state='PR' OR state_code='72' OR state_name='Puerto Rico'", "$limit": 5000}
+        params = {
+            "$where": "state='PR' OR state_code='72' OR state_name='Puerto Rico'",
+            "$limit": 5000,
+        }
         resp = _get(session, endpoint, params, logger)
         if not resp:
             continue
@@ -170,18 +207,22 @@ def _fetch_hud_socrata(session, logger) -> list[dict]:
             continue
         for r in data:
             program = str(r.get("program", r.get("program_type", "HCV")))
-            rows.append({
-                "year": str(r.get("year", r.get("report_year", ""))),
-                "program": program,
-                "total_units": str(r.get("total_units", r.get("units_available", ""))),
-                "people_per_unit": str(r.get("people_per_unit", r.get("persons_per_unit", ""))),
-                "total_households": str(r.get("total_households", r.get("households", ""))),
-                "pct_minority": str(r.get("pct_minority", r.get("percent_minority", ""))),
-                "avg_annual_income": str(r.get("avg_annual_income", r.get("average_income", ""))),
-                "avg_rent_burden": str(r.get("avg_rent_burden", r.get("rent_burden", ""))),
-                "total_annual_cost": str(r.get("total_annual_cost", r.get("total_cost", ""))),
-                "source_doc": endpoint,
-            })
+            rows.append(
+                {
+                    "year": str(r.get("year", r.get("report_year", ""))),
+                    "program": program,
+                    "total_units": str(r.get("total_units", r.get("units_available", ""))),
+                    "people_per_unit": str(r.get("people_per_unit", r.get("persons_per_unit", ""))),
+                    "total_households": str(r.get("total_households", r.get("households", ""))),
+                    "pct_minority": str(r.get("pct_minority", r.get("percent_minority", ""))),
+                    "avg_annual_income": str(
+                        r.get("avg_annual_income", r.get("average_income", ""))
+                    ),
+                    "avg_rent_burden": str(r.get("avg_rent_burden", r.get("rent_burden", ""))),
+                    "total_annual_cost": str(r.get("total_annual_cost", r.get("total_cost", ""))),
+                    "source_doc": endpoint,
+                }
+            )
         if rows:
             logger.info(f"  HUD Socrata: {len(rows)} rows")
             return rows
@@ -197,11 +238,22 @@ def _fetch_usaspending(session, logger) -> list[dict]:
             "place_of_performance_locations": [{"country": "USA", "state": "PR"}],
         },
         "fields": [
-            "Award ID", "Recipient Name", "recipient_uei", "Awarding Agency",
-            "Awarding Sub Agency", "Award Amount", "Start Date", "Award Type",
-            "Place of Performance State Code", "Description",
+            "Award ID",
+            "Recipient Name",
+            "recipient_uei",
+            "Awarding Agency",
+            "Awarding Sub Agency",
+            "Award Amount",
+            "Start Date",
+            "Award Type",
+            "Place of Performance State Code",
+            "Description",
         ],
-        "page": 1, "limit": 100, "sort": "Award Amount", "order": "desc", "subawards": False,
+        "page": 1,
+        "limit": 100,
+        "sort": "Award Amount",
+        "order": "desc",
+        "subawards": False,
     }
     page = 1
     while True:
@@ -217,18 +269,20 @@ def _fetch_usaspending(session, logger) -> list[dict]:
         if not results:
             break
         for r in results:
-            rows.append({
-                "year": str(r.get("Start Date", ""))[:4],
-                "program": "HCV",
-                "total_units": "",
-                "people_per_unit": "",
-                "total_households": "",
-                "pct_minority": "",
-                "avg_annual_income": "",
-                "avg_rent_burden": "",
-                "total_annual_cost": str(r.get("Award Amount", "")),
-                "source_doc": "usaspending_cfda_14.871",
-            })
+            rows.append(
+                {
+                    "year": str(r.get("Start Date", ""))[:4],
+                    "program": "HCV",
+                    "total_units": "",
+                    "people_per_unit": "",
+                    "total_households": "",
+                    "pct_minority": "",
+                    "avg_annual_income": "",
+                    "avg_rent_burden": "",
+                    "total_annual_cost": str(r.get("Award Amount", "")),
+                    "source_doc": "usaspending_cfda_14.871",
+                }
+            )
         if not data.get("page_metadata", {}).get("has_next_page", False):
             break
         page += 1

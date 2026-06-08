@@ -30,56 +30,109 @@ import pandas as pd
 from scripts.config import PROJECT_ROOT, setup_logging
 
 CABILDEROS_COLUMNS = [
-    "lobbyist_name", "lobbyist_normalized",
-    "client_name", "client_normalized",
-    "registration_year", "registration_date", "expiry_date",
-    "lobbying_subject", "agency_lobbied",
-    "fee_amount", "source_file",
+    "lobbyist_name",
+    "lobbyist_normalized",
+    "client_name",
+    "client_normalized",
+    "registration_year",
+    "registration_date",
+    "expiry_date",
+    "lobbying_subject",
+    "agency_lobbied",
+    "fee_amount",
+    "source_file",
 ]
 
 # Flexible column mapping for PR Cabilderos registry formats
 COL_MAP = {
     "lobbyist_name": [
-        "Nombre Cabildero", "Cabildero", "Lobbyist Name", "Nombre",
-        "Nombre del Cabildero", "lobbyist", "nombre_cabildero",
+        "Nombre Cabildero",
+        "Cabildero",
+        "Lobbyist Name",
+        "Nombre",
+        "Nombre del Cabildero",
+        "lobbyist",
+        "nombre_cabildero",
     ],
     "client_name": [
-        "Cliente", "Client Name", "Nombre Cliente", "Nombre del Cliente",
-        "Representado", "Entidad", "Entity", "Organization",
-        "nombre_cliente", "cliente",
+        "Cliente",
+        "Client Name",
+        "Nombre Cliente",
+        "Nombre del Cliente",
+        "Representado",
+        "Entidad",
+        "Entity",
+        "Organization",
+        "nombre_cliente",
+        "cliente",
     ],
     "registration_year": [
-        "Año", "Year", "Año de Registro", "Registration Year",
-        "anio", "año_registro",
+        "Año",
+        "Year",
+        "Año de Registro",
+        "Registration Year",
+        "anio",
+        "año_registro",
     ],
     "registration_date": [
-        "Fecha de Registro", "Registration Date", "Fecha Registro",
-        "fecha_registro", "Date Registered",
+        "Fecha de Registro",
+        "Registration Date",
+        "Fecha Registro",
+        "fecha_registro",
+        "Date Registered",
     ],
     "expiry_date": [
-        "Fecha de Expiración", "Expiry Date", "Fecha Expiracion",
-        "fecha_expiracion", "Expiration Date",
+        "Fecha de Expiración",
+        "Expiry Date",
+        "Fecha Expiracion",
+        "fecha_expiracion",
+        "Expiration Date",
     ],
     "lobbying_subject": [
-        "Asunto", "Subject", "Tema", "Materia", "Area de Cabildeo",
-        "lobbying_subject", "asunto",
+        "Asunto",
+        "Subject",
+        "Tema",
+        "Materia",
+        "Area de Cabildeo",
+        "lobbying_subject",
+        "asunto",
     ],
     "agency_lobbied": [
-        "Agencia", "Agency", "Agencia o Entidad", "Entity Lobbied",
-        "agencia", "Cuerpo Legislativo",
+        "Agencia",
+        "Agency",
+        "Agencia o Entidad",
+        "Entity Lobbied",
+        "agencia",
+        "Cuerpo Legislativo",
     ],
     "fee_amount": [
-        "Honorarios", "Fee", "Amount", "Compensación", "Compensation",
-        "honorarios", "fee_amount",
+        "Honorarios",
+        "Fee",
+        "Amount",
+        "Compensación",
+        "Compensation",
+        "honorarios",
+        "fee_amount",
     ],
 }
 
 _STRIP_RE = re.compile(r"[^\w\s]")
 _SPACE_RE = re.compile(r"\s+")
 _NAME_SUFFIXES = {
-    "INC", "LLC", "CORP", "LTD", "CO", "LP", "LLP",
-    "COMPANY", "CORPORATION", "INCORPORATED", "LIMITED",
-    "CSP", "SE", "SAS",
+    "INC",
+    "LLC",
+    "CORP",
+    "LTD",
+    "CO",
+    "LP",
+    "LLP",
+    "COMPANY",
+    "CORPORATION",
+    "INCORPORATED",
+    "LIMITED",
+    "CSP",
+    "SE",
+    "SAS",
 }
 
 
@@ -123,7 +176,9 @@ def _read_file(path, logger):
         elif suffix == ".csv":
             for enc in ("utf-8", "latin-1", "utf-8-sig"):
                 try:
-                    df = pd.read_csv(path, dtype=str, na_filter=False, encoding=enc, low_memory=False)
+                    df = pd.read_csv(
+                        path, dtype=str, na_filter=False, encoding=enc, low_memory=False
+                    )
                     logger.info(f"  Read {len(df):,} rows from {path.name}")
                     return df
                 except UnicodeDecodeError:
@@ -165,8 +220,11 @@ def _find_files(raw_dir, logger):
     if not folder.exists():
         logger.warning(f"  Cabilderos folder not found: {folder}")
         return []
-    files = [f for f in sorted(folder.iterdir())
-             if f.suffix.lower() in (".csv", ".xlsx", ".xls") and not f.name.startswith("~")]
+    files = [
+        f
+        for f in sorted(folder.iterdir())
+        if f.suffix.lower() in (".csv", ".xlsx", ".xls") and not f.name.startswith("~")
+    ]
     logger.info(f"  Found {len(files)} Cabilderos file(s) in {folder}")
     return files
 

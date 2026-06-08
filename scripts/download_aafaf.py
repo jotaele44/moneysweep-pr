@@ -17,6 +17,7 @@ Outputs:
 Usage:
   python3 scripts/download_aafaf.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -38,22 +39,50 @@ PR_DATA_PORTAL_URL = "https://data.pr.gov/api/3/action/package_search"
 
 # Known PR general fund figures from FOMB-certified fiscal plans (publicly disclosed)
 KNOWN_AAFAF_DATA = [
-    {"fiscal_year": "2021", "month": "annual", "report_type": "general_fund",
-     "revenue_category": "total_revenues", "revenue_amount": "10900000000",
-     "expenditure_category": "total_expenditures", "expenditure_amount": "10200000000",
-     "cash_balance": "", "source_doc": "fomb_fiscal_plan_2021"},
-    {"fiscal_year": "2022", "month": "annual", "report_type": "general_fund",
-     "revenue_category": "total_revenues", "revenue_amount": "11800000000",
-     "expenditure_category": "total_expenditures", "expenditure_amount": "10900000000",
-     "cash_balance": "", "source_doc": "fomb_fiscal_plan_2022"},
-    {"fiscal_year": "2023", "month": "annual", "report_type": "general_fund",
-     "revenue_category": "total_revenues", "revenue_amount": "12400000000",
-     "expenditure_category": "total_expenditures", "expenditure_amount": "11200000000",
-     "cash_balance": "", "source_doc": "fomb_fiscal_plan_2023"},
-    {"fiscal_year": "2024", "month": "annual", "report_type": "general_fund",
-     "revenue_category": "total_revenues", "revenue_amount": "13100000000",
-     "expenditure_category": "total_expenditures", "expenditure_amount": "11600000000",
-     "cash_balance": "", "source_doc": "fomb_fiscal_plan_2024"},
+    {
+        "fiscal_year": "2021",
+        "month": "annual",
+        "report_type": "general_fund",
+        "revenue_category": "total_revenues",
+        "revenue_amount": "10900000000",
+        "expenditure_category": "total_expenditures",
+        "expenditure_amount": "10200000000",
+        "cash_balance": "",
+        "source_doc": "fomb_fiscal_plan_2021",
+    },
+    {
+        "fiscal_year": "2022",
+        "month": "annual",
+        "report_type": "general_fund",
+        "revenue_category": "total_revenues",
+        "revenue_amount": "11800000000",
+        "expenditure_category": "total_expenditures",
+        "expenditure_amount": "10900000000",
+        "cash_balance": "",
+        "source_doc": "fomb_fiscal_plan_2022",
+    },
+    {
+        "fiscal_year": "2023",
+        "month": "annual",
+        "report_type": "general_fund",
+        "revenue_category": "total_revenues",
+        "revenue_amount": "12400000000",
+        "expenditure_category": "total_expenditures",
+        "expenditure_amount": "11200000000",
+        "cash_balance": "",
+        "source_doc": "fomb_fiscal_plan_2023",
+    },
+    {
+        "fiscal_year": "2024",
+        "month": "annual",
+        "report_type": "general_fund",
+        "revenue_category": "total_revenues",
+        "revenue_amount": "13100000000",
+        "expenditure_category": "total_expenditures",
+        "expenditure_amount": "11600000000",
+        "cash_balance": "",
+        "source_doc": "fomb_fiscal_plan_2024",
+    },
 ]
 
 PAGE_SLEEP = 0.5
@@ -75,14 +104,18 @@ AAFAF_COLUMNS = [
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR AAFAF budget research)",
-        "Accept": "text/html,application/xhtml+xml,application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR AAFAF budget research)",
+            "Accept": "text/html,application/xhtml+xml,application/json",
+        }
+    )
     return s
 
 
-def _get(session: requests.Session, url: str, params: dict, logger, accept_html: bool = False) -> requests.Response | None:
+def _get(
+    session: requests.Session, url: str, params: dict, logger, accept_html: bool = False
+) -> requests.Response | None:
     headers = {}
     if accept_html:
         headers["Accept"] = "text/html,application/xhtml+xml"
@@ -101,7 +134,7 @@ def _get(session: requests.Session, url: str, params: dict, logger, accept_html:
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -118,6 +151,7 @@ def _find_excel_links(html: str, base_url: str) -> list[str]:
             result.append(link)
         elif link.startswith("/"):
             from urllib.parse import urlparse
+
             parsed = urlparse(base_url)
             result.append(f"{parsed.scheme}://{parsed.netloc}{link}")
         else:
@@ -130,7 +164,7 @@ def _parse_excel_to_records(content: bytes, url: str, logger) -> list[dict]:
     rows = []
     try:
         df = pd.read_excel(pd.io.common.BytesIO(content), sheet_name=None, header=None)
-        for sheet_name, sheet_df in (df.items() if isinstance(df, dict) else [("Sheet1", df)]):
+        for sheet_name, sheet_df in df.items() if isinstance(df, dict) else [("Sheet1", df)]:
             # Try to detect if this looks like financial data
             text_vals = sheet_df.astype(str).values.flatten()
             has_financial = any(
@@ -184,7 +218,9 @@ def _fetch_pr_data_portal(session: requests.Session, logger) -> list[dict]:
     """Search PR Open Data portal for AAFAF/budget datasets."""
     rows = []
     try:
-        resp = _get(session, PR_DATA_PORTAL_URL, {"q": "aafaf presupuesto budget", "rows": 20}, logger)
+        resp = _get(
+            session, PR_DATA_PORTAL_URL, {"q": "aafaf presupuesto budget", "rows": 20}, logger
+        )
         if not resp:
             return rows
         data = resp.json() if hasattr(resp, "json") else {}
@@ -198,11 +234,15 @@ def _fetch_pr_data_portal(session: requests.Session, logger) -> list[dict]:
                         file_resp = session.get(url, timeout=60)
                         if file_resp.status_code == 200:
                             if fmt == "csv":
-                                df = pd.read_csv(pd.io.common.BytesIO(file_resp.content), low_memory=False)
+                                df = pd.read_csv(
+                                    pd.io.common.BytesIO(file_resp.content), low_memory=False
+                                )
                                 df["source_doc"] = url
                                 df["report_type"] = "pr_data_portal"
                                 rows.extend(df.to_dict("records"))
-                                logger.info(f"  PR data portal: {len(df)} rows from {url.split('/')[-1]}")
+                                logger.info(
+                                    f"  PR data portal: {len(df)} rows from {url.split('/')[-1]}"
+                                )
                             else:
                                 records = _parse_excel_to_records(file_resp.content, url, logger)
                                 rows.extend(records)
@@ -235,13 +275,29 @@ def parse_records(records: list[dict]) -> pd.DataFrame:
             rename[col] = "month"
         elif "report_type" in cl:
             rename[col] = "report_type"
-        elif ("revenue" in cl or "ingreso" in cl) and "category" in cl and "revenue_category" not in rename.values():
+        elif (
+            ("revenue" in cl or "ingreso" in cl)
+            and "category" in cl
+            and "revenue_category" not in rename.values()
+        ):
             rename[col] = "revenue_category"
-        elif ("revenue" in cl or "ingreso" in cl) and "amount" in cl and "revenue_amount" not in rename.values():
+        elif (
+            ("revenue" in cl or "ingreso" in cl)
+            and "amount" in cl
+            and "revenue_amount" not in rename.values()
+        ):
             rename[col] = "revenue_amount"
-        elif ("expenditure" in cl or "gasto" in cl) and "category" in cl and "expenditure_category" not in rename.values():
+        elif (
+            ("expenditure" in cl or "gasto" in cl)
+            and "category" in cl
+            and "expenditure_category" not in rename.values()
+        ):
             rename[col] = "expenditure_category"
-        elif ("expenditure" in cl or "gasto" in cl) and "amount" in cl and "expenditure_amount" not in rename.values():
+        elif (
+            ("expenditure" in cl or "gasto" in cl)
+            and "amount" in cl
+            and "expenditure_amount" not in rename.values()
+        ):
             rename[col] = "expenditure_amount"
         elif "balance" in cl and "cash_balance" not in rename.values():
             rename[col] = "cash_balance"
@@ -294,7 +350,10 @@ def run(root: Path = None, force: bool = False) -> dict:
 
     # Always include known seed data so the output is never empty when APIs are blocked
     logger.info(f"  Adding {len(KNOWN_AAFAF_DATA)} known AAFAF seed rows...")
-    known_keys = {(r.get("fiscal_year", ""), r.get("month", ""), r.get("revenue_category", "")) for r in all_records}
+    known_keys = {
+        (r.get("fiscal_year", ""), r.get("month", ""), r.get("revenue_category", ""))
+        for r in all_records
+    }
     for seed in KNOWN_AAFAF_DATA:
         if (seed["fiscal_year"], seed["month"], seed["revenue_category"]) not in known_keys:
             all_records.append(seed)

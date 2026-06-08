@@ -8,6 +8,7 @@ parse it client-side, and filter against the caller's identifiers.
 No credentials required. The full list is small enough (~10K entries)
 to fit easily in memory.
 """
+
 from __future__ import annotations
 
 import xml.etree.ElementTree as ET
@@ -59,16 +60,18 @@ def parse_sdn_xml(content: bytes) -> list[dict[str, Any]]:
         last = _text(entry, "lastName")
         first = _text(entry, "firstName")
         name = f"{last}, {first}".strip(", ") if first else last
-        programs = sorted({
-            (p.text or "").strip() for p in _collect(entry, "program") if (p.text or "").strip()
-        })
-        rows.append({
-            "uid": _text(entry, "uid"),
-            "name": name,
-            "sdn_type": _text(entry, "sdnType"),
-            "programs": "|".join(programs),
-            "aka_names": "|".join(_aka_names(entry)),
-        })
+        programs = sorted(
+            {(p.text or "").strip() for p in _collect(entry, "program") if (p.text or "").strip()}
+        )
+        rows.append(
+            {
+                "uid": _text(entry, "uid"),
+                "name": name,
+                "sdn_type": _text(entry, "sdnType"),
+                "programs": "|".join(programs),
+                "aka_names": "|".join(_aka_names(entry)),
+            }
+        )
     return rows
 
 
@@ -86,10 +89,12 @@ class OFACSDNAdapter(EntityAdapter):
         import requests
 
         s = requests.Session()
-        s.headers.update({
-            "Accept": "application/xml,text/xml",
-            "User-Agent": "contract-sweeper-query/1",
-        })
+        s.headers.update(
+            {
+                "Accept": "application/xml,text/xml",
+                "User-Agent": "contract-sweeper-query/1",
+            }
+        )
         return s
 
     def _download(self, session) -> bytes:

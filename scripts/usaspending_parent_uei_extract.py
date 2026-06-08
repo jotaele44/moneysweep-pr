@@ -16,6 +16,7 @@ Usage:
   python3 scripts/usaspending_parent_uei_extract.py --limit 200
   python3 scripts/usaspending_parent_uei_extract.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -35,12 +36,16 @@ ENRICHMENT_DIR = PROCESSED_DIR / "enrichment"
 OUTPUT_CSV = ENRICHMENT_DIR / "usaspending_parent_index.csv"
 
 USAS_SEARCH = "https://api.usaspending.gov/api/v2/recipient/"
-SLEEP = 0.4          # ~2.5 req/s → well under any practical limit
+SLEEP = 0.4  # ~2.5 req/s → well under any practical limit
 MAX_RETRIES = 3
 
 OUTPUT_FIELDS = [
-    "uei", "usas_name", "recipient_hash",
-    "parent_uei", "parent_name", "parent_duns",
+    "uei",
+    "usas_name",
+    "recipient_hash",
+    "parent_uei",
+    "parent_name",
+    "parent_duns",
     "resolved_at",
 ]
 
@@ -84,7 +89,8 @@ def _collect_ueis() -> list[str]:
 def _post(url: str, body: dict) -> dict | None:
     payload = json.dumps(body).encode()
     req = urllib.request.Request(
-        url, data=payload,
+        url,
+        data=payload,
         headers={"Content-Type": "application/json", "Accept": "application/json"},
     )
     for attempt in range(MAX_RETRIES):
@@ -221,7 +227,9 @@ def run(*, force: bool = False, dry_run: bool = False, limit: int | None = None)
 
         if i % checkpoint_every == 0:
             _flush(list(resolved.values()))
-            parent_rate = sum(1 for r in resolved.values() if r.get("parent_uei")) / max(len(resolved), 1)
+            parent_rate = sum(1 for r in resolved.values() if r.get("parent_uei")) / max(
+                len(resolved), 1
+            )
             log.info(f"  [CHECKPOINT] {len(resolved)} done, parent_uei rate={parent_rate:.1%}")
 
     _flush(list(resolved.values()))

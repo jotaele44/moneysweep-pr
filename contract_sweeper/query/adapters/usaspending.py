@@ -9,6 +9,7 @@ Endpoint and request shape mirror the existing bulk producers at
 `scripts/download_grants.py:_build_bulk_payload` and
 `scripts/download_subawards.py:_fetch_page`.
 """
+
 from __future__ import annotations
 
 from datetime import date
@@ -63,9 +64,7 @@ SUBAWARD_FIELDS = [
 ]
 
 
-def _municipalities_to_county_suffixes(
-    municipalities: tuple[str, ...], root
-) -> list[str]:
+def _municipalities_to_county_suffixes(municipalities: tuple[str, ...], root) -> list[str]:
     """Translate canonical names or FIPS codes → 3-digit PR county suffixes.
 
     USAspending's `place_of_performance_locations` filter wants the 3-digit
@@ -119,9 +118,7 @@ def _build_filters(
 ) -> dict[str, Any]:
     counties = _municipalities_to_county_suffixes(query.municipalities, root)
     if counties:
-        locations = [
-            {"country": "USA", "state": "PR", "county": c} for c in counties
-        ]
+        locations = [{"country": "USA", "state": "PR", "county": c} for c in counties]
     else:
         locations = [{"country": "USA", "state": "PR"}]
     start, end = _date_window(query)
@@ -141,7 +138,9 @@ def _build_filters(
     return filters
 
 
-def _inject_program_numbers(payload: dict[str, Any], program_numbers: tuple[str, ...]) -> dict[str, Any]:
+def _inject_program_numbers(
+    payload: dict[str, Any], program_numbers: tuple[str, ...]
+) -> dict[str, Any]:
     """Add CFDA program numbers to a payload's filters if not already present."""
     if program_numbers and "program_numbers" not in payload["filters"]:
         payload["filters"]["program_numbers"] = list(program_numbers)
@@ -151,7 +150,9 @@ def _inject_program_numbers(payload: dict[str, Any], program_numbers: tuple[str,
 def build_payload(query: Query, *, root, page: int = 1) -> dict[str, Any]:
     """Backward-compatible payload builder for the prime adapter (contracts)."""
     return {
-        "filters": _build_filters(query, root=root, type_codes=CONTRACT_TYPE_CODES, subawards=False),
+        "filters": _build_filters(
+            query, root=root, type_codes=CONTRACT_TYPE_CODES, subawards=False
+        ),
         "fields": PRIME_FIELDS,
         "page": page,
         "limit": PAGE_LIMIT,

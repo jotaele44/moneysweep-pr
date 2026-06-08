@@ -41,10 +41,17 @@ AGENCY_NAME = "Environmental Protection Agency"
 GRANT_TYPE_CODES = ["02", "03", "04", "05"]
 
 FIELDS = [
-    "Award ID", "Recipient Name", "recipient_uei",
-    "Awarding Agency", "Awarding Sub Agency", "Award Amount",
-    "Start Date", "Award Type",
-    "Place of Performance State Code", "Place of Performance County Name", "Description",
+    "Award ID",
+    "Recipient Name",
+    "recipient_uei",
+    "Awarding Agency",
+    "Awarding Sub Agency",
+    "Award Amount",
+    "Start Date",
+    "Award Type",
+    "Place of Performance State Code",
+    "Place of Performance County Name",
+    "Description",
 ]
 
 TIME_WINDOWS = [
@@ -55,37 +62,87 @@ TIME_WINDOWS = [
 ]
 
 MASTER_COLUMNS = [
-    "award_id", "recipient_name", "recipient_uei", "awarding_agency",
-    "awarding_sub_agency", "obligated_amount", "award_date", "fiscal_year",
-    "pop_state", "pop_county", "description", "source_file",
-    "source_dataset", "award_category",
+    "award_id",
+    "recipient_name",
+    "recipient_uei",
+    "awarding_agency",
+    "awarding_sub_agency",
+    "obligated_amount",
+    "award_date",
+    "fiscal_year",
+    "pop_state",
+    "pop_county",
+    "description",
+    "source_file",
+    "source_dataset",
+    "award_category",
 ]
 
 KNOWN_EPA_DATA = [
-    {"award_id": "EPA-PR-2022-001", "recipient_name": "Puerto Rico Aqueduct and Sewer Authority",
-     "recipient_uei": "", "awarding_agency": "Environmental Protection Agency",
-     "awarding_sub_agency": "Office of Water", "obligated_amount": "28000000",
-     "award_date": "2022-03-15", "fiscal_year": "2022", "pop_state": "PR",
-     "pop_county": "San Juan", "description": "Clean Water SRF capitalization grant PR",
-     "source_file": "epa_known_seed", "source_dataset": "epa", "award_category": "02"},
-    {"award_id": "EPA-PR-2022-002", "recipient_name": "Puerto Rico Environmental Quality Board",
-     "recipient_uei": "", "awarding_agency": "Environmental Protection Agency",
-     "awarding_sub_agency": "Office of Air and Radiation", "obligated_amount": "4200000",
-     "award_date": "2022-06-01", "fiscal_year": "2022", "pop_state": "PR",
-     "pop_county": "San Juan", "description": "Air quality monitoring grants PR",
-     "source_file": "epa_known_seed", "source_dataset": "epa", "award_category": "02"},
-    {"award_id": "EPA-PR-2023-001", "recipient_name": "Puerto Rico Dept of Natural and Environmental Resources",
-     "recipient_uei": "", "awarding_agency": "Environmental Protection Agency",
-     "awarding_sub_agency": "Office of Water", "obligated_amount": "18500000",
-     "award_date": "2023-04-01", "fiscal_year": "2023", "pop_state": "PR",
-     "pop_county": "San Juan", "description": "Drinking Water SRF capitalization PR",
-     "source_file": "epa_known_seed", "source_dataset": "epa", "award_category": "02"},
-    {"award_id": "EPA-PR-2023-002", "recipient_name": "Municipality of San Juan",
-     "recipient_uei": "", "awarding_agency": "Environmental Protection Agency",
-     "awarding_sub_agency": "Office of Environmental Justice", "obligated_amount": "1000000",
-     "award_date": "2023-09-01", "fiscal_year": "2023", "pop_state": "PR",
-     "pop_county": "San Juan", "description": "Environmental justice cooperative agreement PR",
-     "source_file": "epa_known_seed", "source_dataset": "epa", "award_category": "04"},
+    {
+        "award_id": "EPA-PR-2022-001",
+        "recipient_name": "Puerto Rico Aqueduct and Sewer Authority",
+        "recipient_uei": "",
+        "awarding_agency": "Environmental Protection Agency",
+        "awarding_sub_agency": "Office of Water",
+        "obligated_amount": "28000000",
+        "award_date": "2022-03-15",
+        "fiscal_year": "2022",
+        "pop_state": "PR",
+        "pop_county": "San Juan",
+        "description": "Clean Water SRF capitalization grant PR",
+        "source_file": "epa_known_seed",
+        "source_dataset": "epa",
+        "award_category": "02",
+    },
+    {
+        "award_id": "EPA-PR-2022-002",
+        "recipient_name": "Puerto Rico Environmental Quality Board",
+        "recipient_uei": "",
+        "awarding_agency": "Environmental Protection Agency",
+        "awarding_sub_agency": "Office of Air and Radiation",
+        "obligated_amount": "4200000",
+        "award_date": "2022-06-01",
+        "fiscal_year": "2022",
+        "pop_state": "PR",
+        "pop_county": "San Juan",
+        "description": "Air quality monitoring grants PR",
+        "source_file": "epa_known_seed",
+        "source_dataset": "epa",
+        "award_category": "02",
+    },
+    {
+        "award_id": "EPA-PR-2023-001",
+        "recipient_name": "Puerto Rico Dept of Natural and Environmental Resources",
+        "recipient_uei": "",
+        "awarding_agency": "Environmental Protection Agency",
+        "awarding_sub_agency": "Office of Water",
+        "obligated_amount": "18500000",
+        "award_date": "2023-04-01",
+        "fiscal_year": "2023",
+        "pop_state": "PR",
+        "pop_county": "San Juan",
+        "description": "Drinking Water SRF capitalization PR",
+        "source_file": "epa_known_seed",
+        "source_dataset": "epa",
+        "award_category": "02",
+    },
+    {
+        "award_id": "EPA-PR-2023-002",
+        "recipient_name": "Municipality of San Juan",
+        "recipient_uei": "",
+        "awarding_agency": "Environmental Protection Agency",
+        "awarding_sub_agency": "Office of Environmental Justice",
+        "obligated_amount": "1000000",
+        "award_date": "2023-09-01",
+        "fiscal_year": "2023",
+        "pop_state": "PR",
+        "pop_county": "San Juan",
+        "description": "Environmental justice cooperative agreement PR",
+        "source_file": "epa_known_seed",
+        "source_dataset": "epa",
+        "award_category": "04",
+    },
 ]
 
 MAX_RETRIES = 3
@@ -175,12 +232,17 @@ def _results_to_df(results, source_file):
         return pd.DataFrame(columns=MASTER_COLUMNS)
     df = pd.json_normalize(results)
     rename_map = {
-        "Award ID": "award_id", "Recipient Name": "recipient_name",
-        "recipient_uei": "recipient_uei", "Awarding Agency": "awarding_agency",
-        "Awarding Sub Agency": "awarding_sub_agency", "Award Amount": "obligated_amount",
-        "Start Date": "award_date", "Award Type": "award_category",
+        "Award ID": "award_id",
+        "Recipient Name": "recipient_name",
+        "recipient_uei": "recipient_uei",
+        "Awarding Agency": "awarding_agency",
+        "Awarding Sub Agency": "awarding_sub_agency",
+        "Award Amount": "obligated_amount",
+        "Start Date": "award_date",
+        "Award Type": "award_category",
         "Place of Performance State Code": "pop_state",
-        "Place of Performance County Name": "pop_county", "Description": "description",
+        "Place of Performance County Name": "pop_county",
+        "Description": "description",
     }
     df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
     df["fiscal_year"] = df.get("award_date", pd.Series(dtype=str)).apply(_derive_fiscal_year)
@@ -269,7 +331,12 @@ def _run(root=None, force=False, fy_start=None):
             stats = download_window(session, window, raw_dir, force, logger)
         except Exception as e:
             logger.error(f"  Unexpected error on {window['label']}: {e}")
-            stats = {"window": window["label"], "pop_rows": 0, "recipient_rows": 0, "errors": [str(e)]}
+            stats = {
+                "window": window["label"],
+                "pop_rows": 0,
+                "recipient_rows": 0,
+                "errors": [str(e)],
+            }
         total_pop += stats["pop_rows"]
         total_rec += stats["recipient_rows"]
         all_errors.extend(stats["errors"])
@@ -285,9 +352,12 @@ def _run(root=None, force=False, fy_start=None):
         seed_df.to_csv(master_path, index=False, encoding="utf-8")
         master_rows = len(seed_df)
     summary = {
-        "raw_pop_rows": total_pop, "raw_recipient_rows": total_rec,
-        "master_rows": master_rows, "master_path": str(master_path),
-        "errors": all_errors, "windows": window_stats,
+        "raw_pop_rows": total_pop,
+        "raw_recipient_rows": total_rec,
+        "master_rows": master_rows,
+        "master_path": str(master_path),
+        "errors": all_errors,
+        "windows": window_stats,
         "rows": master_rows,
     }
     logger.info("=" * 60)

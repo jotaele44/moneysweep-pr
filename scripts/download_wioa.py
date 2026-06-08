@@ -44,10 +44,17 @@ AGENCY_NAME = "Department of Labor"
 GRANT_TYPE_CODES = ["02", "03", "04", "05"]
 
 FIELDS = [
-    "Award ID", "Recipient Name", "recipient_uei",
-    "Awarding Agency", "Awarding Sub Agency", "Award Amount",
-    "Start Date", "Award Type",
-    "Place of Performance State Code", "Place of Performance County Name", "Description",
+    "Award ID",
+    "Recipient Name",
+    "recipient_uei",
+    "Awarding Agency",
+    "Awarding Sub Agency",
+    "Award Amount",
+    "Start Date",
+    "Award Type",
+    "Place of Performance State Code",
+    "Place of Performance County Name",
+    "Description",
 ]
 
 TIME_WINDOWS = [
@@ -58,37 +65,71 @@ TIME_WINDOWS = [
 ]
 
 MASTER_COLUMNS = [
-    "award_id", "recipient_name", "recipient_uei", "awarding_agency",
-    "awarding_sub_agency", "obligated_amount", "award_date", "fiscal_year",
-    "pop_state", "pop_county", "description", "source_file",
-    "source_dataset", "award_category",
+    "award_id",
+    "recipient_name",
+    "recipient_uei",
+    "awarding_agency",
+    "awarding_sub_agency",
+    "obligated_amount",
+    "award_date",
+    "fiscal_year",
+    "pop_state",
+    "pop_county",
+    "description",
+    "source_file",
+    "source_dataset",
+    "award_category",
 ]
 
 KNOWN_WIOA_DATA = [
-    {"award_id": "WIOA-PR-2022-001",
-     "recipient_name": "Puerto Rico Dept of Labor and Human Resources",
-     "recipient_uei": "", "awarding_agency": "Department of Labor",
-     "awarding_sub_agency": "Employment and Training Administration",
-     "obligated_amount": "48000000", "award_date": "2022-07-01", "fiscal_year": "2022",
-     "pop_state": "PR", "pop_county": "",
-     "description": "WIOA Title I Adult formula allocation Puerto Rico FY2022",
-     "source_file": "wioa_known_seed", "source_dataset": "wioa", "award_category": "02"},
-    {"award_id": "WIOA-PR-2022-002",
-     "recipient_name": "Puerto Rico Dept of Labor and Human Resources",
-     "recipient_uei": "", "awarding_agency": "Department of Labor",
-     "awarding_sub_agency": "Employment and Training Administration",
-     "obligated_amount": "31000000", "award_date": "2022-07-01", "fiscal_year": "2022",
-     "pop_state": "PR", "pop_county": "",
-     "description": "WIOA Title I Dislocated Worker formula allocation PR FY2022",
-     "source_file": "wioa_known_seed", "source_dataset": "wioa", "award_category": "02"},
-    {"award_id": "WIOA-PR-2022-003",
-     "recipient_name": "Puerto Rico Department of Education",
-     "recipient_uei": "", "awarding_agency": "Department of Labor",
-     "awarding_sub_agency": "Employment and Training Administration",
-     "obligated_amount": "14000000", "award_date": "2022-07-01", "fiscal_year": "2022",
-     "pop_state": "PR", "pop_county": "",
-     "description": "WIOA Title I Youth formula allocation PR FY2022",
-     "source_file": "wioa_known_seed", "source_dataset": "wioa", "award_category": "02"},
+    {
+        "award_id": "WIOA-PR-2022-001",
+        "recipient_name": "Puerto Rico Dept of Labor and Human Resources",
+        "recipient_uei": "",
+        "awarding_agency": "Department of Labor",
+        "awarding_sub_agency": "Employment and Training Administration",
+        "obligated_amount": "48000000",
+        "award_date": "2022-07-01",
+        "fiscal_year": "2022",
+        "pop_state": "PR",
+        "pop_county": "",
+        "description": "WIOA Title I Adult formula allocation Puerto Rico FY2022",
+        "source_file": "wioa_known_seed",
+        "source_dataset": "wioa",
+        "award_category": "02",
+    },
+    {
+        "award_id": "WIOA-PR-2022-002",
+        "recipient_name": "Puerto Rico Dept of Labor and Human Resources",
+        "recipient_uei": "",
+        "awarding_agency": "Department of Labor",
+        "awarding_sub_agency": "Employment and Training Administration",
+        "obligated_amount": "31000000",
+        "award_date": "2022-07-01",
+        "fiscal_year": "2022",
+        "pop_state": "PR",
+        "pop_county": "",
+        "description": "WIOA Title I Dislocated Worker formula allocation PR FY2022",
+        "source_file": "wioa_known_seed",
+        "source_dataset": "wioa",
+        "award_category": "02",
+    },
+    {
+        "award_id": "WIOA-PR-2022-003",
+        "recipient_name": "Puerto Rico Department of Education",
+        "recipient_uei": "",
+        "awarding_agency": "Department of Labor",
+        "awarding_sub_agency": "Employment and Training Administration",
+        "obligated_amount": "14000000",
+        "award_date": "2022-07-01",
+        "fiscal_year": "2022",
+        "pop_state": "PR",
+        "pop_county": "",
+        "description": "WIOA Title I Youth formula allocation PR FY2022",
+        "source_file": "wioa_known_seed",
+        "source_dataset": "wioa",
+        "award_category": "02",
+    },
 ]
 
 MAX_RETRIES = 3
@@ -107,6 +148,7 @@ _HTTP = HttpConfig(
 
 def _session():
     return build_session("ContractSweeper/1.0")
+
 
 def _derive_fiscal_year(date_str):
     if not date_str or pd.isna(date_str):
@@ -132,6 +174,7 @@ def _file_has_data(filepath):
 def _fetch_page(session, payload, logger):
     return http_post_json(session, USASPENDING_URL, payload, logger=logger, config=_HTTP)
 
+
 def _paginate(session, base_payload, logger):
     def _fetch(page):
         payload = {**base_payload, "page": page}
@@ -148,6 +191,7 @@ def _paginate(session, base_payload, logger):
         return PageResult(results, page + 1 if has_next else None)
 
     return list(paginate(_fetch, start_marker=1))
+
 
 def _build_payload(filter_type, window):
     time_period = [{"start_date": window["start_date"], "end_date": window["end_date"]}]
@@ -177,12 +221,17 @@ def _results_to_df(results, source_file):
         return pd.DataFrame(columns=MASTER_COLUMNS)
     df = pd.json_normalize(results)
     rename_map = {
-        "Award ID": "award_id", "Recipient Name": "recipient_name",
-        "recipient_uei": "recipient_uei", "Awarding Agency": "awarding_agency",
-        "Awarding Sub Agency": "awarding_sub_agency", "Award Amount": "obligated_amount",
-        "Start Date": "award_date", "Award Type": "award_category",
+        "Award ID": "award_id",
+        "Recipient Name": "recipient_name",
+        "recipient_uei": "recipient_uei",
+        "Awarding Agency": "awarding_agency",
+        "Awarding Sub Agency": "awarding_sub_agency",
+        "Award Amount": "obligated_amount",
+        "Start Date": "award_date",
+        "Award Type": "award_category",
         "Place of Performance State Code": "pop_state",
-        "Place of Performance County Name": "pop_county", "Description": "description",
+        "Place of Performance County Name": "pop_county",
+        "Description": "description",
     }
     df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
     df["fiscal_year"] = df.get("award_date", pd.Series(dtype=str)).apply(_derive_fiscal_year)
@@ -271,7 +320,12 @@ def _run(root=None, force=False, fy_start=None):
             stats = download_window(session, window, raw_dir, force, logger)
         except Exception as e:
             logger.error(f"  Unexpected error on {window['label']}: {e}")
-            stats = {"window": window["label"], "pop_rows": 0, "recipient_rows": 0, "errors": [str(e)]}
+            stats = {
+                "window": window["label"],
+                "pop_rows": 0,
+                "recipient_rows": 0,
+                "errors": [str(e)],
+            }
         total_pop += stats["pop_rows"]
         total_rec += stats["recipient_rows"]
         all_errors.extend(stats["errors"])
@@ -287,17 +341,24 @@ def _run(root=None, force=False, fy_start=None):
         seed_df.to_csv(master_path, index=False, encoding="utf-8")
         master_rows = len(seed_df)
     summary = {
-        "raw_pop_rows": total_pop, "raw_recipient_rows": total_rec,
-        "master_rows": master_rows, "master_path": str(master_path),
-        "errors": all_errors, "windows": window_stats,
+        "raw_pop_rows": total_pop,
+        "raw_recipient_rows": total_rec,
+        "master_rows": master_rows,
+        "master_path": str(master_path),
+        "errors": all_errors,
+        "windows": window_stats,
         "rows": master_rows,
     }
-    logger.info(f"  PoP rows: {total_pop:,} | Recipient rows: {total_rec:,} | Master rows: {master_rows:,}")
+    logger.info(
+        f"  PoP rows: {total_pop:,} | Recipient rows: {total_rec:,} | Master rows: {master_rows:,}"
+    )
     return summary
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Download DOL WIOA workforce grants for Puerto Rico")
+    parser = argparse.ArgumentParser(
+        description="Download DOL WIOA workforce grants for Puerto Rico"
+    )
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--fy-start", type=int, metavar="YEAR")
     args = parser.parse_args()

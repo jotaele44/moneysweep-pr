@@ -17,6 +17,7 @@ Outputs:
 Usage:
   python3 scripts/download_medicare_parts.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -40,19 +41,59 @@ RETRY_BACKOFF = [5, 15, 30]
 
 # Known PR Medicare Part A and Part D data from CMS geographic variation public reports
 KNOWN_MEDICARE_PARTS_DATA = [
-    {"calendar_year":"2021","program_part":"Part A","provider_or_drug_name":"All Providers","total_beneficiaries":"695000","total_claims":"1850000","total_payments":"4200000000","avg_payment_per_claim":"2270","state":"PR","source_doc":"CMS_Medicare_Geographic_Variation_2021"},
-    {"calendar_year":"2022","program_part":"Part A","provider_or_drug_name":"All Providers","total_beneficiaries":"710000","total_claims":"1920000","total_payments":"4500000000","avg_payment_per_claim":"2344","state":"PR","source_doc":"CMS_Medicare_Geographic_Variation_2022"},
-    {"calendar_year":"2021","program_part":"Part D","provider_or_drug_name":"All Drugs","total_beneficiaries":"650000","total_claims":"8200000","total_payments":"1100000000","avg_payment_per_claim":"134","state":"PR","source_doc":"CMS_Part_D_Geographic_2021"},
-    {"calendar_year":"2022","program_part":"Part D","provider_or_drug_name":"All Drugs","total_beneficiaries":"660000","total_claims":"8500000","total_payments":"1200000000","avg_payment_per_claim":"141","state":"PR","source_doc":"CMS_Part_D_Geographic_2022"},
+    {
+        "calendar_year": "2021",
+        "program_part": "Part A",
+        "provider_or_drug_name": "All Providers",
+        "total_beneficiaries": "695000",
+        "total_claims": "1850000",
+        "total_payments": "4200000000",
+        "avg_payment_per_claim": "2270",
+        "state": "PR",
+        "source_doc": "CMS_Medicare_Geographic_Variation_2021",
+    },
+    {
+        "calendar_year": "2022",
+        "program_part": "Part A",
+        "provider_or_drug_name": "All Providers",
+        "total_beneficiaries": "710000",
+        "total_claims": "1920000",
+        "total_payments": "4500000000",
+        "avg_payment_per_claim": "2344",
+        "state": "PR",
+        "source_doc": "CMS_Medicare_Geographic_Variation_2022",
+    },
+    {
+        "calendar_year": "2021",
+        "program_part": "Part D",
+        "provider_or_drug_name": "All Drugs",
+        "total_beneficiaries": "650000",
+        "total_claims": "8200000",
+        "total_payments": "1100000000",
+        "avg_payment_per_claim": "134",
+        "state": "PR",
+        "source_doc": "CMS_Part_D_Geographic_2021",
+    },
+    {
+        "calendar_year": "2022",
+        "program_part": "Part D",
+        "provider_or_drug_name": "All Drugs",
+        "total_beneficiaries": "660000",
+        "total_claims": "8500000",
+        "total_payments": "1200000000",
+        "avg_payment_per_claim": "141",
+        "state": "PR",
+        "source_doc": "CMS_Part_D_Geographic_2022",
+    },
 ]
 
 # Known stable CMS dataset resource IDs for Part D and geographic variation
 # These may change; script will fall back gracefully if they 404
 CMS_KNOWN_DATASETS = [
     # Part D Drug Spending by State — CMS publishes annually
-    "https://data.cms.gov/resource/6i6u-frbu.json",   # Part D spending by drug/state
-    "https://data.cms.gov/resource/w96h-y9mq.json",   # Medicare Geographic Variation
-    "https://data.cms.gov/resource/tbcw-ytz8.json",   # Medicare Part D state summary
+    "https://data.cms.gov/resource/6i6u-frbu.json",  # Part D spending by drug/state
+    "https://data.cms.gov/resource/w96h-y9mq.json",  # Medicare Geographic Variation
+    "https://data.cms.gov/resource/tbcw-ytz8.json",  # Medicare Part D state summary
 ]
 
 MEDICARE_PARTS_COLUMNS = [
@@ -70,10 +111,12 @@ MEDICARE_PARTS_COLUMNS = [
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR Medicare research)",
-        "Accept": "application/json",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR Medicare research)",
+            "Accept": "application/json",
+        }
+    )
     return s
 
 
@@ -94,7 +137,7 @@ def _get_json(session: requests.Session, url: str, params: dict, logger) -> list
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed for {url}: {exc}")
@@ -114,7 +157,10 @@ def _fetch_cms_catalog(session: requests.Session, logger) -> list[str]:
         for ds in datasets:
             title = str(ds.get("title", "")).lower()
             desc = str(ds.get("description", "")).lower()
-            if any(kw in title or kw in desc for kw in ["part d", "part a", "geographic variation", "drug spending"]):
+            if any(
+                kw in title or kw in desc
+                for kw in ["part d", "part a", "geographic variation", "drug spending"]
+            ):
                 for dist in ds.get("distribution", []):
                     url = dist.get("downloadURL", dist.get("accessURL", ""))
                     if url and (".json" in url or "resource" in url):
@@ -126,7 +172,9 @@ def _fetch_cms_catalog(session: requests.Session, logger) -> list[str]:
     return resource_urls
 
 
-def _fetch_resource(session: requests.Session, url: str, pr_filters: list[str], logger) -> list[dict]:
+def _fetch_resource(
+    session: requests.Session, url: str, pr_filters: list[str], logger
+) -> list[dict]:
     """Paginate a CMS Socrata resource endpoint filtering for PR."""
     rows = []
     limit = 1000
@@ -228,7 +276,11 @@ def run(root: Path = None, force: bool = False) -> dict:
             rename[col] = "calendar_year"
         elif "part" in cl and "program_part" not in rename.values():
             rename[col] = "program_part"
-        elif ("drug" in cl or "provider" in cl) and "name" in cl and "provider_or_drug_name" not in rename.values():
+        elif (
+            ("drug" in cl or "provider" in cl)
+            and "name" in cl
+            and "provider_or_drug_name" not in rename.values()
+        ):
             rename[col] = "provider_or_drug_name"
         elif "beneficiar" in cl and "total_beneficiaries" not in rename.values():
             rename[col] = "total_beneficiaries"

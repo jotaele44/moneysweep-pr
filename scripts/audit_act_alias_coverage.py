@@ -34,7 +34,9 @@ from contract_sweeper.runtime.name_normalization import normalize_name
 from scripts.config import PROJECT_ROOT, setup_logging
 
 
-DEFAULT_INPUT = PROJECT_ROOT / "data" / "raw" / "act_transition" / "transition_contracts_extracted.csv"
+DEFAULT_INPUT = (
+    PROJECT_ROOT / "data" / "raw" / "act_transition" / "transition_contracts_extracted.csv"
+)
 FALLBACK_INPUT = PROJECT_ROOT / "tests" / "fixtures" / "act_transition" / "sample_rows.csv"
 DEFAULT_OUTPUT_MD = PROJECT_ROOT / "reports" / "act_transition_alias_audit.md"
 DEFAULT_OUTPUT_CSV = PROJECT_ROOT / "reports" / "act_transition_alias_audit.csv"
@@ -72,7 +74,9 @@ def _resolve_input(arg_path: Path | None) -> Path:
     return FALLBACK_INPUT
 
 
-def _build_clusters(rows: list[dict[str, str]], overrides: dict[str, str]) -> dict[str, ClusterStats]:
+def _build_clusters(
+    rows: list[dict[str, str]], overrides: dict[str, str]
+) -> dict[str, ClusterStats]:
     clusters: dict[str, ClusterStats] = {}
     for row in rows:
         raw = (row.get("contractor_name") or "").strip()
@@ -81,7 +85,9 @@ def _build_clusters(rows: list[dict[str, str]], overrides: dict[str, str]) -> di
         canonical, overridden = apply_override(raw, overrides)
         if not canonical:
             continue
-        stats = clusters.setdefault(canonical, ClusterStats(canonical=canonical, overridden=overridden))
+        stats = clusters.setdefault(
+            canonical, ClusterStats(canonical=canonical, overridden=overridden)
+        )
         # If any raw form was overridden into this canonical, the cluster is "matched".
         stats.overridden = stats.overridden or overridden
         stats.raw_names.add(raw)
@@ -104,9 +110,9 @@ def _municipio_evidence(clusters: dict[str, ClusterStats]) -> list[tuple[str, st
     for canonical, stats in clusters.items():
         upper = canonical.upper()
         if upper.startswith(spanish_prefix):
-            sp_map[upper[len(spanish_prefix):].strip()] = stats
+            sp_map[upper[len(spanish_prefix) :].strip()] = stats
         elif upper.startswith(english_prefix):
-            en_map[upper[len(english_prefix):].strip()] = stats
+            en_map[upper[len(english_prefix) :].strip()] = stats
     pairs: list[tuple[str, str, set[str]]] = []
     for town, sp_stats in sorted(sp_map.items()):
         if town in en_map:
@@ -135,11 +141,7 @@ def _write_markdown(
     # A cluster needs an alias override only when default normalization can't
     # already collapse its raw forms. Cross-source clusters with even one shared
     # normalized form still surface because they're high-value cross-references.
-    recommended = [
-        c
-        for c in unmatched
-        if c.needs_override and not _is_municipio(c)
-    ]
+    recommended = [c for c in unmatched if c.needs_override and not _is_municipio(c)]
     recommended.sort(key=lambda c: (-c.source_count, -c.total_occurrences, c.canonical))
 
     municipio_pairs = _municipio_evidence(clusters)
@@ -156,8 +158,12 @@ def _write_markdown(
     lines.append("## Coverage summary")
     lines.append("")
     lines.append(f"- Matched (cluster has at least one override hit): **{len(matched)}**")
-    lines.append(f"- Unmatched (no override hit; default-normalized canonical): **{len(unmatched)}**")
-    lines.append(f"- Cross-source clusters (appear in ≥2 source_dataset values): **{len(cross_source)}**")
+    lines.append(
+        f"- Unmatched (no override hit; default-normalized canonical): **{len(unmatched)}**"
+    )
+    lines.append(
+        f"- Cross-source clusters (appear in ≥2 source_dataset values): **{len(cross_source)}**"
+    )
     lines.append("")
 
     # Per-source-year breakdown
@@ -187,9 +193,13 @@ def _write_markdown(
     )
     lines.append("")
     if not recommended:
-        lines.append("_None — every multi-form cluster is already covered by the default normalizer or by an explicit override._")
+        lines.append(
+            "_None — every multi-form cluster is already covered by the default normalizer or by an explicit override._"
+        )
     else:
-        lines.append("| rank | sources | total rows | distinct normalized | proposed canonical | raw forms |")
+        lines.append(
+            "| rank | sources | total rows | distinct normalized | proposed canonical | raw forms |"
+        )
         lines.append("|---|---|---|---|---|---|")
         for i, c in enumerate(recommended, start=1):
             forms = " · ".join(sorted(c.raw_names))
@@ -223,9 +233,7 @@ def _write_markdown(
         for c in unmatched_for_review:
             forms = " · ".join(sorted(c.raw_names))
             sources = ", ".join(sorted(c.occurrences_by_source))
-            lines.append(
-                f"| `{c.canonical}` | {c.total_occurrences} | {forms} | {sources} |"
-            )
+            lines.append(f"| `{c.canonical}` | {c.total_occurrences} | {forms} | {sources} |")
     lines.append("")
 
     lines.append("## Cross-source clusters (entities in both ACT_2020 and ACUDEN_2024)")
@@ -281,7 +289,9 @@ def _write_csv(out_path: Path, clusters: dict[str, ClusterStats]) -> None:
                 "raw_forms",
             ]
         )
-        for canonical, stats in sorted(clusters.items(), key=lambda kv: (-kv[1].total_occurrences, kv[0])):
+        for canonical, stats in sorted(
+            clusters.items(), key=lambda kv: (-kv[1].total_occurrences, kv[0])
+        ):
             writer.writerow(
                 [
                     canonical,
@@ -301,10 +311,7 @@ def main(argv: list[str] | None = None) -> int:
         "--input",
         type=Path,
         default=None,
-        help=(
-            f"CSV input path. Default: {DEFAULT_INPUT} if it exists, "
-            f"else {FALLBACK_INPUT}."
-        ),
+        help=(f"CSV input path. Default: {DEFAULT_INPUT} if it exists, else {FALLBACK_INPUT}."),
     )
     parser.add_argument("--output-md", type=Path, default=DEFAULT_OUTPUT_MD)
     parser.add_argument("--output-csv", type=Path, default=DEFAULT_OUTPUT_CSV)

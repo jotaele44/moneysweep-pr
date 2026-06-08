@@ -18,6 +18,7 @@ CLI::
     python scripts/build_fiscal_control_events.py            # write the CSV + manifest
     python scripts/build_fiscal_control_events.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -46,9 +47,17 @@ SOURCE_ID = "fiscal_control_events_seed"
 TIER_CONFIDENCE = {"T1": 0.95, "T2": 0.85, "T3": 0.7, "T4": 0.5}
 
 COLUMNS = [
-    "event_id", "event_date", "event_type", "title",
-    "related_entity_id", "related_entity_name", "claim",
-    "source_id", "evidence_tier", "confidence", "notes",
+    "event_id",
+    "event_date",
+    "event_type",
+    "title",
+    "related_entity_id",
+    "related_entity_name",
+    "claim",
+    "source_id",
+    "evidence_tier",
+    "confidence",
+    "notes",
 ]
 
 
@@ -75,20 +84,22 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
         title = (ref.get("title") or "").strip()
         related_name = (ref.get("related_entity") or "").strip()
         tier = (ref.get("evidence_tier") or "").strip()
-        rows.append({
-            "event_id": f"FCE_{name_hash(date + '|' + title)}",
-            "event_date": date,
-            "event_type": (ref.get("event_type") or "").strip(),
-            "title": title,
-            "related_entity_id": index.get(related_name, ""),
-            "related_entity_name": related_name,
-            "claim": (ref.get("claim") or "").strip(),
-            "source_id": SOURCE_ID,
-            "evidence_tier": tier,
-            "confidence": TIER_CONFIDENCE.get(tier, 0.0),
-            "notes": "",
-            "_related_name": related_name,
-        })
+        rows.append(
+            {
+                "event_id": f"FCE_{name_hash(date + '|' + title)}",
+                "event_date": date,
+                "event_type": (ref.get("event_type") or "").strip(),
+                "title": title,
+                "related_entity_id": index.get(related_name, ""),
+                "related_entity_name": related_name,
+                "claim": (ref.get("claim") or "").strip(),
+                "source_id": SOURCE_ID,
+                "evidence_tier": tier,
+                "confidence": TIER_CONFIDENCE.get(tier, 0.0),
+                "notes": "",
+                "_related_name": related_name,
+            }
+        )
     return rows
 
 
@@ -109,7 +120,9 @@ def check(rows: list[dict[str, Any]], root: Path | None = None) -> list[str]:
     for i, row in enumerate(rows, start=1):
         # A named related_entity must resolve; an empty one (e.g. federal law) is allowed.
         if row["_related_name"] and not row["related_entity_id"]:
-            problems.append(f"row {i}: related_entity {row['_related_name']!r} not found in entity_master")
+            problems.append(
+                f"row {i}: related_entity {row['_related_name']!r} not found in entity_master"
+            )
         for msg in validate_row(_public_row(row), schema):
             problems.append(f"row {i} ({row.get('title')!r}): {msg}")
     return problems
@@ -149,7 +162,9 @@ def build(root: Path | None = None) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Build the top-form Fiscal Control Events timeline.")
+    parser = argparse.ArgumentParser(
+        description="Build the top-form Fiscal Control Events timeline."
+    )
     parser.add_argument("--root", default=".")
     parser.add_argument("--check", action="store_true", help="Validate without writing.")
     args = parser.parse_args(argv)
@@ -157,7 +172,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

@@ -18,7 +18,10 @@ import re
 from pathlib import Path
 
 EMAIL_RE = re.compile(r"[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}", re.I)
-HEADER_RE = re.compile(r"^(Service List|Puerto Rico - PREPA|Claim Name Address Information|EPIQ BANKRUPTCY|Case:)", re.I)
+HEADER_RE = re.compile(
+    r"^(Service List|Puerto Rico - PREPA|Claim Name Address Information|EPIQ BANKRUPTCY|Case:)",
+    re.I,
+)
 PAGE_RE = re.compile(r"Document Page\s+(\d+)\s+of\s+410", re.I)
 
 
@@ -114,8 +117,12 @@ def write_csv(rows: list[dict[str, str]], output_path: Path) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Parse PREPA Title III service matrix text into CSV")
-    parser.add_argument("input_text", type=Path, help="Text dump extracted from PREPA Title III service matrix PDF")
+    parser = argparse.ArgumentParser(
+        description="Parse PREPA Title III service matrix text into CSV"
+    )
+    parser.add_argument(
+        "input_text", type=Path, help="Text dump extracted from PREPA Title III service matrix PDF"
+    )
     parser.add_argument("output_csv", type=Path, help="Structured CSV output path")
     args = parser.parse_args()
 

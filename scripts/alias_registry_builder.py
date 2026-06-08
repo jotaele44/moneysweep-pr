@@ -10,6 +10,7 @@ Usage:
   python3 scripts/alias_registry_builder.py
   python3 scripts/alias_registry_builder.py --root /path/to/repo
 """
+
 from __future__ import annotations
 
 import argparse
@@ -20,19 +21,29 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import sys
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from contract_sweeper.runtime.alias_overrides import apply as apply_override
 from contract_sweeper.runtime.alias_overrides import load_overrides
 
 NAME_FIELDS = [
-    "recipient_name", "vendor_name", "award_recipient_name",
-    "prime_recipient_name", "sub_recipient_name", "client_name",
-    "registrant_name", "contractor", "applicant",
+    "recipient_name",
+    "vendor_name",
+    "award_recipient_name",
+    "prime_recipient_name",
+    "sub_recipient_name",
+    "client_name",
+    "registrant_name",
+    "contractor",
+    "applicant",
 ]
 AMOUNT_FIELDS = [
-    "obligated_amount", "total_obligation", "obligation_amount",
-    "amount", "subaward_amount",
+    "obligated_amount",
+    "total_obligation",
+    "obligation_amount",
+    "amount",
+    "subaward_amount",
 ]
 
 
@@ -61,11 +72,16 @@ def build_alias_registry(root: Path) -> dict:
     processed = root / "data" / "staging" / "processed"
     overrides = load_overrides()
     override_count = 0
-    clusters: dict = defaultdict(lambda: {
-        "aliases": set(), "sources": set(), "row_count": 0, "total_amount": 0.0,
-        "override_hits": 0,
-    })
-    for path in (processed.rglob("*.csv") if processed.exists() else []):
+    clusters: dict = defaultdict(
+        lambda: {
+            "aliases": set(),
+            "sources": set(),
+            "row_count": 0,
+            "total_amount": 0.0,
+            "override_hits": 0,
+        }
+    )
+    for path in processed.rglob("*.csv") if processed.exists() else []:
         for row in _iter_rows(path):
             for field in NAME_FIELDS:
                 raw = (row.get(field) or "").strip()
@@ -92,12 +108,9 @@ def build_alias_registry(root: Path) -> dict:
             "parent_uei": "",
             "parent_name": "",
             "status": (
-                "operator_curated_cluster" if c["override_hits"] > 0
-                else "candidate_alias_cluster"
+                "operator_curated_cluster" if c["override_hits"] > 0 else "candidate_alias_cluster"
             ),
-            "manual_review_required": (
-                len(c["aliases"]) > 1 and c["override_hits"] == 0
-            ),
+            "manual_review_required": (len(c["aliases"]) > 1 and c["override_hits"] == 0),
             "override_hits": c["override_hits"],
         }
         for n, c in sorted(clusters.items(), key=lambda kv: (-kv[1]["total_amount"], kv[0]))
@@ -108,16 +121,13 @@ def build_alias_registry(root: Path) -> dict:
         "entry_count": len(entries),
         "override_count": override_count,
         "identity_warning": (
-            "Alias clusters are normalized-name candidates, "
-            "not verified legal identity."
+            "Alias clusters are normalized-name candidates, not verified legal identity."
         ),
         "entries": entries,
     }
     enrichment_dir = processed / "enrichment"
     enrichment_dir.mkdir(parents=True, exist_ok=True)
-    (enrichment_dir / "alias_registry.json").write_text(
-        json.dumps(out, indent=2), encoding="utf-8"
-    )
+    (enrichment_dir / "alias_registry.json").write_text(json.dumps(out, indent=2), encoding="utf-8")
     return out
 
 

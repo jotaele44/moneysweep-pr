@@ -161,9 +161,7 @@ def classify_feasibility(row: dict[str, str], generated_at: str) -> dict[str, An
         "likely_source_type": str(row.get("likely_source_type", "")).strip(),
         "missing_columns": "|".join(missing_columns),
         "directly_mappable_columns": "|".join(buckets["directly_mappable"]),
-        "deterministically_derivable_columns": "|".join(
-            buckets["deterministically_derivable"]
-        ),
+        "deterministically_derivable_columns": "|".join(buckets["deterministically_derivable"]),
         "filterable_from_raw_data_columns": "|".join(buckets["filterable_from_raw_data"]),
         "requires_external_source_columns": "|".join(buckets["requires_external_source"]),
         "cannot_infer_safely_columns": "|".join(buckets["cannot_infer_safely"]),

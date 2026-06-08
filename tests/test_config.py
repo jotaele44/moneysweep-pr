@@ -23,6 +23,7 @@ from scripts.config import (
 # clean_column_name
 # ---------------------------------------------------------------------------
 
+
 class TestCleanColumnName:
     def test_strips_whitespace(self):
         assert clean_column_name("  Date Signed  ") == "Date Signed"
@@ -31,7 +32,10 @@ class TestCleanColumnName:
         assert clean_column_name("\ufeffAward ID") == "Award ID"
 
     def test_normalizes_newlines(self):
-        assert clean_column_name("Period of Performance\nStart Date") == "Period of Performance Start Date"
+        assert (
+            clean_column_name("Period of Performance\nStart Date")
+            == "Period of Performance Start Date"
+        )
 
     def test_normalizes_carriage_return(self):
         assert clean_column_name("Award\r\nAmount") == "Award Amount"
@@ -43,6 +47,7 @@ class TestCleanColumnName:
 # ---------------------------------------------------------------------------
 # find_column
 # ---------------------------------------------------------------------------
+
 
 class TestFindColumn:
     def test_exact_match(self):
@@ -97,6 +102,7 @@ class TestFindColumn:
 # read_csv_safe
 # ---------------------------------------------------------------------------
 
+
 class TestReadCsvSafe:
     def test_reads_utf8(self, tmp_path):
         p = tmp_path / "test.csv"
@@ -141,12 +147,22 @@ class TestReadCsvSafe:
 # Manifest & helpers
 # ---------------------------------------------------------------------------
 
+
 class TestManifest:
     def test_manifest_has_13_entries(self):
         assert len(DOWNLOAD_MANIFEST) == 13
 
     def test_all_entries_have_required_keys(self):
-        required = {"filename", "source", "url", "year_start", "year_end", "filter_type", "filters", "description"}
+        required = {
+            "filename",
+            "source",
+            "url",
+            "year_start",
+            "year_end",
+            "filter_type",
+            "filters",
+            "description",
+        }
         for entry in DOWNLOAD_MANIFEST:
             missing = required - set(entry.keys())
             assert not missing, f"{entry['filename']} missing keys: {missing}"
@@ -174,11 +190,22 @@ class TestManifest:
         assert all(n.endswith(".csv") for n in names)
 
     def test_get_normalized_filename(self):
-        assert get_normalized_filename("expansion_fpds_2000_2004_direct.csv") == "normalized_expansion_fpds_2000_2004_direct.csv"
+        assert (
+            get_normalized_filename("expansion_fpds_2000_2004_direct.csv")
+            == "normalized_expansion_fpds_2000_2004_direct.csv"
+        )
 
     def test_standard_columns_present(self):
-        expected = {"contract_id", "award_date", "vendor_name", "agency_name",
-                    "obligated_amount", "pop_state", "source_file", "fiscal_year"}
+        expected = {
+            "contract_id",
+            "award_date",
+            "vendor_name",
+            "agency_name",
+            "obligated_amount",
+            "pop_state",
+            "source_file",
+            "fiscal_year",
+        }
         assert expected.issubset(set(STANDARD_COLUMNS))
 
     def test_column_families_keys(self):

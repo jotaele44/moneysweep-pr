@@ -62,7 +62,9 @@ OUTPUT_COLUMNS = [
     "contract_suffix",
 ]
 
-DEFAULT_OUTPUT = PROJECT_ROOT / "data" / "raw" / "act_transition" / "transition_contracts_extracted.csv"
+DEFAULT_OUTPUT = (
+    PROJECT_ROOT / "data" / "raw" / "act_transition" / "transition_contracts_extracted.csv"
+)
 
 # Per-source descriptors. ``order`` lists which schema field each PDF column maps
 # to, left-to-right; ``None`` means the column is absent for that source.

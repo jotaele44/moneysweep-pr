@@ -17,6 +17,7 @@ Usage:
   python3 scripts/execution_chain_builder.py
   python3 scripts/execution_chain_builder.py --root /path/to/repo
 """
+
 from __future__ import annotations
 
 import argparse
@@ -28,30 +29,59 @@ from pathlib import Path
 from typing import Any
 
 import sys
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 NAME_FIELDS = ["recipient_name", "vendor_name", "prime_recipient_name", "prime_name"]
 UEI_FIELDS = ["recipient_uei", "uei", "prime_uei", "prime_recipient_uei"]
 PARENT_UEI_FIELDS = ["parent_uei", "prime_parent_uei", "ultimate_parent_uei"]
 AMOUNT_FIELDS = ["obligated_amount", "total_obligation", "obligation_amount", "amount"]
-AWARD_ID_FIELDS = ["award_id", "prime_award_id", "prime_award_ids",
-                   "prime_award_generated_internal_id", "generated_internal_id",
-                   "contract_id", "generated_unique_award_id", "prime_award_unique_key"]
+AWARD_ID_FIELDS = [
+    "award_id",
+    "prime_award_id",
+    "prime_award_ids",
+    "prime_award_generated_internal_id",
+    "generated_internal_id",
+    "contract_id",
+    "generated_unique_award_id",
+    "prime_award_unique_key",
+]
 # Fields a subaward row may carry that identify its prime award, in join-priority
 # order: the USAspending generated internal id is the strongest (matches the prime
 # contracts master's generated_internal_id exactly); plural variants come from the
 # pre-aggregated pr_prime_sub_relationships.csv summary.
-SUB_JOIN_FIELDS = ["prime_award_generated_internal_id", "prime_award_id",
-                   "prime_award_ids", "award_id", "generated_unique_award_id",
-                   "prime_award_unique_key"]
+SUB_JOIN_FIELDS = [
+    "prime_award_generated_internal_id",
+    "prime_award_id",
+    "prime_award_ids",
+    "award_id",
+    "generated_unique_award_id",
+    "prime_award_unique_key",
+]
 # Keys to index the prime-award masters by, so any of the above resolves.
-PRIME_KEY_FIELDS = ["generated_internal_id", "contract_id", "award_id",
-                    "generated_unique_award_id", "prime_award_unique_key"]
+PRIME_KEY_FIELDS = [
+    "generated_internal_id",
+    "contract_id",
+    "award_id",
+    "generated_unique_award_id",
+    "prime_award_unique_key",
+]
 PRIME_NAME_FIELDS = ["prime_recipient_name", "prime_name", "prime_recipient"]
-FUNDING_FIELDS = ["funding_source", "funding_agency", "awarding_agency",
-                  "awarding_agencies", "awarding_sub_agency"]
+FUNDING_FIELDS = [
+    "funding_source",
+    "funding_agency",
+    "awarding_agency",
+    "awarding_agencies",
+    "awarding_sub_agency",
+]
 SUBAWARD_ID_FIELDS = ["subaward_id", "subaward_number", "generated_unique_subaward_id"]
-MUNICIPALITY_FIELDS = ["municipality", "pop_county", "county", "pop_city", "place_of_performance_city"]
+MUNICIPALITY_FIELDS = [
+    "municipality",
+    "pop_county",
+    "county",
+    "pop_city",
+    "place_of_performance_city",
+]
 
 
 def _read_csv(path: Path) -> list[dict]:
@@ -131,8 +161,13 @@ def _load_entity_index(root: Path) -> dict[str, dict]:
 
 
 def _link_confidence(
-    aid: str, prime: str, subn: str, prime_uei: str, sub_uei: str,
-    prime_in_index: bool, strong_key: bool
+    aid: str,
+    prime: str,
+    subn: str,
+    prime_uei: str,
+    sub_uei: str,
+    prime_in_index: bool,
+    strong_key: bool,
 ) -> float:
     """Confidence that a subaward is correctly linked to its prime award.
 
@@ -168,7 +203,16 @@ def build_execution_chains(root: Path) -> dict[str, Any]:
         strong_key = bool((s.get("prime_award_generated_internal_id") or "").strip())
 
         prime = _first(s, PRIME_NAME_FIELDS) or _first(m, NAME_FIELDS)
-        subn = _first(s, ["sub_recipient_name", "subawardee_name", "sub_name", "sub_recipient", "recipient_name"])
+        subn = _first(
+            s,
+            [
+                "sub_recipient_name",
+                "subawardee_name",
+                "sub_name",
+                "sub_recipient",
+                "recipient_name",
+            ],
+        )
 
         prime_uei = _first(s, ["prime_uei", "prime_recipient_uei"]) or _first(m, UEI_FIELDS)
         sub_uei = _first(s, ["sub_uei", "sub_recipient_uei", "subawardee_uei", "recipient_uei"])
@@ -182,8 +226,9 @@ def build_execution_chains(root: Path) -> dict[str, Any]:
             sub_parent_uei = entity_idx[sub_uei].get("parent_uei", "")
 
         municipality = _first(s, MUNICIPALITY_FIELDS) or _first(m, MUNICIPALITY_FIELDS)
-        asset_id = _first(s, ["asset_id", "facility_id", "project_number", "project_id"]) or \
-                   _first(m, ["asset_id", "facility_id", "project_number", "project_id"])
+        asset_id = _first(s, ["asset_id", "facility_id", "project_number", "project_id"]) or _first(
+            m, ["asset_id", "facility_id", "project_number", "project_id"]
+        )
 
         conf = _link_confidence(aid, prime, subn, prime_uei, sub_uei, bool(m), strong_key)
 
@@ -202,7 +247,7 @@ def build_execution_chains(root: Path) -> dict[str, Any]:
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "funding_source": _first(m, FUNDING_FIELDS) or _first(s, FUNDING_FIELDS),
             "program": _first(m, ["program", "assistance_listing", "cfda_number", "award_category"])
-                       or _first(s, ["award_category"]),
+            or _first(s, ["award_category"]),
             "prime_name": prime,
             "prime_uei": prime_uei,
             "prime_parent_uei": prime_parent_uei,
@@ -211,7 +256,8 @@ def build_execution_chains(root: Path) -> dict[str, Any]:
             "sub_parent_uei": sub_parent_uei,
             "award_id": aid,
             "subaward_id": _first(s, SUBAWARD_ID_FIELDS),
-            "project_id": _first(s, ["project_id", "project_number"]) or _first(m, ["project_id", "project_number"]),
+            "project_id": _first(s, ["project_id", "project_number"])
+            or _first(m, ["project_id", "project_number"]),
             "asset_id": asset_id,
             "municipality": municipality,
             "obligation_amount": _money(m),
@@ -265,9 +311,11 @@ def build_execution_chains(root: Path) -> dict[str, Any]:
         by_muni[muni]["total_subaward"] += c["subaward_amount"]
 
     muni_rows = [
-        {**{k: v for k, v in r.items() if k not in ("unique_primes", "unique_subs")},
-         "unique_prime_count": len(r["unique_primes"]),
-         "unique_sub_count": len(r["unique_subs"])}
+        {
+            **{k: v for k, v in r.items() if k not in ("unique_primes", "unique_subs")},
+            "unique_prime_count": len(r["unique_primes"]),
+            "unique_sub_count": len(r["unique_subs"]),
+        }
         for r in by_muni.values()
     ]
     muni_rows.sort(key=lambda r: -r["total_obligation"])

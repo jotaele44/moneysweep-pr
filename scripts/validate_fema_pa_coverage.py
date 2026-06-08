@@ -29,10 +29,10 @@ import requests
 from scripts.parquet_utils import pq_read
 from scripts.config import PROJECT_ROOT, setup_logging
 
-NORMALIZED_DIR  = PROJECT_ROOT / "data" / "normalized"
-VALIDATION_DIR  = PROJECT_ROOT / "data" / "validation"
-REVIEW_DIR      = PROJECT_ROOT / "data" / "review"
-LINKED_DIR      = PROJECT_ROOT / "data" / "linked"
+NORMALIZED_DIR = PROJECT_ROOT / "data" / "normalized"
+VALIDATION_DIR = PROJECT_ROOT / "data" / "validation"
+REVIEW_DIR = PROJECT_ROOT / "data" / "review"
+LINKED_DIR = PROJECT_ROOT / "data" / "linked"
 
 PW_TARGET = 178
 HIGH_VALUE_THRESHOLD = 1_000_000
@@ -42,15 +42,27 @@ FEMA_V2_PA = "https://www.fema.gov/api/open/v2/PublicAssistanceFundedProjectsDet
 PAGE_SIZE = 1000
 
 GAP_COLUMNS = [
-    "pw_number", "disaster_number", "applicant_name", "category",
-    "project_amount", "gap_reason",
+    "pw_number",
+    "disaster_number",
+    "applicant_name",
+    "category",
+    "project_amount",
+    "gap_reason",
 ]
 DIFF_COLUMNS = [
-    "metric", "v1_value", "v2_value", "difference", "pct_difference",
+    "metric",
+    "v1_value",
+    "v2_value",
+    "difference",
+    "pct_difference",
 ]
 HIGH_VALUE_COLUMNS = [
-    "pw_number", "disaster_number", "applicant_name",
-    "project_amount", "link_confidence", "review_note",
+    "pw_number",
+    "disaster_number",
+    "applicant_name",
+    "project_amount",
+    "link_confidence",
+    "review_note",
 ]
 
 
@@ -92,9 +104,7 @@ def _fetch_count_and_amount(endpoint, logger):
         meta = data.get("metadata", {})
         count = meta.get("count", None)
         records = data.get(endpoint.split("/")[-1], [])
-        total = sum(
-            float(r.get("projectAmount", 0) or 0) for r in records
-        )
+        total = sum(float(r.get("projectAmount", 0) or 0) for r in records)
         return count, total
     except Exception as e:
         logger.warning(f"  V1/V2 diff fetch failed: {e}")
@@ -106,7 +116,11 @@ def _build_v1_v2_diff(df_v2, logger):
     rows = []
 
     v2_count = len(df_v2) if not df_v2.empty else 0
-    v2_amount = pd.to_numeric(df_v2.get("project_amount", pd.Series(dtype=float)), errors="coerce").sum() if not df_v2.empty else 0
+    v2_amount = (
+        pd.to_numeric(df_v2.get("project_amount", pd.Series(dtype=float)), errors="coerce").sum()
+        if not df_v2.empty
+        else 0
+    )
 
     logger.info("  Fetching v1 sample for diff comparison...")
     v1_count_raw, v1_amount_sample = _fetch_count_and_amount(FEMA_V1_PA, logger)
@@ -126,20 +140,24 @@ def _build_v1_v2_diff(df_v2, logger):
         }
 
     rows.append(_diff_row("record_count_pr", v1_count_raw, v2_count))
-    rows.append({
-        "metric": "amount_sample_first_page",
-        "v1_value": v1_amount_sample,
-        "v2_value": v2_amount,
-        "difference": None,
-        "pct_difference": None,
-    })
-    rows.append({
-        "metric": "note",
-        "v1_value": "v1 amounts from first page only (sample)",
-        "v2_value": "v2 amounts from full loaded dataset",
-        "difference": None,
-        "pct_difference": None,
-    })
+    rows.append(
+        {
+            "metric": "amount_sample_first_page",
+            "v1_value": v1_amount_sample,
+            "v2_value": v2_amount,
+            "difference": None,
+            "pct_difference": None,
+        }
+    )
+    rows.append(
+        {
+            "metric": "note",
+            "v1_value": "v1 amounts from first page only (sample)",
+            "v2_value": "v2 amounts from full loaded dataset",
+            "difference": None,
+            "pct_difference": None,
+        }
+    )
 
     return pd.DataFrame(rows, columns=DIFF_COLUMNS)
 
@@ -149,25 +167,35 @@ def run(root=None, force=False):
     VALIDATION_DIR.mkdir(parents=True, exist_ok=True)
     REVIEW_DIR.mkdir(parents=True, exist_ok=True)
 
-    gap_path        = root / "data" / "validation" / "fema_pa_gap_report.csv"
-    diff_path       = root / "data" / "validation" / "fema_pa_v1_v2_diff_report.csv"
-    highval_path    = root / "data" / "review" / "fema_pa_high_value_unresolved.csv"
+    gap_path = root / "data" / "validation" / "fema_pa_gap_report.csv"
+    diff_path = root / "data" / "validation" / "fema_pa_v1_v2_diff_report.csv"
+    highval_path = root / "data" / "review" / "fema_pa_high_value_unresolved.csv"
     logger = setup_logging("validate_fema_pa_coverage")
 
     if gap_path.exists() and not force:
         logger.info("  Validation outputs exist — skipping. Use --force to re-run.")
-        return {"pw_coverage": 0, "pw_target": PW_TARGET, "coverage_pass": False,
-                "gap_count": 0, "high_value_unresolved": 0, "status": "CACHED"}
+        return {
+            "pw_coverage": 0,
+            "pw_target": PW_TARGET,
+            "coverage_pass": False,
+            "gap_count": 0,
+            "high_value_unresolved": 0,
+            "status": "CACHED",
+        }
 
     logger.info("Loading validation inputs...")
-    df_v2      = _load_parquet(root / "data" / "normalized" / "fema_pa_projects_v2.parquet", logger)
-    df_portal  = _load_parquet(root / "data" / "normalized" / "fema_pa_portal_178_pws.parquet", logger)
+    df_v2 = _load_parquet(root / "data" / "normalized" / "fema_pa_projects_v2.parquet", logger)
+    df_portal = _load_parquet(
+        root / "data" / "normalized" / "fema_pa_portal_178_pws.parquet", logger
+    )
     df_linkage = _load_csv(root / "data" / "linked" / "fema_178_pw_linkage.csv", logger)
 
     # 1. 178-PW coverage check
     pw_coverage = len(df_portal) if not df_portal.empty else 0
     coverage_pass = pw_coverage >= PW_TARGET
-    logger.info(f"  178-PW coverage: {pw_coverage}/{PW_TARGET} — {'PASS' if coverage_pass else 'BELOW TARGET'}")
+    logger.info(
+        f"  178-PW coverage: {pw_coverage}/{PW_TARGET} — {'PASS' if coverage_pass else 'BELOW TARGET'}"
+    )
 
     # 2. V1 vs V2 diff
     df_diff = _build_v1_v2_diff(df_v2, logger)
@@ -188,16 +216,22 @@ def run(root=None, force=False):
                 gap_reason = "pw_not_in_portal"
                 if not pw:
                     gap_reason = "no_pw_number"
-                gap_rows.append({
-                    "pw_number":       pw,
-                    "disaster_number": r.get("disaster_number", ""),
-                    "applicant_name":  r.get("applicant_name", ""),
-                    "category":        r.get("category", ""),
-                    "project_amount":  amt,
-                    "gap_reason":      gap_reason,
-                })
+                gap_rows.append(
+                    {
+                        "pw_number": pw,
+                        "disaster_number": r.get("disaster_number", ""),
+                        "applicant_name": r.get("applicant_name", ""),
+                        "category": r.get("category", ""),
+                        "project_amount": amt,
+                        "gap_reason": gap_reason,
+                    }
+                )
 
-    df_gap = pd.DataFrame(gap_rows, columns=GAP_COLUMNS) if gap_rows else pd.DataFrame(columns=GAP_COLUMNS)
+    df_gap = (
+        pd.DataFrame(gap_rows, columns=GAP_COLUMNS)
+        if gap_rows
+        else pd.DataFrame(columns=GAP_COLUMNS)
+    )
     df_gap.to_csv(gap_path, index=False, encoding="utf-8")
     logger.info(f"  Gap report: {len(df_gap):,} rows → {gap_path.name}")
 
@@ -208,23 +242,31 @@ def run(root=None, force=False):
         for _, r in df_linkage[none_mask].iterrows():
             amt = pd.to_numeric(r.get("v2_project_amount", 0), errors="coerce") or 0
             if amt >= HIGH_VALUE_THRESHOLD:
-                highval_rows.append({
-                    "pw_number":        r.get("pw_number", ""),
-                    "disaster_number":  r.get("disaster_number", ""),
-                    "applicant_name":   r.get("applicant_name", ""),
-                    "project_amount":   amt,
-                    "link_confidence":  "none",
-                    "review_note":      f"High-value (${amt:,.0f}) with no contract/entity match",
-                })
+                highval_rows.append(
+                    {
+                        "pw_number": r.get("pw_number", ""),
+                        "disaster_number": r.get("disaster_number", ""),
+                        "applicant_name": r.get("applicant_name", ""),
+                        "project_amount": amt,
+                        "link_confidence": "none",
+                        "review_note": f"High-value (${amt:,.0f}) with no contract/entity match",
+                    }
+                )
 
-    df_highval = pd.DataFrame(highval_rows, columns=HIGH_VALUE_COLUMNS) if highval_rows else pd.DataFrame(columns=HIGH_VALUE_COLUMNS)
+    df_highval = (
+        pd.DataFrame(highval_rows, columns=HIGH_VALUE_COLUMNS)
+        if highval_rows
+        else pd.DataFrame(columns=HIGH_VALUE_COLUMNS)
+    )
     df_highval.to_csv(highval_path, index=False, encoding="utf-8")
     logger.info(f"  High-value unresolved: {len(df_highval):,} → {highval_path.name}")
 
     logger.info("=" * 60)
     logger.info("FEMA PA VALIDATION SUMMARY")
     logger.info("=" * 60)
-    logger.info(f"  178-PW coverage:       {pw_coverage}/{PW_TARGET} — {'PASS' if coverage_pass else 'FAIL'}")
+    logger.info(
+        f"  178-PW coverage:       {pw_coverage}/{PW_TARGET} — {'PASS' if coverage_pass else 'FAIL'}"
+    )
     logger.info(f"  Gap report rows:        {len(df_gap):,}")
     logger.info(f"  High-value unresolved:  {len(df_highval):,}")
 
@@ -239,12 +281,16 @@ def run(root=None, force=False):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Validate FEMA PA coverage and generate gap reports")
+    parser = argparse.ArgumentParser(
+        description="Validate FEMA PA coverage and generate gap reports"
+    )
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     result = run(force=args.force)
-    print(f"\nFEMA PA validation: {result['pw_coverage']}/{result['pw_target']} PWs, "
-          f"{result['gap_count']} gaps, {result['high_value_unresolved']} high-value unresolved")
+    print(
+        f"\nFEMA PA validation: {result['pw_coverage']}/{result['pw_target']} PWs, "
+        f"{result['gap_count']} gaps, {result['high_value_unresolved']} high-value unresolved"
+    )
     return 0
 
 

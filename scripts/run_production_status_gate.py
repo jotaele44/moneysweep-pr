@@ -13,7 +13,9 @@ from contract_sweeper.validation.production_status import run_gate
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Evaluate and stamp production status for current outputs")
+    parser = argparse.ArgumentParser(
+        description="Evaluate and stamp production status for current outputs"
+    )
     parser.add_argument("--root", default=".", help="Project root directory")
     args = parser.parse_args()
 

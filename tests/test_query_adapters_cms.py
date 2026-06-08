@@ -1,4 +1,5 @@
 """Tests for Batch 7a CMS-family query adapters (mocked HTTP)."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -52,9 +53,7 @@ def test_cms_socrata_iterates_each_resource_id(adapter_cls, expected_ids):
     df = adapter.fetch(Query())
     assert len(df) == len(expected_ids)
     # All three resource URLs hit.
-    urls = [
-        (ca.args[0] if ca.args else ca[0][0]) for ca in session.get.call_args_list
-    ]
+    urls = [(ca.args[0] if ca.args else ca[0][0]) for ca in session.get.call_args_list]
     for rid in expected_ids:
         assert any(rid in u for u in urls)
     # Each row tagged with its source_dataset_id.
@@ -193,7 +192,11 @@ def test_ckan_metastore_keyword_filter_picks_matching_datasets(
     assert metastore_base in metastore_url
     assert "/metastore/schemas/dataset/items" in metastore_url
     # POST hit the matched resource_id (not the missed one).
-    post_url = session.post.call_args.args[0] if session.post.call_args.args else session.post.call_args[0][0]
+    post_url = (
+        session.post.call_args.args[0]
+        if session.post.call_args.args
+        else session.post.call_args[0][0]
+    )
     assert "match-001" in post_url
     assert "no-match-001" not in post_url
     assert len(df) == 1
@@ -239,8 +242,7 @@ def test_ckan_metastore_paginates_until_short_page():
     df = adapter.fetch(Query())
     assert len(df) == 10001
     offsets = [
-        (c.kwargs.get("json") or c[1]["json"])["offset"]
-        for c in session.post.call_args_list
+        (c.kwargs.get("json") or c[1]["json"])["offset"] for c in session.post.call_args_list
     ]
     assert offsets == [0, 10000]
 
@@ -274,7 +276,9 @@ def test_ckan_metastore_keyword_match_is_case_insensitive():
 @pytest.mark.unit
 def test_ckan_metastore_tags_rows_with_source_dataset_id():
     session = MagicMock()
-    session.get.return_value = _mock_response([_ds_item("CHIP State", "resA", dataset_id="ds-chip-2024")])
+    session.get.return_value = _mock_response(
+        [_ds_item("CHIP State", "resA", dataset_id="ds-chip-2024")]
+    )
     session.post.return_value = _mock_response({"results": [{"state": "PR", "enrollment": 100}]})
     adapter = CHIPAdapter(root=REPO_ROOT, session=session)
     df = adapter.fetch(Query())

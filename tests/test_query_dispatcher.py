@@ -1,4 +1,5 @@
 """Tests for the dispatcher's caching, error handling, and source routing."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -63,10 +64,16 @@ def test_dispatcher_returns_manual_only_for_stubbed_source(tmp_path):
 def test_dispatcher_cache_miss_then_hit(tmp_path):
     _StaticAdapter.call_count = 0
     with patch.dict(ADAPTER_REGISTRY, {"usaspending_prime": _StaticAdapter}, clear=False):
-        r1 = query(Query(municipalities=("San Juan",), fiscal_years=(2024,)),
-                   source_ids=["usaspending_prime"], root=tmp_path)
-        r2 = query(Query(municipalities=("San Juan",), fiscal_years=(2024,)),
-                   source_ids=["usaspending_prime"], root=tmp_path)
+        r1 = query(
+            Query(municipalities=("San Juan",), fiscal_years=(2024,)),
+            source_ids=["usaspending_prime"],
+            root=tmp_path,
+        )
+        r2 = query(
+            Query(municipalities=("San Juan",), fiscal_years=(2024,)),
+            source_ids=["usaspending_prime"],
+            root=tmp_path,
+        )
     assert r1.outcomes["usaspending_prime"].status == "ok"
     assert r2.outcomes["usaspending_prime"].status == "cache_hit"
     # Adapter was only invoked once across the two queries.
@@ -104,8 +111,9 @@ def test_dispatcher_records_error_when_adapter_raises(tmp_path):
 def test_dispatcher_attaches_geo_columns_via_post_ingest(tmp_path):
     _StaticAdapter.call_count = 0
     with patch.dict(ADAPTER_REGISTRY, {"usaspending_prime": _StaticAdapter}, clear=False):
-        r = query(Query(municipalities=("San Juan",)),
-                  source_ids=["usaspending_prime"], root=tmp_path)
+        r = query(
+            Query(municipalities=("San Juan",)), source_ids=["usaspending_prime"], root=tmp_path
+        )
     df = r.outcomes["usaspending_prime"].df
     assert "geo_municipality_code" in df.columns
     assert df.iloc[0]["geo_municipality_code"] == "72127"
@@ -239,10 +247,12 @@ def test_query_entities_error_isolation(tmp_path):
         {"sam_entities": _StaticEntityAdapter, "ofac_sdn": _RaisingEntityAdapter},
         clear=False,
     ):
-        eq = EntityQuery(identifiers=(
-            EntityIdentifier(kind="uei", value="X1"),
-            EntityIdentifier(kind="name", value="Acme"),
-        ))
+        eq = EntityQuery(
+            identifiers=(
+                EntityIdentifier(kind="uei", value="X1"),
+                EntityIdentifier(kind="name", value="Acme"),
+            )
+        )
         r = query_entities(eq, source_ids=["sam_entities", "ofac_sdn"], root=tmp_path)
     assert r.outcomes["sam_entities"].status == "ok"
     assert r.outcomes["ofac_sdn"].status == "error"
@@ -252,6 +262,7 @@ def test_query_entities_error_isolation(tmp_path):
 @pytest.mark.unit
 def test_query_entities_default_source_ids_covers_entity_registry(tmp_path):
     """When source_ids is None, dispatch hits every registered entity source."""
+
     class _Empty(EntityAdapter):
         source_id = ""
         supported_kinds = frozenset()
@@ -264,4 +275,3 @@ def test_query_entities_default_source_ids_covers_entity_registry(tmp_path):
         eq = EntityQuery(identifiers=(EntityIdentifier(kind="uei", value="X1"),))
         r = query_entities(eq, root=tmp_path)
     assert set(r.outcomes.keys()) == set(ENTITY_ADAPTER_REGISTRY.keys())
-

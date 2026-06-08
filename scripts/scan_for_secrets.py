@@ -15,6 +15,7 @@ Exit codes:
   0 — no leaks detected
   3 — leaks detected (count + locations printed)
 """
+
 from __future__ import annotations
 
 import argparse
@@ -74,10 +75,22 @@ ALLOWED_PATH_FRAGMENTS = (
 )
 
 # Files where we read line-by-line; everything else is skipped.
-SCAN_EXTENSIONS = frozenset({
-    ".py", ".yaml", ".yml", ".json", ".md", ".txt", ".sh", ".cfg", ".ini",
-    ".toml", ".env", ".csv",
-})
+SCAN_EXTENSIONS = frozenset(
+    {
+        ".py",
+        ".yaml",
+        ".yml",
+        ".json",
+        ".md",
+        ".txt",
+        ".sh",
+        ".cfg",
+        ".ini",
+        ".toml",
+        ".env",
+        ".csv",
+    }
+)
 
 # Inside .env.example placeholder strings should appear next to the var name.
 PLACEHOLDER_OK_FILES = (".env.example",)
@@ -95,7 +108,7 @@ def _line_has_secret(line: str, path_name: str) -> str | None:
         return None
     # Env-var assignment with non-placeholder value
     for var in SENSITIVE_ENV_VARS:
-        if stripped.startswith(var + "=") or stripped.startswith(var + ' = '):
+        if stripped.startswith(var + "=") or stripped.startswith(var + " = "):
             value = stripped.split("=", 1)[1].strip().strip("'").strip('"')
             if not value:
                 continue
@@ -155,9 +168,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         print(json.dumps(result, indent=2))
     else:
-        print(
-            f"scanned {result['files_scanned']} files; {len(result['findings'])} finding(s)"
-        )
+        print(f"scanned {result['files_scanned']} files; {len(result['findings'])} finding(s)")
         for f in result["findings"]:
             print(f"  {f['file']}:{f['line']}  {f['reason']}")
     return 0 if not result["findings"] else 3

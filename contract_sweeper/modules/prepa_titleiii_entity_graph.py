@@ -81,11 +81,51 @@ class CorrelationFlag:
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
-LEGAL_TERMS = ("LLP", "LAW", "LEGAL", "COUNSEL", "ABOG", "PSC", "P.S.C", "L.CDA", "LCDO", "ATTORNEY")
-FINANCE_TERMS = ("BANK", "BOND", "CAPITAL", "ASSET", "FUND", "GUARANTY", "JPMORGAN", "SCOTIABANK", "GOLDMAN")
+LEGAL_TERMS = (
+    "LLP",
+    "LAW",
+    "LEGAL",
+    "COUNSEL",
+    "ABOG",
+    "PSC",
+    "P.S.C",
+    "L.CDA",
+    "LCDO",
+    "ATTORNEY",
+)
+FINANCE_TERMS = (
+    "BANK",
+    "BOND",
+    "CAPITAL",
+    "ASSET",
+    "FUND",
+    "GUARANTY",
+    "JPMORGAN",
+    "SCOTIABANK",
+    "GOLDMAN",
+)
 ENERGY_TERMS = ("ENERGY", "FUEL", "PETROLEUM", "VITOL", "PUMA", "ECOELECTRICA", "LNG", "POWER")
-INFRA_TERMS = ("CONSTRUCTION", "CONTRACTOR", "ENGINEERING", "AECOM", "BLACK & VEATCH", "ALSTOM", "AIREKO", "INFRASTRUCTURE")
-GOV_TERMS = ("AUTORIDAD", "AUTHORITY", "AAFAF", "AGENCY", "DEPARTMENT", "EPA", "TRUSTEE", "MUNICIPIO", "ADMINISTRACION")
+INFRA_TERMS = (
+    "CONSTRUCTION",
+    "CONTRACTOR",
+    "ENGINEERING",
+    "AECOM",
+    "BLACK & VEATCH",
+    "ALSTOM",
+    "AIREKO",
+    "INFRASTRUCTURE",
+)
+GOV_TERMS = (
+    "AUTORIDAD",
+    "AUTHORITY",
+    "AAFAF",
+    "AGENCY",
+    "DEPARTMENT",
+    "EPA",
+    "TRUSTEE",
+    "MUNICIPIO",
+    "ADMINISTRACION",
+)
 LABOR_TERMS = ("UNION", "RETIRE", "RETIRO", "PENSION", "JUBIL", "EMPLOYEE", "EMPLEADOS")
 
 
@@ -138,7 +178,9 @@ def build_nodes(rows: Iterable[dict[str, str]], source_document: str) -> list[En
             normalized_name=normalized,
             sector=classify_sector(raw_name),
             source_document=source_document,
-            service_metadata={k: v for k, v in row.items() if k not in {"entity_name", "claim_name", "name"}},
+            service_metadata={
+                k: v for k, v in row.items() if k not in {"entity_name", "claim_name", "name"}
+            },
         )
         nodes[node.entity_id] = node
     return list(nodes.values())
@@ -159,18 +201,35 @@ def match_contract_records(
     nodes: Iterable[EntityNode],
     records: Iterable[dict[str, Any]],
     dataset_name: str,
-    name_fields: tuple[str, ...] = ("recipient_name", "vendor_name", "awardee", "contractor", "entity_name", "name"),
+    name_fields: tuple[str, ...] = (
+        "recipient_name",
+        "vendor_name",
+        "awardee",
+        "contractor",
+        "entity_name",
+        "name",
+    ),
     threshold: float = 0.72,
 ) -> list[CorrelationFlag]:
     flags: list[CorrelationFlag] = []
     for node in nodes:
         for record in records:
-            candidate_values = [str(record.get(field, "")) for field in name_fields if record.get(field)]
-            best = max((_overlap_score(node.normalized_name, value) for value in candidate_values), default=0.0)
+            candidate_values = [
+                str(record.get(field, "")) for field in name_fields if record.get(field)
+            ]
+            best = max(
+                (_overlap_score(node.normalized_name, value) for value in candidate_values),
+                default=0.0,
+            )
             if best < threshold:
                 continue
             flag_type = _flag_for_sector(node.sector)
-            record_id = record.get("record_id") or record.get("award_id") or record.get("piid") or record.get("id")
+            record_id = (
+                record.get("record_id")
+                or record.get("award_id")
+                or record.get("piid")
+                or record.get("id")
+            )
             flags.append(
                 CorrelationFlag(
                     flag_type=flag_type,
@@ -201,7 +260,9 @@ def _flag_for_sector(sector: EntitySector) -> FlagType:
     return FlagType.PREPA_STAKEHOLDER_OVERLAP
 
 
-def export_graph(nodes: list[EntityNode], flags: list[CorrelationFlag], output_path: str | Path) -> None:
+def export_graph(
+    nodes: list[EntityNode], flags: list[CorrelationFlag], output_path: str | Path
+) -> None:
     payload = {
         "module": "prepa_titleiii_entity_graph",
         "nodes": [asdict(node) for node in nodes],
@@ -212,7 +273,11 @@ def export_graph(nodes: list[EntityNode], flags: list[CorrelationFlag], output_p
     Path(output_path).write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
 
 
-def run(service_matrix_csv: str | Path, output_json: str | Path, source_document: str = "PREPA Title III service matrix") -> dict[str, Any]:
+def run(
+    service_matrix_csv: str | Path,
+    output_json: str | Path,
+    source_document: str = "PREPA Title III service matrix",
+) -> dict[str, Any]:
     rows = read_rows(service_matrix_csv)
     nodes = build_nodes(rows, source_document=source_document)
     export_graph(nodes, [], output_json)

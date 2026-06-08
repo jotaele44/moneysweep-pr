@@ -1,4 +1,5 @@
 """Tests for download_emma — record normalization, underwriter extraction, and run() flow."""
+
 from __future__ import annotations
 
 import csv
@@ -23,6 +24,7 @@ from scripts.download_emma import (
 # _records_to_bonds_df
 # ---------------------------------------------------------------------------
 
+
 def test_empty_records_returns_empty_df():
     df = _records_to_bonds_df([])
     assert df.empty
@@ -30,15 +32,17 @@ def test_empty_records_returns_empty_df():
 
 
 def test_camel_case_fields_mapped():
-    records = [{
-        "Cusip":         "123456789",
-        "issuerName":    "Puerto Rico Electric Power Authority",
-        "maturityDate":  "2035-01-01",
-        "parAmount":     "500000000",
-        "couponRate":    "5.0",
-        "saleType":      "negotiated",
-        "taxStatus":     "tax-exempt",
-    }]
+    records = [
+        {
+            "Cusip": "123456789",
+            "issuerName": "Puerto Rico Electric Power Authority",
+            "maturityDate": "2035-01-01",
+            "parAmount": "500000000",
+            "couponRate": "5.0",
+            "saleType": "negotiated",
+            "taxStatus": "tax-exempt",
+        }
+    ]
     df = _records_to_bonds_df(records)
     assert df.iloc[0]["cusip"] == "123456789"
     assert "PUERTO RICO ELECTRIC POWER" in df.iloc[0]["issuer_normalized"].upper()
@@ -46,12 +50,14 @@ def test_camel_case_fields_mapped():
 
 
 def test_underwriter_field_extracted():
-    records = [{
-        "cusip":            "111222333",
-        "issuerName":       "Commonwealth of Puerto Rico",
-        "syndicateManager": "Goldman Sachs",
-        "parAmount":        "1000000",
-    }]
+    records = [
+        {
+            "cusip": "111222333",
+            "issuerName": "Commonwealth of Puerto Rico",
+            "syndicateManager": "Goldman Sachs",
+            "parAmount": "1000000",
+        }
+    ]
     df = _records_to_bonds_df(records)
     assert df.iloc[0]["underwriter_name"] == "Goldman Sachs"
     assert "GOLDMAN" in df.iloc[0]["underwriter_normalized"].upper()
@@ -89,6 +95,7 @@ def test_multiple_records():
 # _records_to_underwriter_df (Path B stats records)
 # ---------------------------------------------------------------------------
 
+
 def test_underwriter_df_from_stats_empty():
     df = _records_to_underwriter_df([])
     assert df.empty
@@ -96,14 +103,16 @@ def test_underwriter_df_from_stats_empty():
 
 
 def test_underwriter_df_from_stats_basic():
-    records = [{
-        "underwriterName": "Goldman Sachs",
-        "totalParAmount":  "5000000000",
-        "dealCount":       "12",
-        "issuerCount":     "5",
-        "firstIssueDate":  "2010-01-01",
-        "lastIssueDate":   "2023-06-01",
-    }]
+    records = [
+        {
+            "underwriterName": "Goldman Sachs",
+            "totalParAmount": "5000000000",
+            "dealCount": "12",
+            "issuerCount": "5",
+            "firstIssueDate": "2010-01-01",
+            "lastIssueDate": "2023-06-01",
+        }
+    ]
     df = _records_to_underwriter_df(records)
     assert len(df) == 1
     assert df.iloc[0]["underwriter_name"] == "Goldman Sachs"
@@ -115,7 +124,7 @@ def test_underwriter_df_from_stats_basic():
 def test_underwriter_df_filters_blank_names():
     records = [
         {"underwriterName": "Goldman", "totalParAmount": "1000"},
-        {"underwriterName": "",        "totalParAmount": "2000"},
+        {"underwriterName": "", "totalParAmount": "2000"},
     ]
     df = _records_to_underwriter_df(records)
     assert len(df) == 1
@@ -124,7 +133,7 @@ def test_underwriter_df_filters_blank_names():
 def test_underwriter_df_sorted_descending_par():
     records = [
         {"underwriterName": "Small Firm", "totalParAmount": "100"},
-        {"underwriterName": "Big Bank",   "totalParAmount": "9999"},
+        {"underwriterName": "Big Bank", "totalParAmount": "9999"},
     ]
     df = _records_to_underwriter_df(records)
     assert df.iloc[0]["underwriter_name"] == "Big Bank"
@@ -134,47 +143,72 @@ def test_underwriter_df_sorted_descending_par():
 # _build_underwriter_df_from_bonds (aggregation from bond rows)
 # ---------------------------------------------------------------------------
 
+
 def test_build_from_bonds_empty():
     df = _build_underwriter_df_from_bonds(pd.DataFrame(columns=BOND_COLUMNS))
     assert df.empty
 
 
 def test_build_from_bonds_aggregates_correctly():
-    df_bonds = pd.DataFrame({
-        "cusip":                  ["A001", "A002", "A003"],
-        "issuer_name":            ["PREPA", "PRASA", "PREPA"],
-        "issuer_normalized":      ["PREPA", "PRASA", "PREPA"],
-        "underwriter_name":       ["Goldman", "Goldman", "Citi"],
-        "underwriter_normalized": ["GOLDMAN", "GOLDMAN", "CITI"],
-        "par_amount":             ["500", "300", "200"],
-        "issue_date":             ["2015-01-01", "2016-01-01", "2017-01-01"],
-        **{c: [""] * 3 for c in BOND_COLUMNS
-           if c not in ["cusip", "issuer_name", "issuer_normalized",
-                        "underwriter_name", "underwriter_normalized",
-                        "par_amount", "issue_date"]},
-    })
+    df_bonds = pd.DataFrame(
+        {
+            "cusip": ["A001", "A002", "A003"],
+            "issuer_name": ["PREPA", "PRASA", "PREPA"],
+            "issuer_normalized": ["PREPA", "PRASA", "PREPA"],
+            "underwriter_name": ["Goldman", "Goldman", "Citi"],
+            "underwriter_normalized": ["GOLDMAN", "GOLDMAN", "CITI"],
+            "par_amount": ["500", "300", "200"],
+            "issue_date": ["2015-01-01", "2016-01-01", "2017-01-01"],
+            **{
+                c: [""] * 3
+                for c in BOND_COLUMNS
+                if c
+                not in [
+                    "cusip",
+                    "issuer_name",
+                    "issuer_normalized",
+                    "underwriter_name",
+                    "underwriter_normalized",
+                    "par_amount",
+                    "issue_date",
+                ]
+            },
+        }
+    )
     df_uw = _build_underwriter_df_from_bonds(df_bonds)
     assert len(df_uw) == 2
     goldman = df_uw[df_uw["underwriter_name"] == "Goldman"].iloc[0]
     assert goldman["total_par_amount"] == pytest.approx(800.0)
     assert goldman["deal_count"] == 2
-    assert goldman["issuer_count"] == 2   # PREPA + PRASA
+    assert goldman["issuer_count"] == 2  # PREPA + PRASA
 
 
 def test_build_from_bonds_skips_blank_underwriter():
-    df_bonds = pd.DataFrame({
-        "cusip":                  ["A001", "A002"],
-        "issuer_name":            ["PREPA", "PRASA"],
-        "issuer_normalized":      ["PREPA", "PRASA"],
-        "underwriter_name":       ["",      "Goldman"],
-        "underwriter_normalized": ["",      "GOLDMAN"],
-        "par_amount":             ["100",   "200"],
-        "issue_date":             ["2020-01-01", "2021-01-01"],
-        **{c: [""] * 2 for c in BOND_COLUMNS
-           if c not in ["cusip", "issuer_name", "issuer_normalized",
-                        "underwriter_name", "underwriter_normalized",
-                        "par_amount", "issue_date"]},
-    })
+    df_bonds = pd.DataFrame(
+        {
+            "cusip": ["A001", "A002"],
+            "issuer_name": ["PREPA", "PRASA"],
+            "issuer_normalized": ["PREPA", "PRASA"],
+            "underwriter_name": ["", "Goldman"],
+            "underwriter_normalized": ["", "GOLDMAN"],
+            "par_amount": ["100", "200"],
+            "issue_date": ["2020-01-01", "2021-01-01"],
+            **{
+                c: [""] * 2
+                for c in BOND_COLUMNS
+                if c
+                not in [
+                    "cusip",
+                    "issuer_name",
+                    "issuer_normalized",
+                    "underwriter_name",
+                    "underwriter_normalized",
+                    "par_amount",
+                    "issue_date",
+                ]
+            },
+        }
+    )
     df_uw = _build_underwriter_df_from_bonds(df_bonds)
     assert len(df_uw) == 1
     assert df_uw.iloc[0]["underwriter_name"] == "Goldman"
@@ -183,6 +217,7 @@ def test_build_from_bonds_skips_blank_underwriter():
 # ---------------------------------------------------------------------------
 # fiscal_year derivation
 # ---------------------------------------------------------------------------
+
 
 def test_fiscal_year_derived_from_issue_date_jan():
     """Jan–Sep issue date → same calendar year."""
@@ -200,7 +235,9 @@ def test_fiscal_year_derived_from_issue_date_oct():
 
 def test_fiscal_year_already_in_record_is_preserved():
     """If the record already supplies fiscal_year it should not be overwritten."""
-    records = [{"cusip": "CCC", "issuerName": "GDB", "issue_date": "2015-11-01", "fiscal_year": "2015"}]
+    records = [
+        {"cusip": "CCC", "issuerName": "GDB", "issue_date": "2015-11-01", "fiscal_year": "2015"}
+    ]
     df = _records_to_bonds_df(records)
     # When fiscal_year is already set and non-empty, the derivation is skipped.
     # The value may be "2015" (pre-set) or "2016" (derived from Oct+ date).
@@ -217,6 +254,7 @@ def test_fiscal_year_empty_on_missing_issue_date():
 # ---------------------------------------------------------------------------
 # KNOWN_EMMA_BONDS seed corpus
 # ---------------------------------------------------------------------------
+
 
 def test_known_bonds_cover_expected_issuers():
     issuers = {b["issuer_name"] for b in KNOWN_EMMA_BONDS}
@@ -252,6 +290,7 @@ def test_known_bonds_produce_nonempty_df():
 # run() integration — API blocked, falls back to seed corpus
 # ---------------------------------------------------------------------------
 
+
 def test_run_produces_nonempty_outputs(tmp_path):
     """run() must write non-empty bonds and underwriters CSVs even when the API is blocked."""
     result = run(root=tmp_path, force=True)
@@ -261,7 +300,7 @@ def test_run_produces_nonempty_outputs(tmp_path):
     assert result["underwriter_rows"] >= 1
 
     bonds_path = Path(result["bonds_path"])
-    uw_path    = Path(result["uw_path"])
+    uw_path = Path(result["uw_path"])
     assert bonds_path.exists()
     assert uw_path.exists()
 
@@ -299,13 +338,15 @@ def test_run_force_refetches(tmp_path):
 
 def test_run_merges_api_results_with_seed(tmp_path):
     """When the API returns new records they should be merged with the seed corpus."""
-    extra = [{
-        "cusip": "NEWCUSIP1",
-        "issuerName": "New PR Issuer",
-        "parAmount": "100000000",
-        "IssueDate": "2023-01-01",
-        "syndicateManager": "Test Bank",
-    }]
+    extra = [
+        {
+            "cusip": "NEWCUSIP1",
+            "issuerName": "New PR Issuer",
+            "parAmount": "100000000",
+            "IssueDate": "2023-01-01",
+            "syndicateManager": "Test Bank",
+        }
+    ]
     with patch("scripts.download_emma._fetch_pr_securities") as mock_fetch:
         mock_fetch.return_value = extra
         result = run(root=tmp_path, force=True)

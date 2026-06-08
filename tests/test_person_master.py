@@ -4,6 +4,7 @@ Fully offline: the producer reads only the committed canonical_v1 people table a
 validates against ``schemas/person_master.schema.json`` via the stdlib
 canonical_v1 schema interpreter (no ``jsonschema`` dependency).
 """
+
 from __future__ import annotations
 
 import csv

@@ -4,6 +4,7 @@ Behaviour-preserving move of the orchestrator's small building blocks:
 the archived-source skip finder, the pandas check, logging setup, and the
 banner/summary printers. run_all.py imports these unchanged.
 """
+
 from __future__ import annotations
 
 import importlib.abc
@@ -69,6 +70,7 @@ def check_pandas() -> bool:
     """Check pandas is installed. Print helpful message if not."""
     try:
         import pandas  # noqa: F401
+
         return True
     except ImportError:
         print("ERROR: pandas is not installed.")
@@ -88,9 +90,7 @@ def setup_pipeline_logging(logs_dir: Path) -> logging.Logger:
     if logger.handlers:
         logger.handlers.clear()
 
-    fmt = logging.Formatter(
-        "%(asctime)s [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
-    )
+    fmt = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 
     fh = logging.FileHandler(log_file, mode="w", encoding="utf-8")
     fh.setLevel(logging.DEBUG)
@@ -146,6 +146,7 @@ def print_summary(
                 covered_years += f" — GAPS: {missing}"
 
             from scripts.validate_expansion_coverage import check_2007_gap
+
             gap_2007 = "OK" if check_2007_gap(matrix) else "CRITICAL: MISSING"
 
             gaps = []
@@ -168,11 +169,7 @@ def print_summary(
         and coverage_result in (None, 0)
     )
 
-    partial = (
-        steps.get("dirs", False)
-        and steps.get("instructions", False)
-        and not all_ok
-    )
+    partial = steps.get("dirs", False) and steps.get("instructions", False) and not all_ok
 
     status = "SUCCESS" if all_ok else ("PARTIAL" if partial else "FAILED")
 
@@ -203,6 +200,7 @@ def print_summary(
         logger.info("  Files normalized:      SKIPPED")
     else:
         from scripts.config import DOWNLOAD_MANIFEST as DM
+
         logger.info(f"  Files normalized:      {normalize_count}/{len(DM)}")
 
     logger.info(f"  Year coverage:         {covered_years}")

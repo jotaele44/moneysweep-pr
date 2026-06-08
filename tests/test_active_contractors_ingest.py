@@ -3,6 +3,7 @@
 The live ingest needs a file placed in data/raw/Active Contractor Listing/.
 These tests cover only the pure parse_records() transform, so they run offline.
 """
+
 from __future__ import annotations
 
 import pandas as pd
@@ -20,16 +21,20 @@ def test_empty_df_returns_empty_with_columns():
 
 @pytest.mark.unit
 def test_english_column_names_pass_through():
-    raw = pd.DataFrame([{
-        "Name": "Acme Construction Corp",
-        "Registro": "REG-001",
-        "Registration Date": "2022-01-15",
-        "Expiry Date": "2024-01-15",
-        "Type": "General Contractor",
-        "NAICS": "2361",
-        "Municipality": "San Juan",
-        "Status": "Active",
-    }])
+    raw = pd.DataFrame(
+        [
+            {
+                "Name": "Acme Construction Corp",
+                "Registro": "REG-001",
+                "Registration Date": "2022-01-15",
+                "Expiry Date": "2024-01-15",
+                "Type": "General Contractor",
+                "NAICS": "2361",
+                "Municipality": "San Juan",
+                "Status": "Active",
+            }
+        ]
+    )
     df = parse_records(raw, "test.csv")
     assert len(df) == 1
     assert list(df.columns) == CONTRACTOR_COLUMNS
@@ -41,12 +46,16 @@ def test_english_column_names_pass_through():
 
 @pytest.mark.unit
 def test_spanish_column_names_mapped():
-    raw = pd.DataFrame([{
-        "Nombre": "Constructora PR LLC",
-        "Registro": "PR-2020-0001",
-        "Municipio": "Ponce",
-        "Estado": "Activo",
-    }])
+    raw = pd.DataFrame(
+        [
+            {
+                "Nombre": "Constructora PR LLC",
+                "Registro": "PR-2020-0001",
+                "Municipio": "Ponce",
+                "Estado": "Activo",
+            }
+        ]
+    )
     df = parse_records(raw, "spanish.csv")
     assert len(df) == 1
     assert df.iloc[0]["entity_name"] == "Constructora PR LLC"
@@ -85,11 +94,13 @@ def test_multiple_rows_all_present():
 
 @pytest.mark.unit
 def test_blank_entity_name_rows_filtered():
-    raw = pd.DataFrame([
-        {"Name": "Real Company LLC"},
-        {"Name": ""},
-        {"Name": "   "},
-    ])
+    raw = pd.DataFrame(
+        [
+            {"Name": "Real Company LLC"},
+            {"Name": ""},
+            {"Name": "   "},
+        ]
+    )
     df = parse_records(raw)
     assert len(df) == 1
     assert df.iloc[0]["entity_name"] == "Real Company LLC"

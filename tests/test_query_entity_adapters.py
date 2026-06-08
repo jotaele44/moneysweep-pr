@@ -1,4 +1,5 @@
 """Tests for the entity-mode source adapters (SAM, OFAC SDN)."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -28,21 +29,26 @@ def _mock_response(payload):
 
 def _sam_payload(uei: str, name: str, state: str = "PR") -> dict:
     return {
-        "entityData": [{
-            "entityRegistration": {
-                "ueiSAM": uei,
-                "cageCode": "12345",
-                "legalBusinessName": name,
-                "registrationStatus": "Active",
-                "registrationExpirationDate": "2027-01-01",
-            },
-            "coreData": {
-                "physicalAddress": {"stateOrProvinceCode": state, "city": "San Juan"},
-                "entityHierarchyInformation": {
-                    "immediateParentEntity": {"ueiSAM": "PARENT1", "legalBusinessName": "Parent Co"},
+        "entityData": [
+            {
+                "entityRegistration": {
+                    "ueiSAM": uei,
+                    "cageCode": "12345",
+                    "legalBusinessName": name,
+                    "registrationStatus": "Active",
+                    "registrationExpirationDate": "2027-01-01",
                 },
-            },
-        }]
+                "coreData": {
+                    "physicalAddress": {"stateOrProvinceCode": state, "city": "San Juan"},
+                    "entityHierarchyInformation": {
+                        "immediateParentEntity": {
+                            "ueiSAM": "PARENT1",
+                            "legalBusinessName": "Parent Co",
+                        },
+                    },
+                },
+            }
+        ]
     }
 
 
@@ -110,10 +116,12 @@ def test_sam_silently_skips_unsupported_kind(monkeypatch):
     session = MagicMock()
     session.get.return_value = _mock_response(_sam_payload("X1", "Acme"))
     adapter = SAMEntitiesAdapter(root=REPO_ROOT, session=session)
-    eq = EntityQuery(identifiers=(
-        EntityIdentifier(kind="cik", value="0001234"),  # unsupported in SAM
-        EntityIdentifier(kind="uei", value="X1"),
-    ))
+    eq = EntityQuery(
+        identifiers=(
+            EntityIdentifier(kind="cik", value="0001234"),  # unsupported in SAM
+            EntityIdentifier(kind="uei", value="X1"),
+        )
+    )
     df = adapter.fetch(eq)
     assert len(df) == 1
     # Exactly one HTTP call — only the uei kind was looked up.
@@ -130,11 +138,13 @@ def test_sam_iterates_each_supported_identifier(monkeypatch):
         _mock_response(_sam_payload("U3", "Org Three")),
     ]
     adapter = SAMEntitiesAdapter(root=REPO_ROOT, session=session)
-    eq = EntityQuery(identifiers=(
-        EntityIdentifier(kind="uei", value="U1"),
-        EntityIdentifier(kind="uei", value="U2"),
-        EntityIdentifier(kind="name", value="Acme"),
-    ))
+    eq = EntityQuery(
+        identifiers=(
+            EntityIdentifier(kind="uei", value="U1"),
+            EntityIdentifier(kind="uei", value="U2"),
+            EntityIdentifier(kind="name", value="Acme"),
+        )
+    )
     df = adapter.fetch(eq)
     assert len(df) == 3
     assert session.get.call_count == 3

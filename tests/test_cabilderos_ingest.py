@@ -6,6 +6,7 @@ drop-file -> processed-CSV chain. The ingester reads operator-delivered CSV/Exce
 exports from the PR Office of Government Ethics dropzone (no network), so these
 run fully offline.
 """
+
 from __future__ import annotations
 
 import csv
@@ -25,6 +26,7 @@ from scripts.ingest_cabilderos import (
 # Unit: pure transforms
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.unit
 def test_normalize_name_strips_punctuation_and_entity_suffixes():
     assert _normalize_name("Estrategias Group, Inc.") == "ESTRATEGIAS GROUP"
@@ -34,13 +36,15 @@ def test_normalize_name_strips_punctuation_and_entity_suffixes():
 
 @pytest.mark.unit
 def test_parse_df_maps_spanish_headers_to_canonical_schema():
-    df = pd.DataFrame({
-        "Nombre Cabildero": ["Juan Perez", "Maria Lopez"],
-        "Cliente": ["Acme LLC", "Beta Foundation"],
-        "Año": ["2024", "2023"],
-        "Agencia": ["Senado", "Cámara"],
-        "Honorarios": ["50000", "30000"],
-    })
+    df = pd.DataFrame(
+        {
+            "Nombre Cabildero": ["Juan Perez", "Maria Lopez"],
+            "Cliente": ["Acme LLC", "Beta Foundation"],
+            "Año": ["2024", "2023"],
+            "Agencia": ["Senado", "Cámara"],
+            "Honorarios": ["50000", "30000"],
+        }
+    )
     out = _parse_df(df, "cabilderos_2024.csv", logger=_NullLogger())
     assert list(out.columns) == CABILDEROS_COLUMNS
     assert len(out) == 2
@@ -56,8 +60,9 @@ def test_parse_df_maps_spanish_headers_to_canonical_schema():
 
 @pytest.mark.unit
 def test_parse_df_drops_rows_without_client():
-    df = pd.DataFrame({"Nombre Cabildero": ["Lob A", "Lob B", "Lob C"],
-                       "Cliente": ["Real Client", "", "  "]})
+    df = pd.DataFrame(
+        {"Nombre Cabildero": ["Lob A", "Lob B", "Lob C"], "Cliente": ["Real Client", "", "  "]}
+    )
     out = _parse_df(df, "f.csv", logger=_NullLogger())
     assert len(out) == 1
     assert out.iloc[0]["client_name"] == "Real Client"
@@ -66,6 +71,7 @@ def test_parse_df_drops_rows_without_client():
 # ---------------------------------------------------------------------------
 # Integration: full drop-file -> processed chain
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.integration
 def test_run_materializes_processed_output_from_dropzone(tmp_path: Path):

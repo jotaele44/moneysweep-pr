@@ -1,4 +1,5 @@
 """Tests for the canonical_v1 debt ingester (WS-J)."""
+
 import pytest
 
 from contract_sweeper.validation import canonical_v1_schema as cv1
@@ -18,7 +19,9 @@ def test_classify_maps_issuers_to_enum():
     assert idebt.classify("PUERTO RICO SALES TAX FINANCING CORP", "COFINA Senior Bonds") == "COFINA"
     assert idebt.classify("PUERTO RICO ELECTRIC POWER AUTHORITY", "PREPA Power Revenue") == "PREPA"
     assert idebt.classify("PUERTO RICO AQUEDUCT AND SEWER AUTHORITY", "PRASA Revenue") == "PRASA"
-    assert idebt.classify("PUERTO RICO HIGHWAYS AND TRANSPORTATION AUTHORITY", "HTA Revenue") == "HTA"
+    assert (
+        idebt.classify("PUERTO RICO HIGHWAYS AND TRANSPORTATION AUTHORITY", "HTA Revenue") == "HTA"
+    )
     assert idebt.classify("UNIVERSITY OF PUERTO RICO", "UPR System Revenue") == "other"
 
 
@@ -41,8 +44,8 @@ def test_rows_and_evidence_validate(built):
     evidence_ids = {e.evidence_id for e in built["evidence_rows"]}
     for row in built["debt_rows"]:
         assert cv1.validate_row(row, debt_schema) == [], row
-        assert row["issuer_entity_id"] in entity_ids       # no broken reference
-        assert row["evidence_id"] in evidence_ids          # no provenance -> no row
+        assert row["issuer_entity_id"] in entity_ids  # no broken reference
+        assert row["evidence_id"] in evidence_ids  # no provenance -> no row
         assert row["currency"] == "USD"
     for ev in built["evidence_rows"]:
         assert cv1.validate_row(ev.as_row(), ev_schema) == [], ev

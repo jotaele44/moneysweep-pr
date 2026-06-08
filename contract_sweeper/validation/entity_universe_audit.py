@@ -126,7 +126,9 @@ def _load_entity_master_rows(root: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def _build_rows_from_entity_master(root: Path, graph_vendor_norms: set[str]) -> list[dict[str, Any]]:
+def _build_rows_from_entity_master(
+    root: Path, graph_vendor_norms: set[str]
+) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for row in _load_entity_master_rows(root):
         raw_name = str(row.get("canonical_name") or row.get("entity_key") or "").strip()
@@ -134,11 +136,7 @@ def _build_rows_from_entity_master(root: Path, graph_vendor_norms: set[str]) -> 
         if not raw_name or not norm:
             continue
 
-        entity_id = str(
-            row.get("resolved_entity_key")
-            or row.get("entity_key")
-            or norm
-        ).strip()
+        entity_id = str(row.get("resolved_entity_key") or row.get("entity_key") or norm).strip()
         parent_uei = str(row.get("parent_uei") or "").strip()
         parent_name = str(row.get("parent_name") or "").strip()
         award_count = _safe_int(row.get("award_count"))
@@ -156,7 +154,9 @@ def _build_rows_from_entity_master(root: Path, graph_vendor_norms: set[str]) -> 
                 "entity_id": entity_id,
                 "parent_uei": parent_uei,
                 "parent_name": parent_name,
-                "resolution_method": "entity_master_parent_lineage" if parent_uei else "entity_master_unresolved",
+                "resolution_method": "entity_master_parent_lineage"
+                if parent_uei
+                else "entity_master_unresolved",
                 "resolution_confidence": 0.95 if parent_uei else 0.35,
                 "source_system": source_system,
                 "award_count": award_count,
@@ -175,12 +175,19 @@ def _build_rows_from_summaries(root: Path, graph_vendor_norms: set[str]) -> list
     power_summary = _read_json(root / "data/staging/processed/pr_power_network_summary.json")
     dominance_summary = _read_json(root / "data/staging/processed/dominance_summary.json")
 
-    entities = power_summary.get("top_entities") or report_summary.get("awards", {}).get("top_entities") or []
+    entities = (
+        power_summary.get("top_entities")
+        or report_summary.get("awards", {}).get("top_entities")
+        or []
+    )
     if not isinstance(entities, list):
         entities = []
 
     unique_entities = max(len(entities), 1)
-    total_rows = _safe_int(dominance_summary.get("total_rows") or _read_json(root / "data/staging/processed/pr_all_awards_summary.json").get("total_rows"))
+    total_rows = _safe_int(
+        dominance_summary.get("total_rows")
+        or _read_json(root / "data/staging/processed/pr_all_awards_summary.json").get("total_rows")
+    )
     avg_group = int(round(total_rows / unique_entities)) if total_rows else 1
     contract_counts = _load_graph_contract_counts(root)
 
@@ -196,7 +203,11 @@ def _build_rows_from_summaries(root: Path, graph_vendor_norms: set[str]) -> list
         high_value = obligation >= HIGH_VALUE_THRESHOLD
         graph_present = norm in graph_vendor_norms
         collapse_suspect = bool((high_value and True) or (not graph_present))
-        source_system = "|".join(ent.get("sources", [])) if isinstance(ent.get("sources"), list) else "summary_only"
+        source_system = (
+            "|".join(ent.get("sources", []))
+            if isinstance(ent.get("sources"), list)
+            else "summary_only"
+        )
 
         rows.append(
             {
@@ -233,8 +244,7 @@ def _infer_collapse_stage(root: Path, rows: list[dict[str, Any]]) -> str:
     network_summary = _read_json(root / "data/staging/processed/graph/network_summary.json")
 
     unique_in_master = _safe_int(
-        all_awards_summary.get("unique_recipients")
-        or dominance_summary.get("unique_vendors")
+        all_awards_summary.get("unique_recipients") or dominance_summary.get("unique_vendors")
     )
     normalized_count = len(rows)
     parent_coverage = (
@@ -327,8 +337,12 @@ def run_audit(root: Path) -> dict[str, Any]:
         {
             "diagnostic": "raw_award_rows",
             "observed_value": _safe_int(
-                _read_json(root / "data/staging/processed/pr_all_awards_summary.json").get("total_rows")
-                or _read_json(root / "data/staging/processed/dominance_summary.json").get("total_rows")
+                _read_json(root / "data/staging/processed/pr_all_awards_summary.json").get(
+                    "total_rows"
+                )
+                or _read_json(root / "data/staging/processed/dominance_summary.json").get(
+                    "total_rows"
+                )
             ),
             "required_value": ">= 1",
             "severity": "INFO",
@@ -373,7 +387,9 @@ def run_audit(root: Path) -> dict[str, Any]:
             "diagnostic": "inferred_18_entity_collapse_stage",
             "observed_value": collapse_stage,
             "required_value": "not collapse_before_or_at_master_table",
-            "severity": "BLOCKER" if collapse_stage == "collapse_before_or_at_master_table" else "INFO",
+            "severity": "BLOCKER"
+            if collapse_stage == "collapse_before_or_at_master_table"
+            else "INFO",
             "notes": "where the constrained universe is first observable",
         },
         {
@@ -461,4 +477,3 @@ def run_audit(root: Path) -> dict[str, Any]:
     _write_json(root / "data/exports/rebuild_status.json", rebuild_status)
 
     return rebuild_status
-

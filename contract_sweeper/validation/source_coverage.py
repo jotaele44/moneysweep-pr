@@ -44,30 +44,210 @@ class SourceSpec:
 
 
 SOURCE_SPECS: tuple[SourceSpec, ...] = (
-    SourceSpec("usaspending_awards", "scripts/auto_download.py", ("data/staging/processed/pr_contracts_master.csv", "data/staging/processed/pr_all_awards_master.csv"), YEAR_RANGE_DEFAULT, True, "https://api.usaspending.gov"),
-    SourceSpec("sam_entity_extract", "scripts/sam_enrichment.py", ("data/staging/processed/enrichment/vendor_uei_index.csv", "data/staging/processed/enrichment/master_enriched.csv"), YEAR_RANGE_DEFAULT, True, "https://api.sam.gov"),
-    SourceSpec("fsrs_subawards", "scripts/download_subawards.py", ("data/staging/processed/pr_subawards_master.csv", "data/staging/processed/pr_prime_sub_relationships.csv"), YEAR_RANGE_DEFAULT, True, "https://api.usaspending.gov"),
-    SourceSpec("fema_pa_hmgp", "scripts/download_fema.py", ("data/staging/processed/pr_fema_pa_master.csv", "data/staging/processed/pr_fema_hmgp_master.csv"), YEAR_RANGE_DEFAULT, True, "https://www.fema.gov/openfema-data-page"),
-    SourceSpec("hud_cdbg", "scripts/download_cdbg_dr.py", ("data/staging/processed/pr_cdbg_dr_master.csv", "data/staging/processed/pr_hud_master.csv"), YEAR_RANGE_DEFAULT, True, "https://www.hudexchange.info"),
-    SourceSpec("cor3", "scripts/download_cor3.py", ("data/staging/processed/pr_cor3_projects.csv",), YEAR_RANGE_DEFAULT, False, "https://www.cor3.pr.gov"),
-    SourceSpec("prasa_aaa", "scripts/download_prasa.py", ("data/staging/processed/pr_prasa_contracts.csv",), YEAR_RANGE_DEFAULT, False, "https://www.acueductospr.com"),
-    SourceSpec("prepa_luma_genera", "scripts/download_prepa_contracts.py", ("data/staging/processed/pr_prepa_contracts.csv",), YEAR_RANGE_DEFAULT, False, "https://aeepr.com"),
-    SourceSpec("lda", "scripts/download_lda.py", ("data/staging/processed/pr_lda_filings.csv",), YEAR_RANGE_DEFAULT, True, "https://lda.senate.gov"),
-    SourceSpec("pr_cabilderos", "scripts/download_cabilderos.py", ("data/staging/processed/pr_cabilderos.csv",), YEAR_RANGE_DEFAULT, False, "https://app.estado.pr.gov"),
-    SourceSpec("emma_msrb_bonds", "scripts/download_emma.py", ("data/staging/processed/pr_emma_bonds.csv", "data/staging/processed/pr_emma_underwriters.csv", "data/staging/processed/pr_msrb_trades.csv"), YEAR_RANGE_DEFAULT, True, "https://emma.msrb.org"),
-    SourceSpec("fdic_banks", "scripts/download_fdic.py", ("data/staging/processed/pr_fdic_institutions.csv", "data/staging/processed/pr_fdic_financials.csv"), YEAR_RANGE_DEFAULT, True, "https://banks.data.fdic.gov"),
-    SourceSpec("cms_medicare", "scripts/download_cms.py", ("data/staging/processed/pr_cms_master.csv",), YEAR_RANGE_DEFAULT, True, "https://data.cms.gov"),
-    SourceSpec("fec", "scripts/download_fec.py", ("data/staging/processed/pr_fec_contributions.csv",), YEAR_RANGE_DEFAULT, True, "https://api.open.fec.gov"),
-    SourceSpec("municipal_contracts", "scripts/download_municipal.py", ("data/staging/processed/pr_municipal_contracts.csv",), YEAR_RANGE_DEFAULT, False, "https://www.comprasal.gov"),
-    SourceSpec("ogpe_permits", "scripts/download_p3.py", ("data/staging/processed/pr_ogpe_permits.csv",), YEAR_RANGE_DEFAULT, False, "https://ogpe.pr.gov"),
-    SourceSpec("act60_lihtc", "scripts/download_act60.py", ("data/staging/processed/pr_act60_decrees.csv", "data/staging/processed/pr_lihtc_projects.csv"), YEAR_RANGE_DEFAULT, False, "https://www.hacienda.pr.gov"),
-    SourceSpec("promesa_creditors", "scripts/download_promesa_creditors.py", ("data/staging/processed/pr_promesa_creditors.csv",), YEAR_RANGE_DEFAULT, False, "https://www.justice.gov"),
-    SourceSpec("sf133", "scripts/download_sf133.py", ("data/staging/processed/pr_sf133_budget_execution.csv",), YEAR_RANGE_DEFAULT, True, "https://api.usaspending.gov"),
-    SourceSpec("ofac", "scripts/download_ofac.py", ("data/staging/processed/pr_ofac_matches.csv",), YEAR_RANGE_DEFAULT, True, "https://sanctionslist.ofac.treas.gov"),
+    SourceSpec(
+        "usaspending_awards",
+        "scripts/auto_download.py",
+        (
+            "data/staging/processed/pr_contracts_master.csv",
+            "data/staging/processed/pr_all_awards_master.csv",
+        ),
+        YEAR_RANGE_DEFAULT,
+        True,
+        "https://api.usaspending.gov",
+    ),
+    SourceSpec(
+        "sam_entity_extract",
+        "scripts/sam_enrichment.py",
+        (
+            "data/staging/processed/enrichment/vendor_uei_index.csv",
+            "data/staging/processed/enrichment/master_enriched.csv",
+        ),
+        YEAR_RANGE_DEFAULT,
+        True,
+        "https://api.sam.gov",
+    ),
+    SourceSpec(
+        "fsrs_subawards",
+        "scripts/download_subawards.py",
+        (
+            "data/staging/processed/pr_subawards_master.csv",
+            "data/staging/processed/pr_prime_sub_relationships.csv",
+        ),
+        YEAR_RANGE_DEFAULT,
+        True,
+        "https://api.usaspending.gov",
+    ),
+    SourceSpec(
+        "fema_pa_hmgp",
+        "scripts/download_fema.py",
+        (
+            "data/staging/processed/pr_fema_pa_master.csv",
+            "data/staging/processed/pr_fema_hmgp_master.csv",
+        ),
+        YEAR_RANGE_DEFAULT,
+        True,
+        "https://www.fema.gov/openfema-data-page",
+    ),
+    SourceSpec(
+        "hud_cdbg",
+        "scripts/download_cdbg_dr.py",
+        (
+            "data/staging/processed/pr_cdbg_dr_master.csv",
+            "data/staging/processed/pr_hud_master.csv",
+        ),
+        YEAR_RANGE_DEFAULT,
+        True,
+        "https://www.hudexchange.info",
+    ),
+    SourceSpec(
+        "cor3",
+        "scripts/download_cor3.py",
+        ("data/staging/processed/pr_cor3_projects.csv",),
+        YEAR_RANGE_DEFAULT,
+        False,
+        "https://www.cor3.pr.gov",
+    ),
+    SourceSpec(
+        "prasa_aaa",
+        "scripts/download_prasa.py",
+        ("data/staging/processed/pr_prasa_contracts.csv",),
+        YEAR_RANGE_DEFAULT,
+        False,
+        "https://www.acueductospr.com",
+    ),
+    SourceSpec(
+        "prepa_luma_genera",
+        "scripts/download_prepa_contracts.py",
+        ("data/staging/processed/pr_prepa_contracts.csv",),
+        YEAR_RANGE_DEFAULT,
+        False,
+        "https://aeepr.com",
+    ),
+    SourceSpec(
+        "lda",
+        "scripts/download_lda.py",
+        ("data/staging/processed/pr_lda_filings.csv",),
+        YEAR_RANGE_DEFAULT,
+        True,
+        "https://lda.senate.gov",
+    ),
+    SourceSpec(
+        "pr_cabilderos",
+        "scripts/download_cabilderos.py",
+        ("data/staging/processed/pr_cabilderos.csv",),
+        YEAR_RANGE_DEFAULT,
+        False,
+        "https://app.estado.pr.gov",
+    ),
+    SourceSpec(
+        "emma_msrb_bonds",
+        "scripts/download_emma.py",
+        (
+            "data/staging/processed/pr_emma_bonds.csv",
+            "data/staging/processed/pr_emma_underwriters.csv",
+            "data/staging/processed/pr_msrb_trades.csv",
+        ),
+        YEAR_RANGE_DEFAULT,
+        True,
+        "https://emma.msrb.org",
+    ),
+    SourceSpec(
+        "fdic_banks",
+        "scripts/download_fdic.py",
+        (
+            "data/staging/processed/pr_fdic_institutions.csv",
+            "data/staging/processed/pr_fdic_financials.csv",
+        ),
+        YEAR_RANGE_DEFAULT,
+        True,
+        "https://banks.data.fdic.gov",
+    ),
+    SourceSpec(
+        "cms_medicare",
+        "scripts/download_cms.py",
+        ("data/staging/processed/pr_cms_master.csv",),
+        YEAR_RANGE_DEFAULT,
+        True,
+        "https://data.cms.gov",
+    ),
+    SourceSpec(
+        "fec",
+        "scripts/download_fec.py",
+        ("data/staging/processed/pr_fec_contributions.csv",),
+        YEAR_RANGE_DEFAULT,
+        True,
+        "https://api.open.fec.gov",
+    ),
+    SourceSpec(
+        "municipal_contracts",
+        "scripts/download_municipal.py",
+        ("data/staging/processed/pr_municipal_contracts.csv",),
+        YEAR_RANGE_DEFAULT,
+        False,
+        "https://www.comprasal.gov",
+    ),
+    SourceSpec(
+        "ogpe_permits",
+        "scripts/download_p3.py",
+        ("data/staging/processed/pr_ogpe_permits.csv",),
+        YEAR_RANGE_DEFAULT,
+        False,
+        "https://ogpe.pr.gov",
+    ),
+    SourceSpec(
+        "act60_lihtc",
+        "scripts/download_act60.py",
+        (
+            "data/staging/processed/pr_act60_decrees.csv",
+            "data/staging/processed/pr_lihtc_projects.csv",
+        ),
+        YEAR_RANGE_DEFAULT,
+        False,
+        "https://www.hacienda.pr.gov",
+    ),
+    SourceSpec(
+        "promesa_creditors",
+        "scripts/download_promesa_creditors.py",
+        ("data/staging/processed/pr_promesa_creditors.csv",),
+        YEAR_RANGE_DEFAULT,
+        False,
+        "https://www.justice.gov",
+    ),
+    SourceSpec(
+        "sf133",
+        "scripts/download_sf133.py",
+        ("data/staging/processed/pr_sf133_budget_execution.csv",),
+        YEAR_RANGE_DEFAULT,
+        True,
+        "https://api.usaspending.gov",
+    ),
+    SourceSpec(
+        "ofac",
+        "scripts/download_ofac.py",
+        ("data/staging/processed/pr_ofac_matches.csv",),
+        YEAR_RANGE_DEFAULT,
+        True,
+        "https://sanctionslist.ofac.treas.gov",
+    ),
 )
 
 
-REQUIRED_SOURCE_COLUMNS = ("source_system", "years_expected", "years_present", "year_coverage_pct", "rows_total", "rows_by_year", "field_completeness_pct", "pagination_complete", "capped_result_detected", "fixture_detected", "download_timestamp", "source_url_or_endpoint", "cache_source", "backfill_required")
+REQUIRED_SOURCE_COLUMNS = (
+    "source_system",
+    "years_expected",
+    "years_present",
+    "year_coverage_pct",
+    "rows_total",
+    "rows_by_year",
+    "field_completeness_pct",
+    "pagination_complete",
+    "capped_result_detected",
+    "fixture_detected",
+    "download_timestamp",
+    "source_url_or_endpoint",
+    "cache_source",
+    "backfill_required",
+)
 
 
 def _utc_now() -> str:
@@ -195,7 +375,12 @@ def _field_completeness_for_csv(path: Path) -> tuple[float, list[dict[str, Any]]
     name_cols = ("recipient_name", "vendor_name", "prime_recipient", "entity_name", "name")
     amount_cols = ("obligated_amount", "total_obligation", "amount", "total_flow", "par_amount")
     date_cols = ("award_date", "fiscal_year", "date", "year")
-    lookup = {"id": id_cols, "recipient": name_cols, "amount": amount_cols, "date_or_year": date_cols}
+    lookup = {
+        "id": id_cols,
+        "recipient": name_cols,
+        "amount": amount_cols,
+        "date_or_year": date_cols,
+    }
 
     rows: list[dict[str, Any]] = []
     with path.open("r", encoding="utf-8", errors="replace", newline="") as handle:
@@ -212,7 +397,9 @@ def _field_completeness_for_csv(path: Path) -> tuple[float, list[dict[str, Any]]
                         break
                 values_by_bucket[bucket].append(value)
 
-    bucket_scores = {bucket: _non_empty_ratio(values) for bucket, values in values_by_bucket.items()}
+    bucket_scores = {
+        bucket: _non_empty_ratio(values) for bucket, values in values_by_bucket.items()
+    }
     avg = round(sum(bucket_scores.values()) / max(len(bucket_scores), 1), 4)
     for bucket, score in bucket_scores.items():
         rows.append(
@@ -274,7 +461,11 @@ def _infer_master_collapse_cause(root: Path) -> dict[str, Any]:
     new_masters, expansion_files = _parse_builder_inputs(build_script)
     processed_dir = root / "data/staging/processed"
     expansion_dir = root / "data/staging/expansion"
-    expected = [processed_dir / "pr_contracts_master.csv"] + [processed_dir / f for f in new_masters] + [expansion_dir / f for f in expansion_files]
+    expected = (
+        [processed_dir / "pr_contracts_master.csv"]
+        + [processed_dir / f for f in new_masters]
+        + [expansion_dir / f for f in expansion_files]
+    )
     present = [p for p in expected if p.exists()]
     present_rows = sum(_row_count(p) for p in present)
     present_count = len(present)
@@ -285,15 +476,22 @@ def _infer_master_collapse_cause(root: Path) -> dict[str, Any]:
         or dominance_summary.get("unique_vendors")
         or report_summary.get("awards", {}).get("unique_entities")
     )
-    total_rows = _safe_int(
-        awards_summary.get("total_rows")
-        or dominance_summary.get("total_rows")
-    )
+    total_rows = _safe_int(awards_summary.get("total_rows") or dominance_summary.get("total_rows"))
 
-    build_text = build_script.read_text(encoding="utf-8", errors="replace") if build_script.exists() else ""
-    dedup_text = dedup_script.read_text(encoding="utf-8", errors="replace") if dedup_script.exists() else ""
-    builder_topn_signal = ("top_n" in build_text.lower()) or ("head(" in build_text.lower()) or ("nlargest(" in build_text.lower())
-    dedup_aggressive_signal = ("drop_duplicates" in dedup_text.lower()) and ("vendor_name" in dedup_text.lower() or "recipient_name" in dedup_text.lower())
+    build_text = (
+        build_script.read_text(encoding="utf-8", errors="replace") if build_script.exists() else ""
+    )
+    dedup_text = (
+        dedup_script.read_text(encoding="utf-8", errors="replace") if dedup_script.exists() else ""
+    )
+    builder_topn_signal = (
+        ("top_n" in build_text.lower())
+        or ("head(" in build_text.lower())
+        or ("nlargest(" in build_text.lower())
+    )
+    dedup_aggressive_signal = ("drop_duplicates" in dedup_text.lower()) and (
+        "vendor_name" in dedup_text.lower() or "recipient_name" in dedup_text.lower()
+    )
 
     if unique_entities <= 18 and present_count == 0 and total_rows > 0:
         cause = "build_unified_master_input_gap_with_stale_summary_replay"
@@ -303,7 +501,9 @@ def _infer_master_collapse_cause(root: Path) -> dict[str, Any]:
         detail = "Only a small fraction of declared master inputs exist; collapse likely caused upstream of entity resolution."
     elif unique_entities <= 18 and builder_topn_signal:
         cause = "build_unified_master_topn_or_cap_signature"
-        detail = "Builder script contains top-N/capping signatures and constrained output cardinality."
+        detail = (
+            "Builder script contains top-N/capping signatures and constrained output cardinality."
+        )
     elif unique_entities <= 18 and dedup_aggressive_signal:
         cause = "deduplicate_master_aggressive_entity_dedup_signature"
         detail = "Dedup script indicates potential vendor-level collapse behavior."
@@ -361,7 +561,9 @@ def run_audit(root: Path) -> dict[str, Any]:
                     }
                 )
 
-        pagination_complete = (not spec.requires_pagination) or bool(script_sig["has_pagination_tokens"])
+        pagination_complete = (not spec.requires_pagination) or bool(
+            script_sig["has_pagination_tokens"]
+        )
         capped_result_detected = bool(
             script_sig["capped_detected"] and (not pagination_complete or rows_total <= 1000)
         )
@@ -378,7 +580,9 @@ def run_audit(root: Path) -> dict[str, Any]:
         download_timestamp = ""
         if files:
             latest = max(p.stat().st_mtime for p in files)
-            download_timestamp = datetime.fromtimestamp(latest, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            download_timestamp = datetime.fromtimestamp(latest, timezone.utc).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            )
 
         backfill_required = bool(
             rows_total == 0
@@ -448,7 +652,9 @@ def run_audit(root: Path) -> dict[str, Any]:
     collapse = _infer_master_collapse_cause(root)
 
     # Add master-builder audit line into source coverage table.
-    builder_backfill = collapse["builder_present_input_count"] < max(1, collapse["builder_expected_input_count"] // 2)
+    builder_backfill = collapse["builder_present_input_count"] < max(
+        1, collapse["builder_expected_input_count"] // 2
+    )
     source_rows.append(
         {
             "source_system": "master_builder.build_unified_master",
@@ -477,12 +683,15 @@ def run_audit(root: Path) -> dict[str, Any]:
                 "rows_total": collapse["builder_present_input_rows"],
                 "year_coverage_pct": 0.0,
                 "field_completeness_pct": 0.0,
-                "manifest_missing_count": collapse["builder_expected_input_count"] - collapse["builder_present_input_count"],
+                "manifest_missing_count": collapse["builder_expected_input_count"]
+                - collapse["builder_present_input_count"],
                 "recommended_action": collapse["r3_primary_collapse_cause_detail"],
             },
         )
 
-    _write_csv(exports_dir / "source_coverage_audit.csv", source_rows, list(REQUIRED_SOURCE_COLUMNS))
+    _write_csv(
+        exports_dir / "source_coverage_audit.csv", source_rows, list(REQUIRED_SOURCE_COLUMNS)
+    )
     _write_csv(
         exports_dir / "source_field_completeness.csv",
         field_rows,
@@ -491,13 +700,26 @@ def run_audit(root: Path) -> dict[str, Any]:
     _write_csv(
         review_dir / "source_backfill_queue.csv",
         backfill_rows,
-        ["source_system", "priority", "script_path", "rows_total", "year_coverage_pct", "field_completeness_pct", "manifest_missing_count", "recommended_action"],
+        [
+            "source_system",
+            "priority",
+            "script_path",
+            "rows_total",
+            "year_coverage_pct",
+            "field_completeness_pct",
+            "manifest_missing_count",
+            "recommended_action",
+        ],
     )
 
     # R3 gate.
-    production_source_rows = [row for row in source_rows if not str(row["source_system"]).startswith("master_builder.")]
+    production_source_rows = [
+        row for row in source_rows if not str(row["source_system"]).startswith("master_builder.")
+    ]
     active_sources = [row for row in production_source_rows if row.get("rows_total", 0) > 0]
-    coverage_gate = bool(active_sources) and all(float(row.get("year_coverage_pct", 0)) >= 95.0 for row in active_sources)
+    coverage_gate = bool(active_sources) and all(
+        float(row.get("year_coverage_pct", 0)) >= 95.0 for row in active_sources
+    )
     backfill_gate = len(backfill_rows) == 0
     collapse_gate = collapse["r3_primary_collapse_cause"] not in {
         "build_unified_master_input_gap_with_stale_summary_replay",

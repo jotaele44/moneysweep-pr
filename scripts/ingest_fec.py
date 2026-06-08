@@ -25,6 +25,7 @@ Usage:
   python3 scripts/ingest_fec.py
   python3 scripts/ingest_fec.py --force
 """
+
 from __future__ import annotations
 
 import argparse
@@ -60,23 +61,23 @@ OUTPUT_COLUMNS = [
 
 # Column name candidates for each output field (tried in order, first match wins)
 COL_MAP = {
-    "cycle":                        ["two_year_transaction_period", "cycle", "report_year"],
-    "contributor_name":             ["contributor_name", "contributor name", "name"],
-    "contributor_city":             ["contributor_city", "contributor city", "city"],
-    "contributor_zip_code":         ["contributor_zip", "contributor_zip_code", "zip_code", "zip"],
-    "contributor_employer":         ["contributor_employer", "employer"],
-    "contributor_occupation":       ["contributor_occupation", "occupation"],
-    "contribution_receipt_amount":  ["contribution_receipt_amount", "amount", "contribution_amount"],
-    "contribution_receipt_date":    ["contribution_receipt_date", "date", "receipt_date"],
-    "committee_id":                 ["committee_id", "fec_committee_id", "cmte_id"],
-    "committee_name":               ["committee_name", "committee name", "cmte_name"],
-    "candidate_id":                 ["candidate_id", "cand_id"],
-    "candidate_name":               ["candidate_name", "candidate name"],
-    "report_year":                  ["report_year", "rpt_yr"],
-    "election_type":                ["election_type", "election type", "form_type"],
-    "memo_text":                    ["memo_text", "memo text", "memo_cd", "memo"],
-    "is_individual":                ["entity_type", "entity type"],
-    "_transaction_id":              ["transaction_id", "sub_id", "image_number"],
+    "cycle": ["two_year_transaction_period", "cycle", "report_year"],
+    "contributor_name": ["contributor_name", "contributor name", "name"],
+    "contributor_city": ["contributor_city", "contributor city", "city"],
+    "contributor_zip_code": ["contributor_zip", "contributor_zip_code", "zip_code", "zip"],
+    "contributor_employer": ["contributor_employer", "employer"],
+    "contributor_occupation": ["contributor_occupation", "occupation"],
+    "contribution_receipt_amount": ["contribution_receipt_amount", "amount", "contribution_amount"],
+    "contribution_receipt_date": ["contribution_receipt_date", "date", "receipt_date"],
+    "committee_id": ["committee_id", "fec_committee_id", "cmte_id"],
+    "committee_name": ["committee_name", "committee name", "cmte_name"],
+    "candidate_id": ["candidate_id", "cand_id"],
+    "candidate_name": ["candidate_name", "candidate name"],
+    "report_year": ["report_year", "rpt_yr"],
+    "election_type": ["election_type", "election type", "form_type"],
+    "memo_text": ["memo_text", "memo text", "memo_cd", "memo"],
+    "is_individual": ["entity_type", "entity type"],
+    "_transaction_id": ["transaction_id", "sub_id", "image_number"],
 }
 
 
@@ -120,9 +121,9 @@ def _parse_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
 
     # Handle efiling split-name format: first + middle + last → contributor_name
     if out_df["contributor_name"].eq("").all():
-        first_col  = df_lower.get("contributor_first_name")
+        first_col = df_lower.get("contributor_first_name")
         middle_col = df_lower.get("contributor_middle_name")
-        last_col   = df_lower.get("contributor_last_name")
+        last_col = df_lower.get("contributor_last_name")
         if first_col or last_col:
             parts = []
             if first_col:
@@ -150,8 +151,11 @@ def _parse_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
     # Derive report_year from date if missing
     if out_df["report_year"].eq("").all() or out_df["report_year"].isna().all():
         out_df["report_year"] = out_df["contribution_receipt_date"].apply(
-            lambda d: str(pd.to_datetime(d, errors="coerce").year)
-            if pd.notna(pd.to_datetime(d, errors="coerce")) else ""
+            lambda d: (
+                str(pd.to_datetime(d, errors="coerce").year)
+                if pd.notna(pd.to_datetime(d, errors="coerce"))
+                else ""
+            )
         )
 
     # Filter to PR only (in case the export covers other states)
@@ -217,8 +221,12 @@ def run(root: Path = None, force: bool = False) -> dict:
         combined = combined.drop_duplicates(subset=["_transaction_id"], keep="first")
     else:
         combined = combined.drop_duplicates(
-            subset=["contributor_name", "committee_id",
-                    "contribution_receipt_date", "contribution_receipt_amount"],
+            subset=[
+                "contributor_name",
+                "committee_id",
+                "contribution_receipt_date",
+                "contribution_receipt_amount",
+            ],
             keep="first",
         )
     removed = before - len(combined)

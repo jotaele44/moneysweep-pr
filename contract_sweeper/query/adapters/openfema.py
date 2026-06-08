@@ -6,6 +6,7 @@ Adds a `countyFips` clause when the caller passes specific municipalities;
 HMGP records don't carry county FIPS so that adapter narrows to PR state
 only and lets `apply_post_ingest` do municipality-level enrichment.
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -71,7 +72,10 @@ def build_hmgp_filter(query: Query) -> str:
     parts: list[str] = ["stateCode eq 'PR'"]
     if query.fiscal_years:
         years = sorted({int(y) for y in query.fiscal_years})
-        clause = " or ".join(f"projectAmount ne null and disasterNumber ne null and incidentDate ge '{y}-01-01' and incidentDate le '{y}-12-31'" for y in years)
+        clause = " or ".join(
+            f"projectAmount ne null and disasterNumber ne null and incidentDate ge '{y}-01-01' and incidentDate le '{y}-12-31'"
+            for y in years
+        )
         parts.append(f"({clause})")
     return " and ".join(parts)
 

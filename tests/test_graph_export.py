@@ -5,6 +5,7 @@ node/edge property-graph and validates against ``schemas/graph_nodes.schema.json
 and ``schemas/graph_edges.schema.json`` via the stdlib canonical_v1 schema
 interpreter (no ``jsonschema`` dependency).
 """
+
 from __future__ import annotations
 
 import csv
@@ -113,24 +114,28 @@ def test_known_edges_present(nodes, edges):
     luma = by_name["LUMA Energy"]
     fomb = by_name["Financial Oversight and Management Board for Puerto Rico"]
     # Commonwealth PARENT_OF PREPA
-    assert any(e["from_node_id"] == commonwealth and e["to_node_id"] == prepa
-               and e["edge_type"] == "PARENT_OF" for e in edges)
+    assert any(
+        e["from_node_id"] == commonwealth
+        and e["to_node_id"] == prepa
+        and e["edge_type"] == "PARENT_OF"
+        for e in edges
+    )
     # LUMA operates PREPA assets -> RELATED_TO with the precise relationship in notes
     luma_edge = next(e for e in edges if e["to_node_id"] == luma)
     assert luma_edge["from_node_id"] == prepa
     assert luma_edge["edge_type"] == "RELATED_TO"
     assert "P3_OPERATOR_OF" in luma_edge["notes"]
     # FOMB has board members
-    assert any(e["to_node_id"] == fomb and e["edge_type"] == "BOARD_MEMBER_OF"
-               for e in edges)
+    assert any(e["to_node_id"] == fomb and e["edge_type"] == "BOARD_MEMBER_OF" for e in edges)
 
 
 @pytest.mark.integration
 def test_csv_exports_regenerate_identically(nodes, edges):
     nodes_path = REPO_ROOT / bge.NODES_OUT
     edges_path = REPO_ROOT / bge.EDGES_OUT
-    assert nodes_path.exists() and edges_path.exists(), \
+    assert nodes_path.exists() and edges_path.exists(), (
         "exports not written — run scripts/build_graph_export.py"
+    )
     with nodes_path.open(newline="", encoding="utf-8") as fh:
         on_disk_nodes = list(csv.DictReader(fh))
     with edges_path.open(newline="", encoding="utf-8") as fh:
@@ -149,8 +154,9 @@ def test_csv_exports_regenerate_identically(nodes, edges):
 def test_neo4j_headers(nodes, edges):
     nodes_path = REPO_ROOT / bge.NEO4J_NODES_OUT
     edges_path = REPO_ROOT / bge.NEO4J_EDGES_OUT
-    assert nodes_path.exists() and edges_path.exists(), \
+    assert nodes_path.exists() and edges_path.exists(), (
         "neo4j exports not written — run scripts/build_graph_export.py"
+    )
     with nodes_path.open(newline="", encoding="utf-8") as fh:
         node_header = next(csv.reader(fh))
     with edges_path.open(newline="", encoding="utf-8") as fh:

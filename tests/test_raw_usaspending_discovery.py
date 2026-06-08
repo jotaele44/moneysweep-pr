@@ -282,24 +282,21 @@ def test_r49h_discovers_zip_members_and_validates_only_blocked_targets(tmp_path:
     assert status["downstream_phases_blocked"] is True
 
     unfreeze_rows = _csv_rows(
-        tmp_path
-        / "data"
-        / "review_queue"
-        / "raw_usaspending_unfreeze_candidates_r4_9h.csv"
+        tmp_path / "data" / "review_queue" / "raw_usaspending_unfreeze_candidates_r4_9h.csv"
     )
     assert len(unfreeze_rows) == 1
     assert unfreeze_rows[0]["expected_input"] == "data/staging/processed/pr_grants_master.csv"
     assert unfreeze_rows[0]["validation_reason"] == "exact_required_columns_present"
 
     rejected_rows = _csv_rows(
-        tmp_path
-        / "data"
-        / "review_queue"
-        / "raw_usaspending_rejected_candidates_r4_9h.csv"
+        tmp_path / "data" / "review_queue" / "raw_usaspending_rejected_candidates_r4_9h.csv"
     )
     assert len(rejected_rows) == 2
     assert all("pop_state" in row["missing_columns"] for row in rejected_rows)
-    assert all(row["expected_input"] != "data/staging/processed/pr_contracts_master.csv" for row in rejected_rows)
+    assert all(
+        row["expected_input"] != "data/staging/processed/pr_contracts_master.csv"
+        for row in rejected_rows
+    )
 
 
 def test_r49h_gate_passes_with_no_raw_candidates(tmp_path: Path):

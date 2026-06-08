@@ -4,6 +4,7 @@ Pins the run()/_session/_fetch_page/_paginate contract for the USASpending
 POST family (doj_grants is the canonical shape shared by ed/epa/oia/usace_civil/
 hhs/haf). All network is mocked; no real HTTP.
 """
+
 from __future__ import annotations
 
 import pandas as pd

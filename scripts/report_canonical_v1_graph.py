@@ -15,6 +15,7 @@ CLI::
 
     python scripts/report_canonical_v1_graph.py --root .
 """
+
 from __future__ import annotations
 
 import argparse
@@ -35,9 +36,18 @@ JSON_OUT = "reports/canonical_v1_graph_summary.json"
 GATE_LABEL = "NON_PRODUCTION_DIAGNOSTIC"
 
 # Node tables that carry graph nodes (evidence/review_queue are not graph nodes).
-NODE_TABLES = ("people", "entities", "roles", "contracts", "projects",
-               "debt_instruments", "lobbying_records", "funding_sources",
-               "properties", "municipalities")
+NODE_TABLES = (
+    "people",
+    "entities",
+    "roles",
+    "contracts",
+    "projects",
+    "debt_instruments",
+    "lobbying_records",
+    "funding_sources",
+    "properties",
+    "municipalities",
+)
 
 
 def summarize(root: Path | None = None) -> dict[str, Any]:
@@ -98,7 +108,8 @@ def summarize(root: Path | None = None) -> dict[str, Any]:
         "edges_backed_by_accepted_evidence": edges_with_accepted,
         "connected_node_count": connected_nodes,
         "review_queue_open": sum(
-            1 for r in tables.get("review_queue", [])
+            1
+            for r in tables.get("review_queue", [])
             if (r.get("status") or "").strip() in ("open", "in_review")
         ),
         "top_degree_nodes": [{"node_id": n, "degree": d} for n, d in top_degree],
@@ -175,8 +186,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.print:
         print(json.dumps(summary, indent=2))
     else:
-        print(f"wrote {MD_OUT} and {JSON_OUT} "
-              f"({summary['total_nodes']} nodes, {summary['edge_count']} edges)")
+        print(
+            f"wrote {MD_OUT} and {JSON_OUT} "
+            f"({summary['total_nodes']} nodes, {summary['edge_count']} edges)"
+        )
     return 0
 
 

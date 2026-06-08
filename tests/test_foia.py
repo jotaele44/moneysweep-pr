@@ -5,6 +5,7 @@ request-templates doc. Fully offline; validation uses the stdlib canonical_v1
 schema interpreter (no ``jsonschema`` dependency). Producers use ``build_rows``
 (read-only) so the working tree is never touched.
 """
+
 from __future__ import annotations
 
 import csv
@@ -31,6 +32,7 @@ def _committed(rel: str):
 # --------------------------------------------------------------------------- #
 # foia_tracker
 # --------------------------------------------------------------------------- #
+
 
 @pytest.fixture(scope="module")
 def foia_rows():
@@ -81,6 +83,7 @@ def test_foia_regenerates_identically(foia_rows):
 # yield_tracking
 # --------------------------------------------------------------------------- #
 
+
 @pytest.fixture(scope="module")
 def yield_rows():
     return bfy.build_rows(REPO_ROOT)
@@ -117,17 +120,19 @@ def test_yield_regenerates_identically(yield_rows):
 # submission state
 # --------------------------------------------------------------------------- #
 
+
 @pytest.mark.unit
 def test_foia_all_submitted(foia_rows):
     for r in foia_rows:
-        assert r["request_status"] == "submitted", \
+        assert r["request_status"] == "submitted", (
             f"{r['request_id']} expected submitted, got {r['request_status']}"
-
+        )
 
 
 # --------------------------------------------------------------------------- #
 # request_templates
 # --------------------------------------------------------------------------- #
+
 
 @pytest.mark.unit
 def test_request_templates_doc_present_and_complete():

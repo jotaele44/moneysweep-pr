@@ -69,5 +69,7 @@ def test_pr_news_router_pipeline_writes_raw_intake_and_router_exports(tmp_path):
 
     verification = verify_exports(export_dir)
     assert verification["all_exports_exist"] is True
-    saved_verification = json.loads((export_dir / "export_verification.json").read_text(encoding="utf-8"))
+    saved_verification = json.loads(
+        (export_dir / "export_verification.json").read_text(encoding="utf-8")
+    )
     assert saved_verification["all_exports_exist"] is True

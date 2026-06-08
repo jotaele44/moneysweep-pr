@@ -22,6 +22,7 @@ Design notes
   Only the inter-attempt *sleep schedule* changes (jittered-exponential instead
   of a fixed list); sleeps are injected so they are mocked in tests.
 """
+
 from __future__ import annotations
 
 import time

@@ -22,6 +22,7 @@ CLI::
     python scripts/build_entity_master.py            # write the CSV + manifest
     python scripts/build_entity_master.py --check     # validate without writing
 """
+
 from __future__ import annotations
 
 import argparse
@@ -46,23 +47,29 @@ SOURCE_ID = "pr_public_money_entities"
 
 # Output column order (matches schema required fields + notes).
 ENTITY_MASTER_COLUMNS = [
-    "entity_id", "entity_type", "canonical_name", "jurisdiction",
-    "source_id", "evidence_tier", "confidence", "notes",
+    "entity_id",
+    "entity_type",
+    "canonical_name",
+    "jurisdiction",
+    "source_id",
+    "evidence_tier",
+    "confidence",
+    "notes",
 ]
 
 # Source entity_type -> schema entity_type enum + ID type-code.
 #   schema enum: organization | person | government_agency | municipality | ...
 #   ID pattern:  ^ENT_(ORG|PERSON|AGENCY|MUNI|PROJECT|CONTRACT|DEBT|PROPERTY|ASSET)_...
 TYPE_MAP: dict[str, tuple[str, str]] = {
-    "agency":    ("government_agency", "AGENCY"),
-    "utility":   ("government_agency", "AGENCY"),
-    "firm":      ("organization", "ORG"),
-    "fund":      ("organization", "ORG"),
+    "agency": ("government_agency", "AGENCY"),
+    "utility": ("government_agency", "AGENCY"),
+    "firm": ("organization", "ORG"),
+    "fund": ("organization", "ORG"),
     "nonprofit": ("organization", "ORG"),
-    "other":     ("organization", "ORG"),
+    "other": ("organization", "ORG"),
 }
 
-EVIDENCE_TIER = "T1"   # committed official/registry reference
+EVIDENCE_TIER = "T1"  # committed official/registry reference
 CONFIDENCE = 0.95
 
 
@@ -82,16 +89,18 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
                 continue
             schema_type, code = TYPE_MAP[src_type]
             aliases = (ref.get("aliases") or "").strip()
-            rows.append({
-                "entity_id": f"ENT_{code}_{name_hash(name)}",
-                "entity_type": schema_type,
-                "canonical_name": name,
-                "jurisdiction": (ref.get("jurisdiction") or "").strip() or "PR",
-                "source_id": SOURCE_ID,
-                "evidence_tier": EVIDENCE_TIER,
-                "confidence": CONFIDENCE,
-                "notes": f"aliases={aliases}" if aliases else "",
-            })
+            rows.append(
+                {
+                    "entity_id": f"ENT_{code}_{name_hash(name)}",
+                    "entity_type": schema_type,
+                    "canonical_name": name,
+                    "jurisdiction": (ref.get("jurisdiction") or "").strip() or "PR",
+                    "source_id": SOURCE_ID,
+                    "evidence_tier": EVIDENCE_TIER,
+                    "confidence": CONFIDENCE,
+                    "notes": f"aliases={aliases}" if aliases else "",
+                }
+            )
     return rows
 
 
@@ -144,7 +153,9 @@ def build(root: Path | None = None) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Build the top-form Entity Master reference table.")
+    parser = argparse.ArgumentParser(
+        description="Build the top-form Entity Master reference table."
+    )
     parser.add_argument("--root", default=".")
     parser.add_argument("--check", action="store_true", help="Validate without writing.")
     args = parser.parse_args(argv)
@@ -152,7 +163,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         rows = build_rows(root)
         problems = check(rows, root)
-        print(json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2))
+        print(
+            json.dumps({"ok": not problems, "row_count": len(rows), "problems": problems}, indent=2)
+        )
         return 0 if not problems else 1
     print(json.dumps(build(root), indent=2))
     return 0

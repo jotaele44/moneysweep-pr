@@ -16,6 +16,7 @@ CLI::
     python scripts/bridge_canonical_v1_federation.py --root .
     python scripts/bridge_canonical_v1_federation.py --check     # validate, no write
 """
+
 from __future__ import annotations
 
 import argparse
@@ -110,18 +111,23 @@ def write_streams(streams: dict[str, Any], root: Path) -> dict[str, Any]:
         "stream_counts": {s: len(streams[s]) for s in STREAMS},
         "source_feeds": {
             "federal_publications": sum(
-                1 for s in streams["sources"]
+                1
+                for s in streams["sources"]
                 if (s.get("lineage") or {}).get("producer_phase") == FEDERAL_PUBLICATIONS_PHASE
             ),
             "canonical_v1_evidence": sum(
-                1 for s in streams["sources"]
+                1
+                for s in streams["sources"]
                 if (s.get("lineage") or {}).get("producer_phase") != FEDERAL_PUBLICATIONS_PHASE
             ),
         },
         "not_yet_federated_count": len(streams["not_yet_federated"]),
         "edges_federated_pct": round(
-            100.0 * len(streams["relationships"])
-            / max(1, len(streams["relationships"]) + len(streams["not_yet_federated"])), 2),
+            100.0
+            * len(streams["relationships"])
+            / max(1, len(streams["relationships"]) + len(streams["not_yet_federated"])),
+            2,
+        ),
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
@@ -142,9 +148,17 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps({"ok": False, "errors": errors[:50]}, indent=2))
         return 1
     if args.check:
-        print(json.dumps({"ok": True, "stream_counts": {s: len(streams[s]) for s in STREAMS},
-                          "federal_publications_added": n_pubs,
-                          "not_yet_federated": len(streams["not_yet_federated"])}, indent=2))
+        print(
+            json.dumps(
+                {
+                    "ok": True,
+                    "stream_counts": {s: len(streams[s]) for s in STREAMS},
+                    "federal_publications_added": n_pubs,
+                    "not_yet_federated": len(streams["not_yet_federated"]),
+                },
+                indent=2,
+            )
+        )
         return 0
     print(json.dumps(write_streams(streams, root), indent=2))
     return 0

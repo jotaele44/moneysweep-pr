@@ -1,4 +1,5 @@
 """Tests for scripts/gap_analysis_builder.py."""
+
 import csv
 import json
 
@@ -58,8 +59,14 @@ def gap_repo(tmp_path):
 @pytest.mark.unit
 def test_build_gap_returns_summary_keys(gap_repo):
     result = build_gap_analysis(gap_repo)
-    for key in ("total_sources", "required_sources", "fully_materialized",
-                "not_materialized", "coverage_rate", "required_coverage_rate"):
+    for key in (
+        "total_sources",
+        "required_sources",
+        "fully_materialized",
+        "not_materialized",
+        "coverage_rate",
+        "required_coverage_rate",
+    ):
         assert key in result
 
 
@@ -68,8 +75,8 @@ def test_build_gap_counts(gap_repo):
     result = build_gap_analysis(gap_repo)
     assert result["total_sources"] == 3
     assert result["required_sources"] == 2
-    assert result["fully_materialized"] == 1   # source_a
-    assert result["not_materialized"] == 1     # source_b (required, missing)
+    assert result["fully_materialized"] == 1  # source_a
+    assert result["not_materialized"] == 1  # source_b (required, missing)
     assert result["partially_materialized"] == 1  # source_c (optional, empty file)
 
 

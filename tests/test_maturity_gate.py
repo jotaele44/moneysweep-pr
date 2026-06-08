@@ -1,4 +1,5 @@
 """Tests for contract_sweeper.runtime.maturity_gate."""
+
 from __future__ import annotations
 
 import csv
@@ -90,7 +91,8 @@ def test_claim_tier_worst_wins_across_multiple(fixture_repo: Path) -> None:
     dm = load_dataset_to_source_map(fixture_repo)
     tier = claim_tier(
         ["pr_fec_contributions.csv", "pr_lda_filings.csv", "pr_emma_bonds.csv"],
-        m, dm,
+        m,
+        dm,
     )
     assert tier == "blocked"
 
@@ -115,7 +117,8 @@ def test_unmaterialized_sources_lists_blocked_only(fixture_repo: Path) -> None:
     dm = load_dataset_to_source_map(fixture_repo)
     blocked = unmaterialized_sources(
         ["pr_fec_contributions.csv", "pr_emma_bonds.csv", "pr_msrb_rtrs_trades.csv"],
-        m, dm,
+        m,
+        dm,
     )
     assert sorted(blocked) == ["pr_emma_bonds.csv", "pr_msrb_rtrs_trades.csv"]
 
@@ -135,24 +138,28 @@ def test_influence_graph_builder_emits_claim_tier(fixture_repo: Path) -> None:
             f, fieldnames=["award_id", "awarding_agency", "recipient_name", "obligated_amount"]
         )
         w.writeheader()
-        w.writerow({
-            "award_id": "A1",
-            "awarding_agency": "Federal Agency",
-            "recipient_name": "Acme Corp",
-            "obligated_amount": "1000",
-        })
+        w.writerow(
+            {
+                "award_id": "A1",
+                "awarding_agency": "Federal Agency",
+                "recipient_name": "Acme Corp",
+                "obligated_amount": "1000",
+            }
+        )
 
     # EMMA bond row referencing a not-materialized source.
     bonds = proc / "pr_emma_bonds.csv"
     with bonds.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=["issuer_name", "underwriter_name", "par_amount", "cusip"])
         w.writeheader()
-        w.writerow({
-            "issuer_name": "PR Highway Authority",
-            "underwriter_name": "Big Bank",
-            "par_amount": "500000",
-            "cusip": "1234ABC",
-        })
+        w.writerow(
+            {
+                "issuer_name": "PR Highway Authority",
+                "underwriter_name": "Big Bank",
+                "par_amount": "500000",
+                "cusip": "1234ABC",
+            }
+        )
 
     build_graph(fixture_repo)
 

@@ -4,6 +4,7 @@ Fully offline: the producer reads only committed public reference CSVs and
 validates against ``schemas/agency_master.schema.json`` via the stdlib
 canonical_v1 schema interpreter (no ``jsonschema`` dependency).
 """
+
 from __future__ import annotations
 
 import csv
@@ -58,7 +59,11 @@ def test_ids_unique_deterministic_and_match_pattern(rows, schema):
 def test_agency_types_within_schema_enum(rows, schema):
     enum = set(schema["properties"]["agency_type"]["enum"])
     assert {r["agency_type"] for r in rows} <= enum
-    assert {r["agency_type"] for r in rows} == {"government_agency", "public_corporation", "municipality"}
+    assert {r["agency_type"] for r in rows} == {
+        "government_agency",
+        "public_corporation",
+        "municipality",
+    }
 
 
 @pytest.mark.unit
@@ -72,7 +77,9 @@ def test_evidence_tier_and_confidence(rows):
 def test_utility_maps_to_public_corporation(rows):
     prepa = next(r for r in rows if r["canonical_name"] == "Puerto Rico Electric Power Authority")
     assert prepa["agency_type"] == "public_corporation"
-    prasa = next(r for r in rows if r["canonical_name"] == "Puerto Rico Aqueduct and Sewer Authority")
+    prasa = next(
+        r for r in rows if r["canonical_name"] == "Puerto Rico Aqueduct and Sewer Authority"
+    )
     assert prasa["agency_type"] == "public_corporation"
 
 

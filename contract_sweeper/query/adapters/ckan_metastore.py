@@ -13,6 +13,7 @@ paginates the datastore-query endpoint filtered to PR.
 
 No credentials required.
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -55,10 +56,12 @@ class _CKANMetastoreAdapter(SourceAdapter):
         import requests
 
         s = requests.Session()
-        s.headers.update({
-            "Accept": "application/json",
-            "User-Agent": "contract-sweeper-query/1",
-        })
+        s.headers.update(
+            {
+                "Accept": "application/json",
+                "User-Agent": "contract-sweeper-query/1",
+            }
+        )
         return s
 
     def _get(self, session, url: str, params: dict[str, Any] | None = None):
@@ -159,7 +162,11 @@ class _CKANMetastoreAdapter(SourceAdapter):
             except Exception:  # noqa: BLE001 — one bad dataset shouldn't sink the rest
                 continue
             all_rows.extend(
-                {**row, "source_dataset_id": dataset_id or resource_id, "source_resource_id": resource_id}
+                {
+                    **row,
+                    "source_dataset_id": dataset_id or resource_id,
+                    "source_resource_id": resource_id,
+                }
                 for row in rows
             )
 

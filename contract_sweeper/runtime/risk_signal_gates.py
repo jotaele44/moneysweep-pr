@@ -11,6 +11,7 @@ Gates:
 These are checked by `python -m contract_sweeper.runtime.risk_signal_gates --root .`
 Returns exit code 0 on all pass, non-zero on any failure.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -22,12 +23,12 @@ from pathlib import Path
 
 from contract_sweeper.runtime.risk_signals import SIGNAL_COLUMNS, SCHEMA_VERSION
 
-SIGNALS_CSV       = Path("data") / "staging" / "processed" / "risk" / "risk_signals_master.csv"
+SIGNALS_CSV = Path("data") / "staging" / "processed" / "risk" / "risk_signals_master.csv"
 ENTITY_SCORES_CSV = Path("data") / "staging" / "processed" / "risk" / "entity_risk_scores.csv"
-MANIFEST_JSON     = Path("data") / "manifests" / "risk_signal_report.json"
+MANIFEST_JSON = Path("data") / "manifests" / "risk_signal_report.json"
 
-_LINEAGE_FIELDS  = ("evidence_source", "evidence_row_ids")
-_EXPLAIN_FIELDS  = ("explanation",)
+_LINEAGE_FIELDS = ("evidence_source", "evidence_row_ids")
+_EXPLAIN_FIELDS = ("explanation",)
 
 
 def _now_iso() -> str:
@@ -69,8 +70,11 @@ def gate_signal_lineage_complete(root: Path) -> dict:
     path = root / SIGNALS_CSV
     rows = _read_csv_rows(path)
     if not rows:
-        return {"gate": "risk_signal_lineage_complete", "passed": False,
-                "reason": "No signal rows to check"}
+        return {
+            "gate": "risk_signal_lineage_complete",
+            "passed": False,
+            "reason": "No signal rows to check",
+        }
     incomplete = [
         r.get("signal_id", str(i))
         for i, r in enumerate(rows)
@@ -91,8 +95,11 @@ def gate_signal_explainability_complete(root: Path) -> dict:
     path = root / SIGNALS_CSV
     rows = _read_csv_rows(path)
     if not rows:
-        return {"gate": "risk_signal_explainability_complete", "passed": False,
-                "reason": "No signal rows to check"}
+        return {
+            "gate": "risk_signal_explainability_complete",
+            "passed": False,
+            "reason": "No signal rows to check",
+        }
     incomplete = [
         r.get("signal_id", str(i))
         for i, r in enumerate(rows)
@@ -114,8 +121,11 @@ def gate_no_random_scores(root: Path) -> dict:
     path = root / SIGNALS_CSV
     rows = _read_csv_rows(path)
     if not rows:
-        return {"gate": "no_random_scores", "passed": True,
-                "reason": "No rows — vacuously deterministic"}
+        return {
+            "gate": "no_random_scores",
+            "passed": True,
+            "reason": "No rows — vacuously deterministic",
+        }
     ids = [r.get("signal_id", "") for r in rows]
     duplicates = [sid for sid in set(ids) if ids.count(sid) > 1]
     passed = len(duplicates) == 0
@@ -153,8 +163,11 @@ def run_all_gates(root: Path) -> list[dict]:
 def main() -> None:
     parser = argparse.ArgumentParser(description="R7 risk signal gates")
     parser.add_argument("--root", default=".", help="Repository root path")
-    parser.add_argument("--allow-failed", action="store_true",
-                        help="Exit 0 even when gates fail (bootstrap mode only)")
+    parser.add_argument(
+        "--allow-failed",
+        action="store_true",
+        help="Exit 0 even when gates fail (bootstrap mode only)",
+    )
     args = parser.parse_args()
     root = Path(args.root).resolve()
 
@@ -164,11 +177,11 @@ def main() -> None:
     ts = _now_iso()
     report = {
         "schema_version": SCHEMA_VERSION,
-        "generated_at":   ts,
-        "all_passed":     len(failing) == 0,
-        "gate_count":     len(records),
-        "failing_count":  len(failing),
-        "records":        records,
+        "generated_at": ts,
+        "all_passed": len(failing) == 0,
+        "gate_count": len(records),
+        "failing_count": len(failing),
+        "records": records,
     }
 
     # Write manifest

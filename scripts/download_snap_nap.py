@@ -17,6 +17,7 @@ Output:
 Usage:
   python3 scripts/download_snap_nap.py [--force]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -41,10 +42,15 @@ MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 SNAP_NAP_COLUMNS = [
-    "fiscal_year", "quarter", "program_type",
-    "total_participants", "total_issuances",
-    "federal_expenditure", "administrative_cost",
-    "avg_benefit_per_household", "source_doc",
+    "fiscal_year",
+    "quarter",
+    "program_type",
+    "total_participants",
+    "total_issuances",
+    "federal_expenditure",
+    "administrative_cost",
+    "avg_benefit_per_household",
+    "source_doc",
 ]
 
 # USDA FNS NAP-specific program data endpoints (stable URLs)
@@ -56,19 +62,61 @@ FNS_NAP_URLS = [
 
 # Known PR NAP annual participation and issuance data from USDA FNS public reports
 KNOWN_SNAP_NAP_DATA = [
-    {"fiscal_year":"2020","quarter":"annual","program_type":"NAP","total_participants":"1350000","total_issuances":"2060000000","federal_expenditure":"2060000000","administrative_cost":"95000000","avg_benefit_per_household":"372","source_doc":"USDA_FNS_NAP_PR_FY2020"},
-    {"fiscal_year":"2021","quarter":"annual","program_type":"NAP","total_participants":"1380000","total_issuances":"2220000000","federal_expenditure":"2220000000","administrative_cost":"98000000","avg_benefit_per_household":"395","source_doc":"USDA_FNS_NAP_PR_FY2021"},
-    {"fiscal_year":"2022","quarter":"annual","program_type":"NAP","total_participants":"1410000","total_issuances":"2450000000","federal_expenditure":"2450000000","administrative_cost":"102000000","avg_benefit_per_household":"422","source_doc":"USDA_FNS_NAP_PR_FY2022"},
-    {"fiscal_year":"2023","quarter":"annual","program_type":"NAP","total_participants":"1390000","total_issuances":"2380000000","federal_expenditure":"2380000000","administrative_cost":"100000000","avg_benefit_per_household":"415","source_doc":"USDA_FNS_NAP_PR_FY2023"},
+    {
+        "fiscal_year": "2020",
+        "quarter": "annual",
+        "program_type": "NAP",
+        "total_participants": "1350000",
+        "total_issuances": "2060000000",
+        "federal_expenditure": "2060000000",
+        "administrative_cost": "95000000",
+        "avg_benefit_per_household": "372",
+        "source_doc": "USDA_FNS_NAP_PR_FY2020",
+    },
+    {
+        "fiscal_year": "2021",
+        "quarter": "annual",
+        "program_type": "NAP",
+        "total_participants": "1380000",
+        "total_issuances": "2220000000",
+        "federal_expenditure": "2220000000",
+        "administrative_cost": "98000000",
+        "avg_benefit_per_household": "395",
+        "source_doc": "USDA_FNS_NAP_PR_FY2021",
+    },
+    {
+        "fiscal_year": "2022",
+        "quarter": "annual",
+        "program_type": "NAP",
+        "total_participants": "1410000",
+        "total_issuances": "2450000000",
+        "federal_expenditure": "2450000000",
+        "administrative_cost": "102000000",
+        "avg_benefit_per_household": "422",
+        "source_doc": "USDA_FNS_NAP_PR_FY2022",
+    },
+    {
+        "fiscal_year": "2023",
+        "quarter": "annual",
+        "program_type": "NAP",
+        "total_participants": "1390000",
+        "total_issuances": "2380000000",
+        "federal_expenditure": "2380000000",
+        "administrative_cost": "100000000",
+        "avg_benefit_per_household": "415",
+        "source_doc": "USDA_FNS_NAP_PR_FY2023",
+    },
 ]
 
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "ContractSweeper/1.0 (PR NAP nutrition assistance research)",
-        "Accept": "application/json, text/html",
-    })
+    s.headers.update(
+        {
+            "User-Agent": "ContractSweeper/1.0 (PR NAP nutrition assistance research)",
+            "Accept": "application/json, text/html",
+        }
+    )
     return s
 
 
@@ -88,7 +136,7 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> requests.
         except requests.RequestException as exc:
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
-                logger.warning(f"  Attempt {attempt+1} failed ({exc}) — retrying in {wait}s")
+                logger.warning(f"  Attempt {attempt + 1} failed ({exc}) — retrying in {wait}s")
                 time.sleep(wait)
             else:
                 logger.error(f"  All {MAX_RETRIES} attempts failed: {exc}")
@@ -118,6 +166,7 @@ def _post(session: requests.Session, url: str, payload: dict, logger) -> dict | 
 def _find_excel_csv_links(html: str, base_url: str) -> list[str]:
     import re
     from urllib.parse import urlparse
+
     pattern = r'href=["\']([^"\']*\.(?:xlsx|xls|csv))["\']'
     links = re.findall(pattern, html, re.IGNORECASE)
     result = []
@@ -134,10 +183,23 @@ def _parse_fns_excel(content: bytes, url: str, logger) -> list[dict]:
     rows = []
     try:
         sheets = pd.read_excel(pd.io.common.BytesIO(content), sheet_name=None, header=None)
-        for sheet_name, raw_df in (sheets.items() if isinstance(sheets, dict) else [("Sheet1", sheets)]):
+        for sheet_name, raw_df in (
+            sheets.items() if isinstance(sheets, dict) else [("Sheet1", sheets)]
+        ):
             flat = raw_df.astype(str).values.flatten()
-            has_nap = any(kw in str(v).lower() for v in flat
-                         for kw in ["nap", "nutrition", "participant", "issuance", "benefit", "puerto rico", "pr"])
+            has_nap = any(
+                kw in str(v).lower()
+                for v in flat
+                for kw in [
+                    "nap",
+                    "nutrition",
+                    "participant",
+                    "issuance",
+                    "benefit",
+                    "puerto rico",
+                    "pr",
+                ]
+            )
             if not has_nap:
                 continue
             try:
@@ -204,8 +266,12 @@ def _fetch_fns_pages(session: requests.Session, logger) -> list[dict]:
 def _fetch_datagov(session: requests.Session, logger) -> list[dict]:
     rows = []
     try:
-        resp = _get(session, DATAGOV_CKAN_URL,
-                    {"q": "usda fns nap nutrition assistance puerto rico", "rows": 10}, logger)
+        resp = _get(
+            session,
+            DATAGOV_CKAN_URL,
+            {"q": "usda fns nap nutrition assistance puerto rico", "rows": 10},
+            logger,
+        )
         if not resp:
             return rows
         data = resp.json()
@@ -219,15 +285,25 @@ def _fetch_datagov(session: requests.Session, logger) -> list[dict]:
                         file_resp = session.get(url, timeout=60)
                         if file_resp.status_code == 200:
                             if fmt == "csv":
-                                df = pd.read_csv(pd.io.common.BytesIO(file_resp.content), low_memory=False)
+                                df = pd.read_csv(
+                                    pd.io.common.BytesIO(file_resp.content), low_memory=False
+                                )
                                 df["source_doc"] = url
                                 df["program_type"] = "NAP"
-                                pr_mask = df.astype(str).apply(
-                                    lambda col: col.str.contains("puerto rico|\\bPR\\b", case=False, na=False)
-                                ).any(axis=1)
+                                pr_mask = (
+                                    df.astype(str)
+                                    .apply(
+                                        lambda col: col.str.contains(
+                                            "puerto rico|\\bPR\\b", case=False, na=False
+                                        )
+                                    )
+                                    .any(axis=1)
+                                )
                                 df = df[pr_mask]
                                 rows.extend(df.to_dict("records"))
-                                logger.info(f"  data.gov: {len(df)} PR rows from {url.split('/')[-1]}")
+                                logger.info(
+                                    f"  data.gov: {len(df)} PR rows from {url.split('/')[-1]}"
+                                )
                     except Exception as e:
                         logger.debug(f"  Could not fetch {url}: {e}")
     except Exception as e:
@@ -248,7 +324,13 @@ def _fetch_usaspending_nap(session: requests.Session, logger) -> list[dict]:
                     "program_numbers": [cfda],
                     "place_of_performance_locations": [{"country": "USA", "state": "PR"}],
                 },
-                "fields": ["Award ID", "Recipient Name", "Award Amount", "Start Date", "Description"],
+                "fields": [
+                    "Award ID",
+                    "Recipient Name",
+                    "Award Amount",
+                    "Start Date",
+                    "Description",
+                ],
                 "page": page,
                 "limit": 100,
                 "sort": "Award Amount",
@@ -262,17 +344,19 @@ def _fetch_usaspending_nap(session: requests.Session, logger) -> list[dict]:
             if not results:
                 break
             for r in results:
-                rows.append({
-                    "fiscal_year": "",
-                    "quarter": "",
-                    "program_type": f"USDA_CFDA_{cfda}",
-                    "total_participants": "",
-                    "total_issuances": str(r.get("Award Amount", "")),
-                    "federal_expenditure": str(r.get("Award Amount", "")),
-                    "administrative_cost": "",
-                    "avg_benefit_per_household": "",
-                    "source_doc": f"usaspending_{cfda}",
-                })
+                rows.append(
+                    {
+                        "fiscal_year": "",
+                        "quarter": "",
+                        "program_type": f"USDA_CFDA_{cfda}",
+                        "total_participants": "",
+                        "total_issuances": str(r.get("Award Amount", "")),
+                        "federal_expenditure": str(r.get("Award Amount", "")),
+                        "administrative_cost": "",
+                        "avg_benefit_per_household": "",
+                        "source_doc": f"usaspending_{cfda}",
+                    }
+                )
             if not data.get("page_metadata", {}).get("has_next_page", False):
                 break
             page += 1
@@ -363,7 +447,9 @@ def run(root: Path = None, force: bool = False) -> dict:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Download USDA FNS NAP nutrition assistance data for PR")
+    parser = argparse.ArgumentParser(
+        description="Download USDA FNS NAP nutrition assistance data for PR"
+    )
     parser.add_argument("--force", action="store_true", help="Re-download even if cached")
     args = parser.parse_args()
     result = run(force=args.force)

@@ -5,6 +5,7 @@ from the `FEC_API_KEY` env var. The Schedule A endpoint doesn't accept a
 PR municipality / county FIPS filter, so municipality narrowing is handled
 client-side via `apply_post_ingest` in the dispatcher.
 """
+
 from __future__ import annotations
 
 import os
@@ -70,7 +71,9 @@ class FECPRAdapter(SourceAdapter):
             "sort": "-contribution_receipt_date",
         }
         if query.fiscal_years:
-            base_params["two_year_transaction_period"] = sorted({int(y) for y in query.fiscal_years})
+            base_params["two_year_transaction_period"] = sorted(
+                {int(y) for y in query.fiscal_years}
+            )
         if query.date_range:
             base_params["min_date"], base_params["max_date"] = query.date_range
 

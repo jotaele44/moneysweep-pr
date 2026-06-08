@@ -22,6 +22,7 @@ Usage:
   python3 scripts/download_msrb_trades.py --force
   python3 scripts/download_msrb_trades.py --max-cusips 200
 """
+
 from __future__ import annotations
 
 import argparse
@@ -43,9 +44,9 @@ from scripts.build_unified_master import _normalize_name
 # Constants
 # ---------------------------------------------------------------------------
 
-EMMA_BASE     = "https://emma.msrb.org"
-PAGE_SLEEP    = 0.3
-MAX_RETRIES   = 3
+EMMA_BASE = "https://emma.msrb.org"
+PAGE_SLEEP = 0.3
+MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 # Per-CUSIP trade history endpoint
@@ -62,10 +63,16 @@ DEFAULT_MAX_CUSIPS = 500
 YEARS_BACK = 5  # pull trades for the last N fiscal years
 
 OUTPUT_COLUMNS = [
-    "cusip", "trade_date", "settlement_date",
-    "par_traded", "price", "yield",
-    "dealer_id", "dealer_name", "dealer_normalized",
-    "trade_type",   # B=buy from customer, S=sell to customer, D=interdealer
+    "cusip",
+    "trade_date",
+    "settlement_date",
+    "par_traded",
+    "price",
+    "yield",
+    "dealer_id",
+    "dealer_name",
+    "dealer_normalized",
+    "trade_type",  # B=buy from customer, S=sell to customer, D=interdealer
     "market_side",  # customer | interdealer
 ]
 
@@ -73,13 +80,16 @@ OUTPUT_COLUMNS = [
 # HTTP helpers
 # ---------------------------------------------------------------------------
 
+
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0; PR bond research)",
-        "Accept":     "application/json, text/html, */*",
-        "Referer":    EMMA_BASE,
-    })
+    s.headers.update(
+        {
+            "User-Agent": "Mozilla/5.0 (compatible; ContractSweeper/1.0; PR bond research)",
+            "Accept": "application/json, text/html, */*",
+            "Referer": EMMA_BASE,
+        }
+    )
     return s
 
 
@@ -130,9 +140,11 @@ def _get_bytes(session, url, params, logger) -> bytes | None:
 # Fetch strategies
 # ---------------------------------------------------------------------------
 
+
 def _fetch_bulk(session, logger) -> list[dict]:
     """Try bulk state-level trade export (zip or JSON)."""
     import datetime
+
     current_year = datetime.date.today().year
 
     for ep in TRADE_BULK_ENDPOINTS:
@@ -159,6 +171,7 @@ def _fetch_bulk(session, logger) -> list[dict]:
             # Try JSON
             try:
                 import json
+
                 records = json.loads(raw.decode("utf-8"))
                 if isinstance(records, list) and records:
                     return records
@@ -187,15 +200,14 @@ def _fetch_per_cusip(session, cusips: list[str], logger) -> list[dict]:
         if isinstance(data, list):
             records = data
         elif isinstance(data, dict):
-            records = (data.get("trades") or data.get("results") or
-                       data.get("data") or [])
+            records = data.get("trades") or data.get("results") or data.get("data") or []
         else:
             records = []
         for r in records:
             r["_cusip"] = cusip
         all_records.extend(records)
         if (i + 1) % 50 == 0:
-            logger.info(f"    {i+1}/{len(cusips)} CUSIPs queried, {len(all_records):,} trades")
+            logger.info(f"    {i + 1}/{len(cusips)} CUSIPs queried, {len(all_records):,} trades")
 
     if failed:
         logger.debug(f"    {failed} CUSIP queries returned no data")
@@ -205,6 +217,7 @@ def _fetch_per_cusip(session, cusips: list[str], logger) -> list[dict]:
 # ---------------------------------------------------------------------------
 # Normalize raw trade record → canonical schema
 # ---------------------------------------------------------------------------
+
 
 def _normalize_trade(r: dict) -> dict:
     def _f(*keys):
@@ -226,21 +239,27 @@ def _normalize_trade(r: dict) -> dict:
 
     trade_type = _f("tradeType", "trade_type", "TradeType", "sideOfTrade", "side")
     market_side = "interdealer" if trade_type.upper() in ("D", "INTERDEALER") else "customer"
-    dealer = _f("dealerName", "dealer_name", "DealerName", "brokerDealer",
-                "reportingParty", "reportingPartyName")
+    dealer = _f(
+        "dealerName",
+        "dealer_name",
+        "DealerName",
+        "brokerDealer",
+        "reportingParty",
+        "reportingPartyName",
+    )
 
     return {
-        "cusip":             r.get("_cusip") or _f("cusip", "Cusip", "CUSIP"),
-        "trade_date":        _f("tradeDate", "trade_date", "TradeDate", "executionDate"),
-        "settlement_date":   _f("settlementDate", "settlement_date", "SettlementDate"),
-        "par_traded":        _num("parTraded", "par_traded", "quantity", "Quantity", "parAmount"),
-        "price":             _num("price", "Price", "tradePrice", "cleanPrice"),
-        "yield":             _num("yield", "Yield", "tradeYield"),
-        "dealer_id":         _f("dealerId", "dealer_id", "DealerId", "mpid", "MPID"),
-        "dealer_name":       dealer,
+        "cusip": r.get("_cusip") or _f("cusip", "Cusip", "CUSIP"),
+        "trade_date": _f("tradeDate", "trade_date", "TradeDate", "executionDate"),
+        "settlement_date": _f("settlementDate", "settlement_date", "SettlementDate"),
+        "par_traded": _num("parTraded", "par_traded", "quantity", "Quantity", "parAmount"),
+        "price": _num("price", "Price", "tradePrice", "cleanPrice"),
+        "yield": _num("yield", "Yield", "tradeYield"),
+        "dealer_id": _f("dealerId", "dealer_id", "DealerId", "mpid", "MPID"),
+        "dealer_name": dealer,
         "dealer_normalized": _normalize_name(dealer),
-        "trade_type":        trade_type,
-        "market_side":       market_side,
+        "trade_type": trade_type,
+        "market_side": market_side,
     }
 
 
@@ -248,8 +267,8 @@ def _normalize_trade(r: dict) -> dict:
 # Core
 # ---------------------------------------------------------------------------
 
-def run(root: Path = None, force: bool = False,
-        max_cusips: int = DEFAULT_MAX_CUSIPS) -> dict:
+
+def run(root: Path = None, force: bool = False, max_cusips: int = DEFAULT_MAX_CUSIPS) -> dict:
     root = Path(root or PROJECT_ROOT)
     proc = root / "data" / "staging" / "processed"
     out_path = proc / "pr_msrb_trades.csv"
@@ -276,9 +295,7 @@ def run(root: Path = None, force: bool = False,
             df_bonds = pd.read_csv(bonds_path, dtype=str, low_memory=False)
             cusips = df_bonds["cusip"].dropna().unique().tolist()[:max_cusips]
             if cusips:
-                logger.info(
-                    f"  Trying per-CUSIP trade fetch for {len(cusips):,} CUSIPs..."
-                )
+                logger.info(f"  Trying per-CUSIP trade fetch for {len(cusips):,} CUSIPs...")
                 raw_records = _fetch_per_cusip(session, cusips, logger)
         else:
             logger.warning("  pr_emma_bonds.csv not found — run download_emma.py first")
@@ -311,10 +328,10 @@ def run(root: Path = None, force: bool = False,
     )
 
     return {
-        "status":         "OK",
-        "rows":           n,
+        "status": "OK",
+        "rows": n,
         "unique_dealers": unique_dealers,
-        "total_par":      float(total_par),
+        "total_par": float(total_par),
     }
 
 
@@ -322,13 +339,18 @@ def run(root: Path = None, force: bool = False,
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Download MSRB RTRS trade data for PR municipal bonds"
     )
     parser.add_argument("--force", action="store_true")
-    parser.add_argument("--max-cusips", type=int, default=DEFAULT_MAX_CUSIPS,
-                        help=f"Max CUSIPs to query individually (default: {DEFAULT_MAX_CUSIPS})")
+    parser.add_argument(
+        "--max-cusips",
+        type=int,
+        default=DEFAULT_MAX_CUSIPS,
+        help=f"Max CUSIPs to query individually (default: {DEFAULT_MAX_CUSIPS})",
+    )
     args = parser.parse_args()
     result = run(force=args.force, max_cusips=args.max_cusips)
     return 0 if result.get("status") in ("OK", "CACHED", "EMPTY") else 1

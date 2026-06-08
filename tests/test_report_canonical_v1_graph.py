@@ -1,4 +1,5 @@
 """Tests for the read-only canonical_v1 graph legibility reporter."""
+
 import json
 
 import pytest

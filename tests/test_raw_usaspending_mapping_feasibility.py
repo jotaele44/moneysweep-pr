@@ -73,26 +73,17 @@ def _bootstrap_inputs(
     blocked_rows: list[dict],
 ) -> None:
     _write_csv(
-        tmp_path
-        / "data"
-        / "review_queue"
-        / "raw_usaspending_rejected_candidates_r4_9h.csv",
+        tmp_path / "data" / "review_queue" / "raw_usaspending_rejected_candidates_r4_9h.csv",
         rejected_rows,
         REJECTED_FIELDNAMES,
     )
     _write_csv(
-        tmp_path
-        / "data"
-        / "exports"
-        / "raw_usaspending_candidate_matches_r4_9h.csv",
+        tmp_path / "data" / "exports" / "raw_usaspending_candidate_matches_r4_9h.csv",
         [],
         REJECTED_FIELDNAMES,
     )
     _write_csv(
-        tmp_path
-        / "data"
-        / "exports"
-        / "raw_usaspending_validation_report_r4_9h.csv",
+        tmp_path / "data" / "exports" / "raw_usaspending_validation_report_r4_9h.csv",
         [],
         REJECTED_FIELDNAMES,
     )
@@ -205,16 +196,10 @@ def test_mapping_feasibility_reviews_rejections_without_creating_unfreeze_candid
     assert status["phase_7_8_blocked"] is True
 
     candidates = _csv_rows(
-        tmp_path
-        / "data"
-        / "review_queue"
-        / "raw_usaspending_transform_candidates_r4_9h2.csv"
+        tmp_path / "data" / "review_queue" / "raw_usaspending_transform_candidates_r4_9h2.csv"
     )
     rejects = _csv_rows(
-        tmp_path
-        / "data"
-        / "review_queue"
-        / "raw_usaspending_transform_rejects_r4_9h2.csv"
+        tmp_path / "data" / "review_queue" / "raw_usaspending_transform_rejects_r4_9h2.csv"
     )
     still_blocked = _csv_rows(
         tmp_path / "data" / "review_queue" / "sources_still_blocked_r4_9h2.csv"
@@ -225,9 +210,7 @@ def test_mapping_feasibility_reviews_rejections_without_creating_unfreeze_candid
     assert "pop_state" in candidates[0]["deterministically_derivable_columns"]
     assert rejects[0]["expected_input"] == reject_target
     assert "pop_state" in rejects[0]["cannot_infer_safely_columns"]
-    assert {
-        row["expected_input"]: row["r4_9h2_status"] for row in still_blocked
-    } == {
+    assert {row["expected_input"]: row["r4_9h2_status"] for row in still_blocked} == {
         candidate_target: "potential_transform_candidate_but_still_blocked",
         reject_target: "still_external_only",
     }
@@ -262,10 +245,7 @@ def test_mapping_feasibility_keeps_is_pr_vendor_pop_state_rejected(
     assert status["targets_still_external_only"] == 1
 
     matrix = _csv_rows(
-        tmp_path
-        / "data"
-        / "exports"
-        / "raw_usaspending_mapping_feasibility_matrix_r4_9h2.csv"
+        tmp_path / "data" / "exports" / "raw_usaspending_mapping_feasibility_matrix_r4_9h2.csv"
     )
     assert matrix[0]["feasibility_status"] == "transform_reject"
     assert matrix[0]["cannot_infer_safely_columns"] == "pop_state"

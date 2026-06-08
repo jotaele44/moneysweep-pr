@@ -12,6 +12,7 @@ Usage:
   python3 scripts/download_sf133.py --force
   python3 scripts/download_sf133.py --fy-start 2017
 """
+
 from __future__ import annotations
 
 import argparse
@@ -31,11 +32,13 @@ from scripts.config import PROJECT_ROOT, setup_logging
 # ---------------------------------------------------------------------------
 
 FEDERAL_ACCOUNTS_URL = "https://api.usaspending.gov/api/v2/federal_accounts/"
-ACCOUNT_DETAIL_URL   = "https://api.usaspending.gov/api/v2/federal_accounts/{}/available_object_classes/"
+ACCOUNT_DETAIL_URL = (
+    "https://api.usaspending.gov/api/v2/federal_accounts/{}/available_object_classes/"
+)
 
-PAGE_SIZE    = 100
-PAGE_SLEEP   = 0.3
-MAX_RETRIES  = 3
+PAGE_SIZE = 100
+PAGE_SLEEP = 0.3
+MAX_RETRIES = 3
 RETRY_BACKOFF = [5, 15, 30]
 
 # PR-relevant agencies: FEMA=58, HUD=86, DOT=69, DOE=89, USDA=12, Army=21, SBA=73, HHS=75
@@ -53,20 +56,36 @@ PR_AGENCIES = {
 
 # PR-relevant keyword filters for account titles
 PR_KEYWORDS = [
-    "puerto rico", "disaster", "recovery", "reconstruction",
-    "community development", "housing", "infrastructure",
-    "highway", "energy", "agriculture", "small business",
+    "puerto rico",
+    "disaster",
+    "recovery",
+    "reconstruction",
+    "community development",
+    "housing",
+    "infrastructure",
+    "highway",
+    "energy",
+    "agriculture",
+    "small business",
 ]
 
 OUTPUT_COLUMNS = [
-    "fiscal_year", "agency_code", "agency_name", "account_number",
-    "account_title", "budget_authority", "obligations",
-    "outlays", "unobligated_balance", "obligation_rate",
+    "fiscal_year",
+    "agency_code",
+    "agency_name",
+    "account_number",
+    "account_title",
+    "budget_authority",
+    "obligations",
+    "outlays",
+    "unobligated_balance",
+    "obligation_rate",
 ]
 
 # ---------------------------------------------------------------------------
 # HTTP helpers
 # ---------------------------------------------------------------------------
+
 
 def _get(session: requests.Session, url: str, params: dict, logger) -> dict | None:
     for attempt in range(MAX_RETRIES):
@@ -115,8 +134,10 @@ def _post(session: requests.Session, url: str, payload: dict, logger) -> dict | 
 # Fetch
 # ---------------------------------------------------------------------------
 
-def _fetch_accounts(session: requests.Session, agency_code: str,
-                    fy_start: int, fy_end: int, logger) -> list[dict]:
+
+def _fetch_accounts(
+    session: requests.Session, agency_code: str, fy_start: int, fy_end: int, logger
+) -> list[dict]:
     """Fetch all federal accounts for an agency across fiscal years."""
     accounts = []
     for fy in range(fy_start, fy_end + 1):
@@ -145,19 +166,23 @@ def _fetch_accounts(session: requests.Session, agency_code: str,
                     or budget > 1_000_000_000  # >$1B accounts are always tracked
                 )
                 if is_relevant:
-                    accounts.append({
-                        "fiscal_year": fy,
-                        "agency_code": agency_code,
-                        "agency_name": PR_AGENCIES.get(agency_code, agency_code),
-                        "account_number": acct.get("account_number", ""),
-                        "account_title": acct.get("account_title", ""),
-                        "budget_authority": budget,
-                        "obligations": float(acct.get("obligations") or 0),
-                        "outlays": float(acct.get("outlays") or 0),
-                        "unobligated_balance": float(acct.get("unobligated_balance") or 0),
-                    })
+                    accounts.append(
+                        {
+                            "fiscal_year": fy,
+                            "agency_code": agency_code,
+                            "agency_name": PR_AGENCIES.get(agency_code, agency_code),
+                            "account_number": acct.get("account_number", ""),
+                            "account_title": acct.get("account_title", ""),
+                            "budget_authority": budget,
+                            "obligations": float(acct.get("obligations") or 0),
+                            "outlays": float(acct.get("outlays") or 0),
+                            "unobligated_balance": float(acct.get("unobligated_balance") or 0),
+                        }
+                    )
             page += 1
-            if not data.get("hasNext", False) and page > data.get("page_metadata", {}).get("total", 1):
+            if not data.get("hasNext", False) and page > data.get("page_metadata", {}).get(
+                "total", 1
+            ):
                 break
             # Also break if we got fewer than a full page
             if len(results) < PAGE_SIZE:
@@ -169,8 +194,8 @@ def _fetch_accounts(session: requests.Session, agency_code: str,
 # Core
 # ---------------------------------------------------------------------------
 
-def run(root: Path = None, force: bool = False,
-        fy_start: int = 2017, fy_end: int = 2026) -> dict:
+
+def run(root: Path = None, force: bool = False, fy_start: int = 2017, fy_end: int = 2026) -> dict:
     root = Path(root or PROJECT_ROOT)
     out_path = root / "data" / "staging" / "processed" / "pr_sf133_budget_execution.csv"
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -179,15 +204,19 @@ def run(root: Path = None, force: bool = False,
 
     if out_path.exists() and not force:
         rows = sum(1 for _ in open(out_path)) - 1
-        logger.info(f"  SF-133: {out_path.name} exists ({rows:,} rows) — skipping. Use --force to re-download.")
+        logger.info(
+            f"  SF-133: {out_path.name} exists ({rows:,} rows) — skipping. Use --force to re-download."
+        )
         return {"status": "CACHED", "rows": rows}
 
     session = requests.Session()
-    session.headers.update({
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "User-Agent": "ContractSweeper/1.0 (PR federal spending research)",
-    })
+    session.headers.update(
+        {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "User-Agent": "ContractSweeper/1.0 (PR federal spending research)",
+        }
+    )
 
     all_accounts = []
     for code, name in PR_AGENCIES.items():
@@ -205,14 +234,19 @@ def run(root: Path = None, force: bool = False,
 
     # Compute obligation rate (avoid div/0)
     df["obligation_rate"] = df.apply(
-        lambda r: round(r["obligations"] / r["budget_authority"], 4)
-        if r["budget_authority"] > 0 else 0.0,
+        lambda r: (
+            round(r["obligations"] / r["budget_authority"], 4) if r["budget_authority"] > 0 else 0.0
+        ),
         axis=1,
     )
 
-    df = df[OUTPUT_COLUMNS].drop_duplicates(
-        subset=["fiscal_year", "agency_code", "account_number"]
-    ).sort_values(["fiscal_year", "agency_code", "budget_authority"], ascending=[False, True, False])
+    df = (
+        df[OUTPUT_COLUMNS]
+        .drop_duplicates(subset=["fiscal_year", "agency_code", "account_number"])
+        .sort_values(
+            ["fiscal_year", "agency_code", "budget_authority"], ascending=[False, True, False]
+        )
+    )
 
     df.to_csv(out_path, index=False)
     rows = len(df)
@@ -224,18 +258,26 @@ def run(root: Path = None, force: bool = False,
     logger.info(f"  Total budget authority: ${total_budget:,.0f}")
     logger.info(f"  Total obligated:        ${total_obligated:,.0f} ({avg_rate:.1%})")
 
-    return {"status": "OK", "rows": rows, "total_budget": total_budget,
-            "total_obligated": total_obligated, "avg_obligation_rate": avg_rate}
+    return {
+        "status": "OK",
+        "rows": rows,
+        "total_budget": total_budget,
+        "total_obligated": total_obligated,
+        "avg_obligation_rate": avg_rate,
+    }
 
 
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Download SF-133 budget execution data")
     parser.add_argument("--force", action="store_true", help="Re-download even if output exists")
-    parser.add_argument("--fy-start", type=int, default=2017, help="First fiscal year (default: 2017)")
+    parser.add_argument(
+        "--fy-start", type=int, default=2017, help="First fiscal year (default: 2017)"
+    )
     parser.add_argument("--fy-end", type=int, default=2026, help="Last fiscal year (default: 2026)")
     args = parser.parse_args()
     result = run(force=args.force, fy_start=args.fy_start, fy_end=args.fy_end)
