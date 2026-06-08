@@ -1,0 +1,25 @@
+name: Lint (report-only)
+
+# Report-only: this workflow surfaces ruff lint findings but never blocks a merge
+# (continue-on-error). The tree has a known lint backlog that is cleaned up
+# incrementally per docs/BUILD_EXECUTION_SEQUENCE.md (Wave B); promote this to a
+# gating check (remove continue-on-error) once `ruff check .` is clean.
+on: [push, pull_request]
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dev tooling
+        run: pip install -r requirements-dev.txt
+
+      - name: Run ruff lint (report-only)
+        continue-on-error: true
+        run: ruff check --output-format=github .
