@@ -1,0 +1,12 @@
+# Revisions to ignore in `git blame` (and on GitHub's blame view).
+#
+# Each entry is a commit that made a large, purely-mechanical change (e.g. a
+# repo-wide auto-format) with no semantic effect, so that blame attributes lines
+# to the author who last meaningfully changed them rather than to the format pass.
+#
+# GitHub honors this file automatically. Locally, enable it once with:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Wave C: repo-wide `ruff format` (428 files), formatting only — see
+# docs/BUILD_EXECUTION_SEQUENCE.md.
+cfc96501b66502c9d610a3c61ba2d60817d87127
