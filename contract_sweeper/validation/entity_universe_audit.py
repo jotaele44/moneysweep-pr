@@ -333,7 +333,7 @@ def run_audit(root: Path) -> dict[str, Any]:
         ],
     )
 
-    diagnostics = [
+    diagnostics: list[dict[str, Any]] = [
         {
             "diagnostic": "raw_award_rows",
             "observed_value": _safe_int(

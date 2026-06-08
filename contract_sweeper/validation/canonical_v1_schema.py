@@ -266,11 +266,11 @@ def validate_referential_integrity(
             nid = (row.get(id_col) or "").strip()
             if not ntype or not nid:
                 continue
-            target = NODE_TYPE_TABLE.get(ntype)
-            if target is None:
+            target_table = NODE_TYPE_TABLE.get(ntype)
+            if target_table is None:
                 report.add(f"[edges:{i}] unknown {type_col}={ntype!r}")
-            elif nid not in pks.get(target, set()):
-                report.add(f"[edges:{i}] broken endpoint {id_col}={nid!r} -> {target}")
+            elif nid not in pks.get(target_table, set()):
+                report.add(f"[edges:{i}] broken endpoint {id_col}={nid!r} -> {target_table}")
 
 
 def validate_controlled_vocab(

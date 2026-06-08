@@ -5,9 +5,12 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
+
+if TYPE_CHECKING:
+    from .entity_types import EntityQuery
 
 Status = Literal["ok", "cache_hit", "manual_only", "error"]
 
@@ -59,7 +62,7 @@ class SourceQueryOutcome:
 
 @dataclass
 class QueryResult:
-    query: Query
+    query: Query | EntityQuery
     outcomes: dict[str, SourceQueryOutcome] = field(default_factory=dict)
 
     @property

@@ -107,7 +107,9 @@ def _lineage(source_csv: str) -> dict[str, Any]:
     }
 
 
-def _norm_conf(value: str) -> float:
+def _norm_conf(value: str | None) -> float:
+    if value is None:
+        return 0.0
     try:
         return max(0.0, min(1.0, float(value)))
     except (TypeError, ValueError):
@@ -154,7 +156,7 @@ def build_streams(root: Path | None = None) -> dict[str, Any]:
         etype: str,
         jurisdiction: str,
         ev_id: str,
-        conf: str,
+        conf: str | None,
         source_csv: str,
     ) -> None:
         eid = fed_entity_id(cid)

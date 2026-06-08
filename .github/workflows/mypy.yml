@@ -1,7 +1,8 @@
-name: Type check (report-only)
+name: Type check
 
-# Report-only: this workflow surfaces mypy findings but never blocks a merge
-# (continue-on-error). Promote to a gating check once the baseline is clean.
+# Gating: the contract_sweeper/ package type-checks clean (Wave D of
+# docs/BUILD_EXECUTION_SEQUENCE.md), so mypy now blocks merges on regressions.
+# Scope/strictness widen incrementally per the sequence (scripts/ is task 24).
 on: [push, pull_request]
 
 jobs:
@@ -18,8 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install mypy
+          pip install -r requirements-dev.txt
 
-      - name: Run mypy (report-only)
-        continue-on-error: true
+      - name: Run mypy
         run: python -m mypy

@@ -40,7 +40,12 @@ def _default_source_ids(root: Path) -> list[str]:
     """When the caller doesn't specify sources, query every adapter we have."""
     known = set(ADAPTER_REGISTRY.keys())
     # Order by registry order so results are deterministic.
-    return [s.get("source_id") for s in all_sources(root) if s.get("source_id") in known]
+    out: list[str] = []
+    for s in all_sources(root):
+        sid = s.get("source_id")
+        if sid is not None and sid in known:
+            out.append(sid)
+    return out
 
 
 def _resolve_ttl(source_id: str, root: Path) -> int:
