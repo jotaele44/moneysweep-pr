@@ -1,0 +1,25 @@
+# Dependabot keeps dependencies and GitHub Actions current and surfaces security
+# advisories as PRs. The Python lockfile (requirements.lock) is compiled from
+# requirements.in by uv; the lockfile-drift CI check (.github/workflows/lockfile.yml)
+# keeps the lock honest, while these PRs propose the underlying version bumps.
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "repo-governance"
+    commit-message:
+      prefix: "deps"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "repo-governance"
+    commit-message:
+      prefix: "ci"
