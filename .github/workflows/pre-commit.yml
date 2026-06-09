@@ -1,0 +1,41 @@
+name: pre-commit
+
+# Gating: runs every hook in .pre-commit-config.yaml across the whole tree.
+# This is green only because Waves B-D of docs/BUILD_EXECUTION_SEQUENCE.md
+# brought the tree to zero lint/format errors and a clean narrow-scope mypy;
+# it locks that in so a regression in any hook blocks the merge. It overlaps
+# with lint.yml / mypy.yml by design (those stay as the fast, focused gates);
+# this job is the holistic "the hooks a contributor runs locally also pass in CI"
+# guarantee promised by CONTRIBUTING.md.
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pre-commit
+        # Pin to the dev-tooling ruff/mypy versions implicitly: the hooks declare
+        # their own `rev`s, so we only need the runner here.
+        run: pip install pre-commit
+
+      - name: Cache pre-commit hook environments
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            pre-commit-${{ runner.os }}-
+
+      - name: Run all hooks
+        run: pre-commit run --all-files --show-diff-on-failure
