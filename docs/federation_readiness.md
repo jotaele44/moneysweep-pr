@@ -90,6 +90,60 @@ Contract v1.1.0 (additive, backward compatible) adds the join keys the
 A 1.0.0 consumer ignores these fields; `export_contract_version` remains the
 single compatibility key.
 
+## Cross-repo release & handshake procedure
+
+The federation export contract is versioned **independently** of any
+Contract-Sweeper software release. Its single source of truth is
+`scripts/build_export_package.py:EXPORT_CONTRACT_VERSION` (currently `1.2.0`).
+Three on-disk places mirror that literal and are pinned to it by
+`tests/test_conformance_fixture_freshness.py`:
+
+- `exports/conformance/v1_2/manifest.json` (the golden conformance package),
+- `exports/samples/manifest.sample.json`,
+- `schemas/contract_sweeper_export_manifest.schema.json` (`const`).
+
+> The finance-lane **report** contract (`readiness/contract_sweeper_finance_lane.py`,
+> `1.0.0`) is a *separate* contract on its own version track. Do not couple the two.
+
+### When you bump the federation contract version
+
+Compatibility is matched on `export_contract_version` alone, so versioning policy is:
+
+| Change to the export shape | Version bump |
+|----------------------------|--------------|
+| New **optional** field a 1.x consumer can ignore (e.g. the v1.1.0 `location`/`external_ids` adds) | **minor** |
+| Field removed/renamed, type narrowed, or a new **required** field | **major** |
+| Doc/comment-only, no wire change | none |
+
+Producer-side steps for a bump (all in one PR against `main`):
+
+1. Edit `EXPORT_CONTRACT_VERSION` in `scripts/build_export_package.py`.
+2. Update the schema `const` and regenerate the sample + conformance manifests
+   (`python scripts/run_export.py … --mode test` into the fixture dir, or hand-edit
+   the literal) so `tests/test_conformance_fixture_freshness.py` passes.
+3. Add a `CHANGELOG.md` entry under **Unreleased** describing the contract change.
+4. Bump the schema/fixture directory name if it is a **major** version
+   (`exports/conformance/v1_2/` → `v2_0/`).
+
+### What happens on merge
+
+When the PR lands on `main`, `.github/workflows/release-tag.yml` resolves the new
+`EXPORT_CONTRACT_VERSION`, and — only if no `export-v<version>` tag exists yet —
+creates that annotated tag and a matching GitHub release. The workflow is
+idempotent and non-gating: it reacts to the bump, it never blocks the merge.
+
+### Coordinating with `spiderweb-pr`
+
+1. Producer cuts the `export-v<version>` tag (above).
+2. Notify the `spiderweb-pr` maintainers with the tag and the CHANGELOG entry.
+   The `query-hub` ingest adapter reads `export_contract_version` from each
+   package's `manifest.json` and gates ingestion on a compatible range.
+3. For a **minor** bump, existing hub consumers keep working (additive only);
+   for a **major** bump, the hub adapter must be updated to the new shape
+   **before** production packages at that version are emitted.
+4. The committed `exports/conformance/v<version>/` package is the contract test
+   both sides validate against — it is the shared source of truth for the wire shape.
+
 ## Next steps (future work)
 
 1. Map `data/processed/` master outputs into the five canonical streams.
