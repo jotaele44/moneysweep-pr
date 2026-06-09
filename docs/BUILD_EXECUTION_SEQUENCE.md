@@ -75,11 +75,11 @@ _Highest-blast-radius modules first. Each new test file lets you raise the floor
 34. Unit-test `contract_sweeper/pipeline/manual_import_dropzone.py` (operator-supplied file ingestion).
 35. Unit-test `contract_sweeper/pipeline/source_materialization.py`.
 36. Unit-test `contract_sweeper/pipeline/scoped_unfreeze_materialization.py`.
-37. Unit-test `contract_sweeper/runtime/retry_runtime.py`.
-38. Unit-test `contract_sweeper/runtime/pagination_runtime.py`.
-39. Unit-test `contract_sweeper/runtime/file_hash_runtime.py`.
-40. Unit-test `contract_sweeper/runtime/evidence_tiers.py`.
-41. Unit-test `contract_sweeper/runtime/risk_signal_gates.py`.
+37. **[done]** Unit-test `contract_sweeper/runtime/retry_runtime.py` — `tests/test_runtime_helpers.py` (success/transient-recovery/exhaustion + exception narrowing + backoff/jitter).
+38. **[done]** Unit-test `contract_sweeper/runtime/pagination_runtime.py` — `tests/test_runtime_helpers.py` (multi-page walk, start_marker, max_pages guard).
+39. **[done]** Unit-test `contract_sweeper/runtime/file_hash_runtime.py` — `tests/test_runtime_helpers.py` (hashlib parity, empty + multi-chunk).
+40. **[done]** Unit-test `contract_sweeper/runtime/evidence_tiers.py` — `tests/test_runtime_helpers.py` (tier derivation/caps, confidence, OCR scoring, claim-tier mapping).
+41. **[done]** Unit-test `contract_sweeper/runtime/risk_signal_gates.py` — already covered by `tests/test_risk_signals.py` (all five gates + `run_all_gates`).
 42. Adapter error/credential-path tests: `query/adapters/sam.py`.
 43. Adapter error/credential-path tests: `query/adapters/highergov.py`.
 44. Adapter error/credential-path tests: `query/adapters/ckan_metastore.py`.
