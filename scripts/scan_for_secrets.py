@@ -127,7 +127,7 @@ def _line_has_secret(line: str, path_name: str) -> str | None:
     return None
 
 
-def scan(root: Path) -> dict[str, list[dict[str, str]]]:
+def scan(root: Path) -> dict:
     findings: list[dict[str, str]] = []
     files_scanned = 0
     for p in root.rglob("*"):

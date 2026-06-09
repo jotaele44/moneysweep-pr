@@ -110,7 +110,7 @@ def _sum_col(df: pd.DataFrame, col: str) -> float:
 # ---------------------------------------------------------------------------
 
 
-def build_profiles(root: Path = None) -> dict:
+def build_profiles(root: Path | None = None) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

@@ -143,7 +143,7 @@ def _get(session, url, params, logger):
 
 
 def _scrape_aafaf_cofina(session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     logger.info("  Scraping AAFAF COFINA reports page...")
     resp = _get(session, AAFAF_COFINA_URL, {}, logger)
     if not resp:
@@ -209,7 +209,7 @@ def _scrape_aafaf_cofina(session, logger) -> list[dict]:
 
 
 def _fetch_emma_cofina(session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     logger.info("  Querying EMMA for COFINA disclosures...")
     params = {"stateCode": "PR", "issuerId": "COFINA", "pageSize": 100, "page": 1}
     resp = _get(session, EMMA_ISSUER_URL, params, logger)
@@ -241,7 +241,7 @@ def _fetch_emma_cofina(session, logger) -> list[dict]:
     return rows
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)

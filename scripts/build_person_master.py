@@ -64,7 +64,9 @@ def _load_schema(root: Path) -> dict[str, Any]:
     return json.loads((root / SCHEMA).read_text(encoding="utf-8"))
 
 
-def _confidence(raw: str) -> float:
+def _confidence(raw: str | None) -> float:
+    if raw is None:
+        return 0.5
     try:
         return float(raw)
     except (TypeError, ValueError):

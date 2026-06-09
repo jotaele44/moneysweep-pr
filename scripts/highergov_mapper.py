@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Deterministic mappings per resource type
-HIGHERGOV_MAPPINGS = {
+HIGHERGOV_MAPPINGS: dict = {
     "opportunity": {
         "description": "Municipal opportunities (small businesses, contracts)",
         "date_cols": ["posted_date", "due_date", "captured_date"],
@@ -108,7 +108,7 @@ def map_highergov_resource(df: pd.DataFrame, resource_type: str) -> tuple[pd.Dat
         return df, {}
 
     mapping = HIGHERGOV_MAPPINGS[resource_type]
-    validation = {
+    validation: dict = {
         "resource_type": resource_type,
         "total_rows": len(df),
         "dates": {},

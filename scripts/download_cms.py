@@ -27,6 +27,8 @@ Usage:
 
 from __future__ import annotations
 
+from typing import Any
+
 import argparse
 import sys
 import time
@@ -206,8 +208,8 @@ def _get(
     params: dict,
     logger,
     method: str = "GET",
-    json_body: dict = None,
-) -> dict | list | None:
+    json_body: dict | None = None,
+) -> Any:
     for attempt in range(MAX_RETRIES):
         try:
             if method == "POST":
@@ -268,7 +270,7 @@ def _fetch_open_payments_dataset(session: requests.Session, uuid: str, logger) -
     """Fetch all PR rows from one Open Payments dataset resource."""
     url = f"{OPEN_PAYMENTS_BASE}/datastore/query/{uuid}/0"
     offset = 0
-    records = []
+    records: list = []
 
     while True:
         params = {
@@ -376,7 +378,7 @@ def _fetch_medicare_dataset(session: requests.Session, dataset_id: str, logger) 
     """Fetch PR rows from one CMS Medicare Part B dataset."""
     url = f"{CMS_DATA_BASE}/{dataset_id}/data"
     offset = 0
-    records = []
+    records: list = []
 
     while True:
         params = {
@@ -482,7 +484,7 @@ def download_medicare(
 
 
 def run(
-    root: Path = None,
+    root: Path | None = None,
     skip_open_payments: bool = False,
     skip_medicare: bool = False,
     force: bool = False,
@@ -498,7 +500,7 @@ def run(
 
     logger = setup_logging("download_cms")
     session = _session()
-    result = {"status": "OK"}
+    result: dict = {"status": "OK"}
 
     # Open Payments
     op_out_path = out_dir / "pr_cms_open_payments.csv"

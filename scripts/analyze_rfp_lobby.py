@@ -96,7 +96,7 @@ def _match_vendor_to_lda(vendor_norm: str, lda_df: pd.DataFrame) -> pd.DataFrame
     return lda_df[scores >= MIN_SCORE].copy()
 
 
-def run(root: Path = None, window_days: int = WINDOW_DAYS) -> dict:
+def run(root: Path | None = None, window_days: int = WINDOW_DAYS) -> dict:
     root = Path(root or PROJECT_ROOT)
     proc = root / "data" / "staging" / "processed"
     out_path = proc / "pr_rfp_lobby_crossref.csv"

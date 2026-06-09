@@ -192,7 +192,7 @@ def _parse_excel_to_records(content: bytes, url: str, logger) -> list[dict]:
 
 def _fetch_aafaf_reports(session: requests.Session, logger) -> list[dict]:
     """Scrape AAFAF reports index for downloadable Excel files."""
-    rows = []
+    rows: list = []
     resp = _get(session, AAFAF_REPORTS_URL, {}, logger, accept_html=True)
     if not resp:
         logger.warning("  AAFAF reports page not accessible")
@@ -216,7 +216,7 @@ def _fetch_aafaf_reports(session: requests.Session, logger) -> list[dict]:
 
 def _fetch_pr_data_portal(session: requests.Session, logger) -> list[dict]:
     """Search PR Open Data portal for AAFAF/budget datasets."""
-    rows = []
+    rows: list = []
     try:
         resp = _get(
             session, PR_DATA_PORTAL_URL, {"q": "aafaf presupuesto budget", "rows": 20}, logger
@@ -266,7 +266,7 @@ def parse_records(records: list[dict]) -> pd.DataFrame:
 
     df = pd.json_normalize(records)
 
-    rename = {}
+    rename: dict = {}
     for col in df.columns:
         cl = col.lower().replace(" ", "_").replace(" ", "_")
         if ("year" in cl or "año" in cl or "fiscal" in cl) and "fiscal_year" not in rename.values():
@@ -317,7 +317,7 @@ def _normalize_records(records: list[dict], logger) -> pd.DataFrame:
     return df
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

@@ -217,7 +217,11 @@ def _parse_pension_excel(content: bytes, url: str, fund_hint: str, logger) -> li
                     ):
                         fy_col = col
                         break
-                record = {"source_doc": url, "fund_name": fund_hint, "report_type": "annual_report"}
+                record: dict = {
+                    "source_doc": url,
+                    "fund_name": fund_hint,
+                    "report_type": "annual_report",
+                }
                 if fy_col:
                     years = pd.to_numeric(df[fy_col], errors="coerce").dropna()
                     if not years.empty:
@@ -265,7 +269,7 @@ def _fetch_from_site(
     session: requests.Session, base_url: str, fund_name: str, logger
 ) -> list[dict]:
     """Fetch pension data from a specific agency website."""
-    rows = []
+    rows: list = []
     resp = _get(session, base_url, logger)
     if not resp:
         return rows
@@ -313,7 +317,7 @@ def _fetch_oversight_board_pension(session: requests.Session, logger) -> list[di
     return rows
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

@@ -115,7 +115,7 @@ def _paginate(session: requests.Session, logger) -> list[dict]:
     Paginate sbir.gov awards API for PR firms.
     Tries api.sbir.gov first, falls back to www.sbir.gov.
     """
-    all_records = []
+    all_records: list = []
 
     for base_url, count_field, data_field, start_param, size_param, state_param in [
         (SBIR_API_URL, "totalCount", "data", "start", "rows", "state"),
@@ -224,11 +224,11 @@ def _file_has_data(filepath: Path) -> bool:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None) -> dict:
+def run(root: Path | None = None) -> dict:
     return _run(root=root, force=False)
 
 
-def _run(root: Path = None, force: bool = False) -> dict:
+def _run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

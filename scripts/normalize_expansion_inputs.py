@@ -152,7 +152,7 @@ def normalize_file(input_path: Path, output_dir: Path, logger) -> dict:
     """
     Normalize a single expansion CSV. Returns a result dict.
     """
-    result = {
+    result: dict = {
         "filename": input_path.name,
         "input_rows": 0,
         "output_rows": 0,
@@ -263,7 +263,7 @@ def normalize_file(input_path: Path, output_dir: Path, logger) -> dict:
     return result
 
 
-def normalize_all(root: Path = None) -> list:
+def normalize_all(root: Path | None = None) -> list:
     """Normalize all expansion CSVs. Returns list of result dicts."""
     if root is None:
         root = PROJECT_ROOT
@@ -335,7 +335,7 @@ def print_report(results: list, logger) -> None:
     logger.info("")
 
 
-def main(root: Path = None) -> int:
+def main(root: Path | None = None) -> int:
     """Run normalization. Returns count of successfully normalized files."""
     if root is None:
         root = PROJECT_ROOT

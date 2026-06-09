@@ -162,7 +162,7 @@ def _normalize_name(name: str) -> str:
 
 
 def _fetch_ncua_search_api(session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     logger.info("  Querying NCUA credit union search API for PR...")
     params = {"state": "PR", "pageSize": 1000, "pageNumber": 1}
     resp = _get(session, NCUA_SEARCH_API, params, logger)
@@ -299,7 +299,7 @@ def _fetch_ncua_bulk(session, logger) -> list[dict]:
     return rows
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)

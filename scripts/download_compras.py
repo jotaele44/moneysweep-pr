@@ -247,7 +247,7 @@ def _normalize_award(r: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False, max_pages: int = DEFAULT_MAX_PAGES) -> dict:
+def run(root: Path | None = None, force: bool = False, max_pages: int = DEFAULT_MAX_PAGES) -> dict:
     root = Path(root or PROJECT_ROOT)
     raw_dir = root / "data" / "staging" / "raw" / "compras"
     out_dir = root / "data" / "staging" / "processed"
@@ -268,7 +268,7 @@ def run(root: Path = None, force: bool = False, max_pages: int = DEFAULT_MAX_PAG
         return {"status": "CACHED", "rfp_rows": rfp_rows, "award_rows": award_rows}
 
     session = _session()
-    results = {"rfps": [], "awards": []}
+    results: dict = {"rfps": [], "awards": []}
 
     for record_type, endpoints in COMPRAS_ENDPOINTS.items():
         for endpoint in endpoints:

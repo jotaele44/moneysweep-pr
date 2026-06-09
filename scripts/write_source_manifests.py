@@ -78,7 +78,7 @@ def run(
     else:
         sources = all_sources(root)
 
-    results = {}
+    results: dict = {}
     for src in sources:
         sid = src["source_id"]
         items = _profile_source(root, src)

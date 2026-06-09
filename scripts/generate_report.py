@@ -540,7 +540,7 @@ def _section_tax_incentive(
     ti_df = pd.DataFrame(rows)
 
     # cross-ref with federal awards
-    dual = []
+    dual = pd.DataFrame()
     if not entity_df.empty and "canonical_name_normalized" in entity_df.columns:
         entity_norms = set(entity_df["canonical_name_normalized"].dropna().apply(_norm))
         dual_keys = set(ti_df["norm_key"]) & entity_norms
@@ -659,7 +659,7 @@ def _section_promesa(
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> dict:
+def run(root: Path | None = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> dict:
     root = Path(root or PROJECT_ROOT)
     proc = root / "data" / "staging" / "processed"
     reports_dir = root / "data" / "reports"

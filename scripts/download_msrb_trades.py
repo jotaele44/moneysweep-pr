@@ -268,7 +268,9 @@ def _normalize_trade(r: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False, max_cusips: int = DEFAULT_MAX_CUSIPS) -> dict:
+def run(
+    root: Path | None = None, force: bool = False, max_cusips: int = DEFAULT_MAX_CUSIPS
+) -> dict:
     root = Path(root or PROJECT_ROOT)
     proc = root / "data" / "staging" / "processed"
     out_path = proc / "pr_msrb_trades.csv"

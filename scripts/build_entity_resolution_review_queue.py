@@ -101,7 +101,7 @@ def check(rows: list[dict[str, Any]], root: Path | None = None) -> list[str]:
     if len(set(ids)) != len(ids):
         problems.append("duplicate review_id values present")
     # Referential integrity: every queued object_id must exist in the person master.
-    known = set()
+    known: set = set()
     with (root / PERSON_MASTER).open(newline="", encoding="utf-8") as fh:
         known.update(r["person_id"] for r in csv.DictReader(fh))
     for i, row in enumerate(rows, start=1):

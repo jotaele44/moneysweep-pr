@@ -20,6 +20,8 @@ Usage:
 
 from __future__ import annotations
 
+from typing import Any
+
 import argparse
 import sys
 import time
@@ -136,7 +138,7 @@ def _session() -> requests.Session:
     return s
 
 
-def _get(session: requests.Session, url: str, params: dict, logger) -> dict | list | None:
+def _get(session: requests.Session, url: str, params: dict, logger) -> Any:
     for attempt in range(MAX_RETRIES):
         try:
             resp = session.get(url, params=params, timeout=60)
@@ -161,7 +163,7 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | li
 
 
 def _fetch_13f_filings(session: requests.Session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     # EDGAR full-text search for 13F-HR filings mentioning Puerto Rico
     params = {
         "q": '"Puerto Rico"',
@@ -202,7 +204,7 @@ def _fetch_13f_filings(session: requests.Session, logger) -> list[dict]:
 
 
 def _fetch_nport_filings(session: requests.Session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     # EDGAR N-PORT search for PR bond exposure
     params = {
         "q": '"Puerto Rico" "municipal"',
@@ -280,7 +282,7 @@ def _fetch_known_fund_submissions(session: requests.Session, logger) -> list[dic
     return rows
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)

@@ -228,14 +228,14 @@ def _fetch_usaspending_va(session: requests.Session, logger) -> list[dict]:
 
 def _fetch_va_open_data(session: requests.Session, logger) -> list[dict]:
     """Query data.va.gov CKAN API for PR-related datasets."""
-    rows = []
+    rows: list = []
     try:
         search_url = f"{VA_OPEN_DATA_BASE}/api/views"
         data = _get(session, search_url, {"limit": 50}, logger)
         if not data:
             return rows
 
-        items = data if isinstance(data, list) else []
+        items: list = data if isinstance(data, list) else []
         for view in items[:10]:
             view_id = view.get("id", "")
             if not view_id:
@@ -266,7 +266,7 @@ def _normalize_records(records: list[dict], source_system: str, logger) -> pd.Da
 
     df = pd.json_normalize(records)
 
-    rename = {}
+    rename: dict = {}
     for col in df.columns:
         cl = col.lower().replace(" ", "_").replace("-", "_")
         if ("fiscal_year" in cl or "fy" == cl) and "fiscal_year" not in rename.values():
@@ -316,7 +316,7 @@ def _normalize_records(records: list[dict], source_system: str, logger) -> pd.Da
     return df[VA_COLUMNS]
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

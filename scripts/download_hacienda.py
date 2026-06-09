@@ -199,7 +199,7 @@ def _parse_month_year(text: str):
 
 
 def _scrape_hacienda(session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     logger.info("  Scraping Hacienda monthly revenue bulletins...")
     resp = _get(session, HACIENDA_BULLETINS_URL, {}, logger)
     if not resp:
@@ -275,7 +275,7 @@ def _scrape_hacienda(session, logger) -> list[dict]:
 
 
 def _fetch_pr_data_portal(session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     logger.info("  Searching PR data portal for Hacienda revenue datasets...")
     params = {"q": "hacienda ingresos recaudacion", "rows": 10}
     resp = _get(session, PR_DATA_SEARCH, params, logger)
@@ -332,7 +332,7 @@ def _fetch_pr_data_portal(session, logger) -> list[dict]:
     return rows
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)

@@ -719,7 +719,7 @@ def _records_to_underwriter_df(records: list[dict]) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

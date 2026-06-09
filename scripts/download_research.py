@@ -199,7 +199,7 @@ def download_nih(root: Path, force: bool, logger) -> pd.DataFrame:
 
     logger.info("NIH RePORTER: starting download (PR grants, 2000-2025)...")
 
-    all_records = []
+    all_records: list = []
     offset = 0
     total = None
     page_num = 0
@@ -345,7 +345,7 @@ def download_nsf(root: Path, force: bool, logger) -> pd.DataFrame:
 
     logger.info("NSF Awards: starting download (PR institutions, 2000-2025)...")
 
-    all_records = []
+    all_records: list = []
     offset = 1  # NSF uses 1-based offset
     page_num = 0
 
@@ -509,7 +509,7 @@ def build_master(nih_df: pd.DataFrame, nsf_df: pd.DataFrame, root: Path, logger)
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None) -> dict:
+def run(root: Path | None = None) -> dict:
     """
     Main programmatic entry point.
 
@@ -526,7 +526,7 @@ def run(root: Path = None) -> dict:
 
 
 def _run_internal(
-    root: Path = None,
+    root: Path | None = None,
     nih_only: bool = False,
     nsf_only: bool = False,
     force: bool = False,
