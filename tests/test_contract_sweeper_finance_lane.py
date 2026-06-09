@@ -7,10 +7,16 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from contract_sweeper.validation.canonical_v1_schema import validate_row  # noqa: E402
 from readiness.contract_sweeper_finance_lane import (  # noqa: E402
+    EXPORT_CONTRACT_VERSION,
     FINANCE_FIELDS,
     ContractSweeperFinanceLaneError,
     build_contract_sweeper_finance_lane,
+)
+
+_REPORT_SCHEMA = Path(__file__).resolve().parents[1] / (
+    "schemas/contract_sweeper_finance_lane_report.schema.json"
 )
 
 # the real router derivative columns (from scripts/route_pr_intake.py output)
@@ -157,3 +163,30 @@ def test_finance_records_carry_no_geometry(tmp_path):
     funding = _read(tmp_path / "out" / "data" / "normalized" / "funding_event_leads.csv")
     assert set(funding[0].keys()) == set(FINANCE_FIELDS)
     assert "latitude" not in funding[0] and "longitude" not in funding[0]
+
+
+# --------------------------------------------------------------------------- #
+# Report-contract hardening (Wave E)
+# --------------------------------------------------------------------------- #
+
+
+def test_report_pins_export_contract_version():
+    """The finance-lane report contract is 1.0.0 — bumping it is a deliberate,
+    cross-repo-coordinated act, so lock it down here (see schemas/README.md)."""
+    assert EXPORT_CONTRACT_VERSION == "1.0.0"
+
+
+def test_emitted_report_conforms_to_schema(tmp_path):
+    """An emitted report validates against its draft-07 schema (via the repo's
+    stdlib validator) and carries the pinned contract version."""
+    report = build_contract_sweeper_finance_lane(_write(tmp_path, [_row()]), tmp_path / "out")
+    schema = json.loads(_REPORT_SCHEMA.read_text(encoding="utf-8"))
+
+    errors = validate_row(report, schema)
+    assert errors == [], f"emitted report violates its schema: {errors}"
+
+    # The report's own contract version must match the module constant.
+    assert report["export_contract_version"] == EXPORT_CONTRACT_VERSION == "1.0.0"
+
+    # Schema must enumerate exactly the keys the builder emits (no drift either way).
+    assert set(schema["required"]) == set(report)
