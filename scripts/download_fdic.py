@@ -441,7 +441,7 @@ def _download_financials(session: requests.Session, certs: list[str], logger) ->
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

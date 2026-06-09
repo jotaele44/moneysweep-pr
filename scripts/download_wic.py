@@ -226,7 +226,7 @@ def _fetch_fns_excel(session, logger) -> list[dict]:
 
 
 def _fetch_data_gov(session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     logger.info("  Searching data.gov for WIC Puerto Rico datasets...")
     params = {"q": "WIC women infants children Puerto Rico nutrition", "rows": 10}
     resp = _get(session, DATA_GOV_SEARCH, params, logger)
@@ -347,7 +347,7 @@ def _fetch_usaspending(session, logger) -> list[dict]:
     return rows
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)

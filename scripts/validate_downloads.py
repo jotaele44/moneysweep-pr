@@ -23,7 +23,7 @@ def validate_file(filepath: Path, logger) -> dict:
     - filename, exists, rows, date_col, vendor_col, agency_col, amount_col,
       has_data (at least one row with non-null vendor+agency+amount), status
     """
-    result = {
+    result: dict = {
         "filename": filepath.name,
         "exists": False,
         "rows": 0,
@@ -112,7 +112,7 @@ def validate_file(filepath: Path, logger) -> dict:
     return result
 
 
-def validate_all(root: Path = None) -> list:
+def validate_all(root: Path | None = None) -> list:
     """Validate all expected expansion files. Returns list of result dicts."""
     if root is None:
         root = PROJECT_ROOT
@@ -187,7 +187,7 @@ def print_report(results: list, logger) -> None:
             logger.info("Then re-run: python3 scripts/validate_downloads.py")
 
 
-def main(root: Path = None) -> int:
+def main(root: Path | None = None) -> int:
     """
     Run download validation. Returns:
     0 = all pass, 1 = any fail, 2 = warnings only

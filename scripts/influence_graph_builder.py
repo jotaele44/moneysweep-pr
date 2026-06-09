@@ -143,7 +143,8 @@ def _load_entity_index(root: Path) -> dict[str, dict]:
     for row in _read_csv(root / "data/staging/processed/entities_resolved.csv"):
         uei = row.get("entity_uei", "").strip()
         name = row.get("normalized_name", "").strip()
-        for key in filter(None, [uei, name]):
+        keys: list[str] = [k for k in (uei, name) if k]
+        for key in keys:
             idx.setdefault(key, row)
     return idx
 

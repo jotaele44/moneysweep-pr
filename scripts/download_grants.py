@@ -462,7 +462,7 @@ def download_pass(
     if fy_start is not None:
         windows = [w for w in windows if int(w["label"]) >= fy_start]
 
-    stats = {"prefix": prefix, "rows": 0, "errors": []}
+    stats: dict = {"prefix": prefix, "rows": 0, "errors": []}
     logger.info(f"  [{prefix}] Running {len(windows)} FY windows (filter={filter_type})")
 
     consecutive_failures = 0
@@ -547,13 +547,13 @@ def build_master(raw_dir: Path, master_path: Path, logger) -> int:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None) -> dict:
+def run(root: Path | None = None) -> dict:
     """Main entry point (no --force). Returns summary dict."""
     return _run(root=root, force=False, only_pass=None, fy_start=None)
 
 
 def _run(
-    root: Path = None,
+    root: Path | None = None,
     force: bool = False,
     only_pass: str | None = None,
     fy_start: int | None = None,

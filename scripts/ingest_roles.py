@@ -59,7 +59,7 @@ ROLES_COLUMNS = [
 ]
 
 
-def role_id(person_id: str, entity_id: str, role_title: str) -> str:
+def role_id(person_id: str | None, entity_id: str | None, role_title: str) -> str:
     """Deterministic role id from (person, entity, title)."""
     return f"role_{name_hash(f'{person_id}|{entity_id}|{role_title}')}"
 

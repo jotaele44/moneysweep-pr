@@ -169,7 +169,7 @@ def _build_usaspending_payload(entry: dict) -> tuple:
     # spending_by_award only supports data from 2007-10-01 onward
     effective_start = max(year_start, USASPENDING_MIN_YEAR)
 
-    payload_filters = {
+    payload_filters: dict = {
         "time_period": [
             {"start_date": f"{effective_start}-10-01", "end_date": f"{year_end}-09-30"}
         ],
@@ -385,8 +385,8 @@ def download_usaspending_bulk(
     output_dir: Path,
     logger,
     session: requests.Session,
-    fy_start: int = None,
-    fy_end: int = None,
+    fy_start: int | None = None,
+    fy_end: int | None = None,
 ) -> dict:
     """Download via the USASpending bulk_download/awards/ async API.
 
@@ -614,7 +614,8 @@ def download_fpds(entry: dict, output_dir: Path, logger, session: requests.Sessi
     while True:
         url = (
             f"{FPDS_BASE}?s=FPDS&indexName=awardfull&templateName=1.5.3"
-            f"&q={requests.utils.quote(query)}&start={offset}&length={page_size}"
+            # requests.utils.quote is re-exported at runtime but absent from the stubs.
+            f"&q={requests.utils.quote(query)}&start={offset}&length={page_size}"  # type: ignore[attr-defined]
         )
 
         try:
@@ -810,7 +811,7 @@ def download_single(
         }
 
 
-def download_all(root: Path = None, force: bool = False, only: str = None) -> list:
+def download_all(root: Path | None = None, force: bool = False, only: str | None = None) -> list:
     """Download all expansion datasets. Returns list of result dicts."""
     if root is None:
         root = PROJECT_ROOT
@@ -890,7 +891,7 @@ def print_download_summary(results: list, logger) -> None:
                 logger.info(f"  {r['filename']}: see DOWNLOAD_INSTRUCTIONS.md")
 
 
-def main(root: Path = None, force: bool = False, only: str = None) -> int:
+def main(root: Path | None = None, force: bool = False, only: str | None = None) -> int:
     """Run auto-download. Returns count of successfully downloaded files."""
     if root is None:
         root = PROJECT_ROOT

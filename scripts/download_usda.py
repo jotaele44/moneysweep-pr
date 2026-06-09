@@ -72,7 +72,7 @@ FIELDS = [
     "Description",
 ]
 
-TIME_WINDOWS = [
+TIME_WINDOWS: list[dict] = [
     {"label": "2000f2009", "start_date": "2007-10-01", "end_date": "2009-09-30", "fy_start": 2000},
     {"label": "2010f2017", "start_date": "2010-10-01", "end_date": "2017-09-30", "fy_start": 2010},
     {"label": "2018f2022", "start_date": "2018-10-01", "end_date": "2022-09-30", "fy_start": 2018},
@@ -283,11 +283,11 @@ def build_master(raw_dir: Path, master_path: Path, logger) -> int:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None) -> dict:
+def run(root: Path | None = None) -> dict:
     return _run(root=root, force=False, fy_start=None)
 
 
-def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
+def _run(root: Path | None = None, force: bool = False, fy_start: int | None = None) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

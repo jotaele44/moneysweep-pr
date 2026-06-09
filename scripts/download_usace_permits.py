@@ -176,7 +176,7 @@ def _build_output(df: pd.DataFrame) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     root = Path(root or PROJECT_ROOT)
     raw_dir = root / "data" / "staging" / "raw" / "usace"
     out_path = root / "data" / "staging" / "processed" / "pr_usace_permits.csv"

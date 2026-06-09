@@ -129,7 +129,7 @@ def _get(session, url, params, logger):
 
 
 def _fetch_medicaid_gov(session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     logger.info("  Searching data.medicaid.gov for CHIP datasets...")
     resp = _get(session, MEDICAID_GOV_API, {"%5B%5D": "keyword=chip"}, logger)
     if not resp:
@@ -206,7 +206,7 @@ def _fetch_medicaid_gov(session, logger) -> list[dict]:
 
 
 def _fetch_data_gov(session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     logger.info("  Searching data.gov for CHIP Puerto Rico datasets...")
     params = {"q": "CHIP children health insurance Puerto Rico", "rows": 10}
     resp = _get(session, DATA_GOV_SEARCH, params, logger)
@@ -271,7 +271,7 @@ def _fetch_data_gov(session, logger) -> list[dict]:
     return rows
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)

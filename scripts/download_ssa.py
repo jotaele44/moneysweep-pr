@@ -169,14 +169,14 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
 
 def _fetch_ssa_open_data(session: requests.Session, logger) -> list[dict]:
     """Query SSA Open Data CKAN API for PR benefit data."""
-    rows = []
+    rows: list = []
     try:
         search_url = f"{SSA_OPEN_DATA_BASE}/api/views"
         data = _get(session, search_url, {"limit": 100}, logger)
         if not data:
             return rows
 
-        items = data if isinstance(data, list) else []
+        items: list = data if isinstance(data, list) else []
         pr_views = [
             v
             for v in items
@@ -271,7 +271,7 @@ def _normalize_records(records: list[dict], logger) -> pd.DataFrame:
 
     df = pd.json_normalize(records)
 
-    rename = {}
+    rename: dict = {}
     for col in df.columns:
         cl = col.lower().replace(" ", "_").replace("-", "_")
         if ("year" in cl or cl == "fy") and "calendar_year" not in rename.values():
@@ -305,7 +305,7 @@ def _normalize_records(records: list[dict], logger) -> pd.DataFrame:
     return df[SSA_COLUMNS]
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

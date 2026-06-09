@@ -591,12 +591,12 @@ def _normalize_local_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None) -> dict:
+def run(root: Path | None = None) -> dict:
     """Main entry point (no --force). Returns summary dict."""
     return _run(root=root, force=False)
 
 
-def _run(root: Path = None, force: bool = False) -> dict:
+def _run(root: Path | None = None, force: bool = False) -> dict:
     """Internal runner used by both run() and main()."""
     if root is None:
         root = PROJECT_ROOT

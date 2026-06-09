@@ -189,7 +189,7 @@ def _eqb_violations(entity_norm: str, eqb_df: pd.DataFrame) -> tuple[int, int]:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     root = Path(root or PROJECT_ROOT)
     proc = root / "data" / "staging" / "processed"
     out_path = proc / "pr_delivery_scorecard.csv"
@@ -198,9 +198,9 @@ def run(root: Path = None, force: bool = False) -> dict:
     logger = setup_logging("analyze_project_delivery", log_dir=root / "data" / "logs")
 
     if out_path.exists() and not force:
-        rows = sum(1 for _ in open(out_path)) - 1
-        logger.info(f"  Delivery scorecard: exists ({rows:,} rows) — skipping (use --force).")
-        return {"status": "CACHED", "rows": rows}
+        row_count = sum(1 for _ in open(out_path)) - 1
+        logger.info(f"  Delivery scorecard: exists ({row_count:,} rows) — skipping (use --force).")
+        return {"status": "CACHED", "rows": row_count}
 
     # Load all inputs
     entity_df = _load(proc / "entity_master.csv", "entity_master", logger)

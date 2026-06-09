@@ -146,7 +146,7 @@ def _get_json(session: requests.Session, url: str, params: dict, logger) -> list
 
 def _fetch_cms_catalog(session: requests.Session, logger) -> list[str]:
     """Search CMS data catalog for Part A and Part D datasets."""
-    resource_urls = []
+    resource_urls: list = []
     try:
         catalog_url = f"{CMS_DATA_BASE}/data.json"
         data = _get_json(session, catalog_url, {}, logger)
@@ -184,7 +184,7 @@ def _fetch_resource(
     filter_clause = " OR ".join(f"state='{f}'" for f in pr_filters)
 
     while True:
-        params = {
+        params: dict = {
             "$limit": limit,
             "$offset": offset,
         }
@@ -203,7 +203,7 @@ def _fetch_resource(
     return rows
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 
@@ -269,7 +269,7 @@ def run(root: Path = None, force: bool = False) -> dict:
     df = pd.json_normalize(all_records)
 
     # Flexible column mapping
-    rename = {}
+    rename: dict = {}
     for col in df.columns:
         cl = col.lower().replace(" ", "_").replace("-", "_")
         if ("year" in cl) and "calendar_year" not in rename.values():

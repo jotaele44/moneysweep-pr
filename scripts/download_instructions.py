@@ -181,7 +181,7 @@ whatever records are available.
 """
 
 
-def generate_instructions(root: Path = None) -> Path:
+def generate_instructions(root: Path | None = None) -> Path:
     """Generate DOWNLOAD_INSTRUCTIONS.md and manifest.json. Returns path to MD file."""
     if root is None:
         root = PROJECT_ROOT
@@ -213,7 +213,7 @@ def generate_instructions(root: Path = None) -> Path:
         "- **Vendor**: Vendor State = PR\n\n",
     ]
 
-    generators = {
+    generators: dict = {
         "FPDS": _generate_fpds_instructions,
         "USASpending": {
             "idv": _generate_usaspending_idv_instructions,
@@ -297,7 +297,7 @@ def generate_instructions(root: Path = None) -> Path:
     return md_path
 
 
-def main(root: Path = None) -> int:
+def main(root: Path | None = None) -> int:
     """Generate download instructions. Returns 0 on success."""
     if root is None:
         root = PROJECT_ROOT

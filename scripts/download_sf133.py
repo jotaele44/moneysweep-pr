@@ -195,7 +195,9 @@ def _fetch_accounts(
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False, fy_start: int = 2017, fy_end: int = 2026) -> dict:
+def run(
+    root: Path | None = None, force: bool = False, fy_start: int = 2017, fy_end: int = 2026
+) -> dict:
     root = Path(root or PROJECT_ROOT)
     out_path = root / "data" / "staging" / "processed" / "pr_sf133_budget_execution.csv"
     out_path.parent.mkdir(parents=True, exist_ok=True)

@@ -166,8 +166,8 @@ def main_with_args(argv: Sequence[str] | None = None) -> int:
             )
 
     status_counts: Dict[str, int] = {}
-    for result in results:
-        status = str(result.get("final_status") or "")
+    for summary_row in results:
+        status = str(summary_row.get("final_status") or "")
         status_counts[status] = status_counts.get(status, 0) + 1
 
     summary = {

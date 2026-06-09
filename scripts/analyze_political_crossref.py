@@ -426,7 +426,7 @@ CABILDERO_CROSSREF_COLUMNS = [
 
 
 def _blank_cabildero_record(norm: str) -> dict:
-    rec = {col: "" for col in CABILDERO_CROSSREF_COLUMNS}
+    rec: dict = {col: "" for col in CABILDERO_CROSSREF_COLUMNS}
     rec["normalized_name"] = norm
     rec["lda_filing_count"] = 0
     rec["lda_total_income"] = 0.0

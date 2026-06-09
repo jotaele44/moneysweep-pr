@@ -104,8 +104,8 @@ def map_fdic_resource(df: pd.DataFrame, resource_type: str) -> tuple:
     config = FDIC_MAPPINGS[resource_type]
 
     # Validate dates and amounts
-    date_validation = validate_dates(df, config["date_cols"])
-    amount_validation = validate_amounts(df, config["amount_cols"])
+    date_validation = validate_dates(df, list(config["date_cols"]))
+    amount_validation = validate_amounts(df, list(config["amount_cols"]))
 
     # Check for threshold violations (>5% unparsed = warning)
     threshold = 95.0

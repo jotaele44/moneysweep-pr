@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts.config import ALL_DIRS, PROJECT_ROOT, setup_logging
 
 
-def main(root: Path = None) -> int:
+def main(root: Path | None = None) -> int:
     """Create all pipeline directories. Returns 0 on success."""
     if root is None:
         root = PROJECT_ROOT

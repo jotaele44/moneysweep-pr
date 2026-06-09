@@ -233,7 +233,7 @@ def parse_records(raw_records: list[dict]) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     root = Path(root or PROJECT_ROOT)
     raw_dir = root / "data" / "staging" / "raw" / "cor3"
     out_path = root / "data" / "staging" / "processed" / "pr_cor3_projects.csv"

@@ -181,7 +181,7 @@ def classify_status(row: dict[str, str], canon: str, cleaned: str) -> tuple[str,
     return "review", "needs_corrob_or_alias_resolution"
 
 
-def read_csv(path: Path) -> list[dict[str, str]]:
+def read_csv(path: Path) -> list[dict[str, Any]]:
     with path.open("r", encoding="utf-8-sig", newline="") as f:
         return list(csv.DictReader(f))
 
@@ -247,7 +247,7 @@ def main() -> int:
                     pass
             else:
                 datasets.update([x for x in ds.split(";") if x])
-        merged = dict(best)
+        merged: dict = dict(best)
         merged["alias_count"] = len(items)
         merged["merged_temporal_edges"] = int(total_edges)
         merged["merged_dataset_count"] = len(datasets)

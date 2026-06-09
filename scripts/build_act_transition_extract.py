@@ -141,7 +141,7 @@ def _split_contract(contract_number: str, suffix_sep: str) -> tuple[str, str]:
     return m.group(1), (m.group(2) or "").strip()
 
 
-def _is_header(row: list[str]) -> bool:
+def _is_header(row: list[str | None]) -> bool:
     return any("contratista" in (c or "").lower() for c in row)
 
 
@@ -160,7 +160,7 @@ def _resolve_pdf(flag: Path | None, drop_subdir: str, logger) -> Path | None:
 
 
 def extract_pdf(pdf_path: Path, source_key: str, logger) -> list[dict[str, str]]:
-    cfg = SOURCES[source_key]
+    cfg: dict = SOURCES[source_key]
     order = cfg["order"]
     rows: list[dict[str, str]] = []
     with pdfplumber.open(pdf_path) as pdf:

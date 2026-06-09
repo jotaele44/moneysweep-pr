@@ -115,7 +115,7 @@ def _match_to_entity(name_norm: str, entity_norms: pd.Series) -> bool:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     root = Path(root or PROJECT_ROOT)
     proc = root / "data" / "staging" / "processed"
     out_path = proc / "pr_bond_flow.csv"
@@ -137,9 +137,9 @@ def run(root: Path = None, force: bool = False) -> dict:
         logger.info(f"  Bond claim tier: {bond_tier}")
 
     if out_path.exists() and not force:
-        rows = sum(1 for _ in open(out_path)) - 1
-        logger.info(f"  Bond flow: exists ({rows:,} rows) — skipping (use --force).")
-        return {"status": "CACHED", "rows": rows, "claim_tier": bond_tier}
+        row_count = sum(1 for _ in open(out_path)) - 1
+        logger.info(f"  Bond flow: exists ({row_count:,} rows) — skipping (use --force).")
+        return {"status": "CACHED", "rows": row_count, "claim_tier": bond_tier}
 
     # Load inputs
     bonds_df = _load(proc / "pr_emma_bonds.csv", "EMMA bonds", logger)

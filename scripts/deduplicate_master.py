@@ -81,7 +81,7 @@ def deduplicate(df: pd.DataFrame, logger) -> pd.DataFrame:
     return df
 
 
-def main(root: Path = None) -> dict:
+def main(root: Path | None = None) -> dict:
     """Build and write pr_contracts_master.csv. Returns stats dict."""
     if root is None:
         root = PROJECT_ROOT

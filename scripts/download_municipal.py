@@ -290,7 +290,9 @@ def _fetch_county_awards(session, fy: int, logger) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False, fy_start: int = 2017, fy_end: int = 2026) -> dict:
+def run(
+    root: Path | None = None, force: bool = False, fy_start: int = 2017, fy_end: int = 2026
+) -> dict:
     root = Path(root or PROJECT_ROOT)
     out_path = root / "data" / "staging" / "processed" / "pr_municipal_finance.csv"
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -298,12 +300,14 @@ def run(root: Path = None, force: bool = False, fy_start: int = 2017, fy_end: in
     logger = setup_logging("download_municipal", log_dir=root / "data" / "logs")
 
     if out_path.exists() and not force:
-        rows = sum(1 for _ in open(out_path)) - 1
-        logger.info(f"  Municipal: {out_path.name} exists ({rows:,} rows) — skipping. Use --force.")
-        return {"status": "CACHED", "rows": rows}
+        row_count = sum(1 for _ in open(out_path)) - 1
+        logger.info(
+            f"  Municipal: {out_path.name} exists ({row_count:,} rows) — skipping. Use --force."
+        )
+        return {"status": "CACHED", "rows": row_count}
 
     session = _session()
-    all_rows = []
+    all_rows: list = []
 
     for fy in range(fy_start, fy_end + 1):
         logger.info(f"  Fetching PR county awards FY{fy}...")

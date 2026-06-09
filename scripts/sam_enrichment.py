@@ -411,7 +411,7 @@ def merge_into_master(results: dict, root: Path, output_dir: Path, logger) -> No
 
     with open(master_path) as f:
         reader = csv.DictReader(f)
-        fieldnames = reader.fieldnames or []
+        fieldnames = list(reader.fieldnames or [])
         rows = list(reader)
 
     for col in ("recipient_uei", "recipient_cage", "recipient_duns", "parent_uei", "parent_name"):
@@ -449,7 +449,9 @@ def merge_into_master(results: dict, root: Path, output_dir: Path, logger) -> No
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, resume: bool = False, dry_run: bool = False, top_n: int = None) -> dict:
+def run(
+    root: Path | None = None, resume: bool = False, dry_run: bool = False, top_n: int | None = None
+) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

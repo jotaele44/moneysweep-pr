@@ -628,7 +628,7 @@ def run(
     # Sort by fiscal year key
     by_fiscal_year = dict(sorted(by_fiscal_year.items()))
 
-    summary = {
+    summary: dict = {
         "total_rows": total_rows,
         "total_obligation_usd": total_obligation,
         "by_dataset": by_dataset,

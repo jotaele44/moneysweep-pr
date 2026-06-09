@@ -138,7 +138,7 @@ ALL_DIRS = [
 # Download manifest — the 13 expected expansion files
 # ---------------------------------------------------------------------------
 
-DOWNLOAD_MANIFEST = [
+DOWNLOAD_MANIFEST: list[dict] = [
     # ---- FPDS: 4 time windows x 2 filter types = 8 files ----
     {
         "filename": "expansion_fpds_2000_2004_direct.csv",
@@ -506,7 +506,7 @@ def read_csv_safe(filepath, nrows=None):
     raise RuntimeError(f"Failed to read {filepath}: {last_err}")
 
 
-def setup_logging(log_name: str, log_dir: Path = None) -> logging.Logger:
+def setup_logging(log_name: str, log_dir: Path | None = None) -> logging.Logger:
     """
     Set up a logger that writes to stdout and a log file.
     Creates log directory if needed.
@@ -551,7 +551,7 @@ def get_normalized_filename(expansion_filename: str) -> str:
 
 def _load_dotenv(path: Path) -> dict:
     """Minimal .env parser: KEY=value per line, ignores comments and blanks."""
-    out = {}
+    out: dict = {}
     if not path.exists():
         return out
     for raw in path.read_text(encoding="utf-8").splitlines():

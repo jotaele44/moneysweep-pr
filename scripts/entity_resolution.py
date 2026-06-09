@@ -259,7 +259,7 @@ def resolve_vendor(vendor: dict, sam_index: dict, cache: dict, logger) -> dict:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, top_n: int = TOP_N_DEFAULT, resume: bool = False) -> Path:
+def run(root: Path | None = None, top_n: int = TOP_N_DEFAULT, resume: bool = False) -> Path:
     if root is None:
         root = PROJECT_ROOT
 

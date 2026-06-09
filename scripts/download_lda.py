@@ -248,7 +248,7 @@ def _fetch_pass(session: requests.Session, state_param: str, logger) -> list[dic
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
+def run(root: Path | None = None, api_key: str | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

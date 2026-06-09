@@ -23,6 +23,8 @@ Usage:
 
 from __future__ import annotations
 
+from typing import Any
+
 import argparse
 import sys
 import time
@@ -141,7 +143,7 @@ def _session() -> requests.Session:
     return s
 
 
-def _get(session: requests.Session, url: str, params: dict, logger) -> dict | list | None:
+def _get(session: requests.Session, url: str, params: dict, logger) -> Any:
     for attempt in range(MAX_RETRIES):
         try:
             resp = session.get(url, params=params, timeout=60)
@@ -258,7 +260,7 @@ def _extract_annual_series(
                 ]
                 if annual:
                     # Deduplicate by (end date) keeping latest filed
-                    by_end = {}
+                    by_end: dict = {}
                     for e in annual:
                         end = e["end"][:4]  # fiscal year
                         if end not in by_end or e.get("filed", "") > by_end[end].get("filed", ""):
@@ -273,7 +275,7 @@ def _extract_annual_series(
 
 
 def _company_financials(cik: str, ticker: str, name: str, facts: dict) -> list[dict]:
-    series_by_concept = {}
+    series_by_concept: dict = {}
     for field, concepts in XBRL_CONCEPTS.items():
         unit = (
             "pure"
@@ -301,7 +303,7 @@ def _company_financials(cik: str, ticker: str, name: str, facts: dict) -> list[d
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

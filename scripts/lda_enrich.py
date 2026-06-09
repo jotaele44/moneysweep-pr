@@ -271,7 +271,10 @@ def _flatten(rec: dict) -> dict:
 
 
 def run(
-    root: Path = None, api_key: str | None = None, top_n: int = TOP_N_DEFAULT, force: bool = False
+    root: Path | None = None,
+    api_key: str | None = None,
+    top_n: int = TOP_N_DEFAULT,
+    force: bool = False,
 ) -> dict:
     if root is None:
         root = PROJECT_ROOT
