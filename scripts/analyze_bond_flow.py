@@ -115,7 +115,7 @@ def _match_to_entity(name_norm: str, entity_norms: pd.Series) -> bool:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     root = Path(root or PROJECT_ROOT)
     proc = root / "data" / "staging" / "processed"
     out_path = proc / "pr_bond_flow.csv"

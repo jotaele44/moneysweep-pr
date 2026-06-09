@@ -170,11 +170,11 @@ def _fetch_cycle(session: requests.Session, cycle: int, sleep_s: float, logger) 
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
+def run(root: Path | None = None, api_key: str | None = None, force: bool = False) -> dict:
     return _run(root=root, api_key=api_key, force=force)
 
 
-def _run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
+def _run(root: Path | None = None, api_key: str | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

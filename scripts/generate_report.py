@@ -659,7 +659,7 @@ def _section_promesa(
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> dict:
+def run(root: Path | None = None, force: bool = False, top_n: int = TOP_N_DEFAULT) -> dict:
     root = Path(root or PROJECT_ROOT)
     proc = root / "data" / "staging" / "processed"
     reports_dir = root / "data" / "reports"

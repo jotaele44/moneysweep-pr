@@ -487,7 +487,7 @@ def download_hmgp(force: bool, logger) -> tuple[int, str]:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None) -> dict:
+def run(root: Path | None = None) -> dict:
     """
     Download FEMA PA and HMGP datasets for Puerto Rico.
 

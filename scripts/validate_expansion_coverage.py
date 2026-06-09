@@ -185,7 +185,7 @@ def report_coverage(matrix: dict, logger) -> dict:
     }
 
 
-def main(root: Path = None) -> int:
+def main(root: Path | None = None) -> int:
     """
     Run coverage validation. Returns:
     0 = full coverage + 2007 present

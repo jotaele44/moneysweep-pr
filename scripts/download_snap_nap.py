@@ -264,7 +264,7 @@ def _fetch_fns_pages(session: requests.Session, logger) -> list[dict]:
 
 
 def _fetch_datagov(session: requests.Session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     try:
         resp = _get(
             session,
@@ -366,7 +366,7 @@ def _fetch_usaspending_nap(session: requests.Session, logger) -> list[dict]:
     return rows
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)
@@ -418,7 +418,7 @@ def run(root: Path = None, force: bool = False) -> dict:
 
     df = pd.json_normalize(all_rows)
 
-    rename = {}
+    rename: dict = {}
     for col in df.columns:
         cl = col.lower().replace(" ", "_")
         if "year" in cl and "fiscal_year" not in rename.values():

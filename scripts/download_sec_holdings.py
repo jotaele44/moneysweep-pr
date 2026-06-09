@@ -161,7 +161,7 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | li
 
 
 def _fetch_13f_filings(session: requests.Session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     # EDGAR full-text search for 13F-HR filings mentioning Puerto Rico
     params = {
         "q": '"Puerto Rico"',
@@ -202,7 +202,7 @@ def _fetch_13f_filings(session: requests.Session, logger) -> list[dict]:
 
 
 def _fetch_nport_filings(session: requests.Session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     # EDGAR N-PORT search for PR bond exposure
     params = {
         "q": '"Puerto Rico" "municipal"',
@@ -280,7 +280,7 @@ def _fetch_known_fund_submissions(session: requests.Session, logger) -> list[dic
     return rows
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)

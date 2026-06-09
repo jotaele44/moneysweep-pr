@@ -220,7 +220,7 @@ def _parse_sheet(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
     return out_df[OUTPUT_COLUMNS]
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)

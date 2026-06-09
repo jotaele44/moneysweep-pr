@@ -160,7 +160,7 @@ def compute_metrics(G: nx.DiGraph) -> dict[str, dict]:
 
 
 def run(
-    root: Path = None,
+    root: Path | None = None,
     min_obligation: float = MIN_OBLIGATION_DEFAULT,
     top_nodes: int = TOP_NODES_DEFAULT,
 ) -> dict:

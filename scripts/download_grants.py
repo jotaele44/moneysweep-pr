@@ -547,13 +547,13 @@ def build_master(raw_dir: Path, master_path: Path, logger) -> int:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None) -> dict:
+def run(root: Path | None = None) -> dict:
     """Main entry point (no --force). Returns summary dict."""
     return _run(root=root, force=False, only_pass=None, fy_start=None)
 
 
 def _run(
-    root: Path = None,
+    root: Path | None = None,
     force: bool = False,
     only_pass: str | None = None,
     fy_start: int | None = None,

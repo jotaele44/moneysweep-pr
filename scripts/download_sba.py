@@ -185,7 +185,7 @@ def _paginate_datastore(
     logger,
 ) -> list[dict]:
     """Paginate CKAN datastore_search filtered to State=PR."""
-    all_records = []
+    all_records: list = []
     offset = 0
     total = None
     filters = json.dumps({"State": "PR"})
@@ -431,12 +431,12 @@ def _file_has_data(filepath: Path) -> bool:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None) -> dict:
+def run(root: Path | None = None) -> dict:
     """Main entry point (no --force). Returns summary dict."""
     return _run(root=root, force=False)
 
 
-def _run(root: Path = None, force: bool = False) -> dict:
+def _run(root: Path | None = None, force: bool = False) -> dict:
     """Internal runner used by both run() and main()."""
     if root is None:
         root = PROJECT_ROOT

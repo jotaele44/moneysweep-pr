@@ -278,7 +278,7 @@ def _fetch_osha_bulk(session: requests.Session, logger) -> list[dict]:
 
 
 def _fetch_dol_opendata(session: requests.Session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     try:
         resp = _get(
             session,
@@ -322,7 +322,7 @@ def _normalize_records(all_rows: list[dict], logger) -> pd.DataFrame:
 
     df = pd.json_normalize(all_rows)
 
-    rename = {}
+    rename: dict = {}
     for col in df.columns:
         cl = col.lower().replace(" ", "_")
         if (
@@ -383,7 +383,7 @@ def _normalize_records(all_rows: list[dict], logger) -> pd.DataFrame:
     return df[DOL_COLUMNS]
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)

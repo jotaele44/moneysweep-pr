@@ -319,12 +319,12 @@ def build_master(raw_dir: Path, master_path: Path, logger) -> int:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None) -> dict:
+def run(root: Path | None = None) -> dict:
     """Main entry point. Returns summary dict."""
     return _run(root=root, force=False, fy_start=None)
 
 
-def _run(root: Path = None, force: bool = False, fy_start: int = None) -> dict:
+def _run(root: Path | None = None, force: bool = False, fy_start: int | None = None) -> dict:
     """Internal runner used by both run() and main()."""
     if root is None:
         root = PROJECT_ROOT

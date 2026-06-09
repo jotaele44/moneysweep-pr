@@ -171,7 +171,7 @@ def parse_records(raw_df: "pd.DataFrame | None", permit_type: str = "air") -> pd
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     root = Path(root or PROJECT_ROOT)
     out_path = root / "data" / "staging" / "processed" / "pr_eqb_permits.csv"
     out_path.parent.mkdir(parents=True, exist_ok=True)

@@ -219,7 +219,7 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
 
 def _fetch_companies(session: requests.Session, logger) -> list[dict]:
     url = f"{OC_BASE}/companies/search"
-    all_items = []
+    all_items: list = []
 
     for page in range(1, MAX_PAGES + 1):
         params = {
@@ -315,7 +315,7 @@ def _companies_to_df(items: list[dict]) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False, api_token: str | None = None) -> dict:
+def run(root: Path | None = None, force: bool = False, api_token: str | None = None) -> dict:
     if root is None:
         root = PROJECT_ROOT
     if api_token is None:

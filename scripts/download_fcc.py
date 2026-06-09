@@ -224,7 +224,7 @@ def _fetch_usac_dataset(
 
 
 def _fetch_fcc_opendata(session: requests.Session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     try:
         search_url = f"{FCC_OPENDATA_BASE}/api/views"
         data = _get_json(session, search_url, {"limit": 100}, logger)
@@ -263,7 +263,7 @@ def _normalize_records(all_rows: list[dict], logger) -> pd.DataFrame:
 
     df = pd.json_normalize(all_rows)
 
-    rename = {}
+    rename: dict = {}
     for col in df.columns:
         cl = col.lower().replace(" ", "_").replace("-", "_")
         if (
@@ -319,7 +319,7 @@ def _normalize_records(all_rows: list[dict], logger) -> pd.DataFrame:
     return df[FCC_COLUMNS]
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)

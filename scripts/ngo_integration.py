@@ -639,7 +639,7 @@ def consolidate_ngos(records: pd.DataFrame) -> pd.DataFrame:
             set(group["legal_name"].dropna().astype(str)) - {str(base.get("legal_name", ""))}
         )
         source_ids = []
-        coverage = set()
+        coverage: set = set()
         for _, row in group.iterrows():
             try:
                 source_ids.extend(json.loads(row.get("source_ids") or "[]"))

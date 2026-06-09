@@ -385,8 +385,8 @@ def download_usaspending_bulk(
     output_dir: Path,
     logger,
     session: requests.Session,
-    fy_start: int = None,
-    fy_end: int = None,
+    fy_start: int | None = None,
+    fy_end: int | None = None,
 ) -> dict:
     """Download via the USASpending bulk_download/awards/ async API.
 
@@ -810,7 +810,7 @@ def download_single(
         }
 
 
-def download_all(root: Path = None, force: bool = False, only: str = None) -> list:
+def download_all(root: Path | None = None, force: bool = False, only: str | None = None) -> list:
     """Download all expansion datasets. Returns list of result dicts."""
     if root is None:
         root = PROJECT_ROOT
@@ -890,7 +890,7 @@ def print_download_summary(results: list, logger) -> None:
                 logger.info(f"  {r['filename']}: see DOWNLOAD_INSTRUCTIONS.md")
 
 
-def main(root: Path = None, force: bool = False, only: str = None) -> int:
+def main(root: Path | None = None, force: bool = False, only: str | None = None) -> int:
     """Run auto-download. Returns count of successfully downloaded files."""
     if root is None:
         root = PROJECT_ROOT

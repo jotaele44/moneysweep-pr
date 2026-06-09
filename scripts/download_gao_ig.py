@@ -288,7 +288,7 @@ def _scrape_hud_oig(session: requests.Session, logger) -> list[dict]:
 
 
 def _scrape_dhs_oig(session: requests.Session, logger) -> list[dict]:
-    rows = []
+    rows: list = []
     logger.info("  Scraping DHS/FEMA OIG for Puerto Rico reports...")
     params = {"program[]": "FEMA", "state": "PR"}
     resp = _get(session, DHS_OIG_URL, params, logger)
@@ -325,7 +325,7 @@ def _scrape_dhs_oig(session: requests.Session, logger) -> list[dict]:
     return rows
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)

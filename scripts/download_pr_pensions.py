@@ -265,7 +265,7 @@ def _fetch_from_site(
     session: requests.Session, base_url: str, fund_name: str, logger
 ) -> list[dict]:
     """Fetch pension data from a specific agency website."""
-    rows = []
+    rows: list = []
     resp = _get(session, base_url, logger)
     if not resp:
         return rows
@@ -313,7 +313,7 @@ def _fetch_oversight_board_pension(session: requests.Session, logger) -> list[di
     return rows
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

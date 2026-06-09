@@ -304,7 +304,7 @@ def build_entities(root: Path) -> dict[str, Any]:
     resolved_count = sum(1 for r in rows if r["parent_uei"] or r["parent_name"])
     corporate = [r for r in rows if r.get("entity_type") == "corporate"]
     corp_resolved = sum(1 for r in corporate if r.get("parent_uei"))
-    type_counts = {}
+    type_counts: dict = {}
     for r in rows:
         t = r.get("entity_type", "unknown")
         type_counts[t] = type_counts.get(t, 0) + 1

@@ -268,7 +268,7 @@ def _crossref(df_sdn: pd.DataFrame, awards_path: Path, logger) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

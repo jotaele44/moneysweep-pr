@@ -449,7 +449,9 @@ def merge_into_master(results: dict, root: Path, output_dir: Path, logger) -> No
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, resume: bool = False, dry_run: bool = False, top_n: int = None) -> dict:
+def run(
+    root: Path | None = None, resume: bool = False, dry_run: bool = False, top_n: int | None = None
+) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

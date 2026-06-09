@@ -189,7 +189,7 @@ def _eqb_violations(entity_norm: str, eqb_df: pd.DataFrame) -> tuple[int, int]:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     root = Path(root or PROJECT_ROOT)
     proc = root / "data" / "staging" / "processed"
     out_path = proc / "pr_delivery_scorecard.csv"

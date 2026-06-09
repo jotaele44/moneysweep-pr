@@ -150,7 +150,7 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
 
 def _fetch_medicaid_data_api(session: requests.Session, logger) -> list[dict]:
     """Try data.medicaid.gov CKAN-style API for PR expenditure datasets."""
-    rows = []
+    rows: list = []
     try:
         # Search for datasets related to Puerto Rico expenditures
         search_url = f"{MEDICAID_DATA_BASE}/api/1/metastore/schemas/dataset/items"
@@ -198,7 +198,7 @@ def _fetch_medicaid_data_api(session: requests.Session, logger) -> list[dict]:
 
 def _fetch_fmap_rates(session: requests.Session, logger) -> list[dict]:
     """Scrape FMAP rate table from Medicaid.gov."""
-    rows = []
+    rows: list = []
     try:
         resp = session.get(FMAP_PAGE_URL, timeout=60)
         if resp.status_code != 200:
@@ -269,7 +269,7 @@ def _normalize_records(records: list[dict], logger) -> pd.DataFrame:
     return df[MEDICAID_COLUMNS]
 
 
-def run(root: Path = None, force: bool = False) -> dict:
+def run(root: Path | None = None, force: bool = False) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

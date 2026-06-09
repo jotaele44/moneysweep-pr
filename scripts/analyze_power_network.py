@@ -133,7 +133,7 @@ def _num(df: pd.DataFrame, col: str) -> pd.Series:
 # ---------------------------------------------------------------------------
 
 
-def build_power_network(root: Path = None, top_n: int = 50) -> dict:
+def build_power_network(root: Path | None = None, top_n: int = 50) -> dict:
     if root is None:
         root = PROJECT_ROOT
 

@@ -205,7 +205,7 @@ def _get(session: requests.Session, url: str, params: dict, logger) -> dict | No
 def _list_orgs(session: requests.Session, logger) -> list[dict]:
     url = f"{PROPUBLICA_BASE}/organizations/search.json"
     page = 0
-    orgs = []
+    orgs: list = []
 
     while True:
         params = {"state[id]": "PR", "page": page}
@@ -283,7 +283,9 @@ def _num(val) -> float | str:
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path = None, min_revenue: float = DEFAULT_MIN_REV, force: bool = False) -> dict:
+def run(
+    root: Path | None = None, min_revenue: float = DEFAULT_MIN_REV, force: bool = False
+) -> dict:
     if root is None:
         root = PROJECT_ROOT
 
