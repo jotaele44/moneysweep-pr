@@ -181,7 +181,7 @@ def _rows_from_tables(
             for raw in data_rows:
                 if all(not cell for cell in raw):
                     continue
-                row: dict[str, str] = {}
+                row = {}
                 for idx, col in enumerate(columns):
                     if col in col_index and col_index[col] < len(raw):
                         row[col] = raw[col_index[col]]

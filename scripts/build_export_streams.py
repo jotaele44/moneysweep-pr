@@ -275,13 +275,13 @@ class Crosswalk:
     def __init__(self) -> None:
         self._by_key: dict[str, str] = {}
 
-    def register(self, ent_id: str, *keys: str) -> None:
+    def register(self, ent_id: str, *keys: str | None) -> None:
         for key in keys:
             k = _clean(key)
             if k:
                 self._by_key.setdefault(k.upper(), ent_id)
 
-    def resolve(self, *keys: str) -> str | None:
+    def resolve(self, *keys: str | None) -> str | None:
         for key in keys:
             k = _clean(key)
             if k:

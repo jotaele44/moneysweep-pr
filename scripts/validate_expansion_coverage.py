@@ -33,7 +33,7 @@ def check_file_coverage(filepath: Path) -> dict:
     Read a normalized CSV and return coverage info.
     Returns: {exists, rows, fiscal_years: set[int], errors}
     """
-    result = {"exists": False, "rows": 0, "fiscal_years": set(), "errors": []}
+    result: dict = {"exists": False, "rows": 0, "fiscal_years": set(), "errors": []}
 
     if not filepath.exists():
         result["errors"].append("File not found")

@@ -261,12 +261,11 @@ def _scrape_hud_oig(session: requests.Session, logger) -> list[dict]:
             )
             date = dates[date_idx] if date_idx < len(dates) else ""
             date_idx += 1
+            rid_match = re.search(r"(\d{4}-[A-Z]{2}-\d{4}|[A-Z]{2}\d{4})", url_path, re.I)
             rows.append(
                 {
                     "report_date": date,
-                    "report_id": re.search(r"(\d{4}-[A-Z]{2}-\d{4}|[A-Z]{2}\d{4})", url_path, re.I)
-                    and re.search(r"(\d{4}-[A-Z]{2}-\d{4}|[A-Z]{2}\d{4})", url_path, re.I).group(1)
-                    or "",
+                    "report_id": rid_match.group(1) if rid_match else "",
                     "agency": "HUD",
                     "report_source": "HUD_OIG",
                     "title": title,

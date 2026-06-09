@@ -169,7 +169,7 @@ def _build_usaspending_payload(entry: dict) -> tuple:
     # spending_by_award only supports data from 2007-10-01 onward
     effective_start = max(year_start, USASPENDING_MIN_YEAR)
 
-    payload_filters = {
+    payload_filters: dict = {
         "time_period": [
             {"start_date": f"{effective_start}-10-01", "end_date": f"{year_end}-09-30"}
         ],
@@ -614,7 +614,8 @@ def download_fpds(entry: dict, output_dir: Path, logger, session: requests.Sessi
     while True:
         url = (
             f"{FPDS_BASE}?s=FPDS&indexName=awardfull&templateName=1.5.3"
-            f"&q={requests.utils.quote(query)}&start={offset}&length={page_size}"
+            # requests.utils.quote is re-exported at runtime but absent from the stubs.
+            f"&q={requests.utils.quote(query)}&start={offset}&length={page_size}"  # type: ignore[attr-defined]
         )
 
         try:

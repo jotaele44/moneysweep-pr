@@ -152,7 +152,7 @@ def normalize_file(input_path: Path, output_dir: Path, logger) -> dict:
     """
     Normalize a single expansion CSV. Returns a result dict.
     """
-    result = {
+    result: dict = {
         "filename": input_path.name,
         "input_rows": 0,
         "output_rows": 0,

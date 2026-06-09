@@ -251,7 +251,7 @@ def _fetch_detail(session: requests.Session, ein: str, logger) -> dict:
     if len(filings) >= 4:
         old_rev = _num(filings[3].get("totrevenue"))
         new_rev = _num(latest.get("totrevenue"))
-        if old_rev and new_rev:
+        if isinstance(old_rev, float) and isinstance(new_rev, float) and old_rev and new_rev:
             pct = (new_rev - old_rev) / abs(old_rev) * 100
             trend = f"{pct:+.0f}%"
 
@@ -375,12 +375,11 @@ def run(
 
     df.to_csv(out_path, index=False, encoding="utf-8")
 
-    above_threshold = sum(
-        1
-        for o in orgs
-        if isinstance(_num(o.get("revenue_amt") or o.get("income_amt")), float)
-        and _num(o.get("revenue_amt") or o.get("income_amt")) >= min_revenue
-    )
+    above_threshold = 0
+    for o in orgs:
+        rev = _num(o.get("revenue_amt") or o.get("income_amt"))
+        if isinstance(rev, float) and rev >= min_revenue:
+            above_threshold += 1
 
     total_rev = pd.to_numeric(df["total_revenue"], errors="coerce").sum()
 

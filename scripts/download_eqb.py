@@ -179,9 +179,9 @@ def run(root: Path | None = None, force: bool = False) -> dict:
     logger = setup_logging("download_eqb", log_dir=root / "data" / "logs")
 
     if out_path.exists() and not force:
-        rows = sum(1 for _ in open(out_path)) - 1
-        logger.info(f"  EQB permits: {out_path.name} exists ({rows:,} rows) — skipping.")
-        return {"status": "CACHED", "rows": rows}
+        row_count = sum(1 for _ in open(out_path)) - 1
+        logger.info(f"  EQB permits: {out_path.name} exists ({row_count:,} rows) — skipping.")
+        return {"status": "CACHED", "rows": row_count}
 
     session = _session()
     all_rows: list[dict] = []

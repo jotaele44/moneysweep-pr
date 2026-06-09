@@ -184,7 +184,7 @@ def _fetch_resource(
     filter_clause = " OR ".join(f"state='{f}'" for f in pr_filters)
 
     while True:
-        params = {
+        params: dict = {
             "$limit": limit,
             "$offset": offset,
         }

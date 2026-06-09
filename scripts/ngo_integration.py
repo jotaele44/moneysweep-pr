@@ -1034,7 +1034,9 @@ def build_78_municipality_coverage_matrix(
         registered = ngos[ngos["municipality"] == muni] if not ngos.empty else pd.DataFrame()
         funded_edges = edges[edges["municipality"] == muni] if not edges.empty else pd.DataFrame()
         muni_assets = (
-            asset_edges[asset_edges["municipality"] == muni] if has_assets else pd.DataFrame()
+            asset_edges[asset_edges["municipality"] == muni]
+            if (has_assets and asset_edges is not None)
+            else pd.DataFrame()
         )
         asset_linked = int(muni_assets["ngo_id"].nunique()) if not muni_assets.empty else 0
         registered_funded = (

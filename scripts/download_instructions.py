@@ -213,7 +213,7 @@ def generate_instructions(root: Path | None = None) -> Path:
         "- **Vendor**: Vendor State = PR\n\n",
     ]
 
-    generators = {
+    generators: dict = {
         "FPDS": _generate_fpds_instructions,
         "USASpending": {
             "idv": _generate_usaspending_idv_instructions,

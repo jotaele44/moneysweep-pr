@@ -138,7 +138,7 @@ ALL_DIRS = [
 # Download manifest — the 13 expected expansion files
 # ---------------------------------------------------------------------------
 
-DOWNLOAD_MANIFEST = [
+DOWNLOAD_MANIFEST: list[dict] = [
     # ---- FPDS: 4 time windows x 2 filter types = 8 files ----
     {
         "filename": "expansion_fpds_2000_2004_direct.csv",

@@ -462,7 +462,7 @@ def download_pass(
     if fy_start is not None:
         windows = [w for w in windows if int(w["label"]) >= fy_start]
 
-    stats = {"prefix": prefix, "rows": 0, "errors": []}
+    stats: dict = {"prefix": prefix, "rows": 0, "errors": []}
     logger.info(f"  [{prefix}] Running {len(windows)} FY windows (filter={filter_type})")
 
     consecutive_failures = 0

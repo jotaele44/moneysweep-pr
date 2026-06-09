@@ -291,12 +291,13 @@ def run(root: Path | None = None, force: bool = False) -> dict:
         content = raw_path.read_bytes()
     else:
         logger.info("  Downloading OFAC SDN list...")
-        content = _download_xml(session, OFAC_SDN_XML, logger)
-        if content is None:
+        downloaded = _download_xml(session, OFAC_SDN_XML, logger)
+        if downloaded is None:
             session.close()
             return {"sdn_rows": 0, "match_rows": 0, "status": "DOWNLOAD_FAILED"}
-        raw_path.write_bytes(content)
-        logger.info(f"  Cached {raw_path.name} ({len(content):,} bytes)")
+        raw_path.write_bytes(downloaded)
+        logger.info(f"  Cached {raw_path.name} ({len(downloaded):,} bytes)")
+        content = downloaded
 
     session.close()
 

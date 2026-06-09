@@ -217,7 +217,11 @@ def _parse_pension_excel(content: bytes, url: str, fund_hint: str, logger) -> li
                     ):
                         fy_col = col
                         break
-                record = {"source_doc": url, "fund_name": fund_hint, "report_type": "annual_report"}
+                record: dict = {
+                    "source_doc": url,
+                    "fund_name": fund_hint,
+                    "report_type": "annual_report",
+                }
                 if fy_col:
                     years = pd.to_numeric(df[fy_col], errors="coerce").dropna()
                     if not years.empty:

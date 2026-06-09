@@ -27,6 +27,8 @@ Usage:
 
 from __future__ import annotations
 
+from typing import Any
+
 import argparse
 import sys
 import time
@@ -207,7 +209,7 @@ def _get(
     logger,
     method: str = "GET",
     json_body: dict | None = None,
-) -> dict | list | None:
+) -> Any:
     for attempt in range(MAX_RETRIES):
         try:
             if method == "POST":
@@ -498,7 +500,7 @@ def run(
 
     logger = setup_logging("download_cms")
     session = _session()
-    result = {"status": "OK"}
+    result: dict = {"status": "OK"}
 
     # Open Payments
     op_out_path = out_dir / "pr_cms_open_payments.csv"

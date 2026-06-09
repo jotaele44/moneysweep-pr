@@ -296,14 +296,14 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
             for i, link in enumerate(csv.DictReader(fh), start=2):
                 proj_name = (link.get("project_name") or "").strip()
                 fund_name = (link.get("funding_source") or "").strip()
-                pid = resolve(resolver, "Project", proj_name)
-                fid = resolve(resolver, "FundingSource", fund_name)
-                if pid is None:
+                fl_pid = resolve(resolver, "Project", proj_name)
+                fl_fid = resolve(resolver, "FundingSource", fund_name)
+                if fl_pid is None:
                     skipped.append(
                         {"row": f"funding_link:{i}", "reason": f"unresolved project {proj_name!r}"}
                     )
                     continue
-                if fid is None:
+                if fl_fid is None:
                     skipped.append(
                         {
                             "row": f"funding_link:{i}",
@@ -321,7 +321,7 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
                     evidence_tier=(link.get("evidence_tier") or "").strip() or None,
                     review_status="accepted",
                 )
-                eid = edge_id(pid, "FUNDED_BY", fid)
+                eid = edge_id(fl_pid, "FUNDED_BY", fl_fid)
                 if eid in seen:
                     continue
                 seen.add(eid)
@@ -330,10 +330,10 @@ def build_edges(root: Path | None = None) -> dict[str, Any]:
                     {
                         "edge_id": eid,
                         "source_node_type": "Project",
-                        "source_node_id": pid,
+                        "source_node_id": fl_pid,
                         "edge_type": "FUNDED_BY",
                         "target_node_type": "FundingSource",
-                        "target_node_id": fid,
+                        "target_node_id": fl_fid,
                         "start_date": "",
                         "end_date": "",
                         "amount": "",

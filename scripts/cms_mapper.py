@@ -112,11 +112,11 @@ def map_cms_resource(df: pd.DataFrame, resource_type: str, threshold: float = 95
     }
 
     # Validate dates
-    date_results = validate_dates(df, mapping["date_cols"])
+    date_results = validate_dates(df, list(mapping["date_cols"]))
     report["date_validation"] = date_results
 
     # Validate amounts
-    amount_results = validate_amounts(df, mapping["amount_cols"])
+    amount_results = validate_amounts(df, list(mapping["amount_cols"]))
     report["amount_validation"] = amount_results
 
     # Check threshold

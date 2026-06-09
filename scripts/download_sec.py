@@ -23,6 +23,8 @@ Usage:
 
 from __future__ import annotations
 
+from typing import Any
+
 import argparse
 import sys
 import time
@@ -141,7 +143,7 @@ def _session() -> requests.Session:
     return s
 
 
-def _get(session: requests.Session, url: str, params: dict, logger) -> dict | list | None:
+def _get(session: requests.Session, url: str, params: dict, logger) -> Any:
     for attempt in range(MAX_RETRIES):
         try:
             resp = session.get(url, params=params, timeout=60)

@@ -23,7 +23,7 @@ def validate_file(filepath: Path, logger) -> dict:
     - filename, exists, rows, date_col, vendor_col, agency_col, amount_col,
       has_data (at least one row with non-null vendor+agency+amount), status
     """
-    result = {
+    result: dict = {
         "filename": filepath.name,
         "exists": False,
         "rows": 0,

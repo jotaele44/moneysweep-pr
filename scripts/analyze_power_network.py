@@ -370,7 +370,7 @@ def build_power_network(root: Path | None = None, top_n: int = 50) -> dict:
     # Summary JSON
     top_entities = []
     for _, row in merged.head(top_n).iterrows():
-        entry = {
+        entry: dict = {
             "rank": int(row["rank"]),
             "name": str(row["canonical_name"]),
             "influence_score": float(row["influence_score"]),
