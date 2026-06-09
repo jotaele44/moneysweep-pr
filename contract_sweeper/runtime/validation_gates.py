@@ -77,7 +77,11 @@ def _csv_rows(path: Path) -> list[dict[str, str]]:
     try:
         with path.open(encoding="utf-8-sig", newline="") as f:
             return list(csv.DictReader(f))
-    except Exception:
+    except (OSError, UnicodeDecodeError, csv.Error):
+        # A gate input we cannot read (permission/IO error, non-UTF-8 bytes, or
+        # malformed CSV) is treated as "no rows" so one bad file degrades a single
+        # gate to a fail-closed empty instead of crashing the whole evaluation.
+        # #221: previously a bare `except Exception` that masked unrelated bugs.
         return []
 
 

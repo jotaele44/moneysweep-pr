@@ -296,6 +296,74 @@ def test_duplicate_rate_gate_skips_raw_input_files(tmp_path):
     )
 
 
+# --------------------------------------------------------------------------- #
+# Malformed-input resilience (#221)
+#
+# `_csv_rows` narrowed its bare `except Exception` to `(OSError,
+# UnicodeDecodeError, csv.Error)`. These regressions pin that a gate input we
+# cannot read degrades to "no rows" (fail-closed) instead of crashing the whole
+# evaluation — and, critically, that an unrelated programming error would no
+# longer be swallowed by an over-broad except.
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.unit
+def test_csv_rows_returns_empty_on_unreadable_path(tmp_path):
+    """A path that can't be opened as a file (a directory) raises OSError; absorbed → []."""
+    # `_csv_rows` gates on suffix/size first, so make a non-empty .csv *directory*:
+    # exists() is True and suffix is .csv, but open() raises IsADirectoryError (OSError).
+    bad = tmp_path / "actually_a_dir.csv"
+    bad.mkdir()
+    (bad / "inner").write_text("x", encoding="utf-8")  # non-zero stat for the dir
+    assert vg._csv_rows(bad) == []
+
+
+@pytest.mark.unit
+def test_csv_rows_returns_empty_on_non_utf8_bytes(tmp_path):
+    """Non-UTF-8 bytes raise UnicodeDecodeError; the gate reader must absorb it."""
+    bad = tmp_path / "latin1.csv"
+    # 0xFF is invalid as a UTF-8 lead byte.
+    bad.write_bytes(b"award_id,name\nA1,\xff\xfe\n")
+    assert vg._csv_rows(bad) == []
+
+
+@pytest.mark.unit
+def test_csv_rows_overlong_field_is_absorbed(tmp_path):
+    """A field longer than csv's field-size limit raises csv.Error; absorbed → []."""
+    import csv as _csv
+
+    limit = _csv.field_size_limit()
+    bad = tmp_path / "overlong.csv"
+    bad.write_text("award_id,blob\nA1," + ("x" * (limit + 16)) + "\n", encoding="utf-8")
+    assert vg._csv_rows(bad) == []
+
+
+@pytest.mark.unit
+def test_csv_rows_does_not_swallow_unrelated_errors(monkeypatch, tmp_path):
+    """The narrowed except must let a non-IO/CSV bug (e.g. AttributeError) propagate."""
+    good = tmp_path / "ok.csv"
+    good.write_text("award_id,amount\nA1,100\n", encoding="utf-8")
+
+    def _boom(*_a, **_k):
+        raise AttributeError("injected unrelated bug")
+
+    monkeypatch.setattr(vg.csv, "DictReader", _boom)
+    with pytest.raises(AttributeError):
+        vg._csv_rows(good)
+
+
+@pytest.mark.unit
+def test_evaluate_survives_malformed_processed_csv(tmp_path):
+    """End-to-end: a malformed processed CSV must not crash evaluate()."""
+    _build_tmp_repo(tmp_path)
+    proc = tmp_path / "data" / "staging" / "processed"
+    proc.mkdir(parents=True, exist_ok=True)
+    (proc / "entities_resolved.csv").write_bytes(b"entity_id,entity_type\nA1,corporate\x00\n")
+    report = vg.evaluate(tmp_path)  # must not raise
+    assert report["passed"] is False
+    assert report["entity_resolution_rate"] == 0.0
+
+
 @pytest.mark.unit
 def test_duplicate_rate_gate_skips_review_queue_and_exports(tmp_path):
     """Files in review_queue/ and exports/ must also be excluded from the gate."""
