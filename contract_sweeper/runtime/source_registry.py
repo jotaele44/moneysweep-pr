@@ -136,6 +136,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--root", type=Path, default=REPO_ROOT)
     parser.add_argument("--validate", action="store_true", help="Run validation checks")
     args = parser.parse_args(argv)
+    # Local import: source_registry is imported very early/widely, so keep its
+    # module-level import graph minimal and only pull in logging at CLI entry.
+    from contract_sweeper.runtime.logging_config import configure_logging
+
+    configure_logging()
     if args.validate:
         report = validate_registry(args.root)
         print(json.dumps(report, indent=2))

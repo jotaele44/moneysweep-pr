@@ -33,6 +33,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from contract_sweeper.runtime.logging_config import configure_logging
 from contract_sweeper.runtime.source_registry import (
     REPO_ROOT,
     expected_outputs_for,
@@ -518,6 +519,7 @@ def main(argv: list[str] | None = None) -> int:
         help="Always exit 0 (used during R5 bootstrap before real data lands).",
     )
     args = parser.parse_args(argv)
+    configure_logging()
     report = evaluate(args.root)
     paths = write_report(args.root, report)
     print(
