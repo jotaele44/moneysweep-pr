@@ -1,0 +1,99 @@
+name: Release tag on contract bump
+
+# Tags the repository when the FEDERATION export contract version
+# (scripts/build_export_package.py:EXPORT_CONTRACT_VERSION) changes on main.
+#
+# Why keyed to the contract, not a package version: this project has not cut a
+# software release yet (it is NON_PRODUCTION_DIAGNOSTIC). The thing downstream
+# (spiderweb-pr query-hub) actually pins against is the federation export
+# contract version, so that is what we tag. See docs/federation_readiness.md
+# §"Cross-repo release & handshake procedure".
+#
+# The job is idempotent: it only creates a tag/release when no tag already
+# exists for the current version, so re-runs and unrelated pushes are no-ops.
+# It is intentionally NON-gating — it never blocks a merge; it reacts to one.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/build_export_package.py"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Resolve the version and report, but do not create a tag/release"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write  # required to push the annotated tag and create the release
+
+concurrency:
+  group: release-tag
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # need full tag history to detect existing tags
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve federation export contract version
+        id: ver
+        run: |
+          version="$(python -c 'import scripts.build_export_package as b; print(b.EXPORT_CONTRACT_VERSION)')"
+          if [ -z "$version" ]; then
+            echo "::error::could not resolve EXPORT_CONTRACT_VERSION"; exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=export-v$version" >> "$GITHUB_OUTPUT"
+          echo "Resolved federation export contract version: $version"
+
+      - name: Check whether the tag already exists
+        id: exists
+        run: |
+          tag="${{ steps.ver.outputs.tag }}"
+          if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::tag $tag already exists; nothing to do"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Dry-run summary
+        if: ${{ inputs.dry_run == true }}
+        run: |
+          echo "DRY RUN — would create tag ${{ steps.ver.outputs.tag }} (exists=${{ steps.exists.outputs.exists }})"
+
+      - name: Create annotated tag
+        if: ${{ steps.exists.outputs.exists == 'false' && inputs.dry_run != true }}
+        env:
+          TAG: ${{ steps.ver.outputs.tag }}
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "Federation export contract $VERSION"
+          git push origin "$TAG"
+
+      - name: Create GitHub release
+        if: ${{ steps.exists.outputs.exists == 'false' && inputs.dry_run != true }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.ver.outputs.tag }}
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          notes="Federation export contract **$VERSION** (\`contract-sweeper-export\`).
+
+          Consumed by the \`spiderweb-pr\` query-hub. See CHANGELOG.md and
+          docs/federation_readiness.md for the cross-repo handshake procedure.
+
+          This tag marks a contract version, not a software release — the pipeline
+          remains NON_PRODUCTION_DIAGNOSTIC."
+          gh release create "$TAG" --title "Export contract $VERSION" --notes "$notes"
