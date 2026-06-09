@@ -262,6 +262,33 @@ For coverage-enabled environments:
 python -m pytest tests/ --cov=scripts --cov=contract_sweeper --cov-report=term-missing
 ```
 
+## Development
+
+A `Makefile` wraps the same commands the CI quality gates run, so local and CI
+stay in lock-step. After cloning, install the dev tooling and run the full bar:
+
+```bash
+make install-dev   # ruff, mypy (pinned 1.11.2), pytest, pytest-cov, type stubs
+make check         # lint + format-check + type + test  (the gating quality bar)
+```
+
+Individual targets (`make help` lists them all):
+
+| Target | Wraps | Gating CI counterpart |
+|--------|-------|-----------------------|
+| `make lint` | `ruff check .` | `.github/workflows/lint.yml` |
+| `make format` / `make format-check` | `ruff format [--check] .` | `.github/workflows/lint.yml` |
+| `make type` | `python -m mypy` | `.github/workflows/mypy.yml` |
+| `make test` | `pytest` with the `--cov-fail-under` floor | `.github/workflows/tests.yml`, `ci.yml` |
+| `make lock` / `make lock-check` | `uv pip compile requirements.in …` | `.github/workflows/lockfile.yml` |
+| `make precommit` | `pre-commit run --all-files` | `.github/workflows/pre-commit.yml` |
+
+All of these gates are **blocking** on pull requests. To run the git hooks
+locally on every commit, install them once with `pre-commit install`
+(config: `.pre-commit-config.yaml`). Contributor conventions — the fresh-`main`
+staged-PR flow and the full gate list — live in
+[`CONTRIBUTING.md`](CONTRIBUTING.md).
+
 ## Operating Controls
 
 Current repo-control conventions:
