@@ -122,12 +122,12 @@ _Highest-blast-radius modules first. Each new test file lets you raise the floor
 ## WAVE M — Runtime robustness & resumption readiness (the project is paused pending sources)
 _Capstone: make resuming ingestion safe and observable._
 
-70. Introduce structured logging across `contract_sweeper/runtime/` (replace bare prints) — improves resumption debuggability.
-71. Add jitter/backoff + circuit-breaker tests around `retry_runtime` — depends on 37.
-72. Add a diagnostic-mode smoke CI job that dry-runs the `run_all` orchestration — catches integration breakage before source delivery.
-73. Add contract tests asserting the 56 `NotImplementedAdapter` stubs stay deferred (no accidental activation).
-74. Tie a resumption checklist into `production-status-gate.yml` so `NON_PRODUCTION_DIAGNOSTIC` can only flip when source preflight passes.
-75. Build one end-to-end golden-path test for a fully-implemented source as the **template** the remaining sources are onboarded against — the capstone that scales source delivery.
+70. **[done]** Introduce structured logging across `contract_sweeper/runtime/` (replace bare prints) — `contract_sweeper/runtime/logging_config.py` (idempotent `configure_logging()`, key=value or JSON via `CONTRACT_SWEEPER_LOG_FORMAT`, level via `CONTRACT_SWEEPER_LOG_LEVEL`); wired into the runtime CLI `main()`s and the `risk_signal_gates` per-gate diagnostics now route through the logger. Machine-readable `print(json.dumps(...))` results stay on stdout by design. Covered by `tests/test_logging_config.py`.
+71. **[done]** Add jitter/backoff + circuit-breaker tests around `retry_runtime` (depends on 37) — added a `CircuitBreaker` (closed→open→half-open with injected clock) + `CircuitOpen` to `retry_runtime.py`; `tests/test_retry_circuit_breaker.py` pins the jitter band / cap / monotonic backoff and the full breaker state machine.
+72. **[done]** Add a diagnostic-mode smoke CI job that dry-runs the `run_all` orchestration — `.github/workflows/diagnostic-smoke.yml` runs `run_all.py --only-setup --strict-preflight` (setup + structural preflight, no producers/network) so orchestrator integration breakage surfaces before source delivery.
+73. **[done]** Add contract tests asserting the `NotImplementedAdapter` stubs stay deferred (no accidental activation) — `tests/test_stub_adapter_deferral.py` (count-agnostic: every stub-resolved source raises `ManualOnlyError`, concrete sources never fall through to the stub, and the concrete/stub sets partition the 85-source universe).
+74. **[done]** Tie a resumption checklist into `production-status-gate.yml` so `NON_PRODUCTION_DIAGNOSTIC` can only flip when source preflight passes — added `docs/RESUMPTION_CHECKLIST.md` (the ordered preconditions) and a "Resumption-readiness checklist (source preflight gate)" step that runs `run_all.py --only-setup --strict-preflight` in the gate. Strictly additive: the existing diagnostic lock stays the backstop, and any PR that flips the status can't merge while preflight is red.
+75. **[done]** Build one end-to-end golden-path test for a fully-implemented source as the **template** the remaining sources are onboarded against — `tests/test_source_golden_path.py` drives `Query → dispatcher.query() → adapter.fetch() → post-ingest → cache → cache-hit` offline; copy-and-point-at-an-adapter is the onboarding template.
 
 ---
 
