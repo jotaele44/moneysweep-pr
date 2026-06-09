@@ -1,0 +1,19 @@
+# Code ownership for Contract-Sweeper.
+#
+# The maintainer is automatically requested for review on every PR, formalizing
+# the "Architect gate" the project already operates under (STATUS.md). Add more
+# specific rules below the catch-all to delegate areas as the team grows.
+
+# Default owner for everything in the repo.
+*       @jotaele44
+
+# Cross-repo federation contract: changes here affect the spiderweb-pr consumer,
+# so they always need maintainer sign-off.
+/schemas/                @jotaele44
+/contract_sweeper/federation/   @jotaele44
+
+# CI, gates, and dependency policy.
+/.github/                @jotaele44
+/pyproject.toml          @jotaele44
+/requirements.in         @jotaele44
+/requirements.lock       @jotaele44
