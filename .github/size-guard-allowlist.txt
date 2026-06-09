@@ -1,0 +1,8 @@
+# Size-guard allowlist (.github/workflows/size-guard.yml).
+#
+# One repo-relative path per line. A file listed here is exempt from the 5 MiB
+# size-guard threshold. Add a path only with a clear reason in your PR
+# description (why it must live in git rather than release assets / external
+# storage / git-lfs). Keep this list short — it is the escape hatch, not the norm.
+#
+# (empty — no exemptions today; the largest committed fixture is ~2.8 MB)

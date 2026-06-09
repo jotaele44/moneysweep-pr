@@ -114,10 +114,10 @@ _Highest-blast-radius modules first. Each new test file lets you raise the floor
 65. Add a "Development" section to `README.md` pointing at the Makefile + gates.
 
 ## WAVE L — Repo hygiene / history (most disruptive; do last, after content is stable)
-66. Add a size-guard CI check (block new blobs > N MB) — **prevents recurrence before** any purge.
-67. Document the history-purge plan for the 56 MB / 24 MB / 5.3 MB blobs still in history (#222) + a coordinated re-clone window.
-68. Execute the `git filter-repo` purge in the agreed window — depends on 66–67. **(big-diff / history rewrite)**
-69. Verify post-purge clone size and update `RECOMMENDATIONS.md` #1 + this doc — depends on 68.
+66. **[done]** Add a size-guard CI check (block new blobs > N MB) — `.github/workflows/size-guard.yml` fails a PR that adds/grows a tracked file past 5 MiB (added/modified files only), with an exact-match allowlist at `.github/size-guard-allowlist.txt`. **Prevents recurrence before** any purge.
+67. **[done]** Document the history-purge plan for the 56 MB / 24 MB / 5.3 MB blobs still in history (#222) + a coordinated re-clone window — `docs/HISTORY_PURGE_PLAN.md` (confirmed inventory, the `git filter-repo --invert-paths` command, force-push + re-clone steps, verification, and rollback).
+68. _Deferred — **maintainer-coordinated window required.**_ Execute the `git filter-repo` purge per `docs/HISTORY_PURGE_PLAN.md` §"The purge procedure". Not run autonomously: it rewrites published history and force-pushes, so it needs a merge freeze + a coordinated re-clone by all collaborators. **(big-diff / history rewrite)**
+69. _Deferred — depends on 68._ Verify post-purge clone size and update `RECOMMENDATIONS.md` #1 + this doc — procedure captured in `docs/HISTORY_PURGE_PLAN.md` §"Verification".
 
 ## WAVE M — Runtime robustness & resumption readiness (the project is paused pending sources)
 _Capstone: make resuming ingestion safe and observable._
