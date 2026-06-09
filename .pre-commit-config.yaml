@@ -5,11 +5,16 @@ repos:
       - id: gitleaks
         name: gitleaks
         description: Scan for secrets using gitleaks
-        entry: gitleaks detect --source git -v
+        # `--source` takes a path; it must point at the repo root (`.`) so
+        # gitleaks scans the git history. The previous `--source git` named a
+        # non-existent `git/` directory and errored out ("stat git: no such file
+        # or directory") whenever the hook actually ran — surfaced by the gating
+        # `pre-commit run --all-files` CI job (.github/workflows/pre-commit.yml).
+        entry: gitleaks detect --source . -v
         language: golang
         pass_filenames: false
         always_run: true
-        stages: [commit]
+        stages: [pre-commit]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -33,7 +38,7 @@ repos:
         language: system
         pass_filenames: false
         files: ^registries/.*\.yaml$
-        stages: [commit]
+        stages: [pre-commit]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.8
@@ -74,3 +79,10 @@ repos:
         pass_filenames: true
         additional_dependencies:
           - types-PyYAML
+          # types-requests is required so the hook matches the gating mypy.yml
+          # job (which installs requirements-dev.txt). Without it, `pre-commit
+          # run --all-files` fails on runtime/base_downloader.py's `import
+          # requests` (import-untyped is not silenced by --ignore-missing-imports
+          # when stubs exist on PyPI), even though per-commit runs that skip that
+          # file pass. See .github/workflows/pre-commit.yml.
+          - types-requests
