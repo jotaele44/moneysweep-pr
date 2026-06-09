@@ -108,10 +108,10 @@ _Highest-blast-radius modules first. Each new test file lets you raise the floor
 61. Document the cross-repo release/handshake procedure with `spiderweb-pr` in `docs/federation_readiness.md`.
 
 ## WAVE K — Developer experience (wraps the now-stable command set)
-62. Add a `Makefile` (or `justfile`) with `lint` / `format` / `type` / `test` targets wrapping Waves A–G commands.
-63. Add an `.editorconfig` consistent with the ruff line-length.
-64. **(gate)** Add a `pre-commit run --all-files` CI job — green only because Waves B–D made it so.
-65. Add a "Development" section to `README.md` pointing at the Makefile + gates.
+62. **[done]** Add a `Makefile` with `lint` / `format` / `format-check` / `type` / `test` / `cov` / `lock` / `lock-check` / `precommit` / `check` targets wrapping Waves A–G commands; `make help` self-documents.
+63. **[done]** Add an `.editorconfig` consistent with the ruff line-length (100) and per-filetype indents.
+64. **[done] (gate)** Add a `pre-commit run --all-files` CI job (`.github/workflows/pre-commit.yml`) — green only because Waves B–D made it so. Required two fixes the `--all-files` scope surfaced: added `types-requests` to the mypy hook's `additional_dependencies` (so `runtime/base_downloader.py` type-checks like the gating `mypy.yml`), and corrected the gitleaks `entry` from the broken `--source git` (a non-existent path) to `--source .` so secret-scanning actually runs across the 87-commit history.
+65. **[done]** Add a "Development" section to `README.md` pointing at the Makefile + gates (target→gating-CI table, `make install-dev`/`make check`, pre-commit install).
 
 ## WAVE L — Repo hygiene / history (most disruptive; do last, after content is stable)
 66. Add a size-guard CI check (block new blobs > N MB) — **prevents recurrence before** any purge.
