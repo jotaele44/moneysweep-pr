@@ -65,8 +65,8 @@ _See `docs/CODE_GAP_AND_WORKFLOW_AUDIT.md` §B1 correction._
 ## WAVE F — Coverage instrumentation (before adding the floor, measure)
 _Set the ratchet only after you know the number it should start at._
 
-31. Make the CI test job print the total coverage % and keep `coverage.xml` as an artifact (already uploaded) — establishes the baseline.
-32. **(gate)** Add `--cov-fail-under=<measured baseline>` to `pytest.ini` — locks coverage; depends on 31.
+31. **[done]** `pytest.ini` already emits `--cov-report=term-missing` (total %) and `coverage.xml`; measured baseline ≈ 44.5%.
+32. **[done]** **(gate)** Added `--cov-fail-under=42` to `pytest.ini` — locks the coverage baseline (~2.5 pts below current; ratchet upward in Wave G).
 
 ## WAVE G — Tests for untested critical paths (#215; ratchet coverage as you go)
 _Highest-blast-radius modules first. Each new test file lets you raise the floor._
