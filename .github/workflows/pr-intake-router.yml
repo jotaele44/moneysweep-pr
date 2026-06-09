@@ -61,7 +61,11 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run targeted router and producer tests
-        run: python -m pytest tests/test_pr_intake_router.py tests/test_route_pr_intake_cli.py tests/test_pr_intake_router_hook.py tests/test_produce_pr_news_raw_intake.py tests/test_pr_news_router_pipeline.py -v
+        # --no-cov: this job runs a small, targeted subset, so the repo-wide
+        # --cov-fail-under floor in pytest.ini does not apply here (the full
+        # coverage gate lives in tests.yml). Without this the subset reports
+        # ~0% total coverage and fails the inherited floor.
+        run: python -m pytest tests/test_pr_intake_router.py tests/test_route_pr_intake_cli.py tests/test_pr_intake_router_hook.py tests/test_produce_pr_news_raw_intake.py tests/test_pr_news_router_pipeline.py -v --no-cov
 
       - name: Run router export command
         run: python run_pr_intake_router.py --input tests/fixtures/pr_intake_router_sample.jsonl --out-dir data/exports/pr_intake_router --fail-on-validation-errors
