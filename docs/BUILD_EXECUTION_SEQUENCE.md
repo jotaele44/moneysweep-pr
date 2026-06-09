@@ -71,10 +71,10 @@ _Set the ratchet only after you know the number it should start at._
 ## WAVE G — Tests for untested critical paths (#215; ratchet coverage as you go)
 _Highest-blast-radius modules first. Each new test file lets you raise the floor._
 
-33. Unit-test `contract_sweeper/pipeline/credentialed_endpoint_execution.py` (mock HTTP + credentials).
-34. Unit-test `contract_sweeper/pipeline/manual_import_dropzone.py` (operator-supplied file ingestion).
-35. Unit-test `contract_sweeper/pipeline/source_materialization.py`.
-36. Unit-test `contract_sweeper/pipeline/scoped_unfreeze_materialization.py`.
+33. **[done]** Unit-test `contract_sweeper/pipeline/credentialed_endpoint_execution.py` — `tests/test_pipeline_security_modules.py` (credential-presence eval via monkeypatched env, forbidden-artifact flag, safe excerpt/empty-command/env-var-scan helpers).
+34. **[done]** Unit-test `contract_sweeper/pipeline/manual_import_dropzone.py` — `tests/test_pipeline_security_modules.py` (happy stage+manifest, dropzone-missing, missing-columns, forbidden flag, pure helpers).
+35. **[done]** Unit-test `contract_sweeper/pipeline/source_materialization.py` — `tests/test_pipeline_security_modules.py` (materialize+hash-validate, forbidden-path block, invalid-manifest block, status/type/approved-stage-path helpers).
+36. **[done]** Unit-test `contract_sweeper/pipeline/scoped_unfreeze_materialization.py` — `tests/test_pipeline_security_modules.py` (forbidden + not-in-checklist rejection, gate-not-passed on no candidates, `_truthy`/`_approved_target_match`/manifest helpers).
 37. **[done]** Unit-test `contract_sweeper/runtime/retry_runtime.py` — `tests/test_runtime_helpers.py` (success/transient-recovery/exhaustion + exception narrowing + backoff/jitter).
 38. **[done]** Unit-test `contract_sweeper/runtime/pagination_runtime.py` — `tests/test_runtime_helpers.py` (multi-page walk, start_marker, max_pages guard).
 39. **[done]** Unit-test `contract_sweeper/runtime/file_hash_runtime.py` — `tests/test_runtime_helpers.py` (hashlib parity, empty + multi-chunk).
