@@ -103,9 +103,9 @@ _Highest-blast-radius modules first. Each new test file lets you raise the floor
 58. **[done]** Add `SECURITY.md` (private disclosure policy) — pairs with dependabot/pip-audit.
 
 ## WAVE J — Release & versioning (after contracts are schematized + governance exists)
-59. Add a root `CHANGELOG.md` (Keep-a-Changelog) — #220.
-60. Add a release-tagging workflow keyed to `export_contract_version` bumps — depends on 26/30/59.
-61. Document the cross-repo release/handshake procedure with `spiderweb-pr` in `docs/federation_readiness.md`.
+59. **[done]** Add a root `CHANGELOG.md` (Keep-a-Changelog) — #220. Includes the two-contract version table so the federation vs finance-lane tracks never get conflated.
+60. **[done]** Add a release-tagging workflow keyed to `export_contract_version` bumps — `.github/workflows/release-tag.yml` resolves `build_export_package.EXPORT_CONTRACT_VERSION` on `main` pushes that touch that file, and idempotently cuts an `export-v<version>` tag + GitHub release. Non-gating; reacts to a bump, never blocks a merge.
+61. **[done]** Document the cross-repo release/handshake procedure with `spiderweb-pr` in `docs/federation_readiness.md` — minor/major bump policy, producer-side steps, the on-merge tag flow, and the consumer coordination sequence.
 
 ## WAVE K — Developer experience (wraps the now-stable command set)
 62. Add a `Makefile` (or `justfile`) with `lint` / `format` / `type` / `test` targets wrapping Waves A–G commands.
