@@ -80,13 +80,13 @@ _Highest-blast-radius modules first. Each new test file lets you raise the floor
 39. **[done]** Unit-test `contract_sweeper/runtime/file_hash_runtime.py` — `tests/test_runtime_helpers.py` (hashlib parity, empty + multi-chunk).
 40. **[done]** Unit-test `contract_sweeper/runtime/evidence_tiers.py` — `tests/test_runtime_helpers.py` (tier derivation/caps, confidence, OCR scoring, claim-tier mapping).
 41. **[done]** Unit-test `contract_sweeper/runtime/risk_signal_gates.py` — already covered by `tests/test_risk_signals.py` (all five gates + `run_all_gates`).
-42. Adapter error/credential-path tests: `query/adapters/sam.py`.
-43. Adapter error/credential-path tests: `query/adapters/highergov.py`.
-44. Adapter error/credential-path tests: `query/adapters/ckan_metastore.py`.
-45. Adapter error/credential-path tests: `query/adapters/cms_socrata.py`.
-46. Adapter error/credential-path tests: `query/adapters/ofac.py`.
+42. **[done]** Adapter error/credential-path tests: `query/adapters/sam.py` — already covered by `tests/test_query_entity_adapters.py` (credential-missing-before-HTTP, param routing, iteration).
+43. **[done]** Adapter error/credential-path tests: `query/adapters/highergov.py` — `tests/test_query_adapters_highergov.py` (credential gate before HTTP, ctor-vs-env key, request shape, `_extract_records` payload tolerance, extraction + pagination).
+44. **[done]** Adapter error/credential-path tests: `query/adapters/ckan_metastore.py` — already covered by `tests/test_query_adapters_cms.py` (keyword filter, empty metastore, POST conditions, pagination, metastore-down→empty).
+45. **[done]** Adapter error/credential-path tests: `query/adapters/cms_socrata.py` — already covered by `tests/test_query_adapters_cms.py` (resource iteration, state clause, app-token present/absent, partial-failure resilience).
+46. **[done]** Adapter error/credential-path tests: `query/adapters/ofac.py` — already covered by `tests/test_query_entity_adapters.py` (`parse_sdn_xml`, name/aka/uei filtering, empty results, no-credentials).
 47. Narrow the broad `except Exception: return []` in `runtime/validation_gates.py` (#221) + add a malformed-file regression test — safe now that the path is covered.
-48. **(gate)** Raise `--cov-fail-under` to the new, higher post-33–47 baseline — ratchet up.
+48. **(gate)** Raise `--cov-fail-under` to the new, higher post-33–47 baseline — ratchet up. *(Floor now 44 after PR 6's pipeline tests; the adapter additions move the total negligibly, so it stays at 44.)*
 
 ## WAVE H — Dependency & supply-chain automation (after dev-deps exist)
 49. **[done]** Add `.github/dependabot.yml` (`pip` + `github-actions`, weekly, `repo-governance` label) — #219.
