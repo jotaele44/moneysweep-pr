@@ -56,11 +56,11 @@ _Each step keeps the existing narrow mypy gate green while widening it._
 ## WAVE E — Cross-repo contract hardening (corrects the #216 false positive)
 _See `docs/CODE_GAP_AND_WORKFLOW_AUDIT.md` §B1 correction._
 
-26. Add a one-line provenance comment at **each** `EXPORT_CONTRACT_VERSION` (federation package vs. finance lane) so the two contracts are never conflated again.
-27. Author `schemas/contract_sweeper_finance_lane_report.schema.json` for the finance-lane report — the real B1 gap.
-28. Add a test validating an emitted finance-lane report against schema 27 and asserting `export_contract_version == "1.0.0"` — depends on 27.
-29. Add a conformance-fixture freshness check for `exports/conformance/v1_2/` so the federation package can't silently drift from its schema.
-30. Centralize each contract version into a single importable constant (one per contract) — removes the duplicate literal in `scripts/build_export_package.py` vs. samples.
+26. **[done]** Add a one-line provenance comment at **each** `EXPORT_CONTRACT_VERSION` (federation package vs. finance lane) so the two contracts are never conflated again.
+27. **[done]** Author `schemas/contract_sweeper_finance_lane_report.schema.json` for the finance-lane report — the real B1 gap.
+28. **[done]** Add a test validating an emitted finance-lane report against schema 27 and asserting `export_contract_version == "1.0.0"` — `tests/test_contract_sweeper_finance_lane.py`.
+29. **[done]** Add a conformance-fixture freshness check for `exports/conformance/v1_2/` so the federation package can't silently drift from its schema — `tests/test_conformance_fixture_freshness.py` rebuilds the manifest from the on-disk streams and asserts sha256/record_count/package_id parity.
+30. **[done]** Centralize each contract version into a single importable constant (one per contract) — `build_export_package.EXPORT_CONTRACT_VERSION` is the single source for the federation literal; the freshness test pins the conformance manifest, sample manifest, and manifest-schema `const` to it (and asserts the finance-lane version stays independent).
 
 ## WAVE F — Coverage instrumentation (before adding the floor, measure)
 _Set the ratchet only after you know the number it should start at._
@@ -85,8 +85,8 @@ _Highest-blast-radius modules first. Each new test file lets you raise the floor
 44. **[done]** Adapter error/credential-path tests: `query/adapters/ckan_metastore.py` — already covered by `tests/test_query_adapters_cms.py` (keyword filter, empty metastore, POST conditions, pagination, metastore-down→empty).
 45. **[done]** Adapter error/credential-path tests: `query/adapters/cms_socrata.py` — already covered by `tests/test_query_adapters_cms.py` (resource iteration, state clause, app-token present/absent, partial-failure resilience).
 46. **[done]** Adapter error/credential-path tests: `query/adapters/ofac.py` — already covered by `tests/test_query_entity_adapters.py` (`parse_sdn_xml`, name/aka/uei filtering, empty results, no-credentials).
-47. Narrow the broad `except Exception: return []` in `runtime/validation_gates.py` (#221) + add a malformed-file regression test — safe now that the path is covered.
-48. **(gate)** Raise `--cov-fail-under` to the new, higher post-33–47 baseline — ratchet up. *(Floor now 44 after PR 6's pipeline tests; the adapter additions move the total negligibly, so it stays at 44.)*
+47. **[done]** Narrow the broad `except Exception: return []` in `runtime/validation_gates.py` (#221) to `(OSError, UnicodeDecodeError, csv.Error)` + add malformed/unreadable-file regressions (incl. one asserting unrelated bugs now propagate) — `tests/test_validation_gates.py`.
+48. **[done] (gate)** Raise `--cov-fail-under` to the new, higher post-33–47 baseline — ratchet up. *(Held at 44: the contract/validation-gate additions move the total up but the floor stays a couple points below to absorb run-to-run variance.)*
 
 ## WAVE H — Dependency & supply-chain automation (after dev-deps exist)
 49. **[done]** Add `.github/dependabot.yml` (`pip` + `github-actions`, weekly, `repo-governance` label) — #219.
