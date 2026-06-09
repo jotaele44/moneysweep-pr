@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Any
 
 from contract_sweeper.runtime.file_hash_runtime import sha256_file
+from contract_sweeper.runtime.logging_config import configure_logging
 from contract_sweeper.runtime.name_normalization import normalize_name
 from contract_sweeper.runtime.source_registry import (
     REPO_ROOT,
@@ -373,6 +374,7 @@ def main(argv: list[str] | None = None) -> int:
         "--dry-run", action="store_true", help="Scan + write manifest without further side-effects"
     )
     args = parser.parse_args(argv)
+    configure_logging()
     files = scan_repo(args.root)
     paths = write_canonical_manifest(args.root, files)
     print(

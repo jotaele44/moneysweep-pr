@@ -1,0 +1,31 @@
+name: Diagnostic smoke
+
+# Dry-runs the run_all orchestration in its safe, no-network diagnostic mode
+# (`--only-setup --strict-preflight`): directory setup, instruction generation,
+# and the registry-driven structural preflight — no producers, no downloads, no
+# row construction. It catches integration breakage in the orchestrator import
+# graph / setup / preflight path BEFORE source delivery, so resuming ingestion
+# starts from a known-green orchestrator (Wave M, task 72).
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostic-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Dry-run run_all (setup + strict preflight, no producers)
+        run: |
+          python3 run_all.py --only-setup --strict-preflight
+          echo "diagnostic smoke: run_all --only-setup --strict-preflight exited $?"

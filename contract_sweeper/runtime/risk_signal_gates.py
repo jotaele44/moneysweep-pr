@@ -21,7 +21,10 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from contract_sweeper.runtime.logging_config import configure_logging, get_logger
 from contract_sweeper.runtime.risk_signals import SIGNAL_COLUMNS, SCHEMA_VERSION
+
+_LOG = get_logger(__name__)
 
 SIGNALS_CSV = Path("data") / "staging" / "processed" / "risk" / "risk_signals_master.csv"
 ENTITY_SCORES_CSV = Path("data") / "staging" / "processed" / "risk" / "entity_risk_scores.csv"
@@ -169,6 +172,7 @@ def main() -> None:
         help="Exit 0 even when gates fail (bootstrap mode only)",
     )
     args = parser.parse_args()
+    configure_logging()
     root = Path(args.root).resolve()
 
     records = run_all_gates(root)
@@ -191,16 +195,25 @@ def main() -> None:
         json.dumps(report, indent=2), encoding="utf-8"
     )
 
+    # Per-gate outcomes are diagnostics, not the command's machine output, so
+    # they go through the structured logger (stderr) rather than stdout.
     for r in records:
-        status = "PASS" if r["passed"] else "FAIL"
-        print(f"  [{status}] {r['gate']}" + (f" — {r['reason']}" if r.get("reason") else ""))
+        log = _LOG.info if r["passed"] else _LOG.warning
+        log(
+            "risk_signal_gate",
+            extra={
+                "gate": r["gate"],
+                "status": "PASS" if r["passed"] else "FAIL",
+                "reason": r.get("reason") or "",
+            },
+        )
 
     if failing:
-        print(f"\n{len(failing)} R7 gate(s) failing.")
+        _LOG.warning("risk_signal_gates_failing", extra={"failing_count": len(failing)})
         if not args.allow_failed:
             sys.exit(1)
     else:
-        print("\nAll R7 gates passed.")
+        _LOG.info("risk_signal_gates_all_passed", extra={"gate_count": len(records)})
 
 
 if __name__ == "__main__":

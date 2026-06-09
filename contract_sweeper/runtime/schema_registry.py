@@ -12,6 +12,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from contract_sweeper.runtime.logging_config import configure_logging
+
 DEFAULT_REGISTRY_PATH = "registries/schema_registry.json"
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -94,6 +96,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--root", type=Path, default=REPO_ROOT)
     parser.add_argument("--validate", action="store_true")
     args = parser.parse_args(argv)
+    configure_logging()
     if args.validate:
         report = validate_registry(args.root)
         print(json.dumps(report, indent=2))
