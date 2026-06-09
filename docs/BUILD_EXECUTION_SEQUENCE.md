@@ -95,12 +95,12 @@ _Highest-blast-radius modules first. Each new test file lets you raise the floor
 52. **[done]** Add `.github/workflows/pip-audit.yml` — scheduled (+ dispatch) `pip-audit` against `requirements.lock`, report-only to start.
 
 ## WAVE I — Governance & community scaffolding (independent; low coupling)
-53. Add `LICENSE` (select a license suited to public-data redistribution) — #218.
-54. Add `CONTRIBUTING.md` documenting the branch/PR flow **and** the now-green quality gates (Waves A–G).
-55. Add `CODEOWNERS` reflecting the Architect-gate ownership the repo already runs informally.
-56. Add `.github/pull_request_template.md` mirroring the existing review checklist.
-57. Add `CODE_OF_CONDUCT.md`.
-58. Add `SECURITY.md` (disclosure policy) — pairs with dependabot/pip-audit.
+53. **[done]** Add `LICENSE` — **MIT** (with a note that ingested public data keeps its originating terms) — #218.
+54. **[done]** Add `CONTRIBUTING.md` documenting the fresh-`main` branch/PR flow **and** the now-gating quality gates (ruff lint/format, mypy, pytest, lockfile).
+55. **[done]** Add `.github/CODEOWNERS` reflecting the Architect-gate ownership (maintainer `@jotaele44`; federation contract + CI flagged explicitly).
+56. **[done]** Add `.github/pull_request_template.md` mirroring the existing review checklist (gates + scope/risk + federation-contract flag).
+57. **[done]** Add `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1, adopted by reference).
+58. **[done]** Add `SECURITY.md` (private disclosure policy) — pairs with dependabot/pip-audit.
 
 ## WAVE J — Release & versioning (after contracts are schematized + governance exists)
 59. Add a root `CHANGELOG.md` (Keep-a-Changelog) — #220.
