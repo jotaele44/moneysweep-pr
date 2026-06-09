@@ -26,6 +26,11 @@ from typing import Any
 
 INPUT_FILENAME = "contract_sweeper_derivatives.csv"
 LANE_ID = "contract_sweeper_politics_finance_lane"
+# Versions the FINANCE-LANE REPORT contract only (the report dict / JSON this
+# module emits, modeled by schemas/contract_sweeper_finance_lane_report.schema.json).
+# This is the single source of truth for that version. It is INDEPENDENT of the
+# federation "contract-sweeper-export" contract, which is versioned separately in
+# scripts/build_export_package.py (currently 1.2.0) — do not couple the two.
 EXPORT_CONTRACT_VERSION = "1.0.0"
 REPORT_FILENAME = "contract_sweeper_finance_lane_report.json"
 

@@ -22,12 +22,29 @@ contract_sweeper_funding_award.schema.json
 contract_sweeper_relationship.schema.json
 contract_sweeper_source.schema.json
 contract_sweeper_transaction.schema.json
+contract_sweeper_finance_lane_report.schema.json
 ```
 
-These six files define the public surface area Contract-Sweeper publishes for
+The first six files define the public surface area Contract-Sweeper publishes for
 federated consumption. The README at repo root cites a "Contract-Finance"
-export contract (currently v1.2.0); these schemas are how that contract is
-expressed in machine-readable form.
+export contract (currently v1.2.0, the single source of truth being
+`EXPORT_CONTRACT_VERSION` in `scripts/build_export_package.py`); these schemas are
+how that contract is expressed in machine-readable form.
+
+#### Two independent versioned contracts (don't conflate)
+
+The seventh file, `contract_sweeper_finance_lane_report.schema.json`, models the
+report dict emitted by `readiness/contract_sweeper_finance_lane.py` — the
+Contract-Sweeper counterpart to spiderweb-pr's spatial-lane report. It is a
+**separate** exported contract with its **own** version lineage, currently **1.0.0**
+(the single source of truth being `EXPORT_CONTRACT_VERSION` in that module). The two
+module-level constants share a name (`EXPORT_CONTRACT_VERSION`) but version different
+things — bump them independently:
+
+| Contract | Version constant | Current | Schema |
+|---|---|---|---|
+| Federation "contract-sweeper-export" (→ spiderweb-pr query-hub) | `scripts/build_export_package.py` | 1.2.0 | the first six files |
+| Finance-lane report | `readiness/contract_sweeper_finance_lane.py` | 1.0.0 | `contract_sweeper_finance_lane_report.schema.json` |
 
 ### Editing rules for exported schemas
 

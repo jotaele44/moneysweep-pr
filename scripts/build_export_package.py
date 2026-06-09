@@ -31,6 +31,11 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
+# Versions the FEDERATION "contract-sweeper-export" contract consumed by the
+# spiderweb-pr query-hub (see the handshake constants below). This is the single
+# source of truth for that version. It is INDEPENDENT of the finance-lane REPORT
+# contract, which is versioned separately in readiness/contract_sweeper_finance_lane.py
+# (currently 1.0.0) — the two share a constant name only, not a lineage.
 EXPORT_CONTRACT_VERSION = "1.2.0"
 PRODUCER_NAME = "contract-sweeper"
 DEFAULT_PRODUCER_VERSION = "0.1.0"
