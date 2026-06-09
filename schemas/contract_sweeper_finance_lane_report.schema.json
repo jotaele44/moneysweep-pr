@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://contract-sweeper/schemas/contract_sweeper_finance_lane_report.schema.json",
+  "title": "Contract-Sweeper finance-lane report",
+  "description": "Machine-readable report emitted by readiness/contract_sweeper_finance_lane.py (contract_sweeper_finance_lane_report.json). This is the Contract-Sweeper counterpart to spiderweb-pr's spatial-lane report and shares its shape. Its `export_contract_version` (1.0.0) versions THIS lane-report contract only; it is independent of the federation 'contract-sweeper-export' contract versioned in scripts/build_export_package.py (1.2.0).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "generated_at",
+    "lane_id",
+    "input_dir",
+    "producer",
+    "export_contract_version",
+    "status",
+    "input_rows",
+    "routed_rows",
+    "normalized_writes",
+    "by_table",
+    "by_review_queue",
+    "discrepancy_count",
+    "zero_loss_pass",
+    "outputs"
+  ],
+  "properties": {
+    "generated_at": {
+      "type": "string",
+      "description": "UTC ISO-8601 timestamp of report generation.",
+      "format": "date-time"
+    },
+    "lane_id": {
+      "type": "string",
+      "description": "Stable identifier for this intake lane.",
+      "enum": ["contract_sweeper_politics_finance_lane"]
+    },
+    "input_dir": {
+      "type": "string",
+      "description": "Directory the lane consumed its derivatives CSV from.",
+      "minLength": 1
+    },
+    "producer": {
+      "type": "string",
+      "description": "Upstream component that produced the routed derivatives.",
+      "enum": ["pr-intake-router"]
+    },
+    "export_contract_version": {
+      "type": "string",
+      "description": "Semantic version of the finance-lane report contract (this schema). Distinct from the federation export contract.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "status": {
+      "type": "string",
+      "description": "READY when at least one row routed, otherwise EMPTY.",
+      "enum": ["READY", "EMPTY"]
+    },
+    "input_rows": {
+      "type": "integer",
+      "description": "Total derivative rows read from the input CSV.",
+      "minimum": 0
+    },
+    "routed_rows": {
+      "type": "integer",
+      "description": "Rows that routed to at least one normalized table or review queue.",
+      "minimum": 0
+    },
+    "normalized_writes": {
+      "type": "integer",
+      "description": "Total records written across all normalized tables.",
+      "minimum": 0
+    },
+    "by_table": {
+      "type": "object",
+      "description": "Per-normalized-table record counts, keyed by table name.",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "by_review_queue": {
+      "type": "object",
+      "description": "Per-review-queue record counts, keyed by queue name.",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "discrepancy_count": {
+      "type": "integer",
+      "description": "Rows recorded in the discrepancy queue (routed nowhere else).",
+      "minimum": 0
+    },
+    "zero_loss_pass": {
+      "type": "boolean",
+      "description": "True when routed_rows + discrepancy_count == input_rows (nothing dropped)."
+    },
+    "outputs": {
+      "type": "object",
+      "description": "Relative paths of the artifacts this lane wrote.",
+      "additionalProperties": false,
+      "required": ["normalized", "review", "daily_report", "lane_report"],
+      "properties": {
+        "normalized": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "review": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "daily_report": { "type": "string" },
+        "lane_report": { "type": "string" }
+      }
+    }
+  }
+}
