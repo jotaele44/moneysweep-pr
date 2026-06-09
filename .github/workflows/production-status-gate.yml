@@ -27,6 +27,19 @@ jobs:
       - name: Run production status gate
         run: python scripts/run_production_status_gate.py --root .
 
+      - name: Resumption-readiness checklist (source preflight gate)
+        # Wave M, task 74. Couples the production-status flip to source preflight:
+        # the structural preflight must be green here, so no change that flips
+        # NON_PRODUCTION_DIAGNOSTIC can merge while preflight is failing. The
+        # ordered preconditions for an actual flip live in
+        # docs/RESUMPTION_CHECKLIST.md; the diagnostic lock below stays the
+        # backstop. Strictly additive — it can only make the gate redder.
+        run: |
+          test -f docs/RESUMPTION_CHECKLIST.md \
+            || { echo "::error::docs/RESUMPTION_CHECKLIST.md is missing"; exit 1; }
+          python3 run_all.py --only-setup --strict-preflight
+          echo "resumption checklist: source preflight green (see docs/RESUMPTION_CHECKLIST.md)"
+
       - name: Enforce diagnostic production status
         run: |
           python - <<'PY'
