@@ -1,0 +1,55 @@
+name: Size guard
+
+# Blocks a PR that adds or grows a tracked file past the size threshold, so the
+# ~89 MB data-blob problem documented in docs/HISTORY_PURGE_PLAN.md (#222) cannot
+# recur. This is deliberately landed BEFORE any history purge: stop the bleeding
+# first, then rewrite history in a coordinated window.
+#
+# It only inspects files ADDED or MODIFIED in the PR (not the existing tree), so
+# the current committed fixtures are unaffected unless a PR makes them bigger.
+# Genuinely-needed large files belong in release assets, external object storage,
+# or git-lfs — or, with justification, on the allowlist below.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  size-guard:
+    runs-on: ubuntu-latest
+    env:
+      # 5 MiB. The historical offenders were 56 MB / 24 MB / 5.3 MB; the largest
+      # legitimately-committed fixture today is ~2.8 MB, so this leaves headroom.
+      MAX_BYTES: "5242880"
+      ALLOWLIST: ".github/size-guard-allowlist.txt"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Block oversized new or grown blobs
+        run: |
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          fail=0
+          # Added (A) or modified (M) files in this PR.
+          while IFS= read -r f; do
+            [ -n "$f" ] || continue
+            # Skip allowlisted paths (exact match).
+            if [ -f "$ALLOWLIST" ] && grep -Fxq "$f" "$ALLOWLIST"; then
+              continue
+            fi
+            size="$(git cat-file -s "$head:$f" 2>/dev/null || echo 0)"
+            if [ "$size" -gt "$MAX_BYTES" ]; then
+              echo "::error file=$f::$f is $size bytes (limit $MAX_BYTES). Move large data to release assets / external storage / git-lfs, or add the path to $ALLOWLIST with justification."
+              fail=1
+            fi
+          done < <(git diff --name-only --diff-filter=AM "$base" "$head")
+
+          if [ "$fail" -ne 0 ]; then
+            echo "Size guard FAILED — see the annotations above."
+            exit 1
+          fi
+          echo "Size guard passed: no new or modified file exceeds $MAX_BYTES bytes."
