@@ -1,15 +1,14 @@
 name: Intake Delivery (manual)
 
-# Cross-repo intake delivery — SCAFFOLDING, manual-only (workflow_dispatch).
-# Pipeline: PR-intake router -> Contract-Sweeper finance-lane normalization ->
-# same-repo PR with the finance tables -> deliver the spiderweb-pr derivative to
-# that repo's intake dropzone via a cross-repo PR.
+# Contract-Sweeper finance-lane normalization — SCAFFOLDING, manual-only
+# (workflow_dispatch). Pipeline: PR-intake router -> finance-lane normalization ->
+# same-repo PR with the finance tables.
 #
-# The cross-repo step needs a FEDERATION_DELIVERY_TOKEN secret: a repo-scoped PAT
-# with write access to jotaele44/spiderweb-pr (the default GITHUB_TOKEN is
-# single-repo). Without it, that step is skipped. This workflow is NOT exercised
-# by CI; the underlying logic lives in tested scripts
-# (scripts/build_contract_sweeper_finance_lane.py, scripts/deliver_derivatives.py).
+# Note: the former cross-repo delivery to spiderweb-pr was retired (2026-06) when
+# spiderweb-pr became a producer-only federation node and removed its
+# intake-normalize receiver. This workflow no longer delivers to other repos.
+# Not exercised by CI; the underlying logic lives in
+# scripts/build_contract_sweeper_finance_lane.py.
 
 on:
   workflow_dispatch:
@@ -51,23 +50,3 @@ jobs:
             data/normalized/*.csv
             data/review/*.csv
             reports/daily/politics_finance_update_report.md
-      - name: Deliver to spiderweb-pr (cross-repo PR; needs FEDERATION_DELIVERY_TOKEN)
-        if: ${{ secrets.FEDERATION_DELIVERY_TOKEN != '' }}
-        env:
-          DELIVERY_TOKEN: ${{ secrets.FEDERATION_DELIVERY_TOKEN }}
-          RUN_ID: ${{ github.run_id }}
-        run: |
-          set -e
-          git clone --depth 1 "https://x-access-token:${DELIVERY_TOKEN}@github.com/jotaele44/spiderweb-pr.git" /tmp/spiderweb-pr
-          python3 scripts/deliver_derivatives.py --derivatives-dir data/exports/pr_intake_router --dropzone /tmp/spiderweb-pr/data/intake/pr_intake
-          cd /tmp/spiderweb-pr
-          BRANCH="intake/spiderweb-derivatives-${RUN_ID}"
-          git config user.name "prii-federation-bot"
-          git config user.email "prii-federation-bot@users.noreply.github.com"
-          git checkout -b "$BRANCH"
-          git add data/intake/pr_intake/spiderweb_pr_derivatives.csv
-          git commit -m "Intake delivery: spiderweb_pr derivatives from Contract-Sweeper router"
-          git push origin "$BRANCH"
-          GH_TOKEN="$DELIVERY_TOKEN" gh pr create --repo jotaele44/spiderweb-pr --head "$BRANCH" --base main \
-            --title "Intake delivery: spiderweb spatial lane derivatives" \
-            --body "Automated cross-repo delivery from the Contract-Sweeper PR-intake router. Normalize with scripts/build_spiderweb_spatial_lane.py --input data/intake/pr_intake"
