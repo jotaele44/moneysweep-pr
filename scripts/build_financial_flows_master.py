@@ -6,6 +6,7 @@ Architecture:
   [FEMA PA v2]  [HUD DRGR]  [USASpending/FPDS]  [PR Procurement]
         ↓             ↓              ↓                  ↓
               financial_flows_master.parquet
+              financial_flows_master.csv  (export bridge mirror)
 
 Inputs (all optional — graceful if missing):
   data/normalized/fema_pa_projects_v2.parquet
@@ -20,8 +21,9 @@ Inputs (all optional — graceful if missing):
   data/staging/processed/pr_compras_awards.csv
   data/staging/processed/pr_contracts_master.csv  (or pr_all_awards_master.csv)
 
-Output:
+Outputs:
   data/normalized/financial_flows_master.parquet
+  data/staging/processed/financial_flows_master.csv
 
 Usage:
   python3 scripts/build_financial_flows_master.py
@@ -57,10 +59,12 @@ FLOW_COLUMNS = [
     "project_id",
     "applicant_or_grantee",
     "responsible_organization",
+    "recipient_entity_id",
     "prime_vendor",
     "sub_vendor",
     "amount_type",
     "amount",
+    "flow_date",
     "obligation_date",
     "drawdown_date",
     "award_date",
@@ -77,6 +81,14 @@ TODAY = str(date.today())
 
 def _fid():
     return str(uuid.uuid4())[:12]
+
+
+def _first_nonempty(*values) -> str:
+    for value in values:
+        text = str(value or "").strip()
+        if text and text.lower() not in {"nan", "none", "nat"}:
+            return text
+    return ""
 
 
 def _load_parquet(path, logger):
@@ -106,7 +118,44 @@ def _load_csv(path, logger):
 def _row(**kwargs):
     base = {col: "" for col in FLOW_COLUMNS}
     base.update(kwargs)
+    if not str(base.get("flow_date", "")).strip():
+        base["flow_date"] = _first_nonempty(
+            base.get("drawdown_date"),
+            base.get("obligation_date"),
+            base.get("award_date"),
+        )
     return base
+
+
+def _finalize_flow_frame(df: pd.DataFrame) -> pd.DataFrame:
+    """Guarantee the canonical flow schema and export-bridge date column.
+
+    The federation export mapper reads ``financial_flows_master.csv`` from the
+    processed staging directory and expects a ``flow_date`` column. The canonical
+    builder historically wrote only parquet under ``data/normalized`` and carried
+    source-specific dates as ``drawdown_date`` / ``obligation_date`` /
+    ``award_date``. This normalizer makes the bridge explicit and deterministic.
+    """
+    out = df.copy()
+    for col in FLOW_COLUMNS:
+        if col not in out.columns:
+            out[col] = ""
+    out["flow_date"] = out.apply(
+        lambda r: _first_nonempty(
+            r.get("flow_date"),
+            r.get("drawdown_date"),
+            r.get("obligation_date"),
+            r.get("award_date"),
+        ),
+        axis=1,
+    )
+    return out[FLOW_COLUMNS]
+
+
+def _write_csv_bridge(df: pd.DataFrame, path: Path, logger) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _finalize_flow_frame(df).to_csv(path, index=False)
+    logger.info(f"  → {path.relative_to(path.parents[2]) if len(path.parents) > 2 else path}")
 
 
 def _ingest_fema_pa(df_v2, df_portal, df_linkage, logger):
@@ -138,6 +187,7 @@ def _ingest_fema_pa(df_v2, df_portal, df_linkage, logger):
                 pw_number=pw,
                 applicant_or_grantee=str(r.get("applicant_name", "")).strip(),
                 responsible_organization=str(r.get("applicant_name", "")).strip(),
+                recipient_entity_id=str(link.get("recipient_uei", "")) if link else "",
                 prime_vendor=str(link.get("recipient_name", "")) if link else "",
                 amount_type="federal_share_obligated",
                 amount=str(r.get("federal_share_obligated", "")),
@@ -270,6 +320,7 @@ def _ingest_pr_procurement(df_prasa, df_compras, logger):
         date_col = next((c for c in ["award_date", "action_date"] if c in df.columns), None)
         id_col = next((c for c in ["contract_id", "rfp_id", "award_id"] if c in df.columns), None)
         muni_col = next((c for c in ["municipality", "pop_county"] if c in df.columns), None)
+        uei_col = next((c for c in ["recipient_uei", "vendor_uei", "entity_uei"] if c in df.columns), None)
         for _, r in df.iterrows():
             rows.append(
                 _row(
@@ -278,6 +329,7 @@ def _ingest_pr_procurement(df_prasa, df_compras, logger):
                     source_system=source_label.lower(),
                     source_file=source_file,
                     funding_source="PR_GOVERNMENT",
+                    recipient_entity_id=str(r.get(uei_col, "")) if uei_col else "",
                     prime_vendor=str(r.get(vendor_col, "")) if vendor_col else "",
                     amount_type="contract_value",
                     amount=str(r.get(amount_col, "")) if amount_col else "",
@@ -296,6 +348,13 @@ def _ingest_contracts(df_contracts, logger):
     if df_contracts.empty:
         return rows
     for _, r in df_contracts.iterrows():
+        recipient_id = _first_nonempty(
+            r.get("recipient_uei"),
+            r.get("parent_uei"),
+            r.get("recipient_entity_id"),
+            r.get("normalized_name"),
+            r.get("recipient_name"),
+        )
         rows.append(
             _row(
                 flow_id=_fid(),
@@ -305,6 +364,7 @@ def _ingest_contracts(df_contracts, logger):
                 funding_source="FEDERAL",
                 applicant_or_grantee="",
                 responsible_organization="",
+                recipient_entity_id=recipient_id,
                 prime_vendor=str(r.get("recipient_name", "")),
                 amount_type="obligated_amount",
                 amount=str(r.get("obligated_amount", "")),
@@ -325,14 +385,21 @@ def run(root=None, force=False):
     proc_dir = root / "data" / "staging" / "processed"
     linked_dir = root / "data" / "linked"
     norm_dir.mkdir(parents=True, exist_ok=True)
+    proc_dir.mkdir(parents=True, exist_ok=True)
 
     out_path = norm_dir / "financial_flows_master.parquet"
+    csv_bridge_path = proc_dir / "financial_flows_master.csv"
     logger = setup_logging("build_financial_flows_master")
 
     if out_path.exists() and not force:
-        rows = len(pq_read(out_path))
-        logger.info(f"  financial_flows_master.parquet exists ({rows:,} rows) — skipping.")
-        return {"rows": rows, "status": "CACHED"}
+        df_cached = _finalize_flow_frame(pq_read(out_path))
+        pq_write(df_cached, out_path)
+        _write_csv_bridge(df_cached, csv_bridge_path, logger)
+        rows = len(df_cached)
+        logger.info(
+            f"  financial_flows_master.parquet exists ({rows:,} rows) — refreshed CSV bridge."
+        )
+        return {"rows": rows, "status": "CACHED", "csv_bridge": str(csv_bridge_path)}
 
     logger.info("Loading upstream inputs...")
     df_fema_v2 = _load_parquet(norm_dir / "fema_pa_projects_v2.parquet", logger)
@@ -361,7 +428,9 @@ def run(root=None, force=False):
         logger.warning("  No upstream data found — writing empty financial_flows_master")
         df_out = pd.DataFrame(columns=FLOW_COLUMNS)
 
+    df_out = _finalize_flow_frame(df_out)
     pq_write(df_out, out_path)
+    _write_csv_bridge(df_out, csv_bridge_path, logger)
 
     total_amount = pd.to_numeric(df_out["amount"], errors="coerce").fillna(0).sum()
     flow_types = df_out["flow_type"].value_counts().to_dict() if not df_out.empty else {}
@@ -374,12 +443,18 @@ def run(root=None, force=False):
     for ftype, count in sorted(flow_types.items(), key=lambda x: -x[1]):
         logger.info(f"    {ftype}: {count:,}")
     logger.info(f"  → {out_path.name}")
+    logger.info(f"  → {csv_bridge_path.name}")
 
-    return {"rows": len(df_out), "total_amount": total_amount, "status": "OK"}
+    return {
+        "rows": len(df_out),
+        "total_amount": total_amount,
+        "status": "OK",
+        "csv_bridge": str(csv_bridge_path),
+    }
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Build financial flows master parquet")
+    parser = argparse.ArgumentParser(description="Build financial flows master parquet + CSV bridge")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     result = run(force=args.force)
