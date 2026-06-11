@@ -28,8 +28,9 @@ DEFAULT_ENDPOINTS = [
     "https://sam.gov/",
     "https://lda.senate.gov/",
     "https://api.open.fec.gov/",
-    "https://api.opencorporates.com/",
     "https://www.highergov.com/",
+    "https://api.gleif.org/",
+    "https://data.sec.gov/",
 ]
 
 

@@ -54,7 +54,7 @@ manual_exports:
     notes: FEMA Public Assistance 178-PW Excel exports from the authorized PA portal. OpenFEMA v2 is preferred; 178-PW is the supplement.
 
   - source_id: pr_corporate_registry
-    expected_drop_dir: data/manual/pr_corporate_registry/
+    expected_drop_dir: data/raw/Active Contractor Listing/
     expected_filename_pattern: "*.csv|*.xlsx"
     expected_columns:
       - registration_number

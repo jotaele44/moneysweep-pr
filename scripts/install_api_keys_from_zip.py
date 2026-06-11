@@ -39,7 +39,6 @@ NAME_NORMALIZATION = {
     "highergov_api_key": "HIGHERGOV_API_KEY",
     "lda_api_key": "LDA_API_KEY",
     "fec_api_key": "FEC_API_KEY",
-    "opencorporates_api_token": "OPENCORPORATES_API_TOKEN",
     "felt_api_key": "FELT_API_KEY",
     "nimble_api_key": "NIMBLE_API_KEY",
 }

@@ -46,7 +46,7 @@ Contract-Sweeper currently tracks source families across the following domains:
 | Infrastructure | PRASA, PREPA, ACT, PPP, capital projects, recovery projects |
 | Lobbying and influence | Puerto Rico cabilderos, federal LDA, campaign-finance crosswalks |
 | Debt and fiscal control | EMMA/MSRB, COFINA, AAFAF, PROMESA creditor/fiscal-control references |
-| Contractor references | DCAA active contractor listings, OFAC, OpenCorporates, entity aliases |
+| Contractor references | DCAA active contractor listings, OFAC, GLEIF LEI, SEC officers, entity aliases |
 | Geospatial analysis | Municipality normalization, infrastructure geography, GIS overlays |
 
 ## Manual Source Intake Backlog
@@ -197,7 +197,6 @@ Common runtime keys include:
 SAM_API_KEY
 LDA_API_KEY
 FEC_API_KEY
-OPENCORPORATES_API_TOKEN
 HIGHERGOV_API_KEY
 ```
 
