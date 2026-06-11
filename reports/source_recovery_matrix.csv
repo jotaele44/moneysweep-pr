@@ -43,11 +43,13 @@ wic,False,api_adapter,True,True,,True,True,scripts/download_wic.py,1,0,1,,Materi
 wioa,False,api_adapter,True,True,,True,True,scripts/download_wioa.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 dol_whd_osha,False,api_producer,True,True,,False,True,scripts/download_dol.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 fcc_usf,False,api_producer,True,True,,False,True,scripts/download_fcc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+fec_committees,False,api_producer,True,True,FEC_API_KEY,False,True,scripts/download_fec_committees.py,3,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 financialdata_net,False,api_producer,True,True,FINANCIALDATA_API_KEY,False,True,scripts/enrichment/enrich_financialdata_entities.py,4,0,0,,"Run producer under strict preflight; public API path, set key if gated."
 gao_ig_audits,False,api_producer,True,True,,False,True,scripts/download_gao_ig.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 hud_cdbg_dr_public,True,api_producer,True,True,,False,True,scripts/download_cdbg_dr.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 lihtc,False,api_producer,True,True,,False,True,scripts/download_lihtc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 ncua,False,api_producer,True,True,,False,True,scripts/download_ncua.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+ngo_integration_layer,False,api_producer,True,True,,False,True,scripts/ngo_integration.py,3,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 nmtc,False,api_producer,True,True,,False,True,scripts/download_nmtc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sec_13f_nport,False,api_producer,True,True,,False,True,scripts/download_sec_holdings.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sec_edgar,False,api_producer,True,True,,False,True,scripts/download_sec.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
@@ -58,6 +60,7 @@ nara_catalog_aws_open_data,False,deferred_stub,False,False,,False,True,scripts/d
 nara_nextgen_catalog_v3,False,deferred_stub,False,False,NARA_API_KEY,False,True,scripts/download_nara_nextgen.py,2,0,0,,Intentionally unimplemented; remains not_materialized by design.
 act_transition_contracts,False,manual_export,False,False,,False,True,scripts/ingest_act_transition.py,1,0,1,data/manual/act_transition/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 acuden_2024_transition,False,manual_export,False,False,,False,True,scripts/ingest_act_transition.py,1,0,1,data/manual/acuden_2024/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+contralor_electoral,False,manual_export,False,False,,False,True,scripts/ingest_oce.py,1,0,1,data/raw/OCE/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 dcaa_active_contractors,False,manual_export,False,False,,False,True,scripts/download_active_contractors.py,1,0,1,data/raw/Active Contractor Listing/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 donaciones_pr,False,manual_export,False,False,,False,True,scripts/ingest_donaciones.py,1,0,1,data/raw/Donaciones/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 follow_the_money,False,manual_export,False,False,,False,True,scripts/ingest_follow_the_money.py,4,0,1,data/raw/follow_the_money/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.

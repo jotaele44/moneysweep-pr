@@ -1249,6 +1249,19 @@ def run_pipeline() -> dict[str, object]:
     export_alias_registry(ngos)
     export_graph_layer(ngos, funding_edges)
     write_review_outputs(ngos, funding_edges, coverage, asset_edges, fiscal_edges)
+
+    # NGO ↔ political-donation crossref. Runs against the freshly-written
+    # ngos_master.csv plus any FEC / PR CEE / PR OCE donation feeds already
+    # materialized. Tolerant of missing donation feeds — a missing feed yields
+    # a status dict, never an exception.
+    ngo_donations = {"rows": 0, "status": "SKIPPED"}
+    try:
+        from scripts.analyze_political_crossref import build_ngo_donation_crossref
+
+        ngo_donations = build_ngo_donation_crossref(root=ROOT)
+    except Exception as exc:  # noqa: BLE001 — keep NGO pipeline resilient
+        ngo_donations = {"rows": 0, "status": f"ERROR: {type(exc).__name__}: {exc}"}
+
     summary = {
         "ngos": int(len(ngos)),
         "funding_edges": int(len(funding_edges)),
@@ -1257,6 +1270,10 @@ def run_pipeline() -> dict[str, object]:
         "municipalities": int(coverage["municipality"].nunique()),
         "output_dir": str(NGO_OUT_DIR.relative_to(ROOT)),
         "status": "pass" if coverage["municipality"].nunique() == 78 else "fail",
+        "ngo_political_donations": {
+            "rows": int(ngo_donations.get("rows", 0) or 0),  # type: ignore[call-overload]
+            "status": str(ngo_donations.get("status", "")),
+        },
     }
     (NGO_OUT_DIR / "ngo_validation_report.json").write_text(
         json.dumps(summary, indent=2), encoding="utf-8"

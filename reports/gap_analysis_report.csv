@@ -31,6 +31,7 @@ cms_open_payments,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/p
 cofina,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cofina.csv,
 compras_pr,territorial,False,none,2,0,2,0,not_materialized,0,1,data/staging/processed/pr_compras_rfps.csv,comprashpr.com RFP / award scrape.
 congressional_earmarks,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_earmarks.csv,
+contralor_electoral,political_finance,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_oce_donations.csv,"PR Oficina del Contralor Electoral (OCE) campaign-finance registry. Distinct from `oficina_contralor` (government-audit Contralor, a different agency). ingest_oce.py is a dropzone reader (no network c"
 dcaa_active_contractors,manual_export,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_active_contractors.csv,DCAA FY2007/FY2012/FY2013 active contractor listings. Alias/crosswalk source.
 doe_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_doe.csv,
 doj_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_doj_grants.csv,
@@ -43,6 +44,7 @@ eqb_epa_icis,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/pr
 exim_bank,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_exim.csv,
 fcc_usf,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fcc_usf.csv,
 fdic,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fdic.csv,
+fec_committees,political_finance,False,api_key:FEC_API_KEY,3,0,3,0,not_materialized,0,1,data/staging/processed/pr_fec_committees.csv,"FEC committee master plus Schedule B (disbursements) and Schedule E (independent expenditures) for PR-linked political committees. Makes PACs, Super PACs, 527s, and party committees first-class entiti"
 fema_hmgp,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fema_hmgp.csv,
 fhlb,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fhlb.csv,
 financialdata_net,optional_commercial_enrichment,False,api_key:FINANCIALDATA_API_KEY,4,0,4,0,not_materialized,0,0,outputs/enrichment/financialdata_identifier_crosswalk.csv,OPTIONAL commercial provider for public-market entity resolution (CUSIP / ISIN / FIGI / LEI / CIK / ticker crosswalks). NOT a required source — never wired into coverage gates. Live use requires BOTH 
@@ -64,6 +66,7 @@ nara_catalog_aws_open_data,provenance_archival,False,none,2,0,2,0,not_materializ
 nara_nextgen_catalog_v3,provenance_archival,False,api_key:NARA_API_KEY,2,0,2,0,not_materialized,0,0,data/staging/processed/nara_nextgen/nara_record_locator_index.csv,"Targeted archival locator only. Do not use as a contract-award, financial-flow, or bulk archival source. Fetcher intentionally not implemented until a credential and bounded query allowlist are availa"
 ncua,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ncua.csv,
 nfip_claims,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_nfip_claims.csv,
+ngo_integration_layer,nonprofit,False,none,3,0,3,0,not_materialized,0,1,data/staging/processed/ngos/ngos_master.csv,"NGO / OSFL identity, funding, and coverage layer built from IRS EO BMF, TEOS, PR state registry, and USASpending drops. Also drives the NGO ↔ political-donation crossref (analyze_political_crossref: b"
 nih_reporter,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_nih_grants.csv,
 nmtc,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_nmtc.csv,
 nonprofits_irs990,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_nonprofits_990.csv,

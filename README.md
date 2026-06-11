@@ -8,7 +8,7 @@ lobbying, campaign-finance, debt/fiscal-control, contractor-reference, and geosp
 records.
 
 The project began as a 13-dataset federal procurement pipeline. It has expanded into
-an 84-source registry with source-readiness gates, strict preflight controls,
+an 88-source registry with source-readiness gates, strict preflight controls,
 manual-source ingestion, entity-resolution staging, and graph/influence outputs.
 
 ## Current Operating State
@@ -16,7 +16,7 @@ manual-source ingestion, entity-resolution staging, and graph/influence outputs.
 Contract-Sweeper is **not yet a production-certified master dataset**. The current
 state is a controlled buildout phase:
 
-- **Source registry:** 84 tracked source definitions.
+- **Source registry:** 88 tracked source definitions.
 - **Automatable sources:** 54 marked ready by the materialization-readiness gate.
 - **Queued / excluded sources:** manual exports, scraper-needed Puerto Rico sources,
   semantic duplicates, and deferred stubs remain outside the automatable target.
