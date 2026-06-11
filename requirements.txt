@@ -8,6 +8,7 @@ python-dotenv>=1.0.0
 pyarrow>=24.0.0
 # R5 foundation deps
 PyYAML>=6.0
-networkx>=3.0
+networkx>=3.6.1; python_version >= '3.11'
+networkx>=3.0; python_version < '3.11'
 # ACT/ACUDEN PDF extraction harness
 pdfplumber>=0.10.0
