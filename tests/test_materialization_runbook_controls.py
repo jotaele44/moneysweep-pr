@@ -28,9 +28,11 @@ def test_materialization_operator_checklist_exists():
 def test_materialization_readiness_snapshot_matches_runbook_counts():
     snapshot = json.loads(Path("reports/materialization_readiness.json").read_text(encoding="utf-8"))
 
-    assert snapshot["total_sources"] == 85
-    assert snapshot["automatable_total"] == 55
-    assert snapshot["automatable_ready"] == 55
+    # Net +1 vs prior baseline of 85: added free keyless entity-resolution
+    # sources gleif_lei and sec_officers, and removed the paid OpenCorporates.
+    assert snapshot["total_sources"] == 86
+    assert snapshot["automatable_total"] == 56
+    assert snapshot["automatable_ready"] == 56
     assert snapshot["queued_excluded_total"] == 30
     assert snapshot["automatable_not_ready"] == []
 

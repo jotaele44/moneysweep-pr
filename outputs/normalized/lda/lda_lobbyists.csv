@@ -1,0 +1,2 @@
+lobbyist_id,first_name,middle_name,last_name,suffix,prefix,source_id,source_family,source_endpoint,source_url,retrieved_at,api_record_id,record_hash,raw_payload_stored,evidence_tier
+LOB-001,Ana,M.,Rivera,,Ms.,lda_gov,federal_lobbying,lobbyists,https://lda.gov/api/v1/lobbyists/?format=api,2026-06-06T00:53:25Z,LOB-001,cccde7882ed511bdd01130774df75c20e16ef7dc5ed1bc91aed80b4c426cf927,False,T1

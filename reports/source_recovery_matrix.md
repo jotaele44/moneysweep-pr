@@ -1,23 +1,23 @@
 # Source Materialization Readiness
 
-Total sources: **85**
-Automatable: **55** (ready: **55**, need API key at run time: 5)
+Total sources: **86**
+Automatable: **56** (ready: **56**, need API key at run time: 4)
 Queued / excluded: **30**
 
 ## Path types
 
 | path_type | automatable | count | recommended_action |
 | --- | --- | --- | --- |
-| `api_adapter` | True | 42 | Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated). |
-| `api_producer` | True | 13 | Run producer under strict preflight; public API path, set key if gated. |
+| `api_adapter` | True | 41 | Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated). |
+| `api_producer` | True | 15 | Run producer under strict preflight; public API path, set key if gated. |
 | `scraper_needed` | False | 15 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
 | `manual_export` | False | 10 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
 | `deferred_stub` | False | 2 | Intentionally unimplemented; remains not_materialized by design. |
 
-API keys needed for full automatable materialization: `FEC_API_KEY`, `FINANCIALDATA_API_KEY`, `HIGHERGOV_API_KEY`, `OPENCORPORATES_API_TOKEN`, `SAM_API_KEY`
+API keys needed for full automatable materialization: `FEC_API_KEY`, `FINANCIALDATA_API_KEY`, `HIGHERGOV_API_KEY`, `SAM_API_KEY`
 
-## api_adapter (42)
+## api_adapter (41)
 
 - `chip`
 - `cms_open_payments`
@@ -46,7 +46,6 @@ API keys needed for full automatable materialization: `FEC_API_KEY`, `FINANCIALD
 - `nonprofits_irs990`
 - `ofac_sdn`
 - `oia_grants`
-- `opencorporates`
 - `research_grants`
 - `sam_entities`
 - `sba_loans`
@@ -62,18 +61,20 @@ API keys needed for full automatable materialization: `FEC_API_KEY`, `FINANCIALD
 - `wic`
 - `wioa`
 
-## api_producer (13)
+## api_producer (15)
 
 - `dol_whd_osha`
 - `fcc_usf`
 - `financialdata_net`
 - `gao_ig_audits`
+- `gleif_lei`
 - `hud_cdbg_dr_public`
 - `lihtc`
 - `ncua`
 - `nmtc`
 - `sec_13f_nport`
 - `sec_edgar`
+- `sec_officers`
 - `sf133_budget_execution`
 - `ssa`
 - `usace_permits`

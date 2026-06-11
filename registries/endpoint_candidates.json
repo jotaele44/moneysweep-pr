@@ -248,10 +248,6 @@
       "url": "https://www.treasury.gov/ofac/downloads/sdn.csv"
     },
     {
-      "source_id": "opencorporates",
-      "url": "https://opencorporates.com/"
-    },
-    {
       "source_id": "pr_corporate_registry",
       "url": "https://rceweb.estado.pr.gov/",
       "notes": "Manual export only."

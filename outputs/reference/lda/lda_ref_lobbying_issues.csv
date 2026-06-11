@@ -1,0 +1,2 @@
+reference_id,code,name,description,source_id,source_family,source_endpoint,source_url,retrieved_at,api_record_id,record_hash,raw_payload_stored,evidence_tier
+BUD,BUD,Budget/Appropriations,,lda_gov,federal_lobbying,constants/filing/lobbyingactivityissues,https://lda.gov/api/v1/constants/filing/lobbyingactivityissues/?format=api,2026-06-06T00:53:25Z,BUD,fcae283d3ad653f43cd6f29ad7e60a52a35ac5658a6b26a0e24643466e0611e1,False,T1

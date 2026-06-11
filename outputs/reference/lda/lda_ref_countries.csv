@@ -1,0 +1,2 @@
+reference_id,code,name,description,source_id,source_family,source_endpoint,source_url,retrieved_at,api_record_id,record_hash,raw_payload_stored,evidence_tier
+US,US,United States,,lda_gov,federal_lobbying,constants/general/countries,https://lda.gov/api/v1/constants/general/countries/?format=api,2026-06-06T00:53:25Z,US,ed9945fcc4d0d9ac8513a685443ba30a9b3b004eed7d1b6bbf3339e683161609,False,T1

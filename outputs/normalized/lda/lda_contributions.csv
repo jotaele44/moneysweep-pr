@@ -1,0 +1,2 @@
+contribution_id,filing_id,registrant_id,registrant_name,client_id,client_name,item_type,amount,contribution_date,payee_or_recipient,source_id,source_family,source_endpoint,source_url,retrieved_at,api_record_id,record_hash,raw_payload_stored,evidence_tier
+CON-001,FIL-001,REG-001,MZLS LLC,CLI-001,SENATE OF PUERTO RICO,Contribution,1000.00,2026-03-15,Demo Committee,lda_gov,federal_lobbying,contributions,https://lda.gov/api/v1/contributions/?format=api,2026-06-06T00:53:25Z,CON-001,0a2997a54de004d040e9b4acb6a8f6f7399c5738f3d2cd20ffda3d05149583d3,False,T1

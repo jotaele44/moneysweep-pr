@@ -1,0 +1,2 @@
+reference_id,code,name,description,source_id,source_family,source_endpoint,source_url,retrieved_at,api_record_id,record_hash,raw_payload_stored,evidence_tier
+JR,Jr.,Jr.,,lda_gov,federal_lobbying,constants/lobbyist/suffixes,https://lda.gov/api/v1/constants/lobbyist/suffixes/?format=api,2026-06-06T00:53:25Z,JR,8692cdb47cea287a6ad351587afaca8bcae1165d2d17eb11fe0100b428acb66f,False,T1

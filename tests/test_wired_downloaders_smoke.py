@@ -92,8 +92,13 @@ B5_TERRITORIAL_MUNICIPAL = [
 B6_BONDS_ENTITY_MANUAL = [
     ("msrb_rtrs_trades", "download_msrb_trades"),
     ("ofac_sdn", "download_ofac"),
-    ("opencorporates", "download_opencorporates"),
     ("dcaa_active_contractors", "download_active_contractors"),
+]
+
+# Free, keyless entity-resolution sources that replace the paid OpenCorporates.
+B7_FREE_ENTITY_RESOLUTION = [
+    ("gleif_lei", "download_gleif"),
+    ("sec_officers", "download_sec_officers"),
 ]
 
 WIRED_SOURCES = (
@@ -103,6 +108,7 @@ WIRED_SOURCES = (
     + B4_DISASTER_RESEARCH
     + B5_TERRITORIAL_MUNICIPAL
     + B6_BONDS_ENTITY_MANUAL
+    + B7_FREE_ENTITY_RESOLUTION
 )
 
 

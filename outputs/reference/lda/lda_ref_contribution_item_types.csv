@@ -1,0 +1,2 @@
+reference_id,code,name,description,source_id,source_family,source_endpoint,source_url,retrieved_at,api_record_id,record_hash,raw_payload_stored,evidence_tier
+CONTRIB,CONTRIB,Contribution,,lda_gov,federal_lobbying,constants/contribution/itemtypes,https://lda.gov/api/v1/constants/contribution/itemtypes/?format=api,2026-06-06T00:53:25Z,CONTRIB,4d228d1a3cda68e6efdcc032437365860eb982c11ee344063d31804c90f7baa8,False,T1

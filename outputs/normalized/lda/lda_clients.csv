@@ -1,0 +1,2 @@
+client_id,client_name,client_country,client_state,client_address,client_city,client_zip,source_id,source_family,source_endpoint,source_url,retrieved_at,api_record_id,record_hash,raw_payload_stored,evidence_tier
+CLI-001,SENATE OF PUERTO RICO,US,PR,Capitol Building,San Juan,00901,lda_gov,federal_lobbying,clients,https://lda.gov/api/v1/clients/?format=api,2026-06-06T00:53:25Z,CLI-001,5a9881fb067d23a37584ffa565c21aeb995e93d755469fca14ad0579a8d3b32f,False,T1

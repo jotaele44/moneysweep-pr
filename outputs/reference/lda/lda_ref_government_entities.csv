@@ -1,0 +1,2 @@
+reference_id,code,name,description,source_id,source_family,source_endpoint,source_url,retrieved_at,api_record_id,record_hash,raw_payload_stored,evidence_tier
+SENATE,SENATE,U.S. Senate,,lda_gov,federal_lobbying,constants/filing/governmententities,https://lda.gov/api/v1/constants/filing/governmententities/?format=api,2026-06-06T00:53:25Z,SENATE,9f7084d72c0ee2e4c8551de412e176890d1ed544f38d9b95291264017252146f,False,T1

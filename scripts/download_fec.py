@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from scripts.config import PROCESSED_DIR, PROJECT_ROOT, setup_logging
+from scripts.config import PROCESSED_DIR, PROJECT_ROOT, get_fec_api_key, setup_logging
 from contract_sweeper.runtime.base_downloader import (
     HttpConfig,
     PageResult,
@@ -175,9 +175,9 @@ def _run(root: Path = None, api_key: str = None, force: bool = False) -> dict:
 
     logger = setup_logging("download_fec")
 
-    # Resolve API key
+    # Resolve API key (env -> .env -> DEMO_KEY)
     if not api_key:
-        api_key = os.environ.get("FEC_API_KEY", "DEMO_KEY")
+        api_key = get_fec_api_key()
     is_demo = api_key == "DEMO_KEY"
     sleep_s = PAGE_SLEEP_DEMO if is_demo else PAGE_SLEEP_KEY
     if is_demo:

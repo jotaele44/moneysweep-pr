@@ -1,0 +1,2 @@
+registrant_id,registrant_name,registrant_ppb_country,registrant_ppb_state,registrant_address,registrant_city,registrant_zip,source_id,source_family,source_endpoint,source_url,retrieved_at,api_record_id,record_hash,raw_payload_stored,evidence_tier
+REG-001,MZLS LLC,US,PR,100 Demo Street,San Juan,00901,lda_gov,federal_lobbying,registrants,https://lda.gov/api/v1/registrants/?format=api,2026-06-06T00:53:25Z,REG-001,65cc4d31ecd539529dee26b42de0e5e5af5c562cd3c83d8b6934423ecf128111,False,T1

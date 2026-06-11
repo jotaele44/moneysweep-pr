@@ -8,8 +8,12 @@ import sys
 from pathlib import Path
 import time
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 import requests
 import pandas as pd
+
+from scripts.config import get_highergov_api_key
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUT_DIR = PROJECT_ROOT / "data" / "staging" / "expansion"
@@ -76,7 +80,7 @@ def fetch_resource(resource: str, api_key: str, params: dict) -> pd.DataFrame | 
 
 
 def main():
-    api_key = os.environ.get("HIGHERGOV_API_KEY", "").strip()
+    api_key = get_highergov_api_key()  # env -> .env -> None
     if not api_key:
         print("HIGHERGOV_API_KEY not set")
         return 2

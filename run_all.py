@@ -32,7 +32,6 @@ Core pipeline flags:
   --skip-power-network       Step 25  integrated power/influence network
   --skip-emma                Step 26  MSRB EMMA municipal bonds
   --skip-ofac                Step 27  OFAC SDN sanctions crossref
-  --skip-opencorporates      Step 28  OpenCorporates PR registry
   --skip-prime-sub           Step 29  prime-to-sub relationships
 
 Supplemental federal downloads (steps 6b–6j):
@@ -1790,21 +1789,11 @@ def main() -> int:
             logger.error(f"[Step 27/29] FAILED: {e}")
 
     # ------------------------------------------------------------------
-    # Step 28: OpenCorporates PR business registry
+    # Step 28: (removed) OpenCorporates — the paid registry was removed and
+    # replaced by free, keyless sources: gleif_lei (scripts/download_gleif.py)
+    # and sec_officers (scripts/download_sec_officers.py), plus the
+    # operator-supplied pr_corporate_registry export. No longer run.
     # ------------------------------------------------------------------
-    if args.skip_opencorporates:
-        logger.info("[Step 28/29] SKIPPED (--skip-opencorporates)\n")
-    else:
-        logger.info("[Step 28/29] Downloading PR business entities from OpenCorporates...")
-        try:
-            from scripts.download_opencorporates import run as run_oc
-            oc_result = run_oc(root=root, api_token=args.oc_api_token)
-            logger.info(
-                f"[Step 28/29] Done — {oc_result.get('company_rows', 0):,} companies, "
-                f"{oc_result.get('officer_rows', 0):,} officer records\n"
-            )
-        except Exception as e:
-            logger.error(f"[Step 28/29] FAILED: {e}")
 
     # ------------------------------------------------------------------
     # Step 28b: Contractor project delivery scorecard

@@ -1,0 +1,44 @@
+{
+  "authority_level": "api_authoritative",
+  "created_at": "2026-06-06T00:53:25Z",
+  "endpoints_discovered": [
+    "clients",
+    "constants/contribution/itemtypes",
+    "constants/filing/filingtypes",
+    "constants/filing/governmententities",
+    "constants/filing/lobbyingactivityissues",
+    "constants/general/countries",
+    "constants/general/states",
+    "constants/lobbyist/prefixes",
+    "constants/lobbyist/suffixes",
+    "contributions",
+    "filings",
+    "lobbyists",
+    "registrants"
+  ],
+  "normalized_outputs": [
+    "outputs/normalized/lda/lda_registrants.csv",
+    "outputs/normalized/lda/lda_clients.csv",
+    "outputs/normalized/lda/lda_lobbyists.csv",
+    "outputs/normalized/lda/lda_filings.csv",
+    "outputs/normalized/lda/lda_contributions.csv"
+  ],
+  "reference_outputs": [
+    "outputs/reference/lda/lda_ref_filing_types.csv",
+    "outputs/reference/lda/lda_ref_lobbying_issues.csv",
+    "outputs/reference/lda/lda_ref_government_entities.csv",
+    "outputs/reference/lda/lda_ref_countries.csv",
+    "outputs/reference/lda/lda_ref_states.csv",
+    "outputs/reference/lda/lda_ref_lobbyist_prefixes.csv",
+    "outputs/reference/lda/lda_ref_lobbyist_suffixes.csv",
+    "outputs/reference/lda/lda_ref_contribution_item_types.csv"
+  ],
+  "replacement_decision": {
+    "Registrants.pdf": "retained_as_fixture",
+    "manual_lda_extracts": "retained_as_archival_snapshot",
+    "uploaded_static_lda_registrant_client_filing_snapshots": "replaced_by_api"
+  },
+  "source_id": "lda_gov",
+  "static_seed_role_after_adapter": "regression_fixture",
+  "unresolved_static_seed_files": []
+}
