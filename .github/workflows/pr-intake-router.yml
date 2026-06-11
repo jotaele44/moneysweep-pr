@@ -80,7 +80,7 @@ jobs:
         run: cat data/exports/pr_intake_router/export_verification.json
 
       - name: Upload router exports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pr-intake-router-exports-py${{ matrix.python-version }}
           path: data/exports/pr_intake_router/
