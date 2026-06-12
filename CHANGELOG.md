@@ -25,6 +25,26 @@ A bump to the **federation export** version is what the release-tagging workflow
 ## [Unreleased]
 
 ### Added
+- **NGO political-donation coverage build-out** (`docs/NGO_DONATION_COVERAGE.md`):
+  - `analyze_political_crossref.build_ngo_donation_crossref` — joins
+    `ngos_master.csv` against federal FEC + PR CEE/OCE donation feeds, flags
+    501(c)(4)/(5)/(6) as `likely_political`, and emits
+    `data/staging/processed/ngos/ngo_political_donations.csv`. Auto-invoked from
+    `ngo_integration.py` after `ngos_master.csv` is written. New `--ngo` flag on
+    the crossref CLI.
+  - New `scripts/download_fec_committees.py` — FEC committee master plus
+    Schedule B (disbursements) and Schedule E (independent expenditures) so
+    PACs, Super PACs, 527s, and party committees become first-class entities.
+    New source `fec_committees` in the registry.
+  - New `scripts/ingest_oce.py` — PR Oficina del Contralor Electoral
+    dropzone reader writing `pr_oce_donations.csv` aligned column-for-column to
+    `pr_donaciones.csv`. New source `contralor_electoral` in the registry
+    (distinct from the existing `oficina_contralor` government-audit source).
+    New source `ngo_integration_layer` declares the NGO master / funding /
+    coverage outputs.
+  - 990 political-activity signal: `download_nonprofits.py` now writes
+    `lobbying_expenditure`, `political_expenditure`, `schedule_c_filed`, and a
+    derived `politically_active` flag.
 - Build-execution roadmap hardening (`docs/BUILD_EXECUTION_SEQUENCE.md`, Waves A–M):
   - **Quality-gate spine** (now blocking): `ruff` lint + format, `mypy` (pinned 1.11.2),
     `pytest` with a `--cov-fail-under` floor, and a `requirements.lock` drift check.

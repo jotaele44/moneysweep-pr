@@ -59,6 +59,7 @@ data/staging/processed/ngos/ngo_duplicate_candidates.csv
 data/staging/processed/ngos/ngo_disaster_recovery_exposure.csv
 data/staging/processed/ngos/ngo_asset_edges.csv
 data/staging/processed/ngos/ngo_fiscal_sponsor_edges.csv
+data/staging/processed/ngos/ngo_political_donations.csv
 data/staging/processed/ngos/ngo_graph.gexf
 data/staging/processed/ngos/ngo_coverage_report.md
 data/staging/processed/ngos/ngo_validation_report.json
@@ -194,6 +195,63 @@ from these edges.
    form a group ruling; the central organization (affiliation code 6) is emitted
    as the sponsor of its subordinates (affiliation code 9)
    (`relationship_type=group_exemption`, confidence 70).
+
+## NGO ↔ Political-Donation Cross-Reference
+
+After `ngos_master.csv` is written, the NGO layer invokes
+`analyze_political_crossref.build_ngo_donation_crossref(root=ROOT)`. This joins
+the NGO identity universe against political-donation feeds present in the
+processed directory and writes `ngo_political_donations.csv`. The crossref is
+NGO-centric: one row per matched NGO with separate federal/PR totals.
+
+Inputs (any subset can be present):
+
+| Path | Source | Status |
+|---|---|---|
+| `data/staging/processed/pr_fec_contributions.csv` | FEC Schedule A (federal) | required for federal matches |
+| `data/staging/processed/pr_donaciones.csv` | PR State Election Commission (CEE) | optional |
+| `data/staging/processed/pr_oce_donations.csv` | PR Oficina del Contralor Electoral (OCE) | optional |
+
+Output columns (subset):
+
+| Column | Description |
+|---|---|
+| `ngo_id`, `legal_name`, `ein`, `municipality` | NGO identity carried from `ngos_master.csv` |
+| `irs_subsection`, `entity_type`, `confidence`, `review_status` | NGO identity carried from `ngos_master.csv` |
+| `politically_active_subsection` | `likely_political` for 501(c)(4)/(5)/(6); `restricted_charity` for 501(c)(3); `other` otherwise |
+| `donation_sources` | `federal_fec`, `pr`, or `both` |
+| `fec_total_contributions`, `fec_contribution_count`, `fec_committees_funded`, `fec_candidates_funded`, `fec_earliest`, `fec_latest` | Federal donation aggregates |
+| `pr_total_contributions`, `pr_contribution_count`, `pr_recipients`, `pr_parties`, `pr_earliest`, `pr_latest` | PR (CEE + OCE) donation aggregates |
+| `total_political_contributions` | Sum of federal + PR amounts |
+| `matched_alias` | The normalized NGO name variant that produced the match |
+
+Behavior:
+
+- Name matching reuses `analyze_political_crossref._normalize` (which applies
+  the project's alias overrides) on the NGO `legal_name` **and** every entry in
+  the `aliases` column (JSON list or pipe-delimited).
+- FEC individuals are excluded (`is_individual == True` / `entity_type == "IND"`)
+  to avoid personal-name collisions with NGO names.
+- The crossref output is deliberately **not** declared as an `expected_output`
+  in `source_registry.json` — matches the existing convention (see
+  `fec` source notes) for derived analysis artifacts so preflight gates do not
+  fail before the upstream feeds are materialized.
+
+## 990 Political-Activity Signal
+
+`scripts/download_nonprofits.py` writes four political-activity columns to
+`pr_nonprofits.csv`:
+
+| Column | Source |
+|---|---|
+| `lobbying_expenditure` | ProPublica 990 detail (multiple field aliases probed) |
+| `political_expenditure` | ProPublica 990 detail (multiple field aliases probed) |
+| `schedule_c_filed` | `"true"` when any lobbying or political amount is non-zero |
+| `politically_active` | `"true"` when subsection ∈ {4,5,6} **or** any of the above signals non-zero |
+
+ProPublica does not reliably expose 990 Schedule C line items. Authoritative
+Schedule C extraction belongs to the IRS 990 e-file XML AWS dataset — a
+documented follow-up vector (see `docs/NGO_DONATION_COVERAGE.md`).
 
 ## Recommended Next Vector
 

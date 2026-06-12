@@ -153,7 +153,42 @@ OUTPUT_COLUMNS = [
     "officer_compensation",
     "employee_count",
     "revenue_trend",
+    # ----- Political-activity signal (Phase B) -----
+    # Lobbying / political-expenditure fields are captured opportunistically
+    # from the ProPublica 990 detail when present. ProPublica does NOT reliably
+    # expose 990 Schedule C line items, so these may be blank even when the
+    # org actually filed Schedule C. Authoritative Schedule C extraction
+    # belongs to the IRS 990 e-file XML AWS dataset (future vector).
+    "lobbying_expenditure",
+    "political_expenditure",
+    "schedule_c_filed",
+    "politically_active",
 ]
+
+# IRS 501(c) subsections most likely to engage in political activity
+# (social welfare / labor / business leagues). 501(c)(3) is restricted from
+# political-campaign intervention; everything else is bucketed "other".
+_POLITICAL_SUBSECTIONS = {"4", "5", "6"}
+
+
+def _derive_politically_active(
+    subsection: str,
+    lobbying_expenditure,
+    political_expenditure,
+    schedule_c_filed: str,
+) -> str:
+    """Return 'true' / 'false' flag based on subsection or any non-zero political/lobbying field."""
+    if str(subsection or "").strip() in _POLITICAL_SUBSECTIONS:
+        return "true"
+    if str(schedule_c_filed or "").strip().lower() in {"true", "1", "yes"}:
+        return "true"
+    for v in (lobbying_expenditure, political_expenditure):
+        try:
+            if v not in ("", None) and float(v) > 0:
+                return "true"
+        except (TypeError, ValueError):
+            continue
+    return "false"
 
 
 # ---------------------------------------------------------------------------
@@ -255,6 +290,23 @@ def _fetch_detail(session: requests.Session, ein: str, logger) -> dict:
             pct = (new_rev - old_rev) / abs(old_rev) * 100
             trend = f"{pct:+.0f}%"
 
+    # Lobbying / political fields from ProPublica's exposed 990 fields. Field
+    # names vary across form versions; we probe several aliases and silently
+    # leave the value blank if none are present.
+    lobbying = _num(
+        latest.get("lbbygexpnsmlnyr") or latest.get("lbbygexpndtrs") or latest.get("lobby_expenses")
+    )
+    political = _num(
+        latest.get("polcamactvtexpndtramt")
+        or latest.get("polact_expense")
+        or latest.get("political_expenses")
+    )
+    sched_c = ""
+    if isinstance(political, float) and political > 0:
+        sched_c = "true"
+    elif isinstance(lobbying, float) and lobbying > 0:
+        sched_c = "true"
+
     return {
         "latest_filing_year": latest.get("tax_prd_yr") or str(latest.get("tax_prd", ""))[:4],
         "total_revenue": _num(latest.get("totrevenue")),
@@ -266,6 +318,9 @@ def _fetch_detail(session: requests.Session, ein: str, logger) -> dict:
         "officer_compensation": _num(latest.get("compnsatncurrofcr")),
         "employee_count": latest.get("noemployees") or "",
         "revenue_trend": trend,
+        "lobbying_expenditure": lobbying,
+        "political_expenditure": political,
+        "schedule_c_filed": sched_c,
     }
 
 
@@ -351,6 +406,9 @@ def run(
             "officer_compensation": "",
             "employee_count": "",
             "revenue_trend": "",
+            "lobbying_expenditure": org.get("lobbying_expenditure", ""),
+            "political_expenditure": org.get("political_expenditure", ""),
+            "schedule_c_filed": org.get("schedule_c_filed", ""),
         }
 
         # Fetch detail only for orgs meeting revenue threshold
@@ -359,6 +417,12 @@ def run(
             detail = _fetch_detail(session, ein, logger)
             base.update(detail)
 
+        base["politically_active"] = _derive_politically_active(
+            base.get("subsection_code", ""),
+            base.get("lobbying_expenditure", ""),
+            base.get("political_expenditure", ""),
+            base.get("schedule_c_filed", ""),
+        )
         rows.append(base)
 
     session.close()

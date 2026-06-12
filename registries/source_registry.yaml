@@ -582,6 +582,72 @@ sources:
     update_cadence: yearly
     notes: Follow the Money export data for PR. ingest_follow_the_money.py is a dropzone reader (no network code) producing 4 outputs from operator-delivered CSV exports in data/raw/follow_the_money/. Previously mislabeled with a phantom pr_follow_the_money.csv output that is never written.
 
+  - source_id: fec_committees
+    family: political_finance
+    required: false
+    authentication: api_key:FEC_API_KEY
+    endpoint_url: https://api.open.fec.gov/
+    producer_script: scripts/download_fec_committees.py
+    expected_outputs:
+      - data/staging/processed/pr_fec_committees.csv
+      - data/staging/processed/pr_fec_disbursements.csv
+      - data/staging/processed/pr_fec_independent_expenditures.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: monthly
+    notes: >
+      FEC committee master plus Schedule B (disbursements) and Schedule E
+      (independent expenditures) for PR-linked political committees. Makes
+      PACs, Super PACs, 527s, and party committees first-class entities in
+      the political-finance layer rather than only being embedded as
+      committee_id/committee_name columns on Schedule A contribution rows
+      handled by the existing `fec` source.
+
+  - source_id: contralor_electoral
+    family: political_finance
+    required: false
+    authentication: manual_export
+    endpoint_url: https://oce.pr.gov/
+    producer_script: scripts/ingest_oce.py
+    expected_outputs:
+      - data/staging/processed/pr_oce_donations.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/OCE/
+    update_cadence: ad_hoc
+    notes: >
+      PR Oficina del Contralor Electoral (OCE) campaign-finance registry.
+      Distinct from `oficina_contralor` (government-audit Contralor, a
+      different agency). ingest_oce.py is a dropzone reader (no network
+      code) producing pr_oce_donations.csv aligned column-for-column to
+      pr_donaciones.csv so the NGO political-donation crossref consumes
+      both feeds uniformly.
+
+  - source_id: ngo_integration_layer
+    family: nonprofit
+    required: false
+    authentication: none
+    endpoint_url: ""
+    producer_script: scripts/ngo_integration.py
+    expected_outputs:
+      - data/staging/processed/ngos/ngos_master.csv
+      - data/staging/processed/ngos/ngo_funding_edges.csv
+      - data/staging/processed/ngos/ngo_municipal_coverage.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: ad_hoc
+    notes: >
+      NGO / OSFL identity, funding, and coverage layer built from IRS EO BMF,
+      TEOS, PR state registry, and USASpending drops. Also drives the
+      NGO ↔ political-donation crossref (analyze_political_crossref:
+      build_ngo_donation_crossref → data/staging/processed/ngos/
+      ngo_political_donations.csv) which is intentionally NOT declared as
+      an expected_output to avoid preflight gate failures (matches the
+      convention used by `fec` for pr_fec_crossref.csv).
+
   # ----- Federal grants (sectoral) -----
   - source_id: sba_loans
     family: federal

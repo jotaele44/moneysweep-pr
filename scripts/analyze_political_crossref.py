@@ -22,6 +22,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -557,16 +558,324 @@ def build_cabildero_crossref(root: Path | None = None) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# NGO ↔ political-donation crossref
+# ---------------------------------------------------------------------------
+
+NGO_DONATION_CROSSREF_COLUMNS = [
+    "ngo_id",
+    "normalized_name",
+    "legal_name",
+    "ein",
+    "municipality",
+    "irs_subsection",
+    "entity_type",
+    "confidence",
+    "review_status",
+    "politically_active_subsection",
+    "donation_sources",
+    "fec_total_contributions",
+    "fec_contribution_count",
+    "fec_committees_funded",
+    "fec_candidates_funded",
+    "fec_earliest",
+    "fec_latest",
+    "pr_total_contributions",
+    "pr_contribution_count",
+    "pr_recipients",
+    "pr_parties",
+    "pr_earliest",
+    "pr_latest",
+    "total_political_contributions",
+    "matched_alias",
+]
+
+_POLITICAL_SUBSECTIONS = {"4", "5", "6"}
+_RESTRICTED_SUBSECTION = "3"
+
+
+def _classify_subsection(raw: object) -> str:
+    """Map IRS 501(c) subsection to a political-activity bucket.
+
+    501(c)(4)/(5)/(6) are the subsections most likely to engage in political
+    activity (social welfare, labor, business leagues). 501(c)(3) is restricted
+    from political campaign intervention. Everything else is bucketed ``other``.
+    """
+    digits = re.sub(r"\D+", "", str(raw or ""))
+    if digits in _POLITICAL_SUBSECTIONS:
+        return "likely_political"
+    if digits == _RESTRICTED_SUBSECTION:
+        return "restricted_charity"
+    return "other"
+
+
+def _ngo_name_variants(row: pd.Series) -> list[str]:
+    """Return normalized name + alias variants for matching against donors."""
+    variants: list[str] = []
+    seen: set[str] = set()
+    legal = _normalize(row.get("legal_name"))
+    if legal:
+        variants.append(legal)
+        seen.add(legal)
+    raw_aliases = row.get("aliases", "")
+    if raw_aliases and not pd.isna(raw_aliases):
+        text = str(raw_aliases).strip()
+        candidates: list[str] = []
+        if text.startswith("[") and text.endswith("]"):
+            try:
+                parsed = json.loads(text)
+                if isinstance(parsed, list):
+                    candidates = [str(x) for x in parsed]
+            except (json.JSONDecodeError, ValueError):
+                candidates = [text]
+        elif "|" in text:
+            candidates = text.split("|")
+        else:
+            candidates = [text]
+        for cand in candidates:
+            norm = _normalize(cand)
+            if norm and norm not in seen:
+                variants.append(norm)
+                seen.add(norm)
+    return variants
+
+
+def _build_fec_org_index(fec: pd.DataFrame) -> pd.DataFrame:
+    """FEC contributions grouped by normalized contributor name, organizations only."""
+    df = fec.copy()
+    # Exclude individual contributors so we don't match on personal names that
+    # happen to collide with an NGO. is_individual is written by download_fec
+    # from entity_type=="IND"; tolerate both raw FEC and our downstream rows.
+    if "is_individual" in df.columns:
+        df = df[df["is_individual"].astype(str).str.lower() != "true"]
+    if "entity_type" in df.columns:
+        df = df[df["entity_type"].astype(str).str.upper() != "IND"]
+    if df.empty:
+        return pd.DataFrame(columns=["_norm"])
+    df["_norm"] = df["contributor_name"].apply(_normalize)
+    df["_amt"] = pd.to_numeric(df.get("contribution_receipt_amount"), errors="coerce").fillna(0)
+    return (
+        df[df["_norm"] != ""]
+        .groupby("_norm")
+        .agg(
+            fec_total_contributions=("_amt", "sum"),
+            fec_contribution_count=("_amt", "count"),
+            fec_committees_funded=(
+                "committee_name",
+                lambda x: "|".join(sorted({c for c in x.dropna() if c})[:10]),
+            ),
+            fec_candidates_funded=(
+                "candidate_name",
+                lambda x: "|".join(sorted({c for c in x.dropna() if c})[:10]),
+            ),
+            fec_earliest=("contribution_receipt_date", "min"),
+            fec_latest=("contribution_receipt_date", "max"),
+        )
+        .reset_index()
+    )
+
+
+def _build_pr_donation_index(donations: pd.DataFrame) -> pd.DataFrame:
+    """PR (CEE / OCE) donations grouped by normalized donor name."""
+    df = donations.copy()
+    df["_norm"] = df["donor_name"].apply(_normalize)
+    df["_amt"] = pd.to_numeric(df.get("amount"), errors="coerce").fillna(0)
+    return (
+        df[df["_norm"] != ""]
+        .groupby("_norm")
+        .agg(
+            pr_total_contributions=("_amt", "sum"),
+            pr_contribution_count=("_amt", "count"),
+            pr_recipients=(
+                "candidate_or_committee",
+                lambda x: "|".join(sorted({c for c in x.dropna() if c})[:10]),
+            )
+            if "candidate_or_committee" in df.columns
+            else ("donor_name", "count"),
+            pr_parties=("party", lambda x: "|".join(sorted({c for c in x.dropna() if c})[:10]))
+            if "party" in df.columns
+            else ("donor_name", "count"),
+            pr_earliest=("contribution_date", "min")
+            if "contribution_date" in df.columns
+            else ("donor_name", "count"),
+            pr_latest=("contribution_date", "max")
+            if "contribution_date" in df.columns
+            else ("donor_name", "count"),
+        )
+        .reset_index()
+    )
+
+
+def _load_pr_donations(processed_dir: Path) -> pd.DataFrame:
+    """Concatenate CEE (donaciones) + OCE (Contralor Electoral) donations if present."""
+    frames: list[pd.DataFrame] = []
+    for fname in ("pr_donaciones.csv", "pr_oce_donations.csv"):
+        path = processed_dir / fname
+        if path.exists():
+            df = pd.read_csv(path, dtype=str, low_memory=False)
+            if not df.empty and "donor_name" in df.columns:
+                df["_origin_file"] = fname
+                frames.append(df)
+    if not frames:
+        return pd.DataFrame(columns=["donor_name"])
+    return pd.concat(frames, ignore_index=True, sort=False)
+
+
+def build_ngo_donation_crossref(root: Path | None = None) -> dict:
+    """Cross-reference NGOs against political-donation feeds (federal FEC + PR CEE/OCE).
+
+    Identifies organizations in ``ngos_master.csv`` that appear as **donors** to
+    political campaigns / committees. Matches on the normalized NGO ``legal_name``
+    and any alias in the ``aliases`` column. FEC individuals are excluded to
+    avoid personal-name collisions. The output is NGO-centric (one row per
+    matched NGO) with separate federal / PR totals and a derived
+    ``politically_active_subsection`` flag derived from ``irs_subsection``
+    (501(c)(4)/(5)/(6) → ``likely_political``, (c)(3) → ``restricted_charity``).
+    """
+    root = Path(root) if root is not None else PROJECT_ROOT
+    processed_dir = root / "data" / "staging" / "processed"
+    ngo_dir = processed_dir / "ngos"
+    logger = setup_logging("analyze_political_crossref.ngo")
+
+    ngos_path = ngo_dir / "ngos_master.csv"
+    fec_path = processed_dir / "pr_fec_contributions.csv"
+    out_path = ngo_dir / "ngo_political_donations.csv"
+    ngo_dir.mkdir(parents=True, exist_ok=True)
+
+    if not ngos_path.exists():
+        logger.error(f"  NGO master not found: {ngos_path}")
+        return {"rows": 0, "status": "MISSING_NGO_MASTER"}
+
+    ngos = pd.read_csv(ngos_path, dtype=str, low_memory=False)
+    if ngos.empty:
+        pd.DataFrame(columns=NGO_DONATION_CROSSREF_COLUMNS).to_csv(out_path, index=False)
+        return {"rows": 0, "status": "EMPTY_NGO_MASTER", "path": str(out_path)}
+
+    fec_df = (
+        pd.read_csv(fec_path, dtype=str, low_memory=False) if fec_path.exists() else pd.DataFrame()
+    )
+    pr_df = _load_pr_donations(processed_dir)
+
+    if (fec_df.empty or "contributor_name" not in fec_df.columns) and pr_df.empty:
+        logger.error("  No donation feeds present (FEC and PR CEE/OCE both absent or empty)")
+        pd.DataFrame(columns=NGO_DONATION_CROSSREF_COLUMNS).to_csv(out_path, index=False)
+        return {"rows": 0, "status": "MISSING_DONATIONS", "path": str(out_path)}
+
+    logger.info(
+        f"  {len(ngos):,} NGOs · {len(fec_df):,} FEC rows · {len(pr_df):,} PR donation rows"
+    )
+
+    fec_index = (
+        _build_fec_org_index(fec_df)
+        if not fec_df.empty and "contributor_name" in fec_df.columns
+        else pd.DataFrame(columns=["_norm"])
+    )
+    pr_index = (
+        _build_pr_donation_index(pr_df) if not pr_df.empty else pd.DataFrame(columns=["_norm"])
+    )
+
+    fec_lookup = fec_index.set_index("_norm").to_dict("index") if not fec_index.empty else {}
+    pr_lookup = pr_index.set_index("_norm").to_dict("index") if not pr_index.empty else {}
+
+    rows: list[dict] = []
+    for _, ngo in ngos.iterrows():
+        variants = _ngo_name_variants(ngo)
+        if not variants:
+            continue
+        matched_alias = ""
+        fec_match: dict | None = None
+        pr_match: dict | None = None
+        for v in variants:
+            if fec_match is None and v in fec_lookup:
+                fec_match = fec_lookup[v]
+                matched_alias = matched_alias or v
+            if pr_match is None and v in pr_lookup:
+                pr_match = pr_lookup[v]
+                matched_alias = matched_alias or v
+            if fec_match is not None and pr_match is not None:
+                break
+        if fec_match is None and pr_match is None:
+            continue
+
+        donation_sources = (
+            "both" if (fec_match and pr_match) else ("federal_fec" if fec_match else "pr")
+        )
+        fec_total = float((fec_match or {}).get("fec_total_contributions", 0) or 0)
+        pr_total = float((pr_match or {}).get("pr_total_contributions", 0) or 0)
+        rec: dict = {col: "" for col in NGO_DONATION_CROSSREF_COLUMNS}
+        rec.update(
+            {
+                "ngo_id": ngo.get("ngo_id", ""),
+                "normalized_name": variants[0],
+                "legal_name": ngo.get("legal_name", ""),
+                "ein": ngo.get("ein", ""),
+                "municipality": ngo.get("municipality", ""),
+                "irs_subsection": ngo.get("irs_subsection", ""),
+                "entity_type": ngo.get("entity_type", ""),
+                "confidence": ngo.get("confidence", ""),
+                "review_status": ngo.get("review_status", ""),
+                "politically_active_subsection": _classify_subsection(
+                    ngo.get("irs_subsection", "")
+                ),
+                "donation_sources": donation_sources,
+                "matched_alias": matched_alias,
+                "total_political_contributions": fec_total + pr_total,
+            }
+        )
+        if fec_match:
+            rec["fec_total_contributions"] = fec_total
+            rec["fec_contribution_count"] = int(fec_match.get("fec_contribution_count", 0) or 0)
+            rec["fec_committees_funded"] = fec_match.get("fec_committees_funded", "")
+            rec["fec_candidates_funded"] = fec_match.get("fec_candidates_funded", "")
+            rec["fec_earliest"] = fec_match.get("fec_earliest", "")
+            rec["fec_latest"] = fec_match.get("fec_latest", "")
+        if pr_match:
+            rec["pr_total_contributions"] = pr_total
+            rec["pr_contribution_count"] = int(pr_match.get("pr_contribution_count", 0) or 0)
+            rec["pr_recipients"] = pr_match.get("pr_recipients", "")
+            rec["pr_parties"] = pr_match.get("pr_parties", "")
+            rec["pr_earliest"] = pr_match.get("pr_earliest", "")
+            rec["pr_latest"] = pr_match.get("pr_latest", "")
+        rows.append(rec)
+
+    if not rows:
+        pd.DataFrame(columns=NGO_DONATION_CROSSREF_COLUMNS).to_csv(out_path, index=False)
+        logger.info(f"  NGO donation crossref: 0 matched NGOs → {out_path.name}")
+        return {"rows": 0, "status": "EMPTY", "path": str(out_path)}
+
+    df = pd.DataFrame(rows, columns=NGO_DONATION_CROSSREF_COLUMNS)
+    df["total_political_contributions"] = pd.to_numeric(
+        df["total_political_contributions"], errors="coerce"
+    ).fillna(0)
+    df = df.sort_values("total_political_contributions", ascending=False)
+    df.to_csv(out_path, index=False, encoding="utf-8")
+
+    sources_breakdown = df["donation_sources"].value_counts().to_dict()
+    subsection_breakdown = df["politically_active_subsection"].value_counts().to_dict()
+    logger.info(
+        f"  NGO donation crossref: {len(df):,} matched NGOs → {out_path.name} | "
+        f"sources: {sources_breakdown} | subsection flags: {subsection_breakdown}"
+    )
+    return {
+        "rows": len(df),
+        "status": "OK",
+        "path": str(out_path),
+        "donation_sources": sources_breakdown,
+        "politically_active_subsection": subsection_breakdown,
+    }
+
+
+# ---------------------------------------------------------------------------
 # Combined entry point
 # ---------------------------------------------------------------------------
 
 
 def build_political_crossref(root: Path | None = None) -> dict:
-    """Run FEC, lobbying, and cabildero crossrefs; return combined summary."""
+    """Run FEC, lobbying, cabildero, and NGO-donation crossrefs."""
     fec = build_fec_crossref(root)
     lda = build_lobbying_crossref(root)
     cabildero = build_cabildero_crossref(root)
-    return {"fec": fec, "lda": lda, "cabildero": cabildero}
+    ngo = build_ngo_donation_crossref(root)
+    return {"fec": fec, "lda": lda, "cabildero": cabildero, "ngo": ngo}
 
 
 def main() -> int:
@@ -576,12 +885,16 @@ def main() -> int:
     parser.add_argument(
         "--cabildero", action="store_true", help="Run cabildero/registrant crossref only"
     )
+    parser.add_argument(
+        "--ngo", action="store_true", help="Run NGO ↔ political donation crossref only"
+    )
     args = parser.parse_args()
 
-    selected = args.fec or args.lda or args.cabildero
+    selected = args.fec or args.lda or args.cabildero or args.ngo
     run_fec = args.fec or not selected
     run_lda = args.lda or not selected
     run_cab = args.cabildero or not selected
+    run_ngo = args.ngo or not selected
 
     if run_fec:
         r = build_fec_crossref()
@@ -592,6 +905,9 @@ def main() -> int:
     if run_cab:
         r = build_cabildero_crossref()
         print(f"Cabildero crossref: {r['rows']:,} registrants → {r.get('path', '')}")
+    if run_ngo:
+        r = build_ngo_donation_crossref()
+        print(f"NGO donation crossref: {r['rows']:,} matched NGOs → {r.get('path', '')}")
     return 0
 
 
