@@ -20,25 +20,12 @@ on:
       - 'tests/fixtures/pr_intake_router_sample.jsonl'
       - 'tests/fixtures/pr_news_incoming_sample.jsonl'
       - '.github/workflows/pr-intake-router.yml'
+  # No path filter on pull_request: router-tests is a *required* status check
+  # on main, so it must report on every PR. A path-filtered required check
+  # never reports on PRs that don't touch these paths, permanently blocking
+  # the merge ("N of M required status checks are expected"). The push trigger
+  # stays path-filtered since push runs don't gate PR merges.
   pull_request:
-    paths:
-      - 'shared/pr_intake_router.py'
-      - 'scripts/route_pr_intake.py'
-      - 'scripts/run_pr_intake_router_hook.py'
-      - 'scripts/produce_pr_news_raw_intake.py'
-      - 'scripts/run_pr_news_router_pipeline.py'
-      - 'run_pr_intake_router.py'
-      - 'run_pr_news_raw_intake.py'
-      - 'run_pr_news_router_pipeline.py'
-      - 'config/pr_intake_domain_router.yaml'
-      - 'tests/test_pr_intake_router.py'
-      - 'tests/test_route_pr_intake_cli.py'
-      - 'tests/test_pr_intake_router_hook.py'
-      - 'tests/test_produce_pr_news_raw_intake.py'
-      - 'tests/test_pr_news_router_pipeline.py'
-      - 'tests/fixtures/pr_intake_router_sample.jsonl'
-      - 'tests/fixtures/pr_news_incoming_sample.jsonl'
-      - '.github/workflows/pr-intake-router.yml'
   workflow_dispatch:
 
 jobs:
