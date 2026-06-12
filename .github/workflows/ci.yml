@@ -16,6 +16,40 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
+      - name: Validate federation manifest
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path('federation.json').read_text())
+          required = {
+              'schema_version',
+              'program_id',
+              'repository_full_name',
+              'hub_parent',
+              'hub_callable_commands',
+              'canonical_outputs',
+              'federation_readiness_gate',
+          }
+          missing = sorted(required - set(manifest))
+          if missing:
+              raise SystemExit(f'missing federation manifest keys: {missing}')
+          if manifest['program_id'] != 'moneysweep-pr':
+              raise SystemExit(f"unexpected program_id: {manifest['program_id']}")
+          if manifest['hub_parent'] != 'thehub-pr':
+              raise SystemExit(f"unexpected hub_parent: {manifest['hub_parent']}")
+          commands = manifest['hub_callable_commands']
+          for key in ('setup', 'strict_preflight', 'full_pipeline', 'test_suite'):
+              if key not in commands:
+                  raise SystemExit(f'missing hub command: {key}')
+          gate = manifest['federation_readiness_gate']
+          if gate.get('ready_for_hub_discovery') is not True:
+              raise SystemExit('ready_for_hub_discovery must be true')
+          if not isinstance(gate.get('blocking_conditions'), list):
+              raise SystemExit('blocking_conditions must be a list')
+          PY
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
