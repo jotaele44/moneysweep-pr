@@ -20,5 +20,36 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Federation manifest gate
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path("federation.json").read_text())
+          required = {
+              "schema_version",
+              "program_id",
+              "repository_full_name",
+              "federation_role",
+              "hub_parent",
+              "hub_callable_commands",
+              "canonical_outputs",
+              "federation_readiness_gate",
+          }
+          missing = sorted(required - set(manifest))
+          assert not missing, f"federation.json missing required keys: {missing}"
+          assert manifest["schema_version"] == "repo_federation_manifest_v1"
+          assert manifest["program_id"] == "moneysweep-pr"
+          assert manifest["hub_parent"] == "thehub-pr"
+          commands = manifest["hub_callable_commands"]
+          assert "setup" in commands and "test_suite" in commands
+          gate = manifest["federation_readiness_gate"]
+          assert isinstance(gate.get("ready_for_hub_discovery"), bool)
+          assert isinstance(gate.get("ready_for_hub_live_execution"), bool)
+          assert isinstance(gate.get("blocking_conditions"), list)
+          print("federation manifest gate passed")
+          PY
+
       - name: Run tests
         run: python -m pytest tests/ -v
