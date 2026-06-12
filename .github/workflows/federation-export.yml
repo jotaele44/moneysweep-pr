@@ -2,7 +2,7 @@ name: Federation Export
 
 # Builds and validates a production federation export package
 # (masters -> streams -> package -> validate, via scripts/run_export.py) and
-# uploads it as an artifact for the spiderweb-pr query-hub to ingest.
+# uploads it as an artifact for thehub-pr / PRIIS federation ingestion.
 #
 # Runs on demand and on a weekly schedule. While the production pipeline is
 # paused (NON_PRODUCTION_DIAGNOSTIC) the canonical masters under
