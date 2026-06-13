@@ -1,9 +1,4 @@
-"""Tranche B source-intake controller for operator-delivered source files.
-
-This controller does not perform live fetches and does not mark any source as
-materialized. It converts dropped CSV/XLSX files into deterministic canonical
-staging outputs and emits a readiness summary for the recovery matrix pass.
-"""
+"""Offline Tranche B staging controller for dropped tabular source files."""
 
 from __future__ import annotations
 
@@ -45,7 +40,6 @@ LOCAL_CONTRACT_COLUMNS = [
     "evidence_tier",
     "confidence",
 ]
-
 INFRASTRUCTURE_PROJECT_COLUMNS = [
     "source_id",
     "source_file",
@@ -65,7 +59,6 @@ INFRASTRUCTURE_PROJECT_COLUMNS = [
     "evidence_tier",
     "confidence",
 ]
-
 INFRASTRUCTURE_FACT_COLUMNS = [
     "source_id",
     "source_file",
@@ -82,7 +75,6 @@ INFRASTRUCTURE_FACT_COLUMNS = [
     "evidence_tier",
     "confidence",
 ]
-
 LOBBYING_COLUMNS = [
     "source_id",
     "source_file",
@@ -99,7 +91,6 @@ LOBBYING_COLUMNS = [
     "evidence_tier",
     "confidence",
 ]
-
 CONTRACTOR_REFERENCE_COLUMNS = [
     "source_id",
     "source_file",
@@ -118,38 +109,24 @@ CONTRACTOR_REFERENCE_COLUMNS = [
 
 LOCAL_CONTRACT_MAP = {
     "record_id": ["record_id", "id", "ID", "Número", "Numero", "Row ID"],
-    "contract_id": [
-        "contract_id",
-        "Contract ID",
-        "Contrato",
-        "Contract Number",
-        "Número de Contrato",
-    ],
+    "contract_id": ["contract_id", "Contract ID", "Contrato", "Contract Number"],
     "contract_title": [
         "contract_title",
         "Title",
         "Titulo",
         "Descripción",
         "Description",
-        "Objeto",
     ],
-    "contractor_name": [
-        "contractor_name",
-        "Contratista",
-        "Contractor",
-        "Vendor Name",
-        "Proveedor",
-    ],
+    "contractor_name": ["contractor_name", "Contratista", "Contractor", "Vendor Name"],
     "agency_name": ["agency_name", "Agencia", "Agency", "Entidad", "Department"],
     "amount": ["amount", "Monto", "Amount", "Contract Value", "Total"],
-    "start_date": ["start_date", "Fecha Inicio", "Start Date", "Vigencia Desde"],
-    "end_date": ["end_date", "Fecha Fin", "End Date", "Vigencia Hasta"],
+    "start_date": ["start_date", "Fecha Inicio", "Start Date"],
+    "end_date": ["end_date", "Fecha Fin", "End Date"],
     "fiscal_year": ["fiscal_year", "FY", "Año Fiscal", "Fiscal Year"],
     "municipality": ["municipality", "Municipio", "Municipality", "Ciudad"],
     "procurement_type": ["procurement_type", "Tipo", "Type", "Award Type"],
     "status": ["status", "Estado", "Estatus", "Status"],
 }
-
 PROJECT_MAP = {
     "project_id": ["project_id", "Project ID", "Número de Proyecto", "ID"],
     "project_name": ["project_name", "Project Name", "Proyecto", "Nombre del Proyecto"],
@@ -164,7 +141,6 @@ PROJECT_MAP = {
     "latitude": ["latitude", "Lat", "Latitude"],
     "longitude": ["longitude", "Lon", "Longitude"],
 }
-
 FACT_MAP = {
     "fact_id": ["fact_id", "ID", "Record ID"],
     "asset_name": ["asset_name", "Asset", "Facility", "Sistema", "Project"],
@@ -176,7 +152,6 @@ FACT_MAP = {
     "unit": ["unit", "Unit", "Unidad"],
     "municipality": ["municipality", "Municipio", "Municipality"],
 }
-
 LOBBYING_MAP = {
     "record_id": ["record_id", "ID", "filing_uuid", "Registration Number"],
     "registrant_name": ["registrant_name", "Registrant", "Cabildero", "Lobbyist Name"],
@@ -188,19 +163,28 @@ LOBBYING_MAP = {
         "registration_date",
         "Registration Date",
         "Fecha de Registro",
-        "dt_posted",
     ],
     "termination_date": ["termination_date", "Termination Date", "Expiry Date"],
     "jurisdiction": ["jurisdiction", "Jurisdiction", "client_state", "State"],
 }
-
 CONTRACTOR_REF_MAP = {
-    "contractor_name": ["contractor_name", "Contractor", "Vendor Name", "Name", "Nombre"],
+    "contractor_name": [
+        "contractor_name",
+        "Contractor",
+        "Vendor Name",
+        "Name",
+        "Nombre",
+    ],
     "normalized_name": ["normalized_name", "entity_normalized", "Normalized Name"],
     "uei": ["uei", "UEI", "Unique Entity ID"],
     "cage": ["cage", "CAGE", "CAGE Code"],
     "duns": ["duns", "DUNS", "Duns Number"],
-    "agency_reference": ["agency_reference", "Agency", "Source Agency", "Listing Agency"],
+    "agency_reference": [
+        "agency_reference",
+        "Agency",
+        "Source Agency",
+        "Listing Agency",
+    ],
     "fiscal_year": ["fiscal_year", "FY", "Fiscal Year"],
     "listing_type": ["listing_type", "Listing Type", "Type", "Status"],
 }
@@ -300,33 +284,27 @@ def _postprocess(spec: SourceSpec, frame: pd.DataFrame) -> pd.DataFrame:
             missing, "contractor_name"
         ].map(normalize_name)
 
-    if "record_id" in frame.columns:
-        _stable_record_ids(frame, spec.source_id, "record_id")
-    if "project_id" in frame.columns:
-        _stable_record_ids(frame, spec.source_id, "project_id")
-    if "fact_id" in frame.columns:
-        _stable_record_ids(frame, spec.source_id, "fact_id")
+    for id_col in ("record_id", "project_id", "fact_id"):
+        if id_col in frame.columns:
+            _stable_record_ids(frame, spec.source_id, id_col)
 
-    for col in ("jurisdiction",):
-        if col in frame.columns:
-            blank = frame[col].astype(str).str.strip() == ""
-            frame.loc[blank, col] = "PR" if spec.source_id.startswith("pr_") else "US"
+    if "jurisdiction" in frame.columns:
+        blank = frame["jurisdiction"].astype(str).str.strip() == ""
+        frame.loc[blank, "jurisdiction"] = (
+            "PR" if spec.source_id.startswith("pr_") else "US"
+        )
 
-    non_provenance = [
-        col
-        for col in frame.columns
-        if col
-        not in {
-            "source_id",
-            "source_file",
-            "raw_text_excerpt",
-            "evidence_tier",
-            "confidence",
-        }
-    ]
-    if non_provenance:
-        keep = frame[non_provenance].astype(str).agg("".join, axis=1).str.strip() != ""
-        frame = frame[keep]
+    provenance_columns = {
+        "source_id",
+        "source_file",
+        "raw_text_excerpt",
+        "evidence_tier",
+        "confidence",
+    }
+    non_provenance = [col for col in frame.columns if col not in provenance_columns]
+    if non_provenance and not frame.empty:
+        joined = frame[non_provenance].astype(str).agg("".join, axis=1)
+        frame = frame[joined.str.strip() != ""]
 
     dedupe = [col for col in spec.dedupe_columns if col in frame.columns]
     if dedupe and not frame.empty:
@@ -358,14 +336,16 @@ def materialize_spec(root: Path, spec: SourceSpec, force: bool = False) -> dict:
         )
         for table in loaded
     ]
-    frame = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=spec.columns)
+    frame = (
+        pd.concat(frames, ignore_index=True)
+        if frames
+        else pd.DataFrame(columns=spec.columns)
+    )
     frame = _postprocess(spec, frame)
     missing = ensure_required_columns(frame, spec.columns)
     write_canonical_csv(frame, output_path, spec.columns)
 
-    status = "ok" if len(frame) else "empty"
-    if missing:
-        status = "schema_error"
+    status = "schema_error" if missing else ("ok" if len(frame) else "empty")
     return {
         "source_id": spec.source_id,
         "status": status,
@@ -389,15 +369,18 @@ def run(
     if unknown:
         raise ValueError(f"Unknown Tranche B source key(s): {', '.join(unknown)}")
 
-    results = [materialize_spec(root_path, SOURCE_SPECS[key], force=force) for key in selected]
+    results = [
+        materialize_spec(root_path, SOURCE_SPECS[key], force=force) for key in selected
+    ]
+    statuses = {result["status"] for result in results}
     summary = {
         "schema_version": "tranche_b_source_intake_v1",
         "status": "prepared"
-        if all(r["status"] in {"ok", "empty", "existing"} for r in results)
+        if statuses <= {"ok", "empty", "existing"}
         else "needs_fix",
         "sources_total": len(results),
-        "sources_with_rows": sum(1 for r in results if r["rows"] > 0),
-        "rows_total": sum(int(r["rows"]) for r in results),
+        "sources_with_rows": sum(1 for result in results if result["rows"] > 0),
+        "rows_total": sum(int(result["rows"]) for result in results),
         "materialization_promotion": "not_performed",
         "results": results,
     }
