@@ -96,7 +96,12 @@ def read_tabular_file(path: Path) -> pd.DataFrame:
         last_error: Exception | None = None
         for encoding in ("utf-8", "utf-8-sig", "latin-1"):
             try:
-                return pd.read_csv(path, dtype=str, na_filter=False, encoding=encoding)
+                return pd.read_csv(
+                    path,
+                    dtype=str,
+                    na_filter=False,
+                    encoding=encoding,
+                )
             except UnicodeDecodeError as exc:
                 last_error = exc
         raise ValueError(f"Could not decode CSV {path}") from last_error
@@ -105,7 +110,12 @@ def read_tabular_file(path: Path) -> pd.DataFrame:
         xl = pd.ExcelFile(path)
         best = pd.DataFrame()
         for sheet in xl.sheet_names:
-            frame = pd.read_excel(xl, sheet_name=sheet, dtype=str, na_filter=False)
+            frame = pd.read_excel(
+                xl,
+                sheet_name=sheet,
+                dtype=str,
+                na_filter=False,
+            )
             if len(frame) > len(best):
                 best = frame
         return best
@@ -165,8 +175,11 @@ def map_frame(
         result["confidence"] = confidence
     if "raw_text_excerpt" in output_columns:
         text_cols = [c for c in result.columns if c != "raw_text_excerpt"]
-        result["raw_text_excerpt"] = result[text_cols].astype(str).agg(" | ".join, axis=1).map(
-            lambda value: safe_text(value, 240)
+        result["raw_text_excerpt"] = (
+            result[text_cols]
+            .astype(str)
+            .agg(" | ".join, axis=1)
+            .map(lambda value: safe_text(value, 240))
         )
     return result[output_columns]
 
@@ -182,7 +195,13 @@ def write_canonical_csv(frame: pd.DataFrame, path: Path, columns: list[str]) -> 
         if col not in ordered.columns:
             ordered[col] = ""
     ordered = ordered[columns]
-    ordered.to_csv(path, index=False, encoding="utf-8", lineterminator="\n", quoting=csv.QUOTE_MINIMAL)
+    ordered.to_csv(
+        path,
+        index=False,
+        encoding="utf-8",
+        lineterminator="\n",
+        quoting=csv.QUOTE_MINIMAL,
+    )
 
 
 def read_csv_rows(path: Path) -> list[dict[str, str]]:
