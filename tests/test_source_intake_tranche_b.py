@@ -66,7 +66,13 @@ def test_run_builds_local_contract_output(tmp_path: Path):
     summary = run(root=tmp_path, sources=["act"], force=True)
     assert summary["status"] == "prepared"
     assert summary["rows_total"] == 1
-    rows = read_csv_rows(tmp_path / "data" / "staging" / "processed" / "pr_act_transition_contracts.csv")
+    rows = read_csv_rows(
+        tmp_path
+        / "data"
+        / "staging"
+        / "processed"
+        / "pr_act_transition_contracts.csv"
+    )
     assert list(rows[0].keys()) == LOCAL_CONTRACT_COLUMNS
     assert rows[0]["source_id"] == "act_transition_contracts"
     assert rows[0]["contract_id"] == "ACT-1"
@@ -101,12 +107,16 @@ def test_run_builds_lobby_and_reference_outputs(tmp_path: Path):
     summary = run(root=tmp_path, sources=["cabilderos", "dcaa"], force=True)
     assert summary["rows_total"] == 2
 
-    lobby_rows = read_csv_rows(tmp_path / "data" / "staging" / "processed" / "pr_cabilderos_registry.csv")
+    lobby_rows = read_csv_rows(
+        tmp_path / "data" / "staging" / "processed" / "pr_cabilderos_registry.csv"
+    )
     assert list(lobby_rows[0].keys()) == LOBBYING_COLUMNS
     assert lobby_rows[0]["registrant_name"] == "Lobbyist A"
     assert lobby_rows[0]["client_name"] == "Client A"
 
-    vendor_rows = read_csv_rows(tmp_path / "data" / "staging" / "processed" / "dcaa_active_contractors.csv")
+    vendor_rows = read_csv_rows(
+        tmp_path / "data" / "staging" / "processed" / "dcaa_active_contractors.csv"
+    )
     assert list(vendor_rows[0].keys()) == CONTRACTOR_REFERENCE_COLUMNS
     assert vendor_rows[0]["contractor_name"] == "Vendor A LLC"
     assert vendor_rows[0]["normalized_name"] == "VENDOR A"
