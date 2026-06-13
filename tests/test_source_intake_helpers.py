@@ -41,7 +41,15 @@ def test_map_frame_adds_provenance_and_excerpt():
     out = map_frame(
         frame,
         {"contract_id": ["Contract ID"], "contractor_name": ["Contratista"]},
-        ["source_id", "source_file", "contract_id", "contractor_name", "raw_text_excerpt", "evidence_tier", "confidence"],
+        [
+            "source_id",
+            "source_file",
+            "contract_id",
+            "contractor_name",
+            "raw_text_excerpt",
+            "evidence_tier",
+            "confidence",
+        ],
         "test_source",
         "input.csv",
     )
