@@ -118,9 +118,28 @@ CONTRACTOR_REFERENCE_COLUMNS = [
 
 LOCAL_CONTRACT_MAP = {
     "record_id": ["record_id", "id", "ID", "Número", "Numero", "Row ID"],
-    "contract_id": ["contract_id", "Contract ID", "Contrato", "Contract Number", "Número de Contrato"],
-    "contract_title": ["contract_title", "Title", "Titulo", "Descripción", "Description", "Objeto"],
-    "contractor_name": ["contractor_name", "Contratista", "Contractor", "Vendor Name", "Proveedor"],
+    "contract_id": [
+        "contract_id",
+        "Contract ID",
+        "Contrato",
+        "Contract Number",
+        "Número de Contrato",
+    ],
+    "contract_title": [
+        "contract_title",
+        "Title",
+        "Titulo",
+        "Descripción",
+        "Description",
+        "Objeto",
+    ],
+    "contractor_name": [
+        "contractor_name",
+        "Contratista",
+        "Contractor",
+        "Vendor Name",
+        "Proveedor",
+    ],
     "agency_name": ["agency_name", "Agencia", "Agency", "Entidad", "Department"],
     "amount": ["amount", "Monto", "Amount", "Contract Value", "Total"],
     "start_date": ["start_date", "Fecha Inicio", "Start Date", "Vigencia Desde"],
@@ -165,7 +184,12 @@ LOBBYING_MAP = {
     "person_name": ["person_name", "Person", "Lobbyist", "Nombre Cabildero"],
     "entity_name": ["entity_name", "Entity", "Entidad", "Organization"],
     "relationship_type": ["relationship_type", "Relationship", "Type", "filing_type"],
-    "registration_date": ["registration_date", "Registration Date", "Fecha de Registro", "dt_posted"],
+    "registration_date": [
+        "registration_date",
+        "Registration Date",
+        "Fecha de Registro",
+        "dt_posted",
+    ],
     "termination_date": ["termination_date", "Termination Date", "Expiry Date"],
     "jurisdiction": ["jurisdiction", "Jurisdiction", "client_state", "State"],
 }
@@ -264,13 +288,17 @@ def _stable_record_ids(frame: pd.DataFrame, prefix: str, id_col: str) -> None:
     if id_col not in frame.columns:
         return
     missing = frame[id_col].astype(str).str.strip() == ""
-    frame.loc[missing, id_col] = [f"{prefix}-{i + 1:06d}" for i in range(int(missing.sum()))]
+    frame.loc[missing, id_col] = [
+        f"{prefix}-{i + 1:06d}" for i in range(int(missing.sum()))
+    ]
 
 
 def _postprocess(spec: SourceSpec, frame: pd.DataFrame) -> pd.DataFrame:
     if "contractor_name" in frame.columns and "normalized_name" in frame.columns:
         missing = frame["normalized_name"].astype(str).str.strip() == ""
-        frame.loc[missing, "normalized_name"] = frame.loc[missing, "contractor_name"].map(normalize_name)
+        frame.loc[missing, "normalized_name"] = frame.loc[
+            missing, "contractor_name"
+        ].map(normalize_name)
 
     if "record_id" in frame.columns:
         _stable_record_ids(frame, spec.source_id, "record_id")
@@ -287,7 +315,14 @@ def _postprocess(spec: SourceSpec, frame: pd.DataFrame) -> pd.DataFrame:
     non_provenance = [
         col
         for col in frame.columns
-        if col not in {"source_id", "source_file", "raw_text_excerpt", "evidence_tier", "confidence"}
+        if col
+        not in {
+            "source_id",
+            "source_file",
+            "raw_text_excerpt",
+            "evidence_tier",
+            "confidence",
+        }
     ]
     if non_provenance:
         keep = frame[non_provenance].astype(str).agg("".join, axis=1).str.strip() != ""
@@ -314,7 +349,13 @@ def materialize_spec(root: Path, spec: SourceSpec, force: bool = False) -> dict:
 
     loaded = load_tabular_dropzone(root / spec.dropzone)
     frames = [
-        map_frame(table.frame, spec.column_map, spec.columns, spec.source_id, table.path.name)
+        map_frame(
+            table.frame,
+            spec.column_map,
+            spec.columns,
+            spec.source_id,
+            table.path.name,
+        )
         for table in loaded
     ]
     frame = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=spec.columns)
@@ -337,7 +378,11 @@ def materialize_spec(root: Path, spec: SourceSpec, force: bool = False) -> dict:
     }
 
 
-def run(root: Path | str | None = None, sources: list[str] | None = None, force: bool = False) -> dict:
+def run(
+    root: Path | str | None = None,
+    sources: list[str] | None = None,
+    force: bool = False,
+) -> dict:
     root_path = Path(root or PROJECT_ROOT)
     selected = sources or list(SOURCE_SPECS)
     unknown = sorted(set(selected) - set(SOURCE_SPECS))
@@ -347,7 +392,9 @@ def run(root: Path | str | None = None, sources: list[str] | None = None, force:
     results = [materialize_spec(root_path, SOURCE_SPECS[key], force=force) for key in selected]
     summary = {
         "schema_version": "tranche_b_source_intake_v1",
-        "status": "prepared" if all(r["status"] in {"ok", "empty", "existing"} for r in results) else "needs_fix",
+        "status": "prepared"
+        if all(r["status"] in {"ok", "empty", "existing"} for r in results)
+        else "needs_fix",
         "sources_total": len(results),
         "sources_with_rows": sum(1 for r in results if r["rows"] > 0),
         "rows_total": sum(int(r["rows"]) for r in results),
@@ -356,14 +403,28 @@ def run(root: Path | str | None = None, sources: list[str] | None = None, force:
     }
     report_path = root_path / "reports" / "tranche_b_source_intake_readiness.json"
     report_path.parent.mkdir(parents=True, exist_ok=True)
-    report_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    report_path.write_text(
+        json.dumps(summary, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     return summary
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Build Tranche B source-intake staging outputs")
-    parser.add_argument("--source", action="append", choices=sorted(SOURCE_SPECS), dest="sources")
-    parser.add_argument("--force", action="store_true", help="Regenerate outputs even if present")
+    parser = argparse.ArgumentParser(
+        description="Build Tranche B source-intake staging outputs"
+    )
+    parser.add_argument(
+        "--source",
+        action="append",
+        choices=sorted(SOURCE_SPECS),
+        dest="sources",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Regenerate outputs even if present",
+    )
     args = parser.parse_args(argv)
     summary = run(sources=args.sources, force=args.force)
     print(json.dumps(summary, indent=2, sort_keys=True))
