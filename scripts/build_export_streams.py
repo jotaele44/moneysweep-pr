@@ -64,6 +64,28 @@ EDGES_FILE = "entity_edges.csv"
 # entities, synthesized funding agencies).
 DERIVED_SOURCE_REF = "contract_sweeper_resolution"
 
+# Inflow / revenue transactions. Outflows default to "disbursement"; rows carrying
+# a revenue flow_type emit an inflow transaction_type instead, with the aggregate
+# public/ratepayer entity as payer and the collecting agency as payee. The
+# transaction schema's `transaction_type` is an open string, so no schema change is
+# needed — see docs/transaction_schema.md.
+DEFAULT_TRANSACTION_TYPE = "disbursement"
+REVENUE_FLOW_TYPE_TO_TXN = {
+    "toll_revenue": "toll_collection",
+    "fare_revenue": "fare_collection",
+    "utility_rate_revenue": "utility_rate_revenue",
+    "port_fee_revenue": "port_fee_revenue",
+}
+
+
+def _transaction_type_for(row: dict[str, str]) -> str:
+    """Resolve a row's transaction_type: explicit column, else flow_type map, else outflow."""
+    explicit = _clean(row.get("transaction_type"))
+    if explicit:
+        return explicit
+    return REVENUE_FLOW_TYPE_TO_TXN.get(_clean(row.get("flow_type")), DEFAULT_TRANSACTION_TYPE)
+
+
 # Entity rows that are aggregates / sentinels, not real entities.
 SENTINEL_NORMALIZED_NAMES = {"MULTIPLE RECIPIENTS", "UNKNOWN", ""}
 SENTINEL_ENTITY_TYPES = {"aggregate"}
@@ -502,6 +524,7 @@ def _build_transactions(
             rep.skip("unresolved_payer")
             continue
         source_id = source_id_for(_clean(row.get("source_system")))
+        transaction_type = _transaction_type_for(row)
         txn_id = _deterministic_id(
             "txn",
             {
@@ -511,7 +534,7 @@ def _build_transactions(
                 "transaction_date": txn_date,
                 "amount": amount,
                 "currency": CURRENCY,
-                "transaction_type": "disbursement",
+                "transaction_type": transaction_type,
             },
         )
         txn_row: dict[str, Any] = {
@@ -522,7 +545,7 @@ def _build_transactions(
             "amount": amount,
             "currency": CURRENCY,
             "transaction_date": txn_date,
-            "transaction_type": "disbursement",
+            "transaction_type": transaction_type,
             "confidence": _parse_confidence(row.get("link_confidence")),
             "lineage": {
                 "producer_script": "scripts/build_financial_flows_master.py",

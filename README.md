@@ -20,8 +20,8 @@ The pipeline acquires, normalizes, validates, and cross-links public procurement
 
 Contract-Sweeper is **not yet a production-certified master dataset**. The current state is a controlled buildout phase:
 
-- **Source registry:** 88 tracked source definitions.
-- **Automatable sources:** 57 marked ready by the materialization-readiness gate.
+- **Source registry:** 98 tracked source definitions.
+- **Automatable sources:** 59 marked ready by the materialization-readiness gate.
 - **Queued / excluded sources:** manual exports, scraper-needed Puerto Rico sources, semantic duplicates, and deferred stubs remain outside the automatable target.
 - **Strict preflight:** required before producer execution or promotion.
 - **Current active work:** Tranche B manual-source ingestion and reconciliation.
@@ -45,6 +45,7 @@ reports/source_registry_status.csv
 | Federal grants and recovery | FEMA, HUD/CDBG-DR, USACE, DOT, USDA, DOE, DOJ, HHS, ED |
 | Territorial / municipal contracts | Puerto Rico agency contracts, municipality-linked spending, Compras |
 | Infrastructure | PRASA, PREPA, ACT, PPP, capital projects, recovery projects |
+| Infrastructure income | Aggregate civilian-paid revenue: tolls (AutoExpreso/ACT/Metropistas), transit fares (AMA/Tren Urbano), water/power rates (PRASA/PREPA-LUMA), port/airport fees — modeled as inflow transactions (payer = aggregate public, payee = collecting agency) |
 | Lobbying and influence | Puerto Rico cabilderos, federal LDA, campaign-finance crosswalks |
 | Debt and fiscal control | EMMA/MSRB, COFINA, AAFAF, PROMESA creditor/fiscal-control references |
 | Contractor references | DCAA active contractor listings, OFAC, OpenCorporates, entity aliases |

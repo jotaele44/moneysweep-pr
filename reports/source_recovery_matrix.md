@@ -1,17 +1,17 @@
 # Source Materialization Readiness
 
-Total sources: **88**
-Automatable: **57** (ready: **57**, need API key at run time: 6)
-Queued / excluded: **31**
+Total sources: **98**
+Automatable: **59** (ready: **59**, need API key at run time: 6)
+Queued / excluded: **39**
 
 ## Path types
 
 | path_type | automatable | count | recommended_action |
 | --- | --- | --- | --- |
 | `api_adapter` | True | 42 | Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated). |
-| `api_producer` | True | 15 | Run producer under strict preflight; public API path, set key if gated. |
+| `api_producer` | True | 17 | Run producer under strict preflight; public API path, set key if gated. |
+| `manual_export` | False | 19 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
 | `scraper_needed` | False | 15 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
-| `manual_export` | False | 11 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
 | `deferred_stub` | False | 2 | Intentionally unimplemented; remains not_materialized by design. |
 
@@ -62,9 +62,10 @@ API keys needed for full automatable materialization: `FEC_API_KEY`, `FINANCIALD
 - `wic`
 - `wioa`
 
-## api_producer (15)
+## api_producer (17)
 
 - `dol_whd_osha`
+- `emma_infra_revenue`
 - `fcc_usf`
 - `fec_committees`
 - `financialdata_net`
@@ -74,6 +75,7 @@ API keys needed for full automatable materialization: `FEC_API_KEY`, `FINANCIALD
 - `ncua`
 - `ngo_integration_layer`
 - `nmtc`
+- `prasa_contracts_master`
 - `sec_13f_nport`
 - `sec_edgar`
 - `sf133_budget_execution`
@@ -85,19 +87,27 @@ API keys needed for full automatable materialization: `FEC_API_KEY`, `FINANCIALD
 - `nara_catalog_aws_open_data`
 - `nara_nextgen_catalog_v3`
 
-## manual_export (11)
+## manual_export (19)
 
+- `act_toll_revenue`
 - `act_transition_contracts`
 - `acuden_2024_transition`
 - `contralor_electoral`
 - `dcaa_active_contractors`
 - `donaciones_pr`
+- `dtop_road_contracts`
 - `follow_the_money`
 - `hud_drgr_authorized`
 - `oficina_contralor`
+- `ports_airports_contracts`
+- `ports_airports_revenue`
 - `pr_cabilderos`
 - `pr_corporate_registry`
 - `prasa`
+- `prasa_rate_revenue`
+- `prepa_luma_rate_revenue`
+- `transit_contracts`
+- `transit_fare_revenue`
 
 ## scraper_needed (15)
 

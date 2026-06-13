@@ -13,7 +13,7 @@ Default mode is dry-run fixture mode; live API calls require --live.
 No API key is required. Uploaded/"
 oficina_contralor,territorial,True,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_contralor_audits.csv,PR Comptroller (OCPR) audit reports and findings on government entities and contractors. Operator delivers exported CSV/Excel to the dropzone. NOTE the OCPR contract registry (consultacontratos.ocpr.g
 pr_cabilderos,lobbying,True,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cabilderos.csv,"PR Office of Government Ethics (OEG) state-level lobbyist (cabildero) registry. ingest_cabilderos.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers the OEG export to data/raw"
-prasa,infrastructure,True,manual_export,2,0,2,0,not_materialized,0,1,data/staging/processed/pr_prasa_contracts.csv,"PRASA aqueduct/sewer authority. ingest_prasa.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers exported procurement files to data/raw/PRASA/. Includes Consulting Engineer Rep"
+prasa,infrastructure,True,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prasa_contracts.csv,"PRASA aqueduct/sewer authority. ingest_prasa.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers exported procurement files to data/raw/PRASA/. Includes Consulting Engineer Rep"
 sam_entities,entity_resolution,True,api_key:SAM_API_KEY,2,0,2,0,not_materialized,0,1,data/staging/processed/enrichment/vendor_uei_index.csv,"SAM full extract + per-UEI enrichment for parent resolution.
 Supplemented by scripts/usaspending_parent_uei_extract.py (no rate limit).
 SAM API rate: 1,000 req/day → full 2,334-UEI run = 2.3+ days.
@@ -24,6 +24,7 @@ no corporate parent_uei is expected for these entities.
 "
 usaspending_subawards,federal,True,none,2,1,1,0,partially_materialized,3,1,data/staging/processed/pr_subawards_master.csv,
 aafaf,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_aafaf_budget.csv,PR Fiscal Agency & Financial Advisory Authority. Budget execution.
+act_toll_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_act_toll_revenue.csv,Aggregate toll revenue (ACT / AutoExpreso / Metropistas PR-22/PR-5) from ACT audited financials and EMMA toll-revenue-bond disclosures. Dropzone reader; pursue finer (per-plaza) breakdowns via FOIA.
 act_transition_contracts,manual_export,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_act_transition_contracts.csv,"PR ACT transition contract files (Autopistas, Ferrovial, LPC&D, etc.). Manual export."
 acuden_2024_transition,manual_export,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_acuden_transition.csv,ACUDEN 2024 transition contract file. Transfer-of-funds contracts to municipalities/daycare/nonprofits.
 chip,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_chip.csv,
@@ -38,7 +39,9 @@ doj_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processe
 dol_whd_osha,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_dol_whd.csv,
 donaciones_pr,political_finance,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_donaciones.csv,PR State Election Commission (CEE/CEEPUR) state-level donation registry. ingest_donaciones.py is a dropzone reader for operator-delivered CEE CSV exports — no network code. Previously mislabeled as us
 dot_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_dot_grants.csv,
+dtop_road_contracts,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_dtop_road_contracts.csv,"DTOP/ACT permanent road construction & maintenance contracts (rolling, beyond the 2020 transition snapshot). OCPR registry agency code 032."
 ed_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ed_grants.csv,
+emma_infra_revenue,infrastructure_revenue,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_emma_revenue_disclosures.csv,MSRB EMMA continuing-disclosure revenue extraction (toll/water/power bond-pledged revenue). The one authentication-free automatable revenue spine; cross-checks the manual dropzone figures. PDF extract
 epa_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_epa_grants.csv,
 eqb_epa_icis,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_eqb_permits.csv,PR Environmental Quality Board + EPA ICIS environmental permits.
 exim_bank,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_exim.csv,
@@ -74,10 +77,15 @@ ofac_sdn,entity_resolution,False,none,1,0,1,0,not_materialized,0,1,data/staging/
 oia_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_oia_grants.csv,
 opencorporates,entity_resolution,False,api_key:OPENCORPORATES_API_TOKEN,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_opencorporates.csv,
 p3_authority,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_p3_contracts.csv,
+ports_airports_contracts,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ports_airports_contracts.csv,PR Ports Authority / Aerostar contracts and capital projects. Also fed by scripts/parse_aaa_ports_pdf.py from the acquired completed_projects_AAA.pdf.
+ports_airports_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ports_airports_revenue.csv,Aggregate port/airport fee revenue (PR Ports Authority + Aerostar/SJU) from audited financials and EMMA disclosures.
 pr_act_60_decrees,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_act60_decrees.csv,
 pr_corporate_registry,manual_export,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_corporate_registry.csv,
 pr_pensions,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_pension_funds.csv,
+prasa_contracts_master,infrastructure,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/prasa_contracts_master.csv,Vendor-level aggregation of pr_prasa_contracts.csv. Closes the previously-dangling prasa_contracts_master.csv output (declared with no producer). Derived source; runs after the prasa dropzone ingest.
+prasa_rate_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prasa_rate_revenue.csv,"Aggregate PRASA water/sewer rate revenue from audited financials, rate-case filings, and EMMA disclosures. Shares scripts/ingest_utility_revenue.py with prepa_luma_rate_revenue."
 prepa_luma_genera,infrastructure,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prepa_contracts.csv,PREPA / LUMA Energy / Genera PR contracts and operating data.
+prepa_luma_rate_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prepa_rate_revenue.csv,Aggregate PREPA/LUMA power rate revenue from audited financials and EMMA legacy revenue-bond disclosures. Shares scripts/ingest_utility_revenue.py with prasa_rate_revenue.
 promesa_creditors,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_promesa_creditors.csv,
 research_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_research_grants.csv,
 rum_cover_over,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_rum_coverover.csv,
@@ -90,6 +98,8 @@ sf133_budget_execution,federal,False,none,1,0,1,0,not_materialized,0,1,data/stag
 slfrf,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_slfrf_master.csv,
 snap_nap,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_snap_nap.csv,
 ssa,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ssa.csv,
+transit_contracts,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_transit_contracts.csv,AMA / Tren Urbano (ATI) operating and O&M contracts.
+transit_fare_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_transit_fare_revenue.csv,Aggregate transit farebox revenue (AMA buses + Tren Urbano / ATI) from audited financials and budgets.
 usace_civil_works,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_usace_civil.csv,
 usace_permits,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_usace_permits.csv,
 usda_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_usda.csv,

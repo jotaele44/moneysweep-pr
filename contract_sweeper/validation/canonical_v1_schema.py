@@ -12,7 +12,7 @@ validation this module also enforces three model invariants:
 
 * **Referential integrity** — every foreign key resolves to an existing
   primary key (``no broken reference``).
-* **Controlled-vocabulary gate** — ``edges.edge_type`` must be one of the 12
+* **Controlled-vocabulary gate** — ``edges.edge_type`` must be one of the 15
   approved verbs (``no unknown verb``); offenders are reported for routing to
   ``review_queue.csv``.
 * **Evidence-presence gate** — every edge carries a non-empty ``evidence_id``
@@ -118,6 +118,9 @@ EDGE_TYPES: tuple[str, ...] = (
     "SHARES_PERSONNEL_WITH",
     "LOBBIES_FOR",
     "BENEFITS_FROM",
+    "COLLECTS_REVENUE",
+    "ALLOCATES_REVENUE_TO",
+    "PLEDGED_TO_DEBT",
 )
 
 

@@ -30,10 +30,10 @@ def test_materialization_readiness_snapshot_matches_runbook_counts():
         Path("reports/materialization_readiness.json").read_text(encoding="utf-8")
     )
 
-    assert snapshot["total_sources"] == 88
-    assert snapshot["automatable_total"] == 57
-    assert snapshot["automatable_ready"] == 57
-    assert snapshot["queued_excluded_total"] == 31
+    assert snapshot["total_sources"] == 98
+    assert snapshot["automatable_total"] == 59
+    assert snapshot["automatable_ready"] == 59
+    assert snapshot["queued_excluded_total"] == 39
     assert snapshot["automatable_not_ready"] == []
 
 

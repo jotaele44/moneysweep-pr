@@ -13,14 +13,16 @@ test (`tests/test_materialization_readiness.py`).
 
 See `reports/materialization_readiness.json`:
 
-- **88** total registered sources
-- **57 automatable** — all structurally `ready` (adapter or importable producer
+- **98** total registered sources
+- **59 automatable** — all structurally `ready` (adapter or importable producer
   + declared outputs). This is the fill target.
 - **5 automatable sources need an API key** at run time: `SAM_API_KEY`,
   `LDA_API_KEY`, `FEC_API_KEY`, `OPENCORPORATES_API_TOKEN`, `HIGHERGOV_API_KEY`.
-- **31 queued / excluded** (not part of the automatable target):
-  - `scraper_needed` (20) — PR-gov HTML/PDF surfaces; need a scraping adapter.
-  - `manual_export` (6) — operator-supplied files (see step 3).
+- **39 queued / excluded** (not part of the automatable target):
+  - `scraper_needed` (15) — PR-gov HTML/PDF surfaces; need a scraping adapter.
+  - `manual_export` (19) — operator-supplied files (see step 3); includes the new
+    infrastructure revenue (toll/fare/utility-rate/port-fee) and infrastructure
+    contract (DTOP roads, ports/airports, transit) dropzones.
   - `semantic_duplicate` (3) — covered by a sibling source; never materialize alone.
   - `deferred_stub` (2) — NARA; intentionally unimplemented.
 
