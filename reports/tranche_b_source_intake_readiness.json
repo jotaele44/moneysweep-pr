@@ -6,64 +6,14 @@
   "controller": "scripts/source_intake_tranche_b.py",
   "helper_module": "scripts/source_intake_helpers.py",
   "sources_total": 7,
-  "sources": [
-    {
-      "source_key": "act",
-      "source_id": "act_transition_contracts",
-      "dropzone": "data/raw/ACT Transition Contracts",
-      "output": "data/staging/processed/pr_act_transition_contracts.csv",
-      "schema": "schemas/local_contracts.schema.json"
-    },
-    {
-      "source_key": "acuden",
-      "source_id": "acuden_2024_transition",
-      "dropzone": "data/raw/ACUDEN Transition Contracts",
-      "output": "data/staging/processed/pr_acuden_transition.csv",
-      "schema": "schemas/local_contracts.schema.json"
-    },
-    {
-      "source_key": "prasa_projects",
-      "source_id": "prasa_completed_projects",
-      "dropzone": "data/raw/PRASA Completed Projects",
-      "output": "data/staging/processed/prasa_completed_projects.csv",
-      "schema": "schemas/infrastructure_projects.schema.json"
-    },
-    {
-      "source_key": "prasa_cer",
-      "source_id": "prasa_fy2024_cer",
-      "dropzone": "data/raw/PRASA CER",
-      "output": "data/staging/processed/prasa_cer_facts.csv",
-      "schema": "schemas/infrastructure_fiscal_facts.schema.json"
-    },
-    {
-      "source_key": "cabilderos",
-      "source_id": "pr_cabilderos",
-      "dropzone": "data/raw/Cabilderos",
-      "output": "data/staging/processed/pr_cabilderos_registry.csv",
-      "schema": "schemas/lobbying_registry.schema.json"
-    },
-    {
-      "source_key": "lda",
-      "source_id": "federal_lda_registrants",
-      "dropzone": "data/raw/Federal LDA Registrants",
-      "output": "data/staging/processed/federal_lda_registrants.csv",
-      "schema": "schemas/lobbying_registry.schema.json"
-    },
-    {
-      "source_key": "dcaa",
-      "source_id": "dcaa_active_contractors",
-      "dropzone": "data/raw/DCAA Active Contractors",
-      "output": "data/staging/processed/dcaa_active_contractors.csv",
-      "schema": "schemas/contractor_reference.schema.json"
-    }
-  ],
   "validation": {
     "tests_added": [
       "tests/test_source_intake_helpers.py",
       "tests/test_source_intake_tranche_b.py"
     ],
+    "schema_gap": "patched",
     "connector_test_execution": "not_available",
     "required_local_command": "python3 -m pytest tests/test_source_intake_helpers.py tests/test_source_intake_tranche_b.py -q"
   },
-  "promotion_gate": "No source is marked fully_materialized by this report. Promotion requires dropped source files, generated outputs, schema checks, deterministic regression tests, and refreshed recovery matrices."
+  "promotion_gate": "No promotion is performed by this report. Promotion requires dropped source files, generated outputs, schema checks, deterministic regression tests, and refreshed recovery matrices."
 }
