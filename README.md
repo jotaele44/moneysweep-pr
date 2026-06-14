@@ -20,8 +20,8 @@ The pipeline acquires, normalizes, validates, and cross-links public procurement
 
 Contract-Sweeper is **not yet a production-certified master dataset**. The current state is a controlled buildout phase:
 
-- **Source registry:** 98 tracked source definitions.
-- **Automatable sources:** 59 marked ready by the materialization-readiness gate.
+- **Source registry:** 123 tracked source definitions.
+- **Automatable sources:** 67 marked ready by the materialization-readiness gate.
 - **Queued / excluded sources:** manual exports, scraper-needed Puerto Rico sources, semantic duplicates, and deferred stubs remain outside the automatable target.
 - **Strict preflight:** required before producer execution or promotion.
 - **Current active work:** Tranche B manual-source ingestion and reconciliation.

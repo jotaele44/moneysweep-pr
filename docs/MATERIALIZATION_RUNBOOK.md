@@ -13,16 +13,17 @@ test (`tests/test_materialization_readiness.py`).
 
 See `reports/materialization_readiness.json`:
 
-- **98** total registered sources
-- **59 automatable** — all structurally `ready` (adapter or importable producer
+- **123** total registered sources
+- **67 automatable** — all structurally `ready` (adapter or importable producer
   + declared outputs). This is the fill target.
-- **5 automatable sources need an API key** at run time: `SAM_API_KEY`,
-  `LDA_API_KEY`, `FEC_API_KEY`, `OPENCORPORATES_API_TOKEN`, `HIGHERGOV_API_KEY`.
-- **39 queued / excluded** (not part of the automatable target):
-  - `scraper_needed` (15) — PR-gov HTML/PDF surfaces; need a scraping adapter.
-  - `manual_export` (19) — operator-supplied files (see step 3); includes the new
+- Automatable sources that need an API key at run time: `SAM_API_KEY`,
+  `LDA_API_KEY`, `FEC_API_KEY`, `FAC_API_KEY`, `OPENCORPORATES_API_TOKEN`,
+  `HIGHERGOV_API_KEY`.
+- **56 queued / excluded** (not part of the automatable target):
+  - `manual_export` (36) — operator-supplied files (see step 3); includes the
     infrastructure revenue (toll/fare/utility-rate/port-fee) and infrastructure
     contract (DTOP roads, ports/airports, transit) dropzones.
+  - `scraper_needed` (15) — PR-gov HTML/PDF surfaces; need a scraping adapter.
   - `semantic_duplicate` (3) — covered by a sibling source; never materialize alone.
   - `deferred_stub` (2) — NARA; intentionally unimplemented.
 
@@ -78,8 +79,8 @@ python3 scripts/build_source_recovery_matrix.py
 Success criteria:
 - `reports/materialization_readiness.json`: `automatable_ready == automatable_total`.
 - `reports/gap_analysis_report.json`: every **automatable** source shows
-  `fully_materialized` (note: overall `coverage_rate` is over *all 88* sources,
-  so it will not reach 1.0 while the 31 queued sources remain unmaterialized —
+  `fully_materialized` (note: overall `coverage_rate` is over *all 123* sources,
+  so it will not reach 1.0 while the 56 queued sources remain unmaterialized —
   judge success against the automatable subset and `required_coverage_rate`).
 
 ## Definition of done (per source)
