@@ -5,9 +5,17 @@ relevant to Puerto Rico public-money intelligence that have **no entry** in the
 123-source registry (`registries/source_registry.yaml`). Each candidate was
 checked against the live registry id list and verified against a primary source._
 
-**This pass does not add registry entries.** It is a prioritized intake backlog;
-the machine-readable rows live in `financial_source_coverage_gaps.csv` and are
+The machine-readable rows live in `financial_source_coverage_gaps.csv` and are
 surfaced in `financial_source_audit.{csv,md}` as the `not_considered` bucket.
+
+**Update (P1 promotion):** the three P1 candidates below — `hacienda_sut_ivu`,
+`census_gov_finances`, `fta_ntd` — have been **promoted into the registry as
+deferred intake stubs** (producer `scripts/download_coverage_gap_intake.py`;
+`hacienda_sut_ivu` classifies `scraper_needed`, the other two `deferred_stub`).
+They now appear in the audit ledger as registry sources, not `not_considered`.
+The remaining backlog (`gsa_iolp_real_property`, `hmda_ffiec`,
+`prac_pandemic_oversight`) stays here until a real fetcher/adapter is built — each
+needs network egress or an API key, unavailable in the buildout environment.
 
 ## Context
 

@@ -66,6 +66,8 @@ ssa,False,api_producer,True,True,,False,True,scripts/download_ssa.py,1,0,1,,"Run
 usace_permits,False,api_producer,True,True,,False,True,scripts/download_usace_permits.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 usaspending_loans,False,api_producer,True,True,,False,True,scripts/download_usaspending_loans.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 usda_farm_subsidies,False,api_producer,True,True,,False,True,scripts/download_usda_farm.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+census_gov_finances,False,deferred_stub,False,False,CENSUS_API_KEY,False,True,scripts/download_coverage_gap_intake.py,1,0,0,,Intentionally unimplemented; remains not_materialized by design.
+fta_ntd,False,deferred_stub,False,False,,False,True,scripts/download_coverage_gap_intake.py,1,0,0,,Intentionally unimplemented; remains not_materialized by design.
 nara_catalog_aws_open_data,False,deferred_stub,False,False,,False,True,scripts/download_nara_nextgen.py,2,0,0,,Intentionally unimplemented; remains not_materialized by design.
 nara_nextgen_catalog_v3,False,deferred_stub,False,False,NARA_API_KEY,False,True,scripts/download_nara_nextgen.py,2,0,0,,Intentionally unimplemented; remains not_materialized by design.
 act_toll_revenue,False,manual_export,False,False,,False,True,scripts/ingest_toll_revenue.py,1,0,1,data/manual/act_toll_revenue/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
@@ -83,7 +85,7 @@ donaciones_pr,False,manual_export,False,False,,False,True,scripts/ingest_donacio
 dtop_road_contracts,False,manual_export,False,False,,False,True,scripts/ingest_dtop_road_contracts.py,1,0,1,data/manual/dtop_road_contracts/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 dtop_vehicle_fees,False,manual_export,False,False,,False,True,scripts/ingest_dtop_vehicle_fees.py,1,0,1,data/raw/DTOP/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 equitable_sharing,False,manual_export,False,False,,False,True,scripts/ingest_equitable_sharing.py,1,0,1,data/raw/Equitable_Sharing/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
-follow_the_money,False,manual_export,False,False,,False,True,scripts/ingest_follow_the_money.py,4,0,1,data/raw/follow_the_money/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+follow_the_money,False,manual_export,False,False,,False,True,scripts/ingest_follow_the_money.py,3,0,1,data/raw/follow_the_money/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 gaming_commission,False,manual_export,False,False,,False,True,scripts/ingest_gaming_commission.py,1,0,1,data/raw/Gaming/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 hud_drgr_authorized,True,manual_export,False,False,,False,True,scripts/ingest_hud_drgr_exports.py,2,0,1,data/manual/hud_drgr/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 irs_ctc_eitc_pr,False,manual_export,False,False,,False,True,scripts/ingest_irs_ctc_eitc_pr.py,1,0,1,data/raw/IRS_CTC_EITC/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
@@ -111,6 +113,7 @@ cor3,True,scraper_needed,False,False,,False,True,scripts/download_cor3.py,1,0,1,
 emma_bonds,True,scraper_needed,False,False,,False,True,scripts/download_emma.py,2,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 eqb_epa_icis,False,scraper_needed,False,False,,False,True,scripts/download_eqb.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 hacienda,False,scraper_needed,False,False,,False,True,scripts/download_hacienda.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+hacienda_sut_ivu,False,scraper_needed,False,False,,False,True,scripts/download_coverage_gap_intake.py,1,0,0,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 msrb_rtrs_trades,False,scraper_needed,False,False,,False,True,scripts/download_msrb_trades.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 municipal_finance,False,scraper_needed,False,False,,False,True,scripts/download_municipal.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 p3_authority,False,scraper_needed,False,False,,False,True,scripts/download_p3.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
