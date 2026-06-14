@@ -1,8 +1,13 @@
 """Tests for the Follow the Money ingester (scripts.ingest_follow_the_money).
 
 Covers the pure transform functions and the full drop-file -> processed-CSV chain
-(4 output files). The ingester reads operator-delivered CSV exports from
-data/raw/follow_the_money/ — no network code — so all tests run fully offline.
+(3 output files: SF-133 budget execution, municipal bridge, facility matches). The
+ingester reads operator-delivered CSV exports from data/raw/follow_the_money/ — no
+network code — so all tests run fully offline.
+
+The Epstein PR-case bank-wire records that previously also lived in this dropzone
+were separated into the epstein_pr_case watchlist (see test_epstein_watchlist.py);
+this ingester no longer reads or produces them.
 """
 
 from __future__ import annotations
@@ -15,9 +20,7 @@ import pytest
 
 from scripts.ingest_follow_the_money import (
     SF133_OUTPUT_COLUMNS,
-    WIRE_COLUMNS,
     _build_sf133,
-    _build_wire_ledger,
     run,
 )
 
@@ -76,36 +79,7 @@ def test_build_sf133_handles_is_obligation_variants():
 
 
 # ---------------------------------------------------------------------------
-# Unit: _build_wire_ledger
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.unit
-def test_build_wire_ledger_empty_inputs_returns_empty_schema():
-    out = _build_wire_ledger(None, None, None, None, _NullLogger())
-    assert list(out.columns) == WIRE_COLUMNS
-    assert len(out) == 0
-
-
-@pytest.mark.unit
-def test_build_wire_ledger_with_ledger_df():
-    ledger = pd.DataFrame(
-        {
-            "txn_date": ["2024-01-15"],
-            "entity_raw": ["ACME LLC"],
-            "destination_bank": ["FirstBank"],
-            "destination_account": ["123456"],
-            "amount_usd": ["50000"],
-        }
-    )
-    out = _build_wire_ledger(ledger, None, None, None, _NullLogger())
-    assert list(out.columns) == WIRE_COLUMNS
-    assert len(out) == 1
-    assert out.iloc[0]["entity_raw"] == "ACME LLC"
-
-
-# ---------------------------------------------------------------------------
-# Integration: full drop-file -> 4 output CSVs
+# Integration: full drop-file -> 3 output CSVs
 # ---------------------------------------------------------------------------
 
 
@@ -120,7 +94,7 @@ def test_run_no_dropzone_returns_no_files(tmp_path: Path):
 
 
 @pytest.mark.integration
-def test_run_with_sf133_file_writes_all_four_outputs(tmp_path: Path):
+def test_run_with_sf133_file_writes_three_outputs(tmp_path: Path):
     drop = tmp_path / "data" / "raw" / "follow_the_money"
     drop.mkdir(parents=True)
 
@@ -136,23 +110,26 @@ def test_run_with_sf133_file_writes_all_four_outputs(tmp_path: Path):
     result = run(root=tmp_path)
     assert result["rows"] == 1
     assert result["status"] == "OK"
+    assert set(result["outputs"]) == {
+        "pr_sf133_budget_execution.csv",
+        "pr_ftm_municipal_bridge.csv",
+        "pr_ftm_facility_matches.csv",
+    }
 
     out_dir = tmp_path / "data" / "staging" / "processed"
     sf133 = out_dir / "pr_sf133_budget_execution.csv"
-    wire = out_dir / "pr_ftm_wire_ledger.csv"
     muni = out_dir / "pr_ftm_municipal_bridge.csv"
     fac = out_dir / "pr_ftm_facility_matches.csv"
 
-    for p in (sf133, wire, muni, fac):
+    for p in (sf133, muni, fac):
         assert p.exists(), f"Expected output missing: {p.name}"
+
+    # No Epstein wire-ledger output is produced anymore.
+    assert not (out_dir / "pr_ftm_wire_ledger.csv").exists()
 
     # SF-133 output has canonical columns
     rows = list(csv.DictReader(sf133.open()))
     assert list(rows[0].keys()) == SF133_OUTPUT_COLUMNS
-
-    # Wire/muni/facility outputs have correct empty schemas (no wire files given)
-    wire_rows = list(csv.DictReader(wire.open()))
-    assert list(csv.DictReader(wire.open()).fieldnames or []) == WIRE_COLUMNS or wire_rows == []
 
 
 @pytest.mark.integration

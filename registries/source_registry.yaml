@@ -725,7 +725,6 @@ sources:
     producer_script: scripts/ingest_follow_the_money.py
     expected_outputs:
       - data/staging/processed/pr_sf133_budget_execution.csv
-      - data/staging/processed/pr_ftm_wire_ledger.csv
       - data/staging/processed/pr_ftm_municipal_bridge.csv
       - data/staging/processed/pr_ftm_facility_matches.csv
     schema_version: r5_v1
@@ -733,7 +732,7 @@ sources:
       min_rows: 1
     manual_drop_dir: data/raw/follow_the_money/
     update_cadence: yearly
-    notes: Follow the Money export data for PR. ingest_follow_the_money.py is a dropzone reader (no network code) producing 4 outputs from operator-delivered CSV exports in data/raw/follow_the_money/. Previously mislabeled with a phantom pr_follow_the_money.csv output that is never written.
+    notes: PR public-money export data (SF-133 budget execution, municipal political/federal bridge, facility contract matches). ingest_follow_the_money.py is a dropzone reader (no network code) producing 3 outputs from operator-delivered CSV exports in data/raw/follow_the_money/. Municipal-bridge and facility-match outputs materialize offline from committed inputs. NOTE - the EP_PR_PRBank_* bank-wire records previously co-located in this dropzone are Jeffrey Epstein PR-case records, not a public-money source; they were separated to the epstein_pr_case watchlist (registries/watchlists/epstein_pr_case.json) and are no longer ingested here.
 
   - source_id: fec_committees
     family: political_finance
@@ -1825,3 +1824,51 @@ sources:
     update_cadence: ad_hoc
     notes: >
       PR Public Housing Administration (AVP/PRPHA) operating subsidies and RAD conversions. Distinct from HUD Section-8 HCV. Operator-delivered exports.
+
+  # ----- Coverage-gap intake stubs (promoted from reports/financial_source_coverage_gaps.md) -----
+  # Tracked P1 gaps awaiting a real fetcher/adapter. Producer is a deferred no-op
+  # (scripts/download_coverage_gap_intake.py); these remain not_materialized until built.
+  - source_id: hacienda_sut_ivu
+    family: territorial
+    required: false
+    authentication: none
+    endpoint_url: https://hacienda.pr.gov/inversionistas/estadisticas-y-recaudos-statistics-and-revenues
+    producer_script: scripts/download_coverage_gap_intake.py
+    expected_outputs:
+      - data/staging/processed/pr_hacienda_sut_ivu.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 0
+    update_cadence: monthly
+    notes: >
+      PR Treasury Sales & Use Tax (IVU/SUT) collections by fiscal year / month / NAICS, plus COFIM municipal IVU — the largest PR consumption-tax revenue stream, not otherwise captured. Scraper surface (hacienda.pr.gov bulk tables); queued for a scraping adapter (scraper_needed).
+
+  - source_id: census_gov_finances
+    family: territorial
+    required: false
+    authentication: api_key:CENSUS_API_KEY
+    endpoint_url: https://api.census.gov/data
+    producer_script: scripts/download_coverage_gap_intake.py
+    expected_outputs:
+      - data/staging/processed/pr_census_gov_finances.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 0
+    update_cadence: yearly
+    notes: >
+      Census Annual Survey of State & Local Government Finances + State Government Tax Collections + Public Pensions for PR (FIPS 72) — the authoritative aggregate revenue/expenditure baseline. API-automatable via the Census Data API. Fetcher intentionally not implemented yet (deferred): no network egress / API key in the buildout environment.
+
+  - source_id: fta_ntd
+    family: infrastructure
+    required: false
+    authentication: none
+    endpoint_url: https://www.transit.dot.gov/ntd
+    producer_script: scripts/download_coverage_gap_intake.py
+    expected_outputs:
+      - data/staging/processed/pr_fta_ntd.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 0
+    update_cadence: yearly
+    notes: >
+      FTA National Transit Database — financial, funding-source, and operating-expense data for PR transit agencies (PRHTA, PRITA, Ports Authority). Complements transit_contracts / transit_fare_revenue with federal funding + audited operating finance. Free bulk download. Fetcher intentionally not implemented yet (deferred).

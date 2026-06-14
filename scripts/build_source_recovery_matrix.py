@@ -51,6 +51,7 @@ SCRAPER_NEEDED = {
     "compras_pr",
     "aafaf",
     "hacienda",
+    "hacienda_sut_ivu",
     "cofina",
     "prepa_luma_genera",
     "cor3",

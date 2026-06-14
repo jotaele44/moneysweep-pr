@@ -72,6 +72,7 @@ FAMILY_DOMAIN = {
 OFFLINE_SOURCE_INPUTS = {
     "act_transition_contracts": "data/raw/act_transition/transition_contracts_extracted.csv",
     "acuden_2024_transition": "data/raw/act_transition/transition_contracts_extracted.csv",
+    "follow_the_money": "data/raw/follow_the_money/municipality_political_federal_bridge.csv",
 }
 
 # path_type -> the plain-language audit bucket. Automatable path types are

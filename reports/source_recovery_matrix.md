@@ -1,8 +1,8 @@
 # Source Materialization Readiness
 
-Total sources: **123**
+Total sources: **126**
 Automatable: **67** (ready: **67**, need API key at run time: 8)
-Queued / excluded: **56**
+Queued / excluded: **59**
 
 ## Path types
 
@@ -11,9 +11,9 @@ Queued / excluded: **56**
 | `api_adapter` | True | 42 | Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated). |
 | `api_producer` | True | 25 | Run producer under strict preflight; public API path, set key if gated. |
 | `manual_export` | False | 36 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
-| `scraper_needed` | False | 15 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
+| `scraper_needed` | False | 16 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
+| `deferred_stub` | False | 4 | Intentionally unimplemented; remains not_materialized by design. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
-| `deferred_stub` | False | 2 | Intentionally unimplemented; remains not_materialized by design. |
 
 API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KEY`, `FINANCIALDATA_API_KEY`, `HIGHERGOV_API_KEY`, `OPENCORPORATES_API_TOKEN`, `SAM_API_KEY`
 
@@ -90,8 +90,10 @@ API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KE
 - `usaspending_loans`
 - `usda_farm_subsidies`
 
-## deferred_stub (2)
+## deferred_stub (4)
 
+- `census_gov_finances`
+- `fta_ntd`
 - `nara_catalog_aws_open_data`
 - `nara_nextgen_catalog_v3`
 
@@ -134,7 +136,7 @@ API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KE
 - `transit_contracts`
 - `transit_fare_revenue`
 
-## scraper_needed (15)
+## scraper_needed (16)
 
 - `aafaf`
 - `cofina`
@@ -143,6 +145,7 @@ API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KE
 - `emma_bonds`
 - `eqb_epa_icis`
 - `hacienda`
+- `hacienda_sut_ivu`
 - `msrb_rtrs_trades`
 - `municipal_finance`
 - `p3_authority`
