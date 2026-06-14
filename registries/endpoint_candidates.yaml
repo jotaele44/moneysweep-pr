@@ -283,3 +283,54 @@ endpoint_candidates:
 
   - source_id: grants_gov
     url: https://www.grants.gov/
+
+  # ----- Infrastructure revenue + contract sources -----
+  - source_id: act_toll_revenue
+    url: https://www.act.pr.gov/
+    fallback_urls:
+      - https://emma.msrb.org/
+    notes: ACT audited financials + EMMA toll-revenue-bond disclosures.
+
+  - source_id: ports_airports_revenue
+    url: https://www.prpa.pr.gov/
+    fallback_urls:
+      - https://emma.msrb.org/
+
+  - source_id: transit_fare_revenue
+    url: https://ama.pr.gov/
+    fallback_urls:
+      - https://dtop.pr.gov/
+
+  - source_id: prasa_rate_revenue
+    url: https://www.acueductospr.com/
+    fallback_urls:
+      - https://emma.msrb.org/
+
+  - source_id: prepa_luma_rate_revenue
+    url: https://aeepr.com/es-pr/
+    fallback_urls:
+      - https://emma.msrb.org/
+
+  - source_id: emma_infra_revenue
+    url: https://emma.msrb.org/
+    notes: MSRB EMMA continuing disclosures for PR infrastructure revenue bonds.
+
+  - source_id: dtop_road_contracts
+    url: https://consultacontratos.ocpr.gov.pr/
+    fallback_urls:
+      - https://dtop.pr.gov/
+    notes: OCPR registry agency code 032.
+
+  - source_id: ports_airports_contracts
+    url: https://www.prpa.pr.gov/
+    fallback_urls:
+      - https://consultacontratos.ocpr.gov.pr/
+
+  - source_id: transit_contracts
+    url: https://consultacontratos.ocpr.gov.pr/
+    fallback_urls:
+      - https://ama.pr.gov/
+
+  - source_id: prasa_contracts_master
+    url: ""
+    notes: Derived source — no upstream endpoint.

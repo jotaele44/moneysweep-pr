@@ -219,13 +219,26 @@ sources:
     producer_script: scripts/ingest_prasa.py
     expected_outputs:
       - data/staging/processed/pr_prasa_contracts.csv
-      - data/staging/processed/prasa_contracts_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
     manual_drop_dir: data/raw/PRASA/
     update_cadence: yearly
-    notes: PRASA aqueduct/sewer authority. ingest_prasa.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers exported procurement files to data/raw/PRASA/. Includes Consulting Engineer Report FY2024 baseline. NOTE expected output prasa_contracts_master.csv is declared but has no producer or consumer yet (the producer writes only pr_prasa_contracts.csv, which build_financial_flows_master.py consumes); the master aggregation is a future deliverable, not a current gap.
+    notes: PRASA aqueduct/sewer authority. ingest_prasa.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers exported procurement files to data/raw/PRASA/. Includes Consulting Engineer Report FY2024 baseline. The vendor-level master is now produced by the prasa_contracts_master source (scripts/build_prasa_contracts_master.py).
+
+  - source_id: prasa_contracts_master
+    family: infrastructure
+    required: false
+    authentication: none
+    endpoint_url: ""
+    producer_script: scripts/build_prasa_contracts_master.py
+    expected_outputs:
+      - data/staging/processed/prasa_contracts_master.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: yearly
+    notes: Vendor-level aggregation of pr_prasa_contracts.csv. Closes the previously-dangling prasa_contracts_master.csv output (declared with no producer). Derived source; runs after the prasa dropzone ingest.
 
   - source_id: prepa_luma_genera
     family: infrastructure
@@ -240,6 +253,146 @@ sources:
       min_rows: 1
     update_cadence: quarterly
     notes: PREPA / LUMA Energy / Genera PR contracts and operating data.
+
+  # ----- Infrastructure REVENUE (income side: what civilians pay to use infra) -----
+  # Aggregate / published figures only (audited financials, MSRB EMMA continuing
+  # disclosures, budgets) — never individual payments. Modeled as inflow transactions
+  # (payer = aggregate public/ratepayer entity, payee = collecting agency). See
+  # docs/transaction_schema.md.
+  - source_id: act_toll_revenue
+    family: infrastructure_revenue
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.act.pr.gov/
+    producer_script: scripts/ingest_toll_revenue.py
+    expected_outputs:
+      - data/staging/processed/pr_act_toll_revenue.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/act_toll_revenue/
+    update_cadence: yearly
+    notes: Aggregate toll revenue (ACT / AutoExpreso / Metropistas PR-22/PR-5) from ACT audited financials and EMMA toll-revenue-bond disclosures. Dropzone reader; pursue finer (per-plaza) breakdowns via FOIA.
+
+  - source_id: ports_airports_revenue
+    family: infrastructure_revenue
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.prpa.pr.gov/
+    producer_script: scripts/ingest_port_airport_revenue.py
+    expected_outputs:
+      - data/staging/processed/pr_ports_airports_revenue.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/ports_airports_revenue/
+    update_cadence: yearly
+    notes: Aggregate port/airport fee revenue (PR Ports Authority + Aerostar/SJU) from audited financials and EMMA disclosures.
+
+  - source_id: transit_fare_revenue
+    family: infrastructure_revenue
+    required: false
+    authentication: manual_export
+    endpoint_url: https://ama.pr.gov/
+    producer_script: scripts/ingest_transit_fare_revenue.py
+    expected_outputs:
+      - data/staging/processed/pr_transit_fare_revenue.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/transit_fare_revenue/
+    update_cadence: yearly
+    notes: Aggregate transit farebox revenue (AMA buses + Tren Urbano / ATI) from audited financials and budgets.
+
+  - source_id: prasa_rate_revenue
+    family: infrastructure_revenue
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.acueductospr.com/
+    producer_script: scripts/ingest_utility_revenue.py
+    expected_outputs:
+      - data/staging/processed/pr_prasa_rate_revenue.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/prasa_rate_revenue/
+    update_cadence: yearly
+    notes: Aggregate PRASA water/sewer rate revenue from audited financials, rate-case filings, and EMMA disclosures. Shares scripts/ingest_utility_revenue.py with prepa_luma_rate_revenue.
+
+  - source_id: prepa_luma_rate_revenue
+    family: infrastructure_revenue
+    required: false
+    authentication: manual_export
+    endpoint_url: https://aeepr.com/es-pr/
+    producer_script: scripts/ingest_utility_revenue.py
+    expected_outputs:
+      - data/staging/processed/pr_prepa_rate_revenue.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/prepa_rate_revenue/
+    update_cadence: yearly
+    notes: Aggregate PREPA/LUMA power rate revenue from audited financials and EMMA legacy revenue-bond disclosures. Shares scripts/ingest_utility_revenue.py with prasa_rate_revenue.
+
+  - source_id: emma_infra_revenue
+    family: infrastructure_revenue
+    required: false
+    authentication: none
+    endpoint_url: https://emma.msrb.org/
+    producer_script: scripts/extract_emma_revenue.py
+    expected_outputs:
+      - data/staging/processed/pr_emma_revenue_disclosures.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: quarterly
+    notes: MSRB EMMA continuing-disclosure revenue extraction (toll/water/power bond-pledged revenue). The one authentication-free automatable revenue spine; cross-checks the manual dropzone figures. PDF extraction is best-effort.
+
+  # ----- Infrastructure CONTRACTS (outflow side: where the money goes) -----
+  - source_id: dtop_road_contracts
+    family: infrastructure
+    required: false
+    authentication: manual_export
+    endpoint_url: https://consultacontratos.ocpr.gov.pr/
+    producer_script: scripts/ingest_dtop_road_contracts.py
+    expected_outputs:
+      - data/staging/processed/pr_dtop_road_contracts.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/dtop_road_contracts/
+    update_cadence: quarterly
+    notes: DTOP/ACT permanent road construction & maintenance contracts (rolling, beyond the 2020 transition snapshot). OCPR registry agency code 032.
+
+  - source_id: ports_airports_contracts
+    family: infrastructure
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.prpa.pr.gov/
+    producer_script: scripts/ingest_port_airport_contracts.py
+    expected_outputs:
+      - data/staging/processed/pr_ports_airports_contracts.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/ports_airports_contracts/
+    update_cadence: quarterly
+    notes: PR Ports Authority / Aerostar contracts and capital projects. Also fed by scripts/parse_aaa_ports_pdf.py from the acquired completed_projects_AAA.pdf.
+
+  - source_id: transit_contracts
+    family: infrastructure
+    required: false
+    authentication: manual_export
+    endpoint_url: https://consultacontratos.ocpr.gov.pr/
+    producer_script: scripts/ingest_transit_contracts.py
+    expected_outputs:
+      - data/staging/processed/pr_transit_contracts.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/transit_contracts/
+    update_cadence: quarterly
+    notes: AMA / Tren Urbano (ATI) operating and O&M contracts.
 
   # ----- PR transition / agency contracts -----
   - source_id: act_transition_contracts
@@ -581,6 +734,72 @@ sources:
     manual_drop_dir: data/raw/follow_the_money/
     update_cadence: yearly
     notes: Follow the Money export data for PR. ingest_follow_the_money.py is a dropzone reader (no network code) producing 4 outputs from operator-delivered CSV exports in data/raw/follow_the_money/. Previously mislabeled with a phantom pr_follow_the_money.csv output that is never written.
+
+  - source_id: fec_committees
+    family: political_finance
+    required: false
+    authentication: api_key:FEC_API_KEY
+    endpoint_url: https://api.open.fec.gov/
+    producer_script: scripts/download_fec_committees.py
+    expected_outputs:
+      - data/staging/processed/pr_fec_committees.csv
+      - data/staging/processed/pr_fec_disbursements.csv
+      - data/staging/processed/pr_fec_independent_expenditures.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: monthly
+    notes: >
+      FEC committee master plus Schedule B (disbursements) and Schedule E
+      (independent expenditures) for PR-linked political committees. Makes
+      PACs, Super PACs, 527s, and party committees first-class entities in
+      the political-finance layer rather than only being embedded as
+      committee_id/committee_name columns on Schedule A contribution rows
+      handled by the existing `fec` source.
+
+  - source_id: contralor_electoral
+    family: political_finance
+    required: false
+    authentication: manual_export
+    endpoint_url: https://oce.pr.gov/
+    producer_script: scripts/ingest_oce.py
+    expected_outputs:
+      - data/staging/processed/pr_oce_donations.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/OCE/
+    update_cadence: ad_hoc
+    notes: >
+      PR Oficina del Contralor Electoral (OCE) campaign-finance registry.
+      Distinct from `oficina_contralor` (government-audit Contralor, a
+      different agency). ingest_oce.py is a dropzone reader (no network
+      code) producing pr_oce_donations.csv aligned column-for-column to
+      pr_donaciones.csv so the NGO political-donation crossref consumes
+      both feeds uniformly.
+
+  - source_id: ngo_integration_layer
+    family: nonprofit
+    required: false
+    authentication: none
+    endpoint_url: ""
+    producer_script: scripts/ngo_integration.py
+    expected_outputs:
+      - data/staging/processed/ngos/ngos_master.csv
+      - data/staging/processed/ngos/ngo_funding_edges.csv
+      - data/staging/processed/ngos/ngo_municipal_coverage.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: ad_hoc
+    notes: >
+      NGO / OSFL identity, funding, and coverage layer built from IRS EO BMF,
+      TEOS, PR state registry, and USASpending drops. Also drives the
+      NGO ↔ political-donation crossref (analyze_political_crossref:
+      build_ngo_donation_crossref → data/staging/processed/ngos/
+      ngo_political_donations.csv) which is intentionally NOT declared as
+      an expected_output to avoid preflight gate failures (matches the
+      convention used by `fec` for pr_fec_crossref.csv).
 
   # ----- Federal grants (sectoral) -----
   - source_id: sba_loans
@@ -1234,3 +1453,399 @@ sources:
       FINANCIALDATA_API_KEY and FINANCIALDATA_LICENSE_APPROVED=true.
       Default mode is dry-run/mock with synthetic fixtures. Raw vendor payloads
       are never persisted. See docs/financialdata_provider.md.
+
+  # ===== Government-flow coverage expansion (25 sources): federal API producers =====
+
+  - source_id: usaspending_loans
+    family: federal
+    required: false
+    authentication: none
+    endpoint_url: https://api.usaspending.gov/
+    producer_script: scripts/download_usaspending_loans.py
+    expected_outputs:
+      - data/staging/processed/pr_federal_loans.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: weekly
+    notes: >
+      Federal direct loans and loan guarantees (assistance type 07/08) to PR recipients via the USASpending API. Captures face value + federal subsidy cost, distinct from contracts/grants.
+
+  - source_id: federal_audit_clearinghouse
+    family: federal
+    required: false
+    authentication: api_key:FAC_API_KEY
+    endpoint_url: https://api.fac.gov/
+    producer_script: scripts/download_fac.py
+    expected_outputs:
+      - data/staging/processed/pr_single_audits.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: quarterly
+    notes: >
+      Federal Single Audit (SF-SAC) results for PR auditees from the Federal Audit Clearinghouse. Oversight on subrecipients of federal awards. Free api.data.gov key (FAC_API_KEY).
+
+  - source_id: sam_exclusions
+    family: entity_resolution
+    required: false
+    authentication: api_key:SAM_API_KEY
+    endpoint_url: https://api.sam.gov/
+    producer_script: scripts/download_sam_exclusions.py
+    expected_outputs:
+      - data/staging/processed/sam_exclusions.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: weekly
+    notes: >
+      SAM.gov exclusions (debarment) list — suspended/excluded parties. Screening complement to sam_entities and ofac_sdn. Requires SAM_API_KEY.
+
+  - source_id: usda_farm_subsidies
+    family: federal
+    required: false
+    authentication: none
+    endpoint_url: https://api.usaspending.gov/
+    producer_script: scripts/download_usda_farm.py
+    expected_outputs:
+      - data/staging/processed/pr_usda_farm_subsidies.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: monthly
+    notes: >
+      USDA FSA direct payments + RMA crop-insurance subsidies to PR producers via USASpending (assistance types 06/10). Distinct from rural-development usda_grants.
+
+  - source_id: hud_cdbg_mit
+    family: federal
+    required: false
+    authentication: none
+    endpoint_url: https://api.usaspending.gov/
+    producer_script: scripts/download_cdbg_mit.py
+    expected_outputs:
+      - data/staging/processed/pr_cdbg_mit.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: monthly
+    notes: >
+      HUD CDBG-Mitigation (CFDA 14.272) allocations to PR via USASpending. Distinct from CDBG-DR (hud_cdbg_dr_public) and DRGR reporting (hud_drgr_authorized).
+
+  - source_id: fema_individual_assistance
+    family: federal
+    required: false
+    authentication: none
+    endpoint_url: https://www.fema.gov/api/open/
+    producer_script: scripts/download_fema_ia.py
+    expected_outputs:
+      - data/staging/processed/pr_fema_ia.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: monthly
+    notes: >
+      FEMA Individual Assistance / Individuals & Households Program housing aid to PR (OpenFEMA HousingAssistanceOwners). Direct-to-household disaster flow, distinct from Public Assistance and HMGP.
+
+  - source_id: opportunity_zones
+    family: federal
+    required: false
+    authentication: none
+    endpoint_url: https://www.cdfifund.gov/
+    producer_script: scripts/download_opportunity_zones.py
+    expected_outputs:
+      - data/staging/processed/pr_opportunity_zones.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: yearly
+    notes: >
+      Qualified Opportunity Zone designated census tracts in PR (Treasury/IRS capital-gains incentive). Source URL configurable via OZ_DATA_URL; live pull requires network.
+
+  - source_id: opm_fedscope
+    family: federal
+    required: false
+    authentication: none
+    endpoint_url: https://www.opm.gov/data/
+    producer_script: scripts/download_opm_fedscope.py
+    expected_outputs:
+      - data/staging/processed/pr_federal_payroll.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: quarterly
+    notes: >
+      Federal civilian payroll (employment + average salary) in PR from OPM FedScope. Source URL configurable via FEDSCOPE_DATA_URL; live pull requires network.
+
+  # ===== Government-flow coverage expansion: PR-territorial & federal manual dropzones =====
+
+  - source_id: doj_settlements
+    family: federal
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.justice.gov/
+    producer_script: scripts/ingest_doj_settlements.py
+    expected_outputs:
+      - data/staging/processed/pr_doj_settlements.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/DOJ_Settlements/
+    update_cadence: ad_hoc
+    notes: >
+      DOJ / USAO-PR civil settlements and False Claims Act recoveries involving PR entities. Operator-delivered exports (no machine API).
+
+  - source_id: equitable_sharing
+    family: federal
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.justice.gov/afp
+    producer_script: scripts/ingest_equitable_sharing.py
+    expected_outputs:
+      - data/staging/processed/pr_equitable_sharing.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/Equitable_Sharing/
+    update_cadence: ad_hoc
+    notes: >
+      DOJ/Treasury equitable-sharing asset-forfeiture payouts to PR law enforcement. Operator-delivered exports.
+
+  - source_id: irs_ctc_eitc_pr
+    family: federal
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.irs.gov/statistics
+    producer_script: scripts/ingest_irs_ctc_eitc_pr.py
+    expected_outputs:
+      - data/staging/processed/pr_irs_ctc_eitc.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/IRS_CTC_EITC/
+    update_cadence: ad_hoc
+    notes: >
+      IRS Child Tax Credit / EITC payments to PR families (post-ARPA expansion), from SOI/Treasury exports. Operator-delivered.
+
+  - source_id: ocpr_contracts
+    family: territorial
+    required: false
+    authentication: manual_export
+    endpoint_url: https://consultacontratos.ocpr.gov.pr/
+    producer_script: scripts/ingest_ocpr_contracts.py
+    expected_outputs:
+      - data/staging/processed/pr_ocpr_contracts.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/OCPR_Contracts/
+    update_cadence: ad_hoc
+    notes: >
+      Canonical PR Comptroller (OCPR) contract registry — every PR government contract. Distinct from oficina_contralor (audit reports only). Interactive surface; operator-delivered exports until a scraper is built.
+
+  - source_id: ddec_incentives
+    family: territorial
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.ddec.pr.gov/
+    producer_script: scripts/ingest_ddec_incentives.py
+    expected_outputs:
+      - data/staging/processed/pr_ddec_incentives.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/DDEC_Incentives/
+    update_cadence: ad_hoc
+    notes: >
+      DDEC Act 60/20/22 tax-incentive decrees (export-services / individual-investor grants). Operator-delivered exports.
+
+  - source_id: crim_property_tax
+    family: municipal
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.crimpr.net/
+    producer_script: scripts/ingest_crim_property_tax.py
+    expected_outputs:
+      - data/staging/processed/pr_crim_property_tax.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/CRIM/
+    update_cadence: ad_hoc
+    notes: >
+      CRIM municipal property-tax assessments and collections. Operator-delivered exports.
+
+  - source_id: ases_plan_vital
+    family: territorial
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.asespr.org/
+    producer_script: scripts/ingest_ases_plan_vital.py
+    expected_outputs:
+      - data/staging/processed/pr_ases_contracts.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/ASES/
+    update_cadence: ad_hoc
+    notes: >
+      ASES Plan Vital Medicaid managed-care contracts and MCO capitation (territorial program spend). Distinct from federal medicaid_fmap match. Operator-delivered exports.
+
+  - source_id: loteria_pr
+    family: territorial
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.loteriapr.com/
+    producer_script: scripts/ingest_loteria_pr.py
+    expected_outputs:
+      - data/staging/processed/pr_loteria.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/Loteria/
+    update_cadence: ad_hoc
+    notes: >
+      Loteria de Puerto Rico + Loteria Electronica revenue, prize payouts and retailer commissions. Operator-delivered exports.
+
+  - source_id: gaming_commission
+    family: territorial
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.jcapr.pr.gov/
+    producer_script: scripts/ingest_gaming_commission.py
+    expected_outputs:
+      - data/staging/processed/pr_gaming.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/Gaming/
+    update_cadence: ad_hoc
+    notes: >
+      PR Gaming Commission casino/slot-machine licensing and gaming-tax revenue. Operator-delivered exports.
+
+  - source_id: ports_authority
+    family: infrastructure
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.prpa.pr.gov/
+    producer_script: scripts/ingest_ports_authority.py
+    expected_outputs:
+      - data/staging/processed/pr_ports_concessions.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/Ports/
+    update_cadence: ad_hoc
+    notes: >
+      PR Ports Authority concession fees and leases (e.g. Aerostar/LMM airport). Operator-delivered exports.
+
+  - source_id: act_tolls_concession
+    family: infrastructure
+    required: false
+    authentication: manual_export
+    endpoint_url: https://act.dtop.pr.gov/
+    producer_script: scripts/ingest_act_tolls_concession.py
+    expected_outputs:
+      - data/staging/processed/pr_act_tolls.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/ACT_Tolls/
+    update_cadence: ad_hoc
+    notes: >
+      PR Highways & Transportation Authority toll revenue and Metropistas/Autopistas concession payments. Distinct from ACT transition contracts. Operator-delivered exports.
+
+  - source_id: oatrh_payroll
+    family: territorial
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.oatrh.pr.gov/
+    producer_script: scripts/ingest_oatrh_payroll.py
+    expected_outputs:
+      - data/staging/processed/pr_govt_payroll.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/OATRH_Payroll/
+    update_cadence: ad_hoc
+    notes: >
+      PR central-government payroll / salaries (OATRH Nomina). Operator-delivered exports.
+
+  - source_id: ogpe_permits
+    family: municipal
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.ogpe.pr.gov/
+    producer_script: scripts/ingest_ogpe_permits.py
+    expected_outputs:
+      - data/staging/processed/pr_ogpe_permits.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/OGPe/
+    update_cadence: ad_hoc
+    notes: >
+      OGPe construction-permit fees and green-energy incentives. Operator-delivered exports.
+
+  - source_id: dtop_vehicle_fees
+    family: territorial
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.dtop.pr.gov/
+    producer_script: scripts/ingest_dtop_vehicle_fees.py
+    expected_outputs:
+      - data/staging/processed/pr_dtop_fees.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/DTOP/
+    update_cadence: ad_hoc
+    notes: >
+      DTOP vehicle-registration (marbete) and license fee collections. Operator-delivered exports.
+
+  - source_id: tourism_room_tax
+    family: territorial
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.discoverpuertorico.com/
+    producer_script: scripts/ingest_tourism_room_tax.py
+    expected_outputs:
+      - data/staging/processed/pr_tourism_roomtax.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/Tourism/
+    update_cadence: ad_hoc
+    notes: >
+      PR Tourism Company hotel-occupancy tax (impuesto de ocupacion) and co-op marketing contributions. Operator-delivered exports.
+
+  - source_id: bde_loans
+    family: territorial
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.bde.pr.gov/
+    producer_script: scripts/ingest_bde_loans.py
+    expected_outputs:
+      - data/staging/processed/pr_bde_loans.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/BDE/
+    update_cadence: ad_hoc
+    notes: >
+      Banco de Desarrollo Economico (Economic Development Bank) territorial business loans. Distinct from federal SBA loans. Operator-delivered exports.
+
+  - source_id: prpha_housing_subsidy
+    family: territorial
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.avp.pr.gov/
+    producer_script: scripts/ingest_prpha_housing_subsidy.py
+    expected_outputs:
+      - data/staging/processed/pr_prpha_subsidies.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/raw/PRPHA/
+    update_cadence: ad_hoc
+    notes: >
+      PR Public Housing Administration (AVP/PRPHA) operating subsidies and RAD conversions. Distinct from HUD Section-8 HCV. Operator-delivered exports.

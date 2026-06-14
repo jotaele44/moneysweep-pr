@@ -50,6 +50,7 @@ One CSV template per table in [`data/canonical_v1/`](../data/canonical_v1/).
 | `debt_instruments.csv` | `debt_id` | GO, COFINA, PREPA, PRASA, HTA, bond classes |
 | `lobbying_records.csv` | `lobbying_record_id` | PR cabilderos / LDA filings |
 | `funding_sources.csv` | `funding_source_id` | FEMA, HUD, EPA, DOE, CDBG-DR, ARPA |
+| `revenue_streams.csv` | `revenue_stream_id` | Civilian-paid infrastructure income (tolls, fares, utility rates, port fees) |
 | `properties.csv` | `property_id` | Hotels, land, concessions, facilities |
 | `municipalities.csv` | `municipality_id` | Geographic anchors |
 | `edges.csv` | `edge_id` | Typed graph relationships |
@@ -98,6 +99,9 @@ Use **one universal** `edges.csv`, not separate edge tables per tier.
 | `SHARES_PERSONNEL_WITH` | Shared personnel between entities |
 | `LOBBIES_FOR` | Lobbyist/firm lobbies for a client |
 | `BENEFITS_FROM` | Node benefits from a contract/funding/project |
+| `COLLECTS_REVENUE` | Agency collects infrastructure revenue from the public (income side) |
+| `ALLOCATES_REVENUE_TO` | Agency directs collected revenue to operating spend/budget |
+| `PLEDGED_TO_DEBT` | A revenue stream is pledged to a debt instrument (EMMA-disclosed) |
 
 Edges using a verb outside this list should be routed to `review_queue.csv`
 rather than written to `edges.csv`.
