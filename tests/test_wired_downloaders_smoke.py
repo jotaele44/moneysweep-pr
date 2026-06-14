@@ -96,6 +96,36 @@ B6_BONDS_ENTITY_MANUAL = [
     ("dcaa_active_contractors", "download_active_contractors"),
 ]
 
+# Government-flow coverage expansion (25 sources): 8 federal API producers +
+# 17 PR-territorial / federal manual dropzone readers.
+B7_GOVFLOW_25 = [
+    ("usaspending_loans", "download_usaspending_loans"),
+    ("federal_audit_clearinghouse", "download_fac"),
+    ("sam_exclusions", "download_sam_exclusions"),
+    ("usda_farm_subsidies", "download_usda_farm"),
+    ("hud_cdbg_mit", "download_cdbg_mit"),
+    ("fema_individual_assistance", "download_fema_ia"),
+    ("opportunity_zones", "download_opportunity_zones"),
+    ("opm_fedscope", "download_opm_fedscope"),
+    ("doj_settlements", "ingest_doj_settlements"),
+    ("equitable_sharing", "ingest_equitable_sharing"),
+    ("irs_ctc_eitc_pr", "ingest_irs_ctc_eitc_pr"),
+    ("ocpr_contracts", "ingest_ocpr_contracts"),
+    ("ddec_incentives", "ingest_ddec_incentives"),
+    ("crim_property_tax", "ingest_crim_property_tax"),
+    ("ases_plan_vital", "ingest_ases_plan_vital"),
+    ("loteria_pr", "ingest_loteria_pr"),
+    ("gaming_commission", "ingest_gaming_commission"),
+    ("ports_authority", "ingest_ports_authority"),
+    ("act_tolls_concession", "ingest_act_tolls_concession"),
+    ("oatrh_payroll", "ingest_oatrh_payroll"),
+    ("ogpe_permits", "ingest_ogpe_permits"),
+    ("dtop_vehicle_fees", "ingest_dtop_vehicle_fees"),
+    ("tourism_room_tax", "ingest_tourism_room_tax"),
+    ("bde_loans", "ingest_bde_loans"),
+    ("prpha_housing_subsidy", "ingest_prpha_housing_subsidy"),
+]
+
 WIRED_SOURCES = (
     B1_FEDERAL_GRANTS
     + B2_BENEFITS_HEALTH
@@ -103,6 +133,7 @@ WIRED_SOURCES = (
     + B4_DISASTER_RESEARCH
     + B5_TERRITORIAL_MUNICIPAL
     + B6_BONDS_ENTITY_MANUAL
+    + B7_GOVFLOW_25
 )
 
 

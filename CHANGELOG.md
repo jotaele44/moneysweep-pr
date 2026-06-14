@@ -25,6 +25,28 @@ A bump to the **federation export** version is what the release-tagging workflow
 ## [Unreleased]
 
 ### Added
+- **Government-flow coverage expansion — 25 new sources** (`docs/GOVERNMENT_FLOW_COVERAGE.md`),
+  taking the registry from 88 → **113** tracked sources (automatable 57 → **65**,
+  queued/excluded 31 → **48**):
+  - 8 federal API producers (reusing `contract_sweeper.runtime.base_downloader`):
+    `usaspending_loans` (direct loans/guarantees), `usda_farm_subsidies`
+    (FSA/RMA), `hud_cdbg_mit` (CDBG-Mitigation), `federal_audit_clearinghouse`
+    (SF-SAC Single Audits), `sam_exclusions` (debarment), `fema_individual_assistance`
+    (IHP), `opportunity_zones`, `opm_fedscope` (federal payroll).
+  - 17 PR-territorial / federal manual dropzone readers via the new shared
+    `contract_sweeper.runtime.dropzone_ingest` helper: `ocpr_contracts` (the
+    canonical PR contract registry), `ddec_incentives`, `crim_property_tax`,
+    `ases_plan_vital`, `loteria_pr`, `gaming_commission`, `ports_authority`,
+    `act_tolls_concession`, `oatrh_payroll`, `ogpe_permits`, `dtop_vehicle_fees`,
+    `tourism_room_tax`, `bde_loans`, `prpha_housing_subsidy`, `doj_settlements`,
+    `equitable_sharing`, `irs_ctc_eitc_pr`.
+  - New `contract_sweeper/runtime/dropzone_ingest.py` factors the
+    `ingest_oce`/`ingest_donaciones` reader (cache → empty-dropzone →
+    case-insensitive ES/EN column mapping → blank-key filter → dedupe) into one
+    shared, tested helper.
+  - All new sources are `required: false` and ship dry-run (producers degrade to
+    a header-only CSV without network/keys); live materialization is deferred and
+    documented in the runbook.
 - **NGO political-donation coverage build-out** (`docs/NGO_DONATION_COVERAGE.md`):
   - `analyze_political_crossref.build_ngo_donation_crossref` — joins
     `ngos_master.csv` against federal FEC + PR CEE/OCE donation feeds, flags
