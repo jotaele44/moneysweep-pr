@@ -375,9 +375,9 @@ def run(
     statuses = {result["status"] for result in results}
     summary = {
         "schema_version": "tranche_b_source_intake_v1",
-        "status": "prepared"
-        if statuses <= {"ok", "empty", "existing"}
-        else "needs_fix",
+        "status": (
+            "prepared" if statuses <= {"ok", "empty", "existing"} else "needs_fix"
+        ),
         "sources_total": len(results),
         "sources_with_rows": sum(1 for result in results if result["rows"] > 0),
         "rows_total": sum(int(result["rows"]) for result in results),
@@ -395,7 +395,7 @@ def run(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Build Tranche B source-intake staging outputs"
+        description="Build Tranche B source-intake staging outputs",
     )
     parser.add_argument(
         "--source",
