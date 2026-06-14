@@ -219,13 +219,26 @@ sources:
     producer_script: scripts/ingest_prasa.py
     expected_outputs:
       - data/staging/processed/pr_prasa_contracts.csv
-      - data/staging/processed/prasa_contracts_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
     manual_drop_dir: data/raw/PRASA/
     update_cadence: yearly
-    notes: PRASA aqueduct/sewer authority. ingest_prasa.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers exported procurement files to data/raw/PRASA/. Includes Consulting Engineer Report FY2024 baseline. NOTE expected output prasa_contracts_master.csv is declared but has no producer or consumer yet (the producer writes only pr_prasa_contracts.csv, which build_financial_flows_master.py consumes); the master aggregation is a future deliverable, not a current gap.
+    notes: PRASA aqueduct/sewer authority. ingest_prasa.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers exported procurement files to data/raw/PRASA/. Includes Consulting Engineer Report FY2024 baseline. The vendor-level master is now produced by the prasa_contracts_master source (scripts/build_prasa_contracts_master.py).
+
+  - source_id: prasa_contracts_master
+    family: infrastructure
+    required: false
+    authentication: none
+    endpoint_url: ""
+    producer_script: scripts/build_prasa_contracts_master.py
+    expected_outputs:
+      - data/staging/processed/prasa_contracts_master.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: yearly
+    notes: Vendor-level aggregation of pr_prasa_contracts.csv. Closes the previously-dangling prasa_contracts_master.csv output (declared with no producer). Derived source; runs after the prasa dropzone ingest.
 
   - source_id: prepa_luma_genera
     family: infrastructure
@@ -240,6 +253,146 @@ sources:
       min_rows: 1
     update_cadence: quarterly
     notes: PREPA / LUMA Energy / Genera PR contracts and operating data.
+
+  # ----- Infrastructure REVENUE (income side: what civilians pay to use infra) -----
+  # Aggregate / published figures only (audited financials, MSRB EMMA continuing
+  # disclosures, budgets) — never individual payments. Modeled as inflow transactions
+  # (payer = aggregate public/ratepayer entity, payee = collecting agency). See
+  # docs/transaction_schema.md.
+  - source_id: act_toll_revenue
+    family: infrastructure_revenue
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.act.pr.gov/
+    producer_script: scripts/ingest_toll_revenue.py
+    expected_outputs:
+      - data/staging/processed/pr_act_toll_revenue.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/act_toll_revenue/
+    update_cadence: yearly
+    notes: Aggregate toll revenue (ACT / AutoExpreso / Metropistas PR-22/PR-5) from ACT audited financials and EMMA toll-revenue-bond disclosures. Dropzone reader; pursue finer (per-plaza) breakdowns via FOIA.
+
+  - source_id: ports_airports_revenue
+    family: infrastructure_revenue
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.prpa.pr.gov/
+    producer_script: scripts/ingest_port_airport_revenue.py
+    expected_outputs:
+      - data/staging/processed/pr_ports_airports_revenue.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/ports_airports_revenue/
+    update_cadence: yearly
+    notes: Aggregate port/airport fee revenue (PR Ports Authority + Aerostar/SJU) from audited financials and EMMA disclosures.
+
+  - source_id: transit_fare_revenue
+    family: infrastructure_revenue
+    required: false
+    authentication: manual_export
+    endpoint_url: https://ama.pr.gov/
+    producer_script: scripts/ingest_transit_fare_revenue.py
+    expected_outputs:
+      - data/staging/processed/pr_transit_fare_revenue.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/transit_fare_revenue/
+    update_cadence: yearly
+    notes: Aggregate transit farebox revenue (AMA buses + Tren Urbano / ATI) from audited financials and budgets.
+
+  - source_id: prasa_rate_revenue
+    family: infrastructure_revenue
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.acueductospr.com/
+    producer_script: scripts/ingest_utility_revenue.py
+    expected_outputs:
+      - data/staging/processed/pr_prasa_rate_revenue.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/prasa_rate_revenue/
+    update_cadence: yearly
+    notes: Aggregate PRASA water/sewer rate revenue from audited financials, rate-case filings, and EMMA disclosures. Shares scripts/ingest_utility_revenue.py with prepa_luma_rate_revenue.
+
+  - source_id: prepa_luma_rate_revenue
+    family: infrastructure_revenue
+    required: false
+    authentication: manual_export
+    endpoint_url: https://aeepr.com/es-pr/
+    producer_script: scripts/ingest_utility_revenue.py
+    expected_outputs:
+      - data/staging/processed/pr_prepa_rate_revenue.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/prepa_rate_revenue/
+    update_cadence: yearly
+    notes: Aggregate PREPA/LUMA power rate revenue from audited financials and EMMA legacy revenue-bond disclosures. Shares scripts/ingest_utility_revenue.py with prasa_rate_revenue.
+
+  - source_id: emma_infra_revenue
+    family: infrastructure_revenue
+    required: false
+    authentication: none
+    endpoint_url: https://emma.msrb.org/
+    producer_script: scripts/extract_emma_revenue.py
+    expected_outputs:
+      - data/staging/processed/pr_emma_revenue_disclosures.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: quarterly
+    notes: MSRB EMMA continuing-disclosure revenue extraction (toll/water/power bond-pledged revenue). The one authentication-free automatable revenue spine; cross-checks the manual dropzone figures. PDF extraction is best-effort.
+
+  # ----- Infrastructure CONTRACTS (outflow side: where the money goes) -----
+  - source_id: dtop_road_contracts
+    family: infrastructure
+    required: false
+    authentication: manual_export
+    endpoint_url: https://consultacontratos.ocpr.gov.pr/
+    producer_script: scripts/ingest_dtop_road_contracts.py
+    expected_outputs:
+      - data/staging/processed/pr_dtop_road_contracts.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/dtop_road_contracts/
+    update_cadence: quarterly
+    notes: DTOP/ACT permanent road construction & maintenance contracts (rolling, beyond the 2020 transition snapshot). OCPR registry agency code 032.
+
+  - source_id: ports_airports_contracts
+    family: infrastructure
+    required: false
+    authentication: manual_export
+    endpoint_url: https://www.prpa.pr.gov/
+    producer_script: scripts/ingest_port_airport_contracts.py
+    expected_outputs:
+      - data/staging/processed/pr_ports_airports_contracts.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/ports_airports_contracts/
+    update_cadence: quarterly
+    notes: PR Ports Authority / Aerostar contracts and capital projects. Also fed by scripts/parse_aaa_ports_pdf.py from the acquired completed_projects_AAA.pdf.
+
+  - source_id: transit_contracts
+    family: infrastructure
+    required: false
+    authentication: manual_export
+    endpoint_url: https://consultacontratos.ocpr.gov.pr/
+    producer_script: scripts/ingest_transit_contracts.py
+    expected_outputs:
+      - data/staging/processed/pr_transit_contracts.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    manual_drop_dir: data/manual/transit_contracts/
+    update_cadence: quarterly
+    notes: AMA / Tren Urbano (ATI) operating and O&M contracts.
 
   # ----- PR transition / agency contracts -----
   - source_id: act_transition_contracts

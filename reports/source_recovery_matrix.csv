@@ -42,6 +42,7 @@ va_benefits,False,api_adapter,True,True,,True,True,scripts/download_va.py,1,0,1,
 wic,False,api_adapter,True,True,,True,True,scripts/download_wic.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 wioa,False,api_adapter,True,True,,True,True,scripts/download_wioa.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 dol_whd_osha,False,api_producer,True,True,,False,True,scripts/download_dol.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+emma_infra_revenue,False,api_producer,True,True,,False,True,scripts/extract_emma_revenue.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 fcc_usf,False,api_producer,True,True,,False,True,scripts/download_fcc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 fec_committees,False,api_producer,True,True,FEC_API_KEY,False,True,scripts/download_fec_committees.py,3,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 federal_audit_clearinghouse,False,api_producer,True,True,FAC_API_KEY,False,True,scripts/download_fac.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
@@ -56,6 +57,7 @@ ngo_integration_layer,False,api_producer,True,True,,False,True,scripts/ngo_integ
 nmtc,False,api_producer,True,True,,False,True,scripts/download_nmtc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 opm_fedscope,False,api_producer,True,True,,False,True,scripts/download_opm_fedscope.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 opportunity_zones,False,api_producer,True,True,,False,True,scripts/download_opportunity_zones.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+prasa_contracts_master,False,api_producer,True,True,,False,True,scripts/build_prasa_contracts_master.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sam_exclusions,False,api_producer,True,True,SAM_API_KEY,False,True,scripts/download_sam_exclusions.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sec_13f_nport,False,api_producer,True,True,,False,True,scripts/download_sec_holdings.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sec_edgar,False,api_producer,True,True,,False,True,scripts/download_sec.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
@@ -66,6 +68,7 @@ usaspending_loans,False,api_producer,True,True,,False,True,scripts/download_usas
 usda_farm_subsidies,False,api_producer,True,True,,False,True,scripts/download_usda_farm.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 nara_catalog_aws_open_data,False,deferred_stub,False,False,,False,True,scripts/download_nara_nextgen.py,2,0,0,,Intentionally unimplemented; remains not_materialized by design.
 nara_nextgen_catalog_v3,False,deferred_stub,False,False,NARA_API_KEY,False,True,scripts/download_nara_nextgen.py,2,0,0,,Intentionally unimplemented; remains not_materialized by design.
+act_toll_revenue,False,manual_export,False,False,,False,True,scripts/ingest_toll_revenue.py,1,0,1,data/manual/act_toll_revenue/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 act_tolls_concession,False,manual_export,False,False,,False,True,scripts/ingest_act_tolls_concession.py,1,0,1,data/raw/ACT_Tolls/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 act_transition_contracts,False,manual_export,False,False,,False,True,scripts/ingest_act_transition.py,1,0,1,data/manual/act_transition/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 acuden_2024_transition,False,manual_export,False,False,,False,True,scripts/ingest_act_transition.py,1,0,1,data/manual/acuden_2024/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
@@ -77,6 +80,7 @@ dcaa_active_contractors,False,manual_export,False,False,,False,True,scripts/down
 ddec_incentives,False,manual_export,False,False,,False,True,scripts/ingest_ddec_incentives.py,1,0,1,data/raw/DDEC_Incentives/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 doj_settlements,False,manual_export,False,False,,False,True,scripts/ingest_doj_settlements.py,1,0,1,data/raw/DOJ_Settlements/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 donaciones_pr,False,manual_export,False,False,,False,True,scripts/ingest_donaciones.py,1,0,1,data/raw/Donaciones/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+dtop_road_contracts,False,manual_export,False,False,,False,True,scripts/ingest_dtop_road_contracts.py,1,0,1,data/manual/dtop_road_contracts/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 dtop_vehicle_fees,False,manual_export,False,False,,False,True,scripts/ingest_dtop_vehicle_fees.py,1,0,1,data/raw/DTOP/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 equitable_sharing,False,manual_export,False,False,,False,True,scripts/ingest_equitable_sharing.py,1,0,1,data/raw/Equitable_Sharing/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 follow_the_money,False,manual_export,False,False,,False,True,scripts/ingest_follow_the_money.py,4,0,1,data/raw/follow_the_money/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
@@ -88,12 +92,18 @@ oatrh_payroll,False,manual_export,False,False,,False,True,scripts/ingest_oatrh_p
 ocpr_contracts,False,manual_export,False,False,,False,True,scripts/ingest_ocpr_contracts.py,1,0,1,data/raw/OCPR_Contracts/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 oficina_contralor,True,manual_export,False,False,,False,True,scripts/ingest_contralor.py,1,0,1,data/raw/Oficina del Contralor/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 ogpe_permits,False,manual_export,False,False,,False,True,scripts/ingest_ogpe_permits.py,1,0,1,data/raw/OGPe/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+ports_airports_contracts,False,manual_export,False,False,,False,True,scripts/ingest_port_airport_contracts.py,1,0,1,data/manual/ports_airports_contracts/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+ports_airports_revenue,False,manual_export,False,False,,False,True,scripts/ingest_port_airport_revenue.py,1,0,1,data/manual/ports_airports_revenue/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 ports_authority,False,manual_export,False,False,,False,True,scripts/ingest_ports_authority.py,1,0,1,data/raw/Ports/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 pr_cabilderos,True,manual_export,False,False,,False,True,scripts/ingest_cabilderos.py,1,0,1,data/raw/Cabilderos/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 pr_corporate_registry,False,manual_export,False,False,,False,True,scripts/ingest_active_contractors.py,1,0,1,data/raw/Active Contractor Listing/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
-prasa,True,manual_export,False,False,,False,True,scripts/ingest_prasa.py,2,0,1,data/raw/PRASA/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+prasa,True,manual_export,False,False,,False,True,scripts/ingest_prasa.py,1,0,1,data/raw/PRASA/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+prasa_rate_revenue,False,manual_export,False,False,,False,True,scripts/ingest_utility_revenue.py,1,0,1,data/manual/prasa_rate_revenue/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+prepa_luma_rate_revenue,False,manual_export,False,False,,False,True,scripts/ingest_utility_revenue.py,1,0,1,data/manual/prepa_rate_revenue/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 prpha_housing_subsidy,False,manual_export,False,False,,False,True,scripts/ingest_prpha_housing_subsidy.py,1,0,1,data/raw/PRPHA/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 tourism_room_tax,False,manual_export,False,False,,False,True,scripts/ingest_tourism_room_tax.py,1,0,1,data/raw/Tourism/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+transit_contracts,False,manual_export,False,False,,False,True,scripts/ingest_transit_contracts.py,1,0,1,data/manual/transit_contracts/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+transit_fare_revenue,False,manual_export,False,False,,False,True,scripts/ingest_transit_fare_revenue.py,1,0,1,data/manual/transit_fare_revenue/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 aafaf,False,scraper_needed,False,False,,False,True,scripts/download_aafaf.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 cofina,False,scraper_needed,False,False,,False,True,scripts/download_cofina.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 compras_pr,False,scraper_needed,False,False,,False,True,scripts/download_compras.py,2,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.

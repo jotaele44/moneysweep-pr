@@ -30,6 +30,10 @@
 - Tie each claim to source class and confidence context.
 - If a gate fails, claims must be downgraded to blocked/unvalidated wording.
 - Avoid conclusive language unless a claim is strictly observed and directly sourced.
+- `COLLECTS_REVENUE` and `PLEDGED_TO_DEBT` edges are `Observed`/`Linked` when sourced
+  from audited financials or EMMA disclosures, but `ALLOCATES_REVENUE_TO` edges are
+  `Inferred` unless a line-item appropriation document is cited — collected revenue
+  funding a specific contract is an inference, not an observed accounting trail.
 
 ## Tier Derivation (Maturity Gate)
 

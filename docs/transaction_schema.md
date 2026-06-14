@@ -39,6 +39,42 @@ transactions are the cash flows under it.
 {"transaction_id":"txn_0624b7f4231a96ef917e56c60e8dfcfd","source_id":"src_633ec79b98705f6ddce6dbd6555d0cee","payer_entity_id":"ent_ee9bafc35b7200bc560f2c7f2e7d7d1d","payee_entity_id":"ent_9f4831646edda3ece7dd1ff3a8b8738c","amount":1000000.0,"currency":"USD","transaction_date":"2023-03-20","transaction_type":"disbursement","confidence":0.9,"lineage":{"producer_script":"scripts/build_export_package.py","producer_phase":"EXPORT_PACKAGE_BUILD","source_inputs":["data/processed/funding_awards.csv"],"extraction_method":"deterministic_canonicalization"},"synthetic":true,"created_at":"2024-01-15T12:00:00Z","extracted_at":"2024-01-15T12:00:00Z"}
 ```
 
+## Inflow / revenue transactions (infrastructure income)
+
+Transactions are not limited to government outflows. The same stream represents
+**money the public pays to use infrastructure** — aggregate toll, transit fare,
+utility rate, and port/airport fee revenue. No schema change is needed: direction is
+encoded by `payer_entity_id → payee_entity_id`, and `transaction_type` is an open
+string, so an inflow is simply `{payer = aggregate public, payee = collecting agency}`
+with a revenue `transaction_type`. `amount` stays non-negative.
+
+### Inflow `transaction_type` vocabulary
+
+| `transaction_type`     | Meaning                                   | Service domain |
+|------------------------|-------------------------------------------|----------------|
+| `toll_collection`      | Highway/expressway toll revenue           | toll           |
+| `fare_collection`      | Transit farebox revenue                   | transit        |
+| `utility_rate_revenue` | Water/power rate revenue                  | utility        |
+| `port_fee_revenue`     | Port/airport wharfage, landing, fees      | port           |
+
+### Aggregate public / ratepayer payer
+
+Individual payers are private and unobtainable, so revenue is attributed to a
+deterministic **aggregate public entity per service domain** (the only legal and
+available granularity):
+
+- `PUBLIC RATEPAYERS TOLL`, `PUBLIC RATEPAYERS TRANSIT`,
+  `PUBLIC RATEPAYERS UTILITY`, `PUBLIC RATEPAYERS PORT`.
+
+These resolve to normal `ent_<32hex>` ids through the entity crosswalk (so the
+`dangling_entity_ref` gate passes) and are seeded as real aggregate-figure entities —
+`synthetic` stays `false` (that flag is reserved for `test` mode). They must never be
+treated as individuals. Figures are sourced from audited financial statements, MSRB
+EMMA continuing-disclosure filings, and agency budgets; finer breakdowns are pursued
+via FOIA. The producers populate these via `scripts/build_financial_flows_master.py`
+(`_ingest_infrastructure_revenue`); `scripts/build_export_streams.py` derives the
+revenue `transaction_type` from the flow's `flow_type`.
+
 ## Optional `location` (place of performance)
 
 Since contract v1.1.0, transactions may carry the same optional inline

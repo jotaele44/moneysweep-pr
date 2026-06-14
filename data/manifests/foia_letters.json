@@ -6,10 +6,10 @@
     "data/reference/foia_requester.json"
   ],
   "output": "docs/foia_letters",
-  "letter_count": 9,
+  "letter_count": 17,
   "jurisdictions": [
     "PR",
     "US"
   ],
-  "generated_at": "2026-06-05T14:47:10.432090+00:00"
+  "generated_at": "2026-06-13T17:16:00.340716+00:00"
 }
