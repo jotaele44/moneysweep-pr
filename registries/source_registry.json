@@ -1459,6 +1459,448 @@
       },
       "update_cadence": "ad_hoc",
       "notes": "OPTIONAL commercial provider for public-market entity resolution (CUSIP / ISIN / FIGI / LEI / CIK / ticker crosswalks). NOT a required source \u2014 never wired into coverage gates. Live use requires BOTH FINANCIALDATA_API_KEY and FINANCIALDATA_LICENSE_APPROVED=true. Default mode is dry-run/mock with synthetic fixtures. Raw vendor payloads are never persisted. See docs/financialdata_provider.md.\n"
+    },
+    {
+      "source_id": "usaspending_loans",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://api.usaspending.gov/",
+      "producer_script": "scripts/download_usaspending_loans.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_federal_loans.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "weekly",
+      "notes": "Federal direct loans and loan guarantees (assistance type 07/08) to PR recipients via the USASpending API. Captures face value + federal subsidy cost, distinct from contracts/grants.\n"
+    },
+    {
+      "source_id": "federal_audit_clearinghouse",
+      "family": "federal",
+      "required": false,
+      "authentication": "api_key:FAC_API_KEY",
+      "endpoint_url": "https://api.fac.gov/",
+      "producer_script": "scripts/download_fac.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_single_audits.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly",
+      "notes": "Federal Single Audit (SF-SAC) results for PR auditees from the Federal Audit Clearinghouse. Oversight on subrecipients of federal awards. Free api.data.gov key (FAC_API_KEY).\n"
+    },
+    {
+      "source_id": "sam_exclusions",
+      "family": "entity_resolution",
+      "required": false,
+      "authentication": "api_key:SAM_API_KEY",
+      "endpoint_url": "https://api.sam.gov/",
+      "producer_script": "scripts/download_sam_exclusions.py",
+      "expected_outputs": [
+        "data/staging/processed/sam_exclusions.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "weekly",
+      "notes": "SAM.gov exclusions (debarment) list \u2014 suspended/excluded parties. Screening complement to sam_entities and ofac_sdn. Requires SAM_API_KEY.\n"
+    },
+    {
+      "source_id": "usda_farm_subsidies",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://api.usaspending.gov/",
+      "producer_script": "scripts/download_usda_farm.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_usda_farm_subsidies.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly",
+      "notes": "USDA FSA direct payments + RMA crop-insurance subsidies to PR producers via USASpending (assistance types 06/10). Distinct from rural-development usda_grants.\n"
+    },
+    {
+      "source_id": "hud_cdbg_mit",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://api.usaspending.gov/",
+      "producer_script": "scripts/download_cdbg_mit.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_cdbg_mit.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly",
+      "notes": "HUD CDBG-Mitigation (CFDA 14.272) allocations to PR via USASpending. Distinct from CDBG-DR (hud_cdbg_dr_public) and DRGR reporting (hud_drgr_authorized).\n"
+    },
+    {
+      "source_id": "fema_individual_assistance",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.fema.gov/api/open/",
+      "producer_script": "scripts/download_fema_ia.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_fema_ia.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly",
+      "notes": "FEMA Individual Assistance / Individuals & Households Program housing aid to PR (OpenFEMA HousingAssistanceOwners). Direct-to-household disaster flow, distinct from Public Assistance and HMGP.\n"
+    },
+    {
+      "source_id": "opportunity_zones",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.cdfifund.gov/",
+      "producer_script": "scripts/download_opportunity_zones.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_opportunity_zones.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "yearly",
+      "notes": "Qualified Opportunity Zone designated census tracts in PR (Treasury/IRS capital-gains incentive). Source URL configurable via OZ_DATA_URL; live pull requires network.\n"
+    },
+    {
+      "source_id": "opm_fedscope",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.opm.gov/data/",
+      "producer_script": "scripts/download_opm_fedscope.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_federal_payroll.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly",
+      "notes": "Federal civilian payroll (employment + average salary) in PR from OPM FedScope. Source URL configurable via FEDSCOPE_DATA_URL; live pull requires network.\n"
+    },
+    {
+      "source_id": "doj_settlements",
+      "family": "federal",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.justice.gov/",
+      "producer_script": "scripts/ingest_doj_settlements.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_doj_settlements.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/DOJ_Settlements/",
+      "update_cadence": "ad_hoc",
+      "notes": "DOJ / USAO-PR civil settlements and False Claims Act recoveries involving PR entities. Operator-delivered exports (no machine API).\n"
+    },
+    {
+      "source_id": "equitable_sharing",
+      "family": "federal",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.justice.gov/afp",
+      "producer_script": "scripts/ingest_equitable_sharing.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_equitable_sharing.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/Equitable_Sharing/",
+      "update_cadence": "ad_hoc",
+      "notes": "DOJ/Treasury equitable-sharing asset-forfeiture payouts to PR law enforcement. Operator-delivered exports.\n"
+    },
+    {
+      "source_id": "irs_ctc_eitc_pr",
+      "family": "federal",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.irs.gov/statistics",
+      "producer_script": "scripts/ingest_irs_ctc_eitc_pr.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_irs_ctc_eitc.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/IRS_CTC_EITC/",
+      "update_cadence": "ad_hoc",
+      "notes": "IRS Child Tax Credit / EITC payments to PR families (post-ARPA expansion), from SOI/Treasury exports. Operator-delivered.\n"
+    },
+    {
+      "source_id": "ocpr_contracts",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://consultacontratos.ocpr.gov.pr/",
+      "producer_script": "scripts/ingest_ocpr_contracts.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_ocpr_contracts.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/OCPR_Contracts/",
+      "update_cadence": "ad_hoc",
+      "notes": "Canonical PR Comptroller (OCPR) contract registry \u2014 every PR government contract. Distinct from oficina_contralor (audit reports only). Interactive surface; operator-delivered exports until a scraper is built.\n"
+    },
+    {
+      "source_id": "ddec_incentives",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.ddec.pr.gov/",
+      "producer_script": "scripts/ingest_ddec_incentives.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_ddec_incentives.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/DDEC_Incentives/",
+      "update_cadence": "ad_hoc",
+      "notes": "DDEC Act 60/20/22 tax-incentive decrees (export-services / individual-investor grants). Operator-delivered exports.\n"
+    },
+    {
+      "source_id": "crim_property_tax",
+      "family": "municipal",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.crimpr.net/",
+      "producer_script": "scripts/ingest_crim_property_tax.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_crim_property_tax.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/CRIM/",
+      "update_cadence": "ad_hoc",
+      "notes": "CRIM municipal property-tax assessments and collections. Operator-delivered exports.\n"
+    },
+    {
+      "source_id": "ases_plan_vital",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.asespr.org/",
+      "producer_script": "scripts/ingest_ases_plan_vital.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_ases_contracts.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/ASES/",
+      "update_cadence": "ad_hoc",
+      "notes": "ASES Plan Vital Medicaid managed-care contracts and MCO capitation (territorial program spend). Distinct from federal medicaid_fmap match. Operator-delivered exports.\n"
+    },
+    {
+      "source_id": "loteria_pr",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.loteriapr.com/",
+      "producer_script": "scripts/ingest_loteria_pr.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_loteria.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/Loteria/",
+      "update_cadence": "ad_hoc",
+      "notes": "Loteria de Puerto Rico + Loteria Electronica revenue, prize payouts and retailer commissions. Operator-delivered exports.\n"
+    },
+    {
+      "source_id": "gaming_commission",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.jcapr.pr.gov/",
+      "producer_script": "scripts/ingest_gaming_commission.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_gaming.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/Gaming/",
+      "update_cadence": "ad_hoc",
+      "notes": "PR Gaming Commission casino/slot-machine licensing and gaming-tax revenue. Operator-delivered exports.\n"
+    },
+    {
+      "source_id": "ports_authority",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.prpa.pr.gov/",
+      "producer_script": "scripts/ingest_ports_authority.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_ports_concessions.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/Ports/",
+      "update_cadence": "ad_hoc",
+      "notes": "PR Ports Authority concession fees and leases (e.g. Aerostar/LMM airport). Operator-delivered exports.\n"
+    },
+    {
+      "source_id": "act_tolls_concession",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://act.dtop.pr.gov/",
+      "producer_script": "scripts/ingest_act_tolls_concession.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_act_tolls.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/ACT_Tolls/",
+      "update_cadence": "ad_hoc",
+      "notes": "PR Highways & Transportation Authority toll revenue and Metropistas/Autopistas concession payments. Distinct from ACT transition contracts. Operator-delivered exports.\n"
+    },
+    {
+      "source_id": "oatrh_payroll",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.oatrh.pr.gov/",
+      "producer_script": "scripts/ingest_oatrh_payroll.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_govt_payroll.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/OATRH_Payroll/",
+      "update_cadence": "ad_hoc",
+      "notes": "PR central-government payroll / salaries (OATRH Nomina). Operator-delivered exports.\n"
+    },
+    {
+      "source_id": "ogpe_permits",
+      "family": "municipal",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.ogpe.pr.gov/",
+      "producer_script": "scripts/ingest_ogpe_permits.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_ogpe_permits.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/OGPe/",
+      "update_cadence": "ad_hoc",
+      "notes": "OGPe construction-permit fees and green-energy incentives. Operator-delivered exports.\n"
+    },
+    {
+      "source_id": "dtop_vehicle_fees",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.dtop.pr.gov/",
+      "producer_script": "scripts/ingest_dtop_vehicle_fees.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_dtop_fees.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/DTOP/",
+      "update_cadence": "ad_hoc",
+      "notes": "DTOP vehicle-registration (marbete) and license fee collections. Operator-delivered exports.\n"
+    },
+    {
+      "source_id": "tourism_room_tax",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.discoverpuertorico.com/",
+      "producer_script": "scripts/ingest_tourism_room_tax.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_tourism_roomtax.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/Tourism/",
+      "update_cadence": "ad_hoc",
+      "notes": "PR Tourism Company hotel-occupancy tax (impuesto de ocupacion) and co-op marketing contributions. Operator-delivered exports.\n"
+    },
+    {
+      "source_id": "bde_loans",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.bde.pr.gov/",
+      "producer_script": "scripts/ingest_bde_loans.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_bde_loans.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/BDE/",
+      "update_cadence": "ad_hoc",
+      "notes": "Banco de Desarrollo Economico (Economic Development Bank) territorial business loans. Distinct from federal SBA loans. Operator-delivered exports.\n"
+    },
+    {
+      "source_id": "prpha_housing_subsidy",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.avp.pr.gov/",
+      "producer_script": "scripts/ingest_prpha_housing_subsidy.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_prpha_subsidies.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/PRPHA/",
+      "update_cadence": "ad_hoc",
+      "notes": "PR Public Housing Administration (AVP/PRPHA) operating subsidies and RAD conversions. Distinct from HUD Section-8 HCV. Operator-delivered exports.\n"
     }
   ]
 }
