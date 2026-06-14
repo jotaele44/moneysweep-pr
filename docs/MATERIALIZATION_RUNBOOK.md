@@ -13,14 +13,15 @@ test (`tests/test_materialization_readiness.py`).
 
 See `reports/materialization_readiness.json`:
 
-- **88** total registered sources
-- **57 automatable** — all structurally `ready` (adapter or importable producer
+- **113** total registered sources
+- **65 automatable** — all structurally `ready` (adapter or importable producer
   + declared outputs). This is the fill target.
-- **5 automatable sources need an API key** at run time: `SAM_API_KEY`,
-  `LDA_API_KEY`, `FEC_API_KEY`, `OPENCORPORATES_API_TOKEN`, `HIGHERGOV_API_KEY`.
-- **31 queued / excluded** (not part of the automatable target):
-  - `scraper_needed` (20) — PR-gov HTML/PDF surfaces; need a scraping adapter.
-  - `manual_export` (6) — operator-supplied files (see step 3).
+- Automatable sources that need an API key at run time: `SAM_API_KEY`,
+  `LDA_API_KEY`, `FEC_API_KEY`, `FAC_API_KEY`, `OPENCORPORATES_API_TOKEN`,
+  `HIGHERGOV_API_KEY`.
+- **48 queued / excluded** (not part of the automatable target):
+  - `manual_export` (28) — operator-supplied files (see step 3).
+  - `scraper_needed` (15) — PR-gov HTML/PDF surfaces; need a scraping adapter.
   - `semantic_duplicate` (3) — covered by a sibling source; never materialize alone.
   - `deferred_stub` (2) — NARA; intentionally unimplemented.
 
@@ -76,8 +77,8 @@ python3 scripts/build_source_recovery_matrix.py
 Success criteria:
 - `reports/materialization_readiness.json`: `automatable_ready == automatable_total`.
 - `reports/gap_analysis_report.json`: every **automatable** source shows
-  `fully_materialized` (note: overall `coverage_rate` is over *all 88* sources,
-  so it will not reach 1.0 while the 31 queued sources remain unmaterialized —
+  `fully_materialized` (note: overall `coverage_rate` is over *all 113* sources,
+  so it will not reach 1.0 while the 48 queued sources remain unmaterialized —
   judge success against the automatable subset and `required_coverage_rate`).
 
 ## Definition of done (per source)
