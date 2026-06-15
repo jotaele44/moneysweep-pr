@@ -52,6 +52,8 @@ SCRAPER_NEEDED = {
     "aafaf",
     "hacienda",
     "hacienda_sut_ivu",
+    "pr_act_154_excise",
+    "pr_income_tax_collections",
     "cofina",
     "prepa_luma_genera",
     "cor3",

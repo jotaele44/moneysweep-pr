@@ -1,6 +1,6 @@
 {
   "schema_version": "r5_readiness_v1",
-  "total_sources": 126,
+  "total_sources": 129,
   "automatable_total": 67,
   "automatable_ready": 67,
   "automatable_not_ready": [],
@@ -15,12 +15,12 @@
   ],
   "queued_excluded": {
     "manual_export": 36,
-    "scraper_needed": 16,
-    "deferred_stub": 4,
+    "scraper_needed": 18,
+    "deferred_stub": 5,
     "semantic_duplicate": 3,
     "broken_producer": 0
   },
-  "queued_excluded_total": 59,
+  "queued_excluded_total": 62,
   "outputs": [
     "reports/source_recovery_matrix.csv",
     "reports/source_recovery_matrix.md",
