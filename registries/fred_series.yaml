@@ -5,16 +5,17 @@
 #
 # To add a series: append an entry. To remove one: delete it.
 #
-# IMPORTANT: every id here must be a real FRED series. download_fred.py now
-# fails the whole refresh (status PARTIAL_FAILURE, prior CSV preserved) if any
-# series errors, so a bogus id breaks the producer rather than silently
-# yielding 0 rows. Verify new ids resolve at
-# https://fred.stlouisfed.org/series/<id> before adding.
+# IMPORTANT: every id here must be a real FRED series. download_fred.py fails the
+# whole refresh (status PARTIAL_FAILURE, prior CSV preserved) if any series
+# errors, so a bogus id breaks the producer rather than silently yielding 0 rows.
+# Verify new ids resolve at https://fred.stlouisfed.org/series/<id> before adding.
 #
-# Pruned 2026-06-15 to ids confirmed to exist via the /fred/series API. Nine
-# guessed ids returned HTTP 400 "series does not exist" and were removed:
-# PRNA, PRMFG, PRCONS, RGMP72060, PRRGSP, PRSTHPI, PRBPPRIV, RPIPR, PRPOPL.
-# Re-add output / housing / income coverage only with confirmed FRED ids.
+# Curated 2026-06-15 against the live FRED /series + /series/search APIs: all ids
+# below are confirmed to exist and return observations. Earlier guessed ids that
+# FRED 400s on were replaced with the real series. Concepts FRED does NOT publish
+# for PR (all-transactions house price index, building permits, per-capita
+# personal income, total real GSP) are intentionally omitted — do not re-add
+# placeholder ids for them.
 #
 # FRED API reference:
 #   - https://fred.stlouisfed.org/docs/api/fred/series_observations.html
@@ -37,8 +38,34 @@ series:
     units: persons
     frequency: monthly
 
+  - series_id: SMS72000000000000001
+    description: "Puerto Rico all employees, total nonfarm (monthly, SA)"
+    units: thousands of persons
+    frequency: monthly
+
+  - series_id: SMS72000003000000001
+    description: "Puerto Rico all employees, manufacturing (monthly, SA)"
+    units: thousands of persons
+    frequency: monthly
+
+  - series_id: SMU72000002000000001SA
+    description: "Puerto Rico all employees, construction (monthly, SA)"
+    units: thousands of persons
+    frequency: monthly
+
   # -------- Wages --------
   - series_id: STTMINWGPR
     description: "Puerto Rico state minimum wage (annual, $/hr)"
     units: dollars per hour
+    frequency: annual
+
+  # -------- Output / demographic (annual) --------
+  - series_id: NYGDPPCAPKDPRI
+    description: "Puerto Rico constant GDP per capita (annual, 2010 US$)"
+    units: 2010 us dollars
+    frequency: annual
+
+  - series_id: POPTOTPRA647NWDB
+    description: "Puerto Rico resident population, total (annual, NSA)"
+    units: persons
     frequency: annual

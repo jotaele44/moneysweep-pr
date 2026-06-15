@@ -10,11 +10,14 @@
 #   - https://www.eia.gov/opendata/documentation.php
 #   - https://www.eia.gov/opendata/browser/electricity (route + facet browser)
 #
-# Notes on PR coverage:
-#   - PR appears as state code "PR" in facets that accept stateid/location.
-#   - PR is included in the electric-power-operational-data and retail-sales
-#     endpoints. Some EIA datasets (forms 860/923 detail tables) may lag for PR.
-
+# Notes on PR coverage (verified 2026-06-15 against the live API):
+#   - PR electricity data is published ONLY under electric-power-operational-data
+#     (facet location=PR): net generation by fuel type. All entries below use it.
+#   - PR is NOT in the retail-sales dataset (absent from its stateid facet) nor in
+#     SEDS (absent from its stateId facet), so retail sales/price by sector are
+#     unavailable from EIA for PR — those series were removed rather than left to
+#     return 0 rows (download_eia.py now fails a refresh on any hard fetch error).
+#
 api_version: v2
 base_url: https://api.eia.gov/v2
 default_frequency: monthly
@@ -22,7 +25,7 @@ default_start: "2010-01"
 # default_end omitted — fetcher uses the current period
 
 series:
-  # -------- Net generation by fuel type (EIA-923, monthly) ------------------
+  # -------- Net generation by fuel type (electric-power-operational-data) ----
   - series_id: pr_net_generation_all_fuels
     description: "PR net electricity generation, all fuels, all sectors (thousand MWh)"
     route: electricity/electric-power-operational-data
@@ -77,85 +80,3 @@ series:
       fueltypeid: ["REN"]
       sectorid: ["99"]
     units: thousand megawatthours
-
-  # -------- Retail electricity sales (EIA-861, monthly) -------------------
-  - series_id: pr_retail_sales_residential
-    description: "PR retail electricity sales, residential sector (MWh)"
-    route: electricity/retail-sales
-    frequency: monthly
-    data_field: sales
-    facets:
-      stateid: ["PR"]
-      sectorid: ["RES"]
-    units: million kilowatthours
-
-  - series_id: pr_retail_sales_commercial
-    description: "PR retail electricity sales, commercial sector (MWh)"
-    route: electricity/retail-sales
-    frequency: monthly
-    data_field: sales
-    facets:
-      stateid: ["PR"]
-      sectorid: ["COM"]
-    units: million kilowatthours
-
-  - series_id: pr_retail_sales_industrial
-    description: "PR retail electricity sales, industrial sector (MWh)"
-    route: electricity/retail-sales
-    frequency: monthly
-    data_field: sales
-    facets:
-      stateid: ["PR"]
-      sectorid: ["IND"]
-    units: million kilowatthours
-
-  - series_id: pr_retail_sales_all_sectors
-    description: "PR retail electricity sales, all sectors (MWh)"
-    route: electricity/retail-sales
-    frequency: monthly
-    data_field: sales
-    facets:
-      stateid: ["PR"]
-      sectorid: ["ALL"]
-    units: million kilowatthours
-
-  # -------- Retail electricity prices (EIA-861, monthly) ------------------
-  - series_id: pr_retail_price_residential
-    description: "PR average retail electricity price, residential (cents/kWh)"
-    route: electricity/retail-sales
-    frequency: monthly
-    data_field: price
-    facets:
-      stateid: ["PR"]
-      sectorid: ["RES"]
-    units: cents per kilowatthour
-
-  - series_id: pr_retail_price_commercial
-    description: "PR average retail electricity price, commercial (cents/kWh)"
-    route: electricity/retail-sales
-    frequency: monthly
-    data_field: price
-    facets:
-      stateid: ["PR"]
-      sectorid: ["COM"]
-    units: cents per kilowatthour
-
-  - series_id: pr_retail_price_industrial
-    description: "PR average retail electricity price, industrial (cents/kWh)"
-    route: electricity/retail-sales
-    frequency: monthly
-    data_field: price
-    facets:
-      stateid: ["PR"]
-      sectorid: ["IND"]
-    units: cents per kilowatthour
-
-  - series_id: pr_retail_price_all_sectors
-    description: "PR average retail electricity price, all sectors (cents/kWh)"
-    route: electricity/retail-sales
-    frequency: monthly
-    data_field: price
-    facets:
-      stateid: ["PR"]
-      sectorid: ["ALL"]
-    units: cents per kilowatthour
