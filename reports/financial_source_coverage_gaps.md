@@ -22,11 +22,18 @@ network egress or an API key, unavailable in the buildout environment.
 
 **Completeness note (PR own-source revenue):** the registry was comprehensive on the
 federal-in, influence, debt, and PR-spending axes but had a systematic hole on the
-revenue PR raises itself. The P0 promotions above address the largest pieces
-(Act 154, income tax, the consolidated General Fund series). Remaining revenue gaps in
-the backlog: `pr_arbitrios_excise` (alcohol/tobacco/fuel/cement/sugar/plastics) and the
-`estadisticas_pr_portal` open-data API (which can also feed the GF/income-tax series),
-plus `pr_ui_trust_fund` on the labor side.
+revenue PR raises itself. The P0 promotions addressed the largest pieces (Act 154,
+income tax, the consolidated General Fund series).
+
+**Now materialized (automatable):** `pr_general_fund_revenues` and
+`pr_income_tax_collections` are wired to a real producer —
+`scripts/download_estadisticas_pr.py` — which pulls them from the **Datos.PR CKAN API**
+(`datos.estadisticas.pr`). Both are now `api_producer` (automatable) rather than
+deferred/scraper; they materialize on a networked run (egress-blocked sandbox writes an
+empty schema gracefully). Remaining revenue-side backlog: `pr_arbitrios_excise`
+(alcohol/tobacco/fuel/cement/sugar/plastics, Hacienda SC-2225), the
+`estadisticas_pr_external_trade` series (the untapped imports/exports part of the same
+portal — extend the estadisticas producer), and `pr_ui_trust_fund` on the labor side.
 
 ## Context
 
