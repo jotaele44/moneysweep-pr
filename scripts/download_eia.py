@@ -251,7 +251,7 @@ def _rows_to_dataframe(series: dict, raw_rows: list[dict], source_date: str) -> 
     return pd.DataFrame(out_rows, columns=OUTPUT_COLUMNS)
 
 
-def run(root: Path = None, force: bool = False, only: list[str] | None = None) -> dict:
+def run(root: Path | None = None, force: bool = False, only: list[str] | None = None) -> dict:
     if root is None:
         root = PROJECT_ROOT
     root = Path(root)
