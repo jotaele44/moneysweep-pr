@@ -1,16 +1,16 @@
 # Source Materialization Readiness
 
-Total sources: **129**
-Automatable: **69** (ready: **69**, need API key at run time: 8)
-Queued / excluded: **60**
+Total sources: **133**
+Automatable: **70** (ready: **70**, need API key at run time: 8)
+Queued / excluded: **63**
 
 ## Path types
 
 | path_type | automatable | count | recommended_action |
 | --- | --- | --- | --- |
 | `api_adapter` | True | 42 | Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated). |
-| `api_producer` | True | 27 | Run producer under strict preflight; public API path, set key if gated. |
-| `manual_export` | False | 36 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
+| `api_producer` | True | 28 | Run producer under strict preflight; public API path, set key if gated. |
+| `manual_export` | False | 39 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
 | `scraper_needed` | False | 17 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
 | `deferred_stub` | False | 4 | Intentionally unimplemented; remains not_materialized by design. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
@@ -62,10 +62,11 @@ API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KE
 - `wic`
 - `wioa`
 
-## api_producer (27)
+## api_producer (28)
 
 - `dol_whd_osha`
 - `emma_infra_revenue`
+- `estadisticas_pr_external_trade`
 - `fcc_usf`
 - `fec_committees`
 - `federal_audit_clearinghouse`
@@ -99,7 +100,7 @@ API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KE
 - `nara_catalog_aws_open_data`
 - `nara_nextgen_catalog_v3`
 
-## manual_export (36)
+## manual_export (39)
 
 - `act_toll_revenue`
 - `act_tolls_concession`
@@ -131,6 +132,9 @@ API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KE
 - `pr_cabilderos`
 - `pr_corporate_registry`
 - `prasa`
+- `prasa_cer`
+- `prasa_cip`
+- `prasa_completed_projects`
 - `prasa_rate_revenue`
 - `prepa_luma_rate_revenue`
 - `prpha_housing_subsidy`

@@ -115,4 +115,8 @@ def test_module_imports_without_network():
     """Preflight imports every producer; this must not require egress."""
     assert callable(mod.run)
     assert callable(mod.main)
-    assert set(SOURCES) == {"pr_general_fund_revenues", "pr_income_tax_collections"}
+    assert set(SOURCES) == {
+        "pr_general_fund_revenues",
+        "pr_income_tax_collections",
+        "estadisticas_pr_external_trade",
+    }

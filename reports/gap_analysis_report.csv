@@ -61,6 +61,7 @@ epa_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processe
 eqb_epa_icis,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_eqb_permits.csv,PR Environmental Quality Board + EPA ICIS environmental permits.
 equitable_sharing,federal,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_equitable_sharing.csv,"DOJ/Treasury equitable-sharing asset-forfeiture payouts to PR law enforcement. Operator-delivered exports.
 "
+estadisticas_pr_external_trade,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_external_trade.csv,PR external-trade series (imports / exports) from the Instituto de Estadisticas / Datos.PR CKAN portal. Automatable via the CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisti
 exim_bank,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_exim.csv,
 fcc_usf,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fcc_usf.csv,
 fdic,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fdic.csv,
@@ -127,6 +128,11 @@ pr_corporate_registry,manual_export,False,manual_export,1,0,1,0,not_materialized
 pr_general_fund_revenues,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_general_fund_revenues.csv,"Consolidated PR General Fund net revenues by source (Instituto de Estadisticas ""Ingresos Netos al Fondo General"") — one authoritative series covering Act 154, income tax, IVU, arbitrios, licenses, lot"
 pr_income_tax_collections,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_income_tax_collections.csv,PR individual & corporate income tax collections — the income-contribution series from the Instituto de Estadisticas / Datos.PR CKAN portal. Largest recurring General Fund revenue category. Automatabl
 pr_pensions,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_pension_funds.csv,
+prasa_cer,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prasa_cer.csv,P0 - PRASA Capital Expenditure Report (CER) / audited financial-statement line items. Core financial-infrastructure evidence for PR's largest recovery-driven public corporation. Operator-delivered CSV
+prasa_cip,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prasa_cip.csv,"P0 - PRASA Capital Improvement Program (CIP) project list (project, cost, status, fiscal year). Operator-delivered CSV extracts.
+"
+prasa_completed_projects,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prasa_completed_projects.csv,"P0 - PRASA completed projects — FEMA 406 / COR3 recovery-infrastructure join bridge. Operator-delivered CSV extracts.
+"
 prasa_contracts_master,infrastructure,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/prasa_contracts_master.csv,Vendor-level aggregation of pr_prasa_contracts.csv. Closes the previously-dangling prasa_contracts_master.csv output (declared with no producer). Derived source; runs after the prasa dropzone ingest.
 prasa_rate_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prasa_rate_revenue.csv,"Aggregate PRASA water/sewer rate revenue from audited financials, rate-case filings, and EMMA disclosures. Shares scripts/ingest_utility_revenue.py with prepa_luma_rate_revenue."
 prepa_luma_genera,infrastructure,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prepa_contracts.csv,PREPA / LUMA Energy / Genera PR contracts and operating data.

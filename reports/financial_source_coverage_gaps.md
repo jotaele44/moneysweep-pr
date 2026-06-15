@@ -25,15 +25,20 @@ federal-in, influence, debt, and PR-spending axes but had a systematic hole on t
 revenue PR raises itself. The P0 promotions addressed the largest pieces (Act 154,
 income tax, the consolidated General Fund series).
 
-**Now materialized (automatable):** `pr_general_fund_revenues` and
-`pr_income_tax_collections` are wired to a real producer —
-`scripts/download_estadisticas_pr.py` — which pulls them from the **Datos.PR CKAN API**
-(`datos.estadisticas.pr`). Both are now `api_producer` (automatable) rather than
-deferred/scraper; they materialize on a networked run (egress-blocked sandbox writes an
-empty schema gracefully). Remaining revenue-side backlog: `pr_arbitrios_excise`
-(alcohol/tobacco/fuel/cement/sugar/plastics, Hacienda SC-2225), the
-`estadisticas_pr_external_trade` series (the untapped imports/exports part of the same
-portal — extend the estadisticas producer), and `pr_ui_trust_fund` on the labor side.
+**Now materialized (automatable):** `pr_general_fund_revenues`,
+`pr_income_tax_collections`, and `estadisticas_pr_external_trade` are wired to a real
+producer — `scripts/download_estadisticas_pr.py` — which pulls them from the **Datos.PR
+CKAN API** (`datos.estadisticas.pr`). All three are `api_producer` (automatable); they
+materialize on a networked run (egress-blocked sandbox writes an empty schema gracefully).
+
+**PRASA financial-infrastructure evidence (P0):** `prasa_cer` (CER / audited statements),
+`prasa_cip` (capital improvement program), and `prasa_completed_projects` (FEMA 406 /
+COR3 recovery bridge) are now registered as `manual_export` sources with a real parser
+(`scripts/ingest_prasa_cer.py`), awaiting operator CSV extracts in `data/raw/PRASA/<cer|
+cip|completed>/`.
+
+Remaining revenue-side backlog: `pr_arbitrios_excise` (alcohol/tobacco/fuel/cement/sugar/
+plastics, Hacienda SC-2225) and `pr_ui_trust_fund` on the labor side.
 
 ## Context
 
