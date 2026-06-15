@@ -8,14 +8,25 @@ checked against the live registry id list and verified against a primary source.
 The machine-readable rows live in `financial_source_coverage_gaps.csv` and are
 surfaced in `financial_source_audit.{csv,md}` as the `not_considered` bucket.
 
-**Update (P1 promotion):** the three P1 candidates below — `hacienda_sut_ivu`,
-`census_gov_finances`, `fta_ntd` — have been **promoted into the registry as
-deferred intake stubs** (producer `scripts/download_coverage_gap_intake.py`;
-`hacienda_sut_ivu` classifies `scraper_needed`, the other two `deferred_stub`).
-They now appear in the audit ledger as registry sources, not `not_considered`.
-The remaining backlog (`gsa_iolp_real_property`, `hmda_ffiec`,
-`prac_pandemic_oversight`) stays here until a real fetcher/adapter is built — each
-needs network egress or an API key, unavailable in the buildout environment.
+**Update (promotions):** six candidates have been **promoted into the registry as
+deferred intake stubs** (producer `scripts/download_coverage_gap_intake.py`):
+- First P1 batch: `hacienda_sut_ivu` (scraper_needed), `census_gov_finances`,
+  `fta_ntd` (deferred_stub).
+- P0 own-source-revenue batch (closing the territorial-revenue gap): `pr_act_154_excise`
+  and `pr_income_tax_collections` (scraper_needed, Hacienda statistics surface), and
+  `pr_general_fund_revenues` (deferred_stub, estadisticas API).
+
+These now appear in the audit ledger as registry sources, not `not_considered`. The
+remaining backlog below stays here until a real fetcher/adapter is built — each needs
+network egress or an API key, unavailable in the buildout environment.
+
+**Completeness note (PR own-source revenue):** the registry was comprehensive on the
+federal-in, influence, debt, and PR-spending axes but had a systematic hole on the
+revenue PR raises itself. The P0 promotions above address the largest pieces
+(Act 154, income tax, the consolidated General Fund series). Remaining revenue gaps in
+the backlog: `pr_arbitrios_excise` (alcohol/tobacco/fuel/cement/sugar/plastics) and the
+`estadisticas_pr_portal` open-data API (which can also feed the GF/income-tax series),
+plus `pr_ui_trust_fund` on the labor side.
 
 ## Context
 

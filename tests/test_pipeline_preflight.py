@@ -29,6 +29,10 @@ def test_api_key_status_reports_present_and_missing(monkeypatch, caplog):
     secret = "DUMMY_SECRET_VALUE_DO_NOT_LOG"
     monkeypatch.setenv("SAM_API_KEY", secret)
     monkeypatch.delenv("FEC_API_KEY", raising=False)
+    # Neutralize any local .env so key presence is controlled solely by os.environ —
+    # otherwise a developer with a populated .env (e.g. a real FEC_API_KEY) would see
+    # this assertion flip. CI has no .env, but local runs must match it.
+    monkeypatch.setattr("scripts.pipeline_preflight._load_dotenv_dict", lambda root: {})
 
     with caplog.at_level(logging.DEBUG):
         result = run_pipeline_preflight(REPO_ROOT, _logger(), strict=False)

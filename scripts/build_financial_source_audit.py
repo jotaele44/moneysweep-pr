@@ -102,7 +102,7 @@ BUCKET_BLURB = {
     "wired_materializing": "Wired and producing output on disk now.",
     "wired_offline_ready": "Wired; materializes fully offline from a committed input (no operator file/network).",
     "wired_ready_unmaterialized": "Wired and ready; just needs a run (network egress).",
-    "wired_needs_key": "Wired and automatable, but its API key is not set.",
+    "wired_needs_key": "Wired and automatable, but requires an API key (gated by the registry auth).",
     "wired_not_set_to_materialize": "Wired but produces nothing by design (deferred stub / sibling duplicate).",
     "queued_manual": "Wired, but waits on an operator-delivered manual export.",
     "queued_scraper": "Declared, but needs a scraping adapter for a PR-gov HTML/PDF surface.",
@@ -144,17 +144,20 @@ def _name_aligned(source_id: str, producer_script: str) -> bool:
     return stem in sid or sid in stem
 
 
-def _audit_status(source_id: str, path_type: str, readiness: str, present: int) -> str:
+def _audit_status(source_id: str, path_type: str, needs_key: str, present: int) -> str:
     bucket = PATH_TYPE_BUCKET.get(path_type)
     if bucket:
         # A queued manual source with a committed offline input is better than queued.
         if bucket == "queued_manual" and _offline_input(source_id):
             return "wired_offline_ready"
         return bucket
-    # Automatable (api_adapter / api_producer): resolve by output / key state.
+    # Automatable (api_adapter / api_producer): resolve by output / key requirement.
+    # `needs_key` is the registry auth requirement (api_key:*), NOT whether the key is
+    # currently set — so this classification is environment-independent and reproducible
+    # in a clean checkout (it does not depend on a local .env).
     if present > 0:
         return "wired_materializing"
-    if readiness == "missing_key_limited":
+    if needs_key:
         return "wired_needs_key"
     return "wired_ready_unmaterialized"
 
@@ -199,8 +202,8 @@ def build_rows() -> list[dict]:
         total, present = _outputs_present(expected)
         path_type = _classify(src)
         readiness = classify_source_readiness(REPO_ROOT, src)["readiness_status"]
-        audit_status = _audit_status(sid, path_type, readiness, present)
         needs_key = auth.split("api_key:", 1)[1] if auth.startswith("api_key:") else ""
+        audit_status = _audit_status(sid, path_type, needs_key, present)
         dropzone = src.get("manual_drop_dir", "") or ""
         domain, is_financial = FAMILY_DOMAIN.get(family, ("uncategorized", True))
         rows.append(

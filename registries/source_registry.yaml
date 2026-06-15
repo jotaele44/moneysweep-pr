@@ -1872,3 +1872,49 @@ sources:
     update_cadence: yearly
     notes: >
       FTA National Transit Database — financial, funding-source, and operating-expense data for PR transit agencies (PRHTA, PRITA, Ports Authority). Complements transit_contracts / transit_fare_revenue with federal funding + audited operating finance. Free bulk download. Fetcher intentionally not implemented yet (deferred).
+
+  # ----- PR own-source revenue intake stubs (P0; close the territorial-revenue gap) -----
+  - source_id: pr_act_154_excise
+    family: territorial
+    required: false
+    authentication: none
+    endpoint_url: https://hacienda.pr.gov/inversionistas/estadisticas-y-recaudos-statistics-and-revenues
+    producer_script: scripts/download_coverage_gap_intake.py
+    expected_outputs:
+      - data/staging/processed/pr_act_154_excise.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 0
+    update_cadence: monthly
+    notes: >
+      Act 154 excise tax on foreign controlled corporations — historically ~$1.8B/yr and 13-21% of the General Fund, the single largest GF revenue line. Hacienda statistics surface; queued for a scraping adapter (scraper_needed).
+
+  - source_id: pr_income_tax_collections
+    family: territorial
+    required: false
+    authentication: none
+    endpoint_url: https://hacienda.pr.gov/inversionistas/estadisticas-y-recaudos-statistics-and-revenues
+    producer_script: scripts/download_coverage_gap_intake.py
+    expected_outputs:
+      - data/staging/processed/pr_income_tax_collections.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 0
+    update_cadence: yearly
+    notes: >
+      PR individual & corporate income tax collections (Hacienda return statistics). Largest recurring General Fund revenue category, not otherwise captured. Hacienda statistics surface; queued for a scraping adapter (scraper_needed).
+
+  - source_id: pr_general_fund_revenues
+    family: territorial
+    required: false
+    authentication: none
+    endpoint_url: https://api.estadisticas.gobierno.pr/
+    producer_script: scripts/download_coverage_gap_intake.py
+    expected_outputs:
+      - data/staging/processed/pr_general_fund_revenues.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 0
+    update_cadence: monthly
+    notes: >
+      Consolidated PR General Fund net revenues by source (Instituto de Estadisticas "Ingresos Netos al Fondo General" + estadisticas API) — one authoritative series covering Act 154, income tax, IVU, arbitrios, licenses, lottery, customs, and rum cover-over. API-automatable via api.estadisticas.gobierno.pr; fetcher intentionally not implemented yet (deferred).
