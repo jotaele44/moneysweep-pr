@@ -5,9 +5,10 @@ coverage-gap backlog (``reports/financial_source_coverage_gaps.md``) into the
 registry as tracked intake stubs:
 
   - ``hacienda_sut_ivu``           PR Treasury Sales & Use Tax (IVU/SUT) collections (scraper surface)
-  - ``census_gov_finances``        Census Annual Survey of State & Local Government Finances (PR)
-  - ``fta_ntd``                    FTA National Transit Database — PR transit agency finance
   - ``pr_act_154_excise``          Act 154 excise on foreign controlled corporations (scraper surface)
+
+(``census_gov_finances`` and ``fta_ntd`` graduated to real producers —
+``scripts/download_census_gov_finances.py`` and ``scripts/download_fta_ntd.py``.)
 
 Like ``scripts/download_nara_nextgen.py``, declaring this producer keeps the
 readiness preflight honest: each source resolves to a real, importable, callable
@@ -33,8 +34,6 @@ from scripts.config import PROJECT_ROOT, setup_logging
 # Source IDs this producer serves (mirrors the registry entries).
 COVERAGE_GAP_SOURCE_IDS = (
     "hacienda_sut_ivu",
-    "census_gov_finances",
-    "fta_ntd",
     "pr_act_154_excise",
 )
 

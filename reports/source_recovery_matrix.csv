@@ -41,6 +41,7 @@ usda_grants,False,api_adapter,True,True,,True,True,scripts/download_usda.py,1,0,
 va_benefits,False,api_adapter,True,True,,True,True,scripts/download_va.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 wic,False,api_adapter,True,True,,True,True,scripts/download_wic.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 wioa,False,api_adapter,True,True,,True,True,scripts/download_wioa.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+census_gov_finances,False,api_producer,True,True,CENSUS_API_KEY,False,True,scripts/download_census_gov_finances.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
 dol_whd_osha,False,api_producer,True,True,,False,True,scripts/download_dol.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 emma_infra_revenue,False,api_producer,True,True,,False,True,scripts/extract_emma_revenue.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 estadisticas_pr_external_trade,False,api_producer,True,True,,False,True,scripts/download_estadisticas_pr.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
@@ -49,6 +50,7 @@ fec_committees,False,api_producer,True,True,FEC_API_KEY,False,True,scripts/downl
 federal_audit_clearinghouse,False,api_producer,True,True,FAC_API_KEY,False,True,scripts/download_fac.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 fema_individual_assistance,False,api_producer,True,True,,False,True,scripts/download_fema_ia.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 financialdata_net,False,api_producer,True,True,FINANCIALDATA_API_KEY,False,True,scripts/enrichment/enrich_financialdata_entities.py,4,0,0,,"Run producer under strict preflight; public API path, set key if gated."
+fta_ntd,False,api_producer,True,True,,False,True,scripts/download_fta_ntd.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
 gao_ig_audits,False,api_producer,True,True,,False,True,scripts/download_gao_ig.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 hud_cdbg_dr_public,True,api_producer,True,True,,False,True,scripts/download_cdbg_dr.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 hud_cdbg_mit,False,api_producer,True,True,,False,True,scripts/download_cdbg_mit.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
@@ -69,8 +71,6 @@ ssa,False,api_producer,True,True,,False,True,scripts/download_ssa.py,1,0,1,,"Run
 usace_permits,False,api_producer,True,True,,False,True,scripts/download_usace_permits.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 usaspending_loans,False,api_producer,True,True,,False,True,scripts/download_usaspending_loans.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 usda_farm_subsidies,False,api_producer,True,True,,False,True,scripts/download_usda_farm.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
-census_gov_finances,False,deferred_stub,False,False,CENSUS_API_KEY,False,True,scripts/download_coverage_gap_intake.py,1,0,0,,Intentionally unimplemented; remains not_materialized by design.
-fta_ntd,False,deferred_stub,False,False,,False,True,scripts/download_coverage_gap_intake.py,1,0,0,,Intentionally unimplemented; remains not_materialized by design.
 nara_catalog_aws_open_data,False,deferred_stub,False,False,,False,True,scripts/download_nara_nextgen.py,2,0,0,,Intentionally unimplemented; remains not_materialized by design.
 nara_nextgen_catalog_v3,False,deferred_stub,False,False,NARA_API_KEY,False,True,scripts/download_nara_nextgen.py,2,0,0,,Intentionally unimplemented; remains not_materialized by design.
 act_toll_revenue,False,manual_export,False,False,,False,True,scripts/ingest_toll_revenue.py,1,0,1,data/manual/act_toll_revenue/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.

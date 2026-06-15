@@ -33,7 +33,7 @@ ases_plan_vital,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,dat
 "
 bde_loans,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_bde_loans.csv,"Banco de Desarrollo Economico (Economic Development Bank) territorial business loans. Distinct from federal SBA loans. Operator-delivered exports.
 "
-census_gov_finances,territorial,False,api_key:CENSUS_API_KEY,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_census_gov_finances.csv,Census Annual Survey of State & Local Government Finances + State Government Tax Collections + Public Pensions for PR (FIPS 72) — the authoritative aggregate revenue/expenditure baseline. API-automata
+census_gov_finances,territorial,False,api_key:CENSUS_API_KEY,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_census_gov_finances.csv,Census government-finance / tax-collection figures for PR (FIPS 72) via the Census Data API. Automatable (needs CENSUS_API_KEY); materialized by scripts/download_census_gov_finances.py. Caveat - Censu
 chip,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_chip.csv,
 cms_open_payments,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cms_open_payments.csv,
 cofina,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cofina.csv,
@@ -75,7 +75,7 @@ fhlb,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_f
 financialdata_net,optional_commercial_enrichment,False,api_key:FINANCIALDATA_API_KEY,4,0,4,0,not_materialized,0,0,outputs/enrichment/financialdata_identifier_crosswalk.csv,OPTIONAL commercial provider for public-market entity resolution (CUSIP / ISIN / FIGI / LEI / CIK / ticker crosswalks). NOT a required source — never wired into coverage gates. Live use requires BOTH 
 follow_the_money,political_finance,False,manual_export,3,0,3,0,not_materialized,0,1,data/staging/processed/pr_sf133_budget_execution.csv,"PR public-money export data (SF-133 budget execution, municipal political/federal bridge, facility contract matches). ingest_follow_the_money.py is a dropzone reader (no network code) producing 3 outp"
 fpds_report_builder,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fpds_report_builder.csv,FPDS Report Builder FY2018-2024 ingestion. Supplements USAspending.
-fta_ntd,infrastructure,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_fta_ntd.csv,"FTA National Transit Database — financial, funding-source, and operating-expense data for PR transit agencies (PRHTA, PRITA, Ports Authority). Complements transit_contracts / transit_fare_revenue with"
+fta_ntd,infrastructure,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_fta_ntd.csv,"FTA National Transit Database — financial, funding-source, and operating-expense data for PR transit agencies (PRHTA, PRITA, Ports Authority). Automatable via the Socrata SODA API on data.transportati"
 gaming_commission,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_gaming.csv,"PR Gaming Commission casino/slot-machine licensing and gaming-tax revenue. Operator-delivered exports.
 "
 gao_ig_audits,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_gao_ig_audits.csv,
