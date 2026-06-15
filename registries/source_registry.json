@@ -2151,8 +2151,8 @@
       "family": "territorial",
       "required": false,
       "authentication": "none",
-      "endpoint_url": "https://hacienda.pr.gov/inversionistas/estadisticas-y-recaudos-statistics-and-revenues",
-      "producer_script": "scripts/download_coverage_gap_intake.py",
+      "endpoint_url": "https://datos.estadisticas.pr/",
+      "producer_script": "scripts/download_estadisticas_pr.py",
       "expected_outputs": [
         "data/staging/processed/pr_income_tax_collections.csv"
       ],
@@ -2161,15 +2161,15 @@
         "min_rows": 0
       },
       "update_cadence": "yearly",
-      "notes": "PR individual & corporate income tax collections (Hacienda return statistics). Largest recurring General Fund revenue category, not otherwise captured. Hacienda statistics surface; queued for a scraping adapter (scraper_needed).\n"
+      "notes": "PR individual & corporate income tax collections \u2014 the income-contribution series from the Instituto de Estadisticas / Datos.PR CKAN portal. Largest recurring General Fund revenue category. Automatable via the CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py.\n"
     },
     {
       "source_id": "pr_general_fund_revenues",
       "family": "territorial",
       "required": false,
       "authentication": "none",
-      "endpoint_url": "https://api.estadisticas.gobierno.pr/",
-      "producer_script": "scripts/download_coverage_gap_intake.py",
+      "endpoint_url": "https://datos.estadisticas.pr/",
+      "producer_script": "scripts/download_estadisticas_pr.py",
       "expected_outputs": [
         "data/staging/processed/pr_general_fund_revenues.csv"
       ],
@@ -2178,7 +2178,7 @@
         "min_rows": 0
       },
       "update_cadence": "monthly",
-      "notes": "Consolidated PR General Fund net revenues by source (Instituto de Estadisticas \"Ingresos Netos al Fondo General\" + estadisticas API) \u2014 one authoritative series covering Act 154, income tax, IVU, arbitrios, licenses, lottery, customs, and rum cover-over. API-automatable via api.estadisticas.gobierno.pr; fetcher intentionally not implemented yet (deferred).\n"
+      "notes": "Consolidated PR General Fund net revenues by source (Instituto de Estadisticas \"Ingresos Netos al Fondo General\") \u2014 one authoritative series covering Act 154, income tax, IVU, arbitrios, licenses, lottery, customs, and rum cover-over. Automatable via the Datos.PR CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py.\n"
     }
   ]
 }

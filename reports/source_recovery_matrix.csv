@@ -57,6 +57,8 @@ ngo_integration_layer,False,api_producer,True,True,,False,True,scripts/ngo_integ
 nmtc,False,api_producer,True,True,,False,True,scripts/download_nmtc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 opm_fedscope,False,api_producer,True,True,,False,True,scripts/download_opm_fedscope.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 opportunity_zones,False,api_producer,True,True,,False,True,scripts/download_opportunity_zones.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+pr_general_fund_revenues,False,api_producer,True,True,,False,True,scripts/download_estadisticas_pr.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
+pr_income_tax_collections,False,api_producer,True,True,,False,True,scripts/download_estadisticas_pr.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
 prasa_contracts_master,False,api_producer,True,True,,False,True,scripts/build_prasa_contracts_master.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sam_exclusions,False,api_producer,True,True,SAM_API_KEY,False,True,scripts/download_sam_exclusions.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sec_13f_nport,False,api_producer,True,True,,False,True,scripts/download_sec_holdings.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
@@ -70,7 +72,6 @@ census_gov_finances,False,deferred_stub,False,False,CENSUS_API_KEY,False,True,sc
 fta_ntd,False,deferred_stub,False,False,,False,True,scripts/download_coverage_gap_intake.py,1,0,0,,Intentionally unimplemented; remains not_materialized by design.
 nara_catalog_aws_open_data,False,deferred_stub,False,False,,False,True,scripts/download_nara_nextgen.py,2,0,0,,Intentionally unimplemented; remains not_materialized by design.
 nara_nextgen_catalog_v3,False,deferred_stub,False,False,NARA_API_KEY,False,True,scripts/download_nara_nextgen.py,2,0,0,,Intentionally unimplemented; remains not_materialized by design.
-pr_general_fund_revenues,False,deferred_stub,False,False,,False,True,scripts/download_coverage_gap_intake.py,1,0,0,,Intentionally unimplemented; remains not_materialized by design.
 act_toll_revenue,False,manual_export,False,False,,False,True,scripts/ingest_toll_revenue.py,1,0,1,data/manual/act_toll_revenue/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 act_tolls_concession,False,manual_export,False,False,,False,True,scripts/ingest_act_tolls_concession.py,1,0,1,data/raw/ACT_Tolls/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 act_transition_contracts,False,manual_export,False,False,,False,True,scripts/ingest_act_transition.py,1,0,1,data/manual/act_transition/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
@@ -120,7 +121,6 @@ municipal_finance,False,scraper_needed,False,False,,False,True,scripts/download_
 p3_authority,False,scraper_needed,False,False,,False,True,scripts/download_p3.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 pr_act_154_excise,False,scraper_needed,False,False,,False,True,scripts/download_coverage_gap_intake.py,1,0,0,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 pr_act_60_decrees,False,scraper_needed,False,False,,False,True,scripts/download_act60.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-pr_income_tax_collections,False,scraper_needed,False,False,,False,True,scripts/download_coverage_gap_intake.py,1,0,0,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 pr_pensions,False,scraper_needed,False,False,,False,True,scripts/download_pr_pensions.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 prepa_luma_genera,False,scraper_needed,False,False,,False,True,scripts/download_prepa_contracts.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 promesa_creditors,False,scraper_needed,False,False,,False,True,scripts/download_promesa_creditors.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
