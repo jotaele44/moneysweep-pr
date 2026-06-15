@@ -43,7 +43,9 @@ Atentamente,
 ```
 
 Applies to the PR targets in the queue (PRASA, OCPR / Oficina del Contralor,
-COR3, OEG cabilderos, CEE donaciones, compras.pr.gov).
+COR3, OEG cabilderos, CEE donaciones, compras.pr.gov, and the infrastructure
+revenue/contract targets: ACT/AutoExpreso, DTOP, Autoridad de los Puertos, AMA,
+and Tren Urbano / ATI).
 
 ---
 

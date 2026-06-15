@@ -30,10 +30,13 @@ def test_materialization_readiness_snapshot_matches_runbook_counts():
         Path("reports/materialization_readiness.json").read_text(encoding="utf-8")
     )
 
-    assert snapshot["total_sources"] == 88
-    assert snapshot["automatable_total"] == 57
-    assert snapshot["automatable_ready"] == 57
-    assert snapshot["queued_excluded_total"] == 31
+    # Merged registry: origin/main's 123 sources minus the removed paid
+    # OpenCorporates plus the two free keyless replacements gleif_lei +
+    # sec_officers = 124 total; automatable 67 -> 68 (net +1).
+    assert snapshot["total_sources"] == 124
+    assert snapshot["automatable_total"] == 68
+    assert snapshot["automatable_ready"] == 68
+    assert snapshot["queued_excluded_total"] == 56
     assert snapshot["automatable_not_ready"] == []
 
 

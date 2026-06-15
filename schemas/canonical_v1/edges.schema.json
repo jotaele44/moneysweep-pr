@@ -15,7 +15,8 @@
     "edge_type": {"type": "string", "enum": [
       "HOLDS_ROLE_IN", "OWNS_OR_CONTROLS", "REPRESENTS", "ADVISES",
       "RECEIVES_CONTRACT", "FUNDED_BY", "LOCATED_IN", "HOLDS_DEBT",
-      "NEGOTIATES_WITH", "SHARES_PERSONNEL_WITH", "LOBBIES_FOR", "BENEFITS_FROM"
+      "NEGOTIATES_WITH", "SHARES_PERSONNEL_WITH", "LOBBIES_FOR", "BENEFITS_FROM",
+      "COLLECTS_REVENUE", "ALLOCATES_REVENUE_TO", "PLEDGED_TO_DEBT"
     ]},
     "target_node_type": {"type": "string", "enum": ["Person", "Entity", "Contract", "Project", "DebtInstrument", "LobbyingRecord", "FundingSource", "Property", "Municipality"]},
     "target_node_id": {"type": "string", "minLength": 1},

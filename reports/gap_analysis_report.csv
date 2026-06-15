@@ -13,7 +13,7 @@ Default mode is dry-run fixture mode; live API calls require --live.
 No API key is required. Uploaded/"
 oficina_contralor,territorial,True,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_contralor_audits.csv,PR Comptroller (OCPR) audit reports and findings on government entities and contractors. Operator delivers exported CSV/Excel to the dropzone. NOTE the OCPR contract registry (consultacontratos.ocpr.g
 pr_cabilderos,lobbying,True,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cabilderos.csv,"PR Office of Government Ethics (OEG) state-level lobbyist (cabildero) registry. ingest_cabilderos.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers the OEG export to data/raw"
-prasa,infrastructure,True,manual_export,2,0,2,0,not_materialized,0,1,data/staging/processed/pr_prasa_contracts.csv,"PRASA aqueduct/sewer authority. ingest_prasa.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers exported procurement files to data/raw/PRASA/. Includes Consulting Engineer Rep"
+prasa,infrastructure,True,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prasa_contracts.csv,"PRASA aqueduct/sewer authority. ingest_prasa.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers exported procurement files to data/raw/PRASA/. Includes Consulting Engineer Rep"
 sam_entities,entity_resolution,True,api_key:SAM_API_KEY,2,0,2,0,not_materialized,0,1,data/staging/processed/enrichment/vendor_uei_index.csv,"SAM full extract + per-UEI enrichment for parent resolution.
 Supplemented by scripts/usaspending_parent_uei_extract.py (no rate limit).
 SAM API rate: 1,000 req/day → full 2,334-UEI run = 2.3+ days.
@@ -24,39 +24,73 @@ no corporate parent_uei is expected for these entities.
 "
 usaspending_subawards,federal,True,none,2,1,1,0,partially_materialized,3,1,data/staging/processed/pr_subawards_master.csv,
 aafaf,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_aafaf_budget.csv,PR Fiscal Agency & Financial Advisory Authority. Budget execution.
+act_toll_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_act_toll_revenue.csv,Aggregate toll revenue (ACT / AutoExpreso / Metropistas PR-22/PR-5) from ACT audited financials and EMMA toll-revenue-bond disclosures. Dropzone reader; pursue finer (per-plaza) breakdowns via FOIA.
+act_tolls_concession,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_act_tolls.csv,"PR Highways & Transportation Authority toll revenue and Metropistas/Autopistas concession payments. Distinct from ACT transition contracts. Operator-delivered exports.
+"
 act_transition_contracts,manual_export,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_act_transition_contracts.csv,"PR ACT transition contract files (Autopistas, Ferrovial, LPC&D, etc.). Manual export."
 acuden_2024_transition,manual_export,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_acuden_transition.csv,ACUDEN 2024 transition contract file. Transfer-of-funds contracts to municipalities/daycare/nonprofits.
+ases_plan_vital,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ases_contracts.csv,"ASES Plan Vital Medicaid managed-care contracts and MCO capitation (territorial program spend). Distinct from federal medicaid_fmap match. Operator-delivered exports.
+"
+bde_loans,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_bde_loans.csv,"Banco de Desarrollo Economico (Economic Development Bank) territorial business loans. Distinct from federal SBA loans. Operator-delivered exports.
+"
 chip,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_chip.csv,
 cms_open_payments,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cms_open_payments.csv,
 cofina,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cofina.csv,
 compras_pr,territorial,False,none,2,0,2,0,not_materialized,0,1,data/staging/processed/pr_compras_rfps.csv,comprashpr.com RFP / award scrape.
 congressional_earmarks,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_earmarks.csv,
 contralor_electoral,political_finance,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_oce_donations.csv,"PR Oficina del Contralor Electoral (OCE) campaign-finance registry. Distinct from `oficina_contralor` (government-audit Contralor, a different agency). ingest_oce.py is a dropzone reader (no network c"
+crim_property_tax,municipal,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_crim_property_tax.csv,"CRIM municipal property-tax assessments and collections. Operator-delivered exports.
+"
 dcaa_active_contractors,manual_export,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_active_contractors.csv,DCAA FY2007/FY2012/FY2013 active contractor listings. Alias/crosswalk source.
+ddec_incentives,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ddec_incentives.csv,"DDEC Act 60/20/22 tax-incentive decrees (export-services / individual-investor grants). Operator-delivered exports.
+"
 doe_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_doe.csv,
 doj_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_doj_grants.csv,
+doj_settlements,federal,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_doj_settlements.csv,"DOJ / USAO-PR civil settlements and False Claims Act recoveries involving PR entities. Operator-delivered exports (no machine API).
+"
 dol_whd_osha,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_dol_whd.csv,
 donaciones_pr,political_finance,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_donaciones.csv,PR State Election Commission (CEE/CEEPUR) state-level donation registry. ingest_donaciones.py is a dropzone reader for operator-delivered CEE CSV exports — no network code. Previously mislabeled as us
 dot_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_dot_grants.csv,
+dtop_road_contracts,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_dtop_road_contracts.csv,"DTOP/ACT permanent road construction & maintenance contracts (rolling, beyond the 2020 transition snapshot). OCPR registry agency code 032."
+dtop_vehicle_fees,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_dtop_fees.csv,"DTOP vehicle-registration (marbete) and license fee collections. Operator-delivered exports.
+"
 ed_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ed_grants.csv,
+emma_infra_revenue,infrastructure_revenue,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_emma_revenue_disclosures.csv,MSRB EMMA continuing-disclosure revenue extraction (toll/water/power bond-pledged revenue). The one authentication-free automatable revenue spine; cross-checks the manual dropzone figures. PDF extract
 epa_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_epa_grants.csv,
 eqb_epa_icis,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_eqb_permits.csv,PR Environmental Quality Board + EPA ICIS environmental permits.
+equitable_sharing,federal,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_equitable_sharing.csv,"DOJ/Treasury equitable-sharing asset-forfeiture payouts to PR law enforcement. Operator-delivered exports.
+"
 exim_bank,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_exim.csv,
 fcc_usf,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fcc_usf.csv,
 fdic,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fdic.csv,
 fec_committees,political_finance,False,api_key:FEC_API_KEY,3,0,3,0,not_materialized,0,1,data/staging/processed/pr_fec_committees.csv,"FEC committee master plus Schedule B (disbursements) and Schedule E (independent expenditures) for PR-linked political committees. Makes PACs, Super PACs, 527s, and party committees first-class entiti"
+federal_audit_clearinghouse,federal,False,api_key:FAC_API_KEY,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_single_audits.csv,"Federal Single Audit (SF-SAC) results for PR auditees from the Federal Audit Clearinghouse. Oversight on subrecipients of federal awards. Free api.data.gov key (FAC_API_KEY).
+"
 fema_hmgp,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fema_hmgp.csv,
+fema_individual_assistance,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fema_ia.csv,"FEMA Individual Assistance / Individuals & Households Program housing aid to PR (OpenFEMA HousingAssistanceOwners). Direct-to-household disaster flow, distinct from Public Assistance and HMGP.
+"
 fhlb,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fhlb.csv,
 financialdata_net,optional_commercial_enrichment,False,api_key:FINANCIALDATA_API_KEY,4,0,4,0,not_materialized,0,0,outputs/enrichment/financialdata_identifier_crosswalk.csv,OPTIONAL commercial provider for public-market entity resolution (CUSIP / ISIN / FIGI / LEI / CIK / ticker crosswalks). NOT a required source — never wired into coverage gates. Live use requires BOTH 
 follow_the_money,political_finance,False,manual_export,4,0,4,0,not_materialized,0,1,data/staging/processed/pr_sf133_budget_execution.csv,Follow the Money export data for PR. ingest_follow_the_money.py is a dropzone reader (no network code) producing 4 outputs from operator-delivered CSV exports in data/raw/follow_the_money/. Previously
 fpds_report_builder,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fpds_report_builder.csv,FPDS Report Builder FY2018-2024 ingestion. Supplements USAspending.
+gaming_commission,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_gaming.csv,"PR Gaming Commission casino/slot-machine licensing and gaming-tax revenue. Operator-delivered exports.
+"
 gao_ig_audits,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_gao_ig_audits.csv,
+gleif_lei,entity_resolution,False,none,2,0,2,0,not_materialized,0,1,data/staging/processed/pr_gleif_entities.csv,"Free, keyless GLEIF LEI database filtered to Puerto Rico (legalAddress
+country PR + jurisdiction US-PR, de-duped by LEI). Corporate identity
+(legal name, status, legal form, local registration number,"
 grants_gov,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_grants.csv,
 hacienda,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_hacienda_revenues.csv,
 haf,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_haf.csv,
 hhs_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_hhs_grants.csv,
+hud_cdbg_mit,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cdbg_mit.csv,"HUD CDBG-Mitigation (CFDA 14.272) allocations to PR via USASpending. Distinct from CDBG-DR (hud_cdbg_dr_public) and DRGR reporting (hud_drgr_authorized).
+"
 hud_hcv_section8,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_hud_hcv.csv,
+irs_ctc_eitc_pr,federal,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_irs_ctc_eitc.csv,"IRS Child Tax Credit / EITC payments to PR families (post-ARPA expansion), from SOI/Treasury exports. Operator-delivered.
+"
 lihtc,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_lihtc.csv,
+loteria_pr,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_loteria.csv,"Loteria de Puerto Rico + Loteria Electronica revenue, prize payouts and retailer commissions. Operator-delivered exports.
+"
 medicaid_fmap,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_medicaid_fmap.csv,
 medicare_advantage,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_medicare_advantage.csv,
 medicare_parts,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_medicare_parts.csv,
@@ -70,28 +104,59 @@ ngo_integration_layer,nonprofit,False,none,3,0,3,0,not_materialized,0,1,data/sta
 nih_reporter,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_nih_grants.csv,
 nmtc,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_nmtc.csv,
 nonprofits_irs990,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_nonprofits_990.csv,
+oatrh_payroll,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_govt_payroll.csv,"PR central-government payroll / salaries (OATRH Nomina). Operator-delivered exports.
+"
+ocpr_contracts,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ocpr_contracts.csv,Canonical PR Comptroller (OCPR) contract registry — every PR government contract. Distinct from oficina_contralor (audit reports only). Interactive surface; operator-delivered exports until a scraper 
 ofac_sdn,entity_resolution,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/ofac_sdn.csv,
+ogpe_permits,municipal,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ogpe_permits.csv,"OGPe construction-permit fees and green-energy incentives. Operator-delivered exports.
+"
 oia_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_oia_grants.csv,
-opencorporates,entity_resolution,False,api_key:OPENCORPORATES_API_TOKEN,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_opencorporates.csv,
+opm_fedscope,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_federal_payroll.csv,"Federal civilian payroll (employment + average salary) in PR from OPM FedScope. Source URL configurable via FEDSCOPE_DATA_URL; live pull requires network.
+"
+opportunity_zones,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_opportunity_zones.csv,"Qualified Opportunity Zone designated census tracts in PR (Treasury/IRS capital-gains incentive). Source URL configurable via OZ_DATA_URL; live pull requires network.
+"
 p3_authority,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_p3_contracts.csv,
+ports_airports_contracts,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ports_airports_contracts.csv,PR Ports Authority / Aerostar contracts and capital projects. Also fed by scripts/parse_aaa_ports_pdf.py from the acquired completed_projects_AAA.pdf.
+ports_airports_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ports_airports_revenue.csv,Aggregate port/airport fee revenue (PR Ports Authority + Aerostar/SJU) from audited financials and EMMA disclosures.
+ports_authority,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ports_concessions.csv,"PR Ports Authority concession fees and leases (e.g. Aerostar/LMM airport). Operator-delivered exports.
+"
 pr_act_60_decrees,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_act60_decrees.csv,
 pr_corporate_registry,manual_export,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_corporate_registry.csv,
 pr_pensions,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_pension_funds.csv,
+prasa_contracts_master,infrastructure,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/prasa_contracts_master.csv,Vendor-level aggregation of pr_prasa_contracts.csv. Closes the previously-dangling prasa_contracts_master.csv output (declared with no producer). Derived source; runs after the prasa dropzone ingest.
+prasa_rate_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prasa_rate_revenue.csv,"Aggregate PRASA water/sewer rate revenue from audited financials, rate-case filings, and EMMA disclosures. Shares scripts/ingest_utility_revenue.py with prepa_luma_rate_revenue."
 prepa_luma_genera,infrastructure,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prepa_contracts.csv,PREPA / LUMA Energy / Genera PR contracts and operating data.
+prepa_luma_rate_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prepa_rate_revenue.csv,Aggregate PREPA/LUMA power rate revenue from audited financials and EMMA legacy revenue-bond disclosures. Shares scripts/ingest_utility_revenue.py with prasa_rate_revenue.
 promesa_creditors,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_promesa_creditors.csv,
+prpha_housing_subsidy,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prpha_subsidies.csv,"PR Public Housing Administration (AVP/PRPHA) operating subsidies and RAD conversions. Distinct from HUD Section-8 HCV. Operator-delivered exports.
+"
 research_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_research_grants.csv,
 rum_cover_over,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_rum_coverover.csv,
+sam_exclusions,entity_resolution,False,api_key:SAM_API_KEY,1,0,1,0,not_materialized,0,1,data/staging/processed/sam_exclusions.csv,"SAM.gov exclusions (debarment) list — suspended/excluded parties. Screening complement to sam_entities and ofac_sdn. Requires SAM_API_KEY.
+"
 sba_loans,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sba_loans.csv,
 sba_ppp,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sba_ppp.csv,
 sbir,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sbir.csv,
 sec_13f_nport,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sec_holdings.csv,
 sec_edgar,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sec_edgar.csv,
+sec_officers,entity_resolution,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sec_officers.csv,"Free, keyless officers/directors of PR-domiciled SEC filers, parsed from
+Form 3/4/5 insider-filing ownership XML. Replaces the OpenCorporates
+officers slice (whose seeds were all SEC filers).
+"
 sf133_budget_execution,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sf133.csv,
 slfrf,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_slfrf_master.csv,
 snap_nap,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_snap_nap.csv,
 ssa,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ssa.csv,
+tourism_room_tax,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_tourism_roomtax.csv,"PR Tourism Company hotel-occupancy tax (impuesto de ocupacion) and co-op marketing contributions. Operator-delivered exports.
+"
+transit_contracts,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_transit_contracts.csv,AMA / Tren Urbano (ATI) operating and O&M contracts.
+transit_fare_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_transit_fare_revenue.csv,Aggregate transit farebox revenue (AMA buses + Tren Urbano / ATI) from audited financials and budgets.
 usace_civil_works,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_usace_civil.csv,
 usace_permits,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_usace_permits.csv,
+usaspending_loans,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_federal_loans.csv,"Federal direct loans and loan guarantees (assistance type 07/08) to PR recipients via the USASpending API. Captures face value + federal subsidy cost, distinct from contracts/grants.
+"
+usda_farm_subsidies,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_usda_farm_subsidies.csv,"USDA FSA direct payments + RMA crop-insurance subsidies to PR producers via USASpending (assistance types 06/10). Distinct from rural-development usda_grants.
+"
 usda_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_usda.csv,
 va_benefits,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_va.csv,
 wic,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_wic.csv,

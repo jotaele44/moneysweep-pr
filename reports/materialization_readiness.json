@@ -1,25 +1,25 @@
 {
   "schema_version": "r5_readiness_v1",
-  "total_sources": 88,
-  "automatable_total": 57,
-  "automatable_ready": 57,
+  "total_sources": 124,
+  "automatable_total": 68,
+  "automatable_ready": 68,
   "automatable_not_ready": [],
-  "automatable_needs_key_count": 6,
+  "automatable_needs_key_count": 7,
   "automatable_required_keys": [
+    "FAC_API_KEY",
     "FEC_API_KEY",
     "FINANCIALDATA_API_KEY",
     "HIGHERGOV_API_KEY",
-    "OPENCORPORATES_API_TOKEN",
     "SAM_API_KEY"
   ],
   "queued_excluded": {
-    "manual_export": 11,
+    "manual_export": 36,
     "scraper_needed": 15,
     "deferred_stub": 2,
     "semantic_duplicate": 3,
     "broken_producer": 0
   },
-  "queued_excluded_total": 31,
+  "queued_excluded_total": 56,
   "outputs": [
     "reports/source_recovery_matrix.csv",
     "reports/source_recovery_matrix.md",

@@ -66,7 +66,7 @@
     },
     {
       "source_id": "pr_corporate_registry",
-      "expected_drop_dir": "data/manual/pr_corporate_registry/",
+      "expected_drop_dir": "data/raw/Active Contractor Listing/",
       "expected_filename_pattern": "*.csv|*.xlsx",
       "expected_columns": [
         "registration_number",
@@ -144,6 +144,147 @@
         }
       ],
       "notes": "DCAA FY2007 / FY2012 / FY2013 active contractor listings. Historical entity-resolution aid and alias/crosswalk source. Use only when matched to PR-relevant entities."
+    },
+    {
+      "source_id": "act_toll_revenue",
+      "expected_drop_dir": "data/manual/act_toll_revenue/",
+      "expected_filename_pattern": "*.csv|*.xlsx",
+      "expected_columns": [
+        "fiscal_year",
+        "revenue_category",
+        "amount"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        },
+        {
+          "rule": "row_count_min",
+          "value": 1,
+          "action": "warn_if_below"
+        }
+      ],
+      "notes": "Aggregate ACT/AutoExpreso/Metropistas toll revenue exported from audited financials or EMMA disclosures. Aggregate only \u2014 no individual crossings."
+    },
+    {
+      "source_id": "ports_airports_revenue",
+      "expected_drop_dir": "data/manual/ports_airports_revenue/",
+      "expected_filename_pattern": "*.csv|*.xlsx",
+      "expected_columns": [
+        "fiscal_year",
+        "revenue_category",
+        "amount"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "Aggregate PR Ports Authority / Aerostar (SJU) fee revenue."
+    },
+    {
+      "source_id": "transit_fare_revenue",
+      "expected_drop_dir": "data/manual/transit_fare_revenue/",
+      "expected_filename_pattern": "*.csv|*.xlsx",
+      "expected_columns": [
+        "fiscal_year",
+        "revenue_category",
+        "amount"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "Aggregate AMA bus / Tren Urbano (ATI) farebox revenue."
+    },
+    {
+      "source_id": "prasa_rate_revenue",
+      "expected_drop_dir": "data/manual/prasa_rate_revenue/",
+      "expected_filename_pattern": "*.csv|*.xlsx",
+      "expected_columns": [
+        "fiscal_year",
+        "revenue_category",
+        "amount"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "Aggregate PRASA water/sewer rate revenue."
+    },
+    {
+      "source_id": "prepa_luma_rate_revenue",
+      "expected_drop_dir": "data/manual/prepa_rate_revenue/",
+      "expected_filename_pattern": "*.csv|*.xlsx",
+      "expected_columns": [
+        "fiscal_year",
+        "revenue_category",
+        "amount"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "Aggregate PREPA/LUMA power rate revenue."
+    },
+    {
+      "source_id": "dtop_road_contracts",
+      "expected_drop_dir": "data/manual/dtop_road_contracts/",
+      "expected_filename_pattern": "*.csv|*.xlsx|*.pdf",
+      "expected_columns": [
+        "vendor_name",
+        "contract_value",
+        "award_date"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "DTOP/ACT permanent road construction & maintenance contracts. OCPR agency code 032."
+    },
+    {
+      "source_id": "ports_airports_contracts",
+      "expected_drop_dir": "data/manual/ports_airports_contracts/",
+      "expected_filename_pattern": "*.csv|*.xlsx|*.pdf",
+      "expected_columns": [
+        "vendor_name",
+        "contract_value",
+        "award_date"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "PR Ports Authority / Aerostar contracts. Also fed by the acquired completed_projects_AAA.pdf."
+    },
+    {
+      "source_id": "transit_contracts",
+      "expected_drop_dir": "data/manual/transit_contracts/",
+      "expected_filename_pattern": "*.csv|*.xlsx|*.pdf",
+      "expected_columns": [
+        "vendor_name",
+        "contract_value",
+        "award_date"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "AMA / Tren Urbano (ATI) operating and O&M contracts."
     }
   ]
 }

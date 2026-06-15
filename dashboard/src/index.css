@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 215 28% 7%;
+    --foreground: 195 100% 95%;
+    --card: 215 25% 10%;
+    --card-foreground: 195 100% 90%;
+    --popover: 215 25% 10%;
+    --popover-foreground: 195 100% 90%;
+    --primary: 187 100% 50%;
+    --primary-foreground: 215 28% 7%;
+    --secondary: 215 20% 16%;
+    --secondary-foreground: 195 80% 85%;
+    --muted: 215 20% 14%;
+    --muted-foreground: 215 15% 50%;
+    --accent: 170 100% 40%;
+    --accent-foreground: 215 28% 7%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 215 20% 18%;
+    --input: 215 20% 16%;
+    --ring: 187 100% 50%;
+    --radius: 0.5rem;
+    --font-heading: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    /* Custom tokens */
+    --glow-cyan: 0 0 12px rgba(0, 229, 255, 0.4);
+    --glow-teal: 0 0 12px rgba(0, 191, 165, 0.4);
+    --glow-border: rgba(0, 229, 255, 0.25);
+    --panel-bg: rgba(15, 25, 35, 0.95);
+    --grid-color: rgba(0, 229, 255, 0.04);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+    background-image:
+      linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.6);
+}
+
+/* Glow effects */
+.glow-cyan {
+  box-shadow: var(--glow-cyan);
+  border-color: rgba(0, 229, 255, 0.4) !important;
+}
+
+.glow-border {
+  border-color: var(--glow-border);
+}
+
+/* Streaming cursor */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+.stream-cursor::after {
+  content: '▋';
+  animation: blink 1s infinite;
+  color: hsl(var(--primary));
+  font-family: var(--font-mono);
+}
+
+/* Leaflet dark override */
+.leaflet-container {
+  background: #0a1520 !important;
+}
+
+/* Panel glass effect */
+.panel-glass {
+  background: var(--panel-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glow-border);
+}

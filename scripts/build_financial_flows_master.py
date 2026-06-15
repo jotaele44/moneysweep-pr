@@ -291,6 +291,63 @@ def _ingest_pr_procurement(df_prasa, df_compras, logger):
     return rows
 
 
+# Revenue (income) side: what the public pays to use infrastructure. service_domain
+# -> (flow_type, aggregate public/ratepayer payer entity). The collecting agency is
+# the payee. See docs/transaction_schema.md for the inflow convention.
+_REVENUE_DOMAIN = {
+    "toll": ("toll_revenue", "PUBLIC RATEPAYERS TOLL"),
+    "transit": ("fare_revenue", "PUBLIC RATEPAYERS TRANSIT"),
+    "utility": ("utility_rate_revenue", "PUBLIC RATEPAYERS UTILITY"),
+    "port": ("port_fee_revenue", "PUBLIC RATEPAYERS PORT"),
+}
+
+
+def _fy_to_date(fiscal_year):
+    raw = str(fiscal_year or "").strip()
+    if not raw:
+        return ""
+    try:
+        return f"{int(float(raw))}-07-01"
+    except ValueError:
+        return ""
+
+
+def _ingest_infrastructure_revenue(revenue_frames, logger):
+    """Emit revenue flow rows: payer = aggregate public, payee = collecting agency.
+
+    revenue_frames: list of (source_system_label, source_file, DataFrame) where each
+    DataFrame uses the shared revenue schema (scripts/_revenue_common.REVENUE_COLUMNS).
+    """
+    rows = []
+    for source_label, source_file, df in revenue_frames:
+        if df is None or df.empty:
+            continue
+        for _, r in df.iterrows():
+            domain = str(r.get("service_domain", "")).strip().lower()
+            flow_type, public_payer = _REVENUE_DOMAIN.get(
+                domain, ("infrastructure_revenue", "PUBLIC RATEPAYERS")
+            )
+            agency = str(r.get("collecting_agency", "")).strip()
+            rows.append(
+                _row(
+                    flow_id=_fid(),
+                    flow_type=flow_type,
+                    source_system=source_label,
+                    source_file=source_file,
+                    funding_source=public_payer,
+                    applicant_or_grantee=agency,
+                    responsible_organization=agency,
+                    amount_type="gross_revenue",
+                    amount=str(r.get("amount", "")),
+                    award_date=_fy_to_date(r.get("fiscal_year")),
+                    municipality=str(r.get("municipality", "")),
+                    evidence_path=source_file,
+                )
+            )
+    logger.info(f"  Infrastructure revenue: {len(rows):,} flow rows")
+    return rows
+
+
 def _ingest_contracts(df_contracts, logger):
     rows = []
     if df_contracts.empty:
@@ -348,12 +405,26 @@ def run(root=None, force=False):
     if df_contracts.empty:
         df_contracts = _load_csv(proc_dir / "pr_all_awards_master.csv", logger)
 
+    # Infrastructure revenue (income side) — aggregate published figures.
+    revenue_frames = [
+        (label, fname, _load_csv(proc_dir / fname, logger))
+        for label, fname in [
+            ("act_toll_revenue", "pr_act_toll_revenue.csv"),
+            ("transit_fare_revenue", "pr_transit_fare_revenue.csv"),
+            ("ports_airports_revenue", "pr_ports_airports_revenue.csv"),
+            ("prasa_rate_revenue", "pr_prasa_rate_revenue.csv"),
+            ("prepa_luma_rate_revenue", "pr_prepa_rate_revenue.csv"),
+            ("emma_revenue", "pr_emma_revenue_disclosures.csv"),
+        ]
+    ]
+
     all_rows = []
     all_rows.extend(_ingest_fema_pa(df_fema_v2, df_fema_portal, df_fema_linkage, logger))
     all_rows.extend(_ingest_hud_drgr(df_hud_projects, df_hud_acts, df_hud_draws, logger))
     all_rows.extend(_ingest_cor3(df_cor3, logger))
     all_rows.extend(_ingest_pr_procurement(df_prasa, df_compras, logger))
     all_rows.extend(_ingest_contracts(df_contracts, logger))
+    all_rows.extend(_ingest_infrastructure_revenue(revenue_frames, logger))
 
     if all_rows:
         df_out = pd.DataFrame(all_rows, columns=FLOW_COLUMNS)
