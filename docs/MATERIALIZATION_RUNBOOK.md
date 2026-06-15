@@ -94,3 +94,30 @@ has `row_count ≥ validation_threshold.min_rows`.
 Building the 20 `scraper_needed` PR-gov adapters and integrating the manual
 datasets (ACT/ACUDEN/PRASA/cabilderos/DCAA). Until then, those sources stay
 queued and excluded from the automatable target by design.
+
+## Live materialization (egress-capable runner)
+
+When outbound HTTPS is available (a GitHub Actions runner or a networked
+machine), drive the automatable set with the runner rather than the full
+`run_all.py` orchestrator:
+
+```bash
+python3 scripts/run_automatable_sources.py --dry-run      # list the automatable selection
+python3 scripts/run_automatable_sources.py                # run all automatable (needs egress + keys)
+python3 scripts/run_automatable_sources.py --source pr_general_fund_revenues
+python3 scripts/run_automatable_sources.py --family territorial
+```
+
+The runner reuses the readiness classifier for selection, runs an egress
+preflight (`scripts/check_network_egress.py`) and **skips all producers when
+egress is blocked** (exits 0, summary marks `egress_blocked`), and captures each
+producer's result so one failure never aborts the run. A run summary is written
+to `data/staging/materialization_run_summary.json` (gitignored). API keys are
+read from the environment / `.env` (`SAM_API_KEY`, `FEC_API_KEY`, `FAC_API_KEY`,
+`CENSUS_API_KEY`, `LDA_API_KEY`, `DATA_GOV_API_KEY`, plus HigherGov /
+OpenCorporates / FinancialData where used).
+
+CI: trigger **Actions → "Materialize automatable sources"**
+(`.github/workflows/materialize-sources.yml`, manual `workflow_dispatch`, confirm
+`YES`). It exports the repo secrets, runs the runner, and uploads
+`data/staging/processed` + the run summary as artifacts (never committed).
