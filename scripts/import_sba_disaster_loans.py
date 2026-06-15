@@ -107,7 +107,9 @@ def make_record_id(record: dict[str, Any]) -> str:
     return hashlib.sha256(key.encode("utf-8")).hexdigest()[:24]
 
 
-def normalize_sheet(path: Path, sheet_name: str, loan_type: str, markers: set[str]) -> list[dict[str, Any]]:
+def normalize_sheet(
+    path: Path, sheet_name: str, loan_type: str, markers: set[str]
+) -> list[dict[str, Any]]:
     header_row = detect_header_row(path, sheet_name, markers)
     df = pd.read_excel(path, sheet_name=sheet_name, header=header_row)
     df.columns = [str(col).strip() for col in df.columns]
@@ -184,7 +186,9 @@ def write_summary(path: Path, records: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     approved = sum(float(record.get("approved_loan_amount") or 0) for record in records)
     verified = sum(float(record.get("verified_loss_amount") or 0) for record in records)
-    municipalities = {record.get("municipality") for record in records if record.get("municipality")}
+    municipalities = {
+        record.get("municipality") for record in records if record.get("municipality")
+    }
     lines = [
         "# SBA Recovery Loan Import Summary",
         "",

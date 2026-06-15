@@ -20,8 +20,8 @@ The pipeline acquires, normalizes, validates, and cross-links public procurement
 
 Contract-Sweeper is **not yet a production-certified master dataset**. The current state is a controlled buildout phase:
 
-- **Source registry:** 123 tracked source definitions, plus pending SBA Disaster Loan source-family registration.
-- **Automatable sources:** 67 marked ready by the materialization-readiness gate.
+- **Source registry:** 124 tracked source definitions, plus pending SBA Disaster Loan source-family registration.
+- **Automatable sources:** 68 marked ready by the materialization-readiness gate.
 - **Queued / excluded sources:** manual exports, scraper-needed Puerto Rico sources, semantic duplicates, deferred stubs, and newly identified manual recovery-assistance files remain outside the automatable target until parser and validation gates pass.
 - **Strict preflight:** required before producer execution or promotion.
 - **Current active work:** Tranche B manual-source ingestion, SBA disaster-loan source refresh, and reconciliation.
@@ -56,7 +56,7 @@ reports/sba_recovery_source_refresh.txt
 | Infrastructure income | Aggregate civilian-paid revenue: tolls (AutoExpreso/ACT/Metropistas), transit fares (AMA/Tren Urbano), water/power rates (PRASA/PREPA-LUMA), port/airport fees — modeled as inflow transactions (payer = aggregate public, payee = collecting agency) |
 | Lobbying and influence | Puerto Rico cabilderos, federal LDA, campaign-finance crosswalks |
 | Debt and fiscal control | EMMA/MSRB, COFINA, AAFAF, PROMESA creditor/fiscal-control references |
-| Contractor references | DCAA active contractor listings, OFAC, OpenCorporates, entity aliases |
+| Contractor references | DCAA active contractor listings, OFAC, GLEIF LEI, SEC officers, entity aliases |
 | Geospatial analysis | Municipality normalization, infrastructure geography, GIS overlays, recovery-loss distribution |
 
 ## Boundary rules

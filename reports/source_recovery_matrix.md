@@ -1,23 +1,23 @@
 # Source Materialization Readiness
 
-Total sources: **123**
-Automatable: **67** (ready: **67**, need API key at run time: 8)
+Total sources: **124**
+Automatable: **68** (ready: **68**, need API key at run time: 7)
 Queued / excluded: **56**
 
 ## Path types
 
 | path_type | automatable | count | recommended_action |
 | --- | --- | --- | --- |
-| `api_adapter` | True | 42 | Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated). |
-| `api_producer` | True | 25 | Run producer under strict preflight; public API path, set key if gated. |
+| `api_adapter` | True | 41 | Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated). |
+| `api_producer` | True | 27 | Run producer under strict preflight; public API path, set key if gated. |
 | `manual_export` | False | 36 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
 | `scraper_needed` | False | 15 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
 | `deferred_stub` | False | 2 | Intentionally unimplemented; remains not_materialized by design. |
 
-API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KEY`, `FINANCIALDATA_API_KEY`, `HIGHERGOV_API_KEY`, `OPENCORPORATES_API_TOKEN`, `SAM_API_KEY`
+API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KEY`, `FINANCIALDATA_API_KEY`, `HIGHERGOV_API_KEY`, `SAM_API_KEY`
 
-## api_adapter (42)
+## api_adapter (41)
 
 - `chip`
 - `cms_open_payments`
@@ -46,7 +46,6 @@ API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KE
 - `nonprofits_irs990`
 - `ofac_sdn`
 - `oia_grants`
-- `opencorporates`
 - `research_grants`
 - `sam_entities`
 - `sba_loans`
@@ -62,7 +61,7 @@ API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KE
 - `wic`
 - `wioa`
 
-## api_producer (25)
+## api_producer (27)
 
 - `dol_whd_osha`
 - `emma_infra_revenue`
@@ -72,6 +71,7 @@ API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KE
 - `fema_individual_assistance`
 - `financialdata_net`
 - `gao_ig_audits`
+- `gleif_lei`
 - `hud_cdbg_dr_public`
 - `hud_cdbg_mit`
 - `lihtc`
@@ -84,6 +84,7 @@ API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KE
 - `sam_exclusions`
 - `sec_13f_nport`
 - `sec_edgar`
+- `sec_officers`
 - `sf133_budget_execution`
 - `ssa`
 - `usace_permits`

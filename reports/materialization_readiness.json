@@ -1,16 +1,15 @@
 {
   "schema_version": "r5_readiness_v1",
-  "total_sources": 123,
-  "automatable_total": 67,
-  "automatable_ready": 67,
+  "total_sources": 124,
+  "automatable_total": 68,
+  "automatable_ready": 68,
   "automatable_not_ready": [],
-  "automatable_needs_key_count": 8,
+  "automatable_needs_key_count": 7,
   "automatable_required_keys": [
     "FAC_API_KEY",
     "FEC_API_KEY",
     "FINANCIALDATA_API_KEY",
     "HIGHERGOV_API_KEY",
-    "OPENCORPORATES_API_TOKEN",
     "SAM_API_KEY"
   ],
   "queued_excluded": {
