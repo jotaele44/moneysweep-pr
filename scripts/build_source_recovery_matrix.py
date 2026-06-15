@@ -62,7 +62,6 @@ SCRAPER_NEEDED = {
     "rum_cover_over",
     "municipal_finance",
     "pr_pensions",
-    "eqb_epa_icis",
     "emma_bonds",
     "msrb_rtrs_trades",
 }

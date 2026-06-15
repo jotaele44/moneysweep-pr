@@ -1,17 +1,17 @@
 # Source Materialization Readiness
 
 Total sources: **133**
-Automatable: **72** (ready: **72**, need API key at run time: 9)
-Queued / excluded: **61**
+Automatable: **73** (ready: **73**, need API key at run time: 9)
+Queued / excluded: **60**
 
 ## Path types
 
 | path_type | automatable | count | recommended_action |
 | --- | --- | --- | --- |
 | `api_adapter` | True | 42 | Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated). |
-| `api_producer` | True | 30 | Run producer under strict preflight; public API path, set key if gated. |
+| `api_producer` | True | 31 | Run producer under strict preflight; public API path, set key if gated. |
 | `manual_export` | False | 39 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
-| `scraper_needed` | False | 17 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
+| `scraper_needed` | False | 16 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
 | `deferred_stub` | False | 2 | Intentionally unimplemented; remains not_materialized by design. |
 
@@ -62,11 +62,12 @@ API keys needed for full automatable materialization: `CENSUS_API_KEY`, `FAC_API
 - `wic`
 - `wioa`
 
-## api_producer (30)
+## api_producer (31)
 
 - `census_gov_finances`
 - `dol_whd_osha`
 - `emma_infra_revenue`
+- `eqb_epa_icis`
 - `estadisticas_pr_external_trade`
 - `fcc_usf`
 - `fec_committees`
@@ -142,14 +143,13 @@ API keys needed for full automatable materialization: `CENSUS_API_KEY`, `FAC_API
 - `transit_contracts`
 - `transit_fare_revenue`
 
-## scraper_needed (17)
+## scraper_needed (16)
 
 - `aafaf`
 - `cofina`
 - `compras_pr`
 - `cor3`
 - `emma_bonds`
-- `eqb_epa_icis`
 - `hacienda`
 - `hacienda_sut_ivu`
 - `msrb_rtrs_trades`

@@ -31,9 +31,9 @@ def test_materialization_readiness_snapshot_matches_runbook_counts():
     )
 
     assert snapshot["total_sources"] == 133
-    assert snapshot["automatable_total"] == 72
-    assert snapshot["automatable_ready"] == 72
-    assert snapshot["queued_excluded_total"] == 61
+    assert snapshot["automatable_total"] == 73
+    assert snapshot["automatable_ready"] == 73
+    assert snapshot["queued_excluded_total"] == 60
     assert snapshot["automatable_not_ready"] == []
 
 

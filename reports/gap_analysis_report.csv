@@ -58,7 +58,7 @@ dtop_vehicle_fees,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,d
 ed_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ed_grants.csv,
 emma_infra_revenue,infrastructure_revenue,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_emma_revenue_disclosures.csv,MSRB EMMA continuing-disclosure revenue extraction (toll/water/power bond-pledged revenue). The one authentication-free automatable revenue spine; cross-checks the manual dropzone figures. PDF extract
 epa_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_epa_grants.csv,
-eqb_epa_icis,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_eqb_permits.csv,PR Environmental Quality Board + EPA ICIS environmental permits.
+eqb_epa_icis,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_epa_echo_icis.csv,"PR environmental enforcement (EPA ICIS-FE&C / ECHO) — federal penalties assessed against PR facilities. Automatable via the public, keyless ECHO Enforcement Case Search REST API (echodata.epa.gov; X_A"
 equitable_sharing,federal,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_equitable_sharing.csv,"DOJ/Treasury equitable-sharing asset-forfeiture payouts to PR law enforcement. Operator-delivered exports.
 "
 estadisticas_pr_external_trade,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_external_trade.csv,PR external-trade series (imports / exports) from the Instituto de Estadisticas / Datos.PR CKAN portal. Automatable via the CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisti
