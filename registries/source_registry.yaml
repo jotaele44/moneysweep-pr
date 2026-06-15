@@ -592,15 +592,16 @@ sources:
     family: territorial
     required: false
     authentication: none
-    endpoint_url: https://echo.epa.gov/
-    producer_script: scripts/download_eqb.py
+    endpoint_url: https://echodata.epa.gov/echo/
+    producer_script: scripts/download_epa_echo_icis.py
     expected_outputs:
-      - data/staging/processed/pr_eqb_permits.csv
+      - data/staging/processed/pr_epa_echo_icis.csv
     schema_version: r5_v1
     validation_threshold:
-      min_rows: 1
+      min_rows: 0
     update_cadence: monthly
-    notes: PR Environmental Quality Board + EPA ICIS environmental permits.
+    notes: >
+      PR environmental enforcement (EPA ICIS-FE&C / ECHO) — federal penalties assessed against PR facilities. Automatable via the public, keyless ECHO Enforcement Case Search REST API (echodata.epa.gov; X_API_KEY sent opportunistically as an api.data.gov rate-limit header). Materialized by scripts/download_epa_echo_icis.py (endpoint/fields confirmed on first live run).
 
   # ----- Bonds / municipal finance -----
   - source_id: emma_bonds

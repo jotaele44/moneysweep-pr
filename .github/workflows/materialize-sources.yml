@@ -56,6 +56,7 @@ jobs:
           HIGHERGOV_API_KEY: ${{ secrets.HIGHERGOV_API_KEY }}
           OPENCORPORATES_API_TOKEN: ${{ secrets.OPENCORPORATES_API_TOKEN }}
           FINANCIALDATA_API_KEY: ${{ secrets.FINANCIALDATA_API_KEY }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
         run: |
           python3 scripts/run_automatable_sources.py \
             ${{ github.event.inputs.source && format('--source {0}', github.event.inputs.source) || '' }} \
