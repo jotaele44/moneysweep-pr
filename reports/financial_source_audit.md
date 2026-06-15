@@ -1,6 +1,6 @@
 # Financial Data-Source Audit
 
-Registry sources: **129** (financial: **122**, supporting/reference: **7**). Not-yet-considered candidates: **6**.
+Registry sources: **133** (financial: **126**, supporting/reference: **7**). Not-yet-considered candidates: **5**.
 
 _Read-only re-projection of `reports/source_recovery_matrix.csv` + live producer health into money-flow audit buckets. Regenerate with `python3 scripts/build_financial_source_audit.py`._
 
@@ -10,20 +10,20 @@ _Read-only re-projection of `reports/source_recovery_matrix.csv` + live producer
 | --- | --- | --- | --- |
 | `wired_materializing` | 2 | 2 | Wired and producing output on disk now. |
 | `wired_offline_ready` | 3 | 3 | Wired; materializes fully offline from a committed input (no operator file/network). |
-| `wired_ready_unmaterialized` | 60 | 59 | Wired and ready; just needs a run (network egress). |
+| `wired_ready_unmaterialized` | 61 | 60 | Wired and ready; just needs a run (network egress). |
 | `wired_needs_key` | 7 | 3 | Wired and automatable, but requires an API key (gated by the registry auth). |
 | `wired_not_set_to_materialize` | 7 | 5 | Wired but produces nothing by design (deferred stub / sibling duplicate). |
-| `queued_manual` | 33 | 33 | Wired, but waits on an operator-delivered manual export. |
+| `queued_manual` | 36 | 36 | Wired, but waits on an operator-delivered manual export. |
 | `queued_scraper` | 17 | 17 | Declared, but needs a scraping adapter for a PR-gov HTML/PDF surface. |
 | `broken` | 0 | 0 | Producer is missing / fails import / has no callable entrypoint. |
-| `not_considered` | 6 | 0 | Real-world financial source with no registry entry yet. |
+| `not_considered` | 5 | 0 | Real-world financial source with no registry entry yet. |
 
 ## The four questions
 
-1. **Which financial sources are wired?** 117 are wired to a producer — 2 producing output now, 3 able to materialize fully offline from committed inputs, 62 automatable & ready to run (incl. key-gated), 50 wired but queued behind a manual export or scraper.
+1. **Which financial sources are wired?** 121 are wired to a producer — 2 producing output now, 3 able to materialize fully offline from committed inputs, 63 automatable & ready to run (incl. key-gated), 53 wired but queued behind a manual export or scraper.
 2. **Which don't work?** 0 have a structural producer defect (missing / import error / no entrypoint). Runtime correctness beyond import is not verified offline — see caveat below.
 3. **Which aren't set to materialize anything?** 5 produce nothing by design (deferred stubs + semantic duplicates of sibling sources).
-4. **Which haven't even been considered?** 6 real-world financial sources have no registry entry (see `financial_source_coverage_gaps.md`).
+4. **Which haven't even been considered?** 5 real-world financial sources have no registry entry (see `financial_source_coverage_gaps.md`).
 
 > **Caveat:** `producer_importable` is a static import/entrypoint check — it does **not** confirm a producer yields valid rows at run time. With outbound egress blocked in this environment, live-API correctness is unverified; only offline-materializable sources are proven end-to-end.
 
@@ -33,16 +33,16 @@ _Read-only re-projection of `reports/source_recovery_matrix.csv` + live producer
 | --- | --- | --- | --- |
 | `debt_and_bonds` | 2 | 0 | 2 |
 | `federal_awards` | 62 | 2 | 3 |
-| `infrastructure_contracts` | 9 | 0 | 7 |
+| `infrastructure_contracts` | 12 | 0 | 10 |
 | `infrastructure_revenue` | 6 | 0 | 5 |
 | `lobbying_influence` | 2 | 0 | 1 |
 | `manual_financial` | 5 | 0 | 3 |
 | `municipal_finance` | 3 | 0 | 3 |
 | `nonprofit_funding` | 1 | 0 | 0 |
 | `political_finance` | 5 | 0 | 2 |
-| `territorial_spending` | 27 | 0 | 24 |
+| `territorial_spending` | 28 | 0 | 24 |
 
-## Producer/source-id name mismatches (29)
+## Producer/source-id name mismatches (31)
 
 Sources whose `source_id` is not recoverable from the producer filename. Legitimate for shared aggregators, but a registry-enumeration risk worth tracking (a rename or audit keyed on filenames can silently miss these).
 
@@ -70,6 +70,8 @@ Sources whose `source_id` is not recoverable from the producer filename. Legitim
 | `pr_corporate_registry` | `ingest_active_contractors.py` | manual_financial |
 | `pr_general_fund_revenues` | `download_estadisticas_pr.py` | territorial_spending |
 | `pr_income_tax_collections` | `download_estadisticas_pr.py` | territorial_spending |
+| `prasa_cip` | `ingest_prasa_cer.py` | infrastructure_contracts |
+| `prasa_completed_projects` | `ingest_prasa_cer.py` | infrastructure_contracts |
 | `prasa_rate_revenue` | `ingest_utility_revenue.py` | infrastructure_revenue |
 | `prepa_luma_genera` | `download_prepa_contracts.py` | infrastructure_contracts |
 | `prepa_luma_rate_revenue` | `ingest_utility_revenue.py` | infrastructure_revenue |

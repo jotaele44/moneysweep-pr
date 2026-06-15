@@ -2179,6 +2179,77 @@
       },
       "update_cadence": "monthly",
       "notes": "Consolidated PR General Fund net revenues by source (Instituto de Estadisticas \"Ingresos Netos al Fondo General\") \u2014 one authoritative series covering Act 154, income tax, IVU, arbitrios, licenses, lottery, customs, and rum cover-over. Automatable via the Datos.PR CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py.\n"
+    },
+    {
+      "source_id": "estadisticas_pr_external_trade",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://datos.estadisticas.pr/",
+      "producer_script": "scripts/download_estadisticas_pr.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_external_trade.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 0
+      },
+      "update_cadence": "monthly",
+      "notes": "PR external-trade series (imports / exports) from the Instituto de Estadisticas / Datos.PR CKAN portal. Automatable via the CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py alongside the General Fund revenue and income-tax series.\n"
+    },
+    {
+      "source_id": "prasa_cer",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.acueductospr.com/",
+      "producer_script": "scripts/ingest_prasa_cer.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_prasa_cer.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/PRASA/cer/",
+      "update_cadence": "yearly",
+      "notes": "P0 - PRASA Capital Expenditure Report (CER) / audited financial-statement line items. Core financial-infrastructure evidence for PR's largest recovery-driven public corporation. Operator-delivered CSV extracts of the published PDFs.\n"
+    },
+    {
+      "source_id": "prasa_cip",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.acueductospr.com/",
+      "producer_script": "scripts/ingest_prasa_cer.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_prasa_cip.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/PRASA/cip/",
+      "update_cadence": "yearly",
+      "notes": "P0 - PRASA Capital Improvement Program (CIP) project list (project, cost, status, fiscal year). Operator-delivered CSV extracts.\n"
+    },
+    {
+      "source_id": "prasa_completed_projects",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.acueductospr.com/",
+      "producer_script": "scripts/ingest_prasa_cer.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_prasa_completed_projects.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/PRASA/completed/",
+      "update_cadence": "yearly",
+      "notes": "P0 - PRASA completed projects \u2014 FEMA 406 / COR3 recovery-infrastructure join bridge. Operator-delivered CSV extracts.\n"
     }
   ]
 }

@@ -10,6 +10,7 @@ portal feeds two registry sources:
                                      licenses, lottery, customs, rum cover-over)
   - ``pr_income_tax_collections`` <- income-tax contribution series (individual +
                                      corporate)
+  - ``estadisticas_pr_external_trade`` <- PR external-trade series (imports / exports)
 
 CKAN access (no API key): ``package_search`` resolves the dataset by name, then
 ``datastore_search`` (paginated) pulls the active datastore resource; if the resource
@@ -97,6 +98,10 @@ SOURCES = {
     "pr_income_tax_collections": {
         "query": "contribucion sobre ingresos",
         "output": "data/staging/processed/pr_income_tax_collections.csv",
+    },
+    "estadisticas_pr_external_trade": {
+        "query": "comercio externo importaciones exportaciones",
+        "output": "data/staging/processed/pr_external_trade.csv",
     },
 }
 
