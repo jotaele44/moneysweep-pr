@@ -1,11 +1,12 @@
 {
   "schema_version": "r5_readiness_v1",
   "total_sources": 133,
-  "automatable_total": 70,
-  "automatable_ready": 70,
+  "automatable_total": 72,
+  "automatable_ready": 72,
   "automatable_not_ready": [],
-  "automatable_needs_key_count": 8,
+  "automatable_needs_key_count": 9,
   "automatable_required_keys": [
+    "CENSUS_API_KEY",
     "FAC_API_KEY",
     "FEC_API_KEY",
     "FINANCIALDATA_API_KEY",
@@ -16,11 +17,11 @@
   "queued_excluded": {
     "manual_export": 39,
     "scraper_needed": 17,
-    "deferred_stub": 4,
+    "deferred_stub": 2,
     "semantic_duplicate": 3,
     "broken_producer": 0
   },
-  "queued_excluded_total": 63,
+  "queued_excluded_total": 61,
   "outputs": [
     "reports/source_recovery_matrix.csv",
     "reports/source_recovery_matrix.md",

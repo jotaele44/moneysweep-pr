@@ -2101,7 +2101,7 @@
       "required": false,
       "authentication": "api_key:CENSUS_API_KEY",
       "endpoint_url": "https://api.census.gov/data",
-      "producer_script": "scripts/download_coverage_gap_intake.py",
+      "producer_script": "scripts/download_census_gov_finances.py",
       "expected_outputs": [
         "data/staging/processed/pr_census_gov_finances.csv"
       ],
@@ -2110,15 +2110,15 @@
         "min_rows": 0
       },
       "update_cadence": "yearly",
-      "notes": "Census Annual Survey of State & Local Government Finances + State Government Tax Collections + Public Pensions for PR (FIPS 72) \u2014 the authoritative aggregate revenue/expenditure baseline. API-automatable via the Census Data API. Fetcher intentionally not implemented yet (deferred): no network egress / API key in the buildout environment.\n"
+      "notes": "Census government-finance / tax-collection figures for PR (FIPS 72) via the Census Data API. Automatable (needs CENSUS_API_KEY); materialized by scripts/download_census_gov_finances.py. Caveat - Census notes PR is excluded from many API datasets; the producer returns EMPTY gracefully if PR is absent from the chosen dataset (dataset/vars confirmed on first live run).\n"
     },
     {
       "source_id": "fta_ntd",
       "family": "infrastructure",
       "required": false,
       "authentication": "none",
-      "endpoint_url": "https://www.transit.dot.gov/ntd",
-      "producer_script": "scripts/download_coverage_gap_intake.py",
+      "endpoint_url": "https://data.transportation.gov/",
+      "producer_script": "scripts/download_fta_ntd.py",
       "expected_outputs": [
         "data/staging/processed/pr_fta_ntd.csv"
       ],
@@ -2127,7 +2127,7 @@
         "min_rows": 0
       },
       "update_cadence": "yearly",
-      "notes": "FTA National Transit Database \u2014 financial, funding-source, and operating-expense data for PR transit agencies (PRHTA, PRITA, Ports Authority). Complements transit_contracts / transit_fare_revenue with federal funding + audited operating finance. Free bulk download. Fetcher intentionally not implemented yet (deferred).\n"
+      "notes": "FTA National Transit Database \u2014 financial, funding-source, and operating-expense data for PR transit agencies (PRHTA, PRITA, Ports Authority). Automatable via the Socrata SODA API on data.transportation.gov; materialized by scripts/download_fta_ntd.py (NTD resource id confirmed on first live run).\n"
     },
     {
       "source_id": "pr_act_154_excise",

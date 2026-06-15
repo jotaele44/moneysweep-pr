@@ -1,21 +1,21 @@
 # Source Materialization Readiness
 
 Total sources: **133**
-Automatable: **70** (ready: **70**, need API key at run time: 8)
-Queued / excluded: **63**
+Automatable: **72** (ready: **72**, need API key at run time: 9)
+Queued / excluded: **61**
 
 ## Path types
 
 | path_type | automatable | count | recommended_action |
 | --- | --- | --- | --- |
 | `api_adapter` | True | 42 | Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated). |
-| `api_producer` | True | 28 | Run producer under strict preflight; public API path, set key if gated. |
+| `api_producer` | True | 30 | Run producer under strict preflight; public API path, set key if gated. |
 | `manual_export` | False | 39 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
 | `scraper_needed` | False | 17 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
-| `deferred_stub` | False | 4 | Intentionally unimplemented; remains not_materialized by design. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
+| `deferred_stub` | False | 2 | Intentionally unimplemented; remains not_materialized by design. |
 
-API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KEY`, `FINANCIALDATA_API_KEY`, `HIGHERGOV_API_KEY`, `OPENCORPORATES_API_TOKEN`, `SAM_API_KEY`
+API keys needed for full automatable materialization: `CENSUS_API_KEY`, `FAC_API_KEY`, `FEC_API_KEY`, `FINANCIALDATA_API_KEY`, `HIGHERGOV_API_KEY`, `OPENCORPORATES_API_TOKEN`, `SAM_API_KEY`
 
 ## api_adapter (42)
 
@@ -62,8 +62,9 @@ API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KE
 - `wic`
 - `wioa`
 
-## api_producer (28)
+## api_producer (30)
 
+- `census_gov_finances`
 - `dol_whd_osha`
 - `emma_infra_revenue`
 - `estadisticas_pr_external_trade`
@@ -72,6 +73,7 @@ API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KE
 - `federal_audit_clearinghouse`
 - `fema_individual_assistance`
 - `financialdata_net`
+- `fta_ntd`
 - `gao_ig_audits`
 - `hud_cdbg_dr_public`
 - `hud_cdbg_mit`
@@ -93,10 +95,8 @@ API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KE
 - `usaspending_loans`
 - `usda_farm_subsidies`
 
-## deferred_stub (4)
+## deferred_stub (2)
 
-- `census_gov_finances`
-- `fta_ntd`
 - `nara_catalog_aws_open_data`
 - `nara_nextgen_catalog_v3`
 
