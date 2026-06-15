@@ -158,9 +158,7 @@ def map_frame(
     for output_col in output_columns:
         candidates = column_map.get(output_col, [])
         source_col = resolve_column(frame.columns, candidates)
-        out[output_col] = (
-            frame[source_col].fillna("").astype(str) if source_col else ""
-        )
+        out[output_col] = frame[source_col].fillna("").astype(str) if source_col else ""
 
     result = pd.DataFrame(out)
     for col in output_columns:

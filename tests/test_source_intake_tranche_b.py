@@ -67,11 +67,7 @@ def test_run_builds_local_contract_output(tmp_path: Path):
     assert summary["status"] == "prepared"
     assert summary["rows_total"] == 1
     rows = read_csv_rows(
-        tmp_path
-        / "data"
-        / "staging"
-        / "processed"
-        / "pr_act_transition_contracts.csv"
+        tmp_path / "data" / "staging" / "processed" / "pr_act_transition_contracts.csv"
     )
     assert list(rows[0].keys()) == LOCAL_CONTRACT_COLUMNS
     assert rows[0]["source_id"] == "act_transition_contracts"

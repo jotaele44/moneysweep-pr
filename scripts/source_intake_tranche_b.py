@@ -272,17 +272,15 @@ def _stable_record_ids(frame: pd.DataFrame, prefix: str, id_col: str) -> None:
     if id_col not in frame.columns:
         return
     missing = frame[id_col].astype(str).str.strip() == ""
-    frame.loc[missing, id_col] = [
-        f"{prefix}-{i + 1:06d}" for i in range(int(missing.sum()))
-    ]
+    frame.loc[missing, id_col] = [f"{prefix}-{i + 1:06d}" for i in range(int(missing.sum()))]
 
 
 def _postprocess(spec: SourceSpec, frame: pd.DataFrame) -> pd.DataFrame:
     if "contractor_name" in frame.columns and "normalized_name" in frame.columns:
         missing = frame["normalized_name"].astype(str).str.strip() == ""
-        frame.loc[missing, "normalized_name"] = frame.loc[
-            missing, "contractor_name"
-        ].map(normalize_name)
+        frame.loc[missing, "normalized_name"] = frame.loc[missing, "contractor_name"].map(
+            normalize_name
+        )
 
     for id_col in ("record_id", "project_id", "fact_id"):
         if id_col in frame.columns:
@@ -290,9 +288,7 @@ def _postprocess(spec: SourceSpec, frame: pd.DataFrame) -> pd.DataFrame:
 
     if "jurisdiction" in frame.columns:
         blank = frame["jurisdiction"].astype(str).str.strip() == ""
-        frame.loc[blank, "jurisdiction"] = (
-            "PR" if spec.source_id.startswith("pr_") else "US"
-        )
+        frame.loc[blank, "jurisdiction"] = "PR" if spec.source_id.startswith("pr_") else "US"
 
     provenance_columns = {
         "source_id",
@@ -336,11 +332,7 @@ def materialize_spec(root: Path, spec: SourceSpec, force: bool = False) -> dict:
         )
         for table in loaded
     ]
-    frame = (
-        pd.concat(frames, ignore_index=True)
-        if frames
-        else pd.DataFrame(columns=spec.columns)
-    )
+    frame = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=spec.columns)
     frame = _postprocess(spec, frame)
     missing = ensure_required_columns(frame, spec.columns)
     write_canonical_csv(frame, output_path, spec.columns)
@@ -369,15 +361,11 @@ def run(
     if unknown:
         raise ValueError(f"Unknown Tranche B source key(s): {', '.join(unknown)}")
 
-    results = [
-        materialize_spec(root_path, SOURCE_SPECS[key], force=force) for key in selected
-    ]
+    results = [materialize_spec(root_path, SOURCE_SPECS[key], force=force) for key in selected]
     statuses = {result["status"] for result in results}
     summary = {
         "schema_version": "tranche_b_source_intake_v1",
-        "status": (
-            "prepared" if statuses <= {"ok", "empty", "existing"} else "needs_fix"
-        ),
+        "status": ("prepared" if statuses <= {"ok", "empty", "existing"} else "needs_fix"),
         "sources_total": len(results),
         "sources_with_rows": sum(1 for result in results if result["rows"] > 0),
         "rows_total": sum(int(result["rows"]) for result in results),
