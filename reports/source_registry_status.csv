@@ -67,7 +67,8 @@ haf,federal,False,none,scripts/download_haf.py,data/staging/processed/pr_haf.csv
 exim_bank,federal,False,none,scripts/download_exim.py,data/staging/processed/pr_exim.csv,yearly,not_materialized,
 congressional_earmarks,federal,False,none,scripts/download_earmarks.py,data/staging/processed/pr_earmarks.csv,yearly,not_materialized,
 ofac_sdn,entity_resolution,False,none,scripts/download_ofac.py,data/staging/processed/ofac_sdn.csv,weekly,not_materialized,
-opencorporates,entity_resolution,False,api_key:OPENCORPORATES_API_TOKEN,scripts/download_opencorporates.py,data/staging/processed/pr_opencorporates.csv,ad_hoc,not_materialized,
+gleif_lei,entity_resolution,False,none,scripts/download_gleif.py,data/staging/processed/pr_gleif_entities.csv;data/staging/processed/pr_gleif_relationships.csv,monthly,not_materialized,"Free, keyless GLEIF LEI database filtered to Puerto Rico (legalAddress country PR + jurisdiction US-PR, de-duped by LEI). Corporate identity (legal name, status, legal form, local registration number, addresses) plus direct/ultimate parent relationships. Replaces the OpenCorporates corporate-identity slice for the larger / financial PR entities."
+sec_officers,entity_resolution,False,none,scripts/download_sec_officers.py,data/staging/processed/pr_sec_officers.csv,monthly,not_materialized,"Free, keyless officers/directors of PR-domiciled SEC filers, parsed from Form 3/4/5 insider-filing ownership XML. Replaces the OpenCorporates officers slice (whose seeds were all SEC filers)."
 pr_corporate_registry,manual_export,False,manual_export,scripts/ingest_active_contractors.py,data/staging/processed/pr_corporate_registry.csv,ad_hoc,not_materialized,
 medicaid_fmap,federal,False,none,scripts/download_medicaid_fmap.py,data/staging/processed/pr_medicaid_fmap.csv,yearly,not_materialized,
 ssa,federal,False,none,scripts/download_ssa.py,data/staging/processed/pr_ssa.csv,yearly,not_materialized,

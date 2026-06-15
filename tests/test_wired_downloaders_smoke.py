@@ -92,13 +92,18 @@ B5_TERRITORIAL_MUNICIPAL = [
 B6_BONDS_ENTITY_MANUAL = [
     ("msrb_rtrs_trades", "download_msrb_trades"),
     ("ofac_sdn", "download_ofac"),
-    ("opencorporates", "download_opencorporates"),
     ("dcaa_active_contractors", "download_active_contractors"),
+]
+
+# Free, keyless entity-resolution sources that replace the paid OpenCorporates.
+B7_FREE_ENTITY_RESOLUTION = [
+    ("gleif_lei", "download_gleif"),
+    ("sec_officers", "download_sec_officers"),
 ]
 
 # Government-flow coverage expansion (25 sources): 8 federal API producers +
 # 17 PR-territorial / federal manual dropzone readers.
-B7_GOVFLOW_25 = [
+B8_GOVFLOW_25 = [
     ("usaspending_loans", "download_usaspending_loans"),
     ("federal_audit_clearinghouse", "download_fac"),
     ("sam_exclusions", "download_sam_exclusions"),
@@ -133,7 +138,8 @@ WIRED_SOURCES = (
     + B4_DISASTER_RESEARCH
     + B5_TERRITORIAL_MUNICIPAL
     + B6_BONDS_ENTITY_MANUAL
-    + B7_GOVFLOW_25
+    + B7_FREE_ENTITY_RESOLUTION
+    + B8_GOVFLOW_25
 )
 
 

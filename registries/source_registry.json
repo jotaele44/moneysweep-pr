@@ -1183,20 +1183,39 @@
       "update_cadence": "weekly"
     },
     {
-      "source_id": "opencorporates",
+      "source_id": "gleif_lei",
       "family": "entity_resolution",
       "required": false,
-      "authentication": "api_key:OPENCORPORATES_API_TOKEN",
-      "endpoint_url": "https://opencorporates.com/",
-      "producer_script": "scripts/download_opencorporates.py",
+      "authentication": "none",
+      "endpoint_url": "https://api.gleif.org/api/v1/lei-records",
+      "producer_script": "scripts/download_gleif.py",
       "expected_outputs": [
-        "data/staging/processed/pr_opencorporates.csv"
+        "data/staging/processed/pr_gleif_entities.csv",
+        "data/staging/processed/pr_gleif_relationships.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
         "min_rows": 1
       },
-      "update_cadence": "ad_hoc"
+      "update_cadence": "monthly",
+      "notes": "Free, keyless GLEIF LEI database filtered to Puerto Rico (legalAddress\ncountry PR + jurisdiction US-PR, de-duped by LEI). Corporate identity\n(legal name, status, legal form, local registration number, addresses)\nplus direct/ultimate parent relationships. Replaces the OpenCorporates\ncorporate-identity slice for the larger / financial PR entities.\n"
+    },
+    {
+      "source_id": "sec_officers",
+      "family": "entity_resolution",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://data.sec.gov",
+      "producer_script": "scripts/download_sec_officers.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_sec_officers.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly",
+      "notes": "Free, keyless officers/directors of PR-domiciled SEC filers, parsed from\nForm 3/4/5 insider-filing ownership XML. Replaces the OpenCorporates\nofficers slice (whose seeds were all SEC filers).\n"
     },
     {
       "source_id": "pr_corporate_registry",

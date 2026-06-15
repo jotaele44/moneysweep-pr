@@ -76,6 +76,9 @@ fpds_report_builder,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging
 gaming_commission,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_gaming.csv,"PR Gaming Commission casino/slot-machine licensing and gaming-tax revenue. Operator-delivered exports.
 "
 gao_ig_audits,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_gao_ig_audits.csv,
+gleif_lei,entity_resolution,False,none,2,0,2,0,not_materialized,0,1,data/staging/processed/pr_gleif_entities.csv,"Free, keyless GLEIF LEI database filtered to Puerto Rico (legalAddress
+country PR + jurisdiction US-PR, de-duped by LEI). Corporate identity
+(legal name, status, legal form, local registration number,"
 grants_gov,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_grants.csv,
 hacienda,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_hacienda_revenues.csv,
 haf,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_haf.csv,
@@ -108,7 +111,6 @@ ofac_sdn,entity_resolution,False,none,1,0,1,0,not_materialized,0,1,data/staging/
 ogpe_permits,municipal,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ogpe_permits.csv,"OGPe construction-permit fees and green-energy incentives. Operator-delivered exports.
 "
 oia_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_oia_grants.csv,
-opencorporates,entity_resolution,False,api_key:OPENCORPORATES_API_TOKEN,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_opencorporates.csv,
 opm_fedscope,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_federal_payroll.csv,"Federal civilian payroll (employment + average salary) in PR from OPM FedScope. Source URL configurable via FEDSCOPE_DATA_URL; live pull requires network.
 "
 opportunity_zones,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_opportunity_zones.csv,"Qualified Opportunity Zone designated census tracts in PR (Treasury/IRS capital-gains incentive). Source URL configurable via OZ_DATA_URL; live pull requires network.
@@ -137,6 +139,10 @@ sba_ppp,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/p
 sbir,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sbir.csv,
 sec_13f_nport,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sec_holdings.csv,
 sec_edgar,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sec_edgar.csv,
+sec_officers,entity_resolution,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sec_officers.csv,"Free, keyless officers/directors of PR-domiciled SEC filers, parsed from
+Form 3/4/5 insider-filing ownership XML. Replaces the OpenCorporates
+officers slice (whose seeds were all SEC filers).
+"
 sf133_budget_execution,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sf133.csv,
 slfrf,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_slfrf_master.csv,
 snap_nap,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_snap_nap.csv,

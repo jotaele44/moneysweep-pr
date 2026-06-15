@@ -28,21 +28,25 @@ def test_api_key_status_reports_present_and_missing(monkeypatch, caplog):
     """Every api_key source reports OK/MISSING; key values are never logged."""
     secret = "DUMMY_SECRET_VALUE_DO_NOT_LOG"
     monkeypatch.setenv("SAM_API_KEY", secret)
-    monkeypatch.delenv("FEC_API_KEY", raising=False)
+    # financialdata_net is the stable "missing" example: FINANCIALDATA_API_KEY is
+    # intentionally unconfigured and never lives in .env, so it stays MISSING
+    # regardless of operator .env contents. (FEC is no longer a valid "missing"
+    # example now that its key is provisioned in .env.)
+    monkeypatch.delenv("FINANCIALDATA_API_KEY", raising=False)
 
     with caplog.at_level(logging.DEBUG):
         result = run_pipeline_preflight(REPO_ROOT, _logger(), strict=False)
 
     text = caplog.text
     assert "sam_entities" in text
-    assert "fec" in text
+    assert "financialdata_net" in text
     assert "[OK]" in text
     assert "[MISSING]" in text
     # The key value itself must never reach the logs.
     assert secret not in text
 
     missing_ids = {m["source_id"] for m in result["missing_keys"]}
-    assert "fec" in missing_ids
+    assert "financialdata_net" in missing_ids
     assert "sam_entities" not in missing_ids
 
 
