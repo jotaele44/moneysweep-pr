@@ -1,7 +1,7 @@
 # Source Materialization Readiness
 
-Total sources: **124**
-Automatable: **68** (ready: **68**, need API key at run time: 7)
+Total sources: **126**
+Automatable: **70** (ready: **70**, need API key at run time: 9)
 Queued / excluded: **56**
 
 ## Path types
@@ -9,13 +9,13 @@ Queued / excluded: **56**
 | path_type | automatable | count | recommended_action |
 | --- | --- | --- | --- |
 | `api_adapter` | True | 41 | Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated). |
-| `api_producer` | True | 27 | Run producer under strict preflight; public API path, set key if gated. |
+| `api_producer` | True | 29 | Run producer under strict preflight; public API path, set key if gated. |
 | `manual_export` | False | 36 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
 | `scraper_needed` | False | 15 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
 | `deferred_stub` | False | 2 | Intentionally unimplemented; remains not_materialized by design. |
 
-API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KEY`, `FINANCIALDATA_API_KEY`, `HIGHERGOV_API_KEY`, `SAM_API_KEY`
+API keys needed for full automatable materialization: `EIA_API_KEY`, `FAC_API_KEY`, `FEC_API_KEY`, `FINANCIALDATA_API_KEY`, `FRED_API_KEY`, `HIGHERGOV_API_KEY`, `SAM_API_KEY`
 
 ## api_adapter (41)
 
@@ -61,15 +61,17 @@ API keys needed for full automatable materialization: `FAC_API_KEY`, `FEC_API_KE
 - `wic`
 - `wioa`
 
-## api_producer (27)
+## api_producer (29)
 
 - `dol_whd_osha`
+- `eia_power_sector`
 - `emma_infra_revenue`
 - `fcc_usf`
 - `fec_committees`
 - `federal_audit_clearinghouse`
 - `fema_individual_assistance`
 - `financialdata_net`
+- `fred_timeseries`
 - `gao_ig_audits`
 - `gleif_lei`
 - `hud_cdbg_dr_public`

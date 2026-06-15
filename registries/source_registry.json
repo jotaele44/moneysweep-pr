@@ -113,6 +113,40 @@
       "notes": "Supplementary federal contract intel via HigherGov. PDFs require parse_highergov_pdfs."
     },
     {
+      "source_id": "eia_power_sector",
+      "family": "federal",
+      "required": false,
+      "authentication": "api_key:EIA_API_KEY",
+      "endpoint_url": "https://api.eia.gov/v2",
+      "producer_script": "scripts/download_eia.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_eia_power_sector.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly",
+      "notes": "EIA Open Data v2 power-sector time-series (net generation, capacity,\nconsumption) for Puerto Rico, per registries/eia_series.yaml. Requires a\nfree EIA_API_KEY (https://www.eia.gov/opendata/register.php). Supplements\nPREPA/LUMA operational monitoring.\n"
+    },
+    {
+      "source_id": "fred_timeseries",
+      "family": "federal",
+      "required": false,
+      "authentication": "api_key:FRED_API_KEY",
+      "endpoint_url": "https://api.stlouisfed.org/fred",
+      "producer_script": "scripts/download_fred.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_fred_timeseries.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly",
+      "notes": "FRED (St. Louis Fed) economic time-series for Puerto Rico indicators\n(employment, prices, income, etc.), per registries/fred_series.yaml.\nRequires a free FRED_API_KEY\n(https://fred.stlouisfed.org/docs/api/api_key.html). Cross-references\nterritorial budgets and bond markets.\n"
+    },
+    {
       "source_id": "fema_pa_openfema_v2",
       "family": "federal",
       "required": true,
