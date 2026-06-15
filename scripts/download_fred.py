@@ -110,7 +110,14 @@ def _get_with_retry(session: requests.Session, url: str, params: dict, logger) -
 
 def _fetch_series(
     session, api_key: str, series: dict, base_url: str, default_start: str, logger
-) -> list[dict]:
+) -> tuple[list[dict], bool]:
+    """Fetch one FRED series.
+
+    Returns ``(observations, fetch_ok)``. ``fetch_ok`` is ``False`` when the
+    request hard-failed (network exhausted / 4xx / 403) so the caller can refuse
+    to overwrite good prior data with a partial result. A series the API answers
+    with no observations returns ``([], True)`` — a legitimate empty, not a failure.
+    """
     series_id = series["series_id"]
     url = f"{base_url.rstrip('/')}/series/observations"
     params = {
@@ -125,9 +132,9 @@ def _fetch_series(
         params["observation_end"] = str(end)
     payload = _get_with_retry(session, url, params, logger)
     if payload is None:
-        return []
+        return [], False
     obs = payload.get("observations") or []
-    return obs
+    return obs, True
 
 
 def _cache_raw(series_id: str, rows: list[dict], raw_dir: Path) -> None:
@@ -217,16 +224,21 @@ def run(root: Path | None = None, force: bool = False, only: list[str] | None = 
     source_date = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     frames: list[pd.DataFrame] = []
     per_series_stats: list[tuple[str, int]] = []
+    failed_series: list[str] = []
 
     try:
         for idx, series in enumerate(series_list, start=1):
             series_id = series.get("series_id") or f"_unnamed_{idx}"
             logger.info(f"  [{idx}/{len(series_list)}] {series_id}")
             try:
-                raw_rows = _fetch_series(session, api_key, series, base_url, default_start, logger)
+                raw_rows, fetch_ok = _fetch_series(
+                    session, api_key, series, base_url, default_start, logger
+                )
             except Exception as e:
                 logger.error(f"  [{series_id}] fetch failed: {e}")
-                raw_rows = []
+                raw_rows, fetch_ok = [], False
+            if not fetch_ok:
+                failed_series.append(series_id)
             _cache_raw(series_id, raw_rows, raw_dir)
             df = _rows_to_dataframe(series, raw_rows, source_date)
             frames.append(df)
@@ -234,6 +246,24 @@ def run(root: Path | None = None, force: bool = False, only: list[str] | None = 
             logger.info(f"    {len(df):,} observations")
     finally:
         session.close()
+
+    # Never overwrite the canonical CSV with a partial result. A transient fetch
+    # failure for any series would otherwise silently drop its previously-good
+    # rows while still reporting OK (because another series populated). Fail loud
+    # and leave the prior file untouched so the operator can re-run.
+    if failed_series:
+        logger.error(
+            f"  {len(failed_series)} series failed to fetch ({', '.join(failed_series)}); "
+            f"refusing to overwrite {out_path.name} — prior data preserved."
+        )
+        return {
+            "status": "PARTIAL_FAILURE",
+            "rows": 0,
+            "series_count": len(per_series_stats),
+            "series_populated": 0,
+            "failed_series": failed_series,
+            "output_path": str(out_path),
+        }
 
     if frames:
         combined = pd.concat(frames, ignore_index=True)

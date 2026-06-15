@@ -5,10 +5,16 @@
 #
 # To add a series: append an entry. To remove one: delete it.
 #
-# Catalog candidates use widely-published PR-specific FRED series IDs.
-# Series whose IDs have been renamed or retired will surface as 0 rows in the
-# per-series summary — edit this file to adjust. The fetcher tolerates
-# per-series failures (logs and continues).
+# IMPORTANT: every id here must be a real FRED series. download_fred.py now
+# fails the whole refresh (status PARTIAL_FAILURE, prior CSV preserved) if any
+# series errors, so a bogus id breaks the producer rather than silently
+# yielding 0 rows. Verify new ids resolve at
+# https://fred.stlouisfed.org/series/<id> before adding.
+#
+# Pruned 2026-06-15 to ids confirmed to exist via the /fred/series API. Nine
+# guessed ids returned HTTP 400 "series does not exist" and were removed:
+# PRNA, PRMFG, PRCONS, RGMP72060, PRRGSP, PRSTHPI, PRBPPRIV, RPIPR, PRPOPL.
+# Re-add output / housing / income coverage only with confirmed FRED ids.
 #
 # FRED API reference:
 #   - https://fred.stlouisfed.org/docs/api/fred/series_observations.html
@@ -26,59 +32,12 @@ series:
     units: percent
     frequency: monthly
 
-  - series_id: PRNA
-    description: "Puerto Rico all employees, total nonfarm (thousands, monthly, NSA)"
-    units: thousands of persons
-    frequency: monthly
-
-  - series_id: PRMFG
-    description: "Puerto Rico all employees, manufacturing (thousands, monthly, NSA)"
-    units: thousands of persons
-    frequency: monthly
-
   - series_id: PRLF
-    description: "Puerto Rico civilian labor force (thousands, monthly, NSA)"
-    units: thousands of persons
+    description: "Puerto Rico civilian labor force (persons, monthly, SA)"
+    units: persons
     frequency: monthly
 
-  - series_id: PRCONS
-    description: "Puerto Rico all employees, construction (thousands, monthly, NSA)"
-    units: thousands of persons
-    frequency: monthly
-
-  # -------- Output / GDP --------
-  - series_id: RGMP72060
-    description: "Real GDP, San Juan-Carolina-Caguas, PR MSA (annual, chained dollars)"
-    units: millions of chained 2017 dollars
-    frequency: annual
-
-  - series_id: PRRGSP
-    description: "Real gross state product, Puerto Rico (annual)"
-    units: millions of chained dollars
-    frequency: annual
-
-  # -------- Housing --------
-  - series_id: PRSTHPI
-    description: "Puerto Rico house price index (quarterly, NSA, 1980=100)"
-    units: index 1980 q1 = 100
-    frequency: quarterly
-
-  - series_id: PRBPPRIV
-    description: "Puerto Rico new private housing units authorized by building permits (monthly, NSA)"
-    units: units
-    frequency: monthly
-
-  # -------- Income / demographic --------
-  - series_id: RPIPR
-    description: "Real per capita personal income, Puerto Rico (annual)"
-    units: chained 2017 dollars
-    frequency: annual
-
-  - series_id: PRPOPL
-    description: "Resident population, Puerto Rico (annual, thousands)"
-    units: thousands of persons
-    frequency: annual
-
+  # -------- Wages --------
   - series_id: STTMINWGPR
     description: "Puerto Rico state minimum wage (annual, $/hr)"
     units: dollars per hour

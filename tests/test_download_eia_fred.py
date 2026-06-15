@@ -132,3 +132,37 @@ def test_fred_rows_to_dataframe_maps_missing_and_formats():
     assert df.iloc[0]["units"] == "percent"
     assert df.iloc[1]["value"] == ""  # "." -> empty
     assert df.iloc[2]["value"] == "1234.5"  # stripped
+
+
+# --------------------------------------------------------------------------
+# Partial-fetch-failure guard: a hard failure must NOT overwrite the canonical
+# CSV with a partial result (regression for the silent-data-loss review).
+# --------------------------------------------------------------------------
+
+_PRIOR_CSV = "series_id,date,value\nPRIOR,2020-01-01,42\n"
+
+
+def test_eia_run_preserves_prior_csv_on_fetch_failure(monkeypatch, tmp_path):
+    monkeypatch.setattr(E, "get_eia_api_key", lambda: "TESTKEY")
+    monkeypatch.setattr(E, "_fetch_series", lambda *a, **k: ([], False))  # simulate hard failure
+    out_dir = tmp_path / "data" / "staging" / "processed"
+    out_dir.mkdir(parents=True)
+    prior = out_dir / E.OUTPUT_PATH.name
+    prior.write_text(_PRIOR_CSV, encoding="utf-8")
+    result = E.run(root=tmp_path, force=True, only=["pr_net_generation_all_fuels"])
+    assert result["status"] == "PARTIAL_FAILURE"
+    assert "pr_net_generation_all_fuels" in result.get("failed_series", [])
+    assert prior.read_text(encoding="utf-8") == _PRIOR_CSV  # untouched
+
+
+def test_fred_run_preserves_prior_csv_on_fetch_failure(monkeypatch, tmp_path):
+    monkeypatch.setattr(F, "get_fred_api_key", lambda: "TESTKEY")
+    monkeypatch.setattr(F, "_fetch_series", lambda *a, **k: ([], False))  # simulate hard failure
+    out_dir = tmp_path / "data" / "staging" / "processed"
+    out_dir.mkdir(parents=True)
+    prior = out_dir / F.OUTPUT_PATH.name
+    prior.write_text(_PRIOR_CSV, encoding="utf-8")
+    result = F.run(root=tmp_path, force=True, only=["PRLF"])
+    assert result["status"] == "PARTIAL_FAILURE"
+    assert "PRLF" in result.get("failed_series", [])
+    assert prior.read_text(encoding="utf-8") == _PRIOR_CSV  # untouched
