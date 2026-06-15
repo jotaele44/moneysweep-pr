@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "contractor_reference.schema.json",
+  "title": "Contractor reference staging row",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "source_id",
+    "source_file",
+    "contractor_name",
+    "normalized_name",
+    "uei",
+    "cage",
+    "duns",
+    "agency_reference",
+    "fiscal_year",
+    "listing_type",
+    "raw_text_excerpt",
+    "evidence_tier",
+    "confidence"
+  ],
+  "properties": {
+    "source_id": {"type": "string"},
+    "source_file": {"type": "string"},
+    "contractor_name": {"type": "string"},
+    "normalized_name": {"type": "string"},
+    "uei": {"type": "string"},
+    "cage": {"type": "string"},
+    "duns": {"type": "string"},
+    "agency_reference": {"type": "string"},
+    "fiscal_year": {"type": "string"},
+    "listing_type": {"type": "string"},
+    "raw_text_excerpt": {"type": "string"},
+    "evidence_tier": {"type": "string"},
+    "confidence": {"type": "string"}
+  }
+}
