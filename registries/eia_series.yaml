@@ -1,0 +1,161 @@
+# EIA PR power-sector time series catalog
+# -----------------------------------------------------------------------------
+# Consumed by scripts/download_eia.py. Each entry resolves to one or more
+# requests against the EIA API v2 (https://api.eia.gov/v2/<route>/data/).
+#
+# To add a series: append a new entry with a unique series_id. To remove one:
+# delete the entry — no code changes required.
+#
+# EIA API v2 references:
+#   - https://www.eia.gov/opendata/documentation.php
+#   - https://www.eia.gov/opendata/browser/electricity (route + facet browser)
+#
+# Notes on PR coverage:
+#   - PR appears as state code "PR" in facets that accept stateid/location.
+#   - PR is included in the electric-power-operational-data and retail-sales
+#     endpoints. Some EIA datasets (forms 860/923 detail tables) may lag for PR.
+
+api_version: v2
+base_url: https://api.eia.gov/v2
+default_frequency: monthly
+default_start: "2010-01"
+# default_end omitted — fetcher uses the current period
+
+series:
+  # -------- Net generation by fuel type (EIA-923, monthly) ------------------
+  - series_id: pr_net_generation_all_fuels
+    description: "PR net electricity generation, all fuels, all sectors (thousand MWh)"
+    route: electricity/electric-power-operational-data
+    frequency: monthly
+    data_field: generation
+    facets:
+      location: ["PR"]
+      fueltypeid: ["ALL"]
+      sectorid: ["99"]   # 99 = all sectors
+    units: thousand megawatthours
+
+  - series_id: pr_net_generation_petroleum
+    description: "PR net electricity generation, petroleum-fired (thousand MWh)"
+    route: electricity/electric-power-operational-data
+    frequency: monthly
+    data_field: generation
+    facets:
+      location: ["PR"]
+      fueltypeid: ["PEL"]
+      sectorid: ["99"]
+    units: thousand megawatthours
+
+  - series_id: pr_net_generation_natural_gas
+    description: "PR net electricity generation, natural gas (thousand MWh)"
+    route: electricity/electric-power-operational-data
+    frequency: monthly
+    data_field: generation
+    facets:
+      location: ["PR"]
+      fueltypeid: ["NG"]
+      sectorid: ["99"]
+    units: thousand megawatthours
+
+  - series_id: pr_net_generation_coal
+    description: "PR net electricity generation, coal (thousand MWh)"
+    route: electricity/electric-power-operational-data
+    frequency: monthly
+    data_field: generation
+    facets:
+      location: ["PR"]
+      fueltypeid: ["COW"]
+      sectorid: ["99"]
+    units: thousand megawatthours
+
+  - series_id: pr_net_generation_all_renewables
+    description: "PR net electricity generation, all renewables (thousand MWh)"
+    route: electricity/electric-power-operational-data
+    frequency: monthly
+    data_field: generation
+    facets:
+      location: ["PR"]
+      fueltypeid: ["REN"]
+      sectorid: ["99"]
+    units: thousand megawatthours
+
+  # -------- Retail electricity sales (EIA-861, monthly) -------------------
+  - series_id: pr_retail_sales_residential
+    description: "PR retail electricity sales, residential sector (MWh)"
+    route: electricity/retail-sales
+    frequency: monthly
+    data_field: sales
+    facets:
+      stateid: ["PR"]
+      sectorid: ["RES"]
+    units: million kilowatthours
+
+  - series_id: pr_retail_sales_commercial
+    description: "PR retail electricity sales, commercial sector (MWh)"
+    route: electricity/retail-sales
+    frequency: monthly
+    data_field: sales
+    facets:
+      stateid: ["PR"]
+      sectorid: ["COM"]
+    units: million kilowatthours
+
+  - series_id: pr_retail_sales_industrial
+    description: "PR retail electricity sales, industrial sector (MWh)"
+    route: electricity/retail-sales
+    frequency: monthly
+    data_field: sales
+    facets:
+      stateid: ["PR"]
+      sectorid: ["IND"]
+    units: million kilowatthours
+
+  - series_id: pr_retail_sales_all_sectors
+    description: "PR retail electricity sales, all sectors (MWh)"
+    route: electricity/retail-sales
+    frequency: monthly
+    data_field: sales
+    facets:
+      stateid: ["PR"]
+      sectorid: ["ALL"]
+    units: million kilowatthours
+
+  # -------- Retail electricity prices (EIA-861, monthly) ------------------
+  - series_id: pr_retail_price_residential
+    description: "PR average retail electricity price, residential (cents/kWh)"
+    route: electricity/retail-sales
+    frequency: monthly
+    data_field: price
+    facets:
+      stateid: ["PR"]
+      sectorid: ["RES"]
+    units: cents per kilowatthour
+
+  - series_id: pr_retail_price_commercial
+    description: "PR average retail electricity price, commercial (cents/kWh)"
+    route: electricity/retail-sales
+    frequency: monthly
+    data_field: price
+    facets:
+      stateid: ["PR"]
+      sectorid: ["COM"]
+    units: cents per kilowatthour
+
+  - series_id: pr_retail_price_industrial
+    description: "PR average retail electricity price, industrial (cents/kWh)"
+    route: electricity/retail-sales
+    frequency: monthly
+    data_field: price
+    facets:
+      stateid: ["PR"]
+      sectorid: ["IND"]
+    units: cents per kilowatthour
+
+  - series_id: pr_retail_price_all_sectors
+    description: "PR average retail electricity price, all sectors (cents/kWh)"
+    route: electricity/retail-sales
+    frequency: monthly
+    data_field: price
+    facets:
+      stateid: ["PR"]
+      sectorid: ["ALL"]
+    units: cents per kilowatthour
