@@ -33,6 +33,7 @@ ases_plan_vital,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,dat
 "
 bde_loans,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_bde_loans.csv,"Banco de Desarrollo Economico (Economic Development Bank) territorial business loans. Distinct from federal SBA loans. Operator-delivered exports.
 "
+census_gov_finances,territorial,False,api_key:CENSUS_API_KEY,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_census_gov_finances.csv,Census government-finance / tax-collection figures for PR (FIPS 72) via the Census Data API. Automatable (needs CENSUS_API_KEY); materialized by scripts/download_census_gov_finances.py. Caveat - Censu
 chip,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_chip.csv,
 cms_open_payments,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cms_open_payments.csv,
 cofina,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cofina.csv,
@@ -60,9 +61,10 @@ consumption) for Puerto Rico, per registries/eia_series.yaml. Requires a
 free EIA_API_KEY (https://www.eia.gov/opendata/register.ph"
 emma_infra_revenue,infrastructure_revenue,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_emma_revenue_disclosures.csv,MSRB EMMA continuing-disclosure revenue extraction (toll/water/power bond-pledged revenue). The one authentication-free automatable revenue spine; cross-checks the manual dropzone figures. PDF extract
 epa_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_epa_grants.csv,
-eqb_epa_icis,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_eqb_permits.csv,PR Environmental Quality Board + EPA ICIS environmental permits.
+eqb_epa_icis,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_epa_echo_icis.csv,"PR environmental enforcement (EPA ICIS-FE&C / ECHO) — federal penalties assessed against PR facilities. Automatable via the public, keyless ECHO Enforcement Case Search REST API (echodata.epa.gov; X_A"
 equitable_sharing,federal,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_equitable_sharing.csv,"DOJ/Treasury equitable-sharing asset-forfeiture payouts to PR law enforcement. Operator-delivered exports.
 "
+estadisticas_pr_external_trade,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_external_trade.csv,PR external-trade series (imports / exports) from the Instituto de Estadisticas / Datos.PR CKAN portal. Automatable via the CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisti
 exim_bank,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_exim.csv,
 fcc_usf,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fcc_usf.csv,
 fdic,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fdic.csv,
@@ -74,12 +76,13 @@ fema_individual_assistance,federal,False,none,1,0,1,0,not_materialized,0,1,data/
 "
 fhlb,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fhlb.csv,
 financialdata_net,optional_commercial_enrichment,False,api_key:FINANCIALDATA_API_KEY,4,0,4,0,not_materialized,0,0,outputs/enrichment/financialdata_identifier_crosswalk.csv,OPTIONAL commercial provider for public-market entity resolution (CUSIP / ISIN / FIGI / LEI / CIK / ticker crosswalks). NOT a required source — never wired into coverage gates. Live use requires BOTH 
-follow_the_money,political_finance,False,manual_export,4,0,4,0,not_materialized,0,1,data/staging/processed/pr_sf133_budget_execution.csv,Follow the Money export data for PR. ingest_follow_the_money.py is a dropzone reader (no network code) producing 4 outputs from operator-delivered CSV exports in data/raw/follow_the_money/. Previously
+follow_the_money,political_finance,False,manual_export,3,0,3,0,not_materialized,0,1,data/staging/processed/pr_sf133_budget_execution.csv,"PR public-money export data (SF-133 budget execution, municipal political/federal bridge, facility contract matches). ingest_follow_the_money.py is a dropzone reader (no network code) producing 3 outp"
 fpds_report_builder,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fpds_report_builder.csv,FPDS Report Builder FY2018-2024 ingestion. Supplements USAspending.
 fred_timeseries,federal,False,api_key:FRED_API_KEY,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fred_timeseries.csv,"FRED (St. Louis Fed) economic time-series for Puerto Rico indicators
 (employment, prices, income, etc.), per registries/fred_series.yaml.
 Requires a free FRED_API_KEY
 (https://fred.stlouisfed.org/docs"
+fta_ntd,infrastructure,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_fta_ntd.csv,"FTA National Transit Database — financial, funding-source, and operating-expense data for PR transit agencies (PRHTA, PRITA, Ports Authority). Automatable via the Socrata SODA API on data.transportati"
 gaming_commission,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_gaming.csv,"PR Gaming Commission casino/slot-machine licensing and gaming-tax revenue. Operator-delivered exports.
 "
 gao_ig_audits,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_gao_ig_audits.csv,
@@ -88,6 +91,7 @@ country PR + jurisdiction US-PR, de-duped by LEI). Corporate identity
 (legal name, status, legal form, local registration number,"
 grants_gov,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_grants.csv,
 hacienda,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_hacienda_revenues.csv,
+hacienda_sut_ivu,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_hacienda_sut_ivu.csv,"PR Treasury Sales & Use Tax (IVU/SUT) collections by fiscal year / month / NAICS, plus COFIM municipal IVU — the largest PR consumption-tax revenue stream, not otherwise captured. Scraper surface (hac"
 haf,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_haf.csv,
 hhs_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_hhs_grants.csv,
 hud_cdbg_mit,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cdbg_mit.csv,"HUD CDBG-Mitigation (CFDA 14.272) allocations to PR via USASpending. Distinct from CDBG-DR (hud_cdbg_dr_public) and DRGR reporting (hud_drgr_authorized).
@@ -102,7 +106,7 @@ medicaid_fmap,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/proce
 medicare_advantage,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_medicare_advantage.csv,
 medicare_parts,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_medicare_parts.csv,
 msrb_rtrs_trades,bonds,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_msrb_trades.csv,
-municipal_finance,municipal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_municipal_finance.csv,
+municipal_finance,municipal,False,api_key:FAC_API_KEY,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_municipal_finance.csv,"PR municipal Single Audit (SF-SAC) records from the Federal Audit Clearinghouse (api.fac.gov/general, auditee_state=PR, filtered to MUNICIPIO/MUNICIPALITY OF auditees). API-switch from the OCAM scrape"
 nara_catalog_aws_open_data,provenance_archival,False,none,2,0,2,0,not_materialized,0,0,data/staging/processed/nara_nextgen/nara_bulk_catalog_index.csv,"Future candidate for bulk archival metadata. Evaluate separately from the targeted Catalog API path after dataset location, format, licensing, and storage policy are verified."
 nara_nextgen_catalog_v3,provenance_archival,False,api_key:NARA_API_KEY,2,0,2,0,not_materialized,0,0,data/staging/processed/nara_nextgen/nara_record_locator_index.csv,"Targeted archival locator only. Do not use as a contract-award, financial-flow, or bulk archival source. Fetcher intentionally not implemented until a credential and bounded query allowlist are availa"
 ncua,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ncua.csv,
@@ -127,9 +131,17 @@ ports_airports_contracts,infrastructure,False,manual_export,1,0,1,0,not_material
 ports_airports_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ports_airports_revenue.csv,Aggregate port/airport fee revenue (PR Ports Authority + Aerostar/SJU) from audited financials and EMMA disclosures.
 ports_authority,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ports_concessions.csv,"PR Ports Authority concession fees and leases (e.g. Aerostar/LMM airport). Operator-delivered exports.
 "
+pr_act_154_excise,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_act_154_excise.csv,"Act 154 excise tax on foreign controlled corporations — historically ~$1.8B/yr and 13-21% of the General Fund, the single largest GF revenue line. Hacienda statistics surface; queued for a scraping ad"
 pr_act_60_decrees,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_act60_decrees.csv,
 pr_corporate_registry,manual_export,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_corporate_registry.csv,
+pr_general_fund_revenues,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_general_fund_revenues.csv,"Consolidated PR General Fund net revenues by source (Instituto de Estadisticas ""Ingresos Netos al Fondo General"") — one authoritative series covering Act 154, income tax, IVU, arbitrios, licenses, lot"
+pr_income_tax_collections,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_income_tax_collections.csv,PR individual & corporate income tax collections — the income-contribution series from the Instituto de Estadisticas / Datos.PR CKAN portal. Largest recurring General Fund revenue category. Automatabl
 pr_pensions,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_pension_funds.csv,
+prasa_cer,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prasa_cer.csv,P0 - PRASA Capital Expenditure Report (CER) / audited financial-statement line items. Core financial-infrastructure evidence for PR's largest recovery-driven public corporation. Operator-delivered CSV
+prasa_cip,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prasa_cip.csv,"P0 - PRASA Capital Improvement Program (CIP) project list (project, cost, status, fiscal year). Operator-delivered CSV extracts.
+"
+prasa_completed_projects,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prasa_completed_projects.csv,"P0 - PRASA completed projects — FEMA 406 / COR3 recovery-infrastructure join bridge. Operator-delivered CSV extracts.
+"
 prasa_contracts_master,infrastructure,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/prasa_contracts_master.csv,Vendor-level aggregation of pr_prasa_contracts.csv. Closes the previously-dangling prasa_contracts_master.csv output (declared with no producer). Derived source; runs after the prasa dropzone ingest.
 prasa_rate_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prasa_rate_revenue.csv,"Aggregate PRASA water/sewer rate revenue from audited financials, rate-case filings, and EMMA disclosures. Shares scripts/ingest_utility_revenue.py with prepa_luma_rate_revenue."
 prepa_luma_genera,infrastructure,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prepa_contracts.csv,PREPA / LUMA Energy / Genera PR contracts and operating data.

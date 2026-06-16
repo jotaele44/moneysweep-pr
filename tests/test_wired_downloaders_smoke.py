@@ -83,8 +83,8 @@ B5_TERRITORIAL_MUNICIPAL = [
     ("p3_authority", "download_p3"),
     ("pr_pensions", "download_pr_pensions"),
     ("rum_cover_over", "download_rum_coverover"),
-    ("municipal_finance", "download_municipal"),
-    ("eqb_epa_icis", "download_eqb"),
+    ("municipal_finance", "download_fac_municipal"),
+    ("eqb_epa_icis", "download_epa_echo_icis"),
     ("compras_pr", "download_compras"),
     ("prepa_luma_genera", "download_prepa_contracts"),
 ]

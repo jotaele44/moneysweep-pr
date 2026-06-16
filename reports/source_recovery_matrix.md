@@ -1,21 +1,21 @@
 # Source Materialization Readiness
 
-Total sources: **126**
-Automatable: **70** (ready: **70**, need API key at run time: 9)
-Queued / excluded: **56**
+Total sources: **136**
+Automatable: **77** (ready: **77**, need API key at run time: 11)
+Queued / excluded: **59**
 
 ## Path types
 
 | path_type | automatable | count | recommended_action |
 | --- | --- | --- | --- |
 | `api_adapter` | True | 41 | Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated). |
-| `api_producer` | True | 29 | Run producer under strict preflight; public API path, set key if gated. |
-| `manual_export` | False | 36 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
+| `api_producer` | True | 36 | Run producer under strict preflight; public API path, set key if gated. |
+| `manual_export` | False | 39 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
 | `scraper_needed` | False | 15 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
 | `deferred_stub` | False | 2 | Intentionally unimplemented; remains not_materialized by design. |
 
-API keys needed for full automatable materialization: `EIA_API_KEY`, `FAC_API_KEY`, `FEC_API_KEY`, `FINANCIALDATA_API_KEY`, `FRED_API_KEY`, `HIGHERGOV_API_KEY`, `SAM_API_KEY`
+API keys needed for full automatable materialization: `CENSUS_API_KEY`, `EIA_API_KEY`, `FAC_API_KEY`, `FEC_API_KEY`, `FINANCIALDATA_API_KEY`, `FRED_API_KEY`, `HIGHERGOV_API_KEY`, `SAM_API_KEY`
 
 ## api_adapter (41)
 
@@ -61,27 +61,34 @@ API keys needed for full automatable materialization: `EIA_API_KEY`, `FAC_API_KE
 - `wic`
 - `wioa`
 
-## api_producer (29)
+## api_producer (36)
 
+- `census_gov_finances`
 - `dol_whd_osha`
 - `eia_power_sector`
 - `emma_infra_revenue`
+- `eqb_epa_icis`
+- `estadisticas_pr_external_trade`
 - `fcc_usf`
 - `fec_committees`
 - `federal_audit_clearinghouse`
 - `fema_individual_assistance`
 - `financialdata_net`
 - `fred_timeseries`
+- `fta_ntd`
 - `gao_ig_audits`
 - `gleif_lei`
 - `hud_cdbg_dr_public`
 - `hud_cdbg_mit`
 - `lihtc`
+- `municipal_finance`
 - `ncua`
 - `ngo_integration_layer`
 - `nmtc`
 - `opm_fedscope`
 - `opportunity_zones`
+- `pr_general_fund_revenues`
+- `pr_income_tax_collections`
 - `prasa_contracts_master`
 - `sam_exclusions`
 - `sec_13f_nport`
@@ -98,7 +105,7 @@ API keys needed for full automatable materialization: `EIA_API_KEY`, `FAC_API_KE
 - `nara_catalog_aws_open_data`
 - `nara_nextgen_catalog_v3`
 
-## manual_export (36)
+## manual_export (39)
 
 - `act_toll_revenue`
 - `act_tolls_concession`
@@ -130,6 +137,9 @@ API keys needed for full automatable materialization: `EIA_API_KEY`, `FAC_API_KE
 - `pr_cabilderos`
 - `pr_corporate_registry`
 - `prasa`
+- `prasa_cer`
+- `prasa_cip`
+- `prasa_completed_projects`
 - `prasa_rate_revenue`
 - `prepa_luma_rate_revenue`
 - `prpha_housing_subsidy`
@@ -144,11 +154,11 @@ API keys needed for full automatable materialization: `EIA_API_KEY`, `FAC_API_KE
 - `compras_pr`
 - `cor3`
 - `emma_bonds`
-- `eqb_epa_icis`
 - `hacienda`
+- `hacienda_sut_ivu`
 - `msrb_rtrs_trades`
-- `municipal_finance`
 - `p3_authority`
+- `pr_act_154_excise`
 - `pr_act_60_decrees`
 - `pr_pensions`
 - `prepa_luma_genera`
