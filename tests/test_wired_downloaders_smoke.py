@@ -131,6 +131,12 @@ B8_GOVFLOW_25 = [
     ("prpha_housing_subsidy", "ingest_prpha_housing_subsidy"),
 ]
 
+# Key-gated federal time-series producers (EIA power sector, FRED economics).
+B9_TIMESERIES = [
+    ("eia_power_sector", "download_eia"),
+    ("fred_timeseries", "download_fred"),
+]
+
 WIRED_SOURCES = (
     B1_FEDERAL_GRANTS
     + B2_BENEFITS_HEALTH
@@ -140,6 +146,7 @@ WIRED_SOURCES = (
     + B6_BONDS_ENTITY_MANUAL
     + B7_FREE_ENTITY_RESOLUTION
     + B8_GOVFLOW_25
+    + B9_TIMESERIES
 )
 
 
