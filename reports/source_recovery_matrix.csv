@@ -58,7 +58,7 @@ gleif_lei,False,api_producer,True,True,,False,True,scripts/download_gleif.py,2,0
 hud_cdbg_dr_public,True,api_producer,True,True,,False,True,scripts/download_cdbg_dr.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 hud_cdbg_mit,False,api_producer,True,True,,False,True,scripts/download_cdbg_mit.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 lihtc,False,api_producer,True,True,,False,True,scripts/download_lihtc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
-municipal_finance,False,api_producer,True,True,FAC_API_KEY,False,True,scripts/download_fac_municipal.py,1,1,1,,"Run producer under strict preflight; public API path, set key if gated."
+municipal_finance,False,api_producer,True,True,FAC_API_KEY,False,True,scripts/download_fac_municipal.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 ncua,False,api_producer,True,True,,False,True,scripts/download_ncua.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 ngo_integration_layer,False,api_producer,True,True,,False,True,scripts/ngo_integration.py,3,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 nmtc,False,api_producer,True,True,,False,True,scripts/download_nmtc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."

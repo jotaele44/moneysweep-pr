@@ -106,6 +106,7 @@ medicaid_fmap,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/proce
 medicare_advantage,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_medicare_advantage.csv,
 medicare_parts,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_medicare_parts.csv,
 msrb_rtrs_trades,bonds,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_msrb_trades.csv,
+municipal_finance,municipal,False,api_key:FAC_API_KEY,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_municipal_finance.csv,"PR municipal Single Audit (SF-SAC) records from the Federal Audit Clearinghouse (api.fac.gov/general, auditee_state=PR, filtered to MUNICIPIO/MUNICIPALITY OF auditees). API-switch from the OCAM scrape"
 nara_catalog_aws_open_data,provenance_archival,False,none,2,0,2,0,not_materialized,0,0,data/staging/processed/nara_nextgen/nara_bulk_catalog_index.csv,"Future candidate for bulk archival metadata. Evaluate separately from the targeted Catalog API path after dataset location, format, licensing, and storage policy are verified."
 nara_nextgen_catalog_v3,provenance_archival,False,api_key:NARA_API_KEY,2,0,2,0,not_materialized,0,0,data/staging/processed/nara_nextgen/nara_record_locator_index.csv,"Targeted archival locator only. Do not use as a contract-award, financial-flow, or bulk archival source. Fetcher intentionally not implemented until a credential and bounded query allowlist are availa"
 ncua,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ncua.csv,
@@ -180,4 +181,3 @@ va_benefits,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/process
 wic,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_wic.csv,
 wioa,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_wioa.csv,
 highergov_supplemental,federal,False,api_key:HIGHERGOV_API_KEY,2,1,1,0,partially_materialized,0,1,data/raw/HigherGov/,Supplementary federal contract intel via HigherGov. PDFs require parse_highergov_pdfs.
-municipal_finance,municipal,False,api_key:FAC_API_KEY,1,0,0,1,partially_materialized,0,1,data/staging/processed/pr_municipal_finance.csv,"PR municipal Single Audit (SF-SAC) records from the Federal Audit Clearinghouse (api.fac.gov/general, auditee_state=PR, filtered to MUNICIPIO/MUNICIPALITY OF auditees). API-switch from the OCAM scrape"
