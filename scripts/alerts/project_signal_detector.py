@@ -1,4 +1,5 @@
 """Primary project-emergence detector for Contract-Sweeper."""
+
 from __future__ import annotations
 
 import csv
@@ -17,7 +18,11 @@ _NONWORD = re.compile(r"[^\wáéíóúüñÁÉÍÓÚÜÑ]+", re.UNICODE)
 
 
 class ProjectSignalDetector:
-    def __init__(self, watchlist: list[dict[str, Any]] | None = None, thresholds: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        watchlist: list[dict[str, Any]] | None = None,
+        thresholds: dict[str, Any] | None = None,
+    ):
         self.watchlist = watchlist if watchlist is not None else load_project_watchlist()
         self.thresholds = thresholds if thresholds is not None else load_alert_thresholds()
 
@@ -32,7 +37,12 @@ class ProjectSignalDetector:
                     continue
                 project_id = str(project["project_id"])
                 source = str(record.get("source_dataset") or record.get("source") or "")
-                vendor = str(record.get("recipient_name") or record.get("vendor") or record.get("vendor_name") or "")
+                vendor = str(
+                    record.get("recipient_name")
+                    or record.get("vendor")
+                    or record.get("vendor_name")
+                    or ""
+                )
                 scored = score_record(
                     record,
                     project,
@@ -44,37 +54,69 @@ class ProjectSignalDetector:
                     continue
                 dedupe_key = build_dedupe_key(project_id, record)
                 alert_id = self._alert_id(project_id, dedupe_key)
-                events.append(AlertEvent(
-                    alert_id=alert_id,
-                    project_id=project_id,
-                    canonical_name=str(project.get("canonical_name", project_id)),
-                    alert_level=scored.level,
-                    score=scored.score,
-                    trigger_reason=scored.reasons,
-                    source=source,
-                    source_family=source,
-                    record_id=str(record.get("record_id") or record.get("award_id") or record.get("id") or ""),
-                    record_date=str(record.get("record_date") or record.get("award_date") or record.get("date") or ""),
-                    agency=str(record.get("agency") or record.get("awarding_agency") or record.get("awarding_agency_name") or ""),
-                    vendor=vendor,
-                    amount=_as_float(record.get("obligated_amount") or record.get("amount") or record.get("award_amount")),
-                    municipio=str(record.get("municipio") or record.get("pop_county") or record.get("location") or ""),
-                    parcel_id=str(record.get("parcel_id") or record.get("facility") or ""),
-                    project_stage=scored.stage,
-                    confidence=scored.confidence,
-                    requires_spiderweb=scored.requires_spiderweb,
-                    dedupe_key=dedupe_key,
-                    evidence={"source_record": record},
-                ))
+                events.append(
+                    AlertEvent(
+                        alert_id=alert_id,
+                        project_id=project_id,
+                        canonical_name=str(project.get("canonical_name", project_id)),
+                        alert_level=scored.level,
+                        score=scored.score,
+                        trigger_reason=scored.reasons,
+                        source=source,
+                        source_family=source,
+                        record_id=str(
+                            record.get("record_id")
+                            or record.get("award_id")
+                            or record.get("id")
+                            or ""
+                        ),
+                        record_date=str(
+                            record.get("record_date")
+                            or record.get("award_date")
+                            or record.get("date")
+                            or ""
+                        ),
+                        agency=str(
+                            record.get("agency")
+                            or record.get("awarding_agency")
+                            or record.get("awarding_agency_name")
+                            or ""
+                        ),
+                        vendor=vendor,
+                        amount=_as_float(
+                            record.get("obligated_amount")
+                            or record.get("amount")
+                            or record.get("award_amount")
+                        ),
+                        municipio=str(
+                            record.get("municipio")
+                            or record.get("pop_county")
+                            or record.get("location")
+                            or ""
+                        ),
+                        parcel_id=str(record.get("parcel_id") or record.get("facility") or ""),
+                        project_stage=scored.stage,
+                        confidence=scored.confidence,
+                        requires_spiderweb=scored.requires_spiderweb,
+                        dedupe_key=dedupe_key,
+                        evidence={"source_record": record},
+                    )
+                )
         return dedupe_events(events)
 
     def _matches_project(self, record: dict[str, Any], project: dict[str, Any]) -> bool:
         text = _normalize(" ".join(str(value) for value in record.values()))
-        names = [project.get("canonical_name", ""), *project.get("aliases", []), *project.get("entity_terms", [])]
+        names = [
+            project.get("canonical_name", ""),
+            *project.get("aliases", []),
+            *project.get("entity_terms", []),
+        ]
         return any(_normalize(str(name)) in text for name in names if str(name).strip())
 
     def _source_family_counts(self, records: list[dict[str, Any]]) -> dict[str, int]:
-        counts: dict[str, set[str]] = {str(project["project_id"]): set() for project in self.watchlist}
+        counts: dict[str, set[str]] = {
+            str(project["project_id"]): set() for project in self.watchlist
+        }
         for record in records:
             source = str(record.get("source_dataset") or record.get("source") or "unknown")
             for project in self.watchlist:
@@ -86,7 +128,12 @@ class ProjectSignalDetector:
     def _vendor_counts(records: list[dict[str, Any]]) -> dict[str, int]:
         counts: dict[str, int] = {}
         for record in records:
-            vendor = str(record.get("recipient_name") or record.get("vendor") or record.get("vendor_name") or "").lower()
+            vendor = str(
+                record.get("recipient_name")
+                or record.get("vendor")
+                or record.get("vendor_name")
+                or ""
+            ).lower()
             if vendor:
                 counts[vendor] = counts.get(vendor, 0) + 1
         return counts
@@ -96,7 +143,9 @@ class ProjectSignalDetector:
         return f"ALERT-{project_id}-{hashlib.sha1(dedupe_key.encode()).hexdigest()[:10].upper()}"
 
 
-def detect_project_signals(records: Iterable[dict[str, Any]], watchlist=None, thresholds=None) -> list[AlertEvent]:
+def detect_project_signals(
+    records: Iterable[dict[str, Any]], watchlist=None, thresholds=None
+) -> list[AlertEvent]:
     return ProjectSignalDetector(watchlist=watchlist, thresholds=thresholds).detect(records)
 
 

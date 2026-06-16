@@ -4,6 +4,7 @@ This module is intentionally fail-soft: it never raises into the main pipeline
 unless a caller chooses to do so. Missing master outputs produce an empty alert
 ledger and Spiderweb queue so --run-project-alerts cannot break normal runs.
 """
+
 from __future__ import annotations
 
 import json
@@ -11,7 +12,11 @@ from pathlib import Path
 from typing import Any
 
 from .alert_router import DEFAULT_ALERT_DIR, route_alert_outputs
-from .project_signal_detector import ProjectSignalDetector, load_records_from_csv, load_records_from_jsonl
+from .project_signal_detector import (
+    ProjectSignalDetector,
+    load_records_from_csv,
+    load_records_from_jsonl,
+)
 
 MASTER_CANDIDATES = (
     "data/staging/processed/pr_all_awards_master.csv",
@@ -42,7 +47,9 @@ def run(root: str | Path, logger=None) -> dict[str, Any]:
         master_paths = discover_master_outputs(root_path)
         if not master_paths:
             if logger:
-                logger.warning("[Project alerts] No master outputs found; writing empty alert outputs.")
+                logger.warning(
+                    "[Project alerts] No master outputs found; writing empty alert outputs."
+                )
             result = route_alert_outputs([], alert_dir=alert_dir)
             result.update({"input_paths": [], "record_count": 0, "status": "no_inputs"})
             return result
@@ -50,11 +57,13 @@ def run(root: str | Path, logger=None) -> dict[str, Any]:
         records = load_master_records(master_paths)
         events = ProjectSignalDetector().detect(records)
         result = route_alert_outputs(events, alert_dir=alert_dir)
-        result.update({
-            "input_paths": [str(p) for p in master_paths],
-            "record_count": len(records),
-            "status": "ok",
-        })
+        result.update(
+            {
+                "input_paths": [str(p) for p in master_paths],
+                "record_count": len(records),
+                "status": "ok",
+            }
+        )
         if logger:
             logger.info(
                 "[Project alerts] Done — %s records scanned, %s alerts, %s Spiderweb packets.",

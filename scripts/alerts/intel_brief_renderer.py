@@ -1,4 +1,5 @@
 """Markdown intel brief renderer for project-emergence alerts."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -30,7 +31,7 @@ Contract Sweeper detected a {event.alert_level} project-emergence signal for `{e
 ## Signal table
 | Signal | Present |
 |---|---|
-{reasons or '| none | no |'}
+{reasons or "| none | no |"}
 
 ## Entity graph summary
 Spiderweb required: `{event.requires_spiderweb}`.

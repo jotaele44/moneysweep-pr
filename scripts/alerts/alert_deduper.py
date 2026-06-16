@@ -1,4 +1,5 @@
 """Stable deduplication keys for alert events."""
+
 from __future__ import annotations
 
 import hashlib
