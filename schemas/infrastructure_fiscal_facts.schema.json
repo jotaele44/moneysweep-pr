@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "infrastructure_fiscal_facts.schema.json",
+  "title": "Infrastructure fiscal fact staging row",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "source_id",
+    "source_file",
+    "fact_id",
+    "asset_name",
+    "asset_type",
+    "owner_agency",
+    "fiscal_year",
+    "metric_name",
+    "metric_value",
+    "unit",
+    "municipality",
+    "raw_text_excerpt",
+    "evidence_tier",
+    "confidence"
+  ],
+  "properties": {
+    "source_id": {"type": "string"},
+    "source_file": {"type": "string"},
+    "fact_id": {"type": "string"},
+    "asset_name": {"type": "string"},
+    "asset_type": {"type": "string"},
+    "owner_agency": {"type": "string"},
+    "fiscal_year": {"type": "string"},
+    "metric_name": {"type": "string"},
+    "metric_value": {"type": "string"},
+    "unit": {"type": "string"},
+    "municipality": {"type": "string"},
+    "raw_text_excerpt": {"type": "string"},
+    "evidence_tier": {"type": "string"},
+    "confidence": {"type": "string"}
+  }
+}

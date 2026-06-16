@@ -26,7 +26,6 @@ nih_reporter,False,api_adapter,True,True,,True,True,scripts/download_nih.py,1,0,
 nonprofits_irs990,False,api_adapter,True,True,,True,True,scripts/download_nonprofits.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 ofac_sdn,False,api_adapter,True,True,,True,True,scripts/download_ofac.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 oia_grants,False,api_adapter,True,True,,True,True,scripts/download_oia.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
-opencorporates,False,api_adapter,True,True,OPENCORPORATES_API_TOKEN,True,True,scripts/download_opencorporates.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 research_grants,False,api_adapter,True,True,,True,True,scripts/download_research.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 sam_entities,True,api_adapter,True,True,SAM_API_KEY,True,True,scripts/sam_enrichment.py,2,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 sba_loans,False,api_adapter,True,True,,True,True,scripts/download_sba.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
@@ -43,6 +42,7 @@ wic,False,api_adapter,True,True,,True,True,scripts/download_wic.py,1,0,1,,Materi
 wioa,False,api_adapter,True,True,,True,True,scripts/download_wioa.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 census_gov_finances,False,api_producer,True,True,CENSUS_API_KEY,False,True,scripts/download_census_gov_finances.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
 dol_whd_osha,False,api_producer,True,True,,False,True,scripts/download_dol.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+eia_power_sector,False,api_producer,True,True,EIA_API_KEY,False,True,scripts/download_eia.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 emma_infra_revenue,False,api_producer,True,True,,False,True,scripts/extract_emma_revenue.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 eqb_epa_icis,False,api_producer,True,True,,False,True,scripts/download_epa_echo_icis.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
 estadisticas_pr_external_trade,False,api_producer,True,True,,False,True,scripts/download_estadisticas_pr.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
@@ -51,11 +51,14 @@ fec_committees,False,api_producer,True,True,FEC_API_KEY,False,True,scripts/downl
 federal_audit_clearinghouse,False,api_producer,True,True,FAC_API_KEY,False,True,scripts/download_fac.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 fema_individual_assistance,False,api_producer,True,True,,False,True,scripts/download_fema_ia.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 financialdata_net,False,api_producer,True,True,FINANCIALDATA_API_KEY,False,True,scripts/enrichment/enrich_financialdata_entities.py,4,0,0,,"Run producer under strict preflight; public API path, set key if gated."
+fred_timeseries,False,api_producer,True,True,FRED_API_KEY,False,True,scripts/download_fred.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 fta_ntd,False,api_producer,True,True,,False,True,scripts/download_fta_ntd.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
 gao_ig_audits,False,api_producer,True,True,,False,True,scripts/download_gao_ig.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+gleif_lei,False,api_producer,True,True,,False,True,scripts/download_gleif.py,2,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 hud_cdbg_dr_public,True,api_producer,True,True,,False,True,scripts/download_cdbg_dr.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 hud_cdbg_mit,False,api_producer,True,True,,False,True,scripts/download_cdbg_mit.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 lihtc,False,api_producer,True,True,,False,True,scripts/download_lihtc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+municipal_finance,False,api_producer,True,True,FAC_API_KEY,False,True,scripts/download_fac_municipal.py,1,1,1,,"Run producer under strict preflight; public API path, set key if gated."
 ncua,False,api_producer,True,True,,False,True,scripts/download_ncua.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 ngo_integration_layer,False,api_producer,True,True,,False,True,scripts/ngo_integration.py,3,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 nmtc,False,api_producer,True,True,,False,True,scripts/download_nmtc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
@@ -67,6 +70,7 @@ prasa_contracts_master,False,api_producer,True,True,,False,True,scripts/build_pr
 sam_exclusions,False,api_producer,True,True,SAM_API_KEY,False,True,scripts/download_sam_exclusions.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sec_13f_nport,False,api_producer,True,True,,False,True,scripts/download_sec_holdings.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sec_edgar,False,api_producer,True,True,,False,True,scripts/download_sec.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+sec_officers,False,api_producer,True,True,,False,True,scripts/download_sec_officers.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sf133_budget_execution,False,api_producer,True,True,,False,True,scripts/download_sf133.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 ssa,False,api_producer,True,True,,False,True,scripts/download_ssa.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 usace_permits,False,api_producer,True,True,,False,True,scripts/download_usace_permits.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
@@ -121,7 +125,6 @@ emma_bonds,True,scraper_needed,False,False,,False,True,scripts/download_emma.py,
 hacienda,False,scraper_needed,False,False,,False,True,scripts/download_hacienda.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 hacienda_sut_ivu,False,scraper_needed,False,False,,False,True,scripts/download_coverage_gap_intake.py,1,0,0,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 msrb_rtrs_trades,False,scraper_needed,False,False,,False,True,scripts/download_msrb_trades.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-municipal_finance,False,scraper_needed,False,False,,False,True,scripts/download_municipal.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 p3_authority,False,scraper_needed,False,False,,False,True,scripts/download_p3.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 pr_act_154_excise,False,scraper_needed,False,False,,False,True,scripts/download_coverage_gap_intake.py,1,0,0,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 pr_act_60_decrees,False,scraper_needed,False,False,,False,True,scripts/download_act60.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.

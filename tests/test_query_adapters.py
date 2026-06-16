@@ -765,94 +765,6 @@ def test_sba_adapter_returns_empty_when_discovery_fails():
 
 
 # ---------------------------------------------------------------------------
-# OpenCorporates (Batch 6 — optional token, not credential-gated)
-# ---------------------------------------------------------------------------
-
-
-from contract_sweeper.query.adapters.opencorporates import (  # noqa: E402
-    OpenCorporatesAdapter,
-    JURISDICTION as OC_JURISDICTION,
-)
-
-
-@pytest.mark.unit
-def test_opencorporates_sends_jurisdiction_us_pr_and_paginates_to_total_pages():
-    page1 = {
-        "results": {
-            "companies": [
-                {"company": {"company_number": str(i), "name": f"CO_{i}"}} for i in range(100)
-            ],
-            "total_pages": 2,
-        }
-    }
-    page2 = {
-        "results": {
-            "companies": [{"company": {"company_number": "999", "name": "CO_LAST"}}],
-            "total_pages": 2,
-        }
-    }
-    session = MagicMock()
-    session.get.side_effect = [_mock_response(page1), _mock_response(page2)]
-    adapter = OpenCorporatesAdapter(root=REPO_ROOT, session=session)
-    df = adapter.fetch(Query())
-    assert len(df) == 101
-    pages = [
-        (ca.kwargs.get("params") or ca[1]["params"])["page"] for ca in session.get.call_args_list
-    ]
-    assert pages == [1, 2]
-    for ca in session.get.call_args_list:
-        params = ca.kwargs.get("params") or ca[1]["params"]
-        assert params["jurisdiction_code"] == OC_JURISDICTION == "us_pr"
-        assert params["per_page"] == 100
-
-
-@pytest.mark.unit
-def test_opencorporates_attaches_api_token_when_env_set(monkeypatch):
-    monkeypatch.setenv("OPENCORPORATES_API_TOKEN", "test-token")
-    session = MagicMock()
-    session.get.return_value = _mock_response(
-        {
-            "results": {"companies": [], "total_pages": 1},
-        }
-    )
-    adapter = OpenCorporatesAdapter(root=REPO_ROOT, session=session)
-    adapter.fetch(Query())
-    params = session.get.call_args.kwargs.get("params") or session.get.call_args[1]["params"]
-    assert params["api_token"] == "test-token"
-
-
-@pytest.mark.unit
-def test_opencorporates_calls_api_without_token_when_env_unset(monkeypatch):
-    """No CredentialMissing — adapter must still call the API unauthenticated."""
-    monkeypatch.delenv("OPENCORPORATES_API_TOKEN", raising=False)
-    session = MagicMock()
-    session.get.return_value = _mock_response(
-        {
-            "results": {"companies": [], "total_pages": 1},
-        }
-    )
-    adapter = OpenCorporatesAdapter(root=REPO_ROOT, session=session)
-    adapter.fetch(Query())  # Must NOT raise.
-    params = session.get.call_args.kwargs.get("params") or session.get.call_args[1]["params"]
-    assert "api_token" not in params
-
-
-@pytest.mark.unit
-def test_opencorporates_terminates_on_empty_page():
-    session = MagicMock()
-    session.get.return_value = _mock_response(
-        {
-            "results": {"companies": [], "total_pages": 5},
-        }
-    )
-    adapter = OpenCorporatesAdapter(root=REPO_ROOT, session=session)
-    df = adapter.fetch(Query())
-    assert df.empty
-    # Empty page should stop pagination immediately (one call).
-    assert session.get.call_count == 1
-
-
-# ---------------------------------------------------------------------------
 # HigherGov supplemental (Batch 6 — required api_key, credential-gated)
 # ---------------------------------------------------------------------------
 
@@ -944,5 +856,6 @@ def test_adapter_registry_size_matches_concrete_count():
 
     # 33 original + 5 USASpending agency+CFDA benefit narrows
     # (va_benefits, wioa, wic, snap_nap, hud_hcv_section8)
-    # + usace_civil_works (sub-agency narrow) + fhlb (FDIC SDI).
-    assert len(ADAPTER_REGISTRY) == 40
+    # + usace_civil_works (sub-agency narrow) + fhlb (FDIC SDI),
+    # − opencorporates (paid source removed; replaced by gleif_lei/sec_officers).
+    assert len(ADAPTER_REGISTRY) == 39

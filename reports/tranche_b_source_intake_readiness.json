@@ -1,0 +1,19 @@
+{
+  "schema_version": "tranche_b_source_intake_v1",
+  "status": "prepared_not_executed",
+  "materialization_promotion": "not_performed",
+  "branch": "gpt/tranche-b-source-intake",
+  "controller": "scripts/source_intake_tranche_b.py",
+  "helper_module": "scripts/source_intake_helpers.py",
+  "sources_total": 7,
+  "validation": {
+    "tests_added": [
+      "tests/test_source_intake_helpers.py",
+      "tests/test_source_intake_tranche_b.py"
+    ],
+    "schema_gap": "patched",
+    "connector_test_execution": "not_available",
+    "required_local_command": "python3 -m pytest tests/test_source_intake_helpers.py tests/test_source_intake_tranche_b.py -q"
+  },
+  "promotion_gate": "No promotion is performed by this report. Promotion requires dropped source files, generated outputs, schema checks, deterministic regression tests, and refreshed recovery matrices."
+}

@@ -172,20 +172,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--skip-ofac", action="store_true", help="Skip step 27 (OFAC SDN sanctions list crossref)"
     )
     parser.add_argument(
-        "--skip-opencorporates",
-        action="store_true",
-        help="Skip step 28 (OpenCorporates PR business registry)",
-    )
-    parser.add_argument(
         "--skip-prime-sub",
         action="store_true",
         help="Skip step 29 (prime-to-subcontractor relationship analysis)",
-    )
-    parser.add_argument(
-        "--oc-api-token",
-        dest="oc_api_token",
-        default=None,
-        help="OpenCorporates API token (default: OPENCORPORATES_API_TOKEN env var)",
     )
     # Insertion A — supplemental federal downloads + Report Builder
     parser.add_argument(

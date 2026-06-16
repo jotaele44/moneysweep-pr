@@ -27,7 +27,6 @@ from .nih import NIHReporterAdapter
 from .nonprofits import NonprofitsIRS990Adapter
 from .nsf import NSFAwardsAdapter
 from .ofac import OFACSDNAdapter
-from .opencorporates import OpenCorporatesAdapter
 from .sam import SAMEntitiesAdapter
 from .openfema import (
     OpenFEMAHmgpAdapter,
@@ -101,8 +100,7 @@ ADAPTER_REGISTRY: dict[str, Type[SourceAdapter]] = {
     NonprofitsIRS990Adapter.source_id: NonprofitsIRS990Adapter,
     SBALoansAdapter.source_id: SBALoansAdapter,
     SBAPaycheckProtectionAdapter.source_id: SBAPaycheckProtectionAdapter,
-    # Auth-gated adapters (Batch 6)
-    OpenCorporatesAdapter.source_id: OpenCorporatesAdapter,
+    # Auth-gated adapter (Batch 6)
     HigherGovSupplementalAdapter.source_id: HigherGovSupplementalAdapter,
     # CMS family (Batch 7a — Socrata + CKAN-metastore)
     MedicareAdvantageAdapter.source_id: MedicareAdvantageAdapter,

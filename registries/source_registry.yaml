@@ -124,6 +124,43 @@ sources:
     update_cadence: weekly
     notes: Supplementary federal contract intel via HigherGov. PDFs require parse_highergov_pdfs.
 
+  - source_id: eia_power_sector
+    family: federal
+    required: false
+    authentication: api_key:EIA_API_KEY
+    endpoint_url: https://api.eia.gov/v2
+    producer_script: scripts/download_eia.py
+    expected_outputs:
+      - data/staging/processed/pr_eia_power_sector.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: monthly
+    notes: |
+      EIA Open Data v2 power-sector time-series (net generation, capacity,
+      consumption) for Puerto Rico, per registries/eia_series.yaml. Requires a
+      free EIA_API_KEY (https://www.eia.gov/opendata/register.php). Supplements
+      PREPA/LUMA operational monitoring.
+
+  - source_id: fred_timeseries
+    family: federal
+    required: false
+    authentication: api_key:FRED_API_KEY
+    endpoint_url: https://api.stlouisfed.org/fred
+    producer_script: scripts/download_fred.py
+    expected_outputs:
+      - data/staging/processed/pr_fred_timeseries.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: monthly
+    notes: |
+      FRED (St. Louis Fed) economic time-series for Puerto Rico indicators
+      (employment, prices, income, etc.), per registries/fred_series.yaml.
+      Requires a free FRED_API_KEY
+      (https://fred.stlouisfed.org/docs/api/api_key.html). Cross-references
+      territorial budgets and bond markets.
+
   # ----- FEMA / disaster recovery -----
   - source_id: fema_pa_openfema_v2
     family: federal
@@ -578,15 +615,19 @@ sources:
   - source_id: municipal_finance
     family: municipal
     required: false
-    authentication: none
-    endpoint_url: https://www.ocam.pr.gov/
-    producer_script: scripts/download_municipal.py
+    authentication: api_key:FAC_API_KEY
+    endpoint_url: https://api.fac.gov/
+    producer_script: scripts/download_fac_municipal.py
     expected_outputs:
       - data/staging/processed/pr_municipal_finance.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
-    update_cadence: yearly
+    update_cadence: quarterly
+    notes: >
+      PR municipal Single Audit (SF-SAC) records from the Federal Audit Clearinghouse
+      (api.fac.gov/general, auditee_state=PR, filtered to MUNICIPIO/MUNICIPALITY OF
+      auditees). API-switch from the OCAM scraper; free api.data.gov key (FAC_API_KEY).
 
   - source_id: eqb_epa_icis
     family: territorial
@@ -1050,18 +1091,42 @@ sources:
       min_rows: 1
     update_cadence: weekly
 
-  - source_id: opencorporates
+  - source_id: gleif_lei
     family: entity_resolution
     required: false
-    authentication: api_key:OPENCORPORATES_API_TOKEN
-    endpoint_url: https://opencorporates.com/
-    producer_script: scripts/download_opencorporates.py
+    authentication: none
+    endpoint_url: https://api.gleif.org/api/v1/lei-records
+    producer_script: scripts/download_gleif.py
     expected_outputs:
-      - data/staging/processed/pr_opencorporates.csv
+      - data/staging/processed/pr_gleif_entities.csv
+      - data/staging/processed/pr_gleif_relationships.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
-    update_cadence: ad_hoc
+    update_cadence: monthly
+    notes: |
+      Free, keyless GLEIF LEI database filtered to Puerto Rico (legalAddress
+      country PR + jurisdiction US-PR, de-duped by LEI). Corporate identity
+      (legal name, status, legal form, local registration number, addresses)
+      plus direct/ultimate parent relationships. Replaces the OpenCorporates
+      corporate-identity slice for the larger / financial PR entities.
+
+  - source_id: sec_officers
+    family: entity_resolution
+    required: false
+    authentication: none
+    endpoint_url: https://data.sec.gov
+    producer_script: scripts/download_sec_officers.py
+    expected_outputs:
+      - data/staging/processed/pr_sec_officers.csv
+    schema_version: r5_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: monthly
+    notes: |
+      Free, keyless officers/directors of PR-domiciled SEC filers, parsed from
+      Form 3/4/5 insider-filing ownership XML. Replaces the OpenCorporates
+      officers slice (whose seeds were all SEC filers).
 
   - source_id: pr_corporate_registry
     family: manual_export

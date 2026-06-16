@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-06-15T21:24:23.448078+00:00",
+  "generated_at": "2026-06-16T04:27:27.584299+00:00",
   "schema_version": "r5_v1",
-  "total_sources": 133,
+  "total_sources": 136,
   "required_sources": 14,
   "fully_materialized": 0,
-  "partially_materialized": 2,
+  "partially_materialized": 3,
   "not_materialized": 13,
-  "optional_not_materialized": 118,
+  "optional_not_materialized": 120,
   "coverage_rate": 0.0,
   "required_coverage_rate": 0.0714,
   "outputs": [
