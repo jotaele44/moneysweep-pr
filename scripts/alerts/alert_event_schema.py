@@ -1,9 +1,22 @@
 """Schemas for project-emergence alert events."""
+
 from __future__ import annotations
 
+import sys
 from dataclasses import asdict, dataclass, field
-from enum import IntEnum, StrEnum
+from enum import IntEnum
 from typing import Any
+
+if sys.version_info >= (3, 11):
+    from enum import StrEnum
+else:  # pragma: no cover - Python 3.10 has no enum.StrEnum
+    from enum import Enum
+
+    class StrEnum(str, Enum):
+        """Minimal backport of enum.StrEnum for Python 3.10."""
+
+        def __str__(self) -> str:
+            return str(self.value)
 
 
 class AlertLevel(StrEnum):

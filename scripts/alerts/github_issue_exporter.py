@@ -3,6 +3,7 @@
 This module deliberately does not call the GitHub API. It emits deterministic
 Markdown that can be handed to CI, a CLI, or a connector-specific action.
 """
+
 from __future__ import annotations
 
 from .alert_event_schema import AlertEvent
@@ -22,7 +23,10 @@ def issue_labels(event: AlertEvent) -> list[str]:
 
 
 def issue_body(event: AlertEvent) -> str:
-    reasons = "\n".join(f"- {reason}" for reason in event.trigger_reason) or "- no trigger reason recorded"
+    reasons = (
+        "\n".join(f"- {reason}" for reason in event.trigger_reason)
+        or "- no trigger reason recorded"
+    )
     return f"""## Project
 {event.canonical_name}
 
@@ -45,5 +49,5 @@ def issue_body(event: AlertEvent) -> str:
 - Municipio: {event.municipio}
 
 ## Required next step
-{'Run Spiderweb enrichment for seed entities.' if event.requires_spiderweb else 'Store in watch ledger; no Spiderweb run required.'}
+{"Run Spiderweb enrichment for seed entities." if event.requires_spiderweb else "Store in watch ledger; no Spiderweb run required."}
 """
