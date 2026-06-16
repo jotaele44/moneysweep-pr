@@ -1,14 +1,16 @@
 {
   "schema_version": "r5_readiness_v1",
-  "total_sources": 124,
-  "automatable_total": 68,
-  "automatable_ready": 68,
+  "total_sources": 126,
+  "automatable_total": 70,
+  "automatable_ready": 70,
   "automatable_not_ready": [],
-  "automatable_needs_key_count": 7,
+  "automatable_needs_key_count": 9,
   "automatable_required_keys": [
+    "EIA_API_KEY",
     "FAC_API_KEY",
     "FEC_API_KEY",
     "FINANCIALDATA_API_KEY",
+    "FRED_API_KEY",
     "HIGHERGOV_API_KEY",
     "SAM_API_KEY"
   ],
