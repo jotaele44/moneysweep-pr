@@ -39,7 +39,7 @@ jobs:
       - name: Normalize Contract-Sweeper finance lane
         run: python3 scripts/build_contract_sweeper_finance_lane.py --input data/exports/pr_intake_router --out .
       - name: Open same-repo PR with normalized finance tables
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: intake/finance-lane-update
