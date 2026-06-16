@@ -600,6 +600,73 @@ def get_financialdata_api_key() -> str | None:
     return key or None
 
 
+def get_fec_api_key() -> str:
+    """Return the FEC (api.data.gov) key from FEC_API_KEY env or .env.
+
+    Falls back to ``DEMO_KEY`` (api.data.gov's shared demo key, ~30 req/hour)
+    rather than raising, so a missing key degrades to a small run instead of a
+    crash — mirrors download_fec.py's historical default.
+    """
+    import os
+
+    key = os.environ.get("FEC_API_KEY", "").strip()
+    if key:
+        return key
+    key = _load_dotenv(PROJECT_ROOT / ".env").get("FEC_API_KEY", "").strip()
+    return key or "DEMO_KEY"
+
+
+def get_highergov_api_key() -> str | None:
+    """Return the HigherGov key from HIGHERGOV_API_KEY env or .env; never raises.
+
+    HigherGov is an optional supplemental source, so absence is a normal state —
+    callers skip the source when this is None.
+    """
+    import os
+
+    key = os.environ.get("HIGHERGOV_API_KEY", "").strip()
+    if key:
+        return key
+    key = _load_dotenv(PROJECT_ROOT / ".env").get("HIGHERGOV_API_KEY", "").strip()
+    return key or None
+
+
+def get_eia_api_key() -> str:
+    """Return the EIA Open Data key from EIA_API_KEY env var or .env file. Raises if missing."""
+    import os
+
+    key = os.environ.get("EIA_API_KEY", "").strip()
+    if key:
+        return key
+    key = _load_dotenv(PROJECT_ROOT / ".env").get("EIA_API_KEY", "").strip()
+    if key:
+        return key
+    raise RuntimeError(
+        "EIA_API_KEY not found. Set it one of two ways:\n"
+        "  1. export EIA_API_KEY=your_key_here\n"
+        f"  2. Create {PROJECT_ROOT / '.env'} containing: EIA_API_KEY=your_key_here\n"
+        "Get a free key at https://www.eia.gov/opendata/register.php"
+    )
+
+
+def get_fred_api_key() -> str:
+    """Return the FRED key from FRED_API_KEY env var or .env file. Raises if missing."""
+    import os
+
+    key = os.environ.get("FRED_API_KEY", "").strip()
+    if key:
+        return key
+    key = _load_dotenv(PROJECT_ROOT / ".env").get("FRED_API_KEY", "").strip()
+    if key:
+        return key
+    raise RuntimeError(
+        "FRED_API_KEY not found. Set it one of two ways:\n"
+        "  1. export FRED_API_KEY=your_key_here\n"
+        f"  2. Create {PROJECT_ROOT / '.env'} containing: FRED_API_KEY=your_key_here\n"
+        "Get a free key at https://fred.stlouisfed.org/docs/api/api_key.html"
+    )
+
+
 def is_financialdata_license_approved() -> bool:
     """
     Return True only if FINANCIALDATA_LICENSE_APPROVED is set to a truthy value.

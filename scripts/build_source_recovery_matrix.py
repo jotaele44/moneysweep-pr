@@ -60,7 +60,6 @@ SCRAPER_NEEDED = {
     "pr_act_60_decrees",
     "promesa_creditors",
     "rum_cover_over",
-    "municipal_finance",
     "pr_pensions",
     "emma_bonds",
     "msrb_rtrs_trades",

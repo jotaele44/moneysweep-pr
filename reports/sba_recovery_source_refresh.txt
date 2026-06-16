@@ -1,0 +1,45 @@
+SBA RECOVERY SOURCE REFRESH
+
+Active vector: MONEYSWEEP_SBA_RECOVERY_INTELLIGENCE
+
+New source family:
+- source_id: sba_disaster_loans_pr
+- name: SBA Disaster Loan Data - Puerto Rico
+- owner: U.S. Small Business Administration
+- input: sba_disaster_loans_pr.xlsx
+- sheets: FY22 Home; FY22 Business
+- status: planned / pending importer, schema, tests, and registry regeneration
+
+MoneySweep domain:
+- disaster recovery assistance
+- federal recovery funding
+- verified loss analysis
+- municipality recovery rollups
+
+Required canonical entity:
+- SBARecoveryLoan
+
+Required implementation artifacts:
+- registries/source_registry.yaml entry
+- registries/source_registry.json regeneration if used by repo
+- schemas/sba_recovery_loan.schema.json
+- scripts/import_sba_disaster_loans.py
+- tests/test_import_sba_disaster_loans.py
+- reports/sba_recovery_import_summary.md
+
+Required relationships:
+- SBARecoveryLoan REFERENCES_FEMA_DISASTER FEMARecoveryEvent
+- SBARecoveryLoan ROLLS_UP_TO_MUNICIPALITY Municipality
+- MunicipalityRecoveryRollup COMPARES_WITH_COR3_PROJECTS COR3RecoveryProject
+
+Promotion gates:
+- workbook present in approved manual/raw dropzone
+- importer detects header row for both workbook sheets
+- output validates against schema
+- every record keeps file, sheet, and row lineage
+- numeric amounts normalize safely
+- municipality values normalize to Puerto Rico municipalities
+- FEMA disaster number and municipality join keys are retained
+- materialization readiness updates only after tests pass
+
+Do not mark this source materialized until parser, schema, lineage, row-count, relationship-key, and regression gates pass.

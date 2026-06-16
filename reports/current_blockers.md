@@ -1,13 +1,13 @@
 # Current Blockers — R5 PR2.5
 
-**Updated:** 2026-05-12
+**Updated:** 2026-06-14
 
 ## Active blockers
 
 ### B1 — SAM API rate-limited (1,000 req/day)
 - **Impact:** SAM full extract for 2,334 UEIs takes 2.3+ days
 - **Status:** SAM_API_KEY available; partial run attempted; rate limit reached
-- **Workaround:** USAspending parent lookup (no rate limit) running in background (~7h ETA)
+- **Workaround:** USAspending parent lookup; recalibrate expectations for PR government award sources
 - **Expected:** 5–15% parent resolution; large contractors (AECOM, Fluor, Parsons) should resolve
 
 ### B2 — pr_fec_crossref.csv is header-only
@@ -25,6 +25,14 @@
 - **Root cause:** Top-20 entities by obligation are all PR government agencies; no corporate parent expected
 - **Fix:** Recalibrate per-source threshold in `source_registry.yaml`: `usaspending_prime → 0.05`, `fema_pa → 0.05`; retain `0.90` for FSRS/FPDS corporate-prime sources
 - **Scope:** PR3 registry patch
+
+### B5 — SBA Disaster Loan workbook identified but not materialized
+- **Impact:** Puerto Rico disaster recovery assistance coverage is incomplete without SBA verified-loss and approved-loan data.
+- **Source file:** `sba_disaster_loans_pr.xlsx`
+- **Detected sheets:** `FY22 Home`, `FY22 Business`
+- **Root cause:** source family was not yet represented as a first-class MoneySweep recovery-assistance source.
+- **Required:** add source registry entry, `SBARecoveryLoan` schema, workbook importer with header-row detection, JSONL/CSV output, FEMA disaster-number relationship mapping, municipality rollups, and tests.
+- **Promotion block:** do not mark materialized until parser, schema, lineage, row-count, relationship-key, and regression gates pass.
 
 ## Resolved in PR2
 

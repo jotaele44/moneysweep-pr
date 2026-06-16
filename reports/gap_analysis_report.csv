@@ -56,6 +56,9 @@ dtop_road_contracts,infrastructure,False,manual_export,1,0,1,0,not_materialized,
 dtop_vehicle_fees,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_dtop_fees.csv,"DTOP vehicle-registration (marbete) and license fee collections. Operator-delivered exports.
 "
 ed_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ed_grants.csv,
+eia_power_sector,federal,False,api_key:EIA_API_KEY,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_eia_power_sector.csv,"EIA Open Data v2 power-sector time-series (net generation, capacity,
+consumption) for Puerto Rico, per registries/eia_series.yaml. Requires a
+free EIA_API_KEY (https://www.eia.gov/opendata/register.ph"
 emma_infra_revenue,infrastructure_revenue,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_emma_revenue_disclosures.csv,MSRB EMMA continuing-disclosure revenue extraction (toll/water/power bond-pledged revenue). The one authentication-free automatable revenue spine; cross-checks the manual dropzone figures. PDF extract
 epa_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_epa_grants.csv,
 eqb_epa_icis,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_epa_echo_icis.csv,"PR environmental enforcement (EPA ICIS-FE&C / ECHO) — federal penalties assessed against PR facilities. Automatable via the public, keyless ECHO Enforcement Case Search REST API (echodata.epa.gov; X_A"
@@ -75,10 +78,17 @@ fhlb,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_f
 financialdata_net,optional_commercial_enrichment,False,api_key:FINANCIALDATA_API_KEY,4,0,4,0,not_materialized,0,0,outputs/enrichment/financialdata_identifier_crosswalk.csv,OPTIONAL commercial provider for public-market entity resolution (CUSIP / ISIN / FIGI / LEI / CIK / ticker crosswalks). NOT a required source — never wired into coverage gates. Live use requires BOTH 
 follow_the_money,political_finance,False,manual_export,3,0,3,0,not_materialized,0,1,data/staging/processed/pr_sf133_budget_execution.csv,"PR public-money export data (SF-133 budget execution, municipal political/federal bridge, facility contract matches). ingest_follow_the_money.py is a dropzone reader (no network code) producing 3 outp"
 fpds_report_builder,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fpds_report_builder.csv,FPDS Report Builder FY2018-2024 ingestion. Supplements USAspending.
+fred_timeseries,federal,False,api_key:FRED_API_KEY,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_fred_timeseries.csv,"FRED (St. Louis Fed) economic time-series for Puerto Rico indicators
+(employment, prices, income, etc.), per registries/fred_series.yaml.
+Requires a free FRED_API_KEY
+(https://fred.stlouisfed.org/docs"
 fta_ntd,infrastructure,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_fta_ntd.csv,"FTA National Transit Database — financial, funding-source, and operating-expense data for PR transit agencies (PRHTA, PRITA, Ports Authority). Automatable via the Socrata SODA API on data.transportati"
 gaming_commission,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_gaming.csv,"PR Gaming Commission casino/slot-machine licensing and gaming-tax revenue. Operator-delivered exports.
 "
 gao_ig_audits,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_gao_ig_audits.csv,
+gleif_lei,entity_resolution,False,none,2,0,2,0,not_materialized,0,1,data/staging/processed/pr_gleif_entities.csv,"Free, keyless GLEIF LEI database filtered to Puerto Rico (legalAddress
+country PR + jurisdiction US-PR, de-duped by LEI). Corporate identity
+(legal name, status, legal form, local registration number,"
 grants_gov,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_grants.csv,
 hacienda,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_hacienda_revenues.csv,
 hacienda_sut_ivu,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_hacienda_sut_ivu.csv,"PR Treasury Sales & Use Tax (IVU/SUT) collections by fiscal year / month / NAICS, plus COFIM municipal IVU — the largest PR consumption-tax revenue stream, not otherwise captured. Scraper surface (hac"
@@ -96,7 +106,6 @@ medicaid_fmap,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/proce
 medicare_advantage,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_medicare_advantage.csv,
 medicare_parts,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_medicare_parts.csv,
 msrb_rtrs_trades,bonds,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_msrb_trades.csv,
-municipal_finance,municipal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_municipal_finance.csv,
 nara_catalog_aws_open_data,provenance_archival,False,none,2,0,2,0,not_materialized,0,0,data/staging/processed/nara_nextgen/nara_bulk_catalog_index.csv,"Future candidate for bulk archival metadata. Evaluate separately from the targeted Catalog API path after dataset location, format, licensing, and storage policy are verified."
 nara_nextgen_catalog_v3,provenance_archival,False,api_key:NARA_API_KEY,2,0,2,0,not_materialized,0,0,data/staging/processed/nara_nextgen/nara_record_locator_index.csv,"Targeted archival locator only. Do not use as a contract-award, financial-flow, or bulk archival source. Fetcher intentionally not implemented until a credential and bounded query allowlist are availa"
 ncua,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ncua.csv,
@@ -112,7 +121,6 @@ ofac_sdn,entity_resolution,False,none,1,0,1,0,not_materialized,0,1,data/staging/
 ogpe_permits,municipal,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ogpe_permits.csv,"OGPe construction-permit fees and green-energy incentives. Operator-delivered exports.
 "
 oia_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_oia_grants.csv,
-opencorporates,entity_resolution,False,api_key:OPENCORPORATES_API_TOKEN,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_opencorporates.csv,
 opm_fedscope,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_federal_payroll.csv,"Federal civilian payroll (employment + average salary) in PR from OPM FedScope. Source URL configurable via FEDSCOPE_DATA_URL; live pull requires network.
 "
 opportunity_zones,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_opportunity_zones.csv,"Qualified Opportunity Zone designated census tracts in PR (Treasury/IRS capital-gains incentive). Source URL configurable via OZ_DATA_URL; live pull requires network.
@@ -149,6 +157,10 @@ sba_ppp,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/p
 sbir,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sbir.csv,
 sec_13f_nport,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sec_holdings.csv,
 sec_edgar,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sec_edgar.csv,
+sec_officers,entity_resolution,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sec_officers.csv,"Free, keyless officers/directors of PR-domiciled SEC filers, parsed from
+Form 3/4/5 insider-filing ownership XML. Replaces the OpenCorporates
+officers slice (whose seeds were all SEC filers).
+"
 sf133_budget_execution,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sf133.csv,
 slfrf,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_slfrf_master.csv,
 snap_nap,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_snap_nap.csv,
@@ -168,3 +180,4 @@ va_benefits,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/process
 wic,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_wic.csv,
 wioa,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_wioa.csv,
 highergov_supplemental,federal,False,api_key:HIGHERGOV_API_KEY,2,1,1,0,partially_materialized,0,1,data/raw/HigherGov/,Supplementary federal contract intel via HigherGov. PDFs require parse_highergov_pdfs.
+municipal_finance,municipal,False,api_key:FAC_API_KEY,1,0,0,1,partially_materialized,0,1,data/staging/processed/pr_municipal_finance.csv,"PR municipal Single Audit (SF-SAC) records from the Federal Audit Clearinghouse (api.fac.gov/general, auditee_state=PR, filtered to MUNICIPIO/MUNICIPALITY OF auditees). API-switch from the OCAM scrape"

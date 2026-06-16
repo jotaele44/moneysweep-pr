@@ -30,10 +30,13 @@ def test_materialization_readiness_snapshot_matches_runbook_counts():
         Path("reports/materialization_readiness.json").read_text(encoding="utf-8")
     )
 
-    assert snapshot["total_sources"] == 133
-    assert snapshot["automatable_total"] == 73
-    assert snapshot["automatable_ready"] == 73
-    assert snapshot["queued_excluded_total"] == 60
+    # Merged: our branch (133/73) ∪ main's GLEIF/SEC/EIA/FRED reconcile, plus
+    # municipal_finance flipped scraper_needed -> api_producer (FAC API). Counts
+    # below are pinned to the regenerated reports/materialization_readiness.json.
+    assert snapshot["total_sources"] == 136
+    assert snapshot["automatable_total"] == 77
+    assert snapshot["automatable_ready"] == 77
+    assert snapshot["queued_excluded_total"] == 59
     assert snapshot["automatable_not_ready"] == []
 
 

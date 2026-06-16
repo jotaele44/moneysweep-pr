@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lobbying_registry.schema.json",
+  "title": "Lobbying registry staging row",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "source_id",
+    "source_file",
+    "record_id",
+    "registrant_name",
+    "client_name",
+    "person_name",
+    "entity_name",
+    "relationship_type",
+    "registration_date",
+    "termination_date",
+    "jurisdiction",
+    "raw_text_excerpt",
+    "evidence_tier",
+    "confidence"
+  ],
+  "properties": {
+    "source_id": {"type": "string"},
+    "source_file": {"type": "string"},
+    "record_id": {"type": "string"},
+    "registrant_name": {"type": "string"},
+    "client_name": {"type": "string"},
+    "person_name": {"type": "string"},
+    "entity_name": {"type": "string"},
+    "relationship_type": {"type": "string"},
+    "registration_date": {"type": "string"},
+    "termination_date": {"type": "string"},
+    "jurisdiction": {"type": "string"},
+    "raw_text_excerpt": {"type": "string"},
+    "evidence_tier": {"type": "string"},
+    "confidence": {"type": "string"}
+  }
+}
