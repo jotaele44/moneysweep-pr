@@ -36,9 +36,9 @@ pandas==2.3.3 ; python_full_version < '3.11'
     # via -r requirements.in
 pandas==3.0.3 ; python_full_version >= '3.11'
     # via -r requirements.in
-pdfminer-six==20251230
+pdfminer-six==20260107
     # via pdfplumber
-pdfplumber==0.11.9
+pdfplumber==0.11.10
     # via -r requirements.in
 pillow==12.2.0
     # via pdfplumber
@@ -54,7 +54,7 @@ pygments==2.20.0
     # via pytest
 pypdfium2==5.9.0
     # via pdfplumber
-pytest==9.0.3
+pytest==9.1.0
     # via
     #   -r requirements.in
     #   pytest-cov
