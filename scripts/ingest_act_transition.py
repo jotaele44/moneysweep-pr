@@ -11,8 +11,15 @@ which writes per-PDF 6-column CSVs under ``data/staging/raw/``) and the canonica
 the source PDF in the manual drop dir, running this producer materializes the
 declared output (≥1 row ⇒ ``fully_materialized`` in gap analysis).
 
-No network. Materialization still requires the operator-supplied PDF; with no PDF
-present the producer is a clean no-op (writes nothing, reports ``EMPTY``).
+Offline fallback: when no operator PDF (or pre-staged raw CSV) is available, the
+producer materializes directly from the committed 18-column extract written by
+``scripts/build_act_transition_extract.py`` at ``data/raw/act_transition/
+transition_contracts_extracted.csv`` (one dataset per source key). That file is
+git-tracked, so the declared output is reproducible end-to-end with no PDF and no
+network — the offline path proven by tests/test_act_transition_materialization.py.
+
+No network. With neither a PDF, a staged raw CSV, nor the committed extract
+present, the producer is a clean no-op (writes nothing, reports ``EMPTY``).
 
 Usage:
   python3 scripts/ingest_act_transition.py                 # both sources
@@ -45,6 +52,14 @@ PROCESSED_OUTPUTS = {
     "act": "data/staging/processed/pr_act_transition_contracts.csv",
     "acuden": "data/staging/processed/pr_acuden_transition.csv",
 }
+
+# Offline fallback input: the committed 18-column extract from
+# scripts/build_act_transition_extract.py, one `source_dataset` per source key.
+COMMITTED_EXTRACT = "data/raw/act_transition/transition_contracts_extracted.csv"
+EXTRACT_DATASET = {"act": "ACT_2020", "acuden": "ACUDEN_2024"}
+
+# Operator PDF drop dirs (mirrors scripts/extract_act_acuden_pdfs.py drop dirs).
+PDF_DROP_SUBDIR = {"act": "act_transition", "acuden": "acuden_2024"}
 
 # Canonical processed schema: extractor's 6 columns + a provenance tag.
 CANONICAL_COLUMNS = [
@@ -110,24 +125,78 @@ def _write_processed(rows: list[dict], out_path: Path) -> None:
         w.writerows(rows)
 
 
-def materialize_source(root: Path, source_key: str, input_dir: Path | None, logger) -> dict:
-    """Extract (if a PDF is present) then promote one source to its processed CSV."""
-    # Lazy import — keeps module import (and the readiness preflight) free of pdfplumber.
-    from contract_sweeper.runtime.alias_overrides import load_overrides
-    from scripts.extract_act_acuden_pdfs import extract_source
-
-    overrides = load_overrides()
-    extract_source(
-        source_key, root, overrides, dry_run=False, input_override=input_dir, logger=logger
+def _pdf_available(root: Path, source_key: str, input_dir: Path | None) -> bool:
+    """True if an operator PDF is present (so the extractor is worth importing)."""
+    drop = (
+        input_dir
+        if input_dir is not None
+        else root / "data" / "manual" / PDF_DROP_SUBDIR[source_key]
     )
+    return drop.exists() and any(p.suffix.lower() == ".pdf" for p in drop.iterdir())
+
+
+def _read_committed_extract_rows(root: Path, source_key: str) -> list[dict]:
+    """Offline fallback rows from the committed 18-column extract.
+
+    Maps the extract's raw-date / numeric-amount columns onto the six fields
+    ``promote_rows`` consumes, filtered to this source's ``source_dataset``. No
+    PDF, no network — used only when no operator-supplied input has been staged.
+    """
+    path = root / COMMITTED_EXTRACT
+    if not path.exists():
+        return []
+    dataset = EXTRACT_DATASET[source_key]
+    rows: list[dict] = []
+    with path.open(encoding="utf-8", newline="") as f:
+        for r in csv.DictReader(f):
+            if (r.get("source_dataset") or "").strip() != dataset:
+                continue
+            rows.append(
+                {
+                    "contractor_name": r.get("contractor_name", ""),
+                    "contract_number": r.get("contract_number", ""),
+                    "start_date": r.get("start_date_raw", ""),
+                    "end_date": r.get("end_date_raw", ""),
+                    "amount": r.get("amount_numeric") or r.get("amount_raw", ""),
+                    "service_type": r.get("service_type", ""),
+                }
+            )
+    return rows
+
+
+def materialize_source(root: Path, source_key: str, input_dir: Path | None, logger) -> dict:
+    """Materialize one source to its processed CSV.
+
+    Prefers a freshly-extracted operator PDF; falls back to a pre-staged raw CSV;
+    falls back again to the committed offline extract. ``pdfplumber`` is imported
+    only when an actual PDF is present, so the offline path (and the readiness
+    preflight that imports this module) never touches the PDF stack.
+    """
+    if _pdf_available(root, source_key, input_dir):
+        # Lazy import — keeps module import (and the readiness preflight) free of pdfplumber.
+        from contract_sweeper.runtime.alias_overrides import load_overrides
+        from scripts.extract_act_acuden_pdfs import extract_source
+
+        overrides = load_overrides()
+        extract_source(
+            source_key, root, overrides, dry_run=False, input_override=input_dir, logger=logger
+        )
+
     staged = _read_staged_rows(root, source_key)
+    origin = "staged extract"
+    if not staged:
+        staged = _read_committed_extract_rows(root, source_key)
+        origin = "committed extract (offline)"
+
     promoted = promote_rows(staged, source_key)
     out_path = root / PROCESSED_OUTPUTS[source_key]
     if not promoted:
         logger.info(f"  [{source_key}] no rows to promote (drop a PDF first) — EMPTY")
         return {"source": source_key, "status": "EMPTY", "rows": 0, "output": str(out_path)}
     _write_processed(promoted, out_path)
-    logger.info(f"  [{source_key}] {len(promoted)} rows → {PROCESSED_OUTPUTS[source_key]}")
+    logger.info(
+        f"  [{source_key}] {len(promoted)} rows → {PROCESSED_OUTPUTS[source_key]} [{origin}]"
+    )
     return {"source": source_key, "status": "OK", "rows": len(promoted), "output": str(out_path)}
 
 

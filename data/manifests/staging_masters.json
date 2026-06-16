@@ -175,11 +175,6 @@
       "sha256": "67111e8b01d63fd3398f993c6e702d2cf38f5484faae7778b56ac642b72385e6",
       "size_bytes": 296789
     },
-    "data/staging/processed/pr_eqb_permits.csv": {
-      "row_count": 3361,
-      "sha256": "83fe4e0c2cba2a076d891e2b8894d3772d54c86c441591ce3ee0ea6d02713701",
-      "size_bytes": 287517
-    },
     "data/staging/processed/pr_exim_master.csv": {
       "row_count": 0,
       "sha256": "0e97d455e15af27ad3b473e72ac1cf71af35ed728e286cad81efd5fcbc97793c",
@@ -234,11 +229,6 @@
       "row_count": 246,
       "sha256": "de8f172f365f747eeee8bdfca560eae6304200d11bcacad4cb1847df0440e9b9",
       "size_bytes": 13317
-    },
-    "data/staging/processed/pr_ftm_wire_ledger.csv": {
-      "row_count": 25,
-      "sha256": "c3e9bab2bfe52711e32c961c45f3f81396a96289582fbc597c45dd5b6b4d6874",
-      "size_bytes": 2142
     },
     "data/staging/processed/pr_gao_ig_reports.csv": {
       "row_count": 5,
@@ -491,7 +481,7 @@
       "size_bytes": 292810
     }
   },
-  "generated_at": "2026-06-16T10:07:11Z",
+  "generated_at": "2026-06-16T10:19:28Z",
   "note": "Row counts for the gitignored data/staging/processed masters. Committed source of truth for coverage reports in a clean checkout (the CSVs themselves are too large to track \u2014 see size-guard). Regenerate with scripts/build_staging_manifest.py after a data refresh.",
   "schema_version": "staging_masters_v1"
 }

@@ -51,6 +51,8 @@ SCRAPER_NEEDED = {
     "compras_pr",
     "aafaf",
     "hacienda",
+    "hacienda_sut_ivu",
+    "pr_act_154_excise",
     "cofina",
     "prepa_luma_genera",
     "cor3",
@@ -58,9 +60,7 @@ SCRAPER_NEEDED = {
     "pr_act_60_decrees",
     "promesa_creditors",
     "rum_cover_over",
-    "municipal_finance",
     "pr_pensions",
-    "eqb_epa_icis",
     "emma_bonds",
     "msrb_rtrs_trades",
 }

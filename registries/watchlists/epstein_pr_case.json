@@ -1,0 +1,83 @@
+{
+  "schema_version": "watchlist_v1",
+  "watchlist_id": "epstein_pr_case",
+  "status": "flagged_reference_only",
+  "do_not_materialize": true,
+  "purpose": "Cross-reference flag only — NOT a public-money source. Flag overlaps with incoming public-money data (contracts, grants, donations, wires) for human review.",
+  "source_case": "EP_PR_CASE",
+  "flagged_entities": [
+    "CYPRESS INC",
+    "GREAT ST JIM LLC",
+    "JEFFREY E EPSTEIN",
+    "LAUREL INC",
+    "LSJE LLC",
+    "MAPLE INC",
+    "MICHELLE'S TRANSPORT CO LLC",
+    "NAUTILUS INC"
+  ],
+  "flagged_banks": [
+    "Banco Popular de Puerto Rico",
+    "FirstBank Puerto Rico"
+  ],
+  "transaction_count": 9,
+  "transactions": [
+    {
+      "txn_date": "2019-03-26",
+      "entity": "JEFFREY E EPSTEIN",
+      "destination_bank": "FirstBank Puerto Rico",
+      "amount_usd": "560000.0"
+    },
+    {
+      "txn_date": "2019-03-26",
+      "entity": "JEFFREY E EPSTEIN N",
+      "destination_bank": "Banco Popular de Puerto Rico",
+      "amount_usd": "560000.0"
+    },
+    {
+      "txn_date": "2019-03-29",
+      "entity": "CYPRESS INC",
+      "destination_bank": "FirstBank Puerto Rico",
+      "amount_usd": "100000.0"
+    },
+    {
+      "txn_date": "2019-03-29",
+      "entity": "GREAT ST JIM LLC A",
+      "destination_bank": "FirstBank Puerto Rico",
+      "amount_usd": "100000.0"
+    },
+    {
+      "txn_date": "2019-03-29",
+      "entity": "ISJE LUC A",
+      "destination_bank": "FirstBank Puerto Rico",
+      "amount_usd": "175000.0"
+    },
+    {
+      "txn_date": "2019-03-29",
+      "entity": "LAURELINC",
+      "destination_bank": "FirstBank Puerto Rico",
+      "amount_usd": "150000.0"
+    },
+    {
+      "txn_date": "2019-03-29",
+      "entity": "MAPLE INC",
+      "destination_bank": "FirstBank Puerto Rico",
+      "amount_usd": "275000.0"
+    },
+    {
+      "txn_date": "2019-03-29",
+      "entity": "MICHELLE'S TRANSPORT CO LLC A",
+      "destination_bank": "FirstBank Puerto Rico",
+      "amount_usd": "100000.0"
+    },
+    {
+      "txn_date": "2019-03-29",
+      "entity": "NAUTILUS INC",
+      "destination_bank": "FirstBank Puerto Rico",
+      "amount_usd": "100000.0"
+    }
+  ],
+  "generated_from": [
+    "data/watchlists/epstein_pr_case/EP_PR_PRBank_Wire_Ledger_ALL.csv",
+    "data/watchlists/epstein_pr_case/EP_PR_PRBank_Summary_ByEntity.csv"
+  ]
+}
