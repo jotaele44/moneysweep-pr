@@ -1,14 +1,14 @@
 pandas>=2.0.0
 requests>=2.34.2
 lxml>=4.9.0
-pytest>=9.0.3
-pytest-cov>=4.1.0
+pytest>=9.1.0
+pytest-cov>=7.1.0
 rapidfuzz>=3.0.0
 python-dotenv>=1.0.0
 pyarrow>=24.0.0
 # R5 foundation deps
-PyYAML>=6.0
+PyYAML>=6.0.3
 networkx>=3.6.1; python_version >= '3.11'
 networkx>=3.0; python_version < '3.11'
 # ACT/ACUDEN PDF extraction harness
-pdfplumber>=0.10.0
+pdfplumber>=0.11.10
