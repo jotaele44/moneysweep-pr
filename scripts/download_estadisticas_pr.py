@@ -146,7 +146,7 @@ def _ckan_action(session, base: str, action: str, params: dict, logger) -> dict 
 def _resolve_resource(session, base: str, query: str, logger) -> dict | None:
     """package_search for the dataset; return the best fetchable resource (datastore or CSV)."""
     result = _ckan_action(session, base, "package_search", {"q": query, "rows": 5}, logger)
-    if not result:
+    if not result or not isinstance(result, dict):
         return None
     for pkg in result.get("results", []):
         resources = pkg.get("resources", [])
@@ -171,7 +171,7 @@ def _fetch_datastore(session, base: str, resource_id: str, logger) -> list[dict]
             {"resource_id": resource_id, "limit": PAGE_LIMIT, "offset": offset},
             logger,
         )
-        if not result:
+        if not result or not isinstance(result, dict):
             break
         records = result.get("records", [])
         if not records:
