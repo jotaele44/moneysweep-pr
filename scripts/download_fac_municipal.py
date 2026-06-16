@@ -104,7 +104,9 @@ def _fetch(session, logger) -> list[dict]:
             "order": "audit_year.desc",
         }
         config = HttpConfig(user_agent=_USER_AGENT, page_sleep=0.3)
-        data: Any = http_get_json(session, FAC_URL, params, logger=logger, config=config)
+        data: Any = http_get_json(
+            session, FAC_URL, params, logger=logger, config=config
+        )
         # PostgREST returns a JSON array; transport failure -> None -> stop.
         results = data if isinstance(data, list) else []
         if not results:
@@ -115,7 +117,9 @@ def _fetch(session, logger) -> list[dict]:
     return list(paginate(_page, start_marker=0))
 
 
-def run(root: Path | None = None, api_key: str | None = None, force: bool = False) -> dict:
+def run(
+    root: Path | None = None, api_key: str | None = None, force: bool = False
+) -> dict:
     root = Path(root or PROJECT_ROOT)
     out_path = root / "data" / "staging" / "processed" / "pr_municipal_finance.csv"
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -129,10 +133,14 @@ def run(root: Path | None = None, api_key: str | None = None, force: bool = Fals
 
     api_key = api_key or os.environ.get("FAC_API_KEY", "")
     if not api_key:
-        logger.warning("  FAC_API_KEY not set — request will be limited/blocked by api.data.gov")
+        logger.warning(
+            "  FAC_API_KEY not set — request will be limited/blocked by api.data.gov"
+        )
     session = build_session(_USER_AGENT, {"X-Api-Key": api_key} if api_key else None)
 
-    logger.info("Fetching PR municipal Single Audits from the Federal Audit Clearinghouse...")
+    logger.info(
+        "Fetching PR municipal Single Audits from the Federal Audit Clearinghouse..."
+    )
     try:
         records = _fetch(session, logger)
     finally:
@@ -141,7 +149,9 @@ def run(root: Path | None = None, api_key: str | None = None, force: bool = Fals
     df = parse_records(records, municipal_only=True)
     df.to_csv(out_path, index=False, encoding="utf-8")
     status = "OK" if len(df) else "NO_DATA"
-    logger.info(f"  {status}: {len(df):,} municipal single-audit records → {out_path.name}")
+    logger.info(
+        f"  {status}: {len(df):,} municipal single-audit records → {out_path.name}"
+    )
     return {"rows": len(df), "path": str(out_path), "status": status}
 
 
@@ -152,8 +162,12 @@ fetch = run
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--api-key", default=None, help="FAC API key (or set FAC_API_KEY)")
-    parser.add_argument("--force", action="store_true", help="Re-fetch even if output exists")
+    parser.add_argument(
+        "--api-key", default=None, help="FAC API key (or set FAC_API_KEY)"
+    )
+    parser.add_argument(
+        "--force", action="store_true", help="Re-fetch even if output exists"
+    )
     args = parser.parse_args()
     result = run(api_key=args.api_key, force=args.force)
     print(f"\nMunicipal single audits: {result['rows']:,} rows — {result['status']}")
