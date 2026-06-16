@@ -184,7 +184,7 @@ sources:
     endpoint_url: https://www.fema.gov/openfema-data-page/hazard-mitigation-grant-program-disaster-summaries-v2
     producer_script: scripts/download_fema.py
     expected_outputs:
-      - data/staging/processed/pr_fema_hmgp.csv
+      - data/staging/processed/pr_fema_hmgp_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -846,7 +846,7 @@ sources:
     endpoint_url: https://www.sba.gov/document/report-sba-loan-data-tools
     producer_script: scripts/download_sba.py
     expected_outputs:
-      - data/staging/processed/pr_sba_loans.csv
+      - data/staging/processed/pr_sba_loans_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -911,7 +911,7 @@ sources:
     endpoint_url: https://www.usace.army.mil/Missions/Civil-Works/
     producer_script: scripts/download_usace_civil.py
     expected_outputs:
-      - data/staging/processed/pr_usace_civil.csv
+      - data/staging/processed/pr_usace_civil_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -937,7 +937,7 @@ sources:
     endpoint_url: https://www.epa.gov/grants
     producer_script: scripts/download_epa.py
     expected_outputs:
-      - data/staging/processed/pr_epa_grants.csv
+      - data/staging/processed/pr_epa_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -950,7 +950,7 @@ sources:
     endpoint_url: https://www.transportation.gov/grants
     producer_script: scripts/download_dot.py
     expected_outputs:
-      - data/staging/processed/pr_dot_grants.csv
+      - data/staging/processed/pr_dot_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -963,7 +963,7 @@ sources:
     endpoint_url: https://www.usda.gov/topics/farming/grants-and-loans
     producer_script: scripts/download_usda.py
     expected_outputs:
-      - data/staging/processed/pr_usda.csv
+      - data/staging/processed/pr_usda_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -976,7 +976,7 @@ sources:
     endpoint_url: https://www.energy.gov/eere/funding/funding-opportunities
     producer_script: scripts/download_doe.py
     expected_outputs:
-      - data/staging/processed/pr_doe.csv
+      - data/staging/processed/pr_doe_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -989,7 +989,7 @@ sources:
     endpoint_url: https://www.justice.gov/grants
     producer_script: scripts/download_doj_grants.py
     expected_outputs:
-      - data/staging/processed/pr_doj_grants.csv
+      - data/staging/processed/pr_doj_grants_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1002,7 +1002,7 @@ sources:
     endpoint_url: https://www2.ed.gov/programs/find/title/index.html
     producer_script: scripts/download_ed.py
     expected_outputs:
-      - data/staging/processed/pr_ed_grants.csv
+      - data/staging/processed/pr_ed_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1015,7 +1015,7 @@ sources:
     endpoint_url: https://www.hhs.gov/grants/
     producer_script: scripts/download_hhs.py
     expected_outputs:
-      - data/staging/processed/pr_hhs_grants.csv
+      - data/staging/processed/pr_hhs_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1028,7 +1028,7 @@ sources:
     endpoint_url: https://www.doi.gov/oia
     producer_script: scripts/download_oia.py
     expected_outputs:
-      - data/staging/processed/pr_oia_grants.csv
+      - data/staging/processed/pr_oia_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1081,7 +1081,7 @@ sources:
     endpoint_url: https://www.treasury.gov/ofac/downloads/sdn.csv
     producer_script: scripts/download_ofac.py
     expected_outputs:
-      - data/staging/processed/ofac_sdn.csv
+      - data/staging/processed/pr_ofac_sdn.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1159,7 +1159,7 @@ sources:
     endpoint_url: https://www.ssa.gov/data/
     producer_script: scripts/download_ssa.py
     expected_outputs:
-      - data/staging/processed/pr_ssa.csv
+      - data/staging/processed/pr_ssa_benefits.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1237,7 +1237,7 @@ sources:
     endpoint_url: https://www.dol.gov/agencies/eta/wioa
     producer_script: scripts/download_wioa.py
     expected_outputs:
-      - data/staging/processed/pr_wioa.csv
+      - data/staging/processed/pr_wioa_grants.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1263,7 +1263,7 @@ sources:
     endpoint_url: https://www.benefits.va.gov/REPORTS/
     producer_script: scripts/download_va.py
     expected_outputs:
-      - data/staging/processed/pr_va.csv
+      - data/staging/processed/pr_va_benefits.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1277,7 +1277,8 @@ sources:
     endpoint_url: https://www.fdic.gov/resources/data-tools/
     producer_script: scripts/download_fdic.py
     expected_outputs:
-      - data/staging/processed/pr_fdic.csv
+      - data/staging/processed/pr_fdic_financials.csv
+      - data/staging/processed/pr_fdic_institutions.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1290,7 +1291,7 @@ sources:
     endpoint_url: https://www.ncua.gov/analysis/credit-union-corporate-call-report-data
     producer_script: scripts/download_ncua.py
     expected_outputs:
-      - data/staging/processed/pr_ncua.csv
+      - data/staging/processed/pr_ncua_credit_unions.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1303,7 +1304,7 @@ sources:
     endpoint_url: https://www.fhfa.gov/data
     producer_script: scripts/download_fhlb.py
     expected_outputs:
-      - data/staging/processed/pr_fhlb.csv
+      - data/staging/processed/pr_fhlb_advances.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1316,7 +1317,8 @@ sources:
     endpoint_url: https://www.sec.gov/edgar
     producer_script: scripts/download_sec.py
     expected_outputs:
-      - data/staging/processed/pr_sec_edgar.csv
+      - data/staging/processed/pr_sec_companies.csv
+      - data/staging/processed/pr_sec_financials.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1394,7 +1396,7 @@ sources:
     endpoint_url: https://projects.propublica.org/nonprofits/api
     producer_script: scripts/download_nonprofits.py
     expected_outputs:
-      - data/staging/processed/pr_nonprofits_990.csv
+      - data/staging/processed/pr_nonprofits.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1407,7 +1409,7 @@ sources:
     endpoint_url: https://www.gao.gov/
     producer_script: scripts/download_gao_ig.py
     expected_outputs:
-      - data/staging/processed/pr_gao_ig_audits.csv
+      - data/staging/processed/pr_gao_ig_reports.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1420,7 +1422,7 @@ sources:
     endpoint_url: https://www.dol.gov/agencies/whd
     producer_script: scripts/download_dol.py
     expected_outputs:
-      - data/staging/processed/pr_dol_whd.csv
+      - data/staging/processed/pr_dol_enforcement.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1446,7 +1448,7 @@ sources:
     endpoint_url: https://www.grants.gov/
     producer_script: scripts/download_research.py
     expected_outputs:
-      - data/staging/processed/pr_research_grants.csv
+      - data/staging/processed/pr_research_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1
@@ -1459,7 +1461,7 @@ sources:
     endpoint_url: https://www.grants.gov/
     producer_script: scripts/download_grants.py
     expected_outputs:
-      - data/staging/processed/pr_grants.csv
+      - data/staging/processed/pr_grants_master.csv
     schema_version: r5_v1
     validation_threshold:
       min_rows: 1

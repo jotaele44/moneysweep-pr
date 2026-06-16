@@ -1,0 +1,497 @@
+{
+  "files": {
+    "data/staging/processed/normalized_expansion_dod_upr_2001_2015.csv": {
+      "row_count": 1901,
+      "sha256": "c282fd0bfe9bd0104a3edd55575c02efd948895bf4f7002ee5d0c09dd8bb8d70",
+      "size_bytes": 599581
+    },
+    "data/staging/processed/normalized_expansion_dod_upr_2016_2025.csv": {
+      "row_count": 2774,
+      "sha256": "ffea2ceb9bbb1d15e1b56f18dabb0942d7e3454cfe7530dcb463bdabeb432066",
+      "size_bytes": 871223
+    },
+    "data/staging/processed/normalized_expansion_fpds_2005_2008_direct.csv": {
+      "row_count": 14717,
+      "sha256": "fb3d5b0b9c1d87c50ee58266af4a33fab9b3d5a9c651b30fedbc036044dc682f",
+      "size_bytes": 4509245
+    },
+    "data/staging/processed/normalized_expansion_fpds_2005_2008_vendor.csv": {
+      "row_count": 6696,
+      "sha256": "ed3abf5e3621a6d56c3456cbae29d3fa6ead00107fdd0fbf3a24bdc9666eb78d",
+      "size_bytes": 2024689
+    },
+    "data/staging/processed/normalized_expansion_fpds_2009_2016_direct.csv": {
+      "row_count": 25615,
+      "sha256": "d4dfa999a428d3db1412ea58a32441dac2f3fd1b72d0cd57bc33d04b6463bff1",
+      "size_bytes": 7966362
+    },
+    "data/staging/processed/normalized_expansion_fpds_2009_2016_vendor.csv": {
+      "row_count": 17975,
+      "sha256": "70575e65c5d40d78ba699e7fb2076784f744b2d99268d70a91b1c06d946ad471",
+      "size_bytes": 5528195
+    },
+    "data/staging/processed/normalized_expansion_fpds_2017_2025_direct.csv": {
+      "row_count": 24595,
+      "sha256": "e84381e418de02d41888dc8529dea88bc20f87818d94c362c2086e2e423a2bc8",
+      "size_bytes": 8160123
+    },
+    "data/staging/processed/normalized_expansion_fpds_2017_2025_vendor.csv": {
+      "row_count": 17094,
+      "sha256": "2741b0311ba46194b257d35cf62be1904014a4d5066fadb8f421f5b0974deb66",
+      "size_bytes": 5524984
+    },
+    "data/staging/processed/normalized_expansion_idv_indirect_pr.csv": {
+      "row_count": 541,
+      "sha256": "cc76f1127aa5bce3c8feac3e63f958a0db841ae4e05e16e0bc4048b539f7199e",
+      "size_bytes": 237478
+    },
+    "data/staging/processed/normalized_expansion_reconstruction_2017_2025.csv": {
+      "row_count": 1356,
+      "sha256": "54ddb20656cfd022f8c1f662418d888052d33507bb2a422b9484a1220a91880c",
+      "size_bytes": 581297
+    },
+    "data/staging/processed/pr_aafaf_budget.csv": {
+      "row_count": 4,
+      "sha256": "6b1a92e10179a3b3d6e07bcd868f1e43febd8d33bda66e3d554c97aa697252e9",
+      "size_bytes": 550
+    },
+    "data/staging/processed/pr_act60_decrees.csv": {
+      "row_count": 5,
+      "sha256": "f2072346569cd4dcbc6ccb207c06d606521f988fb5567322ce1ea1b6817c3012",
+      "size_bytes": 682
+    },
+    "data/staging/processed/pr_active_contractors.csv": {
+      "row_count": 0,
+      "sha256": "2a3ea42d84a536ef4d70cd46df0dd7e27ed82279dc38d76b47888797c335ad51",
+      "size_bytes": 135
+    },
+    "data/staging/processed/pr_bond_flow.csv": {
+      "row_count": 0,
+      "sha256": "d5d7ac65b8b337c744ed290b3eac5967141084d819d65480e78ec04ae0aa3464",
+      "size_bytes": 262
+    },
+    "data/staging/processed/pr_cabilderos.csv": {
+      "row_count": 0,
+      "sha256": "651ddac158fce009c60eeb757a8d153df38cab50d76c0245c8ddd93d7efda116",
+      "size_bytes": 167
+    },
+    "data/staging/processed/pr_cdbg_dr_master.csv": {
+      "row_count": 7700,
+      "sha256": "18e33b1d79024e302d6e0f1ae272c3dcd621b6ae70316857289b886a4089404e",
+      "size_bytes": 2707911
+    },
+    "data/staging/processed/pr_chip.csv": {
+      "row_count": 4,
+      "sha256": "0d716c3af20837f3e501d75fcbe74b053670251767026678ee12a7bc18548655",
+      "size_bytes": 378
+    },
+    "data/staging/processed/pr_cofina.csv": {
+      "row_count": 5,
+      "sha256": "21c7ce8fb30d302a568200d141c500447f41c9dac0c99ed044829b0041acecce",
+      "size_bytes": 563
+    },
+    "data/staging/processed/pr_compras_awards.csv": {
+      "row_count": 0,
+      "sha256": "75764226724ca6e64e2c02f1556f24ada1daee364e0e72b4c03deac71947d02e",
+      "size_bytes": 117
+    },
+    "data/staging/processed/pr_compras_rfps.csv": {
+      "row_count": 0,
+      "sha256": "c64204f97ab9b2688d9c811629b031405e2690444323c68dbc4ea31cb432654e",
+      "size_bytes": 82
+    },
+    "data/staging/processed/pr_contracts_master.csv": {
+      "row_count": 68681,
+      "sha256": "b24bae35d029461bb214502496597c7f319bdc9958bdc52c5df11a1bfb0b577e",
+      "size_bytes": 23443353
+    },
+    "data/staging/processed/pr_contralor_audits.csv": {
+      "row_count": 0,
+      "sha256": "6b6f21707ab7fc5ebd3b67c75149f0a3e2de771938053eee8c27a6279183946c",
+      "size_bytes": 162
+    },
+    "data/staging/processed/pr_cor3_projects.csv": {
+      "row_count": 0,
+      "sha256": "0c9eb91263e51edf80343e2d93ef4de37b770a3997b46604df344a6a784fabfa",
+      "size_bytes": 146
+    },
+    "data/staging/processed/pr_corporate_registry.csv": {
+      "row_count": 0,
+      "sha256": "2a3ea42d84a536ef4d70cd46df0dd7e27ed82279dc38d76b47888797c335ad51",
+      "size_bytes": 135
+    },
+    "data/staging/processed/pr_delivery_scorecard.csv": {
+      "row_count": 0,
+      "sha256": "da1839255389cb2e7c3823fc1d6b2a888dd6141b7f2404e7ec3ff33201ca1c6e",
+      "size_bytes": 220
+    },
+    "data/staging/processed/pr_doe_master.csv": {
+      "row_count": 180,
+      "sha256": "6c6130e3b788c87ece54a8e579060a4dbae0b7f2c10253f479a30d87c65e6da4",
+      "size_bytes": 41173
+    },
+    "data/staging/processed/pr_doj_grants_master.csv": {
+      "row_count": 419,
+      "sha256": "6023ff165f74738bd1a5d78692a5e0c655b4df97c5683c7a80409f84b83c1fc8",
+      "size_bytes": 161352
+    },
+    "data/staging/processed/pr_dol_enforcement.csv": {
+      "row_count": 3,
+      "sha256": "98c8e55f884c1c4ce607e4d3a8e7677acae628ad1b669bd2e4c4d2f72ac929fb",
+      "size_bytes": 650
+    },
+    "data/staging/processed/pr_dot_master.csv": {
+      "row_count": 376,
+      "sha256": "513094bef53a8cffd7c08e21c758154751d91ee388b06f4d46ed1f5c65f46178",
+      "size_bytes": 175503
+    },
+    "data/staging/processed/pr_earmarks.csv": {
+      "row_count": 0,
+      "sha256": "a785039c5ab396909713e4e60d163341b1dc5111d496dd71f738b9961a10c7ff",
+      "size_bytes": 213
+    },
+    "data/staging/processed/pr_ed_master.csv": {
+      "row_count": 379,
+      "sha256": "754451e40a3d1c2b6c20d3e291601e629eee23aade4ad532c9795ca9881efaa3",
+      "size_bytes": 81897
+    },
+    "data/staging/processed/pr_eia_power_sector.csv": {
+      "row_count": 615,
+      "sha256": "9b292608444dfccdf40fab254cb363369015da87c31682f1e143c87806c5af05",
+      "size_bytes": 138507
+    },
+    "data/staging/processed/pr_emma_bonds.csv": {
+      "row_count": 20,
+      "sha256": "66b8ed22487f59fbfd74a6d3d208621904926d81811127459e45edef5096c9bc",
+      "size_bytes": 5444
+    },
+    "data/staging/processed/pr_emma_underwriters.csv": {
+      "row_count": 15,
+      "sha256": "b6da6acf3f6c866bd8a47dcb6d92e0ccce4130e543fc4af5ec7e7a423025103e",
+      "size_bytes": 1290
+    },
+    "data/staging/processed/pr_epa_master.csv": {
+      "row_count": 631,
+      "sha256": "67111e8b01d63fd3398f993c6e702d2cf38f5484faae7778b56ac642b72385e6",
+      "size_bytes": 296789
+    },
+    "data/staging/processed/pr_eqb_permits.csv": {
+      "row_count": 3361,
+      "sha256": "83fe4e0c2cba2a076d891e2b8894d3772d54c86c441591ce3ee0ea6d02713701",
+      "size_bytes": 287517
+    },
+    "data/staging/processed/pr_exim_master.csv": {
+      "row_count": 0,
+      "sha256": "0e97d455e15af27ad3b473e72ac1cf71af35ed728e286cad81efd5fcbc97793c",
+      "size_bytes": 189
+    },
+    "data/staging/processed/pr_fcc_usf.csv": {
+      "row_count": 4,
+      "sha256": "903885f38b7df96cd61c7ac6ec34e442ac96f6ccca7ced3ac27f62cde34cf21d",
+      "size_bytes": 781
+    },
+    "data/staging/processed/pr_fdic_financials.csv": {
+      "row_count": 2086,
+      "sha256": "fd5a176e0786b5c408759e02a70374bbf65beadc94d9ce344b1faa9f4b7a7f95",
+      "size_bytes": 304214
+    },
+    "data/staging/processed/pr_fdic_institutions.csv": {
+      "row_count": 44,
+      "sha256": "932af8c97d62a5d55ea38287663e289578865d550f91d256a11ca7e3f308fafa",
+      "size_bytes": 5625
+    },
+    "data/staging/processed/pr_fec_contributions.csv": {
+      "row_count": 16637,
+      "sha256": "050d9b642c09e76abaca1189c084617d6c4927af9062a2b943534be11e536c14",
+      "size_bytes": 2372540
+    },
+    "data/staging/processed/pr_fema_hmgp_master.csv": {
+      "row_count": 25,
+      "sha256": "f93e7a5901feab0f934bc94eb51455ef48476d6403a446866e61609a14cc3ba8",
+      "size_bytes": 4512
+    },
+    "data/staging/processed/pr_fema_pa_master.csv": {
+      "row_count": 21868,
+      "sha256": "5983e2eb57cbe6e73cf1f331dbaba6abd46e9b31c414b843031c10f1da19222e",
+      "size_bytes": 5118438
+    },
+    "data/staging/processed/pr_fhlb_advances.csv": {
+      "row_count": 3,
+      "sha256": "5649c743ed8e40434153ac559717f415e53c6981cabc2733a235caca10ee23fa",
+      "size_bytes": 526
+    },
+    "data/staging/processed/pr_fred_timeseries.csv": {
+      "row_count": 2131,
+      "sha256": "78572aafc7bf3ac2bb7c8a3993f84467e19add1cd67a62bd41cb3c64f5d31673",
+      "size_bytes": 304204
+    },
+    "data/staging/processed/pr_ftm_facility_matches.csv": {
+      "row_count": 4,
+      "sha256": "d8ee292499f3961d2ad4a01d42f652479daec7b23ffc36dfbf7319066bede328",
+      "size_bytes": 646
+    },
+    "data/staging/processed/pr_ftm_municipal_bridge.csv": {
+      "row_count": 246,
+      "sha256": "de8f172f365f747eeee8bdfca560eae6304200d11bcacad4cb1847df0440e9b9",
+      "size_bytes": 13317
+    },
+    "data/staging/processed/pr_ftm_wire_ledger.csv": {
+      "row_count": 25,
+      "sha256": "c3e9bab2bfe52711e32c961c45f3f81396a96289582fbc597c45dd5b6b4d6874",
+      "size_bytes": 2142
+    },
+    "data/staging/processed/pr_gao_ig_reports.csv": {
+      "row_count": 5,
+      "sha256": "9ee4cb83408bedcf5ff317e3c50e3a8739909d35f46447ca0990d9fef2f7a1a7",
+      "size_bytes": 1290
+    },
+    "data/staging/processed/pr_gleif_entities.csv": {
+      "row_count": 501,
+      "sha256": "1c6a23008d45b2befb0c3b181566a134329edd125538a6c7e63211ae39290e2e",
+      "size_bytes": 143524
+    },
+    "data/staging/processed/pr_gleif_relationships.csv": {
+      "row_count": 66,
+      "sha256": "419d8997c7dc0e2eb7665a5fbe3191a01186d8f91fd8d8ab947fad68d28e8038",
+      "size_bytes": 7151
+    },
+    "data/staging/processed/pr_grants_master.csv": {
+      "row_count": 461668,
+      "sha256": "8d33432e294222410aec70472a4d0de1707b4f5f4a4aa3e94071e43655623242",
+      "size_bytes": 150210274
+    },
+    "data/staging/processed/pr_hacienda_revenues.csv": {
+      "row_count": 8,
+      "sha256": "6bcf54626a3899e75b42129321b737e85576a9a68ec567e19dc6001cc3f8b41c",
+      "size_bytes": 740
+    },
+    "data/staging/processed/pr_haf_spending.csv": {
+      "row_count": 0,
+      "sha256": "0e97d455e15af27ad3b473e72ac1cf71af35ed728e286cad81efd5fcbc97793c",
+      "size_bytes": 189
+    },
+    "data/staging/processed/pr_hhs_master.csv": {
+      "row_count": 307,
+      "sha256": "d69b0ea4a41cca061d841c881a2c6a2b8cd88017c3a81abf6d5fa2b844398a7c",
+      "size_bytes": 78042
+    },
+    "data/staging/processed/pr_hud_hcv.csv": {
+      "row_count": 2,
+      "sha256": "e421ef85cd8e74eb3b9ed2be252875f8bc94e9b5cb0f5c15d7487a3d25483eb0",
+      "size_bytes": 336
+    },
+    "data/staging/processed/pr_lda_filings.csv": {
+      "row_count": 1,
+      "sha256": "c8b3aa4995156450e71753b8ba2bbf7f5b2b316815970355df4e39bd7ef5f76f",
+      "size_bytes": 637
+    },
+    "data/staging/processed/pr_lihtc_projects.csv": {
+      "row_count": 0,
+      "sha256": "b91c4c0f3956f1c9a3e5c757905233d16b5897b4ea9b530ff28049d1206ee27b",
+      "size_bytes": 213
+    },
+    "data/staging/processed/pr_medicaid_fmap.csv": {
+      "row_count": 89,
+      "sha256": "b5e8d0816d04f80cd6baee3be3978a098d93597f354d65f35f76bbb1f21edfe2",
+      "size_bytes": 7327
+    },
+    "data/staging/processed/pr_medicare_advantage.csv": {
+      "row_count": 5,
+      "sha256": "8931bf115e7d2e5485b9efd11c90a397b0df6459fb13bc54f25fcfbfa38037fb",
+      "size_bytes": 848
+    },
+    "data/staging/processed/pr_medicare_parts.csv": {
+      "row_count": 4,
+      "sha256": "61d7db3d90d310ef59206fd5434e3affa8cdf98680eb0561813d792e1cee344b",
+      "size_bytes": 498
+    },
+    "data/staging/processed/pr_msrb_trades.csv": {
+      "row_count": 0,
+      "sha256": "8e93f8a90866cbd44d3c5ff6deebf8b16c2c5e97091be0d569c0b03c8741f50e",
+      "size_bytes": 119
+    },
+    "data/staging/processed/pr_municipal_finance.csv": {
+      "row_count": 5,
+      "sha256": "bc937bcb507f992e135300d116f02f96a279b97b244e0d5604e5b46d5770cbe9",
+      "size_bytes": 389
+    },
+    "data/staging/processed/pr_ncua_credit_unions.csv": {
+      "row_count": 4,
+      "sha256": "8aeef1eb4802be442b8b93ed90fbe47deac5bdf5fb3f0d3e7e7cc3b1f07d31d9",
+      "size_bytes": 839
+    },
+    "data/staging/processed/pr_nfip_claims.csv": {
+      "row_count": 0,
+      "sha256": "fc19ab6d78cc3133c790fa327b3f5d6378bf7f41dbda4cefce4eb20070e68a94",
+      "size_bytes": 205
+    },
+    "data/staging/processed/pr_nih_grants.csv": {
+      "row_count": 103,
+      "sha256": "d256c73a773cc88c52c0cfc56605c24c572ecf794e4c78a8f607456a9c14eabd",
+      "size_bytes": 16884
+    },
+    "data/staging/processed/pr_nmtc_allocations.csv": {
+      "row_count": 0,
+      "sha256": "ab6b96ab796674bc775933f74b89a4f2c64236721490ec9bdddf87886395ba0e",
+      "size_bytes": 121
+    },
+    "data/staging/processed/pr_nonprofits.csv": {
+      "row_count": 3,
+      "sha256": "849ab6fe84ad9dfa03d1158054c8ac39d442ddf3e9213afcbc2def848829b493",
+      "size_bytes": 485
+    },
+    "data/staging/processed/pr_ofac_matches.csv": {
+      "row_count": 0,
+      "sha256": "878eaf18ad2122b66ce4c3456598d08d87df21b21ff84b043014fea20f30bd2f",
+      "size_bytes": 120
+    },
+    "data/staging/processed/pr_ofac_sdn.csv": {
+      "row_count": 19050,
+      "sha256": "c2e78ae7bb8216859961e1a4895e06345a7cc88b719e62ea7895ddb44f9073cd",
+      "size_bytes": 1627219
+    },
+    "data/staging/processed/pr_oia_master.csv": {
+      "row_count": 364,
+      "sha256": "a70ff5b08602e6f5a59f90ff3af5d70411ed51ae7cc917fb37fd357d47366643",
+      "size_bytes": 157642
+    },
+    "data/staging/processed/pr_p3_contracts.csv": {
+      "row_count": 5,
+      "sha256": "9be3f67a9f605843f9535e36c8961af19538d470c50a04e73d4cdc4d20d02593",
+      "size_bytes": 850
+    },
+    "data/staging/processed/pr_pension_funds.csv": {
+      "row_count": 4,
+      "sha256": "3e086e1c01c6d150c452736bbc6567c0fceb310b113cc23f5837ba50f9b18c66",
+      "size_bytes": 681
+    },
+    "data/staging/processed/pr_prasa_contracts.csv": {
+      "row_count": 0,
+      "sha256": "1ed890263aec8cb89d5701ac1b4ce5007ddab715e246e27a356ec62aa440b140",
+      "size_bytes": 146
+    },
+    "data/staging/processed/pr_prepa_contracts.csv": {
+      "row_count": 8,
+      "sha256": "6fcc44d5cb2dda0cfbeb1d09a09d2a90689cf773eae969c9310233084ea86b77",
+      "size_bytes": 1938
+    },
+    "data/staging/processed/pr_promesa_creditors.csv": {
+      "row_count": 16,
+      "sha256": "58a8a2786da0e7aee043671fdb7647c5bf67ac3dd86f182827ba022e90fe7dcc",
+      "size_bytes": 2251
+    },
+    "data/staging/processed/pr_report_builder_master.csv": {
+      "row_count": 0,
+      "sha256": "f1cd07bbc2dd9d59234994fb1cfcbb6a4bb0338bb8cae0694f27737dbe9ac5f0",
+      "size_bytes": 235
+    },
+    "data/staging/processed/pr_research_master.csv": {
+      "row_count": 4946,
+      "sha256": "3f1333aef23e8f2dd93e4086a2fdec441406ee369fea39a8c864984c6d8a70e8",
+      "size_bytes": 979964
+    },
+    "data/staging/processed/pr_rfp_lobby_crossref.csv": {
+      "row_count": 0,
+      "sha256": "e36d95174cbafb23cd7fb739637dc873d85438452e5a3cc8233c1e24b3a159ff",
+      "size_bytes": 209
+    },
+    "data/staging/processed/pr_rum_coverover.csv": {
+      "row_count": 7,
+      "sha256": "1aa6a9a68fa95d047128ddfd96599cc7e469cd9646fa0c1dde597f6e013cbb7c",
+      "size_bytes": 1008
+    },
+    "data/staging/processed/pr_sba_loans_master.csv": {
+      "row_count": 2,
+      "sha256": "c32f8d582ff14d0c1bf8773e2d055647601342afccc776f3e37f6e7e44b517f2",
+      "size_bytes": 361
+    },
+    "data/staging/processed/pr_sbir_master.csv": {
+      "row_count": 0,
+      "sha256": "0e97d455e15af27ad3b473e72ac1cf71af35ed728e286cad81efd5fcbc97793c",
+      "size_bytes": 189
+    },
+    "data/staging/processed/pr_sec_companies.csv": {
+      "row_count": 15,
+      "sha256": "3731b1b7bcbc6fd4b5f5818e6c4a890bde442a09f613e12ba24104c6dfcd9002",
+      "size_bytes": 1651
+    },
+    "data/staging/processed/pr_sec_financials.csv": {
+      "row_count": 156,
+      "sha256": "ef055ec70454c5dd6a8eba5578be98a5fae01002f3f99dc6546634b3db579036",
+      "size_bytes": 17378
+    },
+    "data/staging/processed/pr_sec_holdings.csv": {
+      "row_count": 54,
+      "sha256": "6540e9ce339228b32d247efc9465835266fcfa7b99cceba4939eb1a9e83b3918",
+      "size_bytes": 7090
+    },
+    "data/staging/processed/pr_sec_officers.csv": {
+      "row_count": 85,
+      "sha256": "9cc4d3509e8a2cb6d0e86bd2685571104f964a9ec66f264816b1d264825c2349",
+      "size_bytes": 12219
+    },
+    "data/staging/processed/pr_sf133_budget_execution.csv": {
+      "row_count": 1247,
+      "sha256": "26c13b5b1e371ed3d1cd76a362c749aa5f99743367900e70bbadc10f54ef5861",
+      "size_bytes": 142891
+    },
+    "data/staging/processed/pr_slfrf_master.csv": {
+      "row_count": 200,
+      "sha256": "4e1956d9af20c7bb7dc170877fb02f929ecf4ab116d4135479ff0720adb7f70b",
+      "size_bytes": 417971
+    },
+    "data/staging/processed/pr_snap_nap.csv": {
+      "row_count": 61,
+      "sha256": "dc7b5ba4605271bd22d68b3ecaa4a35ead6c026838d60af61f0bb9bbcfe6863e",
+      "size_bytes": 3844
+    },
+    "data/staging/processed/pr_ssa_benefits.csv": {
+      "row_count": 6,
+      "sha256": "0c4c417de229da21e46f92cf429cd042df40c775b152bca246390fdea94929a9",
+      "size_bytes": 718
+    },
+    "data/staging/processed/pr_subawards_master.csv": {
+      "row_count": 7122,
+      "sha256": "1d81c6774c56a7622ae98c546ccfc87f826f817b174d02801a60cc5c2ef41c16",
+      "size_bytes": 1671663
+    },
+    "data/staging/processed/pr_usace_civil_master.csv": {
+      "row_count": 3,
+      "sha256": "2649c021d465c2147c96bf1a5d49cbf9198be65c2acec5b3ce375173478bb94a",
+      "size_bytes": 834
+    },
+    "data/staging/processed/pr_usace_permits.csv": {
+      "row_count": 0,
+      "sha256": "67ca414d0042cb4ff63a0cd74dee8dc98e371f0c76590ef80064c7ef40ae9319",
+      "size_bytes": 137
+    },
+    "data/staging/processed/pr_usda_master.csv": {
+      "row_count": 688,
+      "sha256": "5159703d75ce3129dee297b202a1a0d3695fc4848e5a8d7710864318a9c8ca63",
+      "size_bytes": 210557
+    },
+    "data/staging/processed/pr_va_benefits.csv": {
+      "row_count": 6,
+      "sha256": "3b4e0ddbacfa67ab08d936bca0f04d4e3a0ea5a43af37670e1f379c9370f4cbb",
+      "size_bytes": 948
+    },
+    "data/staging/processed/pr_wic.csv": {
+      "row_count": 4,
+      "sha256": "c93f7f1a508587e2f0354b4dfc3bb56686126e2072cf729d9986467856e2d001",
+      "size_bytes": 432
+    },
+    "data/staging/processed/pr_wioa_grants.csv": {
+      "row_count": 444,
+      "sha256": "7ac724b9c73c1eb6299316b35ced46ab6eee37cb992a87460a3ee391ccc73062",
+      "size_bytes": 146508
+    },
+    "data/staging/processed/vendor_targets.csv": {
+      "row_count": 7472,
+      "sha256": "b4e88e28de75a84cd7665b20eb28b98792fc149c7e50d10c21bfee6529a2a3a7",
+      "size_bytes": 292810
+    }
+  },
+  "generated_at": "2026-06-16T10:07:11Z",
+  "note": "Row counts for the gitignored data/staging/processed masters. Committed source of truth for coverage reports in a clean checkout (the CSVs themselves are too large to track \u2014 see size-guard). Regenerate with scripts/build_staging_manifest.py after a data refresh.",
+  "schema_version": "staging_masters_v1"
+}

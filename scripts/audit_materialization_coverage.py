@@ -84,6 +84,19 @@ def _csv_row_count(path: Path) -> int:
         return -1
 
 
+# Non-terminal pipeline intermediates: produced and consumed internally (the
+# normalized_expansion_* FPDS/DoD/reconstruction shards and the SAM-enrichment
+# vendor_targets.csv are folded into pr_contracts_master.csv by
+# deduplicate_master.py / sam_enrichment.py). They are real rows on disk but not
+# primary source outputs, so they classify as "intermediate", not "orphan".
+INTERMEDIATE_PREFIXES = ("normalized_expansion_",)
+INTERMEDIATE_NAMES = frozenset({"vendor_targets.csv"})
+
+
+def _is_intermediate(name: str) -> bool:
+    return name in INTERMEDIATE_NAMES or any(name.startswith(p) for p in INTERMEDIATE_PREFIXES)
+
+
 def inventory_processed_files(root: Path) -> dict[str, Any]:
     """Inventory every materialized CSV in data/staging/processed and classify it.
 
@@ -100,25 +113,31 @@ def inventory_processed_files(root: Path) -> dict[str, Any]:
 
     proc = root / PROCESSED_SUBDIR
     files: list[dict[str, Any]] = []
-    total_rows = declared_rows = orphan_rows = 0
+    total_rows = declared_rows = orphan_rows = intermediate_rows = 0
     for p in sorted(proc.glob("*.csv")):
         rc = _csv_row_count(p)
         rows = max(rc, 0)
         claimed_by = declared_names.get(p.name, [])
-        is_orphan = not claimed_by and rows >= 1
+        is_intermediate = _is_intermediate(p.name)
+        is_orphan = not claimed_by and not is_intermediate and rows >= 1
         total_rows += rows
         if claimed_by:
             declared_rows += rows
+            classification = "declared"
+        elif is_intermediate and rows >= 1:
+            intermediate_rows += rows
+            classification = "intermediate"
         elif is_orphan:
             orphan_rows += rows
+            classification = "orphan"
+        else:
+            classification = "empty"
         files.append(
             {
                 "file": p.name,
                 "rows": rows,
                 "claimed_by": ";".join(claimed_by),
-                "classification": "declared"
-                if claimed_by
-                else ("orphan" if is_orphan else "empty"),
+                "classification": classification,
             }
         )
     files.sort(key=lambda r: -r["rows"])
@@ -129,6 +148,8 @@ def inventory_processed_files(root: Path) -> dict[str, Any]:
         "registry_accounted_rows": declared_rows,
         "orphan_rows": orphan_rows,
         "orphan_file_count": sum(1 for f in files if f["classification"] == "orphan"),
+        "intermediate_rows": intermediate_rows,
+        "intermediate_file_count": sum(1 for f in files if f["classification"] == "intermediate"),
         "files": files,
     }
 
