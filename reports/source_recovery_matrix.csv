@@ -7,7 +7,7 @@ dot_grants,False,api_adapter,True,True,,True,True,scripts/download_dot.py,1,0,1,
 ed_grants,False,api_adapter,True,True,,True,True,scripts/download_ed.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 epa_grants,False,api_adapter,True,True,,True,True,scripts/download_epa.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 exim_bank,False,api_adapter,True,True,,True,True,scripts/download_exim.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
-fdic,False,api_adapter,True,True,,True,True,scripts/download_fdic.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+fdic,False,api_adapter,True,True,,True,True,scripts/download_fdic.py,2,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 fec,True,api_adapter,True,True,FEC_API_KEY,True,True,scripts/download_fec.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 fema_hmgp,False,api_adapter,True,True,,True,True,scripts/download_fema.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 fema_pa_openfema_v2,True,api_adapter,True,True,,True,True,scripts/download_openfema_pa_projects.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
@@ -69,7 +69,7 @@ pr_income_tax_collections,False,api_producer,True,True,,False,True,scripts/downl
 prasa_contracts_master,False,api_producer,True,True,,False,True,scripts/build_prasa_contracts_master.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sam_exclusions,False,api_producer,True,True,SAM_API_KEY,False,True,scripts/download_sam_exclusions.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sec_13f_nport,False,api_producer,True,True,,False,True,scripts/download_sec_holdings.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
-sec_edgar,False,api_producer,True,True,,False,True,scripts/download_sec.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+sec_edgar,False,api_producer,True,True,,False,True,scripts/download_sec.py,2,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sec_officers,False,api_producer,True,True,,False,True,scripts/download_sec_officers.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sf133_budget_execution,False,api_producer,True,True,,False,True,scripts/download_sf133.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 ssa,False,api_producer,True,True,,False,True,scripts/download_ssa.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
