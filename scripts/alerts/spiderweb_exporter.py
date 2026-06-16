@@ -1,4 +1,5 @@
 """Export review-plus alert events as Spiderweb seed packets."""
+
 from __future__ import annotations
 
 import json

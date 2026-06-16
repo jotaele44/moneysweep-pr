@@ -1,4 +1,5 @@
 """Load and normalize project-watchlist configuration."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,7 +8,7 @@ from typing import Any
 try:
     import yaml
 except ImportError:  # pragma: no cover
-    yaml = None
+    yaml = None  # type: ignore[assignment]
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_WATCHLIST_PATH = PROJECT_ROOT / "config" / "project_watchlist.yaml"

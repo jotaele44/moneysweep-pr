@@ -1,14 +1,18 @@
 """Write project-emergence alert outputs."""
+
 from __future__ import annotations
 
 import csv
 import json
 from pathlib import Path
+from typing import Any
 
 from .alert_event_schema import AlertEvent
 from .spiderweb_exporter import export_spiderweb_queue
 
-DEFAULT_ALERT_DIR = Path(__file__).resolve().parents[2] / "data" / "staging" / "processed" / "alerts"
+DEFAULT_ALERT_DIR = (
+    Path(__file__).resolve().parents[2] / "data" / "staging" / "processed" / "alerts"
+)
 
 
 def write_jsonl(events: list[AlertEvent], path: str | Path) -> None:
@@ -23,9 +27,24 @@ def write_csv_ledger(events: list[AlertEvent], path: str | Path) -> None:
     output = Path(path)
     output.parent.mkdir(parents=True, exist_ok=True)
     fields = [
-        "alert_id", "project_id", "canonical_name", "alert_level", "score", "source", "record_id",
-        "record_date", "agency", "vendor", "amount", "municipio", "parcel_id", "project_stage",
-        "trigger_reason", "confidence", "requires_spiderweb", "dedupe_key",
+        "alert_id",
+        "project_id",
+        "canonical_name",
+        "alert_level",
+        "score",
+        "source",
+        "record_id",
+        "record_date",
+        "agency",
+        "vendor",
+        "amount",
+        "municipio",
+        "parcel_id",
+        "project_stage",
+        "trigger_reason",
+        "confidence",
+        "requires_spiderweb",
+        "dedupe_key",
     ]
     with output.open("w", encoding="utf-8", newline="") as fh:
         writer = csv.DictWriter(fh, fieldnames=fields)
@@ -36,7 +55,9 @@ def write_csv_ledger(events: list[AlertEvent], path: str | Path) -> None:
             writer.writerow({field: row.get(field, "") for field in fields})
 
 
-def route_alert_outputs(events: list[AlertEvent], alert_dir: str | Path = DEFAULT_ALERT_DIR) -> dict[str, str | int]:
+def route_alert_outputs(
+    events: list[AlertEvent], alert_dir: str | Path = DEFAULT_ALERT_DIR
+) -> dict[str, Any]:
     base = Path(alert_dir)
     event_path = base / "project_alert_events.jsonl"
     ledger_path = base / "project_watch_ledger.csv"
