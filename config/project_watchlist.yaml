@@ -1,0 +1,76 @@
+projects:
+  - project_id: PRJ_ESENCIA
+    canonical_name: Proyecto Esencia
+    status: active_watch
+    priority: tier_1
+    aliases:
+      - Proyecto Esencia
+      - Esencia
+      - Esencia PR
+      - Esencia Puerto Rico
+    locations:
+      municipios:
+        - Cabo Rojo
+        - Lajas
+        - Guanica
+        - Guánica
+        - San German
+        - San Germán
+      regions:
+        - southwest_pr
+        - coastal_resort_development_zone
+    entity_terms:
+      - Esencia
+      - development
+      - resort
+      - hospitality
+      - tourism
+      - master plan
+    source_scope:
+      - compras_pr
+      - ogpe
+      - junta_planificacion
+      - drna
+      - municipio_records
+      - aaafa
+      - preb
+      - cor3
+      - prdoe
+      - ddec
+      - p3a
+      - usaspending
+      - sam_gov
+      - federal_register
+    spiderweb_trigger_threshold: 55
+
+  - project_id: PRJ_PR100
+    canonical_name: PR100
+    status: active_watch
+    priority: tier_1
+    aliases:
+      - PR100
+      - Puerto Rico Grid Resilience and Transition to 100% Renewable Energy
+      - PR 100
+      - Puerto Rico 100
+    locations:
+      municipios: []
+      regions:
+        - islandwide
+    entity_terms:
+      - grid resilience
+      - renewable energy
+      - transmission
+      - distribution
+      - solar
+      - battery storage
+    source_scope:
+      - doe
+      - luma
+      - preb
+      - prepa
+      - genera
+      - usaspending
+      - cor3
+      - fema
+      - p3a
+    spiderweb_trigger_threshold: 55
