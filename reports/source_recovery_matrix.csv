@@ -40,25 +40,32 @@ usda_grants,False,api_adapter,True,True,,True,True,scripts/download_usda.py,1,0,
 va_benefits,False,api_adapter,True,True,,True,True,scripts/download_va.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 wic,False,api_adapter,True,True,,True,True,scripts/download_wic.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
 wioa,False,api_adapter,True,True,,True,True,scripts/download_wioa.py,1,0,1,,Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).
+census_gov_finances,False,api_producer,True,True,CENSUS_API_KEY,False,True,scripts/download_census_gov_finances.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
 dol_whd_osha,False,api_producer,True,True,,False,True,scripts/download_dol.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 eia_power_sector,False,api_producer,True,True,EIA_API_KEY,False,True,scripts/download_eia.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 emma_infra_revenue,False,api_producer,True,True,,False,True,scripts/extract_emma_revenue.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+eqb_epa_icis,False,api_producer,True,True,,False,True,scripts/download_epa_echo_icis.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
+estadisticas_pr_external_trade,False,api_producer,True,True,,False,True,scripts/download_estadisticas_pr.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
 fcc_usf,False,api_producer,True,True,,False,True,scripts/download_fcc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 fec_committees,False,api_producer,True,True,FEC_API_KEY,False,True,scripts/download_fec_committees.py,3,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 federal_audit_clearinghouse,False,api_producer,True,True,FAC_API_KEY,False,True,scripts/download_fac.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 fema_individual_assistance,False,api_producer,True,True,,False,True,scripts/download_fema_ia.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 financialdata_net,False,api_producer,True,True,FINANCIALDATA_API_KEY,False,True,scripts/enrichment/enrich_financialdata_entities.py,4,0,0,,"Run producer under strict preflight; public API path, set key if gated."
 fred_timeseries,False,api_producer,True,True,FRED_API_KEY,False,True,scripts/download_fred.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+fta_ntd,False,api_producer,True,True,,False,True,scripts/download_fta_ntd.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
 gao_ig_audits,False,api_producer,True,True,,False,True,scripts/download_gao_ig.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 gleif_lei,False,api_producer,True,True,,False,True,scripts/download_gleif.py,2,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 hud_cdbg_dr_public,True,api_producer,True,True,,False,True,scripts/download_cdbg_dr.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 hud_cdbg_mit,False,api_producer,True,True,,False,True,scripts/download_cdbg_mit.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 lihtc,False,api_producer,True,True,,False,True,scripts/download_lihtc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+municipal_finance,False,api_producer,True,True,FAC_API_KEY,False,True,scripts/download_fac_municipal.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 ncua,False,api_producer,True,True,,False,True,scripts/download_ncua.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 ngo_integration_layer,False,api_producer,True,True,,False,True,scripts/ngo_integration.py,3,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 nmtc,False,api_producer,True,True,,False,True,scripts/download_nmtc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 opm_fedscope,False,api_producer,True,True,,False,True,scripts/download_opm_fedscope.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 opportunity_zones,False,api_producer,True,True,,False,True,scripts/download_opportunity_zones.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+pr_general_fund_revenues,False,api_producer,True,True,,False,True,scripts/download_estadisticas_pr.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
+pr_income_tax_collections,False,api_producer,True,True,,False,True,scripts/download_estadisticas_pr.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
 prasa_contracts_master,False,api_producer,True,True,,False,True,scripts/build_prasa_contracts_master.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sam_exclusions,False,api_producer,True,True,SAM_API_KEY,False,True,scripts/download_sam_exclusions.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 sec_13f_nport,False,api_producer,True,True,,False,True,scripts/download_sec_holdings.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
@@ -86,7 +93,7 @@ donaciones_pr,False,manual_export,False,False,,False,True,scripts/ingest_donacio
 dtop_road_contracts,False,manual_export,False,False,,False,True,scripts/ingest_dtop_road_contracts.py,1,0,1,data/manual/dtop_road_contracts/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 dtop_vehicle_fees,False,manual_export,False,False,,False,True,scripts/ingest_dtop_vehicle_fees.py,1,0,1,data/raw/DTOP/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 equitable_sharing,False,manual_export,False,False,,False,True,scripts/ingest_equitable_sharing.py,1,0,1,data/raw/Equitable_Sharing/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
-follow_the_money,False,manual_export,False,False,,False,True,scripts/ingest_follow_the_money.py,4,0,1,data/raw/follow_the_money/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+follow_the_money,False,manual_export,False,False,,False,True,scripts/ingest_follow_the_money.py,3,0,1,data/raw/follow_the_money/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 gaming_commission,False,manual_export,False,False,,False,True,scripts/ingest_gaming_commission.py,1,0,1,data/raw/Gaming/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 hud_drgr_authorized,True,manual_export,False,False,,False,True,scripts/ingest_hud_drgr_exports.py,2,0,1,data/manual/hud_drgr/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 irs_ctc_eitc_pr,False,manual_export,False,False,,False,True,scripts/ingest_irs_ctc_eitc_pr.py,1,0,1,data/raw/IRS_CTC_EITC/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
@@ -101,6 +108,9 @@ ports_authority,False,manual_export,False,False,,False,True,scripts/ingest_ports
 pr_cabilderos,True,manual_export,False,False,,False,True,scripts/ingest_cabilderos.py,1,0,1,data/raw/Cabilderos/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 pr_corporate_registry,False,manual_export,False,False,,False,True,scripts/ingest_active_contractors.py,1,0,1,data/raw/Active Contractor Listing/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 prasa,True,manual_export,False,False,,False,True,scripts/ingest_prasa.py,1,0,1,data/raw/PRASA/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+prasa_cer,False,manual_export,False,False,,False,True,scripts/ingest_prasa_cer.py,1,0,1,data/raw/PRASA/cer/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+prasa_cip,False,manual_export,False,False,,False,True,scripts/ingest_prasa_cer.py,1,0,1,data/raw/PRASA/cip/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+prasa_completed_projects,False,manual_export,False,False,,False,True,scripts/ingest_prasa_cer.py,1,0,1,data/raw/PRASA/completed/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 prasa_rate_revenue,False,manual_export,False,False,,False,True,scripts/ingest_utility_revenue.py,1,0,1,data/manual/prasa_rate_revenue/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 prepa_luma_rate_revenue,False,manual_export,False,False,,False,True,scripts/ingest_utility_revenue.py,1,0,1,data/manual/prepa_rate_revenue/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 prpha_housing_subsidy,False,manual_export,False,False,,False,True,scripts/ingest_prpha_housing_subsidy.py,1,0,1,data/raw/PRPHA/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
@@ -112,11 +122,11 @@ cofina,False,scraper_needed,False,False,,False,True,scripts/download_cofina.py,1
 compras_pr,False,scraper_needed,False,False,,False,True,scripts/download_compras.py,2,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 cor3,True,scraper_needed,False,False,,False,True,scripts/download_cor3.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 emma_bonds,True,scraper_needed,False,False,,False,True,scripts/download_emma.py,2,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-eqb_epa_icis,False,scraper_needed,False,False,,False,True,scripts/download_eqb.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 hacienda,False,scraper_needed,False,False,,False,True,scripts/download_hacienda.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+hacienda_sut_ivu,False,scraper_needed,False,False,,False,True,scripts/download_coverage_gap_intake.py,1,0,0,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 msrb_rtrs_trades,False,scraper_needed,False,False,,False,True,scripts/download_msrb_trades.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
-municipal_finance,False,scraper_needed,False,False,,False,True,scripts/download_municipal.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 p3_authority,False,scraper_needed,False,False,,False,True,scripts/download_p3.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
+pr_act_154_excise,False,scraper_needed,False,False,,False,True,scripts/download_coverage_gap_intake.py,1,0,0,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 pr_act_60_decrees,False,scraper_needed,False,False,,False,True,scripts/download_act60.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 pr_pensions,False,scraper_needed,False,False,,False,True,scripts/download_pr_pensions.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.
 prepa_luma_genera,False,scraper_needed,False,False,,False,True,scripts/download_prepa_contracts.py,1,0,1,,Queued: needs a scraping adapter for the PR-gov HTML/PDF surface.

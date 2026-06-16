@@ -5,19 +5,20 @@ Place exported CSV files into  data/raw/follow_the_money/
 
 Expected files:
   funding_flows_sf133.csv
-  EP_PR_PRBank_Wire_Ledger_ALL.csv
-  EP_PR_PRBank_Summary_ByEntity.csv
-  EP_PR_PRBank_Summary_ByAccount.csv
-  EP_PR_PRBank_Summary_ByYear.csv
   Municipal_Blind_Score_CORE6.csv
   municipality_political_federal_bridge.csv
   facility_matches_cross_exam.csv
 
 Outputs (all in data/staging/processed/):
   pr_sf133_budget_execution.csv   — SF-133 federal budget execution by account
-  pr_ftm_wire_ledger.csv          — PR bank wire transactions (ledger + summaries)
   pr_ftm_municipal_bridge.csv     — Municipal blind scores merged with political/federal bridge
   pr_ftm_facility_matches.csv     — Facility contract match cross-exam (pass-through)
+
+Note: the EP_PR_PRBank_* bank-wire records that previously also lived in this
+dropzone are Jeffrey Epstein PR-case records — they are NOT a public-money source
+and have been separated into the `epstein_pr_case` watchlist
+(data/watchlists/epstein_pr_case/, registries/watchlists/epstein_pr_case.json).
+This ingester no longer reads or produces them.
 
 Usage:
   python3 scripts/ingest_follow_the_money.py
@@ -53,16 +54,6 @@ SF133_OUTPUT_COLUMNS = [
     "outlays",
     "unobligated_balance",
     "obligation_rate",
-]
-
-WIRE_COLUMNS = [
-    "source_file",
-    "txn_date",
-    "entity_raw",
-    "destination_bank",
-    "destination_account",
-    "amount_usd",
-    "year",
 ]
 
 MUNI_BRIDGE_COLUMNS = [
@@ -169,103 +160,7 @@ def _build_sf133(df: pd.DataFrame, logger) -> pd.DataFrame:
 
 
 # ---------------------------------------------------------------------------
-# Output 2: PR bank wire ledger
-# ---------------------------------------------------------------------------
-
-
-def _build_wire_ledger(
-    ledger_df: pd.DataFrame,
-    entity_df: pd.DataFrame,
-    account_df: pd.DataFrame,
-    year_df: pd.DataFrame,
-    logger,
-) -> pd.DataFrame:
-    """
-    Combine wire ledger detail with summary frames into WIRE_COLUMNS schema.
-    Missing columns are filled with empty strings.
-    """
-    frames = []
-
-    # --- detailed ledger ---
-    if ledger_df is not None and not ledger_df.empty:
-        ld = ledger_df.copy()
-        row = pd.DataFrame(
-            {
-                "source_file": ld.get("file", "EP_PR_PRBank_Wire_Ledger_ALL"),
-                "txn_date": ld.get("txn_date", ""),
-                "entity_raw": ld.get("entity_raw", ""),
-                "destination_bank": ld.get("destination_bank", ""),
-                "destination_account": ld.get("destination_account", ""),
-                "amount_usd": ld.get("amount_usd", ""),
-                "year": "",
-            }
-        )
-        frames.append(row)
-        logger.info(f"    Wire ledger detail: {len(row):,} rows")
-
-    # --- by-entity summary ---
-    if entity_df is not None and not entity_df.empty:
-        ed = entity_df.copy()
-        row = pd.DataFrame(
-            {
-                "source_file": "EP_PR_PRBank_Summary_ByEntity",
-                "txn_date": "",
-                "entity_raw": ed.get("entity_clean", ""),
-                "destination_bank": ed.get("destination_bank", ""),
-                "destination_account": "",
-                "amount_usd": ed.get("amount_usd", ""),
-                "year": "",
-            }
-        )
-        frames.append(row)
-        logger.info(f"    Wire by-entity summary: {len(row):,} rows")
-
-    # --- by-account summary ---
-    if account_df is not None and not account_df.empty:
-        ad = account_df.copy()
-        row = pd.DataFrame(
-            {
-                "source_file": "EP_PR_PRBank_Summary_ByAccount",
-                "txn_date": "",
-                "entity_raw": "",
-                "destination_bank": ad.get("destination_bank", ""),
-                "destination_account": ad.get("destination_account", ""),
-                "amount_usd": ad.get("amount_usd", ""),
-                "year": "",
-            }
-        )
-        frames.append(row)
-        logger.info(f"    Wire by-account summary: {len(row):,} rows")
-
-    # --- by-year summary ---
-    if year_df is not None and not year_df.empty:
-        yd = year_df.copy()
-        row = pd.DataFrame(
-            {
-                "source_file": "EP_PR_PRBank_Summary_ByYear",
-                "txn_date": "",
-                "entity_raw": "",
-                "destination_bank": yd.get("destination_bank", ""),
-                "destination_account": "",
-                "amount_usd": yd.get("amount_usd", ""),
-                "year": yd.get("year", ""),
-            }
-        )
-        frames.append(row)
-        logger.info(f"    Wire by-year summary: {len(row):,} rows")
-
-    if not frames:
-        return pd.DataFrame(columns=WIRE_COLUMNS)
-
-    combined = pd.concat(frames, ignore_index=True)
-    for col in WIRE_COLUMNS:
-        if col not in combined.columns:
-            combined[col] = ""
-    return combined[WIRE_COLUMNS].fillna("").astype(str)
-
-
-# ---------------------------------------------------------------------------
-# Output 3: Municipal bridge
+# Output 2: Municipal bridge
 # ---------------------------------------------------------------------------
 
 
@@ -358,7 +253,7 @@ def _build_muni_bridge(
 
 
 # ---------------------------------------------------------------------------
-# Output 4: Facility matches (pass-through)
+# Output 3: Facility matches (pass-through)
 # ---------------------------------------------------------------------------
 
 
@@ -428,27 +323,11 @@ def run(root: Path | None = None, force: bool = False) -> dict:
             return None
 
     sf133_df = _read("funding_flows_sf133.csv")
-    ledger_df = _read("EP_PR_PRBank_Wire_Ledger_ALL.csv")
-    entity_df = _read("EP_PR_PRBank_Summary_ByEntity.csv")
-    account_df = _read("EP_PR_PRBank_Summary_ByAccount.csv")
-    year_df = _read("EP_PR_PRBank_Summary_ByYear.csv")
     blind_df = _read("Municipal_Blind_Score_CORE6.csv")
     bridge_df = _read("municipality_political_federal_bridge.csv")
     facility_df = _read("facility_matches_cross_exam.csv")
 
-    all_missing = all(
-        df is None
-        for df in [
-            sf133_df,
-            ledger_df,
-            entity_df,
-            account_df,
-            year_df,
-            blind_df,
-            bridge_df,
-            facility_df,
-        ]
-    )
+    all_missing = all(df is None for df in [sf133_df, blind_df, bridge_df, facility_df])
     if all_missing:
         logger.warning("  No readable Follow the Money files found")
         return {"rows": 0, "path": str(primary_out), "status": "NO_FILES"}
@@ -472,36 +351,29 @@ def run(root: Path | None = None, force: bool = False) -> dict:
         )
 
     # ------------------------------------------------------------------
-    # Output 2: Wire ledger
+    # Output 2: Municipal bridge
     # ------------------------------------------------------------------
-    wire_out_path = out_dir / "pr_ftm_wire_ledger.csv"
-    try:
-        wire_df = _build_wire_ledger(ledger_df, entity_df, account_df, year_df, logger)
-        wire_df.to_csv(wire_out_path, index=False, encoding="utf-8")
-        logger.info(f"  Written: {wire_out_path.name} ({len(wire_df):,} rows)")
-    except Exception as exc:
-        logger.warning(f"  Wire ledger build failed: {exc}")
-
-    # ------------------------------------------------------------------
-    # Output 3: Municipal bridge
-    # ------------------------------------------------------------------
+    muni_rows = 0
     muni_out_path = out_dir / "pr_ftm_municipal_bridge.csv"
     try:
         muni_df = _build_muni_bridge(blind_df, bridge_df, logger)
         muni_df.to_csv(muni_out_path, index=False, encoding="utf-8")
-        logger.info(f"  Written: {muni_out_path.name} ({len(muni_df):,} rows)")
+        muni_rows = len(muni_df)
+        logger.info(f"  Written: {muni_out_path.name} ({muni_rows:,} rows)")
     except Exception as exc:
         logger.warning(f"  Municipal bridge build failed: {exc}")
 
     # ------------------------------------------------------------------
-    # Output 4: Facility matches
+    # Output 3: Facility matches
     # ------------------------------------------------------------------
+    facility_rows = 0
     facility_out_path = out_dir / "pr_ftm_facility_matches.csv"
     if facility_df is not None and not facility_df.empty:
         try:
             fac_df = _build_facility(facility_df, logger)
             fac_df.to_csv(facility_out_path, index=False, encoding="utf-8")
-            logger.info(f"  Written: {facility_out_path.name} ({len(fac_df):,} rows)")
+            facility_rows = len(fac_df)
+            logger.info(f"  Written: {facility_out_path.name} ({facility_rows:,} rows)")
         except Exception as exc:
             logger.warning(f"  Facility matches build failed: {exc}")
     else:
@@ -509,8 +381,20 @@ def run(root: Path | None = None, force: bool = False) -> dict:
             facility_out_path, index=False, encoding="utf-8"
         )
 
-    status = "OK" if sf133_rows > 0 else "EMPTY"
-    return {"rows": sf133_rows, "path": str(primary_out), "status": status}
+    # Success when ANY output materialized rows — not only SF-133 (whose bulk input
+    # is often absent). `rows` is the total across all produced outputs.
+    total_rows = sf133_rows + muni_rows + facility_rows
+    status = "OK" if total_rows > 0 else "EMPTY"
+    return {
+        "rows": total_rows,
+        "path": str(primary_out),
+        "status": status,
+        "outputs": {
+            "pr_sf133_budget_execution.csv": sf133_rows,
+            "pr_ftm_municipal_bridge.csv": muni_rows,
+            "pr_ftm_facility_matches.csv": facility_rows,
+        },
+    }
 
 
 # ---------------------------------------------------------------------------

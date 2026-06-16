@@ -30,13 +30,13 @@ def test_materialization_readiness_snapshot_matches_runbook_counts():
         Path("reports/materialization_readiness.json").read_text(encoding="utf-8")
     )
 
-    # 124 after the GLEIF/SEC reconcile, then +2 for the key-gated EIA + FRED
-    # time-series producers (eia_power_sector, fred_timeseries) = 126 total;
-    # both are automatable api_producers, so automatable 68 -> 70.
-    assert snapshot["total_sources"] == 126
-    assert snapshot["automatable_total"] == 70
-    assert snapshot["automatable_ready"] == 70
-    assert snapshot["queued_excluded_total"] == 56
+    # Merged: our branch (133/73) ∪ main's GLEIF/SEC/EIA/FRED reconcile, plus
+    # municipal_finance flipped scraper_needed -> api_producer (FAC API). Counts
+    # below are pinned to the regenerated reports/materialization_readiness.json.
+    assert snapshot["total_sources"] == 136
+    assert snapshot["automatable_total"] == 77
+    assert snapshot["automatable_ready"] == 77
+    assert snapshot["queued_excluded_total"] == 59
     assert snapshot["automatable_not_ready"] == []
 
 

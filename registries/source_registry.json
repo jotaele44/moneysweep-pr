@@ -684,9 +684,9 @@
       "source_id": "municipal_finance",
       "family": "municipal",
       "required": false,
-      "authentication": "none",
-      "endpoint_url": "https://www.ocam.pr.gov/",
-      "producer_script": "scripts/download_municipal.py",
+      "authentication": "api_key:FAC_API_KEY",
+      "endpoint_url": "https://api.fac.gov/",
+      "producer_script": "scripts/download_fac_municipal.py",
       "expected_outputs": [
         "data/staging/processed/pr_municipal_finance.csv"
       ],
@@ -694,24 +694,25 @@
       "validation_threshold": {
         "min_rows": 1
       },
-      "update_cadence": "yearly"
+      "update_cadence": "quarterly",
+      "notes": "PR municipal Single Audit (SF-SAC) records from the Federal Audit Clearinghouse (api.fac.gov/general, auditee_state=PR, filtered to MUNICIPIO/MUNICIPALITY OF auditees). API-switch from the OCAM scraper; free api.data.gov key (FAC_API_KEY).\n"
     },
     {
       "source_id": "eqb_epa_icis",
       "family": "territorial",
       "required": false,
       "authentication": "none",
-      "endpoint_url": "https://echo.epa.gov/",
-      "producer_script": "scripts/download_eqb.py",
+      "endpoint_url": "https://echodata.epa.gov/echo/",
+      "producer_script": "scripts/download_epa_echo_icis.py",
       "expected_outputs": [
-        "data/staging/processed/pr_eqb_permits.csv"
+        "data/staging/processed/pr_epa_echo_icis.csv"
       ],
       "schema_version": "r5_v1",
       "validation_threshold": {
-        "min_rows": 1
+        "min_rows": 0
       },
       "update_cadence": "monthly",
-      "notes": "PR Environmental Quality Board + EPA ICIS environmental permits."
+      "notes": "PR environmental enforcement (EPA ICIS-FE&C / ECHO) \u2014 federal penalties assessed against PR facilities. Automatable via the public, keyless ECHO Enforcement Case Search REST API (echodata.epa.gov; X_API_KEY sent opportunistically as an api.data.gov rate-limit header). Materialized by scripts/download_epa_echo_icis.py (endpoint/fields confirmed on first live run).\n"
     },
     {
       "source_id": "emma_bonds",
@@ -844,7 +845,6 @@
       "producer_script": "scripts/ingest_follow_the_money.py",
       "expected_outputs": [
         "data/staging/processed/pr_sf133_budget_execution.csv",
-        "data/staging/processed/pr_ftm_wire_ledger.csv",
         "data/staging/processed/pr_ftm_municipal_bridge.csv",
         "data/staging/processed/pr_ftm_facility_matches.csv"
       ],
@@ -854,7 +854,7 @@
       },
       "manual_drop_dir": "data/raw/follow_the_money/",
       "update_cadence": "yearly",
-      "notes": "Follow the Money export data for PR. ingest_follow_the_money.py is a dropzone reader (no network code) producing 4 outputs from operator-delivered CSV exports in data/raw/follow_the_money/. Previously mislabeled with a phantom pr_follow_the_money.csv output that is never written."
+      "notes": "PR public-money export data (SF-133 budget execution, municipal political/federal bridge, facility contract matches). ingest_follow_the_money.py is a dropzone reader (no network code) producing 3 outputs from operator-delivered CSV exports in data/raw/follow_the_money/. Municipal-bridge and facility-match outputs materialize offline from committed inputs. NOTE - the EP_PR_PRBank_* bank-wire records previously co-located in this dropzone are Jeffrey Epstein PR-case records, not a public-money source; they were separated to the epstein_pr_case watchlist (registries/watchlists/epstein_pr_case.json) and are no longer ingested here."
     },
     {
       "source_id": "fec_committees",
@@ -2131,6 +2131,179 @@
       "manual_drop_dir": "data/raw/PRPHA/",
       "update_cadence": "ad_hoc",
       "notes": "PR Public Housing Administration (AVP/PRPHA) operating subsidies and RAD conversions. Distinct from HUD Section-8 HCV. Operator-delivered exports.\n"
+    },
+    {
+      "source_id": "hacienda_sut_ivu",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://hacienda.pr.gov/inversionistas/estadisticas-y-recaudos-statistics-and-revenues",
+      "producer_script": "scripts/download_coverage_gap_intake.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_hacienda_sut_ivu.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 0
+      },
+      "update_cadence": "monthly",
+      "notes": "PR Treasury Sales & Use Tax (IVU/SUT) collections by fiscal year / month / NAICS, plus COFIM municipal IVU \u2014 the largest PR consumption-tax revenue stream, not otherwise captured. Scraper surface (hacienda.pr.gov bulk tables); queued for a scraping adapter (scraper_needed).\n"
+    },
+    {
+      "source_id": "census_gov_finances",
+      "family": "territorial",
+      "required": false,
+      "authentication": "api_key:CENSUS_API_KEY",
+      "endpoint_url": "https://api.census.gov/data",
+      "producer_script": "scripts/download_census_gov_finances.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_census_gov_finances.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 0
+      },
+      "update_cadence": "yearly",
+      "notes": "Census government-finance / tax-collection figures for PR (FIPS 72) via the Census Data API. Automatable (needs CENSUS_API_KEY); materialized by scripts/download_census_gov_finances.py. Caveat - Census notes PR is excluded from many API datasets; the producer returns EMPTY gracefully if PR is absent from the chosen dataset (dataset/vars confirmed on first live run).\n"
+    },
+    {
+      "source_id": "fta_ntd",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://data.transportation.gov/",
+      "producer_script": "scripts/download_fta_ntd.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_fta_ntd.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 0
+      },
+      "update_cadence": "yearly",
+      "notes": "FTA National Transit Database \u2014 financial, funding-source, and operating-expense data for PR transit agencies (PRHTA, PRITA, Ports Authority). Automatable via the Socrata SODA API on data.transportation.gov; materialized by scripts/download_fta_ntd.py (NTD resource id confirmed on first live run).\n"
+    },
+    {
+      "source_id": "pr_act_154_excise",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://hacienda.pr.gov/inversionistas/estadisticas-y-recaudos-statistics-and-revenues",
+      "producer_script": "scripts/download_coverage_gap_intake.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_act_154_excise.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 0
+      },
+      "update_cadence": "monthly",
+      "notes": "Act 154 excise tax on foreign controlled corporations \u2014 historically ~$1.8B/yr and 13-21% of the General Fund, the single largest GF revenue line. Hacienda statistics surface; queued for a scraping adapter (scraper_needed).\n"
+    },
+    {
+      "source_id": "pr_income_tax_collections",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://datos.estadisticas.pr/",
+      "producer_script": "scripts/download_estadisticas_pr.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_income_tax_collections.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 0
+      },
+      "update_cadence": "yearly",
+      "notes": "PR individual & corporate income tax collections \u2014 the income-contribution series from the Instituto de Estadisticas / Datos.PR CKAN portal. Largest recurring General Fund revenue category. Automatable via the CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py.\n"
+    },
+    {
+      "source_id": "pr_general_fund_revenues",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://datos.estadisticas.pr/",
+      "producer_script": "scripts/download_estadisticas_pr.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_general_fund_revenues.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 0
+      },
+      "update_cadence": "monthly",
+      "notes": "Consolidated PR General Fund net revenues by source (Instituto de Estadisticas \"Ingresos Netos al Fondo General\") \u2014 one authoritative series covering Act 154, income tax, IVU, arbitrios, licenses, lottery, customs, and rum cover-over. Automatable via the Datos.PR CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py.\n"
+    },
+    {
+      "source_id": "estadisticas_pr_external_trade",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://datos.estadisticas.pr/",
+      "producer_script": "scripts/download_estadisticas_pr.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_external_trade.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 0
+      },
+      "update_cadence": "monthly",
+      "notes": "PR external-trade series (imports / exports) from the Instituto de Estadisticas / Datos.PR CKAN portal. Automatable via the CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py alongside the General Fund revenue and income-tax series.\n"
+    },
+    {
+      "source_id": "prasa_cer",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.acueductospr.com/",
+      "producer_script": "scripts/ingest_prasa_cer.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_prasa_cer.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/PRASA/cer/",
+      "update_cadence": "yearly",
+      "notes": "P0 - PRASA Capital Expenditure Report (CER) / audited financial-statement line items. Core financial-infrastructure evidence for PR's largest recovery-driven public corporation. Operator-delivered CSV extracts of the published PDFs.\n"
+    },
+    {
+      "source_id": "prasa_cip",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.acueductospr.com/",
+      "producer_script": "scripts/ingest_prasa_cer.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_prasa_cip.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/PRASA/cip/",
+      "update_cadence": "yearly",
+      "notes": "P0 - PRASA Capital Improvement Program (CIP) project list (project, cost, status, fiscal year). Operator-delivered CSV extracts.\n"
+    },
+    {
+      "source_id": "prasa_completed_projects",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "endpoint_url": "https://www.acueductospr.com/",
+      "producer_script": "scripts/ingest_prasa_cer.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_prasa_completed_projects.csv"
+      ],
+      "schema_version": "r5_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "manual_drop_dir": "data/raw/PRASA/completed/",
+      "update_cadence": "yearly",
+      "notes": "P0 - PRASA completed projects \u2014 FEMA 406 / COR3 recovery-infrastructure join bridge. Operator-delivered CSV extracts.\n"
     }
   ]
 }

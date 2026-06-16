@@ -33,6 +33,9 @@ def test_api_key_status_reports_present_and_missing(monkeypatch, caplog):
     # regardless of operator .env contents. (FEC is no longer a valid "missing"
     # example now that its key is provisioned in .env.)
     monkeypatch.delenv("FINANCIALDATA_API_KEY", raising=False)
+    # Neutralize any local .env so key presence is controlled solely by os.environ —
+    # a developer with a populated .env must see the same result as CI (no .env).
+    monkeypatch.setattr("scripts.pipeline_preflight._load_dotenv_dict", lambda root: {})
 
     with caplog.at_level(logging.DEBUG):
         result = run_pipeline_preflight(REPO_ROOT, _logger(), strict=False)

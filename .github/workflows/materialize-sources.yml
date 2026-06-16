@@ -1,0 +1,73 @@
+name: Materialize automatable sources
+
+# Live/API fetch for the automatable financial-source set. Runs on an egress-capable
+# GitHub Actions runner (the buildout sandbox has no egress). Manual-only by default;
+# uncomment the schedule to run weekly. Outputs are uploaded as artifacts, never committed
+# (data-commit policy: data/** is gitignored).
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type 'YES' to confirm live API fetches"
+        required: true
+        default: "no"
+      source:
+        description: "Optional single source id (blank = all automatable)"
+        required: false
+        default: ""
+      family:
+        description: "Optional family filter (blank = all)"
+        required: false
+        default: ""
+  # schedule:
+  #   - cron: "0 6 * * 1"   # Mondays 06:00 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  materialize:
+    name: Run automatable sources (live)
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(toLower(github.event.inputs.confirm), 'yes') }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Egress preflight
+        run: python3 scripts/check_network_egress.py
+
+      - name: Run automatable sources (live fetch)
+        env:
+          SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
+          FEC_API_KEY: ${{ secrets.FEC_API_KEY }}
+          FAC_API_KEY: ${{ secrets.FAC_API_KEY }}
+          CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
+          LDA_API_KEY: ${{ secrets.LDA_API_KEY }}
+          DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
+          HIGHERGOV_API_KEY: ${{ secrets.HIGHERGOV_API_KEY }}
+          OPENCORPORATES_API_TOKEN: ${{ secrets.OPENCORPORATES_API_TOKEN }}
+          FINANCIALDATA_API_KEY: ${{ secrets.FINANCIALDATA_API_KEY }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+        run: |
+          python3 scripts/run_automatable_sources.py \
+            ${{ github.event.inputs.source && format('--source {0}', github.event.inputs.source) || '' }} \
+            ${{ github.event.inputs.family && format('--family {0}', github.event.inputs.family) || '' }}
+
+      - name: Upload materialized outputs + run summary
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: materialized-sources
+          path: |
+            data/staging/processed
+            data/staging/materialization_run_summary.json
+          if-no-files-found: ignore
