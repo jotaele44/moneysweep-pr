@@ -34,12 +34,27 @@ def test_is_municipal_matches_spanish_and_english_forms():
 @pytest.mark.unit
 def test_parse_records_keeps_only_municipal_and_is_deterministic():
     records = [
-        {"report_id": "2", "auditee_name": "MUNICIPIO DE CAGUAS", "audit_year": "2022",
-         "auditee_state": "PR", "total_amount_expended": "5000000"},
-        {"report_id": "1", "auditee_name": "MUNICIPIO DE PONCE", "audit_year": "2023",
-         "auditee_state": "PR", "total_amount_expended": "9000000"},
-        {"report_id": "9", "auditee_name": "UNIVERSITY OF PUERTO RICO", "audit_year": "2023",
-         "auditee_state": "PR", "total_amount_expended": "1000000"},
+        {
+            "report_id": "2",
+            "auditee_name": "MUNICIPIO DE CAGUAS",
+            "audit_year": "2022",
+            "auditee_state": "PR",
+            "total_amount_expended": "5000000",
+        },
+        {
+            "report_id": "1",
+            "auditee_name": "MUNICIPIO DE PONCE",
+            "audit_year": "2023",
+            "auditee_state": "PR",
+            "total_amount_expended": "9000000",
+        },
+        {
+            "report_id": "9",
+            "auditee_name": "UNIVERSITY OF PUERTO RICO",
+            "audit_year": "2023",
+            "auditee_state": "PR",
+            "total_amount_expended": "1000000",
+        },
     ]
     df = parse_records(records)
     assert list(df.columns) == OUTPUT_COLUMNS
@@ -73,14 +88,25 @@ def test_run_with_mocked_fac_and_apikey_header(tmp_path, monkeypatch):
         session = MagicMock()
         # First page returns one municipal + one non-municipal; second page empty.
         session.get.side_effect = [
-            _resp([
-                {"report_id": "1", "auditee_name": "MUNICIPIO DE PONCE",
-                 "auditee_state": "PR", "audit_year": "2023",
-                 "total_amount_expended": "9000000", "number_of_findings": "2"},
-                {"report_id": "2", "auditee_name": "UNIVERSITY OF PUERTO RICO",
-                 "auditee_state": "PR", "audit_year": "2023",
-                 "total_amount_expended": "1000000"},
-            ]),
+            _resp(
+                [
+                    {
+                        "report_id": "1",
+                        "auditee_name": "MUNICIPIO DE PONCE",
+                        "auditee_state": "PR",
+                        "audit_year": "2023",
+                        "total_amount_expended": "9000000",
+                        "number_of_findings": "2",
+                    },
+                    {
+                        "report_id": "2",
+                        "auditee_name": "UNIVERSITY OF PUERTO RICO",
+                        "auditee_state": "PR",
+                        "audit_year": "2023",
+                        "total_amount_expended": "1000000",
+                    },
+                ]
+            ),
             _resp([]),
         ]
         return session
