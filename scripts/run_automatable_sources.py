@@ -32,6 +32,7 @@ import json
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -131,7 +132,7 @@ def run(
     selected = select_sources(sources, source=source, family=family, only=only)
     selected_ids = [s.get("source_id", "") for s in selected]
 
-    summary = {
+    summary: dict[str, Any] = {
         "selected_count": len(selected_ids),
         "selected": selected_ids,
         "egress_ok": None,
