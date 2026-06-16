@@ -86,6 +86,10 @@ A bump to the **federation export** version is what the release-tagging workflow
 ### Changed
 - Narrowed an over-broad `except Exception` in `contract_sweeper/runtime/validation_gates.py`
   to `(OSError, UnicodeDecodeError, csv.Error)` so unrelated bugs are no longer swallowed (#221).
+- Retired `docs/CODE_GAP_AND_WORKFLOW_AUDIT.md` (2026-06-08 advisory): all of its findings
+  (A1, A2/B5, A3, B1, B2, B3, B4, B6) are resolved or mitigated on `main`. The file now carries
+  a deprecation banner and is kept for historical reference only; the authoritative record lives
+  here and in `docs/BUILD_EXECUTION_SEQUENCE.md` (Waves A–M) (#260).
 
 ### Notes
 - Status remains `NON_PRODUCTION_DIAGNOSTIC`; no end-to-end production run is gated on
