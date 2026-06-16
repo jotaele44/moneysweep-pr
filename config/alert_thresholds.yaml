@@ -1,0 +1,41 @@
+thresholds:
+  watch: 35
+  review: 55
+  urgent: 75
+  critical: 90
+
+critical_requirements:
+  minimum_official_source_families: 2
+  require_stage_or_major_amount: true
+
+scoring:
+  exact_project_name_match: 30
+  alias_match: 20
+  official_procurement_source: 20
+  permit_land_use_environmental_source: 20
+  budget_funding_bond_source: 15
+  vendor_recurrence: 15
+  matching_municipio_or_aoi: 10
+  matching_agency: 10
+  matching_parcel_coordinate_facility: 10
+  amount_exceeds_threshold: 10
+  two_source_families: 10
+  three_or_more_source_families: 15
+  stage_advance: 10
+  media_only_penalty: -20
+  stale_duplicate_penalty: -15
+  unrelated_collision_penalty: -25
+
+amount_thresholds:
+  default_major_amount: 1000000
+
+stage_model:
+  0: rumor_media_only
+  1: entity_formation
+  2: planning_visibility
+  3: funding_visibility
+  4: professional_services
+  5: infrastructure_preparation
+  6: construction_procurement
+  7: operations_layer
+  8: expansion_amendment
