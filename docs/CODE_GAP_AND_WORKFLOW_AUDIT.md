@@ -1,5 +1,15 @@
 # Contract-Sweeper — Code Gap Analysis & Repo Workflow Audit
 
+> **⚠️ Retired (2026-06-16).** Every finding in this audit (A1, A2/B5, A3, B1, B2, B3,
+> B4, B6) has been resolved or mitigated on `main`. Now in place: the quality-gate spine
+> (`ruff` + `mypy` gating, `pytest --cov-fail-under`), governance files (CONTRIBUTING /
+> CODE_OF_CONDUCT / LICENSE / CODEOWNERS / PR template), `.github/dependabot.yml`,
+> `CHANGELOG.md` + `.github/workflows/release-tag.yml`, the narrowed `except` in
+> `contract_sweeper/runtime/validation_gates.py`, and the large-blob posture
+> (`docs/HISTORY_PURGE_PLAN.md` + `.github/workflows/size-guard.yml`). This file is
+> retained for historical reference only — see `CHANGELOG.md` and
+> `docs/BUILD_EXECUTION_SEQUENCE.md` (Waves A–M) for the authoritative record. Tracked by #260.
+
 _Generated 2026-06-08. **Advisory only** — no source code, configuration, or
 workflow was changed by the commit that introduced this document (same posture as
 `RECOMMENDATIONS.md` and `docs/DEPENDENCY_SECURITY_AUDIT.md`). Each finding below is
