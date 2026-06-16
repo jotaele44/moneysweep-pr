@@ -134,6 +134,23 @@ def test_orphan_inventory_surfaces_undeclared_data(repo):
     assert inv["registry_accounted_rows"] == 5000 + 200 + 10
 
 
+def test_intermediate_files_not_counted_as_orphans(repo):
+    """normalized_expansion_* and vendor_targets.csv are non-terminal pipeline
+    intermediates (folded into pr_contracts_master.csv) — they classify as
+    'intermediate', never 'orphan'."""
+    proc = repo / "data" / "staging" / "processed"
+    _write_csv(proc / "normalized_expansion_fpds_2020_direct.csv", 777)
+    _write_csv(proc / "vendor_targets.csv", 50)
+    inv = inventory_processed_files(repo)
+    by_file = {f["file"]: f for f in inv["files"]}
+    assert by_file["normalized_expansion_fpds_2020_direct.csv"]["classification"] == "intermediate"
+    assert by_file["vendor_targets.csv"]["classification"] == "intermediate"
+    # the undeclared orphan (1234) is unchanged; intermediates are a separate bucket
+    assert inv["orphan_rows"] == 1234
+    assert inv["intermediate_rows"] == 777 + 50
+    assert inv["intermediate_file_count"] == 2
+
+
 def test_build_audit_offline_is_hermetic(repo):
     """probe=False must not touch the network and must still emit the inventory."""
     audit = build_audit(repo, probe=False)

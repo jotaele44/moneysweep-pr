@@ -39,9 +39,40 @@ def _read_registry(root: Path) -> list[dict]:
         return []
 
 
+_STAGING_MANIFEST_CACHE: dict[str, dict] = {}
+
+
+def _staging_manifest(root: Path) -> dict:
+    """Row counts for the gitignored staging masters (data/manifests/staging_masters.json).
+
+    Cached per root. Lets a clean checkout (where data/staging/processed/*.csv is
+    absent) still report real coverage — see scripts/build_staging_manifest.py.
+    """
+    key = str(root)
+    if key not in _STAGING_MANIFEST_CACHE:
+        mf = root / "data" / "manifests" / "staging_masters.json"
+        try:
+            _STAGING_MANIFEST_CACHE[key] = json.loads(mf.read_text(encoding="utf-8")).get(
+                "files", {}
+            )
+        except (OSError, ValueError):
+            _STAGING_MANIFEST_CACHE[key] = {}
+    return _STAGING_MANIFEST_CACHE[key]
+
+
 def _file_status(root: Path, rel_path: str) -> dict:
     p = root / rel_path
     if not p.exists():
+        # Clean checkout: the gitignored master is absent. Fall back to the
+        # committed staging manifest so coverage reflects reality, not 0%.
+        entry = _staging_manifest(root).get(rel_path)
+        if entry and entry.get("row_count", 0) >= 1:
+            return {
+                "status": "present",
+                "size_bytes": entry.get("size_bytes", 0),
+                "row_count": entry["row_count"],
+                "source": "manifest",
+            }
         return {"status": "missing", "size_bytes": 0, "row_count": 0}
     size = p.stat().st_size
     if size == 0:
