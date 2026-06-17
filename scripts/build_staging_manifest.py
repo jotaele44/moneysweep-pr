@@ -17,6 +17,7 @@ the bulk data. Regenerate after a local data refresh:
 
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 import sys
@@ -29,10 +30,13 @@ MANIFEST_PATH = PROJECT_ROOT / "data" / "manifests" / "staging_masters.json"
 
 
 def _csv_row_count(path: Path) -> int:
-    """Data rows (excluding the header); -1 if unreadable."""
+    """Data rows (excluding the header); -1 if unreadable.
+
+    Uses csv.reader so quoted multi-line fields are counted correctly.
+    """
     try:
         with path.open(encoding="utf-8-sig", newline="") as f:
-            return max(0, sum(1 for _ in f) - 1)
+            return max(0, sum(1 for _ in csv.reader(f)) - 1)
     except OSError:
         return -1
 

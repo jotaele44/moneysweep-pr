@@ -100,7 +100,7 @@ def test_missing_changed_endpoint_produces_readiness_warning(tmp_path: Path):
 
 def test_all_normalized_rows_contain_required_provenance_fields(tmp_path: Path):
     lda.run(output_dir=tmp_path, live=False)
-    path = tmp_path / "outputs/normalized/lda/lda_filings.csv"
+    path = tmp_path / "data/staging/processed/lda_filings.csv"
     rows = list(csv.DictReader(path.open()))
     assert rows
     required = {
@@ -143,19 +143,19 @@ def test_cli_dry_run_writes_expected_output_files(tmp_path: Path):
     code = lda.main(["--output-dir", str(tmp_path), "--limit", "1"])
     assert code == 0
     expected = [
-        "outputs/normalized/lda/lda_registrants.csv",
-        "outputs/normalized/lda/lda_clients.csv",
-        "outputs/normalized/lda/lda_lobbyists.csv",
-        "outputs/normalized/lda/lda_filings.csv",
-        "outputs/normalized/lda/lda_contributions.csv",
-        "outputs/reference/lda/lda_ref_filing_types.csv",
-        "outputs/reference/lda/lda_ref_lobbying_issues.csv",
-        "outputs/reference/lda/lda_ref_government_entities.csv",
-        "outputs/reference/lda/lda_ref_countries.csv",
-        "outputs/reference/lda/lda_ref_states.csv",
-        "outputs/reference/lda/lda_ref_lobbyist_prefixes.csv",
-        "outputs/reference/lda/lda_ref_lobbyist_suffixes.csv",
-        "outputs/reference/lda/lda_ref_contribution_item_types.csv",
+        "data/staging/processed/lda_registrants.csv",
+        "data/staging/processed/lda_clients.csv",
+        "data/staging/processed/lda_lobbyists.csv",
+        "data/staging/processed/lda_filings.csv",
+        "data/staging/processed/lda_contributions.csv",
+        "data/staging/processed/lda_ref_filing_types.csv",
+        "data/staging/processed/lda_ref_lobbying_issues.csv",
+        "data/staging/processed/lda_ref_government_entities.csv",
+        "data/staging/processed/lda_ref_countries.csv",
+        "data/staging/processed/lda_ref_states.csv",
+        "data/staging/processed/lda_ref_lobbyist_prefixes.csv",
+        "data/staging/processed/lda_ref_lobbyist_suffixes.csv",
+        "data/staging/processed/lda_ref_contribution_item_types.csv",
         "data/staging/processed/pr_lda_filings.csv",
         "reports/lda_api_readiness.json",
         "reports/lda_static_seed_replacement_report.json",

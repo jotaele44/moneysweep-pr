@@ -7,7 +7,7 @@
     "reports/source_registry_status.csv"
   ],
   "output": "reports/foia_yield_tracking.csv",
-  "row_count": 17,
-  "open_gaps": 17,
-  "generated_at": "2026-06-16T10:13:55.221622+00:00"
+  "row_count": 16,
+  "open_gaps": 16,
+  "generated_at": "2026-06-17T14:35:35.643077+00:00"
 }
