@@ -158,7 +158,7 @@
       "format": "csv",
       "producer_script": "scripts/build_foia_tracker.py",
       "status": "done",
-      "row_count": 17
+      "row_count": 16
     },
     {
       "report_id": "RPT_4c0f975db7527f36",
@@ -168,7 +168,7 @@
       "format": "csv",
       "producer_script": "scripts/build_foia_yield_tracking.py",
       "status": "done",
-      "row_count": 17
+      "row_count": 16
     },
     {
       "report_id": "RPT_ee8f5ebbcf2ea458",

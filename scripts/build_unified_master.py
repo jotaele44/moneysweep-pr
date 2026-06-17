@@ -93,6 +93,12 @@ NEW_MASTERS = [
     ("pr_wioa_grants.csv", "wioa"),
 ]
 
+# Masters whose producer has been archived (no current producer): still ingested
+# if present, but their absence must NOT trip the fail-closed input guard.
+# pr_hud_master.csv — download_hud.py archived in commit f9c70b0 (HUD-regular
+# CDBG/HOME via USAspending); HUD-DR remains covered by pr_cdbg_dr_master.csv.
+OPTIONAL_MASTERS = frozenset({"pr_hud_master.csv"})
+
 # ---------------------------------------------------------------------------
 # Expansion contracts (IDV, DoD corridor, reconstruction) from auto_download.py
 # These live in data/staging/expansion/ and use USASpending spending_by_award
@@ -442,10 +448,12 @@ def run(
             + ", ".join(sorted(set(forbidden_inputs)))
         )
 
-    if require_all_inputs and missing_inputs:
+    # OPTIONAL_MASTERS (archived producers) may be absent without tripping the guard.
+    required_missing = [rel for rel in missing_inputs if Path(rel).name not in OPTIONAL_MASTERS]
+    if require_all_inputs and required_missing:
         raise RuntimeError(
             "Fail-closed input guard triggered by missing required inputs: "
-            + ", ".join(sorted(set(missing_inputs)))
+            + ", ".join(sorted(set(required_missing)))
         )
 
     # ------------------------------------------------------------------
