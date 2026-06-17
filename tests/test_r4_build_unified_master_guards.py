@@ -95,6 +95,61 @@ def test_r4_missing_required_inputs_fail_closed(monkeypatch: pytest.MonkeyPatch,
         bum.run(root=tmp_path, require_all_inputs=True, fail_on_forbidden=True)
 
 
+def test_r4_optional_master_absence_does_not_fail_closed(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+):
+    # A master whose producer has been archived (OPTIONAL_MASTERS, e.g.
+    # pr_hud_master.csv) may be absent WITHOUT tripping the fail-closed guard,
+    # as long as the genuinely-required inputs are present.
+    monkeypatch.setattr(bum, "NEW_MASTERS", [("pr_optional_demo.csv", "demo")])
+    monkeypatch.setattr(bum, "OPTIONAL_MASTERS", frozenset({"pr_optional_demo.csv"}))
+    monkeypatch.setattr(bum, "EXPANSION_FILES", [])
+
+    contracts = tmp_path / "data" / "staging" / "processed" / "pr_contracts_master.csv"
+    _write_csv(
+        contracts,
+        [
+            {
+                "contract_id": "A-1",
+                "vendor_name": "Acme LLC",
+                "agency_name": "DOE",
+                "award_date": "2024-10-01",
+                "obligated_amount": "100",
+                "pop_state": "PR",
+                "fiscal_year": "2025",
+                "source_file": "normalized_expansion_demo.csv",
+            }
+        ],
+        fieldnames=[
+            "contract_id",
+            "vendor_name",
+            "agency_name",
+            "award_date",
+            "obligated_amount",
+            "pop_state",
+            "fiscal_year",
+            "source_file",
+        ],
+    )
+
+    # pr_optional_demo.csv is intentionally absent — the guard must NOT raise.
+    result = bum.run(
+        root=tmp_path,
+        input_map={
+            "data/staging/processed/pr_contracts_master.csv": {
+                "mapped_rel": "data/staging/processed/pr_contracts_master.csv",
+                "mapping_mode": "exact",
+            }
+        },
+        require_all_inputs=True,
+        fail_on_forbidden=True,
+    )
+
+    output = tmp_path / "data" / "staging" / "processed" / "pr_all_awards_master.csv"
+    assert output.exists()
+    assert result["unique_normalized_entities"] >= 1
+
+
 def test_r4_forbidden_input_mapping_rejected(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     monkeypatch.setattr(bum, "NEW_MASTERS", [])
     monkeypatch.setattr(bum, "EXPANSION_FILES", [])

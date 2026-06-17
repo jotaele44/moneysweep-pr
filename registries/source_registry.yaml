@@ -686,19 +686,19 @@ sources:
     static_seed_role_after_adapter: regression_fixture
     evidence_tier_default: T1_or_T2
     expected_outputs:
-      - outputs/normalized/lda/lda_registrants.csv
-      - outputs/normalized/lda/lda_clients.csv
-      - outputs/normalized/lda/lda_lobbyists.csv
-      - outputs/normalized/lda/lda_filings.csv
-      - outputs/normalized/lda/lda_contributions.csv
-      - outputs/reference/lda/lda_ref_filing_types.csv
-      - outputs/reference/lda/lda_ref_lobbying_issues.csv
-      - outputs/reference/lda/lda_ref_government_entities.csv
-      - outputs/reference/lda/lda_ref_countries.csv
-      - outputs/reference/lda/lda_ref_states.csv
-      - outputs/reference/lda/lda_ref_lobbyist_prefixes.csv
-      - outputs/reference/lda/lda_ref_lobbyist_suffixes.csv
-      - outputs/reference/lda/lda_ref_contribution_item_types.csv
+      - data/staging/processed/lda_registrants.csv
+      - data/staging/processed/lda_clients.csv
+      - data/staging/processed/lda_lobbyists.csv
+      - data/staging/processed/lda_filings.csv
+      - data/staging/processed/lda_contributions.csv
+      - data/staging/processed/lda_ref_filing_types.csv
+      - data/staging/processed/lda_ref_lobbying_issues.csv
+      - data/staging/processed/lda_ref_government_entities.csv
+      - data/staging/processed/lda_ref_countries.csv
+      - data/staging/processed/lda_ref_states.csv
+      - data/staging/processed/lda_ref_lobbyist_prefixes.csv
+      - data/staging/processed/lda_ref_lobbyist_suffixes.csv
+      - data/staging/processed/lda_ref_contribution_item_types.csv
       - data/staging/processed/pr_lda_filings.csv
     schema_version: r5_v1
     validation_threshold:

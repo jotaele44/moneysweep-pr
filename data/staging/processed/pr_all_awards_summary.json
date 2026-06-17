@@ -1,82 +1,145 @@
 {
-  "total_rows": 4503,
-  "total_obligation_usd": 63866298263.11,
+  "total_rows": 453352,
+  "total_obligation_usd": 370329905522.7,
   "by_dataset": {
-    "doe": {
-      "rows": 450,
-      "total_obligation": 5635436257.93
-    },
-    "dot": {
-      "rows": 450,
-      "total_obligation": 6178924478.059999
-    },
-    "fema_hmgp": {
-      "rows": 127,
-      "total_obligation": 1399503487.7099996
-    },
-    "fema_pa": {
-      "rows": 276,
-      "total_obligation": 4306681428.41
+    "subawards": {
+      "rows": 7098,
+      "total_obligation": 33300816295.21
     },
     "grants": {
-      "rows": 800,
-      "total_obligation": 12277993904.529999
-    },
-    "hud": {
-      "rows": 450,
-      "total_obligation": 5454984735.0
-    },
-    "sba_loans": {
-      "rows": 300,
-      "total_obligation": 3388146539.29
-    },
-    "sbir": {
-      "rows": 400,
-      "total_obligation": 5624805605.26
-    },
-    "slfrf": {
-      "rows": 200,
-      "total_obligation": 2923835941.1899996
-    },
-    "subawards": {
-      "rows": 600,
-      "total_obligation": 9104580307.33
+      "rows": 376758,
+      "total_obligation": 292497994461.56
     },
     "usda": {
-      "rows": 450,
-      "total_obligation": 7571405578.4
+      "rows": 111,
+      "total_obligation": 419741555.78999996
+    },
+    "contracts": {
+      "rows": 63311,
+      "total_obligation": 21178172889.760002
+    },
+    "epa": {
+      "rows": 22,
+      "total_obligation": 102207343.0
+    },
+    "dot": {
+      "rows": 165,
+      "total_obligation": 972284782.05
+    },
+    "nih": {
+      "rows": 4077,
+      "total_obligation": 1776146275.0
+    },
+    "slfrf": {
+      "rows": 26,
+      "total_obligation": 45839250.0
+    },
+    "wioa": {
+      "rows": 81,
+      "total_obligation": 534353372.91
+    },
+    "cdbg_dr": {
+      "rows": 724,
+      "total_obligation": 18004179000.0
+    },
+    "doe": {
+      "rows": 61,
+      "total_obligation": 258014875.0
+    },
+    "fema_hmgp": {
+      "rows": 25,
+      "total_obligation": 0.0
+    },
+    "fema_pa": {
+      "rows": 20,
+      "total_obligation": 48221645.42
+    },
+    "nsf": {
+      "rows": 868,
+      "total_obligation": 458933777.0
+    },
+    "sba_loans": {
+      "rows": 2,
+      "total_obligation": 0.0
+    },
+    "usace_civil": {
+      "rows": 3,
+      "total_obligation": 733000000.0
     }
   },
   "by_fiscal_year": {
-    "2000": 66,
-    "2001": 71,
-    "2002": 81,
-    "2003": 76,
-    "2004": 70,
-    "2005": 78,
-    "2006": 67,
-    "2007": 65,
-    "2008": 61,
-    "2009": 66,
-    "2010": 161,
-    "2011": 168,
-    "2012": 183,
-    "2013": 173,
-    "2014": 167,
-    "2015": 161,
-    "2016": 193,
-    "2017": 168,
-    "2018": 255,
-    "2019": 259,
-    "2020": 261,
-    "2021": 231,
-    "2022": 268,
-    "2023": 387,
-    "2024": 389,
-    "2025": 378
+    "1954": 1,
+    "1955": 1,
+    "1956": 2,
+    "1957": 2,
+    "1958": 5,
+    "1959": 13,
+    "1960": 19,
+    "1961": 20,
+    "1962": 25,
+    "1963": 28,
+    "1964": 29,
+    "1965": 21,
+    "1966": 22,
+    "1967": 14,
+    "1968": 10,
+    "1969": 9,
+    "1970": 14,
+    "1971": 18,
+    "1972": 10,
+    "1973": 11,
+    "1974": 11,
+    "1975": 2,
+    "1985": 73,
+    "1986": 84,
+    "1987": 95,
+    "1988": 85,
+    "1989": 100,
+    "1990": 80,
+    "1991": 79,
+    "1992": 78,
+    "1993": 74,
+    "1994": 90,
+    "1995": 93,
+    "1996": 69,
+    "1997": 87,
+    "1998": 69,
+    "1999": 72,
+    "2000": 97,
+    "2001": 113,
+    "2002": 138,
+    "2003": 161,
+    "2004": 206,
+    "2005": 377,
+    "2006": 497,
+    "2007": 2974,
+    "2008": 14076,
+    "2009": 1186,
+    "2010": 6464,
+    "2011": 5316,
+    "2012": 3725,
+    "2013": 3085,
+    "2014": 3776,
+    "2015": 9489,
+    "2016": 7605,
+    "2017": 8385,
+    "2018": 97278,
+    "2019": 23843,
+    "2020": 106284,
+    "2021": 61812,
+    "2022": 29339,
+    "2023": 25689,
+    "2024": 18515,
+    "2025": 15391,
+    "2026": 5934,
+    "2027": 12
   },
-  "unique_recipients": 18,
+  "unique_recipients": 114854,
+  "unique_normalized_entities": 104280,
+  "source_lineage_coverage": 1.0,
+  "build_input_missing_count": 1,
+  "build_input_forbidden_count": 0,
   "outputs": {
-    "unified_master": "/home/user/Contract-Sweeper/data/staging/processed/pr_all_awards_master.csv"
+    "unified_master": "/Users/jotaele/Developer/Contract-Sweeper/data/staging/processed/pr_all_awards_master.csv"
   }
 }

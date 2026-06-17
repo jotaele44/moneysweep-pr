@@ -11,6 +11,7 @@ import argparse
 import csv
 import hashlib
 import json
+import os
 import sys
 import time
 from datetime import datetime, timezone
@@ -42,27 +43,30 @@ EXPECTED_ENDPOINTS: dict[str, str] = {
     "constants/contribution/itemtypes": "constants/contribution/itemtypes/",
 }
 
+# All outputs land in data/staging/processed/ — the gitignored masters dir that
+# build_staging_manifest.py indexes (the committed coverage proxy). Writing under
+# outputs/ would be invisible to the manifest and not gitignored.
 OUTPUTS: dict[str, tuple[str, str]] = {
-    "registrants": ("outputs/normalized/lda/lda_registrants.csv", "T1"),
-    "clients": ("outputs/normalized/lda/lda_clients.csv", "T1"),
-    "lobbyists": ("outputs/normalized/lda/lda_lobbyists.csv", "T1"),
-    "filings": ("outputs/normalized/lda/lda_filings.csv", "T1"),
-    "contributions": ("outputs/normalized/lda/lda_contributions.csv", "T1"),
-    "constants/filing/filingtypes": ("outputs/reference/lda/lda_ref_filing_types.csv", "T1"),
+    "registrants": ("data/staging/processed/lda_registrants.csv", "T1"),
+    "clients": ("data/staging/processed/lda_clients.csv", "T1"),
+    "lobbyists": ("data/staging/processed/lda_lobbyists.csv", "T1"),
+    "filings": ("data/staging/processed/lda_filings.csv", "T1"),
+    "contributions": ("data/staging/processed/lda_contributions.csv", "T1"),
+    "constants/filing/filingtypes": ("data/staging/processed/lda_ref_filing_types.csv", "T1"),
     "constants/filing/lobbyingactivityissues": (
-        "outputs/reference/lda/lda_ref_lobbying_issues.csv",
+        "data/staging/processed/lda_ref_lobbying_issues.csv",
         "T1",
     ),
     "constants/filing/governmententities": (
-        "outputs/reference/lda/lda_ref_government_entities.csv",
+        "data/staging/processed/lda_ref_government_entities.csv",
         "T1",
     ),
-    "constants/general/countries": ("outputs/reference/lda/lda_ref_countries.csv", "T1"),
-    "constants/general/states": ("outputs/reference/lda/lda_ref_states.csv", "T1"),
-    "constants/lobbyist/prefixes": ("outputs/reference/lda/lda_ref_lobbyist_prefixes.csv", "T1"),
-    "constants/lobbyist/suffixes": ("outputs/reference/lda/lda_ref_lobbyist_suffixes.csv", "T1"),
+    "constants/general/countries": ("data/staging/processed/lda_ref_countries.csv", "T1"),
+    "constants/general/states": ("data/staging/processed/lda_ref_states.csv", "T1"),
+    "constants/lobbyist/prefixes": ("data/staging/processed/lda_ref_lobbyist_prefixes.csv", "T1"),
+    "constants/lobbyist/suffixes": ("data/staging/processed/lda_ref_lobbyist_suffixes.csv", "T1"),
     "constants/contribution/itemtypes": (
-        "outputs/reference/lda/lda_ref_contribution_item_types.csv",
+        "data/staging/processed/lda_ref_contribution_item_types.csv",
         "T1",
     ),
 }
@@ -221,12 +225,16 @@ def http_json_fetcher(
     url: str, *, timeout: int = DEFAULT_TIMEOUT_SECONDS, retries: int = DEFAULT_RETRIES
 ) -> Any:
     last_error: Exception | None = None
+    headers = {"Accept": "application/json", "User-Agent": "Contract-Sweeper-LDA/1.0"}
+    # LDA.gov works unauthenticated but enforces tight rate limits (HTTP 429).
+    # An API key raises the ceiling; the scheme is "Authorization: Token <key>"
+    # (mirrors scripts/download_lda.py:149).
+    api_key = os.environ.get("LDA_API_KEY", "").strip()
+    if api_key:
+        headers["Authorization"] = f"Token {api_key}"
     for attempt in range(retries):
         try:
-            req = Request(
-                url,
-                headers={"Accept": "application/json", "User-Agent": "Contract-Sweeper-LDA/1.0"},
-            )
+            req = Request(url, headers=headers)
             with urlopen(req, timeout=timeout) as resp:  # noqa: S310 - public read-only API endpoint
                 return json.loads(resp.read().decode("utf-8"))
         except (HTTPError, URLError, TimeoutError, json.JSONDecodeError) as exc:
@@ -520,17 +528,34 @@ def run(
         write_csv(out_path, rows)
         rel = str(out_path.relative_to(output_dir))
         outputs_created.append(rel)
-        if "/normalized/" in rel:
-            normalized_outputs.append(rel)
-        else:
+        # constants/* endpoints are reference tables; the rest are normalized data.
+        if endpoint_key.startswith("constants/"):
             reference_outputs.append(rel)
+        else:
+            normalized_outputs.append(rel)
 
-    # Legacy downstream compatibility: existing crossref code reads pr_lda_filings.csv.
-    filings_src = output_dir / "outputs/normalized/lda/lda_filings.csv"
+    # Legacy downstream compatibility: existing crossref code (e.g. analyze_political_crossref.py)
+    # reads pr_lda_filings.csv and expects columns 'income' and 'expenses'.  The normalized
+    # schema uses 'amount_reported' for the same dollar field.  Emit both aliases here so
+    # downstream consumers don't need to be updated in lockstep with the adapter.
+    filings_src = output_dir / "data/staging/processed/lda_filings.csv"
     legacy_filings = output_dir / "data/staging/processed/pr_lda_filings.csv"
     if filings_src.exists():
+        with filings_src.open(encoding="utf-8", newline="") as leg_src:
+            leg_reader = csv.DictReader(leg_src)
+            leg_fields = list(leg_reader.fieldnames or [])
+            leg_rows = list(leg_reader)
         legacy_filings.parent.mkdir(parents=True, exist_ok=True)
-        legacy_filings.write_text(filings_src.read_text(encoding="utf-8"), encoding="utf-8")
+        if leg_fields:
+            for leg_row in leg_rows:
+                leg_row["income"] = leg_row.get("amount_reported", "")
+                leg_row["expenses"] = leg_row.get("amount_reported", "")
+            with legacy_filings.open("w", encoding="utf-8", newline="") as leg_dst:
+                leg_writer = csv.DictWriter(leg_dst, fieldnames=leg_fields + ["income", "expenses"])
+                leg_writer.writeheader()
+                leg_writer.writerows(leg_rows)
+        else:
+            legacy_filings.write_text(filings_src.read_text(encoding="utf-8"), encoding="utf-8")
         outputs_created.append(str(legacy_filings.relative_to(output_dir)))
 
     readiness = {
