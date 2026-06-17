@@ -534,12 +534,28 @@ def run(
         else:
             normalized_outputs.append(rel)
 
-    # Legacy downstream compatibility: existing crossref code reads pr_lda_filings.csv.
+    # Legacy downstream compatibility: existing crossref code (e.g. analyze_political_crossref.py)
+    # reads pr_lda_filings.csv and expects columns 'income' and 'expenses'.  The normalized
+    # schema uses 'amount_reported' for the same dollar field.  Emit both aliases here so
+    # downstream consumers don't need to be updated in lockstep with the adapter.
     filings_src = output_dir / "data/staging/processed/lda_filings.csv"
     legacy_filings = output_dir / "data/staging/processed/pr_lda_filings.csv"
     if filings_src.exists():
+        with filings_src.open(encoding="utf-8", newline="") as leg_src:
+            leg_reader = csv.DictReader(leg_src)
+            leg_fields = list(leg_reader.fieldnames or [])
+            leg_rows = list(leg_reader)
         legacy_filings.parent.mkdir(parents=True, exist_ok=True)
-        legacy_filings.write_text(filings_src.read_text(encoding="utf-8"), encoding="utf-8")
+        if leg_fields:
+            for leg_row in leg_rows:
+                leg_row["income"] = leg_row.get("amount_reported", "")
+                leg_row["expenses"] = leg_row.get("amount_reported", "")
+            with legacy_filings.open("w", encoding="utf-8", newline="") as leg_dst:
+                leg_writer = csv.DictWriter(leg_dst, fieldnames=leg_fields + ["income", "expenses"])
+                leg_writer.writeheader()
+                leg_writer.writerows(leg_rows)
+        else:
+            legacy_filings.write_text(filings_src.read_text(encoding="utf-8"), encoding="utf-8")
         outputs_created.append(str(legacy_filings.relative_to(output_dir)))
 
     readiness = {

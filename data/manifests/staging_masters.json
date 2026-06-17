@@ -136,7 +136,7 @@
       "size_bytes": 135
     },
     "data/staging/processed/pr_all_awards_master.csv": {
-      "row_count": 538262,
+      "row_count": 453352,
       "sha256": "b93fae6ac91b14021ce116f7cd286eff6988af7affe241aa356e521550c7223a",
       "size_bytes": 256031018
     },
@@ -151,7 +151,7 @@
       "size_bytes": 167
     },
     "data/staging/processed/pr_cdbg_dr_master.csv": {
-      "row_count": 7700,
+      "row_count": 3808,
       "sha256": "18e33b1d79024e302d6e0f1ae272c3dcd621b6ae70316857289b886a4089404e",
       "size_bytes": 2707911
     },
@@ -201,12 +201,12 @@
       "size_bytes": 220
     },
     "data/staging/processed/pr_doe_master.csv": {
-      "row_count": 180,
+      "row_count": 116,
       "sha256": "6c6130e3b788c87ece54a8e579060a4dbae0b7f2c10253f479a30d87c65e6da4",
       "size_bytes": 41173
     },
     "data/staging/processed/pr_doj_grants_master.csv": {
-      "row_count": 419,
+      "row_count": 264,
       "sha256": "6023ff165f74738bd1a5d78692a5e0c655b4df97c5683c7a80409f84b83c1fc8",
       "size_bytes": 161352
     },
@@ -246,7 +246,7 @@
       "size_bytes": 1290
     },
     "data/staging/processed/pr_epa_master.csv": {
-      "row_count": 631,
+      "row_count": 293,
       "sha256": "67111e8b01d63fd3398f993c6e702d2cf38f5484faae7778b56ac642b72385e6",
       "size_bytes": 296789
     },
@@ -326,7 +326,7 @@
       "size_bytes": 7151
     },
     "data/staging/processed/pr_grants_master.csv": {
-      "row_count": 461668,
+      "row_count": 376759,
       "sha256": "8d33432e294222410aec70472a4d0de1707b4f5f4a4aa3e94071e43655623242",
       "size_bytes": 150210274
     },
@@ -421,7 +421,7 @@
       "size_bytes": 1627219
     },
     "data/staging/processed/pr_oia_master.csv": {
-      "row_count": 364,
+      "row_count": 342,
       "sha256": "a70ff5b08602e6f5a59f90ff3af5d70411ed51ae7cc917fb37fd357d47366643",
       "size_bytes": 157642
     },
@@ -456,7 +456,7 @@
       "size_bytes": 235
     },
     "data/staging/processed/pr_research_master.csv": {
-      "row_count": 4946,
+      "row_count": 4945,
       "sha256": "3f1333aef23e8f2dd93e4086a2fdec441406ee369fea39a8c864984c6d8a70e8",
       "size_bytes": 979964
     },
@@ -551,7 +551,7 @@
       "size_bytes": 432
     },
     "data/staging/processed/pr_wioa_grants.csv": {
-      "row_count": 444,
+      "row_count": 273,
       "sha256": "7ac724b9c73c1eb6299316b35ced46ab6eee37cb992a87460a3ee391ccc73062",
       "size_bytes": 146508
     },
@@ -561,7 +561,7 @@
       "size_bytes": 292810
     }
   },
-  "generated_at": "2026-06-17T14:26:03Z",
+  "generated_at": "2026-06-17T15:04:52Z",
   "note": "Row counts for the gitignored data/staging/processed masters. Committed source of truth for coverage reports in a clean checkout (the CSVs themselves are too large to track \u2014 see size-guard). Regenerate with scripts/build_staging_manifest.py after a data refresh.",
   "schema_version": "staging_masters_v1"
 }
