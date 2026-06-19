@@ -1,0 +1,62 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "va_benefits",
+  "source_url": "https://www.benefits.va.gov/REPORTS/",
+  "producer_script": "scripts/download_va.py",
+  "generated_at": "2026-06-17T19:52:33.927086+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_va_benefits.csv",
+      "relative_path": "data/staging/processed/pr_va_benefits.csv",
+      "extension": ".csv",
+      "size_bytes": 948,
+      "sha256": "3b4e0ddbacfa67ab08d936bca0f04d4e3a0ea5a43af37670e1f379c9370f4cbb",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.925575+00:00",
+      "source_system": "va_benefits",
+      "source_url": "https://www.benefits.va.gov/REPORTS/",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 6,
+      "column_count": 12,
+      "columns": [
+        "fiscal_year",
+        "benefit_type",
+        "recipient_name",
+        "recipient_normalized",
+        "recipient_count",
+        "total_expenditure",
+        "avg_benefit",
+        "facility_name",
+        "contract_id",
+        "obligation_date",
+        "source_system",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "fiscal_year": 0.6666666666666666,
+        "benefit_type": 0.6666666666666666,
+        "recipient_name": 0.6666666666666666,
+        "recipient_normalized": 0.6666666666666666,
+        "recipient_count": 0.6666666666666666,
+        "total_expenditure": 0.6666666666666666,
+        "avg_benefit": 0.6666666666666666,
+        "facility_name": 0.5,
+        "contract_id": 0.0,
+        "obligation_date": 0.6666666666666666,
+        "source_system": 1.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": 1.0,
+      "actual_years": [
+        2023
+      ],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

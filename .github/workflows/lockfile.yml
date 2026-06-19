@@ -5,6 +5,8 @@ name: Lockfile drift
 # requirements.in can't merge without its lockfile update (and vice versa).
 on: [push, pull_request]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 jobs:
   lock-sync:
     runs-on: ubuntu-latest

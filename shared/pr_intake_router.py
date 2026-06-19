@@ -16,6 +16,10 @@ import json
 import re
 import unicodedata
 
+# Repo root is two levels up from this file: shared/ → repo root
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+_DEFAULT_CONFIG_PATH = _REPO_ROOT / "config" / "pr_intake_domain_router.yaml"
+
 try:
     import yaml
 except ImportError as exc:  # pragma: no cover - dependency guard
@@ -109,10 +113,10 @@ class IntakeRouterError(ValueError):
     """Raised when router input/configuration violates a hard gate."""
 
 
-def load_router_config(path: str | Path = "config/pr_intake_domain_router.yaml") -> RouterConfig:
+def load_router_config(path: str | Path | None = None) -> RouterConfig:
     """Load and validate router YAML config."""
 
-    config_path = Path(path)
+    config_path = Path(path) if path is not None else _DEFAULT_CONFIG_PATH
     data = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     if not isinstance(data, Mapping):
         raise IntakeRouterError(f"Router config is not a mapping: {config_path}")

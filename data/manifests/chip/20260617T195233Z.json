@@ -1,0 +1,57 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "chip",
+  "source_url": "https://www.medicaid.gov/chip/index.html",
+  "producer_script": "scripts/download_chip.py",
+  "generated_at": "2026-06-17T19:52:33.910050+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_chip.csv",
+      "relative_path": "data/staging/processed/pr_chip.csv",
+      "extension": ".csv",
+      "size_bytes": 378,
+      "sha256": "0d716c3af20837f3e501d75fcbe74b053670251767026678ee12a7bc18548655",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.908446+00:00",
+      "source_system": "chip",
+      "source_url": "https://www.medicaid.gov/chip/index.html",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 4,
+      "column_count": 8,
+      "columns": [
+        "fiscal_year",
+        "quarter",
+        "enrollment_count",
+        "federal_expenditure",
+        "state_expenditure",
+        "total_expenditure",
+        "fmap_rate",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "fiscal_year": 1.0,
+        "quarter": 1.0,
+        "enrollment_count": 1.0,
+        "federal_expenditure": 1.0,
+        "state_expenditure": 1.0,
+        "total_expenditure": 1.0,
+        "fmap_rate": 1.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

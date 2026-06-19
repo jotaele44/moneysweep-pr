@@ -1,0 +1,60 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "gao_ig_audits",
+  "source_url": "https://www.gao.gov/",
+  "producer_script": "scripts/download_gao_ig.py",
+  "generated_at": "2026-06-17T19:52:33.993901+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_gao_ig_reports.csv",
+      "relative_path": "data/staging/processed/pr_gao_ig_reports.csv",
+      "extension": ".csv",
+      "size_bytes": 1290,
+      "sha256": "9ee4cb83408bedcf5ff317e3c50e3a8739909d35f46447ca0990d9fef2f7a1a7",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.991845+00:00",
+      "source_system": "gao_ig_audits",
+      "source_url": "https://www.gao.gov/",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 5,
+      "column_count": 12,
+      "columns": [
+        "report_date",
+        "report_id",
+        "agency",
+        "report_source",
+        "title",
+        "program_area",
+        "finding_type",
+        "recommendation_count",
+        "dollar_amount_questioned",
+        "status",
+        "url",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "report_date": 1.0,
+        "report_id": 1.0,
+        "agency": 1.0,
+        "report_source": 1.0,
+        "title": 1.0,
+        "program_area": 1.0,
+        "finding_type": 1.0,
+        "recommendation_count": 1.0,
+        "dollar_amount_questioned": 1.0,
+        "status": 1.0,
+        "url": 1.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

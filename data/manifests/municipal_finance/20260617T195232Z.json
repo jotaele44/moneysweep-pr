@@ -1,0 +1,50 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "municipal_finance",
+  "source_url": "https://api.fac.gov/",
+  "producer_script": "scripts/download_fac_municipal.py",
+  "generated_at": "2026-06-17T19:52:32.826313+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_municipal_finance.csv",
+      "relative_path": "data/staging/processed/pr_municipal_finance.csv",
+      "extension": ".csv",
+      "size_bytes": 389,
+      "sha256": "bc937bcb507f992e135300d116f02f96a279b97b244e0d5604e5b46d5770cbe9",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:32.823641+00:00",
+      "source_system": "municipal_finance",
+      "source_url": "https://api.fac.gov/",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 5,
+      "column_count": 6,
+      "columns": [
+        "municipality",
+        "fiscal_year",
+        "federal_awards_count",
+        "federal_awards_obligated",
+        "federal_transfers_per_capita",
+        "data_source"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "municipality": 1.0,
+        "fiscal_year": 1.0,
+        "federal_awards_count": 1.0,
+        "federal_awards_obligated": 1.0,
+        "federal_transfers_per_capita": 1.0,
+        "data_source": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [
+        2023
+      ],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

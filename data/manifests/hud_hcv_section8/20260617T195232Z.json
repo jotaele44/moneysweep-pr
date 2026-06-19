@@ -1,0 +1,59 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "hud_hcv_section8",
+  "source_url": "https://www.huduser.gov/portal/datasets/assthsg.html",
+  "producer_script": "scripts/download_hud_hcv.py",
+  "generated_at": "2026-06-17T19:52:32.769121+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_hud_hcv.csv",
+      "relative_path": "data/staging/processed/pr_hud_hcv.csv",
+      "extension": ".csv",
+      "size_bytes": 336,
+      "sha256": "e421ef85cd8e74eb3b9ed2be252875f8bc94e9b5cb0f5c15d7487a3d25483eb0",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:32.767674+00:00",
+      "source_system": "hud_hcv_section8",
+      "source_url": "https://www.huduser.gov/portal/datasets/assthsg.html",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 2,
+      "column_count": 10,
+      "columns": [
+        "year",
+        "program",
+        "total_units",
+        "people_per_unit",
+        "total_households",
+        "pct_minority",
+        "avg_annual_income",
+        "avg_rent_burden",
+        "total_annual_cost",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "year": 1.0,
+        "program": 1.0,
+        "total_units": 1.0,
+        "people_per_unit": 1.0,
+        "total_households": 1.0,
+        "pct_minority": 1.0,
+        "avg_annual_income": 1.0,
+        "avg_rent_burden": 1.0,
+        "total_annual_cost": 1.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [
+        2021,
+        2022
+      ],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

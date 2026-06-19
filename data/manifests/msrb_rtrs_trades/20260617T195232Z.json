@@ -1,0 +1,41 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "msrb_rtrs_trades",
+  "source_url": "https://emma.msrb.org/",
+  "producer_script": "scripts/download_msrb_trades.py",
+  "generated_at": "2026-06-17T19:52:32.837331+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_msrb_trades.csv",
+      "relative_path": "data/staging/processed/pr_msrb_trades.csv",
+      "extension": ".csv",
+      "size_bytes": 119,
+      "sha256": "8e93f8a90866cbd44d3c5ff6deebf8b16c2c5e97091be0d569c0b03c8741f50e",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:32.833972+00:00",
+      "source_system": "msrb_rtrs_trades",
+      "source_url": "https://emma.msrb.org/",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 0,
+      "column_count": 11,
+      "columns": [
+        "cusip",
+        "trade_date",
+        "settlement_date",
+        "par_traded",
+        "price",
+        "yield",
+        "dealer_id",
+        "dealer_name",
+        "dealer_normalized",
+        "trade_type",
+        "market_side"
+      ],
+      "empty_or_header_only": true,
+      "year_coverage_pct": null,
+      "validation_status": "empty_or_header_only"
+    }
+  ]
+}

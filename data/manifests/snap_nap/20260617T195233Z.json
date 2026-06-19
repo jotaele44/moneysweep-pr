@@ -1,0 +1,59 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "snap_nap",
+  "source_url": "https://www.fns.usda.gov/snap/nutrition-assistance-puerto-rico",
+  "producer_script": "scripts/download_snap_nap.py",
+  "generated_at": "2026-06-17T19:52:33.925047+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_snap_nap.csv",
+      "relative_path": "data/staging/processed/pr_snap_nap.csv",
+      "extension": ".csv",
+      "size_bytes": 3844,
+      "sha256": "dc7b5ba4605271bd22d68b3ecaa4a35ead6c026838d60af61f0bb9bbcfe6863e",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.923584+00:00",
+      "source_system": "snap_nap",
+      "source_url": "https://www.fns.usda.gov/snap/nutrition-assistance-puerto-rico",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 61,
+      "column_count": 9,
+      "columns": [
+        "fiscal_year",
+        "quarter",
+        "program_type",
+        "total_participants",
+        "total_issuances",
+        "federal_expenditure",
+        "administrative_cost",
+        "avg_benefit_per_household",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "fiscal_year": 0.06557377049180328,
+        "quarter": 0.06557377049180328,
+        "program_type": 1.0,
+        "total_participants": 0.06557377049180328,
+        "total_issuances": 1.0,
+        "federal_expenditure": 1.0,
+        "administrative_cost": 0.06557377049180328,
+        "avg_benefit_per_household": 0.06557377049180328,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

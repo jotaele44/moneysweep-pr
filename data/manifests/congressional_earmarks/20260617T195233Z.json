@@ -1,0 +1,45 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "congressional_earmarks",
+  "source_url": "https://www.appropriations.house.gov/",
+  "producer_script": "scripts/download_earmarks.py",
+  "generated_at": "2026-06-17T19:52:33.757689+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_earmarks.csv",
+      "relative_path": "data/staging/processed/pr_earmarks.csv",
+      "extension": ".csv",
+      "size_bytes": 213,
+      "sha256": "a785039c5ab396909713e4e60d163341b1dc5111d496dd71f738b9961a10c7ff",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.756852+00:00",
+      "source_system": "congressional_earmarks",
+      "source_url": "https://www.appropriations.house.gov/",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 0,
+      "column_count": 15,
+      "columns": [
+        "award_id",
+        "recipient_name",
+        "recipient_uei",
+        "awarding_agency",
+        "awarding_sub_agency",
+        "obligated_amount",
+        "award_date",
+        "fiscal_year",
+        "pop_state",
+        "pop_county",
+        "description",
+        "source_file",
+        "source_dataset",
+        "award_category",
+        "earmark_keyword_matched"
+      ],
+      "empty_or_header_only": true,
+      "year_coverage_pct": null,
+      "validation_status": "empty_or_header_only"
+    }
+  ]
+}

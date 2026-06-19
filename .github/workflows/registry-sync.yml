@@ -21,6 +21,8 @@ on:
 permissions:
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 jobs:
   registry-sync:
     name: Registry JSON regenerates identically from YAML

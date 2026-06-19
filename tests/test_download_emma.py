@@ -293,7 +293,9 @@ def test_known_bonds_produce_nonempty_df():
 
 def test_run_produces_nonempty_outputs(tmp_path):
     """run() must write non-empty bonds and underwriters CSVs even when the API is blocked."""
-    result = run(root=tmp_path, force=True)
+    # Mock the network fetch so this test does not make live HTTP calls.
+    with patch("scripts.download_emma._fetch_pr_securities", return_value=[]):
+        result = run(root=tmp_path, force=True)
 
     assert result["status"] == "OK"
     assert result["bond_rows"] >= len(KNOWN_EMMA_BONDS)
@@ -314,7 +316,9 @@ def test_run_produces_nonempty_outputs(tmp_path):
 
 def test_run_idempotent_cached(tmp_path):
     """Second run with force=False must use the cached file, not re-fetch."""
-    run(root=tmp_path, force=True)
+    # Prime the cache without live network access.
+    with patch("scripts.download_emma._fetch_pr_securities", return_value=[]):
+        run(root=tmp_path, force=True)
 
     with patch("scripts.download_emma._fetch_pr_securities") as mock_fetch:
         mock_fetch.return_value = []
@@ -327,7 +331,9 @@ def test_run_idempotent_cached(tmp_path):
 
 def test_run_force_refetches(tmp_path):
     """force=True must re-call the fetch function (even if the result is empty)."""
-    run(root=tmp_path, force=True)
+    # Prime cache without live network access.
+    with patch("scripts.download_emma._fetch_pr_securities", return_value=[]):
+        run(root=tmp_path, force=True)
 
     with patch("scripts.download_emma._fetch_pr_securities") as mock_fetch:
         mock_fetch.return_value = []

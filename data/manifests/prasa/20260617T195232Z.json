@@ -1,0 +1,42 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "prasa",
+  "source_url": "https://www.acueductospr.com/",
+  "producer_script": "scripts/ingest_prasa.py",
+  "generated_at": "2026-06-17T19:52:32.771055+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_prasa_contracts.csv",
+      "relative_path": "data/staging/processed/pr_prasa_contracts.csv",
+      "extension": ".csv",
+      "size_bytes": 146,
+      "sha256": "1ed890263aec8cb89d5701ac1b4ce5007ddab715e246e27a356ec62aa440b140",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:32.769751+00:00",
+      "source_system": "prasa",
+      "source_url": "https://www.acueductospr.com/",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 0,
+      "column_count": 12,
+      "columns": [
+        "contract_id",
+        "vendor_name",
+        "vendor_normalized",
+        "contract_type",
+        "contract_value",
+        "award_date",
+        "start_date",
+        "end_date",
+        "status",
+        "description",
+        "municipality",
+        "source_file"
+      ],
+      "empty_or_header_only": true,
+      "year_coverage_pct": null,
+      "validation_status": "empty_or_header_only"
+    }
+  ]
+}

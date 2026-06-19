@@ -1,0 +1,55 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "hacienda",
+  "source_url": "https://hacienda.pr.gov/",
+  "producer_script": "scripts/download_hacienda.py",
+  "generated_at": "2026-06-17T19:52:32.791137+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_hacienda_revenues.csv",
+      "relative_path": "data/staging/processed/pr_hacienda_revenues.csv",
+      "extension": ".csv",
+      "size_bytes": 740,
+      "sha256": "6bcf54626a3899e75b42129321b737e85576a9a68ec567e19dc6001cc3f8b41c",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:32.787895+00:00",
+      "source_system": "hacienda",
+      "source_url": "https://hacienda.pr.gov/",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 8,
+      "column_count": 7,
+      "columns": [
+        "fiscal_year",
+        "month",
+        "revenue_type",
+        "amount",
+        "yoy_change_pct",
+        "ytd_amount",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "fiscal_year": 1.0,
+        "month": 1.0,
+        "revenue_type": 1.0,
+        "amount": 1.0,
+        "yoy_change_pct": 0.75,
+        "ytd_amount": 1.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [
+        2019,
+        2020,
+        2021,
+        2022
+      ],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

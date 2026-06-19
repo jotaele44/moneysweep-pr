@@ -1,0 +1,56 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "eia_power_sector",
+  "source_url": "https://api.eia.gov/v2",
+  "producer_script": "scripts/download_eia.py",
+  "generated_at": "2026-06-17T19:52:32.317435+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_eia_power_sector.csv",
+      "relative_path": "data/staging/processed/pr_eia_power_sector.csv",
+      "extension": ".csv",
+      "size_bytes": 138507,
+      "sha256": "9b292608444dfccdf40fab254cb363369015da87c31682f1e143c87806c5af05",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:32.309969+00:00",
+      "source_system": "eia_power_sector",
+      "source_url": "https://api.eia.gov/v2",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 615,
+      "column_count": 10,
+      "columns": [
+        "series_id",
+        "date",
+        "value",
+        "units",
+        "frequency",
+        "description",
+        "route",
+        "data_field",
+        "raw_period",
+        "source_date"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "series_id": 1.0,
+        "date": 1.0,
+        "value": 1.0,
+        "units": 1.0,
+        "frequency": 1.0,
+        "description": 1.0,
+        "route": 1.0,
+        "data_field": 1.0,
+        "raw_period": 1.0,
+        "source_date": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

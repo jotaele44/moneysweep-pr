@@ -1,0 +1,58 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "cofina",
+  "source_url": "https://www.cofina.pr.gov/",
+  "producer_script": "scripts/download_cofina.py",
+  "generated_at": "2026-06-17T19:52:32.795422+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_cofina.csv",
+      "relative_path": "data/staging/processed/pr_cofina.csv",
+      "extension": ".csv",
+      "size_bytes": 563,
+      "sha256": "21c7ce8fb30d302a568200d141c500447f41c9dac0c99ed044829b0041acecce",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:32.792214+00:00",
+      "source_system": "cofina",
+      "source_url": "https://www.cofina.pr.gov/",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 5,
+      "column_count": 8,
+      "columns": [
+        "fiscal_year",
+        "month",
+        "sut_collections",
+        "cofina_allocation",
+        "senior_bond_service",
+        "subordinate_bond_service",
+        "residual_to_commonwealth",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "fiscal_year": 1.0,
+        "month": 1.0,
+        "sut_collections": 1.0,
+        "cofina_allocation": 1.0,
+        "senior_bond_service": 1.0,
+        "subordinate_bond_service": 1.0,
+        "residual_to_commonwealth": 1.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024
+      ],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

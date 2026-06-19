@@ -12,7 +12,7 @@ from shared.pr_intake_router import (
 )
 
 
-CONFIG_PATH = Path("config/pr_intake_domain_router.yaml")
+CONFIG_PATH = Path(__file__).resolve().parents[1] / "config" / "pr_intake_domain_router.yaml"
 
 
 def test_public_funding_routes_to_contract_sweeper():

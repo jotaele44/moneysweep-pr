@@ -1,0 +1,56 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "ssa",
+  "source_url": "https://www.ssa.gov/data/",
+  "producer_script": "scripts/download_ssa.py",
+  "generated_at": "2026-06-17T19:52:33.903578+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_ssa_benefits.csv",
+      "relative_path": "data/staging/processed/pr_ssa_benefits.csv",
+      "extension": ".csv",
+      "size_bytes": 718,
+      "sha256": "0c4c417de229da21e46f92cf429cd042df40c775b152bca246390fdea94929a9",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.902332+00:00",
+      "source_system": "ssa",
+      "source_url": "https://www.ssa.gov/data/",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 6,
+      "column_count": 10,
+      "columns": [
+        "calendar_year",
+        "month",
+        "program_type",
+        "beneficiary_count",
+        "total_payments",
+        "avg_monthly_benefit",
+        "retired_workers_count",
+        "disabled_workers_count",
+        "survivors_count",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "calendar_year": 1.0,
+        "month": 1.0,
+        "program_type": 1.0,
+        "beneficiary_count": 1.0,
+        "total_payments": 1.0,
+        "avg_monthly_benefit": 1.0,
+        "retired_workers_count": 1.0,
+        "disabled_workers_count": 1.0,
+        "survivors_count": 1.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

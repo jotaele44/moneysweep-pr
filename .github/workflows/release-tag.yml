@@ -32,6 +32,8 @@ concurrency:
   group: release-tag
   cancel-in-progress: false
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 jobs:
   tag:
     runs-on: ubuntu-latest

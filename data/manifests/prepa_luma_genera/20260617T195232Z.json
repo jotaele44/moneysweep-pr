@@ -1,0 +1,58 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "prepa_luma_genera",
+  "source_url": "https://aeepr.com/es-pr/",
+  "producer_script": "scripts/download_prepa_contracts.py",
+  "generated_at": "2026-06-17T19:52:32.773471+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_prepa_contracts.csv",
+      "relative_path": "data/staging/processed/pr_prepa_contracts.csv",
+      "extension": ".csv",
+      "size_bytes": 1938,
+      "sha256": "6fcc44d5cb2dda0cfbeb1d09a09d2a90689cf773eae969c9310233084ea86b77",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:32.771643+00:00",
+      "source_system": "prepa_luma_genera",
+      "source_url": "https://aeepr.com/es-pr/",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 8,
+      "column_count": 11,
+      "columns": [
+        "contract_id",
+        "vendor_name",
+        "vendor_normalized",
+        "contract_type",
+        "contract_value",
+        "start_date",
+        "end_date",
+        "status",
+        "description",
+        "source_doc",
+        "source_url"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "contract_id": 1.0,
+        "vendor_name": 1.0,
+        "vendor_normalized": 1.0,
+        "contract_type": 1.0,
+        "contract_value": 1.0,
+        "start_date": 1.0,
+        "end_date": 1.0,
+        "status": 1.0,
+        "description": 1.0,
+        "source_doc": 1.0,
+        "source_url": 1.0
+      },
+      "entity_match_rate_pct": 1.0,
+      "actual_years": [],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}
