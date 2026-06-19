@@ -1,0 +1,60 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "sec_13f_nport",
+  "source_url": "https://www.sec.gov/edgar/search-and-access",
+  "producer_script": "scripts/download_sec_holdings.py",
+  "generated_at": "2026-06-17T19:52:33.982808+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_sec_holdings.csv",
+      "relative_path": "data/staging/processed/pr_sec_holdings.csv",
+      "extension": ".csv",
+      "size_bytes": 7090,
+      "sha256": "6540e9ce339228b32d247efc9465835266fcfa7b99cceba4939eb1a9e83b3918",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.979063+00:00",
+      "source_system": "sec_13f_nport",
+      "source_url": "https://www.sec.gov/edgar/search-and-access",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 54,
+      "column_count": 12,
+      "columns": [
+        "filing_date",
+        "fiscal_year_end",
+        "filer_name",
+        "filer_cik",
+        "filer_type",
+        "security_name",
+        "cusip",
+        "issuer_name",
+        "shares_or_principal",
+        "market_value",
+        "holding_type",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "filing_date": 1.0,
+        "fiscal_year_end": 0.07407407407407407,
+        "filer_name": 0.07407407407407407,
+        "filer_cik": 1.0,
+        "filer_type": 1.0,
+        "security_name": 1.0,
+        "cusip": 0.07407407407407407,
+        "issuer_name": 1.0,
+        "shares_or_principal": 0.07407407407407407,
+        "market_value": 0.07407407407407407,
+        "holding_type": 1.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

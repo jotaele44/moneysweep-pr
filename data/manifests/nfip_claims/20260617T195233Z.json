@@ -1,0 +1,44 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "nfip_claims",
+  "source_url": "https://www.fema.gov/openfema-data-page/fima-nfip-redacted-claims-v2",
+  "producer_script": "scripts/download_nfip.py",
+  "generated_at": "2026-06-17T19:52:33.988739+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_nfip_claims.csv",
+      "relative_path": "data/staging/processed/pr_nfip_claims.csv",
+      "extension": ".csv",
+      "size_bytes": 205,
+      "sha256": "fc19ab6d78cc3133c790fa327b3f5d6378bf7f41dbda4cefce4eb20070e68a94",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.987188+00:00",
+      "source_system": "nfip_claims",
+      "source_url": "https://www.fema.gov/openfema-data-page/fima-nfip-redacted-claims-v2",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 0,
+      "column_count": 14,
+      "columns": [
+        "reported_city",
+        "reported_zip",
+        "county_code",
+        "flood_zone",
+        "occupancy_type",
+        "date_of_loss",
+        "year_of_loss",
+        "building_coverage",
+        "contents_coverage",
+        "paid_building",
+        "paid_contents",
+        "building_damage",
+        "contents_damage",
+        "policy_start_date"
+      ],
+      "empty_or_header_only": true,
+      "year_coverage_pct": null,
+      "validation_status": "empty_or_header_only"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "aafaf",
+  "source_url": "https://www.aafaf.pr.gov/",
+  "producer_script": "scripts/download_aafaf.py",
+  "generated_at": "2026-06-17T19:52:32.786182+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_aafaf_budget.csv",
+      "relative_path": "data/staging/processed/pr_aafaf_budget.csv",
+      "extension": ".csv",
+      "size_bytes": 550,
+      "sha256": "6b1a92e10179a3b3d6e07bcd868f1e43febd8d33bda66e3d554c97aa697252e9",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:32.784181+00:00",
+      "source_system": "aafaf",
+      "source_url": "https://www.aafaf.pr.gov/",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 4,
+      "column_count": 9,
+      "columns": [
+        "fiscal_year",
+        "month",
+        "report_type",
+        "revenue_category",
+        "revenue_amount",
+        "expenditure_category",
+        "expenditure_amount",
+        "cash_balance",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "fiscal_year": 1.0,
+        "month": 1.0,
+        "report_type": 1.0,
+        "revenue_category": 1.0,
+        "revenue_amount": 1.0,
+        "expenditure_category": 1.0,
+        "expenditure_amount": 1.0,
+        "cash_balance": 0.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [
+        2021,
+        2022,
+        2023,
+        2024
+      ],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

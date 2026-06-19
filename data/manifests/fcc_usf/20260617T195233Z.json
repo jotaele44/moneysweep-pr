@@ -1,0 +1,56 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "fcc_usf",
+  "source_url": "https://www.fcc.gov/general/universal-service-fund",
+  "producer_script": "scripts/download_fcc.py",
+  "generated_at": "2026-06-17T19:52:33.986399+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_fcc_usf.csv",
+      "relative_path": "data/staging/processed/pr_fcc_usf.csv",
+      "extension": ".csv",
+      "size_bytes": 781,
+      "sha256": "903885f38b7df96cd61c7ac6ec34e442ac96f6ccca7ced3ac27f62cde34cf21d",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.984020+00:00",
+      "source_system": "fcc_usf",
+      "source_url": "https://www.fcc.gov/general/universal-service-fund",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 4,
+      "column_count": 10,
+      "columns": [
+        "program_year",
+        "program_type",
+        "recipient_name",
+        "recipient_normalized",
+        "city",
+        "state",
+        "funding_amount",
+        "category",
+        "application_id",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "program_year": 1.0,
+        "program_type": 1.0,
+        "recipient_name": 1.0,
+        "recipient_normalized": 1.0,
+        "city": 1.0,
+        "state": 1.0,
+        "funding_amount": 1.0,
+        "category": 1.0,
+        "application_id": 1.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": 1.0,
+      "actual_years": [],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

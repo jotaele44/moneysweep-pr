@@ -1,0 +1,41 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "cor3",
+  "source_url": "https://recovery.pr.gov/",
+  "producer_script": "scripts/download_cor3.py",
+  "generated_at": "2026-06-17T19:52:32.613824+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_cor3_projects.csv",
+      "relative_path": "data/staging/processed/pr_cor3_projects.csv",
+      "extension": ".csv",
+      "size_bytes": 146,
+      "sha256": "0c9eb91263e51edf80343e2d93ef4de37b770a3997b46604df344a6a784fabfa",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:32.612966+00:00",
+      "source_system": "cor3",
+      "source_url": "https://recovery.pr.gov/",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 0,
+      "column_count": 11,
+      "columns": [
+        "project_id",
+        "applicant_name",
+        "applicant_normalized",
+        "program",
+        "category",
+        "municipality",
+        "total_approved",
+        "total_disbursed",
+        "disbursement_rate",
+        "status",
+        "last_updated"
+      ],
+      "empty_or_header_only": true,
+      "year_coverage_pct": null,
+      "validation_status": "empty_or_header_only"
+    }
+  ]
+}
