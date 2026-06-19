@@ -1,0 +1,18 @@
+{
+  "artifact_count": 0,
+  "artifacts": [],
+  "export_contract_version": "local-20260619-103043",
+  "generated_at": "2026-06-19T14:30:43.544167+00:00",
+  "package_dir": "exports/package",
+  "producer": "contract-sweeper",
+  "schema_version": "artifact_manifest.v1",
+  "source_count": 1,
+  "sources": [
+    {
+      "bytes": 967803,
+      "path": "source_manifest.json",
+      "record_count": null,
+      "sha256": "9fb1da8447573e2689d12ab46877ed7c558a312c2089bb8146f4f65c5ba8741e"
+    }
+  ]
+}

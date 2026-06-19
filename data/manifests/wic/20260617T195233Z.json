@@ -1,0 +1,59 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "wic",
+  "source_url": "https://www.fns.usda.gov/wic",
+  "producer_script": "scripts/download_wic.py",
+  "generated_at": "2026-06-17T19:52:33.912340+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_wic.csv",
+      "relative_path": "data/staging/processed/pr_wic.csv",
+      "extension": ".csv",
+      "size_bytes": 432,
+      "sha256": "c93f7f1a508587e2f0354b4dfc3bb56686126e2072cf729d9986467856e2d001",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.910927+00:00",
+      "source_system": "wic",
+      "source_url": "https://www.fns.usda.gov/wic",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 4,
+      "column_count": 9,
+      "columns": [
+        "fiscal_year",
+        "month",
+        "total_participants",
+        "women_count",
+        "infants_count",
+        "children_count",
+        "total_food_cost",
+        "total_program_cost",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "fiscal_year": 1.0,
+        "month": 1.0,
+        "total_participants": 1.0,
+        "women_count": 1.0,
+        "infants_count": 1.0,
+        "children_count": 1.0,
+        "total_food_cost": 1.0,
+        "total_program_cost": 1.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

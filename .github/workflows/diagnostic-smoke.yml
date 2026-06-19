@@ -12,6 +12,8 @@ on: [push, pull_request]
 permissions:
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 jobs:
   diagnostic-smoke:
     runs-on: ubuntu-latest

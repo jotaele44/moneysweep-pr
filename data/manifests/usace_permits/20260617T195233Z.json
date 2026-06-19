@@ -1,0 +1,41 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "usace_permits",
+  "source_url": "https://permits.ops.usace.army.mil/orm-public",
+  "producer_script": "scripts/download_usace_permits.py",
+  "generated_at": "2026-06-17T19:52:33.645732+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_usace_permits.csv",
+      "relative_path": "data/staging/processed/pr_usace_permits.csv",
+      "extension": ".csv",
+      "size_bytes": 137,
+      "sha256": "67ca414d0042cb4ff63a0cd74dee8dc98e371f0c76590ef80064c7ef40ae9319",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.644569+00:00",
+      "source_system": "usace_permits",
+      "source_url": "https://permits.ops.usace.army.mil/orm-public",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 0,
+      "column_count": 11,
+      "columns": [
+        "permit_id",
+        "permit_type",
+        "applicant_name",
+        "applicant_normalized",
+        "issued_date",
+        "expiry_date",
+        "project_description",
+        "state",
+        "county",
+        "status",
+        "violation_flag"
+      ],
+      "empty_or_header_only": true,
+      "year_coverage_pct": null,
+      "validation_status": "empty_or_header_only"
+    }
+  ]
+}

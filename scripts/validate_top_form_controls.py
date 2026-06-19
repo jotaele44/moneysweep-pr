@@ -18,9 +18,10 @@ from pathlib import Path
 from typing import Iterable
 
 
-REQUIRED_DOC = Path("docs/TOP_FORM_DEVELOPMENT_CHECKLIST.md")
-REQUIRED_MATRIX = Path("reports/top_form_gap_matrix.csv")
-REQUIRED_SCHEMA = Path("schemas/top_form_gap_matrix.schema.json")
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+REQUIRED_DOC = _REPO_ROOT / "docs" / "TOP_FORM_DEVELOPMENT_CHECKLIST.md"
+REQUIRED_MATRIX = _REPO_ROOT / "reports" / "top_form_gap_matrix.csv"
+REQUIRED_SCHEMA = _REPO_ROOT / "schemas" / "top_form_gap_matrix.schema.json"
 
 REQUIRED_COLUMNS = [
     "gate",

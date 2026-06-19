@@ -12,6 +12,8 @@ on:
         required: true
         default: "no"
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 jobs:
   fetch_highergov:
     runs-on: ubuntu-latest

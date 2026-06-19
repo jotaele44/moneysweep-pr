@@ -1,0 +1,93 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "gleif_lei",
+  "source_url": "https://api.gleif.org/api/v1/lei-records",
+  "producer_script": "scripts/download_gleif.py",
+  "generated_at": "2026-06-17T19:52:33.892404+00:00",
+  "file_count": 2,
+  "files": [
+    {
+      "file_name": "pr_gleif_entities.csv",
+      "relative_path": "data/staging/processed/pr_gleif_entities.csv",
+      "extension": ".csv",
+      "size_bytes": 143524,
+      "sha256": "1c6a23008d45b2befb0c3b181566a134329edd125538a6c7e63211ae39290e2e",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.883761+00:00",
+      "source_system": "gleif_lei",
+      "source_url": "https://api.gleif.org/api/v1/lei-records",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 501,
+      "column_count": 11,
+      "columns": [
+        "lei",
+        "legal_name",
+        "other_names",
+        "jurisdiction",
+        "legal_form",
+        "entity_status",
+        "registered_as",
+        "legal_address",
+        "hq_address",
+        "registration_date",
+        "source_url"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "lei": 1.0,
+        "legal_name": 1.0,
+        "other_names": 0.1497005988023952,
+        "jurisdiction": 1.0,
+        "legal_form": 1.0,
+        "entity_status": 1.0,
+        "registered_as": 0.7425149700598802,
+        "legal_address": 1.0,
+        "hq_address": 1.0,
+        "registration_date": 0.5828343313373253,
+        "source_url": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    },
+    {
+      "file_name": "pr_gleif_relationships.csv",
+      "relative_path": "data/staging/processed/pr_gleif_relationships.csv",
+      "extension": ".csv",
+      "size_bytes": 7151,
+      "sha256": "419d8997c7dc0e2eb7665a5fbe3191a01186d8f91fd8d8ab947fad68d28e8038",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.890509+00:00",
+      "source_system": "gleif_lei",
+      "source_url": "https://api.gleif.org/api/v1/lei-records",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 66,
+      "column_count": 5,
+      "columns": [
+        "lei",
+        "legal_name",
+        "relationship_type",
+        "parent_lei",
+        "parent_name"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "lei": 1.0,
+        "legal_name": 1.0,
+        "relationship_type": 1.0,
+        "parent_lei": 1.0,
+        "parent_name": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "medicare_parts",
+  "source_url": "https://www.cms.gov/data-research",
+  "producer_script": "scripts/download_medicare_parts.py",
+  "generated_at": "2026-06-17T19:52:33.905704+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_medicare_parts.csv",
+      "relative_path": "data/staging/processed/pr_medicare_parts.csv",
+      "extension": ".csv",
+      "size_bytes": 498,
+      "sha256": "61d7db3d90d310ef59206fd5434e3affa8cdf98680eb0561813d792e1cee344b",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.904085+00:00",
+      "source_system": "medicare_parts",
+      "source_url": "https://www.cms.gov/data-research",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 4,
+      "column_count": 9,
+      "columns": [
+        "calendar_year",
+        "program_part",
+        "provider_or_drug_name",
+        "total_beneficiaries",
+        "total_claims",
+        "total_payments",
+        "avg_payment_per_claim",
+        "state",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "calendar_year": 1.0,
+        "program_part": 1.0,
+        "provider_or_drug_name": 1.0,
+        "total_beneficiaries": 1.0,
+        "total_claims": 1.0,
+        "total_payments": 1.0,
+        "avg_payment_per_claim": 1.0,
+        "state": 1.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

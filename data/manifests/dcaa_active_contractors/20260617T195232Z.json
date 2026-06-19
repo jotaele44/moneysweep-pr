@@ -1,0 +1,40 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "dcaa_active_contractors",
+  "source_url": "",
+  "producer_script": "scripts/download_active_contractors.py",
+  "generated_at": "2026-06-17T19:52:32.775284+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_active_contractors.csv",
+      "relative_path": "data/staging/processed/pr_active_contractors.csv",
+      "extension": ".csv",
+      "size_bytes": 135,
+      "sha256": "2a3ea42d84a536ef4d70cd46df0dd7e27ed82279dc38d76b47888797c335ad51",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:32.774132+00:00",
+      "source_system": "dcaa_active_contractors",
+      "source_url": "",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 0,
+      "column_count": 10,
+      "columns": [
+        "entity_name",
+        "entity_normalized",
+        "registration_id",
+        "registration_date",
+        "expiry_date",
+        "contractor_type",
+        "naics_code",
+        "municipality",
+        "status",
+        "source_file"
+      ],
+      "empty_or_header_only": true,
+      "year_coverage_pct": null,
+      "validation_status": "empty_or_header_only"
+    }
+  ]
+}

@@ -1,15 +1,18 @@
 import json
 import subprocess
 import sys
+from pathlib import Path
+
+_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_route_pr_intake_cli_exports_derivative_csvs(tmp_path):
     out_dir = tmp_path / "router_exports"
     cmd = [
         sys.executable,
-        "scripts/route_pr_intake.py",
+        str(_ROOT / "scripts" / "route_pr_intake.py"),
         "--input",
-        "tests/fixtures/pr_intake_router_sample.jsonl",
+        str(_ROOT / "tests" / "fixtures" / "pr_intake_router_sample.jsonl"),
         "--out-dir",
         str(out_dir),
     ]
@@ -57,7 +60,7 @@ def test_route_pr_intake_cli_fails_on_validation_errors_when_requested(tmp_path)
     out_dir = tmp_path / "router_exports"
     cmd = [
         sys.executable,
-        "scripts/route_pr_intake.py",
+        str(_ROOT / "scripts" / "route_pr_intake.py"),
         "--input",
         str(input_path),
         "--out-dir",

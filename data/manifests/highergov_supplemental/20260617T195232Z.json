@@ -1,0 +1,17 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "highergov_supplemental",
+  "source_url": "https://www.highergov.com/api",
+  "producer_script": "scripts/fetch_highergov_api.py",
+  "generated_at": "2026-06-17T19:52:32.309283+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "relative_path": "data/raw/HigherGov",
+      "source_system": "highergov_supplemental",
+      "validation_status": "error",
+      "error": "[Errno 21] Is a directory: '/Users/jotaele/Developer/Contract-Sweeper/data/raw/HigherGov'"
+    }
+  ]
+}

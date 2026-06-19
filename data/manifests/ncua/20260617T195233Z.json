@@ -1,0 +1,60 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "ncua",
+  "source_url": "https://www.ncua.gov/analysis/credit-union-corporate-call-report-data",
+  "producer_script": "scripts/download_ncua.py",
+  "generated_at": "2026-06-17T19:52:33.972804+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_ncua_credit_unions.csv",
+      "relative_path": "data/staging/processed/pr_ncua_credit_unions.csv",
+      "extension": ".csv",
+      "size_bytes": 839,
+      "sha256": "8aeef1eb4802be442b8b93ed90fbe47deac5bdf5fb3f0d3e7e7cc3b1f07d31d9",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.971186+00:00",
+      "source_system": "ncua",
+      "source_url": "https://www.ncua.gov/analysis/credit-union-corporate-call-report-data",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 4,
+      "column_count": 12,
+      "columns": [
+        "reporting_period",
+        "cu_number",
+        "cu_name",
+        "cu_normalized",
+        "total_assets",
+        "total_shares",
+        "total_loans",
+        "net_worth",
+        "members_count",
+        "city",
+        "state",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "reporting_period": 1.0,
+        "cu_number": 1.0,
+        "cu_name": 1.0,
+        "cu_normalized": 1.0,
+        "total_assets": 1.0,
+        "total_shares": 1.0,
+        "total_loans": 1.0,
+        "net_worth": 1.0,
+        "members_count": 1.0,
+        "city": 1.0,
+        "state": 1.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}
