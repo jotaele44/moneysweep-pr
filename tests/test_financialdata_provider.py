@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 """
 Tests for the OPTIONAL FinancialData.net provider adapter and enrichment CLI.
 
