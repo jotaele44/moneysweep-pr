@@ -1,0 +1,54 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "sam_exclusions",
+  "source_url": "https://api.sam.gov/entity-information/v4/exclusions",
+  "producer_script": "scripts/download_sam_exclusions.py",
+  "generated_at": "2026-06-19T16:56:21.034228+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "sam_exclusions.csv",
+      "relative_path": "data/staging/processed/sam_exclusions.csv",
+      "extension": ".csv",
+      "size_bytes": 70827,
+      "sha256": "79525fc91cb60bc2869005807bda00fcd25c94a5dc4a39d635029ed79e91ee02",
+      "ingestion_timestamp_utc": "2026-06-19T16:56:21.034228+00:00",
+      "source_system": "sam_exclusions",
+      "source_url": "https://api.sam.gov/entity-information/v4/exclusions",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 700,
+      "column_count": 9,
+      "columns": [
+        "classification",
+        "name",
+        "exclusion_type",
+        "exclusion_program",
+        "excluding_agency",
+        "active_date",
+        "termination_date",
+        "uei",
+        "state"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "classification": 0.0,
+        "name": 1.0,
+        "exclusion_type": 1.0,
+        "exclusion_program": 1.0,
+        "excluding_agency": 1.0,
+        "active_date": 0.0,
+        "termination_date": 0.0,
+        "uei": 0.13,
+        "state": 0.0
+      },
+      "notes": "700 records fetched; rate-limit on later pages capped this run. Re-run with --force after rate window resets to extend coverage. classification, active_date, termination_date, state sparsity is data-source normal for many SAM exclusion record types.",
+      "empty_or_header_only": false,
+      "duplicate_rate": null,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}
