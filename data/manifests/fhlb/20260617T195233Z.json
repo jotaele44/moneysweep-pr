@@ -1,0 +1,56 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "fhlb",
+  "source_url": "https://www.fhfa.gov/data",
+  "producer_script": "scripts/download_fhlb.py",
+  "generated_at": "2026-06-17T19:52:33.974191+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_fhlb_advances.csv",
+      "relative_path": "data/staging/processed/pr_fhlb_advances.csv",
+      "extension": ".csv",
+      "size_bytes": 526,
+      "sha256": "5649c743ed8e40434153ac559717f415e53c6981cabc2733a235caca10ee23fa",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.973236+00:00",
+      "source_system": "fhlb",
+      "source_url": "https://www.fhfa.gov/data",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 3,
+      "column_count": 9,
+      "columns": [
+        "institution_name",
+        "institution_normalized",
+        "fdic_cert",
+        "reporting_date",
+        "fiscal_year",
+        "advances_outstanding",
+        "advance_type",
+        "collateral_type",
+        "source"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "institution_name": 1.0,
+        "institution_normalized": 1.0,
+        "fdic_cert": 1.0,
+        "reporting_date": 1.0,
+        "fiscal_year": 1.0,
+        "advances_outstanding": 1.0,
+        "advance_type": 1.0,
+        "collateral_type": 1.0,
+        "source": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [
+        2023
+      ],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

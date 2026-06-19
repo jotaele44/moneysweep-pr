@@ -1,0 +1,2485 @@
+{
+  "generated_at": "2026-06-17T19:52:11.085000+00:00",
+  "schema_version": "coverage_audit_v1",
+  "root": "/Users/jotaele/Developer/Contract-Sweeper",
+  "committed_ci_view": {
+    "source": "reports/gap_analysis_report.json",
+    "generated_at": "2026-06-17T14:27:01.937062+00:00",
+    "fully_materialized": 58,
+    "partially_materialized": 1,
+    "coverage_rate": 0.4265,
+    "note": "reflects a clean/CI checkout where gitignored data/staging/processed/pr_*.csv masters are absent"
+  },
+  "local_truth_summary": {
+    "total_sources": 136,
+    "required_sources": 14,
+    "fully_materialized": 58,
+    "partially_materialized": 13,
+    "not_materialized": 65,
+    "no_outputs_declared": 0,
+    "required_fully_materialized": 8,
+    "tier_bulk": 13,
+    "tier_moderate": 19,
+    "tier_seed_stub": 27,
+    "tier_empty": 77,
+    "total_local_rows": 1182419,
+    "coverage_rate_fully": 0.4265,
+    "materialized_any_data": 59
+  },
+  "processed_file_inventory": {
+    "processed_dir": "data/staging/processed",
+    "total_csv_files": 112,
+    "total_rows_on_disk": 1407382,
+    "registry_accounted_rows": 1182366,
+    "orphan_rows": 104280,
+    "orphan_file_count": 1,
+    "intermediate_rows": 120736,
+    "intermediate_file_count": 11,
+    "files": [
+      {
+        "file": "pr_all_awards_master.csv",
+        "rows": 538262,
+        "claimed_by": "usaspending_prime",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_grants_master.csv",
+        "rows": 461668,
+        "claimed_by": "grants_gov",
+        "classification": "declared"
+      },
+      {
+        "file": "entity_master.csv",
+        "rows": 104280,
+        "claimed_by": "",
+        "classification": "orphan"
+      },
+      {
+        "file": "pr_contracts_master.csv",
+        "rows": 68681,
+        "claimed_by": "usaspending_prime",
+        "classification": "declared"
+      },
+      {
+        "file": "normalized_expansion_fpds_2009_2016_direct.csv",
+        "rows": 25615,
+        "claimed_by": "",
+        "classification": "intermediate"
+      },
+      {
+        "file": "normalized_expansion_fpds_2017_2025_direct.csv",
+        "rows": 24595,
+        "claimed_by": "",
+        "classification": "intermediate"
+      },
+      {
+        "file": "pr_fema_pa_master.csv",
+        "rows": 21868,
+        "claimed_by": "fema_pa_openfema_v2",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_ofac_sdn.csv",
+        "rows": 19050,
+        "claimed_by": "ofac_sdn",
+        "classification": "declared"
+      },
+      {
+        "file": "normalized_expansion_fpds_2009_2016_vendor.csv",
+        "rows": 17975,
+        "claimed_by": "",
+        "classification": "intermediate"
+      },
+      {
+        "file": "lda_registrants.csv",
+        "rows": 17349,
+        "claimed_by": "lda",
+        "classification": "declared"
+      },
+      {
+        "file": "normalized_expansion_fpds_2017_2025_vendor.csv",
+        "rows": 17094,
+        "claimed_by": "",
+        "classification": "intermediate"
+      },
+      {
+        "file": "pr_fec_contributions.csv",
+        "rows": 16637,
+        "claimed_by": "fec",
+        "classification": "declared"
+      },
+      {
+        "file": "normalized_expansion_fpds_2005_2008_direct.csv",
+        "rows": 14717,
+        "claimed_by": "",
+        "classification": "intermediate"
+      },
+      {
+        "file": "pr_cdbg_dr_master.csv",
+        "rows": 7700,
+        "claimed_by": "hud_cdbg_dr_public",
+        "classification": "declared"
+      },
+      {
+        "file": "vendor_targets.csv",
+        "rows": 7472,
+        "claimed_by": "",
+        "classification": "intermediate"
+      },
+      {
+        "file": "pr_fsrs_subawards.csv",
+        "rows": 7122,
+        "claimed_by": "fsrs_subawards",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_subawards_master.csv",
+        "rows": 7122,
+        "claimed_by": "usaspending_subawards",
+        "classification": "declared"
+      },
+      {
+        "file": "normalized_expansion_fpds_2005_2008_vendor.csv",
+        "rows": 6696,
+        "claimed_by": "",
+        "classification": "intermediate"
+      },
+      {
+        "file": "pr_research_master.csv",
+        "rows": 4946,
+        "claimed_by": "research_grants",
+        "classification": "declared"
+      },
+      {
+        "file": "normalized_expansion_dod_upr_2016_2025.csv",
+        "rows": 2774,
+        "claimed_by": "",
+        "classification": "intermediate"
+      },
+      {
+        "file": "pr_fred_timeseries.csv",
+        "rows": 2131,
+        "claimed_by": "fred_timeseries",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_fdic_financials.csv",
+        "rows": 2086,
+        "claimed_by": "fdic",
+        "classification": "declared"
+      },
+      {
+        "file": "normalized_expansion_dod_upr_2001_2015.csv",
+        "rows": 1901,
+        "claimed_by": "",
+        "classification": "intermediate"
+      },
+      {
+        "file": "normalized_expansion_reconstruction_2017_2025.csv",
+        "rows": 1356,
+        "claimed_by": "",
+        "classification": "intermediate"
+      },
+      {
+        "file": "pr_sf133_budget_execution.csv",
+        "rows": 1247,
+        "claimed_by": "follow_the_money",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_usda_master.csv",
+        "rows": 688,
+        "claimed_by": "usda_grants",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_epa_master.csv",
+        "rows": 631,
+        "claimed_by": "epa_grants",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_eia_power_sector.csv",
+        "rows": 615,
+        "claimed_by": "eia_power_sector",
+        "classification": "declared"
+      },
+      {
+        "file": "normalized_expansion_idv_indirect_pr.csv",
+        "rows": 541,
+        "claimed_by": "",
+        "classification": "intermediate"
+      },
+      {
+        "file": "pr_gleif_entities.csv",
+        "rows": 501,
+        "claimed_by": "gleif_lei",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_wioa_grants.csv",
+        "rows": 444,
+        "claimed_by": "wioa",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_doj_grants_master.csv",
+        "rows": 419,
+        "claimed_by": "doj_grants",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_ed_master.csv",
+        "rows": 379,
+        "claimed_by": "ed_grants",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_dot_master.csv",
+        "rows": 376,
+        "claimed_by": "dot_grants",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_oia_master.csv",
+        "rows": 364,
+        "claimed_by": "oia_grants",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_hhs_master.csv",
+        "rows": 307,
+        "claimed_by": "hhs_grants",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_ftm_municipal_bridge.csv",
+        "rows": 246,
+        "claimed_by": "follow_the_money",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_slfrf_master.csv",
+        "rows": 200,
+        "claimed_by": "slfrf",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_doe_master.csv",
+        "rows": 180,
+        "claimed_by": "doe_grants",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_sec_financials.csv",
+        "rows": 156,
+        "claimed_by": "sec_edgar",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_nih_grants.csv",
+        "rows": 103,
+        "claimed_by": "nih_reporter",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_medicaid_fmap.csv",
+        "rows": 89,
+        "claimed_by": "medicaid_fmap",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_sec_officers.csv",
+        "rows": 85,
+        "claimed_by": "sec_officers",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_gleif_relationships.csv",
+        "rows": 66,
+        "claimed_by": "gleif_lei",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_snap_nap.csv",
+        "rows": 61,
+        "claimed_by": "snap_nap",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_sec_holdings.csv",
+        "rows": 54,
+        "claimed_by": "sec_13f_nport",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_fdic_institutions.csv",
+        "rows": 44,
+        "claimed_by": "fdic",
+        "classification": "declared"
+      },
+      {
+        "file": "lda_clients.csv",
+        "rows": 25,
+        "claimed_by": "lda",
+        "classification": "declared"
+      },
+      {
+        "file": "lda_contributions.csv",
+        "rows": 25,
+        "claimed_by": "lda",
+        "classification": "declared"
+      },
+      {
+        "file": "lda_filings.csv",
+        "rows": 25,
+        "claimed_by": "lda",
+        "classification": "declared"
+      },
+      {
+        "file": "lda_lobbyists.csv",
+        "rows": 25,
+        "claimed_by": "lda",
+        "classification": "declared"
+      },
+      {
+        "file": "lda_ref_countries.csv",
+        "rows": 25,
+        "claimed_by": "lda",
+        "classification": "declared"
+      },
+      {
+        "file": "lda_ref_filing_types.csv",
+        "rows": 25,
+        "claimed_by": "lda",
+        "classification": "declared"
+      },
+      {
+        "file": "lda_ref_government_entities.csv",
+        "rows": 25,
+        "claimed_by": "lda",
+        "classification": "declared"
+      },
+      {
+        "file": "lda_ref_lobbying_issues.csv",
+        "rows": 25,
+        "claimed_by": "lda",
+        "classification": "declared"
+      },
+      {
+        "file": "lda_ref_states.csv",
+        "rows": 25,
+        "claimed_by": "lda",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_fema_hmgp_master.csv",
+        "rows": 25,
+        "claimed_by": "fema_hmgp",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_lda_filings.csv",
+        "rows": 25,
+        "claimed_by": "lda",
+        "classification": "declared"
+      },
+      {
+        "file": "lda_ref_lobbyist_suffixes.csv",
+        "rows": 23,
+        "claimed_by": "lda",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_emma_bonds.csv",
+        "rows": 20,
+        "claimed_by": "emma_bonds",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_promesa_creditors.csv",
+        "rows": 16,
+        "claimed_by": "promesa_creditors",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_emma_underwriters.csv",
+        "rows": 15,
+        "claimed_by": "emma_bonds",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_sec_companies.csv",
+        "rows": 15,
+        "claimed_by": "sec_edgar",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_hacienda_revenues.csv",
+        "rows": 8,
+        "claimed_by": "hacienda",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_prepa_contracts.csv",
+        "rows": 8,
+        "claimed_by": "prepa_luma_genera",
+        "classification": "declared"
+      },
+      {
+        "file": "lda_ref_lobbyist_prefixes.csv",
+        "rows": 7,
+        "claimed_by": "lda",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_rum_coverover.csv",
+        "rows": 7,
+        "claimed_by": "rum_cover_over",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_ssa_benefits.csv",
+        "rows": 6,
+        "claimed_by": "ssa",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_va_benefits.csv",
+        "rows": 6,
+        "claimed_by": "va_benefits",
+        "classification": "declared"
+      },
+      {
+        "file": "lda_ref_contribution_item_types.csv",
+        "rows": 5,
+        "claimed_by": "lda",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_act60_decrees.csv",
+        "rows": 5,
+        "claimed_by": "pr_act_60_decrees",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_cofina.csv",
+        "rows": 5,
+        "claimed_by": "cofina",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_gao_ig_reports.csv",
+        "rows": 5,
+        "claimed_by": "gao_ig_audits",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_medicare_advantage.csv",
+        "rows": 5,
+        "claimed_by": "medicare_advantage",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_municipal_finance.csv",
+        "rows": 5,
+        "claimed_by": "municipal_finance",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_p3_contracts.csv",
+        "rows": 5,
+        "claimed_by": "p3_authority",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_aafaf_budget.csv",
+        "rows": 4,
+        "claimed_by": "aafaf",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_chip.csv",
+        "rows": 4,
+        "claimed_by": "chip",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_fcc_usf.csv",
+        "rows": 4,
+        "claimed_by": "fcc_usf",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_ftm_facility_matches.csv",
+        "rows": 4,
+        "claimed_by": "follow_the_money",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_medicare_parts.csv",
+        "rows": 4,
+        "claimed_by": "medicare_parts",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_ncua_credit_unions.csv",
+        "rows": 4,
+        "claimed_by": "ncua",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_pension_funds.csv",
+        "rows": 4,
+        "claimed_by": "pr_pensions",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_wic.csv",
+        "rows": 4,
+        "claimed_by": "wic",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_dol_enforcement.csv",
+        "rows": 3,
+        "claimed_by": "dol_whd_osha",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_fhlb_advances.csv",
+        "rows": 3,
+        "claimed_by": "fhlb",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_nonprofits.csv",
+        "rows": 3,
+        "claimed_by": "nonprofits_irs990",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_usace_civil_master.csv",
+        "rows": 3,
+        "claimed_by": "usace_civil_works",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_hud_hcv.csv",
+        "rows": 2,
+        "claimed_by": "hud_hcv_section8",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_sba_loans_master.csv",
+        "rows": 2,
+        "claimed_by": "sba_loans",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_active_contractors.csv",
+        "rows": 0,
+        "claimed_by": "dcaa_active_contractors",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_bond_flow.csv",
+        "rows": 0,
+        "claimed_by": "",
+        "classification": "empty"
+      },
+      {
+        "file": "pr_cabilderos.csv",
+        "rows": 0,
+        "claimed_by": "pr_cabilderos",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_compras_awards.csv",
+        "rows": 0,
+        "claimed_by": "compras_pr",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_compras_rfps.csv",
+        "rows": 0,
+        "claimed_by": "compras_pr",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_contralor_audits.csv",
+        "rows": 0,
+        "claimed_by": "oficina_contralor",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_cor3_projects.csv",
+        "rows": 0,
+        "claimed_by": "cor3",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_corporate_registry.csv",
+        "rows": 0,
+        "claimed_by": "pr_corporate_registry",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_delivery_scorecard.csv",
+        "rows": 0,
+        "claimed_by": "",
+        "classification": "empty"
+      },
+      {
+        "file": "pr_earmarks.csv",
+        "rows": 0,
+        "claimed_by": "congressional_earmarks",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_exim_master.csv",
+        "rows": 0,
+        "claimed_by": "",
+        "classification": "empty"
+      },
+      {
+        "file": "pr_haf_spending.csv",
+        "rows": 0,
+        "claimed_by": "",
+        "classification": "empty"
+      },
+      {
+        "file": "pr_lihtc_projects.csv",
+        "rows": 0,
+        "claimed_by": "",
+        "classification": "empty"
+      },
+      {
+        "file": "pr_msrb_trades.csv",
+        "rows": 0,
+        "claimed_by": "msrb_rtrs_trades",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_nfip_claims.csv",
+        "rows": 0,
+        "claimed_by": "nfip_claims",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_nmtc_allocations.csv",
+        "rows": 0,
+        "claimed_by": "",
+        "classification": "empty"
+      },
+      {
+        "file": "pr_ofac_matches.csv",
+        "rows": 0,
+        "claimed_by": "",
+        "classification": "empty"
+      },
+      {
+        "file": "pr_prasa_contracts.csv",
+        "rows": 0,
+        "claimed_by": "prasa",
+        "classification": "declared"
+      },
+      {
+        "file": "pr_report_builder_master.csv",
+        "rows": 0,
+        "claimed_by": "",
+        "classification": "empty"
+      },
+      {
+        "file": "pr_rfp_lobby_crossref.csv",
+        "rows": 0,
+        "claimed_by": "",
+        "classification": "empty"
+      },
+      {
+        "file": "pr_sbir_master.csv",
+        "rows": 0,
+        "claimed_by": "",
+        "classification": "empty"
+      },
+      {
+        "file": "pr_usace_permits.csv",
+        "rows": 0,
+        "claimed_by": "usace_permits",
+        "classification": "declared"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "usaspending_prime",
+      "family": "federal",
+      "required": true,
+      "authentication": "none",
+      "expected_output_count": 2,
+      "present_count": 2,
+      "local_rows": 606943,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "bulk",
+      "first_expected_output": "data/staging/processed/pr_contracts_master.csv"
+    },
+    {
+      "source_id": "grants_gov",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 461668,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "bulk",
+      "first_expected_output": "data/staging/processed/pr_grants_master.csv"
+    },
+    {
+      "source_id": "fema_pa_openfema_v2",
+      "family": "federal",
+      "required": true,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 21868,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "bulk",
+      "first_expected_output": "data/staging/processed/pr_fema_pa_master.csv"
+    },
+    {
+      "source_id": "ofac_sdn",
+      "family": "entity_resolution",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 19050,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "bulk",
+      "first_expected_output": "data/staging/processed/pr_ofac_sdn.csv"
+    },
+    {
+      "source_id": "lda",
+      "family": "lobbying",
+      "required": true,
+      "authentication": "none",
+      "expected_output_count": 14,
+      "present_count": 14,
+      "local_rows": 17634,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "bulk",
+      "first_expected_output": "data/staging/processed/lda_registrants.csv"
+    },
+    {
+      "source_id": "fec",
+      "family": "political_finance",
+      "required": true,
+      "authentication": "api_key:FEC_API_KEY",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 16637,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "bulk",
+      "first_expected_output": "data/staging/processed/pr_fec_contributions.csv"
+    },
+    {
+      "source_id": "hud_cdbg_dr_public",
+      "family": "federal",
+      "required": true,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 7700,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "bulk",
+      "first_expected_output": "data/staging/processed/pr_cdbg_dr_master.csv"
+    },
+    {
+      "source_id": "usaspending_subawards",
+      "family": "federal",
+      "required": true,
+      "authentication": "none",
+      "expected_output_count": 2,
+      "present_count": 2,
+      "local_rows": 7125,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "bulk",
+      "first_expected_output": "data/staging/processed/pr_subawards_master.csv"
+    },
+    {
+      "source_id": "fsrs_subawards",
+      "family": "federal",
+      "required": true,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 7122,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "bulk",
+      "first_expected_output": "data/staging/processed/pr_fsrs_subawards.csv"
+    },
+    {
+      "source_id": "research_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 4946,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "bulk",
+      "first_expected_output": "data/staging/processed/pr_research_master.csv"
+    },
+    {
+      "source_id": "fred_timeseries",
+      "family": "federal",
+      "required": false,
+      "authentication": "api_key:FRED_API_KEY",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 2131,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "bulk",
+      "first_expected_output": "data/staging/processed/pr_fred_timeseries.csv"
+    },
+    {
+      "source_id": "fdic",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 2,
+      "present_count": 2,
+      "local_rows": 2130,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "bulk",
+      "first_expected_output": "data/staging/processed/pr_fdic_financials.csv"
+    },
+    {
+      "source_id": "follow_the_money",
+      "family": "political_finance",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 3,
+      "present_count": 3,
+      "local_rows": 1497,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "bulk",
+      "first_expected_output": "data/staging/processed/pr_sf133_budget_execution.csv"
+    },
+    {
+      "source_id": "usda_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 688,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_usda_master.csv"
+    },
+    {
+      "source_id": "epa_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 631,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_epa_master.csv"
+    },
+    {
+      "source_id": "eia_power_sector",
+      "family": "federal",
+      "required": false,
+      "authentication": "api_key:EIA_API_KEY",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 615,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_eia_power_sector.csv"
+    },
+    {
+      "source_id": "gleif_lei",
+      "family": "entity_resolution",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 2,
+      "present_count": 2,
+      "local_rows": 567,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_gleif_entities.csv"
+    },
+    {
+      "source_id": "wioa",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 444,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_wioa_grants.csv"
+    },
+    {
+      "source_id": "doj_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 419,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_doj_grants_master.csv"
+    },
+    {
+      "source_id": "ed_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 379,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_ed_master.csv"
+    },
+    {
+      "source_id": "dot_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 376,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_dot_master.csv"
+    },
+    {
+      "source_id": "oia_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 364,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_oia_master.csv"
+    },
+    {
+      "source_id": "hhs_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 307,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_hhs_master.csv"
+    },
+    {
+      "source_id": "slfrf",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 200,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_slfrf_master.csv"
+    },
+    {
+      "source_id": "doe_grants",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 180,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_doe_master.csv"
+    },
+    {
+      "source_id": "sec_edgar",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 2,
+      "present_count": 2,
+      "local_rows": 171,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_sec_companies.csv"
+    },
+    {
+      "source_id": "nih_reporter",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 103,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_nih_grants.csv"
+    },
+    {
+      "source_id": "medicaid_fmap",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 89,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_medicaid_fmap.csv"
+    },
+    {
+      "source_id": "sec_officers",
+      "family": "entity_resolution",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 85,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_sec_officers.csv"
+    },
+    {
+      "source_id": "snap_nap",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 61,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_snap_nap.csv"
+    },
+    {
+      "source_id": "sec_13f_nport",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 54,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/pr_sec_holdings.csv"
+    },
+    {
+      "source_id": "sam_entities",
+      "family": "entity_resolution",
+      "required": true,
+      "authentication": "api_key:SAM_API_KEY",
+      "expected_output_count": 2,
+      "present_count": 1,
+      "local_rows": 50,
+      "min_rows_threshold": 1,
+      "local_status": "partially_materialized",
+      "materiality_tier": "moderate",
+      "first_expected_output": "data/staging/processed/enrichment/vendor_uei_index.csv"
+    },
+    {
+      "source_id": "emma_bonds",
+      "family": "bonds",
+      "required": true,
+      "authentication": "none",
+      "expected_output_count": 2,
+      "present_count": 2,
+      "local_rows": 35,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_emma_bonds.csv"
+    },
+    {
+      "source_id": "fema_hmgp",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 25,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_fema_hmgp_master.csv"
+    },
+    {
+      "source_id": "promesa_creditors",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 16,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_promesa_creditors.csv"
+    },
+    {
+      "source_id": "hacienda",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 8,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_hacienda_revenues.csv"
+    },
+    {
+      "source_id": "prepa_luma_genera",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 8,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_prepa_contracts.csv"
+    },
+    {
+      "source_id": "rum_cover_over",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 7,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_rum_coverover.csv"
+    },
+    {
+      "source_id": "ssa",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 6,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_ssa_benefits.csv"
+    },
+    {
+      "source_id": "va_benefits",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 6,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_va_benefits.csv"
+    },
+    {
+      "source_id": "cofina",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 5,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_cofina.csv"
+    },
+    {
+      "source_id": "gao_ig_audits",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 5,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_gao_ig_reports.csv"
+    },
+    {
+      "source_id": "medicare_advantage",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 5,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_medicare_advantage.csv"
+    },
+    {
+      "source_id": "municipal_finance",
+      "family": "municipal",
+      "required": false,
+      "authentication": "api_key:FAC_API_KEY",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 5,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_municipal_finance.csv"
+    },
+    {
+      "source_id": "p3_authority",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 5,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_p3_contracts.csv"
+    },
+    {
+      "source_id": "pr_act_60_decrees",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 5,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_act60_decrees.csv"
+    },
+    {
+      "source_id": "aafaf",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 4,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_aafaf_budget.csv"
+    },
+    {
+      "source_id": "chip",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 4,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_chip.csv"
+    },
+    {
+      "source_id": "fcc_usf",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 4,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_fcc_usf.csv"
+    },
+    {
+      "source_id": "medicare_parts",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 4,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_medicare_parts.csv"
+    },
+    {
+      "source_id": "ncua",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 4,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_ncua_credit_unions.csv"
+    },
+    {
+      "source_id": "pr_pensions",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 4,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_pension_funds.csv"
+    },
+    {
+      "source_id": "wic",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 4,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_wic.csv"
+    },
+    {
+      "source_id": "dol_whd_osha",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 3,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_dol_enforcement.csv"
+    },
+    {
+      "source_id": "fhlb",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 3,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_fhlb_advances.csv"
+    },
+    {
+      "source_id": "nonprofits_irs990",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 3,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_nonprofits.csv"
+    },
+    {
+      "source_id": "usace_civil_works",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 3,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_usace_civil_master.csv"
+    },
+    {
+      "source_id": "hud_hcv_section8",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 2,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_hud_hcv.csv"
+    },
+    {
+      "source_id": "sba_loans",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 1,
+      "local_rows": 2,
+      "min_rows_threshold": 1,
+      "local_status": "fully_materialized",
+      "materiality_tier": "seed_stub",
+      "first_expected_output": "data/staging/processed/pr_sba_loans_master.csv"
+    },
+    {
+      "source_id": "act_toll_revenue",
+      "family": "infrastructure_revenue",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_act_toll_revenue.csv"
+    },
+    {
+      "source_id": "act_tolls_concession",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_act_tolls.csv"
+    },
+    {
+      "source_id": "act_transition_contracts",
+      "family": "manual_export",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_act_transition_contracts.csv"
+    },
+    {
+      "source_id": "acuden_2024_transition",
+      "family": "manual_export",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_acuden_transition.csv"
+    },
+    {
+      "source_id": "ases_plan_vital",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_ases_contracts.csv"
+    },
+    {
+      "source_id": "bde_loans",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_bde_loans.csv"
+    },
+    {
+      "source_id": "census_gov_finances",
+      "family": "territorial",
+      "required": false,
+      "authentication": "api_key:CENSUS_API_KEY",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 0,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_census_gov_finances.csv"
+    },
+    {
+      "source_id": "cms_open_payments",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_cms_open_payments.csv"
+    },
+    {
+      "source_id": "compras_pr",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 2,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "partially_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_compras_rfps.csv"
+    },
+    {
+      "source_id": "congressional_earmarks",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "partially_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_earmarks.csv"
+    },
+    {
+      "source_id": "contralor_electoral",
+      "family": "political_finance",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_oce_donations.csv"
+    },
+    {
+      "source_id": "cor3",
+      "family": "territorial",
+      "required": true,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "partially_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_cor3_projects.csv"
+    },
+    {
+      "source_id": "crim_property_tax",
+      "family": "municipal",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_crim_property_tax.csv"
+    },
+    {
+      "source_id": "dcaa_active_contractors",
+      "family": "manual_export",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "partially_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_active_contractors.csv"
+    },
+    {
+      "source_id": "ddec_incentives",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_ddec_incentives.csv"
+    },
+    {
+      "source_id": "doj_settlements",
+      "family": "federal",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_doj_settlements.csv"
+    },
+    {
+      "source_id": "donaciones_pr",
+      "family": "political_finance",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_donaciones.csv"
+    },
+    {
+      "source_id": "dtop_road_contracts",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_dtop_road_contracts.csv"
+    },
+    {
+      "source_id": "dtop_vehicle_fees",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_dtop_fees.csv"
+    },
+    {
+      "source_id": "emma_infra_revenue",
+      "family": "infrastructure_revenue",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_emma_revenue_disclosures.csv"
+    },
+    {
+      "source_id": "eqb_epa_icis",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 0,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_epa_echo_icis.csv"
+    },
+    {
+      "source_id": "equitable_sharing",
+      "family": "federal",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_equitable_sharing.csv"
+    },
+    {
+      "source_id": "estadisticas_pr_external_trade",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 0,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_external_trade.csv"
+    },
+    {
+      "source_id": "exim_bank",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_exim.csv"
+    },
+    {
+      "source_id": "fec_committees",
+      "family": "political_finance",
+      "required": false,
+      "authentication": "api_key:FEC_API_KEY",
+      "expected_output_count": 3,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_fec_committees.csv"
+    },
+    {
+      "source_id": "federal_audit_clearinghouse",
+      "family": "federal",
+      "required": false,
+      "authentication": "api_key:FAC_API_KEY",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_single_audits.csv"
+    },
+    {
+      "source_id": "fema_individual_assistance",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_fema_ia.csv"
+    },
+    {
+      "source_id": "financialdata_net",
+      "family": "optional_commercial_enrichment",
+      "required": false,
+      "authentication": "api_key:FINANCIALDATA_API_KEY",
+      "expected_output_count": 4,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 0,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "outputs/enrichment/financialdata_identifier_crosswalk.csv"
+    },
+    {
+      "source_id": "fpds_report_builder",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_fpds_report_builder.csv"
+    },
+    {
+      "source_id": "fta_ntd",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 0,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_fta_ntd.csv"
+    },
+    {
+      "source_id": "gaming_commission",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_gaming.csv"
+    },
+    {
+      "source_id": "hacienda_sut_ivu",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 0,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_hacienda_sut_ivu.csv"
+    },
+    {
+      "source_id": "haf",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_haf.csv"
+    },
+    {
+      "source_id": "highergov_supplemental",
+      "family": "federal",
+      "required": false,
+      "authentication": "api_key:HIGHERGOV_API_KEY",
+      "expected_output_count": 2,
+      "present_count": 1,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "partially_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/raw/HigherGov/"
+    },
+    {
+      "source_id": "hud_cdbg_mit",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_cdbg_mit.csv"
+    },
+    {
+      "source_id": "hud_drgr_authorized",
+      "family": "manual_export",
+      "required": true,
+      "authentication": "manual_export",
+      "expected_output_count": 2,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/hud_drgr_activities.csv"
+    },
+    {
+      "source_id": "irs_ctc_eitc_pr",
+      "family": "federal",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_irs_ctc_eitc.csv"
+    },
+    {
+      "source_id": "lihtc",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_lihtc.csv"
+    },
+    {
+      "source_id": "loteria_pr",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_loteria.csv"
+    },
+    {
+      "source_id": "msrb_rtrs_trades",
+      "family": "bonds",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "partially_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_msrb_trades.csv"
+    },
+    {
+      "source_id": "nara_catalog_aws_open_data",
+      "family": "provenance_archival",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 2,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 0,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/nara_nextgen/nara_bulk_catalog_index.csv"
+    },
+    {
+      "source_id": "nara_nextgen_catalog_v3",
+      "family": "provenance_archival",
+      "required": false,
+      "authentication": "api_key:NARA_API_KEY",
+      "expected_output_count": 2,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 0,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/nara_nextgen/nara_record_locator_index.csv"
+    },
+    {
+      "source_id": "nfip_claims",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "partially_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_nfip_claims.csv"
+    },
+    {
+      "source_id": "ngo_integration_layer",
+      "family": "nonprofit",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 3,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/ngos/ngos_master.csv"
+    },
+    {
+      "source_id": "nmtc",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_nmtc.csv"
+    },
+    {
+      "source_id": "oatrh_payroll",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_govt_payroll.csv"
+    },
+    {
+      "source_id": "ocpr_contracts",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_ocpr_contracts.csv"
+    },
+    {
+      "source_id": "oficina_contralor",
+      "family": "territorial",
+      "required": true,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "partially_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_contralor_audits.csv"
+    },
+    {
+      "source_id": "ogpe_permits",
+      "family": "municipal",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_ogpe_permits.csv"
+    },
+    {
+      "source_id": "opm_fedscope",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_federal_payroll.csv"
+    },
+    {
+      "source_id": "opportunity_zones",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_opportunity_zones.csv"
+    },
+    {
+      "source_id": "ports_airports_contracts",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_ports_airports_contracts.csv"
+    },
+    {
+      "source_id": "ports_airports_revenue",
+      "family": "infrastructure_revenue",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_ports_airports_revenue.csv"
+    },
+    {
+      "source_id": "ports_authority",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_ports_concessions.csv"
+    },
+    {
+      "source_id": "pr_act_154_excise",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 0,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_act_154_excise.csv"
+    },
+    {
+      "source_id": "pr_cabilderos",
+      "family": "lobbying",
+      "required": true,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "partially_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_cabilderos.csv"
+    },
+    {
+      "source_id": "pr_corporate_registry",
+      "family": "manual_export",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "partially_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_corporate_registry.csv"
+    },
+    {
+      "source_id": "pr_general_fund_revenues",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 0,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_general_fund_revenues.csv"
+    },
+    {
+      "source_id": "pr_income_tax_collections",
+      "family": "territorial",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 0,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_income_tax_collections.csv"
+    },
+    {
+      "source_id": "prasa",
+      "family": "infrastructure",
+      "required": true,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "partially_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_prasa_contracts.csv"
+    },
+    {
+      "source_id": "prasa_cer",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_prasa_cer.csv"
+    },
+    {
+      "source_id": "prasa_cip",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_prasa_cip.csv"
+    },
+    {
+      "source_id": "prasa_completed_projects",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_prasa_completed_projects.csv"
+    },
+    {
+      "source_id": "prasa_contracts_master",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/prasa_contracts_master.csv"
+    },
+    {
+      "source_id": "prasa_rate_revenue",
+      "family": "infrastructure_revenue",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_prasa_rate_revenue.csv"
+    },
+    {
+      "source_id": "prepa_luma_rate_revenue",
+      "family": "infrastructure_revenue",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_prepa_rate_revenue.csv"
+    },
+    {
+      "source_id": "prpha_housing_subsidy",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_prpha_subsidies.csv"
+    },
+    {
+      "source_id": "sam_exclusions",
+      "family": "entity_resolution",
+      "required": false,
+      "authentication": "api_key:SAM_API_KEY",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/sam_exclusions.csv"
+    },
+    {
+      "source_id": "sba_ppp",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_sba_ppp.csv"
+    },
+    {
+      "source_id": "sbir",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_sbir.csv"
+    },
+    {
+      "source_id": "sf133_budget_execution",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_sf133.csv"
+    },
+    {
+      "source_id": "tourism_room_tax",
+      "family": "territorial",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_tourism_roomtax.csv"
+    },
+    {
+      "source_id": "transit_contracts",
+      "family": "infrastructure",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_transit_contracts.csv"
+    },
+    {
+      "source_id": "transit_fare_revenue",
+      "family": "infrastructure_revenue",
+      "required": false,
+      "authentication": "manual_export",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_transit_fare_revenue.csv"
+    },
+    {
+      "source_id": "usace_permits",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "partially_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_usace_permits.csv"
+    },
+    {
+      "source_id": "usaspending_loans",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_federal_loans.csv"
+    },
+    {
+      "source_id": "usda_farm_subsidies",
+      "family": "federal",
+      "required": false,
+      "authentication": "none",
+      "expected_output_count": 1,
+      "present_count": 0,
+      "local_rows": 0,
+      "min_rows_threshold": 1,
+      "local_status": "not_materialized",
+      "materiality_tier": "empty",
+      "first_expected_output": "data/staging/processed/pr_usda_farm_subsidies.csv"
+    }
+  ],
+  "universe_coverage": [],
+  "probe_ran": false
+}

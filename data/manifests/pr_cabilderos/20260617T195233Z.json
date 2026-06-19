@@ -1,0 +1,41 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "pr_cabilderos",
+  "source_url": "https://etica.pr.gov/cabilderos/",
+  "producer_script": "scripts/ingest_cabilderos.py",
+  "generated_at": "2026-06-17T19:52:33.362909+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_cabilderos.csv",
+      "relative_path": "data/staging/processed/pr_cabilderos.csv",
+      "extension": ".csv",
+      "size_bytes": 167,
+      "sha256": "651ddac158fce009c60eeb757a8d153df38cab50d76c0245c8ddd93d7efda116",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.361242+00:00",
+      "source_system": "pr_cabilderos",
+      "source_url": "https://etica.pr.gov/cabilderos/",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 0,
+      "column_count": 11,
+      "columns": [
+        "lobbyist_name",
+        "lobbyist_normalized",
+        "client_name",
+        "client_normalized",
+        "registration_year",
+        "registration_date",
+        "expiry_date",
+        "lobbying_subject",
+        "agency_lobbied",
+        "fee_amount",
+        "source_file"
+      ],
+      "empty_or_header_only": true,
+      "year_coverage_pct": null,
+      "validation_status": "empty_or_header_only"
+    }
+  ]
+}

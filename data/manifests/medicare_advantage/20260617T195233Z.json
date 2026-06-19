@@ -1,0 +1,60 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "medicare_advantage",
+  "source_url": "https://www.cms.gov/data-research/statistics-trends-and-reports/medicare-advantage-rates-statistics",
+  "producer_script": "scripts/download_medicare_advantage.py",
+  "generated_at": "2026-06-17T19:52:33.907716+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_medicare_advantage.csv",
+      "relative_path": "data/staging/processed/pr_medicare_advantage.csv",
+      "extension": ".csv",
+      "size_bytes": 848,
+      "sha256": "8931bf115e7d2e5485b9efd11c90a397b0df6459fb13bc54f25fcfbfa38037fb",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.906097+00:00",
+      "source_system": "medicare_advantage",
+      "source_url": "https://www.cms.gov/data-research/statistics-trends-and-reports/medicare-advantage-rates-statistics",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 5,
+      "column_count": 12,
+      "columns": [
+        "contract_year",
+        "plan_id",
+        "plan_name",
+        "organization_name",
+        "organization_normalized",
+        "plan_type",
+        "enrollment_count",
+        "capitation_rate",
+        "total_payment",
+        "county",
+        "state",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "contract_year": 1.0,
+        "plan_id": 1.0,
+        "plan_name": 1.0,
+        "organization_name": 1.0,
+        "organization_normalized": 1.0,
+        "plan_type": 1.0,
+        "enrollment_count": 1.0,
+        "capitation_rate": 1.0,
+        "total_payment": 1.0,
+        "county": 1.0,
+        "state": 1.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

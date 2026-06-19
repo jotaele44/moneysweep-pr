@@ -1,0 +1,69 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "slfrf",
+  "source_url": "https://home.treasury.gov/policy-issues/coronavirus/assistance-for-state-local-and-tribal-governments/state-and-local-fiscal-recovery-funds",
+  "producer_script": "scripts/download_slfrf.py",
+  "generated_at": "2026-06-17T19:52:33.639214+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_slfrf_master.csv",
+      "relative_path": "data/staging/processed/pr_slfrf_master.csv",
+      "extension": ".csv",
+      "size_bytes": 417971,
+      "sha256": "4e1956d9af20c7bb7dc170877fb02f929ecf4ab116d4135479ff0720adb7f70b",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.626134+00:00",
+      "source_system": "slfrf",
+      "source_url": "https://home.treasury.gov/policy-issues/coronavirus/assistance-for-state-local-and-tribal-governments/state-and-local-fiscal-recovery-funds",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 200,
+      "column_count": 14,
+      "columns": [
+        "award_id",
+        "recipient_name",
+        "recipient_uei",
+        "awarding_agency",
+        "awarding_sub_agency",
+        "obligated_amount",
+        "award_date",
+        "fiscal_year",
+        "pop_state",
+        "pop_county",
+        "description",
+        "source_file",
+        "source_dataset",
+        "award_category"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "award_id": 1.0,
+        "recipient_name": 1.0,
+        "recipient_uei": 0.0,
+        "awarding_agency": 1.0,
+        "awarding_sub_agency": 1.0,
+        "obligated_amount": 1.0,
+        "award_date": 0.495,
+        "fiscal_year": 0.495,
+        "pop_state": 0.51,
+        "pop_county": 0.0,
+        "description": 1.0,
+        "source_file": 1.0,
+        "source_dataset": 1.0,
+        "award_category": 1.0
+      },
+      "entity_match_rate_pct": 1.0,
+      "actual_years": [
+        2021,
+        2022,
+        2023,
+        2024
+      ],
+      "duplicate_rate": 0.0,
+      "pk_field": "award_id",
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

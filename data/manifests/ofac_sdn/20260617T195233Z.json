@@ -1,0 +1,46 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "ofac_sdn",
+  "source_url": "https://www.treasury.gov/ofac/downloads/sdn.csv",
+  "producer_script": "scripts/download_ofac.py",
+  "generated_at": "2026-06-17T19:52:33.883105+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_ofac_sdn.csv",
+      "relative_path": "data/staging/processed/pr_ofac_sdn.csv",
+      "extension": ".csv",
+      "size_bytes": 1627219,
+      "sha256": "c2e78ae7bb8216859961e1a4895e06345a7cc88b719e62ea7895ddb44f9073cd",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:33.760865+00:00",
+      "source_system": "ofac_sdn",
+      "source_url": "https://www.treasury.gov/ofac/downloads/sdn.csv",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 19050,
+      "column_count": 5,
+      "columns": [
+        "uid",
+        "name",
+        "sdn_type",
+        "programs",
+        "aka_names"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "uid": 1.0,
+        "name": 1.0,
+        "sdn_type": 1.0,
+        "programs": 1.0,
+        "aka_names": 0.5187926509186351
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}

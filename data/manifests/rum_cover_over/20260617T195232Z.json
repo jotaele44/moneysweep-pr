@@ -1,0 +1,64 @@
+{
+  "manifest_type": "per_source_ingest_snapshot",
+  "schema_version": "r5_v1",
+  "source_id": "rum_cover_over",
+  "source_url": "https://home.treasury.gov/about/offices/economic-policy/territorial-tax-rebate",
+  "producer_script": "scripts/download_rum_coverover.py",
+  "generated_at": "2026-06-17T19:52:32.822493+00:00",
+  "file_count": 1,
+  "files": [
+    {
+      "file_name": "pr_rum_coverover.csv",
+      "relative_path": "data/staging/processed/pr_rum_coverover.csv",
+      "extension": ".csv",
+      "size_bytes": 1008,
+      "sha256": "1aa6a9a68fa95d047128ddfd96599cc7e469cd9646fa0c1dde597f6e013cbb7c",
+      "ingestion_timestamp_utc": "2026-06-17T19:52:32.820247+00:00",
+      "source_system": "rum_cover_over",
+      "source_url": "https://home.treasury.gov/about/offices/economic-policy/territorial-tax-rebate",
+      "schema_version": "r5_v1",
+      "expected_years": null,
+      "row_count": 7,
+      "column_count": 10,
+      "columns": [
+        "fiscal_year",
+        "rum_gallons_pr",
+        "rum_proof_gallons_pr",
+        "excise_tax_rate_per_proof_gallon",
+        "excise_tax_estimated",
+        "coverover_amount_pr",
+        "allocation_prepa",
+        "allocation_hta",
+        "allocation_general_fund",
+        "source_doc"
+      ],
+      "empty_or_header_only": false,
+      "field_completeness_pct_by_column": {
+        "fiscal_year": 1.0,
+        "rum_gallons_pr": 1.0,
+        "rum_proof_gallons_pr": 1.0,
+        "excise_tax_rate_per_proof_gallon": 1.0,
+        "excise_tax_estimated": 1.0,
+        "coverover_amount_pr": 1.0,
+        "allocation_prepa": 1.0,
+        "allocation_hta": 1.0,
+        "allocation_general_fund": 1.0,
+        "source_doc": 1.0
+      },
+      "entity_match_rate_pct": null,
+      "actual_years": [
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "duplicate_rate": 0.0,
+      "pk_field": null,
+      "year_coverage_pct": null,
+      "validation_status": "present"
+    }
+  ]
+}
