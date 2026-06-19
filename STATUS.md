@@ -66,6 +66,18 @@ Live control files:
 
 ---
 
+## Triage Decisions
+
+| Issue | Title | Category | Rationale |
+|-------|-------|----------|-----------|
+| #271 + children (#272–#307) | Ingestion epic — 100% coverage roadmap | `blocked:sandbox` | Requires live network egress, API keys, and operator file drops unavailable in the current NON_PRODUCTION_DIAGNOSTIC sandbox |
+| #257 | Materialize 14 required sources | `blocked:sandbox` | Same sandbox constraint; key-gated and manual-export waves cannot run |
+| #259 | Run 56 automatable-but-unrun sources | `blocked:sandbox` | Same sandbox constraint; producer scripts need live network egress |
+| #222 | Purge large blobs from git history | Deliberate deferral | Working-tree cost is modest (~12 MB); .gitignore deny-all prevents accumulation; defer until stable merge cadence |
+| #87 | Federal tier-0 fetchers (salvage) | Deliberate deferral | Revisit under source-intake batches 151–180 after materialization spine and manual-intake backlog clear |
+
+---
+
 ## Next Native Vectors
 
 Choose one vector at a time:
