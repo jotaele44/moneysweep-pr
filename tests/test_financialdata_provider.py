@@ -16,6 +16,8 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
+_ROOT = Path(__file__).resolve().parents[1]
+
 import pytest
 
 from scripts.providers import ProviderReadiness
@@ -190,13 +192,13 @@ def test_normalize_name_strips_suffixes_and_punctuation():
 
 
 def _required_schema_fields() -> set[str]:
-    schema_path = Path("schemas/canonical_v1/financialdata_enrichment.schema.json")
+    schema_path = _ROOT / "schemas" / "canonical_v1" / "financialdata_enrichment.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
     return set(schema.get("required", []))
 
 
 def _schema_provider_const() -> str:
-    schema_path = Path("schemas/canonical_v1/financialdata_enrichment.schema.json")
+    schema_path = _ROOT / "schemas" / "canonical_v1" / "financialdata_enrichment.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
     return schema["properties"]["provider"]["const"]
 
@@ -215,7 +217,7 @@ def test_schema_required_keys_present_in_row():
 
 
 def test_schema_enums_respected_for_match_methods():
-    schema_path = Path("schemas/canonical_v1/financialdata_enrichment.schema.json")
+    schema_path = _ROOT / "schemas" / "canonical_v1" / "financialdata_enrichment.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
     allowed_methods = set(schema["properties"]["match_method"]["enum"])
     allowed_tiers = set(schema["properties"]["evidence_tier"]["enum"])
@@ -255,7 +257,7 @@ def test_cli_dry_run_writes_expected_outputs(tmp_path, monkeypatch):
     readiness_target = tmp_path / "reports" / "financialdata_enrichment_readiness.json"
     monkeypatch.setattr(cli_mod, "READINESS_PATH", readiness_target)
 
-    fixture = Path("tests/fixtures/financialdata_synthetic_entities.csv")
+    fixture = _ROOT / "tests" / "fixtures" / "financialdata_synthetic_entities.csv"
     assert fixture.exists(), "synthetic fixture missing"
 
     output_dir = tmp_path / "outputs"
@@ -304,7 +306,7 @@ def test_cli_dry_run_no_network_call(tmp_path, monkeypatch):
         cli_mod, "READINESS_PATH", tmp_path / "reports" / "financialdata_enrichment_readiness.json"
     )
 
-    fixture = Path("tests/fixtures/financialdata_synthetic_entities.csv")
+    fixture = _ROOT / "tests" / "fixtures" / "financialdata_synthetic_entities.csv"
     with (
         patch("requests.get", side_effect=AssertionError("no network in tests")),
         patch("requests.post", side_effect=AssertionError("no network in tests")),

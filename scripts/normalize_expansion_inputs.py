@@ -96,7 +96,7 @@ def normalize_highergov_df(df: pd.DataFrame) -> pd.DataFrame:
     # amount detection: contains $ or commas + digits
     def col_amount_score(col):
         s = df[col].astype(str)
-        return s.str.contains(r"\$|\b\d{1,3}(,\d{3})+(\.\d+)?\b").sum()
+        return s.str.contains(r"\$|\b\d{1,3}(?:,\d{3})+(?:\.\d+)?\b").sum()
 
     amount_col = None
     best_amount_score = 0

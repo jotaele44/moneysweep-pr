@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 from pathlib import Path
 
@@ -72,6 +73,25 @@ ALLOWED_PATH_FRAGMENTS = (
     "/data/manifests/",  # manifests contain sha256 hashes that look like hex
     "/scripts/scan_for_secrets.py",  # this file
     "/.pytest_cache/",
+)
+
+# Directory names that are pruned entirely before descending — never scanned.
+# This is separate from ALLOWED_PATH_FRAGMENTS: pruned dirs are never even walked,
+# which avoids iterating through .venv (8 k+ files), data/ (858 MB of government
+# datasets), and other large non-source trees on every run.
+PRUNE_DIRS = frozenset(
+    {
+        ".venv",
+        "venv",
+        ".git",
+        "__pycache__",
+        ".pytest_cache",
+        "node_modules",
+        "archive",
+        # Downloaded government data — runtime artifacts, not developer source files.
+        # Secrets would never be hardcoded into a downloaded CSV/JSON dataset.
+        "data",
+    }
 )
 
 # Files where we read line-by-line; everything else is skipped.
@@ -130,28 +150,35 @@ def _line_has_secret(line: str, path_name: str) -> str | None:
 def scan(root: Path) -> dict:
     findings: list[dict[str, str]] = []
     files_scanned = 0
-    for p in root.rglob("*"):
-        if not p.is_file():
-            continue
-        if _path_allowed(p, root):
-            continue
-        if p.suffix.lower() not in SCAN_EXTENSIONS:
-            continue
-        try:
-            text = p.read_text(encoding="utf-8", errors="ignore")
-        except Exception:
-            continue
-        files_scanned += 1
-        for lineno, line in enumerate(text.splitlines(), 1):
-            reason = _line_has_secret(line, p.name)
-            if reason:
-                findings.append(
-                    {
-                        "file": p.relative_to(root).as_posix(),
-                        "line": str(lineno),
-                        "reason": reason,
-                    }
-                )
+    for dirpath_str, dirnames, filenames in os.walk(root):
+        # Prune directories in-place so os.walk never descends into them.
+        # This eliminates traversal of .venv (8 k+ files), .git, node_modules, etc.
+        dirnames[:] = [
+            d for d in dirnames
+            if d not in PRUNE_DIRS
+        ]
+        dirpath = Path(dirpath_str)
+        for fname in filenames:
+            p = dirpath / fname
+            if _path_allowed(p, root):
+                continue
+            if p.suffix.lower() not in SCAN_EXTENSIONS:
+                continue
+            try:
+                text = p.read_text(encoding="utf-8", errors="ignore")
+            except Exception:
+                continue
+            files_scanned += 1
+            for lineno, line in enumerate(text.splitlines(), 1):
+                reason = _line_has_secret(line, p.name)
+                if reason:
+                    findings.append(
+                        {
+                            "file": p.relative_to(root).as_posix(),
+                            "line": str(lineno),
+                            "reason": reason,
+                        }
+                    )
     return {"findings": findings, "files_scanned": files_scanned}
 
 
