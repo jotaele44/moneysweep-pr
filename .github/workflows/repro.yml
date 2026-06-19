@@ -11,6 +11,8 @@ on:
 permissions:
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 jobs:
   reproduce-top-form-outputs:
     name: Regenerate top-form outputs and assert no diff
