@@ -5,6 +5,8 @@ name: Type check
 # Scope/strictness widen incrementally per the sequence (scripts/ is task 24).
 on: [push, pull_request]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 jobs:
   mypy:
     runs-on: ubuntu-latest
