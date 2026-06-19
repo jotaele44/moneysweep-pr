@@ -22,6 +22,7 @@ def test_scan_for_secrets_exits_clean():
         capture_output=True,
         text=True,
         check=False,
+        timeout=30,
     )
     # Exit code 0 = clean, 3 = leaks. We require 0.
     assert proc.returncode == 0, (

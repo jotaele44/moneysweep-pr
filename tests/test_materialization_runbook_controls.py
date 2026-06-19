@@ -3,9 +3,11 @@ from pathlib import Path
 
 from scripts.check_network_egress import check_https_endpoint, run_checks
 
+_ROOT = Path(__file__).resolve().parents[1]
+
 
 def test_materialization_runbook_exists_and_names_automatable_target():
-    path = Path("docs/MATERIALIZATION_RUNBOOK.md")
+    path = _ROOT / "docs" / "MATERIALIZATION_RUNBOOK.md"
     assert path.exists()
 
     text = path.read_text(encoding="utf-8")
@@ -15,7 +17,7 @@ def test_materialization_runbook_exists_and_names_automatable_target():
 
 
 def test_materialization_operator_checklist_exists():
-    path = Path("docs/MATERIALIZATION_OPERATOR_CHECKLIST.md")
+    path = _ROOT / "docs" / "MATERIALIZATION_OPERATOR_CHECKLIST.md"
     assert path.exists()
 
     text = path.read_text(encoding="utf-8")
@@ -27,7 +29,7 @@ def test_materialization_operator_checklist_exists():
 
 def test_materialization_readiness_snapshot_matches_runbook_counts():
     snapshot = json.loads(
-        Path("reports/materialization_readiness.json").read_text(encoding="utf-8")
+        (_ROOT / "reports" / "materialization_readiness.json").read_text(encoding="utf-8")
     )
 
     # Merged: our branch (133/73) ∪ main's GLEIF/SEC/EIA/FRED reconcile, plus

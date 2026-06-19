@@ -43,7 +43,7 @@ def test_top_form_gap_matrix_contains_required_gates():
 
 
 def test_top_form_checklist_doc_exists_and_has_expected_sections():
-    path = Path("docs/TOP_FORM_DEVELOPMENT_CHECKLIST.md")
+    path = Path(__file__).resolve().parents[1] / "docs" / "TOP_FORM_DEVELOPMENT_CHECKLIST.md"
     assert path.exists()
 
     content = path.read_text(encoding="utf-8")

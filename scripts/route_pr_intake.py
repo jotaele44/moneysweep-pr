@@ -37,7 +37,9 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="Input JSONL, JSON array, or CSV file containing raw intake items.",
     )
     parser.add_argument(
-        "--config", default="config/pr_intake_domain_router.yaml", help="Router YAML config path."
+        "--config",
+        default=str(REPO_ROOT / "config" / "pr_intake_domain_router.yaml"),
+        help="Router YAML config path.",
     )
     parser.add_argument(
         "--out-dir",

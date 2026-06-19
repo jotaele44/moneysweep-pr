@@ -84,6 +84,9 @@ def test_run_no_egress_writes_empty_without_raising(tmp_path, monkeypatch):
     session = MagicMock()
     session.get.side_effect = echo.requests.ConnectionError("no egress")
     monkeypatch.setattr(echo, "_session", lambda: session)
+    # Suppress retry-backoff sleeps (5s + 15s per failed attempt) so the test
+    # does not take 20+ seconds on the FUSE-mounted sandbox filesystem.
+    monkeypatch.setattr("time.sleep", lambda _: None)
     result = run(root=tmp_path)
     assert result["status"] == "EMPTY"
     assert result["rows"] == 0
