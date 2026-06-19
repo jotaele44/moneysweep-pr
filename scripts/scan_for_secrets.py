@@ -153,10 +153,7 @@ def scan(root: Path) -> dict:
     for dirpath_str, dirnames, filenames in os.walk(root):
         # Prune directories in-place so os.walk never descends into them.
         # This eliminates traversal of .venv (8 k+ files), .git, node_modules, etc.
-        dirnames[:] = [
-            d for d in dirnames
-            if d not in PRUNE_DIRS
-        ]
+        dirnames[:] = [d for d in dirnames if d not in PRUNE_DIRS]
         dirpath = Path(dirpath_str)
         for fname in filenames:
             p = dirpath / fname
