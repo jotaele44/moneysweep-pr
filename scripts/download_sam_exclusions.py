@@ -127,7 +127,9 @@ def run(root: Path | None = None, api_key: str | None = None, force: bool = Fals
         pd.DataFrame(columns=OUTPUT_COLUMNS).to_csv(out_path, index=False, encoding="utf-8")
         return {"rows": 0, "path": str(out_path), "status": "NO_KEY"}
 
-    session = build_session(_USER_AGENT)
+    # SAM.gov exclusions v4 returns 406 when Accept: application/json is set;
+    # override to wildcard so the server uses its default content negotiation.
+    session = build_session(_USER_AGENT, extra_headers={"Accept": "*/*"})
     logger.info("Fetching SAM.gov exclusions (debarment list)...")
     try:
         rows = _fetch(session, api_key, logger)
