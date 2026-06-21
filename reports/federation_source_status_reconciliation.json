@@ -1,30 +1,34 @@
 {
   "schema_version": "federation_source_status_reconciliation_v1",
-  "active_vector": "CONTRACT_SWEEPER_FEDERATION_READINESS_AUDIT",
-  "reconciled_at": "2026-06-05",
+  "active_vector": "PREP_TRANCHE_B_MANUAL_SOURCE_INGESTION",
+  "reconciled_at": "2026-06-21",
   "status": "CONTROL_PLANE_RECONCILED",
-  "canonical_source_count": 84,
+  "canonical_source_count": 136,
   "source_count_file": "reports/materialization_readiness.json",
-  "automatable_total": 54,
-  "automatable_ready": 54,
-  "queued_excluded_total": 30,
+  "automatable_total": 77,
+  "automatable_ready": 77,
+  "queued_excluded_total": 59,
   "queued_excluded": {
-    "manual_export": 10,
+    "manual_export": 39,
     "scraper_needed": 15,
     "semantic_duplicate": 3,
     "deferred_stub": 2,
     "broken_producer": 0
   },
   "runtime_required_keys": [
+    "CENSUS_API_KEY",
+    "EIA_API_KEY",
+    "FAC_API_KEY",
     "FEC_API_KEY",
+    "FINANCIALDATA_API_KEY",
+    "FRED_API_KEY",
     "HIGHERGOV_API_KEY",
-    "LDA_API_KEY",
-    "OPENCORPORATES_API_TOKEN",
     "SAM_API_KEY"
   ],
   "historical_drift_notes": [
-    "Older status text may still reference 82 sources. Federation readers must use the current 84-source materialization readiness file.",
-    "Older next-action text may describe a stale queued breakdown. Federation readers must use the queued_excluded object in this file."
+    "Older status text may still reference 82 sources. Federation readers must use the current 136-source materialization readiness file.",
+    "Older next-action text may describe a stale queued breakdown. Federation readers must use the queued_excluded object in this file.",
+    "Registry grew from 84 to 136 sources after the June 2026 federation readiness audit as new manual-export, SBA disaster-loan, and fiscal sources were registered. The previous reconciliation was against 84-source truth (2026-06-05). README formerly referenced 124 sources (stale intermediate snapshot)."
   ],
   "federation_gate": {
     "ready_for_hub_discovery": true,

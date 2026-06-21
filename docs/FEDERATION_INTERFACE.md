@@ -2,7 +2,7 @@
 
 ## Active Vector
 
-`CONTRACT_SWEEPER_FEDERATION_READINESS_AUDIT`
+`PREP_TRANCHE_B_MANUAL_SOURCE_INGESTION`
 
 ## Purpose
 
@@ -31,23 +31,23 @@ Current canonical count:
 
 | Metric | Value |
 |---|---:|
-| Total sources | 84 |
-| Automatable sources | 54 |
-| Automatable ready | 54 |
-| Queued/excluded | 30 |
+| Total sources | 136 |
+| Automatable sources | 77 |
+| Automatable ready | 77 |
+| Queued/excluded | 59 |
 | Broken producers | 0 |
 
 Queued/excluded breakdown:
 
 | Class | Count |
 |---|---:|
-| manual_export | 10 |
+| manual_export | 39 |
 | scraper_needed | 15 |
 | semantic_duplicate | 3 |
 | deferred_stub | 2 |
 | broken_producer | 0 |
 
-Older status text may reference 82 sources. Federation consumers must treat `reports/materialization_readiness.json`, `federation.json`, and `reports/federation_source_status_reconciliation.json` as current control-plane truth.
+Older status text may reference 82 or 84 sources. Federation consumers must treat `reports/materialization_readiness.json`, `federation.json`, and `reports/federation_source_status_reconciliation.json` as current control-plane truth.
 
 ## Hub Callable Commands
 
@@ -68,10 +68,13 @@ Older status text may reference 82 sources. Federation consumers must treat `rep
 The following keys are local runtime requirements and must never be committed:
 
 ```text
+CENSUS_API_KEY
+EIA_API_KEY
+FAC_API_KEY
 FEC_API_KEY
+FINANCIALDATA_API_KEY
+FRED_API_KEY
 HIGHERGOV_API_KEY
-LDA_API_KEY
-OPENCORPORATES_API_TOKEN
 SAM_API_KEY
 ```
 
@@ -103,5 +106,5 @@ Missing keys are not structural repo defects. They limit or skip key-gated produ
 ## Next Vector
 
 ```text
-EXECUTE_NEXT_VECTOR: PREP_TRANCHE_B_MANUAL_SOURCE_INGESTION
+EXECUTE_NEXT_VECTOR: EXEC_TRANCHE_B_MANUAL_SOURCE_INGESTION
 ```

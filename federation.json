@@ -6,27 +6,30 @@
   "federation_role": "public_money_intelligence_node",
   "hub_parent": "thehub-pr",
   "jurisdiction": "Puerto Rico",
-  "active_vector": "CONTRACT_SWEEPER_FEDERATION_READINESS_AUDIT",
+  "active_vector": "PREP_TRANCHE_B_MANUAL_SOURCE_INGESTION",
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_required": true,
   "source_truth": {
     "source_of_truth_file": "reports/materialization_readiness.json",
-    "total_sources": 84,
-    "automatable_total": 54,
-    "automatable_ready": 54,
-    "queued_excluded_total": 30,
+    "total_sources": 136,
+    "automatable_total": 77,
+    "automatable_ready": 77,
+    "queued_excluded_total": 59,
     "queued_excluded": {
-      "manual_export": 10,
+      "manual_export": 39,
       "scraper_needed": 15,
       "semantic_duplicate": 3,
       "deferred_stub": 2,
       "broken_producer": 0
     },
     "runtime_required_keys": [
+      "CENSUS_API_KEY",
+      "EIA_API_KEY",
+      "FAC_API_KEY",
       "FEC_API_KEY",
+      "FINANCIALDATA_API_KEY",
+      "FRED_API_KEY",
       "HIGHERGOV_API_KEY",
-      "LDA_API_KEY",
-      "OPENCORPORATES_API_TOKEN",
       "SAM_API_KEY"
     ]
   },
@@ -74,7 +77,7 @@
       "manual-source Tranche B not materialized",
       "PR-gov scraper-needed queue remains unresolved",
       "runtime API keys must be supplied locally",
-      "source-count wording drift must stay reconciled to 84-source truth"
+      "source-count wording must stay reconciled to reports/materialization_readiness.json truth"
     ]
   }
 }

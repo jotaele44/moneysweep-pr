@@ -2,7 +2,7 @@
 
 ## Active Vector
 
-`CONTRACT_SWEEPER_FEDERATION_READINESS_AUDIT`
+`PREP_TRANCHE_B_MANUAL_SOURCE_INGESTION`
 
 ## Audit Scope
 
@@ -35,11 +35,11 @@ This audit evaluates the repository from current control-plane state to Federati
 
 | Dimension | Status | Finding |
 |---|---|---|
-| Source registry | Strong, not final | 84 total sources are declared in current readiness truth |
-| Automatable surface | Ready for controlled execution | 54/54 automatable sources are ready |
+| Source registry | Strong, not final | 136 total sources are declared in current readiness truth |
+| Automatable surface | Ready for controlled execution | 77/77 automatable sources are ready |
 | Broken producers | Clear | 0 broken producers recorded |
-| Runtime credentials | Operator-dependent | 5 keys must be supplied locally |
-| Manual ingestion | Not complete | 10 manual-export sources remain queued/excluded |
+| Runtime credentials | Operator-dependent | 8 keys must be supplied locally |
+| Manual ingestion | Not complete | 39 manual-export sources remain queued/excluded |
 | Scraper queue | Not complete | 15 sources require scraper/adaptor work |
 | Hub discovery | Ready | `federation.json` and interface documentation now define discovery contract |
 | Live Hub execution | Not ready | Materialization, keys, and validation remain unresolved |
@@ -49,7 +49,7 @@ This audit evaluates the repository from current control-plane state to Federati
 | Layer | Score | Basis |
 |---|---:|---|
 | Repo structure | 85% | Existing scripts, docs, registries, tests, reports |
-| Control-plane truth | 82% | Strong readiness files; remaining historical wording drift |
+| Control-plane truth | 90% | Source-count reconciliation complete; all federation-facing files updated to 136-source truth |
 | Hub discoverability | 90% | Manifest and interface contract now added |
 | Live execution readiness | 60% | Strict preflight exists, but live materialization still blocked |
 | Data reproducibility | 75% | Output policy exists; generated data must still be regenerated after materialization |
@@ -60,11 +60,11 @@ This audit evaluates the repository from current control-plane state to Federati
 
 | Priority | Gap | Required Fix | Owner |
 |---|---|---|---|
-| P0 | Source-count drift | Use 84-source truth in Federation-facing files | GPT / Claude |
+| DONE | Source-count reconciliation | Updated all Federation-facing files to 136-source truth (2026-06-21) | GPT / Claude |
 | P0 | Hub callable contract | Keep `federation.json` and `docs/FEDERATION_INTERFACE.md` stable | GPT / Claude |
 | P0 | Strict preflight dependency | Require strict preflight before producer execution | GPT / Claude |
 | P0 | Manual source ingestion | Build Tranche B parsers, schemas, outputs, tests | GPT / Claude |
-| P0 | Runtime keys | Provide local `.env` values for 5 key-gated sources | Operator |
+| P0 | Runtime keys | Provide local `.env` values for 8 key-gated sources | Operator |
 | P1 | Scraper-needed queue | Build PR-gov scraping adapters for queued sources | GPT / Claude |
 | P1 | Materialization proof | Regenerate source recovery/readiness matrices after runs | GPT / Claude |
 | P1 | Output promotion | Promote only after canonical outputs validate | GPT / Claude |
@@ -91,5 +91,5 @@ This audit evaluates the repository from current control-plane state to Federati
 ## Next Gate
 
 ```text
-EXECUTE_NEXT_VECTOR: PREP_TRANCHE_B_MANUAL_SOURCE_INGESTION
+EXECUTE_NEXT_VECTOR: EXEC_TRANCHE_B_MANUAL_SOURCE_INGESTION
 ```
