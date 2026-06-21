@@ -2,9 +2,9 @@
 
 ## Current Vector
 
-`MONEYSWEEP_DOC_SOURCE_REFRESH`
+`PREP_TRANCHE_B_MANUAL_SOURCE_INGESTION`
 
-This vector updates documentation and source-intake tracking for the newly identified SBA Disaster Loan Puerto Rico dataset. It is metadata/documentation/control-plane only. It does not ingest, parse, transform, extract, scrape, materialize, or run live producers.
+This vector prepares the control plane for Tranche B manual source ingestion. The prior source-count reconciliation (84→136) and SBA disaster-loan documentation are both complete. This is the current active development vector.
 
 ## Completed In Prior Federation Vector
 
@@ -13,6 +13,7 @@ This vector updates documentation and source-intake tracking for the newly ident
 | Create audit branch | Done | `gpt/federation-readiness-audit` |
 | Add Federation manifest | Done | `federation.json` |
 | Reconcile 84-source status | Done | `reports/federation_source_status_reconciliation.json` |
+| Reconcile 136-source status (source-count wording) | Done | `federation.json`, `reports/federation_source_status_reconciliation.json`, `docs/FEDERATION_INTERFACE.md`, `README.md`, `reports/federation_readiness_audit.md`, `reports/current_status.json` |
 | Map Hub callable commands | Done | `docs/FEDERATION_INTERFACE.md` |
 | Add readiness audit | Done | `reports/federation_readiness_audit.md` |
 | Prep Tranche B manual ingestion | Done | `docs/TRANCHE_B_MANUAL_SOURCE_INGESTION_PREP.md` |

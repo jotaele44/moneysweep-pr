@@ -20,11 +20,11 @@ The pipeline acquires, normalizes, validates, and cross-links public procurement
 
 Contract-Sweeper is **not yet a production-certified master dataset**. The current state is a controlled buildout phase:
 
-- **Source registry:** 124 tracked source definitions, plus pending SBA Disaster Loan source-family registration.
-- **Automatable sources:** 68 marked ready by the materialization-readiness gate.
-- **Queued / excluded sources:** manual exports, scraper-needed Puerto Rico sources, semantic duplicates, deferred stubs, and newly identified manual recovery-assistance files remain outside the automatable target until parser and validation gates pass.
+- **Source registry:** 136 tracked source definitions (includes SBA disaster-loan sources).
+- **Automatable sources:** 77 marked ready by the materialization-readiness gate.
+- **Queued / excluded sources:** 39 manual-export sources, 15 scraper-needed Puerto Rico sources, semantic duplicates, and deferred stubs remain outside the automatable target until parser and validation gates pass.
 - **Strict preflight:** required before producer execution or promotion.
-- **Current active work:** Tranche B manual-source ingestion, SBA disaster-loan source refresh, and reconciliation.
+- **Current active work:** Tranche B manual-source ingestion (next vector); source-count reconciliation complete.
 - **Last recorded full test baseline:** 1229 passed, 5 skipped, 0 failed.
 
 Source-of-truth status files:
