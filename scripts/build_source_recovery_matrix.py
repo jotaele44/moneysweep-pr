@@ -44,25 +44,13 @@ OUT_JSON = REPO_ROOT / "reports" / "materialization_readiness.json"
 
 ADAPTER_SOURCE_IDS = set(ADAPTER_REGISTRY) | set(ENTITY_ADAPTER_REGISTRY)
 
-# PR-gov HTML/PDF / custom surfaces whose producer is a placeholder, not a real
-# fetcher. Queued for a dedicated scraping-adapter design pass (out of scope of
-# the automatable fill). Curated domain knowledge — kept explicit on purpose.
+# PR-gov HTML/PDF / custom surfaces with no real fetcher yet.
+# Only genuine stubs remain here; sources with real scraping implementations
+# have been promoted to api_producer so they appear in the automatable set.
+# Curated domain knowledge — kept explicit on purpose.
 SCRAPER_NEEDED = {
-    "compras_pr",
-    "aafaf",
-    "hacienda",
-    "hacienda_sut_ivu",
-    "pr_act_154_excise",
-    "cofina",
-    "prepa_luma_genera",
-    "cor3",
-    "p3_authority",
-    "pr_act_60_decrees",
-    "promesa_creditors",
-    "rum_cover_over",
-    "pr_pensions",
-    "emma_bonds",
-    "msrb_rtrs_trades",
+    "hacienda_sut_ivu",  # download_coverage_gap_intake.py — intentional deferred stub
+    "pr_act_154_excise",  # download_coverage_gap_intake.py — intentional deferred stub
 }
 
 # Sources fully covered by a sibling source; they never materialize independently.

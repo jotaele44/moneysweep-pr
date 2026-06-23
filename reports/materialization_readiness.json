@@ -1,8 +1,8 @@
 {
   "schema_version": "r5_readiness_v1",
   "total_sources": 136,
-  "automatable_total": 77,
-  "automatable_ready": 77,
+  "automatable_total": 90,
+  "automatable_ready": 90,
   "automatable_not_ready": [],
   "automatable_needs_key_count": 11,
   "automatable_required_keys": [
@@ -17,12 +17,12 @@
   ],
   "queued_excluded": {
     "manual_export": 39,
-    "scraper_needed": 15,
+    "scraper_needed": 2,
     "deferred_stub": 2,
     "semantic_duplicate": 3,
     "broken_producer": 0
   },
-  "queued_excluded_total": 59,
+  "queued_excluded_total": 46,
   "outputs": [
     "reports/source_recovery_matrix.csv",
     "reports/source_recovery_matrix.md",

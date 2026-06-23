@@ -1,19 +1,80 @@
 {
-  "schema_version": "tranche_b_source_intake_v1",
-  "status": "prepared_not_executed",
   "materialization_promotion": "not_performed",
-  "branch": "gpt/tranche-b-source-intake",
-  "controller": "scripts/source_intake_tranche_b.py",
-  "helper_module": "scripts/source_intake_helpers.py",
+  "results": [
+    {
+      "dropzone": "data/raw/ACT Transition Contracts",
+      "files_seen": 0,
+      "missing_columns": [],
+      "output": "data/staging/processed/pr_act_transition_contracts.csv",
+      "rows": 0,
+      "schema": "schemas/local_contracts.schema.json",
+      "source_id": "act_transition_contracts",
+      "status": "empty"
+    },
+    {
+      "dropzone": "data/raw/ACUDEN Transition Contracts",
+      "files_seen": 0,
+      "missing_columns": [],
+      "output": "data/staging/processed/pr_acuden_transition.csv",
+      "rows": 0,
+      "schema": "schemas/local_contracts.schema.json",
+      "source_id": "acuden_2024_transition",
+      "status": "empty"
+    },
+    {
+      "dropzone": "data/raw/PRASA Completed Projects",
+      "files_seen": 0,
+      "missing_columns": [],
+      "output": "data/staging/processed/prasa_completed_projects.csv",
+      "rows": 0,
+      "schema": "schemas/infrastructure_projects.schema.json",
+      "source_id": "prasa_completed_projects",
+      "status": "empty"
+    },
+    {
+      "dropzone": "data/raw/PRASA CER",
+      "files_seen": 0,
+      "missing_columns": [],
+      "output": "data/staging/processed/prasa_cer_facts.csv",
+      "rows": 0,
+      "schema": "schemas/infrastructure_fiscal_facts.schema.json",
+      "source_id": "prasa_fy2024_cer",
+      "status": "empty"
+    },
+    {
+      "dropzone": "data/raw/Cabilderos",
+      "files_seen": 0,
+      "missing_columns": [],
+      "output": "data/staging/processed/pr_cabilderos_registry.csv",
+      "rows": 0,
+      "schema": "schemas/lobbying_registry.schema.json",
+      "source_id": "pr_cabilderos",
+      "status": "empty"
+    },
+    {
+      "dropzone": "data/raw/Federal LDA Registrants",
+      "files_seen": 0,
+      "missing_columns": [],
+      "output": "data/staging/processed/federal_lda_registrants.csv",
+      "rows": 0,
+      "schema": "schemas/lobbying_registry.schema.json",
+      "source_id": "federal_lda_registrants",
+      "status": "empty"
+    },
+    {
+      "dropzone": "data/raw/DCAA Active Contractors",
+      "files_seen": 0,
+      "missing_columns": [],
+      "output": "data/staging/processed/dcaa_active_contractors.csv",
+      "rows": 0,
+      "schema": "schemas/contractor_reference.schema.json",
+      "source_id": "dcaa_active_contractors",
+      "status": "empty"
+    }
+  ],
+  "rows_total": 0,
+  "schema_version": "tranche_b_source_intake_v1",
   "sources_total": 7,
-  "validation": {
-    "tests_added": [
-      "tests/test_source_intake_helpers.py",
-      "tests/test_source_intake_tranche_b.py"
-    ],
-    "schema_gap": "patched",
-    "connector_test_execution": "not_available",
-    "required_local_command": "python3 -m pytest tests/test_source_intake_helpers.py tests/test_source_intake_tranche_b.py -q"
-  },
-  "promotion_gate": "No promotion is performed by this report. Promotion requires dropped source files, generated outputs, schema checks, deterministic regression tests, and refreshed recovery matrices."
+  "sources_with_rows": 0,
+  "status": "prepared"
 }

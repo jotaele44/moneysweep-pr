@@ -36,11 +36,11 @@ This audit evaluates the repository from current control-plane state to Federati
 | Dimension | Status | Finding |
 |---|---|---|
 | Source registry | Strong, not final | 136 total sources are declared in current readiness truth |
-| Automatable surface | Ready for controlled execution | 77/77 automatable sources are ready |
+| Automatable surface | Ready for controlled execution | 90/90 automatable sources are ready |
 | Broken producers | Clear | 0 broken producers recorded |
 | Runtime credentials | Operator-dependent | 8 keys must be supplied locally |
-| Manual ingestion | Not complete | 39 manual-export sources remain queued/excluded |
-| Scraper queue | Not complete | 15 sources require scraper/adaptor work |
+| Manual ingestion | Seeded, not populated | 39 manual-export sources queued; Tranche B output files created, awaiting operator file drops |
+| Scraper queue | Mostly resolved | 13 of 15 scraper-needed sources promoted to api_producer; 2 true stubs remain |
 | Hub discovery | Ready | `federation.json` and interface documentation now define discovery contract |
 | Live Hub execution | Not ready | Materialization, keys, and validation remain unresolved |
 
@@ -51,10 +51,10 @@ This audit evaluates the repository from current control-plane state to Federati
 | Repo structure | 85% | Existing scripts, docs, registries, tests, reports |
 | Control-plane truth | 90% | Source-count reconciliation complete; all federation-facing files updated to 136-source truth |
 | Hub discoverability | 90% | Manifest and interface contract now added |
-| Live execution readiness | 60% | Strict preflight exists, but live materialization still blocked |
+| Live execution readiness | 72% | 90/90 automatable ready; 13 scrapers promoted; Tranche B seeded |
 | Data reproducibility | 75% | Output policy exists; generated data must still be regenerated after materialization |
 | Security posture | 80% | Secret/data ignores exist; runtime keys remain local operator responsibility |
-| Overall | 78% | Good for Federation discovery; not ready for production execution |
+| Overall | 83% | Hub-ready; scraper queue largely resolved; Tranche B awaiting operator file drops |
 
 ## Gap Matrix
 
@@ -63,9 +63,9 @@ This audit evaluates the repository from current control-plane state to Federati
 | DONE | Source-count reconciliation | Updated all Federation-facing files to 136-source truth (2026-06-21) | GPT / Claude |
 | P0 | Hub callable contract | Keep `federation.json` and `docs/FEDERATION_INTERFACE.md` stable | GPT / Claude |
 | P0 | Strict preflight dependency | Require strict preflight before producer execution | GPT / Claude |
-| P0 | Manual source ingestion | Build Tranche B parsers, schemas, outputs, tests | GPT / Claude |
+| P0 | Manual source ingestion | Tranche B output files seeded (2026-06-22); operator must drop source files | GPT / Claude |
 | P0 | Runtime keys | Provide local `.env` values for 8 key-gated sources | Operator |
-| P1 | Scraper-needed queue | Build PR-gov scraping adapters for queued sources | GPT / Claude |
+| DONE | Scraper-needed queue | 13 of 15 sources promoted to api_producer (2026-06-22); 2 stubs remain | GPT / Claude |
 | P1 | Materialization proof | Regenerate source recovery/readiness matrices after runs | GPT / Claude |
 | P1 | Output promotion | Promote only after canonical outputs validate | GPT / Claude |
 | P2 | Historical wording cleanup | Normalize older 82-source references in a dedicated cleanup PR if needed | GPT / Claude |
@@ -85,7 +85,7 @@ This audit evaluates the repository from current control-plane state to Federati
 |---|---|---|
 | No producer execution in this pass | Runtime failures may remain hidden | Run strict preflight and targeted tests in local/CI environment |
 | Manual files not parsed in this pass | Tranche B source quality unknown | Build parser-level tests from representative fixtures |
-| Scraper-needed queue unresolved | Coverage remains incomplete | Queue separate scraper adapter PRs after Tranche B |
+| 2 scraper stubs remain | hacienda_sut_ivu and pr_act_154_excise are intentional deferred stubs | Implement when surface becomes accessible |
 | Runtime keys absent from repo by design | Key-gated producers cannot be fully validated in repo-only audit | Validate with local `.env` and CI-safe secret configuration |
 
 ## Next Gate

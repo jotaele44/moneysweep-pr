@@ -32,9 +32,9 @@ Current canonical count:
 | Metric | Value |
 |---|---:|
 | Total sources | 136 |
-| Automatable sources | 77 |
-| Automatable ready | 77 |
-| Queued/excluded | 59 |
+| Automatable sources | 90 |
+| Automatable ready | 90 |
+| Queued/excluded | 46 |
 | Broken producers | 0 |
 
 Queued/excluded breakdown:
@@ -42,7 +42,7 @@ Queued/excluded breakdown:
 | Class | Count |
 |---|---:|
 | manual_export | 39 |
-| scraper_needed | 15 |
+| scraper_needed | 2 |
 | semantic_duplicate | 3 |
 | deferred_stub | 2 |
 | broken_producer | 0 |
