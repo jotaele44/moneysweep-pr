@@ -104,10 +104,12 @@ def main() -> None:
         w.writerows(rows)
 
     print(f"master rows:        {len(rows):,}")
-    print(f"rows patched w/UEI: {patched:,}  ({patched/max(len(rows),1)*100:.1f}%)")
+    print(f"rows patched w/UEI: {patched:,}  ({patched / max(len(rows), 1) * 100:.1f}%)")
     print(f"distinct vendors:   {len(vendors_hit):,}")
-    print(f"obligated value:    ${val_patched:,.0f} / ${val_total:,.0f}"
-          f"  ({val_patched/max(val_total,1)*100:.1f}%)")
+    print(
+        f"obligated value:    ${val_patched:,.0f} / ${val_total:,.0f}"
+        f"  ({val_patched / max(val_total, 1) * 100:.1f}%)"
+    )
     print(f"output:             {out}")
 
 

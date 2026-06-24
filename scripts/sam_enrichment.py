@@ -679,12 +679,13 @@ if __name__ == "__main__":
     parser.add_argument("--dry-run", action="store_true", help="Validate config only, no API calls")
     parser.add_argument("--top", type=int, metavar="N", help="Only enrich top N vendors by value")
     parser.add_argument(
-        "--max-api", type=int, metavar="N", dest="max_api",
+        "--max-api",
+        type=int,
+        metavar="N",
+        dest="max_api",
         help="Stop after N live API lookups (daily-quota guard); resume-safe",
     )
     args = parser.parse_args()
 
-    summary = run(
-        resume=args.resume, dry_run=args.dry_run, top_n=args.top, max_api=args.max_api
-    )
+    summary = run(resume=args.resume, dry_run=args.dry_run, top_n=args.top, max_api=args.max_api)
     sys.exit(0 if summary.get("dry_run") or summary.get("coverage_gate_pass") else 1)

@@ -34,11 +34,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))  # so `from scripts.*` resolves when run as a file
 
-DAT_SEARCH_DIRS = [
-    Path(os.environ["SAM_BULK_DIR"]) if os.environ.get("SAM_BULK_DIR") else None,
-    PROJECT_ROOT / "data" / "raw" / "sam",
-]
-DAT_SEARCH_DIRS = [p for p in DAT_SEARCH_DIRS if p is not None]
+DAT_SEARCH_DIRS: list[Path] = [PROJECT_ROOT / "data" / "raw" / "sam"]
+if os.environ.get("SAM_BULK_DIR"):
+    DAT_SEARCH_DIRS.insert(0, Path(os.environ["SAM_BULK_DIR"]))
 
 # Genuine legal-form suffixes ONLY. Descriptive words (CONSTRUCTION, SERVICES,
 # GROUP, SOLUTIONS, ...) are deliberately excluded: stripping them over-merges
@@ -115,7 +113,12 @@ def run(dat: Path, root: Path, limit: int | None = None) -> dict:
             if len(p) < 19:
                 continue
             uei, cage, status, legal, dba, state = (
-                p[0], p[3], p[5], p[11], p[12], p[18],
+                p[0],
+                p[3],
+                p[5],
+                p[11],
+                p[12],
+                p[18],
             )
             if not uei:
                 continue
@@ -174,14 +177,16 @@ def confirm_k2(r_rows: list[dict]) -> tuple[list[dict], list[dict]]:
     and 0.85 threshold the SAM API leg uses). Returns (confirmed, rejected)."""
     try:
         from scripts.sam_enrichment import (
-            MATCH_THRESHOLD, name_similarity, normalize_vendor,
+            MATCH_THRESHOLD,
+            name_similarity,
+            normalize_vendor,
         )
     except Exception:
         return [], r_rows  # scorer unavailable -> treat all as unconfirmed
-    confirmed, rejected = [], []
+    confirmed: list[dict] = []
+    rejected: list[dict] = []
     for r in r_rows:
-        s = name_similarity(normalize_vendor(r["vendor_name"]),
-                            normalize_vendor(r["sam_name"]))
+        s = name_similarity(normalize_vendor(r["vendor_name"]), normalize_vendor(r["sam_name"]))
         r = {**r, "match_score": round(s, 3)}
         (confirmed if s >= MATCH_THRESHOLD else rejected).append(r)
     return confirmed, rejected
@@ -190,10 +195,20 @@ def confirm_k2(r_rows: list[dict]) -> tuple[list[dict], list[dict]]:
 def write_outputs(summary: dict, root: Path) -> dict:
     out_dir = root / "data" / "staging" / "processed" / "enrichment"
     out_dir.mkdir(parents=True, exist_ok=True)
-    cols = ["vendor_name", "total_value", "uei", "cage", "sam_name",
-            "status", "state", "match_tier", "matched_on", "source"]
-    auth = out_dir / "sam_bulk_v2_matches.csv"          # k1_exact — authoritative
-    review = out_dir / "sam_bulk_v2_review.csv"         # k2_suffix — all candidates
+    cols = [
+        "vendor_name",
+        "total_value",
+        "uei",
+        "cage",
+        "sam_name",
+        "status",
+        "state",
+        "match_tier",
+        "matched_on",
+        "source",
+    ]
+    auth = out_dir / "sam_bulk_v2_matches.csv"  # k1_exact — authoritative
+    review = out_dir / "sam_bulk_v2_review.csv"  # k2_suffix — all candidates
     confirmed_p = out_dir / "sam_bulk_v2_confirmed_k2.csv"  # k2 passing >=0.85
     a_rows = [m for m in summary["_matches"].values() if m["match_tier"] == "k1_exact"]
     r_rows = [m for m in summary["_matches"].values() if m["match_tier"] == "k2_suffix"]
@@ -201,8 +216,7 @@ def write_outputs(summary: dict, root: Path) -> dict:
 
     def _dump(path, data, extra_cols=()):
         with open(path, "w", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=list(cols) + list(extra_cols),
-                               extrasaction="ignore")
+            w = csv.DictWriter(f, fieldnames=list(cols) + list(extra_cols), extrasaction="ignore")
             w.writeheader()
             for m in sorted(data, key=lambda x: x["total_value"], reverse=True):
                 w.writerow(m)
@@ -210,10 +224,16 @@ def write_outputs(summary: dict, root: Path) -> dict:
     _dump(auth, a_rows)
     _dump(review, r_rows, ("match_score",))
     _dump(confirmed_p, confirmed, ("match_score",))
-    return {"auth": auth, "review": review, "confirmed": confirmed_p,
-            "n_auth": len(a_rows), "n_review": len(r_rows),
-            "n_confirmed": len(confirmed), "n_rejected": len(rejected),
-            "v_auth": sum(m["total_value"] for m in a_rows)}
+    return {
+        "auth": auth,
+        "review": review,
+        "confirmed": confirmed_p,
+        "n_auth": len(a_rows),
+        "n_review": len(r_rows),
+        "n_confirmed": len(confirmed),
+        "n_rejected": len(rejected),
+        "v_auth": sum(m["total_value"] for m in a_rows),
+    }
 
 
 if __name__ == "__main__":
@@ -230,10 +250,12 @@ if __name__ == "__main__":
     print(f"DAT:              {s['dat']}  ({s['header']})")
     print(f"Entities:         {s['entities_scanned']:,}")
     print(f"Targets:          {s['targets']:,}")
-    print(f"Authoritative:    {o['n_auth']:,}  ({o['n_auth']/max(s['targets'],1)*100:.1f}% count)"
-          f"  ${o['v_auth']:,.0f}  ({o['v_auth']/max(tv,1)*100:.1f}% value)")
+    print(
+        f"Authoritative:    {o['n_auth']:,}  ({o['n_auth'] / max(s['targets'], 1) * 100:.1f}% count)"
+        f"  ${o['v_auth']:,.0f}  ({o['v_auth'] / max(tv, 1) * 100:.1f}% value)"
+    )
     print(f"Confirmed (k2):   {o['n_confirmed']:,}  (>=0.85) -> {o['confirmed'].name}")
     print(f"Rejected (k2):    {o['n_rejected']:,}  -> residual")
-    print(f"Residual for API: {s['targets']-o['n_auth']-o['n_confirmed']:,}")
+    print(f"Residual for API: {s['targets'] - o['n_auth'] - o['n_confirmed']:,}")
     print(f"Elapsed:          {s['elapsed_s']}s")
     print(f"Output:           {o['auth']}")
