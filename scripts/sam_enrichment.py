@@ -450,7 +450,11 @@ def merge_into_master(results: dict, root: Path, output_dir: Path, logger) -> No
 
 
 def run(
-    root: Path | None = None, resume: bool = False, dry_run: bool = False, top_n: int | None = None
+    root: Path | None = None,
+    resume: bool = False,
+    dry_run: bool = False,
+    top_n: int | None = None,
+    max_api: int | None = None,
 ) -> dict:
     if root is None:
         root = PROJECT_ROOT
@@ -503,6 +507,10 @@ def run(
     resolved = sum(1 for r in results.values() if r.get("uei"))
     failed = []
     processed = 0
+    api_calls = 0
+
+    if max_api:
+        logger.info(f"[GUARD] Daily API budget: stop after {max_api:,} live lookups")
 
     logger.info(f"[START] {datetime.now().isoformat()}")
 
@@ -530,9 +538,24 @@ def run(
             processed += 1
             continue
 
+        # Daily API budget guard — checkpoint and stop before exceeding the cap
+        if max_api and api_calls >= max_api:
+            _save_json(
+                checkpoint_path,
+                {"last_idx": i, "resolved": resolved, "ts": datetime.now().isoformat()},
+            )
+            write_index(results, output_dir)
+            _save_json(cache_path, cache)
+            logger.info(
+                f"[GUARD] Reached API budget ({max_api:,} lookups) at vendor #{i}. "
+                f"Checkpoint saved — rerun with --resume tomorrow."
+            )
+            break
+
         # SAM primary lookup
         time.sleep(RATE_DELAY)
         sam_result = sam_lookup_by_name(vendor, api_key)
+        api_calls += 1
         source = "SAM"
 
         # USASpending fallback
@@ -655,7 +678,13 @@ if __name__ == "__main__":
     parser.add_argument("--resume", action="store_true", help="Resume from checkpoint")
     parser.add_argument("--dry-run", action="store_true", help="Validate config only, no API calls")
     parser.add_argument("--top", type=int, metavar="N", help="Only enrich top N vendors by value")
+    parser.add_argument(
+        "--max-api", type=int, metavar="N", dest="max_api",
+        help="Stop after N live API lookups (daily-quota guard); resume-safe",
+    )
     args = parser.parse_args()
 
-    summary = run(resume=args.resume, dry_run=args.dry_run, top_n=args.top)
+    summary = run(
+        resume=args.resume, dry_run=args.dry_run, top_n=args.top, max_api=args.max_api
+    )
     sys.exit(0 if summary.get("dry_run") or summary.get("coverage_gate_pass") else 1)
