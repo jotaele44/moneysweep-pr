@@ -85,7 +85,7 @@ python scripts/fetch_legislative_canonical_sources.py --allow-missing-key
 
 ## Validation
 
-Static GitHub inspection confirms registered producer paths exist, expected outputs are repo-relative, and authentication modes match the source-registry validator. Local pytest execution must still be run in a checkout or CI runner.
+Static GitHub inspection confirms registered producer paths exist, expected outputs are repo-relative, authentication modes match the source-registry validator, and the canonical fetcher now has non-network tests for measure normalization, scalar/list parsing, promotion gating, and output writing. Local pytest execution must still be run in a checkout or CI runner.
 
 ```bash
 python -m pytest tests/test_legislapr_discovery.py tests/test_legislapr_discovery_probe.py tests/test_legislative_canonical_sources.py tests/test_source_registry.py -q
