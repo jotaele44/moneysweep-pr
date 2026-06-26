@@ -1,0 +1,58 @@
+version: "1.0"
+schema_version: "r5_source_registry_overlay_v1"
+
+# LegislaPR is added as a non-authoritative legislative-intelligence source.
+# It enriches MoneySweep records with authority, appropriation, oversight, and
+# sponsor/status context. Canonical law/measure validation remains assigned to
+# official Puerto Rico legislative publication systems such as OSL/SUTRA and
+# Department of State law publication surfaces.
+
+sources:
+  - source_id: legislapr_sessions_export
+    family: legislative_context
+    required: false
+    authentication: api_key:LEGISLAPR_API_KEY
+    endpoint_url: https://www.legislapr.com/
+    producer_script: scripts/ingest_legislapr_sessions.py
+    expected_outputs:
+      - data/staging/processed/legislative/pr_legislapr_measures.csv
+      - data/staging/processed/legislative/pr_legislative_context_links.csv
+      - data/staging/processed/legislative/pr_legislative_osl_sutra_crosswalk.csv
+    schema_version: r5_legislative_context_v1
+    validation_threshold:
+      min_rows: 1
+      measure_id_coverage_pct: 0.95
+      session_coverage_pct: 0.95
+      source_url_coverage_pct: 0.90
+    manual_drop_dir: data/manual/legislapr/
+    update_cadence: per_session_export
+    evidence_tier: T2_operational_export
+    authority_role: enrichment_only
+    notes: |
+      Operator has API key and exported available Puerto Rico session records.
+      This source should be used to enrich funding, procurement, recovery,
+      oversight, and vendor records with legislative context: measure status,
+      enacted-law signal, sponsor/committee metadata, appropriation keywords,
+      agency mentions, and oversight references. Do not promote this as the
+      canonical legal authority without crosswalk confirmation against official
+      OSL/SUTRA or Puerto Rico Department of State law publication identifiers.
+
+  - source_id: osl_sutra_legislative_canonical_crosswalk
+    family: legislative_context
+    required: false
+    authentication: none
+    endpoint_url: https://sutra.oslpr.org/
+    producer_script: scripts/crosswalk_legislapr_osl_sutra.py
+    expected_outputs:
+      - data/staging/processed/legislative/pr_legislative_osl_sutra_crosswalk.csv
+    schema_version: r5_legislative_context_v1
+    validation_threshold:
+      min_rows: 1
+      canonical_id_coverage_pct: 0.80
+    update_cadence: per_session_export
+    evidence_tier: T1_official_publication
+    authority_role: canonical_validator
+    notes: |
+      Official legislative identifier crosswalk for validating LegislaPR-derived
+      measures, law numbers, session labels, and URLs before promotion into
+      canonical MoneySweep authority chains.
