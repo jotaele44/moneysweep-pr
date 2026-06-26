@@ -65,6 +65,16 @@ class CanonicalLegislativeRecord:
     fetched_at: str
 
 
+def _as_string_list(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return [str(item) for item in value if item is not None]
+    if isinstance(value, tuple):
+        return [str(item) for item in value if item is not None]
+    return [str(value)]
+
+
 def _compact_measure_id(value: str) -> str:
     raw = re.sub(r"[^A-Za-z0-9]", "", value or "").upper()
     raw = raw.replace("PDELC", "PC").replace("PDELS", "PS")
@@ -214,8 +224,8 @@ def build_canonical_record(discovery_record: dict[str, Any], api_key: str | None
         openstates_bill_id=str(openstates_payload.get("id") or ""),
         openstates_session=str(openstates_payload.get("session") or discovery_record.get("session") or ""),
         openstates_title=str(openstates_payload.get("title") or discovery_record.get("title") or ""),
-        openstates_classification=list(openstates_payload.get("classification") or []),
-        openstates_subjects=list(openstates_payload.get("subject") or openstates_payload.get("subjects") or []),
+        openstates_classification=_as_string_list(openstates_payload.get("classification")),
+        openstates_subjects=_as_string_list(openstates_payload.get("subject") or openstates_payload.get("subjects")),
         openstates_actions_count=len(openstates_payload.get("actions") or []),
         openstates_sponsorships_count=len(openstates_payload.get("sponsorships") or []),
         official_document_confirmed=official_document_confirmed,
