@@ -21,11 +21,11 @@ try:
 except Exception:  # pragma: no cover
     PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-    def setup_logging(name: str, log_dir: Path | None = None):
+    def setup_logging(log_name: str, log_dir: Path | None = None) -> logging.Logger:
         import logging
 
         logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
-        return logging.getLogger(name)
+        return logging.getLogger(log_name)
 
 DEFAULT_MEASURES = "data/staging/processed/pr_legislapr_measures_probe.json"
 DEFAULT_CONTRACTS = "data/staging/processed/pr_contracts_master.csv"
