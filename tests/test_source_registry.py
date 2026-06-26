@@ -95,6 +95,23 @@ def test_source_registry_extensions_are_loaded():
 
 
 @pytest.mark.unit
+def test_legislapr_legislative_sources_are_loaded():
+    discovery = sr.source_by_id("legislapr_discovery", REPO_ROOT)
+    assert discovery is not None
+    assert discovery["family"] == "territorial_legislation"
+    assert discovery["authentication"] == "none"
+    assert discovery["producer_script"] == "scripts/probe_legislapr_detail.py"
+    assert discovery["promotion_rule"] == "cross_confirmed_only"
+
+    canonical = sr.source_by_id("legislative_canonical_sources", REPO_ROOT)
+    assert canonical is not None
+    assert canonical["family"] == "territorial_legislation"
+    assert canonical["authentication"] == "api_key:OPENSTATES_API_KEY"
+    assert canonical["producer_script"] == "scripts/fetch_legislative_canonical_sources.py"
+    assert canonical["depends_on"] == ["legislapr_discovery"]
+
+
+@pytest.mark.unit
 def test_expected_outputs_for_resolves_to_repo_root():
     src = sr.source_by_id("usaspending_prime", REPO_ROOT)
     assert src is not None
