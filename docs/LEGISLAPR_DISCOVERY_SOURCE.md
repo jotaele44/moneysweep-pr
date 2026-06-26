@@ -9,13 +9,18 @@
 | Field | Value |
 |---|---|
 | Discovery source ID | `legislapr_discovery` |
+| Session source ID | `legislapr_sessions` |
 | Canonical source ID | `legislative_canonical_sources` |
+| Crosswalk source ID | `osl_sutra_crosswalk` |
 | Discovery tier | T2 operational discovery / enrichment |
 | Canonical status | Cross-confirmed candidate only |
 | Canonical confirmation | OpenStates plus official Legislative Assembly/SUTRA document link |
 | Promotion rule | `cross_confirmed_only` |
 | Discovery producer | `scripts/probe_legislapr_detail.py` |
+| Session producer | `scripts/ingest_legislapr_sessions.py` |
 | Canonical producer | `scripts/fetch_legislative_canonical_sources.py` |
+| Crosswalk producer | `scripts/build_osl_sutra_crosswalk.py` |
+| Registry merge utility | `scripts/merge_legislapr_registry.py` |
 | Registry extension | `registries/source_registry_extensions/legislapr_discovery.json` |
 | Schema extension | `registries/schema_registry_extensions/legislapr_legislative_measure.json` |
 
@@ -33,12 +38,14 @@ OpenStates API v3 is the canonical structured legislative route used here. Its r
 LegislaPR measure detail page
     -> measure_id normalization
     -> outbound link extraction
+    -> session index extraction
     -> OpenStates link check
     -> official Legislative Assembly/SUTRA document check
     -> fiscal keyword scan
     -> promotion_status assignment
     -> OpenStates API confirmation
     -> official document URL confirmation
+    -> OSL/SUTRA crosswalk build
     -> promoted_candidate or blocked_pending_canonical_confirmation
 ```
 
@@ -52,6 +59,13 @@ LegislaPR measure detail page
 
 ## Local run
 
+Registry merge pre-step:
+
+```bash
+python scripts/merge_legislapr_registry.py
+python scripts/merge_legislapr_registry.py --check
+```
+
 Discovery probe:
 
 ```bash
@@ -60,12 +74,12 @@ python scripts/probe_legislapr_detail.py \
   --output data/staging/processed/pr_legislapr_measures_probe.json
 ```
 
-Batch discovery:
+Session index:
 
 ```bash
-python scripts/probe_legislapr_detail.py \
-  --input data/manual/legislapr/measure_urls.txt \
-  --output data/staging/processed/pr_legislapr_measures_probe.json
+python scripts/ingest_legislapr_sessions.py \
+  --input data/staging/processed/pr_legislapr_measures_probe.json \
+  --output data/staging/processed/pr_legislapr_sessions.json
 ```
 
 Canonical confirmation:
@@ -83,12 +97,21 @@ Offline/SUTRA-only audit mode:
 python scripts/fetch_legislative_canonical_sources.py --allow-missing-key
 ```
 
-## Validation
-
-Static GitHub inspection confirms registered producer paths exist, expected outputs are repo-relative, authentication modes match the source-registry validator, and the canonical fetcher now has non-network tests for measure normalization, scalar/list parsing, promotion gating, and output writing. The PR branch is mergeable by GitHub metadata, but local pytest execution must still be run in a checkout or CI runner before merge.
+OSL/SUTRA crosswalk:
 
 ```bash
-python -m pytest tests/test_legislapr_discovery.py tests/test_legislapr_discovery_probe.py tests/test_legislative_canonical_sources.py tests/test_source_registry.py -q
+python scripts/build_osl_sutra_crosswalk.py \
+  --discovery data/staging/processed/pr_legislapr_measures_probe.json \
+  --canonical data/staging/processed/pr_legislative_measures_canonical.json \
+  --output data/staging/processed/pr_osl_sutra_crosswalk.json
+```
+
+## Validation
+
+Static GitHub inspection confirms registered producer paths exist, expected outputs are repo-relative, authentication modes match the source-registry validator, and the link builders now have non-network tests for measure/session normalization, scalar/list parsing, promotion gating, crosswalk writing, and registry merge dedupe. Local pytest execution must still be run in a checkout or CI runner before merge.
+
+```bash
+python -m pytest tests/test_legislapr_discovery.py tests/test_legislapr_discovery_probe.py tests/test_legislative_canonical_sources.py tests/test_legislative_link_builders.py tests/test_source_registry.py -q
 python -m moneysweep.runtime.source_registry --validate
 ```
 
