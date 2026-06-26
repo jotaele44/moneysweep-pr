@@ -164,7 +164,7 @@ def _canonical_measure_id(value: str) -> str:
     value = value.replace("P C", "PC").replace("P S", "PS")
     value = value.replace("R C S", "RCS").replace("R C C", "RCC")
     value = value.replace("R S", "RS").replace("R C", "RC")
-    return value
+    return re.sub(r"\s+", "", value)
 
 
 def measure_id_from_url(url: str) -> str:

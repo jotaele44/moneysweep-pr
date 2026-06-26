@@ -19,7 +19,7 @@
         "year_coverage_pct": 0.95
       },
       "update_cadence": "weekly",
-      "notes": "USAspending API + bulk archive. No key required.\nTop recipients are PR government agencies (PRDOH, ADSEF, PRDE, PRHA) \u2014\nno corporate parent_uei is expected for these entities.\n"
+      "notes": "USAspending API + bulk archive. No key required.\nTop recipients are PR government agencies (PRDOH, ADSEF, PRDE, PRHA) —\nno corporate parent_uei is expected for these entities.\n"
     },
     {
       "source_id": "usaspending_subawards",
@@ -92,7 +92,7 @@
         "parent_uei_coverage_pct_corporate": 0.002
       },
       "update_cadence": "monthly",
-      "notes": "SAM full extract + per-UEI enrichment for parent resolution.\nSupplemented by scripts/usaspending_parent_uei_extract.py (no rate limit).\nSAM API rate: 1,000 req/day \u2192 full 2,334-UEI run = 2.3+ days.\n"
+      "notes": "SAM full extract + per-UEI enrichment for parent resolution.\nSupplemented by scripts/usaspending_parent_uei_extract.py (no rate limit).\nSAM API rate: 1,000 req/day → full 2,334-UEI run = 2.3+ days.\n"
     },
     {
       "source_id": "highergov_supplemental",
@@ -230,7 +230,7 @@
       },
       "manual_drop_dir": "data/manual/hud_drgr/",
       "update_cadence": "monthly",
-      "notes": "Credentialed DRGR portal \u2014 operator must export and drop manifests in manual_drop_dir."
+      "notes": "Credentialed DRGR portal — operator must export and drop manifests in manual_drop_dir."
     },
     {
       "source_id": "hud_hcv_section8",
@@ -712,7 +712,7 @@
         "min_rows": 0
       },
       "update_cadence": "monthly",
-      "notes": "PR environmental enforcement (EPA ICIS-FE&C / ECHO) \u2014 federal penalties assessed against PR facilities. Automatable via the public, keyless ECHO Enforcement Case Search REST API (echodata.epa.gov; X_API_KEY sent opportunistically as an api.data.gov rate-limit header). Materialized by scripts/download_epa_echo_icis.py (endpoint/fields confirmed on first live run).\n"
+      "notes": "PR environmental enforcement (EPA ICIS-FE&C / ECHO) — federal penalties assessed against PR facilities. Automatable via the public, keyless ECHO Enforcement Case Search REST API (echodata.epa.gov; X_API_KEY sent opportunistically as an api.data.gov rate-limit header). Materialized by scripts/download_epa_echo_icis.py (endpoint/fields confirmed on first live run).\n"
     },
     {
       "source_id": "emma_bonds",
@@ -834,7 +834,7 @@
       },
       "manual_drop_dir": "data/raw/Donaciones/",
       "update_cadence": "ad_hoc",
-      "notes": "PR State Election Commission (CEE/CEEPUR) state-level donation registry. ingest_donaciones.py is a dropzone reader for operator-delivered CEE CSV exports \u2014 no network code. Previously mislabeled as using ingest_fec.py (federal FEC) with a wrong output path. Cross-references federal FEC via analyze_political_crossref.py."
+      "notes": "PR State Election Commission (CEE/CEEPUR) state-level donation registry. ingest_donaciones.py is a dropzone reader for operator-delivered CEE CSV exports — no network code. Previously mislabeled as using ingest_fec.py (federal FEC) with a wrong output path. Cross-references federal FEC via analyze_political_crossref.py."
     },
     {
       "source_id": "follow_the_money",
@@ -910,7 +910,7 @@
         "min_rows": 1
       },
       "update_cadence": "ad_hoc",
-      "notes": "NGO / OSFL identity, funding, and coverage layer built from IRS EO BMF, TEOS, PR state registry, and USASpending drops. Also drives the NGO \u2194 political-donation crossref (analyze_political_crossref: build_ngo_donation_crossref \u2192 data/staging/processed/ngos/ ngo_political_donations.csv) which is intentionally NOT declared as an expected_output to avoid preflight gate failures (matches the convention used by `fec` for pr_fec_crossref.csv).\n"
+      "notes": "NGO / OSFL identity, funding, and coverage layer built from IRS EO BMF, TEOS, PR state registry, and USASpending drops. Also drives the NGO ↔ political-donation crossref (analyze_political_crossref: build_ngo_donation_crossref → data/staging/processed/ngos/ ngo_political_donations.csv) which is intentionally NOT declared as an expected_output to avoid preflight gate failures (matches the convention used by `fec` for pr_fec_crossref.csv).\n"
     },
     {
       "source_id": "sba_loans",
@@ -1690,7 +1690,7 @@
         "min_rows": 0
       },
       "update_cadence": "ad_hoc",
-      "notes": "OPTIONAL commercial provider for public-market entity resolution (CUSIP / ISIN / FIGI / LEI / CIK / ticker crosswalks). NOT a required source \u2014 never wired into coverage gates. Live use requires BOTH FINANCIALDATA_API_KEY and FINANCIALDATA_LICENSE_APPROVED=true. Default mode is dry-run/mock with synthetic fixtures. Raw vendor payloads are never persisted. See docs/financialdata_provider.md.\n"
+      "notes": "OPTIONAL commercial provider for public-market entity resolution (CUSIP / ISIN / FIGI / LEI / CIK / ticker crosswalks). NOT a required source — never wired into coverage gates. Live use requires BOTH FINANCIALDATA_API_KEY and FINANCIALDATA_LICENSE_APPROVED=true. Default mode is dry-run/mock with synthetic fixtures. Raw vendor payloads are never persisted. See docs/financialdata_provider.md.\n"
     },
     {
       "source_id": "usaspending_loans",
@@ -1741,7 +1741,7 @@
         "min_rows": 1
       },
       "update_cadence": "weekly",
-      "notes": "SAM.gov exclusions (debarment) list \u2014 suspended/excluded parties. Screening complement to sam_entities and ofac_sdn. Requires SAM_API_KEY.\n"
+      "notes": "SAM.gov exclusions (debarment) list — suspended/excluded parties. Screening complement to sam_entities and ofac_sdn. Requires SAM_API_KEY.\n"
     },
     {
       "source_id": "usda_farm_subsidies",
@@ -1898,7 +1898,7 @@
       },
       "manual_drop_dir": "data/raw/OCPR_Contracts/",
       "update_cadence": "ad_hoc",
-      "notes": "Canonical PR Comptroller (OCPR) contract registry \u2014 every PR government contract. Distinct from oficina_contralor (audit reports only). Interactive surface; operator-delivered exports until a scraper is built.\n"
+      "notes": "Canonical PR Comptroller (OCPR) contract registry — every PR government contract. Distinct from oficina_contralor (audit reports only). Interactive surface; operator-delivered exports until a scraper is built.\n"
     },
     {
       "source_id": "ddec_incentives",
@@ -2149,7 +2149,7 @@
         "min_rows": 0
       },
       "update_cadence": "monthly",
-      "notes": "PR Treasury Sales & Use Tax (IVU/SUT) collections by fiscal year / month / NAICS, plus COFIM municipal IVU \u2014 the largest PR consumption-tax revenue stream, not otherwise captured. Scraper surface (hacienda.pr.gov bulk tables); queued for a scraping adapter (scraper_needed).\n"
+      "notes": "PR Treasury Sales & Use Tax (IVU/SUT) collections by fiscal year / month / NAICS, plus COFIM municipal IVU — the largest PR consumption-tax revenue stream, not otherwise captured. Scraper surface (hacienda.pr.gov bulk tables); queued for a scraping adapter (scraper_needed).\n"
     },
     {
       "source_id": "census_gov_finances",
@@ -2183,7 +2183,7 @@
         "min_rows": 0
       },
       "update_cadence": "yearly",
-      "notes": "FTA National Transit Database \u2014 financial, funding-source, and operating-expense data for PR transit agencies (PRHTA, PRITA, Ports Authority). Automatable via the Socrata SODA API on data.transportation.gov; materialized by scripts/download_fta_ntd.py (NTD resource id confirmed on first live run).\n"
+      "notes": "FTA National Transit Database — financial, funding-source, and operating-expense data for PR transit agencies (PRHTA, PRITA, Ports Authority). Automatable via the Socrata SODA API on data.transportation.gov; materialized by scripts/download_fta_ntd.py (NTD resource id confirmed on first live run).\n"
     },
     {
       "source_id": "pr_act_154_excise",
@@ -2200,7 +2200,7 @@
         "min_rows": 0
       },
       "update_cadence": "monthly",
-      "notes": "Act 154 excise tax on foreign controlled corporations \u2014 historically ~$1.8B/yr and 13-21% of the General Fund, the single largest GF revenue line. Hacienda statistics surface; queued for a scraping adapter (scraper_needed).\n"
+      "notes": "Act 154 excise tax on foreign controlled corporations — historically ~$1.8B/yr and 13-21% of the General Fund, the single largest GF revenue line. Hacienda statistics surface; queued for a scraping adapter (scraper_needed).\n"
     },
     {
       "source_id": "pr_income_tax_collections",
@@ -2217,7 +2217,7 @@
         "min_rows": 0
       },
       "update_cadence": "yearly",
-      "notes": "PR individual & corporate income tax collections \u2014 the income-contribution series from the Instituto de Estadisticas / Datos.PR CKAN portal. Largest recurring General Fund revenue category. Automatable via the CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py.\n"
+      "notes": "PR individual & corporate income tax collections — the income-contribution series from the Instituto de Estadisticas / Datos.PR CKAN portal. Largest recurring General Fund revenue category. Automatable via the CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py.\n"
     },
     {
       "source_id": "pr_general_fund_revenues",
@@ -2234,7 +2234,7 @@
         "min_rows": 0
       },
       "update_cadence": "monthly",
-      "notes": "Consolidated PR General Fund net revenues by source (Instituto de Estadisticas \"Ingresos Netos al Fondo General\") \u2014 one authoritative series covering Act 154, income tax, IVU, arbitrios, licenses, lottery, customs, and rum cover-over. Automatable via the Datos.PR CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py.\n"
+      "notes": "Consolidated PR General Fund net revenues by source (Instituto de Estadisticas \"Ingresos Netos al Fondo General\") — one authoritative series covering Act 154, income tax, IVU, arbitrios, licenses, lottery, customs, and rum cover-over. Automatable via the Datos.PR CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py.\n"
     },
     {
       "source_id": "estadisticas_pr_external_trade",
@@ -2305,7 +2305,134 @@
       },
       "manual_drop_dir": "data/raw/PRASA/completed/",
       "update_cadence": "yearly",
-      "notes": "P0 - PRASA completed projects \u2014 FEMA 406 / COR3 recovery-infrastructure join bridge. Operator-delivered CSV extracts.\n"
+      "notes": "P0 - PRASA completed projects — FEMA 406 / COR3 recovery-infrastructure join bridge. Operator-delivered CSV extracts.\n"
+    },
+    {
+      "source_id": "legislapr_discovery",
+      "family": "territorial_legislation",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.legislapr.com/",
+      "producer_script": "scripts/probe_legislapr_detail.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_legislapr_measures_probe.json"
+      ],
+      "schema_version": "legislative_measure_v1",
+      "validation_threshold": {
+        "min_rows": 1,
+        "cross_confirmation_required": true,
+        "canonical_sources_required": [
+          "openstates",
+          "sutra_oslpr"
+        ]
+      },
+      "update_cadence": "weekly",
+      "tier": "T2_operational",
+      "role": "legislative_discovery_enrichment",
+      "promotion_rule": "cross_confirmed_only",
+      "canonical_source_required": true,
+      "canonical_sources": [
+        "OpenStates",
+        "Asamblea Legislativa de Puerto Rico / SUTRA OSLPR"
+      ],
+      "notes": "LegislaPR is a public legislative discovery and enrichment surface for Puerto Rico measures. Treat extracted summaries/pros/cons as non-authoritative. Promote only when the measure is cross-confirmed against OpenStates and official Assembly/SUTRA links."
+    },
+    {
+      "source_id": "legislapr_sessions",
+      "family": "territorial_legislation",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "",
+      "producer_script": "scripts/ingest_legislapr_sessions.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_legislapr_sessions.json"
+      ],
+      "schema_version": "legislative_session_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "weekly",
+      "tier": "T2_operational",
+      "role": "legislative_session_index",
+      "depends_on": [
+        "legislapr_discovery"
+      ],
+      "notes": "Deterministic session index extracted from LegislaPR discovery output and OpenStates URLs. No external service calls."
+    },
+    {
+      "source_id": "legislative_canonical_sources",
+      "family": "territorial_legislation",
+      "required": false,
+      "authentication": "api_key:OPENSTATES_API_KEY",
+      "endpoint_url": "https://v3.openstates.org/",
+      "producer_script": "scripts/fetch_legislative_canonical_sources.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_legislative_measures_canonical.json"
+      ],
+      "schema_version": "legislative_measure_v1",
+      "validation_threshold": {
+        "min_rows": 1,
+        "promotion_requires": [
+          "openstates_confirmation",
+          "official_document_confirmation"
+        ]
+      },
+      "update_cadence": "weekly",
+      "tier": "T1_cross_confirmed",
+      "role": "legislative_canonical_confirmation",
+      "promotion_rule": "promoted_candidate_requires_openstates_and_sutra",
+      "depends_on": [
+        "legislapr_discovery"
+      ],
+      "notes": "Canonical confirmation layer for LegislaPR discovery candidates. Uses OpenStates API v3 and official Assembly/SUTRA document links; requires OPENSTATES_API_KEY unless running in explicit SUTRA-only audit mode."
+    },
+    {
+      "source_id": "osl_sutra_crosswalk",
+      "family": "territorial_legislation",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "",
+      "producer_script": "scripts/build_osl_sutra_crosswalk.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_osl_sutra_crosswalk.json"
+      ],
+      "schema_version": "legislative_crosswalk_v1",
+      "validation_threshold": {
+        "min_rows": 1,
+        "high_confidence_rate_pct": 0.0
+      },
+      "update_cadence": "weekly",
+      "tier": "T2_operational",
+      "role": "openstates_sutra_link_crosswalk",
+      "depends_on": [
+        "legislapr_discovery",
+        "legislative_canonical_sources"
+      ],
+      "notes": "Deterministic OpenStates-to-official Assembly/SUTRA crosswalk. No network calls; link confidence is based on discovered canonical URLs and confirmation status."
+    },
+    {
+      "source_id": "legislative_fiscal_link_candidates",
+      "family": "territorial_legislation",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "",
+      "producer_script": "scripts/build_legislative_links.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_legislative_fiscal_link_candidates.csv"
+      ],
+      "schema_version": "legislative_link_candidate_v1",
+      "validation_threshold": {
+        "min_rows": 1,
+        "manual_review_required": true
+      },
+      "update_cadence": "weekly",
+      "tier": "T2_operational",
+      "role": "legislative_to_fiscal_candidate_links",
+      "depends_on": [
+        "legislapr_discovery",
+        "contracts_master"
+      ],
+      "notes": "Manual-review candidate queue linking legislative measures to fiscal records through conservative fiscal terms and agency or municipality text alignment."
     }
   ]
 }
