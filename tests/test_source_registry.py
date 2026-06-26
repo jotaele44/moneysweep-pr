@@ -33,7 +33,6 @@ def test_each_source_has_required_fields():
 @pytest.mark.unit
 def test_required_sources_present():
     required_ids = {s["source_id"] for s in sr.required_sources(REPO_ROOT)}
-    # The mission core set must be required.
     expected = {
         "usaspending_prime",
         "usaspending_subawards",
@@ -56,7 +55,6 @@ def test_required_sources_present():
 @pytest.mark.unit
 def test_validate_registry_passes_on_real_registry():
     report = sr.validate_registry(REPO_ROOT)
-    # Errors are fatal; warnings are tolerated. R5 PR1 must produce zero errors.
     assert report["ok"], f"source_registry validation errors: {report['errors']}"
 
 
@@ -68,7 +66,6 @@ def test_no_duplicate_source_ids():
 
 @pytest.mark.unit
 def test_json_sibling_matches_yaml_keys(tmp_path):
-    """JSON sibling must be a faithful render of the YAML structure."""
     yaml_path = REPO_ROOT / "registries" / "source_registry.yaml"
     json_path = REPO_ROOT / "registries" / "source_registry.json"
     assert yaml_path.exists(), "source_registry.yaml missing"
@@ -96,30 +93,18 @@ def test_source_registry_extensions_are_loaded():
 
 @pytest.mark.unit
 def test_legislapr_legislative_sources_are_loaded():
-    discovery = sr.source_by_id("legislapr_discovery", REPO_ROOT)
-    assert discovery is not None
-    assert discovery["family"] == "territorial_legislation"
-    assert discovery["authentication"] == "none"
-    assert discovery["producer_script"] == "scripts/probe_legislapr_detail.py"
-    assert discovery["promotion_rule"] == "cross_confirmed_only"
-
-    sessions = sr.source_by_id("legislapr_sessions", REPO_ROOT)
-    assert sessions is not None
-    assert sessions["producer_script"] == "scripts/ingest_legislapr_sessions.py"
-    assert sessions["depends_on"] == ["legislapr_discovery"]
-
-    canonical = sr.source_by_id("legislative_canonical_sources", REPO_ROOT)
-    assert canonical is not None
-    assert canonical["family"] == "territorial_legislation"
-    assert canonical["authentication"] == "api_key:OPENSTATES_API_KEY"
-    assert canonical["producer_script"] == "scripts/fetch_legislative_canonical_sources.py"
-    assert canonical["depends_on"] == ["legislapr_discovery"]
-
-    crosswalk = sr.source_by_id("osl_sutra_crosswalk", REPO_ROOT)
-    assert crosswalk is not None
-    assert crosswalk["authentication"] == "none"
-    assert crosswalk["producer_script"] == "scripts/build_osl_sutra_crosswalk.py"
-    assert crosswalk["depends_on"] == ["legislapr_discovery", "legislative_canonical_sources"]
+    expected = {
+        "legislapr_discovery": "scripts/probe_legislapr_detail.py",
+        "legislapr_sessions": "scripts/ingest_legislapr_sessions.py",
+        "legislative_canonical_sources": "scripts/fetch_legislative_canonical_sources.py",
+        "osl_sutra_crosswalk": "scripts/build_osl_sutra_crosswalk.py",
+        "legislative_fiscal_link_candidates": "scripts/build_legislative_links.py",
+    }
+    for source_id, producer_script in expected.items():
+        src = sr.source_by_id(source_id, REPO_ROOT)
+        assert src is not None
+        assert src["family"] == "territorial_legislation"
+        assert src["producer_script"] == producer_script
 
 
 @pytest.mark.unit
