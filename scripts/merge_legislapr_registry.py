@@ -33,7 +33,9 @@ def _load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _merge_sources(registry: dict[str, Any], incoming: list[dict[str, Any]]) -> tuple[dict[str, Any], bool]:
+def _merge_sources(
+    registry: dict[str, Any], incoming: list[dict[str, Any]]
+) -> tuple[dict[str, Any], bool]:
     existing = registry.setdefault("sources", [])
     by_id = {src.get("source_id"): index for index, src in enumerate(existing)}
     changed = False
@@ -62,7 +64,9 @@ def merge(check: bool = False) -> dict[str, Any]:
     if check and changed:
         raise RuntimeError("main source registry is missing LegislaPR sources")
     if not check and changed:
-        REGISTRY_YAML.write_text(yaml.safe_dump(merged, sort_keys=False, allow_unicode=True), encoding="utf-8")
+        REGISTRY_YAML.write_text(
+            yaml.safe_dump(merged, sort_keys=False, allow_unicode=True), encoding="utf-8"
+        )
         REGISTRY_JSON.write_text(json.dumps(merged, indent=2, ensure_ascii=False), encoding="utf-8")
     return {
         "changed": changed,

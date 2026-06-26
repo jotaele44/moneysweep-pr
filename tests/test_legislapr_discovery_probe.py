@@ -18,8 +18,14 @@ def test_detail_url_quotes_measure_id_space():
 
 def test_promotion_state_requires_openstates_and_official_document():
     assert promotion_state(None, None) == "discovery_only_hold"
-    assert promotion_state("https://openstates.org/pr/bills/2025-2026/PS782/", None) == "partially_confirmed_hold"
-    assert promotion_state(None, "https://sutra.oslpr.org/medidas/ps0782-25.doc") == "partially_confirmed_hold"
+    assert (
+        promotion_state("https://openstates.org/pr/bills/2025-2026/PS782/", None)
+        == "partially_confirmed_hold"
+    )
+    assert (
+        promotion_state(None, "https://sutra.oslpr.org/medidas/ps0782-25.doc")
+        == "partially_confirmed_hold"
+    )
     assert (
         promotion_state(
             "https://openstates.org/pr/bills/2025-2026/PS782/",

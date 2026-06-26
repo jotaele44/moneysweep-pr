@@ -23,6 +23,7 @@ from typing import Iterable
 from urllib.error import URLError
 from urllib.parse import unquote, urljoin, urlparse
 from urllib.request import Request, urlopen
+import logging
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -32,8 +33,6 @@ except Exception:  # pragma: no cover - keeps parser testable in isolation
     PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
     def setup_logging(log_name: str, log_dir: Path | None = None) -> logging.Logger:
-        import logging
-
         logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
         return logging.getLogger(log_name)
 
@@ -226,7 +225,9 @@ def parse_legislapr_detail(html: str, source_url: str) -> LegislativeMeasureProb
 
     full_text = _clean_text(" | ".join(parser.text_chunks))
     title = parser.title or _extract_field(full_text, ["Título", "Titulo", "Title"])
-    summary = parser.meta_description or _extract_field(full_text, ["Resumen", "Summary", "Descripción", "Descripcion"])
+    summary = parser.meta_description or _extract_field(
+        full_text, ["Resumen", "Summary", "Descripción", "Descripcion"]
+    )
     measure_id = measure_id_from_url(source_url)
     if not measure_id:
         match = MEASURE_ID_RE.search(full_text)
@@ -251,7 +252,9 @@ def parse_legislapr_detail(html: str, source_url: str) -> LegislativeMeasureProb
         if any(token in u.lower() for token in ["pdf", "document", "doc", "sutra", "oslpr"])
     )
 
-    authors_text = _extract_field(full_text, ["Autores", "Authors", "Radicado por", "Presentado por"])
+    authors_text = _extract_field(
+        full_text, ["Autores", "Authors", "Radicado por", "Presentado por"]
+    )
     authors = [a.strip(" ,;") for a in re.split(r",|;| y ", authors_text) if a.strip(" ,;")]
 
     return LegislativeMeasureProbe(
@@ -276,7 +279,9 @@ def parse_legislapr_detail(html: str, source_url: str) -> LegislativeMeasureProb
 
 
 def fetch_html(url: str, timeout: int = 30) -> str:
-    request = Request(url, headers={"User-Agent": USER_AGENT, "Accept-Language": "es-PR,es;q=0.9,en;q=0.8"})
+    request = Request(
+        url, headers={"User-Agent": USER_AGENT, "Accept-Language": "es-PR,es;q=0.9,en;q=0.8"}
+    )
     with urlopen(request, timeout=timeout) as response:  # nosec: public legislative source URL from operator input
         return response.read().decode("utf-8", errors="replace")
 
@@ -295,7 +300,9 @@ def _read_urls(args: argparse.Namespace) -> list[str]:
     return _dedupe(urls)
 
 
-def run(urls: Iterable[str], root: Path | None = None, output: str = DEFAULT_OUTPUT) -> dict[str, object]:
+def run(
+    urls: Iterable[str], root: Path | None = None, output: str = DEFAULT_OUTPUT
+) -> dict[str, object]:
     root = Path(root or PROJECT_ROOT)
     out_path = root / output
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -312,7 +319,9 @@ def run(urls: Iterable[str], root: Path | None = None, output: str = DEFAULT_OUT
             errors.append({"url": url, "error": str(exc)})
 
     out_path.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
-    cross_confirmed = sum(1 for row in rows if row.get("promotion_status") == "cross_confirmed_candidate")
+    cross_confirmed = sum(
+        1 for row in rows if row.get("promotion_status") == "cross_confirmed_candidate"
+    )
     return {
         "status": "OK" if rows else "EMPTY",
         "rows": len(rows),
@@ -323,10 +332,18 @@ def run(urls: Iterable[str], root: Path | None = None, output: str = DEFAULT_OUT
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Probe LegislaPR detail pages for T2 legislative discovery records")
-    parser.add_argument("--url", action="append", help="LegislaPR measure detail URL. May be repeated.")
+    parser = argparse.ArgumentParser(
+        description="Probe LegislaPR detail pages for T2 legislative discovery records"
+    )
+    parser.add_argument(
+        "--url", action="append", help="LegislaPR measure detail URL. May be repeated."
+    )
     parser.add_argument("--input", help="Text file of LegislaPR measure URLs, one per line.")
-    parser.add_argument("--output", default=DEFAULT_OUTPUT, help=f"Repo-relative JSON output path (default: {DEFAULT_OUTPUT})")
+    parser.add_argument(
+        "--output",
+        default=DEFAULT_OUTPUT,
+        help=f"Repo-relative JSON output path (default: {DEFAULT_OUTPUT})",
+    )
     args = parser.parse_args(argv)
 
     urls = _read_urls(args)

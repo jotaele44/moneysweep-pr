@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import urlparse
+import logging
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -19,10 +20,9 @@ except Exception:  # pragma: no cover
     PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
     def setup_logging(log_name: str, log_dir: Path | None = None) -> logging.Logger:
-        import logging
-
         logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
         return logging.getLogger(log_name)
+
 
 DEFAULT_INPUT = "data/staging/processed/pr_legislapr_measures_probe.json"
 DEFAULT_OUTPUT = "data/staging/processed/pr_legislative_document_crosswalk.csv"
@@ -49,7 +49,9 @@ def read_records(path: Path) -> list[dict[str, Any]]:
 def is_official_document_url(url: str) -> bool:
     parsed = urlparse(url or "")
     host = parsed.netloc.lower()
-    return parsed.scheme in {"http", "https"} and any(marker in host for marker in OFFICIAL_HOST_MARKERS)
+    return parsed.scheme in {"http", "https"} and any(
+        marker in host for marker in OFFICIAL_HOST_MARKERS
+    )
 
 
 def first_document_url(row: dict[str, Any]) -> str:
@@ -82,20 +84,34 @@ def build_crosswalk(records: Iterable[dict[str, Any]]) -> list[dict[str, str]]:
                 "openstates_url": str(row.get("openstates_url") or ""),
                 "document_url": document_url,
                 "document_domain": urlparse(document_url).netloc.lower() if document_url else "",
-                "crosswalk_status": "ready" if document_url and row.get("openstates_url") else "needs_review",
+                "crosswalk_status": "ready"
+                if document_url and row.get("openstates_url")
+                else "needs_review",
             }
         )
     return rows
 
 
-def run(root: Path | None = None, input_path: str = DEFAULT_INPUT, output_path: str = DEFAULT_OUTPUT) -> dict[str, Any]:
+def run(
+    root: Path | None = None, input_path: str = DEFAULT_INPUT, output_path: str = DEFAULT_OUTPUT
+) -> dict[str, Any]:
     root = Path(root or PROJECT_ROOT)
     logger = setup_logging("build_legislative_document_crosswalk", log_dir=root / "data" / "logs")
     rows = build_crosswalk(read_records(root / input_path))
     out = root / output_path
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["measure_id", "legislapr_url", "openstates_url", "document_url", "document_domain", "crosswalk_status"])
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=[
+                "measure_id",
+                "legislapr_url",
+                "openstates_url",
+                "document_url",
+                "document_domain",
+                "crosswalk_status",
+            ],
+        )
         writer.writeheader()
         writer.writerows(rows)
     logger.info("legislative document crosswalk: %s rows", len(rows))

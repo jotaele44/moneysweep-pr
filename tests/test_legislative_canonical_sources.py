@@ -25,7 +25,9 @@ def test_as_string_list_preserves_scalar_values():
 
 
 def test_build_canonical_record_blocks_without_official_confirmation(monkeypatch):
-    monkeypatch.setattr("scripts.fetch_legislative_canonical_sources._url_exists", lambda url: False)
+    monkeypatch.setattr(
+        "scripts.fetch_legislative_canonical_sources._url_exists", lambda url: False
+    )
     row = build_canonical_record(
         {
             "measure_id": "PS782",

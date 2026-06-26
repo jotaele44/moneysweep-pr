@@ -21,6 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import urlparse
+import logging
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -30,8 +31,6 @@ except Exception:  # pragma: no cover
     PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
     def setup_logging(log_name: str, log_dir: Path | None = None) -> logging.Logger:
-        import logging
-
         logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
         return logging.getLogger(log_name)
 
@@ -81,7 +80,9 @@ def _normalize_session(value: str) -> str:
     return value.strip()
 
 
-def extract_sessions(records: Iterable[dict[str, Any]], manual_sessions: Iterable[str] = ()) -> list[LegislativeSessionRecord]:
+def extract_sessions(
+    records: Iterable[dict[str, Any]], manual_sessions: Iterable[str] = ()
+) -> list[LegislativeSessionRecord]:
     buckets: dict[str, dict[str, Any]] = {}
     now = datetime.now(timezone.utc).isoformat()
 
@@ -105,7 +106,11 @@ def extract_sessions(records: Iterable[dict[str, Any]], manual_sessions: Iterabl
         source_url = str(row.get("source_url") or row.get("detail_url") or "")
         session = str(row.get("openstates_session") or row.get("session") or "")
         add(session, source_url, "record_field")
-        add(_session_from_openstates_url(str(row.get("openstates_url") or "")), source_url, "openstates_url")
+        add(
+            _session_from_openstates_url(str(row.get("openstates_url") or "")),
+            source_url,
+            "openstates_url",
+        )
         for value in SESSION_RE.findall(json.dumps(row, ensure_ascii=False)):
             add(value, source_url, "text_scan")
 
@@ -126,14 +131,22 @@ def extract_sessions(records: Iterable[dict[str, Any]], manual_sessions: Iterabl
     ]
 
 
-def run(root: Path | None = None, input_path: str = DEFAULT_INPUT, output_path: str = DEFAULT_OUTPUT, manual_sessions: Iterable[str] = ()) -> dict[str, Any]:
+def run(
+    root: Path | None = None,
+    input_path: str = DEFAULT_INPUT,
+    output_path: str = DEFAULT_OUTPUT,
+    manual_sessions: Iterable[str] = (),
+) -> dict[str, Any]:
     root = Path(root or PROJECT_ROOT)
     logger = setup_logging("ingest_legislapr_sessions", log_dir=root / "data" / "logs")
     records = _read_records(root / input_path)
     sessions = extract_sessions(records, manual_sessions=manual_sessions)
     out = root / output_path
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps([asdict(row) for row in sessions], ensure_ascii=False, indent=2), encoding="utf-8")
+    out.write_text(
+        json.dumps([asdict(row) for row in sessions], ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
     logger.info("LegislaPR sessions: %s rows", len(sessions))
     return {"status": "OK" if sessions else "EMPTY", "rows": len(sessions), "output": str(out)}
 
@@ -144,7 +157,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", default=DEFAULT_OUTPUT)
     parser.add_argument("--session", action="append", default=[])
     args = parser.parse_args(argv)
-    print(json.dumps(run(input_path=args.input, output_path=args.output, manual_sessions=args.session), indent=2))
+    print(
+        json.dumps(
+            run(input_path=args.input, output_path=args.output, manual_sessions=args.session),
+            indent=2,
+        )
+    )
     return 0
 
 

@@ -46,7 +46,12 @@ def test_legislapr_source_registry_extension_loaded():
 
 @pytest.mark.unit
 def test_legislapr_schema_extension_declares_measure_table():
-    path = REPO_ROOT / "registries" / "schema_registry_extensions" / "legislapr_legislative_measure.json"
+    path = (
+        REPO_ROOT
+        / "registries"
+        / "schema_registry_extensions"
+        / "legislapr_legislative_measure.json"
+    )
     data = json.loads(path.read_text(encoding="utf-8"))
     table = data["canonical_tables"]["legislative_measures"]
     assert table["primary_key"] == ["measure_id", "source_system"]
@@ -77,7 +82,10 @@ def test_parse_legislapr_detail_requires_cross_confirmation_for_candidate():
 
 @pytest.mark.unit
 def test_parse_legislapr_detail_blocks_unconfirmed_records():
-    row = parse_legislapr_detail("<html><title>PS 782</title><p>Presupuesto y fondos</p></html>", "https://www.legislapr.com/bills/PS%20782")
+    row = parse_legislapr_detail(
+        "<html><title>PS 782</title><p>Presupuesto y fondos</p></html>",
+        "https://www.legislapr.com/bills/PS%20782",
+    )
     assert row.fiscal_language_detected is True
     assert row.openstates_url == ""
     assert row.sutra_url == ""

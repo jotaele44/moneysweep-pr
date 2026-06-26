@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-import csv
-import json
 
-from scripts.build_legislative_document_crosswalk import build_crosswalk, compact_measure_id, is_official_document_url
+from scripts.build_legislative_document_crosswalk import (
+    build_crosswalk,
+    compact_measure_id,
+    is_official_document_url,
+)
 from scripts.build_legislative_links import build_links
 from scripts.ingest_legislapr_sessions import extract_sessions
 from scripts.merge_legislapr_registry import _merge_sources
@@ -11,10 +13,14 @@ from scripts.merge_legislapr_registry import _merge_sources
 
 def test_merge_sources_adds_legislapr_without_duplicates():
     registry = {"sources": [{"source_id": "existing", "required": False}]}
-    merged, changed = _merge_sources(registry, [{"source_id": "legislapr_discovery", "required": False}])
+    merged, changed = _merge_sources(
+        registry, [{"source_id": "legislapr_discovery", "required": False}]
+    )
     assert changed is True
     assert [src["source_id"] for src in merged["sources"]] == ["existing", "legislapr_discovery"]
-    merged_again, changed_again = _merge_sources(merged, [{"source_id": "legislapr_discovery", "required": False}])
+    merged_again, changed_again = _merge_sources(
+        merged, [{"source_id": "legislapr_discovery", "required": False}]
+    )
     assert changed_again is False
     assert len(merged_again["sources"]) == 2
 

@@ -23,6 +23,7 @@ from typing import Any, Iterable
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
+import logging
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -32,8 +33,6 @@ except Exception:  # pragma: no cover
     PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
     def setup_logging(log_name: str, log_dir: Path | None = None) -> logging.Logger:
-        import logging
-
         logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
         return logging.getLogger(log_name)
 
@@ -109,16 +108,25 @@ def _url_exists(url: str, timeout: int = 20) -> bool:
     if not url:
         return False
     host = urlparse(url).netloc.lower()
-    if not any(marker in host for marker in ["oslpr.org", "senado.pr.gov", "camara.pr.gov", "rcm.gov.pr"]):
+    if not any(
+        marker in host for marker in ["oslpr.org", "senado.pr.gov", "camara.pr.gov", "rcm.gov.pr"]
+    ):
         return False
-    request = Request(url, method="HEAD", headers={"User-Agent": "MoneySweep-PR/1.0 canonical legislative confirmation"})
+    request = Request(
+        url,
+        method="HEAD",
+        headers={"User-Agent": "MoneySweep-PR/1.0 canonical legislative confirmation"},
+    )
     try:
         with urlopen(request, timeout=timeout) as response:  # nosec: URL is constrained to official legislative domains
             return response.status < 400
     except HTTPError as exc:
         if exc.code in {403, 405}:
             try:
-                request = Request(url, headers={"User-Agent": "MoneySweep-PR/1.0 canonical legislative confirmation"})
+                request = Request(
+                    url,
+                    headers={"User-Agent": "MoneySweep-PR/1.0 canonical legislative confirmation"},
+                )
                 with urlopen(request, timeout=timeout) as response:  # nosec: URL is constrained to official legislative domains
                     return response.status < 400
             except (HTTPError, URLError, TimeoutError, OSError):
@@ -167,7 +175,9 @@ def _dedupe(values: Iterable[str]) -> list[str]:
     return out
 
 
-def _extract_openstates_bill_payload(discovery_record: dict[str, Any], api_key: str) -> dict[str, Any]:
+def _extract_openstates_bill_payload(
+    discovery_record: dict[str, Any], api_key: str
+) -> dict[str, Any]:
     measure_id = _spaced_measure_id(str(discovery_record.get("measure_id") or ""))
     compact_id = _compact_measure_id(measure_id)
 
@@ -194,14 +204,18 @@ def _extract_openstates_bill_payload(discovery_record: dict[str, Any], api_key: 
     return {}
 
 
-def build_canonical_record(discovery_record: dict[str, Any], api_key: str | None) -> CanonicalLegislativeRecord:
+def build_canonical_record(
+    discovery_record: dict[str, Any], api_key: str | None
+) -> CanonicalLegislativeRecord:
     measure_id = _spaced_measure_id(str(discovery_record.get("measure_id") or ""))
     openstates_payload: dict[str, Any] = {}
     if api_key:
         openstates_payload = _extract_openstates_bill_payload(discovery_record, api_key)
 
     openstates_url = str(discovery_record.get("openstates_url") or "")
-    sutra_url = str(discovery_record.get("sutra_url") or discovery_record.get("official_document_url") or "")
+    sutra_url = str(
+        discovery_record.get("sutra_url") or discovery_record.get("official_document_url") or ""
+    )
     official_document_confirmed = _url_exists(sutra_url)
     openstates_confirmed = bool(openstates_payload) or bool(openstates_url)
 
@@ -218,14 +232,22 @@ def build_canonical_record(discovery_record: dict[str, Any], api_key: str | None
     return CanonicalLegislativeRecord(
         measure_id=measure_id,
         source_system=SOURCE_SYSTEM,
-        legislapr_url=str(discovery_record.get("source_url") or discovery_record.get("detail_url") or ""),
+        legislapr_url=str(
+            discovery_record.get("source_url") or discovery_record.get("detail_url") or ""
+        ),
         openstates_url=openstates_url,
         sutra_url=sutra_url,
         openstates_bill_id=str(openstates_payload.get("id") or ""),
-        openstates_session=str(openstates_payload.get("session") or discovery_record.get("session") or ""),
-        openstates_title=str(openstates_payload.get("title") or discovery_record.get("title") or ""),
+        openstates_session=str(
+            openstates_payload.get("session") or discovery_record.get("session") or ""
+        ),
+        openstates_title=str(
+            openstates_payload.get("title") or discovery_record.get("title") or ""
+        ),
         openstates_classification=_as_string_list(openstates_payload.get("classification")),
-        openstates_subjects=_as_string_list(openstates_payload.get("subject") or openstates_payload.get("subjects")),
+        openstates_subjects=_as_string_list(
+            openstates_payload.get("subject") or openstates_payload.get("subjects")
+        ),
         openstates_actions_count=len(openstates_payload.get("actions") or []),
         openstates_sponsorships_count=len(openstates_payload.get("sponsorships") or []),
         official_document_confirmed=official_document_confirmed,
@@ -255,17 +277,38 @@ def run(
     out.write_text(json.dumps(canonical, ensure_ascii=False, indent=2), encoding="utf-8")
 
     promoted = sum(1 for row in canonical if row["promotion_status"] == "promoted_candidate")
-    logger.info("canonical legislative records: %s rows, %s promoted candidates", len(canonical), promoted)
-    return {"status": "OK" if canonical else "EMPTY", "rows": len(canonical), "promoted_candidates": promoted, "output": str(out)}
+    logger.info(
+        "canonical legislative records: %s rows, %s promoted candidates", len(canonical), promoted
+    )
+    return {
+        "status": "OK" if canonical else "EMPTY",
+        "rows": len(canonical),
+        "promoted_candidates": promoted,
+        "output": str(out),
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", default=DEFAULT_INPUT, help=f"Repo-relative discovery JSON/JSONL input path (default: {DEFAULT_INPUT})")
-    parser.add_argument("--output", default=DEFAULT_OUTPUT, help=f"Repo-relative canonical JSON output path (default: {DEFAULT_OUTPUT})")
-    parser.add_argument("--allow-missing-key", action="store_true", help="Permit SUTRA-only confirmation when OPENSTATES_API_KEY is not available")
+    parser.add_argument(
+        "--input",
+        default=DEFAULT_INPUT,
+        help=f"Repo-relative discovery JSON/JSONL input path (default: {DEFAULT_INPUT})",
+    )
+    parser.add_argument(
+        "--output",
+        default=DEFAULT_OUTPUT,
+        help=f"Repo-relative canonical JSON output path (default: {DEFAULT_OUTPUT})",
+    )
+    parser.add_argument(
+        "--allow-missing-key",
+        action="store_true",
+        help="Permit SUTRA-only confirmation when OPENSTATES_API_KEY is not available",
+    )
     args = parser.parse_args(argv)
-    result = run(input_path=args.input, output_path=args.output, allow_missing_key=args.allow_missing_key)
+    result = run(
+        input_path=args.input, output_path=args.output, allow_missing_key=args.allow_missing_key
+    )
     print(json.dumps(result, indent=2))
     return 0 if result.get("status") in {"OK", "EMPTY"} else 1
 

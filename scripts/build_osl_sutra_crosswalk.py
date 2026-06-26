@@ -19,6 +19,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import urlparse
+import logging
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -28,10 +29,9 @@ except Exception:  # pragma: no cover
     PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
     def setup_logging(log_name: str, log_dir: Path | None = None) -> logging.Logger:
-        import logging
-
         logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
         return logging.getLogger(log_name)
+
 
 DEFAULT_DISCOVERY = "data/staging/processed/pr_legislapr_measures_probe.json"
 DEFAULT_CANONICAL = "data/staging/processed/pr_legislative_measures_canonical.json"
@@ -98,7 +98,9 @@ def _confidence(openstates_url: str, sutra_url: str, status: str) -> float:
     return round(min(score, 1.0), 2)
 
 
-def build_crosswalk(discovery: Iterable[dict[str, Any]], canonical: Iterable[dict[str, Any]]) -> list[LegislativeCrosswalkRecord]:
+def build_crosswalk(
+    discovery: Iterable[dict[str, Any]], canonical: Iterable[dict[str, Any]]
+) -> list[LegislativeCrosswalkRecord]:
     rows: dict[str, dict[str, Any]] = {}
     for record in discovery:
         mid = compact_measure_id(str(record.get("measure_id") or ""))
@@ -109,8 +111,12 @@ def build_crosswalk(discovery: Iterable[dict[str, Any]], canonical: Iterable[dic
                 "measure_id": spaced_measure_id(mid),
                 "legislapr_url": str(record.get("source_url") or record.get("detail_url") or ""),
                 "openstates_url": str(record.get("openstates_url") or ""),
-                "sutra_url": str(record.get("sutra_url") or record.get("official_document_url") or ""),
-                "canonical_confirmation_status": str(record.get("canonical_confirmation_status") or ""),
+                "sutra_url": str(
+                    record.get("sutra_url") or record.get("official_document_url") or ""
+                ),
+                "canonical_confirmation_status": str(
+                    record.get("canonical_confirmation_status") or ""
+                ),
                 "promotion_status": str(record.get("promotion_status") or ""),
             }
         )
@@ -119,7 +125,13 @@ def build_crosswalk(discovery: Iterable[dict[str, Any]], canonical: Iterable[dic
         if not mid:
             continue
         base = rows.setdefault(mid, {"measure_id": spaced_measure_id(mid)})
-        for key in ["legislapr_url", "openstates_url", "sutra_url", "canonical_confirmation_status", "promotion_status"]:
+        for key in [
+            "legislapr_url",
+            "openstates_url",
+            "sutra_url",
+            "canonical_confirmation_status",
+            "promotion_status",
+        ]:
             value = str(record.get(key) or "")
             if value:
                 base[key] = value
@@ -157,13 +169,22 @@ def run(
 ) -> dict[str, Any]:
     root = Path(root or PROJECT_ROOT)
     logger = setup_logging("build_osl_sutra_crosswalk", log_dir=root / "data" / "logs")
-    rows = build_crosswalk(_read_records(root / discovery_path), _read_records(root / canonical_path))
+    rows = build_crosswalk(
+        _read_records(root / discovery_path), _read_records(root / canonical_path)
+    )
     out = root / output_path
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps([asdict(row) for row in rows], ensure_ascii=False, indent=2), encoding="utf-8")
+    out.write_text(
+        json.dumps([asdict(row) for row in rows], ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     confirmed = sum(1 for row in rows if row.link_confidence >= 0.8)
     logger.info("OSL/SUTRA crosswalk: %s rows, %s high-confidence", len(rows), confirmed)
-    return {"status": "OK" if rows else "EMPTY", "rows": len(rows), "high_confidence_rows": confirmed, "output": str(out)}
+    return {
+        "status": "OK" if rows else "EMPTY",
+        "rows": len(rows),
+        "high_confidence_rows": confirmed,
+        "output": str(out),
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -172,7 +193,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--canonical", default=DEFAULT_CANONICAL)
     parser.add_argument("--output", default=DEFAULT_OUTPUT)
     args = parser.parse_args(argv)
-    print(json.dumps(run(discovery_path=args.discovery, canonical_path=args.canonical, output_path=args.output), indent=2))
+    print(
+        json.dumps(
+            run(
+                discovery_path=args.discovery,
+                canonical_path=args.canonical,
+                output_path=args.output,
+            ),
+            indent=2,
+        )
+    )
     return 0
 
 

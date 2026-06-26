@@ -13,6 +13,7 @@ import re
 import sys
 from pathlib import Path
 from typing import Any, Iterable
+import logging
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -22,15 +23,28 @@ except Exception:  # pragma: no cover
     PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
     def setup_logging(log_name: str, log_dir: Path | None = None) -> logging.Logger:
-        import logging
-
         logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
         return logging.getLogger(log_name)
+
 
 DEFAULT_MEASURES = "data/staging/processed/pr_legislapr_measures_probe.json"
 DEFAULT_CONTRACTS = "data/staging/processed/pr_contracts_master.csv"
 DEFAULT_OUTPUT = "data/staging/processed/pr_legislative_fiscal_link_candidates.csv"
-FISCAL_TERMS = ("fondos", "presupuesto", "asignacion", "asignación", "contrato", "emergencia", "reembolso", "incentivo", "bonos", "deuda", "fema", "cor3", "cdbg")
+FISCAL_TERMS = (
+    "fondos",
+    "presupuesto",
+    "asignacion",
+    "asignación",
+    "contrato",
+    "emergencia",
+    "reembolso",
+    "incentivo",
+    "bonos",
+    "deuda",
+    "fema",
+    "cor3",
+    "cdbg",
+)
 
 
 def norm(value: str) -> str:
@@ -67,20 +81,26 @@ def fiscal_terms(text: str) -> list[str]:
     return [term for term in FISCAL_TERMS if norm(term) in normalized]
 
 
-def build_links(measures: Iterable[dict[str, Any]], contracts: Iterable[dict[str, str]]) -> list[dict[str, str]]:
+def build_links(
+    measures: Iterable[dict[str, Any]], contracts: Iterable[dict[str, str]]
+) -> list[dict[str, str]]:
     contract_rows = list(contracts)
     links: list[dict[str, str]] = []
     seen: set[tuple[str, str, str]] = set()
     for measure in measures:
         measure_id = str(measure.get("measure_id") or "")
-        text = " ".join(str(measure.get(key) or "") for key in ["title", "summary", "status", "source_url"])
+        text = " ".join(
+            str(measure.get(key) or "") for key in ["title", "summary", "status", "source_url"]
+        )
         terms = fiscal_terms(text)
         if not terms and not measure.get("fiscal_language_detected"):
             continue
         measure_text = norm(text)
         for contract in contract_rows:
             agency = contract.get("awarding_agency") or contract.get("agency") or ""
-            municipality = contract.get("municipality") or contract.get("geo_municipality_name") or ""
+            municipality = (
+                contract.get("municipality") or contract.get("geo_municipality_name") or ""
+            )
             award_id = contract.get("award_id") or contract.get("contract_number") or ""
             signals: list[str] = []
             if agency and norm(agency) and norm(agency) in measure_text:
@@ -104,7 +124,9 @@ def build_links(measures: Iterable[dict[str, Any]], contracts: Iterable[dict[str
                     "link_type": "legislative_fiscal_candidate",
                     "evidence_signals": "+".join(sorted(set(signals))),
                     "fiscal_terms": "+".join(terms),
-                    "link_confidence": "0.50" if "agency_name" in signals or "municipality_name" in signals else "0.25",
+                    "link_confidence": "0.50"
+                    if "agency_name" in signals or "municipality_name" in signals
+                    else "0.25",
                     "review_status": "manual_review_required",
                     "source_url": str(measure.get("source_url") or ""),
                 }
@@ -112,14 +134,35 @@ def build_links(measures: Iterable[dict[str, Any]], contracts: Iterable[dict[str
     return links
 
 
-def run(root: Path | None = None, measures_path: str = DEFAULT_MEASURES, contracts_path: str = DEFAULT_CONTRACTS, output_path: str = DEFAULT_OUTPUT) -> dict[str, Any]:
+def run(
+    root: Path | None = None,
+    measures_path: str = DEFAULT_MEASURES,
+    contracts_path: str = DEFAULT_CONTRACTS,
+    output_path: str = DEFAULT_OUTPUT,
+) -> dict[str, Any]:
     root = Path(root or PROJECT_ROOT)
     logger = setup_logging("build_legislative_links", log_dir=root / "data" / "logs")
-    links = build_links(read_json_records(root / measures_path), read_contracts(root / contracts_path))
+    links = build_links(
+        read_json_records(root / measures_path), read_contracts(root / contracts_path)
+    )
     out = root / output_path
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["measure_id", "target_award_id", "target_agency", "target_municipality", "link_type", "evidence_signals", "fiscal_terms", "link_confidence", "review_status", "source_url"])
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=[
+                "measure_id",
+                "target_award_id",
+                "target_agency",
+                "target_municipality",
+                "link_type",
+                "evidence_signals",
+                "fiscal_terms",
+                "link_confidence",
+                "review_status",
+                "source_url",
+            ],
+        )
         writer.writeheader()
         writer.writerows(links)
     logger.info("legislative fiscal link candidates: %s rows", len(links))
@@ -132,7 +175,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--contracts", default=DEFAULT_CONTRACTS)
     parser.add_argument("--output", default=DEFAULT_OUTPUT)
     args = parser.parse_args(argv)
-    print(json.dumps(run(measures_path=args.measures, contracts_path=args.contracts, output_path=args.output), indent=2))
+    print(
+        json.dumps(
+            run(
+                measures_path=args.measures, contracts_path=args.contracts, output_path=args.output
+            ),
+            indent=2,
+        )
+    )
     return 0
 
 

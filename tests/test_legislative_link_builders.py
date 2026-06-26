@@ -68,7 +68,12 @@ def test_crosswalk_run_writes_output(tmp_path):
         encoding="utf-8",
     )
     canonical.write_text("[]", encoding="utf-8")
-    result = run_crosswalk(root=tmp_path, discovery_path="discovery.json", canonical_path="canonical.json", output_path="crosswalk.json")
+    result = run_crosswalk(
+        root=tmp_path,
+        discovery_path="discovery.json",
+        canonical_path="canonical.json",
+        output_path="crosswalk.json",
+    )
     assert result["status"] == "OK"
     rows = json.loads(output.read_text(encoding="utf-8"))
     assert rows[0]["measure_compact_id"] == "PS782"
