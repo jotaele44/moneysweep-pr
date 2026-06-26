@@ -36,7 +36,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.runtime.source_registry import load_source_registry
+from moneysweep.runtime.source_registry import load_source_registry
 from scripts.build_source_recovery_matrix import PATH_TYPES, _classify
 from scripts.check_network_egress import run_checks
 from scripts.config import PROJECT_ROOT, setup_logging

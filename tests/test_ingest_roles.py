@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from contract_sweeper.runtime.canonical_ids import entity_id, person_id
-from contract_sweeper.validation import canonical_v1_schema as cv1
+from moneysweep.runtime.canonical_ids import entity_id, person_id
+from moneysweep.validation import canonical_v1_schema as cv1
 from scripts import ingest_roles as ir
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "canonical_v1_roles_sample.csv"

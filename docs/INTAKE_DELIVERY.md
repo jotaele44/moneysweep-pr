@@ -1,7 +1,7 @@
 # Intake finance-lane normalization (#114)
 
 How Puerto Rico politics/finance records flow from the shared PR-intake router
-into Contract-Sweeper's normalized finance lane.
+into moneysweep-pr's normalized finance lane.
 
 > **Retired (2026-06): the cross-repo delivery to spiderweb-pr.** spiderweb-pr
 > became a producer-only federation node and removed its `intake-normalize`
@@ -16,11 +16,11 @@ into Contract-Sweeper's normalized finance lane.
 ```
 raw intake items (JSONL/JSON/CSV)
   └─ scripts/route_pr_intake.py            # shared/pr_intake_router.py + config/pr_intake_domain_router.yaml
-       └─ data/exports/pr_intake_router/contract_sweeper_derivatives.csv
-            └─ scripts/build_contract_sweeper_finance_lane.py   (this repo, #114)
+       └─ data/exports/pr_intake_router/moneysweep_derivatives.csv
+            └─ scripts/build_moneysweep_finance_lane.py   (this repo, #114)
                  → data/normalized/{funding_event_leads, contracts_procurement_events,
                     politics_finance_items, agency_actions, lobbying_political_links}.csv
-                 + data/review/{verification_queue, contract_sweeper_crosswalk_queue,
+                 + data/review/{verification_queue, moneysweep_crosswalk_queue,
                     discrepancy_queue}.csv
 ```
 
@@ -34,7 +34,7 @@ row lands in ≥1 normalized table or review queue, or is recorded in
 ```bash
 python3 scripts/route_pr_intake.py --input tests/fixtures/pr_intake_router_sample.jsonl \
         --out-dir data/exports/pr_intake_router
-python3 scripts/build_contract_sweeper_finance_lane.py --input data/exports/pr_intake_router --out .
+python3 scripts/build_moneysweep_finance_lane.py --input data/exports/pr_intake_router --out .
 ```
 
 ## Automation
@@ -43,4 +43,4 @@ python3 scripts/build_contract_sweeper_finance_lane.py --input data/exports/pr_i
 chain and opens a same-repo finance-lane PR (using the default `GITHUB_TOKEN`).
 
 > The workflow is delivery scaffolding and is **not** exercised by CI. The logic
-> it calls **is** covered: `tests/test_contract_sweeper_finance_lane.py`.
+> it calls **is** covered: `tests/test_moneysweep_finance_lane.py`.

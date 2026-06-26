@@ -1,4 +1,4 @@
-"""Primary project-emergence detector for Contract-Sweeper."""
+"""Primary project-emergence detector for moneysweep-pr."""
 
 from __future__ import annotations
 

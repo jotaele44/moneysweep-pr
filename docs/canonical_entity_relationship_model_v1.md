@@ -205,10 +205,10 @@ expected to be bridged later:
 
 | v1 (this doc) | Existing model |
 |---------------|----------------|
-| `people.csv` + `entities.csv` | `entities.jsonl` (`schemas/contract_sweeper_entity.schema.json`), unified via `entity_type` |
-| `edges.csv` | `relationships.jsonl` (`schemas/contract_sweeper_relationship.schema.json`) |
-| `evidence.csv` | `sources.jsonl` (`schemas/contract_sweeper_source.schema.json`) + `lineage` |
-| `contracts.csv` / `funding_sources.csv` | `funding_awards.jsonl` (`schemas/contract_sweeper_funding_award.schema.json`) |
+| `people.csv` + `entities.csv` | `entities.jsonl` (`schemas/moneysweep_entity.schema.json`), unified via `entity_type` |
+| `edges.csv` | `relationships.jsonl` (`schemas/moneysweep_relationship.schema.json`) |
+| `evidence.csv` | `sources.jsonl` (`schemas/moneysweep_source.schema.json`) + `lineage` |
+| `contracts.csv` / `funding_sources.csv` | `funding_awards.jsonl` (`schemas/moneysweep_funding_award.schema.json`) |
 | `municipalities.csv` | `data/reference/pr_municipalities.csv` |
 | `evidence_tier` `T1`–`T4` | claim tiers in `CLAIM_LANGUAGE_POLICY.md` (Observed / Linked / Inferred / Risk / Blocked) |
 | semantic IDs (`person_<hash>`, `contract_<agency>_<num>`) | deterministic hash IDs (`ent_/rel_/src_/awd_/txn_<32hex>`) |

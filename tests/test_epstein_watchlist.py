@@ -70,7 +70,7 @@ def test_epstein_known_entities_present():
 
 
 def test_watchlist_not_in_source_registry():
-    from contract_sweeper.runtime.source_registry import all_sources
+    from moneysweep.runtime.source_registry import all_sources
 
     ids = {s["source_id"] for s in all_sources(REPO_ROOT)}
     assert "epstein_pr_case" not in ids

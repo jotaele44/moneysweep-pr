@@ -66,7 +66,7 @@ def write_artifact_manifest(
     *,
     source_files: list[str | Path] | None = None,
     export_version: str | None = None,
-    producer: str = "contract-sweeper",
+    producer: str = "moneysweep-pr",
 ) -> dict[str, Any]:
     """Create an artifact manifest for a package directory plus optional inputs."""
 
@@ -120,7 +120,7 @@ def write_artifact_manifest(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Write artifact manifest for Contract-Sweeper export outputs."
+        description="Write artifact manifest for moneysweep-pr export outputs."
     )
     parser.add_argument("--package-dir", required=True, help="Export package directory")
     parser.add_argument(

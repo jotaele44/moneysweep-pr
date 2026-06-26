@@ -6,7 +6,7 @@ Keep the repository stable while source recovery remains externally blocked.
 
 ## Core Gates
 
-1. Compile gate: `python -m compileall contract_sweeper tests`
+1. Compile gate: `python -m compileall moneysweep tests`
 2. Test gate: `pytest -q`
 3. Production-status gate: `python scripts/run_production_status_gate.py --root .`
 

@@ -5,12 +5,12 @@ Skipped dirs: .venv, venv, .git, __pycache__, node_modules, .pytest_cache, .clau
 
 Total hits: 49 across 24 files.
 
-## `contract_sweeper/pipeline/repo_quality_audit.py`
+## `moneysweep/pipeline/repo_quality_audit.py`
 
 - L98 [placeholder] `# avoid false positives from documented placeholders`
 - L100 [placeholder] `if any(token in lowered for token in ("example", "placeholder", "dummy", "test_", "fake_")):`
 
-## `contract_sweeper/validation/source_coverage.py`
+## `moneysweep/validation/source_coverage.py`
 
 - L257 [pass (empty body)] `pass`
 - L263 [pass (empty body)] `pass`

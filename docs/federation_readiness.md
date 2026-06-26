@@ -1,13 +1,13 @@
 # Federation Readiness
 
-This document describes how Contract-Sweeper participates in the federation as a
+This document describes how moneysweep-pr participates in the federation as a
 **producer**, and the state of the producer side after this change.
 
 ## Cross-repo topology
 
 ```
   ┌─────────────────────────┐        export package (manifest + 5 JSONL)
-  │   Contract-Sweeper       │  ───────────────────────────────────────────►
+  │   moneysweep-pr       │  ───────────────────────────────────────────►
   │   (producer)             │        exports/<package>/                      │
   └─────────────────────────┘                                                 ▼
                                                        ┌──────────────────────────────┐
@@ -18,7 +18,7 @@ This document describes how Contract-Sweeper participates in the federation as a
 ```
 
 Key fact: the **query hub is not an independent repo**. It is the `query-hub`
-component that lives inside the **`spiderweb-pr`** repo. Contract-Sweeper and
+component that lives inside the **`spiderweb-pr`** repo. moneysweep-pr and
 `spiderweb-pr` communicate through the export package on disk/artifact — there is
 no shared runtime, database, or network service between them.
 
@@ -26,10 +26,10 @@ no shared runtime, database, or network service between them.
 
 | Concern | Owner |
 |---------|-------|
-| Producing canonical rows (entities, sources, awards, transactions, relationships) | Contract-Sweeper |
-| Deterministic IDs, lineage, confidence, synthetic flags | Contract-Sweeper |
-| Packaging (`manifest.json` + JSONL) and `federation` handshake | Contract-Sweeper |
-| Fail-closed self-validation before hand-off | Contract-Sweeper |
+| Producing canonical rows (entities, sources, awards, transactions, relationships) | moneysweep-pr |
+| Deterministic IDs, lineage, confidence, synthetic flags | moneysweep-pr |
+| Packaging (`manifest.json` + JSONL) and `federation` handshake | moneysweep-pr |
+| Fail-closed self-validation before hand-off | moneysweep-pr |
 | Discovering, ingesting, indexing, and querying packages | `spiderweb-pr` `query-hub` |
 | Hub-side adapters / storage / query API | `spiderweb-pr` (out of scope here) |
 
@@ -39,10 +39,10 @@ Each package's `manifest.json` carries a `federation` block:
 
 ```json
 "federation": {
-  "producer_repo": "contract-sweeper",
+  "producer_repo": "moneysweep-pr",
   "consumer_repo": "spiderweb-pr",
   "consumer_component": "query-hub",
-  "contract": "contract-sweeper-export"
+  "contract": "moneysweep-pr-export"
 }
 ```
 
@@ -54,7 +54,7 @@ producer side, before it is ever handed off.
 
 ## What is in place after this change (producer end)
 
-- Versioned export contract (`contract-sweeper-export` v`1.0.0`) with JSON
+- Versioned export contract (`moneysweep-pr-export` v`1.0.0`) with JSON
   Schemas for all five streams plus the manifest.
 - Deterministic IDs, common row envelope (`source_id`, `lineage`, `confidence`,
   `synthetic`, `created_at`, `extracted_at`).
@@ -80,7 +80,7 @@ The following are **not** part of this producer-side change:
 ## v1.1.0 — matching fields
 
 Contract v1.1.0 (additive, backward compatible) adds the join keys the
-`spiderweb-pr` `query-hub` needs to match Contract-Sweeper data:
+`spiderweb-pr` `query-hub` needs to match moneysweep-pr data:
 
 - **`location`** (inline, optional) on awards & transactions — place of
   performance (`municipality_code`, lat/lon, …) for spatial matching.
@@ -93,16 +93,16 @@ single compatibility key.
 ## Cross-repo release & handshake procedure
 
 The federation export contract is versioned **independently** of any
-Contract-Sweeper software release. Its single source of truth is
+moneysweep-pr software release. Its single source of truth is
 `scripts/build_export_package.py:EXPORT_CONTRACT_VERSION` (currently `1.2.0`).
 Three on-disk places mirror that literal and are pinned to it by
 `tests/test_conformance_fixture_freshness.py`:
 
 - `exports/conformance/v1_2/manifest.json` (the golden conformance package),
 - `exports/samples/manifest.sample.json`,
-- `schemas/contract_sweeper_export_manifest.schema.json` (`const`).
+- `schemas/moneysweep_export_manifest.schema.json` (`const`).
 
-> The finance-lane **report** contract (`readiness/contract_sweeper_finance_lane.py`,
+> The finance-lane **report** contract (`readiness/moneysweep_finance_lane.py`,
 > `1.0.0`) is a *separate* contract on its own version track. Do not couple the two.
 
 ### When you bump the federation contract version

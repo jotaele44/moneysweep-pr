@@ -21,7 +21,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.runtime.dropzone_ingest import ingest_dropzone
+from moneysweep.runtime.dropzone_ingest import ingest_dropzone
 from scripts.config import PROJECT_ROOT
 
 RAW_DIR_NAME = "data/raw/Gaming"

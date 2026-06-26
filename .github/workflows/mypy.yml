@@ -1,6 +1,6 @@
 name: Type check
 
-# Gating: the contract_sweeper/ package type-checks clean (Wave D of
+# Gating: the moneysweep/ package type-checks clean (Wave D of
 # docs/BUILD_EXECUTION_SEQUENCE.md), so mypy now blocks merges on regressions.
 # Scope/strictness widen incrementally per the sequence (scripts/ is task 24).
 on: [push, pull_request]

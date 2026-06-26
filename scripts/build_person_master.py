@@ -15,7 +15,7 @@ determinism), and the original ``person_id`` is carried as ``source_person_id`` 
 the Person Master joins cleanly to ``canonical_v1/{people,roles,review_queue}.csv``.
 
 Reuses the stdlib schema validator in
-``contract_sweeper.validation.canonical_v1_schema`` (no ``jsonschema`` dep).
+``moneysweep.validation.canonical_v1_schema`` (no ``jsonschema`` dep).
 
 CLI::
 
@@ -35,7 +35,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.validation.canonical_v1_schema import validate_row
+from moneysweep.validation.canonical_v1_schema import validate_row
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PEOPLE = "data/canonical_v1/people.csv"

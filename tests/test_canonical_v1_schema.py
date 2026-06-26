@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from contract_sweeper.validation import canonical_v1_schema as cv1
+from moneysweep.validation import canonical_v1_schema as cv1
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCHEMA_DIR = REPO_ROOT / "schemas" / "canonical_v1"

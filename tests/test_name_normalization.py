@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from contract_sweeper.runtime.name_normalization import normalize_name
+from moneysweep.runtime.name_normalization import normalize_name
 
 
 @pytest.mark.unit

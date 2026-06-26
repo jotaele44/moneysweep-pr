@@ -106,8 +106,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 
-from contract_sweeper.orchestrator.cli import build_arg_parser
-from contract_sweeper.orchestrator.support import (
+from moneysweep.orchestrator.cli import build_arg_parser
+from moneysweep.orchestrator.support import (
     check_pandas,
     install_archived_source_skip,
     print_banner,

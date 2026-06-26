@@ -111,7 +111,7 @@ flagging 501(c)(4)/(5)/(6) as `likely_political`.
 ```bash
 python3 scripts/gap_analysis_builder.py
 python3 scripts/build_source_recovery_matrix.py
-python3 -c "from contract_sweeper.runtime import source_registry as sr; \
+python3 -c "from moneysweep.runtime import source_registry as sr; \
   r = sr.validate_registry(); print(r['ok'], r['errors'])"   # → True []
 python -m pytest tests/ -q
 ```

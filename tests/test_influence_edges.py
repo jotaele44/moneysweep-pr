@@ -13,7 +13,7 @@ import json
 
 import pytest
 
-from contract_sweeper.validation.canonical_v1_schema import validate_row
+from moneysweep.validation.canonical_v1_schema import validate_row
 from scripts import build_influence_edges as bie
 
 REPO_ROOT = bie.REPO_ROOT

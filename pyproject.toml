@@ -1,6 +1,6 @@
 [tool.mypy]
 # Gradually-typed baseline. As of Wave D (docs/BUILD_EXECUTION_SEQUENCE.md) the
-# contract_sweeper/ package type-checks clean and .github/workflows/mypy.yml is a
+# moneysweep/ package type-checks clean and .github/workflows/mypy.yml is a
 # GATING check. As of sequence task 24, scripts/ is also in scope and clean.
 # Remaining widening (future work): bring run_all.py into scope and drop
 # ignore_missing_imports per-module as third-party stubs land.
@@ -13,8 +13,8 @@ no_implicit_optional = true
 # import outside them (e.g. tests/, archive/) are followed for symbols but their
 # own errors are not reported.
 follow_imports = "silent"
-# contract_sweeper/ (package) + scripts/ (CLI/pipeline) are both checked and clean.
-files = ["contract_sweeper", "scripts"]
+# moneysweep/ (package) + scripts/ (CLI/pipeline) are both checked and clean.
+files = ["moneysweep", "scripts"]
 exclude = "(^archive/|tests/)"
 
 [tool.ruff]

@@ -17,7 +17,7 @@ The extractor:
     and applies a per-document layout profile (column order, header skip,
     column-name map) when one exists. Falls back to a heuristic
     "first-table-per-page" profile for unknown documents.
-  * Applies alias overrides (``contract_sweeper.runtime.alias_overrides``) to
+  * Applies alias overrides (``moneysweep.runtime.alias_overrides``) to
     the ``contractor_name`` column so canonical clusters reach the staged CSV
     before any downstream join.
   * Writes one CSV per source PDF under
@@ -47,8 +47,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pdfplumber
 
-from contract_sweeper.runtime.alias_overrides import apply as apply_override
-from contract_sweeper.runtime.alias_overrides import load_overrides
+from moneysweep.runtime.alias_overrides import apply as apply_override
+from moneysweep.runtime.alias_overrides import load_overrides
 from scripts.config import PROJECT_ROOT, setup_logging
 
 

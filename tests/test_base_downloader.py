@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 import requests
 
-from contract_sweeper.runtime.base_downloader import (
+from moneysweep.runtime.base_downloader import (
     BaseDownloader,
     HttpConfig,
     PageResult,

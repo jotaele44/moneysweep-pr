@@ -4,7 +4,7 @@ Reads a structured CSV extraction of ACT/ACUDEN transition-contract publications
 (default: the curated synthetic fixture at
 ``tests/fixtures/act_transition/sample_rows.csv``; full operator drop expected at
 ``data/raw/act_transition/transition_contracts_extracted.csv``) and reports which
-contractor names already collapse via ``contract_sweeper.runtime.alias_overrides``
+contractor names already collapse via ``moneysweep.runtime.alias_overrides``
 and which still produce distinct normalized forms that should become candidates
 for new override entries.
 
@@ -28,9 +28,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.runtime.alias_overrides import apply as apply_override
-from contract_sweeper.runtime.alias_overrides import load_overrides
-from contract_sweeper.runtime.name_normalization import normalize_name
+from moneysweep.runtime.alias_overrides import apply as apply_override
+from moneysweep.runtime.alias_overrides import load_overrides
+from moneysweep.runtime.name_normalization import normalize_name
 from scripts.config import PROJECT_ROOT, setup_logging
 
 
@@ -254,7 +254,7 @@ def _write_markdown(
     lines.append("")
     lines.append(
         "`normalize_name()` now bridges Spanish/English municipio designators to a "
-        "canonical `MUNICIPIO <town>` form (see `contract_sweeper.runtime.name_normalization`). "
+        "canonical `MUNICIPIO <town>` form (see `moneysweep.runtime.name_normalization`). "
         "This section should normally be empty: any residual pair of `MUNICIPIO DE X` and "
         "`MUNICIPALITY OF X` canonicals here means a designator variant slipped past that rule "
         "and the normalizer regex needs widening."

@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 Jorge González and the Contract-Sweeper contributors
+Copyright (c) 2026 Jorge González and the moneysweep-pr contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@ SOFTWARE.
 
 ---
 
-Note on data: this license covers the Contract-Sweeper source code. Public
+Note on data: this license covers the moneysweep-pr source code. Public
 records and datasets the pipeline ingests or redistributes are governed by
 their own originating terms and remain in the public domain or under their
 respective licenses; the MIT grant above does not extend or alter those terms.

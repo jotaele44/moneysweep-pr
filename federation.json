@@ -1,7 +1,7 @@
 {
   "schema_version": "repo_federation_manifest_v1",
   "program_id": "moneysweep-pr",
-  "repository_full_name": "jotaele44/Contract-Sweeper",
+  "repository_full_name": "jotaele44/moneysweep-pr",
   "repository_legacy_name": "Contract-Sweeper",
   "federation_role": "public_money_intelligence_node",
   "hub_parent": "thehub-pr",

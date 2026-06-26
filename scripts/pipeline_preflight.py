@@ -170,7 +170,7 @@ def run_pipeline_preflight(
     logger.info("-" * 70)
 
     try:
-        from contract_sweeper.runtime.source_registry import all_sources
+        from moneysweep.runtime.source_registry import all_sources
 
         sources = all_sources(root)
     except Exception as exc:

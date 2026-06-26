@@ -13,7 +13,7 @@ import json
 
 import pytest
 
-from contract_sweeper.validation.canonical_v1_schema import validate_row
+from moneysweep.validation.canonical_v1_schema import validate_row
 from scripts import build_geo_reason_codes as bgr
 from scripts import build_gis_layer_manifest as bgm
 from scripts import build_hq_bias_reference as bhq

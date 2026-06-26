@@ -1,7 +1,7 @@
 """
 Shared dropzone-reader helpers for infrastructure REVENUE (income) producers.
 
-Contract-Sweeper historically tracks public-money *outflows* (contracts, grants,
+moneysweep-pr historically tracks public-money *outflows* (contracts, grants,
 disbursements). The revenue producers add the *income* side: what the public pays
 to use infrastructure (tolls, transit fares, water/power rates, port/airport fees).
 

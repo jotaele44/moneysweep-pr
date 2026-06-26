@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from contract_sweeper.federation import canonical_v1_bridge as bridge
+from moneysweep.federation import canonical_v1_bridge as bridge
 from scripts import bridge_canonical_v1_federation as br
 
 REPO_ROOT = bridge.REPO_ROOT

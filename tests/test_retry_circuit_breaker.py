@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from contract_sweeper.runtime.retry_runtime import (
+from moneysweep.runtime.retry_runtime import (
     CircuitBreaker,
     CircuitOpen,
     RetryPolicy,

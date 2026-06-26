@@ -1,6 +1,6 @@
-# Contributing to Contract-Sweeper
+# Contributing to moneysweep-pr
 
-Thanks for helping improve Contract-Sweeper — a pipeline for tracing Puerto Rico
+Thanks for helping improve moneysweep-pr — a pipeline for tracing Puerto Rico
 public money across federal and local sources. This guide covers the workflow and
 the automated quality gates every change must pass.
 
@@ -37,7 +37,7 @@ Run these locally before pushing — CI enforces every one:
 Notes:
 - Pin parity matters: CI uses the versions in `requirements-dev.txt` (e.g. mypy
   `1.11.2`). Use those locally so results match.
-- `mypy` checks `contract_sweeper/` (scripts are followed but not yet reported).
+- `mypy` checks `moneysweep/` (scripts are followed but not yet reported).
 - `ruff format` is the house style; a `.git-blame-ignore-revs` keeps blame readable
   across the one-time reformat.
 

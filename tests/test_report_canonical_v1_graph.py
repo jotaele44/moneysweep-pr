@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from contract_sweeper.validation import canonical_v1_schema as cv1
+from moneysweep.validation import canonical_v1_schema as cv1
 from scripts import report_canonical_v1_graph as rep
 
 REPO_ROOT = cv1.REPO_ROOT

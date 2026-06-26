@@ -1,6 +1,6 @@
 """Build risk signals master from R5 data shapes.
 
-Calls contract_sweeper.runtime.risk_signals.compute_signals() and writes:
+Calls moneysweep.runtime.risk_signals.compute_signals() and writes:
   data/staging/processed/risk/risk_signals_master.csv
   data/staging/processed/risk/entity_risk_scores.csv
   data/staging/processed/risk/project_risk_scores.csv
@@ -23,7 +23,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
-from contract_sweeper.runtime.risk_signals import (
+from moneysweep.runtime.risk_signals import (
     SIGNAL_COLUMNS,
     ENTITY_SCORE_COLUMNS,
     PROJECT_SCORE_COLUMNS,

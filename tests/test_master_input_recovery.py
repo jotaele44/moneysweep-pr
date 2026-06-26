@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from contract_sweeper.validation.master_input_recovery import run_recovery_and_rebuild
+from moneysweep.validation.master_input_recovery import run_recovery_and_rebuild
 from scripts import build_unified_master as bum
 
 

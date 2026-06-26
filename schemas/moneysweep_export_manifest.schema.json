@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "moneysweep_export_manifest.schema.json",
+  "title": "moneysweep-pr Export Manifest",
+  "description": "Manifest describing a packaged moneysweep-pr federation export. One per package directory.",
+  "type": "object",
+  "required": [
+    "package_id",
+    "producer",
+    "producer_version",
+    "export_contract_version",
+    "mode",
+    "created_at",
+    "extracted_at",
+    "federation",
+    "files"
+  ],
+  "properties": {
+    "package_id": {
+      "type": "string",
+      "pattern": "^pkg_[a-f0-9]{32}$",
+      "description": "Deterministic ID derived from sorted (filename, sha256) entries plus mode."
+    },
+    "producer": {
+      "type": "string",
+      "const": "moneysweep-pr"
+    },
+    "producer_version": {
+      "type": "string"
+    },
+    "export_contract_version": {
+      "type": "string",
+      "const": "1.2.0"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["test", "production"]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "extracted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "federation": {
+      "type": "object",
+      "description": "Cross-repo handshake descriptor. Names the producer and the consuming query hub (a component within the spiderweb-pr repo). Compatibility is keyed off the top-level export_contract_version; no version is duplicated here.",
+      "required": ["producer_repo", "consumer_repo", "consumer_component", "contract"],
+      "properties": {
+        "producer_repo": {"type": "string", "const": "moneysweep-pr"},
+        "consumer_repo": {"type": "string", "const": "spiderweb-pr"},
+        "consumer_component": {"type": "string", "const": "query-hub"},
+        "contract": {"type": "string", "const": "moneysweep-pr-export"}
+      }
+    },
+    "coverage_window": {
+      "type": "object",
+      "properties": {
+        "fiscal_year_min": {"type": "integer"},
+        "fiscal_year_max": {"type": "integer"}
+      }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["filename", "stream", "record_count", "sha256", "schema_id"],
+        "properties": {
+          "filename": {"type": "string"},
+          "stream": {
+            "type": "string",
+            "enum": ["entities", "sources", "funding_awards", "transactions", "relationships"]
+          },
+          "record_count": {"type": "integer", "minimum": 0},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "schema_id": {"type": "string"}
+        }
+      }
+    }
+  }
+}

@@ -11,7 +11,7 @@ import json
 
 import pytest
 
-from contract_sweeper.validation.canonical_v1_schema import validate_row
+from moneysweep.validation.canonical_v1_schema import validate_row
 from scripts import build_analyst_reports_manifest as bar
 from scripts import build_dashboard_explorer as bde
 from scripts import build_source_drilldown as bsd

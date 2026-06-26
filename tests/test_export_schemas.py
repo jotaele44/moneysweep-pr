@@ -14,7 +14,7 @@ import json
 
 import pytest
 
-from contract_sweeper.validation.canonical_v1_schema import validate_row
+from moneysweep.validation.canonical_v1_schema import validate_row
 from scripts import build_graph_export as bge
 from scripts import build_gis_layer_manifest as bgm
 

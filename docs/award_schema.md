@@ -1,7 +1,7 @@
 # Award Schema
 
 Stream: `funding_awards.jsonl` · Schema:
-[`schemas/contract_sweeper_funding_award.schema.json`](../schemas/contract_sweeper_funding_award.schema.json)
+[`schemas/moneysweep_funding_award.schema.json`](../schemas/moneysweep_funding_award.schema.json)
 
 A **funding award** is a grant, contract, or other obligation from a funding
 agency to a recipient.

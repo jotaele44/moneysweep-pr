@@ -1,4 +1,4 @@
-# Contract-Sweeper — Improvement Recommendations
+# moneysweep-pr — Improvement Recommendations
 
 _Generated 2026-05-29. Advisory only — no source code was refactored or deleted
 in the change that introduced this document. Each item below is sized so the
@@ -12,7 +12,7 @@ refactors) deliberately._
 | Python files | ~410 |
 | Python LOC | ~100k |
 | `scripts/` files | 158 (69 are `download_*.py`) |
-| `contract_sweeper/pipeline/` files | ~42 |
+| `moneysweep/pipeline/` files | ~42 |
 | Test files | 106 |
 | Data committed to git | ~89 MB under `data/` |
 | Largest single source file | `run_all.py` (114 KB) |
@@ -30,7 +30,7 @@ struggling project.
 |---|------|-------|----------------|--------|------|----------|
 | 1 | Remove | ~89 MB of data blobs committed to git (56 MB `data/raw/follow_the_money/funding_flows_sf133.csv`, 24 MB `data/staging/processed/partial/..._r4_9g.csv`, 5.3 MB FEC CSV, several PDFs) | Purge from history with `git filter-repo`; move sample data to release assets / external object storage. **Plan + size-guard landed; purge itself awaits a coordinated window — see [`docs/HISTORY_PURGE_PLAN.md`](docs/HISTORY_PURGE_PLAN.md).** | M | High (history rewrite) | P0 |
 | 2 | Improve | `.gitignore` claims data is "too large for git" but blobs slipped through because their paths don't match the globs (spaces, nested dirs) | Switch to a deny-all `data/**` rule with an explicit `!*.gitkeep` / `!manifest.json` allowlist | S | Low | P0 |
-| 3 | Reorganize | Pipeline-script graveyard: ~42 files in `contract_sweeper/pipeline/`, many one-off remediation passes (`backfill_failure_remediation`, `controlled_backfill_execution`, `final_backfill_retry`, `targeted_backfill_retry`, `partial_master_rebuild`, `scoped_partial_rebuild`, `final_source_recovery_pass`, `producer_patch_retry`, `endpoint_patch_retry`, …) | Move superseded one-shots into `archive/` (precedent: `archive/r4_legacy/`); keep only the current canonical backfill path | M | Medium | P1 |
+| 3 | Reorganize | Pipeline-script graveyard: ~42 files in `moneysweep/pipeline/`, many one-off remediation passes (`backfill_failure_remediation`, `controlled_backfill_execution`, `final_backfill_retry`, `targeted_backfill_retry`, `partial_master_rebuild`, `scoped_partial_rebuild`, `final_source_recovery_pass`, `producer_patch_retry`, `endpoint_patch_retry`, …) | Move superseded one-shots into `archive/` (precedent: `archive/r4_legacy/`); keep only the current canonical backfill path | M | Medium | P1 |
 | 4 | Reorganize | 69 `download_*.py` scripts with no shared base — high duplication of fetch/retry/validate/manifest logic | Extract a `BaseDownloader` (or `acquisition` module) handling HTTP, retry, checksum, manifest write; make each source a thin subclass/config | L | Medium | P1 |
 | 5 | Improve | `run_all.py` is a single 114 KB monolithic orchestrator | Decompose into a thin CLI entry + per-stage modules (one module per the 7 documented steps) | L | Medium | P1 |
 | 6 | Improve | Round-suffixed test names (`test_*_r48b`, `_r49z`, `_r48d`) are hard to navigate and imply ad-hoc development rounds | Rename to describe behavior under test; drop round suffixes | S | Low | P2 |
@@ -54,7 +54,7 @@ struggling project.
 
 ## Cross-repo federation (shared with spiderweb-pr)
 
-Contract-Sweeper produces a versioned "Contract-Finance" export contract
+moneysweep-pr produces a versioned "Contract-Finance" export contract
 (currently v1.2.0) consumed by `spiderweb-pr`'s federation adapter. The version
 is bumped by hand across both repos. **Recommendation:** add an automated
 contract-compatibility test — a golden schema fixture plus an explicit version

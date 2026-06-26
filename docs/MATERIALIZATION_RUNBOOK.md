@@ -66,7 +66,7 @@ python3 -m pytest tests/test_materialization_readiness.py -q
 ### 5. Materialize
 - **Adapter-backed sources** (35) — on-demand query path:
   ```bash
-  python -m contract_sweeper.query --source <source_id> [--fy 2020,2021 ...]
+  python -m moneysweep.query --source <source_id> [--fy 2020,2021 ...]
   ```
 - **Full pipeline** (producers + downstream) — registry-driven orchestrator:
   ```bash

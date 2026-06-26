@@ -13,7 +13,7 @@ import re
 
 import pytest
 
-from contract_sweeper.validation.canonical_v1_schema import validate_row
+from moneysweep.validation.canonical_v1_schema import validate_row
 from scripts import build_entity_resolution_review_queue as brq
 
 REPO_ROOT = brq.REPO_ROOT

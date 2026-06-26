@@ -5,10 +5,10 @@ the staging tree, so their validation primitives — forbidden-artifact-token
 detection, status/type gates, approved-stage-path enforcement, and credential
 checks — are the security surface and are exercised directly here:
 
-  - contract_sweeper.pipeline.credentialed_endpoint_execution
-  - contract_sweeper.pipeline.manual_import_dropzone
-  - contract_sweeper.pipeline.source_materialization
-  - contract_sweeper.pipeline.scoped_unfreeze_materialization
+  - moneysweep.pipeline.credentialed_endpoint_execution
+  - moneysweep.pipeline.manual_import_dropzone
+  - moneysweep.pipeline.source_materialization
+  - moneysweep.pipeline.scoped_unfreeze_materialization
 
 All behavior asserted here was verified against the live implementation. No
 network or real credentials are used; producer "scripts" are tiny tmp files.
@@ -22,7 +22,7 @@ from pathlib import Path
 
 import pytest
 
-from contract_sweeper.pipeline import (
+from moneysweep.pipeline import (
     credentialed_endpoint_execution as cee,
     manual_import_dropzone as mid,
     scoped_unfreeze_materialization as suf,

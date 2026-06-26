@@ -1,4 +1,4 @@
-"""Project-emergence alert subsystem for Contract-Sweeper."""
+"""Project-emergence alert subsystem for moneysweep-pr."""
 
 from .alert_event_schema import AlertEvent, AlertLevel, ProjectStage
 from .project_signal_detector import ProjectSignalDetector, detect_project_signals

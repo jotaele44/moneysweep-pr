@@ -1,6 +1,6 @@
 """Behavior tests for the government-flow dropzone readers (Tranches 2-3).
 
-All 17 readers delegate to ``contract_sweeper.runtime.dropzone_ingest`` and are
+All 17 readers delegate to ``moneysweep.runtime.dropzone_ingest`` and are
 network-free, so they are exercised directly here: empty-dropzone handling, the
 shared Spanish/English column mapping with blank-key filtering, and the cached
 short-circuit.

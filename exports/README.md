@@ -1,8 +1,8 @@
 # exports/
 
-Staging area for Contract-Sweeper **federation export packages**.
+Staging area for moneysweep-pr **federation export packages**.
 
-Contract-Sweeper is a *producer* in the federation: it emits self-describing,
+moneysweep-pr is a *producer* in the federation: it emits self-describing,
 validated export packages that the **query hub** ingests. The query hub is not
 an independent repo — it lives as the `query-hub` component inside the
 [`spiderweb-pr`](https://github.com/jotaele44) repo. This directory is the
@@ -28,8 +28,8 @@ exports/
 
 `conformance/v1_2/` is a committed, **non-synthetic** package in the current
 `1.2.0` on-wire shape. A byte-identical copy lives in the consumer repo at
-`spiderweb-pr/tests/fixtures/contract_sweeper_v1_2/`, where
-`tests/test_contract_sweeper_conformance.py` ingests it through the consumer's
+`spiderweb-pr/tests/fixtures/moneysweep_v1_2/`, where
+`tests/test_moneysweep_conformance.py` ingests it through the consumer's
 adapter + production gate + contract-finance layer. This pair guards against the
 contract-drift incident in which both repos shipped incompatible "1.1.0"
 definitions — see the consumer-side report at

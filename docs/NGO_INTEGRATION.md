@@ -4,7 +4,7 @@
 
 `NGO_INTEGRATION_ISLANDWIDE_COVERAGE`
 
-This layer extends Contract-Sweeper beyond procurement vendors by adding a first-class NGO / OSFL execution-chain layer. The goal is to track nonprofit identity, award exposure, municipal coverage, and graph relationships without mutating the existing FPDS / USASpending / FSRS pipeline.
+This layer extends moneysweep-pr beyond procurement vendors by adding a first-class NGO / OSFL execution-chain layer. The goal is to track nonprofit identity, award exposure, municipal coverage, and graph relationships without mutating the existing FPDS / USASpending / FSRS pipeline.
 
 ## Execution Command
 
@@ -40,7 +40,7 @@ data/raw/ngos/usaspending/*.json
 data/raw/ngos/usaspending/*.jsonl
 ```
 
-It also reads existing processed Contract-Sweeper award outputs when present:
+It also reads existing processed moneysweep-pr award outputs when present:
 
 ```text
 data/staging/processed/pr_contracts_master.csv

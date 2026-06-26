@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.pipeline.source_delivery_watch import run_source_delivery_watch
+from moneysweep.pipeline.source_delivery_watch import run_source_delivery_watch
 
 
 def main() -> int:

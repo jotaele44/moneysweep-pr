@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.validation.production_status import run_gate
+from moneysweep.validation.production_status import run_gate
 
 
 def main() -> int:

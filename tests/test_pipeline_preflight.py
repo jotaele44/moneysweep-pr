@@ -8,7 +8,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from contract_sweeper.runtime.source_registry import all_sources
+from moneysweep.runtime.source_registry import all_sources
 from scripts.pipeline_preflight import (
     STRUCTURAL_STATUSES,
     classify_source_readiness,
@@ -79,7 +79,7 @@ def test_strict_fails_on_structural_error_but_nonstrict_continues(monkeypatch):
         }
     ]
     monkeypatch.setattr(
-        "contract_sweeper.runtime.source_registry.all_sources",
+        "moneysweep.runtime.source_registry.all_sources",
         lambda root=None: broken,
     )
 

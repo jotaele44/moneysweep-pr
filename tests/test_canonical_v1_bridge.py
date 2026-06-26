@@ -4,8 +4,8 @@ import re
 
 import pytest
 
-from contract_sweeper.federation import canonical_v1_bridge as bridge
-from contract_sweeper.validation import canonical_v1_schema as cv1
+from moneysweep.federation import canonical_v1_bridge as bridge
+from moneysweep.validation import canonical_v1_schema as cv1
 from scripts import bridge_canonical_v1_federation as br
 
 REPO_ROOT = cv1.REPO_ROOT

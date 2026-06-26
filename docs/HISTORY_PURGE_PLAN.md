@@ -54,14 +54,14 @@ recur the moment history is clean. This is task 66; the purge is task 68.
 
 2. **Back up.** Create a throwaway mirror so the rewrite is reversible:
    ```bash
-   git clone --mirror git@github.com:jotaele44/contract-sweeper.git cs-backup.git
+   git clone --mirror git@github.com:jotaele44/moneysweep-pr.git cs-backup.git
    ```
 
 3. **Rewrite history** with [`git-filter-repo`](https://github.com/newren/git-filter-repo)
    (preferred over BFG/`filter-branch`). Strip the specific large paths while
    keeping the small, intentionally-committed fixtures under `data/`:
    ```bash
-   git clone git@github.com:jotaele44/contract-sweeper.git cs-purge
+   git clone git@github.com:jotaele44/moneysweep-pr.git cs-purge
    cd cs-purge
    git filter-repo \
      --path "data/raw/Follow the Money/funding_flows_sf133.csv" \
@@ -93,7 +93,7 @@ After the force-push:
 
 ```bash
 # Clone size, fresh and full
-git clone --no-single-branch git@github.com:jotaele44/contract-sweeper.git cs-verify
+git clone --no-single-branch git@github.com:jotaele44/moneysweep-pr.git cs-verify
 du -sh cs-verify/.git
 
 # The offenders must be absent from all history
@@ -118,5 +118,5 @@ step 2:
 
 ```bash
 cd cs-backup.git
-git push --force --mirror git@github.com:jotaele44/contract-sweeper.git
+git push --force --mirror git@github.com:jotaele44/moneysweep-pr.git
 ```

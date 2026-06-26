@@ -27,7 +27,7 @@ DEFAULT_EXPORT_DIR = Path("data/exports/pr_intake_router")
 
 EXPECTED_EXPORTS = (
     "route_results.jsonl",
-    "contract_sweeper_derivatives.csv",
+    "moneysweep_derivatives.csv",
     "spiderweb_pr_derivatives.csv",
     "manual_review_queue.csv",
     "routing_summary.json",

@@ -1,4 +1,4 @@
-"""Contract-Sweeper federation export validator.
+"""moneysweep-pr federation export validator.
 
 Fail-closed integrity checks for a packaged export directory. JSON Schemas
 in ``schemas/`` are loaded for required-field lists; value-shape rules are
@@ -47,11 +47,11 @@ STREAM_FILENAMES: dict[str, str] = {
 }
 
 STREAM_SCHEMA_FILES: dict[str, str] = {
-    "entities": "contract_sweeper_entity.schema.json",
-    "sources": "contract_sweeper_source.schema.json",
-    "funding_awards": "contract_sweeper_funding_award.schema.json",
-    "transactions": "contract_sweeper_transaction.schema.json",
-    "relationships": "contract_sweeper_relationship.schema.json",
+    "entities": "moneysweep_entity.schema.json",
+    "sources": "moneysweep_source.schema.json",
+    "funding_awards": "moneysweep_funding_award.schema.json",
+    "transactions": "moneysweep_transaction.schema.json",
+    "relationships": "moneysweep_relationship.schema.json",
 }
 
 MONEY_STREAMS = ("funding_awards", "transactions")
@@ -59,10 +59,10 @@ MONEY_STREAMS = ("funding_awards", "transactions")
 # Cross-repo federation handshake the producer must declare so the spiderweb-pr
 # query hub can route and version-check the package on ingest.
 FEDERATION_EXPECTED = {
-    "producer_repo": "contract-sweeper",
+    "producer_repo": "moneysweep-pr",
     "consumer_repo": "spiderweb-pr",
     "consumer_component": "query-hub",
-    "contract": "contract-sweeper-export",
+    "contract": "moneysweep-pr-export",
 }
 
 # Iteration order: streams whose IDs are referenced by others come first.
@@ -502,7 +502,7 @@ def validate_package(package_dir: str | Path, mode: str = "test") -> list[Valida
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Validate a Contract-Sweeper export package (fail-closed).",
+        description="Validate a moneysweep-pr export package (fail-closed).",
     )
     parser.add_argument("--package", required=True, help="path to package directory")
     parser.add_argument("--mode", choices=("test", "production"), default="test")

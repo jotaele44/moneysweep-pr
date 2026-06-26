@@ -42,7 +42,7 @@ import requests
 from scripts.config import PROJECT_ROOT, setup_logging
 
 CKAN_BASE = "https://datos.estadisticas.pr"
-USER_AGENT = "ContractSweeper/1.0 (+https://github.com/jotaele44/Contract-Sweeper)"
+USER_AGENT = "ContractSweeper/1.0 (+https://github.com/jotaele44/moneysweep-pr)"
 MAX_RETRIES = 3
 RETRY_BACKOFF = (5, 15, 30)
 PAGE_LIMIT = 1000

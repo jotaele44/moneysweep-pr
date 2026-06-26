@@ -33,7 +33,7 @@ except ImportError:
 import pandas as pd
 
 from scripts.config import PROJECT_ROOT, setup_logging
-from contract_sweeper.validation.production_status import load_current_status
+from moneysweep.validation.production_status import load_current_status
 
 MIN_OBLIGATION_DEFAULT = 0
 TOP_NODES_DEFAULT = 30

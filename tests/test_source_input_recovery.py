@@ -6,7 +6,7 @@ import csv
 import json
 from pathlib import Path
 
-from contract_sweeper.validation.source_input_recovery import run_recovery
+from moneysweep.validation.source_input_recovery import run_recovery
 
 
 def _write_csv(path: Path, rows: list[dict], fieldnames: list[str]) -> None:

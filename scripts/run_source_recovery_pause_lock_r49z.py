@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.pipeline.source_recovery_pause_lock import run_source_recovery_pause_lock
+from moneysweep.pipeline.source_recovery_pause_lock import run_source_recovery_pause_lock
 
 
 def main() -> int:

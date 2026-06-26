@@ -9,7 +9,7 @@ Queued / excluded: **46**
 | path_type | automatable | count | recommended_action |
 | --- | --- | --- | --- |
 | `api_producer` | True | 49 | Run producer under strict preflight; public API path, set key if gated. |
-| `api_adapter` | True | 41 | Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated). |
+| `api_adapter` | True | 41 | Materialize via `python -m moneysweep.query --source <id>` (set key if gated). |
 | `manual_export` | False | 39 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
 | `deferred_stub` | False | 2 | Intentionally unimplemented; remains not_materialized by design. |

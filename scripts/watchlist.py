@@ -2,7 +2,7 @@
 
 A *watchlist* is a flagged reference list (e.g. entities from a criminal case)
 that is deliberately **not** a source in the materialization registry. Its only
-purpose is cross-referencing: when Contract-Sweeper acquires public-money data,
+purpose is cross-referencing: when moneysweep-pr acquires public-money data,
 test incoming entity names against the watchlist and flag overlaps for human
 review. See ``data/watchlists/<id>/README.md``.
 """

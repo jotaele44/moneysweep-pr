@@ -4,7 +4,7 @@ schema_version: "r5_alias_overrides_v1"
 # Curated canonical-name overrides for entity clustering.
 #
 # Each entry forces all listed aliases (after default normalization via
-# contract_sweeper.runtime.name_normalization.normalize_name) to collapse
+# moneysweep.runtime.name_normalization.normalize_name) to collapse
 # into the same canonical group. Use this only for cases where the default
 # normalizer cannot bridge the variants — e.g. structural rebrands, shared
 # subsidiaries, or PR-specific spelling variants.

@@ -32,7 +32,7 @@ Example:
 ## Alignment with the existing repo
 
 This vocabulary intentionally mirrors the in-repo artifact lineage model in
-[`contract_sweeper/validation/artifact_lineage.py`](../contract_sweeper/validation/artifact_lineage.py),
+[`moneysweep/validation/artifact_lineage.py`](../moneysweep/validation/artifact_lineage.py),
 which already tracks `producer_script`, `producer_phase`, and `source_inputs`
 for internal artifacts. Reusing the same terms keeps producer-internal lineage
 and the federation export lineage consistent.

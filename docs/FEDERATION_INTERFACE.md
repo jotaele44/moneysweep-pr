@@ -1,4 +1,4 @@
-# Federation Interface — Contract-Sweeper / moneysweep-pr
+# Federation Interface — moneysweep-pr / moneysweep-pr
 
 ## Active Vector
 
@@ -8,7 +8,7 @@
 
 This document defines how the Hub should discover and call this repository as the Puerto Rico public-money intelligence node of the wider code Federation.
 
-The historical repository name is `Contract-Sweeper`. The Federation program role is `moneysweep-pr`.
+The historical repository name is `moneysweep-pr`. The Federation program role is `moneysweep-pr`.
 
 ## Current Gate
 

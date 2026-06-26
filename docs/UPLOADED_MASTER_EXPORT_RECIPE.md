@@ -1,7 +1,7 @@
 # Uploaded Master Export Recipe
 
 This recipe makes the local production-generation path reproducible inside
-Contract-Sweeper.
+moneysweep-pr.
 
 ## Inputs
 
@@ -31,12 +31,12 @@ entity_edges.csv
 uploaded_master_mapping_report.json
 ```
 
-## Step 2 — Generate Contract-Sweeper v1.1 package
+## Step 2 — Generate moneysweep-pr v1.1 package
 
 ```bash
 python scripts/run_export.py \
   --processed-dir data/staging/processed_uploaded_masters \
-  --output-dir exports/contract_sweeper_uploaded_masters_v1_1 \
+  --output-dir exports/moneysweep_uploaded_masters_v1_1 \
   --mode production
 ```
 
@@ -44,7 +44,7 @@ python scripts/run_export.py \
 
 ```bash
 python scripts/write_artifact_manifest.py \
-  --package-dir exports/contract_sweeper_uploaded_masters_v1_1 \
+  --package-dir exports/moneysweep_uploaded_masters_v1_1 \
   --source-file /path/to/pr_contracts_master_v2.csv \
   --source-file /path/to/pr_all_awards_master.csv \
   --source-file /path/to/lda_canonical_client_summary_all.csv

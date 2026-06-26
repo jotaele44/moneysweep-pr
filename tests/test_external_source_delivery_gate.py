@@ -7,7 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from contract_sweeper.pipeline.external_source_delivery_gate import (
+from moneysweep.pipeline.external_source_delivery_gate import (
     run_external_source_delivery_gate,
 )
 

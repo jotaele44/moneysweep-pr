@@ -31,7 +31,7 @@ stream rather than an error.
 | Export field | Source |
 |---|---|
 | `entity_id` | `ent_<sha256[:32]>` of `{normalized_name, entity_type, jurisdiction}` |
-| `source_id` | the derived source `contract_sweeper_resolution` |
+| `source_id` | the derived source `moneysweep_resolution` |
 | `name` | `entity_name` |
 | `normalized_name` | `normalized_name` (else `normalize_name(entity_name)`) |
 | `entity_type` | `entity_type` (default `recipient`) |
@@ -107,8 +107,8 @@ Emitted on awards & transactions only when `geo_municipality_code` or
 
 ## Reused helpers
 
-- `contract_sweeper/runtime/name_normalization.py:normalize_name`
-- `contract_sweeper/runtime/linkage_confidence.py` (confidence is `[0,1]`;
+- `moneysweep/runtime/name_normalization.py:normalize_name`
+- `moneysweep/runtime/linkage_confidence.py` (confidence is `[0,1]`;
   `MANUAL_REVIEW_THRESHOLD = 0.90`)
 - `scripts/build_export_package.py` (`_deterministic_id`, `build_package`)
 - `scripts/validate_export.py` (`validate_package`)

@@ -8,7 +8,7 @@ import logging
 
 import pytest
 
-from contract_sweeper.runtime import logging_config as lc
+from moneysweep.runtime import logging_config as lc
 
 
 @pytest.fixture(autouse=True)

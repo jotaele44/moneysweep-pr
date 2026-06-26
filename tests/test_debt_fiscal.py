@@ -12,7 +12,7 @@ import json
 
 import pytest
 
-from contract_sweeper.validation.canonical_v1_schema import validate_row
+from moneysweep.validation.canonical_v1_schema import validate_row
 from scripts import build_creditor_mapping as bcm
 from scripts import build_debt_instruments as bdi
 from scripts import build_fiscal_control_events as bfe

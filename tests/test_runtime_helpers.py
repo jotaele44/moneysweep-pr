@@ -1,10 +1,10 @@
 """Unit tests for the pure/fast runtime helpers (Wave G, PR 5).
 
 Covers four previously-untested stdlib-only modules:
-  - contract_sweeper.runtime.evidence_tiers
-  - contract_sweeper.runtime.file_hash_runtime
-  - contract_sweeper.runtime.retry_runtime
-  - contract_sweeper.runtime.pagination_runtime
+  - moneysweep.runtime.evidence_tiers
+  - moneysweep.runtime.file_hash_runtime
+  - moneysweep.runtime.retry_runtime
+  - moneysweep.runtime.pagination_runtime
 
 (risk_signal_gates is already exercised by tests/test_risk_signals.py.)
 """
@@ -15,7 +15,7 @@ import hashlib
 
 import pytest
 
-from contract_sweeper.runtime import (
+from moneysweep.runtime import (
     evidence_tiers as et,
     file_hash_runtime as fh,
     pagination_runtime as pg,
@@ -117,7 +117,7 @@ def test_claim_tier_for_unaccepted_downgrades_one_level():
 
 @pytest.mark.unit
 def test_sha256_file_matches_hashlib(tmp_path):
-    data = b"contract-sweeper public money\n"
+    data = b"moneysweep-pr public money\n"
     p = tmp_path / "f.bin"
     p.write_bytes(data)
     assert fh.sha256_file(p) == hashlib.sha256(data).hexdigest()

@@ -5,9 +5,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from contract_sweeper.query.adapters import ADAPTER_REGISTRY, get_adapter
-from contract_sweeper.query.adapters.fhlb import FHLBAdvancesAdapter
-from contract_sweeper.query.adapters.usaspending import (
+from moneysweep.query.adapters import ADAPTER_REGISTRY, get_adapter
+from moneysweep.query.adapters.fhlb import FHLBAdvancesAdapter
+from moneysweep.query.adapters.usaspending import (
     HUDHCVSection8Adapter,
     SNAPNAPAdapter,
     USACECivilWorksAdapter,
@@ -15,7 +15,7 @@ from contract_sweeper.query.adapters.usaspending import (
     WICAdapter,
     WIOAAdapter,
 )
-from contract_sweeper.query.types import Query
+from moneysweep.query.types import Query
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 BENEFIT_SOURCE_IDS = [

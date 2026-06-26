@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from contract_sweeper.runtime import source_registry as sr
+from moneysweep.runtime import source_registry as sr
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 

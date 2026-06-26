@@ -37,7 +37,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.runtime.maturity_gate import (
+from moneysweep.runtime.maturity_gate import (
     claim_tier,
     load_dataset_to_source_map,
     load_source_maturity,

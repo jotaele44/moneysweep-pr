@@ -5,7 +5,7 @@ Equivalent to:
     python scripts/route_pr_intake.py --input <raw_items> --out-dir <exports>
 
 This intentionally keeps the PR intake router callable without modifying the
-large Contract-Sweeper run_all.py orchestrator until a safer full orchestrator
+large moneysweep-pr run_all.py orchestrator until a safer full orchestrator
 refactor is made.
 """
 

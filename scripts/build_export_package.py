@@ -1,4 +1,4 @@
-"""Build a Contract-Sweeper federation export package.
+"""Build a moneysweep-pr federation export package.
 
 Reads pre-shaped JSONL stream files from ``--input-dir`` (default:
 ``exports/samples/``), copies them into ``--output-dir`` under canonical
@@ -31,29 +31,29 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
-# Versions the FEDERATION "contract-sweeper-export" contract consumed by the
+# Versions the FEDERATION "moneysweep-pr-export" contract consumed by the
 # spiderweb-pr query-hub (see the handshake constants below). This is the single
 # source of truth for that version. It is INDEPENDENT of the finance-lane REPORT
-# contract, which is versioned separately in readiness/contract_sweeper_finance_lane.py
+# contract, which is versioned separately in readiness/moneysweep_finance_lane.py
 # (currently 1.0.0) — the two share a constant name only, not a lineage.
 EXPORT_CONTRACT_VERSION = "1.2.0"
-PRODUCER_NAME = "contract-sweeper"
+PRODUCER_NAME = "moneysweep-pr"
 DEFAULT_PRODUCER_VERSION = "0.1.0"
 
 # Cross-repo federation handshake. The query hub is a component inside the
 # spiderweb-pr repo, not an independent repo. The hub keys ingestion off this
 # descriptor; compatibility is matched against EXPORT_CONTRACT_VERSION above.
-PRODUCER_REPO = "contract-sweeper"
+PRODUCER_REPO = "moneysweep-pr"
 CONSUMER_REPO = "spiderweb-pr"
 CONSUMER_COMPONENT = "query-hub"
-CONTRACT_NAME = "contract-sweeper-export"
+CONTRACT_NAME = "moneysweep-pr-export"
 
 STREAMS: tuple[tuple[str, str, str], ...] = (
-    ("entities", "entities.jsonl", "contract_sweeper_entity.schema.json"),
-    ("sources", "sources.jsonl", "contract_sweeper_source.schema.json"),
-    ("funding_awards", "funding_awards.jsonl", "contract_sweeper_funding_award.schema.json"),
-    ("transactions", "transactions.jsonl", "contract_sweeper_transaction.schema.json"),
-    ("relationships", "relationships.jsonl", "contract_sweeper_relationship.schema.json"),
+    ("entities", "entities.jsonl", "moneysweep_entity.schema.json"),
+    ("sources", "sources.jsonl", "moneysweep_source.schema.json"),
+    ("funding_awards", "funding_awards.jsonl", "moneysweep_funding_award.schema.json"),
+    ("transactions", "transactions.jsonl", "moneysweep_transaction.schema.json"),
+    ("relationships", "relationships.jsonl", "moneysweep_relationship.schema.json"),
 )
 
 
@@ -185,7 +185,7 @@ def build_package(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Build a Contract-Sweeper federation export package.",
+        description="Build a moneysweep-pr federation export package.",
     )
     parser.add_argument(
         "--input-dir",

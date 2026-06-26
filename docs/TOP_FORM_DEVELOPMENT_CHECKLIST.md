@@ -1,10 +1,10 @@
-# Contract-Sweeper Top-Form Development Checklist
+# moneysweep-pr Top-Form Development Checklist
 
 ## Purpose
 
-This document defines the production-complete target state for Contract-Sweeper.
+This document defines the production-complete target state for moneysweep-pr.
 
-A top-form Contract-Sweeper installation must ingest, normalize, validate, resolve, score, and export Puerto Rico public-money datasets across federal procurement, territorial contracts, municipal contracts, infrastructure, lobbying, campaign finance, debt, grants, public records, contractor-reference registries, and geospatial layers.
+A top-form moneysweep-pr installation must ingest, normalize, validate, resolve, score, and export Puerto Rico public-money datasets across federal procurement, territorial contracts, municipal contracts, infrastructure, lobbying, campaign finance, debt, grants, public records, contractor-reference registries, and geospatial layers.
 
 This document is a control artifact. It defines completion gates. It does not claim that the repository is currently production-complete.
 
@@ -189,7 +189,7 @@ Geographic outputs must distinguish vendor headquarters from place of performanc
 
 ## Production Complete Definition
 
-Contract-Sweeper is production-complete only when:
+moneysweep-pr is production-complete only when:
 
 1. Required sources are materialized or explicitly classified as blocked, manual-required, or auth-required.
 2. All required source schemas validate.

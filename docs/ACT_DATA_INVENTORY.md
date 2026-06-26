@@ -70,7 +70,7 @@ administration transition. ACT and ACUDEN both produce such reports.
 ## Resolved follow-ups
 
 - **Bilingual municipio normalizer rule.** ✅ Implemented in
-  `contract_sweeper.runtime.name_normalization`: `Municipio de X`,
+  `moneysweep.runtime.name_normalization`: `Municipio de X`,
   `Municipality of X`, and `Municipio Autónomo de X` now collapse to a canonical
   `MUNICIPIO <town>` form, bridging the Spanish/English variants across both
   source datasets without needing per-municipio alias entries. The audit

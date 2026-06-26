@@ -7,8 +7,8 @@ import csv
 import pandas as pd
 import pytest
 
-import contract_sweeper.runtime.risk_signals as rs
-import contract_sweeper.runtime.risk_signal_gates as rsg
+import moneysweep.runtime.risk_signals as rs
+import moneysweep.runtime.risk_signal_gates as rsg
 
 
 # ---------- Fixtures ----------

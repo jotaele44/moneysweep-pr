@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "manifest_type": "contract_finance_artifact_manifest",
   "producer": {
-    "repository": "jotaele44/Contract-Sweeper",
+    "repository": "jotaele44/moneysweep-pr",
     "branch": "main",
     "commit": "17c21ac2f3675895d890bf51a508167de50943c9",
     "producer_script": "scripts/run_contract_finance_geo_reasoning.py",

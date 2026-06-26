@@ -6,7 +6,7 @@ import csv
 import json
 from pathlib import Path
 
-from contract_sweeper.validation.source_coverage import SourceSpec, run_audit
+from moneysweep.validation.source_coverage import SourceSpec, run_audit
 
 
 def _write_json(path: Path, payload: dict) -> None:
@@ -125,7 +125,7 @@ def test_r3_audit_can_pass_with_full_coverage_for_custom_single_source(tmp_path:
     )
 
     monkeypatch.setattr(
-        "contract_sweeper.validation.source_coverage.SOURCE_SPECS",
+        "moneysweep.validation.source_coverage.SOURCE_SPECS",
         (
             SourceSpec(
                 source_system="single_source",

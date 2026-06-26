@@ -109,5 +109,5 @@ def test_build_manifest_emits_spiderweb_handshake():
     fed = manifest["federation"]
     assert fed["consumer_repo"] == "spiderweb-pr"
     assert fed["consumer_component"] == "query-hub"
-    assert fed["contract"] == "contract-sweeper-export"
-    assert fed["producer_repo"] == "contract-sweeper"
+    assert fed["contract"] == "moneysweep-pr-export"
+    assert fed["producer_repo"] == "moneysweep-pr"

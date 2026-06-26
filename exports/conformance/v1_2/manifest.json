@@ -5,48 +5,48 @@
   "federation": {
     "consumer_component": "query-hub",
     "consumer_repo": "spiderweb-pr",
-    "contract": "contract-sweeper-export",
-    "producer_repo": "contract-sweeper"
+    "contract": "moneysweep-pr-export",
+    "producer_repo": "moneysweep-pr"
   },
   "files": [
     {
       "filename": "entities.jsonl",
       "record_count": 2,
-      "schema_id": "contract_sweeper_entity.schema.json",
+      "schema_id": "moneysweep_entity.schema.json",
       "sha256": "8ca7a77234dd7e8fa925ae97478a4d09126e05557169211469d8a180fba4afa8",
       "stream": "entities"
     },
     {
       "filename": "sources.jsonl",
       "record_count": 1,
-      "schema_id": "contract_sweeper_source.schema.json",
+      "schema_id": "moneysweep_source.schema.json",
       "sha256": "cde13ebedc1dec2b841185fc2d3ab9a1eb3f4f68175ed0bb97ca6b0012a08697",
       "stream": "sources"
     },
     {
       "filename": "funding_awards.jsonl",
       "record_count": 2,
-      "schema_id": "contract_sweeper_funding_award.schema.json",
+      "schema_id": "moneysweep_funding_award.schema.json",
       "sha256": "bce15f574edb6cdece1fd2d5883751d777ad9614cfcf29537680b6f9e73b6f2b",
       "stream": "funding_awards"
     },
     {
       "filename": "transactions.jsonl",
       "record_count": 1,
-      "schema_id": "contract_sweeper_transaction.schema.json",
+      "schema_id": "moneysweep_transaction.schema.json",
       "sha256": "bc48c55d83480e0b51eb75c8c50a483c740c2e7c22a16edc7d8d9fe9446100c9",
       "stream": "transactions"
     },
     {
       "filename": "relationships.jsonl",
       "record_count": 1,
-      "schema_id": "contract_sweeper_relationship.schema.json",
+      "schema_id": "moneysweep_relationship.schema.json",
       "sha256": "417746f2ff70ee6e6ddace035462e09ce23a09d6f5e566ba22d9e2eba686e27a",
       "stream": "relationships"
     }
   ],
   "mode": "production",
   "package_id": "pkg_e255afeb6c8139bf632f376a4aad7d81",
-  "producer": "contract-sweeper",
+  "producer": "moneysweep-pr",
   "producer_version": "0.1.0"
 }

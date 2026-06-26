@@ -1,7 +1,7 @@
 # Repo Audit — R5 Foundation Snapshot
 
 **Generated**: 2026-05-11
-**Scope**: `/Users/jotaele/Documents/GitHub/Contract-Sweeper` plus sibling source folders.
+**Scope**: `/Users/jotaele/Documents/GitHub/moneysweep-pr` plus sibling source folders.
 **Auditor**: R5 takeover.
 
 This document is the narrative companion to `source_inventory.csv`,
@@ -34,7 +34,7 @@ ecosystem. The canonical outputs the mission requires are:
 
 **Zero of twelve canonical outputs exist.**
 
-## 2. Core code layer (`contract_sweeper/`)
+## 2. Core code layer (`moneysweep/`)
 
 50 modules across `pipeline/`, `risk/` (empty), `validation/`. The package is
 entirely backfill / freeze / unfreeze / recovery / blocker meta-orchestration
@@ -120,7 +120,7 @@ Real ingestion modules. Grouped:
 `influence_graph_builder`, `parent_collapse`, `manifest_runtime`,
 `source_registry`, `schema_registry`, `validation_gates` modules. R5 PR1
 ports these from the sibling Contract-Sweep repo and lands them in
-`contract_sweeper/runtime/`.
+`moneysweep/runtime/`.
 
 ## 5. Dependency stack
 
@@ -134,7 +134,7 @@ ports these from the sibling Contract-Sweep repo and lands them in
 `pytest.ini` markers: `unit`, `integration`, `pipeline_gate`,
 `non_executing`, `external`, `slow`.
 
-`Contract-Sweeper-Secrets/` (sibling, outside repo) holds `SAM_API_KEY.txt`,
+`moneysweep-pr-Secrets/` (sibling, outside repo) holds `SAM_API_KEY.txt`,
 `LDA_API_KEY.txt`, `HGOV_API_KEY.txt`, `FELT_API_KEY.txt`. **Never read or
 print these values**.
 
@@ -194,7 +194,7 @@ audit.
 ## 9. CI
 
 `.github/workflows/`:
-- `ci.yml` — `python -m compileall contract_sweeper tests` + `pytest -q`.
+- `ci.yml` — `python -m compileall moneysweep tests` + `pytest -q`.
 - `tests.yml` — matrix Python 3.10/3.11/3.12; `pytest tests/ -v`.
 - `production-status-gate.yml` — runs `scripts/run_production_status_gate.py`
   and enforces `data/exports/production_status.json` + `rebuild_status.json`.
@@ -204,8 +204,8 @@ audit.
 
 ## 10. Sibling & worktree state
 
-- `Contract-Sweeper-Secrets/`: 4 key files. Read-only.
-- `Contract-Sweeper-worktrees/`: 13 worktrees, mostly empty stubs of historical
+- `moneysweep-pr-Secrets/`: 4 key files. Read-only.
+- `moneysweep-pr-worktrees/`: 13 worktrees, mostly empty stubs of historical
   phase work. Safe to leave; cleanup deferred.
 - `Documents/Coding/Contract-Sweep/`: **the R5 foundation source**.
   Contains a working Contract Cradle hardening pass with
@@ -219,7 +219,7 @@ audit.
   plus pre-computed audit artifacts. Useful cross-reference.
 - `Documents/Coding/Contract-Sweer/` (typo): incomplete fork, drop later.
 - `PR.INT/`, `Downloads/Local Coding/PR-INT/`: separate PR intelligence
-  packages with their own pipelines. **Not** merged into Contract-Sweeper.
+  packages with their own pipelines. **Not** merged into moneysweep-pr.
 
 ## 11. Branch state
 

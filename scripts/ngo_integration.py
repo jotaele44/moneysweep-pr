@@ -1,4 +1,4 @@
-"""NGO / OSFL integration layer for Contract-Sweeper.
+"""NGO / OSFL integration layer for moneysweep-pr.
 
 This module adds a first-class NGO layer without changing the existing federal
 contract pipeline. It can run with partial source availability and always writes
@@ -1283,7 +1283,7 @@ def run_pipeline() -> dict[str, object]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Build NGO / OSFL integration layer for Contract-Sweeper"
+        description="Build NGO / OSFL integration layer for moneysweep-pr"
     )
     parser.add_argument("--schema-only", action="store_true", help="Write NGO schema files only")
     args = parser.parse_args()

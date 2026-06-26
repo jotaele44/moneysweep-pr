@@ -3,7 +3,7 @@
 ## Our pledge
 
 We as members, contributors, and maintainers pledge to make participation in the
-Contract-Sweeper community a welcoming, respectful, and harassment-free experience
+moneysweep-pr community a welcoming, respectful, and harassment-free experience
 for everyone, regardless of background or identity. We pledge to act and interact in
 ways that contribute to an open, diverse, and healthy community.
 

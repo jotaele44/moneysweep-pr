@@ -9,7 +9,7 @@ The guard reads the machine-readable project state and decides whether the
 current build may be promoted. It does **not** restrict ordinary diagnostic
 development: a normal pull request to `main` always passes.
 
-- Implementation: `contract_sweeper/validation/promotion_guard.py`
+- Implementation: `moneysweep/validation/promotion_guard.py`
 - CLI: `scripts/run_promotion_guard.py`
 - CI: `.github/workflows/promotion-guard.yml`
 - Tests: `tests/test_promotion_guard.py`

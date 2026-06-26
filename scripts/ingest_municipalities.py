@@ -27,8 +27,8 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.runtime.canonical_ids import municipality_id
-from contract_sweeper.runtime.name_normalization import normalize_name
+from moneysweep.runtime.canonical_ids import municipality_id
+from moneysweep.runtime.name_normalization import normalize_name
 from scripts.build_evidence import Evidence, make_evidence, merge_evidence
 
 REPO_ROOT = Path(__file__).resolve().parents[1]

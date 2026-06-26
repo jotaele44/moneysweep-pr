@@ -40,7 +40,7 @@ CENSUS_BASE = "https://api.census.gov"
 # Best-effort dataset + variables (confirm on first live run via the API discovery tool).
 CENSUS_DATASET = os.environ.get("CENSUS_DATASET", "data/timeseries/govs")
 CENSUS_VARS = os.environ.get("CENSUS_VARS", "NAME,AMOUNT,AGG_DESC")
-USER_AGENT = "ContractSweeper/1.0 (+https://github.com/jotaele44/Contract-Sweeper)"
+USER_AGENT = "ContractSweeper/1.0 (+https://github.com/jotaele44/moneysweep-pr)"
 MAX_RETRIES = 3
 RETRY_BACKOFF = (5, 15, 30)
 OUTPUT = "data/staging/processed/pr_census_gov_finances.csv"

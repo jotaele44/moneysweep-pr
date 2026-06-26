@@ -4,15 +4,15 @@ Generated alongside `repo_audit.md`. Sourced from the R5 mission spec.
 
 | Canonical module | Status |
 |---|---|
-| `contract_sweeper/runtime/source_registry.py` | present (R5 PR1) |
-| `contract_sweeper/runtime/schema_registry.py` | present (R5 PR1) |
-| `contract_sweeper/runtime/manifest_runtime.py` | present (R5 PR1) |
-| `contract_sweeper/runtime/validation_gates.py` | present (R5 PR1) |
-| `contract_sweeper/runtime/name_normalization.py` | present (R5 PR1) |
-| `contract_sweeper/runtime/linkage_confidence.py` | present (R5 PR1) |
-| `contract_sweeper/runtime/file_hash_runtime.py` | present (R5 PR1) |
-| `contract_sweeper/runtime/retry_runtime.py` | present (R5 PR1) |
-| `contract_sweeper/runtime/pagination_runtime.py` | present (R5 PR1) |
+| `moneysweep/runtime/source_registry.py` | present (R5 PR1) |
+| `moneysweep/runtime/schema_registry.py` | present (R5 PR1) |
+| `moneysweep/runtime/manifest_runtime.py` | present (R5 PR1) |
+| `moneysweep/runtime/validation_gates.py` | present (R5 PR1) |
+| `moneysweep/runtime/name_normalization.py` | present (R5 PR1) |
+| `moneysweep/runtime/linkage_confidence.py` | present (R5 PR1) |
+| `moneysweep/runtime/file_hash_runtime.py` | present (R5 PR1) |
+| `moneysweep/runtime/retry_runtime.py` | present (R5 PR1) |
+| `moneysweep/runtime/pagination_runtime.py` | present (R5 PR1) |
 | `scripts/scan_for_secrets.py` | present (R5 PR1) |
 | `scripts/alias_registry_builder.py` | missing — port in PR2/PR3 |
 | `scripts/parent_collapse.py` | missing — port in PR2/PR3 |

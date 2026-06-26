@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from contract_sweeper.validation.promotion_guard import (
+from moneysweep.validation.promotion_guard import (
     evaluate_promotion,
     run_guard,
 )

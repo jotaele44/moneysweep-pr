@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from contract_sweeper.runtime.canonical_ids import edge_id
-from contract_sweeper.validation import canonical_v1_schema as cv1
+from moneysweep.runtime.canonical_ids import edge_id
+from moneysweep.validation import canonical_v1_schema as cv1
 from scripts import build_edges as be
 
 REPO_ROOT = cv1.REPO_ROOT

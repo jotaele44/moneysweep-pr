@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from contract_sweeper.validation.production_status import (
+from moneysweep.validation.production_status import (
     STATUS_NON_PRODUCTION,
     STATUS_PARTIAL,
     STATUS_VALIDATED,

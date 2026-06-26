@@ -29,7 +29,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.validation.canonical_v1_schema import validate_row
+from moneysweep.validation.canonical_v1_schema import validate_row
 from scripts.run_contract_finance_geo_reasoning import (
     GEO_RESOLUTION_REASONS,
     JURISDICTION_CLASSES,

@@ -50,5 +50,5 @@ def test_pr_intake_router_hook_runs_existing_input(tmp_path):
     summary = json.loads((out_dir / "routing_summary.json").read_text(encoding="utf-8"))
     assert summary["zero_loss_pass"] is True
     assert summary["raw_item_count"] == 2
-    assert summary["contract_sweeper_derivative_count"] == 1
+    assert summary["moneysweep_derivative_count"] == 1
     assert summary["spiderweb_pr_derivative_count"] == 1

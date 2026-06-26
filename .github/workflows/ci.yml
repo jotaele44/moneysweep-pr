@@ -61,7 +61,7 @@ jobs:
         run: python -m pip install -r requirements.txt
 
       - name: Compile modules
-        run: python -m compileall contract_sweeper scripts tests
+        run: python -m compileall moneysweep scripts tests
 
       - name: Run tests
         run: pytest -q
@@ -78,7 +78,7 @@ jobs:
         run: python scripts/scan_for_secrets.py --root .
 
       - name: Run R5 validation gates (bootstrap mode)
-        run: python -m contract_sweeper.runtime.validation_gates --root . --allow-failed
+        run: python -m moneysweep.runtime.validation_gates --root . --allow-failed
 
       - name: Validate Canonical Entity Relationship Model v1 (bootstrap mode)
-        run: python -m contract_sweeper.validation.canonical_v1_schema --root . --allow-failed
+        run: python -m moneysweep.validation.canonical_v1_schema --root . --allow-failed

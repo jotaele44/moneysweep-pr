@@ -1,4 +1,4 @@
-# System Architecture — Contract-Sweeper
+# System Architecture — moneysweep-pr
 
 **Version:** R5 (post PR64)  
 **Status:** Pipeline complete; production rebuild paused pending source delivery
@@ -7,7 +7,7 @@
 
 ## Overview
 
-Contract-Sweeper is a multi-stage data pipeline that ingests 80+ public and semi-public data sources, normalizes entities, resolves vendor identities, links cross-program funding flows, and produces compliance analysis and influence graphs for Puerto Rico government procurement.
+moneysweep-pr is a multi-stage data pipeline that ingests 80+ public and semi-public data sources, normalizes entities, resolves vendor identities, links cross-program funding flows, and produces compliance analysis and influence graphs for Puerto Rico government procurement.
 
 ```
 [Data Sources] → INGEST → NORMALIZE → RESOLVE → LINK → GRAPH/VALIDATE → EXPORT
@@ -20,7 +20,7 @@ Contract-Sweeper is a multi-stage data pipeline that ingests 80+ public and semi
 Issue #69 proposes migrating to this directory structure:
 
 ```
-contract_sweeper/
+moneysweep/
 ├── sources/          # Source definitions and registries
 ├── ingest/           # Per-source downloaders and ingesters
 ├── normalize/        # Column mapping, deduplication, standardization
@@ -33,13 +33,13 @@ contract_sweeper/
 └── orchestration/    # run_all.py, pipeline runners, backfill logic
 ```
 
-Current state: all code lives in `scripts/` and `contract_sweeper/pipeline|runtime|validation/`. Migration is **not started** (awaiting Architect approval via Issue #69).
+Current state: all code lives in `scripts/` and `moneysweep/pipeline|runtime|validation/`. Migration is **not started** (awaiting Architect approval via Issue #69).
 
 ---
 
 ## Current Directory Layout
 
-### `contract_sweeper/` — Core Package
+### `moneysweep/` — Core Package
 
 | Subpackage | Files | Role |
 |-----------|-------|------|
@@ -99,8 +99,8 @@ Current state: all code lives in `scripts/` and `contract_sweeper/pipeline|runti
    → reports/*.md
 
 7. VALIDATE
-   contract_sweeper/validation/*.py
-   contract_sweeper/runtime/validation_gates.py
+   moneysweep/validation/*.py
+   moneysweep/runtime/validation_gates.py
    → data/exports/rebuild_status.json
    → reports/gap_analysis_report.csv
 
@@ -125,7 +125,7 @@ Current state: all code lives in `scripts/` and `contract_sweeper/pipeline|runti
 
 ## Validation Gate System
 
-Gates live in `contract_sweeper/runtime/validation_gates.py`. Each gate is a named check that must return `PASS` before downstream phases can run.
+Gates live in `moneysweep/runtime/validation_gates.py`. Each gate is a named check that must return `PASS` before downstream phases can run.
 
 Active gates (R5):
 - `source_coverage_rate` — ≥85% of required sources materialized

@@ -32,7 +32,7 @@ HIGH_VALUE_OBLIGATION_THRESHOLD = 1_000_000_000.0  # $1B marks critical sources
 
 def _read_registry(root: Path) -> list[dict]:
     try:
-        from contract_sweeper.runtime.source_registry import load_source_registry
+        from moneysweep.runtime.source_registry import load_source_registry
 
         return load_source_registry(root).get("sources", [])
     except Exception:

@@ -16,8 +16,8 @@ Source surface (committed, public, non-PII, deterministic — no network):
     ``agency`` (→ government_agency) or ``utility`` (→ public_corporation).
   * ``data/reference/pr_municipalities.csv`` — the 78 municipios (→ municipality).
 
-Reuses the deterministic ID helper in ``contract_sweeper.runtime`` and the stdlib
-schema validator in ``contract_sweeper.validation.canonical_v1_schema`` (no
+Reuses the deterministic ID helper in ``moneysweep.runtime`` and the stdlib
+schema validator in ``moneysweep.validation.canonical_v1_schema`` (no
 ``jsonschema`` dep).
 
 CLI::
@@ -38,8 +38,8 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.runtime.canonical_ids import name_hash
-from contract_sweeper.validation.canonical_v1_schema import validate_row
+from moneysweep.runtime.canonical_ids import name_hash
+from moneysweep.validation.canonical_v1_schema import validate_row
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_MONEY = "data/reference/pr_public_money_entities.csv"

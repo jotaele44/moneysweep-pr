@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from contract_sweeper.query.entity_types import (
+from moneysweep.query.entity_types import (
     SUPPORTED_KINDS,
     EntityIdentifier,
     EntityQuery,

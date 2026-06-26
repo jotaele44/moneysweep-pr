@@ -31,7 +31,7 @@ repos:
       - id: regenerate-registry-json
         name: Regenerate registries/*.json from YAML (audit Phase 2)
         # Runs only when a registry YAML changes. The script overwrites the
-        # paired JSON; runtime modules under contract_sweeper.runtime.* read the
+        # paired JSON; runtime modules under moneysweep.runtime.* read the
         # JSON, so this hook is what keeps the wire format in sync with the
         # YAML source of truth. See registries/README.md for the policy.
         entry: python3 scripts/regenerate_registry_json.py
@@ -62,7 +62,7 @@ repos:
         name: mypy (narrow-scope gate, runtime/ only)
         # Audit #10 — INTENTIONALLY BLOCKING within a narrow scope. The hook
         # fails the commit if mypy reports any error in a changed file under
-        # contract_sweeper/runtime/. The audit recommendation originally read
+        # moneysweep/runtime/. The audit recommendation originally read
         # "non-blocking start"; this hook implements that as "blocking on a
         # narrow surface" rather than "report-only everywhere" because a
         # pre-commit hook that never blocks is just noise (the existing
@@ -75,7 +75,7 @@ repos:
           - --ignore-missing-imports
           - --no-strict-optional
           - --follow-imports=silent
-        files: ^contract_sweeper/runtime/
+        files: ^moneysweep/runtime/
         pass_filenames: true
         additional_dependencies:
           - types-PyYAML

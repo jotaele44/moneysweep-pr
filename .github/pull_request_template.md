@@ -23,7 +23,7 @@ docs/BUILD_EXECUTION_SEQUENCE.md or the issue it closes. -->
 
 - [ ] Single-purpose; no unrelated changes
 - [ ] No runtime/behavior change, **or** behavior change is covered by tests
-- [ ] Touches the federation contract (`schemas/`, `contract_sweeper/federation/`)? If so, flagged for maintainer + `spiderweb-pr` coordination
+- [ ] Touches the federation contract (`schemas/`, `moneysweep/federation/`)? If so, flagged for maintainer + `spiderweb-pr` coordination
 
 ## Verification
 

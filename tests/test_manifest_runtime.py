@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from contract_sweeper.runtime import manifest_runtime as mr
+from moneysweep.runtime import manifest_runtime as mr
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "r5"
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from contract_sweeper.runtime.linkage_confidence import (
+from moneysweep.runtime.linkage_confidence import (
     LinkSignals,
     requires_manual_review,
     score_subaward_link,

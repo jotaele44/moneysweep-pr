@@ -2,7 +2,7 @@ version: "1.0"
 schema_version: "r5_manual_export_registry_v1"
 
 # Operator-supplied exports for credentialed portals.
-# No automated credentialed scraping is performed by Contract-Sweeper.
+# No automated credentialed scraping is performed by moneysweep-pr.
 # The operator drops files into expected_drop_dir; the ingester reads from there.
 
 manual_exports:

@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from contract_sweeper.runtime.geo_attribution import (
+from moneysweep.runtime.geo_attribution import (
     GEO_COLUMNS,
     attribute_geo,
     attribution_summary,

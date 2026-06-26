@@ -22,14 +22,14 @@ after** every box below is checked.
 1. **Structural preflight is green.** `python3 run_all.py --only-setup
    --strict-preflight` exits 0 (run in CI by the production-status gate).
 2. **Source coverage meets target.** `python -m
-   contract_sweeper.runtime.validation_gates --root .` shows
+   moneysweep.runtime.validation_gates --root .` shows
    `source_coverage_rate` ≥ its threshold (currently 0.85) with required sources
    materialized — not the bootstrap empty state.
 3. **Validation gates pass on real data.** The R5 gates (entity resolution,
    entity-type assignment, corporate parent UEI, linkage, duplicate rate,
    secret-leakage-zero) pass without `--allow-failed`.
 4. **Risk-signal gates pass.** `python -m
-   contract_sweeper.runtime.risk_signal_gates --root .` exits 0.
+   moneysweep.runtime.risk_signal_gates --root .` exits 0.
 5. **Federation conformance is fresh.** `tests/test_conformance_fixture_freshness.py`
    passes — the committed export package matches its manifest and the contract
    version is consistent across the manifest/sample/schema.

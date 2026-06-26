@@ -1,11 +1,11 @@
-# Contract-Sweeper — Code Gap Analysis & Repo Workflow Audit
+# moneysweep-pr — Code Gap Analysis & Repo Workflow Audit
 
 > **⚠️ Retired (2026-06-16).** Every finding in this audit (A1, A2/B5, A3, B1, B2, B3,
 > B4, B6) has been resolved or mitigated on `main`. Now in place: the quality-gate spine
 > (`ruff` + `mypy` gating, `pytest --cov-fail-under`), governance files (CONTRIBUTING /
 > CODE_OF_CONDUCT / LICENSE / CODEOWNERS / PR template), `.github/dependabot.yml`,
 > `CHANGELOG.md` + `.github/workflows/release-tag.yml`, the narrowed `except` in
-> `contract_sweeper/runtime/validation_gates.py`, and the large-blob posture
+> `moneysweep/runtime/validation_gates.py`, and the large-blob posture
 > (`docs/HISTORY_PURGE_PLAN.md` + `.github/workflows/size-guard.yml`). This file is
 > retained for historical reference only — see `CHANGELOG.md` and
 > `docs/BUILD_EXECUTION_SEQUENCE.md` (Waves A–M) for the authoritative record. Tracked by #260.
@@ -25,9 +25,9 @@ This audit is a **code/engineering** gap analysis. It is distinct from
 
 | Metric | Value |
 |--------|-------|
-| Source modules (`contract_sweeper/`) | ~84 |
-| `contract_sweeper/pipeline/` modules | 28 |
-| `contract_sweeper/query/adapters/` modules | 21 |
+| Source modules (`moneysweep/`) | ~84 |
+| `moneysweep/pipeline/` modules | 28 |
+| `moneysweep/query/adapters/` modules | 21 |
 | Test files (`tests/`) | 154 |
 | Last full suite | 1229 passed · 5 skipped · 0 failed (2026-06-01) |
 | CI workflows (`.github/workflows/`) | 11 |
@@ -57,10 +57,10 @@ The suite is large but concentrated in registry/gate/export logic. The
 credential- and filesystem-handling surface is thin on direct tests:
 
 - **Pipeline: ~3 of 28 modules have dedicated tests.** Untested, high-risk modules:
-  - `contract_sweeper/pipeline/credentialed_endpoint_execution.py` (547 LOC) — handles API credentials/endpoints
-  - `contract_sweeper/pipeline/manual_import_dropzone.py` (459 LOC) — ingests operator-supplied files
-  - `contract_sweeper/pipeline/source_materialization.py` (408 LOC)
-  - `contract_sweeper/pipeline/scoped_unfreeze_materialization.py` (435 LOC)
+  - `moneysweep/pipeline/credentialed_endpoint_execution.py` (547 LOC) — handles API credentials/endpoints
+  - `moneysweep/pipeline/manual_import_dropzone.py` (459 LOC) — ingests operator-supplied files
+  - `moneysweep/pipeline/source_materialization.py` (408 LOC)
+  - `moneysweep/pipeline/scoped_unfreeze_materialization.py` (435 LOC)
 - **Query adapters: 4 adapter test files** (`test_query_adapters.py`,
   `test_query_adapters_benefits.py`, `test_query_adapters_cms.py`,
   `test_query_entity_adapters.py`) cover a subset of the 21 adapters. External-API
@@ -79,7 +79,7 @@ adapters. These are the paths where an untested edge case has real blast radius.
 - No `ruff`/`flake8`/`black`/`isort` config anywhere; style/lint is unenforced.
 - `mypy` runs in CI but as a **non-gating** check (`.github/workflows/mypy.yml`
   sets `continue-on-error: true`), and the pre-commit mypy hook is scoped to
-  `contract_sweeper/runtime/` only — `scripts/`, `tests/`, and `pipeline/` are
+  `moneysweep/runtime/` only — `scripts/`, `tests/`, and `pipeline/` are
   excluded (`pyproject.toml` `exclude = "(^archive/|^scripts/|tests/)"`).
 - `pytest-cov` is configured (`pytest.ini`) but there is **no coverage threshold
   gate** (`--cov-fail-under`), so coverage can regress silently.
@@ -89,7 +89,7 @@ baseline is clean, flip `mypy.yml` to gating and widen scope; add a modest
 `--cov-fail-under` floor to lock in current coverage.
 
 ### A3 — Broad exception swallowing in a shared helper (priority: low)
-`contract_sweeper/runtime/validation_gates.py` (~lines 76–80) reads CSVs under a
+`moneysweep/runtime/validation_gates.py` (~lines 76–80) reads CSVs under a
 bare `except Exception: return []`. A malformed/locked file is indistinguishable
 from an empty one, which can let a validation gate pass on absent data.
 
@@ -99,7 +99,7 @@ _Recommendation:_ narrow to the expected I/O/parse exceptions and log the cause.
 Recorded here so they are not mistaken for gaps:
 - NARA NextGen / NARA v3 are `deferred_stub` (awaiting credential/allowlist);
   `scripts/download_nara_nextgen.py` is a deliberate no-op so strict preflight passes.
-- 56 of the registered sources fall back to `contract_sweeper/query/adapters/_stub.py`
+- 56 of the registered sources fall back to `moneysweep/query/adapters/_stub.py`
   (`NotImplementedAdapter`) for on-demand `.query()`; the production pipeline is unaffected.
 - `scripts/enrichment/enrich_financialdata_entities.py:284` — live mode is an
   intentional deferred stub.
@@ -115,11 +115,11 @@ Recorded here so they are not mistaken for gaps:
 > cross-repo contracts**, so they legitimately differ:
 > - `scripts/build_export_package.py:33` → `1.2.0` — the **federation export package
 >   manifest** (entities/sources/funding_awards/transactions/relationships → `spiderweb-pr`
->   query-hub). Validated by `schemas/contract_sweeper_export_manifest.schema.json`
+>   query-hub). Validated by `schemas/moneysweep_export_manifest.schema.json`
 >   (`const: "1.2.0"`) and asserted in `tests/test_run_export.py`.
-> - `readiness/contract_sweeper_finance_lane.py:28` → `1.0.0` — the **PR-intake finance
->   lane** (issue #114), a different boundary that consumes `contract_sweeper_derivatives.csv`
->   and emits its own report (`contract_sweeper_finance_lane_report.json`,
+> - `readiness/moneysweep_finance_lane.py:28` → `1.0.0` — the **PR-intake finance
+>   lane** (issue #114), a different boundary that consumes `moneysweep_derivatives.csv`
+>   and emits its own report (`moneysweep_finance_lane_report.json`,
 >   `"producer": "pr-intake-router"`). It never references the federation manifest schema.
 >
 > Forcing the finance lane to `1.2.0` would therefore have **corrupted a correct version**.
@@ -127,7 +127,7 @@ Recorded here so they are not mistaken for gaps:
 
 The **real, smaller** residual gap: the finance-lane report has **no JSON Schema** and no
 test validating its shape/version, whereas the federation package does. _Recommendation:_
-add `schemas/contract_sweeper_finance_lane_report.schema.json` + a test that validates the
+add `schemas/moneysweep_finance_lane_report.schema.json` + a test that validates the
 emitted report and asserts `export_contract_version == "1.0.0"`, and add a one-line
 provenance comment at each constant naming which contract it versions (so the two are never
 again mistaken for one). Tracked as WAVE E in `docs/BUILD_EXECUTION_SEQUENCE.md`.

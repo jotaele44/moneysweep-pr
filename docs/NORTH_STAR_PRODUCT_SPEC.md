@@ -1,7 +1,7 @@
 # NORTH STAR PRODUCT SPEC
 
 ## Product Definition
-Contract-Sweeper is a provenance-first Puerto Rico Public-Money Reconstruction and Infrastructure Control Graph platform that converts public contract, grant, infrastructure, finance, lobbying, political, permit, and asset records into validated master tables, execution chains, GIS-linked assets, graph outputs, probabilistic risk signals, and complete-output validation dashboards.
+moneysweep-pr is a provenance-first Puerto Rico Public-Money Reconstruction and Infrastructure Control Graph platform that converts public contract, grant, infrastructure, finance, lobbying, political, permit, and asset records into validated master tables, execution chains, GIS-linked assets, graph outputs, probabilistic risk signals, and complete-output validation dashboards.
 
 ## Platform Intent
 - Produce reproducible, source-traceable master datasets.

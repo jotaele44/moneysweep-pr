@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check outbound HTTPS egress for Contract-Sweeper materialization.
+"""Check outbound HTTPS egress for moneysweep-pr materialization.
 
 This script is intentionally non-mutating:
 - no producers are executed
@@ -60,7 +60,7 @@ def check_https_endpoint(url: str, timeout: float = 5.0) -> EgressCheck:
                     (
                         f"HEAD {parsed.path or '/'} HTTP/1.1\r\n"
                         f"Host: {host}\r\n"
-                        "User-Agent: Contract-Sweeper-Egress-Check/1.0\r\n"
+                        "User-Agent: moneysweep-pr-Egress-Check/1.0\r\n"
                         "Connection: close\r\n\r\n"
                     ).encode("ascii")
                 )

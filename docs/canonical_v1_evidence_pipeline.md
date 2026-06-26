@@ -1,7 +1,7 @@
 # Canonical v1 — Evidence Pipeline
 
 **Status:** foundation (WS-C of the 300-task roadmap)
-**Code:** `scripts/build_evidence.py`, `contract_sweeper/runtime/evidence_tiers.py`
+**Code:** `scripts/build_evidence.py`, `moneysweep/runtime/evidence_tiers.py`
 **Schema:** `schemas/canonical_v1/evidence.schema.json`
 
 Evidence is **first-class** in the Canonical Entity Relationship Model v1: every
@@ -26,7 +26,7 @@ records; network/PDF-binary acquisition is handled by the per-source ingesters
 ## Deterministic IDs
 
 `evidence_id = evidence_<source>_<ref>_<hash>` via
-`contract_sweeper.runtime.canonical_ids.evidence_id(source, ref, payload)`.
+`moneysweep.runtime.canonical_ids.evidence_id(source, ref, payload)`.
 Identical (source, ref, claim) → identical id, so dedup is exact and re-runs are
 idempotent. `dedupe_evidence()` keeps the highest-confidence row per id.
 

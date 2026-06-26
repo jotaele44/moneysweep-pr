@@ -4,8 +4,8 @@ import re
 
 import pytest
 
-from contract_sweeper.runtime import canonical_ids as cid
-from contract_sweeper.runtime.name_normalization import normalize_person_name
+from moneysweep.runtime import canonical_ids as cid
+from moneysweep.runtime.name_normalization import normalize_person_name
 
 ID_PATTERNS = {
     "person": r"^person_[A-Za-z0-9_]+$",
