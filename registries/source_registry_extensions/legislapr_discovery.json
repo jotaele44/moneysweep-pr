@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "schema_version": "r5_source_registry_extension_v1",
+  "sources": [
+    {
+      "source_id": "legislapr_discovery",
+      "family": "territorial_legislation",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.legislapr.com/",
+      "producer_script": "scripts/probe_legislapr_detail.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_legislapr_measures_probe.json"
+      ],
+      "schema_version": "legislative_measure_v1",
+      "validation_threshold": {
+        "min_rows": 1,
+        "cross_confirmation_required": true,
+        "canonical_sources_required": [
+          "openstates",
+          "sutra_oslpr"
+        ]
+      },
+      "update_cadence": "weekly",
+      "tier": "T2_operational",
+      "role": "legislative_discovery_enrichment",
+      "promotion_rule": "cross_confirmed_only",
+      "canonical_source_required": true,
+      "canonical_sources": [
+        "OpenStates",
+        "Asamblea Legislativa de Puerto Rico / SUTRA OSLPR"
+      ],
+      "notes": "LegislaPR is a public legislative discovery and enrichment surface for Puerto Rico measures. Treat extracted summaries/pros/cons as non-authoritative. Promote only when the measure is cross-confirmed against OpenStates and official Assembly/SUTRA links."
+    }
+  ]
+}
