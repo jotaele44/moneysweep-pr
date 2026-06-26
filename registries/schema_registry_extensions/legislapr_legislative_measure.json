@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "schema_version": "r5_schema_registry_extension_v1",
+  "canonical_tables": {
+    "legislative_measures": {
+      "primary_key": ["measure_id", "source_system"],
+      "description": "Puerto Rico legislative measures discovered through LegislaPR and promoted only after OpenStates plus official Assembly/SUTRA confirmation.",
+      "columns": [
+        {"name": "measure_id", "dtype": "string", "required": true, "description": "Canonical Puerto Rico legislative identifier, for example PS 782 or PC 123."},
+        {"name": "measure_type", "dtype": "string", "required": false, "description": "Bill, joint resolution, concurrent resolution, simple resolution, nomination, or other measure type when extractable."},
+        {"name": "chamber", "dtype": "string", "required": false, "description": "House, Senate, or other chamber label when extractable."},
+        {"name": "session", "dtype": "string", "required": false, "description": "Legislative session label when extractable."},
+        {"name": "status", "dtype": "string", "required": false, "description": "Current legislative status shown on the discovery page."},
+        {"name": "title", "dtype": "string", "required": false, "description": "Human-readable measure title or caption."},
+        {"name": "summary", "dtype": "string", "required": false, "description": "Discovery summary; non-authoritative unless corroborated by official text."},
+        {"name": "authors", "dtype": "string", "required": false, "description": "JSON array of listed authors/sponsors when extractable."},
+        {"name": "document_urls", "dtype": "string", "required": false, "description": "JSON array of measure document URLs discovered on the page."},
+        {"name": "openstates_url", "dtype": "string", "required": false, "description": "OpenStates cross-confirmation URL."},
+        {"name": "sutra_url", "dtype": "string", "required": false, "description": "Official Assembly/SUTRA text URL."},
+        {"name": "fiscal_language_detected", "dtype": "bool", "required": true, "description": "True when appropriation, budget, allocation, contract, emergency, bond, or public-corporation fiscal language is detected."},
+        {"name": "promotion_status", "dtype": "string", "required": true, "description": "blocked_pending_canonical_confirmation | cross_confirmed_candidate | promoted."},
+        {"name": "source_system", "dtype": "string", "required": true, "description": "Expected value: legislapr_discovery."},
+        {"name": "source_url", "dtype": "string", "required": true, "description": "LegislaPR detail page URL."},
+        {"name": "extraction_confidence", "dtype": "float64", "required": true, "description": "0.0-1.0 confidence based on direct field extraction and canonical-link coverage."},
+        {"name": "ingestion_timestamp", "dtype": "timestamp", "required": true, "description": "UTC ISO ingest time."}
+      ]
+    }
+  }
+}
