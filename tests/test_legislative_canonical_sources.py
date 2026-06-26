@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import json
+
 from scripts.fetch_legislative_canonical_sources import (
     _compact_measure_id,
     _spaced_measure_id,
     build_canonical_record,
+    run,
 )
 
 
@@ -46,3 +49,35 @@ def test_build_canonical_record_promotes_cross_confirmed_candidate(monkeypatch):
     assert row.official_document_confirmed is True
     assert row.canonical_confirmation_status == "cross_confirmed"
     assert row.promotion_status == "promoted_candidate"
+
+
+def test_run_writes_canonical_output_without_network(tmp_path, monkeypatch):
+    monkeypatch.setattr("scripts.fetch_legislative_canonical_sources._url_exists", lambda url: True)
+    input_path = tmp_path / "input.json"
+    output_path = tmp_path / "output.json"
+    input_path.write_text(
+        json.dumps(
+            [
+                {
+                    "measure_id": "PS782",
+                    "source_url": "https://www.legislapr.com/bills/PS%20782",
+                    "openstates_url": "https://openstates.org/pr/bills/2025-2028/PS782/",
+                    "sutra_url": "https://sutra.oslpr.org/medidas/ps0782-25.doc",
+                    "title": "Fiscal measure",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    result = run(
+        root=tmp_path,
+        input_path="input.json",
+        output_path="output.json",
+        api_key=None,
+        allow_missing_key=True,
+    )
+    assert result["status"] == "OK"
+    assert result["promoted_candidates"] == 1
+    rows = json.loads(output_path.read_text(encoding="utf-8"))
+    assert rows[0]["promotion_status"] == "promoted_candidate"
