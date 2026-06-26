@@ -25,6 +25,8 @@ LegislaPR is useful for fast legislative discovery because it exposes Puerto Ric
 
 LegislaPR remains T2 because it is a discovery/readability layer rather than the canonical government record. MoneySweep promotes only records cross-confirmed against OpenStates and official Puerto Rico Legislative Assembly/SUTRA document links.
 
+OpenStates API v3 is the canonical structured legislative route used here. Its root URL is `https://v3.openstates.org/`, API keys are required, and keys may be supplied through the `X-API-KEY` header or `apikey` query parameter. This repo uses the header route only.
+
 ## Extraction model
 
 ```text
