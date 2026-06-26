@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 from scripts.fetch_legislative_canonical_sources import (
+    _as_string_list,
     _compact_measure_id,
     _spaced_measure_id,
     build_canonical_record,
@@ -15,6 +16,12 @@ def test_measure_id_helpers_normalize_pr_identifiers():
     assert _compact_measure_id("P del C 123") == "PC123"
     assert _spaced_measure_id("PS782") == "PS 782"
     assert _spaced_measure_id("pc-1207") == "PC 1207"
+
+
+def test_as_string_list_preserves_scalar_values():
+    assert _as_string_list("bill") == ["bill"]
+    assert _as_string_list(["bill", "resolution"]) == ["bill", "resolution"]
+    assert _as_string_list(None) == []
 
 
 def test_build_canonical_record_blocks_without_official_confirmation(monkeypatch):
