@@ -108,7 +108,7 @@ python scripts/build_osl_sutra_crosswalk.py \
 
 ## Validation
 
-Static GitHub inspection confirms registered producer paths exist, expected outputs are repo-relative, authentication modes match the source-registry validator, and the link builders now have non-network tests for measure/session normalization, scalar/list parsing, promotion gating, crosswalk writing, and registry merge dedupe. GitHub metadata reported the branch as mergeable before this final documentation-only commit. Local pytest execution must still be run in a checkout or CI runner before merge.
+Static GitHub inspection confirms registered producer paths exist, expected outputs are repo-relative, authentication modes match the source-registry validator, and the link builders now have non-network tests for measure/session normalization, scalar/list parsing, promotion gating, crosswalk writing, and registry merge dedupe. GitHub metadata reports the branch as mergeable. Local pytest execution must still be run in a checkout or CI runner before merge.
 
 ```bash
 python -m pytest tests/test_legislapr_discovery.py tests/test_legislapr_discovery_probe.py tests/test_legislative_canonical_sources.py tests/test_legislative_link_builders.py tests/test_source_registry.py -q
