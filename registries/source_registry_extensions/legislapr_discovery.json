@@ -82,28 +82,52 @@
       "notes": "Canonical confirmation layer for LegislaPR discovery candidates. Uses OpenStates API v3 and official Assembly/SUTRA document links; requires OPENSTATES_API_KEY unless running in explicit SUTRA-only audit mode."
     },
     {
-      "source_id": "osl_sutra_crosswalk",
+      "source_id": "legislative_document_crosswalk",
       "family": "territorial_legislation",
       "required": false,
       "authentication": "none",
       "endpoint_url": "",
-      "producer_script": "scripts/build_osl_sutra_crosswalk.py",
+      "producer_script": "scripts/build_legislative_document_crosswalk.py",
       "expected_outputs": [
-        "data/staging/processed/pr_osl_sutra_crosswalk.json"
+        "data/staging/processed/pr_legislative_document_crosswalk.csv"
       ],
       "schema_version": "legislative_crosswalk_v1",
       "validation_threshold": {
         "min_rows": 1,
-        "high_confidence_rate_pct": 0.0
+        "ready_rate_pct": 0.0
       },
       "update_cadence": "weekly",
       "tier": "T2_operational",
-      "role": "openstates_sutra_link_crosswalk",
+      "role": "openstates_official_document_crosswalk",
       "depends_on": [
         "legislapr_discovery",
         "legislative_canonical_sources"
       ],
-      "notes": "Deterministic OpenStates-to-official Assembly/SUTRA crosswalk. No network calls; link confidence is based on discovered canonical URLs and confirmation status."
+      "notes": "Deterministic OpenStates-to-official Assembly document crosswalk. No network calls; readiness is based on discovered canonical URLs and confirmation status."
+    },
+    {
+      "source_id": "legislative_fiscal_link_candidates",
+      "family": "territorial_legislation",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "",
+      "producer_script": "scripts/build_legislative_links.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_legislative_fiscal_link_candidates.csv"
+      ],
+      "schema_version": "legislative_link_candidate_v1",
+      "validation_threshold": {
+        "min_rows": 1,
+        "manual_review_required": true
+      },
+      "update_cadence": "weekly",
+      "tier": "T2_operational",
+      "role": "legislative_to_fiscal_candidate_links",
+      "depends_on": [
+        "legislapr_discovery",
+        "contracts_master"
+      ],
+      "notes": "Manual-review candidate queue linking legislative measures to fiscal records through conservative fiscal terms and agency or municipality text alignment."
     }
   ]
 }
