@@ -103,12 +103,23 @@ def test_legislapr_legislative_sources_are_loaded():
     assert discovery["producer_script"] == "scripts/probe_legislapr_detail.py"
     assert discovery["promotion_rule"] == "cross_confirmed_only"
 
+    sessions = sr.source_by_id("legislapr_sessions", REPO_ROOT)
+    assert sessions is not None
+    assert sessions["producer_script"] == "scripts/ingest_legislapr_sessions.py"
+    assert sessions["depends_on"] == ["legislapr_discovery"]
+
     canonical = sr.source_by_id("legislative_canonical_sources", REPO_ROOT)
     assert canonical is not None
     assert canonical["family"] == "territorial_legislation"
     assert canonical["authentication"] == "api_key:OPENSTATES_API_KEY"
     assert canonical["producer_script"] == "scripts/fetch_legislative_canonical_sources.py"
     assert canonical["depends_on"] == ["legislapr_discovery"]
+
+    crosswalk = sr.source_by_id("osl_sutra_crosswalk", REPO_ROOT)
+    assert crosswalk is not None
+    assert crosswalk["authentication"] == "none"
+    assert crosswalk["producer_script"] == "scripts/build_osl_sutra_crosswalk.py"
+    assert crosswalk["depends_on"] == ["legislapr_discovery", "legislative_canonical_sources"]
 
 
 @pytest.mark.unit
