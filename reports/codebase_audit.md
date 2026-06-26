@@ -1,4 +1,4 @@
-# Contract-Sweeper — Codebase Consistency Audit
+# moneysweep-pr — Codebase Consistency Audit
 
 _Generated 2026-06-06. Reconcile-and-extend over [RECOMMENDATIONS.md](../RECOMMENDATIONS.md)._
 
@@ -17,7 +17,7 @@ already stale and were not reused for quantitative claims.
 | `download_*.py` | 69 / 74 | **70** | +1 |
 | Total `scripts/*.py` | 158 / 165 | **199** | +34 |
 | `ingest_*.py` | — / 11 | **23** | +12 |
-| `contract_sweeper/pipeline/` files | ~42 | **42** | 0 |
+| `moneysweep/pipeline/` files | ~42 | **42** | 0 |
 | `tests/test_*.py` | 106 | **161** | +55 |
 | `docs/*.md` | — | **56** (top level) | — |
 | `reports/` artifacts | — | **38** | — |
@@ -34,16 +34,16 @@ while the structural debt items from RECOMMENDATIONS.md only partially landed.
 |---|---|---|---|
 | 1 | Purge ~89 MB data blobs from git history | **Open** | `git ls-files data/raw/follow_the_money/` returns 5+ tracked CSVs (`EP_PR_PRBank_Summary_ByAccount.csv`, `..._ByEntity.csv`, `..._ByYear.csv`, `..._Wire_Ledger_ALL.csv`, `Municipal_Blind_Score_CORE6.csv`). History rewrite not done. |
 | 2 | Tighten `.gitignore` to `data/**` allowlist | **Open** | `.gitignore` still uses path-by-path globs (`data/staging/processed/**`, `data/staging/raw/**/*.csv`, `data/raw/*.csv`, plus explicit named files), not the deny-all `data/**` + allowlist form RECS proposed. |
-| 3 | Archive `contract_sweeper/pipeline/` one-shots | **Open** | Still 42 files; all `backfill_*`, `*_retry`, `partial_*_rebuild` files remain. |
-| 4 | Extract `BaseDownloader` | **Partial** | PR [#201](https://github.com/jotaele44/Contract-Sweeper/pull/201) shipped + migrated 10. **60 downloaders still hand-rolled** (see Downloader Drift below). |
-| 5 | Decompose `run_all.py` | **Partial** | PR [#202](https://github.com/jotaele44/Contract-Sweeper/pull/202) extracted CLI (16.7 KB) and support (7.7 KB) into `contract_sweeper/orchestrator/`. `run_all.py` is still **1857 LOC / 90 KB** — most of the body is unmoved. |
+| 3 | Archive `moneysweep/pipeline/` one-shots | **Open** | Still 42 files; all `backfill_*`, `*_retry`, `partial_*_rebuild` files remain. |
+| 4 | Extract `BaseDownloader` | **Partial** | PR [#201](https://github.com/jotaele44/moneysweep-pr/pull/201) shipped + migrated 10. **60 downloaders still hand-rolled** (see Downloader Drift below). |
+| 5 | Decompose `run_all.py` | **Partial** | PR [#202](https://github.com/jotaele44/moneysweep-pr/pull/202) extracted CLI (16.7 KB) and support (7.7 KB) into `moneysweep/orchestrator/`. `run_all.py` is still **1857 LOC / 90 KB** — most of the body is unmoved. |
 | 6 | Rename round-suffixed tests | **Open** | 19 tests still match `test_*_r4[0-9][a-z]*.py`. |
-| 7 | Normalize space-named data dirs to snake_case | **Done** | PR [#200](https://github.com/jotaele44/Contract-Sweeper/pull/200) (commit `75b276b` cites "RECOMMENDATIONS #7" in its message). |
+| 7 | Normalize space-named data dirs to snake_case | **Done** | PR [#200](https://github.com/jotaele44/moneysweep-pr/pull/200) (commit `75b276b` cites "RECOMMENDATIONS #7" in its message). |
 | 8 | Add mypy + lockfile | **Partial** | `requirements.lock` present (new since RECS). `.pre-commit-config.yaml` was read directly: only `gitleaks` and `detect-private-key` hooks configured; no `mypy`. |
 
 ## Downloader Drift (the load-bearing finding)
 
-The canonical pattern is `contract_sweeper/runtime/base_downloader.py` —
+The canonical pattern is `moneysweep/runtime/base_downloader.py` —
 `HttpConfig` dataclass, `build_session`, `http_get_json` / `http_post_json` with
 the unified retry policy, `paginate`, `file_has_data`, `write_csv`, and the
 `BaseDownloader` class that wires them. Counts:
@@ -92,7 +92,7 @@ suffix. **Naming convention is consistent.** One drift:
 
 | Issue | Count |
 |---|---|
-| `contract_sweeper_*` prefix | 6 / 27 (22%) |
+| `moneysweep_*` prefix | 6 / 27 (22%) |
 | No prefix | 21 / 27 (78%) |
 
 The 6 prefixed schemas (`entity`, `export_manifest`, `funding_award`,
@@ -129,13 +129,13 @@ CI check that they are in sync. If both are hand-edited, expect silent drift.
 
 ### `run_all.py`
 
-PR [#202](https://github.com/jotaele44/Contract-Sweeper/pull/202) extracted the
-CLI parser and support helpers into `contract_sweeper/orchestrator/`:
+PR [#202](https://github.com/jotaele44/moneysweep-pr/pull/202) extracted the
+CLI parser and support helpers into `moneysweep/orchestrator/`:
 
 ```
-contract_sweeper/orchestrator/__init__.py    (89 B)
-contract_sweeper/orchestrator/cli.py         (16.7 KB)
-contract_sweeper/orchestrator/support.py     (7.7 KB)
+moneysweep/orchestrator/__init__.py    (89 B)
+moneysweep/orchestrator/cli.py         (16.7 KB)
+moneysweep/orchestrator/support.py     (7.7 KB)
 ```
 
 `run_all.py` itself is still **1857 LOC / 90 KB** — the bulk of the orchestrator
@@ -188,7 +188,7 @@ These read as "test for the thing that was added in rebuild round 4.8c", which
 is meaningful at the time and meaningless six months later. Drop the suffix and
 rename to the behavior under test.
 
-### `contract_sweeper/pipeline/` — the graveyard (RECS #3, still open)
+### `moneysweep/pipeline/` — the graveyard (RECS #3, still open)
 
 42 files, of which the following are visibly one-shot remediation passes:
 
@@ -257,7 +257,7 @@ later at 60.
 | 5 | Fix `download_emma.py` duplicate `__future__` import | 1 real bug | XS | L |
 | 6 | Extract a `BaseIngester` from the 23 `ingest_*.py` files | 0% → ≥50% adoption pre-emptively | M | M |
 | 7 | Complete `run_all.py` decomposition: extract per-stage modules | 1857 → ~300 LOC in `run_all.py` | M | M |
-| 8 | Document the `contract_sweeper_*` schema prefix as a marker, or remove it | 22% prefixed schemas → consistent rule | S | L |
+| 8 | Document the `moneysweep_*` schema prefix as a marker, or remove it | 22% prefixed schemas → consistent rule | S | L |
 | 9 | Split `docs/` and `reports/` by category | 56 + 38 flat files → categorized | S | L |
 | 10 | Add `mypy` to pre-commit (non-blocking start) | RECS #8 part-2 | S | L |
 

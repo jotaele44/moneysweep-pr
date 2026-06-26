@@ -1,5 +1,5 @@
 {
-  "active_vector": "CONTRACT_SWEEPER_100_PERCENT_COMPLETION_ROADMAP → TRANCHE_A_STATUS_TRUTH",
+  "active_vector": "MONEYSWEEP_100_PERCENT_COMPLETION_ROADMAP → TRANCHE_A_STATUS_TRUTH",
   "active_branch": "",
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_active": true,
@@ -152,7 +152,7 @@
       "pip install -r requirements.txt",
       "set the 8 run-time keys in .env: CENSUS_API_KEY, EIA_API_KEY, FAC_API_KEY, FEC_API_KEY, FINANCIALDATA_API_KEY, FRED_API_KEY, HIGHERGOV_API_KEY, SAM_API_KEY",
       "python3 run_all.py --only-setup --strict-preflight (expect 0 structural errors)",
-      "materialize: python -m contract_sweeper.query --source <id> (41 adapter sources) and/or python3 run_all.py --strict-preflight",
+      "materialize: python -m moneysweep.query --source <id> (41 adapter sources) and/or python3 run_all.py --strict-preflight",
       "regenerate: python3 scripts/gap_analysis_builder.py && python3 scripts/build_source_recovery_matrix.py",
       "verify automatable_ready == automatable_total and each automatable source fully_materialized"
     ],

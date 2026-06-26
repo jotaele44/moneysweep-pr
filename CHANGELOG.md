@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Contract-Sweeper are documented in this file.
+All notable changes to moneysweep-pr are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
@@ -15,8 +15,8 @@ separate — they share a constant name only, never a lineage:
 
 | Contract | Version | Source of truth |
 |----------|---------|-----------------|
-| Federation export (`contract-sweeper-export`, consumed by `spiderweb-pr` query-hub) | `1.2.0` | `scripts/build_export_package.py:EXPORT_CONTRACT_VERSION` |
-| Finance-lane report (`contract_sweeper_finance_lane_report.json`) | `1.0.0` | `readiness/contract_sweeper_finance_lane.py:EXPORT_CONTRACT_VERSION` |
+| Federation export (`moneysweep-pr-export`, consumed by `spiderweb-pr` query-hub) | `1.2.0` | `scripts/build_export_package.py:EXPORT_CONTRACT_VERSION` |
+| Finance-lane report (`moneysweep_finance_lane_report.json`) | `1.0.0` | `readiness/moneysweep_finance_lane.py:EXPORT_CONTRACT_VERSION` |
 
 A bump to the **federation export** version is what the release-tagging workflow
 (`.github/workflows/release-tag.yml`) keys off of — see `docs/federation_readiness.md`
@@ -28,19 +28,19 @@ A bump to the **federation export** version is what the release-tagging workflow
 - **Government-flow coverage expansion — 25 new sources** (`docs/GOVERNMENT_FLOW_COVERAGE.md`),
   taking the registry from 88 → **113** tracked sources (automatable 57 → **65**,
   queued/excluded 31 → **48**):
-  - 8 federal API producers (reusing `contract_sweeper.runtime.base_downloader`):
+  - 8 federal API producers (reusing `moneysweep.runtime.base_downloader`):
     `usaspending_loans` (direct loans/guarantees), `usda_farm_subsidies`
     (FSA/RMA), `hud_cdbg_mit` (CDBG-Mitigation), `federal_audit_clearinghouse`
     (SF-SAC Single Audits), `sam_exclusions` (debarment), `fema_individual_assistance`
     (IHP), `opportunity_zones`, `opm_fedscope` (federal payroll).
   - 17 PR-territorial / federal manual dropzone readers via the new shared
-    `contract_sweeper.runtime.dropzone_ingest` helper: `ocpr_contracts` (the
+    `moneysweep.runtime.dropzone_ingest` helper: `ocpr_contracts` (the
     canonical PR contract registry), `ddec_incentives`, `crim_property_tax`,
     `ases_plan_vital`, `loteria_pr`, `gaming_commission`, `ports_authority`,
     `act_tolls_concession`, `oatrh_payroll`, `ogpe_permits`, `dtop_vehicle_fees`,
     `tourism_room_tax`, `bde_loans`, `prpha_housing_subsidy`, `doj_settlements`,
     `equitable_sharing`, `irs_ctc_eitc_pr`.
-  - New `contract_sweeper/runtime/dropzone_ingest.py` factors the
+  - New `moneysweep/runtime/dropzone_ingest.py` factors the
     `ingest_oce`/`ingest_donaciones` reader (cache → empty-dropzone →
     case-insensitive ES/EN column mapping → blank-key filter → dedupe) into one
     shared, tested helper.
@@ -84,7 +84,7 @@ A bump to the **federation export** version is what the release-tagging workflow
     procedure in `docs/federation_readiness.md`.
 
 ### Changed
-- Narrowed an over-broad `except Exception` in `contract_sweeper/runtime/validation_gates.py`
+- Narrowed an over-broad `except Exception` in `moneysweep/runtime/validation_gates.py`
   to `(OSError, UnicodeDecodeError, csv.Error)` so unrelated bugs are no longer swallowed (#221).
 - Retired `docs/CODE_GAP_AND_WORKFLOW_AUDIT.md` (2026-06-08 advisory): all of its findings
   (A1, A2/B5, A3, B1, B2, B3, B4, B6) are resolved or mitigated on `main`. The file now carries
@@ -96,4 +96,4 @@ A bump to the **federation export** version is what the release-tagging workflow
   this changelog. Entries here track engineering/governance changes to the repository, not
   data outputs.
 
-[Unreleased]: https://github.com/jotaele44/contract-sweeper/commits/main
+[Unreleased]: https://github.com/jotaele44/moneysweep-pr/commits/main

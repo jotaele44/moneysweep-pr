@@ -703,7 +703,7 @@ Every cluster where no alias override fired. The reviewer should scan for semant
 
 ## Bilingual municipio collapse regression check
 
-`normalize_name()` now bridges Spanish/English municipio designators to a canonical `MUNICIPIO <town>` form (see `contract_sweeper.runtime.name_normalization`). This section should normally be empty: any residual pair of `MUNICIPIO DE X` and `MUNICIPALITY OF X` canonicals here means a designator variant slipped past that rule and the normalizer regex needs widening.
+`normalize_name()` now bridges Spanish/English municipio designators to a canonical `MUNICIPIO <town>` form (see `moneysweep.runtime.name_normalization`). This section should normally be empty: any residual pair of `MUNICIPIO DE X` and `MUNICIPALITY OF X` canonicals here means a designator variant slipped past that rule and the normalizer regex needs widening.
 
 _None — the normalizer rule bridges every municipio pair in this input._
 

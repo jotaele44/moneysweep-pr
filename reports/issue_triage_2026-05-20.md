@@ -1,6 +1,6 @@
 # Issue Triage — 2026-05-20
 
-Triage of new and unassigned issues in `jotaele44/Contract-Sweeper`, plus
+Triage of new and unassigned issues in `jotaele44/moneysweep-pr`, plus
 status of the ten follow-up areas. Open issues at triage time: #69, #70,
 #86, #87. No duplicates found.
 
@@ -19,7 +19,7 @@ status of the ten follow-up areas. Open issues at triage time: #69, #70,
 |---|------|--------|----------|
 | 1 | Module inventory (#69) | Done | `reports/module_inventory.csv` (225 modules) |
 | 2 | Module consolidation PRs | Increment done; next gate human | PR-D…PR-I all merged (PR-I = `d1cb07a`); `G6` scope selection is an Architect decision |
-| 3 | Promotion guard (#86) | Done (this PR) | `contract_sweeper/validation/promotion_guard.py` + CI |
+| 3 | Promotion guard (#86) | Done (this PR) | `moneysweep/validation/promotion_guard.py` + CI |
 | 4 | Governance artifact suite (#86) | Done (this PR) | `docs/PROMOTION_GUARD.md`, workflow, tests |
 | 5 | Handoff documentation (#70) | Done | `HANDOFF.md`, `STATUS.md`, `SETUP.md`, `.env.example` |
 | 6 | Edu-account clone validation (#70) | Done | 594 passed at transfer gate (per `current_status.json`) |
