@@ -1,0 +1,36 @@
+version: "1.0"
+schema_version: "r5_source_registry_overlay_v1"
+
+# Overlay source definition pending merge into registries/source_registry.yaml.
+# YAML remains the registry source of truth; after merge, run:
+#   python scripts/regenerate_registry_json.py
+
+sources:
+  - source_id: legislapr_discovery
+    family: territorial
+    required: false
+    tier: T2_operational
+    role: legislative_discovery_enrichment
+    authentication: none
+    endpoint_url: https://www.legislapr.com/
+    producer_script: scripts/probe_legislapr_detail_page.py
+    expected_outputs:
+      - data/staging/processed/legislapr_measures_discovery.jsonl
+      - data/staging/processed/legislapr_measure_crosswalk.csv
+    schema_version: r5_legislative_measure_discovery_v1
+    validation_threshold:
+      min_rows: 1
+      cross_confirmed_rate_pct: 0.0
+    update_cadence: weekly
+    canonical_required: true
+    canonical_sources:
+      - openstates
+      - sutra_oslpr
+    promotion_rule: cross_confirmed_only
+    notes: |
+      LegislaPR is a public legislative discovery and readability layer for
+      Puerto Rico measures. It should not be treated as canonical authority.
+      Promote only records cross-confirmed against OpenStates and official
+      Puerto Rico Legislative Assembly/SUTRA document links. AI-generated pros,
+      cons, and summaries are enrichment signals only and must remain below
+      canonical provenance in downstream MoneySweep outputs.
