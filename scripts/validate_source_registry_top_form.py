@@ -49,7 +49,7 @@ REQUIRED_COLUMNS = [
 
 
 def _load_sources(root: Path) -> list[dict[str, Any]]:
-    from contract_sweeper.runtime.source_registry import all_sources
+    from moneysweep.runtime.source_registry import all_sources
 
     return all_sources(root)
 

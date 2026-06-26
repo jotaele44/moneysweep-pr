@@ -1,6 +1,6 @@
 """Row-level contract-finance geo reasoning (standalone producer).
 
-Regenerates the Contract-Sweeper contract-finance / geo layer from **row-level**
+Regenerates the moneysweep-pr contract-finance / geo layer from **row-level**
 canonical exports rather than aggregate municipality CSVs. For every funding
 award and transaction row it attaches an explicit geo-resolution method, reason
 code, confidence, and jurisdiction class; decomposes the UNKNOWN bucket by
@@ -10,12 +10,12 @@ graph with full edge metadata; and re-runs the SpiderWeb engine-readiness gate.
 This module is an *independent* producer: it does not import or run
 ``run_all.py``, any pipeline stage, or anything in the SpiderWeb PR. It only
 reads already-produced row-level inputs and reuses the deterministic geo helpers
-in ``contract_sweeper.runtime.geo_attribution``.
+in ``moneysweep.runtime.geo_attribution``.
 
 Inputs (in priority order):
   1. Export streams (``funding_awards.jsonl`` + ``transactions.jsonl``) from an
      export package built by ``scripts/run_export.py`` (``--export-dir`` or
-     ``exports/contract_sweeper_latest/``).
+     ``exports/moneysweep_latest/``).
   2. Canonical masters (``contracts_master.csv`` + ``financial_flows_master.csv``)
      under ``--processed-dir``.
 
@@ -49,7 +49,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from contract_sweeper.runtime.geo_attribution import (  # noqa: E402
+from moneysweep.runtime.geo_attribution import (  # noqa: E402
     _normalize_fips,
     _normalize_pr_name,
     _strip_accents,
@@ -59,7 +59,7 @@ DEFAULT_PROCESSED_DIR = REPO_ROOT / "data" / "staging" / "processed"
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "outputs" / "contract_finance"
 MUNICIPALITIES_REF = REPO_ROOT / "data" / "reference" / "pr_municipalities.csv"
 DEFAULT_CROSSWALK = REPO_ROOT / "data" / "reference" / "pr_78_municipio_crosswalk.csv"
-DEFAULT_EXPORT_LATEST = REPO_ROOT / "exports" / "contract_sweeper_latest"
+DEFAULT_EXPORT_LATEST = REPO_ROOT / "exports" / "moneysweep_latest"
 
 SAN_JUAN_CODE = "72127"
 DEFAULT_SAN_JUAN_THRESHOLD = 0.35

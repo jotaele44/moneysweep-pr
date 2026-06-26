@@ -1,4 +1,4 @@
-"""Shared fixtures for Contract-Sweeper test suite."""
+"""Shared fixtures for moneysweep-pr test suite."""
 
 import csv
 import sys

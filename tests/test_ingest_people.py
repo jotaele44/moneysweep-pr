@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from contract_sweeper.validation import canonical_v1_schema as cv1
+from moneysweep.validation import canonical_v1_schema as cv1
 from scripts import ingest_people as ip
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "canonical_v1_people_sample.csv"

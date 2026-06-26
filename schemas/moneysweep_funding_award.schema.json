@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "moneysweep_funding_award.schema.json",
+  "title": "moneysweep-pr Funding Award",
+  "description": "A grant, contract, or other federal/state funding award.",
+  "type": "object",
+  "required": [
+    "award_id",
+    "source_id",
+    "recipient_entity_id",
+    "funding_agency_entity_id",
+    "amount",
+    "currency",
+    "fiscal_year",
+    "award_type",
+    "award_date",
+    "confidence",
+    "lineage",
+    "synthetic",
+    "created_at",
+    "extracted_at"
+  ],
+  "properties": {
+    "award_id": {"type": "string", "pattern": "^awd_[a-f0-9]{32}$"},
+    "source_id": {"type": "string", "pattern": "^src_[a-f0-9]{32}$"},
+    "recipient_entity_id": {"type": "string", "pattern": "^ent_[a-f0-9]{32}$"},
+    "funding_agency_entity_id": {"type": "string", "pattern": "^ent_[a-f0-9]{32}$"},
+    "amount": {"type": "number", "minimum": 0.0},
+    "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+    "fiscal_year": {"type": "integer"},
+    "award_type": {"type": "string"},
+    "award_date": {"type": "string", "format": "date"},
+    "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+    "location": {"$ref": "#/definitions/location"},
+    "lineage": {"$ref": "#/definitions/lineage"},
+    "synthetic": {"type": "boolean"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "extracted_at": {"type": "string", "format": "date-time"}
+  },
+  "definitions": {
+    "lineage": {
+      "type": "object",
+      "required": ["producer_script", "producer_phase", "source_inputs"],
+      "properties": {
+        "producer_script": {"type": "string"},
+        "producer_phase": {"type": "string"},
+        "source_inputs": {"type": "array", "items": {"type": "string"}},
+        "extraction_method": {"type": "string"}
+      }
+    },
+    "location": {
+      "type": "object",
+      "description": "Optional place of performance, for matching against the spiderweb-pr query hub's locations.",
+      "properties": {
+        "country": {"type": "string"},
+        "municipality": {"type": "string"},
+        "municipality_code": {"type": "string"},
+        "municipality_name": {"type": "string"},
+        "county_fips": {"type": "string"},
+        "postal_code": {"type": "string"},
+        "latitude": {"type": "number", "minimum": -90.0, "maximum": 90.0},
+        "longitude": {"type": "number", "minimum": -180.0, "maximum": 180.0},
+        "attribution_source": {"type": "string"},
+        "attribution_confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+      }
+    }
+  }
+}

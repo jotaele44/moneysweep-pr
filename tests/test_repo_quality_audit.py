@@ -6,7 +6,7 @@ import csv
 import json
 from pathlib import Path
 
-from contract_sweeper.pipeline.repo_quality_audit import run_repo_quality_audit
+from moneysweep.pipeline.repo_quality_audit import run_repo_quality_audit
 
 
 def _write_json(path: Path, payload: dict) -> None:

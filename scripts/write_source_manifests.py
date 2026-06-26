@@ -22,13 +22,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.runtime.manifest_runtime import (
+from moneysweep.runtime.manifest_runtime import (
     profile_file,
     scan_repo,
     write_canonical_manifest,
     write_per_source_manifest,
 )
-from contract_sweeper.runtime.source_registry import (
+from moneysweep.runtime.source_registry import (
     REPO_ROOT,
     all_sources,
     expected_outputs_for,

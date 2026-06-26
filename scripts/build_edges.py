@@ -32,9 +32,9 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.runtime.canonical_ids import edge_id
-from contract_sweeper.runtime.name_normalization import normalize_name, normalize_person_name
-from contract_sweeper.validation.canonical_v1_schema import EDGE_TYPES, NODE_TYPE_TABLE
+from moneysweep.runtime.canonical_ids import edge_id
+from moneysweep.runtime.name_normalization import normalize_name, normalize_person_name
+from moneysweep.validation.canonical_v1_schema import EDGE_TYPES, NODE_TYPE_TABLE
 from scripts.build_evidence import Evidence, make_evidence, merge_evidence
 
 REPO_ROOT = Path(__file__).resolve().parents[1]

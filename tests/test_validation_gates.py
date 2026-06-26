@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from contract_sweeper.runtime import validation_gates as vg
+from moneysweep.runtime import validation_gates as vg
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "r5"
 

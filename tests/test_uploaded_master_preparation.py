@@ -154,7 +154,7 @@ def test_artifact_manifest_records_hashes_and_counts(tmp_path):
     package = tmp_path / "pkg"
     package.mkdir()
     (package / "manifest.json").write_text(
-        '{"producer":"contract-sweeper","export_contract_version":"1.1.0"}\n', encoding="utf-8"
+        '{"producer":"moneysweep-pr","export_contract_version":"1.1.0"}\n', encoding="utf-8"
     )
     (package / "entities.jsonl").write_text(
         '{"entity_id":"e1"}\n{"entity_id":"e2"}\n', encoding="utf-8"

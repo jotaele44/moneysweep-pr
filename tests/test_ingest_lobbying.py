@@ -2,7 +2,7 @@
 
 import pytest
 
-from contract_sweeper.validation import canonical_v1_schema as cv1
+from moneysweep.validation import canonical_v1_schema as cv1
 from scripts import ingest_lobbying as il
 
 REPO_ROOT = cv1.REPO_ROOT

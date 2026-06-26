@@ -1,4 +1,4 @@
-// Contract-Sweeper display helpers.
+// moneysweep-pr display helpers.
 
 export function fmtMoney(v) {
   if (v == null) return '—'

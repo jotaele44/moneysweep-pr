@@ -15,11 +15,11 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from contract_sweeper.query.adapters.highergov import (
+from moneysweep.query.adapters.highergov import (
     ENV_VAR,
     HigherGovSupplementalAdapter,
 )
-from contract_sweeper.query.types import CredentialMissing, Query
+from moneysweep.query.types import CredentialMissing, Query
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -150,7 +150,7 @@ def test_fetch_single_short_page_returns_rows(monkeypatch):
 def test_fetch_paginates_until_short_page(monkeypatch):
     monkeypatch.setenv(ENV_VAR, "k")
     # Shrink the page size so two small pages exercise the pagination loop.
-    monkeypatch.setattr("contract_sweeper.query.adapters.highergov.PAGE_SIZE", 2)
+    monkeypatch.setattr("moneysweep.query.adapters.highergov.PAGE_SIZE", 2)
     full_page = [{"id": "A"}, {"id": "B"}]  # len == PAGE_SIZE -> has_more
     short_page = [{"id": "C"}]  # len < PAGE_SIZE -> stop
     session = MagicMock()

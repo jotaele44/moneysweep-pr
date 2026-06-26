@@ -9,8 +9,8 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from contract_sweeper.query.cache import FileCache, ttl_for_cadence
-from contract_sweeper.query.types import Query
+from moneysweep.query.cache import FileCache, ttl_for_cadence
+from moneysweep.query.types import Query
 
 
 @pytest.fixture

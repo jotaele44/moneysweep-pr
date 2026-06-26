@@ -1,7 +1,7 @@
 # Transaction Schema
 
 Stream: `transactions.jsonl` · Schema:
-[`schemas/contract_sweeper_transaction.schema.json`](../schemas/contract_sweeper_transaction.schema.json)
+[`schemas/moneysweep_transaction.schema.json`](../schemas/moneysweep_transaction.schema.json)
 
 A **transaction** is a single movement of money between two entities — a
 disbursement, obligation, reimbursement, etc. Where an award is the agreement,

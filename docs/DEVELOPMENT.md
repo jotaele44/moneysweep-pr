@@ -27,7 +27,7 @@ opt-in reproducibility aid; it can be promoted to the default install later.
 ## Type checking
 
 [`mypy`](https://mypy-lang.org/) is configured in `pyproject.toml` with a lenient,
-gradually-typed baseline scoped to the `contract_sweeper` package:
+gradually-typed baseline scoped to the `moneysweep` package:
 
 ```bash
 pip install mypy

@@ -63,7 +63,7 @@ JSON export
 ## Example Usage
 
 ```python
-from contract_sweeper.modules.prepa_titleiii_entity_graph import run
+from moneysweep.modules.prepa_titleiii_entity_graph import run
 
 run(
     service_matrix_csv="data/prepa/service_matrix.csv",

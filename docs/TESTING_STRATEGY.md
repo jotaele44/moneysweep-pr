@@ -56,7 +56,7 @@ The production status must remain `NON_PRODUCTION_DIAGNOSTIC`, and Phase 7/8 mus
 Before merging marker or testing strategy changes, run:
 
 ```bash
-python -m compileall contract_sweeper tests
+python -m compileall moneysweep tests
 pytest -q
 python scripts/run_production_status_gate.py --root .
 python scripts/run_repo_quality_audit_r49z_b.py --root .

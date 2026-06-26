@@ -1,7 +1,7 @@
 # Entity Schema
 
 Stream: `entities.jsonl` · Schema:
-[`schemas/contract_sweeper_entity.schema.json`](../schemas/contract_sweeper_entity.schema.json)
+[`schemas/moneysweep_entity.schema.json`](../schemas/moneysweep_entity.schema.json)
 
 An **entity** is a named party in the funding graph: a funding agency, a prime
 recipient, a sub-recipient, a contractor, etc. Entities are the nodes that
@@ -28,7 +28,7 @@ awards, transactions, and relationships reference.
 `entity_id` is derived from `{normalized_name, entity_type, jurisdiction}`, so
 the same real-world party normalizes to the same ID across deliveries. Use
 `normalized_name` (not `name`) for joins. The repo's existing normalization
-conventions live in `contract_sweeper/runtime/name_normalization.py`.
+conventions live in `moneysweep/runtime/name_normalization.py`.
 
 ## Example (from the fixture)
 

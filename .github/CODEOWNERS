@@ -1,4 +1,4 @@
-# Code ownership for Contract-Sweeper.
+# Code ownership for moneysweep-pr.
 #
 # The maintainer is automatically requested for review on every PR, formalizing
 # the "Architect gate" the project already operates under (STATUS.md). Add more
@@ -10,7 +10,7 @@
 # Cross-repo federation contract: changes here affect the spiderweb-pr consumer,
 # so they always need maintainer sign-off.
 /schemas/                @jotaele44
-/contract_sweeper/federation/   @jotaele44
+/moneysweep/federation/   @jotaele44
 
 # CI, gates, and dependency policy.
 /.github/                @jotaele44

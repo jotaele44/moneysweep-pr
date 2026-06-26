@@ -5,7 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from contract_sweeper.query.types import (
+from moneysweep.query.types import (
     CredentialMissing,
     ManualOnlyError,
     Query,

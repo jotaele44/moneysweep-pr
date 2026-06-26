@@ -1,4 +1,4 @@
-"""Tests for contract_sweeper.runtime.alias_overrides and its wires."""
+"""Tests for moneysweep.runtime.alias_overrides and its wires."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from textwrap import dedent
 
 import pytest
 
-from contract_sweeper.runtime.alias_overrides import (
+from moneysweep.runtime.alias_overrides import (
     AliasOverrideError,
     apply,
     load_overrides,

@@ -1,4 +1,4 @@
-"""Tests for contract_sweeper.runtime.maturity_gate."""
+"""Tests for moneysweep.runtime.maturity_gate."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from contract_sweeper.runtime.maturity_gate import (
+from moneysweep.runtime.maturity_gate import (
     DEFAULT_STATUS_CSV,
     claim_tier,
     load_dataset_to_source_map,

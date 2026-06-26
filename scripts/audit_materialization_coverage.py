@@ -44,8 +44,8 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from scripts.gap_analysis_builder import _file_status, _source_status  # reuse status logic
-from contract_sweeper.runtime.source_registry import load_source_registry
-from contract_sweeper.runtime.base_downloader import (
+from moneysweep.runtime.source_registry import load_source_registry
+from moneysweep.runtime.base_downloader import (
     HttpConfig,
     build_session,
     http_get_json,

@@ -3,7 +3,7 @@
 import pandas as pd
 import pytest
 
-from contract_sweeper.runtime import post_ingest as pi
+from moneysweep.runtime import post_ingest as pi
 
 
 @pytest.mark.unit

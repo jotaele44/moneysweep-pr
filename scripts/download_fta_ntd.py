@@ -40,7 +40,7 @@ from scripts.config import PROJECT_ROOT, setup_logging
 SODA_BASE = "https://data.transportation.gov"
 # Best-effort default NTD annual data-product resource id; confirm on first live run.
 NTD_RESOURCE_ID = os.environ.get("NTD_RESOURCE_ID", "")
-USER_AGENT = "ContractSweeper/1.0 (+https://github.com/jotaele44/Contract-Sweeper)"
+USER_AGENT = "ContractSweeper/1.0 (+https://github.com/jotaele44/moneysweep-pr)"
 PAGE_LIMIT = 1000
 MAX_RECORDS = 200_000
 MAX_RETRIES = 3

@@ -17,7 +17,7 @@ This repository must not store real secrets in tracked files. Source recovery is
 Push and pull request CI must remain secret-free. CI workflows may run only safe checks while source recovery is paused:
 
 ```bash
-python -m compileall contract_sweeper tests
+python -m compileall moneysweep tests
 pytest -q
 python scripts/run_production_status_gate.py --root .
 python scripts/run_repo_quality_audit_r49z_b.py --root .

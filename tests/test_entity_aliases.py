@@ -13,8 +13,8 @@ import re
 
 import pytest
 
-from contract_sweeper.runtime.name_normalization import normalize_name
-from contract_sweeper.validation.canonical_v1_schema import validate_row
+from moneysweep.runtime.name_normalization import normalize_name
+from moneysweep.validation.canonical_v1_schema import validate_row
 from scripts import build_entity_aliases as bea
 
 REPO_ROOT = bea.REPO_ROOT

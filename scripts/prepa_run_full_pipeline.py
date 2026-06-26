@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from prepa_service_matrix_parser import parse_text, write_csv
-from contract_sweeper.modules.prepa_titleiii_entity_graph import (
+from moneysweep.modules.prepa_titleiii_entity_graph import (
     build_nodes,
     export_graph,
     match_contract_records,

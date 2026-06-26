@@ -9,48 +9,48 @@
   "federation": {
     "consumer_component": "query-hub",
     "consumer_repo": "spiderweb-pr",
-    "contract": "contract-sweeper-export",
-    "producer_repo": "contract-sweeper"
+    "contract": "moneysweep-pr-export",
+    "producer_repo": "moneysweep-pr"
   },
   "files": [
     {
       "filename": "entities.jsonl",
       "record_count": 2,
-      "schema_id": "contract_sweeper_entity.schema.json",
+      "schema_id": "moneysweep_entity.schema.json",
       "sha256": "f862177eca6a4beabd2cbaa37314152aad0cbc78d2c14294da49c35830652fd8",
       "stream": "entities"
     },
     {
       "filename": "sources.jsonl",
       "record_count": 1,
-      "schema_id": "contract_sweeper_source.schema.json",
+      "schema_id": "moneysweep_source.schema.json",
       "sha256": "673dca542fcfb3e0e03ded65bbeb47b4cc2f611b2351430f85af80033aa18a83",
       "stream": "sources"
     },
     {
       "filename": "funding_awards.jsonl",
       "record_count": 1,
-      "schema_id": "contract_sweeper_funding_award.schema.json",
+      "schema_id": "moneysweep_funding_award.schema.json",
       "sha256": "1844dfda3a01853715d4cfa1ba208b07b8be0cc249919ebf4aec9ffec988161c",
       "stream": "funding_awards"
     },
     {
       "filename": "transactions.jsonl",
       "record_count": 1,
-      "schema_id": "contract_sweeper_transaction.schema.json",
+      "schema_id": "moneysweep_transaction.schema.json",
       "sha256": "a81cbd48121778d3fe555311a8b5f7cc810d73f05271a1633d45120587b04478",
       "stream": "transactions"
     },
     {
       "filename": "relationships.jsonl",
       "record_count": 1,
-      "schema_id": "contract_sweeper_relationship.schema.json",
+      "schema_id": "moneysweep_relationship.schema.json",
       "sha256": "f16f768165a7047bbb8b3dee57d7b800ce1672b03445f3dbd8e5bd128be4eadb",
       "stream": "relationships"
     }
   ],
   "mode": "test",
   "package_id": "pkg_0091daf003357720e00834c0edf239e8",
-  "producer": "contract-sweeper",
+  "producer": "moneysweep-pr",
   "producer_version": "0.1.0"
 }

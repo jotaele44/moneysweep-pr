@@ -1,7 +1,7 @@
 """Prepare uploaded analysis-master CSVs for reproducible federation export.
 
 This command converts the three raw calibration/input masters used during the
-local production run into Contract-Sweeper canonical processed files:
+local production run into moneysweep-pr canonical processed files:
 
 * entities_resolved.csv
 * contracts_master.csv
@@ -28,7 +28,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from contract_sweeper.runtime.name_normalization import normalize_name  # noqa: E402
+from moneysweep.runtime.name_normalization import normalize_name  # noqa: E402
 
 ENTITY_FIELDS = [
     "entity_id",

@@ -1,6 +1,6 @@
 """Write canonical_v1 -> federation JSONL streams + manifest (WS-Q).
 
-Runs the bridge mapper (``contract_sweeper.federation.canonical_v1_bridge``) and
+Runs the bridge mapper (``moneysweep.federation.canonical_v1_bridge``) and
 writes ``sources.jsonl``, ``entities.jsonl``, ``relationships.jsonl`` under
 ``data/exports/canonical_v1_federation/`` plus a coverage manifest. Each row is
 structurally validated against the required-field set of the matching federation
@@ -28,16 +28,16 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.federation.canonical_v1_bridge import build_streams
+from moneysweep.federation.canonical_v1_bridge import build_streams
 
 OUT_DIR = "data/exports/canonical_v1_federation"
 SCHEMA_DIR = "schemas"
 
 # stream -> (schema filename, output filename)
 STREAMS = {
-    "sources": ("contract_sweeper_source.schema.json", "sources.jsonl"),
-    "entities": ("contract_sweeper_entity.schema.json", "entities.jsonl"),
-    "relationships": ("contract_sweeper_relationship.schema.json", "relationships.jsonl"),
+    "sources": ("moneysweep_source.schema.json", "sources.jsonl"),
+    "entities": ("moneysweep_entity.schema.json", "entities.jsonl"),
+    "relationships": ("moneysweep_relationship.schema.json", "relationships.jsonl"),
 }
 
 # Standalone federal-publications source feed composed into the sources stream.

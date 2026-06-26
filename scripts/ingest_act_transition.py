@@ -174,7 +174,7 @@ def materialize_source(root: Path, source_key: str, input_dir: Path | None, logg
     """
     if _pdf_available(root, source_key, input_dir):
         # Lazy import — keeps module import (and the readiness preflight) free of pdfplumber.
-        from contract_sweeper.runtime.alias_overrides import load_overrides
+        from moneysweep.runtime.alias_overrides import load_overrides
         from scripts.extract_act_acuden_pdfs import extract_source
 
         overrides = load_overrides()

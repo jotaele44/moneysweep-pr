@@ -43,8 +43,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import requests
 
-from contract_sweeper.runtime.alias_overrides import apply as apply_override
-from contract_sweeper.runtime.alias_overrides import load_overrides
+from moneysweep.runtime.alias_overrides import apply as apply_override
+from moneysweep.runtime.alias_overrides import load_overrides
 from scripts.config import PROJECT_ROOT, setup_logging
 
 # ---------------------------------------------------------------------------

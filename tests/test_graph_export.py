@@ -14,7 +14,7 @@ import re
 
 import pytest
 
-from contract_sweeper.validation.canonical_v1_schema import validate_row
+from moneysweep.validation.canonical_v1_schema import validate_row
 from scripts import build_graph_export as bge
 
 REPO_ROOT = bge.REPO_ROOT

@@ -1,8 +1,8 @@
-# Contract-Sweeper — MoneySweep Producer (PRII federation)
+# moneysweep-pr — MoneySweep Producer (PRII federation)
 
-![Tests](https://github.com/jotaele44/contract-sweeper/actions/workflows/tests.yml/badge.svg)
+![Tests](https://github.com/jotaele44/moneysweep-pr/actions/workflows/tests.yml/badge.svg)
 
-`Contract-Sweeper` is the public-money intelligence producer for the Puerto Rico Integrated Intelligence (PRII) federation. Its federation alias is `moneysweep-pr`.
+`moneysweep-pr` is the public-money intelligence producer for the Puerto Rico Integrated Intelligence (PRII) federation. Its federation alias is `moneysweep-pr`.
 
 The pipeline acquires, normalizes, validates, and cross-links public procurement, infrastructure, lobbying, campaign-finance, debt/fiscal-control, contractor-reference, recovery-assistance, and geospatial records. It exports reviewable records for [`thehub-pr`](https://github.com/jotaele44/thehub-pr), where cross-producer aggregation and correlation occur.
 
@@ -10,7 +10,7 @@ The pipeline acquires, normalizes, validates, and cross-links public procurement
 
 | Field | Value |
 |---|---|
-| Repository | `jotaele44/Contract-Sweeper` |
+| Repository | `jotaele44/moneysweep-pr` |
 | Federation alias | `moneysweep-pr` |
 | Parent hub | [`thehub-pr`](https://github.com/jotaele44/thehub-pr) |
 | Primary function | Public money, procurement, grants, recovery, influence, fiscal-control, contractor-reference, and disaster-assistance producer |
@@ -18,7 +18,7 @@ The pipeline acquires, normalizes, validates, and cross-links public procurement
 
 ## Current operating state
 
-Contract-Sweeper is **not yet a production-certified master dataset**. The current state is a controlled buildout phase:
+moneysweep-pr is **not yet a production-certified master dataset**. The current state is a controlled buildout phase:
 
 - **Source registry:** 136 tracked source definitions (includes SBA disaster-loan sources).
 - **Automatable sources:** 90 marked ready by the materialization-readiness gate (13 formerly scraper-queued PR-gov sources promoted after confirming real scraping implementations).
@@ -63,8 +63,8 @@ reports/sba_recovery_source_refresh.txt
 
 | Rule | Meaning |
 |---|---|
-| Contract-Sweeper owns money-source ingestion | It acquires and validates procurement, grant, recovery, fiscal, assistance, and influence records |
-| Hub owns cross-producer correlation | `thehub-pr` aggregates Contract-Sweeper outputs with other producer exports |
+| moneysweep-pr owns money-source ingestion | It acquires and validates procurement, grant, recovery, fiscal, assistance, and influence records |
+| Hub owns cross-producer correlation | `thehub-pr` aggregates moneysweep-pr outputs with other producer exports |
 | Manual sources stay staged | Manual files are not authoritative canonical tables until parser, lineage, validation, and review gates pass |
 | Promotion requires evidence trail | Rows must preserve source, lineage, confidence, and review state |
 
@@ -121,7 +121,7 @@ coverage, lineage, and analyst reports
 | `scripts/pipeline_preflight.py` | Registry-driven structural gate before execution |
 | `scripts/build_source_recovery_matrix.py` | Materialization-readiness and source-recovery classification |
 | `scripts/gap_analysis_builder.py` | Source-registry status regeneration |
-| `contract_sweeper.query` | On-demand query adapter entry point |
+| `moneysweep.query` | On-demand query adapter entry point |
 | `scripts/*download*` / producer modules | Source-specific acquisition modules |
 | `scripts/import_sba_disaster_loans.py` | Planned importer for SBA Disaster Loan workbook once implementation lands |
 | `tests/` | Pytest validation suite |
@@ -131,8 +131,8 @@ coverage, lineage, and analyst reports
 ## Quick start
 
 ```bash
-git clone https://github.com/jotaele44/Contract-Sweeper.git
-cd Contract-Sweeper
+git clone https://github.com/jotaele44/moneysweep-pr.git
+cd moneysweep-pr
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt

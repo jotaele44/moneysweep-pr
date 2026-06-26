@@ -37,9 +37,9 @@ All modules not listed below are **KEEP**. High-value anchors:
 |--------|---------|
 | `scripts/config.py` | 121 inbound imports — foundational config hub |
 | `scripts/build_unified_master.py` | 25 inbound imports — core ETL entrypoint |
-| `contract_sweeper/pipeline/acquisition_package.py` | 18 inbound imports |
+| `moneysweep/pipeline/acquisition_package.py` | 18 inbound imports |
 | `scripts/parquet_utils.py` | 13 inbound imports — I/O utility hub |
-| `contract_sweeper/validation/production_status.py` | 8 inbound imports |
+| `moneysweep/validation/production_status.py` | 8 inbound imports |
 | `scripts/sam_enrichment.py` | 6 inbound imports; tested |
 | `run_all.py` | Main orchestrator (2,288 lines) |
 | All `download_*.py` (74 files) | Unique per-source download logic |
@@ -190,34 +190,34 @@ scripts/ingest_hud_drgr_exports.py
 
 ---
 
-### Group 10 — Pipeline schema management → `contract_sweeper/pipeline/schema_management.py`
+### Group 10 — Pipeline schema management → `moneysweep/pipeline/schema_management.py`
 **2 files → 1 file (saves 1 file)**
 
 Schema alignment and schema remediation are two phases of the same operation.
 
 ```
-contract_sweeper/pipeline/schema_alignment.py
-contract_sweeper/pipeline/schema_remediation.py
+moneysweep/pipeline/schema_alignment.py
+moneysweep/pipeline/schema_remediation.py
 ```
 
 ---
 
-### Group 11 — Endpoint management → `contract_sweeper/pipeline/endpoint_management.py`
+### Group 11 — Endpoint management → `moneysweep/pipeline/endpoint_management.py`
 **2 files → 1 file (saves 1 file)**
 
 ```
-contract_sweeper/pipeline/endpoint_patch_retry.py
-contract_sweeper/pipeline/endpoint_resolution.py
+moneysweep/pipeline/endpoint_patch_retry.py
+moneysweep/pipeline/endpoint_resolution.py
 ```
 
 ---
 
-### Group 12 — Producer management → `contract_sweeper/pipeline/producer_management.py`
+### Group 12 — Producer management → `moneysweep/pipeline/producer_management.py`
 **2 files → 1 file (saves 1 file)**
 
 ```
-contract_sweeper/pipeline/producer_failure_resolution.py
-contract_sweeper/pipeline/producer_patch_retry.py
+moneysweep/pipeline/producer_failure_resolution.py
+moneysweep/pipeline/producer_patch_retry.py
 ```
 
 ---
@@ -237,8 +237,8 @@ Move to `archive/` — do not delete (may contain reference logic), but remove f
 | `scripts/scan_for_secrets.py` | Dev tooling; not in CI; no tests |
 | `scripts/regenerate_registry_json.py` | Dev utility; 0 inbound imports; no tests |
 | `scripts/parse_highergov_pdfs.py` | One-time PDF parser; no tests; 0 inbound refs |
-| `contract_sweeper/validation/cache_audit.py` | Audit artifact; no tests; low active usage |
-| `contract_sweeper/pipeline/credential_unblock_plan.py` | Planning artifact; 1 import; no tests |
+| `moneysweep/validation/cache_audit.py` | Audit artifact; no tests; low active usage |
+| `moneysweep/pipeline/credential_unblock_plan.py` | Planning artifact; 1 import; no tests |
 
 ---
 
@@ -248,12 +248,12 @@ Remove entirely — all logic is trivially inlinable into the consuming module.
 
 | Module | Lines | Inline into |
 |--------|-------|-------------|
-| `contract_sweeper/pipeline/partial_rebuild_gate.py` | 26 | `partial_master_rebuild.py` |
-| `contract_sweeper/pipeline/unfreeze_guard.py` | 71 | `scoped_unfreeze_materialization.py` |
-| `contract_sweeper/pipeline/manual_fulfillment_execution.py` | 60 | `manual_import_dropzone.py` |
-| `contract_sweeper/pipeline/import_slots.py` | 67 | `backfill_runner.py` |
-| `contract_sweeper/runtime/file_hash_runtime.py` | 16 | `manifest_runtime.py` |
-| `contract_sweeper/runtime/pagination_runtime.py` | 45 | Delete (0 external consumers) |
+| `moneysweep/pipeline/partial_rebuild_gate.py` | 26 | `partial_master_rebuild.py` |
+| `moneysweep/pipeline/unfreeze_guard.py` | 71 | `scoped_unfreeze_materialization.py` |
+| `moneysweep/pipeline/manual_fulfillment_execution.py` | 60 | `manual_import_dropzone.py` |
+| `moneysweep/pipeline/import_slots.py` | 67 | `backfill_runner.py` |
+| `moneysweep/runtime/file_hash_runtime.py` | 16 | `manifest_runtime.py` |
+| `moneysweep/runtime/pagination_runtime.py` | 45 | Delete (0 external consumers) |
 
 ---
 

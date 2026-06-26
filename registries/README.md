@@ -16,7 +16,7 @@ endpoint resolution, and manual-export tracking. They exist in two formats:
 multi-line strings, anchors, the lot.
 
 **JSON files are regenerated, never hand-edited.** Runtime modules under
-`contract_sweeper.runtime.*` read JSON because it's faster and stdlib-only;
+`moneysweep.runtime.*` read JSON because it's faster and stdlib-only;
 they never touch YAML. JSON files are an output artifact.
 
 ## Regenerating JSON after a YAML edit
@@ -41,7 +41,7 @@ YAML, commit, JSON regenerates as part of the commit."
 - **YAML for humans:** registries are policy data — source IDs, expected outputs,
   schema columns, endpoint URLs, notes. YAML's comment support and multi-line
   strings make policy edits readable in PRs.
-- **JSON for runtime:** `contract_sweeper.runtime.source_registry`, `schema_registry`,
+- **JSON for runtime:** `moneysweep.runtime.source_registry`, `schema_registry`,
   etc. read JSON via the stdlib without an extra dependency, and JSON parses
   faster than YAML on every startup.
 

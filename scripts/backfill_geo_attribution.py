@@ -28,9 +28,9 @@ import pandas as pd
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from contract_sweeper.runtime.geo_attribution import attribution_summary  # noqa: E402
-from contract_sweeper.runtime.post_ingest import apply_post_ingest  # noqa: E402
-from contract_sweeper.runtime.source_registry import all_sources  # noqa: E402
+from moneysweep.runtime.geo_attribution import attribution_summary  # noqa: E402
+from moneysweep.runtime.post_ingest import apply_post_ingest  # noqa: E402
+from moneysweep.runtime.source_registry import all_sources  # noqa: E402
 
 
 def _read(path: Path) -> pd.DataFrame:

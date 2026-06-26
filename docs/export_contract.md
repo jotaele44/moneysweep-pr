@@ -1,11 +1,11 @@
 # Export Contract
 
-The **export contract** defines how Contract-Sweeper publishes data for the
-federation. Contract-Sweeper is a *producer*: it emits portable, validated
+The **export contract** defines how moneysweep-pr publishes data for the
+federation. moneysweep-pr is a *producer*: it emits portable, validated
 **export packages** that the **query hub** (the `query-hub` component inside the
 [`spiderweb-pr`](#cross-repo-federation-handshake) repo) ingests.
 
-- **Contract name:** `contract-sweeper-export`
+- **Contract name:** `moneysweep-pr-export`
 - **Contract version:** `1.2.0` (field `export_contract_version`)
 
 > **v1.2.0 (current):** no field changes versus v1.1.0 — this is a coordination
@@ -41,12 +41,12 @@ each stream lives in [`schemas/`](../schemas):
 
 | Stream             | File                    | Schema                                            |
 |--------------------|-------------------------|---------------------------------------------------|
-| entities           | `entities.jsonl`        | `contract_sweeper_entity.schema.json`             |
-| sources            | `sources.jsonl`         | `contract_sweeper_source.schema.json`             |
-| funding_awards     | `funding_awards.jsonl`  | `contract_sweeper_funding_award.schema.json`      |
-| transactions       | `transactions.jsonl`    | `contract_sweeper_transaction.schema.json`        |
-| relationships      | `relationships.jsonl`   | `contract_sweeper_relationship.schema.json`       |
-| (manifest)         | `manifest.json`         | `contract_sweeper_export_manifest.schema.json`    |
+| entities           | `entities.jsonl`        | `moneysweep_entity.schema.json`             |
+| sources            | `sources.jsonl`         | `moneysweep_source.schema.json`             |
+| funding_awards     | `funding_awards.jsonl`  | `moneysweep_funding_award.schema.json`      |
+| transactions       | `transactions.jsonl`    | `moneysweep_transaction.schema.json`        |
+| relationships      | `relationships.jsonl`   | `moneysweep_relationship.schema.json`       |
+| (manifest)         | `manifest.json`         | `moneysweep_export_manifest.schema.json`    |
 
 ## Common row envelope
 
@@ -98,17 +98,17 @@ reconcile across deliveries. The canonical helper is
 ```json
 {
   "package_id": "pkg_<32-hex>",
-  "producer": "contract-sweeper",
+  "producer": "moneysweep-pr",
   "producer_version": "0.1.0",
   "export_contract_version": "1.2.0",
   "mode": "test",
   "created_at": "2024-01-15T12:00:00Z",
   "extracted_at": "2024-01-15T12:00:00Z",
   "federation": {
-    "producer_repo": "contract-sweeper",
+    "producer_repo": "moneysweep-pr",
     "consumer_repo": "spiderweb-pr",
     "consumer_component": "query-hub",
-    "contract": "contract-sweeper-export"
+    "contract": "moneysweep-pr-export"
   },
   "coverage_window": { "fiscal_year_min": 2023, "fiscal_year_max": 2023 },
   "files": [
@@ -117,7 +117,7 @@ reconcile across deliveries. The canonical helper is
       "stream": "funding_awards",
       "record_count": 1,
       "sha256": "<64-hex>",
-      "schema_id": "contract_sweeper_funding_award.schema.json"
+      "schema_id": "moneysweep_funding_award.schema.json"
     }
   ]
 }
@@ -132,7 +132,7 @@ The `federation` block makes the package routable to its consumer. The query
 hub is **not** an independent repo — it is the `query-hub` component within the
 `spiderweb-pr` repo. On ingest the hub:
 
-1. Reads `federation.contract` (`contract-sweeper-export`) to route the package.
+1. Reads `federation.contract` (`moneysweep-pr-export`) to route the package.
 2. Checks `export_contract_version` against its supported set — this is the
    **single compatibility key**; no version is duplicated inside the federation
    block, to avoid drift.

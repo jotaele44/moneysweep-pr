@@ -27,7 +27,7 @@ from scripts.config import (
     REQUIRED_MASTER_COLUMNS,
     NULL_THRESHOLDS,
 )
-from contract_sweeper.runtime.post_ingest import apply_post_ingest
+from moneysweep.runtime.post_ingest import apply_post_ingest
 import pandas as pd
 import argparse
 import json

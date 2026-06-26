@@ -1,4 +1,4 @@
-# Handoff — Contract-Sweeper
+# Handoff — moneysweep-pr
 
 **Date:** 2026-05-15  
 **Outgoing operator:** jotaele44 (original/legacy account)  
@@ -10,7 +10,7 @@
 
 ## What This Repository Is
 
-Contract-Sweeper is a data pipeline for collecting, normalizing, linking, and analyzing Puerto Rico government procurement and federal spending data. It ingests 80+ public and semi-public data sources, resolves entities, builds a unified awards master, and produces network/influence graphs and compliance reports.
+moneysweep-pr is a data pipeline for collecting, normalizing, linking, and analyzing Puerto Rico government procurement and federal spending data. It ingests 80+ public and semi-public data sources, resolves entities, builds a unified awards master, and produces network/influence graphs and compliance reports.
 
 The production rebuild is currently **paused** (`NON_PRODUCTION_DIAGNOSTIC`) pending delivery of 21 missing source files. The pipeline architecture, validation gates, and test suite are fully functional.
 
@@ -19,8 +19,8 @@ The production rebuild is currently **paused** (`NON_PRODUCTION_DIAGNOSTIC`) pen
 ## Repository Structure
 
 ```
-Contract-Sweeper/
-├── contract_sweeper/          # Core Python package
+moneysweep-pr/
+├── moneysweep/          # Core Python package
 │   ├── pipeline/              # Orchestration & backfill modules (43 files)
 │   ├── runtime/               # Shared utilities: hashing, registries, gates (9 files)
 │   └── validation/            # Validation gate logic (8 files)

@@ -1,4 +1,4 @@
-# Setup Guide — Contract-Sweeper
+# Setup Guide — moneysweep-pr
 
 **Tested on:** Python 3.9+ · Ubuntu/Debian · macOS  
 **Estimated setup time:** 5 minutes (no data download required for tests)
@@ -10,8 +10,8 @@
 ## 1. Clone
 
 ```bash
-git clone https://github.com/jotaele44/Contract-Sweeper.git
-cd Contract-Sweeper
+git clone https://github.com/jotaele44/moneysweep-pr.git
+cd moneysweep-pr
 ```
 
 No special credentials are needed to clone — the repository is public.

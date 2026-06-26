@@ -14,7 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.validation.promotion_guard import run_guard
+from moneysweep.validation.promotion_guard import run_guard
 
 
 def main() -> int:

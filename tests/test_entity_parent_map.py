@@ -13,7 +13,7 @@ import re
 
 import pytest
 
-from contract_sweeper.validation.canonical_v1_schema import validate_row
+from moneysweep.validation.canonical_v1_schema import validate_row
 from scripts import build_entity_parent_map as bpm
 
 REPO_ROOT = bpm.REPO_ROOT

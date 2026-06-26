@@ -4,8 +4,8 @@ import csv
 
 import pytest
 
-from contract_sweeper.runtime import evidence_tiers as et
-from contract_sweeper.validation import canonical_v1_schema as cv1
+from moneysweep.runtime import evidence_tiers as et
+from moneysweep.validation import canonical_v1_schema as cv1
 from scripts import build_evidence as be
 
 

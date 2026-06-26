@@ -6,7 +6,7 @@ R4.9Z-D adds two push and pull request workflows that automate only the existing
 
 | Workflow | File | Purpose |
 | --- | --- | --- |
-| Contract Sweeper CI | `.github/workflows/ci.yml` | Installs repository dependencies, compiles `contract_sweeper` and `tests`, then runs the test suite. |
+| Contract Sweeper CI | `.github/workflows/ci.yml` | Installs repository dependencies, compiles `moneysweep` and `tests`, then runs the test suite. |
 | Production Status Gate | `.github/workflows/production-status-gate.yml` | Runs the production status gate and repo quality audit, then enforces the diagnostic production state and Phase 7/8 block. |
 
 Both workflows run on:
@@ -19,7 +19,7 @@ Both workflows run on:
 The workflows are limited to these repository checks:
 
 ```bash
-python -m compileall contract_sweeper tests
+python -m compileall moneysweep tests
 pytest -q
 python scripts/run_production_status_gate.py --root .
 python scripts/run_repo_quality_audit_r49z_b.py --root .
@@ -59,7 +59,7 @@ After the repo quality audit, it additionally checks:
 Before changing these workflows, run:
 
 ```bash
-python -m compileall contract_sweeper tests
+python -m compileall moneysweep tests
 pytest -q
 python scripts/run_production_status_gate.py --root .
 ```

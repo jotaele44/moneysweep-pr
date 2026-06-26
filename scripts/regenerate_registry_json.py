@@ -1,7 +1,7 @@
 """Regenerate JSON siblings of the YAML registries.
 
 YAML is the human-editable source of truth in `registries/*.yaml`.
-JSON is the runtime wire format read by `contract_sweeper.runtime.*`.
+JSON is the runtime wire format read by `moneysweep.runtime.*`.
 Run this after editing any YAML registry.
 """
 

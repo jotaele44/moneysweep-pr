@@ -41,7 +41,7 @@ from scripts.config import PROJECT_ROOT, setup_logging
 
 ECHO_BASE = "https://echodata.epa.gov/echo"
 ECHO_ENDPOINT = os.environ.get("ECHO_ENDPOINT", "case_rest_services.get_cases")
-USER_AGENT = "ContractSweeper/1.0 (+https://github.com/jotaele44/Contract-Sweeper)"
+USER_AGENT = "ContractSweeper/1.0 (+https://github.com/jotaele44/moneysweep-pr)"
 MAX_RETRIES = 3
 RETRY_BACKOFF = (5, 15, 30)
 OUTPUT = "data/staging/processed/pr_epa_echo_icis.csv"

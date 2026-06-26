@@ -7,18 +7,18 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from contract_sweeper.query.adapters.ckan_metastore import (
+from moneysweep.query.adapters.ckan_metastore import (
     CHIPAdapter,
     CMSOpenPaymentsAdapter,
     MedicaidFMAPAdapter,
 )
-from contract_sweeper.query.adapters.cms_socrata import (
+from moneysweep.query.adapters.cms_socrata import (
     DEFAULT_STATE_CLAUSE,
     MedicareAdvantageAdapter,
     MedicarePartsAdapter,
     SOCRATA_BASE,
 )
-from contract_sweeper.query.types import Query
+from moneysweep.query.types import Query
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 

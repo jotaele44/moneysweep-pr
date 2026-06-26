@@ -30,7 +30,7 @@ import pandas as pd
 import requests
 
 from scripts.config import PROJECT_ROOT, get_fec_api_key, setup_logging
-from contract_sweeper.runtime.base_downloader import (
+from moneysweep.runtime.base_downloader import (
     HttpConfig,
     PageResult,
     build_session,

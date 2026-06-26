@@ -33,8 +33,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.query.adapters import ADAPTER_REGISTRY, ENTITY_ADAPTER_REGISTRY
-from contract_sweeper.runtime.source_registry import load_source_registry
+from moneysweep.query.adapters import ADAPTER_REGISTRY, ENTITY_ADAPTER_REGISTRY
+from moneysweep.runtime.source_registry import load_source_registry
 from scripts.pipeline_preflight import STRUCTURAL_STATUSES, classify_source_readiness
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -67,7 +67,7 @@ DEFERRED_NOTE_MARKERS = ("intentionally not implemented", "deferred")
 PATH_TYPES = {
     "api_adapter": (
         True,
-        "Materialize via `python -m contract_sweeper.query --source <id>` (set key if gated).",
+        "Materialize via `python -m moneysweep.query --source <id>` (set key if gated).",
     ),
     "api_producer": (
         True,

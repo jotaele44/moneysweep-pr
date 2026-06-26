@@ -15,7 +15,7 @@ networked/credentialed run (see `docs/MATERIALIZATION_RUNBOOK.md`).
 
 ### Tranche 1 — federal API producers (automatable)
 
-Reuse `contract_sweeper.runtime.base_downloader` (`HttpConfig`, `build_session`,
+Reuse `moneysweep.runtime.base_downloader` (`HttpConfig`, `build_session`,
 `http_get_json` / `http_post_json`, `paginate`). All became `api_producer` +
 `ready` in `reports/materialization_readiness.json`.
 
@@ -32,7 +32,7 @@ Reuse `contract_sweeper.runtime.base_downloader` (`HttpConfig`, `build_session`,
 
 ### Tranches 2-3 — manual dropzone readers (queued/manual)
 
-Delegate to the shared `contract_sweeper.runtime.dropzone_ingest.ingest_dropzone`
+Delegate to the shared `moneysweep.runtime.dropzone_ingest.ingest_dropzone`
 helper. Each registers `authentication: manual_export` + a `manual_drop_dir`; an
 operator drops CSV/Excel exports there and runs `scripts/ingest_<id>.py`.
 

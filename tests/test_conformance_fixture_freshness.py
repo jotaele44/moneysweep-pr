@@ -15,7 +15,7 @@ versions (task 30): the federation ``export_contract_version`` is owned by
 ``build_export_package.EXPORT_CONTRACT_VERSION`` and must agree with every place
 that hardcodes the literal (the conformance manifest, the sample manifest, and
 the manifest schema's ``const``). The finance-lane report version is owned
-separately by ``readiness/contract_sweeper_finance_lane.py`` and the two must
+separately by ``readiness/moneysweep_finance_lane.py`` and the two must
 never collapse into one.
 """
 
@@ -99,7 +99,7 @@ def test_sample_manifest_pins_federation_contract_version():
 @pytest.mark.unit
 def test_manifest_schema_const_pins_federation_contract_version():
     schema = json.loads(
-        (REPO_ROOT / "schemas" / "contract_sweeper_export_manifest.schema.json").read_text(
+        (REPO_ROOT / "schemas" / "moneysweep_export_manifest.schema.json").read_text(
             encoding="utf-8"
         )
     )
@@ -112,7 +112,7 @@ def test_manifest_schema_const_pins_federation_contract_version():
 @pytest.mark.unit
 def test_finance_lane_version_is_independent_of_federation_version():
     """The two contract versions are separate sources of truth — never collapse them."""
-    from readiness import contract_sweeper_finance_lane as finance_lane
+    from readiness import moneysweep_finance_lane as finance_lane
 
     # They legitimately differ today (federation 1.2.0 vs finance-lane 1.0.0); the
     # point is that they are distinct constants in distinct modules. This guard

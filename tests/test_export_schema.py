@@ -9,7 +9,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SCHEMAS_DIR = REPO_ROOT / "schemas"
 
 EXPECTED_REQUIRED = {
-    "contract_sweeper_entity.schema.json": {
+    "moneysweep_entity.schema.json": {
         "entity_id",
         "source_id",
         "name",
@@ -22,7 +22,7 @@ EXPECTED_REQUIRED = {
         "created_at",
         "extracted_at",
     },
-    "contract_sweeper_source.schema.json": {
+    "moneysweep_source.schema.json": {
         "source_id",
         "source_type",
         "source_name",
@@ -32,7 +32,7 @@ EXPECTED_REQUIRED = {
         "created_at",
         "extracted_at",
     },
-    "contract_sweeper_funding_award.schema.json": {
+    "moneysweep_funding_award.schema.json": {
         "award_id",
         "source_id",
         "recipient_entity_id",
@@ -48,7 +48,7 @@ EXPECTED_REQUIRED = {
         "created_at",
         "extracted_at",
     },
-    "contract_sweeper_transaction.schema.json": {
+    "moneysweep_transaction.schema.json": {
         "transaction_id",
         "source_id",
         "payer_entity_id",
@@ -63,7 +63,7 @@ EXPECTED_REQUIRED = {
         "created_at",
         "extracted_at",
     },
-    "contract_sweeper_relationship.schema.json": {
+    "moneysweep_relationship.schema.json": {
         "relationship_id",
         "source_id",
         "source_entity_id",
@@ -76,7 +76,7 @@ EXPECTED_REQUIRED = {
         "created_at",
         "extracted_at",
     },
-    "contract_sweeper_export_manifest.schema.json": {
+    "moneysweep_export_manifest.schema.json": {
         "package_id",
         "producer",
         "producer_version",
@@ -118,7 +118,7 @@ def test_all_expected_schema_files_exist():
 @pytest.mark.unit
 def test_manifest_schema_requires_federation_handshake():
     data = json.loads(
-        (SCHEMAS_DIR / "contract_sweeper_export_manifest.schema.json").read_text(encoding="utf-8")
+        (SCHEMAS_DIR / "moneysweep_export_manifest.schema.json").read_text(encoding="utf-8")
     )
     federation = data["properties"]["federation"]
     assert set(federation["required"]) == {

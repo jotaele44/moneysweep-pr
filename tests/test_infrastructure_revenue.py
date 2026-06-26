@@ -20,7 +20,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from contract_sweeper.runtime.source_registry import all_sources, expected_outputs_for
+from moneysweep.runtime.source_registry import all_sources, expected_outputs_for
 from scripts._revenue_common import REVENUE_COLUMNS, _parse_df as parse_revenue
 from scripts._contract_dropzone import CONTRACT_COLUMNS, _parse_df as parse_contract
 from scripts import ingest_toll_revenue, ingest_dtop_road_contracts, build_prasa_contracts_master

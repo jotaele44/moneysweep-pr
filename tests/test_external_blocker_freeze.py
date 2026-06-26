@@ -6,7 +6,7 @@ import csv
 import json
 from pathlib import Path
 
-from contract_sweeper.pipeline.external_blocker_freeze import run_external_blocker_freeze
+from moneysweep.pipeline.external_blocker_freeze import run_external_blocker_freeze
 
 
 def _write_json(path: Path, payload: dict) -> None:

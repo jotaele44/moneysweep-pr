@@ -1,5 +1,5 @@
 """
-Contract-Sweeper dashboard API
+moneysweep-pr dashboard API
 ==============================
 Thin FastAPI read layer over the frozen canonical_v1 CSVs (Tranche A). It does
 NOT import the legacy pipeline — it reads data/canonical_v1/*.csv with pandas and
@@ -40,7 +40,7 @@ EXPECTED = {
     "municipalities": ["municipality_id", "name", "region"],
 }
 
-app = FastAPI(title="Contract-Sweeper API", version="0.1.0")
+app = FastAPI(title="moneysweep-pr API", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],

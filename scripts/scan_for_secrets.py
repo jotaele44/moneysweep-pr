@@ -8,7 +8,7 @@ Safe locations (allowlisted):
   - .env.example (template only, must contain placeholder values)
   - tests/fixtures/r5/*.json (synthetic test data)
   - data/manifests/**/*.json sha256 hashes (64-hex)
-  - any path inside `Contract-Sweeper-Secrets/` (external to repo and gitignored)
+  - any path inside `moneysweep-pr-Secrets/` (external to repo and gitignored)
   - data/raw/** (raw ingest fixtures may legitimately contain UEIs, EIN, etc.)
 
 Exit codes:
@@ -64,7 +64,7 @@ PLACEHOLDER_HINTS = (
 ALLOWED_PATH_FRAGMENTS = (
     ".env.example",
     "/tests/fixtures/",
-    "/Contract-Sweeper-Secrets/",
+    "/moneysweep-pr-Secrets/",
     "/.git/",
     "/.venv/",
     "/venv/",

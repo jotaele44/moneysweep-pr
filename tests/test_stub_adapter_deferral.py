@@ -22,10 +22,10 @@ from pathlib import Path
 
 import pytest
 
-from contract_sweeper.query.adapters import ADAPTER_REGISTRY, get_adapter
-from contract_sweeper.query.adapters._stub import NotImplementedAdapter
-from contract_sweeper.query.types import ManualOnlyError, Query
-from contract_sweeper.runtime.source_registry import REPO_ROOT, all_sources
+from moneysweep.query.adapters import ADAPTER_REGISTRY, get_adapter
+from moneysweep.query.adapters._stub import NotImplementedAdapter
+from moneysweep.query.types import ManualOnlyError, Query
+from moneysweep.runtime.source_registry import REPO_ROOT, all_sources
 
 ROOT = REPO_ROOT
 

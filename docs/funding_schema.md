@@ -29,7 +29,7 @@ The model is a directed funding graph:
 ## Sources stream
 
 Stream: `sources.jsonl` · Schema:
-[`schemas/contract_sweeper_source.schema.json`](../schemas/contract_sweeper_source.schema.json)
+[`schemas/moneysweep_source.schema.json`](../schemas/moneysweep_source.schema.json)
 
 A **source** records where rows came from. It is self-referential: a source
 row's `source_id` is both its identity and its own provenance.
@@ -50,7 +50,7 @@ hub can map an export source back to a known upstream feed.
 ## Relationships stream
 
 Stream: `relationships.jsonl` · Schema:
-[`schemas/contract_sweeper_relationship.schema.json`](../schemas/contract_sweeper_relationship.schema.json)
+[`schemas/moneysweep_relationship.schema.json`](../schemas/moneysweep_relationship.schema.json)
 
 A **relationship** is a directed edge between two entities, backed by a source
 of evidence.

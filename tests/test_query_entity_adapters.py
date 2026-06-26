@@ -7,13 +7,13 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from contract_sweeper.query.adapters.ofac import OFACSDNAdapter, parse_sdn_xml
-from contract_sweeper.query.adapters.sam import (
+from moneysweep.query.adapters.ofac import OFACSDNAdapter, parse_sdn_xml
+from moneysweep.query.adapters.sam import (
     PARAM_FOR_KIND,
     SAMEntitiesAdapter,
 )
-from contract_sweeper.query.entity_types import EntityIdentifier, EntityQuery
-from contract_sweeper.query.types import CredentialMissing
+from moneysweep.query.entity_types import EntityIdentifier, EntityQuery
+from moneysweep.query.types import CredentialMissing
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 

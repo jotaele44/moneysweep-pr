@@ -1,4 +1,4 @@
-# Contract-Sweeper — Build Execution Sequence (75 tasks)
+# moneysweep-pr — Build Execution Sequence (75 tasks)
 
 _Generated 2026-06-08. Companion to `docs/CODE_GAP_AND_WORKFLOW_AUDIT.md`._
 
@@ -47,18 +47,18 @@ _`ruff format` rewrites 507 files. Keep it surgical and reviewable._
 _Each step keeps the existing narrow mypy gate green while widening it._
 
 18. **[done]** Fix the known `geo_attribution.py:172` dict-item return-type bug — annotation was `dict[str, dict[str, str]]` but the function returns `{by_fips, by_alias}` indexes (one more level of nesting).
-19. **[done]** Remove the `geo_attribution.py` exclude from the mypy pre-commit hook — `mypy contract_sweeper/runtime/` now clean across all 19 files.
-20–22. **[done]** Type-clean `contract_sweeper/` (pipeline/ + query/ are already inside the `files=["contract_sweeper"]` scope). Fixed ~15 errors: implicit-`Optional` defaults, `str | None` coercion in the canonical_v1 bridge, a `Query | EntityQuery` union for `FileCache.put`/`QueryResult` (via `TYPE_CHECKING`), default-arg-lambda inference, and a few annotations. All behavior-preserving (suite still 1616 passed).
+19. **[done]** Remove the `geo_attribution.py` exclude from the mypy pre-commit hook — `mypy moneysweep/runtime/` now clean across all 19 files.
+20–22. **[done]** Type-clean `moneysweep/` (pipeline/ + query/ are already inside the `files=["moneysweep"]` scope). Fixed ~15 errors: implicit-`Optional` defaults, `str | None` coercion in the canonical_v1 bridge, a `Query | EntityQuery` union for `FileCache.put`/`QueryResult` (via `TYPE_CHECKING`), default-arg-lambda inference, and a few annotations. All behavior-preserving (suite still 1616 passed).
 23. **[done]** Added `types-requests` to `requirements-dev.txt` — required because mypy's `import-untyped` (stubs available on PyPI) is **not** suppressed by `ignore_missing_imports`. Dropping `ignore_missing_imports` per-module is still future work.
-24. **[done] (gate / big-diff)** Brought `scripts/` (209 files) into mypy scope — added `"scripts"` to `[tool.mypy] files` and dropped `^scripts/` from `exclude`, so the gating `mypy.yml` now type-checks `contract_sweeper` + `scripts` (302 files) clean. Fixed all 298 errors behavior-preservingly: implicit-`Optional` defaults, `var-annotated` empty collections, heterogeneous/row dicts annotated bare `dict`, narrowed `Optional`/`Match`/`bytes|None` at use sites, widened a few helper signatures, and converted the JSON `_get` helpers to `-> Any` (`resp.json()` is genuinely `Any`). One `# type: ignore` only where correct-but-unprovable (`requests.utils.quote`, re-exported at runtime but absent from the stubs). Surfaced + fixed two latent `None`/`[]`-vs-DataFrame bugs (`generate_report` `dual`, `download_ofac` content flow). Remaining widening (run_all.py, dropping `ignore_missing_imports`) noted as future work.
+24. **[done] (gate / big-diff)** Brought `scripts/` (209 files) into mypy scope — added `"scripts"` to `[tool.mypy] files` and dropped `^scripts/` from `exclude`, so the gating `mypy.yml` now type-checks `moneysweep` + `scripts` (302 files) clean. Fixed all 298 errors behavior-preservingly: implicit-`Optional` defaults, `var-annotated` empty collections, heterogeneous/row dicts annotated bare `dict`, narrowed `Optional`/`Match`/`bytes|None` at use sites, widened a few helper signatures, and converted the JSON `_get` helpers to `-> Any` (`resp.json()` is genuinely `Any`). One `# type: ignore` only where correct-but-unprovable (`requests.utils.quote`, re-exported at runtime but absent from the stubs). Surfaced + fixed two latent `None`/`[]`-vs-DataFrame bugs (`generate_report` `dual`, `download_ofac` content flow). Remaining widening (run_all.py, dropping `ignore_missing_imports`) noted as future work.
 25. **[done] (gate)** Flipped `.github/workflows/mypy.yml` to gating (removed `continue-on-error`); `python -m mypy` → clean across 92 files under the pinned mypy 1.11.2.
 
 ## WAVE E — Cross-repo contract hardening (corrects the #216 false positive)
 _See `docs/CODE_GAP_AND_WORKFLOW_AUDIT.md` §B1 correction._
 
 26. **[done]** Add a one-line provenance comment at **each** `EXPORT_CONTRACT_VERSION` (federation package vs. finance lane) so the two contracts are never conflated again.
-27. **[done]** Author `schemas/contract_sweeper_finance_lane_report.schema.json` for the finance-lane report — the real B1 gap.
-28. **[done]** Add a test validating an emitted finance-lane report against schema 27 and asserting `export_contract_version == "1.0.0"` — `tests/test_contract_sweeper_finance_lane.py`.
+27. **[done]** Author `schemas/moneysweep_finance_lane_report.schema.json` for the finance-lane report — the real B1 gap.
+28. **[done]** Add a test validating an emitted finance-lane report against schema 27 and asserting `export_contract_version == "1.0.0"` — `tests/test_moneysweep_finance_lane.py`.
 29. **[done]** Add a conformance-fixture freshness check for `exports/conformance/v1_2/` so the federation package can't silently drift from its schema — `tests/test_conformance_fixture_freshness.py` rebuilds the manifest from the on-disk streams and asserts sha256/record_count/package_id parity.
 30. **[done]** Centralize each contract version into a single importable constant (one per contract) — `build_export_package.EXPORT_CONTRACT_VERSION` is the single source for the federation literal; the freshness test pins the conformance manifest, sample manifest, and manifest-schema `const` to it (and asserts the finance-lane version stays independent).
 
@@ -71,15 +71,15 @@ _Set the ratchet only after you know the number it should start at._
 ## WAVE G — Tests for untested critical paths (#215; ratchet coverage as you go)
 _Highest-blast-radius modules first. Each new test file lets you raise the floor._
 
-33. **[done]** Unit-test `contract_sweeper/pipeline/credentialed_endpoint_execution.py` — `tests/test_pipeline_security_modules.py` (credential-presence eval via monkeypatched env, forbidden-artifact flag, safe excerpt/empty-command/env-var-scan helpers).
-34. **[done]** Unit-test `contract_sweeper/pipeline/manual_import_dropzone.py` — `tests/test_pipeline_security_modules.py` (happy stage+manifest, dropzone-missing, missing-columns, forbidden flag, pure helpers).
-35. **[done]** Unit-test `contract_sweeper/pipeline/source_materialization.py` — `tests/test_pipeline_security_modules.py` (materialize+hash-validate, forbidden-path block, invalid-manifest block, status/type/approved-stage-path helpers).
-36. **[done]** Unit-test `contract_sweeper/pipeline/scoped_unfreeze_materialization.py` — `tests/test_pipeline_security_modules.py` (forbidden + not-in-checklist rejection, gate-not-passed on no candidates, `_truthy`/`_approved_target_match`/manifest helpers).
-37. **[done]** Unit-test `contract_sweeper/runtime/retry_runtime.py` — `tests/test_runtime_helpers.py` (success/transient-recovery/exhaustion + exception narrowing + backoff/jitter).
-38. **[done]** Unit-test `contract_sweeper/runtime/pagination_runtime.py` — `tests/test_runtime_helpers.py` (multi-page walk, start_marker, max_pages guard).
-39. **[done]** Unit-test `contract_sweeper/runtime/file_hash_runtime.py` — `tests/test_runtime_helpers.py` (hashlib parity, empty + multi-chunk).
-40. **[done]** Unit-test `contract_sweeper/runtime/evidence_tiers.py` — `tests/test_runtime_helpers.py` (tier derivation/caps, confidence, OCR scoring, claim-tier mapping).
-41. **[done]** Unit-test `contract_sweeper/runtime/risk_signal_gates.py` — already covered by `tests/test_risk_signals.py` (all five gates + `run_all_gates`).
+33. **[done]** Unit-test `moneysweep/pipeline/credentialed_endpoint_execution.py` — `tests/test_pipeline_security_modules.py` (credential-presence eval via monkeypatched env, forbidden-artifact flag, safe excerpt/empty-command/env-var-scan helpers).
+34. **[done]** Unit-test `moneysweep/pipeline/manual_import_dropzone.py` — `tests/test_pipeline_security_modules.py` (happy stage+manifest, dropzone-missing, missing-columns, forbidden flag, pure helpers).
+35. **[done]** Unit-test `moneysweep/pipeline/source_materialization.py` — `tests/test_pipeline_security_modules.py` (materialize+hash-validate, forbidden-path block, invalid-manifest block, status/type/approved-stage-path helpers).
+36. **[done]** Unit-test `moneysweep/pipeline/scoped_unfreeze_materialization.py` — `tests/test_pipeline_security_modules.py` (forbidden + not-in-checklist rejection, gate-not-passed on no candidates, `_truthy`/`_approved_target_match`/manifest helpers).
+37. **[done]** Unit-test `moneysweep/runtime/retry_runtime.py` — `tests/test_runtime_helpers.py` (success/transient-recovery/exhaustion + exception narrowing + backoff/jitter).
+38. **[done]** Unit-test `moneysweep/runtime/pagination_runtime.py` — `tests/test_runtime_helpers.py` (multi-page walk, start_marker, max_pages guard).
+39. **[done]** Unit-test `moneysweep/runtime/file_hash_runtime.py` — `tests/test_runtime_helpers.py` (hashlib parity, empty + multi-chunk).
+40. **[done]** Unit-test `moneysweep/runtime/evidence_tiers.py` — `tests/test_runtime_helpers.py` (tier derivation/caps, confidence, OCR scoring, claim-tier mapping).
+41. **[done]** Unit-test `moneysweep/runtime/risk_signal_gates.py` — already covered by `tests/test_risk_signals.py` (all five gates + `run_all_gates`).
 42. **[done]** Adapter error/credential-path tests: `query/adapters/sam.py` — already covered by `tests/test_query_entity_adapters.py` (credential-missing-before-HTTP, param routing, iteration).
 43. **[done]** Adapter error/credential-path tests: `query/adapters/highergov.py` — `tests/test_query_adapters_highergov.py` (credential gate before HTTP, ctor-vs-env key, request shape, `_extract_records` payload tolerance, extraction + pagination).
 44. **[done]** Adapter error/credential-path tests: `query/adapters/ckan_metastore.py` — already covered by `tests/test_query_adapters_cms.py` (keyword filter, empty metastore, POST conditions, pagination, metastore-down→empty).
@@ -122,7 +122,7 @@ _Highest-blast-radius modules first. Each new test file lets you raise the floor
 ## WAVE M — Runtime robustness & resumption readiness (the project is paused pending sources)
 _Capstone: make resuming ingestion safe and observable._
 
-70. **[done]** Introduce structured logging across `contract_sweeper/runtime/` (replace bare prints) — `contract_sweeper/runtime/logging_config.py` (idempotent `configure_logging()`, key=value or JSON via `CONTRACT_SWEEPER_LOG_FORMAT`, level via `CONTRACT_SWEEPER_LOG_LEVEL`); wired into the runtime CLI `main()`s and the `risk_signal_gates` per-gate diagnostics now route through the logger. Machine-readable `print(json.dumps(...))` results stay on stdout by design. Covered by `tests/test_logging_config.py`.
+70. **[done]** Introduce structured logging across `moneysweep/runtime/` (replace bare prints) — `moneysweep/runtime/logging_config.py` (idempotent `configure_logging()`, key=value or JSON via `MONEYSWEEP_LOG_FORMAT`, level via `MONEYSWEEP_LOG_LEVEL`); wired into the runtime CLI `main()`s and the `risk_signal_gates` per-gate diagnostics now route through the logger. Machine-readable `print(json.dumps(...))` results stay on stdout by design. Covered by `tests/test_logging_config.py`.
 71. **[done]** Add jitter/backoff + circuit-breaker tests around `retry_runtime` (depends on 37) — added a `CircuitBreaker` (closed→open→half-open with injected clock) + `CircuitOpen` to `retry_runtime.py`; `tests/test_retry_circuit_breaker.py` pins the jitter band / cap / monotonic backoff and the full breaker state machine.
 72. **[done]** Add a diagnostic-mode smoke CI job that dry-runs the `run_all` orchestration — `.github/workflows/diagnostic-smoke.yml` runs `run_all.py --only-setup --strict-preflight` (setup + structural preflight, no producers/network) so orchestrator integration breakage surfaces before source delivery.
 73. **[done]** Add contract tests asserting the `NotImplementedAdapter` stubs stay deferred (no accidental activation) — `tests/test_stub_adapter_deferral.py` (count-agnostic: every stub-resolved source raises `ManualOnlyError`, concrete sources never fall through to the stub, and the concrete/stub sets partition the 85-source universe).

@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "moneysweep_entity.schema.json",
+  "title": "moneysweep-pr Entity",
+  "description": "A canonical entity row (funding agency, recipient, sub-recipient, etc.).",
+  "type": "object",
+  "required": [
+    "entity_id",
+    "source_id",
+    "name",
+    "normalized_name",
+    "entity_type",
+    "jurisdiction",
+    "confidence",
+    "lineage",
+    "synthetic",
+    "created_at",
+    "extracted_at"
+  ],
+  "properties": {
+    "entity_id": {"type": "string", "pattern": "^ent_[a-f0-9]{32}$"},
+    "source_id": {"type": "string", "pattern": "^src_[a-f0-9]{32}$"},
+    "name": {"type": "string"},
+    "normalized_name": {"type": "string"},
+    "entity_type": {"type": "string"},
+    "jurisdiction": {"type": "string"},
+    "external_ids": {
+      "type": "object",
+      "description": "Optional external identifiers for cross-repo entity matching by the spiderweb-pr query hub.",
+      "properties": {
+        "uei": {"type": "string"},
+        "parent_uei": {"type": "string"}
+      }
+    },
+    "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+    "lineage": {"$ref": "#/definitions/lineage"},
+    "synthetic": {"type": "boolean"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "extracted_at": {"type": "string", "format": "date-time"}
+  },
+  "definitions": {
+    "lineage": {
+      "type": "object",
+      "required": ["producer_script", "producer_phase", "source_inputs"],
+      "properties": {
+        "producer_script": {"type": "string"},
+        "producer_phase": {"type": "string"},
+        "source_inputs": {"type": "array", "items": {"type": "string"}},
+        "extraction_method": {"type": "string"}
+      }
+    }
+  }
+}

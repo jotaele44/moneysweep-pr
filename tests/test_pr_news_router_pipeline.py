@@ -64,7 +64,7 @@ def test_pr_news_router_pipeline_writes_raw_intake_and_router_exports(tmp_path):
     routing_summary = json.loads((export_dir / "routing_summary.json").read_text(encoding="utf-8"))
     assert routing_summary["zero_loss_pass"] is True
     assert routing_summary["raw_item_count"] == 2
-    assert routing_summary["contract_sweeper_derivative_count"] == 1
+    assert routing_summary["moneysweep_derivative_count"] == 1
     assert routing_summary["spiderweb_pr_derivative_count"] == 1
 
     verification = verify_exports(export_dir)

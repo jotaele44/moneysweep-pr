@@ -28,7 +28,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.validation.canonical_v1_schema import load_all_tables
+from moneysweep.validation.canonical_v1_schema import load_all_tables
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MD_OUT = "reports/canonical_v1_graph_summary.md"

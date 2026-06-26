@@ -7,7 +7,7 @@ import json
 import zipfile
 from pathlib import Path
 
-from contract_sweeper.pipeline.raw_usaspending_discovery import (
+from moneysweep.pipeline.raw_usaspending_discovery import (
     run_raw_usaspending_discovery,
 )
 

@@ -225,7 +225,7 @@ def http_json_fetcher(
     url: str, *, timeout: int = DEFAULT_TIMEOUT_SECONDS, retries: int = DEFAULT_RETRIES
 ) -> Any:
     last_error: Exception | None = None
-    headers = {"Accept": "application/json", "User-Agent": "Contract-Sweeper-LDA/1.0"}
+    headers = {"Accept": "application/json", "User-Agent": "moneysweep-pr-LDA/1.0"}
     # LDA.gov works unauthenticated but enforces tight rate limits (HTTP 429).
     # An API key raises the ceiling; the scheme is "Authorization: Token <key>"
     # (mirrors scripts/download_lda.py:149).

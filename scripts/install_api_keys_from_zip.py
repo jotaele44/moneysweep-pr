@@ -1,4 +1,4 @@
-"""Install Contract-Sweeper API keys from a `*_API_KEY.txt` zip into `.env`.
+"""Install moneysweep-pr API keys from a `*_API_KEY.txt` zip into `.env`.
 
 The zip is expected to contain one `<NAME>_API_KEY.txt` (or `_API_TOKEN.txt`)
 file per key — each file holds the key value, possibly wrapped in whitespace
@@ -121,7 +121,7 @@ def _probe(label: str, url: str, headers: dict | None, key_to_redact: str | None
     try:
         req = urllib.request.Request(
             url,
-            headers={"User-Agent": "contract-sweeper-installer/0.1", **(headers or {})},
+            headers={"User-Agent": "moneysweep-pr-installer/0.1", **(headers or {})},
         )
         with urllib.request.urlopen(req, timeout=20) as resp:
             body = resp.read(400).decode("utf-8", errors="replace")

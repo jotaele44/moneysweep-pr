@@ -23,12 +23,12 @@ def test_route_pr_intake_cli_exports_derivative_csvs(tmp_path):
     assert summary["zero_loss_pass"] is True
     assert summary["raw_item_count"] == 4
     assert summary["route_result_count"] == 4
-    assert summary["contract_sweeper_derivative_count"] >= 2
+    assert summary["moneysweep_derivative_count"] >= 2
     assert summary["spiderweb_pr_derivative_count"] >= 2
     assert summary["review_queue_count"] >= 1
 
     assert (out_dir / "route_results.jsonl").exists()
-    assert (out_dir / "contract_sweeper_derivatives.csv").exists()
+    assert (out_dir / "moneysweep_derivatives.csv").exists()
     assert (out_dir / "spiderweb_pr_derivatives.csv").exists()
     assert (out_dir / "manual_review_queue.csv").exists()
     assert (out_dir / "routing_summary.json").exists()

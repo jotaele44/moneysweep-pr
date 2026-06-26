@@ -8,17 +8,17 @@ from unittest.mock import patch
 import pandas as pd
 import pytest
 
-from contract_sweeper.query import (
+from moneysweep.query import (
     EntityIdentifier,
     EntityQuery,
     Query,
     query,
     query_entities,
 )
-from contract_sweeper.query.adapters import ADAPTER_REGISTRY, ENTITY_ADAPTER_REGISTRY
-from contract_sweeper.query.adapters.base import SourceAdapter
-from contract_sweeper.query.adapters.entity_base import EntityAdapter
-from contract_sweeper.query.types import CredentialMissing
+from moneysweep.query.adapters import ADAPTER_REGISTRY, ENTITY_ADAPTER_REGISTRY
+from moneysweep.query.adapters.base import SourceAdapter
+from moneysweep.query.adapters.entity_base import EntityAdapter
+from moneysweep.query.types import CredentialMissing
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 

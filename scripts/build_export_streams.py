@@ -1,4 +1,4 @@
-"""Map Contract-Sweeper canonical master tables into export streams.
+"""Map moneysweep-pr canonical master tables into export streams.
 
 Reads the canonical master tables produced by the pipeline (see
 ``registries/schema_registry.json``) from a processed directory and writes the
@@ -44,7 +44,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from contract_sweeper.runtime.name_normalization import normalize_name
+from moneysweep.runtime.name_normalization import normalize_name
 from scripts.build_export_package import _deterministic_id
 
 DEFAULT_PROCESSED_DIR = REPO_ROOT / "data" / "staging" / "processed"
@@ -62,7 +62,7 @@ EDGES_FILE = "entity_edges.csv"
 
 # A derived provenance source for rows the pipeline synthesizes (resolved
 # entities, synthesized funding agencies).
-DERIVED_SOURCE_REF = "contract_sweeper_resolution"
+DERIVED_SOURCE_REF = "moneysweep_resolution"
 
 # Inflow / revenue transactions. Outflows default to "disbursement"; rows carrying
 # a revenue flow_type emit an inflow transaction_type instead, with the aggregate
@@ -254,7 +254,7 @@ def _build_source_row(
         source_url = reg.get("endpoint_url")
     elif source_ref == DERIVED_SOURCE_REF:
         source_type = "derived"
-        source_name = "Contract-Sweeper entity resolution"
+        source_name = "moneysweep-pr entity resolution"
         source_url = None
     else:
         source_type = "external"

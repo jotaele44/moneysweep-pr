@@ -1,4 +1,4 @@
-# Data Policy — Contract-Sweeper
+# Data Policy — moneysweep-pr
 
 **Version:** 1.0 · 2026-05-15
 
@@ -40,7 +40,7 @@ Violations are caught by `scripts/scan_for_secrets.py` (run in pre-commit or CI)
 
 All API keys must follow the rules in `docs/SECRET_HANDLING_POLICY.md`:
 
-- Keys live only in `.env` (gitignored) or in a separate `Contract-Sweeper-Secrets/` directory outside the repository.
+- Keys live only in `.env` (gitignored) or in a separate `moneysweep-pr-Secrets/` directory outside the repository.
 - No key, token, password, or credential may appear in any committed file.
 - The `.env.example` template is the only committed reference to key names.
 - If a key is accidentally committed, it must be **rotated immediately** — git history rewriting does not remove exposure risk from forks/clones.

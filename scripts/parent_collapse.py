@@ -26,9 +26,9 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.runtime.alias_overrides import apply as apply_override
-from contract_sweeper.runtime.alias_overrides import load_overrides
-from contract_sweeper.runtime.name_normalization import normalize_name
+from moneysweep.runtime.alias_overrides import apply as apply_override
+from moneysweep.runtime.alias_overrides import load_overrides
+from moneysweep.runtime.name_normalization import normalize_name
 
 NAME_FIELDS = [
     "recipient_name",

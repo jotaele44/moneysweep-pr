@@ -12,7 +12,7 @@ export default function Dashboard() {
       <header className="flex items-center gap-2 px-4 py-2.5 border-b border-slate-800 bg-slate-900">
         <Banknote className="h-5 w-5 text-amber-400" />
         <div>
-          <h1 className="text-sm font-semibold text-slate-100 leading-none">Contract-Sweeper</h1>
+          <h1 className="text-sm font-semibold text-slate-100 leading-none">moneysweep-pr</h1>
           <p className="text-[11px] text-slate-500 mt-0.5">Puerto Rico public-money contracts & entity network</p>
         </div>
       </header>

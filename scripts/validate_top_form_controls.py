@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate Contract-Sweeper top-form development control artifacts.
+"""Validate moneysweep-pr top-form development control artifacts.
 
 This script intentionally validates only lightweight control artifacts:
 - docs/TOP_FORM_DEVELOPMENT_CHECKLIST.md
@@ -61,7 +61,7 @@ REQUIRED_GATES = {
 }
 
 REQUIRED_DOC_HEADINGS = [
-    "# Contract-Sweeper Top-Form Development Checklist",
+    "# moneysweep-pr Top-Form Development Checklist",
     "## Purpose",
     "## Status Vocabulary",
     "## Evidence Tiers",

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from contract_sweeper.runtime import schema_registry as schemareg
+from moneysweep.runtime import schema_registry as schemareg
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 

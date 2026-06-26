@@ -28,8 +28,8 @@ from typing import Any, Iterable
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.runtime.canonical_ids import evidence_id
-from contract_sweeper.runtime.evidence_tiers import (
+from moneysweep.runtime.canonical_ids import evidence_id
+from moneysweep.runtime.evidence_tiers import (
     claim_tier_for,
     derive_tier,
     score_evidence,

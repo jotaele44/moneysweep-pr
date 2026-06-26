@@ -6,7 +6,7 @@ import csv
 import json
 from pathlib import Path
 
-from contract_sweeper.validation.backfill_execution_plan import run_plan
+from moneysweep.validation.backfill_execution_plan import run_plan
 
 
 def _write_csv(path: Path, rows: list[dict], fieldnames: list[str]) -> None:

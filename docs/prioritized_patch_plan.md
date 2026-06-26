@@ -17,7 +17,7 @@ registry-driven and gate-enforced.
 - [x] `registries/schema_registry.yaml` (+ .json) with 17 canonical tables.
 - [x] `registries/manual_export_registry.yaml` (+ .json) declaring manual-only sources.
 - [x] `registries/endpoint_candidates.yaml` (+ .json) for endpoint health checks.
-- [x] `contract_sweeper/runtime/` with 9 modules:
+- [x] `moneysweep/runtime/` with 9 modules:
       `source_registry`, `schema_registry`, `manifest_runtime`, `validation_gates`,
       `name_normalization`, `linkage_confidence`, `file_hash_runtime`,
       `retry_runtime`, `pagination_runtime`.
@@ -28,9 +28,9 @@ registry-driven and gate-enforced.
 - [x] `.env.example` adds `HGOV_API_KEY`, `FELT_API_KEY`.
 - [x] CI: `.github/workflows/ci.yml` adds validation-gates + secret-scan steps
       (in `--allow-failed` bootstrap mode).
-- [x] `python -m compileall contract_sweeper scripts tests` → exit 0.
+- [x] `python -m compileall moneysweep scripts tests` → exit 0.
 - [x] `pytest -q` → new tests pass; existing tests untouched.
-- [x] `python -m contract_sweeper.runtime.validation_gates --allow-failed` writes
+- [x] `python -m moneysweep.runtime.validation_gates --allow-failed` writes
       `data/manifests/validation_report.json`.
 - [x] `python scripts/scan_for_secrets.py` → exit 0.
 
@@ -96,7 +96,7 @@ ACT/ACUDEN/DCAA legacy spreadsheets to their declared drop zones.
 - Emit per-source manifests.
 - Document operator workflow in `docs/MANUAL_EXPORT_OPERATIONS.md`.
 - Only build after user confirms the source files actually exist in
-  `Contract-Sweeper-Secrets/` or a designated manual drop zone.
+  `moneysweep-pr-Secrets/` or a designated manual drop zone.
 
 ## PR7+ — Long-tail ingestion + governance flip
 
@@ -106,6 +106,6 @@ ACT/ACUDEN/DCAA legacy spreadsheets to their declared drop zones.
 ## Out-of-scope (across all PRs)
 
 - Credentialed portal scraping (DRGR, FEMA 178-PW portal). Manual export only.
-- Refactor of the 50 R4 meta-orchestration modules in `contract_sweeper/pipeline/`.
+- Refactor of the 50 R4 meta-orchestration modules in `moneysweep/pipeline/`.
   They stay until they're empirically unused; cleanup is deferred.
 - Refactor of `run_all.py` into a registry-driven dispatcher. Hooks only in PR1.

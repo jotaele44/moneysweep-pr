@@ -5,7 +5,7 @@
 Please report security issues **privately** — do not open a public issue or PR for
 a suspected vulnerability.
 
-- Preferred: open a private [GitHub Security Advisory](https://github.com/jotaele44/Contract-Sweeper/security/advisories/new)
+- Preferred: open a private [GitHub Security Advisory](https://github.com/jotaele44/moneysweep-pr/security/advisories/new)
   for this repository.
 - Or email the maintainer: **jorge.gonzalez44@upr.edu** (subject line prefixed
   `[SECURITY]`).
@@ -15,7 +15,7 @@ proof of concept if possible. We aim to acknowledge reports within a few days.
 
 ## Scope
 
-This policy covers the Contract-Sweeper source code and its CI/CD configuration.
+This policy covers the moneysweep-pr source code and its CI/CD configuration.
 The pipeline ingests **public records**; please report concerns such as:
 
 - credential/secret handling (env-var usage, accidental secret commits),

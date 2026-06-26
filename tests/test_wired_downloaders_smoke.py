@@ -13,7 +13,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.runtime.source_registry import source_by_id
+from moneysweep.runtime.source_registry import source_by_id
 
 # (source_id, producer module basename) — extended as each B-batch lands.
 B1_FEDERAL_GRANTS = [

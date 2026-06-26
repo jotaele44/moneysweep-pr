@@ -6,7 +6,7 @@ import csv
 import json
 from pathlib import Path
 
-from contract_sweeper.pipeline.raw_usaspending_mapping_feasibility import (
+from moneysweep.pipeline.raw_usaspending_mapping_feasibility import (
     run_raw_usaspending_mapping_feasibility,
 )
 

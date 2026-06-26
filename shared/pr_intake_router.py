@@ -1,7 +1,7 @@
 """Shared Puerto Rico intake router.
 
 This module loads ``config/pr_intake_domain_router.yaml`` and routes raw Puerto
-Rico-relevant intake items into canonical Contract-Sweeper or spiderweb-pr
+Rico-relevant intake items into canonical moneysweep-pr or spiderweb-pr
 lanes. It is intentionally deterministic: no LLM calls, no network access, and
 no silent dropping of records.
 """
@@ -28,7 +28,7 @@ except ImportError as exc:  # pragma: no cover - dependency guard
     ) from exc
 
 
-CONTRACT_REPO = "Contract-Sweeper"
+CONTRACT_REPO = "moneysweep-pr"
 SPIDERWEB_REPO = "spiderweb-pr"
 
 CONTRACT_DOMAINS = {
@@ -88,7 +88,7 @@ class RouteResult:
     canonical_repo: Optional[str]
     derivative_repo: Optional[str]
     output_tables: Dict[str, List[str]] = field(default_factory=dict)
-    contract_sweeper_derivative: Optional[Dict[str, Any]] = None
+    moneysweep_derivative: Optional[Dict[str, Any]] = None
     spiderweb_pr_derivative: Optional[Dict[str, Any]] = None
     review_reason: Optional[str] = None
     validation_errors: List[str] = field(default_factory=list)
@@ -102,7 +102,7 @@ class RouteResult:
             "canonical_repo": self.canonical_repo,
             "derivative_repo": self.derivative_repo,
             "output_tables": self.output_tables,
-            "contract_sweeper_derivative": self.contract_sweeper_derivative,
+            "moneysweep_derivative": self.moneysweep_derivative,
             "spiderweb_pr_derivative": self.spiderweb_pr_derivative,
             "review_reason": self.review_reason,
             "validation_errors": self.validation_errors,
@@ -199,7 +199,7 @@ def route_raw_item(
     )
 
     if canonical_repo == CONTRACT_REPO or derivative_repo == CONTRACT_REPO:
-        result.contract_sweeper_derivative = _build_derivative(
+        result.moneysweep_derivative = _build_derivative(
             raw_item,
             target_repo=CONTRACT_REPO,
             canonical_repo=canonical_repo,
@@ -265,7 +265,7 @@ def _decide_route(
     has_spiderweb = bool(domains & SPIDERWEB_DOMAINS)
 
     if has_contract and not has_spiderweb:
-        return CONTRACT_REPO, None, "routed_contract_sweeper", None
+        return CONTRACT_REPO, None, "routed_moneysweep", None
     if has_spiderweb and not has_contract:
         return SPIDERWEB_REPO, None, "routed_spiderweb_pr", None
 
@@ -404,11 +404,11 @@ def _validate_result(
                     "Spatial derivative missing location fields and manual_geocode_required"
                 )
 
-    if result.final_status in {"routed_contract_sweeper", "dual_routed_contract_primary"}:
+    if result.final_status in {"routed_moneysweep", "dual_routed_contract_primary"}:
         if raw_item.get("verification_status") == "confirmed" and not raw_item.get(
             "matched_t1_record_url"
         ):
-            errors.append("Confirmed Contract-Sweeper item lacks matched_t1_record_url")
+            errors.append("Confirmed moneysweep-pr item lacks matched_t1_record_url")
 
     result.validation_errors = errors
     if strict and errors:

@@ -17,7 +17,7 @@ Use this checklist before and after running source materialization.
 
 ## Run Checklist
 
-- [ ] Adapter-backed sources are run through `python3 -m contract_sweeper.query --source <source_id>`.
+- [ ] Adapter-backed sources are run through `python3 -m moneysweep.query --source <source_id>`.
 - [ ] Producer-backed sources are run through `python3 run_all.py --strict-preflight`.
 - [ ] Scoped runs use documented `--skip-*` flags.
 - [ ] Failures are captured with command, exit code, last 40 lines, changed files, and suspected area.

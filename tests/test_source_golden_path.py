@@ -20,9 +20,9 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from contract_sweeper.query import Query, query
-from contract_sweeper.query.adapters import ADAPTER_REGISTRY
-from contract_sweeper.query.adapters.base import SourceAdapter
+from moneysweep.query import Query, query
+from moneysweep.query.adapters import ADAPTER_REGISTRY
+from moneysweep.query.adapters.base import SourceAdapter
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 

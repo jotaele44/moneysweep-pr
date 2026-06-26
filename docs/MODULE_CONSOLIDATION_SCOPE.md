@@ -21,7 +21,7 @@ These bind every PR in the sequence:
 1. **Archive-only.** No logic rewrites inside the same PR as a file move.
 2. **Destination.** All archived files land in `archive/r4_legacy/<original-relative-path>`. No outright deletions, with one named exception (see §3 PR-0).
 3. **No source coverage regression.** The 14-source active registry must remain ingestable end-to-end after each PR.
-4. **Import graph proof required** before touching `contract_sweeper/pipeline/`.
+4. **Import graph proof required** before touching `moneysweep/pipeline/`.
 5. **Active-source registry must be enumerated** in any PR body that archives expansion downloaders.
 6. **Required PR body sections** (every PR):
    - Import check summary (`rg` results showing zero live imports of moved paths).
@@ -77,7 +77,7 @@ Each entry below is a **scope spec** for a future PR. Order is risk-ascending; l
 ### PR-3 — Archive `validation/cache_audit.py` + `pipeline/credential_unblock_plan.py`
 - **Scope:** Two low-import modules from the ARCHIVE list.
 - **Pre-PR proof:** Import graph snippet showing each module's inbound edges and the rationale that each consumer can switch to the canonical replacement (named explicitly in the PR body).
-- **Note:** This PR begins to touch `contract_sweeper/pipeline/` and therefore triggers the **import graph proof** invariant (§1.4).
+- **Note:** This PR begins to touch `moneysweep/pipeline/` and therefore triggers the **import graph proof** invariant (§1.4).
 
 ### PR-4 — Expansion downloader archive (gated)
 - **Blocked until:** PR body includes the **complete 14-source active registry** (canonical names + entry points). The expansion downloaders being archived must be disjoint from that registry.
@@ -95,7 +95,7 @@ The 12 merge groups in `docs/MODULE_REDUCTION_PLAN.md` (e.g., `source_mappers.py
 | G0 | Architect | This scope plan accepted → PR-0 may open |
 | G1 | Architect | PR-0 merged + import proof for run-wrapper candidates → PR-1 may open |
 | G2 | Architect | PR-1 merged → PR-2 may open |
-| G3 | Architect | Import-graph proof for `contract_sweeper/pipeline/` accepted → PR-3 may open |
+| G3 | Architect | Import-graph proof for `moneysweep/pipeline/` accepted → PR-3 may open |
 | G4 | Architect | 14-source active registry attested in PR body → PR-4 may open |
 | G5 | Architect | New approval explicitly authorizing logic-merge PRs → PR-5+ may open |
 

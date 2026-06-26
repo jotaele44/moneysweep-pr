@@ -145,8 +145,8 @@ def main_with_args(argv: Sequence[str] | None = None) -> int:
         result_dict = result.to_dict()
         results.append(result_dict)
 
-        if result.contract_sweeper_derivative:
-            contract_rows.append(result.contract_sweeper_derivative)
+        if result.moneysweep_derivative:
+            contract_rows.append(result.moneysweep_derivative)
         if result.spiderweb_pr_derivative:
             spiderweb_rows.append(result.spiderweb_pr_derivative)
         if result.validation_errors or result.final_status in {
@@ -177,7 +177,7 @@ def main_with_args(argv: Sequence[str] | None = None) -> int:
         "config_path": str(config_path),
         "raw_item_count": len(raw_items),
         "route_result_count": len(results),
-        "contract_sweeper_derivative_count": len(contract_rows),
+        "moneysweep_derivative_count": len(contract_rows),
         "spiderweb_pr_derivative_count": len(spiderweb_rows),
         "review_queue_count": len(review_rows),
         "status_counts": status_counts,
@@ -187,7 +187,7 @@ def main_with_args(argv: Sequence[str] | None = None) -> int:
     }
 
     write_jsonl(out_dir / "route_results.jsonl", results)
-    write_csv(out_dir / "contract_sweeper_derivatives.csv", contract_rows)
+    write_csv(out_dir / "moneysweep_derivatives.csv", contract_rows)
     write_csv(out_dir / "spiderweb_pr_derivatives.csv", spiderweb_rows)
     write_csv(out_dir / "manual_review_queue.csv", review_rows)
     (out_dir / "routing_summary.json").write_text(

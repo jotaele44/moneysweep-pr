@@ -188,7 +188,7 @@ The Batch 121+ implementation PR is restricted to the following.
 
 **ALLOWED — new files:**
 - `scripts/dedup_entities.py` — the PR3 entity-dedup entrypoint.
-- `contract_sweeper/dedup/` — new package for survivorship/conflict/audit logic.
+- `moneysweep/dedup/` — new package for survivorship/conflict/audit logic.
 - `config/dedup_config.*` — dedup config schema (Batch 122).
 - `tests/test_pr3_dedup*.py` — targeted PR3 tests.
 - New output artifacts under `data/staging/processed/dedup/` and
@@ -200,7 +200,7 @@ The Batch 121+ implementation PR is restricted to the following.
 - `scripts/alias_registry_builder.py` — loader hardening only (Batch 123); no
   change to cluster semantics.
 - `reports/current_status.json` — status updates.
-- `contract_sweeper/runtime/validation_gates.py` — **only** to add PR3 metrics;
+- `moneysweep/runtime/validation_gates.py` — **only** to add PR3 metrics;
   existing thresholds unchanged except the new `entity_overcollapse_ceiling`
   (default 25) and `dedup_rowcount_invariant` gate.
 

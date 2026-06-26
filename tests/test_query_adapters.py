@@ -8,20 +8,20 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from contract_sweeper.query.adapters._stub import NotImplementedAdapter
-from contract_sweeper.query.adapters.fec import FECPRAdapter
-from contract_sweeper.query.adapters.nih import (
+from moneysweep.query.adapters._stub import NotImplementedAdapter
+from moneysweep.query.adapters.fec import FECPRAdapter
+from moneysweep.query.adapters.nih import (
     NIHReporterAdapter,
     build_payload as nih_build_payload,
 )
-from contract_sweeper.query.adapters.openfema import (
+from moneysweep.query.adapters.openfema import (
     OpenFEMAHmgpAdapter,
     OpenFEMAPaAdapter,
     build_filter,
     build_hmgp_filter,
 )
-from contract_sweeper.query.adapters.sbir import SBIRAdapter
-from contract_sweeper.query.adapters.usaspending import (
+from moneysweep.query.adapters.sbir import SBIRAdapter
+from moneysweep.query.adapters.usaspending import (
     USAspendingGrantsAdapter,
     USAspendingPrimeAdapter,
     USAspendingSubawardsAdapter,
@@ -29,7 +29,7 @@ from contract_sweeper.query.adapters.usaspending import (
     _municipalities_to_county_suffixes,
     build_payload,
 )
-from contract_sweeper.query.types import CredentialMissing, ManualOnlyError, Query
+from moneysweep.query.types import CredentialMissing, ManualOnlyError, Query
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -364,7 +364,7 @@ def test_sbir_fetch_handles_list_response():
 # ---------------------------------------------------------------------------
 
 
-from contract_sweeper.query.adapters.usaspending import (  # noqa: E402
+from moneysweep.query.adapters.usaspending import (  # noqa: E402
     DOEGrantsAdapter,
     DOJGrantsAdapter,
     DOTGrantsAdapter,
@@ -414,7 +414,7 @@ def test_agency_grants_adapter_respects_caller_supplied_agency():
 # ---------------------------------------------------------------------------
 
 
-from contract_sweeper.query.adapters.lda import LDAAdapter, build_params as lda_build_params  # noqa: E402
+from moneysweep.query.adapters.lda import LDAAdapter, build_params as lda_build_params  # noqa: E402
 
 
 @pytest.mark.unit
@@ -489,7 +489,7 @@ def test_lda_session_omits_token_when_no_api_key(monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-from contract_sweeper.query.adapters.nsf import NSFAwardsAdapter, build_params as nsf_build_params  # noqa: E402
+from moneysweep.query.adapters.nsf import NSFAwardsAdapter, build_params as nsf_build_params  # noqa: E402
 
 
 @pytest.mark.unit
@@ -533,7 +533,7 @@ def test_nsf_source_id_matches_registry():
 # ---------------------------------------------------------------------------
 
 
-from contract_sweeper.query.adapters.openfema import OpenFEMANfipClaimsAdapter  # noqa: E402
+from moneysweep.query.adapters.openfema import OpenFEMANfipClaimsAdapter  # noqa: E402
 
 
 @pytest.mark.unit
@@ -560,7 +560,7 @@ def test_nfip_claims_adapter_uses_state_pr_filter_and_data_key():
 # ---------------------------------------------------------------------------
 
 
-from contract_sweeper.query.adapters.usaspending import (  # noqa: E402
+from moneysweep.query.adapters.usaspending import (  # noqa: E402
     DIRECT_PAYMENT_TYPE_CODES,
     EXIMBankAdapter,
     HAFAdapter,
@@ -621,7 +621,7 @@ def test_caller_supplied_agency_overrides_narrow_adapter_default():
 # ---------------------------------------------------------------------------
 
 
-from contract_sweeper.query.adapters.fdic import FDICInstitutionsAdapter  # noqa: E402
+from moneysweep.query.adapters.fdic import FDICInstitutionsAdapter  # noqa: E402
 
 
 @pytest.mark.unit
@@ -660,7 +660,7 @@ def test_fdic_adapter_returns_empty_df_when_no_records():
 # ---------------------------------------------------------------------------
 
 
-from contract_sweeper.query.adapters.nonprofits import NonprofitsIRS990Adapter  # noqa: E402
+from moneysweep.query.adapters.nonprofits import NonprofitsIRS990Adapter  # noqa: E402
 
 
 @pytest.mark.unit
@@ -706,7 +706,7 @@ def test_nonprofits_adapter_omits_api_key_header_when_unset(monkeypatch):
 # ---------------------------------------------------------------------------
 
 
-from contract_sweeper.query.adapters.sba import (  # noqa: E402
+from moneysweep.query.adapters.sba import (  # noqa: E402
     SBALoansAdapter,
     SBAPaycheckProtectionAdapter,
     CKAN_DATASTORE_URL,
@@ -769,7 +769,7 @@ def test_sba_adapter_returns_empty_when_discovery_fails():
 # ---------------------------------------------------------------------------
 
 
-from contract_sweeper.query.adapters.highergov import (  # noqa: E402
+from moneysweep.query.adapters.highergov import (  # noqa: E402
     HigherGovSupplementalAdapter,
     HIGHERGOV_BASE,
     PAGE_SIZE as HIGHERGOV_PAGE_SIZE,
@@ -852,7 +852,7 @@ def test_highergov_paginates_until_short_page(monkeypatch):
 
 @pytest.mark.unit
 def test_adapter_registry_size_matches_concrete_count():
-    from contract_sweeper.query.adapters import ADAPTER_REGISTRY
+    from moneysweep.query.adapters import ADAPTER_REGISTRY
 
     # 33 original + 5 USASpending agency+CFDA benefit narrows
     # (va_benefits, wioa, wic, snap_nap, hud_hcv_section8)

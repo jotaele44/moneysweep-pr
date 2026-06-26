@@ -1,4 +1,4 @@
-// REST client for the Contract-Sweeper FastAPI backend.
+// REST client for the moneysweep-pr FastAPI backend.
 // Backend: server/backend/main.py  (uvicorn server.backend.main:app --port 8000)
 // Reads the frozen canonical_v1 CSVs. award amounts are frequently null.
 import snapshot from './snapshot.json' // {} in normal builds; populated for VITE_OFFLINE exports

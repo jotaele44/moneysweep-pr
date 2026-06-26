@@ -13,7 +13,7 @@ attribution, and value).
 ## Alignment with the existing repo
 
 The export `confidence` reuses the same `[0.0, 1.0]` convention already used by
-[`contract_sweeper/runtime/linkage_confidence.py`](../contract_sweeper/runtime/linkage_confidence.py),
+[`moneysweep/runtime/linkage_confidence.py`](../moneysweep/runtime/linkage_confidence.py),
 which scores record linkage from weighted join signals and routes anything below
 `MANUAL_REVIEW_THRESHOLD = 0.90` to manual review. Producers populating export
 rows from linked data should carry that link score through as the row

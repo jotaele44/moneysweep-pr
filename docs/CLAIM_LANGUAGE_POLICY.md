@@ -37,7 +37,7 @@
 
 ## Tier Derivation (Maturity Gate)
 
-`contract_sweeper/runtime/maturity_gate.py` translates the
+`moneysweep/runtime/maturity_gate.py` translates the
 `pipeline_status` column of `reports/source_registry_status.csv` into
 the claim tiers above. When a claim depends on multiple datasets, the
 worst tier wins.

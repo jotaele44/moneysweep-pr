@@ -1,4 +1,4 @@
-# Project Status — Contract-Sweeper
+# Project Status — moneysweep-pr
 
 **Date:** 2026-05-18  
 **Branch:** `main`  

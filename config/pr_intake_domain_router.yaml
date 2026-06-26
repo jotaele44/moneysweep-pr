@@ -1,11 +1,11 @@
 version: 0.1.0
 router_name: pr_intake_domain_router
-primary_repo: Contract-Sweeper
+primary_repo: moneysweep-pr
 paired_repo: spiderweb-pr
 zero_loss_required: true
 
 final_status_values:
-  - routed_contract_sweeper
+  - routed_moneysweep
   - routed_spiderweb_pr
   - dual_routed_contract_primary
   - dual_routed_spiderweb_primary
@@ -17,7 +17,7 @@ final_status_values:
   - metadata_only_archived
 
 canonical_repos:
-  contract_sweeper:
+  moneysweep:
     owns:
       - politics
       - finance
@@ -45,7 +45,7 @@ canonical_repos:
 
 routing_rules:
   - rule_id: CS_PUBLIC_FUNDING
-    canonical_repo: Contract-Sweeper
+    canonical_repo: moneysweep-pr
     domains: [public_funding, finance]
     keywords:
       - asignacion
@@ -68,7 +68,7 @@ routing_rules:
       - verification_queue
 
   - rule_id: CS_CONTRACTS_PROCUREMENT
-    canonical_repo: Contract-Sweeper
+    canonical_repo: moneysweep-pr
     domains: [procurement, contracts]
     keywords:
       - contrato
@@ -84,10 +84,10 @@ routing_rules:
       - procurement
     output_tables:
       - contracts_procurement_events
-      - contract_sweeper_crosswalk_queue
+      - moneysweep_crosswalk_queue
 
   - rule_id: CS_POLITICS_AUTHORITY
-    canonical_repo: Contract-Sweeper
+    canonical_repo: moneysweep-pr
     domains: [politics, lobbying, agency_authority, budget_authority]
     keywords:
       - orden ejecutiva
@@ -203,26 +203,26 @@ routing_rules:
 dual_route_conditions:
   - condition_id: INFRASTRUCTURE_WITH_FUNDING
     if_domains_include: [infrastructure_footprint, public_funding]
-    canonical_repo: Contract-Sweeper
+    canonical_repo: moneysweep-pr
     derivative_repo: spiderweb-pr
     required_backlink: true
 
   - condition_id: ENVIRONMENTAL_GRANT_OR_AWARD
     if_domains_include: [environment_weather, public_funding]
-    canonical_repo: Contract-Sweeper
+    canonical_repo: moneysweep-pr
     derivative_repo: spiderweb-pr
     required_backlink: true
 
   - condition_id: GIS_DATASET_WITH_CONTRACT
     if_domains_include: [geography_gis, contracts]
     canonical_repo: spiderweb-pr
-    derivative_repo: Contract-Sweeper
+    derivative_repo: moneysweep-pr
     required_backlink: true
 
   - condition_id: AVIATION_MARITIME_WITH_PROCUREMENT
     if_domains_include: [aviation_activity, procurement]
     canonical_repo: spiderweb-pr
-    derivative_repo: Contract-Sweeper
+    derivative_repo: moneysweep-pr
     required_backlink: true
 
 required_common_fields:

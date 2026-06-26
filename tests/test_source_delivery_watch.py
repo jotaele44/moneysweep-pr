@@ -6,7 +6,7 @@ import csv
 import json
 from pathlib import Path
 
-from contract_sweeper.pipeline.source_delivery_watch import run_source_delivery_watch
+from moneysweep.pipeline.source_delivery_watch import run_source_delivery_watch
 
 
 def _write_json(path: Path, payload: dict) -> None:

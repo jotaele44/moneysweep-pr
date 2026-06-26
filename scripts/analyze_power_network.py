@@ -41,7 +41,7 @@ import pandas as pd
 import numpy as np
 
 from scripts.config import PROJECT_ROOT, setup_logging
-from contract_sweeper.validation.production_status import load_current_status
+from moneysweep.validation.production_status import load_current_status
 
 
 # ---------------------------------------------------------------------------

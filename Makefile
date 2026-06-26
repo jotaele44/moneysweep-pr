@@ -1,4 +1,4 @@
-# Contract-Sweeper developer command surface.
+# moneysweep-pr developer command surface.
 #
 # Thin wrappers over the same commands the CI quality gates run, so local and CI
 # stay in lock-step (see docs/BUILD_EXECUTION_SEQUENCE.md Waves A-G and the
@@ -41,7 +41,7 @@ test-fast:  ## pytest without coverage instrumentation (quick inner loop)
 	$(PYTHON) -m pytest -o addopts="" -q
 
 cov:  ## pytest with a terminal coverage report
-	$(PYTHON) -m pytest --cov=scripts --cov=contract_sweeper --cov-report=term-missing
+	$(PYTHON) -m pytest --cov=scripts --cov=moneysweep --cov-report=term-missing
 
 lock:  ## Recompile requirements.lock from requirements.in (deterministic, via uv)
 	uv pip compile requirements.in --universal --python-version 3.10 -o requirements.lock

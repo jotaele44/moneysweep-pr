@@ -15,7 +15,7 @@ from shared.pr_intake_router import (
 CONFIG_PATH = Path(__file__).resolve().parents[1] / "config" / "pr_intake_domain_router.yaml"
 
 
-def test_public_funding_routes_to_contract_sweeper():
+def test_public_funding_routes_to_moneysweep():
     config = load_router_config(CONFIG_PATH)
     item = {
         "source_item_id": "RAW-001",
@@ -31,9 +31,9 @@ def test_public_funding_routes_to_contract_sweeper():
 
     result = route_raw_item(item, config)
 
-    assert result.final_status == "routed_contract_sweeper"
+    assert result.final_status == "routed_moneysweep"
     assert result.canonical_repo == CONTRACT_REPO
-    assert result.contract_sweeper_derivative is not None
+    assert result.moneysweep_derivative is not None
     assert result.spiderweb_pr_derivative is None
     assert "CS_PUBLIC_FUNDING" in result.matched_rules
 
@@ -58,7 +58,7 @@ def test_pure_spatial_routes_to_spiderweb_pr():
     assert result.final_status == "routed_spiderweb_pr"
     assert result.canonical_repo == SPIDERWEB_REPO
     assert result.spiderweb_pr_derivative is not None
-    assert result.contract_sweeper_derivative is None
+    assert result.moneysweep_derivative is None
     assert "SW_SUBSURFACE_HYDRO" in result.matched_rules
 
 
@@ -82,7 +82,7 @@ def test_infrastructure_with_funding_dual_routes_contract_primary():
     assert result.final_status == "dual_routed_contract_primary"
     assert result.canonical_repo == CONTRACT_REPO
     assert result.derivative_repo == SPIDERWEB_REPO
-    assert result.contract_sweeper_derivative is not None
+    assert result.moneysweep_derivative is not None
     assert result.spiderweb_pr_derivative is not None
 
 

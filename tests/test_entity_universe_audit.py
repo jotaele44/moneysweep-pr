@@ -6,7 +6,7 @@ import csv
 import json
 from pathlib import Path
 
-from contract_sweeper.validation.entity_universe_audit import run_audit
+from moneysweep.validation.entity_universe_audit import run_audit
 
 
 def _write_json(path: Path, payload: dict) -> None:

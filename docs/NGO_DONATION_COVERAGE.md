@@ -1,6 +1,6 @@
 # NGO / Non-Profit Political-Donation Coverage
 
-This doc tracks how Contract-Sweeper covers the question:
+This doc tracks how moneysweep-pr covers the question:
 
 > *Which Puerto Rico NGOs and other not-for-profits are likely sources of
 > political donations, and where are the remaining blind spots?*
@@ -77,7 +77,7 @@ python -m pytest \
   tests/test_download_nonprofits_political_fields.py \
   tests/test_source_registry.py -v
 
-python3 -c "from contract_sweeper.runtime import source_registry as sr; \
+python3 -c "from moneysweep.runtime import source_registry as sr; \
   r = sr.validate_registry(); print(r['ok'], r['errors'])"
 # → True []
 

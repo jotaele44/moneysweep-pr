@@ -2,8 +2,8 @@
 
 import pytest
 
-from contract_sweeper.runtime.canonical_ids import funding_id
-from contract_sweeper.validation import canonical_v1_schema as cv1
+from moneysweep.runtime.canonical_ids import funding_id
+from moneysweep.validation import canonical_v1_schema as cv1
 from scripts import ingest_funding_sources as ifs
 
 REPO_ROOT = cv1.REPO_ROOT

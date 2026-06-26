@@ -14,8 +14,8 @@ network, no I/O beyond the committed CSV) and deterministic — the same input
 yields byte-identical output across runs.
 
 Reuses the deterministic ID + normalization helpers in
-``contract_sweeper.runtime`` and the stdlib schema validator in
-``contract_sweeper.validation.canonical_v1_schema`` (no ``jsonschema`` dep).
+``moneysweep.runtime`` and the stdlib schema validator in
+``moneysweep.validation.canonical_v1_schema`` (no ``jsonschema`` dep).
 
 CLI::
 
@@ -35,8 +35,8 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.runtime.canonical_ids import name_hash
-from contract_sweeper.validation.canonical_v1_schema import validate_row
+from moneysweep.runtime.canonical_ids import name_hash
+from moneysweep.validation.canonical_v1_schema import validate_row
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REFERENCE = "data/reference/pr_public_money_entities.csv"

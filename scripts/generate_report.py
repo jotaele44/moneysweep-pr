@@ -39,13 +39,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
 
-from contract_sweeper.runtime.maturity_gate import (
+from moneysweep.runtime.maturity_gate import (
     claim_tier,
     load_dataset_to_source_map,
     load_source_maturity,
     unmaterialized_sources,
 )
-from contract_sweeper.validation.production_status import load_current_status
+from moneysweep.validation.production_status import load_current_status
 from scripts.config import PROJECT_ROOT, setup_logging
 
 # ---------------------------------------------------------------------------

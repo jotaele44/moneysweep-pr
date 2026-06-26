@@ -16,7 +16,7 @@ import csv
 import json
 from pathlib import Path
 
-from contract_sweeper.modules.prepa_titleiii_entity_graph import (
+from moneysweep.modules.prepa_titleiii_entity_graph import (
     build_nodes,
     export_graph,
     match_contract_records,

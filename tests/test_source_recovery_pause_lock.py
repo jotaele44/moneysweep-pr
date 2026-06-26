@@ -6,7 +6,7 @@ import csv
 import json
 from pathlib import Path
 
-from contract_sweeper.pipeline.source_recovery_pause_lock import run_source_recovery_pause_lock
+from moneysweep.pipeline.source_recovery_pause_lock import run_source_recovery_pause_lock
 
 
 def _write_json(path: Path, payload: dict) -> None:

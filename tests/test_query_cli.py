@@ -1,4 +1,4 @@
-"""Tests for the ``python -m contract_sweeper.query`` CLI."""
+"""Tests for the ``python -m moneysweep.query`` CLI."""
 
 from __future__ import annotations
 
@@ -11,10 +11,10 @@ from unittest.mock import patch
 import pandas as pd
 import pytest
 
-from contract_sweeper.query import Query
-from contract_sweeper.query.cli import _build_query, _build_parser, main
-from contract_sweeper.query.adapters import ADAPTER_REGISTRY
-from contract_sweeper.query.adapters.base import SourceAdapter
+from moneysweep.query import Query
+from moneysweep.query.cli import _build_query, _build_parser, main
+from moneysweep.query.adapters import ADAPTER_REGISTRY
+from moneysweep.query.adapters.base import SourceAdapter
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 

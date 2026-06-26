@@ -13,7 +13,7 @@ import json
 
 import pytest
 
-from contract_sweeper.validation.canonical_v1_schema import validate_row
+from moneysweep.validation.canonical_v1_schema import validate_row
 from scripts import build_foia_tracker as bft
 from scripts import build_foia_yield_tracking as bfy
 

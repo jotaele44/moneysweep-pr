@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from contract_sweeper.pipeline.repo_quality_audit import run_repo_quality_audit
+from moneysweep.pipeline.repo_quality_audit import run_repo_quality_audit
 
 
 def main() -> int:
