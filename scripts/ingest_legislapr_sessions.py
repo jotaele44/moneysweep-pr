@@ -12,6 +12,8 @@ Usage:
 
 from __future__ import annotations
 
+import logging
+
 import argparse
 import json
 import re
@@ -21,7 +23,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import urlparse
-import logging
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 

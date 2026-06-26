@@ -11,6 +11,8 @@ Usage:
 
 from __future__ import annotations
 
+import logging
+
 import argparse
 import json
 import re
@@ -23,7 +25,6 @@ from typing import Iterable
 from urllib.error import URLError
 from urllib.parse import unquote, urljoin, urlparse
 from urllib.request import Request, urlopen
-import logging
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
