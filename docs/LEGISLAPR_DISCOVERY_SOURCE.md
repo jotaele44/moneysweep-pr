@@ -8,12 +8,14 @@
 
 | Field | Value |
 |---|---|
-| Source ID | `legislapr_discovery` |
-| Tier | T2 operational discovery / enrichment |
-| Canonical status | Not canonical by itself |
+| Discovery source ID | `legislapr_discovery` |
+| Canonical source ID | `legislative_canonical_sources` |
+| Discovery tier | T2 operational discovery / enrichment |
+| Canonical status | Cross-confirmed candidate only |
 | Canonical confirmation | OpenStates plus official Legislative Assembly/SUTRA document link |
 | Promotion rule | `cross_confirmed_only` |
-| Producer | `scripts/probe_legislapr_detail.py` |
+| Discovery producer | `scripts/probe_legislapr_detail.py` |
+| Canonical producer | `scripts/fetch_legislative_canonical_sources.py` |
 | Registry extension | `registries/source_registry_extensions/legislapr_discovery.json` |
 | Schema extension | `registries/schema_registry_extensions/legislapr_legislative_measure.json` |
 
@@ -33,17 +35,22 @@ LegislaPR measure detail page
     -> official Legislative Assembly/SUTRA document check
     -> fiscal keyword scan
     -> promotion_status assignment
+    -> OpenStates API confirmation
+    -> official document URL confirmation
+    -> promoted_candidate or blocked_pending_canonical_confirmation
 ```
 
 ## Promotion statuses
 
 | Status | Meaning | MoneySweep action |
 |---|---|---|
-| `blocked_pending_canonical_confirmation` | LegislaPR page found but both canonical links were not extracted | Keep in staging only |
-| `cross_confirmed_candidate` | OpenStates and official document found | Eligible for canonical promotion after schema validation |
-| `promoted` | Reserved for a downstream promotion job after canonical validation | Canonical surface |
+| `blocked_pending_canonical_confirmation` | Both canonical paths were not confirmed | Keep in staging only |
+| `cross_confirmed_candidate` | Discovery-stage page exposed OpenStates and official document links | Eligible for canonical fetch |
+| `promoted_candidate` | Canonical fetcher confirmed OpenStates and official document evidence | Eligible for downstream canonical promotion review |
 
 ## Local run
+
+Discovery probe:
 
 ```bash
 python scripts/probe_legislapr_detail.py \
@@ -51,7 +58,7 @@ python scripts/probe_legislapr_detail.py \
   --output data/staging/processed/pr_legislapr_measures_probe.json
 ```
 
-For a batch run:
+Batch discovery:
 
 ```bash
 python scripts/probe_legislapr_detail.py \
@@ -59,13 +66,28 @@ python scripts/probe_legislapr_detail.py \
   --output data/staging/processed/pr_legislapr_measures_probe.json
 ```
 
+Canonical confirmation:
+
+```bash
+OPENSTATES_API_KEY="$OPENSTATES_API_KEY" \
+python scripts/fetch_legislative_canonical_sources.py \
+  --input data/staging/processed/pr_legislapr_measures_probe.json \
+  --output data/staging/processed/pr_legislative_measures_canonical.json
+```
+
+Offline/SUTRA-only audit mode:
+
+```bash
+python scripts/fetch_legislative_canonical_sources.py --allow-missing-key
+```
+
 ## Validation
 
 ```bash
-python -m pytest tests/test_legislapr_discovery.py tests/test_legislapr_discovery_probe.py -q
+python -m pytest tests/test_legislapr_discovery.py tests/test_legislapr_discovery_probe.py tests/test_legislative_canonical_sources.py tests/test_source_registry.py -q
 python -m moneysweep.runtime.source_registry --validate
 ```
 
 ## Key handling
 
-OpenStates API keys must be supplied through `.env`, shell environment, or GitHub repository secrets if a future canonical OpenStates fetcher is added. Do not commit keys, captured API responses containing secrets, or debug logs that print environment values.
+OpenStates API keys must be supplied through `.env`, shell environment, or GitHub repository secrets. Do not commit keys, captured API responses containing secrets, or debug logs that print environment values.
