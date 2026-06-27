@@ -141,15 +141,39 @@ def vendor_hash(name: str) -> str:
 # ---------------------------------------------------------------------------
 
 
+class SamQuotaExhausted(Exception):
+    """Raised when the SAM API key's daily request quota is spent (HTTP 429,
+    WSO2 code 900804). Distinct from a transient burst-throttle: further calls
+    today are futile until ``next_access_time`` (00:00 UTC), so the run should
+    checkpoint and stop rather than back off on every remaining vendor."""
+
+    def __init__(self, next_access_time: str = ""):
+        self.next_access_time = next_access_time
+        super().__init__(f"SAM daily quota exhausted; resets {next_access_time or '00:00 UTC'}")
+
+
 def sam_call(params: dict, api_key: str, timeout: tuple = (5, 7)):
-    """GET SAM.gov entity-information API. Returns parsed JSON or None."""
+    """GET SAM.gov entity-information API. Returns parsed JSON or None.
+
+    Raises :class:`SamQuotaExhausted` on daily-quota 429 (code 900804) so the
+    caller can stop cleanly; a generic/transient 429 still backs off and returns
+    None (treated as a miss for this attempt)."""
     full_params = {"api_key": api_key, **params}
     try:
         resp = _requests.get(SAM_BASE_URL, params=full_params, timeout=timeout)
         if resp.status_code == 200:
             return resp.json()
         if resp.status_code == 429:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {}
+            msg = str(body.get("message", "")).lower()
+            if str(body.get("code")) == "900804" or "exceeded your quota" in msg:
+                raise SamQuotaExhausted(str(body.get("nextAccessTime", "")))
             time.sleep(10)
+    except SamQuotaExhausted:
+        raise
     except Exception:
         pass
     return None
@@ -503,6 +527,7 @@ def run(
     resolved = sum(1 for r in results.values() if r.get("uei"))
     failed = []
     processed = 0
+    quota_exhausted = False
 
     logger.info(f"[START] {datetime.now().isoformat()}")
 
@@ -532,7 +557,25 @@ def run(
 
         # SAM primary lookup
         time.sleep(RATE_DELAY)
-        sam_result = sam_lookup_by_name(vendor, api_key)
+        try:
+            sam_result = sam_lookup_by_name(vendor, api_key)
+        except SamQuotaExhausted as e:
+            # Daily quota spent — checkpoint at THIS vendor (not i+1) so a later
+            # --resume retries it, then stop. Avoids hours of 429 back-off and
+            # keeps throttled vendors out of the index as false "UNRESOLVED".
+            write_index(results, output_dir)
+            _save_json(cache_path, cache)
+            _save_json(
+                checkpoint_path,
+                {"last_idx": i, "resolved": resolved, "ts": datetime.now().isoformat()},
+            )
+            logger.warning(
+                f"  [QUOTA] SAM daily quota exhausted at vendor #{i} "
+                f"({resolved} resolved so far). Resets {e.next_access_time or '00:00 UTC'}. "
+                f"Re-run `python3 scripts/sam_enrichment.py --resume` after that time."
+            )
+            quota_exhausted = True
+            break
         source = "SAM"
 
         # USASpending fallback
@@ -624,6 +667,7 @@ def run(
         "value_total_usd": round(value_total, 2),
         "value_coverage_pct": round(value_resolved / max(value_total, 1) * 100, 2),
         "coverage_gate_pass": coverage >= COVERAGE_GATE,
+        "quota_exhausted": quota_exhausted,
     }
     _save_json(output_dir / "enrichment_summary.json", summary)
 
@@ -637,7 +681,12 @@ def run(
         f"  Gate:          {'PASS' if summary['coverage_gate_pass'] else 'FAIL — see failed_lookups.csv'}"
     )
 
-    if not summary["coverage_gate_pass"]:
+    if quota_exhausted:
+        logger.warning(
+            "  Run stopped early on SAM daily-quota exhaustion — partial result is "
+            "resumable with --resume after the quota resets (00:00 UTC)."
+        )
+    elif not summary["coverage_gate_pass"]:
         logger.warning(
             f"  Coverage {coverage:.1%} below gate ({COVERAGE_GATE:.0%}). "
             f"Check {fail_path} for manual resolution."
@@ -658,4 +707,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     summary = run(resume=args.resume, dry_run=args.dry_run, top_n=args.top)
-    sys.exit(0 if summary.get("dry_run") or summary.get("coverage_gate_pass") else 1)
+    # A quota-interrupted run is incomplete-but-resumable, not a failure.
+    ok = (
+        summary.get("dry_run")
+        or summary.get("coverage_gate_pass")
+        or summary.get("quota_exhausted")
+    )
+    sys.exit(0 if ok else 1)

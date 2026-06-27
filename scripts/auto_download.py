@@ -52,6 +52,7 @@ BULK_TIMEOUT_SECS = 600  # 10-minute ceiling for async job completion
 USASPENDING_FIELDS = [
     "Award ID",
     "Recipient Name",
+    "Recipient UEI",
     "Recipient State Code",
     "Awarding Agency",
     "Awarding Sub Agency",
