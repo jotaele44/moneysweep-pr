@@ -36,9 +36,9 @@ def test_materialization_readiness_snapshot_matches_runbook_counts():
     # their producer scripts are importable with real scraping implementations.
     # Only hacienda_sut_ivu and pr_act_154_excise remain scraper_needed (true stubs).
     # Counts below are pinned to the regenerated reports/materialization_readiness.json.
-    assert snapshot["total_sources"] == 136
-    assert snapshot["automatable_total"] == 90
-    assert snapshot["automatable_ready"] == 90
+    assert snapshot["total_sources"] == 141
+    assert snapshot["automatable_total"] == 95
+    assert snapshot["automatable_ready"] == 95
     assert snapshot["queued_excluded_total"] == 46
     assert snapshot["automatable_not_ready"] == []
 
