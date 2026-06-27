@@ -1,21 +1,21 @@
 # Source Materialization Readiness
 
-Total sources: **136**
-Automatable: **90** (ready: **90**, need API key at run time: 11)
+Total sources: **141**
+Automatable: **95** (ready: **95**, need API key at run time: 12)
 Queued / excluded: **46**
 
 ## Path types
 
 | path_type | automatable | count | recommended_action |
 | --- | --- | --- | --- |
-| `api_producer` | True | 49 | Run producer under strict preflight; public API path, set key if gated. |
+| `api_producer` | True | 54 | Run producer under strict preflight; public API path, set key if gated. |
 | `api_adapter` | True | 41 | Materialize via `python -m moneysweep.query --source <id>` (set key if gated). |
 | `manual_export` | False | 39 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
 | `deferred_stub` | False | 2 | Intentionally unimplemented; remains not_materialized by design. |
 | `scraper_needed` | False | 2 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
 
-API keys needed for full automatable materialization: `CENSUS_API_KEY`, `EIA_API_KEY`, `FAC_API_KEY`, `FEC_API_KEY`, `FINANCIALDATA_API_KEY`, `FRED_API_KEY`, `HIGHERGOV_API_KEY`, `SAM_API_KEY`
+API keys needed for full automatable materialization: `CENSUS_API_KEY`, `EIA_API_KEY`, `FAC_API_KEY`, `FEC_API_KEY`, `FINANCIALDATA_API_KEY`, `FRED_API_KEY`, `HIGHERGOV_API_KEY`, `OPENSTATES_API_KEY`, `SAM_API_KEY`
 
 ## api_adapter (41)
 
@@ -61,7 +61,7 @@ API keys needed for full automatable materialization: `CENSUS_API_KEY`, `EIA_API
 - `wic`
 - `wioa`
 
-## api_producer (49)
+## api_producer (54)
 
 - `aafaf`
 - `census_gov_finances`
@@ -86,6 +86,10 @@ API keys needed for full automatable materialization: `CENSUS_API_KEY`, `EIA_API
 - `hacienda`
 - `hud_cdbg_dr_public`
 - `hud_cdbg_mit`
+- `legislapr_discovery`
+- `legislapr_sessions`
+- `legislative_canonical_sources`
+- `legislative_fiscal_link_candidates`
 - `lihtc`
 - `msrb_rtrs_trades`
 - `municipal_finance`
@@ -94,6 +98,7 @@ API keys needed for full automatable materialization: `CENSUS_API_KEY`, `EIA_API
 - `nmtc`
 - `opm_fedscope`
 - `opportunity_zones`
+- `osl_sutra_crosswalk`
 - `p3_authority`
 - `pr_act_60_decrees`
 - `pr_general_fund_revenues`

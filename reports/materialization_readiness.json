@@ -1,10 +1,10 @@
 {
   "schema_version": "r5_readiness_v1",
-  "total_sources": 136,
-  "automatable_total": 90,
-  "automatable_ready": 90,
+  "total_sources": 141,
+  "automatable_total": 95,
+  "automatable_ready": 95,
   "automatable_not_ready": [],
-  "automatable_needs_key_count": 11,
+  "automatable_needs_key_count": 12,
   "automatable_required_keys": [
     "CENSUS_API_KEY",
     "EIA_API_KEY",
@@ -13,6 +13,7 @@
     "FINANCIALDATA_API_KEY",
     "FRED_API_KEY",
     "HIGHERGOV_API_KEY",
+    "OPENSTATES_API_KEY",
     "SAM_API_KEY"
   ],
   "queued_excluded": {

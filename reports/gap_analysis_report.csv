@@ -13,12 +13,12 @@ fec,political_finance,True,api_key:FEC_API_KEY,1,1,0,0,fully_materialized,16637,
 "
 fema_pa_openfema_v2,federal,True,none,1,1,0,0,fully_materialized,21868,1,data/staging/processed/pr_fema_pa_master.csv,Preferred FEMA PA route. OpenFEMA v2 PA projects API.
 fsrs_subawards,federal,True,none,1,1,0,0,fully_materialized,7122,1,data/staging/processed/pr_fsrs_subawards.csv,FSRS prime-to-sub reporting. Joins with USAspending subaward stream.
-hud_cdbg_dr_public,federal,True,none,1,1,0,0,fully_materialized,7700,1,data/staging/processed/pr_cdbg_dr_master.csv,
+hud_cdbg_dr_public,federal,True,none,1,1,0,0,fully_materialized,3808,1,data/staging/processed/pr_cdbg_dr_master.csv,
 lda,lobbying,True,none,14,14,0,0,fully_materialized,17634,1,data/staging/processed/lda_registrants.csv,"API-authoritative federal LDA lobbying source via LDA.gov.
 Canonical API provider alias: lda_gov.
 Default mode is dry-run fixture mode; live API calls require --live.
 No API key is required. Uploaded/"
-usaspending_prime,federal,True,none,2,2,0,0,fully_materialized,606943,1,data/staging/processed/pr_contracts_master.csv,"USAspending API + bulk archive. No key required.
+usaspending_prime,federal,True,none,2,2,0,0,fully_materialized,522033,1,data/staging/processed/pr_contracts_master.csv,"USAspending API + bulk archive. No key required.
 Top recipients are PR government agencies (PRDOH, ADSEF, PRDE, PRHA) —
 no corporate parent_uei is expected for these entities.
 "
@@ -70,6 +70,10 @@ hud_cdbg_mit,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/proces
 "
 irs_ctc_eitc_pr,federal,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_irs_ctc_eitc.csv,"IRS Child Tax Credit / EITC payments to PR families (post-ARPA expansion), from SOI/Treasury exports. Operator-delivered.
 "
+legislapr_discovery,territorial_legislation,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_legislapr_measures_probe.json,LegislaPR is a public legislative discovery and enrichment surface for Puerto Rico measures. Treat extracted summaries/pros/cons as non-authoritative. Promote only when the measure is cross-confirmed 
+legislapr_sessions,territorial_legislation,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_legislapr_sessions.json,Deterministic session index extracted from LegislaPR discovery output and OpenStates URLs. No external service calls.
+legislative_canonical_sources,territorial_legislation,False,api_key:OPENSTATES_API_KEY,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_legislative_measures_canonical.json,Canonical confirmation layer for LegislaPR discovery candidates. Uses OpenStates API v3 and official Assembly/SUTRA document links; requires OPENSTATES_API_KEY unless running in explicit SUTRA-only au
+legislative_fiscal_link_candidates,territorial_legislation,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_legislative_fiscal_link_candidates.csv,Manual-review candidate queue linking legislative measures to fiscal records through conservative fiscal terms and agency or municipality text alignment.
 lihtc,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_lihtc.csv,
 loteria_pr,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_loteria.csv,"Loteria de Puerto Rico + Loteria Electronica revenue, prize payouts and retailer commissions. Operator-delivered exports.
 "
@@ -88,6 +92,7 @@ opm_fedscope,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/proces
 "
 opportunity_zones,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_opportunity_zones.csv,"Qualified Opportunity Zone designated census tracts in PR (Treasury/IRS capital-gains incentive). Source URL configurable via OZ_DATA_URL; live pull requires network.
 "
+osl_sutra_crosswalk,territorial_legislation,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_osl_sutra_crosswalk.json,Deterministic OpenStates-to-official Assembly/SUTRA crosswalk. No network calls; link confidence is based on discovered canonical URLs and confirmation status.
 ports_airports_contracts,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ports_airports_contracts.csv,PR Ports Authority / Aerostar contracts and capital projects. Also fed by scripts/parse_aaa_ports_pdf.py from the acquired completed_projects_AAA.pdf.
 ports_airports_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ports_airports_revenue.csv,Aggregate port/airport fee revenue (PR Ports Authority + Aerostar/SJU) from audited financials and EMMA disclosures.
 ports_authority,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ports_concessions.csv,"PR Ports Authority concession fees and leases (e.g. Aerostar/LMM airport). Operator-delivered exports.
@@ -124,15 +129,15 @@ highergov_supplemental,federal,False,api_key:HIGHERGOV_API_KEY,2,1,1,0,partially
 aafaf,territorial,False,none,1,1,0,0,fully_materialized,4,1,data/staging/processed/pr_aafaf_budget.csv,PR Fiscal Agency & Financial Advisory Authority. Budget execution.
 chip,federal,False,none,1,1,0,0,fully_materialized,4,1,data/staging/processed/pr_chip.csv,
 cofina,territorial,False,none,1,1,0,0,fully_materialized,5,1,data/staging/processed/pr_cofina.csv,
-doe_grants,federal,False,none,1,1,0,0,fully_materialized,180,1,data/staging/processed/pr_doe_master.csv,
-doj_grants,federal,False,none,1,1,0,0,fully_materialized,419,1,data/staging/processed/pr_doj_grants_master.csv,
+doe_grants,federal,False,none,1,1,0,0,fully_materialized,116,1,data/staging/processed/pr_doe_master.csv,
+doj_grants,federal,False,none,1,1,0,0,fully_materialized,264,1,data/staging/processed/pr_doj_grants_master.csv,
 dol_whd_osha,federal,False,none,1,1,0,0,fully_materialized,3,1,data/staging/processed/pr_dol_enforcement.csv,
 dot_grants,federal,False,none,1,1,0,0,fully_materialized,376,1,data/staging/processed/pr_dot_master.csv,
 ed_grants,federal,False,none,1,1,0,0,fully_materialized,379,1,data/staging/processed/pr_ed_master.csv,
 eia_power_sector,federal,False,api_key:EIA_API_KEY,1,1,0,0,fully_materialized,615,1,data/staging/processed/pr_eia_power_sector.csv,"EIA Open Data v2 power-sector time-series (net generation, capacity,
 consumption) for Puerto Rico, per registries/eia_series.yaml. Requires a
 free EIA_API_KEY (https://www.eia.gov/opendata/register.ph"
-epa_grants,federal,False,none,1,1,0,0,fully_materialized,631,1,data/staging/processed/pr_epa_master.csv,
+epa_grants,federal,False,none,1,1,0,0,fully_materialized,293,1,data/staging/processed/pr_epa_master.csv,
 fcc_usf,federal,False,none,1,1,0,0,fully_materialized,4,1,data/staging/processed/pr_fcc_usf.csv,
 fdic,federal,False,none,2,2,0,0,fully_materialized,2130,1,data/staging/processed/pr_fdic_financials.csv,
 fema_hmgp,federal,False,none,1,1,0,0,fully_materialized,25,1,data/staging/processed/pr_fema_hmgp_master.csv,
@@ -146,7 +151,7 @@ gao_ig_audits,federal,False,none,1,1,0,0,fully_materialized,5,1,data/staging/pro
 gleif_lei,entity_resolution,False,none,2,2,0,0,fully_materialized,567,1,data/staging/processed/pr_gleif_entities.csv,"Free, keyless GLEIF LEI database filtered to Puerto Rico (legalAddress
 country PR + jurisdiction US-PR, de-duped by LEI). Corporate identity
 (legal name, status, legal form, local registration number,"
-grants_gov,federal,False,none,1,1,0,0,fully_materialized,461668,1,data/staging/processed/pr_grants_master.csv,
+grants_gov,federal,False,none,1,1,0,0,fully_materialized,376759,1,data/staging/processed/pr_grants_master.csv,
 hacienda,territorial,False,none,1,1,0,0,fully_materialized,8,1,data/staging/processed/pr_hacienda_revenues.csv,
 hhs_grants,federal,False,none,1,1,0,0,fully_materialized,307,1,data/staging/processed/pr_hhs_master.csv,
 hud_hcv_section8,federal,False,none,1,1,0,0,fully_materialized,2,1,data/staging/processed/pr_hud_hcv.csv,
@@ -158,13 +163,13 @@ ncua,federal,False,none,1,1,0,0,fully_materialized,4,1,data/staging/processed/pr
 nih_reporter,federal,False,none,1,1,0,0,fully_materialized,103,1,data/staging/processed/pr_nih_grants.csv,
 nonprofits_irs990,federal,False,none,1,1,0,0,fully_materialized,3,1,data/staging/processed/pr_nonprofits.csv,
 ofac_sdn,entity_resolution,False,none,1,1,0,0,fully_materialized,19050,1,data/staging/processed/pr_ofac_sdn.csv,
-oia_grants,federal,False,none,1,1,0,0,fully_materialized,364,1,data/staging/processed/pr_oia_master.csv,
+oia_grants,federal,False,none,1,1,0,0,fully_materialized,342,1,data/staging/processed/pr_oia_master.csv,
 p3_authority,territorial,False,none,1,1,0,0,fully_materialized,5,1,data/staging/processed/pr_p3_contracts.csv,
 pr_act_60_decrees,territorial,False,none,1,1,0,0,fully_materialized,5,1,data/staging/processed/pr_act60_decrees.csv,
 pr_pensions,territorial,False,none,1,1,0,0,fully_materialized,4,1,data/staging/processed/pr_pension_funds.csv,
 prepa_luma_genera,infrastructure,False,none,1,1,0,0,fully_materialized,8,1,data/staging/processed/pr_prepa_contracts.csv,PREPA / LUMA Energy / Genera PR contracts and operating data.
 promesa_creditors,territorial,False,none,1,1,0,0,fully_materialized,16,1,data/staging/processed/pr_promesa_creditors.csv,
-research_grants,federal,False,none,1,1,0,0,fully_materialized,4946,1,data/staging/processed/pr_research_master.csv,
+research_grants,federal,False,none,1,1,0,0,fully_materialized,4945,1,data/staging/processed/pr_research_master.csv,
 rum_cover_over,territorial,False,none,1,1,0,0,fully_materialized,7,1,data/staging/processed/pr_rum_coverover.csv,
 sba_loans,federal,False,none,1,1,0,0,fully_materialized,2,1,data/staging/processed/pr_sba_loans_master.csv,
 sec_13f_nport,federal,False,none,1,1,0,0,fully_materialized,54,1,data/staging/processed/pr_sec_holdings.csv,
@@ -180,4 +185,4 @@ usace_civil_works,federal,False,none,1,1,0,0,fully_materialized,3,1,data/staging
 usda_grants,federal,False,none,1,1,0,0,fully_materialized,688,1,data/staging/processed/pr_usda_master.csv,
 va_benefits,federal,False,none,1,1,0,0,fully_materialized,6,1,data/staging/processed/pr_va_benefits.csv,
 wic,federal,False,none,1,1,0,0,fully_materialized,4,1,data/staging/processed/pr_wic.csv,
-wioa,federal,False,none,1,1,0,0,fully_materialized,444,1,data/staging/processed/pr_wioa_grants.csv,
+wioa,federal,False,none,1,1,0,0,fully_materialized,273,1,data/staging/processed/pr_wioa_grants.csv,
