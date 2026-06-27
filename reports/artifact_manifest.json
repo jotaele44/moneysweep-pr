@@ -4,7 +4,7 @@
   "export_contract_version": "local-20260619-103043",
   "generated_at": "2026-06-19T14:30:43.544167+00:00",
   "package_dir": "exports/package",
-  "producer": "contract-sweeper",
+  "producer": "moneysweep-pr",
   "schema_version": "artifact_manifest.v1",
   "source_count": 1,
   "sources": [

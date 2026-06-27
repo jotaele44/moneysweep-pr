@@ -74,7 +74,7 @@ SHA256 is recorded here for traceability:
 1. **Bilingual municipio normalizer rule.** ✅ Resolved. `Municipio de X`,
    `Municipality of X`, and `Municipio Autónomo de X` now collapse to a
    canonical `MUNICIPIO <town>` form in
-   `contract_sweeper.runtime.name_normalization`, bridging the Spanish/English
+   `moneysweep.runtime.name_normalization`, bridging the Spanish/English
    variants without per-municipio alias entries.
 
 2. **Accent-folding in `normalize_name`.** ✅ Resolved. A NFKD

@@ -21,7 +21,7 @@
 | File | Change |
 |---|---|
 | `scripts/parent_collapse.py` | Added `_classify_entity_type()` + `entity_type` column in output |
-| `contract_sweeper/runtime/validation_gates.py` | Replaced global `parent_uei_coverage` gate; added 3 entity-type-aware gates; schema_version r5_v1 → r5_v2 |
+| `moneysweep/runtime/validation_gates.py` | Replaced global `parent_uei_coverage` gate; added 3 entity-type-aware gates; schema_version r5_v1 → r5_v2 |
 | `registries/source_registry.yaml` | `sam_entities` → recalibrated thresholds; `usaspending_prime` → added structural note |
 | `registries/source_registry.json` | Regenerated |
 | `tests/test_validation_gates.py` | Updated schema_version assertion; 4 new entity-type gate tests |
@@ -54,6 +54,6 @@ The new `corporate_parent_uei_rate` gate applies only to the 105,145 entities cl
 ```bash
 # After USAspending background task completes:
 python3 scripts/parent_collapse.py   # refresh entity_type + parent stats
-python3 -m contract_sweeper.runtime.validation_gates --allow-failed
+python3 -m moneysweep.runtime.validation_gates --allow-failed
 # Check if corporate_parent_uei_rate ≥ 0.002 passes
 ```
