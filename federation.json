@@ -11,9 +11,9 @@
   "pause_lock_required": true,
   "source_truth": {
     "source_of_truth_file": "reports/materialization_readiness.json",
-    "total_sources": 136,
-    "automatable_total": 90,
-    "automatable_ready": 90,
+    "total_sources": 141,
+    "automatable_total": 95,
+    "automatable_ready": 95,
     "queued_excluded_total": 46,
     "queued_excluded": {
       "manual_export": 39,
@@ -30,6 +30,7 @@
       "FINANCIALDATA_API_KEY",
       "FRED_API_KEY",
       "HIGHERGOV_API_KEY",
+      "OPENSTATES_API_KEY",
       "SAM_API_KEY"
     ]
   },
