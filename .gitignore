@@ -99,3 +99,6 @@ data/cache/**
 
 # Machine-specific cypher-shell discovery output emitted by PREPA load launchers
 outputs/**/cypher_shell_candidates.txt
+
+# generated federation maintenance report (audit artifact, not committed)
+reports/maintenance/

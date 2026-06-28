@@ -42,7 +42,8 @@
     "test_suite": "python3 -m pytest tests/ -q",
     "dashboard_export": "python3 scripts/build_dashboard_explorer.py",
     "foia_letters": "python3 scripts/build_foia_letters.py",
-    "ngo_layer": "python3 scripts/ngo_integration.py"
+    "ngo_layer": "python3 scripts/ngo_integration.py",
+    "maintenance": "python3 scripts/run_maintenance.py --repo moneysweep-pr --mode audit"
   },
   "canonical_outputs": {
     "current_status": "reports/current_status.json",
@@ -54,7 +55,8 @@
     "readiness_audit": "reports/federation_readiness_audit.md",
     "dashboard": "exports/dashboard/index.html",
     "graph_nodes": "exports/graph/nodes.csv",
-    "graph_edges": "exports/graph/edges.csv"
+    "graph_edges": "exports/graph/edges.csv",
+    "maintenance_report": "reports/maintenance/latest.json"
   },
   "manual_ingestion_tranche_b": {
     "branch": "gpt/manual-source-ingestion-tranche-b",
