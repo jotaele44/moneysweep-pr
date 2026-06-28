@@ -259,7 +259,17 @@ def run(
     log_dir.mkdir(parents=True, exist_ok=True)
 
     ueis = _collect_ueis(root)
-    log.info(f"[INIT] {len(ueis)} unique UEIs collected from staged CSVs")
+    log.info(f"[INIT] {len(ueis)} unique UEIs collected")
+
+    if not ueis:
+        log.warning(
+            "No UEIs found — nothing to enrich. This needs the generated vendor index, "
+            "which is gitignored and not in a fresh clone. Provide it first, e.g.:\n"
+            "  data/staging/processed/enrichment/vendor_uei_index.csv  (drop in if you have it), or\n"
+            "  python3 scripts/build_uei_index_from_source.py          (rebuild from the master), or\n"
+            "  run the pipeline: auto_download.py → normalize_expansion_inputs.py → "
+            "deduplicate_master.py → build_uei_index_from_source.py"
+        )
 
     if dry_run:
         return {"uei_count": len(ueis), "dry_run": True}
