@@ -6,9 +6,11 @@ into moneysweep-pr's normalized finance lane.
 > **Retired (2026-06): the cross-repo delivery to spiderweb-pr.** spiderweb-pr
 > became a producer-only federation node and removed its `intake-normalize`
 > receiver, so `scripts/deliver_derivatives.py` and the workflow's cross-repo
-> delivery hop were removed. The router still emits a `spiderweb_pr_derivatives.csv`
-> stream, but it is no longer delivered or normalized downstream. See spiderweb-pr
-> `docs/REPO_BOUNDARY.md` (the spatial-lane normalizer now lives there at
+> delivery hop were removed. The router no longer emits the
+> `spiderweb_pr_derivatives.csv` stream either (removed 2026-06 — nothing consumed
+> it); the spiderweb lane is still classified and reported in `routing_summary.json`
+> as `spiderweb_pr_derivative_count`. See spiderweb-pr `docs/REPO_BOUNDARY.md` (the
+> spatial-lane normalizer now lives there at
 > `docs/legacy/scripts/build_spiderweb_spatial_lane.py`).
 
 ## The chain

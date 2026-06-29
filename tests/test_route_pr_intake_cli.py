@@ -29,7 +29,9 @@ def test_route_pr_intake_cli_exports_derivative_csvs(tmp_path):
 
     assert (out_dir / "route_results.jsonl").exists()
     assert (out_dir / "moneysweep_derivatives.csv").exists()
-    assert (out_dir / "spiderweb_pr_derivatives.csv").exists()
+    # spiderweb_pr_derivatives.csv is no longer written (orphaned output removed);
+    # the spiderweb lane is still classified and reported via the summary count above.
+    assert not (out_dir / "spiderweb_pr_derivatives.csv").exists()
     assert (out_dir / "manual_review_queue.csv").exists()
     assert (out_dir / "routing_summary.json").exists()
 
