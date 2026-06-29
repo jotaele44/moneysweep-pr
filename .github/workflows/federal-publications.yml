@@ -1,0 +1,40 @@
+name: Federal publications validation
+
+# The PR Federal Publications Master workbook lives outside the repo, so CI
+# cannot regenerate data/sources/federal_publications.jsonl. Instead this guards
+# the committed artifact (the 4,248 federation sources folded into canonical_v1)
+# against drift: schema conformance, deterministic src_ ids, uniqueness, and a
+# row-count floor. Metadata-only, stdlib-only — no network, no API keys, no deps.
+
+on:
+  pull_request:
+    paths:
+      - "data/sources/federal_publications.jsonl"
+      - "schemas/moneysweep_source.schema.json"
+      - "scripts/validate_federal_publications.py"
+      - ".github/workflows/federal-publications.yml"
+  schedule:
+    - cron: "0 6 * * 1"  # Mondays 06:00 UTC — catch drift even without a PR
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  validate-federal-publications:
+    name: Validate federal-publications sources
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Validate committed federal_publications.jsonl
+        run: python scripts/validate_federal_publications.py
