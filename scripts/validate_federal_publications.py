@@ -23,6 +23,7 @@ schema changes. Checks:
 
 Exit code 0 when clean, 1 on any violation. No network, no API keys.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -93,7 +94,9 @@ def validate(data_path: Path, schema_path: Path) -> list[str]:
             if not id_pattern.match(sid):
                 errors.append(f"{prefix}: source_id {sid!r} does not match {id_pattern.pattern}")
             if sid in seen_ids:
-                errors.append(f"{prefix}: duplicate source_id {sid!r} (first seen line {seen_ids[sid]})")
+                errors.append(
+                    f"{prefix}: duplicate source_id {sid!r} (first seen line {seen_ids[sid]})"
+                )
             else:
                 seen_ids[sid] = lineno
 
@@ -122,9 +125,15 @@ def validate(data_path: Path, schema_path: Path) -> list[str]:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--data", type=Path, default=DEFAULT_DATA, help="federal_publications.jsonl path")
-    ap.add_argument("--schema", type=Path, default=DEFAULT_SCHEMA, help="moneysweep_source schema path")
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    ap.add_argument(
+        "--data", type=Path, default=DEFAULT_DATA, help="federal_publications.jsonl path"
+    )
+    ap.add_argument(
+        "--schema", type=Path, default=DEFAULT_SCHEMA, help="moneysweep_source schema path"
+    )
     args = ap.parse_args()
 
     if not args.data.is_file():
@@ -138,7 +147,9 @@ def main() -> int:
     total = sum(1 for _ in _iter_rows(args.data))
 
     if errors:
-        print(f"FAIL: {len(errors)} problem(s) in {args.data.name} ({total} rows):", file=sys.stderr)
+        print(
+            f"FAIL: {len(errors)} problem(s) in {args.data.name} ({total} rows):", file=sys.stderr
+        )
         for e in errors[:MAX_REPORTED]:
             print(f"  - {e}", file=sys.stderr)
         if len(errors) > MAX_REPORTED:
