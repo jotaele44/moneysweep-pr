@@ -9,11 +9,25 @@ import hashlib
 import sys
 from pathlib import Path
 
-EXPECTED_COLUMNS = ['Cell_ID', 'Row_Index', 'Column_Index', 'Pixel_X_Min', 'Pixel_Y_Min', 'Pixel_X_Max', 'Pixel_Y_Max', 'Centroid_X', 'Centroid_Y', 'Dark_Pixel_Count', 'Total_Pixel_Count', 'Land_Pixel_Ratio', 'Classification']
+EXPECTED_COLUMNS = [
+    "Cell_ID",
+    "Row_Index",
+    "Column_Index",
+    "Pixel_X_Min",
+    "Pixel_Y_Min",
+    "Pixel_X_Max",
+    "Pixel_Y_Max",
+    "Centroid_X",
+    "Centroid_Y",
+    "Dark_Pixel_Count",
+    "Total_Pixel_Count",
+    "Land_Pixel_Ratio",
+    "Classification",
+]
 EXPECTED_ROWS = 98_304
 EXPECTED_ROW_MAX = 255
 EXPECTED_COLUMN_MAX = 383
-EXPECTED_CLASSIFICATIONS = {'Gridline_Dominant', 'Water_or_Empty', 'Coastline_or_Land'}
+EXPECTED_CLASSIFICATIONS = {"Gridline_Dominant", "Water_or_Empty", "Coastline_or_Land"}
 EXPECTED_SHA256 = "17733f3f18c8a644e31c1eb25fb27b73b4bf353c6de57d5203c4311e05d64483"
 
 
