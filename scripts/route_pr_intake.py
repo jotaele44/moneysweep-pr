@@ -188,7 +188,10 @@ def main_with_args(argv: Sequence[str] | None = None) -> int:
 
     write_jsonl(out_dir / "route_results.jsonl", results)
     write_csv(out_dir / "moneysweep_derivatives.csv", contract_rows)
-    write_csv(out_dir / "spiderweb_pr_derivatives.csv", spiderweb_rows)
+    # The spiderweb-pr lane is still classified and counted (see the summary's
+    # spiderweb_pr_derivative_count), but its CSV export is no longer written:
+    # spiderweb-pr became producer-only and the cross-repo delivery was retired
+    # (scripts/deliver_derivatives.py, 2026-06), so the file had no consumer.
     write_csv(out_dir / "manual_review_queue.csv", review_rows)
     (out_dir / "routing_summary.json").write_text(
         json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8"

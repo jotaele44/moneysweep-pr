@@ -33,9 +33,11 @@ The router writes:
 
 - `route_results.jsonl`
 - `moneysweep_derivatives.csv`
-- `spiderweb_pr_derivatives.csv`
 - `manual_review_queue.csv`
 - `routing_summary.json`
+
+(The spiderweb-pr lane is still classified and counted in `routing_summary.json`
+as `spiderweb_pr_derivative_count`, but its CSV is no longer written — see below.)
 
 ## Daily PR News integration point
 
@@ -51,15 +53,14 @@ Then run:
 python run_pr_intake_router.py --input data/intake/pr_news/raw_items_latest.jsonl --out-dir data/exports/pr_intake_router
 ```
 
-## Downstream consumer (spiderweb-pr)
+## Downstream consumer (spiderweb-pr) — retired
 
-`spiderweb_pr_derivatives.csv` is the spiderweb-pr lane of this export. It is consumed by
-spiderweb-pr's `readiness/pr_intake_import.py`, which validates each row against
-`schemas/pr_intake_derivative.schema.json` and normalizes it into a Spiderweb intel-record
-layer (zero-loss; invalid rows go to a review queue). The producer (or an operator) copies
-the file into the spiderweb-pr dropzone `data/intake/pr_intake/`. The full contract —
-on-disk CSV shape, required columns, and a noted limitation (the derivative does not yet
-carry coordinates) — lives in `spiderweb-pr/docs/contracts/PR_INTAKE_DERIVATIVE_HANDOFF.md`.
+The cross-repo delivery to spiderweb-pr was retired in 2026-06 when spiderweb-pr
+became a producer-only federation node and removed its `intake-normalize` receiver
+(`scripts/deliver_derivatives.py` was deleted). The `spiderweb_pr_derivatives.csv`
+export had no remaining consumer, so it is no longer written. The router still
+classifies items into the spiderweb lane and reports the volume as
+`spiderweb_pr_derivative_count` in `routing_summary.json`. See `docs/INTAKE_DELIVERY.md`.
 
 ## Validation invariant
 
