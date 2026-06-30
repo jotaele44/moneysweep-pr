@@ -1,12 +1,12 @@
 {
   "schema_version": "federation_source_status_reconciliation_v1",
   "active_vector": "PREP_TRANCHE_B_MANUAL_SOURCE_INGESTION",
-  "reconciled_at": "2026-06-22",
+  "reconciled_at": "2026-06-28",
   "status": "CONTROL_PLANE_RECONCILED",
-  "canonical_source_count": 136,
+  "canonical_source_count": 141,
   "source_count_file": "reports/materialization_readiness.json",
-  "automatable_total": 90,
-  "automatable_ready": 90,
+  "automatable_total": 95,
+  "automatable_ready": 95,
   "queued_excluded_total": 46,
   "queued_excluded": {
     "manual_export": 39,
@@ -23,13 +23,15 @@
     "FINANCIALDATA_API_KEY",
     "FRED_API_KEY",
     "HIGHERGOV_API_KEY",
+    "OPENSTATES_API_KEY",
     "SAM_API_KEY"
   ],
   "historical_drift_notes": [
-    "Older status text may still reference 82 or 84 sources. Federation readers must use the current 136-source materialization readiness file.",
+    "Older status text may still reference 82 or 84 sources. Federation readers must use the current materialization readiness file.",
     "Older next-action text may describe a stale queued breakdown. Federation readers must use the queued_excluded object in this file.",
     "Registry grew from 84 to 136 sources after the June 2026 federation readiness audit as new manual-export, SBA disaster-loan, and fiscal sources were registered.",
-    "scraper_needed reduced from 15 to 2 (2026-06-22): 13 sources with real scraping implementations promoted from scraper_needed to api_producer. Only hacienda_sut_ivu and pr_act_154_excise remain as true stubs."
+    "scraper_needed reduced from 15 to 2 (2026-06-22): 13 sources with real scraping implementations promoted from scraper_needed to api_producer. Only hacienda_sut_ivu and pr_act_154_excise remain as true stubs.",
+    "Reconciled from 136 to 141 sources and 90 to 95 automatable (2026-06-28): federation.json and this reconciliation file were lagging reports/materialization_readiness.json (141 total / 95 automatable / 95 ready). OpenStates runtime key added to match materialization truth. No readiness flag changed."
   ],
   "federation_gate": {
     "ready_for_hub_discovery": true,
