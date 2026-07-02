@@ -83,9 +83,7 @@ def _build_workbook(path: Path) -> None:
         ["B100", "4339", "12345", "Mayaguez", "00680", "MAYAGUEZ", 20000, 18000, 5000],
     ]
     with pd.ExcelWriter(path, engine="openpyxl") as writer:
-        pd.DataFrame(home_rows).to_excel(
-            writer, sheet_name="FY22 Home", header=False, index=False
-        )
+        pd.DataFrame(home_rows).to_excel(writer, sheet_name="FY22 Home", header=False, index=False)
         pd.DataFrame(business_rows).to_excel(
             writer, sheet_name="FY22 Business", header=False, index=False
         )
