@@ -263,7 +263,7 @@ def _load_csv_rows(path: Path) -> list[dict]:
         return list(csv.DictReader(handle))
 
 
-def test_r49d_freeze_gate_passes(tmp_path: Path):
+def test_external_blocker_freeze_gate_passes(tmp_path: Path):
     _bootstrap(tmp_path)
     status = run_external_blocker_freeze(tmp_path)
 
@@ -292,7 +292,7 @@ def test_r49d_freeze_gate_passes(tmp_path: Path):
     assert all(row["unfreeze_condition"] for row in freeze_rows)
 
 
-def test_r49d_forbidden_artifact_blocks_gate(tmp_path: Path):
+def test_external_blocker_freeze_forbidden_artifact_blocks_gate(tmp_path: Path):
     _bootstrap(tmp_path)
     blockers_path = (
         tmp_path / "data" / "review_queue" / "external_source_delivery_blockers_r4_9c.csv"

@@ -194,7 +194,7 @@ def _bootstrap(tmp_path: Path, *, missing_count: int, unfreeze_count: int) -> No
     )
 
 
-def test_r49z_pause_lock_passes(tmp_path: Path):
+def test_source_recovery_pause_lock_passes(tmp_path: Path):
     _bootstrap(tmp_path, missing_count=21, unfreeze_count=0)
     status = run_source_recovery_pause_lock(tmp_path)
 
@@ -227,7 +227,7 @@ def test_r49z_pause_lock_passes(tmp_path: Path):
     assert (tmp_path / "docs" / "SOURCE_RECOVERY_PAUSE_STATUS_R4_9Z.md").exists()
 
 
-def test_r49z_pause_lock_fails_when_unfreeze_or_missing_mismatch(tmp_path: Path):
+def test_source_recovery_pause_lock_fails_on_count_mismatch(tmp_path: Path):
     _bootstrap(tmp_path, missing_count=20, unfreeze_count=1)
     status = run_source_recovery_pause_lock(tmp_path)
 

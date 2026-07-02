@@ -215,7 +215,7 @@ def _bootstrap(tmp_path: Path, *, forbidden_in_resume: bool) -> None:
     )
 
 
-def test_r49z_b_gate_passes(tmp_path: Path) -> None:
+def test_repo_quality_audit_gate_passes(tmp_path: Path) -> None:
     _bootstrap(tmp_path, forbidden_in_resume=False)
     status = run_repo_quality_audit(tmp_path)
 
@@ -233,7 +233,7 @@ def test_r49z_b_gate_passes(tmp_path: Path) -> None:
     assert (tmp_path / "docs" / "CI_TESTING_STRATEGY.md").exists()
 
 
-def test_r49z_b_gate_fails_with_forbidden_artifact_paths(tmp_path: Path) -> None:
+def test_repo_quality_audit_fails_with_forbidden_artifact_paths(tmp_path: Path) -> None:
     _bootstrap(tmp_path, forbidden_in_resume=True)
     status = run_repo_quality_audit(tmp_path)
 
