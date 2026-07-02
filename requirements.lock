@@ -54,7 +54,7 @@ pygments==2.20.0
     # via pytest
 pypdfium2==5.9.0
     # via pdfplumber
-pytest==9.1.0
+pytest==9.1.1
     # via
     #   -r requirements.in
     #   pytest-cov
