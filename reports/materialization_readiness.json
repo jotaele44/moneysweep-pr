@@ -1,6 +1,6 @@
 {
   "schema_version": "r5_readiness_v1",
-  "total_sources": 141,
+  "total_sources": 142,
   "automatable_total": 95,
   "automatable_ready": 95,
   "automatable_not_ready": [],
@@ -17,13 +17,13 @@
     "SAM_API_KEY"
   ],
   "queued_excluded": {
-    "manual_export": 39,
+    "manual_export": 40,
     "scraper_needed": 2,
     "deferred_stub": 2,
     "semantic_duplicate": 3,
     "broken_producer": 0
   },
-  "queued_excluded_total": 46,
+  "queued_excluded_total": 47,
   "outputs": [
     "reports/source_recovery_matrix.csv",
     "reports/source_recovery_matrix.md",

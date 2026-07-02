@@ -27,7 +27,7 @@ nonprofits_irs990,False,api_adapter,True,True,,True,True,scripts/download_nonpro
 ofac_sdn,False,api_adapter,True,True,,True,True,scripts/download_ofac.py,1,0,1,,Materialize via `python -m moneysweep.query --source <id>` (set key if gated).
 oia_grants,False,api_adapter,True,True,,True,True,scripts/download_oia.py,1,0,1,,Materialize via `python -m moneysweep.query --source <id>` (set key if gated).
 research_grants,False,api_adapter,True,True,,True,True,scripts/download_research.py,1,0,1,,Materialize via `python -m moneysweep.query --source <id>` (set key if gated).
-sam_entities,True,api_adapter,True,True,SAM_API_KEY,True,True,scripts/sam_enrichment.py,2,0,1,,Materialize via `python -m moneysweep.query --source <id>` (set key if gated).
+sam_entities,True,api_adapter,True,True,SAM_API_KEY,True,True,scripts/sam_enrichment.py,2,1,1,,Materialize via `python -m moneysweep.query --source <id>` (set key if gated).
 sba_loans,False,api_adapter,True,True,,True,True,scripts/download_sba.py,1,0,1,,Materialize via `python -m moneysweep.query --source <id>` (set key if gated).
 sba_ppp,False,api_adapter,True,True,,True,True,scripts/download_sba.py,1,0,1,,Materialize via `python -m moneysweep.query --source <id>` (set key if gated).
 sbir,False,api_adapter,True,True,,True,True,scripts/download_sbir.py,1,0,1,,Materialize via `python -m moneysweep.query --source <id>` (set key if gated).
@@ -64,9 +64,9 @@ hacienda,False,api_producer,True,True,,False,True,scripts/download_hacienda.py,1
 hud_cdbg_dr_public,True,api_producer,True,True,,False,True,scripts/download_cdbg_dr.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 hud_cdbg_mit,False,api_producer,True,True,,False,True,scripts/download_cdbg_mit.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 legislapr_discovery,False,api_producer,True,True,,False,True,scripts/probe_legislapr_detail.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
-legislapr_sessions,False,api_producer,True,True,,False,True,scripts/ingest_legislapr_sessions.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
-legislative_canonical_sources,False,api_producer,True,True,OPENSTATES_API_KEY,False,True,scripts/fetch_legislative_canonical_sources.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
-legislative_fiscal_link_candidates,False,api_producer,True,True,,False,True,scripts/build_legislative_links.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+legislapr_sessions,False,api_producer,True,True,,False,True,scripts/ingest_legislapr_sessions.py,1,1,1,,"Run producer under strict preflight; public API path, set key if gated."
+legislative_canonical_sources,False,api_producer,True,True,OPENSTATES_API_KEY,False,True,scripts/fetch_legislative_canonical_sources.py,1,1,1,,"Run producer under strict preflight; public API path, set key if gated."
+legislative_fiscal_link_candidates,False,api_producer,True,True,,False,True,scripts/build_legislative_links.py,1,1,1,,"Run producer under strict preflight; public API path, set key if gated."
 lihtc,False,api_producer,True,True,,False,True,scripts/download_lihtc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 msrb_rtrs_trades,False,api_producer,True,True,,False,True,scripts/download_msrb_trades.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 municipal_finance,False,api_producer,True,True,FAC_API_KEY,False,True,scripts/download_fac_municipal.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
@@ -75,7 +75,7 @@ ngo_integration_layer,False,api_producer,True,True,,False,True,scripts/ngo_integ
 nmtc,False,api_producer,True,True,,False,True,scripts/download_nmtc.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 opm_fedscope,False,api_producer,True,True,,False,True,scripts/download_opm_fedscope.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 opportunity_zones,False,api_producer,True,True,,False,True,scripts/download_opportunity_zones.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
-osl_sutra_crosswalk,False,api_producer,True,True,,False,True,scripts/build_osl_sutra_crosswalk.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
+osl_sutra_crosswalk,False,api_producer,True,True,,False,True,scripts/build_osl_sutra_crosswalk.py,1,1,1,,"Run producer under strict preflight; public API path, set key if gated."
 p3_authority,False,api_producer,True,True,,False,True,scripts/download_p3.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 pr_act_60_decrees,False,api_producer,True,True,,False,True,scripts/download_act60.py,1,0,1,,"Run producer under strict preflight; public API path, set key if gated."
 pr_general_fund_revenues,False,api_producer,True,True,,False,True,scripts/download_estadisticas_pr.py,1,0,0,,"Run producer under strict preflight; public API path, set key if gated."
@@ -132,6 +132,7 @@ prasa_completed_projects,False,manual_export,False,False,,False,True,scripts/ing
 prasa_rate_revenue,False,manual_export,False,False,,False,True,scripts/ingest_utility_revenue.py,1,0,1,data/manual/prasa_rate_revenue/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 prepa_luma_rate_revenue,False,manual_export,False,False,,False,True,scripts/ingest_utility_revenue.py,1,0,1,data/manual/prepa_rate_revenue/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 prpha_housing_subsidy,False,manual_export,False,False,,False,True,scripts/ingest_prpha_housing_subsidy.py,1,0,1,data/raw/PRPHA/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
+sba_disaster_loans_pr,False,manual_export,False,False,,False,True,scripts/import_sba_disaster_loans.py,2,0,1,data/manual/sba_disaster_loans/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 tourism_room_tax,False,manual_export,False,False,,False,True,scripts/ingest_tourism_room_tax.py,1,0,1,data/raw/Tourism/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 transit_contracts,False,manual_export,False,False,,False,True,scripts/ingest_transit_contracts.py,1,0,1,data/manual/transit_contracts/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.
 transit_fare_revenue,False,manual_export,False,False,,False,True,scripts/ingest_transit_fare_revenue.py,1,0,1,data/manual/transit_fare_revenue/,Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook.

@@ -4,7 +4,7 @@ hud_drgr_authorized,manual_export,True,manual_export,2,0,2,0,not_materialized,0,
 oficina_contralor,territorial,True,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_contralor_audits.csv,PR Comptroller (OCPR) audit reports and findings on government entities and contractors. Operator delivers exported CSV/Excel to the dropzone. NOTE the OCPR contract registry (consultacontratos.ocpr.g
 pr_cabilderos,lobbying,True,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cabilderos.csv,"PR Office of Government Ethics (OEG) state-level lobbyist (cabildero) registry. ingest_cabilderos.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers the OEG export to data/raw"
 prasa,infrastructure,True,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_prasa_contracts.csv,"PRASA aqueduct/sewer authority. ingest_prasa.py is a dropzone reader (CSV/Excel), not a live scraper - operator delivers exported procurement files to data/raw/PRASA/. Includes Consulting Engineer Rep"
-sam_entities,entity_resolution,True,api_key:SAM_API_KEY,2,0,2,0,not_materialized,0,1,data/staging/processed/enrichment/vendor_uei_index.csv,"SAM full extract + per-UEI enrichment for parent resolution.
+sam_entities,entity_resolution,True,api_key:SAM_API_KEY,2,1,1,0,partially_materialized,7473,1,data/staging/processed/enrichment/vendor_uei_index.csv,"SAM full extract + per-UEI enrichment for parent resolution.
 Supplemented by scripts/usaspending_parent_uei_extract.py (no rate limit).
 SAM API rate: 1,000 req/day → full 2,334-UEI run = 2.3+ days.
 "
@@ -71,9 +71,6 @@ hud_cdbg_mit,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/proces
 irs_ctc_eitc_pr,federal,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_irs_ctc_eitc.csv,"IRS Child Tax Credit / EITC payments to PR families (post-ARPA expansion), from SOI/Treasury exports. Operator-delivered.
 "
 legislapr_discovery,territorial_legislation,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_legislapr_measures_probe.json,LegislaPR is a public legislative discovery and enrichment surface for Puerto Rico measures. Treat extracted summaries/pros/cons as non-authoritative. Promote only when the measure is cross-confirmed 
-legislapr_sessions,territorial_legislation,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_legislapr_sessions.json,Deterministic session index extracted from LegislaPR discovery output and OpenStates URLs. No external service calls.
-legislative_canonical_sources,territorial_legislation,False,api_key:OPENSTATES_API_KEY,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_legislative_measures_canonical.json,Canonical confirmation layer for LegislaPR discovery candidates. Uses OpenStates API v3 and official Assembly/SUTRA document links; requires OPENSTATES_API_KEY unless running in explicit SUTRA-only au
-legislative_fiscal_link_candidates,territorial_legislation,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_legislative_fiscal_link_candidates.csv,Manual-review candidate queue linking legislative measures to fiscal records through conservative fiscal terms and agency or municipality text alignment.
 lihtc,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_lihtc.csv,
 loteria_pr,territorial,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_loteria.csv,"Loteria de Puerto Rico + Loteria Electronica revenue, prize payouts and retailer commissions. Operator-delivered exports.
 "
@@ -92,7 +89,6 @@ opm_fedscope,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/proces
 "
 opportunity_zones,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_opportunity_zones.csv,"Qualified Opportunity Zone designated census tracts in PR (Treasury/IRS capital-gains incentive). Source URL configurable via OZ_DATA_URL; live pull requires network.
 "
-osl_sutra_crosswalk,territorial_legislation,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_osl_sutra_crosswalk.json,Deterministic OpenStates-to-official Assembly/SUTRA crosswalk. No network calls; link confidence is based on discovered canonical URLs and confirmation status.
 ports_airports_contracts,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ports_airports_contracts.csv,PR Ports Authority / Aerostar contracts and capital projects. Also fed by scripts/parse_aaa_ports_pdf.py from the acquired completed_projects_AAA.pdf.
 ports_airports_revenue,infrastructure_revenue,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ports_airports_revenue.csv,Aggregate port/airport fee revenue (PR Ports Authority + Aerostar/SJU) from audited financials and EMMA disclosures.
 ports_authority,infrastructure,False,manual_export,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_ports_concessions.csv,"PR Ports Authority concession fees and leases (e.g. Aerostar/LMM airport). Operator-delivered exports.
@@ -113,6 +109,7 @@ prpha_housing_subsidy,territorial,False,manual_export,1,0,1,0,not_materialized,0
 "
 sam_exclusions,entity_resolution,False,api_key:SAM_API_KEY,1,0,1,0,not_materialized,0,1,data/staging/processed/sam_exclusions.csv,"SAM.gov exclusions (debarment) list — suspended/excluded parties. Screening complement to sam_entities and ofac_sdn. Requires SAM_API_KEY.
 "
+sba_disaster_loans_pr,manual_export,False,manual_export,2,0,2,0,not_materialized,0,1,data/staging/processed/sba_recovery_loans_pr.jsonl,"SBA Disaster Loan Data for Puerto Rico workbook (FY22 Home + FY22 Business sheets), verified-loss vs. approved-loan gap analysis. Distinct from the automated sba_loans CKAN pull above. See registries/"
 sba_ppp,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sba_ppp.csv,
 sbir,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sbir.csv,
 sf133_budget_execution,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sf133.csv,
@@ -126,6 +123,7 @@ usaspending_loans,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/p
 usda_farm_subsidies,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_usda_farm_subsidies.csv,"USDA FSA direct payments + RMA crop-insurance subsidies to PR producers via USASpending (assistance types 06/10). Distinct from rural-development usda_grants.
 "
 highergov_supplemental,federal,False,api_key:HIGHERGOV_API_KEY,2,1,1,0,partially_materialized,0,1,data/raw/HigherGov/,Supplementary federal contract intel via HigherGov. PDFs require parse_highergov_pdfs.
+legislative_fiscal_link_candidates,territorial_legislation,False,none,1,0,0,1,partially_materialized,0,1,data/staging/processed/pr_legislative_fiscal_link_candidates.csv,Manual-review candidate queue linking legislative measures to fiscal records through conservative fiscal terms and agency or municipality text alignment.
 aafaf,territorial,False,none,1,1,0,0,fully_materialized,4,1,data/staging/processed/pr_aafaf_budget.csv,PR Fiscal Agency & Financial Advisory Authority. Budget execution.
 chip,federal,False,none,1,1,0,0,fully_materialized,4,1,data/staging/processed/pr_chip.csv,
 cofina,territorial,False,none,1,1,0,0,fully_materialized,5,1,data/staging/processed/pr_cofina.csv,
@@ -155,6 +153,8 @@ grants_gov,federal,False,none,1,1,0,0,fully_materialized,376759,1,data/staging/p
 hacienda,territorial,False,none,1,1,0,0,fully_materialized,8,1,data/staging/processed/pr_hacienda_revenues.csv,
 hhs_grants,federal,False,none,1,1,0,0,fully_materialized,307,1,data/staging/processed/pr_hhs_master.csv,
 hud_hcv_section8,federal,False,none,1,1,0,0,fully_materialized,2,1,data/staging/processed/pr_hud_hcv.csv,
+legislapr_sessions,territorial_legislation,False,none,1,1,0,0,fully_materialized,0,1,data/staging/processed/pr_legislapr_sessions.json,Deterministic session index extracted from LegislaPR discovery output and OpenStates URLs. No external service calls.
+legislative_canonical_sources,territorial_legislation,False,api_key:OPENSTATES_API_KEY,1,1,0,0,fully_materialized,0,1,data/staging/processed/pr_legislative_measures_canonical.json,Canonical confirmation layer for LegislaPR discovery candidates. Uses OpenStates API v3 and official Assembly/SUTRA document links; requires OPENSTATES_API_KEY unless running in explicit SUTRA-only au
 medicaid_fmap,federal,False,none,1,1,0,0,fully_materialized,89,1,data/staging/processed/pr_medicaid_fmap.csv,
 medicare_advantage,federal,False,none,1,1,0,0,fully_materialized,5,1,data/staging/processed/pr_medicare_advantage.csv,
 medicare_parts,federal,False,none,1,1,0,0,fully_materialized,4,1,data/staging/processed/pr_medicare_parts.csv,
@@ -164,6 +164,7 @@ nih_reporter,federal,False,none,1,1,0,0,fully_materialized,103,1,data/staging/pr
 nonprofits_irs990,federal,False,none,1,1,0,0,fully_materialized,3,1,data/staging/processed/pr_nonprofits.csv,
 ofac_sdn,entity_resolution,False,none,1,1,0,0,fully_materialized,19050,1,data/staging/processed/pr_ofac_sdn.csv,
 oia_grants,federal,False,none,1,1,0,0,fully_materialized,342,1,data/staging/processed/pr_oia_master.csv,
+osl_sutra_crosswalk,territorial_legislation,False,none,1,1,0,0,fully_materialized,0,1,data/staging/processed/pr_osl_sutra_crosswalk.json,Deterministic OpenStates-to-official Assembly/SUTRA crosswalk. No network calls; link confidence is based on discovered canonical URLs and confirmation status.
 p3_authority,territorial,False,none,1,1,0,0,fully_materialized,5,1,data/staging/processed/pr_p3_contracts.csv,
 pr_act_60_decrees,territorial,False,none,1,1,0,0,fully_materialized,5,1,data/staging/processed/pr_act60_decrees.csv,
 pr_pensions,territorial,False,none,1,1,0,0,fully_materialized,4,1,data/staging/processed/pr_pension_funds.csv,

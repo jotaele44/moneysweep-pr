@@ -8,7 +8,7 @@ New source family:
 - owner: U.S. Small Business Administration
 - input: sba_disaster_loans_pr.xlsx
 - sheets: FY22 Home; FY22 Business
-- status: planned / pending importer, schema, tests, and registry regeneration
+- status: registry, importer, schema, and tests complete; not_materialized until an operator drops the real workbook into data/manual/sba_disaster_loans/
 
 MoneySweep domain:
 - disaster recovery assistance
@@ -19,18 +19,20 @@ MoneySweep domain:
 Required canonical entity:
 - SBARecoveryLoan
 
-Required implementation artifacts:
+Required implementation artifacts (all present):
 - registries/source_registry.yaml entry
-- registries/source_registry.json regeneration if used by repo
+- registries/manual_export_registry.yaml entry
+- registries/source_registry.json + manual_export_registry.json (regenerated)
 - schemas/sba_recovery_loan.schema.json
-- scripts/import_sba_disaster_loans.py
+- scripts/import_sba_disaster_loans.py (+ write_municipality_rollup())
 - tests/test_import_sba_disaster_loans.py
-- reports/sba_recovery_import_summary.md
+- reports/sba_recovery_import_summary.md (written at import time)
+- data/staging/processed/sba_recovery_loans_pr_municipality_rollup.csv (written at import time)
 
 Required relationships:
-- SBARecoveryLoan REFERENCES_FEMA_DISASTER FEMARecoveryEvent
-- SBARecoveryLoan ROLLS_UP_TO_MUNICIPALITY Municipality
-- MunicipalityRecoveryRollup COMPARES_WITH_COR3_PROJECTS COR3RecoveryProject
+- SBARecoveryLoan REFERENCES_FEMA_DISASTER FEMARecoveryEvent — implemented structurally via the required, non-null fema_disaster_number field
+- SBARecoveryLoan ROLLS_UP_TO_MUNICIPALITY Municipality — implemented structurally via the required, non-null municipality field + the rollup CSV
+- MunicipalityRecoveryRollup COMPARES_WITH_COR3_PROJECTS COR3RecoveryProject — DEFERRED, not implemented. No COR3RecoveryProject entity or COR3 data source exists anywhere in this repo; see docs/SBA_RECOVERY_SOURCE_REFRESH.md.
 
 Promotion gates:
 - workbook present in approved manual/raw dropzone

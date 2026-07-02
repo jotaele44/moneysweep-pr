@@ -26,13 +26,21 @@
 - **Fix:** Recalibrate per-source threshold in `source_registry.yaml`: `usaspending_prime → 0.05`, `fema_pa → 0.05`; retain `0.90` for FSRS/FPDS corporate-prime sources
 - **Scope:** PR3 registry patch
 
-### B5 — SBA Disaster Loan workbook identified but not materialized
-- **Impact:** Puerto Rico disaster recovery assistance coverage is incomplete without SBA verified-loss and approved-loan data.
-- **Source file:** `sba_disaster_loans_pr.xlsx`
-- **Detected sheets:** `FY22 Home`, `FY22 Business`
-- **Root cause:** source family was not yet represented as a first-class MoneySweep recovery-assistance source.
-- **Required:** add source registry entry, `SBARecoveryLoan` schema, workbook importer with header-row detection, JSONL/CSV output, FEMA disaster-number relationship mapping, municipality rollups, and tests.
-- **Promotion block:** do not mark materialized until parser, schema, lineage, row-count, relationship-key, and regression gates pass.
+## Resolved — SBA recovery source implementation
+
+- ~~B5: SBA Disaster Loan workbook identified but not materialized~~ → registry
+  entries added (`manual_export_registry.yaml`, `source_registry.yaml`),
+  `SBARecoveryLoan` schema already matched the importer's record shape,
+  `scripts/import_sba_disaster_loans.py` now also writes a municipality rollup
+  (`sba_recovery_loans_pr_municipality_rollup.csv`), and
+  `tests/test_import_sba_disaster_loans.py` covers header-detection,
+  normalization, schema conformance, and relationship-key presence. `openpyxl`
+  (missing dependency the importer needed) added to requirements + lockfile.
+  Status is `not_materialized` in `reports/source_registry_status.csv` (correct
+  — no operator has dropped `sba_disaster_loans_pr.xlsx` into
+  `data/manual/sba_disaster_loans/` yet; the pipeline plumbing is what's done).
+  `COMPARES_WITH_COR3_PROJECTS` relationship deferred — see
+  `docs/SBA_RECOVERY_SOURCE_REFRESH.md`.
 
 ## Resolved in PR2
 

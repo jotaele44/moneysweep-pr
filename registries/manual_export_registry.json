@@ -146,6 +146,35 @@
       "notes": "DCAA FY2007 / FY2012 / FY2013 active contractor listings. Historical entity-resolution aid and alias/crosswalk source. Use only when matched to PR-relevant entities."
     },
     {
+      "source_id": "sba_disaster_loans_pr",
+      "expected_drop_dir": "data/manual/sba_disaster_loans/",
+      "expected_filename_pattern": "*.xlsx",
+      "expected_columns": [
+        "physical_declaration_number",
+        "eidl_declaration_number",
+        "fema_disaster_number",
+        "sba_disaster_number",
+        "damaged_property_city",
+        "zip_code",
+        "municipality",
+        "verified_loss_amount",
+        "approved_loan_amount",
+        "eidl_amount"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "reject_if_missing"
+        },
+        {
+          "rule": "row_count_min",
+          "value": 1,
+          "action": "warn_if_below"
+        }
+      ],
+      "notes": "SBA Disaster Loan Data for Puerto Rico workbook (FY22 Home + FY22 Business sheets). Verified-loss vs. approved-loan gap analysis for disaster recovery assistance. Distinct from the automated sba_loans CKAN pull (scripts/download_sba.py) \u2014 this is a richer, manually-sourced workbook."
+    },
+    {
       "source_id": "act_toll_revenue",
       "expected_drop_dir": "data/manual/act_toll_revenue/",
       "expected_filename_pattern": "*.csv|*.xlsx",

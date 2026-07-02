@@ -12,3 +12,5 @@ networkx>=3.6.1; python_version >= '3.11'
 networkx>=3.0; python_version < '3.11'
 # ACT/ACUDEN PDF extraction harness
 pdfplumber>=0.11.10
+# SBA disaster-loan workbook importer
+openpyxl>=3.1.0
