@@ -1,0 +1,59 @@
+=== MONEYSWEEP gate (clean venv) 2026-07-02T23:07:58Z ===
+--- compileall ---
+compileall OK
+--- pytest -q ---
+ERROR lib64/python3.11/site-packages/setuptools/tests/test_virtualenv.py - As...
+ERROR lib64/python3.11/site-packages/setuptools/tests/test_warnings.py - Asse...
+ERROR lib64/python3.11/site-packages/setuptools/tests/test_wheel.py - Asserti...
+ERROR lib64/python3.11/site-packages/setuptools/tests/test_windows_wrappers.py
+!!!!!!!!!!!!!!!!!! Interrupted: 166 errors during collection !!!!!!!!!!!!!!!!!!!
+1 skipped, 466 warnings, 166 errors in 10.72s
+pytest rc=2
+--- scan_for_secrets --root . ---
+scanned 1774 files; 0 finding(s)
+scan rc=0
+--- pytest -q (clean) ---
+scripts/write_source_manifests.py                                54     19    65%   44, 55-56, 76-79, 86-87, 110-125, 129
+-------------------------------------------------------------------------------------------
+TOTAL                                                         41974  21948    48%
+Coverage XML written to file coverage.xml
+Required test coverage of 44% reached. Total coverage: 47.71%
+2049 passed, 6 skipped in 60.96s (0:01:00)
+pytest rc=0
+--- validation_gates --root . --allow-failed ---
+{
+  "passed": false,
+  "failed_gate_count": 20,
+  "report_json": "data/manifests/validation_report.json"
+}
+gates rc=0
+--- canonical_v1_schema --root . --allow-failed ---
+canonical_v1 validation: PASS (0 error(s); rows={'people': 60, 'entities': 26, 'roles': 7, 'contracts': 3, 'projects': 5, 'debt_instruments': 20, 'lobbying_records': 3, 'funding_sources': 4, 'properties': 4, 'municipalities': 78, 'edges': 64, 'evidence': 232, 'review_queue': 0})
+schema rc=0
+--- LIVE: OpenFEMA PA projects (keyless) ---
+2026-07-02 23:13:55 [INFO]   Retrieved 13989 records so far.
+2026-07-02 23:13:56 [INFO]   Fetching PublicAssistanceFundedProjectsDetails (skip=14000, top=1000)...
+2026-07-02 23:13:57 [INFO]   Empty page at skip=14000; stopping.
+2026-07-02 23:13:57 [INFO] Batch 3: got 13989 records (total so far: 18726).
+2026-07-02 23:13:57 [INFO] Batch 4/4: disaster numbers [4560, 4571, 4649]...
+2026-07-02 23:13:57 [INFO]   Fetching PublicAssistanceFundedProjectsDetails (skip=0, top=1000)...
+2026-07-02 23:13:58 [INFO]   Total records reported by API: 0
+2026-07-02 23:13:58 [INFO]   Retrieved 1000 records so far.
+2026-07-02 23:13:58 [INFO]   Fetching PublicAssistanceFundedProjectsDetails (skip=1000, top=1000)...
+2026-07-02 23:13:59 [INFO]   Retrieved 2000 records so far.
+2026-07-02 23:14:00 [INFO]   Fetching PublicAssistanceFundedProjectsDetails (skip=2000, top=1000)...
+2026-07-02 23:14:01 [INFO]   Retrieved 3000 records so far.
+2026-07-02 23:14:01 [INFO]   Fetching PublicAssistanceFundedProjectsDetails (skip=3000, top=1000)...
+2026-07-02 23:14:02 [INFO]   Retrieved 3185 records so far.
+2026-07-02 23:14:03 [INFO]   Fetching PublicAssistanceFundedProjectsDetails (skip=4000, top=1000)...
+2026-07-02 23:14:04 [INFO]   Empty page at skip=4000; stopping.
+2026-07-02 23:14:04 [INFO] Batch 4: got 3185 records (total so far: 21911).
+2026-07-02 23:14:04 [INFO] Fetching PA applicants for PR...
+2026-07-02 23:14:04 [INFO]   Fetching PublicAssistanceApplicants (skip=0, top=1000)...
+2026-07-02 23:14:05 [ERROR] Request error on attempt 1: 404 Client Error: Not Found for url: https://www.fema.gov/api/open/v2/PublicAssistanceApplicants?$top=1000&$skip=0&$filter=state%20eq%20'PR'
+2026-07-02 23:14:36 [ERROR] Request error on attempt 2: 404 Client Error: Not Found for url: https://www.fema.gov/api/open/v2/PublicAssistanceApplicants?$top=1000&$skip=0&$filter=state%20eq%20'PR'
+2026-07-02 23:14:36 [WARNING]   No data at skip=0; stopping pagination.
+2026-07-02 23:14:36 [INFO] Fetched 0 PA applicant records.
+2026-07-02 23:14:36 [INFO] Saved 21911 PA v2 records to /home/user/moneysweep-pr/data/normalized/fema_pa_projects_v2.parquet
+2026-07-02 23:14:36 [INFO] Result: {'rows': 21911, 'path': '/home/user/moneysweep-pr/data/normalized/fema_pa_projects_v2.parquet', 'status': 'OK'}
+openfema rc=0

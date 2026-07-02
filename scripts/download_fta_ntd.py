@@ -67,7 +67,11 @@ STATE_FIELDS = ("state", "uace_name", "agency", "agency_name", "city")
 def _session() -> requests.Session:
     s = requests.Session()
     headers = {"User-Agent": USER_AGENT, "Accept": "application/json"}
-    token = os.environ.get("DATA_GOV_API_KEY", "").strip()
+    # Data.gov-family sites share the api.data.gov key; fall back to X_API_KEY
+    # when the source-specific DATA_GOV_API_KEY is not set.
+    token = (
+        os.environ.get("DATA_GOV_API_KEY", "").strip() or os.environ.get("X_API_KEY", "").strip()
+    )
     if token:
         headers["X-App-Token"] = token
     s.headers.update(headers)

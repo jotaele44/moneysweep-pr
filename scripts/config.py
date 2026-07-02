@@ -616,6 +616,28 @@ def get_fec_api_key() -> str:
     return key or "DEMO_KEY"
 
 
+def get_data_gov_api_key() -> str:
+    """Return the api.data.gov key for Data.gov-family sources.
+
+    Data.gov and all associated sites share one api.data.gov key. Prefer the
+    source-specific ``DATA_GOV_API_KEY``; otherwise fall back to the shared
+    ``X_API_KEY`` (env or .env), and finally to api.data.gov's ``DEMO_KEY`` so a
+    missing key degrades to a small run instead of crashing.
+    """
+    import os
+
+    for var in ("DATA_GOV_API_KEY", "X_API_KEY"):
+        key = os.environ.get(var, "").strip()
+        if key:
+            return key
+    parsed = _load_dotenv(PROJECT_ROOT / ".env")
+    for var in ("DATA_GOV_API_KEY", "X_API_KEY"):
+        key = parsed.get(var, "").strip()
+        if key:
+            return key
+    return "DEMO_KEY"
+
+
 def get_highergov_api_key() -> str | None:
     """Return the HigherGov key from HIGHERGOV_API_KEY env or .env; never raises.
 
