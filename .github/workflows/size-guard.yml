@@ -27,7 +27,7 @@ jobs:
       MAX_BYTES: "5242880"
       ALLOWLIST: ".github/size-guard-allowlist.txt"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
