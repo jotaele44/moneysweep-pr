@@ -1,6 +1,6 @@
 pandas>=2.0.0
 requests>=2.34.2
-lxml>=4.9.0
+lxml>=6.1.1
 pytest>=9.1.1
 pytest-cov>=7.1.0
 rapidfuzz>=3.14.5
