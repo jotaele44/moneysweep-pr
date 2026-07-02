@@ -4,7 +4,7 @@
 # .pre-commit-config.yaml. Keep ruff's version in sync with the pre-commit `rev`.
 -r requirements.txt
 
-ruff==0.15.8
+ruff==0.15.18
 mypy==2.1.0
 pytest
 pytest-cov
