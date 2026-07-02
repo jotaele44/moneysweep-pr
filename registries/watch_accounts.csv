@@ -1,0 +1,9 @@
+account_id,organization,platform,handle_or_account,source_family,evidence_tier,data_mode,promotion_eligible,update_cadence,watch_priority,notes
+cor3_x,COR3,x,cor3pr,recovery,T2_CONTEXTUAL,informative_only,false,weekly,P1,Official social signal only; requires primary-source corroboration before promotion.
+cor3_linkedin,COR3,linkedin,Central Office for Recovery Reconstruction and Resiliency,recovery,T2_CONTEXTUAL,informative_only,false,weekly,P1,Official social signal only; useful for reconstruction project leads and aliases.
+fema_region2_x,FEMA Region 2,x,FEMARegion2,federal_recovery,T2_CONTEXTUAL,informative_only,false,weekly,P1,Official social signal only; useful for FEMA regional Puerto Rico recovery leads.
+pr_housing_social,Puerto Rico Department of Housing,official_social,Departamento de la Vivienda,housing_recovery,T2_CONTEXTUAL,informative_only,false,weekly,P1,Official social signal only; useful for CDBG-DR and housing program leads.
+luma_social,LUMA Energy,official_social,LUMA Puerto Rico,infrastructure,T2_CONTEXTUAL,informative_only,false,weekly,P2,Official social signal only; useful for outage project procurement and subcontracting leads.
+prasa_social,PRASA,official_social,AcueductosPR,infrastructure,T2_CONTEXTUAL,informative_only,false,weekly,P2,Official social signal only; useful for water infrastructure project leads.
+municipal_mayors_social,Puerto Rico municipalities,official_social,various municipal accounts,municipal,T3_CONTEXTUAL,informative_only,false,weekly,P2,Distributed official social watch; must resolve to municipality and corroborate against official notices.
+legislative_committees_social,Puerto Rico Legislature,official_social,various committee accounts,legislative,T3_CONTEXTUAL,informative_only,false,weekly,P2,Distributed official social watch; signals hearings bills and oversight activity.

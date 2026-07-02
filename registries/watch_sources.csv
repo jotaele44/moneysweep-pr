@@ -1,0 +1,28 @@
+watch_id,organization,source_family,source_type,platform,territory_scope,evidence_tier,data_mode,promotion_eligible,update_cadence,watch_priority,notes
+cor3_portal,COR3,recovery,official_portal,web,territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P0,Primary recovery portal watch for Puerto Rico reconstruction project changes.
+cor3_document_library,COR3,recovery,document_library,web,territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P0,Official document-library watch for recovery artifacts and source documents.
+fema_openfema,FEMA,federal_recovery,open_data,web,federal,T1_TECHNICAL,authoritative,true,weekly,P0,Primary FEMA Public Assistance project data watch.
+hud_cdbg_dr,HUD,federal_recovery,official_portal,web,federal,T1_TECHNICAL,authoritative,true,weekly,P0,CDBG-DR and CDBG-MIT policy and grant-program watch.
+pr_housing,Puerto Rico Department of Housing,housing_recovery,official_portal,web,territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P0,Housing recovery program and procurement signal watch.
+asg_compras,Puerto Rico General Services Administration,procurement,official_portal,web,territorial,T1_TECHNICAL,authoritative,true,weekly,P0,Territorial procurement and notices watch.
+ocpr_contracts,Office of the Comptroller of Puerto Rico,oversight,official_portal,web,territorial,T1_TECHNICAL,authoritative,true,weekly,P0,Contract registry and audit context watch.
+legislapr,LegislaPR,legislative,official_portal,web,territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P0,Legislative bills and committee action affecting procurement recovery authority.
+house_pr,Puerto Rico House of Representatives,legislative,official_portal,web,territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P0,House hearing and bill watch for budget procurement recovery and oversight signals.
+senate_pr,Puerto Rico Senate,legislative,official_portal,web,territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P0,Senate hearing and bill watch for budget procurement recovery and oversight signals.
+omb_pr,Puerto Rico Office of Management and Budget,budget,official_portal,web,territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P1,Budget and appropriation watch.
+aafaf,AAFAF,fiscal_control,official_portal,web,territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P1,Fiscal policy debt and recovery-finance watch.
+fomb,Financial Oversight and Management Board for Puerto Rico,fiscal_control,official_portal,web,federal_territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P1,Fiscal-plan and certified-budget watch.
+emma_muni_bonds,MSRB EMMA,fiscal_control,official_disclosure,web,federal,T1_TECHNICAL,authoritative,true,weekly,P1,Bond disclosure and infrastructure revenue watch.
+prasa,PRASA,infrastructure,official_portal,web,territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P1,Water utility projects contracts and rate-revenue signal watch.
+luma,LUMA Energy,infrastructure,official_portal,web,territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P1,Transmission distribution operations and subcontracting signal watch.
+prepa,PREPA,infrastructure,official_portal,web,territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P1,Power authority fiscal project and contract context watch.
+genera_pr,Genera PR,infrastructure,official_portal,web,territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P1,Generation operations and procurement-signal watch.
+act_dtop,DTOP / ACT,infrastructure,official_portal,web,territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P1,Transportation infrastructure project and procurement watch.
+ports_authority,Puerto Rico Ports Authority,infrastructure,official_portal,web,territorial,T2_OPERATIONAL,authoritative_context,true,weekly,P1,Ports and airports capital-project watch.
+usace_caribbean,USACE Caribbean District,federal_infrastructure,official_portal,web,federal,T2_OPERATIONAL,authoritative_context,true,weekly,P1,Federal infrastructure project watch.
+dhs_oig,DHS Office of Inspector General,oversight,official_reports,web,federal,T1_TECHNICAL,authoritative,true,weekly,P1,FEMA-related audit and investigation report watch.
+gao,Government Accountability Office,oversight,official_reports,web,federal,T1_TECHNICAL,authoritative,true,weekly,P1,Federal oversight and recovery-program report watch.
+municipal_procurement,Puerto Rico municipalities,municipal,distributed_portals,web,municipal,T2_OPERATIONAL,informative_to_authoritative,false,weekly,P0,Umbrella watch target for 78 municipal procurement pages and public notices.
+cpi_pr,Centro de Periodismo Investigativo,media,investigative_media,web,territorial,T4_SECONDARY,informative_only,false,weekly,P2,Media signal only; creates leads but cannot promote records.
+el_nuevo_dia,El Nuevo Día,media,news,web,territorial,T4_SECONDARY,informative_only,false,weekly,P2,Media signal only; creates leads and alias candidates.
+noticel,NotiCel,media,news,web,territorial,T4_SECONDARY,informative_only,false,weekly,P2,Media signal only; creates leads and alias candidates.

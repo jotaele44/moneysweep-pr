@@ -1,0 +1,48 @@
+{
+  "category_counts": {
+    "federal_recovery_authoritative": 2,
+    "legislative_context": 1,
+    "media_signal": 1,
+    "municipal_procurement": 1,
+    "official_social_informative": 4,
+    "oversight_authoritative": 3,
+    "recovery_authoritative": 2,
+    "territorial_procurement_authoritative": 1
+  },
+  "data_mode_counts": {
+    "authoritative": 2,
+    "authoritative_candidate": 4,
+    "contextual_authoritative": 1,
+    "informative_only": 5,
+    "oversight_context": 3
+  },
+  "evidence_tier_counts": {
+    "T1": 3,
+    "T2": 7,
+    "T4": 5
+  },
+  "generated_at": "STATIC_SEED_REGENERATE_WITH_SCRIPT",
+  "informative_only_count": 5,
+  "informative_only_sources": [
+    "cor3_x_official",
+    "cpi_investigations",
+    "fema_region_2_x_official",
+    "luma_official_social",
+    "prasa_official_social"
+  ],
+  "operator_rule": "Social/media sources generate leads only. Promotion requires corroborating authoritative records and review-state approval.",
+  "producer": "moneysweep-pr",
+  "promotion_eligible_count": 6,
+  "promotion_eligible_sources": [
+    "asg_procurement",
+    "cor3_document_library",
+    "cor3_recovery_portal",
+    "hud_cdbg_dr_mit",
+    "municipal_procurement_watch",
+    "openfema_public_assistance"
+  ],
+  "schema_version": "1.0",
+  "source_count": 15,
+  "validation_errors": [],
+  "weekly_queue": {}
+}
