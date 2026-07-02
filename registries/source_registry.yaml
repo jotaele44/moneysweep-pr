@@ -836,6 +836,21 @@ sources:
   validation_threshold:
     min_rows: 1
   update_cadence: yearly
+- source_id: sba_disaster_loans_pr
+  family: manual_export
+  required: false
+  authentication: manual_export
+  endpoint_url: https://data.sba.gov/dataset/disaster-loan-data
+  producer_script: scripts/import_sba_disaster_loans.py
+  expected_outputs:
+  - data/staging/processed/sba_recovery_loans_pr.jsonl
+  - data/staging/processed/sba_recovery_loans_pr_municipality_rollup.csv
+  schema_version: r5_v1
+  validation_threshold:
+    min_rows: 1
+  manual_drop_dir: data/manual/sba_disaster_loans/
+  update_cadence: yearly
+  notes: SBA Disaster Loan Data for Puerto Rico workbook (FY22 Home + FY22 Business sheets), verified-loss vs. approved-loan gap analysis. Distinct from the automated sba_loans CKAN pull above. See registries/manual_export_registry.yaml for drop-dir validation rules and schemas/sba_recovery_loan.schema.json for the canonical record shape.
 - source_id: slfrf
   family: federal
   required: false

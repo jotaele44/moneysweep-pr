@@ -113,6 +113,7 @@ prpha_housing_subsidy,territorial,False,manual_export,1,0,1,0,not_materialized,0
 "
 sam_exclusions,entity_resolution,False,api_key:SAM_API_KEY,1,0,1,0,not_materialized,0,1,data/staging/processed/sam_exclusions.csv,"SAM.gov exclusions (debarment) list — suspended/excluded parties. Screening complement to sam_entities and ofac_sdn. Requires SAM_API_KEY.
 "
+sba_disaster_loans_pr,manual_export,False,manual_export,2,0,2,0,not_materialized,0,1,data/staging/processed/sba_recovery_loans_pr.jsonl,"SBA Disaster Loan Data for Puerto Rico workbook (FY22 Home + FY22 Business sheets), verified-loss vs. approved-loan gap analysis. Distinct from the automated sba_loans CKAN pull above. See registries/"
 sba_ppp,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sba_ppp.csv,
 sbir,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sbir.csv,
 sf133_budget_execution,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_sf133.csv,

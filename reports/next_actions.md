@@ -23,10 +23,10 @@ This vector prepares the control plane for Tranche B manual source ingestion. Th
 | Step | Status | Artifact |
 |---|---|---|
 | Add SBA Disaster Loan source to documentation surface | Done | `README.md` |
-| Add canonical SBA recovery source-refresh brief | Pending | `docs/SBA_RECOVERY_SOURCE_REFRESH.md` |
-| Add text-mode source delta summary | Pending | `reports/sba_recovery_source_refresh.txt` |
-| Add source registry entry | Pending implementation | `registries/source_registry.yaml` / `registries/source_registry.json` |
-| Add importer/schema/tests | Pending implementation | `scripts/`, `schemas/`, `tests/` |
+| Add canonical SBA recovery source-refresh brief | Done | `docs/SBA_RECOVERY_SOURCE_REFRESH.md` |
+| Add text-mode source delta summary | Done | `reports/sba_recovery_source_refresh.txt` |
+| Add source registry entry | Done | `registries/source_registry.yaml`, `registries/manual_export_registry.yaml` (+ JSON mirrors) |
+| Add importer/schema/tests | Done | `scripts/import_sba_disaster_loans.py`, `schemas/sba_recovery_loan.schema.json`, `tests/test_import_sba_disaster_loans.py` |
 
 ## Current Gate
 
@@ -36,11 +36,14 @@ This vector prepares the control plane for Tranche B manual source ingestion. Th
 | Live Hub execution | Not ready |
 | Producer execution | Requires strict preflight |
 | Production promotion | Blocked until materialization and validation |
-| SBA Disaster Loan source promotion | Blocked until parser, schema, lineage, and tests pass |
+| SBA Disaster Loan source promotion | Code/schema/tests complete (0 structural preflight errors); status is `not_materialized` until an operator drops `sba_disaster_loans_pr.xlsx` into `data/manual/sba_disaster_loans/` |
 
 ## Next Vector
 
-`SBA_RECOVERY_SOURCE_REGISTRY_AND_IMPORTER → IMPLEMENT_SBA_DISASTER_LOAN_INGESTION`
+Pipeline plumbing for `sba_disaster_loans_pr` is complete; materialization now
+depends on an operator delivering the source workbook — same class of blocker
+as the other manual-export sources in `reports/current_blockers.md` B3. No
+automated next vector until a file is dropped.
 
 ## Scope
 
@@ -57,22 +60,10 @@ Tranche B covers acquired manual/source files for:
 
 ## Required SBA Recovery Outputs
 
-SBA recovery ingestion should create parser, canonical output, schema, tests, and relationship docs for:
+- `SBARecoveryLoan` — done (`schemas/sba_recovery_loan.schema.json`, importer, tests)
+- FEMA disaster-number relationships — done, structurally: the `fema_disaster_number` foreign-key field is required and non-null on every emitted record (see `tests/test_import_sba_disaster_loans.py::test_records_carry_relationship_keys`)
+- municipality recovery rollups — done (`sba_recovery_loans_pr_municipality_rollup.csv`)
+- verified-loss versus approved-loan gap metrics — available per-record via `verified_loss_amount` / `approved_loan_amount`
+- COR3 recovery-project comparison hooks — **deferred**, not built. No `COR3RecoveryProject` entity or COR3 data source exists anywhere in this repo; building the comparison would mean inventing a new ingestion pipeline with no real data behind it. See `docs/SBA_RECOVERY_SOURCE_REFRESH.md`.
 
-- `SBARecoveryLoan`
-- FEMA disaster-number relationships
-- municipality recovery rollups
-- verified-loss versus approved-loan gap metrics
-- COR3 recovery-project comparison hooks
-
-No source should be marked done or fully materialized until canonical outputs validate and regression tests pass.
-
-## Recommended Branch
-
-`gpt/sba-recovery-intelligence`
-
-## Execution String
-
-```text
-EXECUTE_NEXT_VECTOR: CREATE_BRANCH:gpt/sba-recovery-intelligence → ADD_SBA_DISASTER_LOAN_SOURCE_REGISTRY → IMPLEMENT_SBARECOVERYLOAN_SCHEMA → BUILD_NORMALIZER_AND_IMPORTER → ADD_FEMA_COR3_RELATIONSHIPS → VALIDATE_FEDERATION_PROMOTION_RULES
-```
+No source should be marked done or fully materialized until canonical outputs validate and regression tests pass — this remains true; `sba_disaster_loans_pr` stays `not_materialized` until an operator drops the real workbook.

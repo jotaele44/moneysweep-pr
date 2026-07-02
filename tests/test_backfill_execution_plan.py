@@ -22,7 +22,7 @@ def _write_json(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload), encoding="utf-8")
 
 
-def test_r46_plan_uses_manual_queue_without_fabrication(tmp_path: Path):
+def test_execution_plan_uses_manual_queue_without_fabrication(tmp_path: Path):
     rows = []
     for i in range(1, 22):
         rows.append(
@@ -64,7 +64,7 @@ def test_r46_plan_uses_manual_queue_without_fabrication(tmp_path: Path):
     assert all(r["row_fabrication_policy"] == "FORBIDDEN_NO_SYNTHETIC_ROWS" for r in plan_rows)
 
 
-def test_r46_updates_rebuild_status(tmp_path: Path):
+def test_execution_plan_updates_rebuild_status(tmp_path: Path):
     _write_csv(
         tmp_path / "data" / "review_queue" / "manual_source_download_queue.csv",
         [

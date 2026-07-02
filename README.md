@@ -123,7 +123,7 @@ coverage, lineage, and analyst reports
 | `scripts/gap_analysis_builder.py` | Source-registry status regeneration |
 | `moneysweep.query` | On-demand query adapter entry point |
 | `scripts/*download*` / producer modules | Source-specific acquisition modules |
-| `scripts/import_sba_disaster_loans.py` | Planned importer for SBA Disaster Loan workbook once implementation lands |
+| `scripts/import_sba_disaster_loans.py` | Importer for the SBA Disaster Loan Puerto Rico workbook (registry-wired, tested; awaits operator file drop to `data/manual/sba_disaster_loans/`) |
 | `tests/` | Pytest validation suite |
 | `docs/` | Architecture, runbooks, data policy, and operating controls |
 | `reports/` | Machine-readable status, readiness, blockers, and audit outputs |

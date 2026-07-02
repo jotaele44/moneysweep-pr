@@ -154,7 +154,7 @@ def _bootstrap_base(tmp_path: Path, checklist_rows: list[dict]) -> None:
     )
 
 
-def test_r49f_passes_with_missing_sources_queued(tmp_path: Path):
+def test_source_delivery_watch_passes_with_missing_sources_queued(tmp_path: Path):
     checklist_rows = [
         {
             "expected_input": "data/staging/processed/pr_contracts_master.csv",
@@ -206,7 +206,7 @@ def test_r49f_passes_with_missing_sources_queued(tmp_path: Path):
     assert len(unfreeze_rows) == 0
 
 
-def test_r49f_detects_unfreeze_candidate_without_materializing(tmp_path: Path):
+def test_source_delivery_watch_detects_unfreeze_candidate_without_materializing(tmp_path: Path):
     checklist_rows = [
         {
             "expected_input": "data/staging/processed/pr_contracts_master.csv",
@@ -269,7 +269,7 @@ def test_r49f_detects_unfreeze_candidate_without_materializing(tmp_path: Path):
     assert unfreeze_rows[0]["expected_input"] == "data/staging/processed/pr_contracts_master.csv"
 
 
-def test_r49f_blocks_forbidden_artifact_paths(tmp_path: Path):
+def test_source_delivery_watch_blocks_forbidden_artifact_paths(tmp_path: Path):
     checklist_rows = [
         {
             "expected_input": "data/reports/pr_contracts_master.csv",

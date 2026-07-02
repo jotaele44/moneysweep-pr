@@ -210,7 +210,7 @@ def _bootstrap(tmp_path: Path) -> None:
     )
 
 
-def test_r49e_handoff_gate_passes(tmp_path: Path):
+def test_source_delivery_handoff_gate_passes(tmp_path: Path):
     _bootstrap(tmp_path)
     status = run_source_delivery_handoff(tmp_path)
 
@@ -240,7 +240,7 @@ def test_r49e_handoff_gate_passes(tmp_path: Path):
     assert (tmp_path / "docs" / "EXTERNAL_BLOCKER_FREEZE_STATUS_R4_9E.md").exists()
 
 
-def test_r49e_gate_fails_when_retry_suppression_missing(tmp_path: Path):
+def test_source_delivery_handoff_fails_when_retry_suppression_missing(tmp_path: Path):
     _bootstrap(tmp_path)
     _write_csv(
         tmp_path / "data" / "review_queue" / "retry_suppression_queue_r4_9d.csv",

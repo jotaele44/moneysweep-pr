@@ -260,7 +260,7 @@ def _bootstrap(tmp_path: Path) -> None:
     )
 
 
-def test_r49h_discovers_zip_members_and_validates_only_blocked_targets(tmp_path: Path):
+def test_raw_usaspending_discovery_validates_only_blocked_targets(tmp_path: Path):
     _bootstrap(tmp_path)
 
     status = run_raw_usaspending_discovery(tmp_path)
@@ -299,7 +299,7 @@ def test_r49h_discovers_zip_members_and_validates_only_blocked_targets(tmp_path:
     )
 
 
-def test_r49h_gate_passes_with_no_raw_candidates(tmp_path: Path):
+def test_raw_usaspending_discovery_passes_with_no_raw_candidates(tmp_path: Path):
     _bootstrap(tmp_path)
     (tmp_path / "data" / "raw" / "USAS.zip").unlink()
     (tmp_path / "data" / "raw" / "notes.txt").write_text("not a supported source", encoding="utf-8")

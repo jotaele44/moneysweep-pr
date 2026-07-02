@@ -286,7 +286,7 @@ def _bootstrap_r49c(tmp_path: Path, *, include_delivered_file: bool) -> None:
     )
 
 
-def test_r49c_passes_with_absent_files_queued(tmp_path: Path):
+def test_source_delivery_gate_passes_with_absent_files_queued(tmp_path: Path):
     _bootstrap_r49c(tmp_path, include_delivered_file=False)
 
     status = run_external_source_delivery_gate(tmp_path)
@@ -307,7 +307,7 @@ def test_r49c_passes_with_absent_files_queued(tmp_path: Path):
     assert status["phase_7_8_blocked"] is True
 
 
-def test_r49c_materializes_delivered_validated_file(tmp_path: Path):
+def test_source_delivery_gate_materializes_delivered_validated_file(tmp_path: Path):
     _bootstrap_r49c(tmp_path, include_delivered_file=True)
 
     status = run_external_source_delivery_gate(tmp_path)

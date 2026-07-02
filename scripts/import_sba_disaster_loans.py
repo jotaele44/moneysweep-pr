@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import re
@@ -16,6 +17,16 @@ SOURCE_ID = "sba_disaster_loans_pr"
 DEFAULT_INPUT = Path("data/manual/sba_disaster_loans/sba_disaster_loans_pr.xlsx")
 DEFAULT_OUTPUT = Path("data/staging/processed/sba_recovery_loans_pr.jsonl")
 DEFAULT_SUMMARY = Path("reports/sba_recovery_import_summary.md")
+DEFAULT_ROLLUP = Path("data/staging/processed/sba_recovery_loans_pr_municipality_rollup.csv")
+
+ROLLUP_COLUMNS = [
+    "municipality",
+    "loan_count",
+    "home_loan_count",
+    "business_loan_count",
+    "total_approved_loan_amount",
+    "total_verified_loss_amount",
+]
 
 HOME_MARKERS = {"SBA Physical Declaration Number", "FEMA Disaster Number", "SBA Disaster Number"}
 BUSINESS_MARKERS = {"SBA EIDL Declaration Number", "FEMA Disaster Number", "SBA Disaster Number"}
@@ -202,15 +213,53 @@ def write_summary(path: Path, records: list[dict[str, Any]]) -> None:
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def build_municipality_rollup(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    rollups: dict[str, dict[str, Any]] = {}
+    for record in records:
+        municipality = record.get("municipality")
+        if not municipality:
+            continue
+        row = rollups.setdefault(
+            municipality,
+            {
+                "municipality": municipality,
+                "loan_count": 0,
+                "home_loan_count": 0,
+                "business_loan_count": 0,
+                "total_approved_loan_amount": 0.0,
+                "total_verified_loss_amount": 0.0,
+            },
+        )
+        row["loan_count"] += 1
+        if record.get("loan_type") == "home":
+            row["home_loan_count"] += 1
+        elif record.get("loan_type") == "business":
+            row["business_loan_count"] += 1
+        row["total_approved_loan_amount"] += float(record.get("approved_loan_amount") or 0)
+        row["total_verified_loss_amount"] += float(record.get("verified_loss_amount") or 0)
+    return [rollups[key] for key in sorted(rollups)]
+
+
+def write_municipality_rollup(path: Path, records: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    rows = build_municipality_rollup(records)
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=ROLLUP_COLUMNS)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--summary", type=Path, default=DEFAULT_SUMMARY)
+    parser.add_argument("--rollup", type=Path, default=DEFAULT_ROLLUP)
     args = parser.parse_args()
     records = import_workbook(args.input)
     write_jsonl(args.output, records)
     write_summary(args.summary, records)
+    write_municipality_rollup(args.rollup, records)
 
 
 if __name__ == "__main__":

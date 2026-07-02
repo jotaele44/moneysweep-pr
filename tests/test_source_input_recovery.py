@@ -30,7 +30,7 @@ def _write_builder_script(path: Path, new_masters: str, expansion_files: str) ->
     )
 
 
-def test_r45_rejects_summary_artifacts_and_writes_manual_queue(tmp_path: Path):
+def test_source_input_recovery_rejects_summary_artifacts(tmp_path: Path):
     _write_builder_script(
         tmp_path / "scripts" / "build_unified_master.py",
         "[('pr_grants_master.csv', 'grants')]",
@@ -56,7 +56,7 @@ def test_r45_rejects_summary_artifacts_and_writes_manual_queue(tmp_path: Path):
     assert (tmp_path / "data" / "review_queue" / "manual_source_download_queue.csv").exists()
 
 
-def test_r45_recovers_contract_and_canonical_staging_with_lineage(tmp_path: Path):
+def test_source_input_recovery_recovers_with_lineage(tmp_path: Path):
     _write_builder_script(
         tmp_path / "scripts" / "build_unified_master.py",
         "[('pr_grants_master.csv', 'grants')]",
@@ -133,7 +133,7 @@ def test_r45_recovers_contract_and_canonical_staging_with_lineage(tmp_path: Path
     assert "recipient_name_normalized" in grants_rows[0]
 
 
-def test_r45_outputs_required_status_files(tmp_path: Path):
+def test_source_input_recovery_outputs_required_status_files(tmp_path: Path):
     _write_builder_script(
         tmp_path / "scripts" / "build_unified_master.py",
         "[]",
