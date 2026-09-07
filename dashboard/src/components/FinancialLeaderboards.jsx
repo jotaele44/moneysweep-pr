@@ -132,6 +132,22 @@ export default function FinancialLeaderboards() {
                 </div>
               )}
 
+              {ranking.sourceManifestations?.length ? (
+                <details className="rounded-lg border border-border bg-card p-3 text-xs">
+                  <summary className="cursor-pointer text-sm font-medium">Provenance &amp; freshness</summary>
+                  {ranking.computedAt && <p className="mt-2 text-muted-foreground">Computed {ranking.computedAt}</p>}
+                  <div className="mt-2 space-y-2">
+                    {ranking.sourceManifestations.map((source) => (
+                      <div key={source.path} className="rounded border border-border p-2">
+                        <div className="break-all font-medium">{source.path}</div>
+                        <div className="mt-1 break-all font-mono text-[10px] text-muted-foreground">SHA256 {source.sha256}</div>
+                        <div className="mt-1 text-[10px] text-muted-foreground">{source.bytes} bytes · modified {source.modifiedAt}</div>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              ) : null}
+
               <div className="rounded-lg border border-border bg-card p-3 text-xs text-muted-foreground">
                 <strong className="text-foreground">Investigation-first rule</strong>
                 <p className="mt-2">A leaderboard is a discovery surface, not an identity claim. Source hashes, record counts, measure semantics, unresolved residue and tie handling remain part of the ranking contract.</p>
