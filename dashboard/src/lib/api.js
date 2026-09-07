@@ -29,7 +29,7 @@ async function requestJSON(path, options = {}, offlineFallback = null) {
     let detail = ''
     try {
       const body = await res.json()
-      detail = body?.detail ? `: ${body.detail}` : ''
+      detail = body?.detail ? `: ${typeof body.detail === 'string' ? body.detail : JSON.stringify(body.detail)}` : ''
     } catch {
       // Preserve status-only diagnostics when the backend did not return JSON.
     }
@@ -78,6 +78,16 @@ export const getCampaignFinanceEntities = (f = {}) =>
   fetchJSON(`/campaign-finance/entities${qs(f)}`, [])
 export const getCampaignFinanceReports = (f = {}) =>
   fetchJSON(`/campaign-finance/reports${qs(f)}`, [])
+
+export const getLeaderboardCategories = () => fetchJSON('/leaderboards/categories', {
+  schemaVersion: 'moneysweep.financial-category-ontology/v1',
+  rankingContractVersion: 'moneysweep.leaderboard/v1',
+  rules: {}, categories: [],
+})
+export const getLeaderboardTop = (f = {}) =>
+  fetchJSON(`/leaderboards/top${qs(f)}`, { categoryId: f.category, rows: [], topN: f.limit ?? 25, certificationState: 'OPEN' })
+export const getLeaderboardMovers = (f = {}) =>
+  fetchJSON(`/leaderboards/movers${qs(f)}`, { categoryId: f.category, rows: [], movementState: 'OPEN_NO_PRIOR_SNAPSHOT' })
 
 // Desktop data-plane controls. Long materialization calls get an explicit
 // ten-minute client timeout; producer failures remain source-level result rows.
