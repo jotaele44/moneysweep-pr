@@ -1,0 +1,9 @@
+{
+  "result_state": "PARTIAL_UNRESOLVED",
+  "arithmetic": {
+    "total": 9,
+    "classified": 9,
+    "authorized_candidates": 0
+  },
+  "blocker": "No non-empty authorized HUD DRGR activity/project/drawdown export is proven."
+}
