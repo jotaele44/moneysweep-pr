@@ -1,23 +1,34 @@
-pandas>=3.0.5
-requests>=2.34.2
-lxml>=6.1.2
-pytest>=9.1.1
-pytest-cov>=7.1.0
-rapidfuzz>=3.14.5
-python-dotenv>=1.2.3
-pyarrow>=25.0.1
-# Contract Forensics V3 persistent-memory engine (DuckDB-backed forensic ledger).
-# pytz is required by duckdb to convert TIMESTAMPTZ values to Python datetimes;
-# pandas 3.0 no longer pulls it in transitively, so declare it explicitly.
-duckdb>=1.5.5
-pytz>=2026.3.post1
-# R5 foundation deps
-PyYAML>=6.0.3
-networkx>=3.6.1; python_version >= '3.11'
-networkx>=3.0; python_version < '3.11'
-# ACT/ACUDEN PDF extraction harness
-pdfplumber>=0.11.10
-# SBA disaster-loan workbook importer
-openpyxl>=3.1.5
-# Shared maintenance core pinned to an immutable TheHub commit.
+certifi==2026.7.22
+cffi==2.1.1
+charset-normalizer==3.5.1
+coverage[toml]==7.16.0
+cryptography==50.0.1
+duckdb==1.5.5
+et-xmlfile==2.0.0
+idna==3.19
+iniconfig==2.3.0
+lxml==6.1.3
+networkx==3.6.1 ; python_version >= "3.11"
+numpy==2.4.6
+openpyxl==3.1.5
+packaging==26.3
+pandas==3.0.5
+pdfminer-six==20260107
+pdfplumber==0.11.10
+pillow==12.3.0
+pluggy==1.6.0
 prii-maintenance @ git+https://github.com/jotaele44/thehub-pr.git@f2b81769924689b4d959554928810b1d7b7ef3d6#subdirectory=packages/prii_maintenance
+pyarrow==25.0.1
+pycparser==3.0
+pygments==2.21.0
+pypdfium2==5.13.0
+pytest==9.1.1
+pytest-cov==7.1.0
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.3
+pytz==2026.3.post1
+pyyaml==6.0.3
+rapidfuzz==3.14.6
+requests==2.34.2
+six==1.17.0
+urllib3==2.7.0
