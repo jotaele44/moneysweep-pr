@@ -8,7 +8,8 @@
   "central_governance_head_sha": "800d3cc719e5c71fff70fefa8214a4c34ab39fd6",
   "central_governance_merge_sha": "58f06c38a143fcdf4277a501bc39929a0eb68f98",
   "central_governance_merged_at": "2026-09-01T00:10:41Z",
-  "disposition": "ATTESTED",
+  "disposition": "COMPATIBLE",
+  "spatial_disposition": "ATTESTED",
   "contracts": [
     "repo_federation_manifest@1",
     "federation_export_manifest@1",

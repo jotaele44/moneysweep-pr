@@ -39,6 +39,11 @@ class UnifiedSkillpackConformanceTests(unittest.TestCase):
         self.assertFalse(MODULE.is_allowed_path("federation/spatial/unreviewed.json", allowed))
         self.assertFalse(MODULE.is_allowed_path("governance/unreviewed.json", allowed))
 
+    def test_spatial_disposition_does_not_replace_repo_compatibility(self) -> None:
+        receipt = json.loads((ROOT / "governance/federation_compatibility.json").read_text())
+        self.assertEqual(receipt["disposition"], "COMPATIBLE")
+        self.assertEqual(receipt["spatial_disposition"], "ATTESTED")
+
 
 if __name__ == "__main__":
     unittest.main()
