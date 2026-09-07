@@ -14,11 +14,15 @@
     "unresolved_count",
     "join_output_count",
     "declared_cardinality",
+    "multiplication_expected",
     "provenance"
   ],
+  "$defs": {
+    "non_empty_string": {"type": "string", "pattern": "^(?:\\S|\\S.*\\S)$"}
+  },
   "properties": {
     "contract_version": {"const": "federation-spatial-migration/1.1"},
-    "migration_id": {"type": "string", "minLength": 1},
+    "migration_id": {"$ref": "#/$defs/non_empty_string"},
     "producer_repo": {"enum": ["spiderweb-pr", "aguayluz-pr", "moneysweep-pr", "skywatcher-pr", "thehub-pr"]},
     "source_count": {"type": "integer", "minimum": 0},
     "retained_count": {"type": "integer", "minimum": 0},
@@ -27,10 +31,10 @@
     "join_output_count": {"type": "integer", "minimum": 0},
     "declared_cardinality": {"enum": ["1:1", "1:N", "N:1", "N:N", "0:1", "UNRESOLVED"]},
     "multiplication_expected": {"type": "boolean", "default": false},
-    "multiplication_reason": {"type": ["string", "null"]},
-    "source_manifestation_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-    "output_manifestation_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "multiplication_reason": {"anyOf": [{"$ref": "#/$defs/non_empty_string"}, {"type": "null"}]},
+    "source_manifestation_ids": {"type": "array", "items": {"$ref": "#/$defs/non_empty_string"}, "uniqueItems": true},
+    "output_manifestation_ids": {"type": "array", "items": {"$ref": "#/$defs/non_empty_string"}, "uniqueItems": true},
     "provenance": {"type": "object"},
-    "notes": {"type": ["string", "null"]}
+    "notes": {"anyOf": [{"$ref": "#/$defs/non_empty_string"}, {"type": "null"}]}
   }
 }

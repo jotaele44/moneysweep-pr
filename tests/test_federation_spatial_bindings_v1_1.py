@@ -1,3 +1,5 @@
+import pytest
+
 from scripts.build_federation_spatial_bindings_v1_1 import adapt
 
 
@@ -71,4 +73,45 @@ def test_one_to_many_cardinality_is_preserved():
             ],
         }
     )
-    assert out["bindings"][0]["cardinality"] == "1:N"
+    binding = out["bindings"][0]
+    assert binding["cardinality"] == "1:N"
+    assert binding["identity_state"] == "UNRESOLVED"
+
+
+def test_raw_and_normalized_record_ids_remain_separate():
+    out = adapt({"project_id": "  P6  "})
+    assert out["record_id_raw"] == "  P6  "
+    assert out["record_id"] == "P6"
+    assert out["bindings"][0]["record_id_raw"] == "  P6  "
+
+
+@pytest.mark.parametrize("evidence", [{}, "STABLE_ID", ["not-an-object"]])
+def test_malformed_evidence_container_fails_closed(evidence):
+    with pytest.raises(ValueError, match="spatial_evidence"):
+        adapt({"project_id": "P7", "spatial_evidence": evidence})
+
+
+def test_whitespace_canonical_id_fails_closed():
+    with pytest.raises(ValueError, match="canonical_id"):
+        adapt(
+            {
+                "project_id": "P8",
+                "spatial_evidence": [
+                    {
+                        "method": "STABLE_ID",
+                        "canonical_id": "   ",
+                        "cardinality": "1:1",
+                    }
+                ],
+            }
+        )
+
+
+def test_duplicate_candidates_fail_instead_of_silently_collapsing():
+    candidate = {
+        "method": "STABLE_ID",
+        "canonical_id": "fed:asset:1",
+        "cardinality": "1:1",
+    }
+    with pytest.raises(ValueError, match="duplicate spatial evidence"):
+        adapt({"project_id": "P9", "spatial_evidence": [candidate, candidate.copy()]})
