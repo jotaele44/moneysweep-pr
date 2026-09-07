@@ -36,7 +36,9 @@ class UnifiedSkillpackConformanceTests(unittest.TestCase):
         manifest = json.loads((ROOT / ".claude/skillpacks/MANIFEST.json").read_text())
         allowed = manifest["allowed_change_paths"]
         self.assertTrue(MODULE.is_allowed_path("federation/spatial/grid_manifest.json", allowed))
+        self.assertTrue(MODULE.is_allowed_path("tests/test_no_secret_leakage.py", allowed))
         self.assertFalse(MODULE.is_allowed_path("federation/spatial/unreviewed.json", allowed))
+        self.assertFalse(MODULE.is_allowed_path("tests/test_unreviewed.py", allowed))
         self.assertFalse(MODULE.is_allowed_path("governance/unreviewed.json", allowed))
 
     def test_spatial_disposition_does_not_replace_repo_compatibility(self) -> None:
