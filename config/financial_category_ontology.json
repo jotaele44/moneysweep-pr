@@ -1,0 +1,32 @@
+{
+  "schema_version": "moneysweep.financial-category-ontology/v1",
+  "ranking_contract_version": "moneysweep.leaderboard/v1",
+  "rules": {
+    "currency_policy": "Rank only comparable values within one currency; do not FX-convert implicitly.",
+    "identity_policy": "Aggregate only by source-native/canonical stable entity IDs. Names and normalized names are display/discovery fields only.",
+    "measure_policy": "Awarded, obligated, disbursed, paid, assessed, claimed, judgment, contributed, loaned, guaranteed, incentivized and estimated values are non-equivalent measures.",
+    "tie_policy": "Use competition ranking by metric value; deterministic entity_id ordering is display-only and never evidence of superiority.",
+    "top_n_policy": "Top N includes every entity tied at rank N.",
+    "unresolved_policy": "Records lacking a stable entity binding never silently contribute to a canonical entity total."
+  },
+  "categories": [
+    {"id":"contract_award","label":"Government contract awards","metric_type":"AWARDED","unit":"currency","adapter":"canonical_contracts","certification_state":"PROVISIONAL","reason":"canonical_v1 contracts expose contractor_entity_id and award_amount; repository master dataset is not yet production-certified"},
+    {"id":"federal_obligation","label":"Federal contract obligations","metric_type":"OBLIGATED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"no canonical obligation adapter is mounted in the diagnostic API"},
+    {"id":"federal_grant","label":"Federal grants","metric_type":"AWARDED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"no canonical grant ranking adapter is mounted in the diagnostic API"},
+    {"id":"disaster_assistance","label":"Disaster recovery assistance","metric_type":"APPROVED_OR_OBLIGATED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"program-specific measures must remain separated before ranking"},
+    {"id":"government_payment","label":"Government payments","metric_type":"PAID","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"paid/disbursed records are not equivalent to contract award_amount"},
+    {"id":"procurement","label":"Procurement awards","metric_type":"AWARDED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"requires a bounded procurement universe and duplicate/amendment adjudication"},
+    {"id":"infrastructure_project","label":"Infrastructure project funding","metric_type":"FUNDED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"project-level funding is not yet bound to canonical entity recipients for ranking"},
+    {"id":"loan","label":"Loans","metric_type":"LOAN_PRINCIPAL","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"loan principal must remain separate from grants and guarantees"},
+    {"id":"guarantee","label":"Loan guarantees","metric_type":"GUARANTEED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"guaranteed amount is a distinct exposure measure"},
+    {"id":"subsidy_incentive","label":"Subsidies and incentives","metric_type":"INCENTIVE","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"requires source-specific benefit semantics"},
+    {"id":"tax_incentive","label":"Tax incentives","metric_type":"DOCUMENTED_BENEFIT","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"estimated and realized tax benefits cannot be mixed"},
+    {"id":"campaign_contribution","label":"Campaign contributions","metric_type":"CONTRIBUTED","unit":"currency","adapter":null,"certification_state":"CANDIDATE_NOT_IDENTITY","reason":"campaign contribution rows expose donor names, but name-only grouping is not canonical entity identity"},
+    {"id":"lobbying_expenditure","label":"Lobbying expenditures","metric_type":"EXPENDED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"requires canonical registrant/client identity binding"},
+    {"id":"property_assessment","label":"Property assessments","metric_type":"ASSESSED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"parcel-owner identity and assessment-date semantics must close before aggregation"},
+    {"id":"legal_judgment","label":"Legal judgments and settlements","metric_type":"JUDGMENT_OR_SETTLEMENT","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"claims, judgments and settlements are distinct legal measures"},
+    {"id":"bankruptcy_claim","label":"Bankruptcy claims","metric_type":"CLAIMED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"claim amount is not paid or adjudicated recovery"},
+    {"id":"municipal_expenditure","label":"Municipal expenditures","metric_type":"PAID_OR_OBLIGATED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"paid and obligated measures require separate adapters"},
+    {"id":"federal_assistance","label":"Federal assistance","metric_type":"ASSISTANCE","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"assistance-type semantics must be partitioned before ranking"}
+  ]
+}
