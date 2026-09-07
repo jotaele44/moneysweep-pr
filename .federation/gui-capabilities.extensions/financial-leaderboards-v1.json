@@ -1,0 +1,27 @@
+{
+  "extension_id": "financial-leaderboards-v1",
+  "capabilities": [
+    {
+      "id": "financial-entity-leaderboards",
+      "classification": "analysis",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Diagnostic Top-25 financial rankings backed by explicit metric ontology, stable canonical_v1 entity IDs, reconciliation accounting and source manifestations. Unsupported categories fail closed rather than synthesizing incomparable measures.",
+      "backend": {
+        "files": ["server/backend/leaderboards.py", "server/backend/main.py", "config/financial_category_ontology.json"],
+        "endpoints": ["GET /leaderboards/categories", "GET /leaderboards/top", "GET /leaderboards/movers"]
+      },
+      "frontend": {
+        "routes": ["/"],
+        "e2e_routes": ["/"],
+        "components": ["dashboard/src/lib/api.js", "dashboard/src/pages/Dashboard.jsx", "dashboard/src/components/FinancialLeaderboards.jsx"],
+        "discoverability": ["dashboard/src/pages/Dashboard.jsx"]
+      },
+      "tests": {
+        "backend": ["tests/test_leaderboards.py"],
+        "contract": ["tests/test_gui_parity.py"],
+        "e2e": ["dashboard/tests/financial-leaderboards.spec.mjs"]
+      }
+    }
+  ]
+}
