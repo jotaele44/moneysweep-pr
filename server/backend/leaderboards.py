@@ -1,7 +1,7 @@
 """Evidence-preserving financial leaderboards for the diagnostic MoneySweep API.
 
-The module deliberately refuses name-only aggregation.  Only adapters with a
-stable entity identifier may produce ranked rows.  Unsupported ontology
+The module deliberately refuses name-only aggregation. Only adapters with a
+stable entity identifier may produce ranked rows. Unsupported ontology
 categories remain visible with an explicit certification state rather than
 silently synthesizing incomparable financial measures.
 """
@@ -121,7 +121,15 @@ def _contract_award_ranking(
         if end_year is not None and (year is None or year > end_year):
             accounting["outOfScopeRecords"] += 1
             continue
-        if entity_type and (entity is None or str(entity.get("entity_type") or "") != entity_type):
+
+        # Identity state is adjudicated before filters that depend on entity
+        # attributes. Missing IDs must never be disguised as ordinary
+        # out-of-scope rows.
+        if not contractor_id or entity is None:
+            accounting["unresolvedRecords"] += 1
+            continue
+
+        if entity_type and str(entity.get("entity_type") or "") != entity_type:
             accounting["outOfScopeRecords"] += 1
             continue
 
@@ -134,16 +142,17 @@ def _contract_award_ranking(
                 accounting["outOfScopeRecords"] += 1
                 continue
 
-        if not contractor_id or entity is None:
-            accounting["unresolvedRecords"] += 1
-            continue
-
         amount = _number(row.get("award_amount"))
         if amount is None:
             accounting["excludedRecords"] += 1
             continue
 
-        row_currency = str(row.get("currency") or "USD").upper()
+        # Currency is part of the financial identity of the metric. A blank
+        # currency is unresolved; assuming USD would silently change meaning.
+        row_currency = str(row.get("currency") or "").strip().upper()
+        if not row_currency:
+            accounting["unresolvedRecords"] += 1
+            continue
         if currency and row_currency != currency.upper():
             accounting["outOfScopeRecords"] += 1
             continue
@@ -185,8 +194,6 @@ def _contract_award_ranking(
         agg["sourceManifestationCount"] = len(agg["sourceManifestationCount"])
         rows.append(agg)
 
-    # Never mix currencies in one ranked universe.  If the caller omitted a
-    # currency and multiple currencies are present, fail closed.
     currencies = sorted({row["currency"] for row in rows})
     if len(currencies) > 1 and currency is None:
         raise HTTPException(
@@ -241,6 +248,7 @@ def _contract_award_ranking(
             "aggregation": "signed award_amount summed by entity and currency",
             "ties": "competition ranking; all entities tied at rank N are returned",
             "nulls": "missing award_amount excluded and counted explicitly",
+            "currency": "blank currency is unresolved; multiple currencies require an explicit filter",
             "geography": "municipality filtering uses LOCATED_IN candidate sets; multi-location ties are unresolved",
             "history": "previousRank/rankDelta remain OPEN until a prior frozen ranking snapshot exists",
         },
