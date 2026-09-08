@@ -1,0 +1,83 @@
+{
+  "schema_version": "moneysweep.leaderboard-release-contract/v1",
+  "repository": "jotaele44/moneysweep-pr",
+  "branch": "feature/moneysweep-leaderboard-plane",
+  "scope": "financial leaderboard producer plane",
+  "ranking_contract": "moneysweep.leaderboard/v1.1",
+  "ontology_contract": "moneysweep.financial-category-ontology/v1.1",
+  "certification_state": "BLOCKED",
+  "certification_issued": false,
+  "promotion_authorized": false,
+  "blockers": [
+    {
+      "id": "CI_EXECUTION",
+      "state": "BLOCKED",
+      "reason": "PR workflow jobs have failed before acquiring a runner and executed zero steps; no pass/fail inference about code is permitted from those runs."
+    },
+    {
+      "id": "HISTORICAL_COMPARISON",
+      "state": "OPEN",
+      "reason": "Top Movers requires at least two independently frozen, hash-verified comparable snapshots."
+    },
+    {
+      "id": "CATEGORY_RESIDUE",
+      "state": "OPEN",
+      "reason": "Ontology categories without stable identity plus one financial semantic remain explicitly unsupported/unmaterialized."
+    },
+    {
+      "id": "THEHUB_PROMOTION",
+      "state": "BLOCKED",
+      "reason": "TheHub may consume only a certification-gated producer contract; producer certification is not issued."
+    }
+  ],
+  "required_gates": [
+    "ONTOLOGY_SCHEMA",
+    "ADAPTER_REGISTRY_CLOSED",
+    "NO_NAME_ONLY_IDENTITY",
+    "NO_CROSS_MEASURE_AGGREGATION",
+    "CURRENCY_PARTITION",
+    "TOP_N_TIE_BOUNDARY",
+    "NULL_EXPLICIT",
+    "IDENTITY_UNRESOLVED_EXPLICIT",
+    "MANY_TO_MANY_FAIL_CLOSED",
+    "ROW_ACCOUNTING_CLOSED",
+    "STABLE_ID_UNIQUENESS",
+    "SNAPSHOT_HASH_VALID",
+    "SNAPSHOT_COMPLETE_CANDIDATE_UNIVERSE",
+    "SNAPSHOT_COMPARABILITY",
+    "SOURCE_CHANGE_MOVEMENT_GUARD",
+    "ENTITY_DRILLDOWN_WHOLE_ROW_CONSERVATION",
+    "SPATIAL_HANDOFF_NO_GEOMETRY_PROMOTION",
+    "GUI_PARITY",
+    "PLAYWRIGHT_E2E",
+    "PYTEST",
+    "LINT",
+    "TYPECHECK",
+    "SECRET_SCAN",
+    "FEDERATION_COMPATIBILITY",
+    "THEHUB_CONSUMER_CONTRACT",
+    "RELEASE_MANIFEST_HASHES",
+    "ZERO_MATERIAL_UNRESOLVED_RESIDUE_INSIDE_CERTIFIED_SCOPE"
+  ],
+  "implemented_surfaces": {
+    "backend": [
+      "server/backend/leaderboards.py",
+      "server/backend/leaderboard_adapters.py",
+      "server/backend/leaderboard_history.py",
+      "server/backend/leaderboard_investigation.py",
+      "server/backend/leaderboard_entities.py"
+    ],
+    "snapshot_materializer": "scripts/materialize_leaderboard_snapshot.py",
+    "frontend": "dashboard/src/components/FinancialLeaderboards.jsx",
+    "api_client": "dashboard/src/lib/api.js",
+    "gui_capability": ".federation/gui-capabilities.extensions/financial-leaderboards-v1.json"
+  },
+  "promotion_rules": {
+    "money_sweep_is_financial_authority": true,
+    "thehub_is_cross_producer_product_surface": true,
+    "spiderweb_is_geometry_authority": true,
+    "thehub_must_not_recompute_money_sweep_rankings": true,
+    "thehub_must_verify_producer_contract_and_release_receipt": true,
+    "diagnostic_ui_does_not_imply_certification": true
+  }
+}
