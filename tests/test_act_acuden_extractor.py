@@ -44,7 +44,7 @@ def _build_pdf(path: Path, header: list[str], rows: list[list[str]]) -> None:
 @pytest.fixture
 def act_repo(tmp_path: Path) -> Path:
     """Repo layout with one ACT PDF in the expected drop dir."""
-    pdf_path = tmp_path / SOURCES["act"]["input_dir"] / "act_sample.pdf"
+    pdf_path = tmp_path / SOURCES["act"]["input_dir"] / "ACT_sample.pdf"
     _build_pdf(
         pdf_path,
         header=[
@@ -79,7 +79,7 @@ def act_repo(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def acuden_repo(tmp_path: Path) -> Path:
-    pdf_path = tmp_path / SOURCES["acuden"]["input_dir"] / "acuden_sample.pdf"
+    pdf_path = tmp_path / SOURCES["acuden"]["input_dir"] / "ACUDES_sample.pdf"
     _build_pdf(
         pdf_path,
         header=[
@@ -137,6 +137,17 @@ def test_acuden_columns_match_registry() -> None:
 # ---------------------------------------------------------------------------
 # Integration: extractor end-to-end on synthetic PDFs
 # ---------------------------------------------------------------------------
+
+
+@pytest.mark.integration
+def test_shared_archive_keeps_source_candidates_separate(act_repo: Path, acuden_repo: Path) -> None:
+    assert act_repo == acuden_repo
+    unrelated = act_repo / SOURCES["act"]["input_dir"] / "unclassified.pdf"
+    unrelated.write_bytes(b"not a classified PDF")
+    summary = extract(root=act_repo)
+    assert summary["act"]["pdfs"] == summary["acuden"]["pdfs"] == 1
+    assert summary["act"]["rows"] == 2
+    assert summary["acuden"]["rows"] == 1
 
 
 @pytest.mark.integration
