@@ -33,6 +33,7 @@ export default defineConfig({
     "data-sources.spec.mjs",
     "hud-drgr-audit.spec.mjs",
     "sort-head.spec.mjs",
+    "client-controls.spec.mjs",
   ],
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,

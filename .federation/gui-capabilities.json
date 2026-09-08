@@ -620,7 +620,9 @@
         "backend": [
           "tests/test_case_manager_foundation.py",
           "tests/test_case_manager_phase1_service.py",
-          "tests/test_case_manager_auth.py"
+          "tests/test_case_manager_auth.py",
+          "tests/test_case_manager_concurrency.py",
+          "tests/test_case_manager_app_health.py"
         ]
       },
       "candidate_ids": [
@@ -1302,6 +1304,41 @@
           "dashboard/tests/hud-drgr-audit.spec.mjs"
         ]
       }
+    },
+    {
+      "id": "client-recovery-navigation-and-filtering",
+      "classification": "client_only",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Visible last-resort app reload, unknown-route home navigation, and local entity/relationship type selection. These controls manage browser navigation or already-loaded view state; they do not claim a backend capability or canonical identity. Null resets filtering without colliding with a literal source type named all.",
+      "frontend": {
+        "routes": [
+          "/",
+          "*"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/components/ErrorBoundary.jsx",
+          "dashboard/src/components/TypeFilterSelect.jsx",
+          "dashboard/src/lib/PageNotFound.jsx"
+        ],
+        "discoverability": [
+          "dashboard/src/main.jsx",
+          "dashboard/src/components/EntitiesTable.jsx",
+          "dashboard/src/components/RelationshipGraph.jsx",
+          "dashboard/src/lib/PageNotFound.jsx"
+        ]
+      },
+      "tests": {
+        "e2e": [
+          "dashboard/tests/client-controls.spec.mjs"
+        ]
+      },
+      "candidate_ids": [
+        "gui_route:dashboard/src/App.jsx:*"
+      ]
     }
   ],
   "exceptions": [

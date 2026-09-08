@@ -10,19 +10,19 @@ import { cn } from '@/lib/utils'
 export default function RelationshipGraph() {
   const query = useEdges()
   const edges = query.data ?? []
-  const [type, setType] = useState('all')
+  const [type, setType] = useState(null)
 
   const rows = useMemo(
-    () => (type === 'all' ? edges : edges.filter((e) => e.edgeType === type)),
+    () => (type === null ? edges : edges.filter((e) => e.edgeType === type)),
     [edges, type],
   )
-  const hasFilter = type !== 'all'
+  const hasFilter = type !== null
 
   return (
     <div className="flex h-full flex-col">
       <div className="ms-filter-bar flex items-center justify-between gap-2 p-2">
         <span className="text-xs text-muted-foreground">{rows.length} relationships</span>
-        <TypeFilterSelect items={edges} field="edgeType" value={type} onChange={setType} width="w-[180px]" />
+        <TypeFilterSelect label="Relationship type" items={edges} field="edgeType" value={type} onChange={setType} width="w-[180px]" />
       </div>
       <div className="ms-scroll-region min-h-0 flex-1 overflow-auto">
         <QueryBoundary
@@ -31,7 +31,7 @@ export default function RelationshipGraph() {
           isFilteredEmpty={() => hasFilter && edges.length > 0 && rows.length === 0}
           emptyLabel="No relationships"
           filteredEmptyLabel="No relationships match this type"
-          onResetFilters={() => setType('all')}
+          onResetFilters={() => setType(null)}
         >
           <div className="space-y-1.5 p-2">
             {rows.map((e) => (

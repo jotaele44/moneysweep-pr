@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import secrets
+from threading import Lock
 from pathlib import Path
 from typing import Literal
 
@@ -34,21 +35,30 @@ MIGRATION_PATH = ROOT / "migrations" / "001_case_manager_v1.sql"
 
 router = APIRouter(prefix="/cases", tags=["case-manager"])
 _repository: SQLiteCaseManagerRepository | None = None
+_repository_lock = Lock()
 
 
 def _services() -> tuple[CaseCommandService, CaseQueryService]:
     global _repository
-    if _repository is None:
-        DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
-        _repository = SQLiteCaseManagerRepository(DATABASE_PATH)
-        _repository.apply_migration(MIGRATION_PATH)
-    return CaseCommandService(_repository), CaseQueryService(_repository)
+    with _repository_lock:
+        if _repository is None:
+            DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
+            candidate = SQLiteCaseManagerRepository(DATABASE_PATH)
+            try:
+                candidate.apply_migration(MIGRATION_PATH)
+            except BaseException:
+                candidate.close()
+                raise
+            _repository = candidate
+        repository = _repository
+    return CaseCommandService(repository), CaseQueryService(repository)
 
 
 def configure_repository(repository: SQLiteCaseManagerRepository | None) -> None:
     """Test hook; production callers use the configured SQLite path."""
     global _repository
-    _repository = repository
+    with _repository_lock:
+        _repository = repository
 
 
 def _reject_legacy_identity(request: Request) -> None:

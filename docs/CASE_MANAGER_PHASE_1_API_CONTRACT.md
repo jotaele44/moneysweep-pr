@@ -71,6 +71,10 @@ Every command:
 
 A failure in either the object write or audit append rolls back both. Concurrent writers that observed a stale audit sequence receive a conflict instead of creating a forked audit chain.
 
+The shared repository serializes transactions and reads with a re-entrant lock. A read cannot expose another request's uncommitted rows, and a failed or nested `BEGIN` never rolls back a transaction it did not start. Interruption rolls back the active request before releasing its connection. Schema migration is rejected while a transaction is active because SQLite script execution can otherwise commit it implicitly.
+
+Repository initialization is synchronized and published only after migration succeeds. A failed initialization closes its candidate connection and leaves the next request able to retry. Repository-created connections are owned by the repository; injected connections remain the caller's responsibility. Independent processes still rely on SQLite file locking and the existing audit-sequence conflict check.
+
 ## Canonical evidence boundary
 
 The service accepts canonical identifiers matching `evidence_*` for links, lead closure, and snapshots. The Case Manager schema contains no canonical evidence table and exposes no operation that can alter evidence text, tier, review status, or promotion state.

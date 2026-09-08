@@ -1,6 +1,7 @@
 import { Component } from 'react'
 
 // Last-resort guard: a render crash shows a readable panel instead of a blank page.
+// Reload clears module-level query caches as well as the failed component tree.
 export default class ErrorBoundary extends Component {
   state = { error: null }
 
@@ -16,7 +17,7 @@ export default class ErrorBoundary extends Component {
           <p className="max-w-md text-sm text-muted-foreground">{String(this.state.error?.message || this.state.error)}</p>
           <button
             className="glow-border rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted"
-            onClick={() => this.setState({ error: null })}
+            onClick={() => window.location.reload()}
           >
             Try again
           </button>

@@ -4,6 +4,7 @@ import csv
 import hashlib
 import json
 import sqlite3
+from contextlib import closing
 import subprocess
 import sys
 from pathlib import Path
@@ -22,6 +23,12 @@ from scripts.certify_database_release import build_report
 from scripts import remediate_canonical_evidence_provenance as remediation
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+
+
+@pytest.fixture
+def connection():
+    with closing(sqlite3.connect(":memory:")) as connection:
+        yield connection
 
 
 def test_database_release_certifier_direct_entrypoint_is_cwd_independent(tmp_path: Path):
@@ -236,10 +243,9 @@ def _case(case_key: str, visibility: str = "internal") -> Case:
     )
 
 
-def test_configured_catalog_rejects_dangling_case_evidence(tmp_path: Path):
+def test_configured_catalog_rejects_dangling_case_evidence(tmp_path: Path, connection):
     evidence_path = tmp_path / "evidence.csv"
     _write_csv(evidence_path, ["evidence_id"], [{"evidence_id": "evidence_real"}])
-    connection = sqlite3.connect(":memory:")
     repository = SQLiteCaseManagerRepository(connection, canonical_evidence_path=evidence_path)
     repository.apply_migration(REPO_ROOT / "migrations/001_case_manager_v1.sql")
     commands = CaseCommandService(repository)
@@ -257,8 +263,7 @@ def test_configured_catalog_rejects_dangling_case_evidence(tmp_path: Path):
         )
 
 
-def test_parent_case_visibility_dominates_public_child():
-    connection = sqlite3.connect(":memory:")
+def test_parent_case_visibility_dominates_public_child(connection):
     repository = SQLiteCaseManagerRepository(connection)
     repository.apply_migration(REPO_ROOT / "migrations/001_case_manager_v1.sql")
     commands = CaseCommandService(repository)
@@ -280,8 +285,7 @@ def test_parent_case_visibility_dominates_public_child():
     assert len(queries.get_case_collection(case.case_id, "claims", "restricted")) == 1
 
 
-def test_cross_case_finding_is_rejected():
-    connection = sqlite3.connect(":memory:")
+def test_cross_case_finding_is_rejected(connection):
     repository = SQLiteCaseManagerRepository(connection)
     repository.apply_migration(REPO_ROOT / "migrations/001_case_manager_v1.sql")
     commands = CaseCommandService(repository)

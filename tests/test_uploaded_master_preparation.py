@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+from io import StringIO
 from pathlib import Path
 
 from scripts.prepare_uploaded_masters import prepare_uploaded_masters
@@ -140,12 +141,16 @@ def test_prepare_uploaded_masters_emits_canonical_processed_files(tmp_path):
         assert (out / name).exists()
         assert report["output_rows"][name] > 0
 
-    contracts_rows = list(csv.DictReader((out / "contracts_master.csv").open(encoding="utf-8")))
+    contracts_rows = list(
+        csv.DictReader(StringIO((out / "contracts_master.csv").read_text(encoding="utf-8")))
+    )
     assert contracts_rows[0]["normalized_name"] == "BETA INC"
     assert contracts_rows[0]["geo_municipality_name"] == "Ponce"
     assert contracts_rows[0]["award_date"] == "2024-05-01"
 
-    flow_rows = list(csv.DictReader((out / "financial_flows_master.csv").open(encoding="utf-8")))
+    flow_rows = list(
+        csv.DictReader(StringIO((out / "financial_flows_master.csv").read_text(encoding="utf-8")))
+    )
     assert len(flow_rows) == 2
     assert {row["source_system"] for row in flow_rows} == {"pdf_contracts", "uploaded_lda_summary"}
 

@@ -1,6 +1,7 @@
 import hashlib
 import json
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 import pytest
@@ -62,11 +63,12 @@ def _event(
     )
 
 
-def _database() -> sqlite3.Connection:
-    database = sqlite3.connect(":memory:")
-    database.execute("PRAGMA foreign_keys = ON")
-    database.executescript(Path("migrations/001_case_manager_v1.sql").read_text())
-    return database
+@pytest.fixture
+def database():
+    with closing(sqlite3.connect(":memory:")) as database:
+        database.execute("PRAGMA foreign_keys = ON")
+        database.executescript(Path("migrations/001_case_manager_v1.sql").read_text())
+        yield database
 
 
 def test_deterministic_ids_are_idempotent():
@@ -231,8 +233,7 @@ def test_sql_migration_is_idempotent_from_clean_state():
         database.close()
 
 
-def test_sql_migration_creates_required_indexes():
-    database = _database()
+def test_sql_migration_creates_required_indexes(database):
     index_rows = database.execute("SELECT name FROM sqlite_master WHERE type='index'")
     names = {row[0] for row in index_rows}
     expected = {
@@ -251,8 +252,7 @@ def test_sql_migration_creates_required_indexes():
     assert expected.issubset(names)
 
 
-def test_sql_rejects_invalid_visibility_and_json():
-    database = _database()
+def test_sql_rejects_invalid_visibility_and_json(database):
     database.execute(
         "INSERT INTO cases(case_id,title,case_type,status,scope,visibility) "
         "VALUES('case_x','X','audit','open','scope','internal')"
@@ -270,8 +270,7 @@ def test_sql_rejects_invalid_visibility_and_json():
         )
 
 
-def test_sql_foreign_keys_are_restrictive():
-    database = _database()
+def test_sql_foreign_keys_are_restrictive(database):
     database.execute(
         "INSERT INTO cases(case_id,title,case_type,status,scope,visibility) "
         "VALUES('case_x','X','audit','open','scope','internal')"
@@ -284,8 +283,7 @@ def test_sql_foreign_keys_are_restrictive():
         database.execute("DELETE FROM cases WHERE case_id='case_x'")
 
 
-def test_sql_migration_blocks_audit_event_mutation():
-    database = _database()
+def test_sql_migration_blocks_audit_event_mutation(database):
     database.execute(
         "INSERT INTO cases(case_id,title,case_type,status,scope,visibility) "
         "VALUES('case_x','X','audit','open','scope','internal')"
