@@ -150,10 +150,18 @@ reports/source_update_tmp/
 # Contract Forensics V3 runtime reports (seed/pipeline/candidate outputs) — never committed
 reports/forensics/
 
+# Scratch output from .federation/check_gui_parity_with_extensions.py
+artifacts/gui-capabilities-merged.json
+
 # Desktop wrapper (see desktop/README.md)
 dashboard/node_modules/
 dashboard/dist/
 desktop/.setup-complete
+desktop/.frontend-source.json
+desktop/last-setup.log
+desktop/wheelhouse/
+# Written by Fix-Gatekeeper.command's ad-hoc codesign into a tracked bundle.
+PRII-MONEYSWEEP.app/Contents/_CodeSignature/
 dist-desktop/
 build/
 desktop/.running
