@@ -6,6 +6,7 @@ data/staging/processed/normalized_expansion_*.csv.
 """
 
 import sys
+import re
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -61,6 +62,32 @@ def derive_fiscal_year(date_series: pd.Series) -> pd.Series:
     return fy
 
 
+def _clean_amount(value: object) -> str:
+    """Validate numeric syntax before removing currency decoration; never strip meaning."""
+    if value is None or pd.isna(value):
+        return ""
+    text = str(value).strip()
+    if text.count("$") > 1:
+        return ""
+    if text.startswith("$"):
+        text = text[1:].strip()
+    accounting_negative = text.startswith("(") and text.endswith(")")
+    if accounting_negative:
+        text = text[1:-1].strip()
+    if text.startswith("$"):
+        text = text[1:].strip()
+    elif text.startswith(("-$", "+$")):
+        text = text[0] + text[2:].strip()
+    if accounting_negative and text.startswith(("-", "+")):
+        return ""  # Two sign conventions are ambiguous, not a double negation.
+    number = (
+        r"[+-]?(?:(?:[0-9]{1,3}(?:,[0-9]{3})+|[0-9]+)(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?"
+    )
+    if re.fullmatch(number, text) is None:
+        return ""
+    return ("-" if accounting_negative else "") + text.replace(",", "")
+
+
 def normalize_highergov_df(df: pd.DataFrame) -> pd.DataFrame:
     """Heuristic cleanup for HigherGov-parsed tables.
 
@@ -68,6 +95,7 @@ def normalize_highergov_df(df: pd.DataFrame) -> pd.DataFrame:
     Renames detected columns to standard names used downstream.
     """
 
+    df = df.copy()
     n = len(df)
     if n == 0:
         return df
@@ -89,10 +117,14 @@ def normalize_highergov_df(df: pd.DataFrame) -> pd.DataFrame:
     date_col = None
     best_date_score = 0
     for c in df.columns:
+        if c in STANDARD_COLUMNS or "award_date" in df.columns:
+            continue
         sc = col_date_score(c)
         if sc > best_date_score and sc / n >= 0.15:
             best_date_score = sc
             date_col = c
+        elif sc == best_date_score and sc > 0:
+            date_col = None  # Equal evidence remains unresolved, independent of column order.
 
     # amount detection: contains $ or commas + digits
     def col_amount_score(col):
@@ -102,10 +134,14 @@ def normalize_highergov_df(df: pd.DataFrame) -> pd.DataFrame:
     amount_col = None
     best_amount_score = 0
     for c in df.columns:
+        if c in STANDARD_COLUMNS or c == date_col or "obligated_amount" in df.columns:
+            continue
         sc = col_amount_score(c)
         if sc > best_amount_score and sc / n >= 0.1:
             best_amount_score = sc
             amount_col = c
+        elif sc == best_amount_score and sc > 0:
+            amount_col = None  # Equal evidence remains unresolved, independent of column order.
 
     # vendor detection: column with many alphabetic words (heuristic)
     def col_vendor_score(col):
@@ -115,10 +151,14 @@ def normalize_highergov_df(df: pd.DataFrame) -> pd.DataFrame:
     vendor_col = None
     best_vendor_score = 0
     for c in df.columns:
+        if c in STANDARD_COLUMNS or c in {date_col, amount_col} or "vendor_name" in df.columns:
+            continue
         sc = col_vendor_score(c)
         if sc > best_vendor_score and sc / n >= 0.2:
             best_vendor_score = sc
             vendor_col = c
+        elif sc == best_vendor_score and sc > 0:
+            vendor_col = None  # Equal evidence remains unresolved, independent of column order.
 
     rename_map = {}
     if date_col and date_col != "award_date":
@@ -134,17 +174,13 @@ def normalize_highergov_df(df: pd.DataFrame) -> pd.DataFrame:
     # If award_date exists but in weird format, try to coerce with pandas
     if "award_date" in df.columns:
         try:
-            df["award_date"] = pd.to_datetime(
-                df["award_date"], errors="coerce", infer_datetime_format=True
-            )
+            df["award_date"] = pd.to_datetime(df["award_date"], errors="coerce", format="mixed")
         except Exception:
             df["award_date"] = pd.NaT
 
     # Clean amounts: remove $ and commas
     if "obligated_amount" in df.columns:
-        df["obligated_amount"] = (
-            df["obligated_amount"].astype(str).str.replace(r"[^0-9.\-]", "", regex=True)
-        )
+        df["obligated_amount"] = df["obligated_amount"].map(_clean_amount)
 
     return df
 
@@ -180,6 +216,14 @@ def normalize_file(input_path: Path, output_dir: Path, logger) -> dict:
         result["errors"].append("Empty file")
         logger.warning(f"  {input_path.name}: Empty file (0 rows)")
         # Still write output (empty CSV with headers)
+
+    # Select whole raw rows before lossy conversions. Different malformed values
+    # can normalize to the same null; that must not manufacture a duplicate.
+    before_dedup = len(df)
+    df = df.drop_duplicates().copy()
+    result["excluded_duplicate_raw_rows"] = before_dedup - len(df)
+    if before_dedup > len(df):
+        logger.info(f"  {input_path.name}: Removed {before_dedup - len(df)} duplicate raw rows")
 
     # Build column map
     col_map = build_column_map(df.columns.tolist())
@@ -217,9 +261,7 @@ def normalize_file(input_path: Path, output_dir: Path, logger) -> dict:
 
     # Convert amount to numeric
     if "obligated_amount" in df.columns:
-        raw_amounts = (
-            df["obligated_amount"].astype(str).str.replace(",", "").str.replace("$", "").str.strip()
-        )
+        raw_amounts = df["obligated_amount"].map(_clean_amount)
         df["obligated_amount"] = pd.to_numeric(raw_amounts, errors="coerce")
         coerced = raw_amounts.notna().sum() - df["obligated_amount"].notna().sum()
         if coerced > 0:
@@ -232,12 +274,6 @@ def normalize_file(input_path: Path, output_dir: Path, logger) -> dict:
 
     # Add source file tag
     df["source_file"] = input_path.stem
-
-    # Deduplicate (within file only)
-    before_dedup = len(df)
-    df = df.drop_duplicates()
-    if before_dedup > len(df):
-        logger.info(f"  {input_path.name}: Removed {before_dedup - len(df)} duplicate rows")
 
     result["output_rows"] = len(df)
 

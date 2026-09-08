@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import os
+import secrets
 from pathlib import Path
 from typing import Literal
 
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from moneysweep.case_manager.ids import deterministic_id
@@ -50,12 +51,32 @@ def configure_repository(repository: SQLiteCaseManagerRepository | None) -> None
     _repository = repository
 
 
-def _actor(value: str | None) -> str:
-    return value or "anonymous"
+def _reject_legacy_identity(request: Request) -> None:
+    if "x-case-actor" in request.headers or "x-case-clearance" in request.headers:
+        raise HTTPException(400, "Client-supplied case identity headers are not supported")
 
 
-def _clearance(value: str | None) -> str:
-    return value or "public"
+def _verified_actor(request: Request) -> str:
+    """Authenticate the trusted service principal; never trust actor/clearance headers."""
+    _reject_legacy_identity(request)
+    expected = os.environ.get("PRII_WRITE_TOKEN", "")
+    if not expected.strip():
+        raise HTTPException(503, "Case access is disabled until PRII_WRITE_TOKEN is configured")
+    scheme, _, presented = request.headers.get("authorization", "").partition(" ")
+    if scheme.lower() != "bearer" or not secrets.compare_digest(
+        presented.encode("utf-8"), expected.encode("utf-8")
+    ):
+        raise HTTPException(401, "Invalid case credentials", headers={"WWW-Authenticate": "Bearer"})
+    return os.environ.get("MONEYSWEEP_CASE_ACTOR", "").strip() or "case-service"
+
+
+def _read_clearance(request: Request) -> str:
+    _reject_legacy_identity(request)
+    if "authorization" not in request.headers:
+        return "public"
+    _verified_actor(request)
+    # This is a single trusted service credential, not per-user role delegation.
+    return "restricted"
 
 
 def _raise(exc: Exception) -> None:
@@ -152,14 +173,14 @@ class SnapshotCreate(BaseModel):
 
 
 @router.get("")
-def get_cases(x_case_clearance: str | None = Header(default=None)):
-    return _services()[1].list_cases(_clearance(x_case_clearance))
+def get_cases(clearance: str = Depends(_read_clearance)):
+    return _services()[1].list_cases(clearance)
 
 
 @router.get("/{case_id}")
-def get_case(case_id: str, x_case_clearance: str | None = Header(default=None)):
+def get_case(case_id: str, clearance: str = Depends(_read_clearance)):
     try:
-        result = _services()[1].get_case(case_id, _clearance(x_case_clearance))
+        result = _services()[1].get_case(case_id, clearance)
     except Exception as exc:
         _raise(exc)
     if result is None:
@@ -180,22 +201,24 @@ def get_case_collection(
         "snapshots",
         "audit-events",
     ],
-    x_case_clearance: str | None = Header(default=None),
+    clearance: str = Depends(_read_clearance),
 ):
     try:
-        return _services()[1].get_case_collection(case_id, collection, _clearance(x_case_clearance))
+        if _services()[1].get_case(case_id, clearance) is None:
+            raise HTTPException(404, "case not visible or not found")
+        return _services()[1].get_case_collection(case_id, collection, clearance)
     except Exception as exc:
         _raise(exc)
 
 
 @router.post("", status_code=201)
-def create_case(payload: CaseCreate, x_case_actor: str | None = Header(default=None)):
+def create_case(payload: CaseCreate, actor: str = Depends(_verified_actor)):
     case = Case(
         case_id=deterministic_id("case", payload.title, payload.case_type, payload.scope),
         **payload.model_dump(),
     )
     try:
-        return _services()[0].create_case(case, _actor(x_case_actor))
+        return _services()[0].create_case(case, actor)
     except Exception as exc:
         _raise(exc)
 
@@ -204,7 +227,7 @@ def create_case(payload: CaseCreate, x_case_actor: str | None = Header(default=N
 def link_evidence(
     case_id: str,
     payload: EvidenceLinkCreate,
-    x_case_actor: str | None = Header(default=None),
+    actor: str = Depends(_verified_actor),
 ):
     record = CaseEvidence(
         case_evidence_id=deterministic_id(
@@ -214,22 +237,20 @@ def link_evidence(
         **payload.model_dump(),
     )
     try:
-        return _services()[0].link_evidence(record, _actor(x_case_actor))
+        return _services()[0].link_evidence(record, actor)
     except Exception as exc:
         _raise(exc)
 
 
 @router.post("/{case_id}/claims", status_code=201)
-def create_claim(
-    case_id: str, payload: ClaimCreate, x_case_actor: str | None = Header(default=None)
-):
+def create_claim(case_id: str, payload: ClaimCreate, actor: str = Depends(_verified_actor)):
     claim = Claim(
         claim_id=deterministic_id("claim", case_id, payload.statement),
         case_id=case_id,
         **payload.model_dump(),
     )
     try:
-        return _services()[0].create_claim(claim, _actor(x_case_actor))
+        return _services()[0].create_claim(claim, actor)
     except Exception as exc:
         _raise(exc)
 
@@ -239,7 +260,7 @@ def link_claim_evidence(
     case_id: str,
     claim_id: str,
     payload: ClaimEvidenceCreate,
-    x_case_actor: str | None = Header(default=None),
+    actor: str = Depends(_verified_actor),
 ):
     record = ClaimEvidence(
         claim_evidence_id=deterministic_id(
@@ -249,7 +270,7 @@ def link_claim_evidence(
         **payload.model_dump(),
     )
     try:
-        return _services()[0].link_claim_evidence(case_id, record, _actor(x_case_actor))
+        return _services()[0].link_claim_evidence(case_id, record, actor)
     except Exception as exc:
         _raise(exc)
 
@@ -258,7 +279,7 @@ def link_claim_evidence(
 def create_contradiction(
     case_id: str,
     payload: ContradictionCreate,
-    x_case_actor: str | None = Header(default=None),
+    actor: str = Depends(_verified_actor),
 ):
     record = Contradiction(
         contradiction_id=deterministic_id("contradiction", case_id, *sorted(payload.claim_ids)),
@@ -270,7 +291,7 @@ def create_contradiction(
         visibility=payload.visibility,
     )
     try:
-        return _services()[0].create_contradiction(record, _actor(x_case_actor))
+        return _services()[0].create_contradiction(record, actor)
     except Exception as exc:
         _raise(exc)
 
@@ -280,7 +301,7 @@ def resolve_contradiction(
     case_id: str,
     contradiction_id: str,
     payload: ContradictionResolution,
-    x_case_actor: str | None = Header(default=None),
+    actor: str = Depends(_verified_actor),
 ):
     try:
         return _services()[0].resolve_contradiction(
@@ -289,7 +310,7 @@ def resolve_contradiction(
             status=payload.status,
             rationale=payload.rationale,
             reviewer=payload.reviewer,
-            actor=_actor(x_case_actor),
+            actor=actor,
             visibility=payload.visibility,
         )
     except Exception as exc:
@@ -297,14 +318,14 @@ def resolve_contradiction(
 
 
 @router.post("/{case_id}/leads", status_code=201)
-def create_lead(case_id: str, payload: LeadCreate, x_case_actor: str | None = Header(default=None)):
+def create_lead(case_id: str, payload: LeadCreate, actor: str = Depends(_verified_actor)):
     lead = Lead(
         lead_id=deterministic_id("lead", case_id, payload.question),
         case_id=case_id,
         **payload.model_dump(),
     )
     try:
-        return _services()[0].create_lead(lead, _actor(x_case_actor))
+        return _services()[0].create_lead(lead, actor)
     except Exception as exc:
         _raise(exc)
 
@@ -314,14 +335,14 @@ def close_lead(
     case_id: str,
     lead_id: str,
     payload: LeadClosure,
-    x_case_actor: str | None = Header(default=None),
+    actor: str = Depends(_verified_actor),
 ):
     try:
         return _services()[0].close_lead(
             case_id=case_id,
             lead_id=lead_id,
             closure_evidence_ids=tuple(payload.closure_evidence_ids),
-            actor=_actor(x_case_actor),
+            actor=actor,
             visibility=payload.visibility,
         )
     except Exception as exc:
@@ -329,9 +350,7 @@ def close_lead(
 
 
 @router.post("/{case_id}/findings", status_code=201)
-def create_finding(
-    case_id: str, payload: FindingCreate, x_case_actor: str | None = Header(default=None)
-):
+def create_finding(case_id: str, payload: FindingCreate, actor: str = Depends(_verified_actor)):
     finding = Finding(
         finding_id=deterministic_id("finding", case_id, payload.claim_id, payload.conclusion),
         case_id=case_id,
@@ -339,7 +358,7 @@ def create_finding(
         **payload.model_dump(),
     )
     try:
-        return _services()[0].create_finding(finding, _actor(x_case_actor))
+        return _services()[0].create_finding(finding, actor)
     except Exception as exc:
         _raise(exc)
 
@@ -349,13 +368,13 @@ def accept_finding(
     case_id: str,
     finding_id: str,
     payload: FindingAcceptance,
-    x_case_actor: str | None = Header(default=None),
+    actor: str = Depends(_verified_actor),
 ):
     try:
         return _services()[0].accept_finding(
             case_id=case_id,
             finding_id=finding_id,
-            actor=_actor(x_case_actor),
+            actor=actor,
             visibility=payload.visibility,
         )
     except Exception as exc:
@@ -363,9 +382,7 @@ def accept_finding(
 
 
 @router.post("/{case_id}/snapshots", status_code=201)
-def create_snapshot(
-    case_id: str, payload: SnapshotCreate, x_case_actor: str | None = Header(default=None)
-):
+def create_snapshot(case_id: str, payload: SnapshotCreate, actor: str = Depends(_verified_actor)):
     snapshot = CaseSnapshot(
         case_snapshot_id=deterministic_id("case_snapshot", case_id, payload.manifest_sha256),
         case_id=case_id,
@@ -373,6 +390,6 @@ def create_snapshot(
         **payload.model_dump(exclude={"evidence_ids"}),
     )
     try:
-        return _services()[0].create_snapshot(snapshot, _actor(x_case_actor))
+        return _services()[0].create_snapshot(snapshot, actor)
     except Exception as exc:
         _raise(exc)

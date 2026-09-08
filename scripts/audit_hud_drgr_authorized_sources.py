@@ -13,6 +13,7 @@ import argparse
 import csv
 import hashlib
 import json
+import io
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -33,7 +34,8 @@ KNOWN_PATHS = [
     / "2024/ACT/transicion2024_archive/files/by_agency/078/Informe_Acciones_Judiciales/Informe_Acciones_Judiciales_CDBG-DR-MIT.pdf",
     FINANCIALS / "Documents/contractdata/data/staging/processed/pr_hud_hcv.csv",
     FINANCIALS / "Documents/contractdata/data/normalized/hud_drgr_projects.parquet",
-    FINANCIALS / "Documents/contractdata/data/normalized/hud_drgr_responsible_orgs_resolved.parquet",
+    FINANCIALS
+    / "Documents/contractdata/data/normalized/hud_drgr_responsible_orgs_resolved.parquet",
 ]
 
 AUTHORIZED_TABLE_HINTS = {
@@ -57,36 +59,79 @@ def sha256_file(path: Path) -> str | None:
     return digest.hexdigest()
 
 
-def inspect_csv(path: Path) -> dict[str, Any]:
-    for encoding in ("utf-8-sig", "utf-8", "latin-1", "cp1252"):
+def inspect_csv(path: Path, raw: bytes | None = None) -> dict[str, Any]:
+    raw = path.read_bytes() if raw is None else raw
+    encoding = "utf-8-sig"
+    try:
+        text = raw.decode(encoding)
+    except UnicodeDecodeError:
+        # Single-byte decoding is reversible but the intended encoding is unknown.
+        encoding = "latin-1"
+        text = raw.decode(encoding)
+    candidates = []
+    hints_set = {hint for hints in AUTHORIZED_TABLE_HINTS.values() for hint in hints}
+    for delimiter in (",", ";", "\t", "|"):
         try:
-            with path.open("r", encoding=encoding, newline="") as handle:
-                reader = csv.reader(handle)
-                header = next(reader, [])
-                row_count = sum(1 for _ in reader)
-            header_text = " ".join(header).lower()
-            hinted = sorted(
-                table
-                for table, hints in AUTHORIZED_TABLE_HINTS.items()
-                if any(hint in header_text for hint in hints)
-            )
-            return {
-                "format": "csv",
-                "encoding": encoding,
-                "logical_rows": row_count,
-                "header": header[:40],
-                "authorized_table_hints": hinted,
-            }
-        except UnicodeDecodeError:
+            rows = list(csv.reader(io.StringIO(text, newline=""), delimiter=delimiter, strict=True))
+        except csv.Error:
             continue
-    return {"format": "csv", "logical_rows": None, "header": [], "error": "decode_failed"}
+        for index, row in enumerate(rows[:100]):
+            normalized = [value.strip().lower().replace("_", " ") for value in row]
+            if len(row) > 1 and hints_set.intersection(normalized):
+                candidates.append((delimiter, index, rows, normalized))
+                break
+    if len(candidates) != 1:
+        return {
+            "format": "csv",
+            "encoding": encoding,
+            "logical_rows": None,
+            "header": [],
+            "authorized_table_hints": [],
+            "error": "header_or_delimiter_unresolved",
+            "schema_state": "UNRESOLVED",
+        }
+    delimiter, index, rows, normalized = candidates[0]
+    header = rows[index]
+    data_rows = rows[index + 1 :]
+    blank_rows = sum(not any(value.strip() for value in row) for row in data_rows)
+    retained = [row for row in data_rows if any(value.strip() for value in row)]
+    malformed = sum(len(row) != len(header) for row in retained)
+    duplicates = sorted({value for value in normalized if normalized.count(value) > 1})
+    valid = not malformed and not duplicates and all(normalized)
+    hinted = sorted(
+        table
+        for table, hints in AUTHORIZED_TABLE_HINTS.items()
+        if set(hints).intersection(normalized)
+    )
+    return {
+        "format": "csv",
+        "encoding": encoding,
+        "encoding_state": "KNOWN_UTF8" if encoding == "utf-8-sig" else "UNRESOLVED_SINGLE_BYTE",
+        "delimiter": delimiter,
+        "header_record": index + 1,
+        "preamble": rows[:index],
+        "logical_rows": len(retained),
+        "header": header,
+        "schema_mapping": [
+            {"raw": raw_name, "normalized": name} for raw_name, name in zip(header, normalized)
+        ],
+        "duplicate_normalized_fields": duplicates,
+        "row_arithmetic": {
+            "source": len(data_rows),
+            "retained": len(retained),
+            "excluded_blank": blank_rows,
+            "malformed": malformed,
+        },
+        "schema_state": "PASS" if valid else "UNRESOLVED",
+        "authorized_table_hints": hinted if valid else [],
+    }
 
 
-def inspect_parquet(path: Path) -> dict[str, Any]:
+def inspect_parquet(path: Path, raw: bytes | None = None) -> dict[str, Any]:
     try:
         import pandas as pd
 
-        frame = pd.read_parquet(path)
+        frame = pd.read_parquet(io.BytesIO(raw) if raw is not None else path)
         header = [str(column) for column in frame.columns]
         header_text = " ".join(header).lower()
         hinted = sorted(
@@ -97,27 +142,56 @@ def inspect_parquet(path: Path) -> dict[str, Any]:
         return {
             "format": "parquet",
             "logical_rows": len(frame),
-            "header": header[:40],
+            "header": header,
             "authorized_table_hints": hinted,
         }
     except Exception as exc:  # noqa: BLE001
         return {"format": "parquet", "logical_rows": None, "header": [], "error": str(exc)}
 
 
-def inspect_path(path: Path) -> dict[str, Any]:
-    if not path.exists():
-        return {"path": str(path), "exists": False, "classification": "UNRESOLVED"}
+def inspect_path(path: Path, snapshot_dir: Path | None = None) -> dict[str, Any]:
+    if not path.is_file():
+        return {
+            "path": str(path),
+            "exists": path.exists(),
+            "classification": "UNRESOLVED",
+            "inclusion_decision": "preserve_blocker",
+            "error": "not_a_readable_file",
+        }
+    try:
+        raw = path.read_bytes()
+    except OSError:
+        return {
+            "path": str(path),
+            "exists": True,
+            "classification": "UNRESOLVED",
+            "inclusion_decision": "preserve_blocker",
+            "error": "source_unreadable",
+        }
+    digest = hashlib.sha256(raw).hexdigest()
     record: dict[str, Any] = {
         "path": str(path),
         "exists": True,
-        "byte_size": path.stat().st_size,
-        "sha256": sha256_file(path),
+        "byte_size": len(raw),
+        "sha256": digest,
+        "identity_effect": "NONE",
+        "authorization": "UNPROVEN",
     }
+    if snapshot_dir is not None:
+        snapshot_dir.mkdir(parents=True, exist_ok=True)
+        target = snapshot_dir / digest
+        if target.exists():
+            if target.read_bytes() != raw:
+                raise ValueError("snapshot digest collision or corrupted stored bytes")
+        else:
+            with target.open("xb") as handle:
+                handle.write(raw)
+        record["snapshot_relative_path"] = "inputs/" + digest
     suffix = path.suffix.lower()
     if suffix == ".csv":
-        record.update(inspect_csv(path))
+        record.update(inspect_csv(path, raw))
     elif suffix == ".parquet":
-        record.update(inspect_parquet(path))
+        record.update(inspect_parquet(path, raw))
     elif suffix == ".pdf":
         record.update({"format": "pdf", "logical_rows": None, "header": []})
     else:
@@ -142,7 +216,10 @@ def inspect_path(path: Path) -> dict[str, Any]:
 
 
 def build_receipt(report_dir: Path) -> dict[str, Any]:
-    records = [inspect_path(path) for path in KNOWN_PATHS]
+    receipt_path = report_dir / "hud_drgr_authorized_pursuit_receipt.json"
+    if receipt_path.exists():
+        raise FileExistsError("Use a new report directory to preserve the prior source snapshot")
+    records = [inspect_path(path, report_dir / "inputs") for path in KNOWN_PATHS]
     authorized = [r for r in records if r.get("classification") == "FOUND_AUTHORIZED_CANDIDATE"]
     receipt = {
         "receipt_type": "moneysweep_hud_drgr_authorized_pursuit",
@@ -160,9 +237,10 @@ def build_receipt(report_dir: Path) -> dict[str, Any]:
         },
         "records": records,
         "result_state": "FOUND_AUTHORIZED_CANDIDATE" if authorized else "PARTIAL_UNRESOLVED",
-        "blocker": None
-        if authorized
-        else "No non-empty authorized HUD DRGR activity/project/drawdown export is proven.",
+        "authorization": "UNPROVEN",
+        "identity_effect": "NONE",
+        "discovery_scope": "EXPLICIT_PATH_LIST_NOT_EXHAUSTIVE",
+        "blocker": "No authorized HUD DRGR export is proven; candidates require independent authorization and ingestion review.",
     }
     report_dir.mkdir(parents=True, exist_ok=True)
     (report_dir / "hud_drgr_authorized_pursuit_receipt.json").write_text(
@@ -193,7 +271,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--report-dir", default=None)
     args = parser.parse_args(argv)
-    report_dir = Path(args.report_dir) if args.report_dir else DEFAULT_REPORT_ROOT / "hud_drgr_pursuit"
+    report_dir = (
+        Path(args.report_dir) if args.report_dir else DEFAULT_REPORT_ROOT / "hud_drgr_pursuit"
+    )
     receipt = build_receipt(report_dir)
     print(json.dumps({k: receipt[k] for k in ("result_state", "arithmetic", "blocker")}, indent=2))
     return 0
