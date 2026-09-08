@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://federation.local/schemas/federation_spatial_identity_v1_1.schema.json",
+  "title": "Federation Spatial Identity v1.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "source_manifestations", "geometry_manifestations", "canonical_entities", "identity_bindings", "unresolved"],
+  "$defs": {
+    "non_empty_string": {"type":"string","pattern":"^(?:\\S|\\S.*\\S)$"},
+    "sha256": {"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "cert_state": {"enum":["PASS","FAIL","OPEN","BLOCKED","PROVISIONAL","AUDIT_ONLY","NONCANONICAL","CANDIDATE_NOT_IDENTITY","UNRESOLVED","SUPERSEDED"]},
+    "cardinality": {"enum":["1:1","1:N","N:1","N:N","0:1","UNRESOLVED"]},
+    "spatial_state": {"enum":["FULLY_WITHIN","PARTIAL","TOUCH_ONLY","OUTSIDE","NULL_EMPTY","UNRESOLVED"]},
+    "source_manifestation": {
+      "type":"object","additionalProperties":false,
+      "required":["manifestation_id","source_id","retrieved_at","byte_sha256","provenance"],
+      "properties":{
+        "manifestation_id":{"$ref":"#/$defs/non_empty_string"},
+        "source_id":{"$ref":"#/$defs/non_empty_string"},
+        "source_url":{"type":["string","null"]},
+        "retrieved_at":{"type":"string","format":"date-time"},
+        "refresh_date":{"type":["string","null"],"format":"date"},
+        "query":{"type":["string","null"]},
+        "page_offset":{"type":["string","integer","null"]},
+        "byte_sha256":{"$ref":"#/$defs/sha256"},
+        "schema_sha256":{"anyOf":[{"$ref":"#/$defs/sha256"},{"type":"null"}]},
+        "row_count":{"type":["integer","null"],"minimum":0},
+        "provenance":{"type":"object"}
+      }
+    },
+    "geometry_manifestation": {
+      "type":"object","additionalProperties":false,
+      "required":["geometry_manifestation_id","source_manifestation_id","geometry","crs","geometry_type","geometry_status"],
+      "properties":{
+        "geometry_manifestation_id":{"$ref":"#/$defs/non_empty_string"},
+        "source_manifestation_id":{"$ref":"#/$defs/non_empty_string"},
+        "geometry":{"type":["object","null"]},
+        "crs":{"type":"string","pattern":"^(EPSG:[0-9]+|OGC:CRS84)$"},
+        "geometry_type":{"type":"string","minLength":1},
+        "has_z":{"type":"boolean"},
+        "has_m":{"type":"boolean"},
+        "geometry_status":{"$ref":"#/$defs/cert_state"},
+        "logical_sha256":{"anyOf":[{"$ref":"#/$defs/sha256"},{"type":"null"}]}
+      }
+    },
+    "canonical_entity": {
+      "type":"object","additionalProperties":false,
+      "required":["canonical_id","entity_type","canonical_name","identity_state","source_manifestations","geometry_manifestations"],
+      "properties":{
+        "canonical_id":{"$ref":"#/$defs/non_empty_string"},
+        "entity_type":{"$ref":"#/$defs/non_empty_string"},
+        "canonical_name":{"$ref":"#/$defs/non_empty_string"},
+        "aliases":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/non_empty_string"}},
+        "identity_state":{"$ref":"#/$defs/cert_state"},
+        "source_manifestations":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/non_empty_string"}},
+        "geometry_manifestations":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/non_empty_string"}},
+        "valid_from":{"type":["string","null"],"format":"date-time"},
+        "valid_to":{"type":["string","null"],"format":"date-time"}
+      }
+    },
+    "identity_binding": {
+      "type":"object","additionalProperties":false,
+      "required":["binding_id","left_id","right_id","cardinality","evidence_basis","evidence_state","identity_state"],
+      "properties":{
+        "binding_id":{"$ref":"#/$defs/non_empty_string"},
+        "left_id":{"$ref":"#/$defs/non_empty_string"},
+        "right_id":{"anyOf":[{"$ref":"#/$defs/non_empty_string"},{"type":"null"}]},
+        "cardinality":{"$ref":"#/$defs/cardinality"},
+        "evidence_basis":{"type":"array","minItems":1,"uniqueItems":true,"items":{"$ref":"#/$defs/non_empty_string"}},
+        "evidence_state":{"enum":["FACT","COMPUTED","BINDING","INFERENCE","ASSUMPTION","HYPOTHESIS","UNKNOWN"]},
+        "identity_state":{"$ref":"#/$defs/cert_state"},
+        "spatial_state":{"anyOf":[{"$ref":"#/$defs/spatial_state"},{"type":"null"}]},
+        "notes":{"type":["string","null"]}
+      }
+    },
+    "unresolved_record": {
+      "type":"object","additionalProperties":false,
+      "required":["scope","reason","state"],
+      "properties":{
+        "scope":{"$ref":"#/$defs/non_empty_string"},
+        "reason":{"$ref":"#/$defs/non_empty_string"},
+        "state":{"$ref":"#/$defs/cert_state"}
+      }
+    }
+  },
+  "properties": {
+    "contract_version":{"const":"federation-spatial-contract/1.1"},
+    "source_manifestations":{"type":"array","items":{"$ref":"#/$defs/source_manifestation"}},
+    "geometry_manifestations":{"type":"array","items":{"$ref":"#/$defs/geometry_manifestation"}},
+    "canonical_entities":{"type":"array","items":{"$ref":"#/$defs/canonical_entity"}},
+    "identity_bindings":{"type":"array","items":{"$ref":"#/$defs/identity_binding"}},
+    "unresolved":{"type":"array","items":{"$ref":"#/$defs/unresolved_record"}}
+  }
+}

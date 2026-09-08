@@ -32,6 +32,25 @@ class UnifiedSkillpackConformanceTests(unittest.TestCase):
             target = entry["unified_target"].split("#", 1)[1]
             self.assertIn(f'<a id="{target}"></a>', skill, entry["capability_id"])
 
+    def test_spatial_architecture_allowlist_is_exact(self) -> None:
+        manifest = json.loads((ROOT / ".claude/skillpacks/MANIFEST.json").read_text())
+        allowed = manifest["allowed_change_paths"]
+        intended = {
+            "docs/SPATIAL_BINDING_CONTRACT_V1.md",
+            "schemas/federation_spatial_identity_v1_1.schema.json",
+            "schemas/federation_spatial_migration_receipt_v1_1.schema.json",
+            "scripts/build_federation_spatial_bindings_v1_1.py",
+            "tests/test_federation_spatial_bindings_v1_1.py",
+        }
+        self.assertTrue(intended.issubset(allowed))
+        for near_miss in (
+            "docs/SPATIAL_BINDING_CONTRACT_V1.md.bak",
+            "schemas/federation_spatial_identity_v1_1.schema.json/extra",
+            "scripts/build_federation_spatial_bindings_v1_1.pyc",
+            "tests/test_federation_spatial_bindings_v1_1.py.bak",
+        ):
+            self.assertFalse(MODULE.is_allowed_path(near_miss, allowed), near_miss)
+
 
 if __name__ == "__main__":
     unittest.main()

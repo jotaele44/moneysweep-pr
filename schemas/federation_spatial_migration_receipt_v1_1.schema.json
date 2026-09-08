@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://federation.local/schemas/federation_spatial_migration_receipt_v1_1.schema.json",
+  "title": "Federation Spatial Migration Receipt v1.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "migration_id",
+    "producer_repo",
+    "source_count",
+    "retained_count",
+    "excluded_count",
+    "unresolved_count",
+    "join_output_count",
+    "declared_cardinality",
+    "multiplication_expected",
+    "provenance"
+  ],
+  "$defs": {
+    "non_empty_string": {"type": "string", "pattern": "^(?:\\S|\\S.*\\S)$"}
+  },
+  "properties": {
+    "contract_version": {"const": "federation-spatial-migration/1.1"},
+    "migration_id": {"$ref": "#/$defs/non_empty_string"},
+    "producer_repo": {"enum": ["spiderweb-pr", "aguayluz-pr", "moneysweep-pr", "skywatcher-pr", "thehub-pr"]},
+    "source_count": {"type": "integer", "minimum": 0},
+    "retained_count": {"type": "integer", "minimum": 0},
+    "excluded_count": {"type": "integer", "minimum": 0},
+    "unresolved_count": {"type": "integer", "minimum": 0},
+    "join_output_count": {"type": "integer", "minimum": 0},
+    "declared_cardinality": {"enum": ["1:1", "1:N", "N:1", "N:N", "0:1", "UNRESOLVED"]},
+    "multiplication_expected": {"type": "boolean", "default": false},
+    "multiplication_reason": {"anyOf": [{"$ref": "#/$defs/non_empty_string"}, {"type": "null"}]},
+    "source_manifestation_ids": {"type": "array", "items": {"$ref": "#/$defs/non_empty_string"}, "uniqueItems": true},
+    "output_manifestation_ids": {"type": "array", "items": {"$ref": "#/$defs/non_empty_string"}, "uniqueItems": true},
+    "provenance": {"type": "object"},
+    "notes": {"anyOf": [{"$ref": "#/$defs/non_empty_string"}, {"type": "null"}]}
+  }
+}
