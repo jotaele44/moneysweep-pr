@@ -33,7 +33,8 @@ KNOWN_PATHS = [
     / "2024/ACT/transicion2024_archive/files/by_agency/078/Informe_Acciones_Judiciales/Informe_Acciones_Judiciales_CDBG-DR-MIT.pdf",
     FINANCIALS / "Documents/contractdata/data/staging/processed/pr_hud_hcv.csv",
     FINANCIALS / "Documents/contractdata/data/normalized/hud_drgr_projects.parquet",
-    FINANCIALS / "Documents/contractdata/data/normalized/hud_drgr_responsible_orgs_resolved.parquet",
+    FINANCIALS
+    / "Documents/contractdata/data/normalized/hud_drgr_responsible_orgs_resolved.parquet",
 ]
 
 AUTHORIZED_TABLE_HINTS = {
@@ -193,7 +194,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--report-dir", default=None)
     args = parser.parse_args(argv)
-    report_dir = Path(args.report_dir) if args.report_dir else DEFAULT_REPORT_ROOT / "hud_drgr_pursuit"
+    report_dir = (
+        Path(args.report_dir) if args.report_dir else DEFAULT_REPORT_ROOT / "hud_drgr_pursuit"
+    )
     receipt = build_receipt(report_dir)
     print(json.dumps({k: receipt[k] for k in ("result_state", "arithmetic", "blocker")}, indent=2))
     return 0

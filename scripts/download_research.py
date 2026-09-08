@@ -16,6 +16,7 @@ Usage:
 
 import sys
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -206,7 +207,7 @@ def download_nih(root: Path, force: bool, logger) -> pd.DataFrame:
 
     while True:
         page_num += 1
-        payload = {
+        payload: dict[str, Any] = {
             "criteria": {
                 "org_states": ["PR"],
                 "date_start": "2000-01-01",
