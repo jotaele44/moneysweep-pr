@@ -6,19 +6,45 @@
       "classification": "analysis",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Diagnostic Top-25 financial rankings backed by explicit metric ontology, stable canonical_v1 entity IDs, reconciliation accounting and source manifestations. Unsupported categories fail closed rather than synthesizing incomparable measures.",
+      "rationale": "Diagnostic evidence-preserving financial rankings, frozen history, typed investigation signals and entity neighborhoods. Each measure has an explicit adapter/identity contract; unsupported or unmaterialized categories fail closed. MoneySweep exposes municipality references but does not claim geometry authority.",
       "backend": {
-        "files": ["server/backend/leaderboards.py", "server/backend/main.py", "config/financial_category_ontology.json"],
-        "endpoints": ["GET /leaderboards/categories", "GET /leaderboards/top", "GET /leaderboards/movers"]
+        "files": [
+          "server/backend/leaderboards.py",
+          "server/backend/leaderboard_adapters.py",
+          "server/backend/leaderboard_history.py",
+          "server/backend/leaderboard_investigation.py",
+          "server/backend/leaderboard_entities.py",
+          "server/backend/main.py",
+          "config/financial_category_ontology.json"
+        ],
+        "endpoints": [
+          "GET /leaderboards/categories",
+          "GET /leaderboards/top",
+          "GET /leaderboards/history",
+          "GET /leaderboards/movers",
+          "GET /leaderboards/signals",
+          "GET /leaderboards/entity/{entity_id}"
+        ]
+      },
+      "analysis": {
+        "files": ["scripts/materialize_leaderboard_snapshot.py"]
       },
       "frontend": {
         "routes": ["/"],
         "e2e_routes": ["/"],
-        "components": ["dashboard/src/lib/api.js", "dashboard/src/pages/Dashboard.jsx", "dashboard/src/components/FinancialLeaderboards.jsx"],
+        "components": [
+          "dashboard/src/lib/api.js",
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/FinancialLeaderboards.jsx"
+        ],
         "discoverability": ["dashboard/src/pages/Dashboard.jsx"]
       },
       "tests": {
-        "backend": ["tests/test_leaderboards.py"],
+        "backend": [
+          "tests/test_leaderboards.py",
+          "tests/test_leaderboard_adapters.py",
+          "tests/test_leaderboard_history.py"
+        ],
         "contract": ["tests/test_gui_parity.py"],
         "e2e": ["dashboard/tests/financial-leaderboards.spec.mjs"]
       }
