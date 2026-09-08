@@ -336,7 +336,9 @@ def download_nih(root: Path, force: bool, logger) -> pd.DataFrame:
 
     if not all_records:
         logger.warning("NIH: no records retrieved — returning empty DataFrame.")
-        return pd.DataFrame(columns=MASTER_COLUMNS + ["agency_code"])
+        empty = pd.DataFrame(columns=MASTER_COLUMNS + ["agency_code"])
+        _write_cache_atomic(empty, raw_path)
+        return empty
 
     df = pd.DataFrame(all_records)
     _write_cache_atomic(df, raw_path)
@@ -466,7 +468,9 @@ def download_nsf(root: Path, force: bool, logger) -> pd.DataFrame:
 
     if not all_records:
         logger.warning("NSF: no records retrieved — returning empty DataFrame.")
-        return pd.DataFrame(columns=MASTER_COLUMNS)
+        empty = pd.DataFrame(columns=MASTER_COLUMNS)
+        _write_cache_atomic(empty, raw_path)
+        return empty
 
     df = pd.DataFrame(all_records)
     _write_cache_atomic(df, raw_path)

@@ -103,3 +103,22 @@ def test_nih_total_change_preserves_cache(tmp_path, monkeypatch):
     with pytest.raises(RuntimeError, match="total changed"):
         research.download_nih(tmp_path, True, logging.getLogger(__name__))
     assert not (research._raw_research_dir(tmp_path) / "nih_raw.csv").exists()
+
+
+@pytest.mark.parametrize("agency", ["nih", "nsf"])
+def test_successful_empty_refresh_replaces_stale_cache(tmp_path, monkeypatch, agency):
+    cache = research._raw_research_dir(tmp_path) / f"{agency}_raw.csv"
+    cache.write_text("award_id\nprevious\n")
+    response = Mock()
+    response.json.return_value = (
+        {"meta": {"total": 0}, "results": []}
+        if agency == "nih"
+        else {"response": {"@status": "OK", "award": []}}
+    )
+    request = Mock(return_value=response)
+    monkeypatch.setattr(research.requests, "post" if agency == "nih" else "get", request)
+    download = getattr(research, f"download_{agency}")
+    assert download(tmp_path, True, logging.getLogger(__name__)).empty
+    assert "previous" not in cache.read_text()
+    assert download(tmp_path, False, logging.getLogger(__name__)).empty
+    assert request.call_count == 1
