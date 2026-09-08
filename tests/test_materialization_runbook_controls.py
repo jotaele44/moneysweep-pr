@@ -77,6 +77,11 @@ def test_materialization_readiness_snapshot_matches_runbook_counts():
     # +1 automatable_total/automatable_ready. Its detail-enrichment pass
     # (scripts/enrich_rdc_details.py) is a second stage of the same source, not
     # a separate registry entry, so it adds nothing to these counts.
+    # hacienda_sut_ivu promoted scraper_needed -> api_producer: it now parses the
+    # live monthly IVU/SUT distribution PDFs from hacienda.pr.gov
+    # (scripts/download_hacienda_sut_ivu.py) instead of waiting on a scraping
+    # adapter. +1 automatable_total/automatable_ready, -1 queued_excluded_total
+    # (scraper_needed 2 -> 1). Only pr_act_154_excise remains scraper_needed.
     live = build_summary(build_rows())
     assert snapshot["total_sources"] == live["total_sources"]
     assert snapshot["automatable_total"] == live["automatable_total"]
