@@ -20,7 +20,9 @@ from server.backend.leaderboard_adapters import (
     contract_awards,
     run_adapter,
 )
+from server.backend.leaderboard_entities import build_entity_drilldown
 from server.backend.leaderboard_history import latest_movers, list_snapshots
+from server.backend.leaderboard_investigation import build_signals
 
 ROOT = Path(__file__).resolve().parents[2]
 ONTOLOGY_PATH = ROOT / "config" / "financial_category_ontology.json"
@@ -86,8 +88,6 @@ def build_ranking(
         entity_type=entity_type,
         currency=currency,
     )
-    # Ontology and implementation must agree on the ranking contract.  This
-    # catches stale adapters before a snapshot can freeze a non-comparable run.
     if result.get("rankingVersion") != ontology["ranking_contract_version"]:
         raise HTTPException(
             500,
@@ -103,8 +103,6 @@ def build_ranking(
 
 
 # Compatibility seam retained for existing focused tests and downstream code.
-# It delegates to the canonical adapter rather than maintaining a second
-# implementation.
 def _contract_award_ranking(
     data: dict[str, pd.DataFrame],
     *,
@@ -185,5 +183,32 @@ def create_router(data: dict[str, pd.DataFrame]) -> APIRouter:
     @router.get("/movers")
     def movers(category: str = "contract_award", limit: int = Query(10, ge=1, le=25)):
         return latest_movers(category, limit=limit)
+
+    @router.get("/signals")
+    def signals(
+        category: str = "contract_award",
+        limit: int = Query(25, ge=1, le=25),
+        start_year: int | None = None,
+        end_year: int | None = None,
+        municipality: str | None = None,
+        entity_type: str | None = None,
+        currency: str | None = None,
+    ):
+        ranking = build_ranking(
+            data,
+            category=category,
+            limit=limit,
+            start_year=start_year,
+            end_year=end_year,
+            municipality=municipality,
+            entity_type=entity_type,
+            currency=currency,
+        )
+        movement = latest_movers(category, limit=10)
+        return build_signals(ranking, movement)
+
+    @router.get("/entity/{entity_id}")
+    def entity_drilldown(entity_id: str):
+        return build_entity_drilldown(data, entity_id)
 
     return router
