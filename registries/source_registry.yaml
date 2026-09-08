@@ -2051,8 +2051,8 @@ sources:
   family: territorial
   required: false
   authentication: none
-  endpoint_url: https://hacienda.pr.gov/inversionistas/estadisticas-y-recaudos-statistics-and-revenues
-  producer_script: scripts/download_coverage_gap_intake.py
+  endpoint_url: https://hacienda.pr.gov/inversionistas/estadisticas-y-recaudos-statistics-and-revenues/ingresos-del-impuesto-sobre-ventas-y-uso-ivu-sales-and-use-tax-sut-revenues
+  producer_script: scripts/download_hacienda_sut_ivu.py
   expected_outputs:
   - data/staging/processed/pr_hacienda_sut_ivu.csv
   schema_version: r5_v1
@@ -2060,9 +2060,15 @@ sources:
     min_rows: 0
   update_cadence: monthly
   notes: 'PR Treasury Sales & Use Tax (IVU/SUT) collections by fiscal year / month
-    / NAICS, plus COFIM municipal IVU — the largest PR consumption-tax revenue stream,
-    not otherwise captured. Scraper surface (hacienda.pr.gov bulk tables); queued
-    for a scraping adapter (scraper_needed).
+    / tax-tranche category (5.5% SUT, 4.5% SUT Surcharge, 4% Services SUT, 0.5% FAM
+    SUT, 1% Municipal SUT, Subtotal, Penalties, Total SUT Collections, Unallocated
+    balances, General Fund) — the largest PR consumption-tax revenue stream, not
+    otherwise captured. Live PDF producer (scripts/download_hacienda_sut_ivu.py);
+    promoted from scraper_needed to api_producer. Scoped to the current single-fiscal-year
+    report template only (recent fiscal years, monthly-updated); older multi-year-table
+    PDFs (pre-FY2018-19-era) use an incompatible layout and are out of scope — see
+    that script''s docstring. NAICS-level and COFIM-municipal-IVU breakdowns are a
+    separate Hacienda report not covered by this adapter.
 
     '
 - source_id: census_gov_finances
