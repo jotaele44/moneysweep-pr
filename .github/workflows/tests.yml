@@ -29,7 +29,7 @@ jobs:
         run: test ! -e "$GITHUB_WORKSPACE/../thehub-pr"
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt httpx jsonschema -r server/backend/requirements.txt
+          python -m pip install -r requirements-dev.txt httpx jsonschema -r server/backend/requirements.txt
           test ! -e "$GITHUB_WORKSPACE/../thehub-pr"
       - name: Federation manifest gate
         run: |
