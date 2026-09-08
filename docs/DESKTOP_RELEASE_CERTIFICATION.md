@@ -96,6 +96,17 @@ A `desktop-v*` public release is different. It fails closed unless:
 An unsigned test artifact must never be relabeled as the final double-click
 release.
 
+### Source-checkout wrapper is outside this claim
+
+The committed repo-root wrapper (`PRII-MONEYSWEEP.app` and the shell launchers)
+is not covered by the signing, notarization or Gatekeeper gates above and is
+never certified by them. It is unsigned by construction, so it always costs one
+Gatekeeper approval per machine; its first run also requires an externally
+installed Python 3.11+ and either network access or an operator-supplied
+wheelhouse. See `desktop/README.md` and `docs/DESKTOP_OFFLINE_BOOTSTRAP.md`.
+Activation of the signing path for the frozen build is documented in
+`docs/APPLE_NOTARIZATION_RUNBOOK.md`.
+
 ## Clean-machine certification
 
 CI frozen-runtime self-tests are necessary but do not universally prove Finder

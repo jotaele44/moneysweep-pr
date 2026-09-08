@@ -45,6 +45,8 @@ def test_node_version_supported_rejects_unsupported_runtimes(version: str) -> No
 
 
 def test_setup_frontend_rejects_node_20_before_npm_install(monkeypatch) -> None:
+    # force_build skips the prebuilt-bundle fast path, so this still exercises the
+    # npm branch's engine guard now that Node is no longer required by default.
     monkeypatch.setattr(setup.shutil, "which", lambda command: f"/usr/bin/{command}")
     monkeypatch.setattr(
         setup.subprocess,
@@ -53,4 +55,25 @@ def test_setup_frontend_rejects_node_20_before_npm_install(monkeypatch) -> None:
     )
 
     with pytest.raises(SystemExit, match=r"Node\.js .* required .* found v20\.20\.0"):
-        setup.setup_frontend()
+        setup.setup_frontend(force_build=True)
+
+
+def test_setup_frontend_default_path_never_consults_node(monkeypatch, tmp_path) -> None:
+    """The regression guard for the first-run failure this whole change fixes.
+
+    Without a dashboard build present, setup_frontend must reach the committed
+    prebuilt bundle without ever asking whether Node.js exists.
+    """
+    dist = tmp_path / "dist"
+
+    def fail_if_called(*args, **kwargs):  # pragma: no cover - only runs on regression
+        raise AssertionError("setup_frontend consulted the Node toolchain")
+
+    monkeypatch.setattr(setup.shutil, "which", fail_if_called)
+    monkeypatch.setattr(setup.subprocess, "run", fail_if_called)
+    monkeypatch.setattr(setup, "DIST_DIR", dist)
+    monkeypatch.setattr(setup, "source_build_available", lambda: False)
+
+    setup.setup_frontend()
+
+    assert (dist / "index.html").is_file()

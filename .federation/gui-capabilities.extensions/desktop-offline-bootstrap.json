@@ -1,0 +1,50 @@
+{
+  "capabilities": [
+    {
+      "id": "desktop-offline-bootstrap",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "First-run plumbing for the source-checkout desktop wrapper: it installs the committed dashboard bundle instead of requiring Node.js, and reports which prerequisite blocks setup. Both run before any window exists, so their results surface in the launcher's own failure dialog rather than as separate interactive GUI capabilities.",
+      "candidate_ids": [
+        "analysis_module:scripts/build_prebuilt_dashboard.py",
+        "analysis_symbol:scripts/build_prebuilt_dashboard.py:main",
+        "cli_surface:desktop/preflight.py",
+        "cli_surface:scripts/build_prebuilt_dashboard.py",
+        "python_module:desktop/prebuilt.py",
+        "python_module:desktop/preflight.py",
+        "python_module:scripts/build_prebuilt_dashboard.py",
+        "python_symbol:desktop/prebuilt.py:build_manifest",
+        "python_symbol:desktop/prebuilt.py:bundle_file_records",
+        "python_symbol:desktop/prebuilt.py:environment_description",
+        "python_symbol:desktop/prebuilt.py:install_prebuilt_dashboard",
+        "python_symbol:desktop/prebuilt.py:is_stale",
+        "python_symbol:desktop/prebuilt.py:iter_fingerprint_inputs",
+        "python_symbol:desktop/prebuilt.py:load_manifest",
+        "python_symbol:desktop/prebuilt.py:record_source_build",
+        "python_symbol:desktop/prebuilt.py:sha256_file",
+        "python_symbol:desktop/prebuilt.py:source_fingerprint",
+        "python_symbol:desktop/prebuilt.py:verify_bundle_bytes",
+        "python_symbol:desktop/preflight.py:check_checkout_intact",
+        "python_symbol:desktop/preflight.py:check_checkout_writable",
+        "python_symbol:desktop/preflight.py:check_dashboard_bundle",
+        "python_symbol:desktop/preflight.py:check_disk_space",
+        "python_symbol:desktop/preflight.py:check_git_available",
+        "python_symbol:desktop/preflight.py:check_network",
+        "python_symbol:desktop/preflight.py:check_python_version",
+        "python_symbol:desktop/preflight.py:check_venv_available",
+        "python_symbol:desktop/preflight.py:format_text",
+        "python_symbol:desktop/preflight.py:main",
+        "python_symbol:desktop/preflight.py:run_checks",
+        "python_symbol:desktop/preflight.py:setup_is_complete",
+        "python_symbol:desktop/setup.py:clear_macos_quarantine",
+        "python_symbol:desktop/setup.py:has_wheelhouse",
+        "python_symbol:desktop/setup.py:report_blocking_prerequisites",
+        "python_symbol:desktop/setup.py:setup_frontend",
+        "python_symbol:desktop/setup.py:source_build_available",
+        "python_symbol:desktop/setup.py:wheelhouse_dir"
+      ]
+    }
+  ],
+  "exceptions": []
+}

@@ -14,14 +14,42 @@ The pipeline acquires, normalizes, validates, and cross-links public procurement
 
 ## Desktop app
 
-Double-click launchers at the repo root start the local desktop app (first run
-installs dependencies, later runs work offline):
+Double-click launchers at the repo root start the local desktop app:
 
 - `PRII-MONEYSWEEP.command` (macOS) / `PRII-MONEYSWEEP.app`
 - `PRII-MONEYSWEEP.bat` (Windows)
 - `PRII-MONEYSWEEP.sh` (Linux)
 
-See [`desktop/README.md`](desktop/README.md) for details.
+**Node.js is not required.** A prebuilt dashboard ships in the repository, so the
+first run only needs Python 3.11+ and one-time network access for Python
+packages. To skip the network too, see
+[`docs/DESKTOP_OFFLINE_BOOTSTRAP.md`](docs/DESKTOP_OFFLINE_BOOTSTRAP.md).
+
+### macOS: getting it without the Gatekeeper detour
+
+macOS marks anything a *browser* downloads with a quarantine flag, and this
+wrapper is not signed with a paid Apple Developer ID. Fetching the repository
+without a browser therefore avoids the prompt entirely:
+
+```bash
+git clone https://github.com/jotaele44/moneysweep-pr.git
+open moneysweep-pr/PRII-MONEYSWEEP.app
+```
+
+If you did download a ZIP through a browser, open
+**`PRII-MONEYSWEEP.command`** first rather than the `.app`. Approve it once
+(right-click → Open; on macOS 15+ use System Settings → Privacy & Security →
+Open Anyway), and setup clears the quarantine flag from the folder as it
+finishes — so every later launch, including the `.app`, opens with no prompt.
+
+Opening the `.app` first from a quarantined folder is the case that used to
+require moving the folder and running a repair script: macOS runs a quarantined
+bundle from a temporary read-only copy where the checkout beside it is missing.
+Starting from the `.command` avoids that entirely.
+
+See [`desktop/README.md`](desktop/README.md) for details, and
+[`docs/APPLE_NOTARIZATION_RUNBOOK.md`](docs/APPLE_NOTARIZATION_RUNBOOK.md) for
+what removes the remaining one-time approval.
 
 ## Federation role
 
