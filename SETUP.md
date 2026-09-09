@@ -56,20 +56,44 @@ python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}
 
 Local setup must not use `pip` or `uv pip install --system` outside `.venv`.
 
-## 3. Install dependencies
+## 3. Select a dependency profile
 
-For exact reproducibility after the Python 3.11 lockfile gate is green:
+The files have distinct ownership:
+
+| Profile | Files | Purpose |
+|---|---|---|
+| Certified-core runtime candidate | `requirements.in`, `requirements.txt`, `requirements.lock` | Pipeline, parsers, local storage, exports, and Hub runtime execution |
+| Audit/development | `requirements-dev.txt` | Runtime closure plus lint, typing, pytest, coverage, and type stubs |
+
+`requirements.in` and `requirements.txt` must remain byte-identical. The
+runtime lock must not contain pytest or pytest-cov. The development manifest
+includes runtime through `-r requirements.txt`; it does not duplicate the
+runtime list.
+
+For the exact runtime environment:
 
 ```bash
 python -m pip install -r requirements.lock
 ```
 
-For the looser development ranges:
+For development, audit, and tests:
 
 ```bash
-python -m pip install -r requirements.txt
 python -m pip install -r requirements-dev.txt
 ```
+
+Validate profile boundaries before installation:
+
+```bash
+python3 scripts/validate_dependency_planes.py
+# or
+make dependency-plane
+```
+
+The validator also checks `federation.json`: `setup` prepares the full audit/test
+environment, while `runtime_setup` installs only the runtime manifest. This
+preserves the existing Hub test contract without making test tooling part of
+the certified-core runtime profile.
 
 The Makefile assumes `.venv` is active and routes installs through `python -m pip`.
 
@@ -99,6 +123,7 @@ make check
 Equivalent commands:
 
 ```bash
+python3 scripts/validate_dependency_planes.py
 python -m compileall moneysweep scripts tests
 python -m pytest
 python -m mypy
@@ -108,7 +133,7 @@ ruff format --check .
 
 ## 6. Verify lockfile provenance
 
-The lockfile is generated with the same Python baseline as the workspace:
+The runtime lock is generated with the same Python baseline as the workspace:
 
 ```bash
 make lock-check
@@ -120,7 +145,11 @@ To regenerate deliberately:
 make lock
 ```
 
-The lockfile drift workflow recompiles with Python 3.11 and fails when the committed output differs. Do not edit the lockfile manually.
+The lockfile drift workflow recompiles with Python 3.11, reruns the dependency
+profile validator, and fails when the committed output differs. Do not edit the
+lockfile manually. The audit/development manifest remains separately pinned for
+the principal quality tools; a complete retained-byte development lock is still
+required before `OFFLINE_REPRODUCIBLE_BUILD` can pass.
 
 ## 7. Initialize optional data directories
 
@@ -171,6 +200,7 @@ Desktop and packaged-app procedures are governed separately by the shared `prii_
 | Python is not 3.11 | Recreate `.venv` with `python3.11 -m venv .venv` |
 | Shared package cannot resolve | Confirm network access to GitHub — the `prii-maintenance` dependency is fetched from a pinned `git+https` URL on install, not a local path |
 | `pip` writes outside the repository | Deactivate the global environment, activate `.venv`, and use `python -m pip` |
+| Dependency profile validation fails | Restore runtime/dev ownership before installing or regenerating locks |
 | Lockfile drift fails | Run `make lock` under Python 3.11 and review the complete diff |
 | Tests need absent local directories | Run `python scripts/setup_directories.py` |
 | Live-source command requests credentials | Stop unless the specific live execution has been authorized |
@@ -183,5 +213,6 @@ Desktop and packaged-app procedures are governed separately by the shared `prii_
 | `scripts/config.py` | Central configuration |
 | `scripts/build_unified_master.py` | Core ETL |
 | `scripts/run_production_status_gate.py` | Production-readiness check |
+| `scripts/validate_dependency_planes.py` | Runtime/dev/Hub profile gate |
 | `federation.json` | Producer commands and readiness declaration |
 | `Makefile` | Local quality and lockfile commands |

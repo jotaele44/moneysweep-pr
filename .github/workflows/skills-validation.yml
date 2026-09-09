@@ -48,9 +48,11 @@ jobs:
           cache: pip
       - name: Assert isolated checkout
         run: test ! -e "$GITHUB_WORKSPACE/../thehub-pr"
+      - name: Validate dependency profiles
+        run: python3 scripts/validate_dependency_planes.py
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
           test ! -e "$GITHUB_WORKSPACE/../thehub-pr"
       - name: Validate skill packet
         run: python3 scripts/validate_skills.py

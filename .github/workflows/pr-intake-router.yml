@@ -20,25 +20,14 @@ on:
       - 'tests/fixtures/pr_intake_router_sample.jsonl'
       - 'tests/fixtures/pr_news_incoming_sample.jsonl'
       - '.github/workflows/pr-intake-router.yml'
-  # No path filter on pull_request: router-tests is a *required* status check
-  # on main, so it must report on every PR. A path-filtered required check
-  # never reports on PRs that don't touch these paths, permanently blocking
-  # the merge ("N of M required status checks are expected"). The push trigger
-  # stays path-filtered since push runs don't gate PR merges.
   pull_request:
   workflow_dispatch:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-# Least privilege: this workflow only reads the repo (and uploads artifacts,
-# which uses the runtime token, not GITHUB_TOKEN). Widen deliberately if a
-# step ever needs to write back.
 permissions:
   contents: read
 
-# Serialise runs on the same ref without cancelling. This workflow can
-# publish, write data, or hand off to another repo, and killing it
-# mid-flight risks leaving that work half-done.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
@@ -52,10 +41,10 @@ jobs:
         python-version: ['3.13']
 
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
@@ -63,8 +52,11 @@ jobs:
       - name: Assert isolated checkout
         run: test ! -e "$GITHUB_WORKSPACE/../thehub-pr"
 
+      - name: Validate dependency profiles
+        run: python3 scripts/validate_dependency_planes.py
+
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements-dev.txt
 
       - name: Run targeted router and producer tests
         # --no-cov: this job runs a small, targeted subset, so the repo-wide
@@ -86,7 +78,7 @@ jobs:
         run: cat data/exports/pr_intake_router/export_verification.json
 
       - name: Upload router exports
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: pr-intake-router-exports-py${{ matrix.python-version }}
           path: data/exports/pr_intake_router/

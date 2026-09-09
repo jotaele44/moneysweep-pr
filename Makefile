@@ -12,7 +12,7 @@ PYTHON_BASELINE ?= 3.11
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install-dev compileall lint format format-check type test test-fast cov \
+.PHONY: help install-dev dependency-plane compileall lint format format-check type test test-fast cov \
         lock lock-check precommit check
 
 help:  ## List available targets
@@ -22,6 +22,9 @@ help:  ## List available targets
 
 install-dev:  ## Install dev + runtime tooling (ruff, mypy, pytest, …)
 	$(PIP) install -r requirements-dev.txt
+
+dependency-plane:  ## Validate runtime/dev manifests and Hub setup profiles
+	$(PYTHON) scripts/validate_dependency_planes.py
 
 compileall:  ## Byte-compile moneysweep/scripts/tests (matches ci.yml's compile step)
 	$(PYTHON) -m compileall moneysweep scripts tests
@@ -47,15 +50,17 @@ test-fast:  ## pytest without coverage instrumentation (quick inner loop)
 cov:  ## pytest with a terminal coverage report
 	$(PYTHON) -m pytest --cov=scripts --cov=moneysweep --cov-report=term-missing
 
-lock:  ## Recompile requirements.lock from requirements.in for the local baseline
+lock:  ## Recompile requirements.lock from requirements.in and validate profiles
 	uv pip compile requirements.in --universal --python-version $(PYTHON_BASELINE) -o requirements.lock
+	$(PYTHON) scripts/validate_dependency_planes.py
 
 lock-check:  ## Fail if requirements.lock is stale vs requirements.in (CI: lockfile.yml)
 	uv pip compile requirements.in --universal --python-version $(PYTHON_BASELINE) -o - \
 		| diff -u requirements.lock - \
+		&& $(PYTHON) scripts/validate_dependency_planes.py \
 		&& echo "requirements.lock is up to date"
 
 precommit:  ## Run every pre-commit hook over the whole tree (CI: pre-commit.yml)
 	pre-commit run --all-files
 
-check: compileall lint format-check type test  ## Run the full gating quality bar locally
+check: dependency-plane compileall lint format-check type test  ## Run the full gating quality bar locally
