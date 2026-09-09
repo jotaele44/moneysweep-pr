@@ -16,6 +16,7 @@ Security contract
   authenticated principal's server-configured clearance.
 * X-Case-Actor may only echo the server-derived actor; a mismatched value is
   rejected rather than trusted.
+* Invalid or non-header-safe server identity configuration fails closed.
 * Credentials are never stored in tracked files.
 """
 
@@ -53,6 +54,14 @@ def _configured_principal() -> tuple[str, CasePrincipal] | None:
     clearance = os.environ.get("MONEYSWEEP_CASE_CLEARANCE", _DEFAULT_CLEARANCE).strip().lower()
     if not actor:
         raise RuntimeError("MONEYSWEEP_CASE_ACTOR must not be empty when PRII_WRITE_TOKEN is set")
+    if "\r" in actor or "\n" in actor:
+        raise RuntimeError("MONEYSWEEP_CASE_ACTOR must not contain control-line characters")
+    try:
+        actor.encode("latin-1")
+    except UnicodeEncodeError as exc:
+        raise RuntimeError(
+            "MONEYSWEEP_CASE_ACTOR must be HTTP-header-safe Latin-1 text"
+        ) from exc
     if clearance not in _VISIBILITY_RANK:
         raise RuntimeError(
             "MONEYSWEEP_CASE_CLEARANCE must be one of public|internal|restricted "
