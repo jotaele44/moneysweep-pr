@@ -29,7 +29,98 @@ def is_allowed_path(path: str, allowed_paths: list[str]) -> bool:
     )
 
 
-def validate(root: Path) -> dict[str, Any]:
+def validate_scope(
+    root: Path,
+    binding: dict[str, Any],
+    manifest: dict[str, Any],
+    base: str,
+    head: str,
+    label: str,
+) -> list[str]:
+    errors = []
+    for revision, role in ((base, "base"), (head, "head")):
+        if run_git(root, "cat-file", "-e", f"{revision}^{{commit}}").returncode != 0:
+            errors.append(f"{label} {role} commit object is unavailable: {revision}")
+    if errors:
+        return errors
+    if run_git(root, "merge-base", "--is-ancestor", base, head).returncode != 0:
+        return [f"{label} base is not an ancestor of {head}"]
+
+    diff = run_git(root, "diff", "--no-renames", "--name-only", f"{base}..{head}")
+    if diff.returncode != 0:
+        return [f"{label} git diff failed"]
+    changed = [path for path in diff.stdout.splitlines() if path]
+    for path in changed:
+        if not is_allowed_path(path, manifest["allowed_change_paths"]):
+            errors.append(f"{label} out-of-scope change: {path}")
+    for surface in binding.get("legacy_surfaces", []):
+        for path in changed:
+            if is_allowed_path(path, [surface, surface.rstrip("/") + "/"]):
+                errors.append(f"{label} legacy surface was modified: {surface}")
+    return errors
+
+
+def validate_git_history(
+    root: Path, binding: dict[str, Any], manifest: dict[str, Any]
+) -> tuple[list[str], list[str]]:
+    errors = []
+    checks = [
+        "exact_base_ancestry",
+        "skillpack_introduction_identity",
+        "introduction_change_scope",
+        "legacy_introduction_separation",
+    ]
+    base = binding["pinned_base_commit"]
+    if run_git(root, "cat-file", "-e", f"{base}^{{commit}}").returncode != 0:
+        return [f"pinned base commit object is unavailable: {base}"], checks
+
+    introduction = run_git(
+        root,
+        "log",
+        "--reverse",
+        "--format=%H",
+        "--diff-filter=A",
+        "--",
+        ".claude/skillpacks/BINDING.json",
+    )
+    if introduction.returncode != 0:
+        return ["skillpack introduction lookup failed"], checks
+    introductions = [commit for commit in introduction.stdout.splitlines() if commit]
+    if len(introductions) != 1:
+        return [
+            f"expected exactly one skillpack introduction commit; found {len(introductions)}"
+        ], checks
+    intro = introductions[0]
+
+    if run_git(root, "merge-base", "--is-ancestor", base, intro).returncode != 0:
+        errors.append("pinned base is not an ancestor of skillpack introduction")
+    if run_git(root, "merge-base", "--is-ancestor", intro, "HEAD").returncode != 0:
+        errors.append("skillpack introduction is not an ancestor of HEAD")
+
+    parents = run_git(root, "rev-list", "--parents", "-n", "1", intro)
+    parent_tokens = parents.stdout.split() if parents.returncode == 0 else []
+    if len(parent_tokens) != 2:
+        errors.append("skillpack introduction must have exactly one parent")
+        return errors, checks
+    errors.extend(
+        validate_scope(
+            root,
+            binding,
+            manifest,
+            parent_tokens[1],
+            intro,
+            "skillpack introduction",
+        )
+    )
+    return errors, checks
+
+
+def validate(
+    root: Path,
+    *,
+    enforce_change_scope: bool = False,
+    change_base: str | None = None,
+) -> dict[str, Any]:
     skillpack_root = root / ".claude" / "skillpacks"
     errors = []
     binding = load_json(skillpack_root / "BINDING.json")
@@ -114,33 +205,24 @@ def validate(root: Path) -> dict[str, Any]:
         "repository_path_bindings",
     ]
     if (root / ".git").exists():
-        base = binding["pinned_base_commit"]
-        shallow = run_git(root, "rev-parse", "--is-shallow-repository")
-        is_shallow = shallow.returncode == 0 and shallow.stdout.strip() == "true"
-        base_obj = run_git(root, "cat-file", "-e", f"{base}^{{commit}}")
-        if base_obj.returncode != 0:
-            if is_shallow:
-                checks.append("git_history_deferred_shallow_checkout")
+        history_errors, history_checks = validate_git_history(root, binding, manifest)
+        errors.extend(history_errors)
+        checks.extend(history_checks)
+        if enforce_change_scope:
+            checks.append("current_change_scope")
+            if not change_base:
+                errors.append("current change scope requires an explicit change base")
             else:
-                errors.append("pinned base commit object is unavailable")
-        else:
-            if run_git(root, "merge-base", "--is-ancestor", base, "HEAD").returncode != 0:
-                errors.append("pinned base is not an ancestor of HEAD")
-            diff = run_git(root, "diff", "--name-only", f"{base}..HEAD")
-            if diff.returncode != 0:
-                errors.append("git diff failed")
-            else:
-                changed = [p for p in diff.stdout.splitlines() if p]
-                allowed = manifest["allowed_change_paths"]
-                for p in changed:
-                    if not is_allowed_path(p, allowed):
-                        errors.append(f"out-of-scope change: {p}")
-                for surface in binding.get("legacy_surfaces", []):
-                    prefix = surface.rstrip("/") + "/"
-                    for p in changed:
-                        if p == surface or p.startswith(prefix):
-                            errors.append(f"legacy surface was modified: {surface}")
-            checks += ["exact_base_ancestry", "change_scope", "legacy_non_modification"]
+                errors.extend(
+                    validate_scope(
+                        root,
+                        binding,
+                        manifest,
+                        change_base,
+                        "HEAD",
+                        "current change scope",
+                    )
+                )
     return {
         "schema_version": "1.0",
         "repository": binding["repository"],
@@ -156,8 +238,14 @@ def validate(root: Path) -> dict[str, Any]:
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--root", default=".")
+    p.add_argument("--enforce-change-scope", action="store_true")
+    p.add_argument("--change-base")
     args = p.parse_args()
-    result = validate(Path(args.root).resolve())
+    result = validate(
+        Path(args.root).resolve(),
+        enforce_change_scope=args.enforce_change_scope,
+        change_base=args.change_base,
+    )
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0 if result["status"] == "success" else 1
 

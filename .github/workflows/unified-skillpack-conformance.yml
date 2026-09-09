@@ -8,10 +8,21 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     permissions: {contents: read}
+    env:
+      EVENT_NAME: ${{ github.event_name }}
+      PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with: {fetch-depth: 0}
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with: {python-version: '3.12'}
-      - run: python tools/validate_unified_skillpacks.py --root .
+      - name: Validate bundle and exact change scope
+        shell: bash
+        run: |
+          args=(--root .)
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            [[ -n "$PR_BASE_SHA" ]] || { echo "missing pull-request base SHA" >&2; exit 1; }
+            args+=(--enforce-change-scope --change-base "$PR_BASE_SHA")
+          fi
+          python tools/validate_unified_skillpacks.py "${args[@]}"
       - run: python -m unittest discover -s tests -p 'test_unified_skillpack_conformance.py'
