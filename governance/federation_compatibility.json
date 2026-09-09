@@ -9,11 +9,16 @@
   "central_governance_merge_sha": "58f06c38a143fcdf4277a501bc39929a0eb68f98",
   "central_governance_merged_at": "2026-09-01T00:10:41Z",
   "disposition": "COMPATIBLE",
+  "spatial_disposition": "ATTESTED",
   "contracts": [
     "repo_federation_manifest@1",
     "federation_export_manifest@1",
     "centinelas_financial_signal@1",
-    "contract_finance_bundle@1"
+    "contract_finance_bundle@1",
+    "federation_cell_index@1",
+    "cell_domain_summary@1",
+    "record_cell_binding@1",
+    "cell_profile@1"
   ],
   "watched_paths": [
     "federation.json",
@@ -21,5 +26,7 @@
     "scripts/federation_export.py",
     "scripts/ingest_centinelas_signals.py",
     "scripts/build_contract_finance_bundle.py"
-  ]
+  ],
+  "spatial_generation": "federation-spatial-index/1",
+  "spatial_note": "Compatible with the federation spatial index generation. This repository consumes the canonical Cell_ID address space and publishes no geometry of its own; its CELL_PROFILE index lands in a later wave."
 }
