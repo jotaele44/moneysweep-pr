@@ -1,0 +1,42 @@
+{
+  "$id": "flight-telemetry-contract/1.0",
+  "schema_version": "1.0.0",
+  "record_type": "TelemetryPoint",
+  "units": {
+    "timestamp_utc": "ISO-8601 UTC",
+    "latitude": "decimal_degrees",
+    "longitude": "decimal_degrees",
+    "baro_altitude_ft": "feet",
+    "geometric_altitude_ft": "feet",
+    "groundspeed_kt": "knots",
+    "track_deg": "degrees_true",
+    "vertical_rate_fpm": "feet_per_minute"
+  },
+  "required": ["source", "timestamp_utc", "latitude", "longitude"],
+  "optional": ["registration", "icao24", "callsign", "baro_altitude_ft", "geometric_altitude_ft", "groundspeed_kt", "track_deg", "vertical_rate_fpm", "squawk", "on_ground", "position_source", "raw_record_hash", "source_record_id"],
+  "null_semantics": {
+    "optional_fields": "null means source did not provide or value was not available; null never means zero",
+    "source": "never null",
+    "timestamp_utc": "never null",
+    "latitude": "never null",
+    "longitude": "never null"
+  },
+  "invariants": [
+    "timestamp_utc is UTC ISO-8601",
+    "latitude in [-90,90]",
+    "longitude in [-180,180]",
+    "source manifestation is preserved",
+    "normalization does not establish source identity",
+    "duplicate adjudication preserves full candidate sets",
+    "tied top evidence remains UNRESOLVED",
+    "join cardinality is reported",
+    "proximity alone never establishes operational relationship or mission purpose"
+  ],
+  "compatibility": {
+    "removing_or_renaming_field": "breaking",
+    "changing_units": "breaking",
+    "changing_null_semantics": "breaking",
+    "adding_required_field": "breaking",
+    "adding_optional_field": "additive"
+  }
+}

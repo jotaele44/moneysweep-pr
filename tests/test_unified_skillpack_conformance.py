@@ -12,6 +12,22 @@ MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader
 SPEC.loader.exec_module(MODULE)
 
+FLIGHT_TELEMETRY_PATHS = (
+    ".federation/flight_telemetry_binding.json",
+    ".federation/flight_telemetry_contract.json",
+    ".github/workflows/flight-telemetry-contract.yml",
+    "scripts/discover_flight_provider_capabilities.py",
+    "scripts/validate_flight_telemetry_contract.py",
+    "scripts/validate_flight_telemetry_federation_lockstep.py",
+)
+FLIGHT_TELEMETRY_NEAR_MISSES = (
+    ".federation/",
+    ".federation/flight_telemetry_binding.json.bak",
+    ".github/workflows/flight-telemetry-contract.yml.disabled",
+    "scripts/",
+    "scripts/validate_flight_telemetry_contract.py.backup",
+)
+
 
 class UnifiedSkillpackConformanceTests(unittest.TestCase):
     def test_full_conformance(self) -> None:
@@ -31,6 +47,16 @@ class UnifiedSkillpackConformanceTests(unittest.TestCase):
         for entry in ledger["entries"]:
             target = entry["unified_target"].split("#", 1)[1]
             self.assertIn(f'<a id="{target}"></a>', skill, entry["capability_id"])
+
+    def test_flight_telemetry_scope_is_exact(self) -> None:
+        manifest = json.loads((ROOT / ".claude/skillpacks/MANIFEST.json").read_text())
+        allowed_paths = manifest["allowed_change_paths"]
+        for file_path in FLIGHT_TELEMETRY_PATHS:
+            self.assertIn(file_path, allowed_paths)
+            self.assertTrue(MODULE.is_allowed_path(file_path, allowed_paths))
+        for file_path in FLIGHT_TELEMETRY_NEAR_MISSES:
+            self.assertNotIn(file_path, allowed_paths)
+            self.assertFalse(MODULE.is_allowed_path(file_path, allowed_paths))
 
 
 if __name__ == "__main__":

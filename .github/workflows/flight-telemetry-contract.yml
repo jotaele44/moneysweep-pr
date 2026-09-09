@@ -1,0 +1,43 @@
+name: Flight Telemetry Contract
+
+on:
+  pull_request:
+    paths:
+      - ".federation/flight_telemetry_contract.json"
+      - ".federation/flight_telemetry_binding.json"
+      - "scripts/validate_flight_telemetry_contract.py"
+      - "scripts/validate_flight_telemetry_federation_lockstep.py"
+      - "scripts/discover_flight_provider_capabilities.py"
+      - ".github/workflows/flight-telemetry-contract.yml"
+  push:
+    branches: [main]
+    paths:
+      - ".federation/flight_telemetry_contract.json"
+      - ".federation/flight_telemetry_binding.json"
+      - "scripts/validate_flight_telemetry_contract.py"
+      - "scripts/validate_flight_telemetry_federation_lockstep.py"
+      - "scripts/discover_flight_provider_capabilities.py"
+      - ".github/workflows/flight-telemetry-contract.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate canonical contract and repo binding
+        run: python scripts/validate_flight_telemetry_contract.py
+      - name: Negative breaking-change regression
+        run: python scripts/validate_flight_telemetry_contract.py --negative-regression
+      - name: Negative cross-repo lockstep regression
+        run: python scripts/validate_flight_telemetry_federation_lockstep.py --self-test
+      - name: Enforce coordinated peer contract bytes
+        run: python scripts/validate_flight_telemetry_federation_lockstep.py
+      - name: Provider capability discovery interface smoke test
+        run: python scripts/discover_flight_provider_capabilities.py --require-no-secret-output
