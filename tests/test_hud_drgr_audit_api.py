@@ -1,5 +1,6 @@
 import hashlib
 import json
+from pathlib import Path
 
 import pytest
 from fastapi import FastAPI
@@ -18,7 +19,8 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setattr(audit, "KNOWN_PATHS", [source])
     app = FastAPI()
     app.include_router(module.router)
-    return TestClient(app, client=("127.0.0.1", 50000))
+    with TestClient(app, client=("127.0.0.1", 50000)) as test_client:
+        yield test_client
 
 
 def test_audit_preserves_snapshots_and_get_does_not_refresh(client, tmp_path, monkeypatch):
@@ -27,14 +29,14 @@ def test_audit_preserves_snapshots_and_get_does_not_refresh(client, tmp_path, mo
     first = client.get("/materialization/hud-drgr/audits").json()["audits"][0]
     assert first["authorization"] == "UNPROVEN"
     assert first["receipt"]["arithmetic"]["authorized_candidates"] == 1
-    raw = open(first["path"], "rb").read()
+    raw = Path(first["path"]).read_bytes()
     assert first["sha256"] == hashlib.sha256(raw).hexdigest()
     assert client.post("/materialization/hud-drgr/audits").status_code == 200
     monkeypatch.setattr(audit, "build_receipt", lambda *_: pytest.fail("GET re-scanned sources"))
     results = client.get("/materialization/hud-drgr/audits").json()
     assert len(results["audits"]) == 2
     assert results["source_refresh"] is False
-    assert open(first["path"], "rb").read() == raw
+    assert Path(first["path"]).read_bytes() == raw
 
 
 def test_malformed_and_arithmetic_mismatch_are_visible(client, tmp_path):

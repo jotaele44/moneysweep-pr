@@ -83,7 +83,8 @@ def test_toll_revenue_run_materializes_from_dropzone(tmp_path: Path):
     result = ingest_toll_revenue.run(root=tmp_path)
     assert result["rows"] == 1
     out = tmp_path / "data" / "staging" / "processed" / "pr_act_toll_revenue.csv"
-    rows = list(csv.DictReader(out.open(encoding="utf-8")))
+    with out.open(encoding="utf-8") as source_file:
+        rows = list(csv.DictReader(source_file))
     assert rows[0]["service_domain"] == "toll"
     assert rows[0]["amount"] == "120000000"
 
@@ -94,7 +95,8 @@ def test_revenue_run_no_dropzone_writes_empty_header(tmp_path: Path):
     assert result["rows"] == 0
     out = tmp_path / "data" / "staging" / "processed" / "pr_act_toll_revenue.csv"
     assert out.exists()
-    assert list(csv.DictReader(out.open(encoding="utf-8"))) == []
+    with out.open(encoding="utf-8") as source_file:
+        assert list(csv.DictReader(source_file)) == []
 
 
 # ---------------------------------------------------------------------------
@@ -144,7 +146,8 @@ def test_prasa_master_aggregates_vendors(tmp_path: Path):
     result = build_prasa_contracts_master.run(root=tmp_path)
     assert result["rows"] == 2
     out = proc / "prasa_contracts_master.csv"
-    by_vendor = {r["vendor_normalized"]: r for r in csv.DictReader(out.open(encoding="utf-8"))}
+    with out.open(encoding="utf-8") as source_file:
+        by_vendor = {r["vendor_normalized"]: r for r in csv.DictReader(source_file)}
     assert by_vendor["ACME"]["contract_count"] == "2"
     assert float(by_vendor["ACME"]["total_contract_value"]) == 1500000.0
 
@@ -200,7 +203,8 @@ def test_export_emits_revenue_transaction_with_public_payer(tmp_path: Path):
     shutil.copytree(SAMPLE_INPUTS, inputs)
 
     flows_path = inputs / "financial_flows_master.csv"
-    existing = list(csv.DictReader(flows_path.open(encoding="utf-8")))
+    with flows_path.open(encoding="utf-8") as source_file:
+        existing = list(csv.DictReader(source_file))
     fieldnames = list(existing[0].keys()) + ["flow_type"]
     for row in existing:
         row["flow_type"] = "federal_contract"

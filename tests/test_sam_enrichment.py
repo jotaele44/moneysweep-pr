@@ -389,6 +389,7 @@ class TestOfflineFirstRun:
                 }
             )
         se.run(root=tmp_path, resume=True)
-        rows = list(csv.DictReader((output_dir / "vendor_uei_index.csv").open()))
+        with (output_dir / "vendor_uei_index.csv").open() as source_file:
+            rows = list(csv.DictReader(source_file))
         assert rows[0]["cage"] == "12345"
         assert rows[0]["parent_uei"] == "PARENTUEI001"

@@ -245,7 +245,8 @@ def test_write_municipality_rollup_writes_expected_csv(workbook: Path, tmp_path:
     records = import_workbook(workbook)
     out_path = tmp_path / "rollup.csv"
     write_municipality_rollup(out_path, records)
-    rows = list(csv.DictReader(out_path.open(encoding="utf-8")))
+    with out_path.open(encoding="utf-8") as source_file:
+        rows = list(csv.DictReader(source_file))
     municipalities = {row["municipality"] for row in rows}
     assert municipalities == {r["municipality"] for r in records}
     san_juan = next(row for row in rows if row["municipality"] == "SAN JUAN")

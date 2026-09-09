@@ -18,11 +18,9 @@ const frontendRoot = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = findRepositoryRoot(frontendRoot);
 const frontendPort = process.env.GUI_FRONTEND_PORT || "5173";
 const frontendUrl = `http://127.0.0.1:${frontendPort}`;
-const backendUrl = "http://127.0.0.1:8000";
-const seedScript = path.join(repositoryRoot, "server", "ingestion", "seed_demo.py");
-const backendCommand = fs.existsSync(seedScript)
-  ? "python server/ingestion/seed_demo.py && python -m uvicorn server.backend.main:app --host 127.0.0.1 --port 8000"
-  : "python -m uvicorn server.backend.main:app --host 127.0.0.1 --port 8000";
+const backendPort = process.env.GUI_BACKEND_PORT || "8000";
+const backendUrl = `http://127.0.0.1:${backendPort}`;
+const backendCommand = "python dashboard/tests/gui_backend.py";
 
 export default defineConfig({
   testDir: "./tests",
@@ -59,6 +57,7 @@ export default defineConfig({
       cwd: repositoryRoot,
       env: {
         ...process.env,
+        GUI_BACKEND_PORT: backendPort,
         ALLOWED_ORIGINS: frontendUrl,
         MONEYSWEEP_CORS_ORIGINS: frontendUrl,
         PYTHONPATH: [

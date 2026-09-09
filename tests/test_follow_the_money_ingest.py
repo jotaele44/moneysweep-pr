@@ -128,7 +128,8 @@ def test_run_with_sf133_file_writes_three_outputs(tmp_path: Path):
     assert not (out_dir / "pr_ftm_wire_ledger.csv").exists()
 
     # SF-133 output has canonical columns
-    rows = list(csv.DictReader(sf133.open()))
+    with sf133.open() as source_file:
+        rows = list(csv.DictReader(source_file))
     assert list(rows[0].keys()) == SF133_OUTPUT_COLUMNS
 
 

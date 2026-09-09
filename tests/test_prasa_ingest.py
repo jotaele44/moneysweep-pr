@@ -88,7 +88,8 @@ def test_run_materializes_processed_output_from_dropzone(tmp_path: Path):
 
     out_path = tmp_path / "data" / "staging" / "processed" / "pr_prasa_contracts.csv"
     assert out_path.exists()
-    rows = list(csv.DictReader(out_path.open(encoding="utf-8")))
+    with out_path.open(encoding="utf-8") as source_file:
+        rows = list(csv.DictReader(source_file))
     assert list(rows[0].keys()) == PRASA_COLUMNS
     assert {r["vendor_name"] for r in rows} == {"Acme LLC", "Beta Corp"}
 
@@ -99,7 +100,8 @@ def test_run_with_no_dropzone_writes_empty_header_only(tmp_path: Path):
     assert result["rows"] == 0
     out_path = tmp_path / "data" / "staging" / "processed" / "pr_prasa_contracts.csv"
     assert out_path.exists()
-    assert list(csv.DictReader(out_path.open(encoding="utf-8"))) == []
+    with out_path.open(encoding="utf-8") as source_file:
+        assert list(csv.DictReader(source_file)) == []
 
 
 class _NullLogger:

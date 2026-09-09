@@ -174,7 +174,8 @@ def test_parent_collapse_records_override_method(alias_repo_with_override: Path)
     entities_csv = (
         alias_repo_with_override / "data" / "staging" / "processed" / "entities_resolved.csv"
     )
-    rows = list(csv.DictReader(entities_csv.open(encoding="utf-8")))
+    with entities_csv.open(encoding="utf-8") as source_file:
+        rows = list(csv.DictReader(source_file))
     lpc_rows = [r for r in rows if r["normalized_name"] == "LPC AND D"]
     assert lpc_rows, "expected LPC AND D entity after override collapse"
     assert lpc_rows[0]["resolution_method"] == "alias_override"

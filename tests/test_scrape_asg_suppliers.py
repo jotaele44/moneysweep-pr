@@ -383,7 +383,8 @@ def test_asg_is_seeded_as_a_government_agency():
     from pathlib import Path
 
     root = Path(__file__).resolve().parent.parent
-    rows = list(csv.DictReader((root / "data/reference/agency_master.csv").open()))
+    with (root / "data/reference/agency_master.csv").open() as source_file:
+        rows = list(csv.DictReader(source_file))
     asg = next(r for r in rows if r["canonical_name"].endswith("General Services Administration"))
     assert asg["agency_type"] == "government_agency"
     assert asg["jurisdiction"] == "PR"

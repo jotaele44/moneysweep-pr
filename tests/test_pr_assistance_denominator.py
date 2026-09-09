@@ -217,8 +217,9 @@ def test_frozen_sam_source_validates_transport_and_logical_hashes(tmp_path):
     source = tmp_path / "sam.csv"
     logical_hash = _write_sam(source)
     artifact = tmp_path / "sam.csv.gz"
-    with gzip.GzipFile(filename="", mode="wb", fileobj=artifact.open("wb"), mtime=0) as output:
-        output.write(source.read_bytes())
+    with artifact.open("wb") as compressed:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=compressed, mtime=0) as output:
+            output.write(source.read_bytes())
     artifact_hash = hashlib.sha256(artifact.read_bytes()).hexdigest()
     programs = _load_sam_financial_programs(artifact, logical_hash, artifact_hash)
     assert set(programs) == {"01.001", "01.002"}

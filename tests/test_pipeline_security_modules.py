@@ -515,7 +515,8 @@ def test_source_materialization_invalid_manifest_blocks(tmp_project):
     assert status["r4_9b_files_materialized"] == 0
     assert status["r4_9b_materialization_blockers"] == 1
     blockers = tmp_project / "data" / "review_queue" / "source_materialization_blockers_r4_9b.csv"
-    reason = list(csv.DictReader(blockers.open(encoding="utf-8")))[0]["blocker_reason"]
+    with blockers.open(encoding="utf-8") as source_file:
+        reason = list(csv.DictReader(source_file))[0]["blocker_reason"]
     assert reason == "invalid_manifest_record"
 
 
@@ -624,7 +625,8 @@ def test_scoped_unfreeze_forbidden_candidate_rejected(tmp_project):
     assert status["r4_9g_forbidden_artifact_usage"] is True
     assert status["r4_9g_candidates_rejected"] == 1
     report = tmp_project / "data" / "exports" / "scoped_unfreeze_validation_report_r4_9g.csv"
-    rows = list(csv.DictReader(report.open(encoding="utf-8")))
+    with report.open(encoding="utf-8") as source_file:
+        rows = list(csv.DictReader(source_file))
     assert rows[0]["validation_status"] == "rejected"
     assert rows[0]["validation_reason"] == "candidate_forbidden_artifact_path"
 
@@ -645,5 +647,6 @@ def test_scoped_unfreeze_candidate_not_in_checklist_rejected(tmp_project):
     status = suf.run_scoped_unfreeze_materialization(tmp_project)
     assert status["r4_9g_candidates_rejected"] == 1
     report = tmp_project / "data" / "exports" / "scoped_unfreeze_validation_report_r4_9g.csv"
-    rows = list(csv.DictReader(report.open(encoding="utf-8")))
+    with report.open(encoding="utf-8") as source_file:
+        rows = list(csv.DictReader(source_file))
     assert rows[0]["validation_reason"] == "candidate_not_listed_in_source_delivery_checklist"
