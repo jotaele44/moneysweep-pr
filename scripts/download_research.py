@@ -15,6 +15,7 @@ Usage:
 """
 
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -178,6 +179,19 @@ def _safe_float(value, default: float = 0.0) -> float:
         return default
 
 
+def _write_cache_atomic(frame: pd.DataFrame, path: Path) -> None:
+    """Publish a complete CSV without truncating an existing cache on failure."""
+    with tempfile.NamedTemporaryFile(
+        dir=path.parent, prefix=f".{path.name}.", delete=False
+    ) as handle:
+        temporary = Path(handle.name)
+    try:
+        frame.to_csv(temporary, index=False)
+        temporary.replace(path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
 # ---------------------------------------------------------------------------
 # NIH RePORTER downloader
 # ---------------------------------------------------------------------------
@@ -206,61 +220,66 @@ def download_nih(root: Path, force: bool, logger) -> pd.DataFrame:
 
     while True:
         page_num += 1
-        payload = {
-            "criteria": {
-                "org_states": ["PR"],
-                "date_start": "2000-01-01",
-                "date_end": __import__("datetime").date.today().strftime("%Y-%m-%d"),
-            },
-            "include_fields": [
-                "ApplId",
-                "ProjectNum",
-                "OrgName",
-                "OrgCity",
-                "OrgState",
-                "ContactPiName",
-                "ProjectTitle",
-                "AwardAmount",
-                "FiscalYear",
-                "AgencyCode",
-                "ProjectStartDate",
-                "ProjectEndDate",
-            ],
-            "offset": offset,
-            "limit": NIH_PAGE_SIZE,
-            "sort_field": "fiscal_year",
-            "sort_order": "desc",
-        }
-
         try:
             resp = requests.post(
                 NIH_API_URL,
-                json=payload,
+                json={
+                    "criteria": {
+                        "org_states": ["PR"],
+                        "date_start": "2000-01-01",
+                        "date_end": __import__("datetime").date.today().strftime("%Y-%m-%d"),
+                    },
+                    "include_fields": [
+                        "ApplId",
+                        "ProjectNum",
+                        "OrgName",
+                        "OrgCity",
+                        "OrgState",
+                        "ContactPiName",
+                        "ProjectTitle",
+                        "AwardAmount",
+                        "FiscalYear",
+                        "AgencyCode",
+                        "ProjectStartDate",
+                        "ProjectEndDate",
+                    ],
+                    "offset": offset,
+                    "limit": NIH_PAGE_SIZE,
+                    "sort_field": "fiscal_year",
+                    "sort_order": "desc",
+                },
                 headers={"Content-Type": "application/json"},
                 timeout=60,
             )
             resp.raise_for_status()
         except requests.HTTPError as exc:
             logger.error(f"NIH HTTP error on page {page_num} (offset={offset}): {exc}")
-            break
+            raise RuntimeError("NIH download incomplete; cache unchanged") from exc
         except requests.RequestException as exc:
             logger.error(f"NIH request error on page {page_num} (offset={offset}): {exc}")
-            break
+            raise RuntimeError("NIH download incomplete; cache unchanged") from exc
 
         try:
             data = resp.json()
         except ValueError as exc:
             logger.error(f"NIH JSON parse error on page {page_num}: {exc}")
-            break
+            raise RuntimeError("NIH download incomplete; cache unchanged") from exc
 
         meta = data.get("meta", {})
         results = data.get("results", [])
 
         if total is None:
-            total = meta.get("total", 0)
+            total = meta.get("total")
+            if isinstance(total, bool) or not isinstance(total, int) or total < 0:
+                raise RuntimeError("NIH download incomplete: invalid total")
             logger.info(f"NIH: total records reported = {total:,}")
 
+        if meta.get("total") != total:
+            raise RuntimeError("NIH download incomplete: total changed during pagination")
+
         if not results:
+            if offset != total:
+                raise RuntimeError("NIH download incomplete: empty page before total")
             logger.info(f"NIH: no results on page {page_num}, stopping.")
             break
 
@@ -305,21 +324,24 @@ def download_nih(root: Path, force: bool, logger) -> pd.DataFrame:
         offset += len(results)
 
         # Stop if we've retrieved everything or got a partial page
-        if total is not None and offset >= total:
+        if offset > total:
+            raise RuntimeError("NIH download incomplete: count exceeds total")
+        if offset == total:
             logger.info("NIH: reached total record count, stopping pagination.")
             break
         if len(results) < NIH_PAGE_SIZE:
-            logger.info("NIH: partial page received, assuming last page.")
-            break
+            raise RuntimeError("NIH download incomplete: short page before total")
 
         time.sleep(NIH_SLEEP)
 
     if not all_records:
         logger.warning("NIH: no records retrieved — returning empty DataFrame.")
-        return pd.DataFrame(columns=MASTER_COLUMNS + ["agency_code"])
+        empty = pd.DataFrame(columns=MASTER_COLUMNS + ["agency_code"])
+        _write_cache_atomic(empty, raw_path)
+        return empty
 
     df = pd.DataFrame(all_records)
-    df.to_csv(raw_path, index=False)
+    _write_cache_atomic(df, raw_path)
     logger.info(f"NIH: saved {len(df):,} rows -> {raw_path}")
     return df
 
@@ -368,33 +390,27 @@ def download_nsf(root: Path, force: bool, logger) -> pd.DataFrame:
             resp.raise_for_status()
         except requests.HTTPError as exc:
             logger.error(f"NSF HTTP error on page {page_num} (offset={offset}): {exc}")
-            break
+            raise RuntimeError("NSF download incomplete; cache unchanged") from exc
         except requests.RequestException as exc:
             logger.error(f"NSF request error on page {page_num} (offset={offset}): {exc}")
-            break
+            raise RuntimeError("NSF download incomplete; cache unchanged") from exc
 
         try:
             data = resp.json()
         except ValueError as exc:
             logger.error(f"NSF JSON parse error on page {page_num}: {exc}")
-            break
+            raise RuntimeError("NSF download incomplete; cache unchanged") from exc
 
         response_body = data.get("response", {})
         status = response_body.get("@status", "")
         if status and status != "OK":
-            logger.warning(f"NSF: non-OK status '{status}' on page {page_num}, stopping.")
-            break
+            raise RuntimeError(f"NSF download incomplete: response status {status!r}")
 
         awards_raw = response_body.get("award")
 
         # awards_raw may be None, a list, or a single dict
         if awards_raw is None:
-            logger.warning(
-                f"NSF: 'award' key missing on page {page_num}. "
-                f"Response keys: {list(response_body.keys())}  "
-                f"Raw snippet: {str(data)[:400]}"
-            )
-            break
+            raise RuntimeError("NSF download incomplete: missing award field")
         if isinstance(awards_raw, dict):
             # Single result returned as dict instead of list
             awards = [awards_raw]
@@ -452,10 +468,12 @@ def download_nsf(root: Path, force: bool, logger) -> pd.DataFrame:
 
     if not all_records:
         logger.warning("NSF: no records retrieved — returning empty DataFrame.")
-        return pd.DataFrame(columns=MASTER_COLUMNS)
+        empty = pd.DataFrame(columns=MASTER_COLUMNS)
+        _write_cache_atomic(empty, raw_path)
+        return empty
 
     df = pd.DataFrame(all_records)
-    df.to_csv(raw_path, index=False)
+    _write_cache_atomic(df, raw_path)
     logger.info(f"NSF: saved {len(df):,} rows -> {raw_path}")
     return df
 

@@ -191,11 +191,8 @@ class TestNormalizeFile:
 
 
 # ---------------------------------------------------------------------------
-# Currency-edge-case coverage — pins behavior of both cleaning paths.
-#   • HigherGov path: regex [^0-9.\-] strip (line 132 of the source)
-#   • Mainline path: strip ',' and '$' then pd.to_numeric (lines 207-209)
-# Each test documents the result. Cases marked "limitation" pin a known
-# rough edge that future normalization work could improve.
+# Currency edge cases must preserve signs/exponents and reject ambiguous tokens.
+# Both source-specific and mainline paths use the same validated grammar.
 # ---------------------------------------------------------------------------
 
 
@@ -205,10 +202,10 @@ class TestCurrencyEdgeCasesHigherGov:
         "raw, expected",
         [
             ("$1,234.56", "1234.56"),
-            ("(500)", "500"),  # limitation: sign lost
+            ("(500)", "-500"),
             ("-1000", "-1000"),
             ("NaN", ""),  # all non-numeric stripped
-            ("1.23e6", "1.236"),  # limitation: 'e' stripped
+            ("1.23e6", "1.23e6"),
             ("1,000,000", "1000000"),
             ("", ""),
         ],
@@ -249,10 +246,9 @@ class TestCurrencyEdgeCasesMainline:
         amounts = self._run(tmp_project, ["$1,234.56"])
         assert abs(amounts[0] - 1234.56) < 0.01
 
-    def test_parens_negative_documented_limitation(self, tmp_project):
+    def test_accounting_parentheses_preserve_negative_amount(self, tmp_project):
         amounts = self._run(tmp_project, ["(500)"])
-        # parens not stripped by mainline cleaner; pd.to_numeric returns NaN
-        assert pd.isna(amounts[0])
+        assert amounts[0] == -500
 
     def test_explicit_negative(self, tmp_project):
         amounts = self._run(tmp_project, ["-1000"])
@@ -304,3 +300,65 @@ class TestDateFallbacks:
         # date didn't parse → fiscal_year should be empty/NA, no 2020 in fiscal_years
         assert 2020 not in result["fiscal_years"]
         assert pd.isna(df["award_date"].iloc[0])
+
+
+@pytest.mark.parametrize(
+    "raw, expected",
+    [
+        ("($1,234.50)", "-1234.50"),
+        ("-$1,000", "-1000"),
+        ("$-500", "-500"),
+        ("1.2E-3", "1.2E-3"),
+        (".25", ".25"),
+        ("1,2", ""),
+        ("12USD34", ""),
+        ("(-500)", ""),
+        ("Infinity", ""),
+        (None, ""),
+        ("1.2.3", ""),
+    ],
+)
+def test_amount_grammar_does_not_synthesize_values(raw, expected):
+    from scripts.normalize_expansion_inputs import _clean_amount
+
+    assert _clean_amount(raw) == expected
+
+
+def test_highergov_preserves_known_columns_dates_and_caller_raw_values():
+    frame = pd.DataFrame(
+        {
+            "award_date": ["2020-01-15", "10/01/2021"],
+            "obligated_amount": ["NaN", "($500)"],
+            "vendor_name": ["Original vendor", "Other vendor"],
+        }
+    )
+    original = frame.copy(deep=True)
+    result = normalize_highergov_df(frame)
+    pd.testing.assert_frame_equal(frame, original)
+    assert result.columns.tolist() == original.columns.tolist()
+    assert result["vendor_name"].tolist() == original["vendor_name"].tolist()
+    assert result["obligated_amount"].tolist() == ["", "-500"]
+    assert result["award_date"].dt.year.tolist() == [2020, 2021]
+
+
+def test_tied_highergov_column_hints_remain_unresolved():
+    frame = pd.DataFrame({"left": ["$100"], "right": ["$200"]})
+    for columns in [["left", "right"], ["right", "left"]]:
+        result = normalize_highergov_df(frame[columns])
+        assert "obligated_amount" not in result.columns
+
+
+def test_distinct_raw_rows_do_not_collapse_when_both_amounts_are_invalid(tmp_project):
+    import logging
+
+    source = tmp_project / "data/staging/expansion/invalid_amounts.csv"
+    source.write_text(
+        "Award ID,Date Signed,Dollars Obligated\nA1,2020-01-01,invalid-one\nA1,2020-01-01,invalid-two\n"
+    )
+    result = normalize_file(
+        source, tmp_project / "data/staging/processed", logging.getLogger("raw-rows")
+    )
+    assert result["input_rows"] == result["output_rows"] == 2
+    assert result["excluded_duplicate_raw_rows"] == 0
+    frame = pd.read_csv(result["output_path"])
+    assert frame["obligated_amount"].isna().all()

@@ -128,9 +128,8 @@ def materialization_status(root: Path) -> pd.DataFrame:
         row_count = 0
         if path.exists():
             try:
-                row_count = max(
-                    sum(1 for _ in path.open(encoding="utf-8", errors="replace")) - 1, 0
-                )
+                with path.open(encoding="utf-8", errors="replace") as source_file:
+                    row_count = max(sum(1 for _ in source_file) - 1, 0)
                 status = "materialized" if row_count else "empty"
             except OSError:
                 status = "unreadable"

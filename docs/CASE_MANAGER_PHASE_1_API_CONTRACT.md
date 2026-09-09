@@ -14,12 +14,22 @@ The database path defaults to `data/case_manager.sqlite3` and may be overridden 
 
 ## Authorization boundary
 
-Clients supply:
+Commands and private reads require `Authorization: Bearer <token>`, matched in
+constant time against the server's `PRII_WRITE_TOKEN`. This follows the Hub's
+shared-service bearer convention. Missing or blank server configuration disables
+privileged access (503); missing or invalid caller credentials return 401.
 
-- `X-Case-Actor` on commands;
-- `X-Case-Clearance: public|internal|restricted` on queries.
+The credential identifies one trusted service principal with restricted clearance.
+Audit events use the server's `MONEYSWEEP_CASE_ACTOR` (default `case-service`).
+This is not multi-user authentication or delegated per-user authorization. Keep the
+credential on trusted service clients; never embed it in a public frontend bundle.
+Runtime token rotation invalidates the previous credential on the next request.
 
-The current policy is a bounded Phase 1 clearance filter, not a replacement for the future authenticated identity provider. Records above the caller clearance are omitted.
+Anonymous reads have public clearance. Nonpublic cases are omitted from lists and
+return 404 through direct and collection reads. The former `X-Case-Actor` and
+`X-Case-Clearance` headers are rejected with 400, including for authenticated callers,
+so they cannot forge audit identity or elevate clearance. The standalone health
+endpoint remains a database liveness check, not authentication readiness.
 
 ## Read endpoints
 
@@ -60,6 +70,10 @@ Every command:
 6. commits once.
 
 A failure in either the object write or audit append rolls back both. Concurrent writers that observed a stale audit sequence receive a conflict instead of creating a forked audit chain.
+
+The shared repository serializes transactions and reads with a re-entrant lock. A read cannot expose another request's uncommitted rows, and a failed or nested `BEGIN` never rolls back a transaction it did not start. Interruption rolls back the active request before releasing its connection. Schema migration is rejected while a transaction is active because SQLite script execution can otherwise commit it implicitly.
+
+Repository initialization is synchronized and published only after migration succeeds. A failed initialization closes its candidate connection and leaves the next request able to retry. Repository-created connections are owned by the repository; injected connections remain the caller's responsibility. Independent processes still rely on SQLite file locking and the existing audit-sequence conflict check.
 
 ## Canonical evidence boundary
 

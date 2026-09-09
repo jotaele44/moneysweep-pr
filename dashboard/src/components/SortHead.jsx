@@ -13,10 +13,12 @@ export default function SortHead({ sortKey, sorter, className, align = 'left', c
       aria-sort={active ? (sorter.dir === 'asc' ? 'ascending' : 'descending') : 'none'}
       onClick={() => sorter.sort(sortKey)}
     >
+      <button type="button" className="min-h-10 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
       <span className={cn('inline-flex items-center gap-1', align === 'right' && 'flex-row-reverse')}>
         {children}
-        <Icon className={cn('h-3 w-3 shrink-0', active ? 'text-primary' : 'opacity-40')} />
+        <Icon aria-hidden="true" className={cn('h-3 w-3 shrink-0', active ? 'text-primary' : 'opacity-40')} />
       </span>
+      </button>
     </TableHead>
   )
 }

@@ -44,7 +44,7 @@ def _build_pdf(path: Path, header: list[str], rows: list[list[str]]) -> None:
 @pytest.fixture
 def act_repo(tmp_path: Path) -> Path:
     """Repo layout with one ACT PDF in the expected drop dir."""
-    pdf_path = tmp_path / SOURCES["act"]["input_dir"] / "act_sample.pdf"
+    pdf_path = tmp_path / SOURCES["act"]["input_dir"] / "ACT_sample.pdf"
     _build_pdf(
         pdf_path,
         header=[
@@ -79,7 +79,7 @@ def act_repo(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def acuden_repo(tmp_path: Path) -> Path:
-    pdf_path = tmp_path / SOURCES["acuden"]["input_dir"] / "acuden_sample.pdf"
+    pdf_path = tmp_path / SOURCES["acuden"]["input_dir"] / "ACUDES_sample.pdf"
     _build_pdf(
         pdf_path,
         header=[
@@ -140,6 +140,17 @@ def test_acuden_columns_match_registry() -> None:
 
 
 @pytest.mark.integration
+def test_shared_archive_keeps_source_candidates_separate(act_repo: Path, acuden_repo: Path) -> None:
+    assert act_repo == acuden_repo
+    unrelated = act_repo / SOURCES["act"]["input_dir"] / "unclassified.pdf"
+    unrelated.write_bytes(b"not a classified PDF")
+    summary = extract(root=act_repo)
+    assert summary["act"]["pdfs"] == summary["acuden"]["pdfs"] == 1
+    assert summary["act"]["rows"] == 2
+    assert summary["acuden"]["rows"] == 1
+
+
+@pytest.mark.integration
 def test_extract_act_emits_canonical_columns(act_repo: Path) -> None:
     summary = extract(source="act", root=act_repo)
     info = summary["act"]
@@ -149,7 +160,8 @@ def test_extract_act_emits_canonical_columns(act_repo: Path) -> None:
 
     out_path = Path(info["outputs"][0])
     assert out_path.exists()
-    rows = list(csv.DictReader(out_path.open(encoding="utf-8")))
+    with out_path.open(encoding="utf-8") as source_file:
+        rows = list(csv.DictReader(source_file))
     assert [r for r in rows]  # non-empty
     assert list(rows[0].keys()) == ACT_COLUMNS
 
@@ -162,7 +174,8 @@ def test_extract_acuden_emits_canonical_columns(acuden_repo: Path) -> None:
     assert info["rows"] == 1
 
     out_path = Path(info["outputs"][0])
-    rows = list(csv.DictReader(out_path.open(encoding="utf-8")))
+    with out_path.open(encoding="utf-8") as source_file:
+        rows = list(csv.DictReader(source_file))
     assert list(rows[0].keys()) == ACUDEN_COLUMNS
     assert rows[0]["contractor_name"] == "Daycare Operator A"
     assert rows[0]["contract_number"] == "ACUDEN-100"
@@ -190,7 +203,8 @@ def test_extractor_applies_alias_overrides(act_repo: Path, monkeypatch) -> None:
     monkeypatch.setattr("scripts.extract_act_acuden_pdfs.load_overrides", lambda: overrides)
     summary = extract(source="act", root=act_repo)
     out_path = Path(summary["act"]["outputs"][0])
-    names = [r["contractor_name"] for r in csv.DictReader(out_path.open(encoding="utf-8"))]
+    with out_path.open(encoding="utf-8") as source_file:
+        names = [r["contractor_name"] for r in csv.DictReader(source_file)]
     assert "LPC AND D" in names
     assert "SUPER ASPHALT" in names
 

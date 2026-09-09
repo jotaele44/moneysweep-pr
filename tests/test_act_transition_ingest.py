@@ -122,6 +122,7 @@ def test_run_materializes_processed_output_from_pdf(tmp_path: Path):
 
     out_path = tmp_path / PROCESSED_OUTPUTS["act"]
     assert out_path.exists()
-    rows = list(csv.DictReader(out_path.open(encoding="utf-8")))
+    with out_path.open(encoding="utf-8") as source_file:
+        rows = list(csv.DictReader(source_file))
     assert rows and list(rows[0].keys()) == CANONICAL_COLUMNS
     assert all(r["source_dataset"] == "act_transition_contracts" for r in rows)

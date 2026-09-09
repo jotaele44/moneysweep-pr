@@ -1,3 +1,4 @@
+import HudDrgrAudit from './HudDrgrAudit'
 import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -159,6 +160,7 @@ export default function DataSources() {
   return (
     <div className="ms-scroll-region h-full overflow-auto p-4">
       <div className="mx-auto grid max-w-6xl gap-4 lg:grid-cols-2">
+        <HudDrgrAudit />
         <section className="rounded-lg border border-border bg-card/50 p-4 lg:col-span-2">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>

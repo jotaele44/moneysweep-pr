@@ -34,9 +34,15 @@ def _app_and_api():
 def _reset_repository():
     """Each test gets its own repository via the module's own test hook."""
     _, case_manager_api = _app_and_api()
+    previous = case_manager_api._repository
     case_manager_api.configure_repository(None)
-    yield
-    case_manager_api.configure_repository(None)
+    try:
+        yield
+    finally:
+        current = case_manager_api._repository
+        if current is not None and current is not previous:
+            current.close()
+        case_manager_api.configure_repository(previous)
 
 
 def test_health_reports_ok_when_the_case_database_is_reachable():

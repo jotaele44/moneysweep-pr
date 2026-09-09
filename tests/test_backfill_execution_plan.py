@@ -59,7 +59,8 @@ def test_execution_plan_uses_manual_queue_without_fabrication(tmp_path: Path):
     assert result["row_fabrication_policy"] == "FORBIDDEN_NO_SYNTHETIC_ROWS"
 
     plan_csv = tmp_path / "data" / "exports" / "backfill_execution_plan_r4_6.csv"
-    plan_rows = list(csv.DictReader(plan_csv.open("r", encoding="utf-8")))
+    with plan_csv.open("r", encoding="utf-8") as source_file:
+        plan_rows = list(csv.DictReader(source_file))
     assert len(plan_rows) == 21
     assert all(r["row_fabrication_policy"] == "FORBIDDEN_NO_SYNTHETIC_ROWS" for r in plan_rows)
 

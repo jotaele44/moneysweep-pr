@@ -19,22 +19,22 @@ import { cn } from '@/lib/utils'
 export default function EntitiesTable() {
   const query = useEntities()
   const entities = query.data ?? []
-  const [type, setType] = useState('all')
+  const [type, setType] = useState(null)
   const [q, setQ] = useState('')
   const [open, setOpen] = useState(null)
 
   const filtered = useMemo(
     () => entities.filter((e) =>
-      (type === 'all' || e.entityType === type) &&
+      (type === null || e.entityType === type) &&
       (!q || (e.name || '').toLowerCase().includes(q.toLowerCase()))),
     [entities, type, q],
   )
   const { sorted: rows, sort, key, dir } = useSortable(filtered)
   const sorter = { sort, key, dir }
-  const hasFilters = type !== 'all' || q.trim().length > 0
+  const hasFilters = type !== null || q.trim().length > 0
 
   const resetFilters = () => {
-    setType('all')
+    setType(null)
     setQ('')
   }
 
@@ -49,7 +49,7 @@ export default function EntitiesTable() {
           aria-label="Search entities"
           className="ms-filter-control h-7 flex-1 bg-background text-xs"
         />
-        <TypeFilterSelect items={entities} field="entityType" value={type} onChange={setType} width="w-[120px]" capitalize />
+        <TypeFilterSelect label="Entity type" items={entities} field="entityType" value={type} onChange={setType} width="w-[120px]" capitalize />
       </div>
       <div className="ms-scroll-region min-h-0 flex-1 overflow-auto">
         <QueryBoundary

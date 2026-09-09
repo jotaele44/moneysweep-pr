@@ -164,13 +164,15 @@ def test_influence_graph_builder_emits_claim_tier(fixture_repo: Path) -> None:
     build_graph(fixture_repo)
 
     edges_path = proc / "graphs" / "entity_edges.csv"
-    edges = list(csv.DictReader(edges_path.open(encoding="utf-8")))
+    with edges_path.open(encoding="utf-8") as source_file:
+        edges = list(csv.DictReader(source_file))
     by_dataset = {e["source_dataset"]: e["claim_tier"] for e in edges}
     assert by_dataset.get("pr_all_awards_master.csv") == "observed"
     assert by_dataset.get("pr_emma_bonds.csv") == "blocked"
 
     top25_path = proc / "graphs" / "top_25_control_entities.csv"
-    top25 = list(csv.DictReader(top25_path.open(encoding="utf-8")))
+    with top25_path.open(encoding="utf-8") as source_file:
+        top25 = list(csv.DictReader(source_file))
     assert top25, "top_25 should be non-empty"
     # Every node must carry a tier.
     assert all(r.get("claim_tier") in {"observed", "linked", "blocked"} for r in top25)

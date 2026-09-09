@@ -161,3 +161,19 @@ describe('SortHead — layout props', () => {
     expect(header().className).toContain('cursor-pointer');
   });
 });
+
+
+describe('SortHead — keyboard access', () => {
+  it('supports Tab, Enter and Space without duplicate sort calls', async () => {
+    const s = sorter();
+    const user = userEvent.setup();
+    renderHead({ sortKey: 'amount', sorter: s, children: 'Amount' });
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'Amount' })).toHaveFocus();
+    await user.keyboard('{Enter}');
+    expect(s.sort).toHaveBeenCalledTimes(1);
+    await user.keyboard(' ');
+    expect(s.sort).toHaveBeenCalledTimes(2);
+    expect(s.sort).toHaveBeenLastCalledWith('amount');
+  });
+});

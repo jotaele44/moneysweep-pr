@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import sqlite3
+from threading import RLock
 from contextlib import contextmanager
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
@@ -22,9 +23,9 @@ class CaseManagerNotFound(LookupError):
 class SQLiteCaseManagerRepository:
     """Explicit SQLite repository with no canonical-evidence write capability.
 
-    File-backed production repositories automatically bind the read-only
-    canonical evidence catalog. In-memory repositories leave it unconfigured so
-    unit tests can remain isolated unless they opt in explicitly.
+    Repository-created connections automatically bind the read-only canonical
+    evidence catalog. Caller-supplied connections leave it unconfigured unless
+    a catalog path is supplied, and remain owned by their caller.
     """
 
     def __init__(
@@ -33,6 +34,7 @@ class SQLiteCaseManagerRepository:
         *,
         canonical_evidence_path: str | Path | None = None,
     ):
+        self._lock = RLock()
         if isinstance(database, sqlite3.Connection):
             self.connection = database
             self._owns_connection = False
@@ -52,21 +54,31 @@ class SQLiteCaseManagerRepository:
         self._evidence_ids: set[str] = set()
 
     def close(self) -> None:
-        if self._owns_connection:
-            self.connection.close()
+        with self._lock:
+            if self._owns_connection:
+                self.connection.close()
 
     def apply_migration(self, migration_path: str | Path) -> None:
-        self.connection.executescript(Path(migration_path).read_text())
+        with self._lock:
+            if self.connection.in_transaction:
+                raise CaseManagerConflict("cannot migrate inside an active transaction")
+            self.connection.executescript(Path(migration_path).read_text())
 
     @contextmanager
     def transaction(self, *, immediate: bool = True) -> Iterator[sqlite3.Connection]:
-        try:
+        # One connection must not host overlapping transactions from API threads.
+        # BEGIN stays outside the rollback block: failed/nested BEGIN owns nothing.
+        with self._lock:
             self.connection.execute("BEGIN IMMEDIATE" if immediate else "BEGIN")
-            yield self.connection
-            self.connection.commit()
-        except Exception:
-            self.connection.rollback()
-            raise
+            try:
+                yield self.connection
+                self.connection.commit()
+            except BaseException as error:
+                try:
+                    self.connection.rollback()
+                except sqlite3.Error as cleanup_error:
+                    error.add_note(f"SQLite rollback also failed: {cleanup_error}")
+                raise
 
     @staticmethod
     def _payload(record: Any) -> dict[str, Any]:
@@ -99,22 +111,23 @@ class SQLiteCaseManagerRepository:
         ``None`` means no catalog was configured (allowed for isolated tests but
         not used by the production API boundary).
         """
-        path = self.canonical_evidence_path
-        if path is None:
-            return None
-        if not path.exists():
-            return False
-        stat = path.stat()
-        signature = (stat.st_mtime_ns, stat.st_size)
-        if signature != self._evidence_cache_signature:
-            with path.open(newline="", encoding="utf-8") as fh:
-                self._evidence_ids = {
-                    (row.get("evidence_id") or "").strip()
-                    for row in csv.DictReader(fh)
-                    if (row.get("evidence_id") or "").strip()
-                }
-            self._evidence_cache_signature = signature
-        return evidence_id in self._evidence_ids
+        with self._lock:
+            path = self.canonical_evidence_path
+            if path is None:
+                return None
+            if not path.exists():
+                return False
+            stat = path.stat()
+            signature = (stat.st_mtime_ns, stat.st_size)
+            if signature != self._evidence_cache_signature:
+                with path.open(newline="", encoding="utf-8") as fh:
+                    self._evidence_ids = {
+                        (row.get("evidence_id") or "").strip()
+                        for row in csv.DictReader(fh)
+                        if (row.get("evidence_id") or "").strip()
+                    }
+                self._evidence_cache_signature = signature
+            return evidence_id in self._evidence_ids
 
     def insert_case(self, record: Any, connection: sqlite3.Connection) -> None:
         self._insert(connection, "cases", self._payload(record))
@@ -261,54 +274,60 @@ class SQLiteCaseManagerRepository:
         self._insert(connection, "case_audit_events", p)
 
     def latest_audit(self, case_id: str) -> tuple[int, str | None]:
-        row = self.connection.execute(
-            "SELECT sequence,payload_sha256 FROM case_audit_events WHERE case_id=? "
-            "ORDER BY sequence DESC LIMIT 1",
-            (case_id,),
-        ).fetchone()
-        return (int(row["sequence"]), row["payload_sha256"]) if row else (0, None)
+        with self._lock:
+            row = self.connection.execute(
+                "SELECT sequence,payload_sha256 FROM case_audit_events WHERE case_id=? "
+                "ORDER BY sequence DESC LIMIT 1",
+                (case_id,),
+            ).fetchone()
+            return (int(row["sequence"]), row["payload_sha256"]) if row else (0, None)
 
     def fetch_one(self, table: str, id_column: str, object_id: str) -> dict[str, Any]:
-        allowed = {
-            "cases",
-            "case_evidence",
-            "claims",
-            "claim_evidence",
-            "contradictions",
-            "leads",
-            "findings",
-            "case_snapshots",
-            "case_audit_events",
-            "case_events",
-        }
-        if table not in allowed:
-            raise ValueError("unsupported table")
-        row = self.connection.execute(
-            f"SELECT * FROM {table} WHERE {id_column}=?", (object_id,)
-        ).fetchone()
-        if row is None:
-            raise CaseManagerNotFound(object_id)
-        return dict(row)
+        with self._lock:
+            allowed = {
+                "cases",
+                "case_evidence",
+                "claims",
+                "claim_evidence",
+                "contradictions",
+                "leads",
+                "findings",
+                "case_snapshots",
+                "case_audit_events",
+                "case_events",
+            }
+            if table not in allowed:
+                raise ValueError("unsupported table")
+            row = self.connection.execute(
+                f"SELECT * FROM {table} WHERE {id_column}=?", (object_id,)
+            ).fetchone()
+            if row is None:
+                raise CaseManagerNotFound(object_id)
+            return dict(row)
 
     def fetch_case_rows(self, table: str, case_id: str) -> list[dict[str, Any]]:
-        allowed = {
-            "case_evidence",
-            "claims",
-            "contradictions",
-            "case_events",
-            "leads",
-            "findings",
-            "case_snapshots",
-            "case_audit_events",
-        }
-        if table not in allowed:
-            raise ValueError("unsupported case table")
-        order = "sequence" if table == "case_audit_events" else "rowid"
-        rows = self.connection.execute(
-            f"SELECT * FROM {table} WHERE case_id=? ORDER BY {order}", (case_id,)
-        ).fetchall()
-        return [dict(row) for row in rows]
+        with self._lock:
+            allowed = {
+                "case_evidence",
+                "claims",
+                "contradictions",
+                "case_events",
+                "leads",
+                "findings",
+                "case_snapshots",
+                "case_audit_events",
+            }
+            if table not in allowed:
+                raise ValueError("unsupported case table")
+            order = "sequence" if table == "case_audit_events" else "rowid"
+            rows = self.connection.execute(
+                f"SELECT * FROM {table} WHERE case_id=? ORDER BY {order}", (case_id,)
+            ).fetchall()
+            return [dict(row) for row in rows]
 
     def list_cases(self) -> list[dict[str, Any]]:
-        rows = self.connection.execute("SELECT * FROM cases ORDER BY opened_at,case_id").fetchall()
-        return [dict(row) for row in rows]
+        with self._lock:
+            rows = self.connection.execute(
+                "SELECT * FROM cases ORDER BY opened_at,case_id"
+            ).fetchall()
+            return [dict(row) for row in rows]

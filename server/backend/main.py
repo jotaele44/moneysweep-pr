@@ -286,3 +286,9 @@ app.include_router(api_keys_router)
 app.include_router(campaign_finance_router)
 app.include_router(government_changes_router)
 app.include_router(ownership_router)
+
+
+# Audit snapshots are shared by the diagnostic and desktop entry points.
+from server.backend.hud_drgr_api import router as hud_drgr_router  # noqa: E402
+
+app.include_router(hud_drgr_router)

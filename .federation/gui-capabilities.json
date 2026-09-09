@@ -94,7 +94,8 @@
           "dashboard/src/components/RelationshipGraph.jsx",
           "dashboard/src/components/MunicipalityAggregates.jsx",
           "dashboard/src/components/StatsBar.jsx",
-          "dashboard/src/components/StatsDistributions.jsx"
+          "dashboard/src/components/StatsDistributions.jsx",
+          "dashboard/src/components/SortHead.jsx"
         ],
         "discoverability": [
           "dashboard/src/pages/Dashboard.jsx"
@@ -110,7 +111,12 @@
           "tests/test_gui_parity.py"
         ],
         "e2e": [
-          "dashboard/tests/gui-parity.spec.mjs"
+          "dashboard/tests/gui-parity.spec.mjs",
+          "dashboard/tests/zip-design.spec.mjs",
+          "dashboard/tests/sort-head.spec.mjs"
+        ],
+        "frontend": [
+          "dashboard/src/components/SortHead.test.jsx"
         ]
       }
     },
@@ -161,7 +167,8 @@
           "tests/test_gui_parity.py"
         ],
         "e2e": [
-          "dashboard/tests/org-change-monitor.spec.mjs"
+          "dashboard/tests/org-change-monitor.spec.mjs",
+          "dashboard/tests/zip-design.spec.mjs"
         ]
       },
       "candidate_ids": [
@@ -242,7 +249,8 @@
           "dashboard/src/components/CampaignFinance.test.jsx"
         ],
         "e2e": [
-          "dashboard/tests/gui-parity.spec.mjs"
+          "dashboard/tests/gui-parity.spec.mjs",
+          "dashboard/tests/zip-design.spec.mjs"
         ]
       }
     },
@@ -331,7 +339,8 @@
           "tests/test_gui_parity.py"
         ],
         "e2e": [
-          "dashboard/tests/campaign-finance.spec.mjs"
+          "dashboard/tests/campaign-finance.spec.mjs",
+          "dashboard/tests/zip-design.spec.mjs"
         ]
       },
       "candidate_ids": [
@@ -594,7 +603,7 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Case-manager schema, repository and service layer; the package's own docstring states it is \"deliberately UI-agnostic\" and it has no dashboard integration.",
+      "rationale": "Case-manager schema, repository and service layer; the package's own docstring states it is \"deliberately UI-agnostic\" and it has no dashboard integration. The standalone security boundary uses a server-verified service bearer credential and server-owned audit identity; anonymous reads remain public. Full Case Manager GUI completion remains covered by the explicit phase-1 exception.",
       "backend": {
         "files": [
           "server/backend/case_manager_api.py",
@@ -610,7 +619,10 @@
       "tests": {
         "backend": [
           "tests/test_case_manager_foundation.py",
-          "tests/test_case_manager_phase1_service.py"
+          "tests/test_case_manager_phase1_service.py",
+          "tests/test_case_manager_auth.py",
+          "tests/test_case_manager_concurrency.py",
+          "tests/test_case_manager_app_health.py"
         ]
       },
       "candidate_ids": [
@@ -754,7 +766,7 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing — zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
+      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing \u2014 zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
       "backend": {
         "files": [
           "scripts/scrape_rdc_demandas.py",
@@ -1175,7 +1187,8 @@
           "tests/test_gui_parity.py"
         ],
         "e2e": [
-          "dashboard/tests/api-keys.spec.mjs"
+          "dashboard/tests/api-keys.spec.mjs",
+          "dashboard/tests/zip-design.spec.mjs"
         ]
       },
       "candidate_ids": [
@@ -1223,6 +1236,108 @@
         "analysis_symbol:scripts/recover_pr_assistance_failed_shards.py:recover_shard",
         "cli_surface:scripts/download_pr_assistance_denominator.py",
         "cli_surface:scripts/recover_pr_assistance_failed_shards.py"
+      ]
+    },
+    {
+      "id": "hud-drgr-source-audit",
+      "classification": "operator",
+      "status": "active",
+      "requires_terminal": false,
+      "backend": {
+        "files": [
+          "server/backend/hud_drgr_api.py",
+          "server/backend/main.py",
+          "server/backend/materialization.py"
+        ],
+        "endpoints": [
+          "GET /hud-drgr/audits",
+          "POST /hud-drgr/audits"
+        ],
+        "symbols": [
+          "server/backend/hud_drgr_api.py:hud_drgr_audits",
+          "server/backend/hud_drgr_api.py:create_hud_drgr_audit"
+        ]
+      },
+      "analysis": {
+        "files": [
+          "scripts/audit_hud_drgr_authorized_sources.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/audit_hud_drgr_authorized_sources.py",
+        "cli_surface:scripts/audit_hud_drgr_authorized_sources.py",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:utc_now",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:sha256_file",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_csv",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_parquet",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_path",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:build_receipt",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:main"
+      ],
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/components/HudDrgrAudit.jsx",
+          "dashboard/src/components/DataSources.jsx",
+          "dashboard/src/lib/api.js",
+          "dashboard/src/lib/hudDrgrApi.js"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/DataSources.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_hud_drgr_audit_api.py",
+          "tests/test_audit_hud_drgr_authorized_sources.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/hud-drgr-audit.spec.mjs"
+        ]
+      }
+    },
+    {
+      "id": "client-recovery-navigation-and-filtering",
+      "classification": "client_only",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Visible last-resort app reload, unknown-route home navigation, and local entity/relationship type selection. These controls manage browser navigation or already-loaded view state; they do not claim a backend capability or canonical identity. Null resets filtering without colliding with a literal source type named all.",
+      "frontend": {
+        "routes": [
+          "/",
+          "*"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/components/ErrorBoundary.jsx",
+          "dashboard/src/components/TypeFilterSelect.jsx",
+          "dashboard/src/lib/PageNotFound.jsx"
+        ],
+        "discoverability": [
+          "dashboard/src/main.jsx",
+          "dashboard/src/components/EntitiesTable.jsx",
+          "dashboard/src/components/RelationshipGraph.jsx",
+          "dashboard/src/lib/PageNotFound.jsx"
+        ]
+      },
+      "tests": {
+        "e2e": [
+          "dashboard/tests/client-controls.spec.mjs"
+        ]
+      },
+      "candidate_ids": [
+        "gui_route:dashboard/src/App.jsx:*"
       ]
     }
   ],

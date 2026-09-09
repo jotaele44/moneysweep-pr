@@ -1,3 +1,4 @@
+import styles from '../zip-design/Overview.module.css'
 import { useSearchParams } from 'react-router-dom'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import StatsBar from '@/components/StatsBar'
@@ -33,18 +34,18 @@ export default function Dashboard() {
   const triggerClass = 'min-h-11 text-xs data-[state=active]:glow-border'
 
   return (
-    <div className="flex h-screen flex-col bg-background text-foreground">
-      <header className="panel-glass flex items-center gap-2 border-b border-border px-4 py-2.5">
+    <div className={`zip-surface zip-money ${styles.appShell}`}>
+      <header className={styles.header}>
         <img src={brandMark} alt="" aria-hidden="true" className="h-6 w-6 rounded-md" />
-        <div>
-          <h1 className="text-sm font-semibold leading-none text-foreground">moneysweep-pr</h1>
+        <div className={styles.brandCopy}>
+          <h1 className="text-sm font-semibold leading-none text-foreground">MoneySweep PR</h1>
           <p className="mt-0.5 text-[11px] text-muted-foreground">Puerto Rico public-money contracts, entities, campaign finance &amp; certified ownership</p>
         </div>
       </header>
 
       <StatsBar />
 
-      <div className="min-h-0 flex-1 p-3">
+      <div className="zip-money-content min-h-0 flex-1 p-3">
         <Tabs value={tab} onValueChange={setTab} className="flex h-full flex-col">
           <div className="overflow-x-auto pb-1">
             <TabsList className={`grid h-auto min-w-[760px] ${OFFLINE ? 'grid-cols-7' : 'grid-cols-9'} bg-card`}>

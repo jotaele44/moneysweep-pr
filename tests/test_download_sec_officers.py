@@ -63,5 +63,6 @@ def test_run_uses_seed_fallback_when_no_insider_filings(monkeypatch, tmp_path):
     assert out.exists()
     import csv
 
-    rows = list(csv.DictReader(out.open()))
+    with out.open() as source_file:
+        rows = list(csv.DictReader(source_file))
     assert rows and set(rows[0]) == set(S.OFFICER_COLUMNS)

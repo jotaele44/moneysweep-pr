@@ -20,7 +20,7 @@ import hashlib
 import json
 import math
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -353,7 +353,7 @@ def prepare_uploaded_masters(
         "entity_edges.csv": _write_csv(output_dir / "entity_edges.csv", EDGE_FIELDS, edges),
     }
     report = {
-        "generated_at": datetime.utcnow().isoformat() + "Z",
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "output_dir": str(output_dir),
         "inputs": {
             "contracts_master": str(contracts_master),

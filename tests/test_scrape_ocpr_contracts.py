@@ -375,7 +375,8 @@ def test_run_materializes_processed_csv_from_scraped_records(tmp_path: Path, mon
 
     out_path = tmp_path / "data" / "staging" / "processed" / "pr_ocpr_contracts.csv"
     assert out_path.exists()
-    rows = list(csv.DictReader(out_path.open(encoding="utf-8")))
+    with out_path.open(encoding="utf-8") as source_file:
+        rows = list(csv.DictReader(source_file))
     assert list(rows[0].keys()) == OUTPUT_COLUMNS
     assert {r["contract_number"] for r in rows} == {"C-1", "C-2"}
 
@@ -414,7 +415,8 @@ def test_run_with_no_records_writes_empty_header_only(tmp_path: Path, monkeypatc
     assert result["status"] == "ERROR"
     out_path = tmp_path / "data" / "staging" / "processed" / "pr_ocpr_contracts.csv"
     assert out_path.exists()
-    assert list(csv.DictReader(out_path.open(encoding="utf-8"))) == []
+    with out_path.open(encoding="utf-8") as source_file:
+        assert list(csv.DictReader(source_file)) == []
 
 
 @pytest.mark.integration

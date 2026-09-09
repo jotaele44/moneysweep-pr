@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 import pytest
@@ -14,11 +15,12 @@ from moneysweep.case_manager.repository import (
 from moneysweep.case_manager.service import CaseCommandService, CaseQueryService
 
 
-def _repository() -> SQLiteCaseManagerRepository:
-    connection = sqlite3.connect(":memory:")
-    repository = SQLiteCaseManagerRepository(connection)
-    repository.apply_migration(Path("migrations/001_case_manager_v1.sql"))
-    return repository
+@pytest.fixture
+def repository():
+    with closing(sqlite3.connect(":memory:")) as connection:
+        repository = SQLiteCaseManagerRepository(connection)
+        repository.apply_migration(Path("migrations/001_case_manager_v1.sql"))
+        yield repository
 
 
 def _case(visibility: str = "internal") -> Case:
@@ -32,8 +34,7 @@ def _case(visibility: str = "internal") -> Case:
     )
 
 
-def test_command_is_atomic_with_audit_event():
-    repository = _repository()
+def test_command_is_atomic_with_audit_event(repository):
     service = CaseCommandService(repository)
     case = _case()
     result = service.create_case(case, "tester")
@@ -44,8 +45,7 @@ def test_command_is_atomic_with_audit_event():
     assert events[0]["action"] == "create_case"
 
 
-def test_transaction_rolls_back_object_when_audit_insert_fails(monkeypatch):
-    repository = _repository()
+def test_transaction_rolls_back_object_when_audit_insert_fails(monkeypatch, repository):
     service = CaseCommandService(repository)
     case = _case()
 
@@ -58,8 +58,7 @@ def test_transaction_rolls_back_object_when_audit_insert_fails(monkeypatch):
     assert repository.list_cases() == []
 
 
-def test_visibility_filtering_is_mandatory():
-    repository = _repository()
+def test_visibility_filtering_is_mandatory(repository):
     commands = CaseCommandService(repository)
     queries = CaseQueryService(repository)
     public_case = _case("public")
@@ -77,8 +76,7 @@ def test_visibility_filtering_is_mandatory():
     assert len(queries.list_cases("restricted")) == 2
 
 
-def test_reference_integrity_and_no_canonical_mutation_path():
-    repository = _repository()
+def test_reference_integrity_and_no_canonical_mutation_path(repository):
     commands = CaseCommandService(repository)
     case = _case()
     commands.create_case(case, "tester")
@@ -102,8 +100,7 @@ def test_reference_integrity_and_no_canonical_mutation_path():
     assert "canonical_evidence" not in tables
 
 
-def test_hash_chain_continuity_across_commands():
-    repository = _repository()
+def test_hash_chain_continuity_across_commands(repository):
     commands = CaseCommandService(repository)
     case = _case()
     commands.create_case(case, "tester")
@@ -122,8 +119,7 @@ def test_hash_chain_continuity_across_commands():
     assert events[1]["previous_event_sha256"] == events[0]["payload_sha256"]
 
 
-def test_concurrent_sequence_rejection():
-    repository = _repository()
+def test_concurrent_sequence_rejection(repository):
     commands = CaseCommandService(repository)
     case = _case()
     commands.create_case(case, "tester")
@@ -147,8 +143,7 @@ def test_concurrent_sequence_rejection():
             repository.append_audit_event(duplicate, 0, connection)
 
 
-def test_finding_acceptance_requires_review():
-    repository = _repository()
+def test_finding_acceptance_requires_review(repository):
     commands = CaseCommandService(repository)
     case = _case()
     commands.create_case(case, "tester")
