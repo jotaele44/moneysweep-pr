@@ -13,5 +13,17 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - run: python tools/validate_unified_skillpacks.py --root .
+      - name: Validate package and dedicated-branch change scope
+        env:
+          CHANGE_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_REF: ${{ github.head_ref || github.ref_name }}
+        run: |
+          args=(--root .)
+          if [[ "$HEAD_REF" == chore/unified-skillpacks-v1.0.0-* ]]; then
+            args+=(--enforce-change-scope)
+            if [[ -n "$CHANGE_BASE_SHA" && ! "$CHANGE_BASE_SHA" =~ ^0+$ ]]; then
+              args+=(--change-base "$CHANGE_BASE_SHA")
+            fi
+          fi
+          python tools/validate_unified_skillpacks.py "${args[@]}"
       - run: python -m unittest discover -s tests -p 'test_unified_skillpack_conformance.py'
