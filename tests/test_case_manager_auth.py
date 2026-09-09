@@ -85,3 +85,39 @@ def test_authenticated_principal_may_request_lower_view(client, monkeypatch):
         headers={"Authorization": f"Bearer {marker}", "X-Case-Clearance": "public"},
     )
     assert response.status_code == 200
+
+
+def test_invalid_bearer_and_clearance_syntax_are_rejected(client, monkeypatch):
+    marker = "fixture-value"
+    monkeypatch.setenv("PRII_WRITE_TOKEN", marker)
+    monkeypatch.setenv("MONEYSWEEP_CASE_ACTOR", "verified-operator")
+    monkeypatch.setenv("MONEYSWEEP_CASE_CLEARANCE", "restricted")
+
+    assert client.get(
+        "/cases", headers={"Authorization": "Bearer wrong-value"}
+    ).status_code == 401
+    assert client.get("/cases", headers={"X-Case-Clearance": "admin"}).status_code == 400
+
+
+@pytest.mark.parametrize(
+    ("actor", "clearance"),
+    [
+        ("operator-🙂", "internal"),
+        ("operator\nspoof", "internal"),
+        ("verified-operator", "owner"),
+    ],
+)
+def test_invalid_server_identity_configuration_fails_closed(
+    client, monkeypatch, actor, clearance
+):
+    marker = "fixture-value"
+    monkeypatch.setenv("PRII_WRITE_TOKEN", marker)
+    monkeypatch.setenv("MONEYSWEEP_CASE_ACTOR", actor)
+    monkeypatch.setenv("MONEYSWEEP_CASE_CLEARANCE", clearance)
+
+    response = client.post(
+        "/cases",
+        headers={"Authorization": f"Bearer {marker}"},
+        json=payload("invalid server identity"),
+    )
+    assert response.status_code == 503
