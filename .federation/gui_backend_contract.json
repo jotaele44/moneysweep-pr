@@ -1,0 +1,33 @@
+{
+  "schema_version": "federation.gui-backend-contract/1.0",
+  "repository": "Jotaele44/moneysweep-pr",
+  "source_commit": "74b10245f925bfd9b9ea07b2ce986981d5d65525",
+  "policy": {"require_zero_material_residue": true, "dimensions": ["executability", "semantic", "state", "auth", "data", "provenance", "device", "identity", "geometry", "authority"]},
+  "discovery": {
+    "backend_roots": ["server/backend", "moneysweep", "desktop", "scripts"],
+    "frontend_roots": ["dashboard/src"],
+    "route_files": ["dashboard/src/App.jsx"],
+    "navigation_files": ["dashboard/src/pages/Dashboard.jsx"],
+    "existing_gui_capability_manifests": [".federation/gui-capabilities.json"]
+  },
+  "authority": {
+    "semantic_authority": "entities-contractors-ownership-control-procurement-capital",
+    "mutation_authority": "moneysweep-domain-state-only",
+    "identity_authority": "corporate-procurement-control-capital-domain-identities",
+    "geometry_authority": "consumer-of-spiderweb-for-federated-geometry",
+    "provenance_authority": "financial-corporate-procurement-property-source-provenance"
+  },
+  "auth": {"mutating_route_policy": "require_guard_or_explicit_public", "guard_patterns": ["Depends\\(", "require_admin", "require_write", "_WRITE_GUARD", "_require_key", "dependencies\\s*="], "explicit_public_mutations": []},
+  "provenance": {"required_fields_when_available": ["source_ref", "source_hash", "source_record_id", "review_status", "confidence"], "frontend_evidence_files": ["dashboard/src/App.jsx", "dashboard/src/pages/Dashboard.jsx", "dashboard/src/lib/api.js"]},
+  "devices": {"desktop": true, "mobile_web": true, "native_ios": false, "native_evidence_files": [], "intentional_restrictions": []},
+  "backend_only_allowlist": [],
+  "gui_only_allowlist": [],
+  "state_claims": [],
+  "runtime_evidence": {
+    "data": {"state": "OPEN", "evidence": []},
+    "identity": {"state": "OPEN", "evidence": []},
+    "geometry": {"state": "OPEN", "evidence": []},
+    "device": {"state": "OPEN", "evidence": []}
+  },
+  "certification": {"state": "OPEN", "material_residue": ["Prove financial/entity/control GUI claims preserve backend identity, provenance, cardinality, and spatial authority boundaries."]}
+}

@@ -1,0 +1,50 @@
+name: GUI backend parity local contract
+
+on:
+  pull_request:
+    paths:
+      - ".federation/gui_backend_contract.json"
+      - ".federation/gui-capabilities.json"
+      - ".federation/gui-capabilities.extensions/**"
+      - "server/backend/**"
+      - "moneysweep/**"
+      - "dashboard/src/**"
+      - "desktop/**"
+      - "scripts/**"
+      - ".github/workflows/gui-backend-parity-local.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate exact audited-source boundary
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, re, subprocess
+          from pathlib import Path
+          data=json.loads(Path('.federation/gui_backend_contract.json').read_text())
+          assert data['schema_version']=='federation.gui-backend-contract/1.0'
+          assert data['policy']['require_zero_material_residue'] is True
+          source=data['source_commit']; assert re.fullmatch(r'[0-9a-f]{40}',source)
+          subprocess.run(['git','cat-file','-e',source+'^{commit}'],check=True)
+          subprocess.run(['git','merge-base','--is-ancestor',source,'HEAD'],check=True)
+          watched=[*data['discovery']['backend_roots'],*data['discovery']['frontend_roots'],*data['discovery']['route_files'],*data['discovery']['navigation_files'],*data['discovery'].get('existing_gui_capability_manifests',[])]
+          changed=subprocess.check_output(['git','diff','--name-only',source+'..HEAD'],text=True).splitlines()
+          def covered(name):
+              return any(name==raw.rstrip('/') or name.startswith(raw.rstrip('/')+'/') for raw in watched)
+          stale=sorted(name for name in changed if covered(name))
+          if stale: raise SystemExit('gui_backend_contract source_commit predates audited source changes: '+', '.join(stale))
+          assert set(data['runtime_evidence'])=={'data','identity','geometry','device'}
+          print('local contract boundary: PASS')
+          PY
+      - name: Run repository GUI capability parity
+        run: python .federation/check_gui_parity_with_extensions.py
