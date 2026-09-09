@@ -1,0 +1,14 @@
+{
+  "binding": "federation-external-render-provider-binding/1.0",
+  "repository": "moneysweep-pr",
+  "authority_repository": "spiderweb-pr",
+  "provider": "apple-mapkit",
+  "classification": "EXTERNAL_RENDER_PROVIDER",
+  "authority": "NONE",
+  "status": "PROVISIONAL",
+  "intended_uses": ["parcel_context", "facility_context", "property_visual_reference", "investigation_context"],
+  "canonical_data_effect": "NONE",
+  "identity_rule": "APPLE_VISUAL_COINCIDENCE_IS_NEVER_IDENTITY_PROOF",
+  "requirements": ["NO_PROVIDER_PIXEL_PERSISTENCE", "NO_TILE_HARVEST", "ATTRIBUTION_VISIBLE", "NO_NAME_OR_PROXIMITY_ONLY_IDENTITY", "OBSERVATIONS_VISUAL_CORROBORATION_ONLY", "CREDENTIALS_LAST"],
+  "live_enablement": "BLOCKED_UNTIL_SPIDERWEB_PROVIDER_PARITY_PASS"
+}
