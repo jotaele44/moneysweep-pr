@@ -35,9 +35,19 @@ def _ranking(*, value_a=100.0, value_b=50.0, source_hash="a" * 64):
     }
 
 
+def _runtime(label="a"):
+    return {
+        "state": "FROZEN",
+        "producerCommit": label * 40,
+        "python": "3.13.0",
+        "packages": {"pandas": "2.x"},
+        "files": [{"path": "leaderboards.py", "sha256": label * 64}],
+    }
+
+
 @pytest.mark.unit
 def test_snapshot_hash_detects_tampering():
-    snapshot = make_snapshot(_ranking(), captured_at="2026-09-01T00:00:00+00:00", snapshot_id="s1")
+    snapshot = make_snapshot(_ranking(), captured_at="2026-09-01T00:00:00+00:00", snapshot_id="s1", runtime_manifest=_runtime())
     assert verify_snapshot(snapshot) == []
     tampered = deepcopy(snapshot)
     tampered["rows"][0]["metricValue"] = 999
@@ -49,19 +59,19 @@ def test_snapshot_requires_complete_candidate_universe_and_closed_arithmetic():
     ranking = _ranking()
     ranking["topN"] = 25
     with pytest.raises(ValueError, match="complete candidate universe"):
-        make_snapshot(ranking, captured_at="2026-09-01T00:00:00+00:00", snapshot_id="s1")
+        make_snapshot(ranking, captured_at="2026-09-01T00:00:00+00:00", snapshot_id="s1", runtime_manifest=_runtime())
     ranking = _ranking()
     ranking["accounting"]["arithmeticClosed"] = False
     with pytest.raises(ValueError, match="accounting"):
-        make_snapshot(ranking, captured_at="2026-09-01T00:00:00+00:00", snapshot_id="s1")
+        make_snapshot(ranking, captured_at="2026-09-01T00:00:00+00:00", snapshot_id="s1", runtime_manifest=_runtime())
 
 
 @pytest.mark.unit
 def test_noncomparable_filters_fail_closed():
-    prior = make_snapshot(_ranking(), captured_at="2026-09-01T00:00:00+00:00", snapshot_id="s1")
+    prior = make_snapshot(_ranking(), captured_at="2026-09-01T00:00:00+00:00", snapshot_id="s1", runtime_manifest=_runtime())
     changed = _ranking()
     changed["filters"] = {"currency": "USD", "startYear": 2025, "endYear": None}
-    current = make_snapshot(changed, captured_at="2026-09-08T00:00:00+00:00", snapshot_id="s2")
+    current = make_snapshot(changed, captured_at="2026-09-08T00:00:00+00:00", snapshot_id="s2", runtime_manifest=_runtime())
     result = compare(prior, current)
     assert result["movementState"] == "UNRESOLVED_NONCOMPARABLE_SNAPSHOTS"
     assert result["rows"] == []
@@ -69,8 +79,8 @@ def test_noncomparable_filters_fail_closed():
 
 @pytest.mark.unit
 def test_source_hash_change_blocks_economic_change_inference():
-    prior = make_snapshot(_ranking(value_a=100, value_b=50), captured_at="2026-09-01T00:00:00+00:00", snapshot_id="s1")
-    current = make_snapshot(_ranking(value_a=120, value_b=50, source_hash="b" * 64), captured_at="2026-09-08T00:00:00+00:00", snapshot_id="s2")
+    prior = make_snapshot(_ranking(value_a=100, value_b=50), captured_at="2026-09-01T00:00:00+00:00", snapshot_id="s1", runtime_manifest=_runtime())
+    current = make_snapshot(_ranking(value_a=120, value_b=50, source_hash="b" * 64), captured_at="2026-09-08T00:00:00+00:00", snapshot_id="s2", runtime_manifest=_runtime())
     result = compare(prior, current)
     assert result["sourceManifestationChanged"] is True
     assert result["economicChangeInferenceAllowed"] is False
@@ -78,8 +88,28 @@ def test_source_hash_change_blocks_economic_change_inference():
 
 
 @pytest.mark.unit
+def test_runtime_change_blocks_economic_change_inference_even_when_source_is_identical():
+    prior = make_snapshot(_ranking(value_a=100, value_b=50), captured_at="2026-09-01T00:00:00+00:00", snapshot_id="s1", runtime_manifest=_runtime("a"))
+    current = make_snapshot(_ranking(value_a=120, value_b=50), captured_at="2026-09-08T00:00:00+00:00", snapshot_id="s2", runtime_manifest=_runtime("b"))
+    result = compare(prior, current)
+    assert result["sourceManifestationChanged"] is False
+    assert result["runtimeManifestationChanged"] is True
+    assert result["economicChangeInferenceAllowed"] is False
+
+
+@pytest.mark.unit
+def test_identical_source_and_runtime_allow_bounded_economic_change_inference():
+    prior = make_snapshot(_ranking(value_a=100, value_b=50), captured_at="2026-09-01T00:00:00+00:00", snapshot_id="s1", runtime_manifest=_runtime())
+    current = make_snapshot(_ranking(value_a=120, value_b=50), captured_at="2026-09-08T00:00:00+00:00", snapshot_id="s2", runtime_manifest=_runtime())
+    result = compare(prior, current)
+    assert result["sourceManifestationChanged"] is False
+    assert result["runtimeManifestationChanged"] is False
+    assert result["economicChangeInferenceAllowed"] is True
+
+
+@pytest.mark.unit
 def test_duplicate_entity_ids_in_snapshot_are_invalid():
-    snapshot = make_snapshot(_ranking(), captured_at="2026-09-01T00:00:00+00:00", snapshot_id="s1")
+    snapshot = make_snapshot(_ranking(), captured_at="2026-09-01T00:00:00+00:00", snapshot_id="s1", runtime_manifest=_runtime())
     duplicate = deepcopy(snapshot)
     duplicate["rows"][1]["entityId"] = "entity_a"
     duplicate.pop("snapshotSha256")
