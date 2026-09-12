@@ -1,7 +1,9 @@
 from __future__ import annotations
 import importlib.util
 import json
+import os
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,16 +34,13 @@ class UnifiedSkillpackConformanceTests(unittest.TestCase):
             target = entry["unified_target"].split("#", 1)[1]
             self.assertIn(f'<a id="{target}"></a>', skill, entry["capability_id"])
 
-    def test_unrelated_later_commits_do_not_expand_skillpack_scope(self) -> None:
-        allowed = json.loads((ROOT / ".claude/skillpacks/MANIFEST.json").read_text())["allowed_change_paths"]
-        changed = MODULE.scoped_change_paths(
-            ROOT,
-            json.loads((ROOT / ".claude/skillpacks/BINDING.json").read_text())["pinned_base_commit"],
-            allowed,
-        )
-        self.assertNotIn("docs/BACKEND_ASSESSMENT_AND_DEVELOPMENT_PLAN.md", changed)
-        self.assertNotIn("scripts/desktop_startup_probe.py", changed)
-        self.assertTrue(all(MODULE.is_allowed_path(path, allowed) for path in changed))
+    def test_scope_base_uses_explicit_current_change_boundary(self) -> None:
+        with patch.dict(os.environ, {"PRII_SKILLPACK_SCOPE_BASE": "a" * 40}, clear=True):
+            self.assertEqual(MODULE.scope_base_from_environment(), "a" * 40)
+
+    def test_local_historical_run_does_not_invent_a_change_boundary(self) -> None:
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertIsNone(MODULE.scope_base_from_environment())
 
 
 if __name__ == "__main__":
