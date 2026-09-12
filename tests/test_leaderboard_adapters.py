@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
 from server.backend import leaderboard_adapters as adapters
+
+
+ROOT = Path(__file__).resolve().parents[1]
+ONTOLOGY = ROOT / "config" / "financial_category_ontology.json"
 
 
 def _core():
@@ -18,6 +23,26 @@ def _core():
         "edges": pd.DataFrame(columns=["edge_type", "source_node_id", "target_node_id"]),
         "municipalities": pd.DataFrame(columns=["municipality_id", "name"]),
     }
+
+
+@pytest.mark.unit
+def test_ontology_adapter_denominator_is_explicit_and_closed():
+    ontology = json.loads(ONTOLOGY.read_text(encoding="utf-8"))
+    categories = ontology["categories"]
+    assert categories
+    ids = [item["id"] for item in categories]
+    assert len(ids) == len(set(ids))
+    for item in categories:
+        assert item.get("metric_type")
+        assert item.get("certification_state")
+        assert item.get("reason")
+        adapter = item.get("adapter")
+        if adapter:
+            assert adapter in adapters.ADAPTERS
+        else:
+            assert item["certification_state"] in {
+                "OPEN", "OPEN_NOT_MATERIALIZED", "CANDIDATE_NOT_IDENTITY", "BLOCKED", "UNRESOLVED"
+            }
 
 
 @pytest.mark.unit
