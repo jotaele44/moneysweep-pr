@@ -1,14 +1,14 @@
 # Source Materialization Readiness
 
-Total sources: **164**
-Automatable: **115** (ready: **115**, need API key at run time: 12)
+Total sources: **167**
+Automatable: **118** (ready: **118**, need API key at run time: 12)
 Queued / excluded: **49**
 
 ## Path types
 
 | path_type | automatable | count | recommended_action |
 | --- | --- | --- | --- |
-| `api_producer` | True | 74 | Run producer under strict preflight; public API path, set key if gated. |
+| `api_producer` | True | 77 | Run producer under strict preflight; public API path, set key if gated. |
 | `api_adapter` | True | 41 | Materialize via `python -m moneysweep.query --source <id>` (set key if gated). |
 | `manual_export` | False | 42 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
@@ -61,7 +61,7 @@ API keys needed for full automatable materialization: `CENSUS_API_KEY`, `EIA_API
 - `wic`
 - `wioa`
 
-## api_producer (74)
+## api_producer (77)
 
 - `aafaf`
 - `act_transition_ppp`
@@ -89,6 +89,7 @@ API keys needed for full automatable materialization: `CENSUS_API_KEY`, `EIA_API
 - `financialdata_net`
 - `fred_timeseries`
 - `fta_ntd`
+- `ftz_board_pr`
 - `gao_ig_audits`
 - `gleif_lei`
 - `hacienda`
@@ -105,7 +106,9 @@ API keys needed for full automatable materialization: `CENSUS_API_KEY`, `EIA_API
 - `ngo_integration_layer`
 - `nmtc`
 - `oce_socrata_live`
+- `ocif_guide_financial_classes`
 - `ocpr_contracts`
+- `ocs_insurer_registry`
 - `oficina_contralor`
 - `opm_fedscope`
 - `opportunity_zones`

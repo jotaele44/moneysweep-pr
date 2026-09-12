@@ -58,6 +58,7 @@ fpds_report_builder,federal,False,semantic_duplicate,semantic_duplicate,not_acqu
 fred_timeseries,federal,False,api_producer,wired_producer,automated,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,1,False,,no coverage contract declared
 fsrs_subawards,federal,True,semantic_duplicate,semantic_duplicate,acquired_ingested,fully_materialized,unverifiable,not_applicable,unknown,provisional,substantial,True,5989,1,False,,authoritative_universe_total not yet measured (method: api_metadata)
 fta_ntd,infrastructure,False,api_producer,wired_producer,automated,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,0,False,,no coverage contract declared
+ftz_board_pr,federal_financial_incentive,False,api_producer,wired_producer,automated,fully_materialized,uncontracted,not_applicable,unknown,provisional,seed,False,44,3,False,,no coverage contract declared
 gaming_commission,territorial,False,manual_export,manual_dropzone,not_acquired,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,1,False,data/raw/Gaming/,no coverage contract declared
 gao_ig_audits,federal,False,api_producer,wired_producer,automated,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,1,False,,no coverage contract declared
 gleif_lei,entity_resolution,False,api_producer,wired_producer,automated,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,1,False,,no coverage contract declared
@@ -94,7 +95,9 @@ nmtc,federal,False,api_producer,wired_producer,automated,not_materialized,uncont
 nonprofits_irs990,federal,False,api_adapter,wired_adapter,automated,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,1,False,,no coverage contract declared
 oatrh_payroll,territorial,False,manual_export,manual_dropzone,not_acquired,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,1,False,data/raw/OATRH_Payroll/,no coverage contract declared
 oce_socrata_live,political_finance,False,api_producer,wired_producer,automated,fully_materialized,uncontracted,not_applicable,unknown,provisional,substantial,False,6474,1,False,,no coverage contract declared
+ocif_guide_financial_classes,financial_regulation,False,api_producer,wired_producer,automated,fully_materialized,uncontracted,not_applicable,unknown,provisional,partial,False,997,1,False,,no coverage contract declared
 ocpr_contracts,territorial,False,api_producer,wired_producer,not_acquired,not_materialized,unverifiable,not_applicable,unknown,uncertified,empty,True,0,1,False,,authoritative_universe_total not yet measured (method: portal_count)
+ocs_insurer_registry,financial_regulation,False,api_producer,wired_producer,automated,fully_materialized,uncontracted,not_applicable,unknown,provisional,partial,False,761,1,True,,no coverage contract declared
 ofac_sdn,entity_resolution,False,api_adapter,wired_adapter,automated,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,1,False,,no coverage contract declared
 oficina_contralor,territorial,True,api_producer,wired_producer,automated,fully_materialized,unverifiable,not_applicable,unknown,provisional,partial,True,85,1,False,,authoritative_universe_total not yet measured (method: document_index)
 ogpe_permits,municipal,False,manual_export,manual_dropzone,not_acquired,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,1,False,data/raw/OGPe/,no coverage contract declared

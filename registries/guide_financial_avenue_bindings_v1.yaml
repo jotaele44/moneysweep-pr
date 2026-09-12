@@ -1,10 +1,17 @@
 version: "1.0"
 schema_version: guide_financial_avenue_bindings_v1
 scope_id: GUIDE_BOUNDED_100_PERCENT
+# base_registry_snapshot was first frozen at 6ccd83fbb0ef7ad33d692cc36b27a94433500fcd
+# (158 sources). It is extended here by exactly the 3 sources materialized to
+# close GFAV-004/005/020 (ocif_guide_financial_classes, ocs_insurer_registry,
+# ftz_board_pr) -> 161. This is a deliberate, in-place refresh of the frozen
+# denominator, not a new dated snapshot; unrelated live-registry growth since
+# 6ccd83f (e.g. hacienda_sut_ivu, census_gov_finances, ...) is NOT folded in
+# here because none of it binds to a guide avenue.
 base_registry_snapshot:
-  ref: 6ccd83fbb0ef7ad33d692cc36b27a94433500fcd
-  expected_source_count: 158
-  source_ids_sha256: 673659d9c53e8428e21052d95819ff35023e90142756686e73a9c9f1b326bbf2
+  ref: 6ccd83fbb0ef7ad33d692cc36b27a94433500fcd+guide_avenue_gap_closure
+  expected_source_count: 161
+  source_ids_sha256: bdec501cf01d4baf70b6aaf968f0b16a574996a3ff3fe00236d8ffaf546e278b
   source_ids_file: reports/guide_financial_avenue_source_audit_v1.csv
 
 allowed_binding_states:
@@ -29,13 +36,18 @@ bindings:
     source_ids: [bde_loans]
     note: Dedicated Economic Development Bank loan lane; currently manual-export dependent.
   GFAV-004:
-    state: ABSENT
-    source_ids: []
-    note: No dedicated OCIF international-financial-entity denominator in the frozen base registry.
+    state: AUTHORITATIVE_ROUTE
+    source_ids: [ocif_guide_financial_classes]
+    note: >-
+      OCIF concessionaire registry, filtered to ENTIDAD FINANCIERA
+      INTERNACIONAL and ENTIDAD BANCARIA INTERNACIONAL license classes;
+      live-materialized 2026-09-12.
   GFAV-005:
-    state: ABSENT
-    source_ids: []
-    note: No dedicated Office of the Commissioner of Insurance insurer denominator in the frozen base registry.
+    state: AUTHORITATIVE_ROUTE
+    source_ids: [ocs_insurer_registry]
+    note: >-
+      Official OCS domestic-insurer current listing plus per-insurer annual
+      financial-report index (2010-2025); live-materialized 2026-09-12.
   GFAV-006:
     state: CANDIDATE_NOT_IDENTITY
     source_ids: [sec_edgar]
@@ -84,9 +96,11 @@ bindings:
     state: SUPPORTING_ROUTE
     source_ids: [pr_act_60_decrees, ddec_incentives]
   GFAV-020:
-    state: ABSENT
-    source_ids: []
-    note: Federal Register references are discovery, not a dedicated FTZ Board Puerto Rico zone/site denominator.
+    state: AUTHORITATIVE_ROUTE
+    source_ids: [ftz_board_pr]
+    note: >-
+      U.S. FTZ Board OFIS zone/site records for Puerto Rico Zones 7, 61 and
+      163, the frozen discovery denominator; live-materialized 2026-09-12.
   GFAV-021:
     state: AUTHORITATIVE_ROUTE
     source_ids: [opportunity_zones, pr_act_60_decrees, ddec_incentives]
@@ -118,13 +132,15 @@ bindings:
     state: SUPPORTING_ROUTE
     source_ids: [pr_act_60_decrees, ddec_incentives, epa_grants]
 
+# GFAV-004/005/020 were promoted out of this block into `bindings:` above once
+# ocif_guide_financial_classes / ocs_insurer_registry / ftz_board_pr
+# materialized. GFAV-007/011/013 remain proposed-only: the OCIF scraper does
+# not currently retain the "INVESTMENT COMPANIES" license class (only
+# INVESTMENT ADVISOR), so it does not yet prove those avenues' denominators.
 proposed_overlay_bindings:
-  GFAV-004: [ocif_guide_financial_classes]
-  GFAV-005: [ocs_insurer_registry]
   GFAV-007: [ocif_guide_financial_classes]
   GFAV-011: [ocs_insurer_registry, pr_act_60_decrees, ddec_incentives]
   GFAV-013: [ocif_guide_financial_classes, ddec_incentives]
-  GFAV-020: [ftz_board_pr]
 
 certification_exclusions:
   - >-

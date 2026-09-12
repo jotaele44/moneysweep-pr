@@ -1,6 +1,6 @@
 {
   "schema_version": "completeness_matrix_v1",
-  "total_sources": 164,
+  "total_sources": 167,
   "contracted_sources": 23,
   "by_wired_status": {
     "deferred": 2,
@@ -8,37 +8,37 @@
     "scraper_stub": 2,
     "semantic_duplicate": 3,
     "wired_adapter": 41,
-    "wired_producer": 74
+    "wired_producer": 77
   },
   "by_acquisition_status": {
     "acquired_ingested": 6,
-    "automated": 114,
+    "automated": 117,
     "not_acquired": 44
   },
   "by_materialization_status": {
-    "fully_materialized": 17,
+    "fully_materialized": 20,
     "not_materialized": 144,
     "partially_materialized": 3
   },
   "by_coverage_status": {
     "below_contract": 3,
     "meets_contract": 3,
-    "uncontracted": 141,
+    "uncontracted": 144,
     "unverifiable": 17
   },
   "by_reconciliation_status": {
-    "not_applicable": 162,
+    "not_applicable": 165,
     "not_evaluated": 2
   },
   "by_certification_status": {
     "certified_complete": 1,
-    "provisional": 16,
+    "provisional": 19,
     "uncertified": 147
   },
   "by_materiality_label": {
     "empty": 146,
-    "partial": 1,
-    "seed": 2,
+    "partial": 3,
+    "seed": 3,
     "substantial": 12,
     "validated_complete": 3
   },

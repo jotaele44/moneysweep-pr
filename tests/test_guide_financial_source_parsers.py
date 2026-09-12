@@ -56,10 +56,18 @@ def test_ocs_current_and_annual_are_distinct_observation_grains():
 
     annual_html = """
     <html><body>
-      <h2>2025</h2>
-      <div><a href='/files/popular-re-2025.pdf'>Popular Re, Inc.</a></div>
-      <h2>2024</h2>
-      <div><a href='/files/popular-re-2024.pdf'>Popular Re, Inc.</a></div>
+      <script>
+        var temp_array = [];
+        temp_array['anio'] = '2025';
+        temp_array['name'] = 'Popular Re, Inc.';
+        temp_array['anchor'] = 'https://docs.pr.gov/files/popular-re-2025.pdf';
+        registros.push(temp_array);
+        var temp_array = [];
+        temp_array['anio'] = '2024';
+        temp_array['name'] = 'Popular Re, Inc.';
+        temp_array['anchor'] = 'https://docs.pr.gov/files/popular-re-2024.pdf';
+        registros.push(temp_array);
+      </script>
     </body></html>
     """
     annual = parse_annual_reports(
@@ -74,25 +82,48 @@ def test_ocs_current_and_annual_are_distinct_observation_grains():
     assert annual[0]["source_record_id"] != annual[1]["source_record_id"]
 
 
-def test_ocs_annual_parser_accepts_official_cms_item_links():
-    html = """
+def test_ocs_annual_parser_reads_embedded_cms_records_and_ignores_site_nav_pdfs():
+    """The live OCS index has no per-report <a href>: rows exist only as JS
+
+    ``temp_array[...]`` assignments inside a hidden CMS list. Unrelated
+    site-wide navigation PDFs (ethics law, strategic plan, ...) repeat
+    identically on every OCS page and must never be mistaken for a report row.
+    """
+    html_page = """
     <html><body>
-      <h2>2025</h2>
-      <div><a href='/informes-anuales/2025-popular-re-inc-j4idh'>Popular Re, Inc.</a></div>
-      <div><a href='/informes-anuales/triple-s-vida-inc-32ejq2025'>Triple-S Vida, Inc.</a></div>
-      <div><a href='/unrelated/2025-item'>Not an annual report</a></div>
+      <nav class="nav-menu">
+        <a href="https://docs.pr.gov/files/OCS/Leyes/Ley1-2012.pdf">2012 Ley de Etica Gubernamental</a>
+      </nav>
+      <section class="page-directorio">
+        <div class="hide w-dyn-list">
+          <script>
+            var registros = [];
+            var temp_array = [];
+            temp_array['anio'] = '2025';
+            temp_array['name'] = 'Triple-S Vida, Inc.';
+            temp_array['anchor'] = 'https://docs.pr.gov/files/OCS/Informes%20Anuales/2025/Triple-S%20Vida.pdf';
+            registros.push(temp_array);
+            var temp_array = [];
+            temp_array['anio'] = '2010';
+            temp_array['name'] = 'UNITED SURETY &amp; INDEMNITY COMPANY';
+            temp_array['anchor'] = 'https://docs.pr.gov/files/OCS/Informes%20Anuales/2010/UNITED%20SURETY.pdf';
+            registros.push(temp_array);
+          </script>
+        </div>
+      </section>
     </body></html>
     """
     rows = parse_annual_reports(
-        html,
+        html_page,
         source_url="https://www.ocs.pr.gov/regulados/informes-anuales",
         retrieved_at="2026-08-26T00:00:00+00:00",
     )
     assert [(row["report_year_raw"], row["insurer_name_raw"]) for row in rows] == [
-        ("2025", "Popular Re, Inc."),
         ("2025", "Triple-S Vida, Inc."),
+        ("2010", "UNITED SURETY & INDEMNITY COMPANY"),
     ]
-    assert all("/informes-anuales/" in row["report_url"] for row in rows)
+    assert all("Ley1-2012" not in row["report_url"] for row in rows)
+    assert all(".pdf" in row["report_url"] for row in rows)
 
 
 def test_ftz_parser_verifies_zone_and_preserves_site_rows():
