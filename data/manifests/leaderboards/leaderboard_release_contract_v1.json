@@ -12,7 +12,7 @@
     {
       "id": "CI_EXECUTION",
       "state": "BLOCKED",
-      "reason": "PR workflow jobs have failed before acquiring a runner and executed zero steps; no pass/fail inference about code is permitted from those runs."
+      "reason": "PR workflow jobs fail before runner acquisition and expose no executed steps; no code-level pass/fail inference is permitted."
     },
     {
       "id": "HISTORICAL_COMPARISON",
@@ -26,8 +26,8 @@
     },
     {
       "id": "THEHUB_PROMOTION",
-      "state": "BLOCKED",
-      "reason": "TheHub may consume only a certification-gated producer contract; producer certification is not issued."
+      "state": "OPEN",
+      "reason": "TheHub consumer contract and fail-closed product surface are prepared in thehub-pr PR #285; promotion remains unauthorized until producer and consumer CI, exact package replay, and trusted receipt/release hashes pass."
     }
   ],
   "required_gates": [
@@ -68,9 +68,13 @@
       "server/backend/leaderboard_entities.py"
     ],
     "snapshot_materializer": "scripts/materialize_leaderboard_snapshot.py",
+    "certification_receipt": "data/manifests/leaderboards/MONEYSWEEP_LEADERBOARD_CERTIFICATION.json",
+    "federation_exporter": "scripts/export_leaderboard_package.py",
+    "federation_export_schema": "schemas/leaderboard_export_package.schema.json",
     "frontend": "dashboard/src/components/FinancialLeaderboards.jsx",
     "api_client": "dashboard/src/lib/api.js",
-    "gui_capability": ".federation/gui-capabilities.extensions/financial-leaderboards-v1.json"
+    "gui_capability": ".federation/gui-capabilities.extensions/financial-leaderboards-v1.json",
+    "thehub_consumer_pr": "jotaele44/thehub-pr#285"
   },
   "promotion_rules": {
     "money_sweep_is_financial_authority": true,
