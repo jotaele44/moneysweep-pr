@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prii.local/schemas/moneysweep-leaderboard-export-package-v1.json",
+  "title": "MoneySweep financial leaderboard export package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "producer",
+    "producerCommit",
+    "rankingContractVersion",
+    "ontologyContractVersion",
+    "certification",
+    "generatedAt",
+    "categories"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "moneysweep.leaderboard-export-package/v1"},
+    "producer": {"const": "moneysweep-pr"},
+    "producerCommit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "rankingContractVersion": {"const": "moneysweep.leaderboard/v1.1"},
+    "ontologyContractVersion": {"const": "moneysweep.financial-category-ontology/v1.1"},
+    "generatedAt": {"type": "string", "format": "date-time"},
+    "certification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "receiptSha256", "releaseManifestSha256"],
+      "properties": {
+        "state": {"const": "PASS"},
+        "receiptSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "releaseManifestSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["categoryId", "metricType", "snapshotId", "snapshotSha256", "rows"],
+        "properties": {
+          "categoryId": {"type": "string", "minLength": 1},
+          "metricType": {"type": "string", "minLength": 1},
+          "snapshotId": {"type": "string", "minLength": 1},
+          "snapshotSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["entityId", "entityDisplayName", "metricValue", "currency", "rank", "entityResolutionState"],
+              "properties": {
+                "entityId": {"type": "string", "minLength": 1},
+                "entityDisplayName": {"type": "string", "minLength": 1},
+                "metricValue": {"type": "number"},
+                "currency": {"type": "string", "minLength": 1},
+                "rank": {"type": "integer", "minimum": 1},
+                "entityResolutionState": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

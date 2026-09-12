@@ -1,0 +1,94 @@
+{
+  "schema_version": "moneysweep.leaderboard-release-contract/v1",
+  "repository": "jotaele44/moneysweep-pr",
+  "branch": "feature/moneysweep-leaderboard-plane",
+  "scope": "financial leaderboard producer plane",
+  "ranking_contract": "moneysweep.leaderboard/v1.1",
+  "ontology_contract": "moneysweep.financial-category-ontology/v1.1",
+  "certification_state": "BLOCKED",
+  "certification_issued": false,
+  "promotion_authorized": false,
+  "blockers": [
+    {
+      "id": "CI_EXECUTION",
+      "state": "BLOCKED",
+      "reason": "PR workflow jobs fail before runner acquisition and expose no executed steps; no code-level pass/fail inference is permitted."
+    },
+    {
+      "id": "HISTORICAL_COMPARISON",
+      "state": "OPEN",
+      "reason": "Top Movers requires at least two independently frozen, hash-verified comparable snapshots with equal ranking, filter, currency, source and runtime/producer-commit boundaries."
+    },
+    {
+      "id": "CATEGORY_RESIDUE",
+      "state": "OPEN",
+      "reason": "The 21-category ontology denominator is fully classified, but 14 categories remain explicitly unsupported because stable identity, one financial semantic, or source materialization is not closed."
+    },
+    {
+      "id": "THEHUB_PROMOTION",
+      "state": "OPEN",
+      "reason": "TheHub consumer contract and fail-closed product surface are prepared in thehub-pr PR #285; promotion remains unauthorized until producer and consumer CI, exact package replay, and trusted receipt/release hashes pass."
+    }
+  ],
+  "required_gates": [
+    "ONTOLOGY_SCHEMA",
+    "ONTOLOGY_DENOMINATOR_CLOSED",
+    "ADAPTER_REGISTRY_CLOSED",
+    "NO_NAME_ONLY_IDENTITY",
+    "NO_CROSS_MEASURE_AGGREGATION",
+    "CURRENCY_PARTITION",
+    "TOP_N_TIE_BOUNDARY",
+    "NULL_EXPLICIT",
+    "IDENTITY_UNRESOLVED_EXPLICIT",
+    "MANY_TO_MANY_FAIL_CLOSED",
+    "ROW_ACCOUNTING_CLOSED",
+    "STABLE_ID_UNIQUENESS",
+    "SNAPSHOT_HASH_VALID",
+    "SNAPSHOT_COMPLETE_CANDIDATE_UNIVERSE",
+    "SNAPSHOT_COMPARABILITY",
+    "SOURCE_CHANGE_MOVEMENT_GUARD",
+    "RUNTIME_MANIFEST_FROZEN",
+    "PRODUCER_COMMIT_BOUND",
+    "ENTITY_DRILLDOWN_WHOLE_ROW_CONSERVATION",
+    "SPATIAL_HANDOFF_NO_GEOMETRY_PROMOTION",
+    "GUI_PARITY",
+    "PLAYWRIGHT_E2E",
+    "PYTEST",
+    "LINT",
+    "TYPECHECK",
+    "SECRET_SCAN",
+    "FEDERATION_COMPATIBILITY",
+    "THEHUB_CONSUMER_CONTRACT",
+    "CROSS_REPOSITORY_REPLAY",
+    "RELEASE_MANIFEST_HASHES",
+    "ZERO_MATERIAL_UNRESOLVED_RESIDUE_INSIDE_CERTIFIED_SCOPE"
+  ],
+  "implemented_surfaces": {
+    "backend": [
+      "server/backend/leaderboards.py",
+      "server/backend/leaderboard_adapters.py",
+      "server/backend/leaderboard_history.py",
+      "server/backend/leaderboard_investigation.py",
+      "server/backend/leaderboard_entities.py"
+    ],
+    "snapshot_materializer": "scripts/materialize_leaderboard_snapshot.py",
+    "certification_receipt": "data/manifests/leaderboards/MONEYSWEEP_LEADERBOARD_CERTIFICATION.json",
+    "ontology_adapter_coverage": "data/manifests/leaderboards/ontology_adapter_coverage_v1.json",
+    "federation_exporter": "scripts/export_leaderboard_package.py",
+    "federation_export_schema": "schemas/leaderboard_export_package.schema.json",
+    "frontend": "dashboard/src/components/FinancialLeaderboards.jsx",
+    "api_client": "dashboard/src/lib/api.js",
+    "gui_capability": ".federation/gui-capabilities.extensions/financial-leaderboards-v1.json",
+    "thehub_consumer_pr": "jotaele44/thehub-pr#285"
+  },
+  "promotion_rules": {
+    "money_sweep_is_financial_authority": true,
+    "thehub_is_cross_producer_product_surface": true,
+    "spiderweb_is_geometry_authority": true,
+    "thehub_must_not_recompute_money_sweep_rankings": true,
+    "thehub_must_verify_producer_contract_and_release_receipt": true,
+    "snapshot_runtime_and_producer_commit_must_match_export": true,
+    "provisional_snapshots_cannot_be_promoted": true,
+    "diagnostic_ui_does_not_imply_certification": true
+  }
+}
