@@ -3,7 +3,7 @@
 The public API delegates every executable financial category to a separately
 bounded adapter. Names are never identity evidence, non-equivalent measures are
 never mixed, and historical movement is exposed only from hash-verified
-comparable snapshots.
+snapshots that match the exact requested ranking universe.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from server.backend.leaderboard_adapters import (
     run_adapter,
 )
 from server.backend.leaderboard_entities import build_entity_drilldown
-from server.backend.leaderboard_history import latest_movers, list_snapshots
+from server.backend.leaderboard_history import compare, list_snapshots
 from server.backend.leaderboard_investigation import build_signals
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -124,6 +124,39 @@ def _contract_award_ranking(
     )
 
 
+def _history_key(value: dict[str, Any]) -> tuple[str, str, str, str, str]:
+    return (
+        str(value.get("categoryId") or ""),
+        str(value.get("metricType") or ""),
+        str(value.get("rankingVersion") or ""),
+        json.dumps(value.get("filters") or {}, sort_keys=True, separators=(",", ":")),
+        json.dumps(value.get("currencies") or [], sort_keys=True, separators=(",", ":")),
+    )
+
+
+def _movers_for_ranking(ranking: dict[str, Any], *, limit: int = 10) -> dict[str, Any]:
+    """Select history only from the exact ranking universe requested now."""
+    category = str(ranking.get("categoryId") or "")
+    target_key = _history_key(ranking)
+    snapshots = [row for row in list_snapshots(category) if _history_key(row) == target_key]
+    if len(snapshots) < 2:
+        return {
+            "categoryId": category,
+            "certificationState": "OPEN",
+            "movementState": "OPEN_NO_COMPARABLE_PRIOR_SNAPSHOT",
+            "reason": "At least two valid frozen snapshots matching the exact category/measure/version/filter/currency universe are required.",
+            "snapshotCount": len(snapshots),
+            "rows": [],
+            "limit": limit,
+            "filters": ranking.get("filters") or {},
+            "currencies": ranking.get("currencies") or [],
+        }
+    result = compare(snapshots[-2], snapshots[-1], limit=limit)
+    result["filters"] = ranking.get("filters") or {}
+    result["currencies"] = ranking.get("currencies") or []
+    return result
+
+
 def create_router(data: dict[str, pd.DataFrame]) -> APIRouter:
     router = APIRouter(prefix="/leaderboards", tags=["leaderboards"])
 
@@ -175,14 +208,33 @@ def create_router(data: dict[str, pd.DataFrame]) -> APIRouter:
                     "filters": row.get("filters"),
                     "currencies": row.get("currencies"),
                     "certificationState": row.get("certificationState"),
+                    "runtimeManifest": row.get("runtimeManifest"),
                 }
                 for row in snapshots
             ],
         }
 
     @router.get("/movers")
-    def movers(category: str = "contract_award", limit: int = Query(10, ge=1, le=25)):
-        return latest_movers(category, limit=limit)
+    def movers(
+        category: str = "contract_award",
+        limit: int = Query(10, ge=1, le=25),
+        start_year: int | None = None,
+        end_year: int | None = None,
+        municipality: str | None = None,
+        entity_type: str | None = None,
+        currency: str | None = None,
+    ):
+        ranking = build_ranking(
+            data,
+            category=category,
+            limit=1,
+            start_year=start_year,
+            end_year=end_year,
+            municipality=municipality,
+            entity_type=entity_type,
+            currency=currency,
+        )
+        return _movers_for_ranking(ranking, limit=limit)
 
     @router.get("/signals")
     def signals(
@@ -204,7 +256,7 @@ def create_router(data: dict[str, pd.DataFrame]) -> APIRouter:
             entity_type=entity_type,
             currency=currency,
         )
-        movement = latest_movers(category, limit=10)
+        movement = _movers_for_ranking(ranking, limit=10)
         return build_signals(ranking, movement)
 
     @router.get("/entity/{entity_id}")
