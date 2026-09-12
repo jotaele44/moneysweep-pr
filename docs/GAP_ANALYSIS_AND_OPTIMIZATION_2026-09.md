@@ -210,14 +210,27 @@ deferred. Measuring that backlog:
 ~2,600 findings total. `I001` (262, autofixable) and `RUF100` (100 — unused suppressions that
 are pure noise) are the cheapest wins if the ratchet is ever advanced.
 
-### C4 — Committed build exhaust — **NOT FIXED (maintainer's call)**
+### C4 — Committed build exhaust the repo already decided to ignore — **NOT FIXED (maintainer's call)**
 
 `reports/local_analysis/` holds **152 tracked files / 5.2 MB** — 61 `.log`, 49 `.txt`, 37
 `.exitcode`, 3 coverage `.xml` — from local debugging sessions dated 2026-07-05/06, referenced
 by **zero** code, tests, or workflows. That is ~73% of the 7.1 MB `reports/` tree.
 
-Deleting it collides with the repo's explicit preserve-for-auditability posture, so it is
-raised, not actioned.
+The decisive detail: **`.gitignore:164` already ignores `reports/local_analysis/`**, describing
+it as "agent scratch, not part of the committed audit trail". Ignore rules do not apply to
+already-tracked paths, so the 152 files the rule was written to exclude are still in the index:
+
+```
+$ git check-ignore -v --no-index reports/local_analysis/.../00_coverage_baseline.xml
+.gitignore:164:reports/local_analysis/    reports/local_analysis/.../00_coverage_baseline.xml
+$ git ls-files reports/local_analysis | wc -l
+152
+```
+
+So `git rm --cached -r reports/local_analysis/` would *implement* the repo's own stated policy
+rather than override the preserve-for-auditability posture — the posture was already decided
+against this content. Still left to the maintainer because it removes 5.2 MB from the index and
+is a content decision, not a quality-gate one.
 
 > **A correction to this review's own starting hypothesis.** An initial scan flagged "41
 > byte-identical tracked blob groups, 2.7 MB wasted". On inspection most are **legitimate**:
@@ -226,11 +239,13 @@ raised, not actioned.
 > `data/exports/*_r4_9h.csv` ↔ `data/review_queue/*` pairs are genuine redundancy. The
 > headline number was wrong and is withdrawn.
 
-### C5 — `artifacts/` is not gitignored — **NOT FIXED**
+### C5 — `artifacts/` was not gitignored — **FIXED**
 
-`.federation/check_gui_parity_with_extensions.py` writes `artifacts/gui-capabilities-merged.json`
-on every run. The path is untracked and absent from `.gitignore`, so it shows as an untracked
-file after any local parity check and is one `git add -A` away from being committed.
+`.federation/check_gui_parity_with_extensions.py:22` writes
+`artifacts/gui-capabilities-merged.json` on every run. The path was absent from `.gitignore`,
+so it surfaced as an untracked file after any local parity check and was one `git add -A` away
+from being committed — a 100 KB derived manifest that is never a source of truth. Added to
+`.gitignore` alongside the existing `reports/local_analysis/` rule.
 
 ---
 
@@ -256,7 +271,7 @@ file after any local parity check and is one `git add -A` away from being commit
 | B4 | Architecture | Decompose `run_all_legacy.py` (2,073 LOC); bring into type + coverage scope | L | Med | P1 |
 | D2/D3 | Governance | Re-certify `reports/current_status.json` and `STATUS.md` from an emitted measurement | S | Low | P2 |
 | C3 | Lint | Advance the ratchet: `I001` (262) and `RUF100` (100) first | S | Low | P2 |
-| C4/C5 | Hygiene | Decide on `reports/local_analysis/` (5.2 MB); gitignore `artifacts/` | S | Low | P2 |
+| C4 | Hygiene | `git rm --cached -r reports/local_analysis/` (5.2 MB) — completes the intent `.gitignore:164` already declares | S | Low | P2 |
 
 ## Verification of the changes in this PR
 
