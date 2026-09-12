@@ -1,9 +1,9 @@
 """Frozen leaderboard snapshot and rank-delta semantics.
 
-Snapshots are immutable evidence artifacts.  Comparisons are permitted only when
+Snapshots are immutable evidence artifacts. Comparisons are permitted only when
 category, financial measure, ranking contract, currency/filter universe and
-identity namespace are equal.  Source changes remain visible in the comparison
-receipt rather than being mislabeled as economic activity.
+runtime manifestation are equal. Source or runtime changes remain visible in the
+comparison receipt rather than being mislabeled as economic activity.
 """
 
 from __future__ import annotations
@@ -27,7 +27,13 @@ def snapshot_sha256(snapshot: dict[str, Any]) -> str:
     return hashlib.sha256(_canonical_json(payload).encode("utf-8")).hexdigest()
 
 
-def make_snapshot(ranking: dict[str, Any], *, captured_at: str, snapshot_id: str) -> dict[str, Any]:
+def make_snapshot(
+    ranking: dict[str, Any],
+    *,
+    captured_at: str,
+    snapshot_id: str,
+    runtime_manifest: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Convert a complete ranking result (limit=None) into an immutable snapshot."""
     if ranking.get("topN") is not None:
         raise ValueError("snapshot source ranking must contain the complete candidate universe")
@@ -35,7 +41,7 @@ def make_snapshot(ranking: dict[str, Any], *, captured_at: str, snapshot_id: str
     if not accounting.get("arithmeticClosed"):
         raise ValueError("ranking accounting must close before snapshot materialization")
     snapshot = {
-        "schemaVersion": "moneysweep.leaderboard-snapshot/v1",
+        "schemaVersion": "moneysweep.leaderboard-snapshot/v1.1",
         "snapshotId": snapshot_id,
         "capturedAt": captured_at,
         "categoryId": ranking["categoryId"],
@@ -47,6 +53,7 @@ def make_snapshot(ranking: dict[str, Any], *, captured_at: str, snapshot_id: str
         "accounting": accounting,
         "rows": ranking.get("rows") or [],
         "sourceManifestations": ranking.get("sourceManifestations") or [],
+        "runtimeManifest": runtime_manifest or {"state": "UNSPECIFIED"},
         "methodology": ranking.get("methodology") or {},
         "certificationState": ranking.get("certificationState"),
     }
@@ -56,7 +63,7 @@ def make_snapshot(ranking: dict[str, Any], *, captured_at: str, snapshot_id: str
 
 def verify_snapshot(snapshot: dict[str, Any]) -> list[str]:
     errors: list[str] = []
-    if snapshot.get("schemaVersion") != "moneysweep.leaderboard-snapshot/v1":
+    if snapshot.get("schemaVersion") != "moneysweep.leaderboard-snapshot/v1.1":
         errors.append("schema_version")
     expected = snapshot.get("snapshotSha256")
     if not expected or expected != snapshot_sha256(snapshot):
@@ -73,6 +80,9 @@ def verify_snapshot(snapshot: dict[str, Any]) -> list[str]:
     accounting = snapshot.get("accounting") or {}
     if accounting.get("arithmeticClosed") is not True:
         errors.append("arithmetic_not_closed")
+    runtime_manifest = snapshot.get("runtimeManifest")
+    if not isinstance(runtime_manifest, dict) or not runtime_manifest:
+        errors.append("runtime_manifest")
     return errors
 
 
@@ -103,6 +113,10 @@ def _comparison_key(snapshot: dict[str, Any]) -> tuple[str, str, str, str, str]:
         _canonical_json(snapshot.get("filters") or {}),
         _canonical_json(snapshot.get("currencies") or []),
     )
+
+
+def _runtime_key(snapshot: dict[str, Any]) -> str:
+    return _canonical_json(snapshot.get("runtimeManifest") or {})
 
 
 def compare(prior: dict[str, Any], current: dict[str, Any], *, limit: int = 10) -> dict[str, Any]:
@@ -182,6 +196,22 @@ def compare(prior: dict[str, Any], current: dict[str, Any], *, limit: int = 10) 
     prior_manifest = {item.get("path"): item.get("sha256") for item in prior.get("sourceManifestations") or []}
     current_manifest = {item.get("path"): item.get("sha256") for item in current.get("sourceManifestations") or []}
     source_changed = prior_manifest != current_manifest
+    runtime_changed = _runtime_key(prior) != _runtime_key(current)
+    runtime_unspecified = (
+        (prior.get("runtimeManifest") or {}).get("state") == "UNSPECIFIED"
+        or (current.get("runtimeManifest") or {}).get("state") == "UNSPECIFIED"
+    )
+    inference_allowed = not source_changed and not runtime_changed and not runtime_unspecified
+    if source_changed and runtime_changed:
+        reason = "source and runtime manifestations changed; movement is a dataset/runtime delta and must not be labeled economic activity"
+    elif source_changed:
+        reason = "source manifestations changed; movement is a dataset delta and must not be labeled economic activity"
+    elif runtime_changed:
+        reason = "runtime manifestation changed; movement may reflect code/dependency behavior and must not be labeled economic activity"
+    elif runtime_unspecified:
+        reason = "runtime manifestation is unspecified; economic-change inference is fail-closed"
+    else:
+        reason = "source and runtime manifestations are identical; rank/value movement is comparable within the frozen contract"
     return {
         "categoryId": current["categoryId"],
         "metricType": current["metricType"],
@@ -190,12 +220,10 @@ def compare(prior: dict[str, Any], current: dict[str, Any], *, limit: int = 10) 
         "priorSnapshotId": prior["snapshotId"],
         "currentSnapshotId": current["snapshotId"],
         "sourceManifestationChanged": source_changed,
-        "economicChangeInferenceAllowed": not source_changed,
-        "reason": (
-            "source manifestations changed; movement is a dataset delta and must not be labeled economic activity"
-            if source_changed
-            else "source manifestations are byte-identical across snapshots; rank/value movement reflects changed ranking rows within the frozen universe"
-        ),
+        "runtimeManifestationChanged": runtime_changed,
+        "runtimeManifestationSpecified": not runtime_unspecified,
+        "economicChangeInferenceAllowed": inference_allowed,
+        "reason": reason,
         "rows": movers[:limit],
         "movementCounts": {
             state: sum(1 for row in deltas if row["movementState"] == state)
