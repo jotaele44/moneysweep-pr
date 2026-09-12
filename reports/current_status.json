@@ -29,15 +29,15 @@
     "main_identical_to_merge_commit": true
   },
   "source_registry_current": {
-    "total_sources": 164,
-    "source_ids_sha256": "4c551385f00ca6df4332ee1643d0ef7a6ab85172632d945d35be285cd94f5826",
+    "total_sources": 167,
+    "source_ids_sha256": "aa4d0db8f8974d21263c3cd528de31ccf187c919c31ae2de6358d9c03f63a1ac",
     "required_sources": 16,
     "override_policy": "Existing source IDs only; source_id and required are immutable."
   },
   "materialization_readiness_truth": {
-    "total_sources": 164,
-    "automatable_total": 115,
-    "automatable_ready": 115,
+    "total_sources": 167,
+    "automatable_total": 118,
+    "automatable_ready": 118,
     "queued_excluded_total": 49,
     "queued_excluded": {
       "manual_export": 42,
@@ -49,7 +49,7 @@
   },
   "materialization_coverage": {
     "evidence_registry_total": 151,
-    "current_registry_total": 164,
+    "current_registry_total": 167,
     "denominator_comparable": false,
     "regeneration_status": "CERTIFIED_OPERATOR_CORPUS_WITH_COMPLETE_DERIVED_LINEAGE",
     "probe_ran": false,
@@ -70,7 +70,7 @@
       "unadjudicated_orphan_rows": 0,
       "unresolved_lineage_rows_within_derived_outputs": 0
     },
-    "denominator_drift_note": "Eleven sources were registered after the certified 151-source operator corpus was measured. The 67/151 snapshot below is unchanged and remains valid only for its frozen denominator; it must be re-measured on an operator machine before comparison with the current 162-source registry."
+    "denominator_drift_note": "Sources were registered after the certified 151-source operator corpus was measured. The 67/151 snapshot below is unchanged and remains valid only for its frozen denominator; it must be re-measured on an operator machine before comparison with the current 167-source registry."
   },
   "wave0_ci_certification": {
     "merged_reconciliation_pr": {

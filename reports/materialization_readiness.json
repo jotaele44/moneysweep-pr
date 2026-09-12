@@ -1,8 +1,8 @@
 {
   "schema_version": "r5_readiness_v1",
-  "total_sources": 164,
-  "automatable_total": 115,
-  "automatable_ready": 115,
+  "total_sources": 167,
+  "automatable_total": 118,
+  "automatable_ready": 118,
   "automatable_not_ready": [],
   "automatable_needs_key_count": 12,
   "automatable_required_keys": [
@@ -27,7 +27,7 @@
   "source_count_provenance": {
     "computed_from_live_registry": true,
     "registry_schema_version": "r5_source_registry_v1",
-    "source_ids_sha256": "4c551385f00ca6df4332ee1643d0ef7a6ab85172632d945d35be285cd94f5826",
+    "source_ids_sha256": "aa4d0db8f8974d21263c3cd528de31ccf187c919c31ae2de6358d9c03f63a1ac",
     "historical_counts_are_non_authoritative": true
   },
   "outputs": [
