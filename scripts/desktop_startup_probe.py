@@ -8,6 +8,7 @@ import importlib
 import json
 import socket
 import sys
+import tempfile
 import threading
 import time
 from datetime import datetime, timezone
@@ -121,7 +122,22 @@ def main() -> int:
     sys.path.insert(0, str(root))
     try:
         config = importlib.import_module("desktop.config")
-        result = probe("desktop.app_server:app", getattr(config, "HEALTH_PATH", "/health"), args.timeout)
+        # The real launcher bootstraps a writable per-user workspace before it
+        # imports the fail-closed desktop ASGI app. Reproduce that lifecycle in
+        # an isolated temporary directory so the probe neither depends on nor
+        # mutates an operator's existing workspace.
+        with tempfile.TemporaryDirectory(prefix="moneysweep-startup-probe-") as workspace:
+            import os
+
+            os.environ["MONEYSWEEP_WORKSPACE_ROOT"] = workspace
+            from desktop.workspace import bootstrap_workspace
+
+            bootstrap_workspace()
+            result = probe(
+                "desktop.app_server:app",
+                getattr(config, "HEALTH_PATH", "/health"),
+                args.timeout,
+            )
     except (Exception, SystemExit) as exc:
         result = {"schema_version": "desktop_startup_probe.v1", "state": "FAIL",
                   "certification": "AUDIT_ONLY", "error": str(exc)}

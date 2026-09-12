@@ -1,5 +1,7 @@
 # Extra dependencies for the double-click desktop wrapper (see desktop/).
 pywebview>=6.2.1
+# desktop.secrets persists connector credentials through the native OS vault.
+keyring>=25,<26
 # Shared federation runtime pinned to an immutable TheHub commit so generated
 # repositories install independently without requiring a sibling checkout.
 prii-desktop @ git+https://github.com/jotaele44/thehub-pr.git@f2b81769924689b4d959554928810b1d7b7ef3d6#subdirectory=packages/prii_desktop
