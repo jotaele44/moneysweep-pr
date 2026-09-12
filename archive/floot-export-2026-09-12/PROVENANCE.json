@@ -1,0 +1,12 @@
+{
+  "schema": "floot-archive-provenance/1.0",
+  "app": "MoneySweep PR",
+  "source_archive": "MoneySweep PR.zip",
+  "retrieved_context_date": "2026-09-12",
+  "sha256": "252ec2d3c75a3a79eab25e61614a11d77227c19bd50741171f7a29684efece13",
+  "byte_size": 506217,
+  "zip_member_count": 231,
+  "archive_role": "HISTORICAL_DONOR_SNAPSHOT",
+  "canonicality": "NONCANONICAL",
+  "rules": {"overwrite_current_main": false, "schema_is_canonical_by_age": false, "infer_database_contents_from_schema": false, "preserve_raw_before_normalization": true}
+}
