@@ -29,6 +29,20 @@ def is_allowed_path(path: str, allowed_paths: list[str]) -> bool:
     )
 
 
+def scoped_change_paths(root: Path, base: str, governed_paths: list[str]) -> list[str]:
+    """Return complete commit-level changes for commits touching governed paths."""
+    history = run_git(root, "log", "--format=%H", f"{base}..HEAD", "--", *governed_paths)
+    if history.returncode != 0:
+        raise RuntimeError("git history query failed")
+    changed: set[str] = set()
+    for commit in filter(None, history.stdout.splitlines()):
+        diff = run_git(root, "diff-tree", "--root", "--no-commit-id", "--name-only", "-r", commit)
+        if diff.returncode != 0:
+            raise RuntimeError(f"git diff-tree failed: {commit}")
+        changed.update(path for path in diff.stdout.splitlines() if path)
+    return sorted(changed)
+
+
 def validate(root: Path) -> dict[str, Any]:
     skillpack_root = root / ".claude" / "skillpacks"
     errors = []
@@ -126,12 +140,9 @@ def validate(root: Path) -> dict[str, Any]:
         else:
             if run_git(root, "merge-base", "--is-ancestor", base, "HEAD").returncode != 0:
                 errors.append("pinned base is not an ancestor of HEAD")
-            diff = run_git(root, "diff", "--name-only", f"{base}..HEAD")
-            if diff.returncode != 0:
-                errors.append("git diff failed")
-            else:
-                changed = [p for p in diff.stdout.splitlines() if p]
-                allowed = manifest["allowed_change_paths"]
+            allowed = manifest["allowed_change_paths"]
+            try:
+                changed = scoped_change_paths(root, base, allowed)
                 for p in changed:
                     if not is_allowed_path(p, allowed):
                         errors.append(f"out-of-scope change: {p}")
@@ -140,6 +151,8 @@ def validate(root: Path) -> dict[str, Any]:
                     for p in changed:
                         if p == surface or p.startswith(prefix):
                             errors.append(f"legacy surface was modified: {surface}")
+            except RuntimeError as exc:
+                errors.append(str(exc))
             checks += ["exact_base_ancestry", "change_scope", "legacy_non_modification"]
     return {
         "schema_version": "1.0",

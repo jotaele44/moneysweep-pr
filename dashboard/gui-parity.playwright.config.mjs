@@ -18,10 +18,11 @@ const frontendRoot = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = findRepositoryRoot(frontendRoot);
 const frontendUrl = "http://127.0.0.1:5173";
 const backendUrl = "http://127.0.0.1:8000";
+const pythonExecutable = process.env.PYTHON || (process.platform === "win32" ? "python" : "python3");
 const seedScript = path.join(repositoryRoot, "server", "ingestion", "seed_demo.py");
 const backendCommand = fs.existsSync(seedScript)
-  ? "python server/ingestion/seed_demo.py && python -m uvicorn server.backend.main:app --host 127.0.0.1 --port 8000"
-  : "python -m uvicorn server.backend.main:app --host 127.0.0.1 --port 8000";
+  ? `${pythonExecutable} server/ingestion/seed_demo.py && ${pythonExecutable} -m uvicorn server.backend.main:app --host 127.0.0.1 --port 8000`
+  : `${pythonExecutable} -m uvicorn server.backend.main:app --host 127.0.0.1 --port 8000`;
 
 export default defineConfig({
   testDir: "./tests",

@@ -32,6 +32,17 @@ class UnifiedSkillpackConformanceTests(unittest.TestCase):
             target = entry["unified_target"].split("#", 1)[1]
             self.assertIn(f'<a id="{target}"></a>', skill, entry["capability_id"])
 
+    def test_unrelated_later_commits_do_not_expand_skillpack_scope(self) -> None:
+        allowed = json.loads((ROOT / ".claude/skillpacks/MANIFEST.json").read_text())["allowed_change_paths"]
+        changed = MODULE.scoped_change_paths(
+            ROOT,
+            json.loads((ROOT / ".claude/skillpacks/BINDING.json").read_text())["pinned_base_commit"],
+            allowed,
+        )
+        self.assertNotIn("docs/BACKEND_ASSESSMENT_AND_DEVELOPMENT_PLAN.md", changed)
+        self.assertNotIn("scripts/desktop_startup_probe.py", changed)
+        self.assertTrue(all(MODULE.is_allowed_path(path, allowed) for path in changed))
+
 
 if __name__ == "__main__":
     unittest.main()
