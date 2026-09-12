@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "moneysweep.leaderboard-certification/v1",
+  "state": "BLOCKED",
+  "certificationIssued": false,
+  "zeroMaterialUnresolvedResidue": false,
+  "scope": "financial leaderboard producer plane",
+  "branch": "feature/moneysweep-leaderboard-plane",
+  "rankingContractVersion": "moneysweep.leaderboard/v1.1",
+  "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.1",
+  "blockingResidue": [
+    {
+      "id": "CI_EXECUTION",
+      "state": "BLOCKED",
+      "reason": "GitHub workflow jobs have not acquired a runner and have executed zero steps; code correctness is not certified."
+    },
+    {
+      "id": "HISTORICAL_COMPARISON",
+      "state": "OPEN",
+      "reason": "At least two independently frozen, hash-verified comparable snapshots are required before top-mover certification."
+    },
+    {
+      "id": "ONTOLOGY_ADAPTER_RESIDUE",
+      "state": "OPEN",
+      "reason": "Financial categories without stable identity plus one measure semantic remain visible but unsupported."
+    },
+    {
+      "id": "THEHUB_CONSUMER_ACCEPTANCE",
+      "state": "BLOCKED",
+      "reason": "TheHub consumer contract and cross-repository regression have not yet produced a passing receipt against this producer head."
+    }
+  ],
+  "promotionAuthorized": false,
+  "certificationPhraseAuthorized": false,
+  "note": "This fail-closed receipt is intentionally non-promotable. Replace only after every required gate passes on one frozen producer head and zero material unresolved residue remains inside the declared certification scope."
+}
