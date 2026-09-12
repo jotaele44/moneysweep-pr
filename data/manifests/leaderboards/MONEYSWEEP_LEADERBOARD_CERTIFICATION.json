@@ -11,25 +11,25 @@
     {
       "id": "CI_EXECUTION",
       "state": "BLOCKED",
-      "reason": "GitHub workflow jobs have not acquired a runner and have executed zero steps; code correctness is not certified."
+      "reason": "Newest GitHub workflow jobs still fail before acquiring a runner and expose no executed steps; code correctness is not certified."
     },
     {
       "id": "HISTORICAL_COMPARISON",
       "state": "OPEN",
-      "reason": "At least two independently frozen, hash-verified comparable snapshots are required before top-mover certification."
+      "reason": "At least two independently frozen, hash-verified comparable snapshots with the same ranking/filter/currency/source/runtime universe are required before Top Movers can be certified."
     },
     {
       "id": "ONTOLOGY_ADAPTER_RESIDUE",
       "state": "OPEN",
-      "reason": "Financial categories without stable identity plus one measure semantic remain visible but unsupported."
+      "reason": "The declared 21-category ontology denominator is classified with zero implicit states: 7 categories are adapter-backed and 14 remain explicitly unsupported pending stable identity, one-measure semantics, or source materialization."
     },
     {
       "id": "THEHUB_CONSUMER_ACCEPTANCE",
       "state": "BLOCKED",
-      "reason": "TheHub consumer contract and cross-repository regression have not yet produced a passing receipt against this producer head."
+      "reason": "TheHub PR #285 now contains the certification-gated consumer, product UI, negative contract regressions, and strict cross-repository contract checks, but executable CI, exact package replay, and trusted receipt/release hashes have not passed."
     }
   ],
   "promotionAuthorized": false,
   "certificationPhraseAuthorized": false,
-  "note": "This fail-closed receipt is intentionally non-promotable. Replace only after every required gate passes on one frozen producer head and zero material unresolved residue remains inside the declared certification scope."
+  "note": "This fail-closed receipt is intentionally non-promotable. Replace only after every required gate passes on one frozen producer head, exact source/runtime/release manifestations are frozen, TheHub replay passes, and zero material unresolved residue remains inside the declared certification scope."
 }
