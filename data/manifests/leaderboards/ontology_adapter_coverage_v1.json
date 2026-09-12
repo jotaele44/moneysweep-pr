@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "moneysweep.financial-category-adapter-coverage/v1",
+  "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.1",
+  "rankingContractVersion": "moneysweep.leaderboard/v1.1",
+  "declaredCategoryCount": 21,
+  "adapterBackedCategoryCount": 7,
+  "explicitlyUnsupportedCategoryCount": 14,
+  "implicitOrUnclassifiedCategoryCount": 0,
+  "coverageArithmeticClosed": true,
+  "adapterBacked": [
+    {"categoryId": "contract_award", "adapter": "canonical_contracts", "state": "PROVISIONAL"},
+    {"categoryId": "debt_issuance", "adapter": "canonical_debt", "state": "PROVISIONAL"},
+    {"categoryId": "federal_obligation", "adapter": "federal_awards_contracts", "state": "PROVISIONAL_DYNAMIC"},
+    {"categoryId": "federal_grant", "adapter": "federal_awards_grants", "state": "PROVISIONAL_DYNAMIC"},
+    {"categoryId": "disaster_assistance", "adapter": "federal_awards_disaster", "state": "PROVISIONAL_DYNAMIC"},
+    {"categoryId": "federal_assistance", "adapter": "federal_awards_assistance", "state": "PROVISIONAL_DYNAMIC"},
+    {"categoryId": "campaign_contribution_received", "adapter": "campaign_finance_receipts", "state": "PROVISIONAL_DYNAMIC"}
+  ],
+  "explicitlyUnsupported": [
+    {"categoryId": "campaign_donor_contribution", "state": "CANDIDATE_NOT_IDENTITY", "blockingDimension": "IDENTITY"},
+    {"categoryId": "government_payment", "state": "OPEN", "blockingDimension": "MEASURE_MATERIALIZATION"},
+    {"categoryId": "procurement", "state": "OPEN", "blockingDimension": "BOUNDED_UNIVERSE_AND_DUPLICATE_ADJUDICATION"},
+    {"categoryId": "infrastructure_project", "state": "OPEN", "blockingDimension": "RECIPIENT_IDENTITY_AND_MEASURE"},
+    {"categoryId": "loan", "state": "OPEN", "blockingDimension": "STABLE_RECIPIENT_IDENTITY"},
+    {"categoryId": "guarantee", "state": "OPEN", "blockingDimension": "MEASURE_MATERIALIZATION"},
+    {"categoryId": "subsidy_incentive", "state": "OPEN", "blockingDimension": "RECIPIENT_IDENTITY_AND_MEASURE"},
+    {"categoryId": "tax_incentive", "state": "OPEN", "blockingDimension": "ESTIMATED_VS_REALIZED_SEMANTICS"},
+    {"categoryId": "lobbying_expenditure", "state": "OPEN", "blockingDimension": "AMOUNT_MATERIALIZATION"},
+    {"categoryId": "property_assessment", "state": "OPEN", "blockingDimension": "ASSESSMENT_VALUE_AND_TEMPORAL_SEMANTICS"},
+    {"categoryId": "legal_judgment", "state": "OPEN", "blockingDimension": "LEGAL_MEASURE_AND_ENTITY_BINDING"},
+    {"categoryId": "bankruptcy_claim", "state": "OPEN", "blockingDimension": "CLAIM_STATUS_AND_ENTITY_BINDING"},
+    {"categoryId": "municipal_expenditure", "state": "OPEN", "blockingDimension": "PAID_VS_OBLIGATED_SEPARATION"},
+    {"categoryId": "public_revenue", "state": "OPEN_NOT_MATERIALIZED", "blockingDimension": "SOURCE_MATERIALIZATION"}
+  ],
+  "rules": {
+    "noNameOnlyIdentity": true,
+    "noCrossMeasureAggregation": true,
+    "absenceIsNotZero": true,
+    "unsupportedCategoriesRemainVisible": true,
+    "certificationCannotIgnoreUnsupportedResidueUnlessScopeExplicitlyExcludesIt": true
+  }
+}
