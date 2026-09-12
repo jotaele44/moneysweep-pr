@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import pandas as pd
 from fastapi import APIRouter, Query
@@ -89,7 +89,7 @@ def _summary(key: str, amount_col: str | None, date_col: str | None) -> dict:
     return result
 
 
-def _finite(value: object) -> float | None:
+def _finite(value: Any) -> float | None:
     try:
         number = float(value)
     except (TypeError, ValueError):

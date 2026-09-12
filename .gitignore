@@ -163,6 +163,12 @@ dist-smoke/
 # audit trail — same posture as reports/maintenance/ above).
 reports/local_analysis/
 
+# Merged GUI-capability manifest written on every run of
+# .federation/check_gui_parity_with_extensions.py (see its MERGED constant).
+# Derived from gui-capabilities.json + the extensions fragments, so it is build
+# output, never a source of truth.
+artifacts/
+
 # Re-block .DS_Store inside the allow-listed data/ subtrees. The top-level
 # .DS_Store rule (line 13) loses to the `!data/<dir>/**` re-includes, so it has
 # to be restated here, after them — see this file's header note on later-wins.

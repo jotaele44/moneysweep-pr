@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Mapping
 from pathlib import Path
+from typing import Any, cast
 
 from fastapi import APIRouter, HTTPException
 
@@ -68,10 +70,13 @@ def ownership_status() -> dict[str, object]:
             "providerEquivalence": "OPEN",
             "blocker": str(exc),
         }
+    # build_ownership_deep_dive() returns dict[str, object], so the nested
+    # certification view needs an explicit cast before it can be indexed.
+    certification_view = cast(Mapping[str, Any], view["certification"])
     return {
         "available": True,
-        "certificationState": view["certification"]["state"],
-        "certificationId": view["certification"]["certificationId"],
+        "certificationState": certification_view["state"],
+        "certificationId": certification_view["certificationId"],
         "certifiedIssuer": "BPOP",
         "regressionIssuers": ["OFG", "EVTC"],
         "providerEquivalence": view["providerEquivalence"],

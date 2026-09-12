@@ -754,7 +754,7 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing — zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
+      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing \u2014 zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
       "backend": {
         "files": [
           "scripts/scrape_rdc_demandas.py",
@@ -1280,6 +1280,24 @@
         "analysis_symbol:scripts/compare_entity_products.py:compare",
         "analysis_symbol:scripts/compare_entity_products.py:main",
         "cli_surface:scripts/compare_entity_products.py"
+      ]
+    },
+    {
+      "id": "audit-hud-drgr-authorized-sources-terminal-analysis",
+      "reason": "scripts/audit_hud_drgr_authorized_sources.py landed on main via fca3264 (a direct push that skipped the AGENTS.md change protocol, so no classification accompanied it) and has left the GUI-parity gate red ever since. It is a terminal-only HUD DRGR source-authorization audit that prints a receipt to stdout and has no user-facing GUI surface. Excepted pending either a GUI rendering of its receipt or its classification as pipeline tooling -- mirrors compare-entity-products-terminal-analysis.",
+      "owner": "jotaele44",
+      "tracking": "docs/GAP_ANALYSIS_AND_OPTIMIZATION_2026-09.md",
+      "expires_on": "2026-12-01",
+      "candidate_ids": [
+        "analysis_module:scripts/audit_hud_drgr_authorized_sources.py",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:build_receipt",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_csv",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_parquet",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_path",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:main",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:sha256_file",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:utc_now",
+        "cli_surface:scripts/audit_hud_drgr_authorized_sources.py"
       ]
     }
   ]

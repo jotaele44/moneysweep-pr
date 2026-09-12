@@ -26,9 +26,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 try:
     import networkx as nx
-except ImportError:
-    print("ERROR: networkx not installed. Run: pip install networkx")
-    sys.exit(1)
+except ImportError as exc:  # pragma: no cover
+    # Raise rather than sys.exit() -- see the note in
+    # scripts/regenerate_registry_json.py.
+    raise ImportError("networkx not installed. Run: pip install networkx") from exc
 
 import pandas as pd
 
