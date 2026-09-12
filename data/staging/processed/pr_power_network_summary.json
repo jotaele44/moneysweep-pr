@@ -227,7 +227,7 @@
     }
   ],
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
-  "production_status_generated_at": "2026-07-28T15:31:23Z",
+  "production_status_generated_at": "2026-09-12T13:56:15Z",
   "production_status_message": "Diagnostic output only — not production-valid.",
   "production_blocker_count": 3
 }
