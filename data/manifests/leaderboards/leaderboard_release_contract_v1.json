@@ -17,12 +17,12 @@
     {
       "id": "HISTORICAL_COMPARISON",
       "state": "OPEN",
-      "reason": "Top Movers requires at least two independently frozen, hash-verified comparable snapshots."
+      "reason": "Top Movers requires at least two independently frozen, hash-verified comparable snapshots with equal ranking, filter, currency, source and runtime/producer-commit boundaries."
     },
     {
       "id": "CATEGORY_RESIDUE",
       "state": "OPEN",
-      "reason": "Ontology categories without stable identity plus one financial semantic remain explicitly unsupported/unmaterialized."
+      "reason": "The 21-category ontology denominator is fully classified, but 14 categories remain explicitly unsupported because stable identity, one financial semantic, or source materialization is not closed."
     },
     {
       "id": "THEHUB_PROMOTION",
@@ -32,6 +32,7 @@
   ],
   "required_gates": [
     "ONTOLOGY_SCHEMA",
+    "ONTOLOGY_DENOMINATOR_CLOSED",
     "ADAPTER_REGISTRY_CLOSED",
     "NO_NAME_ONLY_IDENTITY",
     "NO_CROSS_MEASURE_AGGREGATION",
@@ -46,6 +47,8 @@
     "SNAPSHOT_COMPLETE_CANDIDATE_UNIVERSE",
     "SNAPSHOT_COMPARABILITY",
     "SOURCE_CHANGE_MOVEMENT_GUARD",
+    "RUNTIME_MANIFEST_FROZEN",
+    "PRODUCER_COMMIT_BOUND",
     "ENTITY_DRILLDOWN_WHOLE_ROW_CONSERVATION",
     "SPATIAL_HANDOFF_NO_GEOMETRY_PROMOTION",
     "GUI_PARITY",
@@ -56,6 +59,7 @@
     "SECRET_SCAN",
     "FEDERATION_COMPATIBILITY",
     "THEHUB_CONSUMER_CONTRACT",
+    "CROSS_REPOSITORY_REPLAY",
     "RELEASE_MANIFEST_HASHES",
     "ZERO_MATERIAL_UNRESOLVED_RESIDUE_INSIDE_CERTIFIED_SCOPE"
   ],
@@ -69,6 +73,7 @@
     ],
     "snapshot_materializer": "scripts/materialize_leaderboard_snapshot.py",
     "certification_receipt": "data/manifests/leaderboards/MONEYSWEEP_LEADERBOARD_CERTIFICATION.json",
+    "ontology_adapter_coverage": "data/manifests/leaderboards/ontology_adapter_coverage_v1.json",
     "federation_exporter": "scripts/export_leaderboard_package.py",
     "federation_export_schema": "schemas/leaderboard_export_package.schema.json",
     "frontend": "dashboard/src/components/FinancialLeaderboards.jsx",
@@ -82,6 +87,8 @@
     "spiderweb_is_geometry_authority": true,
     "thehub_must_not_recompute_money_sweep_rankings": true,
     "thehub_must_verify_producer_contract_and_release_receipt": true,
+    "snapshot_runtime_and_producer_commit_must_match_export": true,
+    "provisional_snapshots_cannot_be_promoted": true,
     "diagnostic_ui_does_not_imply_certification": true
   }
 }
