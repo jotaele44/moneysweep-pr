@@ -36,6 +36,8 @@ def load_pass_receipt(path: Path) -> dict:
         raise SystemExit("BLOCKED: leaderboard certification receipt is not PASS/issued")
     if receipt.get("zeroMaterialUnresolvedResidue") is not True:
         raise SystemExit("BLOCKED: certification receipt does not attest zero material unresolved residue")
+    if receipt.get("promotionAuthorized") is not True:
+        raise SystemExit("BLOCKED: certification receipt does not authorize federation promotion")
     return receipt
 
 
@@ -64,12 +66,24 @@ def main() -> int:
     receipt = load_pass_receipt(args.receipt)
     if not args.release_manifest.exists():
         raise SystemExit(f"BLOCKED: release manifest missing: {args.release_manifest}")
+    release = json.loads(args.release_manifest.read_text(encoding="utf-8"))
+    if release.get("certification_state") != "PASS" or release.get("promotion_authorized") is not True:
+        raise SystemExit("BLOCKED: release manifest is not PASS/promotion-authorized")
 
     category_payloads = []
     for category in dict.fromkeys(args.categories):
         snapshot = latest_snapshot(category)
-        if snapshot.get("certificationState") not in {"PASS", "PROVISIONAL"}:
-            raise SystemExit(f"BLOCKED: snapshot state not promotable: {category} {snapshot.get('certificationState')}")
+        if snapshot.get("certificationState") != "PASS":
+            raise SystemExit(
+                f"BLOCKED: snapshot state must be PASS for federation promotion: {category} {snapshot.get('certificationState')}"
+            )
+        runtime_manifest = snapshot.get("runtimeManifest") or {}
+        if runtime_manifest.get("state") != "FROZEN":
+            raise SystemExit(f"BLOCKED: snapshot runtime manifestation is not frozen: {category}")
+        if runtime_manifest.get("producerCommit") != args.producer_commit:
+            raise SystemExit(
+                f"BLOCKED: snapshot producer commit does not match export commit: {category}"
+            )
         category_payloads.append({
             "categoryId": snapshot["categoryId"],
             "metricType": snapshot["metricType"],
