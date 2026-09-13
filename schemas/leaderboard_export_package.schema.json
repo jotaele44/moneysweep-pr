@@ -10,6 +10,7 @@
     "producerCommit",
     "rankingContractVersion",
     "ontologyContractVersion",
+    "scopeId",
     "certification",
     "generatedAt",
     "categories"
@@ -20,30 +21,34 @@
     "producerCommit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
     "rankingContractVersion": {"const": "moneysweep.leaderboard/v1.1"},
     "ontologyContractVersion": {"const": "moneysweep.financial-category-ontology/v1.1"},
+    "scopeId": {"const": "moneysweep.leaderboard.production-v1"},
     "generatedAt": {"type": "string", "format": "date-time"},
     "certification": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["state", "receiptSha256", "releaseManifestSha256"],
+      "required": ["state", "receiptSha256", "releaseManifestSha256", "scopeSha256"],
       "properties": {
         "state": {"const": "PASS"},
         "receiptSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "releaseManifestSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        "releaseManifestSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "scopeSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
       }
     },
     "categories": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "type": "object",
         "additionalProperties": false,
         "required": ["categoryId", "metricType", "snapshotId", "snapshotSha256", "rows"],
         "properties": {
-          "categoryId": {"type": "string", "minLength": 1},
-          "metricType": {"type": "string", "minLength": 1},
+          "categoryId": {"const": "debt_issuance"},
+          "metricType": {"const": "DEBT_ISSUED_PAR"},
           "snapshotId": {"type": "string", "minLength": 1},
           "snapshotSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
           "rows": {
             "type": "array",
+            "minItems": 1,
             "items": {
               "type": "object",
               "required": ["entityId", "entityDisplayName", "metricValue", "currency", "rank", "entityResolutionState"],
@@ -51,9 +56,9 @@
                 "entityId": {"type": "string", "minLength": 1},
                 "entityDisplayName": {"type": "string", "minLength": 1},
                 "metricValue": {"type": "number"},
-                "currency": {"type": "string", "minLength": 1},
+                "currency": {"const": "USD"},
                 "rank": {"type": "integer", "minimum": 1},
-                "entityResolutionState": {"type": "string", "minLength": 1}
+                "entityResolutionState": {"const": "CANONICAL_V1_ENTITY_ID"}
               }
             }
           }
