@@ -87,14 +87,25 @@ def _load_registry_overrides(root: Path) -> list[dict[str, Any]]:
     return overrides
 
 
+def _validate_source_identity_rows(sources: list[dict[str, Any]]) -> None:
+    seen: set[str] = set()
+    for source in sources:
+        source_id = source.get("source_id")
+        if not isinstance(source_id, str) or not source_id or source_id != source_id.strip():
+            raise ValueError("source registry contains missing or non-canonical source_id")
+        if source_id in seen:
+            raise ValueError(f"duplicate source_id: {source_id}")
+        seen.add(source_id)
+        if type(source.get("required")) is not bool:
+            raise ValueError(f"{source_id}: required must be boolean")
+
+
 def _apply_registry_overrides(
     sources: list[dict[str, Any]], overrides: list[dict[str, Any]]
 ) -> list[dict[str, Any]]:
     if not overrides:
         return sources
-    by_id = {source.get("source_id"): dict(source) for source in sources}
-    if len(by_id) != len(sources):
-        raise ValueError("source registry contains duplicate source IDs before overrides")
+    by_id = {source["source_id"]: dict(source) for source in sources}
     seen_overrides: set[str] = set()
     for override in overrides:
         raw_source_id = override.get("source_id")
@@ -112,7 +123,7 @@ def _apply_registry_overrides(
                 raise ValueError(f"{source_id}: override may not change immutable field {field}")
         base.update({key: value for key, value in override.items() if key != "source_id"})
         by_id[source_id] = base
-    return [by_id[source.get("source_id")] for source in sources]
+    return [by_id[source["source_id"]] for source in sources]
 
 
 def load_source_registry(root: Path | None = None) -> dict[str, Any]:
@@ -125,6 +136,7 @@ def load_source_registry(root: Path | None = None) -> dict[str, Any]:
         raise ValueError("root source registry contains non-object source")
     sources = list(root_sources)
     sources.extend(_load_registry_extensions(root))
+    _validate_source_identity_rows(sources)
     sources = _apply_registry_overrides(sources, _load_registry_overrides(root))
     reg = dict(reg)
     reg["sources"] = sources
@@ -173,18 +185,8 @@ def validate_registry(root: Path | None = None) -> dict[str, Any]:
         }
     errors: list[str] = []
     warnings: list[str] = []
-    seen: set[str] = set()
     for source in sources:
-        source_id = source.get("source_id")
-        if not isinstance(source_id, str) or not source_id or source_id != source_id.strip():
-            errors.append(f"source has missing or non-canonical source_id: {source!r}")
-            continue
-        if source_id in seen:
-            errors.append(f"duplicate source_id: {source_id}")
-        seen.add(source_id)
-        required = source.get("required")
-        if type(required) is not bool:
-            errors.append(f"{source_id}: required must be boolean")
+        source_id = source["source_id"]
         script = source.get("producer_script")
         if script:
             if ".." in Path(script).parts:
@@ -201,13 +203,13 @@ def validate_registry(root: Path | None = None) -> dict[str, Any]:
                 continue
             if ".." in Path(output).parts:
                 errors.append(f"{source_id}: expected_output contains parent traversal: {output}")
-        if required is True and not outputs:
+        if source["required"] is True and not outputs:
             warnings.append(f"{source_id}: required source has no expected_outputs declared")
         if source.get("authentication") == "manual_export" and not source.get("manual_drop_dir"):
             warnings.append(f"{source_id}: manual_export source missing manual_drop_dir")
     return {
         "source_count": len(sources),
-        "required_count": sum(1 for source in sources if source.get("required") is True),
+        "required_count": sum(1 for source in sources if source["required"] is True),
         "errors": errors,
         "warnings": warnings,
         "ok": not errors,
