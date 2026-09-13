@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Export certified MoneySweep leaderboard snapshots for TheHub.
 
-This exporter is intentionally unusable before producer certification. It never
-recomputes financial rankings; it packages already-frozen verified snapshots and
-binds them to a PASS certification receipt and release-manifest hash.
+The exporter never recomputes rankings. It packages separately certified,
+hash-verified snapshots and binds them to the exact PASS producer receipt,
+release manifest and bounded certification scope.
 """
 
 from __future__ import annotations
@@ -14,11 +14,13 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
-from server.backend.leaderboard_history import list_snapshots, verify_snapshot
+from server.backend.leaderboard_history import verify_snapshot
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RECEIPT = ROOT / "data" / "manifests" / "leaderboards" / "MONEYSWEEP_LEADERBOARD_CERTIFICATION.json"
 DEFAULT_RELEASE = ROOT / "data" / "manifests" / "leaderboards" / "leaderboard_release_contract_v1.json"
+DEFAULT_SCOPE = ROOT / "data" / "manifests" / "leaderboards" / "leaderboard_certification_scope_v1.json"
+CERTIFIED_SNAPSHOT_DIR = ROOT / "data" / "manifests" / "leaderboards" / "certified_snapshots"
 DEFAULT_OUT = ROOT / "data" / "exports" / "leaderboards" / "leaderboard_package.json"
 
 
@@ -26,10 +28,17 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def load_pass_receipt(path: Path) -> dict:
+def _load_json(path: Path) -> dict:
     if not path.exists():
-        raise SystemExit(f"BLOCKED: certification receipt not found: {path}")
-    receipt = json.loads(path.read_text(encoding="utf-8"))
+        raise SystemExit(f"BLOCKED: required manifest not found: {path}")
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit(f"BLOCKED: invalid JSON manifest: {path}") from exc
+
+
+def load_pass_receipt(path: Path) -> dict:
+    receipt = _load_json(path)
     if receipt.get("schemaVersion") != "moneysweep.leaderboard-certification/v1":
         raise SystemExit("BLOCKED: unsupported leaderboard certification receipt schema")
     if receipt.get("state") != "PASS" or receipt.get("certificationIssued") is not True:
@@ -41,15 +50,34 @@ def load_pass_receipt(path: Path) -> dict:
     return receipt
 
 
-def latest_snapshot(category: str) -> dict:
-    snapshots = list_snapshots(category)
-    if not snapshots:
-        raise SystemExit(f"BLOCKED: no verified frozen snapshot for category {category}")
-    snapshot = snapshots[-1]
-    errors = verify_snapshot(snapshot)
-    if errors:
-        raise SystemExit(f"BLOCKED: invalid snapshot {snapshot.get('snapshotId')}: {errors}")
-    return snapshot
+def _scope_categories(scope: dict) -> set[str]:
+    return {str(item.get("categoryId")) for item in scope.get("includedCategories") or [] if item.get("categoryId")}
+
+
+def latest_certified_snapshot(category: str) -> dict:
+    if not CERTIFIED_SNAPSHOT_DIR.exists():
+        raise SystemExit(f"BLOCKED: certified snapshot directory not found: {CERTIFIED_SNAPSHOT_DIR}")
+    candidates = []
+    for path in sorted(CERTIFIED_SNAPSHOT_DIR.glob("*.json")):
+        try:
+            snapshot = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if snapshot.get("categoryId") != category:
+            continue
+        errors = verify_snapshot(snapshot)
+        if errors:
+            continue
+        certification = snapshot.get("certification") or {}
+        if snapshot.get("certificationState") != "PASS" or certification.get("state") != "PASS":
+            continue
+        if certification.get("zeroMaterialUnresolvedResidue") is not True:
+            continue
+        candidates.append(snapshot)
+    if not candidates:
+        raise SystemExit(f"BLOCKED: no certified PASS snapshot for category {category}")
+    candidates.sort(key=lambda row: (str(row.get("capturedAt") or ""), str(row.get("snapshotId") or "")))
+    return candidates[-1]
 
 
 def main() -> int:
@@ -58,58 +86,83 @@ def main() -> int:
     parser.add_argument("--category", action="append", dest="categories", required=True)
     parser.add_argument("--receipt", type=Path, default=DEFAULT_RECEIPT)
     parser.add_argument("--release-manifest", type=Path, default=DEFAULT_RELEASE)
+    parser.add_argument("--scope", type=Path, default=DEFAULT_SCOPE)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUT)
     args = parser.parse_args()
 
-    if len(args.producer_commit) != 40 or any(ch not in "0123456789abcdef" for ch in args.producer_commit):
+    producer_commit = args.producer_commit.lower()
+    if len(producer_commit) != 40 or any(ch not in "0123456789abcdef" for ch in producer_commit):
         raise SystemExit("producer commit must be a lowercase 40-character git SHA")
+
     receipt = load_pass_receipt(args.receipt)
-    if not args.release_manifest.exists():
-        raise SystemExit(f"BLOCKED: release manifest missing: {args.release_manifest}")
-    release = json.loads(args.release_manifest.read_text(encoding="utf-8"))
+    release = _load_json(args.release_manifest)
+    scope = _load_json(args.scope)
     if release.get("certification_state") != "PASS" or release.get("promotion_authorized") is not True:
         raise SystemExit("BLOCKED: release manifest is not PASS/promotion-authorized")
+    if scope.get("schemaVersion") != "moneysweep.leaderboard-certification-scope/v1":
+        raise SystemExit("BLOCKED: unsupported certification scope schema")
+    scope_id = str(scope.get("scopeId") or "")
+    if not scope_id:
+        raise SystemExit("BLOCKED: certification scope has no scopeId")
+    included = _scope_categories(scope)
+
+    requested = list(dict.fromkeys(args.categories))
+    outside = sorted(set(requested) - included)
+    if outside:
+        raise SystemExit(f"BLOCKED: requested categories outside certified scope: {outside}")
 
     category_payloads = []
-    for category in dict.fromkeys(args.categories):
-        snapshot = latest_snapshot(category)
-        if snapshot.get("certificationState") != "PASS":
-            raise SystemExit(
-                f"BLOCKED: snapshot state must be PASS for federation promotion: {category} {snapshot.get('certificationState')}"
-            )
+    for category in requested:
+        snapshot = latest_certified_snapshot(category)
+        certification = snapshot.get("certification") or {}
+        if certification.get("scopeId") != scope_id:
+            raise SystemExit(f"BLOCKED: certified snapshot scope mismatch: {category}")
         runtime_manifest = snapshot.get("runtimeManifest") or {}
         if runtime_manifest.get("state") != "FROZEN":
             raise SystemExit(f"BLOCKED: snapshot runtime manifestation is not frozen: {category}")
-        if runtime_manifest.get("producerCommit") != args.producer_commit:
-            raise SystemExit(
-                f"BLOCKED: snapshot producer commit does not match export commit: {category}"
-            )
-        category_payloads.append({
-            "categoryId": snapshot["categoryId"],
-            "metricType": snapshot["metricType"],
-            "snapshotId": snapshot["snapshotId"],
-            "snapshotSha256": snapshot["snapshotSha256"],
-            "rows": snapshot["rows"],
-        })
+        if runtime_manifest.get("producerCommit") != producer_commit:
+            raise SystemExit(f"BLOCKED: snapshot producer commit does not match export commit: {category}")
+        category_payloads.append(
+            {
+                "categoryId": snapshot["categoryId"],
+                "metricType": snapshot["metricType"],
+                "snapshotId": snapshot["snapshotId"],
+                "snapshotSha256": snapshot["snapshotSha256"],
+                "rows": snapshot["rows"],
+            }
+        )
 
     package = {
         "schemaVersion": "moneysweep.leaderboard-export-package/v1",
         "producer": "moneysweep-pr",
-        "producerCommit": args.producer_commit,
+        "producerCommit": producer_commit,
         "rankingContractVersion": "moneysweep.leaderboard/v1.1",
         "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.1",
+        "scopeId": scope_id,
         "generatedAt": datetime.now(tz=UTC).replace(microsecond=0).isoformat(),
         "certification": {
             "state": "PASS",
             "receiptSha256": sha256(args.receipt),
             "releaseManifestSha256": sha256(args.release_manifest),
+            "scopeSha256": sha256(args.scope),
         },
         "categories": category_payloads,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     rendered = json.dumps(package, indent=2, sort_keys=True) + "\n"
     args.output.write_text(rendered, encoding="utf-8")
-    print(json.dumps({"state": "PASS", "output": str(args.output), "sha256": sha256(args.output), "categories": len(category_payloads)}, indent=2))
+    print(
+        json.dumps(
+            {
+                "state": "PASS",
+                "output": str(args.output),
+                "sha256": sha256(args.output),
+                "scopeId": scope_id,
+                "categories": len(category_payloads),
+            },
+            indent=2,
+        )
+    )
     return 0
 
 
