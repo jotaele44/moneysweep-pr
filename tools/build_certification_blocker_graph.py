@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 from pathlib import Path
 from typing import Any
@@ -54,19 +55,24 @@ def _json(path: Path) -> dict[str, Any]:
     return payload
 
 
-def _equivalence_reports(root: Path, equivalence_dir: Path | None) -> list[dict[str, Any]]:
+def _freshness(path: Path | None) -> list[dict[str, str]]:
+    if path is None or not path.is_file():
+        return []
+    with path.open(encoding="utf-8-sig", newline="") as fh:
+        return list(csv.DictReader(fh))
+
+
+def _equivalence_reports(
+    root: Path,
+    equivalence_dir: Path | None,
+) -> list[dict[str, Any]]:
     if equivalence_dir is None or not equivalence_dir.is_dir():
         return []
     reports: list[dict[str, Any]] = []
     for path in sorted(equivalence_dir.glob("*.json")):
         claim = _json(path)
         report = verify_equivalence(root=root, claim=claim)
-        reports.append(
-            {
-                "claim_path": path.as_posix(),
-                **report,
-            }
-        )
+        reports.append({"claim_path": path.as_posix(), **report})
     return reports
 
 
@@ -74,6 +80,7 @@ def build(
     *,
     root: Path,
     truth: dict[str, Any],
+    freshness_rows: list[dict[str, str]] | None = None,
     equivalence_dir: Path | None = None,
     production_report: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -88,11 +95,11 @@ def build(
     freshness_blockers: list[dict[str, Any]] = []
     source_nodes: list[dict[str, Any]] = []
 
-    freshness_by_id: dict[str, Any] = {}
-    for row in truth.get("freshness") or []:
-        if isinstance(row, dict) and row.get("source_id"):
-            freshness_by_id[str(row["source_id"])] = row
-
+    freshness_by_id = {
+        str(row.get("source_id")): row
+        for row in freshness_rows or []
+        if row.get("source_id")
+    }
     automatable_types = {"api_adapter", "api_producer"}
     for raw in sources:
         if not isinstance(raw, dict):
@@ -102,15 +109,14 @@ def build(
         path_type = str(raw.get("path_type", ""))
         required = raw.get("required") is True
         coverage = str(raw.get("coverage_status", ""))
-        freshness = freshness_by_id.get(source_id, {})
-        freshness_state = freshness.get("freshness_status")
+        freshness_state = freshness_by_id.get(source_id, {}).get("freshness_status")
 
         blockers: list[str] = []
         if materialization != "fully_materialized":
             blockers.append(f"materialization:{materialization or 'unknown'}")
         if coverage not in {"meets_contract", "uncontracted"}:
             blockers.append(f"coverage:{coverage or 'unknown'}")
-        if path_type in automatable_types and freshness_state not in {"FRESH", "TERMINAL"}:
+        if path_type in automatable_types and freshness_state != "FRESH":
             blockers.append(f"freshness:{freshness_state or 'unknown'}")
 
         node = {
@@ -153,21 +159,31 @@ def build(
                     "blockers": gate.get("blockers") or [],
                 }
 
-    gate_nodes = []
-    for gate_id, dependencies in GATE_DEPENDENCIES.items():
-        gate_nodes.append(
-            {
-                "id": gate_id,
-                "depends_on": dependencies,
-                **gate_states.get(gate_id, {"state": "NOT_EVALUATED", "blockers": []}),
-            }
-        )
+    gate_nodes = [
+        {
+            "id": gate_id,
+            "depends_on": dependencies,
+            **gate_states.get(
+                gate_id,
+                {"state": "NOT_EVALUATED", "blockers": []},
+            ),
+        }
+        for gate_id, dependencies in GATE_DEPENDENCIES.items()
+    ]
 
     registry = truth.get("registry") if isinstance(truth.get("registry"), dict) else {}
     summary = truth.get("summary") if isinstance(truth.get("summary"), dict) else {}
     required_total = int(registry.get("required_sources") or 0)
     required_full = int(summary.get("required_fully_materialized") or 0)
-    graph = {
+    upstream_gate_ids = [
+        gate_id for gate_id in GATE_DEPENDENCIES if gate_id != "G12_RELEASE_CERTIFICATION"
+    ]
+    g0_g11_all_pass = bool(production_report) and all(
+        gate_states.get(gate_id, {}).get("state") == "PASS"
+        for gate_id in upstream_gate_ids
+    )
+
+    return {
         "schema_version": SCHEMA_VERSION,
         "registry": registry,
         "summary": {
@@ -179,13 +195,7 @@ def build(
             "coverage_blocker_count": len(coverage_blockers),
             "freshness_blocker_count": len(freshness_blockers),
             "equivalence_blocker_count": len(equivalence_blockers),
-            "g0_g11_all_pass": all(
-                gate_states.get(f"G{number}_" + next(
-                    (key.split("_", 1)[1] for key in GATE_DEPENDENCIES if key.startswith(f"G{number}_")),
-                    "",
-                ), {}).get("state") == "PASS"
-                for number in range(12)
-            ) if production_report else False,
+            "g0_g11_all_pass": g0_g11_all_pass,
         },
         "required_source_blockers": required_blockers,
         "automatable_materialization_blockers": automatable_blockers,
@@ -201,7 +211,6 @@ def build(
             "certified_requires_g0_g11_pass_and_explicit_activation": True,
         },
     }
-    return graph
 
 
 def main() -> int:
@@ -213,6 +222,11 @@ def main() -> int:
         "--truth",
         type=Path,
         default=Path("reports/certification_truth.json"),
+    )
+    parser.add_argument(
+        "--freshness",
+        type=Path,
+        default=Path("reports/source_freshness.csv"),
     )
     parser.add_argument(
         "--equivalence-dir",
@@ -231,6 +245,7 @@ def main() -> int:
     graph = build(
         root=args.root,
         truth=truth,
+        freshness_rows=_freshness(args.freshness),
         equivalence_dir=args.equivalence_dir,
         production_report=production,
     )
