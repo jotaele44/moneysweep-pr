@@ -91,7 +91,8 @@
   "verification": {
     "bounded_transition_tests": "PASS",
     "bounded_prior_guard_tests": "PASS",
-    "new_effective_registry_tests": "PENDING_HOSTED_OR_FULL_LOCAL_EXECUTION",
+    "new_effective_registry_tests": "BOUNDED_LOCAL_PASS_5_OF_5",
+    "new_effective_registry_test_scope": "isolated exact algorithm reproduction for canonical JSON selection, override-bound definition digest, duplicate-key rejection, non-finite-number rejection, and immutable required override",
     "full_repository_tests": "UNEXECUTED",
     "hosted_actions_state": "PRE_EXECUTION_INFRASTRUCTURE_FAILURE_OBSERVED",
     "production_certificate": "NOT_ISSUED"
