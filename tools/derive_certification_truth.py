@@ -12,24 +12,44 @@ from typing import Any
 
 try:
     from tools.operator_corpus_common import (
-        csv_rows,
         expected_outputs,
         load_sources,
-        safe_relative_path,
         sha256_file,
         source_ids_digest,
         validate_receipt,
     )
 except ModuleNotFoundError:  # pragma: no cover - direct script execution fallback
     from operator_corpus_common import (  # type: ignore[no-redef]
-        csv_rows,
         expected_outputs,
         load_sources,
-        safe_relative_path,
         sha256_file,
         source_ids_digest,
         validate_receipt,
     )
+
+try:
+    from tools.certification_truth_guards import (
+        EvidenceError,
+        aware_datetime,
+        digest_json,
+        evaluate_output,
+        execution_state,
+        freshness_status,
+        load_receipts,
+        receipt_binding_errors,
+    )
+except ModuleNotFoundError:  # pragma: no cover - direct execution fallback
+    from certification_truth_guards import (  # type: ignore[no-redef]
+        EvidenceError,
+        aware_datetime,
+        digest_json,
+        evaluate_output,
+        execution_state,
+        freshness_status,
+        load_receipts,
+        receipt_binding_errors,
+    )
+
 
 from moneysweep.update_controller.models import CADENCE_SLA_HOURS
 from scripts.build_source_recovery_matrix import (
@@ -38,8 +58,8 @@ from scripts.build_source_recovery_matrix import (
     _classify,
 )
 
-TRUTH_SCHEMA_VERSION = "moneysweep.certification_truth/v1"
-SCOPE_SCHEMA_VERSION = "moneysweep.certification_scope/v1"
+TRUTH_SCHEMA_VERSION = "moneysweep.certification_truth/v2"
+SCOPE_SCHEMA_VERSION = "moneysweep.certification_scope/v2"
 
 
 def _git_head(root: Path) -> str | None:
@@ -69,137 +89,11 @@ def _sha256_json(value: object) -> str:
 
 
 def _parse_datetime(value: object) -> datetime | None:
-    if not isinstance(value, str) or not value.strip():
-        return None
-    try:
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-    if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc)
-
-
-def _json_valid(path: Path) -> bool:
-    try:
-        json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-        return False
-    return True
-
-
-def _directory_file_count(path: Path) -> int:
-    if not path.is_dir():
-        return 0
-    return sum(1 for item in path.rglob("*") if item.is_file())
-
-
-def evaluate_output(
-    *,
-    evidence_root: Path,
-    source: dict[str, Any],
-    output_path: str,
-) -> dict[str, Any]:
-    """Evaluate whether one declared output is usable, not merely present."""
-    rel = safe_relative_path(output_path).as_posix()
-    path = evidence_root / rel
-    threshold = source.get("validation_threshold") or {}
-    min_rows = threshold.get("min_rows", 1)
-    if not isinstance(min_rows, int) or isinstance(min_rows, bool) or min_rows < 0:
-        min_rows = 1
-
-    if output_path.endswith("/"):
-        exists = path.is_dir()
-        files = _directory_file_count(path) if exists else 0
-        return {
-            "path": rel + ("/" if not rel.endswith("/") else ""),
-            "kind": "directory",
-            "exists": exists,
-            "usable": exists and files > 0,
-            "file_count": files,
-            "rows": None,
-            "bytes": None,
-            "sha256": None,
-            "reason": None if exists and files > 0 else "directory_empty_or_missing",
-        }
-
-    exists = path.is_file()
-    if not exists:
-        return {
-            "path": rel,
-            "kind": "file",
-            "exists": False,
-            "usable": False,
-            "rows": None,
-            "bytes": None,
-            "sha256": None,
-            "reason": "missing",
-        }
-
-    size = path.stat().st_size
-    digest = sha256_file(path)
-    suffix = path.suffix.lower()
-    if suffix == ".csv":
-        rows = csv_rows(path)
-        usable = rows is not None and rows >= min_rows
-        reason = None
-        if rows is None:
-            reason = "csv_unreadable"
-        elif rows < min_rows:
-            reason = f"below_min_rows:{rows}<{min_rows}"
-        return {
-            "path": rel,
-            "kind": "csv",
-            "exists": True,
-            "usable": usable,
-            "rows": rows,
-            "min_rows": min_rows,
-            "bytes": size,
-            "sha256": digest,
-            "reason": reason,
-        }
-    if suffix == ".json":
-        valid = size > 0 and _json_valid(path)
-        return {
-            "path": rel,
-            "kind": "json",
-            "exists": True,
-            "usable": valid,
-            "rows": None,
-            "bytes": size,
-            "sha256": digest,
-            "reason": None if valid else "json_empty_or_invalid",
-        }
-
-    usable = size > 0
-    return {
-        "path": rel,
-        "kind": "file",
-        "exists": True,
-        "usable": usable,
-        "rows": None,
-        "bytes": size,
-        "sha256": digest,
-        "reason": None if usable else "empty_file",
-    }
+    return aware_datetime(value)
 
 
 def _load_receipts(receipts_dir: Path | None) -> dict[str, dict[str, Any]]:
-    if receipts_dir is None or not receipts_dir.exists():
-        return {}
-    receipts: dict[str, dict[str, Any]] = {}
-    for path in sorted(receipts_dir.glob("*.json")):
-        try:
-            payload = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-            continue
-        if not isinstance(payload, dict):
-            continue
-        source_id = str(payload.get("source_id", "")).strip()
-        if not source_id or source_id in receipts:
-            continue
-        receipts[source_id] = payload
-    return receipts
+    return load_receipts(receipts_dir)
 
 
 def _coverage_state(
@@ -211,10 +105,12 @@ def _coverage_state(
     threshold = source.get("validation_threshold") or {}
     if not threshold:
         return "uncontracted", []
+    if not isinstance(threshold, dict):
+        return "unverifiable", ["invalid_validation_contract"]
     if materialization != "fully_materialized":
         return "unverifiable", ["source_not_fully_materialized"]
 
-    unsupported = sorted(key for key in threshold if key != "min_rows")
+    unsupported = sorted(set(threshold) - {"min_rows", "required_columns", "csv"})
     blockers: list[str] = []
     if unsupported:
         blockers.append("unsupported_contract_keys:" + ",".join(unsupported))
@@ -226,6 +122,8 @@ def _coverage_state(
         validation = receipt.get("validation")
         if isinstance(validation, dict):
             receipt_coverage = validation.get("coverage_contract_pass")
+    if receipt is None:
+        blockers.append("receipt_absent_or_invalid")
     if receipt_coverage is False:
         blockers.append("receipt_coverage_not_proven")
 
@@ -256,22 +154,13 @@ def _freshness_state(
 
     age_hours = None
     if completed_at is not None:
-        age_hours = max((as_of - completed_at).total_seconds() / 3600.0, 0.0)
+        age_hours = (as_of - completed_at).total_seconds() / 3600.0
 
-    if path_type in {"deferred_stub", "semantic_duplicate"}:
-        status = "TERMINAL"
-    elif not automatable:
-        status = "NOT_APPLICABLE"
-    elif materialization != "fully_materialized":
-        status = "NEVER_MATERIALIZED"
-    elif not receipt_valid or completed_at is None:
-        status = "FRESHNESS_UNPROVEN"
-    elif sla in (None, 0):
-        status = "FRESH"
-    elif age_hours is not None and age_hours <= float(sla):
-        status = "FRESH"
-    else:
-        status = "STALE"
+    basis = source.get("freshness_basis")
+    status = freshness_status(
+        cadence=cadence, basis=basis, sla=sla, materialization=materialization,
+        receipt_valid=receipt_valid, completed_at=completed_at, as_of=as_of,
+    )
 
     return {
         "source_id": source["source_id"],
@@ -284,6 +173,7 @@ def _freshness_state(
         "age_hours": round(age_hours, 3) if age_hours is not None else None,
         "freshness_status": status,
         "receipt_valid": receipt_valid,
+        "freshness_basis": basis,
     }
 
 
@@ -295,13 +185,21 @@ def derive(
     scope_dir: Path,
     as_of: datetime,
     operator_corpus_id: str | None = None,
+    execution_receipts_dir: Path | None = None,
 ) -> dict[str, Any]:
+    if as_of.tzinfo is None or as_of.utcoffset() is None:
+        raise EvidenceError("evaluation_time_requires_timezone")
     root = root.resolve()
     evidence_root = evidence_root.resolve()
     scope_dir = scope_dir.resolve()
     sources, registry_paths = load_sources(root)
     registry_digest = source_ids_digest(sources)
     receipts = _load_receipts(receipts_dir)
+    executions = _load_receipts(execution_receipts_dir)
+    registered = {str(source["source_id"]) for source in sources}
+    extra = (set(receipts) | set(executions)) - registered
+    if extra:
+        raise EvidenceError("unregistered_receipts:" + ",".join(sorted(extra)))
 
     source_rows: list[dict[str, Any]] = []
     freshness_rows: list[dict[str, Any]] = []
@@ -337,11 +235,21 @@ def derive(
         path_type = _classify(source, root)
         path_counts[path_type] += 1
         receipt = receipts.get(source_id)
+        receipt_errors = receipt_binding_errors(
+            receipt=receipt, source=source, registry_digest=registry_digest, outputs=outputs
+        )
+        if receipt is not None:
+            receipt_errors.extend(validate_receipt(receipt))
+        bound_receipt = receipt if not receipt_errors else None
+        execution_status, execution_blockers = execution_state(
+            execution=executions.get(source_id), receipt=receipt, source=source,
+            receipt_errors=receipt_errors, materialization=materialization, as_of=as_of,
+        )
         coverage_status, coverage_blockers = _coverage_state(
             source,
             materialization,
             outputs,
-            receipt,
+            bound_receipt,
         )
         coverage_counts[coverage_status] += 1
 
@@ -362,7 +270,7 @@ def derive(
             source=source,
             path_type=path_type,
             materialization=materialization,
-            receipt=receipt,
+            receipt=bound_receipt,
             as_of=as_of,
         )
         freshness_rows.append(freshness)
@@ -384,7 +292,15 @@ def derive(
                 "coverage_blockers": coverage_blockers,
                 "materiality_label": materiality,
                 "receipt_present": receipt is not None,
-                "receipt_valid": bool(receipt is not None and not validate_receipt(receipt)),
+                "receipt_logical_sha256": digest_json(receipt) if receipt is not None else None,
+                "execution_logical_sha256": (
+                    digest_json(executions[source_id]) if source_id in executions else None
+                ),
+                "receipt_valid": not receipt_errors,
+                "receipt_errors": sorted(set(receipt_errors)),
+                "execution_status": execution_status,
+                "execution_blockers": execution_blockers,
+                "automatable": bool(PATH_TYPES.get(path_type, (False, ""))[0]),
                 "outputs": outputs,
             }
         )
@@ -398,7 +314,7 @@ def derive(
     queued_total = sum(queued.values())
 
     evidence_class = (
-        "verified_operator_corpus_mount" if operator_corpus_id else "checkout_or_operator_workspace"
+        "claimed_operator_corpus_unverified" if operator_corpus_id else "checkout_or_operator_workspace"
     )
     truth = {
         "schema_version": TRUTH_SCHEMA_VERSION,
@@ -426,8 +342,14 @@ def derive(
         "sources": sorted(source_rows, key=lambda item: item["source_id"]),
     }
 
+    # A completed or interrupted prior scope is evidence, not an overwrite target.
+    scope_dir.mkdir(parents=True, exist_ok=False)
     scope_reports = scope_dir / "reports"
-    scope_reports.mkdir(parents=True, exist_ok=True)
+    scope_reports.mkdir()
+    execution_not_ready = sorted(
+        row["source_id"] for row in source_rows
+        if row["automatable"] and row["execution_status"] != "EXECUTED_VALID"
+    )
 
     status_path = scope_reports / "source_registry_status.csv"
     with status_path.open("w", encoding="utf-8", newline="") as fh:
@@ -467,8 +389,9 @@ def derive(
         "schema_version": "r5_readiness_scope_v1",
         "total_sources": len(sources),
         "automatable_total": automatable_total,
-        "automatable_ready": automatable_total,
-        "automatable_not_ready": [],
+        "automatable_ready": automatable_total - len(execution_not_ready),
+        "automatable_not_ready": execution_not_ready,
+        "readiness_basis": "bound_successful_execution_and_valid_output",
         "queued_excluded": queued,
         "queued_excluded_total": queued_total,
         "source_count_provenance": {
@@ -519,6 +442,7 @@ def derive(
             "age_hours",
             "freshness_status",
             "receipt_valid",
+            "freshness_basis",
         ]
         writer = csv.DictWriter(fh, fieldnames=fieldnames)
         writer.writeheader()
@@ -543,7 +467,24 @@ def derive(
             "bytes": path.stat().st_size,
         }
 
+    implementation_root = Path(__file__).resolve().parents[1]
+    tool_paths = (
+        "tools/derive_certification_truth.py", "tools/certification_truth_guards.py",
+        "tools/operator_corpus_common.py", "scripts/build_source_recovery_matrix.py",
+        "moneysweep/update_controller/models.py",
+    )
+    tool_hashes = {
+        rel: sha256_file(implementation_root / rel) for rel in tool_paths
+    }
+    configuration = root / "registries/production_certification.yaml"
     scope_identity = {
+        "registry_artifacts": {rel: sha256_file(root / rel) for rel in registry_paths},
+        "source_definitions_sha256": digest_json({
+            source["source_id"]: digest_json(source) for source in sources
+        }),
+        "scope_generation_tools": tool_hashes,
+        "configuration_sha256": sha256_file(configuration) if configuration.is_file() else None,
+        "artifacts_sha256": digest_json(artifacts),
         "registry_source_ids_sha256": registry_digest,
         "operator_corpus_id": operator_corpus_id,
         "implementation_sha": _git_head(Path(__file__).resolve().parents[1]),
@@ -575,6 +516,7 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path("."))
     parser.add_argument("--evidence-root", type=Path)
     parser.add_argument("--receipts-dir", type=Path)
+    parser.add_argument("--execution-receipts-dir", type=Path)
     parser.add_argument(
         "--scope-dir",
         type=Path,
@@ -598,6 +540,7 @@ def main() -> int:
         scope_dir=args.scope_dir,
         as_of=as_of,
         operator_corpus_id=args.operator_corpus_id,
+        execution_receipts_dir=args.execution_receipts_dir,
     )
     print(
         json.dumps(
