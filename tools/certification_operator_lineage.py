@@ -97,18 +97,25 @@ def verify_scope_bound_operator_corpus(
         blockers.append("operator_corpus_manifest_source_count_mismatch")
 
     inventory = verification.get("processed_file_inventory")
+    required_inventory_lists = (
+        "orphan_mounted_files",
+        "unreceipted_operator_files",
+        "accounted_outputs_missing_from_operator",
+    )
     if not isinstance(inventory, dict):
         inventory = {}
         blockers.append("operator_corpus_processed_inventory_missing")
-    if inventory.get("orphan_mounted_files") not in ([], None):
-        blockers.append("operator_corpus_orphan_mounted_files")
-    if inventory.get("unreceipted_operator_files") not in ([], None):
-        blockers.append("operator_corpus_unreceipted_operator_files")
-    if inventory.get("accounted_outputs_missing_from_operator") not in ([], None):
-        blockers.append("operator_corpus_accounted_outputs_missing_from_operator")
+    for key in required_inventory_lists:
+        value = inventory.get(key)
+        if not isinstance(value, list):
+            blockers.append(f"operator_corpus_inventory_{key}_missing_or_invalid")
+        elif value:
+            blockers.append(f"operator_corpus_{key}")
 
     verification_errors = verification.get("errors")
-    if verification_errors not in ([], None):
+    if not isinstance(verification_errors, list):
+        blockers.append("operator_corpus_verification_errors_missing_or_invalid")
+    elif verification_errors:
         blockers.append("operator_corpus_verification_errors_present")
 
     blockers = sorted(set(blockers))
