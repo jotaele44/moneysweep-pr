@@ -1,4 +1,4 @@
-# MoneySweep Case Manager Phase 1 API Contract v0.12
+# MoneySweep Case Manager Phase 1 API Contract v0.13
 
 ## Scope
 
@@ -14,12 +14,24 @@ The database path defaults to `data/case_manager.sqlite3` and may be overridden 
 
 ## Authorization boundary
 
-Clients supply:
+The Case Manager no longer trusts caller-supplied actor or clearance as identity proof.
 
-- `X-Case-Actor` on commands;
-- `X-Case-Clearance: public|internal|restricted` on queries.
+Server-side configuration:
 
-The current policy is a bounded Phase 1 clearance filter, not a replacement for the future authenticated identity provider. Records above the caller clearance are omitted.
+- `PRII_WRITE_TOKEN` enables authenticated Case Manager access. The credential is runtime-only and must not be committed.
+- `MONEYSWEEP_CASE_ACTOR` defines the authenticated actor written to command audit events. If omitted while authentication is enabled, the bounded default is `authenticated-case-operator`.
+- `MONEYSWEEP_CASE_CLEARANCE` defines the authenticated principal's maximum view: `public|internal|restricted`. The bounded default is `internal`.
+
+Fail-closed behavior:
+
+- when `PRII_WRITE_TOKEN` is unset, unauthenticated `GET` requests are restricted to `public` data and every Case Manager command is disabled;
+- when the token is configured, command endpoints require `Authorization: Bearer <runtime token>`;
+- authenticated reads may omit `X-Case-Clearance` to use the server-configured maximum, or request a lower/equal clearance;
+- `X-Case-Clearance` can never elevate beyond the authenticated principal's server-configured maximum;
+- `X-Case-Actor` is a compatibility assertion only: if supplied on an authenticated command, it must exactly match the server-derived actor; otherwise the request is rejected;
+- public reads remain available without credentials, but an unauthenticated caller cannot self-assert `internal` or `restricted` clearance.
+
+No runtime credential value is stored in this contract, repository configuration, fixtures, or source control.
 
 ## Read endpoints
 
@@ -74,3 +86,16 @@ The service accepts canonical identifiers matching `evidence_*` for links, lead 
 - JSON arrays: SQLite JSON1 checks;
 - canonical writes: none;
 - generic update/delete API: absent.
+
+## Authorization regression gates
+
+`tests/test_case_manager_auth.py` must prove both positive and negative behavior:
+
+- public reads remain available without configuration;
+- unauthenticated clearance elevation is rejected;
+- writes fail closed when no runtime credential is configured;
+- configured command access rejects missing authentication;
+- authenticated callers cannot exceed their server-configured clearance;
+- authenticated callers cannot spoof the audit actor;
+- successful authenticated commands use the server-derived actor;
+- authenticated principals may deliberately request a lower-clearance view.

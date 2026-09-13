@@ -8,15 +8,17 @@ from fastapi import FastAPI, HTTPException
 
 from . import case_manager_api
 from .case_manager_api import router
+from .case_manager_auth import install_case_auth
 
 app = FastAPI(
     title="MoneySweep Case Manager API",
-    version="0.12.0",
+    version="0.13.0",
     description=(
         "Command-oriented investigative case service. Canonical evidence is read by identifier "
         "only; generic PATCH and DELETE operations are intentionally absent."
     ),
 )
+install_case_auth(app)
 app.include_router(router)
 
 
