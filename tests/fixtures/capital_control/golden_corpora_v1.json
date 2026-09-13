@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.2.0",
+  "purpose": "Immutable golden correctness denominator for capital_control.resolution_core promotion.",
+  "base_reconciliation": {
+    "original_parent": "437d02f96699a402a328def1d266980f5ee29788",
+    "reconciled_main": "b35ce8888d755c6be88c6715a70592541af792b0",
+    "reason": "PR #519 BPOP SEC ownership golden certification merged after the original parent freeze",
+    "policy": "reuse upstream certified BPOP artifacts; do not duplicate or overwrite them"
+  },
+  "corpora": [
+    {
+      "id": "GOLDEN_001_FINCA_ZEQUEIRA",
+      "state": "ACTIVE_REGRESSION",
+      "fixture": "tests/fixtures/capital_control/golden_corpora_v1.json#GOLDEN_001_FINCA_ZEQUEIRA",
+      "required_gates": [
+        "namespace_collision",
+        "identifier_event_separation",
+        "property_anti_conflation",
+        "grant_arithmetic_closure",
+        "primary_interface_blockers",
+        "foia_fail_closed"
+      ]
+    },
+    {
+      "id": "GOLDEN_002_BPOP",
+      "state": "UPSTREAM_CERTIFIED_SOURCE_AVAILABLE_PENDING_RESOLUTION_CORE_PARITY",
+      "upstream_merge_commit": "b35ce8888d755c6be88c6715a70592541af792b0",
+      "upstream_artifacts": [
+        "registries/capital_control_golden_cases.json",
+        "tests/fixtures/capital_control/sec_upload_baseline_v0_1.json",
+        "tests/test_sec_ownership_hardening_v0_3.py",
+        "moneysweep/capital_control/sec13f.py",
+        "scripts/certify_bpop_sec13f_8q.py"
+      ],
+      "required_gates": [
+        "ticker_cik_stable_id_binding",
+        "exact_quarter_end_denominator",
+        "13f_accession_plus_infotable_key",
+        "additive_vs_restatement_amendment_separation",
+        "superseded_row_preservation",
+        "ambiguous_restatement_fail_closed",
+        "no_nearest_date_substitution",
+        "no_synthetic_financial_fallback",
+        "resolution_core_compatibility"
+      ]
+    },
+    {
+      "id": "GOLDEN_003_TAMCOR",
+      "state": "MATERIALIZED_REGRESSION",
+      "fixture": "tests/fixtures/capital_control/golden_003_tamcor.json",
+      "required_gates": [
+        "related_network_not_1to1",
+        "alias_relationship_stays_provisional",
+        "ocpr_bounded_arithmetic",
+        "transfer_vs_purchase_semantics",
+        "zero_increment_amendment_preservation",
+        "litigation_claim_not_contract_value",
+        "ddec_excel_serial_supersession",
+        "specification_not_award"
+      ]
+    },
+    {
+      "id": "GOLDEN_004_PRASA_JACOBS",
+      "state": "MATERIALIZED_BOUNDED_REGRESSION",
+      "fixture": "tests/fixtures/capital_control/golden_004_prasa_jacobs.json",
+      "required_gates": [
+        "no_slash_label_legal_identity",
+        "lineage_event_separate_from_entity_identity",
+        "temporal_buckets_remain_distinct",
+        "archive_keyword_ids_are_discovery_only",
+        "archive_windows_are_bounded_not_universal",
+        "decision_maker_overlap_requires_exact_dates",
+        "project_contract_binding_requires_primary_evidence"
+      ]
+    }
+  ]
+}

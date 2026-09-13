@@ -1,0 +1,34 @@
+{
+  "schema_version": "moneysweep.reconciliation_candidate/v1",
+  "state": "AUDIT_ONLY",
+  "production_eligible": false,
+  "production_scope_manifest": false,
+  "A_commit": "9694590a5019879e8d50288f046521bcbc3493c6",
+  "B_commit": "7b467ff99a98fa0ea600d9b6b5b62b6b666baa76",
+  "common_ancestor": "b5661dd29b5905015016041057136b6c945ddf5a",
+  "input_registry_trees": {
+    "inputs/A/registries": "13b9d8669609720cceef5fbcb98c4dcc2701724e",
+    "inputs/B/registries": "9a6aa08bdf4672e46890fe3132b0630a076bf4a4"
+  },
+  "whole_file_selections": [
+    {"path": ".federation/gui-capabilities.json", "selected": "B", "git_blob": "c073b2e93efae9fe74dac47c0a4c2f686587eda8", "reason": "B includes the A PRASA additions and later GUI coverage; preserve complete B record."},
+    {"path": "dashboard/tests/api-keys.spec.mjs", "selected": "B", "git_blob": "b4b71b949d9b73d15c6882ed96b1ac0b1efd6a62", "reason": "B retains A dynamic enumeration and adds the credential-variable suffix filter."},
+    {"path": "reports/completeness_matrix.csv", "selected": "B", "git_blob": "6f7d350091632f7eab99e6982a888b11a433d03f", "reason": "Current-report manifestation only; A and B retained separately; neither supplies new evidence credit."},
+    {"path": "reports/completeness_matrix.json", "selected": "B", "git_blob": "cbcd2e07ff01f3e071901a3691eb5a0edb393076", "reason": "Current-report manifestation only; no bucket hand editing, receipt inheritance, or production promotion."}
+  ],
+  "observed_loader_profiles": {
+    "certification": "root YAML plus direct JSON extensions",
+    "runtime": "root JSON plus direct JSON extensions plus direct JSON overrides"
+  },
+  "real_registry_transition_audit": "NOT_EXECUTED",
+  "full_repository_validation": "NOT_EXECUTED",
+  "scope_revision_authorized": false,
+  "outstanding": [
+    "Full exact-ID and whole-definition comparison at A and B",
+    "Runtime versus certification definition reconciliation",
+    "Historical 162/16/113/49 policy versus reported 164/16/116/48 population",
+    "Historical-regression tests and current-scope test separation",
+    "Full lint, format, mypy, coverage, GUI parity and integration validation",
+    "CAS-only evidence authority, canonical/federation replay and authenticated activation"
+  ]
+}

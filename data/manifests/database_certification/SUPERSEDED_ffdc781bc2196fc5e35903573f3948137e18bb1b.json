@@ -1,0 +1,26 @@
+{
+  "state": "SUPERSEDED",
+  "scope": "MoneySweep database and manifest state before database-certification-v1 hardening",
+  "git_commit": "ffdc781bc2196fc5e35903573f3948137e18bb1b",
+  "git_commit_binding": "Exact repository-tree byte manifestation is preserved by the referenced Git commit; Git object identity is not represented as SHA256.",
+  "observed_contradictions": [
+    {
+      "type": "COUNT|TIME|PROVENANCE",
+      "artifact": "data/manifests/source_manifest.csv",
+      "stale_counts": {"entities": 26, "projects": 5, "edges": 64, "evidence": 232},
+      "newer_producer_counts": {"entities": 30, "projects": 8, "edges": 66, "evidence": 260}
+    },
+    {
+      "type": "SCHEMA|SCOPE",
+      "artifact": "moneysweep/validation/canonical_v1_schema.py",
+      "observed": "validator registered 13 canonical CSV tables while data/canonical_v1 contained 14; revenue_streams.csv was omitted"
+    },
+    {
+      "type": "IDENTITY|CLASS",
+      "artifact": "data/reference/pr_public_money_entities.csv",
+      "observed": "internal curated reference seed was emitted as accepted T1 evidence through source_type=registry without an independent authoritative source binding"
+    }
+  ],
+  "certification": "NONCANONICAL|SUPERSEDED",
+  "successor_workstream": "audit/database-certification-v1"
+}

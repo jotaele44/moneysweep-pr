@@ -1,0 +1,85 @@
+{
+  "certification_scope_note": "This source freeze supports bounded guide insurance routes only and does not imply complete Puerto Rico finance coverage.",
+  "identity_invariant": "OCS display cards are retained as displayed and are not silently split or merged into legal entities without a separate authoritative identifier binding.",
+  "manifestations": [
+    {
+      "byte_size": 55031,
+      "content_type": "text/html; charset=utf-8",
+      "http_status": 200,
+      "observation_grain": "current_insurer_listing",
+      "raw_file": "current_insurers.html",
+      "retained_rows": 41,
+      "retrieved_at_utc": "2026-08-26T16:25:40+00:00",
+      "sha256": "187e49fd3dfef8d1a96460afa48c564bea229f1ce4798041c40d83f55e1fbe1d",
+      "url": "https://www.ocs.pr.gov/consumidores/aseguradores-del-pais"
+    },
+    {
+      "byte_size": 317175,
+      "content_type": "text/html; charset=utf-8",
+      "http_status": 200,
+      "observation_grain": "historical_annual_report_index",
+      "raw_file": "annual_reports.html",
+      "retained_rows": 1,
+      "retrieved_at_utc": "2026-08-26T16:25:40+00:00",
+      "sha256": "4ed14892036b35a747e8901b4142ace5d2baddd637fbf7d61451c5c387f243f5",
+      "url": "https://www.ocs.pr.gov/regulados/informes-anuales"
+    }
+  ],
+  "processed_outputs": [
+    {
+      "byte_size": 9889,
+      "path": "data/staging/processed/pr_ocs_insurers.csv",
+      "row_count": 41,
+      "sha256": "b9c1916e5c90ddfba19cef106d48bc6d4a3f61fd69c74a39479a47e647bb79e4"
+    },
+    {
+      "byte_size": 510,
+      "path": "data/staging/processed/pr_ocs_insurer_annual_reports.csv",
+      "row_count": 1,
+      "sha256": "f9049319e18d302bcc7e2ce2a9b860dc515ca7c24a4d9b42f5b6aba7ffeb0c97"
+    }
+  ],
+  "run_started_at_utc": "2026-08-26T16:25:40+00:00",
+  "schema_version": "guide_source_snapshot_manifest_v1",
+  "schemas": {
+    "current_insurer_listing": {
+      "columns": [
+        "source_record_id",
+        "insurer_name_raw",
+        "website_raw",
+        "source_url",
+        "retrieved_at_utc",
+        "geo_municipality_code",
+        "geo_municipality_name",
+        "geo_county_fips",
+        "geo_zip",
+        "geo_lat",
+        "geo_lon",
+        "geo_attribution_source",
+        "geo_attribution_confidence"
+      ],
+      "schema_fingerprint": "b1b11696a795772edf7b6e24ca00c501353147bcf85fe9b091c15b9d6d5f9299"
+    },
+    "historical_annual_report_index": {
+      "columns": [
+        "source_record_id",
+        "report_year_raw",
+        "insurer_name_raw",
+        "report_url",
+        "source_url",
+        "retrieved_at_utc",
+        "geo_municipality_code",
+        "geo_municipality_name",
+        "geo_county_fips",
+        "geo_zip",
+        "geo_lat",
+        "geo_lon",
+        "geo_attribution_source",
+        "geo_attribution_confidence"
+      ],
+      "schema_fingerprint": "45dff3333fc73f63bb54ff98e58537d716a74e4b5d38c7d510dc97b0bdc242be"
+    }
+  },
+  "source_id": "ocs_insurer_registry",
+  "temporal_invariant": "The current insurer listing and historical annual-report index are distinct observation grains. A historical report does not prove current license/status."
+}

@@ -1,0 +1,2 @@
+source_record_id,report_year_raw,insurer_name_raw,report_url,source_url,retrieved_at_utc,geo_municipality_code,geo_municipality_name,geo_county_fips,geo_zip,geo_lat,geo_lon,geo_attribution_source,geo_attribution_confidence
+43f2800d954b3b8b599232822e77a6013ea22b8a80c9e6eb870ffa64369e362b,2012,Ley de Ética Gubernamental,https://eticapr.blob.core.windows.net/files/Leyes%20y%20Reglamentos/Ley1-2012ysus%20enmiendas.pdf,https://www.ocs.pr.gov/regulados/informes-anuales,2026-08-26T16:25:40+00:00,,,,,,,,unknown

@@ -1,0 +1,23 @@
+{
+  "artifact": "CAPITAL_CONTROL_RESOLUTION_CORE_REBASE_RECEIPT_v1",
+  "original_parent": "437d02f96699a402a328def1d266980f5ee29788",
+  "new_main": "b35ce8888d755c6be88c6715a70592541af792b0",
+  "main_ahead_by": 42,
+  "material_overlap": [
+    "moneysweep/capital_control/models.py",
+    "moneysweep/capital_control/validation.py",
+    "tests/test_capital_control_validation_hardening.py"
+  ],
+  "adjudication": {
+    "models.py": "PRESERVE_NEW_MAIN",
+    "validation.py": "PRESERVE_NEW_MAIN",
+    "test_capital_control_validation_hardening.py": "PRESERVE_NEW_MAIN",
+    "sec13f.py": "PRESERVE_NEW_MAIN",
+    "registries/capital_control_golden_cases.json": "PRESERVE_NEW_MAIN_AND_REUSE_AS_GOLDEN_002",
+    "resolution_core_files": "OVERLAY_ON_NEW_MAIN",
+    "legacy_identity.py": "COMPATIBILITY_WRAPPER_OVER_RESOLUTION_CORE",
+    "entity_resolution.py": "ORCHESTRATION_CONSUMER_OF_RESOLUTION_CORE"
+  },
+  "result": "PRESERVATION_AWARE_REBASE_PREPARED",
+  "promotion_state": "NOT_CERTIFIED_PENDING_REMOTE_CI_AND_GOLDEN_003_004"
+}

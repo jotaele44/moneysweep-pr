@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
-          node-version: "22"
+          node-version: "22.22.2"
           cache: npm
           cache-dependency-path: dashboard/package-lock.json
       - name: Set up Python
@@ -34,8 +34,10 @@ jobs:
       - name: Install dashboard dependencies
         working-directory: dashboard
         run: npm ci
-      - name: Install existing backend runtime dependencies
-        run: python -m pip install -r server/backend/requirements.txt
+      - name: Install application and backend runtime dependencies
+        run: >-
+          python -m pip install -r requirements.txt
+          -r server/backend/requirements.txt
       - name: Verify package, unit contracts, lint and production build
         working-directory: dashboard
         run: npm run verify:pilot

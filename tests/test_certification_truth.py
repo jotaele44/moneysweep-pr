@@ -33,16 +33,18 @@ def _source(*, min_rows: int = 1, output: str = "data/staging/processed/a.csv") 
 
 
 def _registry(root: Path, source: dict) -> None:
-    path = root / "registries/source_registry.yaml"
-    path.parent.mkdir(parents=True)
-    path.write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": "test_v1",
-                "sources": [source],
-            },
-            sort_keys=False,
-        ),
+    payload = {
+        "schema_version": "test_v1",
+        "sources": [source],
+    }
+    directory = root / "registries"
+    directory.mkdir(parents=True)
+    (directory / "source_registry.yaml").write_text(
+        yaml.safe_dump(payload, sort_keys=False),
+        encoding="utf-8",
+    )
+    (directory / "source_registry.json").write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
 

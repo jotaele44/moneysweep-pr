@@ -64,6 +64,11 @@ for (const route of routes) {
     }
 
     await expect(page.locator("#root")).toBeVisible();
+    if (route === "/") {
+      await page.getByRole("tab", { name: "Campaign Finance" }).click();
+      await expect(page.getByLabel("Campaign-finance view")).toBeVisible();
+      await expect(page.getByText(/campaign-finance (?:contributions|datasets)/i).first()).toBeVisible();
+    }
     await page.waitForTimeout(750);
     await expect(page.locator("body")).not.toContainText(
       /(?:something broke while rendering|page\s+not\s+found|route\s+not\s+found|404\s*—?\s*not\s+found)/i,

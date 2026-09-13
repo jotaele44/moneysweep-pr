@@ -36,12 +36,23 @@ unreachable behind a feature flag and include a tracking reference and expiry.
 ## Repository files
 
 - `.federation/gui-capabilities.json` — reviewed capability mappings.
+- `.federation/gui-capabilities.extensions/*.json` — reviewed capability/exception
+  fragments merged on top of the base manifest before validation; only appends,
+  never suppresses or edits the base.
 - `.federation/gui-parity-baseline.json` — immutable inventory of pre-existing
   candidates used by the no-new-debt ratchet.
-- `scripts/check_gui_parity.py` — shared static detector and contract validator.
+- `scripts/check_gui_parity.py` — shared static detector and contract validator;
+  owns discovery/validation semantics but only ever sees the base manifest when
+  run directly.
+- `.federation/check_gui_parity_with_extensions.py` — the actual CI entry point
+  (see `.github/workflows/gui-capability-parity.yml` below). Merges the base
+  manifest with every extension fragment, then delegates to
+  `scripts/check_gui_parity.py`. Run this locally, not the bare script, to get
+  a faithful preview of the gate.
 - `tests/test_gui_parity.py` — regression tests for the detector.
 - The frontend `tests/gui-parity.spec.mjs` — manifest-driven browser reachability.
-- `.github/workflows/gui-capability-parity.yml` — PR gate and nightly audit.
+- `.github/workflows/gui-capability-parity.yml` — PR gate and nightly audit;
+  invokes `.federation/check_gui_parity_with_extensions.py`.
 
 ## Signals
 

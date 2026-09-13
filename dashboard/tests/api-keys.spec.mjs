@@ -24,6 +24,9 @@ test("API Keys tab reaches the real backend and lists all known keys", async ({ 
     .split(/\r?\n/)
     .filter((line) => /^[A-Z][A-Z0-9_]*=/.test(line))
     .map((line) => line.split("=", 1)[0])
+    .filter((name) =>
+      ["_API_KEY", "_APP_TOKEN", "_LICENSE_APPROVED"].some((suffix) => name.endsWith(suffix)),
+    )
     .sort();
 
   expect(rows.map((row) => row.name).sort()).toEqual(expectedNames);

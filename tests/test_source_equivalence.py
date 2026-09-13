@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -12,26 +13,28 @@ pytestmark = pytest.mark.unit
 
 def _root(tmp_path: Path) -> Path:
     root = tmp_path / "repo"
-    path = root / "registries/source_registry.yaml"
-    path.parent.mkdir(parents=True)
-    path.write_text(
-        yaml.safe_dump(
+    directory = root / "registries"
+    directory.mkdir(parents=True)
+    payload = {
+        "schema_version": "test_v1",
+        "sources": [
             {
-                "schema_version": "test_v1",
-                "sources": [
-                    {
-                        "source_id": "alpha",
-                        "family": "test",
-                        "required": True,
-                        "authentication": "none",
-                        "producer_script": "scripts/alpha.py",
-                        "expected_outputs": ["data/alpha.csv"],
-                        "validation_threshold": {"min_rows": 1},
-                    }
-                ],
-            },
-            sort_keys=False,
-        ),
+                "source_id": "alpha",
+                "family": "test",
+                "required": True,
+                "authentication": "none",
+                "producer_script": "scripts/alpha.py",
+                "expected_outputs": ["data/alpha.csv"],
+                "validation_threshold": {"min_rows": 1},
+            }
+        ],
+    }
+    (directory / "source_registry.yaml").write_text(
+        yaml.safe_dump(payload, sort_keys=False),
+        encoding="utf-8",
+    )
+    (directory / "source_registry.json").write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
     return root

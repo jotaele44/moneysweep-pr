@@ -96,3 +96,15 @@ def test_archived_producers_are_optional_only():
         archived = str(src.get("producer_script", "")).startswith("archive/")
         if src.get("required"):
             assert not archived, f"{src['source_id']}: required source must not point into archive/"
+
+
+def test_parent_uei_thresholds_match_source_population():
+    sources = {source["source_id"]: source for source in all_sources(REPO_ROOT)}
+    expected = {
+        "usaspending_prime": 0.05,
+        "fema_pa_openfema_v2": 0.05,
+        "fpds_report_builder": 0.90,
+        "fsrs_subawards": 0.90,
+    }
+    for source_id, threshold in expected.items():
+        assert sources[source_id]["validation_threshold"]["parent_uei_coverage_pct"] == threshold

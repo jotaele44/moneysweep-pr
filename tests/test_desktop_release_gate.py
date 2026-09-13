@@ -21,8 +21,9 @@ from moneysweep.validation import production_status as ps
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ".github/workflows/desktop-build.yml"
 TAG_CONDITION = "startsWith(github.ref, 'refs/tags/desktop-v')"
-GATE = "Refuse to publish unless the pipeline is production-validated"
+GATE = "Refuse public release unless production-validated"
 ATTACH = "Attach to release"
+INSTALL = "Install Python dependencies"
 
 
 @pytest.fixture(scope="module")
@@ -76,6 +77,16 @@ def test_gate_allowlists_only_the_release_ready_status(steps):
 def test_gate_runs_on_every_matrix_os(steps):
     # The job matrix includes windows-latest, where bash is not a safe default.
     assert steps[_index(steps, GATE)]["shell"] == "python"
+
+
+@pytest.mark.unit
+def test_vcs_dependency_install_enables_windows_long_paths(steps):
+    install = steps[_index(steps, INSTALL)]
+    assert install["env"] == {
+        "GIT_CONFIG_COUNT": "1",
+        "GIT_CONFIG_KEY_0": "core.longpaths",
+        "GIT_CONFIG_VALUE_0": "true",
+    }
 
 
 @pytest.mark.unit

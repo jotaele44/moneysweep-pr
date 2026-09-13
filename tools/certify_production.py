@@ -26,6 +26,7 @@ from tools.certification_truth_guards import (
     strict_json,
 )
 from tools.operator_corpus_common import load_sources, source_ids_digest
+from moneysweep.runtime.source_registry import load_source_registry as load_runtime_source_registry
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = ROOT / "registries" / "production_certification.yaml"
@@ -251,6 +252,36 @@ def build_report(
     registry_sources, _ = load_sources(root)
     registry_ids = {source["source_id"] for source in registry_sources}
     registry_digest = source_ids_digest(registry_sources)
+
+    runtime_registry_sources = list(load_runtime_source_registry(root).get("sources", []))
+    runtime_registry_ids = [str(source.get("source_id", "")) for source in runtime_registry_sources]
+    runtime_registry_id_counts = Counter(runtime_registry_ids)
+    runtime_registry_duplicate_ids = sorted(
+        source_id for source_id, count in runtime_registry_id_counts.items() if source_id and count > 1
+    )
+    runtime_registry_missing_ids = sum(not source_id for source_id in runtime_registry_ids)
+    runtime_by_id = {
+        str(source["source_id"]): source
+        for source in runtime_registry_sources
+        if isinstance(source.get("source_id"), str) and source["source_id"]
+    }
+    certification_by_id = {str(source["source_id"]): source for source in registry_sources}
+    registry_profile_id_delta = sorted(set(certification_by_id) ^ set(runtime_by_id))
+    registry_profile_definition_delta = sorted(
+        source_id
+        for source_id in set(certification_by_id) & set(runtime_by_id)
+        if digest_json(certification_by_id[source_id]) != digest_json(runtime_by_id[source_id])
+    )
+    registry_profile_blockers: list[str] = []
+    if runtime_registry_duplicate_ids:
+        registry_profile_blockers.append("runtime_registry_duplicate_ids")
+    if runtime_registry_missing_ids:
+        registry_profile_blockers.append("runtime_registry_missing_ids")
+    if registry_profile_id_delta:
+        registry_profile_blockers.append("runtime_certification_source_id_divergence")
+    if registry_profile_definition_delta:
+        registry_profile_blockers.append("runtime_certification_definition_divergence")
+
     readiness = _json(paths["materialization_readiness"])
     status_rows = _csv(paths["source_registry_status"])
     recovery_rows = _csv(paths["source_recovery_matrix"])
@@ -270,11 +301,17 @@ def build_report(
     required_counts = Counter(row["pipeline_status"] for row in required)
     required_blockers = [row for row in required if row["pipeline_status"] != "fully_materialized"]
 
+    recovery_ids = [row["source_id"] for row in recovery_rows]
+    recovery_id_counts = Counter(recovery_ids)
+    recovery_duplicate_ids = sorted(
+        source_id for source_id, count in recovery_id_counts.items() if source_id and count > 1
+    )
     recovery_by_id = {row["source_id"]: row for row in recovery_rows}
     automatable = {
         row["source_id"] for row in recovery_rows if _bool(row.get("automatable", "false"))
     }
     missing_recovery = sorted(unique_ids - set(recovery_by_id))
+    extra_recovery = sorted(set(recovery_by_id) - unique_ids)
     automatable_unmaterialized = sorted(
         row["source_id"]
         for row in status_rows
@@ -353,9 +390,9 @@ def build_report(
         and implementation_sha == _head(ROOT)
         and registry_ids == unique_ids
         and registry_digest == digest
-        and total == 162
-        and required_total == 16
+        and required_total == config["requirements"]["required_source_count"]
         and total == len(status_rows)
+        and not registry_profile_blockers
         and not truth_scope_blockers
         and truth_digest_match
     )
@@ -365,6 +402,7 @@ def build_report(
             g0_blockers.extend(truth_scope_blockers)
         if not truth_digest_match:
             g0_blockers.append("truth_scope_registry_digest_mismatch")
+        g0_blockers.extend(registry_profile_blockers)
         if not g0_blockers:
             g0_blockers.append("scope_implementation_or_denominator_mismatch")
     gates.append(
@@ -387,6 +425,12 @@ def build_report(
                 "truth_scope_id": truth_scope_id,
                 "truth_scope_blockers": truth_scope_blockers,
                 "truth_scope_registry_digest_match": truth_digest_match,
+                "runtime_registry_total": len(runtime_registry_sources),
+                "runtime_registry_duplicate_ids": runtime_registry_duplicate_ids,
+                "runtime_registry_missing_ids": runtime_registry_missing_ids,
+                "runtime_certification_source_id_delta": registry_profile_id_delta,
+                "runtime_certification_definition_delta": registry_profile_definition_delta,
+                "registry_profile_blockers": registry_profile_blockers,
             },
             g0_blockers,
         )
@@ -400,10 +444,14 @@ def build_report(
         and federation.get("source_truth", {}).get("total_sources") == total
         and historical_registry.get("total_sources") == total
         and historical_registry.get("source_ids_sha256") == digest
+        and readiness.get("automatable_total") == len(automatable)
         and readiness.get("automatable_total") == (
             readiness.get("automatable_ready", 0) + len(readiness.get("automatable_not_ready", []))
         )
+        and readiness.get("automatable_total", 0) + readiness.get("queued_excluded_total", 0) == total
+        and not recovery_duplicate_ids
         and not missing_recovery
+        and not extra_recovery
     )
     gates.append(
         _gate(
@@ -422,6 +470,8 @@ def build_report(
                 "automatable_ready": readiness.get("automatable_ready"),
                 "queued_excluded_total": readiness.get("queued_excluded_total"),
                 "missing_recovery_rows": missing_recovery,
+                "extra_recovery_rows": extra_recovery,
+                "duplicate_recovery_ids": recovery_duplicate_ids,
                 "historical_status_main_sha": historical_status.get("main_sha"),
                 "historical_status_is_scope_authority": False,
                 "truth_scope_id": truth_scope_id,
@@ -525,8 +575,10 @@ def build_report(
 
     execution_blockers = derived_execution_blockers(derived_truth, automatable)
     g5 = (
-        not automatable_unmaterialized and not execution_blockers
-        and not truth_scope_blockers and len(automatable) == 113
+        not automatable_unmaterialized
+        and not execution_blockers
+        and not truth_scope_blockers
+        and len(automatable) == readiness.get("automatable_total")
     )
     gates.append(
         _gate(

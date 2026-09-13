@@ -56,6 +56,23 @@ class CaseCommandService:
     def __init__(self, repository: SQLiteCaseManagerRepository):
         self.repository = repository
 
+    def _require_evidence_ids(self, evidence_ids: Iterable[str]) -> None:
+        ids = tuple(evidence_ids)
+        if not ids or any(not item.startswith("evidence_") for item in ids):
+            raise ValueError("canonical evidence identifiers required")
+        for item in ids:
+            exists = self.repository.canonical_evidence_exists(item)
+            if exists is False:
+                raise ValueError(f"canonical evidence identifier not found: {item}")
+
+    def _require_case_object(
+        self, table: str, id_column: str, object_id: str, case_id: str
+    ) -> dict[str, Any]:
+        row = self.repository.fetch_one(table, id_column, object_id)
+        if row.get("case_id") != case_id:
+            raise ValueError(f"{table} object does not belong to case {case_id}")
+        return row
+
     def _execute(
         self,
         *,
@@ -108,8 +125,7 @@ class CaseCommandService:
         )
 
     def link_evidence(self, record: CaseEvidence, actor: str) -> dict[str, Any]:
-        if not record.evidence_id.startswith("evidence_"):
-            raise ValueError("canonical evidence identifier required")
+        self._require_evidence_ids((record.evidence_id,))
         payload = asdict(record)
         return self._execute(
             case_id=record.case_id,
@@ -138,8 +154,8 @@ class CaseCommandService:
     def link_claim_evidence(
         self, case_id: str, record: ClaimEvidence, actor: str
     ) -> dict[str, Any]:
-        if not record.evidence_id.startswith("evidence_"):
-            raise ValueError("canonical evidence identifier required")
+        self._require_case_object("claims", "claim_id", record.claim_id, case_id)
+        self._require_evidence_ids((record.evidence_id,))
         payload = asdict(record)
         return self._execute(
             case_id=case_id,
@@ -155,6 +171,8 @@ class CaseCommandService:
     def create_contradiction(self, record: Contradiction, actor: str) -> dict[str, Any]:
         if record.status != "open":
             raise ValueError("new contradictions must remain open")
+        for claim_id in record.claim_ids:
+            self._require_case_object("claims", "claim_id", claim_id, record.case_id)
         payload = asdict(record)
         return self._execute(
             case_id=record.case_id,
@@ -180,6 +198,7 @@ class CaseCommandService:
     ) -> dict[str, Any]:
         if status not in {"resolved", "held_apart"} or not rationale.strip():
             raise ValueError("explicit resolution status and rationale required")
+        self._require_case_object("contradictions", "contradiction_id", contradiction_id, case_id)
         payload = {
             "contradiction_id": contradiction_id,
             "status": status,
@@ -221,10 +240,8 @@ class CaseCommandService:
         actor: str,
         visibility: Visibility = "internal",
     ) -> dict[str, Any]:
-        if not closure_evidence_ids or any(
-            not item.startswith("evidence_") for item in closure_evidence_ids
-        ):
-            raise ValueError("closure requires canonical evidence identifiers")
+        self._require_case_object("leads", "lead_id", lead_id, case_id)
+        self._require_evidence_ids(closure_evidence_ids)
         payload = {"lead_id": lead_id, "closure_evidence_ids": closure_evidence_ids}
         return self._execute(
             case_id=case_id,
@@ -242,6 +259,7 @@ class CaseCommandService:
     def create_finding(self, finding: Finding, actor: str) -> dict[str, Any]:
         if finding.status != "draft":
             raise ValueError("findings must be created as drafts")
+        self._require_case_object("claims", "claim_id", finding.claim_id, finding.case_id)
         payload = asdict(finding)
         return self._execute(
             case_id=finding.case_id,
@@ -262,6 +280,7 @@ class CaseCommandService:
         actor: str,
         visibility: Visibility = "internal",
     ) -> dict[str, Any]:
+        self._require_case_object("findings", "finding_id", finding_id, case_id)
         payload = {"finding_id": finding_id, "status": "accepted"}
         return self._execute(
             case_id=case_id,
@@ -275,8 +294,14 @@ class CaseCommandService:
         )
 
     def create_snapshot(self, snapshot: CaseSnapshot, actor: str) -> dict[str, Any]:
-        if any(not item.startswith("evidence_") for item in snapshot.evidence_ids):
-            raise ValueError("snapshot contains non-canonical evidence identifier")
+        self._require_evidence_ids(snapshot.evidence_ids)
+        if snapshot.supersedes_snapshot_id:
+            self._require_case_object(
+                "case_snapshots",
+                "case_snapshot_id",
+                snapshot.supersedes_snapshot_id,
+                snapshot.case_id,
+            )
         payload = asdict(snapshot)
         return self._execute(
             case_id=snapshot.case_id,
@@ -320,6 +345,10 @@ class CaseQueryService:
         }
         if collection not in aliases:
             raise ValueError("unsupported collection")
+        # Parent visibility dominates child visibility. A public child cannot leak
+        # the existence/content of a restricted case when the case ID is guessed.
+        if self.get_case(case_id, clearance) is None:
+            return []
         return VisibilityPolicy(clearance).filter(
             self.repository.fetch_case_rows(aliases[collection], case_id)
         )

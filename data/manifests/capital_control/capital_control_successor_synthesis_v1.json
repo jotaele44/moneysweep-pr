@@ -1,0 +1,140 @@
+{
+  "synthesis_id": "CAPITAL_CONTROL_SUCCESSOR_SYNTHESIS_V1",
+  "control_issue": 526,
+  "repository": "jotaele44/moneysweep-pr",
+  "branch": "codex/capital-control-successor-synthesis-v1",
+  "base_main": {
+    "commit": "df78f15f7c36b98bc6ecfae37c7e775ec487ead3",
+    "tree": "fec147c36de04936af9cca4479961cbe53d67fb2"
+  },
+  "source_inputs": {
+    "pr520": {
+      "pr": 520,
+      "state": "OPEN_DRAFT_UNMERGED",
+      "head_sha": "5646ad6014959baf783b66c8dd497f1f518f207e",
+      "tree_sha": "b7b20e1744b51fad15618fd75a6593ed1ec7f0ac",
+      "archive_ref": "archive/pr-520-certified-draft-5646ad6",
+      "role": "CERTIFIED_CANONICAL_CORE_INPUT",
+      "files": {
+        ".federation/gui-capabilities.extensions/capital-control-resolution-core-vnext.json": "d557fb1393a48d9aca4e4e3f231c25f26d01c418",
+        "docs/capital_control_resolution_core_parent_freeze.json": "cb2125e34148077c5bf187ab14d35e1ee1352c98",
+        "docs/capital_control_resolution_core_rebase_receipt.json": "5a80153acf465715c7d83bff1c3bad0a2777aa71",
+        "docs/capital_control_resolution_core_spike_receipt.json": "1c641708cd6421c77b8103ce24ae61ce1bf7609b",
+        "moneysweep/capital_control/__init__.py": "d44d8fe1e09f893da40d2d341d9c3dc69441f9ef",
+        "moneysweep/capital_control/identity.py": "d9dbe0afcafbb5b7a69c6b3c5642d8730b7b2ebe",
+        "moneysweep/capital_control/resolution_core/__init__.py": "1d51581a7821809b5db00224651478e45455c723",
+        "moneysweep/capital_control/resolution_core/attribution.py": "d1fde778f844605403104d21d0cb5cc2dd282114",
+        "moneysweep/capital_control/resolution_core/change_detection.py": "cbd79dec209e9e4f8f79ff55a9cc270d5ff20e74",
+        "moneysweep/capital_control/resolution_core/contradictions.py": "7049099fc88c4800f2d7d126aea59107f5bd582c",
+        "moneysweep/capital_control/resolution_core/engine.py": "475e4a26008fd0126711eef7514c1a8b56a2a9d5",
+        "moneysweep/capital_control/resolution_core/equivalence.py": "d2ae368cdd60de9d0fbdea0dfaa1d38ee97b454a",
+        "moneysweep/capital_control/resolution_core/finance.py": "21968d580aa0b7d940cef7ac903280f336bf207d",
+        "moneysweep/capital_control/resolution_core/gates.py": "2eceab8bc43c6bd7550ad6b8c3f5e62968de10fb",
+        "moneysweep/capital_control/resolution_core/identity.py": "1c628878d33563bdf01cc923c066e6368747cd87",
+        "moneysweep/capital_control/resolution_core/joins.py": "8bcb07638d5d18edf1380eca8577cc7750cc611d",
+        "moneysweep/capital_control/resolution_core/models.py": "8e3c136405c318c02fed28524a80e1d8374704d9",
+        "moneysweep/capital_control/resolution_core/namespace.py": "a34b1604c36b59dfef75f1028d5585acf6eb80e9",
+        "moneysweep/capital_control/resolution_core/property_project.py": "aec7645a79a74d5830d03f635c14224177639f96",
+        "scripts/entity_resolution.py": "49baeb5fd916a8fc522974b464b2257aea07ff50",
+        "skills/moneysweep-resolve-entities/SKILL.md": "df1be08cec85e8b14e17b6fb90e13537bfe08eea",
+        "skills/moneysweep-resolve-entities/agents/openai.yaml": "1a2930c6f540a94a9518e53a64ee9927b3606027",
+        "tests/fixtures/capital_control/golden_003_tamcor.json": "95b3c0ee824472c5bc695f85e246005d646cd882",
+        "tests/fixtures/capital_control/golden_004_prasa_jacobs.json": "21997ddb6800c5ebad2417962dd4b9c55b3ca356",
+        "tests/fixtures/capital_control/golden_corpora_v1.json": "6b8c6cdb5b778c37a4bef93913c312f3170d0b32",
+        "tests/test_entity_resolution_core_gate.py": "7886b0e45858834201f2ed024a88db9bb015d313",
+        "tests/test_resolution_core_contracts.py": "92e954e3749769ab036a03477bb552139fd0cd63",
+        "tests/test_resolution_core_golden_001.py": "ff9c2653e2f5d035cb7ab4af4f928efdd82b1312",
+        "tests/test_resolution_core_golden_003_004.py": "38eb69ec559f66a83a831c19943152de1e979218",
+        "tests/test_resolution_core_hardening.py": "4ffbff0b5e25d931c9daef35c17233e7191ad86c"
+      }
+    },
+    "pr527": {
+      "pr": 527,
+      "state": "OPEN_DRAFT_UNMERGED",
+      "head_sha": "f484a226f73f7f366a88ad9e051bba0d0150da54",
+      "tree_sha": "342cb2c2e1d72569359bd1105b1cf29b1cd298b8",
+      "archive_ref": "archive/pr-527-nonresolver-ci-green-f484a22",
+      "role": "CI_GREEN_BOUNDED_NONRESOLVER_INPUT",
+      "files": {
+        "dashboard/src/lib/api.js": "5bc01270635d1da05919c0bd91517ff24636df8b",
+        "data/manifests/capital_control/pr484_nonresolver_salvage_v1.json": "1776acac19df1d85dd49f832be4c0ed1090ee9e0",
+        "docs/PR484_NONRESOLVER_SALVAGE_V1.md": "6d7d98233c191194ba383f7fc0aad42356752a5a",
+        "scripts/gen_dashboard_snapshot.py": "79883a6d2828a27f22e308bdeff08affd233024e",
+        "tests/test_pr484_nonresolver_salvage_contract.py": "87cd7ee5e5656af5bac048cdf81ea46292ce67d3"
+      }
+    },
+    "pr484": {
+      "pr": 484,
+      "head_sha": "85dc4744173ebd26c68f2b904265c6c91497d5ad",
+      "identity_scope": "HISTORICAL_SOURCE_COMMIT_NOT_LIVE_PR_HEAD",
+      "archive_ref": "archive/pr-484-historical-partial-salvage-85dc474",
+      "role": "HISTORICAL_PARTIAL_SALVAGE_LINEAGE",
+      "resolver_disposition": "SUPERSEDED_NONCANONICAL",
+      "live_pr_observation": {
+        "head_sha": "39d06ec63aba3e212f19f96881e5185b03787881",
+        "base_sha": "b5661dd29b5905015016041057136b6c945ddf5a",
+        "state": "OPEN_DRAFT_UNMERGED_REVIEW_REQUIRED",
+        "historical_source_relation": "DISTINCT_NON_ANCESTOR_AFTER_REBASE"
+      }
+    }
+  },
+  "overlap_adjudication": {
+    "pr520_vs_pr527_path_intersection": [],
+    "pr520_vs_current_main_material_intersection": [
+      "moneysweep/capital_control/__init__.py"
+    ],
+    "pr527_vs_current_main_material_intersection": [
+      "dashboard/src/lib/api.js"
+    ],
+    "moneysweep/capital_control/__init__.py": {
+      "main_blob": "5e057052613bb1529100ba3f9105378bf70ba88d",
+      "pr520_blob": "d44d8fe1e09f893da40d2d341d9c3dc69441f9ef",
+      "derived_merged_blob": "4da38d3f584b4c62aec183d44d099d6dc3ce5ba6",
+      "decision": "PRESERVE_CURRENT_MAIN_DEEP_DIVE_AND_SEC_MATERIALIZATION_EXPORTS_AND_ADD_RESOLUTION_CORE_EXPORT"
+    },
+    "dashboard/src/lib/api.js": {
+      "pr527_blob": "5bc01270635d1da05919c0bd91517ff24636df8b",
+      "current_main_blob": "54c65b2c91f0b4ed36859505b49b943b4707da3c",
+      "derived_merged_blob": "7b8b8785406a6ef62a49bac106cac702aafce8b4",
+      "source_snapshot": "data/manifests/capital_control/source_inputs/pr527/dashboard/src/lib/api.js",
+      "decision": "PRESERVE_CAPITAL_CONTROL_OFFLINE_RESOLUTION_AND_CURRENT_MAIN_DESKTOP_AND_API_CLIENTS"
+    },
+    "all_other_pr520_paths": "EXACT_BLOB_REUSE",
+    "all_other_pr527_paths": "EXACT_BLOB_REUSE"
+  },
+  "invariants": {
+    "no_raw_mutation": true,
+    "no_heuristic_identity_promotion": true,
+    "no_unsafe_many_to_many": true,
+    "parcel_requires_authoritative_property_anchor": true,
+    "federation_requires_stable_id_or_authoritative_binding": true,
+    "funding_requires_project_specific_binding": true,
+    "foia_requires_certified_public_source_exhaustion": true,
+    "full_candidate_sets_preserved": true,
+    "contradictions_and_superseded_preserved": true,
+    "source_input_shas_immutable": true
+  },
+  "required_recertification": [
+    "all pre-existing regressions",
+    "GOLDEN_001 Finca Zequeira",
+    "GOLDEN_002 BPOP/SEC ownership preservation",
+    "GOLDEN_003 TAMCOR",
+    "GOLDEN_004 PRASA/Jacobs",
+    "repository identity-surface audit",
+    "RAW/source-manifestation conservation",
+    "full candidate-set conservation",
+    "contradiction and SUPERSEDED conservation",
+    "namespace occupancy",
+    "unsafe M:N prevention",
+    "authoritative property-anchor gate",
+    "stable-ID/authoritative federation gate",
+    "project-specific funding-attribution gate",
+    "public-source-denominator/FOIA gate",
+    "all protected CI at terminal success",
+    "zero unexplained regression residue"
+  ],
+  "state": "CANDIDATE_REQUIRES_COMPLETE_RECERTIFICATION",
+  "draft_required": true,
+  "merge_authorized": false,
+  "production_promotion_authorized": false
+}

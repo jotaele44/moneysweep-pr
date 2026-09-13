@@ -32,7 +32,8 @@
         "partial_yield",
         "fulfilled",
         "denied",
-        "appealed"
+        "appealed",
+        "superseded"
       ]
     },
     "priority": {"type": "string", "enum": ["P0", "P1", "P2", "P3"]},

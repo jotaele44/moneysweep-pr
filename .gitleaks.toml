@@ -1,0 +1,14 @@
+title = "MoneySweep Gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Allow the immutable PR 527 Git blob ID on its exact provenance line"
+condition = "AND"
+regexTarget = "line"
+regexes = ['''"dashboard/src/lib/api\.js":\s*"[0-9a-f]{40}"''']
+paths = ['''^data/manifests/capital_control/capital_control_successor_synthesis_v1\.json$''']

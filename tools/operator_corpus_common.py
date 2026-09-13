@@ -7,7 +7,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-import yaml
+from moneysweep.runtime.source_registry import (
+    DEFAULT_EXTENSIONS_DIR,
+    DEFAULT_OVERRIDES_DIR,
+    DEFAULT_REGISTRY_PATH,
+    load_source_registry,
+)
 
 RECEIPT_SCHEMA_VERSION = "moneysweep.operator_evidence/v1"
 CORPUS_SCHEMA_VERSION = "moneysweep.operator_corpus/v1"
@@ -20,6 +25,7 @@ def canonical_json(value: object) -> bytes:
         sort_keys=True,
         separators=(",", ":"),
         ensure_ascii=False,
+        allow_nan=False,
     ).encode("utf-8")
 
 
@@ -56,32 +62,44 @@ def safe_relative_path(value: str) -> Path:
     return normalized
 
 
+def _registry_input_paths(root: Path) -> list[str]:
+    paths = [DEFAULT_REGISTRY_PATH]
+    for directory in (DEFAULT_EXTENSIONS_DIR, DEFAULT_OVERRIDES_DIR):
+        folder = root / directory
+        if folder.exists():
+            paths.extend(
+                path.relative_to(root).as_posix()
+                for path in sorted(folder.glob("*.json"))
+                if path.is_file()
+            )
+    return paths
+
+
 def load_sources(root: Path) -> tuple[list[dict[str, Any]], list[str]]:
-    registry_path = root / "registries" / "source_registry.yaml"
-    registry = yaml.safe_load(registry_path.read_text(encoding="utf-8")) or {}
+    """Load the same effective source definitions consumed by runtime.
+
+    Certification receipts bind to the root JSON registry, direct JSON source
+    extensions and direct JSON overrides. YAML manifestations remain source
+    taxonomy/provenance inputs elsewhere but cannot silently define a different
+    production identity plane.
+    """
+    registry = load_source_registry(root)
     sources = list(registry.get("sources") or [])
-    registry_paths = ["registries/source_registry.yaml"]
-
-    extension_dir = root / "registries" / "source_registry_extensions"
-    if extension_dir.exists():
-        for path in sorted(extension_dir.glob("*.json")):
-            payload = json.loads(path.read_text(encoding="utf-8"))
-            extension_sources = payload.get("sources")
-            if extension_sources is None:
-                continue
-            if not isinstance(extension_sources, list):
-                raise RuntimeError(f"source registry extension must contain sources list: {path}")
-            sources.extend(extension_sources)
-            registry_paths.append(path.relative_to(root).as_posix())
-
-    source_ids = [str(source.get("source_id", "")).strip() for source in sources]
-    if any(not source_id for source_id in source_ids):
-        raise RuntimeError("source registry contains an empty source_id")
+    if any(not isinstance(source, dict) for source in sources):
+        raise RuntimeError("effective source registry contains a non-object source")
+    source_ids: list[str] = []
+    for source in sources:
+        raw = source.get("source_id")
+        if not isinstance(raw, str) or not raw or raw != raw.strip():
+            raise RuntimeError("effective source registry contains an invalid raw source_id")
+        source_ids.append(raw)
+        if type(source.get("required")) is not bool:
+            raise RuntimeError(f"{raw}: required must be boolean")
     counts = {source_id: source_ids.count(source_id) for source_id in source_ids}
     duplicates = sorted(source_id for source_id, count in counts.items() if count > 1)
     if duplicates:
         raise RuntimeError("duplicate source IDs: " + ", ".join(duplicates))
-    return sources, registry_paths
+    return sources, _registry_input_paths(root)
 
 
 def source_ids_digest(sources: list[dict[str, Any]]) -> str:

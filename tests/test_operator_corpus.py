@@ -37,14 +37,16 @@ def _source(source_id: str, outputs: list[str]) -> dict:
 def _write_registry(root: Path, source: dict) -> None:
     registry_dir = root / "registries"
     registry_dir.mkdir(parents=True)
+    payload = {
+        "schema_version": "test_source_registry_v1",
+        "sources": [source],
+    }
     (registry_dir / "source_registry.yaml").write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": "test_source_registry_v1",
-                "sources": [source],
-            },
-            sort_keys=False,
-        ),
+        yaml.safe_dump(payload, sort_keys=False),
+        encoding="utf-8",
+    )
+    (registry_dir / "source_registry.json").write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
 

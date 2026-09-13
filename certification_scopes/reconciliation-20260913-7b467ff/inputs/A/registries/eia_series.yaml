@@ -1,0 +1,82 @@
+# EIA PR power-sector time series catalog
+# -----------------------------------------------------------------------------
+# Consumed by scripts/download_eia.py. Each entry resolves to one or more
+# requests against the EIA API v2 (https://api.eia.gov/v2/<route>/data/).
+#
+# To add a series: append a new entry with a unique series_id. To remove one:
+# delete the entry — no code changes required.
+#
+# EIA API v2 references:
+#   - https://www.eia.gov/opendata/documentation.php
+#   - https://www.eia.gov/opendata/browser/electricity (route + facet browser)
+#
+# Notes on PR coverage (verified 2026-06-15 against the live API):
+#   - PR electricity data is published ONLY under electric-power-operational-data
+#     (facet location=PR): net generation by fuel type. All entries below use it.
+#   - PR is NOT in the retail-sales dataset (absent from its stateid facet) nor in
+#     SEDS (absent from its stateId facet), so retail sales/price by sector are
+#     unavailable from EIA for PR — those series were removed rather than left to
+#     return 0 rows (download_eia.py now fails a refresh on any hard fetch error).
+#
+api_version: v2
+base_url: https://api.eia.gov/v2
+default_frequency: monthly
+default_start: "2010-01"
+# default_end omitted — fetcher uses the current period
+
+series:
+  # -------- Net generation by fuel type (electric-power-operational-data) ----
+  - series_id: pr_net_generation_all_fuels
+    description: "PR net electricity generation, all fuels, all sectors (thousand MWh)"
+    route: electricity/electric-power-operational-data
+    frequency: monthly
+    data_field: generation
+    facets:
+      location: ["PR"]
+      fueltypeid: ["ALL"]
+      sectorid: ["99"]   # 99 = all sectors
+    units: thousand megawatthours
+
+  - series_id: pr_net_generation_petroleum
+    description: "PR net electricity generation, petroleum-fired (thousand MWh)"
+    route: electricity/electric-power-operational-data
+    frequency: monthly
+    data_field: generation
+    facets:
+      location: ["PR"]
+      fueltypeid: ["PEL"]
+      sectorid: ["99"]
+    units: thousand megawatthours
+
+  - series_id: pr_net_generation_natural_gas
+    description: "PR net electricity generation, natural gas (thousand MWh)"
+    route: electricity/electric-power-operational-data
+    frequency: monthly
+    data_field: generation
+    facets:
+      location: ["PR"]
+      fueltypeid: ["NG"]
+      sectorid: ["99"]
+    units: thousand megawatthours
+
+  - series_id: pr_net_generation_coal
+    description: "PR net electricity generation, coal (thousand MWh)"
+    route: electricity/electric-power-operational-data
+    frequency: monthly
+    data_field: generation
+    facets:
+      location: ["PR"]
+      fueltypeid: ["COW"]
+      sectorid: ["99"]
+    units: thousand megawatthours
+
+  - series_id: pr_net_generation_all_renewables
+    description: "PR net electricity generation, all renewables (thousand MWh)"
+    route: electricity/electric-power-operational-data
+    frequency: monthly
+    data_field: generation
+    facets:
+      location: ["PR"]
+      fueltypeid: ["REN"]
+      sectorid: ["99"]
+    units: thousand megawatthours

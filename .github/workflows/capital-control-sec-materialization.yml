@@ -1,0 +1,131 @@
+name: Capital Control SEC Materialization
+
+on:
+  push:
+    branches:
+      - codex/capital-control-sources-v0-2
+    paths:
+      - .github/workflows/capital-control-sec-materialization.yml
+      - moneysweep/capital_control/**
+      - scripts/materialize_sec_13f.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  materialize-sec-13f:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.11"
+
+      - name: Install acquisition dependency
+        run: python -m pip install 'requests>=2.34.2'
+
+      - name: Materialize Berkshire Hathaway 2026 Q1 Form 13F
+        id: materialize
+        env:
+          PYTHONPATH: .
+        run: |
+          set +e
+          mkdir -p artifacts/capital_control/sec/0001193125-26-226661
+          python scripts/materialize_sec_13f.py \
+            --accession 0001193125-26-226661 \
+            --filer-cik 0001067983 \
+            --filing-date 2026-05-15 \
+            --period-of-report 2026-03-31 \
+            --primary-url https://www.sec.gov/Archives/edgar/data/1067983/000119312526226661/primary_doc.xml \
+            --information-table-url https://www.sec.gov/Archives/edgar/data/1067983/000119312526226661/53405.xml \
+            --expected-primary-size 5555 \
+            --expected-information-table-size 45259 \
+            --output-dir artifacts/capital_control/sec/0001193125-26-226661 \
+            --application MoneySweepPR/0.2 \
+            --contact jotaele44@users.noreply.github.com \
+            --value-scale 1 \
+            --canonicality CANONICAL \
+            --max-requests-per-second 2 \
+            2>&1 | tee artifacts/capital_control/sec/0001193125-26-226661/materialization.log
+          status=${PIPESTATUS[0]}
+          set -e
+
+          if [ "$status" -eq 0 ]; then
+            echo "outcome=PASS" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if grep -q 'SEC request exhausted 4 attempts; last status=403' \
+            artifacts/capital_control/sec/0001193125-26-226661/materialization.log; then
+            python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          out = Path('artifacts/capital_control/sec/0001193125-26-226661')
+          payload = {
+              'accession_number': '0001193125-26-226661',
+              'filer_cik': '0001067983',
+              'filing_date': '2026-05-15',
+              'period_of_report': '2026-03-31',
+              'certification_status': 'BLOCKED',
+              'block_class': 'SEC_HTTP_403_FROM_GITHUB_HOSTED_RUNNER',
+              'observed_utc': datetime.now(timezone.utc).isoformat(),
+              'primary_document_url': 'https://www.sec.gov/Archives/edgar/data/1067983/000119312526226661/primary_doc.xml',
+              'information_table_url': 'https://www.sec.gov/Archives/edgar/data/1067983/000119312526226661/53405.xml',
+              'expected_primary_size': 5555,
+              'expected_information_table_size': 45259,
+              'value_scale': 1,
+              'raw_source_bytes_frozen': False,
+              'notes': 'All four fair-access attempts received HTTP 403 before primary source bytes could be frozen. This is a transport block, not a zero-result or materialization PASS.',
+          }
+          (out / 'acquisition-status.json').write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          PY
+            echo "outcome=BLOCKED" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          exit "$status"
+
+      - name: Verify materialization or transport-block report
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('artifacts/capital_control/sec/0001193125-26-226661')
+          report_path = root / 'materialization.json'
+          blocked_path = root / 'acquisition-status.json'
+
+          if report_path.exists():
+              report = json.loads(report_path.read_text(encoding='utf-8'))
+              assert report['certification_status'] == 'PASS'
+              assert report['primary_document']['byte_size'] == 5555
+              assert report['information_table']['byte_size'] == 45259
+              reconciliation = report['reconciliation']
+              assert reconciliation['declared_table_entry_total'] == reconciliation['parsed_table_entry_total']
+              assert reconciliation['declared_table_value_total'] == reconciliation['parsed_table_value_total']
+              print(json.dumps(report, indent=2, sort_keys=True))
+          else:
+              blocked = json.loads(blocked_path.read_text(encoding='utf-8'))
+              assert blocked['certification_status'] == 'BLOCKED'
+              assert blocked['block_class'] == 'SEC_HTTP_403_FROM_GITHUB_HOSTED_RUNNER'
+              assert blocked['raw_source_bytes_frozen'] is False
+              print(json.dumps(blocked, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload materialization evidence
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: capital-control-sec-13f-0001193125-26-226661
+          path: artifacts/capital_control/sec/0001193125-26-226661/
+          if-no-files-found: error
+          retention-days: 30

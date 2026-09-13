@@ -1,0 +1,166 @@
+{
+  "schema_version": "moneysweep.registry_transition_adjudication/v1",
+  "state": "AUDIT_ONLY",
+  "production_eligible": false,
+  "A": {
+    "commit_sha": "9694590a5019879e8d50288f046521bcbc3493c6",
+    "registry_tree_git_sha1": "13b9d8669609720cceef5fbcb98c4dcc2701724e",
+    "root_yaml_git_blob_sha1": "52c61b97839793e2ec66458d9bdb8b4545f231f3",
+    "root_json_git_blob_sha1": "bb045271d919ee9b84d5d16b0693e74d9793c976",
+    "extension_tree_git_sha1": "7f4a87c5ec9945675cd919eed1c1c68b7f073b71",
+    "override_tree_git_sha1": "ee658d14616e50d4bf0e2cbd02f0a224e585be01",
+    "source_count": 162,
+    "required_count": 16,
+    "automatable_count": 113,
+    "excluded_count": 49,
+    "source_ids_sha256": "353995f4595fde0f7643ff8d9987154bcd230abe30037cdcbe6e3abd7f4233d1",
+    "readiness_git_blob_sha1": "0bfc5151013d330ae5bf26e33dac1cf80ba9e72f"
+  },
+  "B": {
+    "commit_sha": "7b467ff99a98fa0ea600d9b6b5b62b6b666baa76",
+    "registry_tree_git_sha1": "9a6aa08bdf4672e46890fe3132b0630a076bf4a4",
+    "root_yaml_git_blob_sha1": "3f306ca62bcf61da9254c0cf98991289bfd39aa8",
+    "root_json_git_blob_sha1": "34c84e7897bca59a41b4d44d97bd7d21694d3ff4",
+    "extension_tree_git_sha1": "6feede9091884b1ab51c2ec8673cfd818ef7ebe2",
+    "override_tree_git_sha1": "ee658d14616e50d4bf0e2cbd02f0a224e585be01",
+    "source_count": 164,
+    "required_count": 16,
+    "automatable_count": 116,
+    "excluded_count": 48,
+    "source_ids_sha256": "4c551385f00ca6df4332ee1643d0ef7a6ab85172632d945d35be285cd94f5826",
+    "readiness_git_blob_sha1": "8089758c3accb9ba856e1d1014ea7d4b5cbe5c0b"
+  },
+  "source_id_sets": {
+    "INTERSECTION_count": 162,
+    "A_ONLY": [],
+    "B_ONLY": ["pr_fomb", "pr_fomb_special_reports"],
+    "UNION_count": 164,
+    "SYMMETRIC_DIFFERENCE": ["pr_fomb", "pr_fomb_special_reports"]
+  },
+  "required_id_sets": {
+    "INTERSECTION": [
+      "campaign_finance_entities",
+      "campaign_finance_materialization_gate",
+      "cor3",
+      "emma_bonds",
+      "fec",
+      "fema_pa_openfema_v2",
+      "fsrs_subawards",
+      "hud_cdbg_dr_public",
+      "hud_drgr_authorized",
+      "lda",
+      "oficina_contralor",
+      "pr_cabilderos",
+      "prasa",
+      "sam_entities",
+      "usaspending_prime",
+      "usaspending_subawards"
+    ],
+    "A_ONLY": [],
+    "B_ONLY": [],
+    "SYMMETRIC_DIFFERENCE": []
+  },
+  "existing_source_definition_changes": [
+    {
+      "source_id": "usaspending_prime",
+      "fields": ["validation_threshold.parent_uei_coverage_pct"],
+      "receipt_inheritance": "PROHIBITED"
+    },
+    {
+      "source_id": "fpds_report_builder",
+      "fields": ["validation_threshold.parent_uei_coverage_pct"],
+      "receipt_inheritance": "PROHIBITED"
+    },
+    {
+      "source_id": "fsrs_subawards",
+      "fields": ["validation_threshold.parent_uei_coverage_pct"],
+      "receipt_inheritance": "PROHIBITED"
+    },
+    {
+      "source_id": "fema_pa_openfema_v2",
+      "fields": ["validation_threshold.parent_uei_coverage_pct"],
+      "receipt_inheritance": "PROHIBITED"
+    },
+    {
+      "source_id": "hacienda_sut_ivu",
+      "fields": ["endpoint_url", "producer_script", "notes"],
+      "path_transition": "scraper_needed->api_producer",
+      "automatable_transition": "false->true",
+      "receipt_inheritance": "PROHIBITED"
+    }
+  ],
+  "added_source_definitions": [
+    {
+      "source_id": "pr_fomb",
+      "required": false,
+      "path_type": "api_producer",
+      "automatable": true,
+      "receipt_inheritance": "NOT_APPLICABLE_NEW_ID"
+    },
+    {
+      "source_id": "pr_fomb_special_reports",
+      "required": false,
+      "path_type": "api_producer",
+      "automatable": true,
+      "receipt_inheritance": "NOT_APPLICABLE_NEW_ID"
+    }
+  ],
+  "automatable_transition": {
+    "A": 113,
+    "B": 116,
+    "new_automatable_ids": ["pr_fomb", "pr_fomb_special_reports"],
+    "promoted_existing_ids": ["hacienda_sut_ivu"],
+    "delta": 3,
+    "arithmetic_closes": true
+  },
+  "excluded_transition": {
+    "A": 49,
+    "B": 48,
+    "removed_from_excluded": ["hacienda_sut_ivu"],
+    "delta": -1,
+    "arithmetic_closes": true
+  },
+  "loader_profiles": {
+    "certification_profile": "root YAML + direct JSON extensions",
+    "runtime_profile": "root JSON + direct JSON extensions + direct JSON overrides",
+    "source_id_symmetric_difference_at_B": [],
+    "definition_difference_at_B": ["cor3", "pr_cabilderos"],
+    "override_tree_unchanged": true,
+    "decision": "PROFILES_NOT_EQUIVALENT"
+  },
+  "outside_active_loader_manifestations": [
+    {
+      "path": "registries/source_registry_extensions/dateas_pr_metadata_v0_1.yaml",
+      "state": "DISCOVERY_ONLY_FOR_THIS_AUDIT",
+      "reason": "Both inspected loader profiles consume direct JSON extensions, not YAML extensions."
+    }
+  ],
+  "arithmetic": {
+    "A_source_conservation": "113+49=162",
+    "B_source_conservation": "116+48=164",
+    "set_identity": "162+164=164+162",
+    "required_population_unchanged": true
+  },
+  "certification_effect": {
+    "current_scope_population": 164,
+    "historical_scope_population": 162,
+    "hardcoded_162_gate_valid_for_current_scope": false,
+    "hardcoded_113_automatable_gate_valid_for_current_scope": false,
+    "old_receipts_inherit_across_changed_definitions": false,
+    "historical_scope_superseded": false,
+    "current_scope_state": "PROVISIONAL",
+    "production_state": "NON_PRODUCTION_DIAGNOSTIC"
+  },
+  "blockers": [
+    "runtime_certification_definition_profiles_diverge",
+    "changed_source_definitions_require_new_bound_receipts",
+    "new_source_ids_require_current-scope evidence",
+    "full_repository_validation_unexecuted",
+    "G8_G9_G11_G12_scope_bound_replay_unimplemented"
+  ],
+  "evidence_limitations": [
+    "Git object identity is frozen for registry/report manifestations; this artifact does not claim independent SHA-256 of every retained registry byte.",
+    "Materialization/readiness reports are observations, not proof of 116 successful source executions.",
+    "No source equivalence is inferred from names, counts, category, proximity, or source absence."
+  ]
+}

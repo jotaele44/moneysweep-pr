@@ -1,0 +1,25 @@
+{
+  "schema_version": "prii_repo_compatibility_receipt_v1",
+  "repo": "moneysweep-pr",
+  "central_baseline": "2026-09-01",
+  "central_governance_repo": "jotaele44/thehub-pr",
+  "central_governance_pr": 218,
+  "central_governance_url": "https://github.com/jotaele44/thehub-pr/pull/218",
+  "central_governance_head_sha": "800d3cc719e5c71fff70fefa8214a4c34ab39fd6",
+  "central_governance_merge_sha": "58f06c38a143fcdf4277a501bc39929a0eb68f98",
+  "central_governance_merged_at": "2026-09-01T00:10:41Z",
+  "disposition": "COMPATIBLE",
+  "contracts": [
+    "repo_federation_manifest@1",
+    "federation_export_manifest@1",
+    "centinelas_financial_signal@1",
+    "contract_finance_bundle@1"
+  ],
+  "watched_paths": [
+    "federation.json",
+    "schemas/federation_export_manifest.schema.json",
+    "scripts/federation_export.py",
+    "scripts/ingest_centinelas_signals.py",
+    "scripts/build_contract_finance_bundle.py"
+  ]
+}

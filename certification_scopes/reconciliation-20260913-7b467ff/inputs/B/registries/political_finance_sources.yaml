@@ -1,0 +1,36 @@
+schema_version: political_finance_sources_v1
+sources:
+  - source_id: fec_candidates
+    family: political_finance
+    required: false
+    input: data/staging/processed/pr_fec_candidates.csv
+    outputs:
+      - data/staging/processed/political_finance/political_transactions.csv
+    zero_row_policy: accounted_zero
+    notes: Candidate master and principal campaign committee affiliations.
+  - source_id: fec_schedule_b
+    family: political_finance
+    required: true
+    input: data/staging/processed/pr_fec_disbursements.csv
+    outputs:
+      - data/staging/processed/political_finance/political_transactions.csv
+      - data/staging/processed/political_finance/political_recipient_resolution.csv
+    zero_row_policy: accounted_zero
+  - source_id: fec_schedule_e
+    family: political_finance
+    required: true
+    input: data/staging/processed/pr_fec_independent_expenditures.csv
+    outputs:
+      - data/staging/processed/political_finance/political_transactions.csv
+    zero_row_policy: accounted_zero
+  - source_id: political_finance_graph
+    family: political_finance
+    required: true
+    runner: scripts/materialize_political_finance_graph.py
+    outputs:
+      - data/staging/processed/political_finance/political_entities.csv
+      - data/staging/processed/political_finance/political_transactions.csv
+      - data/staging/processed/political_finance/political_recipient_resolution.csv
+      - data/staging/processed/political_finance/political_contract_lobbying_correlations.csv
+      - data/staging/processed/political_finance/political_flow_paths.csv
+      - data/staging/processed/political_finance/political_materialization_accounting.csv

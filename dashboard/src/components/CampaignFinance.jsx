@@ -137,6 +137,16 @@ export default function CampaignFinance() {
         <Metric label="CEE + OCE" value={((sourceCounts.cee ?? 0) + (sourceCounts.oce ?? 0)).toLocaleString()} />
         <Metric label="Federal outflows" value={(summary.totalFederalOutflowRows ?? 0).toLocaleString()} />
       </div>
+      {!summaryQuery.isPending && !summary.hasData && (
+        <div role="status" className="border-b border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+          {summary.emptyState || 'No campaign-finance datasets are materialized.'}
+        </div>
+      )}
+      {summary.hasData && summary.updatedAt && (
+        <div className="border-b border-border px-3 py-1 text-[10px] text-muted-foreground">
+          Latest materialized file: {new Date(summary.updatedAt).toLocaleString()}
+        </div>
+      )}
 
       <div className="ms-filter-bar flex flex-wrap items-center justify-between gap-2 p-2">
         <div className="flex items-center gap-2">

@@ -1,0 +1,249 @@
+version: "1.1"
+schema_version: guide_act60_temporal_crosswalk_v1
+scope_id: GUIDE_BOUNDED_100_PERCENT
+source_guide_as_of: "2020-12-31"
+current_code_as_of: "2026-07-16"
+
+scope_invariant: >-
+  This crosswalk relates guide-2021 terminology to Act 60 / predecessor-law
+  taxonomy across time. It does not rewrite historical decrees into current-law
+  categories and does not imply complete beneficiary coverage.
+
+relation_types:
+  - EXACT
+  - BROADER_THAN
+  - NARROWER_THAN
+  - SPLIT_INTO
+  - MERGED_FROM
+  - SPECIAL_OVERLAY
+  - PARALLEL_SPECIAL_LAW
+  - SUPERSEDED
+  - NO_DIRECT_CURRENT_EQUIVALENT
+  - UNRESOLVED
+
+current_act60_top_level_categories:
+  authority: Oficina de Gerencia y Presupuesto / Ley 60-2019 segun enmendada
+  source_url: https://bvirtualogp.pr.gov/ogp/BVirtual/LeyesOrganicas/pdf/60-2019.pdf
+  revision_date: "2026-07-16"
+  categories:
+    - Individuos
+    - Exportacion (Servicios y Bienes)
+    - Servicios Financieros y de Seguros
+    - Economia del Visitante
+    - Manufactura, incluyendo el componente de Investigacion y Desarrollo
+    - Infraestructura
+    - Agricultura
+    - Industrias Creativas
+    - Empresarismo
+    - Otras
+  special_overlays:
+    - PYMES
+    - Vieques y Culebra
+  temporal_rule: >-
+    Act 60 states that its prospective changes do not affect businesses or
+    individuals holding decrees, credits, or incentives granted before its
+    approval; predecessor-law manifestations therefore remain separate epochs.
+
+crosswalk:
+  GFAV-008:
+    guide_canonical: resident_individual_investors
+    current_category: Individuos
+    current_term: Individuo Residente Inversionista
+    relation: EXACT
+    current_sections: [2021.01, 2022.01, 2022.02]
+    note: >-
+      Current law preserves this as an individual incentive but changed its
+      treatment for applications filed from 2027 onward; temporal state must be
+      retained rather than normalizing all decrees to one rule.
+
+  GFAV-009:
+    guide_canonical: difficult_recruitment_professionals
+    current_category: Individuos
+    current_term: Profesional de Dificil Reclutamiento
+    relation: EXACT
+    current_sections: [2021.02, 2022.03]
+
+  GFAV-010:
+    guide_canonical: export_goods_services
+    current_category: Exportacion (Servicios y Bienes)
+    relation: EXACT
+
+  GFAV-011:
+    guide_canonical: international_insurers_reinsurers
+    current_category: Servicios Financieros y de Seguros
+    relation: NARROWER_THAN
+    note: >-
+      The guide lane is a specific international-insurance/reinsurance regime
+      within the broader financial-and-insurance Act 60 sector. OCS regulatory
+      identity remains independently required.
+
+  GFAV-013:
+    guide_canonical: private_equity_capital_investment_funds
+    current_category: Servicios Financieros y de Seguros
+    current_term: Fondos de Capital Privado / Fondos de Capital Privado de Puerto Rico
+    relation: NARROWER_THAN
+    note: >-
+      Act 60 incorporates decree use for Act 185 private-capital funds. Private
+      funds remain distinct from investment companies and investment advisers.
+
+  GFAV-014:
+    guide_canonical: tourism_cruise_hotels
+    current_category: Economia del Visitante
+    relation: NARROWER_THAN
+    note: >-
+      Guide tourism/cruise/hotel activities occupy a subset of the broader
+      visitor-economy sector.
+
+  GFAV-015:
+    guide_canonical: manufacturing
+    current_category: Manufactura, incluyendo el componente de Investigacion y Desarrollo
+    relation: NARROWER_THAN
+
+  GFAV-016:
+    guide_canonical: infrastructure_renewable_energy
+    current_category: Infraestructura
+    relation: NARROWER_THAN
+    current_terms:
+      - Energia de Fuentes Renovables
+      - Energia Verde
+      - Productor de Energia Renovable Alterna
+      - Productor de Energia Renovable Sostenible
+    note: >-
+      Renewable-energy activities are explicitly defined in the infrastructure
+      provisions; the guide's combined infrastructure/renewable label is not a
+      separate top-level Act 60 category.
+
+  GFAV-017:
+    guide_canonical: agriculture_agroindustrial
+    current_category: Agricultura
+    relation: EXACT
+
+  GFAV-018:
+    guide_canonical: film_creative
+    current_category: Industrias Creativas
+    relation: NARROWER_THAN
+
+  GFAV-019:
+    guide_canonical: young_entrepreneurship
+    current_category: Empresarismo
+    current_term: Joven Empresario
+    relation: NARROWER_THAN
+
+  GFAV-021:
+    guide_canonical: qualified_opportunity_zone_priority_projects
+    current_category: Otras
+    current_term: Proyecto Prioritario en Zonas de Oportunidad
+    relation: NARROWER_THAN
+    current_sections: [6070.56]
+    note: >-
+      Opportunity-zone priority projects are expressly defined but are not one
+      of the nine named industry/individual top-level categories.
+
+  GFAV-022:
+    guide_canonical: vieques_culebra_special_incentives
+    current_category: Otras
+    current_term: Negocios que operen en Vieques y Culebra
+    relation: SPECIAL_OVERLAY
+    current_sections: [2013.01]
+    note: >-
+      Current Act 60 gives additional benefits to otherwise eligible exempt
+      businesses operating in Vieques or Culebra. It is an overlay rather than a
+      mutually exclusive industry class.
+
+  GFAV-023:
+    guide_canonical: pymes_special_incentives
+    current_category: Empresarismo
+    current_term: Pequenas y Medianas Empresas (PYMES)
+    relation: SPECIAL_OVERLAY
+    current_sections: [2012.01]
+    note: >-
+      Act 60 defines PYMES by business volume and provides a separate benefit
+      subchapter, while expressly excluding several individual/scientific terms
+      from the PYMES definition.
+
+  GFAV-024:
+    guide_canonical: strategic_projects
+    current_category: Otras
+    current_term: Proyectos Estrategicos
+    relation: EXACT
+    current_sections: [2014.01]
+
+  GFAV-025:
+    guide_canonical: pioneer_activities
+    current_category: Otras
+    current_term: Actividad Novedosa Pionera
+    relation: EXACT
+    current_sections: [2014.02]
+
+  GFAV-026:
+    guide_canonical: scientific_research_development
+    current_category: Manufactura, incluyendo el componente de Investigacion y Desarrollo
+    current_terms:
+      - Investigaciones Cientificas Elegibles
+      - Investigador o Cientifico Elegible
+      - investigacion y desarrollo de ciencia y tecnologia
+    relation: SPLIT_INTO
+    note: >-
+      The guide combines scientific research and R&D credits. Current Act 60
+      contains both manufacturing/R&D activity and separate eligible-scientist /
+      scientific-research provisions, so a single category identity would lose
+      statutory scope.
+
+  GFAV-027:
+    guide_canonical: recycling
+    current_category: Manufactura, incluyendo el componente de Investigacion y Desarrollo
+    current_term: Actividades de Reciclaje
+    relation: NARROWER_THAN
+    note: >-
+      Current manufacturing-eligible activities expressly include partial and
+      total recycling activities.
+
+  GFAV-028:
+    guide_canonical: technology
+    current_category:
+      - Exportacion (Servicios y Bienes)
+      - Manufactura, incluyendo el componente de Investigacion y Desarrollo
+      - Infraestructura
+    relation: SPLIT_INTO
+    note: >-
+      Technology is not a standalone top-level Act 60 category. The current code
+      promotes exported technology/services, high-technology manufacturing/R&D,
+      and technology used in energy/infrastructure contexts.
+
+  GFAV-029:
+    guide_canonical: hospital_facilities
+    current_act60_category: null
+    parallel_special_law: Ley 168-1968
+    parallel_special_law_title: Ley de Exenciones Contributivas a Hospitales
+    parallel_special_law_current_revision: "2026-04-14"
+    source_url: https://bvirtualogp.pr.gov/ogp/Bvirtual/leyesreferencia/PDF/Incentivos/168-1968/168-1968.pdf
+    current_term: unidad hospitalaria
+    relation: PARALLEL_SPECIAL_LAW
+    note: >-
+      The current OGP compilation of Ley 168-1968 remains a distinct hospital-tax
+      incentive statute and authorizes benefits where necessary to increase or
+      modernize hospital facilities and medical services. It must not be collapsed
+      into Act 60 medical-professional incentives merely because both concern health.
+
+  GFAV-030:
+    guide_canonical: solid_waste_disposal
+    predecessor_law: Ley 159-2011
+    predecessor_title: >-
+      Ley de Incentivos Contributivos para la Inversion en Facilidades de
+      Reduccion Disposicion y/o Tratamientos de Desperdicios Solidos
+    current_category: Otras
+    relation: SUPERSEDED
+    note: >-
+      Current Act 60's repeal/supersession provisions identify Ley 159-2011 by
+      name. Current recycling/manufacturing provisions must not be silently
+      substituted for the broader historical solid-waste facility incentive.
+
+open_crosswalk_residue: []
+
+certification_state: PASS
+certification_scope: CATEGORY_AND_TEMPORAL_CROSSWALK_ONLY
+certification_reason: >-
+  Every guide incentive lane in this crosswalk now has a bounded current Act 60,
+  special-overlay, active parallel-law, or superseded-predecessor classification.
+  This PASS applies only to taxonomy/temporal binding and does not certify the
+  member-level beneficiary/decree denominator.

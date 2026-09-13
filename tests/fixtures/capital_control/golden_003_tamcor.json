@@ -1,0 +1,121 @@
+{
+  "corpus_id": "GOLDEN_003_TAMCOR",
+  "source_basis": "Frozen TAMCOR / Trujillo Alto Metal / TAM Industries transaction-level dossier, 2026-08-14",
+  "scope": "bounded OCPR FY2012-13 through FY2022-23 plus frozen judicial/DDEC manifestations",
+  "assertions": [
+    {
+      "id": "tamcor-three-corporation-collapse",
+      "type": "ENTITY_IDENTITY",
+      "subject": "Trujillo Alto Metal Corporation",
+      "object": "TAMCOR Manufacturing Corp. | TAM Industries, Inc.",
+      "expected": "UNRESOLVED_N:N",
+      "negative_gate": "shared address/phone/product/domain MUST NOT prove 1:1 legal identity"
+    },
+    {
+      "id": "tamcor-alias-operating-relationship",
+      "type": "ENTITY_IDENTITY",
+      "subject": "Trujillo Alto Metal Corp.",
+      "object": "TAMCOR",
+      "expected": "PROVISIONAL",
+      "reason": "appellate evidence explicitly pairs the name, but DOS/brand filings remain higher-order hardening"
+    },
+    {
+      "id": "ocpr-2014-000748",
+      "type": "FINANCIAL_ATTRIBUTION",
+      "namespace": "OCPR",
+      "instrument": "2014-000748",
+      "raw_contractor": "TAM INDUSTRIES INC.",
+      "amount": 12480.0,
+      "amount_semantics": "CONTRACT_AMOUNT",
+      "source_class": "TRANSFERENCIA_DE_FONDOS",
+      "expected": "PASS_SOURCE_MANIFESTATION"
+    },
+    {
+      "id": "ocpr-2014-000995",
+      "type": "FINANCIAL_ATTRIBUTION",
+      "namespace": "OCPR",
+      "instrument": "2014-000995",
+      "raw_contractor": "TAM INDUSTRIES INC.",
+      "amount": 50000.0,
+      "amount_semantics": "CONTRACT_AMOUNT",
+      "source_class": "TRANSFERENCIA_DE_FONDOS",
+      "expected": "PASS_SOURCE_MANIFESTATION"
+    },
+    {
+      "id": "ocpr-2017-PO0351",
+      "type": "FINANCIAL_ATTRIBUTION",
+      "namespace": "OCPR",
+      "instrument": "2017-PO0351",
+      "raw_contractor": "TAM INDUSTRIES INC.",
+      "amount": 3860.0,
+      "amount_semantics": "CONTRACT_AMOUNT",
+      "source_class": "MATERIAL_PURCHASE",
+      "expected": "PASS_SOURCE_MANIFESTATION"
+    },
+    {
+      "id": "ocpr-2018-000297",
+      "type": "FINANCIAL_ATTRIBUTION",
+      "namespace": "OCPR",
+      "instrument": "2018-000297",
+      "raw_contractor": "TAM INDUSTRIES INC.",
+      "amount": 23563.0,
+      "amount_semantics": "CONTRACT_AMOUNT",
+      "source_class": "MATERIAL_PURCHASE",
+      "expected": "PASS_SOURCE_MANIFESTATION"
+    },
+    {
+      "id": "ocpr-2018-000297-A",
+      "type": "EVENT_IDENTITY",
+      "namespace": "OCPR",
+      "instrument": "2018-000297 A",
+      "parent_instrument": "2018-000297",
+      "increment": 0.0,
+      "expected": "PASS_ZERO_INCREMENT_AMENDMENT_PRESERVED"
+    },
+    {
+      "id": "ocpr-2018-000297-B",
+      "type": "EVENT_IDENTITY",
+      "namespace": "OCPR",
+      "instrument": "2018-000297 B",
+      "parent_instrument": "2018-000297",
+      "increment": 0.0,
+      "expected": "PASS_ZERO_INCREMENT_AMENDMENT_PRESERVED"
+    },
+    {
+      "id": "ocpr-base-arithmetic",
+      "type": "ARITHMETIC",
+      "base_amounts": [12480.0, 50000.0, 3860.0, 23563.0],
+      "expected_total": 89903.0
+    },
+    {
+      "id": "ocpr-class-arithmetic",
+      "type": "ARITHMETIC",
+      "transfer_amounts": [12480.0, 50000.0],
+      "material_purchase_amounts": [3860.0, 23563.0],
+      "expected_transfer_total": 62480.0,
+      "expected_material_purchase_total": 27423.0
+    },
+    {
+      "id": "KAC2006-1038-claim-semantic",
+      "type": "FINANCIAL_ATTRIBUTION",
+      "raw_amount": 86027.21,
+      "amount_semantics": "LITIGATION_CLAIM",
+      "expected": "PASS_CLAIM_ONLY",
+      "negative_gate": "claim amount MUST NOT become contract value, invoice, payment, or recovery"
+    },
+    {
+      "id": "ddec-39084-supersession",
+      "type": "CONTRADICTION",
+      "observations": ["39084 interpreted as decree number", "39084 is Excel serial for 2007-01-02 approval date"],
+      "controlling": "39084 is Excel serial for 2007-01-02 approval date",
+      "expected_superseded": ["39084 interpreted as decree number"]
+    },
+    {
+      "id": "specification-is-not-award",
+      "type": "FINANCIAL_ATTRIBUTION",
+      "subject": "TAMCOR / Trujillo Alto Metal manufacturer references in public-project specifications",
+      "expected": "SPECIFIED_ONLY",
+      "negative_gate": "manufacturer reference MUST NOT become award, sale, invoice, installation, or payment"
+    }
+  ]
+}

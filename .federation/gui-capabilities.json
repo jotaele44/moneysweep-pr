@@ -62,6 +62,23 @@
           "GET /stats"
         ]
       },
+      "analysis": {
+        "files": [
+          "scripts/build_federal_financial_program_registry.py",
+          "scripts/build_om_contract_universe.py",
+          "scripts/build_ppp_coverage.py",
+          "scripts/download_p3.py",
+          "scripts/materialize_ocpr_contracts_resumable.py",
+          "moneysweep/orchestrator/_offline_baseline_core.py",
+          "moneysweep/orchestrator/_offline_baseline_coverage.py",
+          "moneysweep/orchestrator/_offline_baseline_extract.py",
+          "moneysweep/orchestrator/_offline_baseline_runner.py",
+          "moneysweep/orchestrator/offline_baseline.py",
+          "scripts/parse_act_transition_ppp.py",
+          "scripts/run_offline_baseline.py",
+          "scripts/validate_om_contract_universe.py"
+        ]
+      },
       "frontend": {
         "routes": [
           "/"
@@ -170,6 +187,90 @@
       ]
     },
     {
+      "id": "campaign-finance-observatory",
+      "classification": "analysis",
+      "status": "active",
+      "requires_terminal": false,
+      "backend": {
+        "files": [
+          "server/backend/campaign_finance.py",
+          "server/backend/main.py"
+        ],
+        "endpoints": [
+          "GET /campaign-finance/summary",
+          "GET /campaign-finance/contributions",
+          "GET /campaign-finance/entities",
+          "GET /campaign-finance/reports"
+        ]
+      },
+      "analysis": {
+        "files": [
+          "scripts/build_campaign_finance_entities.py",
+          "scripts/campaign_finance_common.py",
+          "scripts/download_fec_schedule_e_resumable.py",
+          "scripts/download_oce.py",
+          "scripts/materialize_campaign_finance.py",
+          "scripts/materialize_political_finance_graph.py",
+          "scripts/validate_campaign_finance_materialization.py",
+          "moneysweep/political_finance/__init__.py",
+          "moneysweep/political_finance/completion.py",
+          "moneysweep/political_finance/flow_graph.py"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/lib/api.js",
+          "dashboard/src/lib/hooks.js",
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/CampaignFinance.jsx"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_campaign_finance_api.py"
+        ],
+        "contract": [
+          "dashboard/src/components/CampaignFinance.test.jsx"
+        ],
+        "e2e": [
+          "dashboard/tests/gui-parity.spec.mjs"
+        ]
+      }
+    },
+    {
+      "id": "repository-quality-automation",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Static workflow and dispatch validators are CI guardrails, not human-facing analytical workflows.",
+      "analysis": {
+        "files": [
+          "scripts/validate_github_workflows.py",
+          "scripts/validate_live_fetch_dispatch.py",
+          "scripts/check_status_freshness.py",
+          "scripts/run_automatable_sources_scoped.py",
+          "moneysweep/orchestrator/cli_legacy.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_live_fetch_dispatch.py",
+          "tests/test_materializer_credential_scope.py",
+          "tests/test_status_freshness.py",
+          "tests/test_workflow_static_validation.py"
+        ]
+      }
+    },
+    {
       "id": "service-health",
       "classification": "internal",
       "status": "active",
@@ -199,10 +300,10 @@
           "server/backend/campaign_finance.py"
         ],
         "endpoints": [
-          "GET /summary",
-          "GET /contributions",
-          "GET /entities",
-          "GET /reports"
+          "GET /campaign-finance/summary",
+          "GET /campaign-finance/contributions",
+          "GET /campaign-finance/entities",
+          "GET /campaign-finance/reports"
         ]
       },
       "frontend": {
@@ -234,10 +335,10 @@
         ]
       },
       "candidate_ids": [
-        "backend_endpoint:server/backend/campaign_finance.py:GET /contributions",
-        "backend_endpoint:server/backend/campaign_finance.py:GET /entities",
-        "backend_endpoint:server/backend/campaign_finance.py:GET /reports",
-        "backend_endpoint:server/backend/campaign_finance.py:GET /summary",
+        "backend_endpoint:server/backend/campaign_finance.py:GET /campaign-finance/contributions",
+        "backend_endpoint:server/backend/campaign_finance.py:GET /campaign-finance/entities",
+        "backend_endpoint:server/backend/campaign_finance.py:GET /campaign-finance/reports",
+        "backend_endpoint:server/backend/campaign_finance.py:GET /campaign-finance/summary",
         "gui_control:dashboard/src/components/CampaignFinance.jsx:input#d1c03111ef8d",
         "gui_control:dashboard/src/components/CampaignFinance.jsx:select#4a1280b1b915",
         "gui_control:dashboard/src/components/CampaignFinance.jsx:select#6beccafbe6be",
@@ -692,7 +793,7 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Canonical investor identity, source provenance, strict ingestion, supersession, and temporal analytics are backend infrastructure. They remain intentionally non-user-facing until a separately certified API and GUI vector is implemented.",
+      "rationale": "Canonical investor identity, source provenance, strict ingestion, supersession, temporal analytics, and authoritative SEC acquisition/materialization are backend/operator infrastructure. They remain intentionally non-user-facing until a separately certified API and GUI vector is implemented.",
       "backend": {
         "files": [
           "moneysweep/capital_control/__init__.py",
@@ -700,9 +801,24 @@
           "moneysweep/capital_control/identity.py",
           "moneysweep/capital_control/ingestion.py",
           "moneysweep/capital_control/models.py",
+          "moneysweep/capital_control/sec_materialization.py",
           "moneysweep/capital_control/source_adapter.py",
           "moneysweep/capital_control/supersession.py",
           "moneysweep/capital_control/validation.py"
+        ],
+        "symbols": [
+          "moneysweep/capital_control/sec_materialization.py:SEC13FMaterializationResult",
+          "moneysweep/capital_control/sec_materialization.py:SEC13FMaterializationTarget",
+          "moneysweep/capital_control/sec_materialization.py:materialize_sec_13f"
+        ]
+      },
+      "analysis": {
+        "files": [
+          "scripts/materialize_sec_13f.py"
+        ],
+        "symbols": [
+          "scripts/materialize_sec_13f.py:build_parser",
+          "scripts/materialize_sec_13f.py:main"
         ]
       },
       "tests": {
@@ -713,7 +829,8 @@
           "tests/test_capital_control_ingestion.py",
           "tests/test_capital_control_supersession.py",
           "tests/test_capital_control_analytics.py",
-          "tests/test_capital_control_validation_hardening.py"
+          "tests/test_capital_control_validation_hardening.py",
+          "tests/test_sec_13f_materialization.py"
         ]
       },
       "candidate_ids": [
@@ -1077,9 +1194,81 @@
         "python_symbol:server/backend/api_keys.py:list_api_keys",
         "python_symbol:server/backend/api_keys.py:set_api_key"
       ]
+    },
+    {
+      "id": "pr-assistance-denominator-pipeline",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Batch acquisition and shard recovery for the Puerto Rico assistance denominator; operator-run CLIs executed offline against USAspending bulk jobs, not surfaced in the dashboard.",
+      "backend": {
+        "files": [
+          "scripts/download_pr_assistance_denominator.py",
+          "scripts/recover_pr_assistance_failed_shards.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_pr_assistance_denominator.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/download_pr_assistance_denominator.py",
+        "analysis_module:scripts/recover_pr_assistance_failed_shards.py",
+        "analysis_symbol:scripts/download_pr_assistance_denominator.py:aggregate",
+        "analysis_symbol:scripts/download_pr_assistance_denominator.py:main",
+        "analysis_symbol:scripts/download_pr_assistance_denominator.py:run_shard",
+        "analysis_symbol:scripts/recover_pr_assistance_failed_shards.py:BulkJobFailed",
+        "analysis_symbol:scripts/recover_pr_assistance_failed_shards.py:main",
+        "analysis_symbol:scripts/recover_pr_assistance_failed_shards.py:recover_shard",
+        "cli_surface:scripts/download_pr_assistance_denominator.py",
+        "cli_surface:scripts/recover_pr_assistance_failed_shards.py"
+      ]
     }
   ],
   "exceptions": [
+    {
+      "id": "case-manager-phase-1-gui-gap",
+      "reason": "Case Manager Phase 1 exposes a service boundary but its claim and evidence-relation workflows are not yet available through the shipped dashboard. Keep the ratchet explicit until the complete GUI path is delivered.",
+      "owner": "jotaele44",
+      "tracking": "docs/GUI_CAPABILITY_PARITY.md#completion-boundary",
+      "expires_on": "2026-11-19",
+      "candidate_ids": [
+        "backend_endpoint:server/backend/case_manager_api.py:GET /{case_id}",
+        "backend_endpoint:server/backend/case_manager_api.py:GET /{case_id}/{collection}",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/claims",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/claims/{claim_id}/evidence-relations"
+      ],
+      "candidate_files": [
+        "moneysweep/case_manager/__init__.py",
+        "moneysweep/case_manager/ids.py",
+        "moneysweep/case_manager/models.py",
+        "moneysweep/case_manager/repository.py",
+        "moneysweep/case_manager/service.py",
+        "moneysweep/case_manager/validators.py",
+        "server/backend/case_manager_api.py",
+        "server/backend/case_manager_app.py"
+      ]
+    },
+    {
+      "id": "forensics-gui-gap",
+      "reason": "The bounded forensics engine remains an analyst CLI and library pending a discoverable dashboard workflow with evidence, provenance, and safe acquisition controls.",
+      "owner": "jotaele44",
+      "tracking": "docs/GUI_CAPABILITY_PARITY.md#completion-boundary",
+      "expires_on": "2026-11-19",
+      "candidate_ids": [
+        "cli_surface:moneysweep/forensics/cli.py"
+      ],
+      "candidate_files": [
+        "moneysweep/forensics/__init__.py",
+        "moneysweep/forensics/adapters.py",
+        "moneysweep/forensics/candidate.py",
+        "moneysweep/forensics/cli.py",
+        "moneysweep/forensics/core.py",
+        "moneysweep/forensics/pipeline.py",
+        "moneysweep/forensics/seed.py"
+      ]
+    },
     {
       "id": "compare-entity-products-terminal-analysis",
       "reason": "scripts/compare_entity_products.py landed on main (entity-product comparison audit tool) after this PR's baseline was built; it is a terminal-only analysis/diagnostic script with no user-facing GUI surface. Excepted pending either a GUI rendering of its comparison report or its classification as pipeline tooling.",

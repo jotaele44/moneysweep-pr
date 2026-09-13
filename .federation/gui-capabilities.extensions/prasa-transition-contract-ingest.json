@@ -1,0 +1,19 @@
+{
+  "capabilities": [
+    {
+      "id": "prasa-transition-contract-ingest",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The PRASA transition-contract ingester is an offline, provenance-preserving source materialization step. Its CSV and receipt feed existing MoneySweep data surfaces; it is not a separate interactive analysis capability.",
+      "candidate_ids": [
+        "analysis_module:scripts/ingest_prasa_transition_contracts.py",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:main",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:parse_prasa_transition_contracts",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:run",
+        "cli_surface:scripts/ingest_prasa_transition_contracts.py"
+      ]
+    }
+  ],
+  "exceptions": []
+}

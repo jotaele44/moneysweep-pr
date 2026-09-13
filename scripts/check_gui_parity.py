@@ -489,7 +489,7 @@ def mapped_candidate_ids(
                         mapped.add(item["id"])
                 elif item["kind"] in {"python_symbol", "analysis_symbol"}:
                     ref = f"{item['path']}:{item.get('symbol', '')}"
-                    if ref in symbols:
+                    if ref in symbols or (not symbols and item["path"] in files):
                         mapped.add(item["id"])
 
         frontend = capability.get("frontend", {})
@@ -768,11 +768,15 @@ def validate_manifest(
     return issues
 
 
-def exception_candidate_ids(manifest: dict[str, Any]) -> set[str]:
+def exception_candidate_ids(
+    manifest: dict[str, Any], candidates: list[dict[str, Any]]
+) -> set[str]:
     result: set[str] = set()
     for exception in manifest.get("exceptions", []):
         if isinstance(exception, dict):
             result.update(str(value) for value in exception.get("candidate_ids", []))
+            files = {str(value) for value in exception.get("candidate_files", [])}
+            result.update(item["id"] for item in candidates if item["path"] in files)
     return result
 
 
@@ -810,7 +814,7 @@ def evaluate(
     current_by_id = {item["id"]: item for item in candidates}
     current_ids = set(current_by_id)
     mapped = mapped_candidate_ids(manifest, candidates)
-    exceptions = exception_candidate_ids(manifest)
+    exceptions = exception_candidate_ids(manifest, candidates)
 
     new_ids = sorted(current_ids - baseline_ids - mapped - exceptions)
     removed_ids = sorted(baseline_ids - current_ids)

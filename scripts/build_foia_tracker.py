@@ -1,13 +1,12 @@
 """Build the FOIA / public-records priority queue (Gate ``foia``, item ``foia_tracker``).
 
 A schema-locked request tracker whose targets are derived from the project's own
-unmet-source gaps: each row is a public-records request for a source that the
-pipeline needs but cannot materialize in-sandbox (credentialed exports,
-key-gated APIs, manual dropzones). The authority is a curated seed
+source gaps: active rows target sources the pipeline cannot materialize
+in-sandbox (credentialed exports, key-gated APIs, manual dropzones), while
+superseded rows preserve requests displaced by independently frozen source
+materialization. The authority is a curated seed
 (``data/reference/foia_priority_queue_seed.csv``) keyed by ``source_id``; the
-producer validates every target against ``reports/source_registry_status.csv`` —
-the target must exist and must NOT already be fully materialized, so the queue
-only ever tracks real gaps.
+producer validates every target against ``reports/source_registry_status.csv``.
 
 Pure, deterministic, no network. Reuses ``name_hash`` and the stdlib schema
 validator (no ``jsonschema`` dep).
@@ -43,6 +42,7 @@ SCHEMA = "schemas/foia_request.schema.json"
 SOURCE_ID = "foia_priority_queue_seed"
 EVIDENCE_TIER = "T2"
 CONFIDENCE = 0.8
+FULLY_MATERIALIZED_STATUSES = {"fulfilled", "superseded"}
 
 COLUMNS = [
     "request_id",
@@ -122,15 +122,23 @@ def check(rows: list[dict[str, Any]], root: Path | None = None) -> list[str]:
         problems.append("duplicate target_source_id values present")
     schema = _load_schema(root)
     for i, row in enumerate(rows, start=1):
-        # Referential integrity: only track real, unmet source gaps.
+        # Referential integrity: active requests track gaps; terminal requests
+        # preserve history after a source is independently materialized.
         st = row.get("_source_status")
+        request_status = row.get("request_status")
         if st is None:
             problems.append(
                 f"row {i}: target {row['target_source_id']!r} not found in source registry status"
             )
-        elif st == "fully_materialized":
+        elif st == "fully_materialized" and request_status not in FULLY_MATERIALIZED_STATUSES:
             problems.append(
-                f"row {i}: target {row['target_source_id']!r} is already fully_materialized — not a gap"
+                f"row {i}: target {row['target_source_id']!r} is fully_materialized but "
+                f"request_status={request_status!r} is still active"
+            )
+        elif st != "fully_materialized" and request_status == "superseded":
+            problems.append(
+                f"row {i}: target {row['target_source_id']!r} is superseded but "
+                f"pipeline_status={st!r} is not fully_materialized"
             )
         for msg in validate_row(_public_row(row), schema):
             problems.append(f"row {i} ({row.get('target_source_id')!r}): {msg}")
@@ -160,6 +168,8 @@ def build(root: Path | None = None) -> dict[str, Any]:
         "source_inputs": [SEED, SOURCE_STATUS],
         "output": OUT,
         "row_count": len(rows),
+        "active_request_count": sum(r["request_status"] != "superseded" for r in rows),
+        "superseded_request_count": sum(r["request_status"] == "superseded" for r in rows),
         "jurisdictions": sorted({r["jurisdiction"] for r in rows}),
         "priorities": sorted({r["priority"] for r in rows}),
         "generated_at": datetime.now(timezone.utc).isoformat(),

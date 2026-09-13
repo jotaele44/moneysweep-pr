@@ -58,7 +58,9 @@ jobs:
             --confirm "$CONFIRM" \
             --source "$SOURCE" \
             --family "$FAMILY"
-          python -m py_compile scripts/run_automatable_sources.py
+          python -m py_compile \
+            scripts/run_automatable_sources.py \
+            scripts/run_automatable_sources_scoped.py
           if [[ "$MODE" == "fetch" ]]; then
             echo "authorized=true" >> "$GITHUB_OUTPUT"
           else
@@ -73,19 +75,19 @@ jobs:
         if: ${{ steps.validate_dispatch.outputs.authorized == 'true' }}
         run: python scripts/check_network_egress.py
 
-      - name: Run automatable sources
+      - name: Run automatable sources with source-scoped credentials
         if: ${{ steps.validate_dispatch.outputs.authorized == 'true' }}
         env:
           SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
           FEC_API_KEY: ${{ secrets.FEC_API_KEY }}
           FAC_API_KEY: ${{ secrets.FAC_API_KEY }}
           CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
-          LDA_API_KEY: ${{ secrets.LDA_API_KEY }}
-          DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
           HIGHERGOV_API_KEY: ${{ secrets.HIGHERGOV_API_KEY }}
-          OPENCORPORATES_API_TOKEN: ${{ secrets.OPENCORPORATES_API_TOKEN }}
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          OPENSTATES_API_KEY: ${{ secrets.OPENSTATES_API_KEY }}
           FINANCIALDATA_API_KEY: ${{ secrets.FINANCIALDATA_API_KEY }}
-          X_API_KEY: ${{ secrets.X_API_KEY }}
+          FINANCIALDATA_LICENSE_APPROVED: ${{ vars.FINANCIALDATA_LICENSE_APPROVED }}
           SOURCE: ${{ inputs.source }}
           FAMILY: ${{ inputs.family }}
         shell: bash
@@ -94,7 +96,7 @@ jobs:
           args=()
           if [[ -n "$SOURCE" ]]; then args+=(--source "$SOURCE"); fi
           if [[ -n "$FAMILY" ]]; then args+=(--family "$FAMILY"); fi
-          python scripts/run_automatable_sources.py "${args[@]}"
+          python -m scripts.run_automatable_sources_scoped "${args[@]}"
 
       - name: Upload materialized outputs
         if: ${{ always() && steps.validate_dispatch.outputs.authorized == 'true' }}

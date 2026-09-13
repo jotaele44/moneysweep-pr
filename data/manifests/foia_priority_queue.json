@@ -8,6 +8,8 @@
   ],
   "output": "reports/foia_priority_queue.csv",
   "row_count": 15,
+  "active_request_count": 15,
+  "superseded_request_count": 0,
   "jurisdictions": [
     "PR",
     "US"
@@ -17,5 +19,5 @@
     "P1",
     "P2"
   ],
-  "generated_at": "2026-07-13T06:12:31.988933+00:00"
+  "generated_at": "2026-09-03T01:50:17.567833+00:00"
 }

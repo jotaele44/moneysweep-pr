@@ -1,0 +1,186 @@
+{
+  "arithmetic": {
+    "authorized_candidates": 0,
+    "classified": 9,
+    "total": 9
+  },
+  "blocker": "No non-empty authorized HUD DRGR activity/project/drawdown export is proven.",
+  "classification_counts": {
+    "FOUND_SUPPORTING_NOT_AUTHORIZED_EXPORT": 6,
+    "PARTIAL_NOT_AUTHORIZED_DRGR": 1,
+    "PARTIAL_UNRESOLVED": 2
+  },
+  "generated_at_utc": "2026-09-06T18:37:57.624405+00:00",
+  "lumen_status": "LUMEN_UNAVAILABLE_OR_UNHEALTHY; bounded local inspection used",
+  "receipt_type": "moneysweep_hud_drgr_authorized_pursuit",
+  "records": [
+    {
+      "authorized_table_hints": [],
+      "byte_size": 2707911,
+      "classification": "FOUND_SUPPORTING_NOT_AUTHORIZED_EXPORT",
+      "encoding": "utf-8-sig",
+      "exists": true,
+      "format": "csv",
+      "header": [
+        "award_id",
+        "recipient_name",
+        "recipient_uei",
+        "awarding_agency",
+        "awarding_sub_agency",
+        "obligated_amount",
+        "award_date",
+        "fiscal_year",
+        "pop_state",
+        "pop_county",
+        "description",
+        "source_file",
+        "source_dataset",
+        "award_category"
+      ],
+      "inclusion_decision": "documentary_support_only",
+      "logical_rows": 3808,
+      "path": "/Users/jotaele/Documents/Financials/COR3_Recovery/contractdata/data/staging/processed/pr_cdbg_dr_master.csv",
+      "sha256": "18e33b1d79024e302d6e0f1ae272c3dcd621b6ae70316857289b886a4089404e"
+    },
+    {
+      "authorized_table_hints": [],
+      "byte_size": 2856106,
+      "classification": "FOUND_SUPPORTING_NOT_AUTHORIZED_EXPORT",
+      "encoding": "utf-8-sig",
+      "exists": true,
+      "format": "csv",
+      "header": [
+        "internal_id",
+        "Award ID",
+        "Recipient Name",
+        "recipient_uei",
+        "Total Obligation",
+        "Start Date",
+        "Awarding Agency",
+        "Awarding Sub Agency",
+        "Description",
+        "awarding_agency_id",
+        "agency_slug",
+        "generated_internal_id"
+      ],
+      "inclusion_decision": "documentary_support_only",
+      "logical_rows": 3805,
+      "path": "/Users/jotaele/Documents/Financials/COR3_Recovery/contractdata/data/staging/raw/cdbg_dr/cdbg_dr_usaspending.csv",
+      "sha256": "8f8725e16293c9e8cd768744cbd148ef173396bee4e871fecdc4130f12f98914"
+    },
+    {
+      "byte_size": 740904,
+      "classification": "FOUND_SUPPORTING_NOT_AUTHORIZED_EXPORT",
+      "exists": true,
+      "format": "pdf",
+      "header": [],
+      "inclusion_decision": "documentary_support_only",
+      "logical_rows": null,
+      "path": "/Users/jotaele/Documents/Financials/2024/ACT/transicion2024_archive/files/by_agency/078/Informe_de_Contratos_Vigentes/Informe_de_Contratos_Vigentes-Programa_de_CDBG-DR-MIT.pdf",
+      "sha256": "376b266040f54a3fd1456cdcfcc71240edd36e64687145ee7acf887f388cd6c8"
+    },
+    {
+      "byte_size": 368754,
+      "classification": "FOUND_SUPPORTING_NOT_AUTHORIZED_EXPORT",
+      "exists": true,
+      "format": "pdf",
+      "header": [],
+      "inclusion_decision": "documentary_support_only",
+      "logical_rows": null,
+      "path": "/Users/jotaele/Documents/Financials/2024/ACT/transicion2024_archive/files/by_agency/078/Informe_Inventario_de_Propiedad/Informe_de_Inventario_de_Propiedad_CDBG-DR-MIT_-_Flota.pdf",
+      "sha256": "2f8946434b392d3a5e7c96b3b54a05a8a431ff922e4ac59e25b40b1fc2aa0f55"
+    },
+    {
+      "byte_size": 377611,
+      "classification": "FOUND_SUPPORTING_NOT_AUTHORIZED_EXPORT",
+      "exists": true,
+      "format": "pdf",
+      "header": [],
+      "inclusion_decision": "documentary_support_only",
+      "logical_rows": null,
+      "path": "/Users/jotaele/Documents/Financials/2024/ACT/transicion2024_archive/files/by_agency/078/Informe_de_Subastas/Informe_de_Subastas_en_Proceso_y_Adjudicadas_-_CDBG-DR-MIT.pdf",
+      "sha256": "6d6ebbf2a2aeb5fdebce8c9150c6add4ffbfcbe1a02e7a166f44b6b4ab81546c"
+    },
+    {
+      "byte_size": 47893,
+      "classification": "FOUND_SUPPORTING_NOT_AUTHORIZED_EXPORT",
+      "exists": true,
+      "format": "pdf",
+      "header": [],
+      "inclusion_decision": "documentary_support_only",
+      "logical_rows": null,
+      "path": "/Users/jotaele/Documents/Financials/2024/ACT/transicion2024_archive/files/by_agency/078/Informe_Acciones_Judiciales/Informe_Acciones_Judiciales_CDBG-DR-MIT.pdf",
+      "sha256": "a24ec5a11d912353f189d717fc402d98df2d362d4ca67d892eddb243072b1492"
+    },
+    {
+      "authorized_table_hints": [],
+      "byte_size": 336,
+      "classification": "PARTIAL_NOT_AUTHORIZED_DRGR",
+      "encoding": "utf-8-sig",
+      "exists": true,
+      "format": "csv",
+      "header": [
+        "year",
+        "program",
+        "total_units",
+        "people_per_unit",
+        "total_households",
+        "pct_minority",
+        "avg_annual_income",
+        "avg_rent_burden",
+        "total_annual_cost",
+        "source_doc"
+      ],
+      "inclusion_decision": "exclude_from_authorized_drgr_credit",
+      "logical_rows": 2,
+      "path": "/Users/jotaele/Documents/Financials/Documents/contractdata/data/staging/processed/pr_hud_hcv.csv",
+      "sha256": "e421ef85cd8e74eb3b9ed2be252875f8bc94e9b5cb0f5c15d7487a3d25483eb0"
+    },
+    {
+      "authorized_table_hints": [],
+      "byte_size": 6220,
+      "classification": "PARTIAL_UNRESOLVED",
+      "exists": true,
+      "format": "parquet",
+      "header": [
+        "grant_number",
+        "grantee_name",
+        "grantee_normalized",
+        "program_type",
+        "disaster_number",
+        "grant_amount",
+        "amount_drawn",
+        "amount_remaining",
+        "disbursement_rate",
+        "activity_count",
+        "completed_activity_count",
+        "source_system"
+      ],
+      "inclusion_decision": "preserve_blocker",
+      "logical_rows": 0,
+      "path": "/Users/jotaele/Documents/Financials/Documents/contractdata/data/normalized/hud_drgr_projects.parquet",
+      "sha256": "998a3e4708421863bddad70a402af9da0f500bf6dd97386da63355409dd12134"
+    },
+    {
+      "authorized_table_hints": [],
+      "byte_size": 3546,
+      "classification": "PARTIAL_UNRESOLVED",
+      "exists": true,
+      "format": "parquet",
+      "header": [
+        "responsible_org",
+        "responsible_org_normalized",
+        "grant_number_list",
+        "activity_count",
+        "total_budget_managed",
+        "total_drawn"
+      ],
+      "inclusion_decision": "preserve_blocker",
+      "logical_rows": 0,
+      "path": "/Users/jotaele/Documents/Financials/Documents/contractdata/data/normalized/hud_drgr_responsible_orgs_resolved.parquet",
+      "sha256": "ecaa80f0ae6f3b300975235f66bb926dcec4987fc3347fe5ef4aab4c56d01bd5"
+    }
+  ],
+  "result_state": "PARTIAL_UNRESOLVED",
+  "source_id": "hud_drgr_authorized"
+}

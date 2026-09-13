@@ -1,14 +1,9 @@
-"""
-Entity Resolution — Top N Vendors → Parent Entity Hierarchy
+"""Entity resolution orchestration for MoneySweep.
 
-Resolves the top N vendors (by total obligation) to their parent entities.
-The default path uses existing identifiers, SAM enrichment output, and cache
-only. A bounded USASpending residual is explicit via ``--use-api``.
-
-Usage:
-  python3 scripts/entity_resolution.py               # offline-first
-  python3 scripts/entity_resolution.py --top 50      # top 50
-  python3 scripts/entity_resolution.py --use-api --max-api 100
+Discovery is offline-first and may use name similarity to generate candidates, but
+canonical identity adjudication is delegated to
+``moneysweep.capital_control.resolution_core``. Name similarity, normalization,
+proximity, or source absence never establishes identity.
 """
 
 from __future__ import annotations
@@ -18,30 +13,25 @@ import csv
 import json
 import sys
 import time
-import urllib.error
-import urllib.parse
 import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from moneysweep.capital_control.resolution_core import (
+    Candidate,
+    CertificationState,
+    EvidenceBasis,
+    resolve_candidates,
+)
 from scripts.config import PROJECT_ROOT, setup_logging
 from scripts.sam_enrichment import normalize_vendor, name_similarity
-
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
 
 USAS_RECIPIENT_SEARCH = "https://api.usaspending.gov/api/v2/recipient/search/"
 USAS_RECIPIENT_DETAIL = "https://api.usaspending.gov/api/v2/recipient/{hash_or_id}/"
 RATE_DELAY = 0.3
 MATCH_THRESHOLD = 0.75
-TOP_N_DEFAULT = 10_000  # analyze all significant entities, not just top 100
-
-
-# ---------------------------------------------------------------------------
-# API helpers
-# ---------------------------------------------------------------------------
+TOP_N_DEFAULT = 10_000
 
 
 def _http_post(url: str, payload: dict, timeout: int = 12) -> dict | None:
@@ -57,7 +47,7 @@ def _http_post(url: str, payload: dict, timeout: int = 12) -> dict | None:
             if resp.status == 200:
                 return json.loads(resp.read().decode())
     except Exception:
-        pass
+        return None
     return None
 
 
@@ -68,116 +58,155 @@ def _http_get(url: str, timeout: int = 12) -> dict | None:
             if resp.status == 200:
                 return json.loads(resp.read().decode())
     except Exception:
-        pass
+        return None
     return None
 
 
 def search_recipient(vendor_name: str) -> dict | None:
-    """Search USASpending for a recipient. Returns best match or None."""
+    """Return the best USASpending *discovery candidate* by name similarity.
+
+    This function deliberately does not certify identity. ``resolve_vendor``
+    must pass the result through resolution_core before any parent is accepted.
+    """
     norm = normalize_vendor(vendor_name)
-    # Use the original name for search (better results than normalized),
-    # but compare using normalized names for scoring.
     payload = {"search_text": vendor_name, "order": "desc", "sort": "amount", "limit": 5}
     data = _http_post(USAS_RECIPIENT_SEARCH, payload)
     if not data:
         return None
     results = data.get("results", [])
-    if not results:
-        return None
-    best, best_score = None, 0.0
-    for r in results:
-        # USASpending recipient/search returns "name" (not "recipient_name")
-        result_name = r.get("name") or r.get("recipient_name", "")
+    best: dict | None = None
+    best_score = 0.0
+    for row in results:
+        result_name = row.get("name") or row.get("recipient_name", "")
         score = name_similarity(norm, normalize_vendor(result_name))
         if score > best_score:
-            best_score, best = score, r
+            best_score, best = score, row
     if best and best_score >= MATCH_THRESHOLD:
+        best = dict(best)
         best["match_score"] = round(best_score, 3)
         return best
     return None
 
 
 def get_recipient_detail(recipient_id: str) -> dict | None:
-    """Fetch recipient detail page (has parent info). recipient_id is the hash."""
-    url = USAS_RECIPIENT_DETAIL.format(hash_or_id=recipient_id)
-    return _http_get(url)
-
-
-# ---------------------------------------------------------------------------
-# Load inputs
-# ---------------------------------------------------------------------------
+    return _http_get(USAS_RECIPIENT_DETAIL.format(hash_or_id=recipient_id))
 
 
 def load_vendor_rankings(root: Path, top_n: int) -> list[dict]:
-    """Load top vendors from master CSV, ranked by total obligation."""
-    # Prefer master_enriched (has UEI already)
     enriched = root / "data" / "staging" / "processed" / "enrichment" / "master_enriched.csv"
     master = root / "data" / "staging" / "processed" / "pr_contracts_master.csv"
     unified = root / "data" / "staging" / "processed" / "pr_all_awards_master.csv"
     source_path = enriched if enriched.exists() else (master if master.exists() else unified)
-
     if not source_path.exists():
         raise FileNotFoundError(f"No master CSV found at {source_path}")
 
     vendor_totals: dict[str, dict] = {}
-    with open(source_path, encoding="utf-8-sig") as f:
-        for row in csv.DictReader(f):
-            # Support both old (vendor_name) and unified (recipient_name) schemas
-            vn = (row.get("vendor_name") or row.get("recipient_name") or "").strip()
-            if not vn:
+    with open(source_path, encoding="utf-8-sig") as handle:
+        for row in csv.DictReader(handle):
+            vendor_name = (row.get("vendor_name") or row.get("recipient_name") or "").strip()
+            if not vendor_name:
                 continue
             try:
-                amt = float(row.get("obligated_amount") or 0)
+                amount = float(row.get("obligated_amount") or 0)
             except (ValueError, TypeError):
-                amt = 0.0
-            if vn not in vendor_totals:
-                vendor_totals[vn] = {
-                    "vendor_name": vn,
+                amount = 0.0
+            item = vendor_totals.setdefault(
+                vendor_name,
+                {
+                    "vendor_name": vendor_name,
                     "total_obligation": 0.0,
                     "record_count": 0,
                     "known_uei": (row.get("recipient_uei") or "").strip(),
                     "known_parent_uei": (row.get("parent_uei") or "").strip(),
                     "known_parent_name": (row.get("parent_name") or "").strip(),
-                }
-            vendor_totals[vn]["total_obligation"] += amt
-            vendor_totals[vn]["record_count"] += 1
-            # Carry UEI if found in any row
-            if not vendor_totals[vn]["known_uei"]:
-                vendor_totals[vn]["known_uei"] = (row.get("recipient_uei") or "").strip()
+                },
+            )
+            item["total_obligation"] += amount
+            item["record_count"] += 1
+            if not item["known_uei"]:
+                item["known_uei"] = (row.get("recipient_uei") or "").strip()
 
-    ranked = sorted(vendor_totals.values(), key=lambda x: x["total_obligation"], reverse=True)
+    ranked = sorted(vendor_totals.values(), key=lambda item: item["total_obligation"], reverse=True)
     return ranked[:top_n]
 
 
 def load_sam_index(root: Path) -> dict[str, dict]:
-    """Load vendor_uei_index.csv from SAM enrichment if it exists."""
-    index_path = root / "data" / "staging" / "processed" / "enrichment" / "vendor_uei_index.csv"
-    if not index_path.exists():
+    path = root / "data" / "staging" / "processed" / "enrichment" / "vendor_uei_index.csv"
+    if not path.exists():
         return {}
-    index = {}
-    with open(index_path, encoding="utf-8-sig") as f:
-        for row in csv.DictReader(f):
-            vn = (row.get("vendor_name") or "").strip()
-            if vn:
-                index[vn] = row
-                index.setdefault(normalize_vendor(vn), row)
+    index: dict[str, dict] = {}
+    with open(path, encoding="utf-8-sig") as handle:
+        for row in csv.DictReader(handle):
+            vendor_name = (row.get("vendor_name") or "").strip()
+            if vendor_name:
+                index[vendor_name] = row
+                index.setdefault(normalize_vendor(vendor_name), row)
     return index
 
 
-# ---------------------------------------------------------------------------
-# Resolution
-# ---------------------------------------------------------------------------
+def _candidate_id(search: dict) -> str:
+    return str(
+        search.get("uei")
+        or search.get("recipient_hash")
+        or search.get("id")
+        or search.get("name")
+        or search.get("recipient_name")
+        or "USASPENDING_CANDIDATE"
+    )
+
+
+def adjudicate_usaspending_candidate(vendor: dict, search: dict):
+    """Adjudicate a discovery candidate without promoting name similarity.
+
+    A USASpending candidate can PASS here only when the input already carries a
+    stable UEI and the candidate independently reports the same UEI. All other
+    name-search results remain CANDIDATE_NOT_IDENTITY.
+    """
+    known_uei = (vendor.get("known_uei") or "").strip()
+    candidate_uei = (search.get("uei") or "").strip()
+    basis = (
+        EvidenceBasis.STABLE_ID
+        if known_uei and candidate_uei and known_uei == candidate_uei
+        else EvidenceBasis.HEURISTIC_DISCOVERY_ONLY
+    )
+    return resolve_candidates(
+        [Candidate(_candidate_id(search), basis, "USASpending recipient search candidate")]
+    )
+
+
+def _safe_sam_parent(vendor: dict, sam_index: dict) -> tuple[dict | None, str]:
+    """Return a SAM row only when binding evidence is available.
+
+    Exact RAW-key lookup is accepted as an existing authoritative source
+    manifestation. A normalized-name-only lookup is discovery unless a known UEI
+    matches the SAM UEI exactly.
+    """
+    vendor_name = vendor["vendor_name"]
+    exact = sam_index.get(vendor_name)
+    if exact:
+        return exact, "AUTHORITATIVE_BINDING"
+
+    normalized = sam_index.get(normalize_vendor(vendor_name))
+    if not normalized:
+        return None, "NONE"
+    known_uei = (vendor.get("known_uei") or "").strip()
+    sam_uei = (normalized.get("uei") or "").strip()
+    if known_uei and sam_uei and known_uei == sam_uei:
+        return normalized, "STABLE_ID"
+    return None, "HEURISTIC_DISCOVERY_ONLY"
 
 
 def resolve_vendor(
-    vendor: dict, sam_index: dict, cache: dict, logger, *, use_api: bool = False
+    vendor: dict,
+    sam_index: dict,
+    cache: dict,
+    logger,
+    *,
+    use_api: bool = False,
 ) -> dict:
-    """Resolve a vendor to its parent entity. Returns enriched dict."""
-    vn = vendor["vendor_name"]
-    norm = normalize_vendor(vn)
-
+    vendor_name = vendor["vendor_name"]
     result = {
-        "vendor_name": vn,
+        "vendor_name": vendor_name,
         "rank": vendor.get("_rank", 0),
         "total_obligation": vendor["total_obligation"],
         "record_count": vendor["record_count"],
@@ -186,34 +215,42 @@ def resolve_vendor(
         "parent_name": vendor.get("known_parent_name", ""),
         "business_types": "",
         "match_confidence": 0.0,
+        "identity_status": "UNRESOLVED",
+        "binding_basis": "NONE",
+        "candidate_uei": "",
         "source": "none",
     }
 
-    # Already have parent from SAM enrichment — done
+    # Existing parent fields are source-backed manifestations. Keep them intact;
+    # the canonical core remains responsible for cross-source entity federation.
     if result["parent_uei"] or result["parent_name"]:
+        result["identity_status"] = "PASS"
+        result["binding_basis"] = "AUTHORITATIVE_BINDING"
         result["source"] = "sam_enrichment"
         return result
 
-    # Check SAM index
-    sam_row = sam_index.get(vn) or sam_index.get(norm)
+    sam_row, sam_basis = _safe_sam_parent(vendor, sam_index)
     if sam_row and sam_row.get("parent_uei"):
         result["uei"] = sam_row.get("uei", result["uei"])
         result["parent_uei"] = sam_row["parent_uei"]
         result["parent_name"] = sam_row.get("parent_name", "")
         result["match_confidence"] = float(sam_row.get("match_score") or 0)
+        result["identity_status"] = "PASS"
+        result["binding_basis"] = sam_basis
         result["source"] = "sam_index"
         return result
     if sam_row and sam_row.get("resolution_status") == "RESOLVED_LOCAL_GOV":
+        result["identity_status"] = "PASS"
+        result["binding_basis"] = sam_basis
         result["source"] = "local_government"
         return result
 
-    # Cache hit
-    if vn in cache:
-        cached = cache[vn]
-        # A parentless cache entry is useful offline but must not suppress a
-        # later explicitly requested residual lookup.
+    if vendor_name in cache:
+        cached = cache[vendor_name]
         if not use_api or cached.get("parent_uei") or cached.get("parent_name"):
             result.update(cached)
+            result.setdefault("identity_status", "PROVISIONAL")
+            result.setdefault("binding_basis", "AUTHORITATIVE_BINDING")
             result["source"] = "cache"
             return result
 
@@ -221,56 +258,78 @@ def resolve_vendor(
         result["source"] = "offline_unresolved"
         return result
 
-    # Query USASpending
     time.sleep(RATE_DELAY)
-    search = search_recipient(vn)
+    search = search_recipient(vendor_name)
     if not search:
         result["source"] = "unresolved"
-        cache[vn] = {"parent_uei": "", "parent_name": "", "uei": result["uei"]}
+        cache[vendor_name] = {
+            "parent_uei": "",
+            "parent_name": "",
+            "uei": result["uei"],
+            "identity_status": "UNRESOLVED",
+            "binding_basis": "NONE",
+        }
         return result
 
     result["match_confidence"] = search.get("match_score", 0.0)
+    result["candidate_uei"] = search.get("uei", "")
+    adjudication = adjudicate_usaspending_candidate(vendor, search)
+    result["identity_status"] = adjudication.state.value
+    result["binding_basis"] = (
+        "STABLE_ID" if adjudication.state is CertificationState.PASS else "HEURISTIC_DISCOVERY_ONLY"
+    )
+
+    if adjudication.state is not CertificationState.PASS:
+        result["source"] = "usaspending_candidate_not_identity"
+        # Preserve the candidate but do not fetch/promote its parent.
+        cache[vendor_name] = {
+            "parent_uei": "",
+            "parent_name": "",
+            "uei": result["uei"],
+            "candidate_uei": result["candidate_uei"],
+            "identity_status": result["identity_status"],
+            "binding_basis": result["binding_basis"],
+        }
+        return result
+
     if not result["uei"]:
         result["uei"] = search.get("uei", "")
-
-    # Fetch detail for parent info
     recipient_id = search.get("recipient_hash") or search.get("id", "")
     if recipient_id:
         time.sleep(RATE_DELAY)
         detail = get_recipient_detail(recipient_id)
         if detail:
-            parent = detail.get("parents") or []
-            if parent:
-                p = parent[0] if isinstance(parent, list) else parent
-                result["parent_uei"] = p.get("uei", "") or p.get("recipient_uei", "")
-                result["parent_name"] = p.get("name", "") or p.get("recipient_name", "")
-            # Also check top-level parent fields
+            parents = detail.get("parents") or []
+            if parents:
+                parent = parents[0] if isinstance(parents, list) else parents
+                result["parent_uei"] = parent.get("uei", "") or parent.get("recipient_uei", "")
+                result["parent_name"] = parent.get("name", "") or parent.get("recipient_name", "")
             if not result["parent_uei"]:
                 result["parent_uei"] = detail.get("parent_uei", "")
                 result["parent_name"] = detail.get("parent_name", "")
-            bt = detail.get("business_types_description") or detail.get("business_types", [])
-            if isinstance(bt, list):
-                result["business_types"] = "; ".join(bt)
-            else:
-                result["business_types"] = str(bt)
+            business_types = detail.get("business_types_description") or detail.get(
+                "business_types", []
+            )
+            result["business_types"] = (
+                "; ".join(business_types)
+                if isinstance(business_types, list)
+                else str(business_types)
+            )
 
-    result["source"] = "usaspending"
-    cache[vn] = {
+    result["source"] = "usaspending_stable_id_bound"
+    cache[vendor_name] = {
         "parent_uei": result["parent_uei"],
         "parent_name": result["parent_name"],
         "uei": result["uei"],
         "business_types": result["business_types"],
+        "identity_status": result["identity_status"],
+        "binding_basis": result["binding_basis"],
     }
     logger.info(
-        f"  {vn[:45]:<45}  parent={result['parent_name'][:30] or '—':<30}  "
-        f"score={result['match_confidence']:.2f}"
+        f"  {vendor_name[:45]:<45} parent={result['parent_name'][:30] or '—':<30} "
+        f"state={result['identity_status']}"
     )
     return result
-
-
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
 
 def run(
@@ -281,9 +340,8 @@ def run(
     use_api: bool = False,
     max_api: int = 100,
 ) -> Path:
-    if root is None:
-        root = PROJECT_ROOT
-
+    del resume  # accepted for CLI compatibility; cache is always read when present.
+    root = root or PROJECT_ROOT
     output_dir = root / "data" / "staging" / "processed" / "enrichment"
     output_dir.mkdir(parents=True, exist_ok=True)
     cache_path = output_dir / "entity_cache.json"
@@ -292,52 +350,29 @@ def run(
     logger = setup_logging("entity_resolution")
     if use_api and max_api < 1:
         raise ValueError("max_api must be at least 1")
-    logger.info(
-        f"Entity resolution — top {top_n} vendors "
-        f"({'offline + bounded API' if use_api else 'offline-only'})"
-    )
 
     vendors = load_vendor_rankings(root, top_n)
     sam_index = load_sam_index(root)
-    # Cache reads are always safe and make the default offline path useful on
-    # repeated runs. ``--resume`` remains accepted for CLI compatibility.
     cache = json.loads(cache_path.read_text()) if cache_path.exists() else {}
 
-    logger.info(f"  Loaded {len(vendors)} vendors, {len(sam_index)} SAM index entries")
-
-    rows = []
-    resolved_count = 0
+    rows: list[dict] = []
     for rank, vendor in enumerate(vendors, 1):
         vendor["_rank"] = rank
-        result = resolve_vendor(vendor, sam_index, cache, logger, use_api=False)
-        rows.append(result)
-        if result.get("parent_uei") or result.get("parent_name"):
-            resolved_count += 1
-        if rank % 25 == 0:
-            logger.info(
-                f"  [PROGRESS] {rank}/{len(vendors)} processed, {resolved_count} with parent entity"
-            )
+        rows.append(resolve_vendor(vendor, sam_index, cache, logger, use_api=False))
 
     api_calls = 0
     if use_api:
-        logger.info(f"  Live residual budget: {max_api} vendor lookups")
-        for idx, (vendor, current) in enumerate(zip(vendors, rows, strict=True)):
+        for index, (vendor, current) in enumerate(zip(vendors, rows, strict=True)):
             if current.get("parent_uei") or current.get("parent_name"):
                 continue
             if current.get("source") == "local_government":
                 continue
             if api_calls >= max_api:
                 break
-            updated = resolve_vendor(vendor, sam_index, cache, logger, use_api=True)
-            rows[idx] = updated
+            rows[index] = resolve_vendor(vendor, sam_index, cache, logger, use_api=True)
             api_calls += 1
 
-    resolved_count = sum(1 for row in rows if row.get("parent_uei") or row.get("parent_name"))
-
-    # Save cache
     cache_path.write_text(json.dumps(cache, indent=2), encoding="utf-8")
-
-    # Write hierarchy CSV
     fieldnames = [
         "rank",
         "vendor_name",
@@ -348,28 +383,25 @@ def run(
         "parent_name",
         "business_types",
         "match_confidence",
+        "identity_status",
+        "binding_basis",
+        "candidate_uei",
         "source",
     ]
-    with open(out_path, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
-        w.writeheader()
-        w.writerows(rows)
+    with open(out_path, "w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
 
-    logger.info(
-        f"\nEntity hierarchy written: {out_path}\n"
-        f"  {resolved_count}/{len(rows)} vendors resolved to parent entity; "
-        f"live API calls={api_calls}"
-    )
+    logger.info(f"Entity hierarchy written: {out_path}; live API calls={api_calls}")
     return out_path
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Entity resolution for top N vendors")
-    parser.add_argument("--top", type=int, default=TOP_N_DEFAULT, help="Number of top vendors")
-    parser.add_argument("--resume", action="store_true", help="Resume from cache")
-    parser.add_argument(
-        "--use-api", action="store_true", help="Enable a bounded USASpending residual pass"
-    )
+    parser = argparse.ArgumentParser(description="MoneySweep entity-resolution orchestration")
+    parser.add_argument("--top", type=int, default=TOP_N_DEFAULT)
+    parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--use-api", action="store_true")
     parser.add_argument("--max-api", type=int, default=100)
     args = parser.parse_args()
     run(top_n=args.top, resume=args.resume, use_api=args.use_api, max_api=args.max_api)

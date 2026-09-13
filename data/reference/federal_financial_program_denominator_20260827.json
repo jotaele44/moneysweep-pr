@@ -1,0 +1,75 @@
+{
+  "schema_version": "federal_financial_program_denominator_v1",
+  "snapshot_date": "2026-08-27",
+  "retrieval_utc": "2026-08-27T21:55:00Z",
+  "source": {
+    "name": "SAM.gov Assistance Listings DataGov frozen extract",
+    "upstream_url": "https://s3.amazonaws.com/falextracts/Assistance%20Listings/datagov/AssistanceListings_DataGov_PUBLIC_CURRENT.csv",
+    "artifact_path": "data/reference/AssistanceListings_DataGov_c32925ccdefe425d.csv.gz",
+    "sha256": "c32925ccdefe425d39cb47fca5d2f408a069c8a7654321f69132047610687bb3",
+    "bytes": 22797314,
+    "artifact_sha256": "a5789e8f768c256f8a2e75c93139715ecf2f45b995b46c5c5ba3ccbc239fa48f",
+    "artifact_bytes": 4623282,
+    "encoding": "cp1252",
+    "compression": "gzip",
+    "columns": 38
+  },
+  "denominator": {
+    "assistance_listing_rows": 2867,
+    "unique_program_numbers": 2867,
+    "duplicate_program_numbers": 0,
+    "financial_program_rows": 2814,
+    "nonfinancial_assistance_rows": 53,
+    "financial_program_classification_pct": 100.0
+  },
+  "financial_program_rule": {
+    "mode": "positive_financial_instrument_token",
+    "case_insensitive_tokens": [
+      "GRANT",
+      "COOPERATIVE AGREEMENT",
+      "DIRECT PAYMENT",
+      "LOAN",
+      "INSURANCE",
+      "FINANCIAL ASSISTANCE",
+      "SALE, EXCHANGE, OR DONATION"
+    ],
+    "rationale": "At least one financial instrument must be stated in Types of Assistance (060). Hybrid financial/nonfinancial listings remain in the financial denominator."
+  },
+  "nonfinancial_assistance_rows_by_type": {
+    "PROVISION OF SPECIALIZED SERVICES": 18,
+    "TRAINING": 11,
+    "DISSEMINATION OF TECHNICAL INFORMATION": 7,
+    "ADVISORY SERVICES AND COUNSELING": 5,
+    "ADVISORY SERVICES AND COUNSELING;TRAINING": 2,
+    "PROVISION OF SPECIALIZED SERVICES;ADVISORY SERVICES AND COUNSELING;DISSEMINATION OF TECHNICAL INFORMATION;TRAINING": 2,
+    "INVESTIGATION OF COMPLAINTS": 2,
+    "INFORMATION": 1,
+    "PROVISION OF SPECIALIZED SERVICES;ADVISORY SERVICES AND COUNSELING": 1,
+    "PROVISION OF SPECIALIZED SERVICES;ADVISORY SERVICES AND COUNSELING;TRAINING": 1,
+    "PROVISION OF SPECIALIZED SERVICES;TRAINING": 1,
+    "ADVISORY SERVICES AND COUNSELING;DISSEMINATION OF TECHNICAL INFORMATION;TRAINING": 1,
+    "USE OF PROPERTY, FACILITIES, AND EQUIPMENT;ADVISORY SERVICES AND COUNSELING;DISSEMINATION OF TECHNICAL INFORMATION": 1
+  },
+  "initial_pr_nexus_policy": {
+    "state_for_every_financial_program_without_award_level_evidence": "requires_award_level_test",
+    "confirmed_pr_activity_requires": "award-level or primary program evidence explicitly binding Puerto Rico",
+    "eligibility_alone_never_promotes_confirmed_activity": true,
+    "initial_state_counts": {
+      "requires_award_level_test": 2814,
+      "confirmed_pr_activity": 0,
+      "pr_eligible_no_activity_recovered": 0,
+      "not_pr_applicable": 0,
+      "historical": 0,
+      "unresolved": 0
+    }
+  },
+  "certification": {
+    "source_bytes_frozen": true,
+    "source_artifact_hash_addressed": true,
+    "program_number_uniqueness_pass": true,
+    "financial_vs_nonfinancial_denominator_pass": true,
+    "pr_nexus_state_total_equals_financial_denominator": true,
+    "award_level_pr_activity_population_complete": false,
+    "global_fain_backfill_allowed": false
+  }
+}
