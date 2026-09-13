@@ -15,6 +15,8 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 CERTIFICATION_RUNTIME_FILES = [
+    ROOT / "scripts" / "leaderboard_release_provenance.py",
+    ROOT / "scripts" / "materialize_leaderboard_snapshot.py",
     ROOT / "scripts" / "certify_leaderboard_snapshot.py",
     ROOT / "scripts" / "materialize_leaderboard_git_snapshot.py",
     ROOT / "scripts" / "finalize_leaderboard_release.py",
