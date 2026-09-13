@@ -15,9 +15,18 @@
       "role": "current",
       "commit": "1be586b5ae13c30a8e4a6a49bc6ae70dd2ddc5df",
       "committedAt": "2026-09-03T16:35:24Z",
-      "debtInstrumentCount": 20
+      "debtInstrumentCount": 20,
+      "issuerCount": 14
     }
   ],
+  "expectedDelta": {
+    "NEW": 9,
+    "EXITED": 0,
+    "UP": 0,
+    "DOWN": 2,
+    "UNCHANGED": 3,
+    "existingEntityValueChanges": 0
+  },
   "comparisonPolicy": {
     "replayUnderCurrentRuntime": true,
     "sourceChangeMeansDatasetDelta": true,
