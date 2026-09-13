@@ -1,0 +1,1286 @@
+{
+  "schema_version": "prii.gui-capability/v1",
+  "repository": "jotaele44/moneysweep-pr",
+  "policy": {
+    "mode": "ratchet",
+    "baseline": ".federation/gui-parity-baseline.json",
+    "require_discoverable_gui": true,
+    "require_e2e": true,
+    "terminal_free_user_path": true
+  },
+  "discovery": {
+    "backend_roots": [
+      "server/backend"
+    ],
+    "production_roots": [
+      "moneysweep",
+      "desktop",
+      "maintenance"
+    ],
+    "analysis_roots": [
+      "scripts"
+    ],
+    "frontend_roots": [
+      "dashboard/src"
+    ],
+    "frontend_capability_roots": [
+      "dashboard/src/pages"
+    ],
+    "frontend_api_roots": [
+      "dashboard/src/lib/api.js"
+    ],
+    "route_files": [
+      "dashboard/src/App.jsx"
+    ],
+    "navigation_files": [
+      "dashboard/src/pages/Dashboard.jsx"
+    ],
+    "implicit_routes": [],
+    "exclude": [
+      "**/tests/**",
+      "**/*.test.*",
+      "**/*.spec.*",
+      "**/components/ui/**",
+      "scripts/check_gui_parity.py"
+    ]
+  },
+  "capabilities": [
+    {
+      "id": "public-money-intelligence-dashboard",
+      "classification": "analysis",
+      "status": "active",
+      "requires_terminal": false,
+      "backend": {
+        "files": [
+          "server/backend/main.py"
+        ],
+        "endpoints": [
+          "GET /contracts",
+          "GET /entities",
+          "GET /edges",
+          "GET /municipalities",
+          "GET /stats"
+        ]
+      },
+      "analysis": {
+        "files": [
+          "scripts/build_federal_financial_program_registry.py",
+          "scripts/build_om_contract_universe.py",
+          "scripts/build_ppp_coverage.py",
+          "scripts/download_p3.py",
+          "scripts/materialize_ocpr_contracts_resumable.py",
+          "moneysweep/orchestrator/_offline_baseline_core.py",
+          "moneysweep/orchestrator/_offline_baseline_coverage.py",
+          "moneysweep/orchestrator/_offline_baseline_extract.py",
+          "moneysweep/orchestrator/_offline_baseline_runner.py",
+          "moneysweep/orchestrator/offline_baseline.py",
+          "scripts/parse_act_transition_ppp.py",
+          "scripts/run_offline_baseline.py",
+          "scripts/validate_om_contract_universe.py"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/lib/api.js",
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/ContractsTable.jsx",
+          "dashboard/src/components/EntitiesTable.jsx",
+          "dashboard/src/components/RelationshipGraph.jsx",
+          "dashboard/src/components/MunicipalityAggregates.jsx",
+          "dashboard/src/components/StatsBar.jsx",
+          "dashboard/src/components/StatsDistributions.jsx"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_dashboard.py",
+          "tests/test_query_adapters.py"
+        ],
+        "contract": [
+          "dashboard/tests/federation-pilot.test.mjs",
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/gui-parity.spec.mjs"
+        ]
+      }
+    },
+    {
+      "id": "government-entity-change-monitor",
+      "classification": "analysis",
+      "status": "active",
+      "requires_terminal": false,
+      "backend": {
+        "files": [
+          "moneysweep/government_change_detection.py",
+          "moneysweep/government_changes.py",
+          "server/backend/government_changes.py",
+          "server/backend/main.py",
+          "moneysweep/government_change_materialization.py",
+          "moneysweep/update_controller/executor.py"
+        ],
+        "endpoints": [
+          "GET /government-changes",
+          "GET /government-changes/candidates",
+          "GET /government-changes/summary"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/lib/api.js",
+          "dashboard/src/lib/hooks.js",
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/GovernmentChanges.jsx",
+          "dashboard/src/components/GovernmentChangeCandidates.jsx"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_org_change_monitor.py",
+          "tests/test_org_change_materialization.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/org-change-monitor.spec.mjs"
+        ]
+      },
+      "candidate_ids": [
+        "python_symbol:moneysweep/government_change_detection.py:candidate_types",
+        "python_symbol:moneysweep/government_change_detection.py:detect_candidates",
+        "python_symbol:moneysweep/government_change_materialization.py:ChangeMaterializationError",
+        "python_symbol:moneysweep/government_change_materialization.py:load_monitor_config",
+        "python_symbol:moneysweep/government_change_materialization.py:materialize_event_ledger",
+        "python_symbol:moneysweep/government_change_materialization.py:materialize_validated_source_update",
+        "python_symbol:moneysweep/government_changes.py:ChangeEventError",
+        "python_symbol:moneysweep/government_changes.py:Evaluation",
+        "python_symbol:moneysweep/government_changes.py:derive_severity",
+        "python_symbol:moneysweep/government_changes.py:evaluate_event",
+        "python_symbol:moneysweep/government_changes.py:evaluate_events",
+        "python_symbol:moneysweep/government_changes.py:invalidation_scopes",
+        "python_symbol:moneysweep/government_changes.py:is_binding",
+        "python_symbol:moneysweep/government_changes.py:succession_cardinality",
+        "python_symbol:moneysweep/government_changes.py:timeline_state",
+        "python_symbol:moneysweep/government_changes.py:validate_event",
+        "python_symbol:server/backend/government_changes.py:change_summary",
+        "python_symbol:server/backend/government_changes.py:list_change_candidates",
+        "python_symbol:server/backend/government_changes.py:list_changes"
+      ]
+    },
+    {
+      "id": "campaign-finance-observatory",
+      "classification": "analysis",
+      "status": "active",
+      "requires_terminal": false,
+      "backend": {
+        "files": [
+          "server/backend/campaign_finance.py",
+          "server/backend/main.py"
+        ],
+        "endpoints": [
+          "GET /campaign-finance/summary",
+          "GET /campaign-finance/contributions",
+          "GET /campaign-finance/entities",
+          "GET /campaign-finance/reports"
+        ]
+      },
+      "analysis": {
+        "files": [
+          "scripts/build_campaign_finance_entities.py",
+          "scripts/campaign_finance_common.py",
+          "scripts/download_fec_schedule_e_resumable.py",
+          "scripts/download_oce.py",
+          "scripts/materialize_campaign_finance.py",
+          "scripts/materialize_political_finance_graph.py",
+          "scripts/validate_campaign_finance_materialization.py",
+          "moneysweep/political_finance/__init__.py",
+          "moneysweep/political_finance/completion.py",
+          "moneysweep/political_finance/flow_graph.py"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/lib/api.js",
+          "dashboard/src/lib/hooks.js",
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/CampaignFinance.jsx"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_campaign_finance_api.py"
+        ],
+        "contract": [
+          "dashboard/src/components/CampaignFinance.test.jsx"
+        ],
+        "e2e": [
+          "dashboard/tests/gui-parity.spec.mjs"
+        ]
+      }
+    },
+    {
+      "id": "repository-quality-automation",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Static workflow and dispatch validators are CI guardrails, not human-facing analytical workflows.",
+      "analysis": {
+        "files": [
+          "scripts/validate_github_workflows.py",
+          "scripts/validate_live_fetch_dispatch.py",
+          "scripts/check_status_freshness.py",
+          "scripts/run_automatable_sources_scoped.py",
+          "moneysweep/orchestrator/cli_legacy.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_live_fetch_dispatch.py",
+          "tests/test_materializer_credential_scope.py",
+          "tests/test_status_freshness.py",
+          "tests/test_workflow_static_validation.py"
+        ]
+      }
+    },
+    {
+      "id": "service-health",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Health probing supports launch and CI readiness rather than a separate user workflow.",
+      "backend": {
+        "files": [
+          "server/backend/main.py"
+        ],
+        "endpoints": [
+          "GET /health"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_server_smoke.py"
+        ]
+      }
+    },
+    {
+      "id": "campaign-finance-tracker",
+      "classification": "analysis",
+      "status": "active",
+      "requires_terminal": false,
+      "backend": {
+        "files": [
+          "server/backend/campaign_finance.py"
+        ],
+        "endpoints": [
+          "GET /campaign-finance/summary",
+          "GET /campaign-finance/contributions",
+          "GET /campaign-finance/entities",
+          "GET /campaign-finance/reports"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/lib/api.js",
+          "dashboard/src/lib/hooks.js",
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/CampaignFinance.jsx"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_campaign_finance_api.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/campaign-finance.spec.mjs"
+        ]
+      },
+      "candidate_ids": [
+        "backend_endpoint:server/backend/campaign_finance.py:GET /campaign-finance/contributions",
+        "backend_endpoint:server/backend/campaign_finance.py:GET /campaign-finance/entities",
+        "backend_endpoint:server/backend/campaign_finance.py:GET /campaign-finance/reports",
+        "backend_endpoint:server/backend/campaign_finance.py:GET /campaign-finance/summary",
+        "gui_control:dashboard/src/components/CampaignFinance.jsx:input#d1c03111ef8d",
+        "gui_control:dashboard/src/components/CampaignFinance.jsx:select#4a1280b1b915",
+        "gui_control:dashboard/src/components/CampaignFinance.jsx:select#6beccafbe6be",
+        "python_module:server/backend/campaign_finance.py",
+        "python_symbol:server/backend/campaign_finance.py:campaign_finance_contributions",
+        "python_symbol:server/backend/campaign_finance.py:campaign_finance_entities",
+        "python_symbol:server/backend/campaign_finance.py:campaign_finance_reports",
+        "python_symbol:server/backend/campaign_finance.py:campaign_finance_summary"
+      ]
+    },
+    {
+      "id": "campaign-finance-data-pipeline",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Batch ETL/materialization jobs that build the campaign-finance dataset served by campaign-finance-tracker; run offline outside the GUI, not a separate user workflow.",
+      "backend": {
+        "files": [
+          "scripts/build_campaign_finance_entities.py",
+          "scripts/materialize_campaign_finance.py",
+          "scripts/campaign_finance_common.py",
+          "scripts/download_fec_schedule_e_resumable.py",
+          "scripts/download_oce.py",
+          "scripts/materialize_political_finance_graph.py",
+          "scripts/validate_campaign_finance_materialization.py",
+          "moneysweep/political_finance/flow_graph.py",
+          "moneysweep/political_finance/completion.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_campaign_finance_entities.py",
+          "tests/test_campaign_finance_validation.py",
+          "tests/test_download_fec.py",
+          "tests/test_download_oce.py",
+          "tests/test_fec_outflow_batching.py",
+          "tests/test_ingest_oce.py",
+          "tests/test_political_finance_completion.py",
+          "tests/test_political_finance_flow_graph.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/build_campaign_finance_entities.py",
+        "analysis_module:scripts/campaign_finance_common.py",
+        "analysis_module:scripts/download_fec_schedule_e_resumable.py",
+        "analysis_module:scripts/download_oce.py",
+        "analysis_module:scripts/materialize_campaign_finance.py",
+        "analysis_module:scripts/materialize_political_finance_graph.py",
+        "analysis_module:scripts/validate_campaign_finance_materialization.py",
+        "analysis_symbol:scripts/build_campaign_finance_entities.py:build_candidates",
+        "analysis_symbol:scripts/build_campaign_finance_entities.py:build_committees",
+        "analysis_symbol:scripts/build_campaign_finance_entities.py:build_edges",
+        "analysis_symbol:scripts/build_campaign_finance_entities.py:resolve_recipients",
+        "analysis_symbol:scripts/build_campaign_finance_entities.py:run",
+        "analysis_symbol:scripts/campaign_finance_common.py:clean_amount",
+        "analysis_symbol:scripts/campaign_finance_common.py:clean_amount_series",
+        "analysis_symbol:scripts/campaign_finance_common.py:clean_date",
+        "analysis_symbol:scripts/campaign_finance_common.py:clean_date_series",
+        "analysis_symbol:scripts/campaign_finance_common.py:derive_cycle",
+        "analysis_symbol:scripts/campaign_finance_common.py:file_sha256",
+        "analysis_symbol:scripts/campaign_finance_common.py:find_column",
+        "analysis_symbol:scripts/campaign_finance_common.py:iter_tabular_frames",
+        "analysis_symbol:scripts/campaign_finance_common.py:normalize_header",
+        "analysis_symbol:scripts/campaign_finance_common.py:stable_id",
+        "analysis_symbol:scripts/campaign_finance_common.py:text_series",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:assemble_output",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:chunks",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:committee_ids",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:current_cycle",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:main",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:normalize_rows",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:page_path",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:request_json",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:run",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:sha256_file",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:utc_now",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:valid_checkpoint",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:write_json",
+        "analysis_symbol:scripts/download_oce.py:fetch_rows",
+        "analysis_symbol:scripts/download_oce.py:main",
+        "analysis_symbol:scripts/download_oce.py:run",
+        "analysis_symbol:scripts/materialize_campaign_finance.py:main",
+        "analysis_symbol:scripts/materialize_campaign_finance.py:run",
+        "analysis_symbol:scripts/materialize_political_finance_graph.py:main",
+        "analysis_symbol:scripts/materialize_political_finance_graph.py:run",
+        "analysis_symbol:scripts/validate_campaign_finance_materialization.py:main",
+        "analysis_symbol:scripts/validate_campaign_finance_materialization.py:run",
+        "cli_surface:scripts/download_fec_schedule_e_resumable.py",
+        "cli_surface:scripts/download_oce.py",
+        "cli_surface:scripts/materialize_campaign_finance.py",
+        "cli_surface:scripts/materialize_political_finance_graph.py",
+        "cli_surface:scripts/validate_campaign_finance_materialization.py",
+        "python_module:moneysweep/political_finance/__init__.py",
+        "python_module:moneysweep/political_finance/completion.py",
+        "python_module:moneysweep/political_finance/flow_graph.py",
+        "python_symbol:moneysweep/political_finance/completion.py:build_affiliation_edges",
+        "python_symbol:moneysweep/political_finance/completion.py:build_transfer_edges",
+        "python_symbol:moneysweep/political_finance/completion.py:correlate_temporal_activity",
+        "python_symbol:moneysweep/political_finance/completion.py:materialization_accounting",
+        "python_symbol:moneysweep/political_finance/flow_graph.py:Resolution",
+        "python_symbol:moneysweep/political_finance/flow_graph.py:build_political_finance_graph",
+        "python_symbol:moneysweep/political_finance/flow_graph.py:classify_committee",
+        "python_symbol:moneysweep/political_finance/flow_graph.py:find_flow_paths",
+        "python_symbol:moneysweep/political_finance/flow_graph.py:normalize_name",
+        "python_symbol:moneysweep/political_finance/flow_graph.py:resolve_recipient"
+      ]
+    },
+    {
+      "id": "federal-contract-pipeline",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Batch ingestion/materialization for OM contract-universe, PRASA transition contracts, PPP coverage, and the federal financial-program registry; run offline, not surfaced in the dashboard.",
+      "backend": {
+        "files": [
+          "scripts/build_om_contract_universe.py",
+          "scripts/validate_om_contract_universe.py",
+          "scripts/build_federal_financial_program_registry.py",
+          "scripts/build_ppp_coverage.py",
+          "scripts/ingest_prasa_transition_contracts.py",
+          "scripts/parse_act_transition_ppp.py",
+          "scripts/materialize_ocpr_contracts_resumable.py",
+          "scripts/download_p3.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_om_contract_universe.py",
+          "tests/test_ppp_coverage.py",
+          "tests/test_parse_act_transition_ppp.py",
+          "tests/test_act_transition_ingest.py",
+          "tests/test_act_transition_materialization.py",
+          "tests/test_ingest_prasa_transition_contracts.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/build_federal_financial_program_registry.py",
+        "analysis_module:scripts/build_om_contract_universe.py",
+        "analysis_module:scripts/build_ppp_coverage.py",
+        "analysis_module:scripts/ingest_prasa_transition_contracts.py",
+        "analysis_module:scripts/materialize_ocpr_contracts_resumable.py",
+        "analysis_module:scripts/parse_act_transition_ppp.py",
+        "analysis_module:scripts/validate_om_contract_universe.py",
+        "analysis_symbol:scripts/build_federal_financial_program_registry.py:acquire",
+        "analysis_symbol:scripts/build_federal_financial_program_registry.py:build",
+        "analysis_symbol:scripts/build_federal_financial_program_registry.py:is_financial",
+        "analysis_symbol:scripts/build_federal_financial_program_registry.py:load_overrides",
+        "analysis_symbol:scripts/build_federal_financial_program_registry.py:main",
+        "analysis_symbol:scripts/build_federal_financial_program_registry.py:sha256_file",
+        "analysis_symbol:scripts/build_om_contract_universe.py:canonicalize",
+        "analysis_symbol:scripts/build_om_contract_universe.py:classify",
+        "analysis_symbol:scripts/build_om_contract_universe.py:fingerprint",
+        "analysis_symbol:scripts/build_om_contract_universe.py:first_column",
+        "analysis_symbol:scripts/build_om_contract_universe.py:load_taxonomy",
+        "analysis_symbol:scripts/build_om_contract_universe.py:main",
+        "analysis_symbol:scripts/build_om_contract_universe.py:materialization_status",
+        "analysis_symbol:scripts/build_om_contract_universe.py:norm",
+        "analysis_symbol:scripts/build_om_contract_universe.py:run",
+        "analysis_symbol:scripts/build_ppp_coverage.py:build_report",
+        "analysis_symbol:scripts/build_ppp_coverage.py:main",
+        "analysis_symbol:scripts/download_p3.py:promote",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:main",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:parse_prasa_transition_contracts",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:run",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:append_rows",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:atomic_json",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:fetch_page_with_reauth",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:initial_checkpoint",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:load_checkpoint",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:main",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:paths",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:promote",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:run",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:sha256",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:utc_now",
+        "analysis_symbol:scripts/parse_act_transition_ppp.py:build_rows",
+        "analysis_symbol:scripts/parse_act_transition_ppp.py:main",
+        "analysis_symbol:scripts/parse_act_transition_ppp.py:summarize",
+        "analysis_symbol:scripts/validate_om_contract_universe.py:main",
+        "analysis_symbol:scripts/validate_om_contract_universe.py:validate",
+        "cli_surface:scripts/build_federal_financial_program_registry.py",
+        "cli_surface:scripts/build_om_contract_universe.py",
+        "cli_surface:scripts/build_ppp_coverage.py",
+        "cli_surface:scripts/ingest_prasa_transition_contracts.py",
+        "cli_surface:scripts/materialize_ocpr_contracts_resumable.py",
+        "cli_surface:scripts/parse_act_transition_ppp.py",
+        "cli_surface:scripts/validate_om_contract_universe.py"
+      ]
+    },
+    {
+      "id": "release-readiness-checks",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "CI/release validation and the offline-baseline build orchestrator; run in automation ahead of a release, not a user-facing workflow.",
+      "backend": {
+        "files": [
+          "scripts/validate_live_fetch_dispatch.py",
+          "scripts/validate_github_workflows.py",
+          "scripts/run_offline_baseline.py",
+          "moneysweep/orchestrator/offline_baseline.py",
+          "moneysweep/orchestrator/cli_legacy.py",
+          "moneysweep/orchestrator/_offline_baseline_core.py",
+          "moneysweep/orchestrator/_offline_baseline_coverage.py",
+          "moneysweep/orchestrator/_offline_baseline_extract.py",
+          "moneysweep/orchestrator/_offline_baseline_runner.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_offline_baseline.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/run_offline_baseline.py",
+        "analysis_module:scripts/validate_github_workflows.py",
+        "analysis_module:scripts/validate_live_fetch_dispatch.py",
+        "analysis_symbol:scripts/validate_github_workflows.py:main",
+        "analysis_symbol:scripts/validate_github_workflows.py:validate_workflow_file",
+        "analysis_symbol:scripts/validate_github_workflows.py:validate_workflows",
+        "analysis_symbol:scripts/validate_live_fetch_dispatch.py:DispatchDecision",
+        "analysis_symbol:scripts/validate_live_fetch_dispatch.py:DispatchValidationError",
+        "analysis_symbol:scripts/validate_live_fetch_dispatch.py:build_parser",
+        "analysis_symbol:scripts/validate_live_fetch_dispatch.py:main",
+        "analysis_symbol:scripts/validate_live_fetch_dispatch.py:validate_dispatch",
+        "cli_surface:moneysweep/orchestrator/cli_legacy.py",
+        "cli_surface:moneysweep/orchestrator/offline_baseline.py",
+        "cli_surface:scripts/validate_github_workflows.py",
+        "cli_surface:scripts/validate_live_fetch_dispatch.py",
+        "python_module:moneysweep/orchestrator/_offline_baseline_core.py",
+        "python_module:moneysweep/orchestrator/_offline_baseline_coverage.py",
+        "python_module:moneysweep/orchestrator/_offline_baseline_extract.py",
+        "python_module:moneysweep/orchestrator/_offline_baseline_runner.py",
+        "python_module:moneysweep/orchestrator/cli_legacy.py",
+        "python_module:moneysweep/orchestrator/offline_baseline.py",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_core.py:BaselineConfig",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_core.py:OfflineBaselineViolation",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_core.py:block_network",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_core.py:discover_inputs",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_core.py:sanitized_child_environment",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_core.py:sha256_file",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_coverage.py:source_coverage",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_extract.py:extract_cabilderos",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_extract.py:local_entity_comparison",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_runner.py:run_offline_baseline",
+        "python_symbol:moneysweep/orchestrator/cli_legacy.py:build_arg_parser",
+        "python_symbol:moneysweep/orchestrator/offline_baseline.py:build_parser",
+        "python_symbol:moneysweep/orchestrator/offline_baseline.py:main"
+      ]
+    },
+    {
+      "id": "case-manager-backend",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Case-manager schema, repository and service layer; the package's own docstring states it is \"deliberately UI-agnostic\" and it has no dashboard integration.",
+      "backend": {
+        "files": [
+          "server/backend/case_manager_api.py",
+          "server/backend/case_manager_app.py",
+          "moneysweep/case_manager/__init__.py",
+          "moneysweep/case_manager/ids.py",
+          "moneysweep/case_manager/models.py",
+          "moneysweep/case_manager/repository.py",
+          "moneysweep/case_manager/service.py",
+          "moneysweep/case_manager/validators.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_case_manager_foundation.py",
+          "tests/test_case_manager_phase1_service.py"
+        ]
+      },
+      "candidate_ids": [
+        "backend_endpoint:server/backend/case_manager_api.py:GET /{case_id}",
+        "backend_endpoint:server/backend/case_manager_api.py:GET /{case_id}/{collection}",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/claims",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/claims/{claim_id}/evidence-relations",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/contradictions",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/contradictions/{contradiction_id}/resolution",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/evidence-links",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/findings",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/findings/{finding_id}/acceptance",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/leads",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/leads/{lead_id}/closure",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/snapshots",
+        "backend_endpoint:server/backend/case_manager_app.py:GET /health",
+        "python_module:moneysweep/case_manager/__init__.py",
+        "python_module:moneysweep/case_manager/ids.py",
+        "python_module:moneysweep/case_manager/models.py",
+        "python_module:moneysweep/case_manager/repository.py",
+        "python_module:moneysweep/case_manager/service.py",
+        "python_module:moneysweep/case_manager/validators.py",
+        "python_module:server/backend/case_manager_api.py",
+        "python_module:server/backend/case_manager_app.py",
+        "python_symbol:moneysweep/case_manager/ids.py:deterministic_id",
+        "python_symbol:moneysweep/case_manager/ids.py:is_deterministic_id",
+        "python_symbol:moneysweep/case_manager/models.py:AuditEvent",
+        "python_symbol:moneysweep/case_manager/models.py:Case",
+        "python_symbol:moneysweep/case_manager/models.py:CaseEntity",
+        "python_symbol:moneysweep/case_manager/models.py:CaseEvent",
+        "python_symbol:moneysweep/case_manager/models.py:CaseEvidence",
+        "python_symbol:moneysweep/case_manager/models.py:CaseSnapshot",
+        "python_symbol:moneysweep/case_manager/models.py:Claim",
+        "python_symbol:moneysweep/case_manager/models.py:ClaimEvidence",
+        "python_symbol:moneysweep/case_manager/models.py:Contradiction",
+        "python_symbol:moneysweep/case_manager/models.py:Finding",
+        "python_symbol:moneysweep/case_manager/models.py:Lead",
+        "python_symbol:moneysweep/case_manager/repository.py:CaseManagerConflict",
+        "python_symbol:moneysweep/case_manager/repository.py:CaseManagerNotFound",
+        "python_symbol:moneysweep/case_manager/repository.py:SQLiteCaseManagerRepository",
+        "python_symbol:moneysweep/case_manager/service.py:CaseCommandService",
+        "python_symbol:moneysweep/case_manager/service.py:CaseQueryService",
+        "python_symbol:moneysweep/case_manager/service.py:VisibilityPolicy",
+        "python_symbol:moneysweep/case_manager/validators.py:ValidationError",
+        "python_symbol:moneysweep/case_manager/validators.py:validate_append_only_events",
+        "python_symbol:moneysweep/case_manager/validators.py:validate_case_bundle",
+        "python_symbol:server/backend/case_manager_api.py:CaseCreate",
+        "python_symbol:server/backend/case_manager_api.py:ClaimCreate",
+        "python_symbol:server/backend/case_manager_api.py:ClaimEvidenceCreate",
+        "python_symbol:server/backend/case_manager_api.py:ContradictionCreate",
+        "python_symbol:server/backend/case_manager_api.py:ContradictionResolution",
+        "python_symbol:server/backend/case_manager_api.py:EvidenceLinkCreate",
+        "python_symbol:server/backend/case_manager_api.py:FindingAcceptance",
+        "python_symbol:server/backend/case_manager_api.py:FindingCreate",
+        "python_symbol:server/backend/case_manager_api.py:LeadClosure",
+        "python_symbol:server/backend/case_manager_api.py:LeadCreate",
+        "python_symbol:server/backend/case_manager_api.py:SnapshotCreate",
+        "python_symbol:server/backend/case_manager_api.py:accept_finding",
+        "python_symbol:server/backend/case_manager_api.py:close_lead",
+        "python_symbol:server/backend/case_manager_api.py:configure_repository",
+        "python_symbol:server/backend/case_manager_api.py:create_case",
+        "python_symbol:server/backend/case_manager_api.py:create_claim",
+        "python_symbol:server/backend/case_manager_api.py:create_contradiction",
+        "python_symbol:server/backend/case_manager_api.py:create_finding",
+        "python_symbol:server/backend/case_manager_api.py:create_lead",
+        "python_symbol:server/backend/case_manager_api.py:create_snapshot",
+        "python_symbol:server/backend/case_manager_api.py:get_case",
+        "python_symbol:server/backend/case_manager_api.py:get_case_collection",
+        "python_symbol:server/backend/case_manager_api.py:get_cases",
+        "python_symbol:server/backend/case_manager_api.py:link_claim_evidence",
+        "python_symbol:server/backend/case_manager_api.py:link_evidence",
+        "python_symbol:server/backend/case_manager_api.py:resolve_contradiction",
+        "python_symbol:server/backend/case_manager_app.py:health"
+      ]
+    },
+    {
+      "id": "contract-forensics-engine",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Contract Forensics V3 persistent-memory engine; a backend evidence-correlation library with no dashboard integration.",
+      "backend": {
+        "files": [
+          "moneysweep/forensics/__init__.py",
+          "moneysweep/forensics/core.py",
+          "moneysweep/forensics/adapters.py",
+          "moneysweep/forensics/candidate.py",
+          "moneysweep/forensics/cli.py",
+          "moneysweep/forensics/pipeline.py",
+          "moneysweep/forensics/seed.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/forensics/test_adapters.py",
+          "tests/forensics/test_engine.py",
+          "tests/forensics/test_pipeline.py",
+          "tests/forensics/test_policy_and_cases.py"
+        ]
+      },
+      "candidate_ids": [
+        "cli_surface:moneysweep/forensics/cli.py",
+        "python_module:moneysweep/forensics/__init__.py",
+        "python_module:moneysweep/forensics/adapters.py",
+        "python_module:moneysweep/forensics/candidate.py",
+        "python_module:moneysweep/forensics/cli.py",
+        "python_module:moneysweep/forensics/core.py",
+        "python_module:moneysweep/forensics/pipeline.py",
+        "python_module:moneysweep/forensics/seed.py",
+        "python_symbol:moneysweep/forensics/adapters.py:AdapterResult",
+        "python_symbol:moneysweep/forensics/adapters.py:ContractorListingAdapter",
+        "python_symbol:moneysweep/forensics/adapters.py:HttpJsonAdapter",
+        "python_symbol:moneysweep/forensics/adapters.py:KeywordEvidenceAdapter",
+        "python_symbol:moneysweep/forensics/adapters.py:LocalTextAdapter",
+        "python_symbol:moneysweep/forensics/adapters.py:SamAdapter",
+        "python_symbol:moneysweep/forensics/adapters.py:SimpleEndpointAdapter",
+        "python_symbol:moneysweep/forensics/adapters.py:SourceAdapter",
+        "python_symbol:moneysweep/forensics/adapters.py:UsaSpendingRecipientAdapter",
+        "python_symbol:moneysweep/forensics/candidate.py:generate_candidate",
+        "python_symbol:moneysweep/forensics/cli.py:main",
+        "python_symbol:moneysweep/forensics/core.py:ForensicsLedger",
+        "python_symbol:moneysweep/forensics/core.py:QueryDecision",
+        "python_symbol:moneysweep/forensics/core.py:canonical_hash",
+        "python_symbol:moneysweep/forensics/core.py:entity_id",
+        "python_symbol:moneysweep/forensics/core.py:evidence_key",
+        "python_symbol:moneysweep/forensics/core.py:federal_award_key",
+        "python_symbol:moneysweep/forensics/core.py:pr_contract_action_key",
+        "python_symbol:moneysweep/forensics/core.py:query_key",
+        "python_symbol:moneysweep/forensics/core.py:utcnow",
+        "python_symbol:moneysweep/forensics/pipeline.py:ForensicsPipeline",
+        "python_symbol:moneysweep/forensics/pipeline.py:PipelineDelta",
+        "python_symbol:moneysweep/forensics/pipeline.py:load_manifest",
+        "python_symbol:moneysweep/forensics/seed.py:build_adapters",
+        "python_symbol:moneysweep/forensics/seed.py:jacobs_subject",
+        "python_symbol:moneysweep/forensics/seed.py:populate",
+        "python_symbol:moneysweep/forensics/seed.py:seed_cluster"
+      ]
+    },
+    {
+      "id": "rdc-civil-claims-ingestion",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing — zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
+      "backend": {
+        "files": [
+          "scripts/scrape_rdc_demandas.py",
+          "scripts/enrich_rdc_details.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_scrape_rdc_demandas.py",
+          "tests/test_enrich_rdc_details.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/enrich_rdc_details.py",
+        "analysis_module:scripts/scrape_rdc_demandas.py",
+        "analysis_symbol:scripts/enrich_rdc_details.py:apply_detail",
+        "analysis_symbol:scripts/enrich_rdc_details.py:main",
+        "analysis_symbol:scripts/enrich_rdc_details.py:parse_detail",
+        "analysis_symbol:scripts/enrich_rdc_details.py:run",
+        "analysis_symbol:scripts/enrich_rdc_details.py:select_pending",
+        "analysis_symbol:scripts/scrape_rdc_demandas.py:case_uid",
+        "analysis_symbol:scripts/scrape_rdc_demandas.py:declared_last_page",
+        "analysis_symbol:scripts/scrape_rdc_demandas.py:fetch_all_records",
+        "analysis_symbol:scripts/scrape_rdc_demandas.py:flag_ambiguous_case_numbers",
+        "analysis_symbol:scripts/scrape_rdc_demandas.py:main",
+        "analysis_symbol:scripts/scrape_rdc_demandas.py:merge_with_existing",
+        "analysis_symbol:scripts/scrape_rdc_demandas.py:parse_caption",
+        "analysis_symbol:scripts/scrape_rdc_demandas.py:parse_rows",
+        "analysis_symbol:scripts/scrape_rdc_demandas.py:run",
+        "cli_surface:scripts/enrich_rdc_details.py",
+        "cli_surface:scripts/scrape_rdc_demandas.py"
+      ]
+    },
+    {
+      "id": "capital-control-runtime-core",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Canonical investor identity, source provenance, strict ingestion, supersession, temporal analytics, and authoritative SEC acquisition/materialization are backend/operator infrastructure. They remain intentionally non-user-facing until a separately certified API and GUI vector is implemented.",
+      "backend": {
+        "files": [
+          "moneysweep/capital_control/__init__.py",
+          "moneysweep/capital_control/analytics.py",
+          "moneysweep/capital_control/identity.py",
+          "moneysweep/capital_control/ingestion.py",
+          "moneysweep/capital_control/models.py",
+          "moneysweep/capital_control/sec_materialization.py",
+          "moneysweep/capital_control/source_adapter.py",
+          "moneysweep/capital_control/supersession.py",
+          "moneysweep/capital_control/validation.py"
+        ],
+        "symbols": [
+          "moneysweep/capital_control/sec_materialization.py:SEC13FMaterializationResult",
+          "moneysweep/capital_control/sec_materialization.py:SEC13FMaterializationTarget",
+          "moneysweep/capital_control/sec_materialization.py:materialize_sec_13f"
+        ]
+      },
+      "analysis": {
+        "files": [
+          "scripts/materialize_sec_13f.py"
+        ],
+        "symbols": [
+          "scripts/materialize_sec_13f.py:build_parser",
+          "scripts/materialize_sec_13f.py:main"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_capital_control_schema_contracts.py",
+          "tests/test_capital_control_models.py",
+          "tests/test_capital_control_identity.py",
+          "tests/test_capital_control_ingestion.py",
+          "tests/test_capital_control_supersession.py",
+          "tests/test_capital_control_analytics.py",
+          "tests/test_capital_control_validation_hardening.py",
+          "tests/test_sec_13f_materialization.py"
+        ]
+      },
+      "candidate_ids": [
+        "python_module:moneysweep/capital_control/__init__.py",
+        "python_module:moneysweep/capital_control/analytics.py",
+        "python_module:moneysweep/capital_control/identity.py",
+        "python_module:moneysweep/capital_control/ingestion.py",
+        "python_module:moneysweep/capital_control/models.py",
+        "python_module:moneysweep/capital_control/source_adapter.py",
+        "python_module:moneysweep/capital_control/supersession.py",
+        "python_module:moneysweep/capital_control/validation.py",
+        "python_symbol:moneysweep/capital_control/analytics.py:PairwiseSetComparison",
+        "python_symbol:moneysweep/capital_control/analytics.py:compare_sets",
+        "python_symbol:moneysweep/capital_control/analytics.py:current_positions",
+        "python_symbol:moneysweep/capital_control/analytics.py:rollup_positions",
+        "python_symbol:moneysweep/capital_control/identity.py:IdentityCandidate",
+        "python_symbol:moneysweep/capital_control/identity.py:IdentityResolution",
+        "python_symbol:moneysweep/capital_control/identity.py:resolve_identity_candidates",
+        "python_symbol:moneysweep/capital_control/ingestion.py:IngestionResult",
+        "python_symbol:moneysweep/capital_control/ingestion.py:ingest",
+        "python_symbol:moneysweep/capital_control/models.py:HoldingObservation",
+        "python_symbol:moneysweep/capital_control/models.py:InvestorIdentity",
+        "python_symbol:moneysweep/capital_control/models.py:SourceManifest",
+        "python_symbol:moneysweep/capital_control/source_adapter.py:SourceAdapter",
+        "python_symbol:moneysweep/capital_control/source_adapter.py:stable_observation_fingerprint",
+        "python_symbol:moneysweep/capital_control/supersession.py:SupersessionResult",
+        "python_symbol:moneysweep/capital_control/supersession.py:apply_supersession",
+        "python_symbol:moneysweep/capital_control/validation.py:ValidationError",
+        "python_symbol:moneysweep/capital_control/validation.py:validate_holding_observation",
+        "python_symbol:moneysweep/capital_control/validation.py:validate_investor_identity",
+        "python_symbol:moneysweep/capital_control/validation.py:validate_source_manifest"
+      ]
+    },
+    {
+      "id": "postmerge-staged-analysis-and-api-surfaces",
+      "classification": "analysis",
+      "status": "staged",
+      "requires_terminal": false,
+      "feature_flag": "postmerge-gui-parity-reconciliation",
+      "tracking": "https://github.com/jotaele44/moneysweep-pr/pull/480",
+      "expires_on": "2026-11-30",
+      "candidate_ids": [
+        "analysis_module:scripts/build_campaign_finance_entities.py",
+        "analysis_module:scripts/build_federal_financial_program_registry.py",
+        "analysis_module:scripts/build_om_contract_universe.py",
+        "analysis_module:scripts/build_ppp_coverage.py",
+        "analysis_module:scripts/campaign_finance_common.py",
+        "analysis_module:scripts/download_fec_schedule_e_resumable.py",
+        "analysis_module:scripts/download_oce.py",
+        "analysis_module:scripts/materialize_campaign_finance.py",
+        "analysis_module:scripts/materialize_ocpr_contracts_resumable.py",
+        "analysis_module:scripts/materialize_political_finance_graph.py",
+        "analysis_module:scripts/parse_act_transition_ppp.py",
+        "analysis_module:scripts/run_offline_baseline.py",
+        "analysis_module:scripts/validate_campaign_finance_materialization.py",
+        "analysis_module:scripts/validate_github_workflows.py",
+        "analysis_module:scripts/validate_live_fetch_dispatch.py",
+        "analysis_module:scripts/validate_om_contract_universe.py",
+        "analysis_symbol:scripts/build_campaign_finance_entities.py:build_candidates",
+        "analysis_symbol:scripts/build_campaign_finance_entities.py:build_committees",
+        "analysis_symbol:scripts/build_campaign_finance_entities.py:build_edges",
+        "analysis_symbol:scripts/build_campaign_finance_entities.py:resolve_recipients",
+        "analysis_symbol:scripts/build_campaign_finance_entities.py:run",
+        "analysis_symbol:scripts/build_federal_financial_program_registry.py:acquire",
+        "analysis_symbol:scripts/build_federal_financial_program_registry.py:build",
+        "analysis_symbol:scripts/build_federal_financial_program_registry.py:is_financial",
+        "analysis_symbol:scripts/build_federal_financial_program_registry.py:load_overrides",
+        "analysis_symbol:scripts/build_federal_financial_program_registry.py:main",
+        "analysis_symbol:scripts/build_federal_financial_program_registry.py:sha256_file",
+        "analysis_symbol:scripts/build_om_contract_universe.py:canonicalize",
+        "analysis_symbol:scripts/build_om_contract_universe.py:classify",
+        "analysis_symbol:scripts/build_om_contract_universe.py:fingerprint",
+        "analysis_symbol:scripts/build_om_contract_universe.py:first_column",
+        "analysis_symbol:scripts/build_om_contract_universe.py:load_taxonomy",
+        "analysis_symbol:scripts/build_om_contract_universe.py:main",
+        "analysis_symbol:scripts/build_om_contract_universe.py:materialization_status",
+        "analysis_symbol:scripts/build_om_contract_universe.py:norm",
+        "analysis_symbol:scripts/build_om_contract_universe.py:run",
+        "analysis_symbol:scripts/build_ppp_coverage.py:build_report",
+        "analysis_symbol:scripts/build_ppp_coverage.py:main",
+        "analysis_symbol:scripts/campaign_finance_common.py:clean_amount",
+        "analysis_symbol:scripts/campaign_finance_common.py:clean_amount_series",
+        "analysis_symbol:scripts/campaign_finance_common.py:clean_date",
+        "analysis_symbol:scripts/campaign_finance_common.py:clean_date_series",
+        "analysis_symbol:scripts/campaign_finance_common.py:derive_cycle",
+        "analysis_symbol:scripts/campaign_finance_common.py:file_sha256",
+        "analysis_symbol:scripts/campaign_finance_common.py:find_column",
+        "analysis_symbol:scripts/campaign_finance_common.py:iter_tabular_frames",
+        "analysis_symbol:scripts/campaign_finance_common.py:normalize_header",
+        "analysis_symbol:scripts/campaign_finance_common.py:stable_id",
+        "analysis_symbol:scripts/campaign_finance_common.py:text_series",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:assemble_output",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:chunks",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:committee_ids",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:current_cycle",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:main",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:normalize_rows",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:page_path",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:request_json",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:run",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:sha256_file",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:utc_now",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:valid_checkpoint",
+        "analysis_symbol:scripts/download_fec_schedule_e_resumable.py:write_json",
+        "analysis_symbol:scripts/download_oce.py:fetch_rows",
+        "analysis_symbol:scripts/download_oce.py:main",
+        "analysis_symbol:scripts/download_oce.py:run",
+        "analysis_symbol:scripts/download_p3.py:promote",
+        "analysis_symbol:scripts/materialize_campaign_finance.py:main",
+        "analysis_symbol:scripts/materialize_campaign_finance.py:run",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:append_rows",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:atomic_json",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:fetch_page_with_reauth",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:initial_checkpoint",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:load_checkpoint",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:main",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:paths",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:promote",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:run",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:sha256",
+        "analysis_symbol:scripts/materialize_ocpr_contracts_resumable.py:utc_now",
+        "analysis_symbol:scripts/materialize_political_finance_graph.py:main",
+        "analysis_symbol:scripts/materialize_political_finance_graph.py:run",
+        "analysis_symbol:scripts/parse_act_transition_ppp.py:build_rows",
+        "analysis_symbol:scripts/parse_act_transition_ppp.py:main",
+        "analysis_symbol:scripts/parse_act_transition_ppp.py:summarize",
+        "analysis_symbol:scripts/validate_campaign_finance_materialization.py:main",
+        "analysis_symbol:scripts/validate_campaign_finance_materialization.py:run",
+        "analysis_symbol:scripts/validate_github_workflows.py:main",
+        "analysis_symbol:scripts/validate_github_workflows.py:validate_workflow_file",
+        "analysis_symbol:scripts/validate_github_workflows.py:validate_workflows",
+        "analysis_symbol:scripts/validate_live_fetch_dispatch.py:DispatchDecision",
+        "analysis_symbol:scripts/validate_live_fetch_dispatch.py:DispatchValidationError",
+        "analysis_symbol:scripts/validate_live_fetch_dispatch.py:build_parser",
+        "analysis_symbol:scripts/validate_live_fetch_dispatch.py:main",
+        "analysis_symbol:scripts/validate_live_fetch_dispatch.py:validate_dispatch",
+        "analysis_symbol:scripts/validate_om_contract_universe.py:main",
+        "analysis_symbol:scripts/validate_om_contract_universe.py:validate",
+        "backend_endpoint:server/backend/campaign_finance.py:GET /contributions",
+        "backend_endpoint:server/backend/campaign_finance.py:GET /entities",
+        "backend_endpoint:server/backend/campaign_finance.py:GET /reports",
+        "backend_endpoint:server/backend/campaign_finance.py:GET /summary",
+        "backend_endpoint:server/backend/case_manager_api.py:GET /{case_id}",
+        "backend_endpoint:server/backend/case_manager_api.py:GET /{case_id}/{collection}",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/claims",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/claims/{claim_id}/evidence-relations",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/contradictions",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/contradictions/{contradiction_id}/resolution",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/evidence-links",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/findings",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/findings/{finding_id}/acceptance",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/leads",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/leads/{lead_id}/closure",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/snapshots",
+        "backend_endpoint:server/backend/case_manager_app.py:GET /health",
+        "cli_surface:moneysweep/forensics/cli.py",
+        "cli_surface:moneysweep/orchestrator/cli_legacy.py",
+        "cli_surface:moneysweep/orchestrator/offline_baseline.py",
+        "cli_surface:scripts/build_federal_financial_program_registry.py",
+        "cli_surface:scripts/build_om_contract_universe.py",
+        "cli_surface:scripts/build_ppp_coverage.py",
+        "cli_surface:scripts/download_fec_schedule_e_resumable.py",
+        "cli_surface:scripts/download_oce.py",
+        "cli_surface:scripts/materialize_campaign_finance.py",
+        "cli_surface:scripts/materialize_ocpr_contracts_resumable.py",
+        "cli_surface:scripts/materialize_political_finance_graph.py",
+        "cli_surface:scripts/parse_act_transition_ppp.py",
+        "cli_surface:scripts/validate_campaign_finance_materialization.py",
+        "cli_surface:scripts/validate_github_workflows.py",
+        "cli_surface:scripts/validate_live_fetch_dispatch.py",
+        "cli_surface:scripts/validate_om_contract_universe.py",
+        "gui_control:dashboard/src/components/CampaignFinance.jsx:input#d1c03111ef8d",
+        "gui_control:dashboard/src/components/CampaignFinance.jsx:select#4a1280b1b915",
+        "gui_control:dashboard/src/components/CampaignFinance.jsx:select#6beccafbe6be",
+        "python_module:moneysweep/case_manager/__init__.py",
+        "python_module:moneysweep/case_manager/ids.py",
+        "python_module:moneysweep/case_manager/models.py",
+        "python_module:moneysweep/case_manager/repository.py",
+        "python_module:moneysweep/case_manager/service.py",
+        "python_module:moneysweep/case_manager/validators.py",
+        "python_module:moneysweep/forensics/__init__.py",
+        "python_module:moneysweep/forensics/adapters.py",
+        "python_module:moneysweep/forensics/candidate.py",
+        "python_module:moneysweep/forensics/cli.py",
+        "python_module:moneysweep/forensics/core.py",
+        "python_module:moneysweep/forensics/pipeline.py",
+        "python_module:moneysweep/forensics/seed.py",
+        "python_module:moneysweep/orchestrator/_offline_baseline_core.py",
+        "python_module:moneysweep/orchestrator/_offline_baseline_coverage.py",
+        "python_module:moneysweep/orchestrator/_offline_baseline_extract.py",
+        "python_module:moneysweep/orchestrator/_offline_baseline_runner.py",
+        "python_module:moneysweep/orchestrator/cli_legacy.py",
+        "python_module:moneysweep/orchestrator/offline_baseline.py",
+        "python_module:moneysweep/political_finance/__init__.py",
+        "python_module:moneysweep/political_finance/completion.py",
+        "python_module:moneysweep/political_finance/flow_graph.py",
+        "python_module:server/backend/campaign_finance.py",
+        "python_module:server/backend/case_manager_api.py",
+        "python_module:server/backend/case_manager_app.py",
+        "python_symbol:moneysweep/case_manager/ids.py:deterministic_id",
+        "python_symbol:moneysweep/case_manager/ids.py:is_deterministic_id",
+        "python_symbol:moneysweep/case_manager/models.py:AuditEvent",
+        "python_symbol:moneysweep/case_manager/models.py:Case",
+        "python_symbol:moneysweep/case_manager/models.py:CaseEntity",
+        "python_symbol:moneysweep/case_manager/models.py:CaseEvent",
+        "python_symbol:moneysweep/case_manager/models.py:CaseEvidence",
+        "python_symbol:moneysweep/case_manager/models.py:CaseSnapshot",
+        "python_symbol:moneysweep/case_manager/models.py:Claim",
+        "python_symbol:moneysweep/case_manager/models.py:ClaimEvidence",
+        "python_symbol:moneysweep/case_manager/models.py:Contradiction",
+        "python_symbol:moneysweep/case_manager/models.py:Finding",
+        "python_symbol:moneysweep/case_manager/models.py:Lead",
+        "python_symbol:moneysweep/case_manager/repository.py:CaseManagerConflict",
+        "python_symbol:moneysweep/case_manager/repository.py:CaseManagerNotFound",
+        "python_symbol:moneysweep/case_manager/repository.py:SQLiteCaseManagerRepository",
+        "python_symbol:moneysweep/case_manager/service.py:CaseCommandService",
+        "python_symbol:moneysweep/case_manager/service.py:CaseQueryService",
+        "python_symbol:moneysweep/case_manager/service.py:VisibilityPolicy",
+        "python_symbol:moneysweep/case_manager/validators.py:ValidationError",
+        "python_symbol:moneysweep/case_manager/validators.py:validate_append_only_events",
+        "python_symbol:moneysweep/case_manager/validators.py:validate_case_bundle",
+        "python_symbol:moneysweep/forensics/adapters.py:AdapterResult",
+        "python_symbol:moneysweep/forensics/adapters.py:ContractorListingAdapter",
+        "python_symbol:moneysweep/forensics/adapters.py:HttpJsonAdapter",
+        "python_symbol:moneysweep/forensics/adapters.py:KeywordEvidenceAdapter",
+        "python_symbol:moneysweep/forensics/adapters.py:LocalTextAdapter",
+        "python_symbol:moneysweep/forensics/adapters.py:SamAdapter",
+        "python_symbol:moneysweep/forensics/adapters.py:SimpleEndpointAdapter",
+        "python_symbol:moneysweep/forensics/adapters.py:SourceAdapter",
+        "python_symbol:moneysweep/forensics/adapters.py:UsaSpendingRecipientAdapter",
+        "python_symbol:moneysweep/forensics/candidate.py:generate_candidate",
+        "python_symbol:moneysweep/forensics/cli.py:main",
+        "python_symbol:moneysweep/forensics/core.py:ForensicsLedger",
+        "python_symbol:moneysweep/forensics/core.py:QueryDecision",
+        "python_symbol:moneysweep/forensics/core.py:canonical_hash",
+        "python_symbol:moneysweep/forensics/core.py:entity_id",
+        "python_symbol:moneysweep/forensics/core.py:evidence_key",
+        "python_symbol:moneysweep/forensics/core.py:federal_award_key",
+        "python_symbol:moneysweep/forensics/core.py:pr_contract_action_key",
+        "python_symbol:moneysweep/forensics/core.py:query_key",
+        "python_symbol:moneysweep/forensics/core.py:utcnow",
+        "python_symbol:moneysweep/forensics/pipeline.py:ForensicsPipeline",
+        "python_symbol:moneysweep/forensics/pipeline.py:PipelineDelta",
+        "python_symbol:moneysweep/forensics/pipeline.py:load_manifest",
+        "python_symbol:moneysweep/forensics/seed.py:build_adapters",
+        "python_symbol:moneysweep/forensics/seed.py:jacobs_subject",
+        "python_symbol:moneysweep/forensics/seed.py:populate",
+        "python_symbol:moneysweep/forensics/seed.py:seed_cluster",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_core.py:BaselineConfig",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_core.py:OfflineBaselineViolation",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_core.py:block_network",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_core.py:discover_inputs",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_core.py:sanitized_child_environment",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_core.py:sha256_file",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_coverage.py:source_coverage",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_extract.py:extract_cabilderos",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_extract.py:local_entity_comparison",
+        "python_symbol:moneysweep/orchestrator/_offline_baseline_runner.py:run_offline_baseline",
+        "python_symbol:moneysweep/orchestrator/cli_legacy.py:build_arg_parser",
+        "python_symbol:moneysweep/orchestrator/offline_baseline.py:build_parser",
+        "python_symbol:moneysweep/orchestrator/offline_baseline.py:main",
+        "python_symbol:moneysweep/political_finance/completion.py:build_affiliation_edges",
+        "python_symbol:moneysweep/political_finance/completion.py:build_transfer_edges",
+        "python_symbol:moneysweep/political_finance/completion.py:correlate_temporal_activity",
+        "python_symbol:moneysweep/political_finance/completion.py:materialization_accounting",
+        "python_symbol:moneysweep/political_finance/flow_graph.py:Resolution",
+        "python_symbol:moneysweep/political_finance/flow_graph.py:build_political_finance_graph",
+        "python_symbol:moneysweep/political_finance/flow_graph.py:classify_committee",
+        "python_symbol:moneysweep/political_finance/flow_graph.py:find_flow_paths",
+        "python_symbol:moneysweep/political_finance/flow_graph.py:normalize_name",
+        "python_symbol:moneysweep/political_finance/flow_graph.py:resolve_recipient",
+        "python_symbol:server/backend/campaign_finance.py:campaign_finance_contributions",
+        "python_symbol:server/backend/campaign_finance.py:campaign_finance_entities",
+        "python_symbol:server/backend/campaign_finance.py:campaign_finance_reports",
+        "python_symbol:server/backend/campaign_finance.py:campaign_finance_summary",
+        "python_symbol:server/backend/case_manager_api.py:CaseCreate",
+        "python_symbol:server/backend/case_manager_api.py:ClaimCreate",
+        "python_symbol:server/backend/case_manager_api.py:ClaimEvidenceCreate",
+        "python_symbol:server/backend/case_manager_api.py:ContradictionCreate",
+        "python_symbol:server/backend/case_manager_api.py:ContradictionResolution",
+        "python_symbol:server/backend/case_manager_api.py:EvidenceLinkCreate",
+        "python_symbol:server/backend/case_manager_api.py:FindingAcceptance",
+        "python_symbol:server/backend/case_manager_api.py:FindingCreate",
+        "python_symbol:server/backend/case_manager_api.py:LeadClosure",
+        "python_symbol:server/backend/case_manager_api.py:LeadCreate",
+        "python_symbol:server/backend/case_manager_api.py:SnapshotCreate",
+        "python_symbol:server/backend/case_manager_api.py:accept_finding",
+        "python_symbol:server/backend/case_manager_api.py:close_lead",
+        "python_symbol:server/backend/case_manager_api.py:configure_repository",
+        "python_symbol:server/backend/case_manager_api.py:create_case",
+        "python_symbol:server/backend/case_manager_api.py:create_claim",
+        "python_symbol:server/backend/case_manager_api.py:create_contradiction",
+        "python_symbol:server/backend/case_manager_api.py:create_finding",
+        "python_symbol:server/backend/case_manager_api.py:create_lead",
+        "python_symbol:server/backend/case_manager_api.py:create_snapshot",
+        "python_symbol:server/backend/case_manager_api.py:get_case",
+        "python_symbol:server/backend/case_manager_api.py:get_case_collection",
+        "python_symbol:server/backend/case_manager_api.py:get_cases",
+        "python_symbol:server/backend/case_manager_api.py:link_claim_evidence",
+        "python_symbol:server/backend/case_manager_api.py:link_evidence",
+        "python_symbol:server/backend/case_manager_api.py:resolve_contradiction",
+        "python_symbol:server/backend/case_manager_app.py:health"
+      ]
+    },
+    {
+      "id": "api-key-management",
+      "classification": "operator",
+      "status": "active",
+      "requires_terminal": false,
+      "backend": {
+        "files": [
+          "server/backend/api_keys.py"
+        ],
+        "endpoints": [
+          "GET /api-keys",
+          "POST /api-keys/{name}"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/lib/api.js",
+          "dashboard/src/lib/hooks.js",
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/ApiKeysPanel.jsx"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_api_keys_endpoint.py",
+          "tests/test_manage_api_keys.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/api-keys.spec.mjs"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/manage_api_keys.py",
+        "analysis_module:scripts/set_api_key.py",
+        "analysis_symbol:scripts/manage_api_keys.py:KeyInfo",
+        "analysis_symbol:scripts/manage_api_keys.py:InvalidKeyValueError",
+        "analysis_symbol:scripts/manage_api_keys.py:UnknownKeyError",
+        "analysis_symbol:scripts/manage_api_keys.py:key_status",
+        "analysis_symbol:scripts/manage_api_keys.py:known_keys",
+        "analysis_symbol:scripts/manage_api_keys.py:set_key",
+        "analysis_symbol:scripts/set_api_key.py:main",
+        "cli_surface:scripts/set_api_key.py",
+        "python_module:server/backend/api_keys.py",
+        "python_symbol:server/backend/api_keys.py:SetKeyRequest",
+        "python_symbol:server/backend/api_keys.py:list_api_keys",
+        "python_symbol:server/backend/api_keys.py:set_api_key"
+      ]
+    },
+    {
+      "id": "pr-assistance-denominator-pipeline",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Batch acquisition and shard recovery for the Puerto Rico assistance denominator; operator-run CLIs executed offline against USAspending bulk jobs, not surfaced in the dashboard.",
+      "backend": {
+        "files": [
+          "scripts/download_pr_assistance_denominator.py",
+          "scripts/recover_pr_assistance_failed_shards.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_pr_assistance_denominator.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/download_pr_assistance_denominator.py",
+        "analysis_module:scripts/recover_pr_assistance_failed_shards.py",
+        "analysis_symbol:scripts/download_pr_assistance_denominator.py:aggregate",
+        "analysis_symbol:scripts/download_pr_assistance_denominator.py:main",
+        "analysis_symbol:scripts/download_pr_assistance_denominator.py:run_shard",
+        "analysis_symbol:scripts/recover_pr_assistance_failed_shards.py:BulkJobFailed",
+        "analysis_symbol:scripts/recover_pr_assistance_failed_shards.py:main",
+        "analysis_symbol:scripts/recover_pr_assistance_failed_shards.py:recover_shard",
+        "cli_surface:scripts/download_pr_assistance_denominator.py",
+        "cli_surface:scripts/recover_pr_assistance_failed_shards.py"
+      ]
+    }
+  ],
+  "exceptions": [
+    {
+      "id": "case-manager-phase-1-gui-gap",
+      "reason": "Case Manager Phase 1 exposes a service boundary but its claim and evidence-relation workflows are not yet available through the shipped dashboard. Keep the ratchet explicit until the complete GUI path is delivered.",
+      "owner": "jotaele44",
+      "tracking": "docs/GUI_CAPABILITY_PARITY.md#completion-boundary",
+      "expires_on": "2026-11-19",
+      "candidate_ids": [
+        "backend_endpoint:server/backend/case_manager_api.py:GET /{case_id}",
+        "backend_endpoint:server/backend/case_manager_api.py:GET /{case_id}/{collection}",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/claims",
+        "backend_endpoint:server/backend/case_manager_api.py:POST /{case_id}/claims/{claim_id}/evidence-relations"
+      ],
+      "candidate_files": [
+        "moneysweep/case_manager/__init__.py",
+        "moneysweep/case_manager/ids.py",
+        "moneysweep/case_manager/models.py",
+        "moneysweep/case_manager/repository.py",
+        "moneysweep/case_manager/service.py",
+        "moneysweep/case_manager/validators.py",
+        "server/backend/case_manager_api.py",
+        "server/backend/case_manager_app.py"
+      ]
+    },
+    {
+      "id": "forensics-gui-gap",
+      "reason": "The bounded forensics engine remains an analyst CLI and library pending a discoverable dashboard workflow with evidence, provenance, and safe acquisition controls.",
+      "owner": "jotaele44",
+      "tracking": "docs/GUI_CAPABILITY_PARITY.md#completion-boundary",
+      "expires_on": "2026-11-19",
+      "candidate_ids": [
+        "cli_surface:moneysweep/forensics/cli.py"
+      ],
+      "candidate_files": [
+        "moneysweep/forensics/__init__.py",
+        "moneysweep/forensics/adapters.py",
+        "moneysweep/forensics/candidate.py",
+        "moneysweep/forensics/cli.py",
+        "moneysweep/forensics/core.py",
+        "moneysweep/forensics/pipeline.py",
+        "moneysweep/forensics/seed.py"
+      ]
+    },
+    {
+      "id": "compare-entity-products-terminal-analysis",
+      "reason": "scripts/compare_entity_products.py landed on main (entity-product comparison audit tool) after this PR's baseline was built; it is a terminal-only analysis/diagnostic script with no user-facing GUI surface. Excepted pending either a GUI rendering of its comparison report or its classification as pipeline tooling.",
+      "owner": "jotaele44",
+      "tracking": "https://github.com/jotaele44/moneysweep-pr/pull/449",
+      "expires_on": "2026-11-01",
+      "candidate_ids": [
+        "analysis_module:scripts/compare_entity_products.py",
+        "analysis_symbol:scripts/compare_entity_products.py:compare",
+        "analysis_symbol:scripts/compare_entity_products.py:main",
+        "cli_surface:scripts/compare_entity_products.py"
+      ]
+    }
+  ]
+}

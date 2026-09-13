@@ -1,0 +1,64 @@
+{
+  "extension_id": "ownership-deep-dive-v1",
+  "capabilities": [
+    {
+      "id": "ownership-and-capital-deep-dive",
+      "classification": "analysis",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Separately gated read-only promotion of the independently certified BPOP SEC 13F eight-quarter scope. The GUI does not broaden certification to OFG/EVTC, does not redownload evidence, and keeps provider metric equivalence OPEN.",
+      "backend": {
+        "files": [
+          "moneysweep/capital_control/deep_dive.py",
+          "server/backend/ownership_api.py",
+          "server/backend/main.py"
+        ],
+        "endpoints": [
+          "GET /status",
+          "GET /{ticker}"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/lib/api.js",
+          "dashboard/src/lib/hooks.js",
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/OwnershipDeepDive.jsx"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_ownership_deep_dive.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/ownership-deep-dive.spec.mjs"
+        ]
+      },
+      "candidate_ids": [
+        "python_module:moneysweep/capital_control/deep_dive.py",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:OwnershipDeepDiveError",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:CertifiedOwnershipScope",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:load_certification",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:load_materialized_holdings",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:build_ownership_deep_dive",
+        "python_module:server/backend/ownership_api.py",
+        "python_symbol:server/backend/ownership_api.py:ownership_status",
+        "python_symbol:server/backend/ownership_api.py:ownership_deep_dive",
+        "backend_endpoint:server/backend/ownership_api.py:GET /status",
+        "backend_endpoint:server/backend/ownership_api.py:GET /{ticker}"
+      ]
+    }
+  ]
+}

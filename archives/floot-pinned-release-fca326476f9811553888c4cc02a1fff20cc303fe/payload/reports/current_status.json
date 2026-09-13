@@ -1,0 +1,201 @@
+{
+  "schema_version": "moneysweep_current_status_v8",
+  "generated_at": "2026-08-20T21:34:20Z",
+  "main_sha": "315520119c47b0f271f19531d53de8454d99f41a",
+  "evidence_snapshot_state": "STALE_NOT_RECERTIFIED",
+  "evidence_snapshot_as_of": "2026-07-30T20:33:33-04:00",
+  "evidence_snapshot_note": "Head identity was refreshed on 2026-08-19. Materialization counts and production evidence below retain their original 2026-07-30 scope and are not recertified for the current head.",
+  "premerge_base_sha": "bd337fb092eb639cdb24b490bc90a8b07e9e51c4",
+  "certified_input_head_sha": "ab576462ded2f2e99c762161b7ec18de8cef73",
+  "current_head_authority": "Local main checkout at 315520119c47b0f271f19531d53de8454d99f41a. Evidence metrics retain their explicitly disclosed older snapshot scope.",
+  "active_vector": "REQUIRED_SOURCE_AND_OPERATOR_EVIDENCE_CLOSURE",
+  "active_branch": "main",
+  "active_pr": null,
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "pause_lock_active": true,
+  "merge_record": {
+    "pr_number": 448,
+    "state": "MERGED",
+    "draft": false,
+    "merge_authorized": true,
+    "merge_completed": true,
+    "merge_method": "squash",
+    "expected_head_sha": "ab576462ded2f2ca590002011861322c9ece2a32",
+    "merge_commit_sha": "9e911203a05cf8f2e99c762161b7ec18de8cef73",
+    "merged_at": "2026-07-30T23:24:01Z",
+    "review_threads": 0,
+    "premerge_workflows": 17,
+    "premerge_workflows_successful": 17,
+    "main_identical_to_merge_commit": true
+  },
+  "source_registry_current": {
+    "total_sources": 164,
+    "source_ids_sha256": "4c551385f00ca6df4332ee1643d0ef7a6ab85172632d945d35be285cd94f5826",
+    "required_sources": 16,
+    "override_policy": "Existing source IDs only; source_id and required are immutable."
+  },
+  "materialization_readiness_truth": {
+    "total_sources": 164,
+    "automatable_total": 115,
+    "automatable_ready": 115,
+    "queued_excluded_total": 49,
+    "queued_excluded": {
+      "manual_export": 42,
+      "scraper_needed": 2,
+      "deferred_stub": 2,
+      "semantic_duplicate": 3,
+      "broken_producer": 0
+    }
+  },
+  "materialization_coverage": {
+    "evidence_registry_total": 151,
+    "current_registry_total": 164,
+    "denominator_comparable": false,
+    "regeneration_status": "CERTIFIED_OPERATOR_CORPUS_WITH_COMPLETE_DERIVED_LINEAGE",
+    "probe_ran": false,
+    "registry_digest_parity": false,
+    "status_count_parity": true,
+    "full_audit_rerun": false,
+    "full_audit_rerun_reason": "The supplied upload set is not a complete processed corpus and all four required-source products contain zero positive rows.",
+    "local_operator_snapshot": {
+      "fully_materialized": 67,
+      "partially_materialized": 11,
+      "not_materialized": 73,
+      "required_fully_materialized": 10,
+      "required_sources": 14,
+      "physical_processed_rows": 1183565,
+      "registry_declared_rows": 849898,
+      "adjudicated_derived_output_rows": 212930,
+      "pipeline_intermediate_rows": 120737,
+      "unadjudicated_orphan_rows": 0,
+      "unresolved_lineage_rows_within_derived_outputs": 0
+    },
+    "denominator_drift_note": "Eleven sources were registered after the certified 151-source operator corpus was measured. The 67/151 snapshot below is unchanged and remains valid only for its frozen denominator; it must be re-measured on an operator machine before comparison with the current 162-source registry."
+  },
+  "wave0_ci_certification": {
+    "merged_reconciliation_pr": {
+      "number": 448,
+      "state": "MERGED",
+      "final_certified_head_sha": "ab576462ded2f2ca590002011861322c9ece2a32",
+      "merge_commit_sha": "9e911203a05cf8f2e99c762161b7ec18de8cef73",
+      "triggered_workflows": 17,
+      "successful_workflows": 17,
+      "status": "GREEN"
+    },
+    "postmerge_status_pr": {
+      "number": 452,
+      "state": "OPEN_DRAFT",
+      "input_head_sha": "d1d0dcb24c03760c3e67f83297f2de22d09cf3ea",
+      "input_workflows": 15,
+      "input_successful_workflows": 15,
+      "current_head_ci": "AUTHORITATIVE_IN_GITHUB_PR_CHECKS"
+    },
+    "workflow_repair_pr": 444,
+    "dependency_refresh_pr": 446,
+    "hosted_preflight_runs": [
+      30452888839,
+      30452890975,
+      30452892905
+    ],
+    "hosted_live_jobs_skipped": true
+  },
+  "required_source_evidence": {
+    "access_report": "reports/WAVE0_REQUIRED_SOURCE_EVIDENCE_2026-07-30.json",
+    "upload_receipt": "reports/WAVE0_REQUIRED_EXPORT_INGESTION_RECEIPT_2026-07-30.json",
+    "required_fully_materialized_before": 10,
+    "required_fully_materialized_after": 10,
+    "required_sources": 14,
+    "materialization_credit_changed": false,
+    "sources": {
+      "cor3": "SUPPLIED_DECLARED_OUTPUT_EMPTY_0_ROWS",
+      "hud_drgr_authorized": "SUPPLIED_NORMALIZED_PARQUETS_EMPTY_0_ROWS_REGISTRY_CSVS_ABSENT",
+      "pr_cabilderos": "SUPPLIED_DECLARED_OUTPUT_EMPTY_0_ROWS",
+      "prasa": "SUPPLIED_DECLARED_OUTPUT_EMPTY_0_ROWS"
+    },
+    "non_substitutable_inputs": {
+      "pr_hud_hcv.csv": "NOT_A_HUD_DRGR_EXPORT",
+      "pr_contracts_master(4).csv": "FEDERAL_AWARD_RECORDS_NOT_AN_OFFICIAL_PRASA_CONTRACT_EXPORT",
+      "pr_prepa_contracts(1).csv": "PREPA_NOT_PRASA"
+    }
+  },
+  "entity_product_comparison": {
+    "script": "scripts/compare_entity_products.py",
+    "report": "reports/entity_product_comparison.json",
+    "schema_version": "entity_product_comparison_v2",
+    "status": "COMPLETE",
+    "duplicate_status": "OVERLAPPING_DERIVED_PRODUCTS",
+    "left_stable_key": "entity_key",
+    "right_stable_key": "normalized_name",
+    "left_unique_keys": 104280,
+    "right_unique_keys": 104280,
+    "intersection_unique": 104280,
+    "union_unique": 104280,
+    "stable_key_overlap_rate": 1.0,
+    "jaccard_rate": 1.0,
+    "shared_projection_columns": [
+      "award_count",
+      "fiscal_year_range"
+    ],
+    "shared_projection_row_overlap_rate": 1.0,
+    "identical_file": false,
+    "semantic_duplicate": false,
+    "actual_enriched_profile_supplied": false,
+    "comparison_boundary": "The pr_entity_profiles awards spine was reconstructed from the uploaded 453,352-row awards master. Supplementary 990, CMS, and FDIC inputs were absent."
+  },
+  "derived_output_lineage": {
+    "adjudication_report": "reports/WAVE0_REQUIRED_GAP_AND_ORPHAN_ADJUDICATION.json",
+    "confirmed_files": 6,
+    "unresolved_files": 0,
+    "unresolved_rows": 0,
+    "entity_master_file": "data/staging/processed/entity_master.csv",
+    "entity_master_producer": "scripts/build_unified_master.py",
+    "entity_master_producer_status": "CONFIRMED",
+    "source_materialization_credit": false
+  },
+  "historical_status_evidence": {
+    "path_at_base": "reports/current_status.json",
+    "blob_sha": "b175df73deb6ecf5bbf0d0040b89ca75f5d1e10c",
+    "classification": "HISTORICAL_144_SOURCE_NONCERTIFICATION"
+  },
+  "issue_reconciliation": {
+    "issue_271": "OPEN_REQUIRED_SOURCE_ROWS_AND_EXTERNAL_EVIDENCE_GATES",
+    "issue_258": "CLOSED_COMPLETED_2026_06_16",
+    "issue_87": "CLOSED_SUPERSEDED_2026_07_28",
+    "merged_status_reconciliation_pr": 448,
+    "merged_status_reconciliation_commit": "9e911203a05cf8f2e99c762161b7ec18de8cef73",
+    "postmerge_status_pr": 452,
+    "superseded_status_pr": 447
+  },
+  "completed_in_wave0": [
+    "PR #448 passed 17 of 17 triggered workflows and was squash-merged into main.",
+    "PR #452 input head d1d0dcb24c03760c3e67f83297f2de22d09cf3ea passed 15 of 15 triggered workflows.",
+    "The 151-source offline operator corpus passed digest and status-count parity.",
+    "All six derived-output producers are now confirmed; entity_master.csv is produced by scripts/build_unified_master.py.",
+    "The entity comparator now recognizes entity_key and reports 104,280 of 104,280 stable keys in common.",
+    "Required-source uploads were adjudicated without awarding credit because every declared required product remained zero-row."
+  ],
+  "open_work": [
+    "Supply non-empty COR3, authorized HUD DRGR, Department of Justice cabilderos, and PRASA export rows.",
+    "Run the entity comparison against the actual enriched pr_entity_profiles.csv when that file and supplementary inputs are supplied.",
+    "Regenerate the complete 151-source materialization audit after valid source ingestion.",
+    "Certify source freshness and authoritative-universe completeness.",
+    "Complete PR2.5/PR2.6 reconciliation before PR3 deduplication.",
+    "Validate production export and downstream federation consumers."
+  ],
+  "preservation": {
+    "pr_448_draft": false,
+    "pr_448_merge_authorized": true,
+    "pr_448_merge_completed": true,
+    "pr_452_draft": true,
+    "pr_452_merge_authorized": false,
+    "auto_merge_used": false,
+    "direct_main_write_authorized": false,
+    "live_fetch_authorized": false,
+    "credential_automation_authorized": false,
+    "data_promotion_authorized": false,
+    "production_activation_authorized": false,
+    "force_push_authorized": false,
+    "history_rewrite_authorized": false,
+    "raw_operator_files_committed": false
+  }
+}
