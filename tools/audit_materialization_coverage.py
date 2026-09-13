@@ -6,6 +6,11 @@ is awarded only by a cryptographically bound operator-corpus manifest plus a
 successful full verification receipt. A CLI assertion alone can never make a
 checkout authoritative, and the mounted corpus is revalidated before authority
 is consumed.
+
+The audit consumes the same effective JSON registry profile as runtime,
+certification truth derivation, receipts, and the operator-corpus verifier: root
+JSON + JSON extensions + JSON overrides. YAML remains historical/taxonomy
+material and cannot silently define a competing certification identity plane.
 """
 
 from __future__ import annotations
@@ -18,13 +23,21 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-import yaml
+from moneysweep.runtime.source_registry import load_source_registry
 
 try:
-    from tools.operator_corpus_common import manifest_digest, source_ids_digest
+    from tools.operator_corpus_common import (
+        load_sources as load_effective_sources,
+        manifest_digest,
+        source_ids_digest,
+    )
     from tools.verify_operator_corpus import verify as verify_operator_corpus
 except ModuleNotFoundError:  # pragma: no cover - direct script execution fallback
-    from operator_corpus_common import manifest_digest, source_ids_digest  # type: ignore[no-redef]
+    from operator_corpus_common import (  # type: ignore[no-redef]
+        load_sources as load_effective_sources,
+        manifest_digest,
+        source_ids_digest,
+    )
     from verify_operator_corpus import verify as verify_operator_corpus  # type: ignore[no-redef]
 
 
@@ -56,31 +69,12 @@ def _as_paths(value: Any) -> list[str]:
 
 
 def _load_sources(root: Path) -> tuple[dict[str, Any], list[dict[str, Any]], list[str]]:
-    registry_path = root / "registries/source_registry.yaml"
-    registry = yaml.safe_load(registry_path.read_text(encoding="utf-8")) or {}
-    sources = list(registry.get("sources") or [])
-    registry_paths = ["registries/source_registry.yaml"]
-
-    extension_dir = root / "registries/source_registry_extensions"
-    if extension_dir.exists():
-        for path in sorted(extension_dir.glob("*.json")):
-            payload = json.loads(path.read_text(encoding="utf-8"))
-            extension_sources = payload.get("sources")
-            if extension_sources is None:
-                continue
-            if not isinstance(extension_sources, list):
-                raise RuntimeError(f"Source registry extension must contain a sources list: {path}")
-            sources.extend(extension_sources)
-            registry_paths.append(path.relative_to(root).as_posix())
-
-    source_ids = [str(source.get("source_id", "")).strip() for source in sources]
-    duplicates = sorted({source_id for source_id in source_ids if source_ids.count(source_id) > 1})
-    if duplicates:
-        raise RuntimeError(
-            "Duplicate source IDs across core/extension registries: " + ", ".join(duplicates)
-        )
-    if any(not source_id for source_id in source_ids):
-        raise RuntimeError("Core/extension source registry contains an empty source_id")
+    """Load exactly the effective runtime/certification source profile."""
+    registry = load_source_registry(root)
+    runtime_sources = list(registry.get("sources") or [])
+    sources, registry_paths = load_effective_sources(root)
+    if runtime_sources != sources:
+        raise RuntimeError("effective registry loader divergence")
     return registry, sources, registry_paths
 
 
@@ -366,13 +360,14 @@ def build(
     authority_blockers = authority_evidence["authority_blockers"]
 
     return {
-        "schema_version": "coverage_audit_v4",
+        "schema_version": "coverage_audit_v5",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "audit_scope": {
             "root": str(root),
             "evidence_root": str(evidence_root),
-            "registry_path": "registries/source_registry.yaml",
+            "registry_path": "registries/source_registry.json",
             "registry_paths": registry_paths,
+            "registry_profile": "effective_runtime_json_extensions_overrides",
             "registry_schema_version": registry.get("schema_version"),
             "registry_source_ids_sha256": source_ids_digest(sources),
             "operator_corpus_authoritative": authority,
