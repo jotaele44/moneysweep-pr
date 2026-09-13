@@ -6,7 +6,7 @@
       "classification": "analysis",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Diagnostic evidence-preserving financial rankings, frozen history, typed investigation signals and entity neighborhoods. Each measure has an explicit adapter/identity contract; unsupported or unmaterialized categories fail closed. MoneySweep exposes municipality references but does not claim geometry authority. Production federation promotion is separately bounded to a certified debt-issuance scope.",
+      "rationale": "Diagnostic evidence-preserving financial rankings, frozen history, typed investigation signals and entity neighborhoods. Each measure has an explicit adapter/identity contract; unsupported or unmaterialized categories fail closed. MoneySweep exposes municipality references but does not claim geometry authority. Production federation promotion is separately bounded to a certified debt-issuance scope with exact package-hash trust.",
       "backend": {
         "files": [
           "server/backend/leaderboards.py",
@@ -33,6 +33,7 @@
           "scripts/certify_leaderboard_snapshot.py",
           "scripts/finalize_leaderboard_release.py",
           "scripts/export_leaderboard_package.py",
+          "scripts/leaderboard_release_provenance.py",
           "data/manifests/leaderboards/leaderboard_certification_scope_v1.json",
           "data/manifests/leaderboards/debt_history_source_refs_v1.json",
           "schemas/leaderboard_export_package.schema.json"
@@ -55,7 +56,8 @@
           "tests/test_leaderboard_history.py",
           "tests/test_leaderboard_git_history.py",
           "tests/test_leaderboard_debt_history_expected.py",
-          "tests/test_leaderboard_snapshot_certification.py"
+          "tests/test_leaderboard_snapshot_certification.py",
+          "tests/test_leaderboard_release_finalizer.py"
         ],
         "contract": ["tests/test_gui_parity.py"],
         "e2e": ["dashboard/tests/financial-leaderboards.spec.mjs"]
