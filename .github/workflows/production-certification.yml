@@ -71,6 +71,27 @@ jobs:
             tests/test_source_equivalence.py \
             -q -o addopts=""
 
+      - name: Derive usable-output certification truth
+        working-directory: implementation
+        run: |
+          rm -rf ../derived-certification-scope
+          python tools/derive_certification_truth.py \
+            --root ../scope \
+            --evidence-root ../scope \
+            --scope-dir ../derived-certification-scope
+          cp ../derived-certification-scope/reports/source_registry_status.csv \
+            ../scope/reports/source_registry_status.csv
+          cp ../derived-certification-scope/reports/materialization_readiness.json \
+            ../scope/reports/materialization_readiness.json
+          cp ../derived-certification-scope/reports/completeness_matrix.json \
+            ../scope/reports/completeness_matrix.json
+          cp ../derived-certification-scope/reports/source_freshness.csv \
+            ../scope/reports/source_freshness.csv
+          cp ../derived-certification-scope/reports/certification_truth.json \
+            reports/certification_truth.ci.json
+          cp ../derived-certification-scope/scope_manifest.json \
+            reports/certification_scope_manifest.ci.json
+
       - name: Regenerate current-denominator lineage evidence
         working-directory: implementation
         run: |
@@ -108,6 +129,7 @@ jobs:
         working-directory: implementation
         run: |
           python - <<'PY'
+          import csv
           import json
           import re
           from pathlib import Path
@@ -115,15 +137,25 @@ jobs:
           report = json.loads(Path("reports/production_certification.ci.json").read_text())
           lineage = json.loads(Path("reports/materialization_coverage_audit.ci.json").read_text())
           readiness = json.loads(Path("../scope/reports/materialization_readiness.json").read_text())
+          truth = json.loads(Path("reports/certification_truth.ci.json").read_text())
+          scope_manifest = json.loads(Path("reports/certification_scope_manifest.ci.json").read_text())
           g7 = json.loads(Path("reports/entity_resolution_certification_audit.ci.json").read_text())
+
+          with Path("../scope/reports/source_registry_status.csv").open(encoding="utf-8-sig", newline="") as fh:
+              status_rows = list(csv.DictReader(fh))
+          required_rows = [row for row in status_rows if row.get("required", "").lower() == "true"]
+          cor3 = next((row for row in status_rows if row["source_id"] == "cor3"), None)
 
           total = readiness["total_sources"]
           digest = readiness["source_count_provenance"]["source_ids_sha256"]
           checks = {
               "source_ledger_matches_live_total": len(report["source_universe"]["source_ledger"]) == total,
+              "truth_matches_live_total": truth["registry"]["total_sources"] == total,
+              "required_count_matches_truth": len(required_rows) == truth["registry"]["required_sources"],
               "lineage_denominator_matches_live_total": lineage["local_truth_summary"]["total_sources"] == total,
               "lineage_registry_digest_matches_live": lineage["audit_scope"]["registry_source_ids_sha256"] == digest,
               "report_registry_digest_matches_live": report["scope"]["registry_source_ids_sha256"] == digest,
+              "scope_manifest_digest_matches_live": scope_manifest["scope_identity"]["registry_source_ids_sha256"] == digest,
               "ci_lineage_not_operator_authoritative": lineage["audit_scope"]["operator_corpus_authoritative"] is False,
               "ci_lineage_orphans_fail_closed": lineage["processed_file_inventory"]["orphan_rows"] is None,
               "g7_no_name_only_resolution": g7["policy"]["name_only_resolution_allowed"] is False,
@@ -132,9 +164,17 @@ jobs:
               "implementation_sha_valid": bool(re.fullmatch(r"[0-9a-f]{40}", report["audit_implementation"]["commit_sha"])),
               "eligibility_matches_state": report["production_eligible"] == (report["certification_state"] == "CERTIFIED"),
               "diagnostic_ci_not_activation": report["production_eligible"] is False,
+              "zero_row_cor3_not_full": cor3 is None or cor3["pipeline_status"] != "fully_materialized",
           }
           failed = [name for name, ok in checks.items() if not ok]
-          print(json.dumps({"live_total": total, "digest": digest, "checks": checks, "failed": failed}, indent=2, sort_keys=True))
+          print(json.dumps({
+              "live_total": total,
+              "required_total": len(required_rows),
+              "digest": digest,
+              "scope_id": scope_manifest["scope_id"],
+              "checks": checks,
+              "failed": failed,
+          }, indent=2, sort_keys=True))
           if failed:
               raise SystemExit("Certification consistency checks failed: " + ", ".join(failed))
           PY
@@ -146,6 +186,8 @@ jobs:
           name: production-certification-audit
           path: |
             implementation/reports/production_certification.ci.json
+            implementation/reports/certification_truth.ci.json
+            implementation/reports/certification_scope_manifest.ci.json
             implementation/reports/materialization_coverage_audit.ci.json
             implementation/reports/entity_resolution_certification_audit.ci.json
           if-no-files-found: error
