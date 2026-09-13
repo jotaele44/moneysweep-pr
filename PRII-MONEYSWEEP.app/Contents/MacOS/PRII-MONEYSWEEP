@@ -46,4 +46,5 @@ if ! "$PY" desktop/setup.py --ensure >"$LOG" 2>&1; then
   notify "First-run setup could not finish. It needs internet the first time (and Node.js for the dashboard build).\n\nDetails: $LOG\n\nOpen Terminal in $REPO and run: python3 desktop/setup.py"
   exit 1
 fi
+rm -f "$LOG"
 exec .venv/bin/python desktop/launch.py
