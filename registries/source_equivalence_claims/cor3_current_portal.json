@@ -1,0 +1,27 @@
+{
+  "schema_version": "moneysweep.source_equivalence/v1",
+  "source_id": "cor3",
+  "candidate_source": {
+    "name": "Current official COR3 public portal",
+    "source_url": "https://recovery.pr.gov/",
+    "authoritative": true
+  },
+  "tests": {
+    "semantic_scope_match": false,
+    "temporal_scope_match": false,
+    "row_universe_match": false,
+    "field_mapping_complete": false,
+    "selection_equivalent": false,
+    "aggregation_equivalent": false
+  },
+  "missing_fields": [],
+  "extra_fields": [],
+  "evidence": [
+    {
+      "kind": "equivalence_status_note",
+      "locator": "docs/equivalence_evidence/cor3_current_portal.md",
+      "sha256": "9b60454b5b3c54df696dcb258aae777516d1f2aeb320cd87bbc707687a327991"
+    }
+  ],
+  "notes": "Fail closed. The current portal may be official, but equivalence to the legacy authoritative workbook universe is unproven and the retained public probe produced zero rows."
+}
