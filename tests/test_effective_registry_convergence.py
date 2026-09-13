@@ -94,6 +94,17 @@ def test_json_extension_is_first_class_and_yaml_extension_is_not(tmp_path: Path)
     assert "registries/source_registry_extensions/discovery.yaml" not in paths
 
 
+def test_duplicate_effective_source_ids_fail_closed_without_overrides(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    _write(
+        root,
+        "registries/source_registry_extensions/duplicate.json",
+        {"sources": [{**_source(), "required": False}]},
+    )
+    with pytest.raises(ValueError, match="duplicate source_id: alpha"):
+        load_source_registry(root)
+
+
 def test_duplicate_json_keys_fail_closed(tmp_path: Path) -> None:
     root = _root(tmp_path)
     (root / "registries/source_registry.json").write_text(
