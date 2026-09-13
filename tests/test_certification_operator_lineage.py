@@ -182,6 +182,43 @@ def test_unreceipted_or_orphan_processed_files_block_authority(
     assert "operator_corpus_accounted_outputs_missing_from_operator" in result["blockers"]
 
 
+def test_missing_inventory_fields_and_errors_list_block_authority(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        lineage,
+        "verify_operator_corpus",
+        lambda **_: _verification(
+            processed_file_inventory={},
+            errors=None,
+        ),
+    )
+
+    result = lineage.verify_scope_bound_operator_corpus(
+        root=tmp_path,
+        corpus_root=tmp_path / "corpus",
+        truth_scope=_scope(),
+        current_registry_total=164,
+        current_registry_digest=DIGEST,
+    )
+
+    assert result["authoritative"] is False
+    assert (
+        "operator_corpus_inventory_orphan_mounted_files_missing_or_invalid"
+        in result["blockers"]
+    )
+    assert (
+        "operator_corpus_inventory_unreceipted_operator_files_missing_or_invalid"
+        in result["blockers"]
+    )
+    assert (
+        "operator_corpus_inventory_accounted_outputs_missing_from_operator_missing_or_invalid"
+        in result["blockers"]
+    )
+    assert "operator_corpus_verification_errors_missing_or_invalid" in result["blockers"]
+
+
 def test_only_fresh_full_snapshot_scope_bound_verification_grants_authority(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
