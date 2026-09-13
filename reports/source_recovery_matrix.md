@@ -1,19 +1,19 @@
 # Source Materialization Readiness
 
 Total sources: **164**
-Automatable: **115** (ready: **115**, need API key at run time: 12)
-Queued / excluded: **49**
+Automatable: **116** (ready: **116**, need API key at run time: 12)
+Queued / excluded: **48**
 
 ## Path types
 
 | path_type | automatable | count | recommended_action |
 | --- | --- | --- | --- |
-| `api_producer` | True | 74 | Run producer under strict preflight; public API path, set key if gated. |
+| `api_producer` | True | 75 | Run producer under strict preflight; public API path, set key if gated. |
 | `api_adapter` | True | 41 | Materialize via `python -m moneysweep.query --source <id>` (set key if gated). |
 | `manual_export` | False | 42 | Operator delivers file to the dropzone; see manual_export_registry.yaml + runbook. |
 | `semantic_duplicate` | False | 3 | No action; covered by sibling source. |
 | `deferred_stub` | False | 2 | Intentionally unimplemented; remains not_materialized by design. |
-| `scraper_needed` | False | 2 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
+| `scraper_needed` | False | 1 | Queued: needs a scraping adapter for the PR-gov HTML/PDF surface. |
 
 API keys needed for full automatable materialization: `CENSUS_API_KEY`, `EIA_API_KEY`, `FAC_API_KEY`, `FEC_API_KEY`, `FINANCIALDATA_API_KEY`, `FRED_API_KEY`, `HIGHERGOV_API_KEY`, `OPENSTATES_API_KEY`, `SAM_API_KEY`
 
@@ -61,7 +61,7 @@ API keys needed for full automatable materialization: `CENSUS_API_KEY`, `EIA_API
 - `wic`
 - `wioa`
 
-## api_producer (74)
+## api_producer (75)
 
 - `aafaf`
 - `act_transition_ppp`
@@ -92,6 +92,7 @@ API keys needed for full automatable materialization: `CENSUS_API_KEY`, `EIA_API
 - `gao_ig_audits`
 - `gleif_lei`
 - `hacienda`
+- `hacienda_sut_ivu`
 - `hud_cdbg_dr_public`
 - `hud_cdbg_mit`
 - `legislapr_discovery`
@@ -188,9 +189,8 @@ API keys needed for full automatable materialization: `CENSUS_API_KEY`, `EIA_API
 - `transit_contracts`
 - `transit_fare_revenue`
 
-## scraper_needed (2)
+## scraper_needed (1)
 
-- `hacienda_sut_ivu`
 - `pr_act_154_excise`
 
 ## semantic_duplicate (3)
