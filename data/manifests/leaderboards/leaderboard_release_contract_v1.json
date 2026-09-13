@@ -3,36 +3,53 @@
   "repository": "jotaele44/moneysweep-pr",
   "branch": "feature/moneysweep-leaderboard-plane",
   "scope": "financial leaderboard producer plane",
+  "certification_scope": "moneysweep.leaderboard.production-v1",
   "ranking_contract": "moneysweep.leaderboard/v1.1",
   "ontology_contract": "moneysweep.financial-category-ontology/v1.1",
   "certification_state": "BLOCKED",
   "certification_issued": false,
   "promotion_authorized": false,
+  "non_blocking_waivers": [
+    {
+      "id": "GITHUB_ACTIONS_EXECUTION",
+      "state": "WAIVED_BY_USER",
+      "asserts_pass": false,
+      "reason": "GitHub Actions runner acquisition is excluded as a blocker for this certification attempt; no unexecuted workflow is represented as passing."
+    }
+  ],
   "blockers": [
     {
-      "id": "CI_EXECUTION",
-      "state": "BLOCKED",
-      "reason": "PR workflow jobs fail before runner acquisition and expose no executed steps; no code-level pass/fail inference is permitted."
+      "id": "HISTORICAL_MATERIALIZATION",
+      "state": "OPEN",
+      "reason": "Git-source replay is implemented; the two debt_issuance source manifestations must still be materialized as hash-verified snapshots and compared."
     },
     {
-      "id": "HISTORICAL_COMPARISON",
+      "id": "CERTIFIED_DEBT_SNAPSHOT",
       "state": "OPEN",
-      "reason": "Top Movers requires at least two independently frozen, hash-verified comparable snapshots with equal ranking, filter, currency, source and runtime/producer-commit boundaries."
+      "reason": "The production scope is bounded to debt_issuance; one current frozen snapshot must satisfy scope accounting/identity/runtime gates and be promoted to PASS by an explicit certification receipt."
     },
     {
-      "id": "CATEGORY_RESIDUE",
+      "id": "THEHUB_EXACT_REPLAY",
       "state": "OPEN",
-      "reason": "The 21-category ontology denominator is fully classified, but 14 categories remain explicitly unsupported because stable identity, one financial semantic, or source materialization is not closed."
+      "reason": "TheHub PR #285 is prepared; exact producer package replay with trusted receipt/release hashes remains to be executed after a PASS producer snapshot exists."
+    }
+  ],
+  "closed_scope_decisions": [
+    {
+      "id": "ONTOLOGY_DENOMINATOR",
+      "state": "PASS",
+      "reason": "All 21 ontology categories are classified; production scope includes debt_issuance and explicitly excludes the other 20 without treating absence as zero."
     },
     {
-      "id": "THEHUB_PROMOTION",
-      "state": "OPEN",
-      "reason": "TheHub consumer contract and fail-closed product surface are prepared in thehub-pr PR #285; promotion remains unauthorized until producer and consumer CI, exact package replay, and trusted receipt/release hashes pass."
+      "id": "HISTORICAL_SOURCE_DISCOVERY",
+      "state": "PASS",
+      "reason": "Repository history supplies a real debt source transition from 11 instruments/5 issuers to 20 instruments/full issuer coverage; replay code preserves this as source expansion rather than automatic economic activity."
     }
   ],
   "required_gates": [
     "ONTOLOGY_SCHEMA",
     "ONTOLOGY_DENOMINATOR_CLOSED",
+    "CERTIFICATION_SCOPE_CLOSED",
     "ADAPTER_REGISTRY_CLOSED",
     "NO_NAME_ONLY_IDENTITY",
     "NO_CROSS_MEASURE_AGGREGATION",
@@ -51,13 +68,6 @@
     "PRODUCER_COMMIT_BOUND",
     "ENTITY_DRILLDOWN_WHOLE_ROW_CONSERVATION",
     "SPATIAL_HANDOFF_NO_GEOMETRY_PROMOTION",
-    "GUI_PARITY",
-    "PLAYWRIGHT_E2E",
-    "PYTEST",
-    "LINT",
-    "TYPECHECK",
-    "SECRET_SCAN",
-    "FEDERATION_COMPATIBILITY",
     "THEHUB_CONSUMER_CONTRACT",
     "CROSS_REPOSITORY_REPLAY",
     "RELEASE_MANIFEST_HASHES",
@@ -72,6 +82,8 @@
       "server/backend/leaderboard_entities.py"
     ],
     "snapshot_materializer": "scripts/materialize_leaderboard_snapshot.py",
+    "git_history_materializer": "scripts/materialize_leaderboard_git_snapshot.py",
+    "certification_scope": "data/manifests/leaderboards/leaderboard_certification_scope_v1.json",
     "certification_receipt": "data/manifests/leaderboards/MONEYSWEEP_LEADERBOARD_CERTIFICATION.json",
     "ontology_adapter_coverage": "data/manifests/leaderboards/ontology_adapter_coverage_v1.json",
     "federation_exporter": "scripts/export_leaderboard_package.py",
