@@ -77,9 +77,16 @@ def run(
     elif not os.environ.get("FEC_API_KEY"):
         results["fec_live"] = {"status": "SKIPPED_NO_FEC_API_KEY"}
 
-    from scripts import build_campaign_finance_entities
+    # Certification path: normalized names may discover candidates but may
+    # never promote identity or canonical graph endpoints by themselves.
+    from scripts import build_campaign_finance_entities_certified
 
-    _run_step("entity_resolution", build_campaign_finance_entities.run, results, root=root)
+    _run_step(
+        "entity_resolution",
+        build_campaign_finance_entities_certified.run,
+        results,
+        root=root,
+    )
 
     # Derived crossrefs are conditional on their own upstreams.
     try:
@@ -97,9 +104,9 @@ def run(
     except Exception as exc:
         results["crossrefs"] = {"status": "ERROR", "error": f"{type(exc).__name__}: {exc}"}
 
-    from scripts import validate_campaign_finance_materialization
+    from scripts import validate_campaign_finance_materialization_certified
 
-    validation = validate_campaign_finance_materialization.run(root=root, strict=strict)
+    validation = validate_campaign_finance_materialization_certified.run(root=root, strict=strict)
     results["validation"] = validation
     # A stale-but-valid file on disk must not mask a failed ladder step: any
     # recorded step ERROR blocks the overall result alongside file validation.
