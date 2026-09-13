@@ -1,0 +1,460 @@
+{
+  "version": "1.0",
+  "schema_version": "r5_manual_export_registry_v1",
+  "manual_exports": [
+    {
+      "source_id": "hud_drgr_authorized",
+      "expected_drop_dir": "data/manual/hud_drgr/",
+      "expected_filename_pattern": "*.csv",
+      "expected_columns": [
+        "grant_number",
+        "grantee_name",
+        "project_id",
+        "project_name",
+        "activity_id",
+        "activity_name",
+        "responsible_organization",
+        "budget",
+        "obligated",
+        "drawdown",
+        "status"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "reject_if_missing"
+        },
+        {
+          "rule": "row_count_min",
+          "value": 1,
+          "action": "warn_if_below"
+        },
+        {
+          "rule": "header_only_check",
+          "action": "reject_if_header_only"
+        }
+      ],
+      "notes": "HUD DRGR authorized exports. Operator logs into DRGR portal and exports allocation/budget/drawdown/obligation tables."
+    },
+    {
+      "source_id": "fema_178_pw_portal",
+      "expected_drop_dir": "data/manual/fema_178_pw/",
+      "expected_filename_pattern": "*.xlsx|*.csv",
+      "expected_columns": [
+        "pw_number",
+        "project_name",
+        "applicant",
+        "subrecipient",
+        "municipality",
+        "federal_share_obligated",
+        "federal_share_paid",
+        "status",
+        "disaster_number"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "reject_if_missing"
+        },
+        {
+          "rule": "row_count_min",
+          "value": 1,
+          "action": "warn_if_below"
+        }
+      ],
+      "notes": "FEMA Public Assistance 178-PW Excel exports from the authorized PA portal. OpenFEMA v2 is preferred; 178-PW is the supplement."
+    },
+    {
+      "source_id": "pr_corporate_registry",
+      "expected_drop_dir": "data/raw/Active Contractor Listing/",
+      "expected_filename_pattern": "*.csv|*.xlsx",
+      "expected_columns": [
+        "registration_number",
+        "entity_name",
+        "status",
+        "registered_agent",
+        "principal_address",
+        "registration_date"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "reject_if_missing"
+        }
+      ],
+      "notes": "PR Department of State corporate registry (rceweb.estado.pr.gov). No public bulk API."
+    },
+    {
+      "source_id": "act_transition_contracts",
+      "expected_drop_dir": "data/raw/act_transition/",
+      "expected_filename_pattern": "transition_contracts_extracted.csv|*.csv|*.xlsx|*.pdf",
+      "expected_columns": [
+        "contractor_name",
+        "contract_number",
+        "start_date",
+        "end_date",
+        "amount",
+        "service_type"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "PR ACT transition contracts (Autopistas de Puerto Rico, Autopistas Metropolitanas, Ferrovial Agroman, LPC&D, etc.). Long-horizon concession entries."
+    },
+    {
+      "source_id": "acuden_2024_transition",
+      "expected_drop_dir": "data/raw/act_transition/",
+      "expected_filename_pattern": "transition_contracts_extracted.csv|*.csv|*.xlsx",
+      "expected_columns": [
+        "contract_number",
+        "contractor",
+        "start_date",
+        "end_date",
+        "amount",
+        "service_type"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "ACUDEN 2024 transition contract file. Mostly transfer-of-funds contracts to municipalities, daycare operators, nonprofits, and individuals."
+    },
+    {
+      "source_id": "dcaa_active_contractors",
+      "expected_drop_dir": "data/raw/Active Contractor Listing/",
+      "expected_filename_pattern": "*.csv|*.xlsx|*.pdf",
+      "expected_columns": [
+        "contractor_name",
+        "address",
+        "office_code",
+        "cage",
+        "duns",
+        "phone",
+        "fiscal_year"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "DCAA FY2007 / FY2012 / FY2013 active contractor listings. Historical entity-resolution aid and alias/crosswalk source. Use only when matched to PR-relevant entities."
+    },
+    {
+      "source_id": "sba_disaster_loans_pr",
+      "expected_drop_dir": "data/manual/sba_disaster_loans/",
+      "expected_filename_pattern": "*.xlsx",
+      "expected_columns": [
+        "physical_declaration_number",
+        "eidl_declaration_number",
+        "fema_disaster_number",
+        "sba_disaster_number",
+        "damaged_property_city",
+        "zip_code",
+        "municipality",
+        "verified_loss_amount",
+        "approved_loan_amount",
+        "eidl_amount"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "reject_if_missing"
+        },
+        {
+          "rule": "row_count_min",
+          "value": 1,
+          "action": "warn_if_below"
+        }
+      ],
+      "notes": "SBA Disaster Loan Data for Puerto Rico workbook (FY22 Home + FY22 Business sheets). Verified-loss vs. approved-loan gap analysis for disaster recovery assistance. Distinct from the automated sba_loans CKAN pull (scripts/download_sba.py) \u2014 this is a richer, manually-sourced workbook."
+    },
+    {
+      "source_id": "act_toll_revenue",
+      "expected_drop_dir": "data/manual/act_toll_revenue/",
+      "expected_filename_pattern": "*.csv|*.xlsx",
+      "expected_columns": [
+        "fiscal_year",
+        "revenue_category",
+        "amount"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        },
+        {
+          "rule": "row_count_min",
+          "value": 1,
+          "action": "warn_if_below"
+        }
+      ],
+      "notes": "Aggregate ACT/AutoExpreso/Metropistas toll revenue exported from audited financials or EMMA disclosures. Aggregate only \u2014 no individual crossings."
+    },
+    {
+      "source_id": "ports_airports_revenue",
+      "expected_drop_dir": "data/manual/ports_airports_revenue/",
+      "expected_filename_pattern": "*.csv|*.xlsx",
+      "expected_columns": [
+        "fiscal_year",
+        "revenue_category",
+        "amount"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "Aggregate PR Ports Authority / Aerostar (SJU) fee revenue."
+    },
+    {
+      "source_id": "transit_fare_revenue",
+      "expected_drop_dir": "data/manual/transit_fare_revenue/",
+      "expected_filename_pattern": "*.csv|*.xlsx",
+      "expected_columns": [
+        "fiscal_year",
+        "revenue_category",
+        "amount"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "Aggregate AMA bus / Tren Urbano (ATI) farebox revenue."
+    },
+    {
+      "source_id": "prasa_rate_revenue",
+      "expected_drop_dir": "data/manual/prasa_rate_revenue/",
+      "expected_filename_pattern": "*.csv|*.xlsx",
+      "expected_columns": [
+        "fiscal_year",
+        "revenue_category",
+        "amount"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "Aggregate PRASA water/sewer rate revenue."
+    },
+    {
+      "source_id": "prepa_luma_rate_revenue",
+      "expected_drop_dir": "data/manual/prepa_rate_revenue/",
+      "expected_filename_pattern": "*.csv|*.xlsx",
+      "expected_columns": [
+        "fiscal_year",
+        "revenue_category",
+        "amount"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "Aggregate PREPA/LUMA power rate revenue."
+    },
+    {
+      "source_id": "dtop_road_contracts",
+      "expected_drop_dir": "data/manual/dtop_road_contracts/",
+      "expected_filename_pattern": "*.csv|*.xlsx|*.pdf",
+      "expected_columns": [
+        "vendor_name",
+        "contract_value",
+        "award_date"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "DTOP/ACT permanent road construction & maintenance contracts. OCPR agency code 032."
+    },
+    {
+      "source_id": "ports_airports_contracts",
+      "expected_drop_dir": "data/manual/ports_airports_contracts/",
+      "expected_filename_pattern": "*.csv|*.xlsx|*.pdf",
+      "expected_columns": [
+        "vendor_name",
+        "contract_value",
+        "award_date"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "PR Ports Authority / Aerostar contracts. Also fed by the acquired completed_projects_AAA.pdf."
+    },
+    {
+      "source_id": "transit_contracts",
+      "expected_drop_dir": "data/manual/transit_contracts/",
+      "expected_filename_pattern": "*.csv|*.xlsx|*.pdf",
+      "expected_columns": [
+        "vendor_name",
+        "contract_value",
+        "award_date"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        }
+      ],
+      "notes": "AMA / Tren Urbano (ATI) operating and O&M contracts."
+    },
+    {
+      "source_id": "cor3",
+      "expected_drop_dir": "data/raw/COR3/",
+      "expected_filename_pattern": "COR3 Transparency Portal_*.xlsx",
+      "expected_columns": [
+        "project_id",
+        "applicant_name",
+        "program",
+        "municipality",
+        "total_approved",
+        "total_disbursed",
+        "status"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        },
+        {
+          "rule": "row_count_min",
+          "value": 1,
+          "action": "warn_if_below"
+        },
+        {
+          "rule": "header_only_check",
+          "action": "reject_if_header_only"
+        }
+      ],
+      "notes": "recovery.pr.gov transparency portal exports (Financial Summary / Procurement Inventory / RFP and Contracts). Portal serves empty bodies to non-browser clients (JS/WAF) \u2014 operator exports the Excel workbooks in a browser and drops them here; scripts/ingest_cor3.py normalizes them. Quarterly cadence."
+    },
+    {
+      "source_id": "prasa",
+      "expected_drop_dir": "data/raw/PRASA/",
+      "expected_filename_pattern": "*.csv|*.xlsx",
+      "expected_columns": [
+        "contract_id",
+        "vendor_name",
+        "contract_type",
+        "contract_value",
+        "award_date",
+        "status"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        },
+        {
+          "rule": "row_count_min",
+          "value": 1,
+          "action": "warn_if_below"
+        },
+        {
+          "rule": "header_only_check",
+          "action": "reject_if_header_only"
+        }
+      ],
+      "notes": "PRASA procurement exports (acueductospr.com serves HTML only; no export endpoint). Operator delivers procurement files; bilingual headers accepted (Contrato/Contratista). PRASA bonds are covered separately by the automated emma_bonds source. Yearly cadence (CER/CIP siblings are ad_hoc via prasa_cer)."
+    },
+    {
+      "source_id": "oficina_contralor",
+      "expected_drop_dir": "data/raw/Oficina del Contralor/",
+      "expected_filename_pattern": "*.csv|*.xlsx",
+      "expected_columns": [
+        "entity_name",
+        "audit_id",
+        "audit_type",
+        "audit_year",
+        "finding_count",
+        "municipality"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        },
+        {
+          "rule": "row_count_min",
+          "value": 1,
+          "action": "warn_if_below"
+        },
+        {
+          "rule": "header_only_check",
+          "action": "reject_if_header_only"
+        }
+      ],
+      "notes": "OCPR audit reports/findings (ocpr.gov.pr). This source is audit reports only \u2014 the contract registry (consultacontratos.ocpr.gov.pr, server-rendered ASP.NET, no public JSON endpoint) is the separate ocpr_contracts source. Monthly cadence."
+    },
+    {
+      "source_id": "pr_cabilderos",
+      "expected_drop_dir": "data/raw/Cabilderos/",
+      "expected_filename_pattern": "*.csv|*.xlsx",
+      "expected_columns": [
+        "lobbyist_name",
+        "client_name",
+        "registration_year",
+        "agency_lobbied"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        },
+        {
+          "rule": "row_count_min",
+          "value": 1,
+          "action": "warn_if_below"
+        },
+        {
+          "rule": "header_only_check",
+          "action": "reject_if_header_only"
+        }
+      ],
+      "notes": "OEG lobbyist (cabildero) registry. The registry host etica.pr.gov is dead (gateway 502, probe 2026-07-04); the OEG's live site is eticapr.com, which exposes ethics datasets via Zoho dashboards but no lobbyist-registry export \u2014 request the export via the OEG public-information channel (eticapr.com/nuestra-oficina/acceso-informacion-publica). Bilingual headers accepted (Nombre Cabildero/Cliente). Quarterly cadence."
+    },
+    {
+      "source_id": "donaciones_pr",
+      "expected_drop_dir": "data/raw/Donaciones/",
+      "expected_filename_pattern": "Donaciones_*.csv|*.csv",
+      "expected_columns": [
+        "donor_name",
+        "amount",
+        "date"
+      ],
+      "validation_rules": [
+        {
+          "rule": "required_columns",
+          "action": "warn_if_missing"
+        },
+        {
+          "rule": "row_count_min",
+          "value": 1,
+          "action": "warn_if_below"
+        },
+        {
+          "rule": "header_only_check",
+          "action": "reject_if_header_only"
+        }
+      ],
+      "notes": "CEE (ceepur.org) campaign-donation exports. Manual portal export; the 2026-03-20 export (Donaciones_20260320.csv, 4,686 rows) is the current attested snapshot per the donaciones_pr coverage contract. Bilingual headers accepted; scripts/ingest_donaciones.py maps Zip Code, Siglas, Candidatura, M\u00e9todo, and Evento. Retain original CEE identifiers."
+    }
+  ]
+}

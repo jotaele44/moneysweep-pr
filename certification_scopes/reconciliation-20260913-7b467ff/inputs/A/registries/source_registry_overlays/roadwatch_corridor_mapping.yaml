@@ -1,0 +1,125 @@
+version: "1.0"
+schema_version: "r5_source_registry_overlay_v1"
+
+# PROMOTED — these five sources now live in registries/source_registry.yaml and are
+# counted by the live registry. This file is retained as the historical definition
+# record; it is NOT loaded at runtime, and edits here have no effect. Change the
+# main registry instead, then run:
+#   python scripts/regenerate_registry_json.py
+#   python scripts/build_source_recovery_matrix.py   # readiness truth + source_ids_sha256
+#
+# RoadWatch corridor mapping (see docs/ROADWATCH_CORRIDOR_MAPPING.md).
+# Four upstream roadway reference sources feed one derived corridor-join ledger
+# that maps federally-funded roadway projects onto the RoadWatch segment network.
+# The producer scripts were implemented across PRs #402 (join), #404 (DTOP) and
+# #405 (STIP/TIP + FHWA HPMS/NBI), which is what unblocked this promotion.
+
+sources:
+  - source_id: dtop_centerline_lrs
+    family: infrastructure
+    required: false
+    tier: T2_operational
+    role: roadwatch_segment_geometry
+    authentication: manual_export
+    endpoint_url: https://www.mct.pr.gov/
+    producer_script: scripts/ingest_dtop_centerline_lrs.py
+    expected_outputs:
+      - data/staging/processed/pr_roadwatch_segments.csv
+    schema_version: r5_roadwatch_segment_v1
+    manual_drop_dir: data/manual/dtop_centerline_lrs/
+    validation_threshold:
+      min_rows: 1
+    update_cadence: yearly
+    notes: |
+      DTOP/ACT roadway centerline linear-referencing system (LRS) with km
+      stationing. Source of the RoadWatch segment network geometry and the
+      route-km measures used to place projects. Operator-dropped export;
+      reconcile the CRS (commonly EPSG:32161) before spatial join.
+
+  - source_id: fhwa_hpms_routes
+    family: infrastructure
+    required: false
+    tier: T2_operational
+    role: roadwatch_route_reference
+    authentication: none
+    endpoint_url: https://geo.dot.gov/server/rest/services/Hosted
+    producer_script: scripts/ingest_fhwa_hpms_routes.py
+    expected_outputs:
+      - data/staging/processed/pr_hpms_routes.csv
+    schema_version: r5_roadwatch_segment_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: yearly
+    notes: |
+      FHWA Highway Performance Monitoring System (HPMS) route geometry for
+      Puerto Rico, served via ArcGIS REST. Cross-check route_id and stationing
+      against the DTOP centerline LRS; secondary geometry authority.
+
+  - source_id: fhwa_nbi_bridges
+    family: infrastructure
+    required: false
+    tier: T2_operational
+    role: roadwatch_structure_reference
+    authentication: none
+    endpoint_url: https://www.fhwa.dot.gov/bridge/nbi.cfm
+    producer_script: scripts/ingest_fhwa_nbi_bridges.py
+    expected_outputs:
+      - data/staging/processed/pr_nbi_bridges.csv
+    schema_version: r5_roadwatch_segment_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: yearly
+    notes: |
+      FHWA National Bridge Inventory (NBI) ASCII/CSV for Puerto Rico. Provides
+      point structures with route + km; used to anchor bridge-scoped projects to
+      the nearest RoadWatch segment (join_method nbi_structure_point).
+
+  - source_id: stip_tip_projects
+    family: infrastructure
+    required: false
+    tier: T2_operational
+    role: roadwatch_project_table
+    authentication: manual_export
+    endpoint_url: https://www.mct.pr.gov/
+    producer_script: scripts/ingest_stip_tip_projects.py
+    expected_outputs:
+      - data/staging/processed/pr_stip_tip_projects.csv
+    schema_version: r5_infrastructure_projects_v1
+    manual_drop_dir: data/manual/stip_tip_projects/
+    validation_threshold:
+      min_rows: 1
+    update_cadence: yearly
+    notes: |
+      STIP/TIP project tables (e.g. Amendment 5, FY2023-26) and bid plans,
+      typically distributed as PDF. Parse with Tabula/Camelot into
+      infrastructure_projects rows carrying route_id and km extents where stated.
+
+  - source_id: roadwatch_corridor_join
+    family: infrastructure
+    required: false
+    tier: T2_operational
+    role: corridor_join_ledger
+    authentication: none
+    endpoint_url: ""
+    producer_script: scripts/build_roadwatch_corridor_join.py
+    expected_outputs:
+      - data/staging/processed/roadwatch_corridor_join_candidates.csv
+    schema_version: r5_roadwatch_corridor_join_v1
+    depends_on:
+      - dtop_centerline_lrs
+      - fhwa_hpms_routes
+      - fhwa_nbi_bridges
+      - stip_tip_projects
+    validation_threshold:
+      min_rows: 1
+      manual_review_required: true
+    update_cadence: yearly
+    promotion_rule: cross_confirmed_only
+    canonical_required: true
+    notes: |
+      Derived corridor-join ledger. Maps STIP/TIP roadway projects onto the
+      RoadWatch segment network via route-km measures and spatial overlay, then
+      promotes route-only projects to segment-level candidates. Each row is a
+      manual-review candidate until accepted; a valid Cell_ID on both sides is
+      required before cross-repo promotion (docs/SPATIAL_OVERLAY_JOIN_RULES.md).
+      Modelled on the legislative_fiscal_link_candidates link-candidate ledger.

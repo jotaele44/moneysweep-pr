@@ -1,0 +1,57 @@
+{
+  "registry_version": "capital_control_golden_cases_v1",
+  "issuer_bindings": [
+    {
+      "ticker": "BPOP",
+      "issuer_id": "ISSUER_CIK_0000763901",
+      "cik": "0000763901",
+      "canonical_name": "POPULAR, INC.",
+      "cusip": "733174700",
+      "role": "GOLDEN_CASE",
+      "cusip_evidence": "SEC Schedule 13G / Form 13F"
+    },
+    {
+      "ticker": "OFG",
+      "issuer_id": "ISSUER_CIK_0001030469",
+      "cik": "0001030469",
+      "canonical_name": "OFG BANCORP",
+      "cusip": "67103X102",
+      "role": "REGRESSION",
+      "cusip_evidence": "SEC Form 13F"
+    },
+    {
+      "ticker": "EVTC",
+      "issuer_id": "ISSUER_CIK_0001559865",
+      "cik": "0001559865",
+      "canonical_name": "EVERTEC, Inc.",
+      "cusip": "30040P103",
+      "role": "REGRESSION",
+      "cusip_evidence": "SEC Form 13F"
+    }
+  ],
+  "negative_identity_rules": [
+    "OFG must not bind to CIK 0001016178",
+    "EVTC must not be satisfied by ticker EVRI",
+    "name normalization is not identity evidence"
+  ],
+  "bpop_required_periods": [
+    "2024-06-30",
+    "2024-09-30",
+    "2024-12-31",
+    "2025-03-31",
+    "2025-06-30",
+    "2025-09-30",
+    "2025-12-31",
+    "2026-03-31"
+  ],
+  "bpop_required_archives": [
+    "01jun2024-31aug2024_form13f.zip",
+    "01sep2024-30nov2024_form13f.zip",
+    "01dec2024-28feb2025_form13f.zip",
+    "01mar2025-31may2025_form13f.zip",
+    "01jun2025-31aug2025_form13f.zip",
+    "01sep2025-30nov2025_form13f.zip",
+    "01dec2025-28feb2026_form13f.zip",
+    "01mar2026-31may2026_form13f.zip"
+  ]
+}

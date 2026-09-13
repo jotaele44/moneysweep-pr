@@ -1,0 +1,66 @@
+version: "1.0"
+schema_version: "r5_source_registry_overlay_v1"
+
+# Pending merge into registries/source_registry.yaml after live materialization,
+# schema validation and current-head CI. These sources close guide-bounded source
+# route gaps only; their presence does not certify GUIDE_BOUNDED_100_PERCENT.
+sources:
+  - source_id: ocif_guide_financial_classes
+    family: financial_regulation
+    required: false
+    authentication: none
+    endpoint_url: https://concesionarios.ocif.pr.gov/es/License/Index
+    producer_script: scripts/scrape_ocif_guide_financial_classes.py
+    expected_outputs:
+      - data/staging/processed/pr_ocif_guide_financial_classes.csv
+    schema_version: r5_ocif_license_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: monthly
+    canonical_required: true
+    notes: >-
+      Official OCIF concessionaire registry. Initial guide-bounded classes are
+      ENTIDAD FINANCIERA INTERNACIONAL, FONDO DE CAPITAL PRIVADO LEY 185-2014,
+      EXEMPT REPORTING ADVISORS and INVESTMENT ADVISOR. Preserve license type and
+      license number exactly. A license/adviser record must never be promoted to
+      a fund, beneficial-owner or investment-company identity without an
+      authoritative binding.
+
+  - source_id: ocs_insurer_registry
+    family: financial_regulation
+    required: false
+    authentication: none
+    endpoint_url: https://www.ocs.pr.gov/consumidores/aseguradores-del-pais
+    producer_script: scripts/scrape_ocs_insurers.py
+    expected_outputs:
+      - data/staging/processed/pr_ocs_insurers.csv
+      - data/staging/processed/pr_ocs_insurer_annual_reports.csv
+    schema_version: r5_ocs_insurer_v1
+    validation_threshold:
+      min_rows: 1
+    update_cadence: quarterly
+    canonical_required: true
+    notes: >-
+      Official Puerto Rico Office of the Commissioner of Insurance domestic
+      insurer list plus annual financial-report index. The annual-report index
+      supplies temporal corroboration and exposes reinsurance entities, but name
+      similarity alone never binds an insurer to an Act 60 incentive decree.
+
+  - source_id: ftz_board_pr
+    family: federal_financial_incentive
+    required: false
+    authentication: none
+    endpoint_url: https://ofis.trade.gov/
+    producer_script: scripts/scrape_ftz_board_pr.py
+    expected_outputs:
+      - data/staging/processed/pr_ftz_zones_sites.csv
+    schema_version: r5_ftz_pr_v1
+    validation_threshold:
+      min_rows: 3
+    update_cadence: quarterly
+    canonical_required: true
+    notes: >-
+      U.S. Foreign-Trade Zones Board OFIS public zone/site data for Puerto Rico.
+      The frozen discovery denominator is Zones 7, 61 and 163; the producer
+      verifies those zone numbers from authoritative detail pages and fails
+      closed if any expected zone is missing or replaced.

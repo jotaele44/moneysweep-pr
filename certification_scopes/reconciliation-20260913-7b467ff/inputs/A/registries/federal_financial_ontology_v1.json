@@ -1,0 +1,267 @@
+{
+  "schema_version": "federal_financial_ontology_v1",
+  "status": "candidate_for_certification",
+  "scope": {
+    "root": "federal_financial_flow",
+    "separates": [
+      "federal_financial_assistance",
+      "federal_procurement",
+      "federal_account_non_award_spending"
+    ],
+    "population_policy": "ontology_first_population_second",
+    "historical_ids_immutable": true
+  },
+  "authoritative_denominators": [
+    {
+      "source": "SAM.gov Assistance Listings",
+      "role": "federal_assistance_program_denominator",
+      "url": "https://sam.gov/assistance-listings",
+      "snapshot_as_of": "2026-08-10"
+    },
+    {
+      "source": "USAspending award type reference API",
+      "role": "award_instrument_code_denominator",
+      "url": "https://api.usaspending.gov/api/v2/references/award_types/",
+      "snapshot_as_of": "2026-08-10",
+      "granular_code_count": 33
+    }
+  ],
+  "object_kinds": [
+    "program",
+    "award",
+    "award_action",
+    "subaward",
+    "entity",
+    "account",
+    "project",
+    "financial_flow",
+    "identifier",
+    "program_pr_nexus",
+    "coverage_audit"
+  ],
+  "award_type_groups": {
+    "contracts": {
+      "A": "BPA Call",
+      "B": "Purchase Order",
+      "C": "Delivery Order",
+      "D": "Definitive Contract"
+    },
+    "loans": {
+      "07": "Direct Loan",
+      "08": "Guaranteed/Insured Loan",
+      "F003": "Direct Loan",
+      "F004": "Loan Guarantee"
+    },
+    "idvs": {
+      "IDV_A": "GWAC Government Wide Acquisition Contract",
+      "IDV_B": "IDC Multi-Agency Contract, Other Indefinite Delivery Contract",
+      "IDV_B_A": "IDC Indefinite Delivery Contract / Requirements",
+      "IDV_B_B": "IDC Indefinite Delivery Contract / Indefinite Quantity",
+      "IDV_B_C": "IDC Indefinite Delivery Contract / Definite Quantity",
+      "IDV_C": "FSS Federal Supply Schedule",
+      "IDV_D": "BOA Basic Ordering Agreement",
+      "IDV_E": "BPA Blanket Purchase Agreement"
+    },
+    "grants": {
+      "02": "Block Grant",
+      "03": "Formula Grant",
+      "04": "Project Grant",
+      "05": "Cooperative Agreement",
+      "F001": "Grant",
+      "F002": "Cooperative Agreement"
+    },
+    "other_financial_assistance": {
+      "09": "Insurance",
+      "F005": "Indemnity / Insurance (non-loan)",
+      "11": "Other Financial Assistance",
+      "-1": "Not Specified",
+      "F008": "Asset Forfeiture / Equitable Sharing",
+      "F009": "Sale, Exchange, or Donation of Property and Goods",
+      "F010": "Other Financial Assistance"
+    },
+    "direct_payments": {
+      "06": "Direct Payment for Specified Use",
+      "10": "Direct Payment with Unrestricted Use",
+      "F006": "Direct Payment for Specified Use",
+      "F007": "Direct Payment with Unrestricted Use"
+    }
+  },
+  "canonical_instrument_families": {
+    "financial_assistance": [
+      "block_grant",
+      "formula_grant",
+      "project_grant",
+      "grant",
+      "cooperative_agreement",
+      "direct_loan",
+      "loan_guarantee",
+      "guaranteed_or_insured_loan",
+      "insurance",
+      "indemnity_or_insurance",
+      "direct_payment_specified_use",
+      "direct_payment_unrestricted_use",
+      "asset_forfeiture_equitable_sharing",
+      "sale_exchange_or_donation_property_goods",
+      "other_financial_assistance",
+      "not_specified"
+    ],
+    "procurement": [
+      "bpa_call",
+      "purchase_order",
+      "delivery_order",
+      "definitive_contract",
+      "gwac",
+      "idc_multi_agency_or_other",
+      "idc_requirements",
+      "idc_indefinite_quantity",
+      "idc_definite_quantity",
+      "federal_supply_schedule",
+      "basic_ordering_agreement",
+      "blanket_purchase_agreement"
+    ],
+    "non_award_account_spending": [
+      "account_balance",
+      "account_program_activity_object_class",
+      "account_breakdown_by_award"
+    ]
+  },
+  "identifier_schemes": [
+    {
+      "id": "federal_assistance_id",
+      "scope": "program",
+      "historical_aliases": [
+        "cfda_number",
+        "aln"
+      ],
+      "temporal": true
+    },
+    {
+      "id": "fain",
+      "scope": "assistance_award",
+      "temporal": false
+    },
+    {
+      "id": "uri",
+      "scope": "assistance_award",
+      "temporal": false
+    },
+    {
+      "id": "usaspending_unique_award_key",
+      "scope": "award",
+      "temporal": false
+    },
+    {
+      "id": "generated_unique_award_id",
+      "scope": "award",
+      "temporal": false
+    },
+    {
+      "id": "piid",
+      "scope": "procurement_award",
+      "temporal": false
+    },
+    {
+      "id": "parent_award_id",
+      "scope": "procurement_parent_award",
+      "temporal": false
+    },
+    {
+      "id": "uei",
+      "scope": "entity",
+      "temporal": true
+    },
+    {
+      "id": "legacy_duns",
+      "scope": "entity",
+      "temporal": true
+    },
+    {
+      "id": "subaward_number",
+      "scope": "subaward",
+      "temporal": false
+    },
+    {
+      "id": "modification_number",
+      "scope": "award_action",
+      "temporal": false
+    },
+    {
+      "id": "treasury_account_symbol",
+      "scope": "account",
+      "temporal": true
+    },
+    {
+      "id": "federal_account_code",
+      "scope": "account",
+      "temporal": true
+    },
+    {
+      "id": "program_activity_code",
+      "scope": "account_program_activity",
+      "temporal": true
+    },
+    {
+      "id": "defc",
+      "scope": "funding_authority_tag",
+      "temporal": true
+    }
+  ],
+  "hard_invariants": [
+    "program_identifier_not_equal_award_identifier",
+    "award_identifier_not_equal_entity_identifier",
+    "award_action_identifier_not_equal_award_identifier",
+    "subaward_identifier_not_equal_prime_award_identifier",
+    "account_identifier_not_equal_award_identifier",
+    "eligibility_not_equal_puerto_rico_activity",
+    "obligation_not_equal_outlay",
+    "award_not_equal_cash_movement",
+    "historical_identifier_values_are_append_only",
+    "no_fuzzy_binding_of_hard_identifiers"
+  ],
+  "pr_nexus_states": [
+    "confirmed_pr_activity",
+    "pr_eligible_no_activity_recovered",
+    "not_pr_applicable",
+    "historical",
+    "unresolved",
+    "requires_award_level_test"
+  ],
+  "financial_flow_types": [
+    "obligation",
+    "deobligation",
+    "outlay",
+    "disbursement",
+    "cost_share",
+    "matching",
+    "repayment",
+    "loan_subsidy_cost",
+    "transfer",
+    "reimbursement",
+    "non_award_account_spending",
+    "revenue",
+    "other"
+  ],
+  "bridge_to_existing_contract": {
+    "legacy_award_id_policy": "preserve_existing_award_id_unchanged",
+    "new_identifier_binding": "attach namespaced identifiers through identifier objects",
+    "legacy_funding_awards_stream": "projection_not_source_of_identifier_semantics",
+    "global_fain_backfill_gate": "blocked_until_ontology_certified"
+  },
+  "acceptance_topologies": [
+    "doe_40101d_formula_grant",
+    "fema_financial_assistance",
+    "hud_block_grant",
+    "sba_direct_loan",
+    "loan_guarantee",
+    "direct_payment",
+    "insurance_or_indemnity",
+    "federal_procurement"
+  ],
+  "certification_targets": {
+    "instrument_ontology_coverage_pct": 100,
+    "identifier_ontology_coverage_pct": 100,
+    "program_denominator_classification_pct": 100,
+    "unadjudicated_identifier_conflicts": 0,
+    "special_case_schema_mutations": 0
+  }
+}
