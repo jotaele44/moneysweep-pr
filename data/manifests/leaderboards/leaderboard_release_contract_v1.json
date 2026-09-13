@@ -26,12 +26,12 @@
     {
       "id": "CERTIFIED_DEBT_SNAPSHOT",
       "state": "OPEN",
-      "reason": "The production scope is bounded to debt_issuance; one current frozen snapshot must satisfy scope accounting/identity/runtime gates and be promoted to PASS by an explicit certification receipt."
+      "reason": "The production scope is bounded to debt_issuance; one current frozen snapshot must satisfy scope accounting/identity/runtime gates and be promoted to PASS by the scoped certifier."
     },
     {
       "id": "THEHUB_EXACT_REPLAY",
       "state": "OPEN",
-      "reason": "TheHub PR #285 is prepared; exact producer package replay with trusted receipt/release hashes remains to be executed after a PASS producer snapshot exists."
+      "reason": "TheHub PR #285 is prepared; exact producer package replay must trust receipt, release, scope, and package SHA-256 values after producer certification."
     }
   ],
   "closed_scope_decisions": [
@@ -43,7 +43,17 @@
     {
       "id": "HISTORICAL_SOURCE_DISCOVERY",
       "state": "PASS",
-      "reason": "Repository history supplies a real debt source transition from 11 instruments/5 issuers to 20 instruments/full issuer coverage; replay code preserves this as source expansion rather than automatic economic activity."
+      "reason": "Repository history supplies a real debt source transition from 11 instruments/5 issuers to 20 instruments/14 issuers; replay preserves this as a dataset delta rather than automatic economic activity."
+    },
+    {
+      "id": "CERTIFICATION_RUNTIME_MODEL",
+      "state": "PASS",
+      "reason": "Ranking runtime and certification/release runtime are separately manifested to avoid circular release hashes; the exported package carries the certification-runtime manifest and digest."
+    },
+    {
+      "id": "EXACT_PACKAGE_TRUST_MODEL",
+      "state": "PASS",
+      "reason": "TheHub consumer requires the exact package SHA-256 in addition to receipt, release-manifest, and certification-scope SHA-256 trust bindings."
     }
   ],
   "required_gates": [
@@ -64,13 +74,16 @@
     "SNAPSHOT_COMPLETE_CANDIDATE_UNIVERSE",
     "SNAPSHOT_COMPARABILITY",
     "SOURCE_CHANGE_MOVEMENT_GUARD",
-    "RUNTIME_MANIFEST_FROZEN",
+    "RANKING_RUNTIME_MANIFEST_FROZEN",
+    "CERTIFICATION_RUNTIME_MANIFEST_FROZEN",
     "PRODUCER_COMMIT_BOUND",
+    "SOURCE_MANIFESTATION_HASHES_EXPORTED",
     "ENTITY_DRILLDOWN_WHOLE_ROW_CONSERVATION",
     "SPATIAL_HANDOFF_NO_GEOMETRY_PROMOTION",
     "THEHUB_CONSUMER_CONTRACT",
     "CROSS_REPOSITORY_REPLAY",
-    "RELEASE_MANIFEST_HASHES",
+    "RECEIPT_RELEASE_SCOPE_HASH_TRUST",
+    "EXACT_PACKAGE_SHA256_TRUST",
     "ZERO_MATERIAL_UNRESOLVED_RESIDUE_INSIDE_CERTIFIED_SCOPE"
   ],
   "implemented_surfaces": {
@@ -83,7 +96,11 @@
     ],
     "snapshot_materializer": "scripts/materialize_leaderboard_snapshot.py",
     "git_history_materializer": "scripts/materialize_leaderboard_git_snapshot.py",
+    "snapshot_certifier": "scripts/certify_leaderboard_snapshot.py",
+    "release_finalizer": "scripts/finalize_leaderboard_release.py",
+    "certification_runtime_provenance": "scripts/leaderboard_release_provenance.py",
     "certification_scope": "data/manifests/leaderboards/leaderboard_certification_scope_v1.json",
+    "history_source_refs": "data/manifests/leaderboards/debt_history_source_refs_v1.json",
     "certification_receipt": "data/manifests/leaderboards/MONEYSWEEP_LEADERBOARD_CERTIFICATION.json",
     "ontology_adapter_coverage": "data/manifests/leaderboards/ontology_adapter_coverage_v1.json",
     "federation_exporter": "scripts/export_leaderboard_package.py",
@@ -98,8 +115,10 @@
     "thehub_is_cross_producer_product_surface": true,
     "spiderweb_is_geometry_authority": true,
     "thehub_must_not_recompute_money_sweep_rankings": true,
-    "thehub_must_verify_producer_contract_and_release_receipt": true,
+    "thehub_must_verify_receipt_release_scope_and_exact_package_hashes": true,
     "snapshot_runtime_and_producer_commit_must_match_export": true,
+    "certification_runtime_manifest_must_be_frozen": true,
+    "source_and_runtime_manifestations_must_be_exported": true,
     "provisional_snapshots_cannot_be_promoted": true,
     "diagnostic_ui_does_not_imply_certification": true
   }
