@@ -18,25 +18,30 @@ jobs:
   lock-sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: "3.11"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
 
       - name: Assert isolated checkout
         run: test ! -e "$GITHUB_WORKSPACE/../thehub-pr"
 
-      - name: Recompile the lockfile
-        run: uv pip compile requirements.in --universal --python-version 3.11 -o requirements.lock
+      - name: Validate committed dependency profiles
+        run: python3 scripts/validate_dependency_planes.py
+
+      - name: Recompile the runtime lockfile
+        run: |
+          uv pip compile requirements.in --universal --python-version 3.11 -o requirements.lock
+          python3 scripts/validate_dependency_planes.py
 
       - name: Upload regenerated lock candidate
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: requirements-lock-python311
           path: requirements.lock

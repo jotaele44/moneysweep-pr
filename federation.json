@@ -29,7 +29,8 @@
     }
   },
   "hub_callable_commands": {
-    "setup": "python3 -m pip install -r requirements.txt && python3 run_all.py --only-setup",
+    "setup": "python3 -m pip install -r requirements-dev.txt && python3 run_all.py --only-setup",
+    "runtime_setup": "python3 -m pip install -r requirements.txt && python3 run_all.py --only-setup",
     "strict_preflight": "python3 run_all.py --only-setup --strict-preflight",
     "full_pipeline": "python3 run_all.py --strict-preflight",
     "materialization_matrix": "python3 scripts/build_source_recovery_matrix.py",

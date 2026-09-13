@@ -8,15 +8,9 @@ on:
   schedule:
     - cron: "33 6 * * 1"   # Mondays 06:33 UTC
 
-# Least privilege: this workflow only reads the repo (and uploads artifacts,
-# which uses the runtime token, not GITHUB_TOKEN). Widen deliberately if a
-# step ever needs to write back.
 permissions:
   contents: read
 
-# Serialise runs on the same ref without cancelling. This workflow can
-# publish, write data, or hand off to another repo, and killing it
-# mid-flight risks leaving that work half-done.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
@@ -25,23 +19,24 @@ jobs:
   maintenance:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: "3.13"
           cache: pip
       - name: Assert isolated checkout
         run: test ! -e "$GITHUB_WORKSPACE/../thehub-pr"
-
+      - name: Validate dependency profiles
+        run: python3 scripts/validate_dependency_planes.py
       - name: Install
-        run: python -m pip install -r requirements.txt jsonschema
+        run: python -m pip install -r requirements-dev.txt jsonschema
       - name: Maintenance tests
         run: python -m pytest tests/test_maintenance.py -q -o addopts=""
       - name: Audit run
         run: python3 scripts/run_maintenance.py --repo moneysweep-pr --mode audit --json
       - name: Upload maintenance report
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: moneysweep-maintenance-report
           path: reports/maintenance/latest.json

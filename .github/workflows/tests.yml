@@ -27,9 +27,11 @@ jobs:
           cache: pip
       - name: Assert isolated checkout
         run: test ! -e "$GITHUB_WORKSPACE/../thehub-pr"
+      - name: Validate dependency profiles
+        run: python3 scripts/validate_dependency_planes.py
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt httpx jsonschema -r server/backend/requirements.txt
+          pip install -r requirements-dev.txt httpx jsonschema -r server/backend/requirements.txt
           test ! -e "$GITHUB_WORKSPACE/../thehub-pr"
       - name: Federation manifest gate
         run: |
@@ -48,7 +50,7 @@ jobs:
           assert manifest["program_id"] == "moneysweep-pr"
           assert manifest["hub_parent"] == "thehub-pr"
           commands = manifest["hub_callable_commands"]
-          assert "setup" in commands and "test_suite" in commands
+          assert "setup" in commands and "runtime_setup" in commands and "test_suite" in commands
           gate = manifest["federation_readiness_gate"]
           assert isinstance(gate.get("ready_for_hub_discovery"), bool)
           assert isinstance(gate.get("ready_for_hub_live_execution"), bool)
