@@ -1,0 +1,67 @@
+{
+  "certification_scope_note": "Frozen FTZ Board source manifestations establish this bounded public route only; they do not expand GUIDE_BOUNDED_100_PERCENT into ALL_PUERTO_RICO_FINANCE.",
+  "manifestations": [
+    {
+      "byte_size": 59081,
+      "content_type": "text/html; charset=utf-8",
+      "detail_id": 103,
+      "expected_zone": "007",
+      "http_status": 200,
+      "observed_zone": "007",
+      "raw_file": "zone_007_detail_103.html",
+      "retained_rows": 16,
+      "retrieved_at_utc": "2026-08-26T15:58:42+00:00",
+      "sha256": "6582dece0bae67a181b2d8ef524309a34d87c4839d704408916ffb8bf0e76a36",
+      "url": "https://ofis.trade.gov/Zones/Details/103"
+    },
+    {
+      "byte_size": 48783,
+      "content_type": "text/html; charset=utf-8",
+      "detail_id": 239,
+      "expected_zone": "061",
+      "http_status": 200,
+      "observed_zone": "061",
+      "raw_file": "zone_061_detail_239.html",
+      "retained_rows": 15,
+      "retrieved_at_utc": "2026-08-26T15:58:42+00:00",
+      "sha256": "61edd20f061ab1533f42a4a267c0794be0808cd7f70fc78ffb2054d7e8e8a246",
+      "url": "https://ofis.trade.gov/Zones/Details/239"
+    },
+    {
+      "byte_size": 44632,
+      "content_type": "text/html; charset=utf-8",
+      "detail_id": 115,
+      "expected_zone": "163",
+      "http_status": 200,
+      "observed_zone": "163",
+      "raw_file": "zone_163_detail_115.html",
+      "retained_rows": 13,
+      "retrieved_at_utc": "2026-08-26T15:58:42+00:00",
+      "sha256": "e381e1df7aece4110767a329844d4075b7271ea398718b30a060dfc4be2c0066",
+      "url": "https://ofis.trade.gov/Zones/Details/115"
+    }
+  ],
+  "processed_output": {
+    "byte_size": 13516,
+    "path": "data/staging/processed/pr_ftz_zones_sites.csv",
+    "row_count": 44,
+    "sha256": "04b580f677b5a44d7e9782da88f88966294ba007c15175cd3b9f7a0b705c3c7a"
+  },
+  "run_started_at_utc": "2026-08-26T15:58:41+00:00",
+  "schema_version": "guide_source_snapshot_manifest_v1",
+  "source_denominator": {
+    "expected_zone_count": 3,
+    "expected_zone_numbers": [
+      "007",
+      "061",
+      "163"
+    ],
+    "observed_zone_count": 3,
+    "observed_zone_numbers": [
+      "007",
+      "061",
+      "163"
+    ]
+  },
+  "source_id": "ftz_board_pr"
+}

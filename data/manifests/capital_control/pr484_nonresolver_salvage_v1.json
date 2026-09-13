@@ -1,0 +1,85 @@
+{
+  "salvage_id": "PR484_NONRESOLVER_SALVAGE_V1",
+  "control_issue": 526,
+  "source_pr": {
+    "number": 484,
+    "head_sha": "85dc4744173ebd26c68f2b904265c6c91497d5ad",
+    "disposition": "PARTIAL_SALVAGE",
+    "resolver_disposition": "SUPERSEDED_NONCANONICAL"
+  },
+  "base_main_sha": "df78f15f7c36b98bc6ecfae37c7e775ec487ead3",
+  "canonical_owner": "moneysweep.capital_control.resolution_core",
+  "canonical_core_materialization": {
+    "state": "EXTERNAL_CERTIFIED_DRAFT_NOT_MERGED",
+    "pr": 520,
+    "certified_sha": "5646ad6014959baf783b66c8dd497f1f518f207e",
+    "present_on_base_main": false
+  },
+  "scope": "selected non-resolver presentation, snapshot, schema-concept, and regression-assertion salvage only",
+  "promotion_state": "BLOCKED_PENDING_CANONICAL_CORE_INTEGRATION_AND_COMPLETE_RECERTIFICATION",
+  "items": [
+    {
+      "id": "exact-query-offline-snapshot",
+      "state": "IMPLEMENTED",
+      "paths": [
+        "dashboard/src/lib/api.js",
+        "scripts/gen_dashboard_snapshot.py"
+      ],
+      "claim": "offline lookup checks the complete request path before falling back to the unfiltered route key"
+    },
+    {
+      "id": "multi-issuer-comparison-presentation",
+      "state": "DEFERRED_DEPENDENCY_GATED",
+      "reason": "only independently certified issuer scopes may be compared; the UI must not synthesize or inherit certification across issuer universes"
+    },
+    {
+      "id": "identity-level-separation",
+      "state": "ALREADY_CANONICAL_REUSED",
+      "paths": [
+        "moneysweep/capital_control/models.py",
+        "moneysweep/capital_control/analytics.py",
+        "tests/test_capital_control_analytics.py"
+      ]
+    },
+    {
+      "id": "accessibility-and-reachability",
+      "state": "ALREADY_CANONICAL_REUSED",
+      "paths": [
+        "dashboard/tests/ownership-deep-dive.spec.mjs"
+      ]
+    },
+    {
+      "id": "holding-schema-concepts",
+      "state": "ALREADY_CANONICAL_REUSED",
+      "paths": [
+        "schemas/capital_control_holding_observation.schema.json",
+        "tests/test_capital_control_schema_contracts.py",
+        "tests/test_capital_control_schema_runtime_alignment.py"
+      ],
+      "note": "the older PR #484 schema is not adopted unchanged"
+    },
+    {
+      "id": "whole-row-and-tied-top-assertions",
+      "state": "ALREADY_CANONICAL_REUSED",
+      "paths": [
+        "tests/test_capital_control_analytics.py",
+        "tests/test_ownership_deep_dive.py"
+      ]
+    },
+    {
+      "id": "pr484-generic-backend-resolver",
+      "state": "SUPERSEDED_NONCANONICAL",
+      "prohibition": "do not port private amendment, comparison, schema-validation, or identity adjudication into server/backend/main.py"
+    }
+  ],
+  "prohibitions": [
+    "NO_DIRECT_PR484_MERGE",
+    "NO_DIRECT_PR484_CHERRY_PICK",
+    "NO_DUPLICATED_CANONICAL_RESOLVER",
+    "NO_NORMALIZED_NAME_IDENTITY_PROMOTION",
+    "NO_SYNTHETIC_HOLDINGS",
+    "NO_MERGE",
+    "NO_PRODUCTION_PROMOTION"
+  ],
+  "recertification_required": true
+}

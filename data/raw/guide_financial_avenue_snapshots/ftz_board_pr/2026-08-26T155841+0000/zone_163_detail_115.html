@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zone Details - FTZ</title>
+
+    <link rel='stylesheet' href='https://ftzstorageaccount.blob.core.windows.net/publicsiteassets/headerfooter.css' />
+    
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/lib/jquery/dist/jqueryui/jquery-ui.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.1.1/css/rowGroup.dataTables.min.css">
+    <link rel="stylesheet" href="/css/site.css" />
+
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/jquery/dist/jqueryui/jquery-ui.min.js"></script>
+    <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/site.js?v=giHXE1c9NFFEdSHpDjEVfP-4X-Dvw5dfu_Vp2LXhN_w"></script>
+
+
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/1.10.15/dataRender/datetime.js"></script>
+    <script src="https://cdn.datatables.net/rowgroup/1.1.1/js/dataTables.rowGroup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+    <script src="https://kit.fontawesome.com/2f44c7f436.js"></script>
+
+</head>
+<body>
+    <div id="header" style="height:125px"></div>
+
+<script type="text/javascript">
+    $("#header").load('https://itab2cfiles.blob.core.windows.net/publicsiteassets/itaheader.html', () => {
+
+        $('.header__menu-link--toggle').on('click', function (e) {
+            menuExpand(e);
+        });
+
+        // Toggles Header Dropdown Menu.
+        $('.header__menu-link--toggle').on('keydown', menuExpand);
+
+        // Shows/Hides Mobile Accordion Menu.
+        $('.header__menu-btn').on('click', function (e) {
+            var mhTarget = $(e.currentTarget);
+
+            if (mhTarget.attr('aria-expanded') === true) {
+                mhTarget.attr('aria-expanded', false);
+            }
+            else {
+                mhTarget.attr('aria-expanded', true);
+            }
+
+            mhTarget.toggleClass('active');
+            $('.header__menu--mobile').toggleClass('active');
+        });
+
+        // Toggles Mobile Accordion Inner Menus.
+        $('.header__accordion-link--toggle').on('click', function (e) {
+            e.preventDefault();
+
+            var mhTarget = $(e.currentTarget);
+            var mhTargetIcons = mhTarget.children('.header__accordion-icon--toggle');
+            var mhTargetMenu = mhTarget.next('.header__accordion-menu');
+            var mhToggleLinks = mhTarget.parent().siblings('.header__accordion-item--expanded').find('.header__accordion-link--toggle');
+            var mhToggleOpenIcons = mhToggleLinks.children('.header__accordion-icon--open');
+            var mhToggleCloseIcons = mhToggleLinks.children('.header__accordion-icon--close');
+            var mhToggleLinksMenu = mhToggleLinks.next('.header__accordion-menu');
+
+            if (mhTarget.hasClass('active')) {
+                mhTarget.removeClass('active').attr('aria-expanded', false);
+                mhTargetMenu.removeClass('active');
+                mhTargetIcons.toggleClass('active');
+            }
+            else {
+                mhTarget.addClass('active').attr('aria-expanded', true);
+                mhTargetMenu.addClass('active');
+                mhTargetIcons.toggleClass('active');
+            }
+
+            if (mhToggleLinks.hasClass('active')) {
+                mhToggleLinks.removeClass('active').attr('aria-expanded', false);
+                mhToggleLinksMenu.removeClass('active');
+                mhToggleOpenIcons.addClass('active');
+                mhToggleCloseIcons.removeClass('active');
+            }
+        });
+        //SEARCH
+        $("#site-search").attr("action","https://development.trade.gov/trade-search")
+
+
+    });
+    function menuExpand(e) {
+
+        if (e.type === "click" || (e.type === "keydown" && (e.key === "Enter" || e.keyCode === 13))) {
+            e.preventDefault();
+            var hTarget = $(e.currentTarget);
+            var hTargetIcons = hTarget.children('.header__menu-icon--toggle');
+            var hTargetMenuItem = hTarget.parent('.header__menu-item--expanded');
+            var hTargetMenu = hTarget.next('ul');
+            var hOtherMenuItems = hTargetMenuItem.siblings('.header__menu-item--expanded');
+            var hOtherLinks = hOtherMenuItems.find('.header__menu-link--toggle');
+            var hOtherOpenIcons = hOtherLinks.children('.header__menu-icon--open');
+            var hOtherCloseIcons = hOtherLinks.children('.header__menu-icon--close');
+            var hOtherMenu = hOtherLinks.next('ul');
+
+            if (hTarget.hasClass('header__menu-link--active')) {
+                hTarget.removeClass('header__menu-link--active').attr('aria-expanded', false);
+                hTargetMenu.removeClass('active');
+
+                // Only removing `.active` class to second level menu items.
+                if (hTargetMenuItem.attr('aria-level') === '2') {
+                    hTargetMenuItem.removeClass('active');
+                    hTargetIcons.toggleClass('active');
+                }
+            }
+            else {
+                hTarget.addClass('header__menu-link--active').attr('aria-expanded', true);
+                hTargetMenu.addClass('active');
+
+                // Only adding `.active` class to second level menu item.
+                if (hTargetMenuItem.attr('aria-level') === '2') {
+                    hTargetMenuItem.addClass('active');
+                    hTargetIcons.toggleClass('active');
+                }
+            }
+
+            if (hOtherLinks.hasClass('header__menu-link--active')) {
+                hOtherLinks.removeClass('header__menu-link--active').attr('aria-expanded', false);
+                hOtherMenu.removeClass('active');
+                hOtherMenuItems.removeClass('active');
+                hOtherOpenIcons.addClass('active');
+                hOtherCloseIcons.removeClass('active');
+            }
+        }
+    }
+</script>
+    <nav class="navbar navbar-expand-sm navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container-fluid">
+            <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                
+
+
+<ul class="navbar-nav">
+        <li class="nav-item header__menu-title">
+            <a class="nav-link text-dark header__menu-link" style="line-height: 1.22; font-size: 15px; font-weight:400;" href="/MicrosoftIdentity/Account/SignIn">Sign in</a>
+        </li>
+</ul>
+
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2" id="headerx">
+                <div class="card">
+                    <div class="card-header">
+                        Public Information
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Homepage</a>
+                            <a class="nav-link" href="/Zones">Zone &amp; Site Information</a>
+                            <a class="nav-link" href="/FRNotices">Federal Register Notices</a>
+                            <a class="nav-link" href="/ManufacturingDB">Production Database</a>
+                            <a class="nav-link" href="/Search">Search</a>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+            <div class="col-md-10">
+                <main role="main" class="pb-3">
+                    
+<input name="__RequestVerificationToken" type="hidden" value="CfDJ8ESXF6gK309Eqkb09i8-DgTiqT8ZFloajSDmmrDqJCYLpWja_FgznNESwuwehQ4pf5CeoTfFUmHwg8cvfjr1fHuooV7hPNYFAQjP_pC0Jg3IBbjP5kAdMycqmDX7Th6ClgZ9cnpXOCsoWiX-Gtm9_bc" />
+<div class="row">
+    <div class="col-12 mb-2">
+        <div class="card">
+            <div class="card-header bg-info text-white h5">
+                Zone Details
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="dropdown dropdown mb-1 float-end">
+            <a class="btn btn-info" href="/Zones">Close</a>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 mb-2">
+        <div class="card">
+            <div class="card-header">
+                Grantee Information
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_ZoneNumber">Zone Number</label>
+            <div>163</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_ApprovedOnDate">Approved on Date</label>
+            <div>10/18/1989</div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_Grantee_Company">Grantee</label>
+            <div>CODEZOL C.D.</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_Location">Location</label>
+            <div>Ponce</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_Status">Status</label>
+            <div>Active</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_ServiceArea">Service Area</label>
+            <div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_PortOfEntry">Port of Entry</label>
+            <div>PR, Ponce</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label">Service Area Maps</label>
+            <form method="post">
+            <input name="__RequestVerificationToken" type="hidden" value="CfDJ8ESXF6gK309Eqkb09i8-DgTiqT8ZFloajSDmmrDqJCYLpWja_FgznNESwuwehQ4pf5CeoTfFUmHwg8cvfjr1fHuooV7hPNYFAQjP_pC0Jg3IBbjP5kAdMycqmDX7Th6ClgZ9cnpXOCsoWiX-Gtm9_bc" /></form>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_Grantee_ContactName">Contact Name</label>
+            <div>Carlos J Velazquez Germain</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_Grantee_Title">Title</label>
+            <div>Executive Director</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_Grantee_EmailAddress">Email Address</label>
+            <div>cvelazquez@zonalibredelsur.com</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_Grantee_PhoneNumber">Phone Number</label>
+            <div>(787) 259-4445</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_Grantee_StreetAddress">Street Address</label>
+            <div>P.O. Box 333</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_Grantee_City">City</label>
+            <div>Mercedita</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_Grantee_State">State</label>
+            <div>PR</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_Grantee_ZipCode">Zip Code</label>
+            <div>00715</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_Grantee_Website">Website</label>
+            <div>www.zonalibredelsur.com</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label" for="ZoneDTO_ActivationLimit">Activation Limit</label>
+            <div>936.984</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label">Total Activated Acres</label>
+            <div>291.8</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="control-label">Zone Schedule</label>
+            <form method="post">
+                        <div class="attachmentBox">
+                            <input class="btn" type="submit" value="FTZ 163 Zone Schedule.pdf" formaction="/Zones/Details/115?GUID=5DBEF6370F8799D08525775E0064350F%20-%20FTZ%20163%20Zone%20Schedule.pdf&amp;fileName=FTZ%20163%20Zone%20Schedule.pdf&amp;handler=DownloadFile" />
+                        </div>
+            <input name="__RequestVerificationToken" type="hidden" value="CfDJ8ESXF6gK309Eqkb09i8-DgTiqT8ZFloajSDmmrDqJCYLpWja_FgznNESwuwehQ4pf5CeoTfFUmHwg8cvfjr1fHuooV7hPNYFAQjP_pC0Jg3IBbjP5kAdMycqmDX7Th6ClgZ9cnpXOCsoWiX-Gtm9_bc" /></form>
+
+        </div>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-12">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="site-tab" data-bs-toggle="tab" href="#site" role="tab" aria-controls="home" aria-selected="true">Site</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="subzone-tab" data-bs-toggle="tab" href="#subzone" role="tab" aria-controls="profile" aria-selected="false">Subzone</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="adminaction-tab" data-bs-toggle="tab" href="#adminaction" role="tab" aria-controls="contact" aria-selected="false">Staff Cases</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="frnotice-tab" data-bs-toggle="tab" href="#frnotice" role="tab" aria-controls="contact" aria-selected="false">FR Notices</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="site" role="tabpanel" aria-labelledby="site-tab">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Site Number</th>
+                                <th>Site Name</th>
+                                <th>Status</th>
+                                <th>Activated Acres</th>
+                                <th>Sunset/Expiration/Lapse Date</th>
+                            </tr>
+                        </thead>
+                    <tr>
+                        <td>
+                            <a href="/Site/Details/2084">
+                                001
+                            </a>
+                        </td>
+                        <td>Port of the Americas</td>
+                        <td>Active</td>
+                        <td>0</td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="/Site/Details/2085">
+                                002
+                            </a>
+                        </td>
+                        <td>Peerless Oil &amp; Chemicals, Inc. Petroleum Termina</td>
+                        <td>Active</td>
+                        <td>183.8</td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="/Site/Details/2086">
+                                003
+                            </a>
+                        </td>
+                        <td>Hato Rey Distribution Center</td>
+                        <td>Active</td>
+                        <td>3</td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="/Site/Details/2087">
+                                004
+                            </a>
+                        </td>
+                        <td>Centro Automatriz Santa Rosa, Inc.</td>
+                        <td>Active</td>
+                        <td>14</td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="/Site/Details/2088">
+                                005
+                            </a>
+                        </td>
+                        <td>Mercedita Industrial Park</td>
+                        <td></td>
+                        <td>0</td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="/Site/Details/2089">
+                                006
+                            </a>
+                        </td>
+                        <td>Coto Laurel Industrial Park</td>
+                        <td>Active</td>
+                        <td>0</td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="/Site/Details/2090">
+                                007
+                            </a>
+                        </td>
+                        <td>Cesar Castillo warehouse</td>
+                        <td>Active</td>
+                        <td>17.2</td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="/Site/Details/2091">
+                                008
+                            </a>
+                        </td>
+                        <td>Ayala Warehouse, Inc.</td>
+                        <td></td>
+                        <td>0</td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="/Site/Details/2093">
+                                010
+                            </a>
+                        </td>
+                        <td>Colomer &amp; Suarez, Inc.                                                                                                                                                                                          Centro de Distribucion Playa de Ponce</td>
+                        <td>Active</td>
+                        <td>5.83</td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="/Site/Details/2094">
+                                011
+                            </a>
+                        </td>
+                        <td>ProCaribe</td>
+                        <td>Active</td>
+                        <td>52</td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="/Site/Details/2095">
+                                012
+                            </a>
+                        </td>
+                        <td>Yaucono Industrial Park</td>
+                        <td>Active</td>
+                        <td>5.97</td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="/Site/Details/2096">
+                                013
+                            </a>
+                        </td>
+                        <td>Rio Piedras Distribution Center</td>
+                        <td>Active</td>
+                        <td>10</td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="/Site/Details/2100">
+                                017
+                            </a>
+                        </td>
+                        <td>Ponce Regional Distribution Center</td>
+                        <td></td>
+                        <td>0</td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    </table>
+            </div>
+            <div class="tab-pane fade" id="subzone" role="tabpanel" aria-labelledby="subzone-tab">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Subzone Number</th>
+                                <th>Company Name</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/843">
+                                        00A
+                                    </a>
+                                </td>
+                                <td>Zimmer Manufacturing BV</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/844">
+                                        00B
+                                    </a>
+                                </td>
+                                <td>HVPH Motor Corporation</td>
+                                <td>Not Active</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/845">
+                                        00C
+                                    </a>
+                                </td>
+                                <td>Puerto Rico Asphalt LLC</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/846">
+                                        00D
+                                    </a>
+                                </td>
+                                <td>Correa Tire Distributor, Inc.</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/847">
+                                        00E
+                                    </a>
+                                </td>
+                                <td>AxisCare Health Logistics, Inc.</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/848">
+                                        00F
+                                    </a>
+                                </td>
+                                <td>Best Petroleum Corporation</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/849">
+                                        00G
+                                    </a>
+                                </td>
+                                <td>Caribe Rx, Inc.</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/850">
+                                        00H
+                                    </a>
+                                </td>
+                                <td>R.Ortiz Auto Distributors, Inc.</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/851">
+                                        00I
+                                    </a>
+                                </td>
+                                <td>Destileria Serralles, Inc.</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/852">
+                                        00J
+                                    </a>
+                                </td>
+                                <td>LT Autos, LLC</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/853">
+                                        00K
+                                    </a>
+                                </td>
+                                <td>Liquilux Gas Corporation</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/854">
+                                        00L
+                                    </a>
+                                </td>
+                                <td>Puerto Rico Steel Products Corporation</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/1095">
+                                        00M
+                                    </a>
+                                </td>
+                                <td>Petro Air Corporation</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/1240">
+                                        00N
+                                    </a>
+                                </td>
+                                <td>Tallaboa PR, LLC</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/1347">
+                                        00O
+                                    </a>
+                                </td>
+                                <td>Centro Automotriz Santa Rosa, Inc.</td>
+                                <td>Approved</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="/SubZone/Details/1540">
+                                        00P
+                                    </a>
+                                </td>
+                                <td>Pompina Mayaguez LLC</td>
+                                <td>Approved</td>
+                            </tr>
+                    </table>
+            </div>
+            <div class="tab-pane fade" id="adminaction" role="tabpanel" aria-labelledby="adminaction-tab">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Number</th>
+                                <th>Category</th>
+                                <th>Company Name</th>
+                            </tr>
+                        </thead>
+                            <tr style="cursor:pointer" onclick="gotoStaffCase(530789);">
+                                <td>A(27f)-87-2010</td>
+                                <td>TSF Minor Boundary Modification</td>
+                                <td>CODEZOL, C.D.</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="gotoStaffCase(531724);">
+                                <td>A(27f)-73-2008</td>
+                                <td>TSF Minor Boundary Modification</td>
+                                <td>Peerless Oil</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="gotoStaffCase(533670);">
+                                <td>A(32c)-13-2010</td>
+                                <td>Scope Determination</td>
+                                <td>Puerto Rico Coffee Roasters</td>
+                            </tr>
+                    </table>
+            </div>
+            <div class="tab-pane fade" id="frnotice" role="tabpanel" aria-labelledby="frnotice-tab">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Number</th>
+                                <th>Subject</th>
+                                <th>Company</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1090381'">
+                                <td>
+                                    B-038-2018
+                                </td>
+                                <td>FTZ 163--Ponce, Puerto Rico; Application for Expansion</td>
+                                <td>Codezol, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1090446'">
+                                <td>
+                                    Ord: 2078
+                                </td>
+                                <td>Expansion of FTZ 163, Ponce, Puerto Rico</td>
+                                <td>Codezol, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092865'">
+                                <td>
+                                    Ord: 0443
+                                </td>
+                                <td>Order Approving the Application of the Puerto Rico International Distribution Center and Free Zone, Inc. for a Foreign Zone in Ponce, Puerto Rico</td>
+                                <td>Puerto Rico International Distribution Center and Free Zone, Inc.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092866'">
+                                <td>
+                                    Ord: 1692
+                                </td>
+                                <td>Expansion of FTZ 163, Ponce, Puerto Rico, Area</td>
+                                <td>CODEZOL, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092867'">
+                                <td>
+                                    Ord: 1693
+                                </td>
+                                <td>Expansion of FTZ 163 Ponce, Puerto Rico, Area</td>
+                                <td>CODEZOL, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092868'">
+                                <td>
+                                    52-2011
+                                </td>
+                                <td>FTZ 163--Ponce, Puerto Rico Application for Expansion</td>
+                                <td>Codezol, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092869'">
+                                <td>
+                                    Ord: 1830
+                                </td>
+                                <td>Expansion of FTZ 163; Ponce, PR</td>
+                                <td>Codezol, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092888'">
+                                <td>
+                                    14-1999
+                                </td>
+                                <td>Application For Foreign-Trade Subzone Status: Peerless Oil &amp; Chemicals, Inc.</td>
+                                <td>Peerless Oil &amp; Chemicals, Inc.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092891'">
+                                <td>
+                                    Ord: 1091
+                                </td>
+                                <td>Expansion of FTZ 163, Ponce, PR</td>
+                                <td>Codezol, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092892'">
+                                <td>
+                                    39-2004
+                                </td>
+                                <td>FTZ 163--Ponce, Puerto Rico Area; Application for Expansion/Time Extension</td>
+                                <td>Codezol, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092908'">
+                                <td>
+                                    Ord: 1397
+                                </td>
+                                <td>Expansion of FTZ 163, Ponce, Puerto Rico, Area</td>
+                                <td>Codezol, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092913'">
+                                <td>
+                                    40-2005
+                                </td>
+                                <td>FTZ 163 - Ponce, Puerto Rico Area, Application for Expansion</td>
+                                <td>CODEZOL, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092914'">
+                                <td>
+                                    67-2005
+                                </td>
+                                <td>FTZ 163 - Ponce, PR; Application for Expansion</td>
+                                <td>Codezol, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092915'">
+                                <td>
+                                    10-2006
+                                </td>
+                                <td>FTZ 163--Ponce, Puerto Rico Area, Application for Expansion</td>
+                                <td>Codezol, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092916'">
+                                <td>
+                                    40-2005
+                                </td>
+                                <td>Withdrawal of Application for Expansion for Ponce, Puerto Rico Area, FTZ 163</td>
+                                <td>CODEZOL, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092927'">
+                                <td>
+                                    Ord: 1467
+                                </td>
+                                <td>Expansion of FTZ 163, Ponce, Puerto Rico</td>
+                                <td>Codezol, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092929'">
+                                <td>
+                                    Ord: 1487
+                                </td>
+                                <td>Expansion of FTZ 163, Ponce, Puerto Rico, Area</td>
+                                <td>Codezol, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092942'">
+                                <td>
+                                    58-2008
+                                </td>
+                                <td>FTZ 163--Ponce, PR; Application for Expansion</td>
+                                <td>CODEZOL, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092943'">
+                                <td>
+                                    58-2008
+                                </td>
+                                <td>FTZ 163 - Ponce, Puerto Rico, Application for, Expansion, Correction</td>
+                                <td>CODEZOL, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092944'">
+                                <td>
+                                    Ord: 1631
+                                </td>
+                                <td>Expansion of FTZ 163, Ponce, Puerto Rico, Area</td>
+                                <td>CODEZOL, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092948'">
+                                <td>
+                                    53-2009
+                                </td>
+                                <td>FTZ 163--Ponce, Puerto Rico Application for Expansion</td>
+                                <td>CODEZOL, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092949'">
+                                <td>
+                                    17-2010
+                                </td>
+                                <td>FTZ 163--Ponce, Puerto Rico; Application for Expansion</td>
+                                <td>CODEZOL, C.D.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1092950'">
+                                <td>
+                                    04-1988
+                                </td>
+                                <td>Proposed Foreign-Trade Zone, Ponce, PR; Application and Public Hearing  </td>
+                                <td>Puerto Rico International Distribution Center and Free Zone, Inc.</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1093279'">
+                                <td>
+                                    B-062-2022
+                                </td>
+                                <td>Notification of  Proposed Production Activity, Global Manufacturing LLC, (Mattresses and  Box Springs), Ponce, Puerto Rico</td>
+                                <td>Global Manufacturing, LLC</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1093341'">
+                                <td>
+                                    B-062-2022
+                                </td>
+                                <td>Foreign-Trade Zone (FTZ) 163; Authorization of Limited Production  Activity; Global Manufacturing LLC; (Mattresses and Box Springs);  Ponce, Puerto Rico</td>
+                                <td>Global Manufacturing, LLC</td>
+                                <td>Completed</td>
+                            </tr>
+                            <tr style="cursor:pointer" onclick="window.location.href='/FRNotices/Details'+'/1093710'">
+                                <td>
+                                    B-041-2025
+                                </td>
+                                <td>FTZ 163--Application for  Reorganization/Expansion</td>
+                                <td>Port of Ponce Authority</td>
+                                <td>Review</td>
+                            </tr>
+                    </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+                </main>
+            </div>
+        </div>
+    </div>
+    <div id="footer"></div>
+<script type="text/javascript">
+    $("#footer").load('https://itab2cfiles.blob.core.windows.net/publicsiteassets/itafooter.html', () => {});
+</script>
+    
+    <script type="text/javascript">
+        function gotoStaffCase(id) {
+            var link = "/StaffCases/Details";
+            window.location.href = link + "/" + id;
+        }
+    </script>
+
+</body>
+</html>

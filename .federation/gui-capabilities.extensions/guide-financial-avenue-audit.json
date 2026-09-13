@@ -1,0 +1,55 @@
+{
+  "capabilities": [
+    {
+      "id": "guide-financial-avenue-audit-pipeline",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Bounded source-audit and authoritative-source materialization pipeline used to generate certified financial-avenue evidence and reports; it is CI/operator plumbing, not a separate human-facing dashboard workflow.",
+      "analysis": {
+        "files": [
+          "scripts/audit_guide_financial_avenues.py",
+          "scripts/finalize_guide_financial_freeze.py",
+          "scripts/scrape_ftz_board_pr.py",
+          "scripts/scrape_ocif_guide_financial_classes.py",
+          "scripts/scrape_ocs_insurers.py"
+        ],
+        "symbols": [
+          "scripts/audit_guide_financial_avenues.py:compute",
+          "scripts/audit_guide_financial_avenues.py:load_inputs",
+          "scripts/audit_guide_financial_avenues.py:main",
+          "scripts/audit_guide_financial_avenues.py:metrics_payload",
+          "scripts/audit_guide_financial_avenues.py:run",
+          "scripts/audit_guide_financial_avenues.py:validate_inputs",
+          "scripts/audit_guide_financial_avenues.py:write_outputs",
+          "scripts/finalize_guide_financial_freeze.py:build_certification",
+          "scripts/finalize_guide_financial_freeze.py:csv_schema",
+          "scripts/finalize_guide_financial_freeze.py:latest_manifest",
+          "scripts/finalize_guide_financial_freeze.py:main",
+          "scripts/finalize_guide_financial_freeze.py:materialized_projection",
+          "scripts/finalize_guide_financial_freeze.py:run",
+          "scripts/finalize_guide_financial_freeze.py:sha256_file",
+          "scripts/finalize_guide_financial_freeze.py:validate_source_snapshot",
+          "scripts/scrape_ftz_board_pr.py:main",
+          "scripts/scrape_ftz_board_pr.py:parse_zone",
+          "scripts/scrape_ftz_board_pr.py:run",
+          "scripts/scrape_ocif_guide_financial_classes.py:fetch_class",
+          "scripts/scrape_ocif_guide_financial_classes.py:main",
+          "scripts/scrape_ocif_guide_financial_classes.py:parse_page",
+          "scripts/scrape_ocif_guide_financial_classes.py:run",
+          "scripts/scrape_ocs_insurers.py:main",
+          "scripts/scrape_ocs_insurers.py:parse_annual_reports",
+          "scripts/scrape_ocs_insurers.py:parse_insurers",
+          "scripts/scrape_ocs_insurers.py:run"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_guide_financial_avenue_audit.py",
+          "tests/test_guide_financial_source_parsers.py"
+        ]
+      }
+    }
+  ],
+  "exceptions": []
+}

@@ -25,6 +25,8 @@ GRAPH_SUMMARY = Path("data/staging/processed/graph/network_summary.json")
 PRIME_SUB_SUMMARY = Path("data/staging/processed/pr_prime_sub_summary.json")
 ENTITY_MASTER = Path("data/staging/processed/entity_master.csv")
 ARTIFACT_AUDIT = Path("data/exports/output_validation_audit.json")
+SOURCE_REGISTRY = Path("registries/source_registry.json")
+DEFAULT_PARENT_UEI_THRESHOLD = 0.90
 
 
 def _utc_now() -> str:
@@ -81,6 +83,18 @@ def _compute_parent_uei_coverage(root: Path) -> float:
     return _non_empty_ratio(values)
 
 
+def _parent_uei_threshold(root: Path, source_id: str | None) -> float:
+    if not source_id:
+        return DEFAULT_PARENT_UEI_THRESHOLD
+    registry = _read_json(root / SOURCE_REGISTRY)
+    for source in registry.get("sources", []):
+        if source.get("source_id") != source_id:
+            continue
+        threshold = source.get("validation_threshold", {}).get("parent_uei_coverage_pct")
+        return _safe_float(threshold) if threshold is not None else DEFAULT_PARENT_UEI_THRESHOLD
+    return DEFAULT_PARENT_UEI_THRESHOLD
+
+
 def _detect_fixture_or_synthetic(
     report_summary: dict[str, Any], prime_sub_summary: dict[str, Any]
 ) -> tuple[bool, list[str]]:
@@ -114,6 +128,7 @@ def collect_gate_metrics(root: Path) -> dict[str, Any]:
     artifact_audit = _read_json(root / ARTIFACT_AUDIT)
 
     production_gate = artifact_audit.get("production_gate", {}) if artifact_audit else {}
+    parent_uei_source_id = production_gate.get("parent_uei_source_id")
     fixture_flag = artifact_audit.get("fixture_or_synthetic_data_detected", None)
     fixture_reasons = (
         artifact_audit.get("fixture_or_synthetic_reasons", []) if artifact_audit else []
@@ -139,6 +154,8 @@ def collect_gate_metrics(root: Path) -> dict[str, Any]:
             if production_gate.get("parent_uei_coverage") is not None
             else _compute_parent_uei_coverage(root)
         ),
+        "parent_uei_source_id": parent_uei_source_id,
+        "parent_uei_required_coverage": _parent_uei_threshold(root, parent_uei_source_id),
         "fixture_or_synthetic_data_detected": bool(fixture_flag),
         "fixture_or_synthetic_reasons": fixture_reasons,
     }
@@ -153,6 +170,9 @@ def evaluate_production_status(metrics: dict[str, Any]) -> tuple[str, list[dict[
     unique_entities = _safe_int(metrics.get("unique_entities"))
     bond_actor_count = _safe_int(metrics.get("bond_actor_count"))
     parent_uei_coverage = _safe_float(metrics.get("parent_uei_coverage"))
+    parent_uei_threshold = _safe_float(
+        metrics.get("parent_uei_required_coverage", DEFAULT_PARENT_UEI_THRESHOLD)
+    )
     fixture_detected = bool(metrics.get("fixture_or_synthetic_data_detected"))
 
     if data_layers < 8:
@@ -203,12 +223,12 @@ def evaluate_production_status(metrics: dict[str, Any]) -> tuple[str, list[dict[
         )
         status = STATUS_PARTIAL
 
-    if status != STATUS_NON_PRODUCTION and parent_uei_coverage < 0.90:
+    if status != STATUS_NON_PRODUCTION and parent_uei_coverage < parent_uei_threshold:
         blockers.append(
             {
                 "metric": "parent_uei_coverage",
                 "observed_value": round(parent_uei_coverage, 4),
-                "required_gate": ">= 0.90 for full production",
+                "required_gate": f">= {parent_uei_threshold:.2f} for full production",
                 "severity": "WARN",
                 "reason": "parent UEI coverage below production threshold",
             }

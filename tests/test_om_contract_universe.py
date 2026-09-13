@@ -127,3 +127,89 @@ def test_builder_emits_blockers_and_validator_passes_structure(tmp_path):
     assert "OCPR_FULL_MATERIALIZATION" in set(gaps.blocker_id)
     ok, errors = validator.validate(out)
     assert ok, errors
+
+
+class FakeSession:
+    def __init__(self):
+        self.closed = False
+
+    def close(self):
+        self.closed = True
+
+
+def normalized_record(number: str) -> dict:
+    return {
+        column: number if column == "contract_number" else "" for column in resumable.OUTPUT_COLUMNS
+    }
+
+
+def test_resumable_uses_filtered_total_and_resumes_without_skips(tmp_path, monkeypatch):
+    pages = iter(
+        [
+            {"recordsTotal": 2, "recordsFiltered": 3, "data": [{"id": "A"}, {"id": "B"}]},
+            {"recordsTotal": 1, "recordsFiltered": 3, "data": [{"id": "C"}]},
+        ]
+    )
+    monkeypatch.setattr(resumable.ocpr, "_session_and_token", lambda logger: (FakeSession(), "t"))
+    monkeypatch.setattr(
+        resumable,
+        "fetch_page_with_reauth",
+        lambda session, token, offset, page_length, logger: (session, token, next(pages)),
+    )
+    monkeypatch.setattr(
+        resumable.ocpr, "_normalize_row", lambda record: normalized_record(record["id"])
+    )
+
+    provisional = resumable.run(tmp_path, page_length=2, max_pages=1, reset=True)
+    assert provisional["status"] == "PROVISIONAL_MAX_PAGES"
+    assert provisional["observed_total"] == 3
+    assert provisional["written_rows"] == 2
+    assert not (tmp_path / resumable.OUT_PATH_REL).exists()
+
+    complete = resumable.run(tmp_path, page_length=2, max_pages=None, reset=False)
+    assert complete["status"] == "COMPLETE"
+    assert complete["raw_rows"] == 3
+    output = pd.read_csv(tmp_path / resumable.OUT_PATH_REL)
+    assert output["contract_number"].tolist() == ["A", "B", "C"]
+
+
+def test_resumable_blocks_total_drift_without_promoting(tmp_path, monkeypatch):
+    pages = iter(
+        [
+            {"recordsTotal": 2, "recordsFiltered": 3, "data": [{"id": "A"}, {"id": "B"}]},
+            {"recordsTotal": 1, "recordsFiltered": 4, "data": [{"id": "C"}]},
+        ]
+    )
+    monkeypatch.setattr(resumable.ocpr, "_session_and_token", lambda logger: (FakeSession(), "t"))
+    monkeypatch.setattr(
+        resumable,
+        "fetch_page_with_reauth",
+        lambda session, token, offset, page_length, logger: (session, token, next(pages)),
+    )
+    monkeypatch.setattr(
+        resumable.ocpr, "_normalize_row", lambda record: normalized_record(record["id"])
+    )
+
+    resumable.run(tmp_path, page_length=2, max_pages=1, reset=True)
+    blocked = resumable.run(tmp_path, page_length=2, max_pages=None, reset=False)
+    assert blocked["status"] == "BLOCKED_TOTAL_CHANGED"
+    assert blocked["observed_total"] == 3
+    assert blocked["latest_total"] == 4
+    assert not (tmp_path / resumable.OUT_PATH_REL).exists()
+
+
+def test_failed_page_preserves_existing_canonical_output(tmp_path, monkeypatch):
+    canonical = tmp_path / resumable.OUT_PATH_REL
+    canonical.parent.mkdir(parents=True)
+    canonical.write_bytes(b"contract_number\nEXISTING\n")
+    before = hashlib.sha256(canonical.read_bytes()).hexdigest()
+    monkeypatch.setattr(resumable.ocpr, "_session_and_token", lambda logger: (FakeSession(), "t"))
+    monkeypatch.setattr(
+        resumable,
+        "fetch_page_with_reauth",
+        lambda session, token, offset, page_length, logger: (session, token, None),
+    )
+
+    blocked = resumable.run(tmp_path, page_length=2, max_pages=1, reset=True)
+    assert blocked["status"] == "BLOCKED_PAGE_FETCH"
+    assert hashlib.sha256(canonical.read_bytes()).hexdigest() == before

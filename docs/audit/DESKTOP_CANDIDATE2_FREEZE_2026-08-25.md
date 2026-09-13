@@ -1,0 +1,241 @@
+# MoneySweep Desktop Candidate 2 Freeze — 2026-08-25
+
+## State
+
+**ENGINEERING_CANDIDATE_PASS — IMMUTABLE HISTORICAL EVIDENCE**  
+**NON_PRODUCTION_DIAGNOSTIC — NOT A PUBLIC RELEASE**  
+**UNSIGNED/UNNOTARIZED PUBLIC-DISTRIBUTION STATE — NOT CERTIFIED**
+
+This ledger freezes the first replacement macOS desktop candidate after the
+branch-caused regressions that superseded Candidate 1 were corrected. It records
+exact source, CI, package, and `.app` member identities. Later hardening must not
+rewrite these identities or promote this artifact beyond the state proved here.
+
+## Source manifestations
+
+Two source identities are intentionally recorded because GitHub pull-request CI
+checks out the synthetic merge ref rather than the branch tip itself:
+
+- branch head: `9026446b320448f6957c0faf6652bc8a30348a99`
+- frozen pre-hardening base: `aa39052cc99d5331fe875196d5853c9d10d0730e`
+- exact PR merge manifestation built by Actions:
+  `5fdf8f4a8ccc8658e0fc65015f97df4daba0f976`
+
+The merge manifestation is the `GITHUB_SHA` written into the desktop release
+manifest. It must not be silently substituted for the branch-head identity.
+
+## Exact-head CI closure
+
+At branch head `9026446b320448f6957c0faf6652bc8a30348a99`, the following workflows
+completed successfully:
+
+- Tests
+- Contract Sweeper CI
+- desktop-build
+- GUI capability parity, including browser E2E
+- Lint
+- pre-commit
+- Type check
+- CodeQL
+- Semgrep
+- Secret scan
+- Lockfile drift
+- Federation template drift
+- Workflow static validation
+- Top-form reproducibility
+- Diagnostic smoke
+- PR Intake Router
+- federation-design pilot
+- Size guard
+- Promotion Guard
+- Production Status Gate workflow
+
+The desktop-build matrix passed Linux, macOS, and Windows. Each platform reached
+complete frozen-runtime dependency installation; real DuckDB/PyArrow dependency
+assertions; console freeze; frozen executable smoke and data-plane self-test;
+windowed desktop freeze; package creation; package byte-identity generation; and
+Actions artifact upload.
+
+## macOS Actions artifact
+
+- workflow run: `32909465820`
+- artifact name: `PRII-MONEYSWEEP-macOS`
+- artifact id: `9586088065`
+- artifact reported size: `239151602` bytes
+- GitHub Actions artifact ZIP SHA-256:
+  `2944bb1a4ec3b8926cb1ffef1ee95631047e5518f05105005066715eade54b4d`
+
+The artifact was downloaded once for independent inspection. The independently
+computed SHA-256 matched the GitHub-reported digest exactly.
+
+## Inner release manifest
+
+`DESKTOP_RELEASE_MANIFEST.json` SHA-256:
+`625428978d4abf4a56d0478d2388471813edd5fe00f88f45813e441cb94f7d03`
+
+The exact manifest reports:
+
+- schema version: `1.1.0`
+- source commit / CI merge manifestation:
+  `5fdf8f4a8ccc8658e0fc65015f97df4daba0f976`
+- runner OS: `macOS`
+- Python: `3.13.14`
+- registered sources: `158`
+- automatable sources: `109`
+- source-ID-set SHA-256:
+  `673659d9c53e8428e21052d95819ff35023e90142756686e73a9c9f1b326bbf2`
+- production status: `NON_PRODUCTION_DIAGNOSTIC`
+
+## Distributable package byte identities
+
+### DMG
+
+- name: `PRII-MONEYSWEEP-macOS.dmg`
+- bytes: `132881092`
+- SHA-256:
+  `73eff3f925f42460c87682dee33e97542128e33f2da51c1d8f7e4cf95aa9d239`
+
+### ZIP
+
+- name: `PRII-MONEYSWEEP-macOS.zip`
+- bytes: `115464267`
+- SHA-256:
+  `7ba8ca5bb2d1875bba506c557e9ea9f18c3d2e65877c16d32747f8aa9cdd5b12`
+
+Independent local hashing matched both values in the build-generated release
+manifest.
+
+## Frozen dependency/build evidence
+
+- `FROZEN_DEPENDENCIES.txt`: 1625 bytes; SHA-256
+  `9a010fbb2b75e6700065726545c912afc6cccd93833ccc921ea23b5478a3bce4`
+- `PYTHON_VERSION.txt` SHA-256:
+  `c4a684e859efa868ffdfb4967e90ffd847a0fc1f293e16ed50ea18af8e3b95f6`
+- `NODE_VERSION.txt` SHA-256:
+  `b8139b18707113247bd3eba5bff8ee50ed8f6bfd5076113805af4e414abfdf23`
+
+The frozen dependency inventory hash independently matched the inner release
+manifest.
+
+## `.app` member-level identity
+
+Candidate 2 is frozen with a symlink-aware canonical member manifest rather than
+using the outer ZIP hash as a proxy for application identity.
+
+Canonicalization version: `moneysweep_app_member_manifest_v2`.
+
+Procedure:
+
+1. enumerate every non-directory member under `PRII-MONEYSWEEP.app/` in the
+   exact distributable ZIP;
+2. preserve POSIX object type and permission mode;
+3. for regular files, record path, type, mode, uncompressed size, and SHA-256;
+4. for symlinks, record path, type, mode, link target, and SHA-256 of the target
+   bytes stored in the ZIP;
+5. sort records by exact member path;
+6. serialize as UTF-8 canonical JSON with object keys sorted and no insignificant
+   whitespace;
+7. SHA-256 the canonical JSON byte stream.
+
+Result:
+
+- total `.app` non-directory members: `1608`
+- regular files: `1395`
+- symlinks: `213`
+- other member types: `0`
+- canonical `.app` tree SHA-256:
+  `975fa1b9248684920f2b3597e953cb136b667e8675de02878749e4b2199885ef`
+
+The locally retained full member-manifest file generated by this procedure had
+SHA-256:
+`b0f6f6379e7955f4a3794621d81f472286912d940eba7b4122b80bf71bf8a459`.
+
+### Principal executable
+
+- path: `PRII-MONEYSWEEP.app/Contents/MacOS/PRII-MONEYSWEEP`
+- type: regular file
+- mode: `0755`
+- bytes: `19349152`
+- SHA-256:
+  `20b4a99da9272d00acd8c3a6992987485562bea558ea5a85fbf8539a6496f6fd`
+
+### Bundle metadata
+
+- `CFBundleIdentifier`: `pr.prii.moneysweep`
+- `CFBundleExecutable`: `PRII-MONEYSWEEP`
+- `CFBundleShortVersionString`: `0.0.0`
+- `CFBundleVersion`: absent
+
+The absent explicit build version is preserved as an observed Candidate 2
+property and must not be silently filled by inference.
+
+## Runtime certification proved by this candidate
+
+The exact macOS build completed the frozen executable smoke and data-plane
+self-test before packaging. The same build workflow asserts real importability of
+DuckDB, PyArrow, pandas, FastAPI, multipart, and keyring from the complete frozen
+runtime. This closes the historical external-Python/DuckDB/PyArrow defect for
+this engineering candidate.
+
+## Production-data boundary
+
+The exact-head production gate recomputed:
+
+- production status: `NON_PRODUCTION_DIAGNOSTIC`
+- populated data layers: `3`
+- unique entities: `18`
+- bond actors: `0`
+- parent-UEI coverage: `0.0`
+- fixture/synthetic signature detected: `true`
+
+The current recovery audit also reports `5` unfreeze candidates and `16` sources
+still missing. Those runtime counts supersede older 0/21 recovery-state counts
+for current-state operations, while the older records remain historical evidence.
+
+No partial diagnostic corpus may be promoted merely to raise the entity count.
+Production validity requires the normal source-completeness and lineage gates to
+close.
+
+## Security/hygiene contradiction retained
+
+The dedicated exact-head Secret scan workflow passed, but the broader R4.9Z-B
+repo-quality audit recorded `possible_secret_findings = 1`. The finding has not
+been adjudicated as either a real credential or a false positive. Candidate 2
+therefore retains an unresolved security-policy contradiction and cannot be a
+zero-residue release candidate.
+
+The R4.9Z-B quality status also reports its historical gate false because its
+old invariant expects zero unfreeze candidates and 21 missing sources while the
+current recovery state has materially advanced to 5/16. That stale historical
+count contract must not be repaired by simply hard-coding 5/16.
+
+## Signing/notarization boundary
+
+This was a pull-request build, not a public `desktop-v*` tag. Therefore the
+Developer-ID signing, Apple notarization, stapling, and Gatekeeper assessment
+steps were intentionally skipped.
+
+Candidate 2 does **not** prove:
+
+- Developer-ID identity;
+- notarization acceptance;
+- stapled ticket validation;
+- Gatekeeper acceptance of the downloaded public artifact;
+- clean-Mac first-launch behavior of the actual published download.
+
+## Promotion rule
+
+Candidate 2 may be cited as **ENGINEERING_CANDIDATE_PASS** only. It must never be
+promoted to final release certification unless the exact same artifact were to
+satisfy all remaining production/security/distribution gates; because further
+security/release hardening is still required, any source-changing remediation
+must create a new candidate rather than mutate this record.
+
+Final certification remains:
+
+`DOWNLOAD -> DOUBLE-CLICK -> READY`
+
+only after `PRODUCTION_VALIDATED`, zero unresolved security/dependency residue,
+Developer-ID signing, notarization, stapling, Gatekeeper PASS, clean-Mac testing
+of the actual published download, and downloaded-byte equality with the release
+manifest.

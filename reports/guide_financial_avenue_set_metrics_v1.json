@@ -1,0 +1,46 @@
+{
+  "base_source_count": 158,
+  "binding_state_counts": {
+    "ABSENT": 3,
+    "AUTHORITATIVE_ROUTE": 5,
+    "CANDIDATE_NOT_IDENTITY": 2,
+    "SUPPORTING_ROUTE": 20
+  },
+  "certification_reason": "Route coverage is not certification; authoritative materialization, exact category/identity bindings, temporal/provenance closure, and zero unresolved residue are not yet established for every avenue.",
+  "certification_state": "OPEN",
+  "global_scope_note": "The frozen 2021 guide explicitly states that it is not exhaustive; GUIDE_BOUNDED_100_PERCENT must never be promoted to a claim of complete Puerto Rico finance coverage.",
+  "guide_avenue_count": 30,
+  "guide_projection": {
+    "a_only": [
+      "GFAV-004",
+      "GFAV-005",
+      "GFAV-020"
+    ],
+    "a_only_count": 3,
+    "b_only_count": 0,
+    "intersection_count": 27,
+    "symmetric_difference": [
+      "GFAV-004",
+      "GFAV-005",
+      "GFAV-020"
+    ],
+    "symmetric_difference_count": 3,
+    "union_count": 30
+  },
+  "pipeline_status_counts_all_158_sources": {
+    "fully_materialized": 11,
+    "not_materialized": 145,
+    "partially_materialized": 2
+  },
+  "proposed_overlay_source_ids": [
+    "ftz_board_pr",
+    "ocif_guide_financial_classes",
+    "ocs_insurer_registry"
+  ],
+  "schema_version": "guide_financial_avenue_set_metrics_v1",
+  "scope_id": "GUIDE_BOUNDED_100_PERCENT",
+  "source_projection": {
+    "b_only_count": 140,
+    "intersection_count": 18
+  }
+}

@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 
 from scripts.build_staging_manifest import build_manifest
+from scripts.gap_analysis_builder import _STAGING_MANIFEST_CACHE, _file_status
 
 pytestmark = pytest.mark.unit
 
@@ -66,3 +67,35 @@ def test_prune_drops_absent_entries(tmp_path):
     files = build_manifest(root, prune=True)["files"]
     assert "data/staging/processed/absent_master.csv" not in files
     assert files["data/staging/processed/present_master.csv"]["row_count"] == 1
+
+
+def test_file_status_preserves_zero_row_manifest_states(tmp_path):
+    root = _make_root(
+        tmp_path,
+        {
+            "data/staging/processed/header_only.csv": {
+                "row_count": 0,
+                "sha256": "header",
+                "size_bytes": 42,
+                "status": "header_only",
+            },
+            "data/staging/processed/empty.csv": {
+                "row_count": 0,
+                "sha256": "empty",
+                "size_bytes": 0,
+                "status": "empty",
+            },
+            "data/staging/processed/legacy_zero.csv": {
+                "row_count": 0,
+                "sha256": "legacy",
+                "size_bytes": 42,
+            },
+        },
+        {},
+    )
+    _STAGING_MANIFEST_CACHE.pop(str(root), None)
+
+    assert _file_status(root, "data/staging/processed/header_only.csv")["status"] == ("header_only")
+    assert _file_status(root, "data/staging/processed/empty.csv")["status"] == "empty"
+    assert _file_status(root, "data/staging/processed/legacy_zero.csv")["status"] == ("missing")
+    assert _file_status(root, "data/staging/processed/absent.csv")["status"] == "missing"

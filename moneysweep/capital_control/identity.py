@@ -3,16 +3,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable
 
-from .models import PASS_BINDING_BASES
+from .resolution_core import Candidate, EvidenceBasis, resolve_candidates
 
 
-EVIDENCE_PRIORITY = {
-    "STABLE_ID": 700,
-    "AUTHORITATIVE_BINDING": 600,
-    "AUTHORITATIVE_ALIAS_WITH_CORROBORATION": 400,
-    "HISTORICAL_CONTINUITY_WITH_CORROBORATION": 300,
-    "HEURISTIC_DISCOVERY_ONLY": 100,
-    "NONE": 0,
+_LEGACY_BASIS_MAP = {
+    "STABLE_ID": EvidenceBasis.STABLE_ID,
+    "AUTHORITATIVE_BINDING": EvidenceBasis.AUTHORITATIVE_BINDING,
+    "AUTHORITATIVE_ALIAS_WITH_CORROBORATION": EvidenceBasis.AUTHORITATIVE_ALIAS_WITH_SPATIOTEMPORAL_SUPPORT,
+    "HISTORICAL_CONTINUITY_WITH_CORROBORATION": EvidenceBasis.HISTORICAL_CONTINUITY_WITH_CORROBORATION,
+    "HEURISTIC_DISCOVERY_ONLY": EvidenceBasis.HEURISTIC_DISCOVERY_ONLY,
+    "NONE": EvidenceBasis.NONE,
 }
 
 
@@ -32,31 +32,20 @@ class IdentityResolution:
 
 
 def resolve_identity_candidates(candidates: Iterable[IdentityCandidate]) -> IdentityResolution:
+    """Compatibility wrapper over the canonical resolution_core identity engine."""
     preserved = tuple(candidates)
-    if not preserved:
-        return IdentityResolution("UNRESOLVED", None, preserved, "no candidates")
-
-    ranked = sorted(
-        preserved,
-        key=lambda candidate: EVIDENCE_PRIORITY.get(candidate.binding_basis, -1),
-        reverse=True,
-    )
-    top_score = EVIDENCE_PRIORITY.get(ranked[0].binding_basis, -1)
-    top = tuple(
-        candidate
-        for candidate in ranked
-        if EVIDENCE_PRIORITY.get(candidate.binding_basis, -1) == top_score
-    )
-    distinct_top_ids = {candidate.candidate_id for candidate in top}
-    if len(distinct_top_ids) != 1:
-        return IdentityResolution("UNRESOLVED", None, preserved, "tied top evidence")
-
-    selected = top[0]
-    if selected.binding_basis not in PASS_BINDING_BASES:
-        return IdentityResolution(
-            "CANDIDATE_NOT_IDENTITY",
-            None,
-            preserved,
-            "best evidence is discovery-only or otherwise non-binding",
+    core_candidates = [
+        Candidate(
+            candidate_id=candidate.candidate_id,
+            basis=_LEGACY_BASIS_MAP.get(candidate.binding_basis, EvidenceBasis.NONE),
+            evidence_ref=candidate.evidence_value,
         )
-    return IdentityResolution("PASS", selected.candidate_id, preserved, "binding evidence selected")
+        for candidate in preserved
+    ]
+    result = resolve_candidates(core_candidates)
+    return IdentityResolution(
+        status=result.state.value,
+        selected_id=result.selected_id,
+        candidates=preserved,
+        reason=result.reason,
+    )

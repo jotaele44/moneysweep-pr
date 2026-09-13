@@ -35,7 +35,10 @@ user-relevant outcomes still require a GUI surface.
    contextual GUI path.
 4. Add or update an end-to-end GUI test.
 5. Run:
-   - `python scripts/check_gui_parity.py`
+   - `python .federation/check_gui_parity_with_extensions.py` (the CI gate;
+     wraps `scripts/check_gui_parity.py` against the manifest merged with
+     `.federation/gui-capabilities.extensions/*.json` — running the bare
+     script skips those extension fragments)
    - the frontend package's `npm run test:gui-parity`
 6. Never regenerate `.federation/gui-parity-baseline.json` merely to make a gate
    pass. Baseline changes require an audited inventory explanation.

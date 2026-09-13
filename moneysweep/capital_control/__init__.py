@@ -1,3 +1,4 @@
+from . import resolution_core
 from .analytics import PairwiseSetComparison, compare_sets, current_positions, rollup_positions
 from .deep_dive import (
     CertifiedOwnershipScope,
@@ -9,7 +10,34 @@ from .deep_dive import (
 from .identity import IdentityCandidate, IdentityResolution, resolve_identity_candidates
 from .ingestion import IngestionResult, ingest
 from .models import HoldingObservation, InvestorIdentity, SourceManifest
-from .source_adapter import SourceAdapter, stable_observation_fingerprint
+from .sec_materialization import (
+    SEC13FMaterializationResult,
+    SEC13FMaterializationTarget,
+    materialize_sec_13f,
+)
+from .source_adapter import (
+    SEC_SOURCE_DEFINITIONS,
+    CapitalSourceDefinition,
+    DenominatorResult,
+    FilingIndexRecord,
+    FrozenSEC13FAdapter,
+    RequestsSECTransport,
+    SEC13FFilingMetadata,
+    SECAcquisitionError,
+    SECFairAccessClient,
+    SECFetchReceipt,
+    SECFrozenResource,
+    SECRequestPolicy,
+    SECTransport,
+    SECTransportResponse,
+    SECUserAgent,
+    SourceAdapter,
+    assert_source_registry_invariants,
+    build_filing_denominator,
+    source_definition,
+    source_for_form_type,
+    stable_observation_fingerprint,
+)
 from .supersession import SupersessionResult, apply_supersession
 from .validation import (
     ValidationError,
@@ -19,7 +47,11 @@ from .validation import (
 )
 
 __all__ = [
+    "CapitalSourceDefinition",
     "CertifiedOwnershipScope",
+    "DenominatorResult",
+    "FilingIndexRecord",
+    "FrozenSEC13FAdapter",
     "HoldingObservation",
     "IdentityCandidate",
     "IdentityResolution",
@@ -27,19 +59,38 @@ __all__ = [
     "InvestorIdentity",
     "OwnershipDeepDiveError",
     "PairwiseSetComparison",
+    "RequestsSECTransport",
+    "SEC13FFilingMetadata",
+    "SEC13FMaterializationResult",
+    "SEC13FMaterializationTarget",
+    "SECAcquisitionError",
+    "SECFairAccessClient",
+    "SECFetchReceipt",
+    "SECFrozenResource",
+    "SECRequestPolicy",
+    "SECTransport",
+    "SECTransportResponse",
+    "SECUserAgent",
+    "SEC_SOURCE_DEFINITIONS",
     "SourceAdapter",
     "SourceManifest",
     "SupersessionResult",
     "ValidationError",
     "apply_supersession",
+    "assert_source_registry_invariants",
+    "build_filing_denominator",
     "build_ownership_deep_dive",
     "compare_sets",
     "current_positions",
     "ingest",
     "load_certification",
     "load_materialized_holdings",
+    "resolution_core",
+    "materialize_sec_13f",
     "resolve_identity_candidates",
     "rollup_positions",
+    "source_definition",
+    "source_for_form_type",
     "stable_observation_fingerprint",
     "validate_holding_observation",
     "validate_investor_identity",

@@ -3,16 +3,18 @@
 from __future__ import annotations
 
 import math
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
 
 import pandas as pd
 from fastapi import APIRouter, Query
+from pandas.errors import EmptyDataError
 
 ROOT = Path(__file__).resolve().parents[2]
 PROCESSED = ROOT / "data" / "staging" / "processed"
 
-router = APIRouter(prefix="/campaign-finance", tags=["campaign-finance"])
+router = APIRouter(tags=["campaign-finance"])
 
 FILES = {
     "fec": "pr_fec_contributions.csv",
@@ -28,7 +30,7 @@ FILES = {
     "fec_expenditures": "pr_fec_independent_expenditures.csv",
 }
 
-_CACHE: dict[str, tuple[float, pd.DataFrame]] = {}
+_CACHE: dict[Path, tuple[float, pd.DataFrame]] = {}
 
 
 def _data(key: str) -> pd.DataFrame:
@@ -36,12 +38,21 @@ def _data(key: str) -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame()
     mtime = path.stat().st_mtime
-    cached = _CACHE.get(key)
+    cached = _CACHE.get(path)
     if cached and cached[0] == mtime:
         return cached[1]
-    frame = pd.read_csv(path, dtype=str, low_memory=False).fillna("")
-    _CACHE[key] = (mtime, frame)
+    try:
+        frame = pd.read_csv(path, dtype=str, low_memory=False).fillna("")
+    except EmptyDataError:
+        frame = pd.DataFrame()
+    _CACHE[path] = (mtime, frame)
     return frame
+
+
+def _series(frame: pd.DataFrame, column: str, default: str = "") -> pd.Series:
+    if column in frame.columns:
+        return frame[column].fillna("")
+    return pd.Series(default, index=frame.index, dtype="object")
 
 
 def _amount(series: pd.Series) -> pd.Series:
@@ -54,14 +65,19 @@ def _amount(series: pd.Series) -> pd.Series:
 def _summary(key: str, amount_col: str | None, date_col: str | None) -> dict:
     frame = _data(key)
     path = PROCESSED / FILES[key]
+    present = path.exists()
     result = {
         "source": key,
         "file": FILES[key],
-        "present": path.exists(),
+        "present": present,
+        "status": "available" if len(frame) else "empty" if present else "unavailable",
         "rows": int(len(frame)),
         "amount": None,
         "earliest": None,
         "latest": None,
+        "updatedAt": (
+            datetime.fromtimestamp(path.stat().st_mtime, tz=UTC).isoformat() if present else None
+        ),
     }
     if not frame.empty and amount_col and amount_col in frame.columns:
         result["amount"] = float(_amount(frame[amount_col]).sum())
@@ -81,7 +97,7 @@ def _finite(value: object) -> float | None:
     return None if math.isnan(number) else number
 
 
-@router.get("/summary")
+@router.get("/campaign-finance/summary")
 def campaign_finance_summary():
     sources = [
         _summary("fec", "contribution_receipt_amount", "contribution_receipt_date"),
@@ -94,12 +110,30 @@ def campaign_finance_summary():
         key: int(len(_data(key)))
         for key in ("candidates", "committees", "recipients", "edges", "reports")
     }
+    present_files = [
+        PROCESSED / filename for filename in FILES.values() if (PROCESSED / filename).exists()
+    ]
+    has_data = any(source["rows"] for source in sources) or any(derived.values())
     return {
         "sources": sources,
         "totalContributionRows": sum(s["rows"] for s in sources[:3]),
         "totalContributionAmount": sum(s["amount"] or 0 for s in sources[:3]),
         "totalFederalOutflowRows": sources[3]["rows"] + sources[4]["rows"],
         "derived": derived,
+        "hasData": bool(has_data),
+        "materializedFileCount": len(present_files),
+        "updatedAt": (
+            datetime.fromtimestamp(
+                max(path.stat().st_mtime for path in present_files), tz=UTC
+            ).isoformat()
+            if present_files
+            else None
+        ),
+        "emptyState": (
+            None
+            if has_data
+            else "No campaign-finance datasets are materialized in this repository checkout."
+        ),
     }
 
 
@@ -124,33 +158,31 @@ def _standardize_contributions(source: str) -> pd.DataFrame:
         out = pd.DataFrame(
             {
                 "source": "fec",
-                "donorName": frame.get("contributor_name", ""),
-                "amount": _amount(
-                    frame.get("contribution_receipt_amount", pd.Series("", index=frame.index))
-                ),
-                "date": frame.get("contribution_receipt_date", ""),
-                "recipientName": frame.get("committee_name", ""),
+                "donorName": _series(frame, "contributor_name"),
+                "amount": _amount(_series(frame, "contribution_receipt_amount")),
+                "date": _series(frame, "contribution_receipt_date"),
+                "recipientName": _series(frame, "committee_name"),
                 "party": "",
-                "cycle": frame.get("cycle", ""),
-                "donorType": frame.get("is_individual", "")
+                "cycle": _series(frame, "cycle"),
+                "donorType": _series(frame, "is_individual")
                 .astype(str)
                 .str.lower()
                 .map({"true": "individual", "false": "organization"})
                 .fillna("unknown"),
-                "committeeId": frame.get("committee_id", ""),
-                "candidateId": frame.get("candidate_id", ""),
+                "committeeId": _series(frame, "committee_id"),
+                "candidateId": _series(frame, "candidate_id"),
             }
         )
     else:
         out = pd.DataFrame(
             {
                 "source": source,
-                "donorName": frame.get("donor_name", ""),
-                "amount": _amount(frame.get("amount", pd.Series("", index=frame.index))),
-                "date": frame.get("contribution_date", ""),
-                "recipientName": frame.get("candidate_or_committee", ""),
-                "party": frame.get("party", ""),
-                "cycle": frame.get("cycle", ""),
+                "donorName": _series(frame, "donor_name"),
+                "amount": _amount(_series(frame, "amount")),
+                "date": _series(frame, "contribution_date"),
+                "recipientName": _series(frame, "candidate_or_committee"),
+                "party": _series(frame, "party"),
+                "cycle": _series(frame, "cycle"),
                 "donorType": "unknown",
                 "committeeId": "",
                 "candidateId": "",
@@ -159,7 +191,7 @@ def _standardize_contributions(source: str) -> pd.DataFrame:
     return out
 
 
-@router.get("/contributions")
+@router.get("/campaign-finance/contributions")
 def campaign_finance_contributions(
     source: Literal["all", "fec", "cee", "oce"] = "all",
     q: str | None = None,
@@ -193,7 +225,7 @@ def campaign_finance_contributions(
     return {"rows": records, "total": total, "limit": limit, "offset": offset}
 
 
-@router.get("/entities")
+@router.get("/campaign-finance/entities")
 def campaign_finance_entities(
     entity_type: Literal["all", "candidate", "committee", "recipient"] = "all",
     q: str | None = None,
@@ -244,10 +276,10 @@ def campaign_finance_entities(
     return rows[:limit]
 
 
-@router.get("/reports")
+@router.get("/campaign-finance/reports")
 def campaign_finance_reports(q: str | None = None, limit: int = Query(1000, ge=1, le=5000)):
     frame = _data("reports")
     if q and not frame.empty:
-        mask = frame.get("committee_name", "").astype(str).str.contains(q, case=False, na=False)
+        mask = _series(frame, "committee_name").astype(str).str.contains(q, case=False, na=False)
         frame = frame[mask]
     return frame.head(limit).to_dict("records") if not frame.empty else []

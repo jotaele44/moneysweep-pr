@@ -1,11 +1,12 @@
 ---
 name: moneysweep-resolve-entities
 description: >-
-  Resolve vendor and person identities across MoneySweep — aliases, UEI/DUNS/LEI
-  identifiers, and parent-child ownership. Use when the user asks to match,
-  dedupe, or link entities. Read-only and review-first: it proposes candidate
-  matches with evidence and confidence and queues conflicts; it never auto-merges
-  high-value entities on a name alone.
+  Orchestrate the canonical MoneySweep resolution core for identifier, event,
+  entity, property/project, and financial-attribution resolution. Preserve RAW
+  source manifestations, stable-ID namespace boundaries, full candidate sets,
+  contradictions, and SUPERSEDED states. Never prove identity from names,
+  normalization, proximity, nearest-neighbor, same category, counts, or source
+  absence alone.
 default_mode: read_only
 allowed_modes: [read_only, offline_write]
 command_ids: []
@@ -14,43 +15,86 @@ owner_repo: jotaele44/moneysweep-pr
 
 # moneysweep-resolve-entities
 
-Orchestrates the existing resolution stack; it does not reimplement matching. The
-authority is `scripts/entity_resolution.py` together with the alias-override and
-entity modules already in the repo (`build_entity_aliases.py`,
-`alias_registry_builder.py`, `build_entity_parent_map.py`,
-`build_entity_resolution_review_queue.py`). This skill runs them, reads the
-candidates, and enforces the review-first gate.
+This skill is the MoneySweep orchestration surface for the canonical implementation
+at `moneysweep.capital_control.resolution_core`. MoneySweep does not maintain a
+second matching engine. `scripts/entity_resolution.py` and existing alias/parent
+scripts are adapters and discovery/orchestration surfaces only; final adjudication
+must pass through `resolution_core`.
 
-## When this fires
-Vendor/person alias resolution, UEI/DUNS/LEI identifier matching, or parent-child
-(ownership) linking requests.
+## Resolution layers
+Keep these propositions separate even when they concern the same records:
 
-## When this does NOT fire (boundary)
-- Name-only automatic merge of high-value entities → never; route the pair to the
-  conflict queue for human review instead.
-- Deriving political or risk conclusions from identity proximity alone → out of
-  scope; this skill resolves identity, it does not editorialize about it.
-- Cross-producer correlation → `thehub-pr`.
+- `IDENTIFIER_IDENTITY`: what an identifier denotes inside its authoritative namespace.
+- `EVENT_IDENTITY`: whether two source manifestations describe the same event/instrument.
+- `ENTITY_IDENTITY`: whether manifestations bind to the same legal/natural entity.
+- `PROPERTY_PROJECT_IDENTITY`: permit/project/property/parcel binding.
+- `FINANCIAL_ATTRIBUTION`: whether a financial instrument is bound to the exact project/property.
+
+Support `1:1`, `1:N`, `N:1`, `N:N`, `0:1`, and `UNRESOLVED`. Never assume 1:1.
+
+## Evidence order
+Prefer, in order: stable ID; authoritative binding; certified geometry;
+point-in-polygon plus an independent alias/ID; point-in-polygon; authoritative
+alias plus spatial/temporal support; historical continuity plus corroboration;
+proximity; unresolved. Hard evidence overrides heuristics. Tied top evidence is
+`UNRESOLVED` and the complete candidate set is preserved.
+
+## Prohibited sole identity proofs
+The following are discovery only unless independently bound:
+`NAME_ONLY`, `NORMALIZED_NAME_ONLY`, `COUNT_EQUALITY`, `NEAREST_ONLY`,
+`PROXIMITY_ONLY`, `SAME_CATEGORY`, and `SOURCE_ABSENCE`.
+
+## Namespace occupancy
+Treat IDs as namespace-scoped, e.g. `CFI::2020-000358` and
+`DDEC::2020-000358`. Before accepting an external field as a canonical ID, check
+whether that identifier is already occupied in its authoritative namespace. A
+conflicting RAW value is preserved exactly; it is never silently corrected.
+Identifier identity and underlying event identity may have different states.
+
+## Dependency gates
+- Parcel work requires an authoritative property anchor/catastro or equivalent.
+- Cross-source federation requires a stable-ID or authoritative bridge.
+- Funding attribution requires a project-specific authoritative binding.
+- FOIA eligibility requires every relevant public-source family to be exhausted,
+  negatively closed, or demonstrably inaccessible with zero unexplained reachable
+  residue.
 
 ## Procedure
-1. Default read-only: run `scripts/entity_resolution.py` and read the existing
-   alias / parent-map / review-queue outputs.
-2. For each candidate, record a match class, its supporting evidence fields
-   (identifiers, normalized names, parent), and a confidence.
-3. Route ambiguity to the conflict queue; preserve every alias and the match
-   provenance — nothing is dropped or silently rewritten.
+1. Freeze source manifestations and preserve RAW strings before normalization.
+2. Generate candidate identifiers/events/entities/properties without promotion.
+3. Use `resolution_core` to adjudicate namespace occupancy and evidence priority.
+4. Compute `INTERSECTION`, `A_ONLY`, `B_ONLY`, `UNION`, and
+   `SYMMETRIC_DIFFERENCE` for proposed equivalence when material.
+5. Preserve contradictions and displaced results as `SUPERSEDED` where appropriate.
+6. Refuse unsafe M:N joins that would multiply records unless explicitly modeled.
+7. Keep financial amount semantics distinct: project estimate, contract amount,
+   max payable, grant authorized, obligation, disbursement, invoice, payment,
+   cancellation, and balance.
+8. After bounded source exhaustion, use change detection and reopen only affected
+   downstream branches.
 
 ## Required outputs
-- candidate matches with a match class + supporting fields per candidate;
-- a confidence per candidate and a conflict queue of unresolved/competing cases;
-- aliases and match provenance preserved.
+Emit candidate sets, proposition type, cardinality, evidence basis, certification
+state, namespace bindings, contradictions, blockers, source manifestations, and
+next safe action. Preserve aliases and provenance; nothing is silently rewritten.
 
 ## Stop conditions
-- Weak identifier-only match on a high-value entity → STOP; queue for review.
-- Competing parents for one entity → STOP; do not pick one silently.
-- An unreviewed alias override in play → STOP; require the review before applying.
+- tied top evidence;
+- name/normalized-name/proximity-only proposed promotion;
+- identifier already occupied by another subject in the same namespace;
+- competing authoritative parents without adjudication;
+- parcel selection before an authoritative property anchor;
+- unsafe many-to-many join;
+- funding attribution without project-specific binding;
+- FOIA request while the public denominator has reachable residue.
+
+## Promotion gates
+No production promotion until legacy capital-control regressions plus all golden
+corpora and invariants pass. `GOLDEN_001_FINCA_ZEQUEIRA` is mandatory; BPOP,
+TAMCOR, and PRASA/Jacobs corpora must close before full resolution-core promotion.
 
 ## Evidence & result envelope
-Emit `{status, commands_considered, commands_run, artifacts, blockers,
-contradictions, next_safe_action}`. Confidence is stated whenever a match is
-inferred; secrets are named only, never valued.
+Emit `{status, proposition_type, cardinality, candidates, selected_id,
+evidence_basis, source_manifestations, blockers, contradictions, superseded,
+next_safe_action}`. Confidence is descriptive only; evidence state controls
+certification.

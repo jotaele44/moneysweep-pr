@@ -1,19 +1,10 @@
 """Seed core PR public-money institutions into Canonical v1 ``entities.csv`` (WS-E).
 
-No external entity dataset was supplied, so this ingests a small, curated, and
-**indisputable** set of public institutions that the canonical model itself
-already requires: the GO / COFINA / PREPA / PRASA / HTA debt issuers named in
-the ``debt_class`` enum, the fiscal/oversight bodies (FOMB, AAFAF, P3 Authority,
-GDB), and the privatized utility operators (LUMA, Genera, Metropistas). They are
-the anchors that the people, debt, contracts, projects, and funding tables link
-to.
-
-Source surface: the committed reference file
-``data/reference/pr_public_money_entities.csv`` (public, non-PII). Evidence-first:
-one accepted Tier-T1 evidence row per entity, referenced by ``evidence_id``. This
-is a deliberately conservative seed, not speculative expansion; richer entity
-ingestion (lobbying firms, contractors, funds) follows once those source
-surfaces are available.
+This producer ingests a curated repository reference surface.  The reference
+file is useful discovery/context, but it is not itself an external primary
+official registry.  Source taxonomy therefore must not prove source identity:
+seed rows are emitted as T3/pending until each source manifestation is bound to
+an authoritative record through the evidence-source binding registry.
 
 Roadmap: WS-E, tasks T69-T82 (seed subset). Stdlib only.
 
@@ -64,7 +55,7 @@ ENTITY_COLUMNS = [
 
 
 def build_rows(root: Path | None = None) -> tuple[list[dict[str, Any]], list[Evidence]]:
-    """Return (entity rows, evidence rows) from the reference seed."""
+    """Return (entity rows, evidence rows) from the noncanonical reference seed."""
     root = root or REPO_ROOT
     entity_rows: list[dict[str, Any]] = []
     evidence_rows: list[Evidence] = []
@@ -77,13 +68,14 @@ def build_rows(root: Path | None = None) -> tuple[list[dict[str, Any]], list[Evi
             aliases = (ref.get("aliases") or "").strip()
             desc = (ref.get("description") or "").strip()
             ev = make_evidence(
-                source_type="registry",
+                source_type="other",
                 source_name=SOURCE_NAME,
                 source_path_or_url=REFERENCE,
                 page_or_line_ref=f"row {i}",
                 claim=f"'{name}' is a Puerto Rico public-money institution ({etype}). {desc}".strip(),
                 extraction_method="manual",
-                review_status="accepted",
+                evidence_tier="T3",
+                review_status="pending",
             )
             evidence_rows.append(ev)
             entity_rows.append(
@@ -97,7 +89,7 @@ def build_rows(root: Path | None = None) -> tuple[list[dict[str, Any]], list[Evi
                     "registry_ids": "",
                     "confidence": ev.confidence,
                     "evidence_id": ev.evidence_id,
-                    "review_status": "accepted",
+                    "review_status": "pending",
                     "notes": f"aliases={aliases}" if aliases else "",
                 }
             )
@@ -113,6 +105,8 @@ def check(rows: list[dict[str, Any]]) -> list[str]:
         problems.append("duplicate entity_id values present")
     if any(r["entity_type"] not in VALID_TYPES for r in rows):
         problems.append("invalid entity_type present")
+    if any(r["review_status"] != "pending" for r in rows):
+        problems.append("noncanonical reference seed unexpectedly promoted")
     return problems
 
 
@@ -136,6 +130,7 @@ def ingest(root: Path | None = None) -> dict[str, Any]:
         "producer_script": "scripts/ingest_entities.py",
         "producer_phase": "CANONICAL_V1_ENTITIES_SEED",
         "source_inputs": [REFERENCE],
+        "source_identity_state": "NONCANONICAL_REFERENCE_SEED",
         "row_count": len(rows),
         "evidence_rows_added": len(evidence_rows),
         "evidence_table_rows": evidence_manifest["row_count"],

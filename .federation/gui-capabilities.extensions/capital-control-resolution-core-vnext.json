@@ -1,0 +1,97 @@
+{
+  "extension_id": "capital-control-resolution-core-vnext",
+  "capabilities": [
+    {
+      "id": "capital-control-resolution-core-runtime",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Canonical MoneySweep identifier/event/entity/property/financial resolution infrastructure. This is intentionally internal backend and orchestration logic; no new GUI surface is claimed by this migration slice.",
+      "backend": {
+        "files": [
+          "moneysweep/capital_control/resolution_core/__init__.py",
+          "moneysweep/capital_control/resolution_core/attribution.py",
+          "moneysweep/capital_control/resolution_core/change_detection.py",
+          "moneysweep/capital_control/resolution_core/contradictions.py",
+          "moneysweep/capital_control/resolution_core/engine.py",
+          "moneysweep/capital_control/resolution_core/equivalence.py",
+          "moneysweep/capital_control/resolution_core/finance.py",
+          "moneysweep/capital_control/resolution_core/gates.py",
+          "moneysweep/capital_control/resolution_core/identity.py",
+          "moneysweep/capital_control/resolution_core/joins.py",
+          "moneysweep/capital_control/resolution_core/models.py",
+          "moneysweep/capital_control/resolution_core/namespace.py",
+          "moneysweep/capital_control/resolution_core/property_project.py"
+        ]
+      },
+      "analysis": {
+        "files": ["scripts/entity_resolution.py"]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_resolution_core_golden_001.py",
+          "tests/test_resolution_core_contracts.py",
+          "tests/test_resolution_core_hardening.py",
+          "tests/test_entity_resolution_core_gate.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_symbol:scripts/entity_resolution.py:adjudicate_usaspending_candidate",
+        "python_module:moneysweep/capital_control/resolution_core/__init__.py",
+        "python_module:moneysweep/capital_control/resolution_core/attribution.py",
+        "python_module:moneysweep/capital_control/resolution_core/change_detection.py",
+        "python_module:moneysweep/capital_control/resolution_core/contradictions.py",
+        "python_module:moneysweep/capital_control/resolution_core/engine.py",
+        "python_module:moneysweep/capital_control/resolution_core/equivalence.py",
+        "python_module:moneysweep/capital_control/resolution_core/finance.py",
+        "python_module:moneysweep/capital_control/resolution_core/gates.py",
+        "python_module:moneysweep/capital_control/resolution_core/identity.py",
+        "python_module:moneysweep/capital_control/resolution_core/joins.py",
+        "python_module:moneysweep/capital_control/resolution_core/models.py",
+        "python_module:moneysweep/capital_control/resolution_core/namespace.py",
+        "python_module:moneysweep/capital_control/resolution_core/property_project.py",
+        "python_symbol:moneysweep/capital_control/resolution_core/attribution.py:FinancialAttribution",
+        "python_symbol:moneysweep/capital_control/resolution_core/attribution.py:attribute_financial_instrument",
+        "python_symbol:moneysweep/capital_control/resolution_core/change_detection.py:BaselineDiff",
+        "python_symbol:moneysweep/capital_control/resolution_core/change_detection.py:ChangeState",
+        "python_symbol:moneysweep/capital_control/resolution_core/change_detection.py:diff_baseline",
+        "python_symbol:moneysweep/capital_control/resolution_core/contradictions.py:Contradiction",
+        "python_symbol:moneysweep/capital_control/resolution_core/contradictions.py:adjudicate_contradiction",
+        "python_symbol:moneysweep/capital_control/resolution_core/engine.py:ResolutionCore",
+        "python_symbol:moneysweep/capital_control/resolution_core/engine.py:make_proposition",
+        "python_symbol:moneysweep/capital_control/resolution_core/equivalence.py:EquivalenceSets",
+        "python_symbol:moneysweep/capital_control/resolution_core/equivalence.py:compute_equivalence_sets",
+        "python_symbol:moneysweep/capital_control/resolution_core/finance.py:GrantClosure",
+        "python_symbol:moneysweep/capital_control/resolution_core/finance.py:close_grant",
+        "python_symbol:moneysweep/capital_control/resolution_core/finance.py:validate_amount",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:DenominatorResult",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:UnlockResult",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:evaluate_foia_gate",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:evaluate_public_denominator",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:evaluate_unlock",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:federation_unlock",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:funding_unlock",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:parcel_unlock",
+        "python_symbol:moneysweep/capital_control/resolution_core/identity.py:Candidate",
+        "python_symbol:moneysweep/capital_control/resolution_core/identity.py:Resolution",
+        "python_symbol:moneysweep/capital_control/resolution_core/identity.py:resolve_candidates",
+        "python_symbol:moneysweep/capital_control/resolution_core/joins.py:assert_no_unsafe_many_to_many",
+        "python_symbol:moneysweep/capital_control/resolution_core/joins.py:classify_join_cardinality",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:Cardinality",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:CertificationState",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:DependencyState",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:EvidenceBasis",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:FinancialAmount",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:NamespaceBinding",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:Proposition",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:PropositionType",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:SourceManifestation",
+        "python_symbol:moneysweep/capital_control/resolution_core/namespace.py:NamespaceOccupancyResult",
+        "python_symbol:moneysweep/capital_control/resolution_core/namespace.py:NamespaceRegistry",
+        "python_symbol:moneysweep/capital_control/resolution_core/property_project.py:PropertyProjectBinding",
+        "python_symbol:moneysweep/capital_control/resolution_core/property_project.py:SpatialState",
+        "python_symbol:moneysweep/capital_control/resolution_core/property_project.py:bind_property_project"
+      ]
+    }
+  ]
+}

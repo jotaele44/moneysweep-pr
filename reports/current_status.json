@@ -1,13 +1,16 @@
 {
   "schema_version": "moneysweep_current_status_v8",
-  "generated_at": "2026-07-30T20:33:33-04:00",
-  "main_sha": "9e911203a05cf8f2e99c762161b7ec18de8cef73",
+  "generated_at": "2026-08-20T21:34:20Z",
+  "main_sha": "315520119c47b0f271f19531d53de8454d99f41a",
+  "evidence_snapshot_state": "STALE_NOT_RECERTIFIED",
+  "evidence_snapshot_as_of": "2026-07-30T20:33:33-04:00",
+  "evidence_snapshot_note": "Head identity was refreshed on 2026-08-19. Materialization counts and production evidence below retain their original 2026-07-30 scope and are not recertified for the current head.",
   "premerge_base_sha": "bd337fb092eb639cdb24b490bc90a8b07e9e51c4",
   "certified_input_head_sha": "ab576462ded2f2e99c762161b7ec18de8cef73",
-  "current_head_authority": "GitHub PR #452 metadata and checks; main remains at PR #448 squash commit 9e911203a05cf8f2e99c762161b7ec18de8cef73.",
-  "active_vector": "SUPPLY_AND_INGEST_MONEYSWEEP_REQUIRED_EXPORTS_v0_3",
-  "active_branch": "agent/moneysweep-postmerge-status-pr448-v0-2",
-  "active_pr": 452,
+  "current_head_authority": "Local main checkout at 315520119c47b0f271f19531d53de8454d99f41a. Evidence metrics retain their explicitly disclosed older snapshot scope.",
+  "active_vector": "REQUIRED_SOURCE_AND_OPERATOR_EVIDENCE_CLOSURE",
+  "active_branch": "main",
+  "active_pr": null,
   "production_status": "NON_PRODUCTION_DIAGNOSTIC",
   "pause_lock_active": true,
   "merge_record": {
@@ -26,19 +29,19 @@
     "main_identical_to_merge_commit": true
   },
   "source_registry_current": {
-    "total_sources": 162,
-    "source_ids_sha256": "353995f4595fde0f7643ff8d9987154bcd230abe30037cdcbe6e3abd7f4233d1",
+    "total_sources": 164,
+    "source_ids_sha256": "4c551385f00ca6df4332ee1643d0ef7a6ab85172632d945d35be285cd94f5826",
     "required_sources": 16,
     "override_policy": "Existing source IDs only; source_id and required are immutable."
   },
   "materialization_readiness_truth": {
-    "total_sources": 162,
-    "automatable_total": 113,
-    "automatable_ready": 113,
-    "queued_excluded_total": 49,
+    "total_sources": 164,
+    "automatable_total": 116,
+    "automatable_ready": 116,
+    "queued_excluded_total": 48,
     "queued_excluded": {
       "manual_export": 42,
-      "scraper_needed": 2,
+      "scraper_needed": 1,
       "deferred_stub": 2,
       "semantic_duplicate": 3,
       "broken_producer": 0
@@ -46,7 +49,7 @@
   },
   "materialization_coverage": {
     "evidence_registry_total": 151,
-    "current_registry_total": 162,
+    "current_registry_total": 164,
     "denominator_comparable": false,
     "regeneration_status": "CERTIFIED_OPERATOR_CORPUS_WITH_COMPLETE_DERIVED_LINEAGE",
     "probe_ran": false,

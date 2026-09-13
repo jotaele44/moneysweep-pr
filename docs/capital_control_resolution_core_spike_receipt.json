@@ -1,0 +1,35 @@
+{
+  "artifact": "CAPITAL_CONTROL_RESOLUTION_CORE_SPIKE_RECEIPT_v1",
+  "status": "PROVISIONAL_LOCAL_SPIKE_PASS",
+  "parent_commit": "437d02f96699a402a328def1d266980f5ee29788",
+  "production_branch": "codex/capital-control-resolution-core-vnext",
+  "contracts_proved": [
+    "typed identifier/event/entity/property/financial proposition separation",
+    "namespace occupancy conflict detection",
+    "full equivalence set computation",
+    "tied-top evidence fail-closed",
+    "proximity-only candidate-not-identity",
+    "authoritative-property-anchor parcel gate",
+    "project-specific funding gate",
+    "public-denominator FOIA gate",
+    "unsafe N:N join rejection",
+    "contradiction and SUPERSEDED preservation",
+    "differential change detection",
+    "legacy capital_control identity compatibility wrapper"
+  ],
+  "local_test_observation": {
+    "observed_passed": 18,
+    "observed_failed": 0,
+    "scope": "disposable local spike only",
+    "certification": "NOT_REMOTE_CI"
+  },
+  "promotion_blockers": [
+    "remote repository CI not yet observed on production branch",
+    "GOLDEN_002 BPOP corpus bytes are governed by open PR #519 and not reconciled",
+    "GOLDEN_003 TAMCOR corpus bytes not yet materialized into this branch",
+    "GOLDEN_004 PRASA/Jacobs corpus bytes not yet materialized into this branch",
+    "full legacy MoneySweep resolver parity not yet certified",
+    "skill registry and runtime contract validation still required"
+  ],
+  "spike_disposition": "contracts transferred into production implementation; no independent spike runtime retained"
+}

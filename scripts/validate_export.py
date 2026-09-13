@@ -67,6 +67,7 @@ FEDERATION_EXPECTED = {
 
 # Iteration order: streams whose IDs are referenced by others come first.
 STREAM_ORDER = ("sources", "entities", "funding_awards", "transactions", "relationships")
+HUB_CORE_STREAMS = ("sources", "entities", "relationships")
 
 
 @dataclass(frozen=True)
@@ -206,8 +207,12 @@ def validate_package(package_dir: str | Path, mode: str = "test") -> list[Valida
                 )
             )
 
-    # Cross-repo federation handshake descriptor (routable to spiderweb-pr/query-hub).
+    # Cross-repo federation handshake descriptor. The historical MoneySweep
+    # package was routed directly to spiderweb-pr/query-hub. The current
+    # committed package is a Hub-conformant producer export routed to TheHub and
+    # may omit empty money streams.
     federation = manifest.get("federation")
+    is_hub_package = False
     if not isinstance(federation, dict):
         errors.append(
             ValidationError(
@@ -217,24 +222,32 @@ def validate_package(package_dir: str | Path, mode: str = "test") -> list[Valida
             )
         )
     else:
-        for key, expected in FEDERATION_EXPECTED.items():
-            actual = federation.get(key)
-            if actual != expected:
-                errors.append(
-                    ValidationError(
-                        "federation_invalid",
-                        "manifest.json",
-                        f"federation.{key}={actual!r} (expected {expected!r})",
+        is_hub_package = (
+            federation.get("producer_repo") == "moneysweep-pr"
+            and federation.get("hub_parent") == "thehub-pr"
+        )
+        if not is_hub_package:
+            for key, expected in FEDERATION_EXPECTED.items():
+                actual = federation.get(key)
+                if actual != expected:
+                    errors.append(
+                        ValidationError(
+                            "federation_invalid",
+                            "manifest.json",
+                            f"federation.{key}={actual!r} (expected {expected!r})",
+                        )
                     )
-                )
+
+    expected_streams = HUB_CORE_STREAMS if is_hub_package else STREAM_ORDER
+    min_file_count = len(expected_streams)
 
     files_decl = manifest.get("files")
-    if not isinstance(files_decl, list) or len(files_decl) < 5:
+    if not isinstance(files_decl, list) or len(files_decl) < min_file_count:
         errors.append(
             ValidationError(
                 "manifest_files_missing",
                 "manifest.json",
-                f"expected 5 file entries, got "
+                f"expected at least {min_file_count} file entries, got "
                 f"{len(files_decl) if isinstance(files_decl, list) else 'none'}",
             )
         )
@@ -246,15 +259,31 @@ def validate_package(package_dir: str | Path, mode: str = "test") -> list[Valida
             if stream in STREAM_FILENAMES and isinstance(entry, dict):
                 declared_by_stream[stream] = entry
 
-    for stream, filename in STREAM_FILENAMES.items():
-        if stream not in declared_by_stream:
+    streams_to_validate = tuple(s for s in STREAM_ORDER if s in declared_by_stream)
+    if is_hub_package:
+        missing_core = [stream for stream in HUB_CORE_STREAMS if stream not in declared_by_stream]
+        for stream in missing_core:
             errors.append(
                 ValidationError(
                     "manifest_files_missing",
                     "manifest.json",
-                    f"missing files[] entry for stream={stream}",
+                    f"missing files[] entry for required Hub stream={stream}",
                 )
             )
+    else:
+        for stream in STREAM_ORDER:
+            if stream not in declared_by_stream:
+                errors.append(
+                    ValidationError(
+                        "manifest_files_missing",
+                        "manifest.json",
+                        f"missing files[] entry for stream={stream}",
+                    )
+                )
+
+    for stream in streams_to_validate:
+        filename = STREAM_FILENAMES[stream]
+        if stream not in declared_by_stream:
             continue
         path = pkg / filename
         if not path.exists():
@@ -267,7 +296,7 @@ def validate_package(package_dir: str | Path, mode: str = "test") -> list[Valida
             )
 
     rows_by_stream: dict[str, list[dict[str, Any]]] = {}
-    for stream in STREAM_ORDER:
+    for stream in streams_to_validate:
         filename = STREAM_FILENAMES[stream]
         path = pkg / filename
         if not path.exists():
@@ -309,7 +338,7 @@ def validate_package(package_dir: str | Path, mode: str = "test") -> list[Valida
         if isinstance(sid, str):
             source_ids.add(sid)
 
-    for stream in STREAM_ORDER:
+    for stream in streams_to_validate:
         if stream not in rows_by_stream:
             continue
         rows = rows_by_stream[stream]

@@ -120,6 +120,13 @@ export default function Items() {
         }
         self.assertTrue(endpoint_ids <= mapped)
         self.assertTrue(route_ids <= mapped)
+        symbol_ids = {
+            item["id"]
+            for item in candidates
+            if item["kind"] == "python_symbol"
+            and item["path"] == "server/backend/main.py"
+        }
+        self.assertLessEqual(symbol_ids, mapped)
 
     def test_backend_without_gui_is_rejected(self) -> None:
         manifest = self._manifest()
@@ -144,7 +151,7 @@ export default function Items() {
             manifest, baseline, after, issues, strict=False
         )
         self.assertFalse(passed)
-        self.assertEqual(2, report["summary"]["new_gaps"])
+        self.assertEqual(1, report["summary"]["new_gaps"])
         self.assertTrue(
             all(
                 item["signal"] == "BACKEND_NOT_GUI_SURFACED"
@@ -178,6 +185,28 @@ export default function Items() {
         )
         codes = [item["code"] for item in issues]
         self.assertEqual(2, codes.count("EXPIRED_PARITY_EXCEPTION"))
+
+    def test_exception_can_cover_a_reviewed_file(self) -> None:
+        manifest = self._manifest()
+        manifest["exceptions"] = [
+            {
+                "id": "backend-file-gap",
+                "reason": "GUI work is tracked separately.",
+                "owner": "maintainer",
+                "tracking": "ITEM-3",
+                "expires_on": "2027-01-01",
+                "candidate_ids": ["backend_endpoint:server/backend/main.py:GET /items"],
+                "candidate_files": ["server/backend/main.py"],
+            }
+        ]
+        candidates = parity.discover_candidates(self.root, manifest)
+        covered = parity.exception_candidate_ids(manifest, candidates)
+        backend_ids = {
+            item["id"]
+            for item in candidates
+            if item["path"] == "server/backend/main.py"
+        }
+        self.assertLessEqual(backend_ids, covered)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,77 @@
+{
+  "corpus_id": "GOLDEN_004_PRASA_JACOBS",
+  "source_basis": "Frozen PRASA/Jacobs research artifacts and archive-harvester configuration already present in the project/library",
+  "scope": "identity/lineage and temporal-role regression; not a claim of complete PRASA-Jacobs contract exhaustion",
+  "assertions": [
+    {
+      "id": "jacobs-ch2m-name-collapse",
+      "type": "ENTITY_IDENTITY",
+      "subject": "Jacobs Engineering",
+      "object": "CH2M / CH2M HILL",
+      "expected": "UNRESOLVED_UNLESS_AUTHORITATIVE_SUCCESSION_BINDING",
+      "negative_gate": "slash-label, shared project, or normalized name MUST NOT alone prove legal succession"
+    },
+    {
+      "id": "jacobs-prasa-presence",
+      "type": "ENTITY_IDENTITY",
+      "subject": "Jacobs Engineering",
+      "object": "Puerto Rico PRASA project manifestation",
+      "expected": "PASS_SOURCE_MANIFESTATION",
+      "reason": "frozen entity registry records confirmed PR presence and PRASA Mayaguez outfall references"
+    },
+    {
+      "id": "jacobs-ch2m-lineage-event",
+      "type": "EVENT_IDENTITY",
+      "subject": "CH2M corporate lineage",
+      "object": "Jacobs post-acquisition lineage",
+      "expected": "PROVISIONAL_PENDING_AUTHORITATIVE_CORPORATE_BINDING",
+      "negative_gate": "historical continuity is not the same proposition as legal entity identity"
+    },
+    {
+      "id": "temporal-lineage-buckets",
+      "type": "EVENT_IDENTITY",
+      "required_states": [
+        "PRE_LAZARO_DIRECTOR",
+        "DIRECTOR_OVERLAP",
+        "PRESIDENT_OVERLAP",
+        "POST_PRASA",
+        "POST_ACQUISITION"
+      ],
+      "expected": "BUCKETS_MUST_REMAIN_DISTINCT"
+    },
+    {
+      "id": "contract-id-discovery-keys",
+      "type": "IDENTIFIER_IDENTITY",
+      "discovery_keys": ["20-RFP-001", "2021-000173", "2020-000182", "2023-000023"],
+      "expected": "DISCOVERY_ONLY_UNTIL_NAMESPACE_AND_PRIMARY_RECORD_BINDING",
+      "negative_gate": "keyword presence in archive configuration MUST NOT certify contract identity"
+    },
+    {
+      "id": "archive-harvester-denominator",
+      "type": "SOURCE_DENOMINATOR",
+      "windows": [
+        {"domain": "acueductospr.com", "start": 2012, "end": 2014},
+        {"domain": "aaasubastas.com", "start": 2012, "end": 2014},
+        {"domain": "acueductos.pr.gov", "start": 2018, "end": 2024}
+      ],
+      "expected": "BOUNDED_DISCOVERY_WINDOW",
+      "negative_gate": "configuration bounds MUST NOT be described as universal historical exhaustion"
+    },
+    {
+      "id": "decision-maker-overlap",
+      "type": "EVENT_IDENTITY",
+      "subject": "PRASA leadership epoch",
+      "object": "company/project contract epoch",
+      "expected": "TEMPORAL_OVERLAP_REQUIRES_EXACT_DATES",
+      "negative_gate": "same general era MUST NOT become direct decision-maker involvement"
+    },
+    {
+      "id": "project-contract-binding",
+      "type": "PROPERTY_PROJECT_IDENTITY",
+      "subject": "PRASA project",
+      "object": "Jacobs/CH2M contract manifestation",
+      "expected": "UNRESOLVED_UNTIL_PRIMARY_PROJECT_CONTRACT_BINDING",
+      "negative_gate": "company PR presence MUST NOT bind every PRASA project to that company"
+    }
+  ]
+}

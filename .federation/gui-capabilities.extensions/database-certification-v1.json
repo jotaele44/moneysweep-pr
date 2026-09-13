@@ -1,0 +1,50 @@
+{
+  "capabilities": [
+    {
+      "id": "database-certification-operator-workflow",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Database release certification and provenance remediation are automatable operator/audit workflows. They produce immutable manifests and certification bundles consumed by governance and release processes; they are not interactive end-user dashboard capabilities and do not depend on an interactive terminal.",
+      "candidate_ids": [
+        "analysis_module:scripts/certify_database_release.py",
+        "analysis_module:scripts/remediate_canonical_evidence_provenance.py",
+        "analysis_symbol:scripts/certify_database_release.py:build_report",
+        "analysis_symbol:scripts/certify_database_release.py:main",
+        "analysis_symbol:scripts/certify_database_release.py:write_atomic_release",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:apply",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:atomic_csv",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:main",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:plan",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:read_rows",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:sha256",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:target_evidence",
+        "cli_surface:scripts/certify_database_release.py",
+        "cli_surface:scripts/remediate_canonical_evidence_provenance.py"
+      ]
+    },
+    {
+      "id": "database-certification-validation-backend",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "These modules are fail-closed validation primitives invoked by tests, CI, release certification, and Case Manager persistence. They have no independent user-facing interaction contract; GUI exposure would weaken rather than improve the audit boundary.",
+      "candidate_ids": [
+        "python_module:moneysweep/validation/case_manager_sqlite.py",
+        "python_module:moneysweep/validation/evidence_provenance.py",
+        "python_module:moneysweep/validation/federation_package.py",
+        "python_symbol:moneysweep/validation/canonical_v1_schema.py:validate_denominator_headers_and_rows",
+        "python_symbol:moneysweep/validation/canonical_v1_schema.py:validate_primary_key_uniqueness",
+        "python_symbol:moneysweep/validation/case_manager_sqlite.py:SQLiteReport",
+        "python_symbol:moneysweep/validation/case_manager_sqlite.py:certify_sqlite",
+        "python_symbol:moneysweep/validation/evidence_provenance.py:ProvenanceReport",
+        "python_symbol:moneysweep/validation/evidence_provenance.py:audit_evidence",
+        "python_symbol:moneysweep/validation/evidence_provenance.py:binding_key_for",
+        "python_symbol:moneysweep/validation/evidence_provenance.py:load_bindings",
+        "python_symbol:moneysweep/validation/federation_package.py:FederationReport",
+        "python_symbol:moneysweep/validation/federation_package.py:certify_federation_package"
+      ]
+    }
+  ],
+  "exceptions": []
+}
