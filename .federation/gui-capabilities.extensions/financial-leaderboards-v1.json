@@ -57,7 +57,8 @@
           "tests/test_leaderboard_git_history.py",
           "tests/test_leaderboard_debt_history_expected.py",
           "tests/test_leaderboard_snapshot_certification.py",
-          "tests/test_leaderboard_release_finalizer.py"
+          "tests/test_leaderboard_release_finalizer.py",
+          "tests/test_leaderboard_release_provenance.py"
         ],
         "contract": ["tests/test_gui_parity.py"],
         "e2e": ["dashboard/tests/financial-leaderboards.spec.mjs"]
