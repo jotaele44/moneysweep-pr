@@ -5,9 +5,11 @@ on:
     paths:
       - "registries/production_certification.yaml"
       - "schemas/operator_evidence_receipt.schema.json"
+      - "schemas/source_equivalence_claim.schema.json"
       - "tools/certify_production.py"
       - "tools/certify_production_scope_bound.py"
       - "tools/certification_operator_lineage.py"
+      - "tools/verify_source_equivalence.py"
       - "tools/audit_materialization_coverage.py"
       - "tools/audit_entity_resolution_certification.py"
       - "tools/operator_corpus_common.py"
@@ -18,6 +20,7 @@ on:
       - "tests/test_operator_corpus.py"
       - "tests/test_certification_operator_lineage.py"
       - "tests/test_certify_production_scope_bound.py"
+      - "tests/test_source_equivalence.py"
       - "reports/**"
       - "registries/**"
       - "scripts/**"
@@ -67,6 +70,7 @@ jobs:
             tests/test_operator_corpus.py \
             tests/test_certification_operator_lineage.py \
             tests/test_certify_production_scope_bound.py \
+            tests/test_source_equivalence.py \
             -q -o addopts=""
 
       - name: Regenerate current-denominator lineage evidence
