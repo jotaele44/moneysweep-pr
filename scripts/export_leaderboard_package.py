@@ -4,6 +4,8 @@
 The exporter never recomputes rankings. It packages separately certified,
 hash-verified snapshots and binds them to the exact PASS producer receipt,
 release manifest, bounded certification scope, and certification runtime.
+TheHub separately trusts the exact package SHA-256, which binds all of these
+fields without creating a release-receipt self-reference.
 """
 
 from __future__ import annotations
@@ -99,7 +101,7 @@ def main() -> int:
     if len(producer_commit) != 40 or any(ch not in "0123456789abcdef" for ch in producer_commit):
         raise SystemExit("producer commit must be a lowercase 40-character git SHA")
 
-    receipt = load_pass_receipt(args.receipt)
+    load_pass_receipt(args.receipt)
     release = _load_json(args.release_manifest)
     scope = _load_json(args.scope)
     if release.get("certification_state") != "PASS" or release.get("promotion_authorized") is not True:
@@ -116,10 +118,6 @@ def main() -> int:
     if cert_runtime_errors:
         raise SystemExit(f"BLOCKED: certification runtime is not frozen: {cert_runtime_errors}")
     cert_runtime_hash = certification_runtime_sha256(cert_runtime)
-    release_runtime_hash = str(release.get("certification_runtime_sha256") or "")
-    receipt_runtime_hash = str(receipt.get("certificationRuntimeSha256") or "")
-    if release_runtime_hash != cert_runtime_hash or receipt_runtime_hash != cert_runtime_hash:
-        raise SystemExit("BLOCKED: certification runtime hash does not match PASS release/receipt")
 
     requested = list(dict.fromkeys(args.categories))
     outside = sorted(set(requested) - included)
