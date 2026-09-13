@@ -1,0 +1,27 @@
+{
+  "schema_version": "moneysweep.source_equivalence/v1",
+  "source_id": "prasa",
+  "candidate_source": {
+    "name": "PRASA 2024 transition active-contracts report",
+    "source_url": "https://transicion2024.pr.gov/Agencias/163/Informe%20Contratos%20Vigentes/Contratos%20Vigentes%20al%2024%20de%20septiembre%20de%202024%20%28Informe%29.pdf",
+    "authoritative": true
+  },
+  "tests": {
+    "semantic_scope_match": false,
+    "temporal_scope_match": false,
+    "row_universe_match": false,
+    "field_mapping_complete": false,
+    "selection_equivalent": false,
+    "aggregation_equivalent": true
+  },
+  "missing_fields": [],
+  "extra_fields": [],
+  "evidence": [
+    {
+      "kind": "bounded_equivalence_basis",
+      "locator": "evidence/source_equivalence/prasa_transition_2024_basis.json",
+      "sha256": "684321a9b899541b9e3ad5c3e1ba6aad4984567fe69774cfffb80765fa68a0e2"
+    }
+  ],
+  "notes": "Official point-in-time evidence is useful but is not proven equivalent to the registered yearly PRASA procurement export. It must not receive source-substitution credit."
+}
