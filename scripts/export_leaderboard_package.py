@@ -3,7 +3,7 @@
 
 The exporter never recomputes rankings. It packages separately certified,
 hash-verified snapshots and binds them to the exact PASS producer receipt,
-release manifest and bounded certification scope.
+release manifest, bounded certification scope, and certification runtime.
 """
 
 from __future__ import annotations
@@ -14,6 +14,11 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
+from scripts.leaderboard_release_provenance import (
+    certification_runtime_manifest,
+    certification_runtime_sha256,
+    validate_certification_runtime,
+)
 from server.backend.leaderboard_history import verify_snapshot
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -106,6 +111,16 @@ def main() -> int:
         raise SystemExit("BLOCKED: certification scope has no scopeId")
     included = _scope_categories(scope)
 
+    cert_runtime = certification_runtime_manifest()
+    cert_runtime_errors = validate_certification_runtime(cert_runtime)
+    if cert_runtime_errors:
+        raise SystemExit(f"BLOCKED: certification runtime is not frozen: {cert_runtime_errors}")
+    cert_runtime_hash = certification_runtime_sha256(cert_runtime)
+    release_runtime_hash = str(release.get("certification_runtime_sha256") or "")
+    receipt_runtime_hash = str(receipt.get("certificationRuntimeSha256") or "")
+    if release_runtime_hash != cert_runtime_hash or receipt_runtime_hash != cert_runtime_hash:
+        raise SystemExit("BLOCKED: certification runtime hash does not match PASS release/receipt")
+
     requested = list(dict.fromkeys(args.categories))
     outside = sorted(set(requested) - included)
     if outside:
@@ -128,6 +143,13 @@ def main() -> int:
                 "metricType": snapshot["metricType"],
                 "snapshotId": snapshot["snapshotId"],
                 "snapshotSha256": snapshot["snapshotSha256"],
+                "capturedAt": snapshot["capturedAt"],
+                "candidateCount": snapshot["candidateCount"],
+                "accounting": snapshot["accounting"],
+                "sourceVersion": snapshot.get("sourceVersion") or {},
+                "sourceManifestations": snapshot["sourceManifestations"],
+                "runtimeManifest": runtime_manifest,
+                "snapshotCertification": certification,
                 "rows": snapshot["rows"],
             }
         )
@@ -145,7 +167,9 @@ def main() -> int:
             "receiptSha256": sha256(args.receipt),
             "releaseManifestSha256": sha256(args.release_manifest),
             "scopeSha256": sha256(args.scope),
+            "certificationRuntimeSha256": cert_runtime_hash,
         },
+        "certificationRuntimeManifest": cert_runtime,
         "categories": category_payloads,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -158,6 +182,7 @@ def main() -> int:
                 "output": str(args.output),
                 "sha256": sha256(args.output),
                 "scopeId": scope_id,
+                "certificationRuntimeSha256": cert_runtime_hash,
                 "categories": len(category_payloads),
             },
             indent=2,
