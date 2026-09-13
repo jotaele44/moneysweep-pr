@@ -6,6 +6,8 @@ on:
       - "registries/production_certification.yaml"
       - "schemas/operator_evidence_receipt.schema.json"
       - "tools/certify_production.py"
+      - "tools/certify_production_scope_bound.py"
+      - "tools/certification_operator_lineage.py"
       - "tools/audit_materialization_coverage.py"
       - "tools/audit_entity_resolution_certification.py"
       - "tools/operator_corpus_common.py"
@@ -14,6 +16,8 @@ on:
       - "tools/write_operator_evidence_receipt.py"
       - "tests/test_production_certification.py"
       - "tests/test_operator_corpus.py"
+      - "tests/test_certification_operator_lineage.py"
+      - "tests/test_certify_production_scope_bound.py"
       - "reports/**"
       - "registries/**"
       - "scripts/**"
@@ -61,6 +65,8 @@ jobs:
           python -m pytest \
             tests/test_production_certification.py \
             tests/test_operator_corpus.py \
+            tests/test_certification_operator_lineage.py \
+            tests/test_certify_production_scope_bound.py \
             -q -o addopts=""
 
       - name: Regenerate current-denominator lineage evidence
@@ -90,7 +96,10 @@ jobs:
       - name: Execute exhaustive certification audit
         working-directory: implementation
         run: |
-          python -m tools.certify_production \
+          # No truth scope or operator corpus is supplied in ordinary PR CI.
+          # Therefore G8 must remain non-authoritative while the bridge itself is
+          # exercised and all historical authority flags remain quarantined.
+          python -m tools.certify_production_scope_bound \
             --root ../scope \
             --config registries/production_certification.yaml \
             --scope-sha "$CERT_SCOPE_SHA" \
@@ -115,16 +124,20 @@ jobs:
           g7 = json.loads(
               Path("reports/entity_resolution_certification_audit.ci.json").read_text(encoding="utf-8")
           )
-          canonical_digest = (
-              "353995f4595fde0f7643ff8d9987154bcd230abe30037cdcbe6e3abd7f4233d1"
+          current_digest = (
+              "4c551385f00ca6df4332ee1643d0ef7a6ab85172632d945d35be285cd94f5826"
           )
+          gates = {gate["id"]: gate for gate in report["gates"]}
           checks = {
-              "source_ledger_162": len(report["source_universe"]["source_ledger"]) == 162,
-              "lineage_denominator_162": lineage["local_truth_summary"]["total_sources"] == 162,
-              "lineage_registry_digest_canonical": lineage["audit_scope"]["registry_source_ids_sha256"] == canonical_digest,
+              "source_ledger_164": len(report["source_universe"]["source_ledger"]) == 164,
+              "lineage_denominator_164": lineage["local_truth_summary"]["total_sources"] == 164,
+              "lineage_registry_digest_current": lineage["audit_scope"]["registry_source_ids_sha256"] == current_digest,
               "ci_lineage_not_operator_authoritative": lineage["audit_scope"]["operator_corpus_authoritative"] is False,
               "ci_lineage_proof_absent": "operator_corpus_proof_not_supplied" in lineage["audit_scope"]["authority_blockers"],
               "ci_lineage_orphans_fail_closed": lineage["processed_file_inventory"]["orphan_rows"] is None,
+              "g8_bridge_not_operator_authoritative": gates["G8_PROVENANCE_AND_LINEAGE"]["evidence"]["operator_corpus_authoritative"] is False,
+              "g8_bridge_requires_corpus": "operator_corpus_root_not_supplied" in gates["G8_PROVENANCE_AND_LINEAGE"]["blockers"],
+              "g8_bridge_requires_truth_scope": "truth_scope_required_for_operator_corpus" in gates["G8_PROVENANCE_AND_LINEAGE"]["blockers"],
               "g7_policy_no_name_only_resolution": g7["policy"]["name_only_resolution_allowed"] is False,
               "g7_policy_no_threshold_lowering": g7["policy"]["confidence_threshold_lowered"] is False,
               "scope_sha_bound_to_checkout": report["scope"]["commit_sha"] == report["scope"]["checkout_head_sha"],
