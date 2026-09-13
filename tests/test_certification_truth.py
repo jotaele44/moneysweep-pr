@@ -27,7 +27,7 @@ def _source(*, min_rows: int = 1, output: str = "data/staging/processed/a.csv") 
         "authentication": "none",
         "producer_script": "scripts/alpha.py",
         "expected_outputs": [output],
-        "validation_threshold": {"min_rows": min_rows},
+        "validation_threshold": {"min_rows": min_rows, "required_columns": ["id"]},
         "update_cadence": "weekly",
     }
 
