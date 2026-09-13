@@ -29,18 +29,21 @@ def _logical_sha256(payload: object) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def _truth_inputs(scope_root: Path) -> tuple[list[dict[str, str]], dict, dict, list[dict[str, str]]]:
+def _truth_inputs(
+    scope_root: Path,
+) -> tuple[list[dict[str, str]], dict[str, Any], dict[str, Any], list[dict[str, str]], dict[str, Any]]:
     reports = scope_root / "reports"
     return (
         _csv(reports / "source_registry_status.csv"),
         _json(reports / "materialization_readiness.json"),
         _json(reports / "completeness_matrix.json"),
         _csv(reports / "source_freshness.csv"),
+        _json(reports / "certification_truth.json"),
     )
 
 
 def build_graph(*, certificate: dict[str, Any], scope_root: Path) -> dict[str, Any]:
-    status_rows, readiness, completeness, freshness_rows = _truth_inputs(scope_root)
+    status_rows, readiness, completeness, freshness_rows, truth = _truth_inputs(scope_root)
     gates = {
         str(gate.get("id")): gate
         for gate in certificate.get("gates", [])
@@ -54,11 +57,21 @@ def build_graph(*, certificate: dict[str, Any], scope_root: Path) -> dict[str, A
         and row.get("pipeline_status") != "fully_materialized"
     )
     execution = sorted(set(readiness.get("automatable_not_ready") or []))
-    coverage = sorted(
-        row["source_id"]
-        for row in completeness.get("source_results", [])
-        if isinstance(row, dict) and row.get("coverage_status") not in {"meets_contract", "uncontracted"}
+
+    truth_sources = {
+        str(row.get("source_id")): row
+        for row in truth.get("sources", [])
+        if isinstance(row, dict) and isinstance(row.get("source_id"), str)
+    }
+    automatable = sorted(
+        source_id for source_id, row in truth_sources.items() if row.get("automatable") is True
     )
+    coverage = sorted(
+        source_id
+        for source_id in automatable
+        if truth_sources[source_id].get("coverage_status") != "meets_contract"
+    )
+
     freshness = sorted(
         row["source_id"]
         for row in freshness_rows
@@ -68,19 +81,19 @@ def build_graph(*, certificate: dict[str, Any], scope_root: Path) -> dict[str, A
 
     source_blockers = {
         "G3_REQUIRED_SOURCE_MATERIALIZATION": required_materialization,
-        "G5_EXECUTION_COMPLETENESS": execution,
-        "G6_SOURCE_CONTRACTS": coverage,
+        "G5_AUTOMATABLE_EXECUTION": execution,
+        "G6_SOURCE_VALIDATION_AND_COVERAGE_CONTRACTS": coverage,
         "G10_FRESHNESS": freshness,
     }
     gate_dependencies = {
         "G3_REQUIRED_SOURCE_MATERIALIZATION": [],
-        "G5_EXECUTION_COMPLETENESS": [],
-        "G6_SOURCE_CONTRACTS": [],
+        "G5_AUTOMATABLE_EXECUTION": [],
+        "G6_SOURCE_VALIDATION_AND_COVERAGE_CONTRACTS": [],
         "G7_ENTITY_RESOLUTION": [],
         "G8_PROVENANCE_AND_LINEAGE": [
             "G3_REQUIRED_SOURCE_MATERIALIZATION",
-            "G5_EXECUTION_COMPLETENESS",
-            "G6_SOURCE_CONTRACTS",
+            "G5_AUTOMATABLE_EXECUTION",
+            "G6_SOURCE_VALIDATION_AND_COVERAGE_CONTRACTS",
             "G10_FRESHNESS",
         ],
         "G9_CANONICAL_MASTER_INVARIANTS": ["G7_ENTITY_RESOLUTION", "G8_PROVENANCE_AND_LINEAGE"],
@@ -124,9 +137,10 @@ def build_graph(*, certificate: dict[str, Any], scope_root: Path) -> dict[str, A
         "unique_blocking_sources": len(unresolved_sources),
         "source_edges": len(source_edges),
         "gate_edges": len(gate_edges),
+        "automatable_sources": len(automatable),
     }
     payload = {
-        "schema_version": "moneysweep.certification_blocker_graph/v1",
+        "schema_version": "moneysweep.certification_blocker_graph/v2",
         "certification_state": certificate.get("certification_state"),
         "production_eligible": certificate.get("production_eligible"),
         "scope": certificate.get("scope"),
@@ -140,6 +154,7 @@ def build_graph(*, certificate: dict[str, Any], scope_root: Path) -> dict[str, A
             "hand_edited_status_allowed": False,
             "source_blocker_deduplication_changes_gate_counts": False,
             "missing_or_nonpass_gate_fails_closed": True,
+            "g6_automatable_requires_meets_contract": True,
         },
     }
     payload["logical_sha256"] = _logical_sha256(payload)
