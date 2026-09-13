@@ -8,10 +8,13 @@ The finalizer performs the non-CI release chain in one fail-closed transaction:
 4. issue producer PASS while federation promotion remains closed;
 5. when a TheHub checkout is supplied, temporarily authorize promotion,
    generate the exact package, run TheHub's consumer/cross-repo regressions,
-   and roll promotion back if replay fails.
+   mount the exact package at TheHub's default product path, verify that mount,
+   and roll promotion back if any replay step fails.
 
 GitHub Actions execution can be waived by scope policy, but this script never
-represents that waiver as a passing test result.
+represents that waiver as a passing test result. Frozen snapshots and comparison
+receipts are immutable: a rerun may reuse byte-identical artifacts but cannot
+silently replace them.
 """
 
 from __future__ import annotations
@@ -20,7 +23,6 @@ import argparse
 import hashlib
 import json
 import os
-import shutil
 import subprocess
 import sys
 from datetime import UTC, datetime
@@ -77,6 +79,14 @@ def _write_atomic(path: Path, raw: bytes) -> None:
     os.replace(temp, path)
 
 
+def _write_immutable(path: Path, raw: bytes) -> None:
+    if path.exists():
+        if path.read_bytes() == raw:
+            return
+        raise SystemExit(f"release blocked: refusing to overwrite immutable artifact {path}")
+    _write_atomic(path, raw)
+
+
 def _history_snapshot(
     *,
     source_ref: dict[str, Any],
@@ -95,7 +105,8 @@ def _history_snapshot(
         entity_type=None,
         currency=currency,
     )
-    if ranking.get("accounting", {}).get("arithmeticClosed") is not True:
+    accounting = ranking.get("accounting") or {}
+    if accounting.get("arithmeticClosed") is not True:
         raise SystemExit(f"release blocked: ranking accounting did not close for {commit}")
     snapshot = make_snapshot(
         ranking,
@@ -138,9 +149,7 @@ def _verify_expected_delta(result: dict[str, Any], expected: dict[str, Any]) -> 
         if row.get("movementState") not in {"NEW", "EXITED"} and float(row.get("valueDelta") or 0) != 0
     )
     if existing_value_changes != expected.get("existingEntityValueChanges"):
-        raise SystemExit(
-            "release blocked: existing-entity value delta count does not match frozen expectation"
-        )
+        raise SystemExit("release blocked: existing-entity value delta count does not match frozen expectation")
 
 
 def _history_receipt(prior: dict[str, Any], current: dict[str, Any], movement: dict[str, Any]) -> dict[str, Any]:
@@ -258,6 +267,53 @@ def _run_thehub_replay(thehub_root: Path) -> None:
         raise RuntimeError(result.stdout + "\n" + result.stderr)
 
 
+def _run_thehub_mounted_check(thehub_root: Path) -> None:
+    env = os.environ.copy()
+    env["PRII_MONEYSWEEP_LEADERBOARD_RECEIPT_SHA256"] = _sha_file(RECEIPT_PATH)
+    env["PRII_MONEYSWEEP_LEADERBOARD_RELEASE_SHA256"] = _sha_file(RELEASE_PATH)
+    env["PRII_MONEYSWEEP_LEADERBOARD_SCOPE_SHA256"] = _sha_file(SCOPE_PATH)
+    code = (
+        "from server.backend import moneysweep_leaderboards as c; "
+        "p=c._load_package(); "
+        "assert p['scopeId']==c.EXPECTED_SCOPE; "
+        "assert len(p['categories'])==1; "
+        "assert p['categories'][0]['categoryId']==c.EXPECTED_CATEGORY"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", code],
+        cwd=thehub_root,
+        env=env,
+        text=True,
+        capture_output=True,
+        timeout=60,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(result.stdout + "\n" + result.stderr)
+
+
+def _reuse_or_certify(current: dict[str, Any], scope: dict[str, Any]) -> tuple[dict[str, Any], Path]:
+    CERTIFIED_DIR.mkdir(parents=True, exist_ok=True)
+    path = CERTIFIED_DIR / f"{current['snapshotId'].replace(':', '_')}.json"
+    if path.exists():
+        certified = _load(path)
+        certification = certified.get("certification") or {}
+        if certification.get("sourceSnapshotSha256") != current.get("snapshotSha256"):
+            raise SystemExit(
+                "release blocked: immutable certified snapshot belongs to a different ranking runtime/source snapshot"
+            )
+        if certification.get("scopeId") != scope.get("scopeId"):
+            raise SystemExit("release blocked: immutable certified snapshot scope mismatch")
+        if verify_snapshot(certified):
+            raise SystemExit("release blocked: existing certified snapshot is invalid")
+        return certified, path
+    certified_at = datetime.now(tz=UTC).replace(microsecond=0).isoformat()
+    try:
+        certified = certify(current, scope, certified_at=certified_at)
+    except ValueError as exc:
+        raise SystemExit(f"release blocked: current debt snapshot certification failed: {exc}") from exc
+    return certified, path
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--thehub-root", type=Path)
@@ -276,7 +332,7 @@ def main() -> int:
 
     runtime = _runtime_manifest()
     runtime_commit = str(runtime.get("producerCommit") or "")
-    if len(runtime_commit) != 40:
+    if len(runtime_commit) != 40 or any(ch not in "0123456789abcdef" for ch in runtime_commit):
         raise SystemExit("release blocked: exact ranking runtime commit unresolved")
     if any(item.get("state") == "MISSING" for item in runtime.get("files") or []):
         raise SystemExit("release blocked: ranking runtime manifestation incomplete")
@@ -289,12 +345,7 @@ def main() -> int:
     movement = compare(prior, current, limit=25)
     _verify_expected_delta(movement, history_refs.get("expectedDelta") or {})
     history_receipt = _history_receipt(prior, current, movement)
-
-    certified_at = datetime.now(tz=UTC).replace(microsecond=0).isoformat()
-    try:
-        certified = certify(current, scope, certified_at=certified_at)
-    except ValueError as exc:
-        raise SystemExit(f"release blocked: current debt snapshot certification failed: {exc}") from exc
+    certified, certified_path = _reuse_or_certify(current, scope)
 
     scope_hash = _sha_file(SCOPE_PATH)
     producer_release, producer_receipt = _producer_documents(
@@ -307,20 +358,15 @@ def main() -> int:
         promote=False,
     )
 
-    # Write evidence artifacts first. Producer PASS is valid even if federation
-    # promotion remains closed; exact TheHub replay is a separate gate.
+    # Immutable evidence artifacts are written before mutable release decisions.
     SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
     for snapshot in (prior, current):
-        _write_atomic(
+        _write_immutable(
             SNAPSHOT_DIR / f"{snapshot['snapshotId'].replace(':', '_')}.json",
             _render(snapshot),
         )
-    _write_atomic(HISTORY_RECEIPT_PATH, _render(history_receipt))
-    CERTIFIED_DIR.mkdir(parents=True, exist_ok=True)
-    _write_atomic(
-        CERTIFIED_DIR / f"{certified['snapshotId'].replace(':', '_')}.json",
-        _render(certified),
-    )
+    _write_immutable(HISTORY_RECEIPT_PATH, _render(history_receipt))
+    _write_immutable(certified_path, _render(certified))
     _write_atomic(RELEASE_PATH, _render(producer_release))
     _write_atomic(RECEIPT_PATH, _render(producer_receipt))
 
@@ -344,8 +390,6 @@ def main() -> int:
     if not (thehub_root / "tests" / "test_moneysweep_leaderboard_crossrepo.py").exists():
         raise SystemExit(f"release blocked: TheHub consumer checkout not found at {thehub_root}")
 
-    # Promotion authorization changes receipt/release hashes, so write the final
-    # promotion documents, export the exact package, and replay those final bytes.
     promoted_release, promoted_receipt = _producer_documents(
         release_template=producer_release,
         receipt_template=producer_receipt,
@@ -357,21 +401,31 @@ def main() -> int:
     )
     previous_release = RELEASE_PATH.read_bytes()
     previous_receipt = RECEIPT_PATH.read_bytes()
+    previous_package = PACKAGE_PATH.read_bytes() if PACKAGE_PATH.exists() else None
+    target = thehub_root / "data" / "aggregate" / "moneysweep" / "leaderboard_package.json"
+    previous_target = target.read_bytes() if target.exists() else None
     try:
         _write_atomic(RELEASE_PATH, _render(promoted_release))
         _write_atomic(RECEIPT_PATH, _render(promoted_receipt))
         _run_export(runtime_commit)
         _run_thehub_replay(thehub_root)
+        _write_atomic(target, PACKAGE_PATH.read_bytes())
+        _run_thehub_mounted_check(thehub_root)
     except Exception as exc:
         _write_atomic(RELEASE_PATH, previous_release)
         _write_atomic(RECEIPT_PATH, previous_receipt)
-        if PACKAGE_PATH.exists():
-            PACKAGE_PATH.unlink()
+        if previous_package is None:
+            if PACKAGE_PATH.exists():
+                PACKAGE_PATH.unlink()
+        else:
+            _write_atomic(PACKAGE_PATH, previous_package)
+        if previous_target is None:
+            if target.exists():
+                target.unlink()
+        else:
+            _write_atomic(target, previous_target)
         raise SystemExit(f"promotion rolled back: {exc}") from exc
 
-    target = thehub_root / "data" / "aggregate" / "moneysweep" / "leaderboard_package.json"
-    target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(PACKAGE_PATH, target)
     print(
         json.dumps(
             {
