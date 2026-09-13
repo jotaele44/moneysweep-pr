@@ -15,13 +15,8 @@
     "evidence"
   ],
   "properties": {
-    "schema_version": {
-      "const": "moneysweep.source_equivalence/v2"
-    },
-    "source_id": {
-      "type": "string",
-      "minLength": 1
-    },
+    "schema_version": {"const": "moneysweep.source_equivalence/v2"},
+    "source_id": {"type": "string", "minLength": 1},
     "candidate_source": {
       "type": "object",
       "additionalProperties": false,
@@ -56,6 +51,8 @@
         "candidate_path",
         "original_sha256",
         "candidate_sha256",
+        "original_format",
+        "candidate_format",
         "stable_key",
         "compare_fields",
         "field_mapping"
@@ -65,6 +62,8 @@
         "candidate_path": {"type": "string", "minLength": 1},
         "original_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "candidate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "original_format": {"$ref": "#/$defs/csv_format"},
+        "candidate_format": {"$ref": "#/$defs/csv_format"},
         "stable_key": {
           "type": "array",
           "minItems": 1,
@@ -80,10 +79,7 @@
         "field_mapping": {
           "type": "object",
           "minProperties": 1,
-          "additionalProperties": {
-            "type": "string",
-            "minLength": 1
-          }
+          "additionalProperties": {"type": "string", "minLength": 1}
         }
       }
     },
@@ -107,13 +103,22 @@
         "properties": {
           "kind": {"type": "string", "minLength": 1},
           "locator": {"type": "string", "minLength": 1},
-          "sha256": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{64}$"
-          }
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
         }
       }
     },
     "notes": {"type": "string"}
+  },
+  "$defs": {
+    "csv_format": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["encoding", "delimiter", "header_row"],
+      "properties": {
+        "encoding": {"enum": ["utf-8", "utf-8-sig"]},
+        "delimiter": {"type": "string", "minLength": 1, "maxLength": 1},
+        "header_row": {"type": "integer", "minimum": 1}
+      }
+    }
   }
 }
