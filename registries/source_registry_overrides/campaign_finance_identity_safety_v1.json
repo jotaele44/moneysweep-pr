@@ -1,0 +1,15 @@
+{
+  "schema_version": "moneysweep.source_registry_override/v1",
+  "overrides": [
+    {
+      "source_id": "campaign_finance_entities",
+      "producer_script": "scripts/build_campaign_finance_entities_certified.py",
+      "notes": "Certification identity hardening: normalized names are discovery-only and never promote a resolved identity. Stable FEC candidate/committee IDs may verify identity within this source plane; ID-less records remain CANDIDATE_NOT_IDENTITY. The source-definition digest intentionally changes so historical receipts from the prior name-only producer cannot inherit authority."
+    },
+    {
+      "source_id": "campaign_finance_materialization_gate",
+      "producer_script": "scripts/validate_campaign_finance_materialization_certified.py",
+      "notes": "Fail-closed materialization gate with explicit NO_NAME_ONLY_PROMOTION checks for candidate/committee records, Schedule B recipient resolution, and campaign-finance edges. Historical gate receipts are non-authoritative for this source definition."
+    }
+  ]
+}
