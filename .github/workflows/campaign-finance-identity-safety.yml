@@ -1,0 +1,67 @@
+name: Campaign finance identity safety
+
+on:
+  pull_request:
+    paths:
+      - "scripts/build_campaign_finance_entities.py"
+      - "scripts/build_campaign_finance_entities_certified.py"
+      - "scripts/validate_campaign_finance_materialization.py"
+      - "scripts/validate_campaign_finance_materialization_certified.py"
+      - "scripts/materialize_campaign_finance.py"
+      - "registries/source_registry_extensions/campaign_finance_completion.json"
+      - "registries/source_registry_overrides/campaign_finance_identity_safety_v1.json"
+      - "tests/test_campaign_finance_entities.py"
+      - "tests/test_campaign_finance_identity_safety.py"
+      - ".github/workflows/campaign-finance-identity-safety.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  identity-safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run campaign-finance identity regressions
+        run: |
+          python -m pytest \
+            tests/test_campaign_finance_identity_safety.py \
+            -q -o addopts=""
+      - name: Prohibit normalized-name identity promotion in certification producers
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          override = json.loads(
+              Path("registries/source_registry_overrides/campaign_finance_identity_safety_v1.json")
+              .read_text(encoding="utf-8")
+          )
+          producers = {row["source_id"]: row["producer_script"] for row in override["overrides"]}
+          expected = {
+              "campaign_finance_entities": "scripts/build_campaign_finance_entities_certified.py",
+              "campaign_finance_materialization_gate": "scripts/validate_campaign_finance_materialization_certified.py",
+          }
+          if producers != expected:
+              raise SystemExit(f"campaign finance certification producer binding drift: {producers!r}")
+          builder = Path(expected["campaign_finance_entities"]).read_text(encoding="utf-8")
+          validator = Path(expected["campaign_finance_materialization_gate"]).read_text(encoding="utf-8")
+          checks = {
+              "builder_policy_present": "NO_NAME_ONLY_PROMOTION" in builder,
+              "builder_candidate_status_present": "CANDIDATE_NOT_IDENTITY" in builder,
+              "validator_policy_present": "NO_NAME_ONLY_PROMOTION" in validator,
+              "validator_rejects_name_only": "name_only_identity_promotion" in validator,
+          }
+          failed = [key for key, value in checks.items() if not value]
+          print(json.dumps({"checks": checks, "failed": failed}, indent=2, sort_keys=True))
+          if failed:
+              raise SystemExit("campaign-finance identity safety checks failed: " + ", ".join(failed))
+          PY
