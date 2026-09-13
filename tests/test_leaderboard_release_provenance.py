@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-import pytest
-
 from scripts import leaderboard_release_provenance as provenance
 
 
@@ -35,6 +33,7 @@ def test_certification_runtime_validation_fails_closed_on_missing_hash():
 
 def test_certification_runtime_validation_fails_closed_on_missing_file_state(monkeypatch, tmp_path):
     missing = tmp_path / "missing.py"
+    monkeypatch.setattr(provenance, "ROOT", tmp_path)
     monkeypatch.setattr(provenance, "CERTIFICATION_RUNTIME_FILES", [missing])
     manifest = provenance.certification_runtime_manifest()
     assert manifest["state"] == "INCOMPLETE"
