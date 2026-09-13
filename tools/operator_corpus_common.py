@@ -15,8 +15,8 @@ from moneysweep.runtime.source_registry import (
 )
 
 RECEIPT_SCHEMA_VERSION = "moneysweep.operator_evidence/v1"
-CORPUS_SCHEMA_VERSION = "moneysweep.operator_corpus/v1"
-VERIFICATION_SCHEMA_VERSION = "moneysweep.operator_corpus_verification/v1"
+CORPUS_SCHEMA_VERSION = "moneysweep.operator_corpus/v2"
+VERIFICATION_SCHEMA_VERSION = "moneysweep.operator_corpus_verification/v2"
 
 
 def canonical_json(value: object) -> bytes:
@@ -41,9 +41,9 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def csv_rows(path: Path, *, logical_path: str | Path | None = None) -> int | None:
-    content_path = Path(logical_path) if logical_path is not None else path
-    if content_path.suffix.lower() != ".csv":
+def csv_rows(path: Path, *, logical_path: str | None = None) -> int | None:
+    suffix = Path(logical_path or path.name).suffix.lower()
+    if suffix != ".csv":
         return None
     try:
         with path.open("r", encoding="utf-8-sig", newline="") as fh:
@@ -62,44 +62,34 @@ def safe_relative_path(value: str) -> Path:
     return normalized
 
 
-def _registry_input_paths(root: Path) -> list[str]:
-    paths = [DEFAULT_REGISTRY_PATH]
-    for directory in (DEFAULT_EXTENSIONS_DIR, DEFAULT_OVERRIDES_DIR):
-        folder = root / directory
-        if folder.exists():
-            paths.extend(
-                path.relative_to(root).as_posix()
-                for path in sorted(folder.glob("*.json"))
-                if path.is_file()
-            )
+def _registry_paths(root: Path) -> list[str]:
+    paths = [DEFAULT_REGISTRY_PATH.as_posix()]
+    extension_dir = root / DEFAULT_EXTENSIONS_DIR
+    if extension_dir.exists():
+        paths.extend(
+            path.relative_to(root).as_posix()
+            for path in sorted(extension_dir.glob("*.json"))
+        )
+    override_dir = root / DEFAULT_OVERRIDES_DIR
+    if override_dir.exists():
+        paths.extend(
+            path.relative_to(root).as_posix()
+            for path in sorted(override_dir.glob("*.json"))
+        )
     return paths
 
 
 def load_sources(root: Path) -> tuple[list[dict[str, Any]], list[str]]:
-    """Load the same effective source definitions consumed by runtime.
-
-    Certification receipts bind to the root JSON registry, direct JSON source
-    extensions and direct JSON overrides. YAML manifestations remain source
-    taxonomy/provenance inputs elsewhere but cannot silently define a different
-    production identity plane.
-    """
     registry = load_source_registry(root)
     sources = list(registry.get("sources") or [])
-    if any(not isinstance(source, dict) for source in sources):
-        raise RuntimeError("effective source registry contains a non-object source")
-    source_ids: list[str] = []
-    for source in sources:
-        raw = source.get("source_id")
-        if not isinstance(raw, str) or not raw or raw != raw.strip():
-            raise RuntimeError("effective source registry contains an invalid raw source_id")
-        source_ids.append(raw)
-        if type(source.get("required")) is not bool:
-            raise RuntimeError(f"{raw}: required must be boolean")
+    source_ids = [str(source.get("source_id", "")).strip() for source in sources]
+    if any(not source_id for source_id in source_ids):
+        raise RuntimeError("source registry contains an empty source_id")
     counts = {source_id: source_ids.count(source_id) for source_id in source_ids}
     duplicates = sorted(source_id for source_id, count in counts.items() if count > 1)
     if duplicates:
         raise RuntimeError("duplicate source IDs: " + ", ".join(duplicates))
-    return sources, _registry_input_paths(root)
+    return sources, _registry_paths(root)
 
 
 def source_ids_digest(sources: list[dict[str, Any]]) -> str:
@@ -153,14 +143,7 @@ def _is_datetime(value: object) -> bool:
 def validate_receipt(receipt: dict[str, Any]) -> list[str]:
     """Validate the receipt contract without trusting ``schema_valid`` itself."""
     errors: list[str] = []
-    allowed_top = {
-        "schema_version",
-        "source_id",
-        "acquisition",
-        "registry",
-        "outputs",
-        "validation",
-    }
+    allowed_top = {"schema_version", "source_id", "acquisition", "registry", "outputs", "validation"}
     extra_top = sorted(set(receipt) - allowed_top)
     if extra_top:
         errors.append("unexpected_top_level_keys:" + ",".join(extra_top))
@@ -184,10 +167,7 @@ def validate_receipt(receipt: dict[str, Any]) -> list[str]:
     extra_acquisition = sorted(set(acquisition) - allowed_acquisition)
     if extra_acquisition:
         errors.append("unexpected_acquisition_keys:" + ",".join(extra_acquisition))
-    if (
-        not isinstance(acquisition.get("producer"), str)
-        or not acquisition.get("producer", "").strip()
-    ):
+    if not isinstance(acquisition.get("producer"), str) or not acquisition.get("producer", "").strip():
         errors.append("receipt_producer_missing")
     if not _is_hex(acquisition.get("producer_sha"), 40):
         errors.append("receipt_producer_sha_invalid")
@@ -195,16 +175,11 @@ def validate_receipt(receipt: dict[str, Any]) -> list[str]:
         errors.append("receipt_completed_at_invalid")
     if "started_at" in acquisition and not _is_datetime(acquisition.get("started_at")):
         errors.append("receipt_started_at_invalid")
-    if (
-        not isinstance(acquisition.get("source_url"), str)
-        or not acquisition.get("source_url", "").strip()
-    ):
+    if not isinstance(acquisition.get("source_url"), str) or not acquisition.get("source_url", "").strip():
         errors.append("receipt_source_url_missing")
     http_status = acquisition.get("http_status")
     if http_status is not None and (
-        not isinstance(http_status, int)
-        or isinstance(http_status, bool)
-        or not 100 <= http_status <= 599
+        not isinstance(http_status, int) or isinstance(http_status, bool) or not 100 <= http_status <= 599
     ):
         errors.append("receipt_http_status_invalid")
 
