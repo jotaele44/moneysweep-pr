@@ -6,15 +6,22 @@ from pathlib import Path
 from typing import Any
 
 try:
-    from tools.operator_corpus_common import load_sources, source_definition_digest
+    from tools.operator_corpus_common import (
+        load_sources,
+        safe_relative_path,
+        sha256_file,
+        source_definition_digest,
+    )
 except ModuleNotFoundError:  # pragma: no cover - direct script execution fallback
     from operator_corpus_common import (  # type: ignore[no-redef]
         load_sources,
+        safe_relative_path,
+        sha256_file,
         source_definition_digest,
     )
 
 SCHEMA_VERSION = "moneysweep.source_equivalence/v1"
-REPORT_VERSION = "moneysweep.source_equivalence_verification/v1"
+REPORT_VERSION = "moneysweep.source_equivalence_verification/v2"
 TEST_KEYS = (
     "semantic_scope_match",
     "temporal_scope_match",
@@ -109,6 +116,46 @@ def validate_claim_shape(claim: dict[str, Any]) -> list[str]:
     return sorted(set(errors))
 
 
+def _verify_evidence_item(*, root: Path, item: dict[str, Any]) -> dict[str, Any]:
+    locator = item.get("locator")
+    expected_sha = item.get("sha256")
+    result: dict[str, Any] = {
+        "kind": item.get("kind"),
+        "locator": locator,
+        "expected_sha256": expected_sha,
+        "actual_sha256": None,
+        "verified": False,
+        "blockers": [],
+    }
+
+    if not isinstance(locator, str) or not locator.strip():
+        result["blockers"].append("locator_missing")
+        return result
+    if locator.startswith(("http://", "https://")):
+        result["blockers"].append("remote_evidence_not_byte_verified")
+        return result
+
+    try:
+        relative = safe_relative_path(locator)
+    except ValueError:
+        result["blockers"].append("unsafe_evidence_locator")
+        return result
+
+    path = root / relative
+    if not path.is_file():
+        result["blockers"].append("evidence_file_missing")
+        return result
+
+    actual_sha = sha256_file(path)
+    result["actual_sha256"] = actual_sha
+    if actual_sha != expected_sha:
+        result["blockers"].append("evidence_sha256_mismatch")
+        return result
+
+    result["verified"] = True
+    return result
+
+
 def verify(*, root: Path, claim: dict[str, Any]) -> dict[str, Any]:
     root = root.resolve()
     errors = validate_claim_shape(claim)
@@ -126,6 +173,22 @@ def verify(*, root: Path, claim: dict[str, Any]) -> dict[str, Any]:
     missing_fields = claim.get("missing_fields")
     missing_fields = missing_fields if isinstance(missing_fields, list) else []
 
+    raw_evidence = claim.get("evidence")
+    evidence_items = raw_evidence if isinstance(raw_evidence, list) else []
+    evidence_results = [
+        _verify_evidence_item(root=root, item=item)
+        for item in evidence_items
+        if isinstance(item, dict)
+    ]
+    verified_evidence_count = sum(item["verified"] is True for item in evidence_results)
+    evidence_blockers = sorted(
+        {
+            blocker
+            for item in evidence_results
+            for blocker in item.get("blockers", [])
+        }
+    )
+
     blockers: list[str] = []
     if candidate.get("authoritative") is not True:
         blockers.append("candidate_not_authoritative")
@@ -136,6 +199,8 @@ def verify(*, root: Path, claim: dict[str, Any]) -> dict[str, Any]:
         blockers.append("missing_fields_present")
     if errors:
         blockers.append("claim_contract_invalid")
+    if not evidence_results or verified_evidence_count != len(evidence_results):
+        blockers.append("evidence_not_byte_verified")
 
     if not blockers:
         decision = "CERTIFIED_EQUIVALENT"
@@ -162,13 +227,18 @@ def verify(*, root: Path, claim: dict[str, Any]) -> dict[str, Any]:
         "extra_fields": (
             claim.get("extra_fields") if isinstance(claim.get("extra_fields"), list) else []
         ),
-        "evidence_count": len(claim.get("evidence") or []),
+        "evidence_count": len(evidence_items),
+        "verified_evidence_count": verified_evidence_count,
+        "evidence": evidence_results,
         "errors": sorted(set(errors)),
         "blockers": sorted(set(blockers)),
+        "evidence_blockers": evidence_blockers,
         "policy": {
             "silent_substitution_allowed": False,
             "certification_requires_all_tests": True,
             "missing_fields_allowed_for_certified_equivalence": False,
+            "byte_verified_evidence_required": True,
+            "remote_only_evidence_can_certify": False,
         },
     }
 
