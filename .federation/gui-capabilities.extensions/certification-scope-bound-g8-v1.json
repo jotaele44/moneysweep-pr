@@ -1,0 +1,28 @@
+{
+  "capabilities": [
+    {
+      "id": "certification-scope-bound-operator-lineage-v1",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Fail-closed certification internals that reverify an operator corpus and bind its corpus identity to the frozen certification truth scope for G8. These modules do not introduce a second user-facing certification action or GUI control; they extend the existing certification audit path. Operator-facing certification status remains at its canonical existing surface, and G9/G11/G12 remain explicitly unimplemented scope-bound interlocks.",
+      "analysis": {
+        "files": [
+          "tools/certification_operator_lineage.py",
+          "tools/certify_production_scope_bound.py"
+        ]
+      },
+      "backend": {
+        "files": [
+          "tools/certification_operator_lineage.py",
+          "tools/certify_production_scope_bound.py"
+        ],
+        "tests": [
+          "tests/test_certification_operator_lineage.py",
+          "tests/test_certify_production_scope_bound.py"
+        ]
+      }
+    }
+  ],
+  "exceptions": []
+}
