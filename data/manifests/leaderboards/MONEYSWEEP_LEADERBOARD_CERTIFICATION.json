@@ -29,7 +29,7 @@
     {
       "id": "THEHUB_EXACT_REPLAY",
       "state": "OPEN",
-      "reason": "TheHub consumer is scope-bound and fail-closed; exact package bytes must still replay with the receipt, release, and scope hashes trusted."
+      "reason": "TheHub consumer is scope-bound and fail-closed; exact package bytes must replay with receipt, release, scope, and package SHA-256 values trusted."
     }
   ],
   "closedDecisions": [
@@ -47,9 +47,19 @@
       "id": "PRODUCER_CONSUMER_AUTHORITY_BOUNDARY",
       "state": "PASS",
       "reason": "MoneySweep remains financial authority, TheHub consumes certified rows without recomputation, and Spiderweb remains geometry authority."
+    },
+    {
+      "id": "CERTIFICATION_RUNTIME_PROVENANCE",
+      "state": "PASS",
+      "reason": "Certification/export/finalization code and immutable release contracts are carried in a separate frozen certification-runtime manifestation, avoiding circular ranking-release hashes."
+    },
+    {
+      "id": "EXACT_PACKAGE_TRUST",
+      "state": "PASS",
+      "reason": "TheHub requires an operator-trusted exact package SHA-256 in addition to trusted receipt, release-manifest, and certification-scope hashes."
     }
   ],
   "promotionAuthorized": false,
   "certificationPhraseAuthorized": false,
-  "note": "GitHub Actions execution is waived as a blocker but is not represented as passing. Promotion remains fail-closed until the three blocking residues are closed on frozen artifacts."
+  "note": "GitHub Actions execution is waived as a blocker but is not represented as passing. Design and static contracts are closed; promotion remains fail-closed until the three execution/materialization residues are closed on frozen artifacts."
 }
