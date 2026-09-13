@@ -1,0 +1,27 @@
+{
+  "schema_version": "moneysweep.source_equivalence/v1",
+  "source_id": "fec_committees",
+  "candidate_source": {
+    "name": "FEC bulk Schedule B/E data products",
+    "source_url": "https://www.fec.gov/data/browse-data/?tab=bulk-data",
+    "authoritative": true
+  },
+  "tests": {
+    "semantic_scope_match": false,
+    "temporal_scope_match": false,
+    "row_universe_match": false,
+    "field_mapping_complete": false,
+    "selection_equivalent": false,
+    "aggregation_equivalent": false
+  },
+  "missing_fields": [],
+  "extra_fields": [],
+  "evidence": [
+    {
+      "kind": "equivalence_status_note",
+      "locator": "docs/equivalence_evidence/fec_bulk_schedule_b_e.md",
+      "sha256": "64119f46c74fce0ab82b21baf41258f37ed7fcc0209693aaf43453587eda04f1"
+    }
+  ],
+  "notes": "Fail closed. Bulk FEC products cannot replace the explicit API lane or remove FEC_API_KEY until all six equivalence dimensions pass against byte-backed evidence."
+}
