@@ -9,13 +9,14 @@
     "source_id",
     "candidate_source",
     "tests",
+    "comparison",
     "missing_fields",
     "extra_fields",
     "evidence"
   ],
   "properties": {
     "schema_version": {
-      "const": "moneysweep.source_equivalence/v1"
+      "const": "moneysweep.source_equivalence/v2"
     },
     "source_id": {
       "type": "string",
@@ -37,18 +38,53 @@
       "required": [
         "semantic_scope_match",
         "temporal_scope_match",
-        "row_universe_match",
-        "field_mapping_complete",
         "selection_equivalent",
         "aggregation_equivalent"
       ],
       "properties": {
         "semantic_scope_match": {"type": "boolean"},
         "temporal_scope_match": {"type": "boolean"},
-        "row_universe_match": {"type": "boolean"},
-        "field_mapping_complete": {"type": "boolean"},
         "selection_equivalent": {"type": "boolean"},
         "aggregation_equivalent": {"type": "boolean"}
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "original_path",
+        "candidate_path",
+        "original_sha256",
+        "candidate_sha256",
+        "stable_key",
+        "compare_fields",
+        "field_mapping"
+      ],
+      "properties": {
+        "original_path": {"type": "string", "minLength": 1},
+        "candidate_path": {"type": "string", "minLength": 1},
+        "original_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "candidate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "stable_key": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "compare_fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "field_mapping": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
       }
     },
     "missing_fields": {
