@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """Materialize one complete financial leaderboard snapshot.
 
-The script never downloads data. It reuses the exact local/canonical source
-manifestations already mounted in MoneySweep, computes the complete candidate
-universe, freezes the executable/runtime manifestation, verifies accounting
-closure, and writes an immutable snapshot whose SHA-256 covers the canonical
-JSON payload.
+The script never downloads data. It reuses exact local/canonical source
+manifestations, computes the complete candidate universe, freezes the ranking
+executable/runtime manifestation, verifies accounting closure, and writes an
+immutable snapshot whose SHA-256 covers the canonical JSON payload.
+
+Release/certification decision files are intentionally not part of the ranking
+runtime hash. They are downstream artifacts and are independently hashed by the
+federation export contract; including them here would create a circular hash
+where issuing a release changes the runtime that the release is certifying.
 """
 
 from __future__ import annotations
@@ -31,7 +35,6 @@ RUNTIME_FILES = [
     ROOT / "server" / "backend" / "leaderboard_history.py",
     ROOT / "server" / "backend" / "leaderboard_investigation.py",
     ROOT / "server" / "backend" / "leaderboard_entities.py",
-    ROOT / "data" / "manifests" / "leaderboards" / "leaderboard_release_contract_v1.json",
 ]
 
 
@@ -126,7 +129,7 @@ def main() -> int:
     if runtime_manifest["producerCommit"] == "UNRESOLVED":
         raise SystemExit("snapshot blocked: exact producer git commit could not be resolved")
     if any(item.get("state") == "MISSING" for item in runtime_manifest["files"]):
-        raise SystemExit("snapshot blocked: required runtime/release manifestation file is missing")
+        raise SystemExit("snapshot blocked: required ranking runtime manifestation file is missing")
 
     snapshot = make_snapshot(
         ranking,
