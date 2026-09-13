@@ -19,6 +19,14 @@ from tools.audit_entity_resolution_certification import (
     build as build_entity_resolution_audit,
 )
 
+from tools.certification_truth_guards import (
+    derived_execution_blockers,
+    digest_json,
+    release_boundary,
+    strict_json,
+)
+from tools.operator_corpus_common import load_sources, source_ids_digest
+
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = ROOT / "registries" / "production_certification.yaml"
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
@@ -32,7 +40,7 @@ TRUTH_INPUTS = {
 
 
 def _json(path: Path) -> dict[str, Any]:
-    value = json.loads(path.read_text(encoding="utf-8"))
+    value = strict_json(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
         raise ValueError(f"{path} must contain a JSON object")
     return value
@@ -156,16 +164,26 @@ def _validate_truth_scope(
     except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError):
         return None, ["truth_scope_manifest_unreadable"]
 
-    if manifest.get("schema_version") != "moneysweep.certification_scope/v1":
+    if manifest.get("schema_version") != "moneysweep.certification_scope/v2":
         blockers.append("truth_scope_schema_mismatch")
     scope_id = manifest.get("scope_id")
     if not isinstance(scope_id, str) or not re.fullmatch(r"[0-9a-f]{64}", scope_id):
         blockers.append("truth_scope_id_invalid")
 
+    identity = manifest.get("scope_identity")
+    if not isinstance(identity, dict):
+        blockers.append("truth_scope_identity_missing")
+        identity = {}
+    elif digest_json(identity) != scope_id:
+        blockers.append("truth_scope_id_mismatch")
+
     artifacts = manifest.get("artifacts")
     if not isinstance(artifacts, dict):
         artifacts = {}
         blockers.append("truth_scope_artifact_manifest_missing")
+
+    if identity.get("artifacts_sha256") != digest_json(artifacts):
+        blockers.append("truth_scope_artifact_inventory_mismatch")
 
     for name in sorted(TRUTH_INPUTS):
         path = paths[name]
@@ -194,6 +212,8 @@ def _validate_truth_scope(
         if truth_record.get("bytes") != truth_path.stat().st_size:
             blockers.append("certification_truth_bytes_mismatch")
 
+    if isinstance(truth_record, dict) and identity.get("truth_sha256") != truth_record.get("sha256"):
+        blockers.append("truth_scope_truth_identity_mismatch")
     return manifest, sorted(set(blockers))
 
 
@@ -225,6 +245,12 @@ def build_report(
         paths=paths,
     )
 
+    derived_truth = {}
+    if truth_root is not None and not truth_scope_blockers:
+        derived_truth = _json(truth_root / "reports/certification_truth.json")
+    registry_sources, _ = load_sources(root)
+    registry_ids = {source["source_id"] for source in registry_sources}
+    registry_digest = source_ids_digest(registry_sources)
     readiness = _json(paths["materialization_readiness"])
     status_rows = _csv(paths["source_registry_status"])
     recovery_rows = _csv(paths["source_recovery_matrix"])
@@ -255,14 +281,18 @@ def build_report(
         if row["source_id"] in automatable and row["pipeline_status"] != "fully_materialized"
     )
 
+    freshness_targets = automatable | {row["source_id"] for row in required}
     freshness_by_id = {row["source_id"]: row for row in freshness_rows}
-    freshness_missing = sorted(automatable - set(freshness_by_id))
+    freshness_missing = sorted(freshness_targets - set(freshness_by_id))
     freshness_nonfresh = sorted(
         source_id
-        for source_id in automatable
+        for source_id in freshness_targets
         if source_id in freshness_by_id
-        and freshness_by_id[source_id].get("enabled", "").lower() == "true"
-        and freshness_by_id[source_id].get("freshness_status", "") != "FRESH"
+        and (
+            freshness_by_id[source_id].get("receipt_valid", "").lower() != "true"
+            or freshness_by_id[source_id].get("freshness_status", "")
+            not in {"FRESH", "FRESHNESS_NOT_APPLICABLE"}
+        )
     )
     open_reviews = [
         row
@@ -300,13 +330,31 @@ def build_report(
 
     truth_scope_id = truth_scope.get("scope_id") if truth_scope else None
     truth_identity = truth_scope.get("scope_identity") if truth_scope else {}
+    if not isinstance(truth_identity, dict):
+        truth_identity = {}
     truth_digest_match = (
         truth_root is None or truth_identity.get("registry_source_ids_sha256") == digest
     )
+    if truth_scope is not None:
+        if truth_identity.get("configuration_sha256") != _sha256(config_path):
+            truth_scope_blockers.append("truth_scope_configuration_mismatch")
+        if truth_identity.get("implementation_sha") != implementation_sha:
+            truth_scope_blockers.append("truth_scope_implementation_mismatch")
+        if truth_identity.get("scope_repository_sha") != scope_sha:
+            truth_scope_blockers.append("truth_scope_repository_mismatch")
+        if truth_identity.get("source_definitions_sha256") != digest_json({
+            source["source_id"]: digest_json(source) for source in registry_sources
+        }):
+            truth_scope_blockers.append("truth_scope_source_definitions_mismatch")
     g0 = (
         bool(HEX40.fullmatch(scope_sha))
         and bool(HEX40.fullmatch(implementation_sha))
         and scope_sha == actual_scope_head
+        and implementation_sha == _head(ROOT)
+        and registry_ids == unique_ids
+        and registry_digest == digest
+        and total == 162
+        and required_total == 16
         and total == len(status_rows)
         and not truth_scope_blockers
         and truth_digest_match
@@ -352,7 +400,9 @@ def build_report(
         and federation.get("source_truth", {}).get("total_sources") == total
         and historical_registry.get("total_sources") == total
         and historical_registry.get("source_ids_sha256") == digest
-        and readiness.get("automatable_total") == readiness.get("automatable_ready")
+        and readiness.get("automatable_total") == (
+            readiness.get("automatable_ready", 0) + len(readiness.get("automatable_not_ready", []))
+        )
         and not missing_recovery
     )
     gates.append(
@@ -413,7 +463,10 @@ def build_report(
         )
 
     g3 = (
-        required_total == config["requirements"]["required_source_count"]
+        truth_root is not None
+        and g0
+        and not truth_scope_blockers
+        and required_total == config["requirements"]["required_source_count"]
         and required_counts.get("fully_materialized", 0) == required_total
         and not required_blockers
     )
@@ -470,36 +523,44 @@ def build_report(
         )
     )
 
-    g5 = not automatable_unmaterialized and not freshness_missing
+    execution_blockers = derived_execution_blockers(derived_truth, automatable)
+    g5 = (
+        not automatable_unmaterialized and not execution_blockers
+        and not truth_scope_blockers and len(automatable) == 113
+    )
     gates.append(
         _gate(
             "G5_AUTOMATABLE_EXECUTION",
             PASS if g5 else FAIL,
             (
-                "All automatable sources are materialized."
+                "All automatable sources have bound execution and valid outputs."
                 if g5
                 else "Automatable execution is incomplete."
             ),
             {
                 "automatable_total": len(automatable),
+                "execution_blockers": execution_blockers,
                 "unmaterialized_count": len(automatable_unmaterialized),
                 "unmaterialized": automatable_unmaterialized,
                 "freshness_missing": freshness_missing,
                 "truth_scope_id": truth_scope_id,
             },
-            automatable_unmaterialized + freshness_missing,
+            automatable_unmaterialized + execution_blockers,
         )
     )
 
     coverage_status = completeness.get("by_coverage_status", {})
     materiality = completeness.get("by_materiality_label", {})
     excluded = readiness.get("queued_excluded_total", 0)
-    g6 = (
-        coverage_status.get("below_contract", 0) == 0
-        and coverage_status.get("unverifiable", 0) == 0
-        and coverage_status.get("uncontracted", 0) == excluded
-        and materiality.get("empty", 0) <= excluded
+    coverage_by_id = {
+        row["source_id"]: row for row in derived_truth.get("sources", [])
+        if isinstance(row, dict) and isinstance(row.get("source_id"), str)
+    }
+    contract_blockers = sorted(
+        source_id for source_id in automatable
+        if coverage_by_id.get(source_id, {}).get("coverage_status") != "meets_contract"
     )
+    g6 = bool(automatable) and not contract_blockers and not execution_blockers and not truth_scope_blockers
     gates.append(
         _gate(
             "G6_SOURCE_VALIDATION_AND_COVERAGE_CONTRACTS",
@@ -510,6 +571,7 @@ def build_report(
                 else "Coverage validation remains incomplete."
             ),
             {
+                "contract_blockers": contract_blockers,
                 "contracted_sources": completeness.get("contracted_sources"),
                 "coverage_status": coverage_status,
                 "materiality": materiality,
@@ -561,10 +623,10 @@ def build_report(
 
     coverage_total = coverage.get("local_truth_summary", {}).get("total_sources")
     orphan_rows = coverage.get("processed_file_inventory", {}).get("orphan_rows")
-    operator_authoritative = (
-        coverage.get("audit_scope", {}).get("operator_corpus_authoritative") is True
-    )
-    lineage_blockers: list[str] = []
+    # A historical audit Boolean is a claim, not an in-process CAS verification.
+    operator_authority_claim = coverage.get("audit_scope", {}).get("operator_corpus_authoritative")
+    operator_authoritative = False
+    lineage_blockers: list[str] = ["scope_bound_corpus_reverification_unimplemented"]
     if coverage_total != total:
         lineage_blockers.append("lineage_denominator_mismatch")
     if not operator_authoritative:
@@ -586,6 +648,7 @@ def build_report(
                 "current_registry_total_sources": total,
                 "coverage_audit_orphan_rows": orphan_rows,
                 "operator_corpus_authoritative": operator_authoritative,
+                "historical_operator_authority_claim": operator_authority_claim,
                 "operator_corpus_id": coverage.get("audit_scope", {}).get("operator_corpus_id"),
                 "registry_paths": coverage.get("audit_scope", {}).get("registry_paths"),
                 "historical_unresolved_lineage_rows": historical_status.get(
@@ -600,7 +663,8 @@ def build_report(
 
     canonical_gate = canonical_graph.get("gate")
     canonical_review = canonical_graph.get("review_queue_open")
-    g9 = canonical_gate == "CERTIFIED" and canonical_review == 0
+    # The historical graph summary is retained, but no replay verifier is bound yet.
+    g9 = False
     gates.append(
         _gate(
             "G9_CANONICAL_MASTER_INVARIANTS",
@@ -615,11 +679,11 @@ def build_report(
                 "review_queue_open": canonical_review,
                 "edge_evidence_coverage_pct": canonical_graph.get("edge_evidence_coverage_pct"),
             },
-            ([] if g9 else ["certified_canonical_master_invariant_receipt_missing"]),
+            ["scope_bound_canonical_replay_unimplemented"],
         )
     )
 
-    g10 = not freshness_nonfresh and not freshness_missing
+    g10 = bool(automatable) and not freshness_nonfresh and not freshness_missing and not truth_scope_blockers and truth_root is not None
     gates.append(
         _gate(
             "G10_FRESHNESS_AND_UNIVERSE_COMPLETENESS",
@@ -640,11 +704,8 @@ def build_report(
     )
 
     fg = federation.get("federation_readiness_gate", {})
-    g11 = (
-        federation.get("production_status") == "CERTIFIED"
-        and fg.get("ready_for_hub_live_execution") is True
-        and not fg.get("blocking_conditions")
-    )
+    # Do not promote production_status/ready_for_hub_live_execution report flags.
+    g11 = False
     gates.append(
         _gate(
             "G11_PRODUCTION_EXPORT_AND_FEDERATION",
@@ -660,29 +721,21 @@ def build_report(
                 "ready_for_hub_live_execution": fg.get("ready_for_hub_live_execution"),
                 "blocking_conditions": fg.get("blocking_conditions", []),
             },
-            list(fg.get("blocking_conditions") or []),
+            list(fg.get("blocking_conditions") or []) + ["scope_bound_federation_replay_unimplemented"],
         )
     )
 
     upstream_nonpass = [gate["id"] for gate in gates if gate["state"] != PASS]
-    activation = bool(
-        historical_status.get("preservation", {}).get("production_activation_authorized")
+    release = release_boundary(
+        upstream_nonpass,
+        historical_status.get("preservation", {}).get("production_activation_authorized"),
     )
-    g12 = not upstream_nonpass and activation
     gates.append(
         _gate(
-            "G12_RELEASE_CERTIFICATION",
-            PASS if g12 else BLOCKED,
-            (
-                "All gates pass and activation is authorized."
-                if g12
-                else "Release certification remains blocked."
-            ),
-            {
-                "upstream_nonpass_gates": upstream_nonpass,
-                "production_activation_authorized": activation,
-            },
-            upstream_nonpass + ([] if activation else ["production_activation_not_authorized"]),
+            "G12_RELEASE_CERTIFICATION", release["state"],
+            "Release remains blocked pending scope-bound authenticated activation.",
+            {key: value for key, value in release.items() if key not in {"state", "blockers"}},
+            release["blockers"],
         )
     )
 
@@ -741,7 +794,7 @@ def build_report(
         },
         "gates": gates,
         "certification_state": (
-            config["states"]["certified"] if all_pass else config["states"]["non_production"]
+            "CERTIFIED" if all_pass else "NON_PRODUCTION_DIAGNOSTIC"
         ),
         "production_eligible": all_pass,
         "nonpass_gate_ids": [gate["id"] for gate in gates if gate["state"] != PASS],
@@ -768,7 +821,7 @@ def main() -> int:
     parser.add_argument(
         "--output",
         type=Path,
-        default=ROOT / "reports" / "production_certification.json",
+        default=None,
     )
     parser.add_argument("--require-certified", action="store_true")
     args = parser.parse_args()
@@ -780,11 +833,13 @@ def main() -> int:
         implementation_sha=args.implementation_sha,
         run_preflight=args.run_preflight,
     )
+    payload = json.dumps(report, indent=2) + "\n"
+    if args.output is None:
+        report_id = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+        args.output = ROOT / "build/certification-diagnostics" / report_id / "production_certificate.json"
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(
-        json.dumps(report, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    with args.output.open("x", encoding="utf-8") as stream:
+        stream.write(payload)
     print(
         json.dumps(
             {
