@@ -1,0 +1,37 @@
+{
+  "schema_version": "moneysweep.financial-category-ontology/v1.1",
+  "ranking_contract_version": "moneysweep.leaderboard/v1.1",
+  "rules": {
+    "currency_policy": "Rank only comparable values within one currency; do not FX-convert implicitly.",
+    "identity_policy": "Aggregate only by source-native or canonical stable identifiers. Names and normalized names are display/discovery fields only.",
+    "measure_policy": "Awarded, obligated, disbursed, paid, assessed, claimed, judgment, contributed, debt par, loan principal, guaranteed, incentivized and estimated values are non-equivalent measures.",
+    "tie_policy": "Use competition ranking by metric value; deterministic entity_id ordering is display-only and never evidence of superiority.",
+    "top_n_policy": "Top N includes every entity tied at rank N.",
+    "unresolved_policy": "Records lacking the adapter's required stable identity or currency never silently contribute to a ranked entity total.",
+    "materialization_policy": "Adapters backed by staging outputs return OPEN_NOT_MATERIALIZED when their frozen local source manifestation is absent; absence is never treated as a zero-valued universe.",
+    "history_policy": "Rank movement requires at least two hash-verified comparable snapshots with equal category, measure, ranking contract, filters and currency universe. Source-manifestation changes are dataset deltas and cannot automatically be labeled economic activity."
+  },
+  "categories": [
+    {"id":"contract_award","label":"Government contract awards","metric_type":"AWARDED","unit":"currency","adapter":"canonical_contracts","certification_state":"PROVISIONAL","reason":"canonical_v1 contracts expose contractor_entity_id and award_amount; repository master dataset is not yet production-certified"},
+    {"id":"debt_issuance","label":"Public debt issued (par amount)","metric_type":"DEBT_ISSUED_PAR","unit":"currency","adapter":"canonical_debt","certification_state":"PROVISIONAL","reason":"canonical_v1 debt instruments expose issuer_entity_id, par_amount, currency and evidence IDs; par amount is not outstanding debt or debt service"},
+    {"id":"federal_obligation","label":"Federal contract obligations","metric_type":"OBLIGATED","unit":"currency","adapter":"federal_awards_contracts","certification_state":"PROVISIONAL_DYNAMIC","reason":"uses source-native recipient_uei plus standardized obligated_amount when pr_all_awards_master.csv is mounted; absence returns OPEN_NOT_MATERIALIZED"},
+    {"id":"federal_grant","label":"Federal grant obligations","metric_type":"OBLIGATED","unit":"currency","adapter":"federal_awards_grants","certification_state":"PROVISIONAL_DYNAMIC","reason":"uses source-native recipient_uei and grant-only obligated_amount from the unified federal-award master when mounted"},
+    {"id":"disaster_assistance","label":"Disaster-recovery assistance obligations","metric_type":"OBLIGATED","unit":"currency","adapter":"federal_awards_disaster","certification_state":"PROVISIONAL_DYNAMIC","reason":"bounded to disaster-source families in the unified federal-award master; approved, paid and loan-principal measures remain separate"},
+    {"id":"federal_assistance","label":"Federal assistance obligations","metric_type":"OBLIGATED","unit":"currency","adapter":"federal_awards_assistance","certification_state":"PROVISIONAL_DYNAMIC","reason":"bounded assistance-source aggregation by source-native recipient_uei; instrument-specific non-obligation measures are excluded"},
+    {"id":"campaign_contribution_received","label":"Campaign contributions received by authoritative FEC committee","metric_type":"CONTRIBUTIONS_RECEIVED","unit":"currency","adapter":"campaign_finance_receipts","certification_state":"PROVISIONAL_DYNAMIC","reason":"uses only authoritative nonblank FEC committee IDs as recipient identities when the campaign graph is mounted; donor name-derived IDs are not promoted"},
+    {"id":"campaign_donor_contribution","label":"Campaign contributions by donor","metric_type":"CONTRIBUTED","unit":"currency","adapter":null,"certification_state":"CANDIDATE_NOT_IDENTITY","reason":"donor graph IDs are currently derived from normalized names; name-derived determinism is not canonical donor identity"},
+    {"id":"government_payment","label":"Government payments","metric_type":"PAID","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"paid/disbursed records are not equivalent to contract award or obligation measures"},
+    {"id":"procurement","label":"Procurement awards beyond canonical_v1 contract scope","metric_type":"AWARDED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"requires a bounded broader procurement universe plus amendment, supersession and duplicate adjudication"},
+    {"id":"infrastructure_project","label":"Infrastructure project funding","metric_type":"FUNDED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"project-level funding is not yet bound to canonical entity recipients with one financial semantic"},
+    {"id":"loan","label":"Loans","metric_type":"LOAN_PRINCIPAL","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"loan principal must remain separate from grants, obligations and guarantees"},
+    {"id":"guarantee","label":"Loan guarantees","metric_type":"GUARANTEED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"guaranteed amount is a distinct exposure measure"},
+    {"id":"subsidy_incentive","label":"Subsidies and incentives","metric_type":"INCENTIVE","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"requires source-specific benefit semantics and stable recipient identity"},
+    {"id":"tax_incentive","label":"Tax incentives","metric_type":"DOCUMENTED_BENEFIT","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"estimated and realized tax benefits cannot be mixed"},
+    {"id":"lobbying_expenditure","label":"Lobbying expenditures","metric_type":"EXPENDED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"canonical lobbying rows expose stable parties but the current amount field is not materially populated"},
+    {"id":"property_assessment","label":"Property assessments","metric_type":"ASSESSED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"canonical properties expose owner IDs but current property values are not materially populated and assessment-date semantics are absent"},
+    {"id":"legal_judgment","label":"Legal judgments and settlements","metric_type":"JUDGMENT_OR_SETTLEMENT","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"claims, judgments and settlements are distinct legal measures and require adjudicated entity binding"},
+    {"id":"bankruptcy_claim","label":"Bankruptcy claims","metric_type":"CLAIMED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"claim amount is not paid, allowed or recovered amount"},
+    {"id":"municipal_expenditure","label":"Municipal expenditures","metric_type":"PAID_OR_OBLIGATED","unit":"currency","adapter":null,"certification_state":"OPEN","reason":"paid and obligated measures require separate source adapters before ranking"},
+    {"id":"public_revenue","label":"Public revenue streams","metric_type":"GROSS_REVENUE","unit":"currency","adapter":null,"certification_state":"OPEN_NOT_MATERIALIZED","reason":"canonical revenue_streams currently defines the schema but contains no materialized rows"}
+  ]
+}
