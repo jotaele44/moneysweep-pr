@@ -272,12 +272,14 @@ def _run_thehub_mounted_check(thehub_root: Path) -> None:
     env["PRII_MONEYSWEEP_LEADERBOARD_RECEIPT_SHA256"] = _sha_file(RECEIPT_PATH)
     env["PRII_MONEYSWEEP_LEADERBOARD_RELEASE_SHA256"] = _sha_file(RELEASE_PATH)
     env["PRII_MONEYSWEEP_LEADERBOARD_SCOPE_SHA256"] = _sha_file(SCOPE_PATH)
+    env["PRII_MONEYSWEEP_LEADERBOARD_PACKAGE_SHA256"] = _sha_file(PACKAGE_PATH)
     code = (
         "from server.backend import moneysweep_leaderboards as c; "
         "p=c._load_package(); "
         "assert p['scopeId']==c.EXPECTED_SCOPE; "
         "assert len(p['categories'])==1; "
-        "assert p['categories'][0]['categoryId']==c.EXPECTED_CATEGORY"
+        "assert p['categories'][0]['categoryId']==c.EXPECTED_CATEGORY; "
+        "assert p['consumerPackageSha256']"
     )
     result = subprocess.run(
         [sys.executable, "-c", code],
