@@ -49,7 +49,7 @@ def _current_status_rows() -> list[dict[str, str]]:
         return list(csv.DictReader(stream))
 
 
-def test_current_evidence_audit_uses_exact_live_denominator_and_fails_profile_drift() -> None:
+def test_current_evidence_audit_uses_exact_live_denominator_and_converged_profile() -> None:
     report = _report()
     gates = _gates(report)
     sources, _ = load_sources(ROOT)
@@ -67,13 +67,11 @@ def test_current_evidence_audit_uses_exact_live_denominator_and_fails_profile_dr
     assert report["production_eligible"] is False
 
     g0 = gates["G0_SCOPE_FREEZE"]
-    assert g0["state"] == "FAIL"
+    assert g0["state"] == "PASS"
     assert g0["evidence"]["runtime_certification_source_id_delta"] == []
-    assert set(g0["evidence"]["runtime_certification_definition_delta"]) == {
-        "cor3",
-        "pr_cabilderos",
-    }
-    assert "runtime_certification_definition_divergence" in g0["blockers"]
+    assert g0["evidence"]["runtime_certification_definition_delta"] == []
+    assert g0["evidence"]["registry_profile_blockers"] == []
+    assert g0["blockers"] == []
 
     assert gates["G1_CONTROL_PLANE_RECONCILIATION"]["state"] == "PASS"
     assert gates["G2_STRICT_PREFLIGHT"]["state"] == "OPEN"
@@ -158,7 +156,7 @@ def test_current_completeness_is_not_promoted() -> None:
     assert gates["G11_PRODUCTION_EXPORT_AND_FEDERATION"]["state"] == "BLOCKED"
 
 
-def test_lineage_auditor_includes_current_extension_registry_without_granting_authority() -> None:
+def test_lineage_auditor_includes_effective_registry_inputs_without_granting_authority() -> None:
     audit = build_coverage_audit(ROOT, operator_corpus_authoritative=False)
 
     assert audit["local_truth_summary"]["total_sources"] == 164
@@ -166,11 +164,13 @@ def test_lineage_auditor_includes_current_extension_registry_without_granting_au
     assert audit["audit_scope"]["operator_corpus_authoritative"] is False
     assert audit["processed_file_inventory"]["orphan_rows"] is None
     registry_paths = set(audit["audit_scope"]["registry_paths"])
-    assert "registries/source_registry.yaml" in registry_paths
+    assert "registries/source_registry.json" in registry_paths
     assert "registries/source_registry_extensions/fomb.json" in registry_paths
     assert "registries/source_registry_extensions/campaign_finance_completion.json" in registry_paths
     assert "registries/source_registry_extensions/nara_nextgen.json" in registry_paths
     assert "registries/source_registry_extensions/sec_ownership_hardening_v0_3.json" in registry_paths
+    assert "registries/source_registry_overrides/wave0_provenance_corrections.json" in registry_paths
+    assert "registries/source_registry.yaml" not in registry_paths
 
 
 def test_current_and_historical_registry_identities_are_separate_and_preserved() -> None:
