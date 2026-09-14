@@ -1,0 +1,28 @@
+{
+  "adjudication": {
+    "aggregation_equivalent": false,
+    "field_mapping_complete": false,
+    "reason": "The public monthly reports and public-facing DRGR surfaces have not been proven to expose the same activity/project row universe and fields as the registered authorized DRGR exports.",
+    "row_universe_match": false,
+    "selection_equivalent": false,
+    "semantic_scope_match": false,
+    "temporal_scope_match": "unproven"
+  },
+  "candidate_name": "HUD CDBG-DR public monthly reports / public reporting surfaces",
+  "candidate_scope": {
+    "drgr_quick_guide_public_data_portal": true,
+    "public_reports": "monthly grant-level/financial reporting products"
+  },
+  "candidate_url": "https://www.hud.gov/hud-partners/community-cdbg-dr-reports",
+  "registered_scope": {
+    "authentication": "manual_export",
+    "expected_outputs": [
+      "data/staging/processed/hud_drgr_activities.csv",
+      "data/staging/processed/hud_drgr_projects.csv"
+    ],
+    "producer_script": "scripts/ingest_hud_drgr_exports.py",
+    "update_cadence": "monthly"
+  },
+  "schema_version": "moneysweep.source_equivalence_basis/v1",
+  "source_id": "hud_drgr_authorized"
+}

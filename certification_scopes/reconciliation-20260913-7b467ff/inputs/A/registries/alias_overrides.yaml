@@ -1,0 +1,678 @@
+version: "1.0"
+schema_version: "r5_alias_overrides_v1"
+
+# Curated canonical-name overrides for entity clustering.
+#
+# Each entry forces all listed aliases (after default normalization via
+# moneysweep.runtime.name_normalization.normalize_name) to collapse
+# into the same canonical group. Use this only for cases where the default
+# normalizer cannot bridge the variants — e.g. structural rebrands, shared
+# subsidiaries, or PR-specific spelling variants.
+#
+# canonical_name      Display form used for the merged cluster.
+# aliases             Raw observed names (case-insensitive, punctuation insensitive).
+# canonical_uei       Optional UEI of the canonical legal entity, when known.
+# parent_canonical    Optional canonical_name of the parent group; used to
+#                     express subsidiary → parent relationships without
+#                     forcing a parent merge.
+# notes               Free text rationale.
+# evidence            Source filename or document sha256 (from
+#                     data/raw/documents/documents_manifest.csv) supporting
+#                     the equivalence. Required for audit.
+#
+# Identity warning: these are operator-curated equivalences, not legal
+# identity assertions. Downstream consumers must still respect the
+# CLAIM_LANGUAGE_POLICY tiering.
+
+entries:
+
+  - canonical_name: "LPC & D"
+    aliases:
+      - "LPC & D"
+      - "LPC and D"
+      - "LPC Contractors"
+      - "LPC Contractors Inc"
+      - "LPC Contractors, Inc."
+      - "LPC&D"
+      - "L. P. C. and D. Inc."
+      - "L.P.C. & D., INC."
+      - "L. P. C. & D., INC"
+      - "L. P. C. & D, INC."
+      - "L. P. C. & D., INC."
+      - "L. P. C. and D., Inc."
+    notes: |
+      ACT transition manual export lists LPC & D and LPC Contractors as the
+      same vendor across different filing years. The dot-and-space spelling
+      forms ("L. P. C. and D. Inc.", "L.P.C. & D., INC.") appear throughout
+      the ACT 2020 transition PDF and normalize to "L P C ..." rather than
+      "LPC ..." under the default normalizer — so they need explicit
+      override entries even though they look obviously equivalent.
+      Source registry note for act_transition_contracts
+      (source_registry.yaml line 257) explicitly names LPC&D.
+    evidence: "registries/source_registry.yaml:act_transition_contracts;reports/act_2020_alias_audit.md"
+
+  - canonical_name: "Super Asphalt Pavement Corp"
+    aliases:
+      - "Super Asphalt"
+      - "Super Asphalt Pavement"
+      - "Super Asphalt Pavement Corp"
+      - "Super Asphalt Pavement Corporation"
+      - "Superasphalt"
+      - "Superasphalt Pavement Corp"
+    notes: |
+      Common PR DOT/ACT highway resurfacing vendor; appears with and
+      without internal space and with/without "Pavement" qualifier.
+    evidence: "operator_blind_spot_report_2026_05_26"
+
+  - canonical_name: "Autopistas de Puerto Rico"
+    aliases:
+      - "Autopistas de Puerto Rico"
+      - "Autopistas de PR"
+      - "Autopistas de Puerto Rico, LLC"
+      - "Autopistas de Puerto Rico LLC"
+      - "Autopistas de PR LLC"
+    notes: |
+      Toll-road concessionaire (PR-22 / PR-5). Distinct from
+      Autopistas Metropolitanas; do not merge with that entity.
+    evidence: "registries/manual_export_registry.yaml:act_transition_contracts"
+
+  - canonical_name: "Autopistas Metropolitanas de Puerto Rico"
+    aliases:
+      - "Autopistas Metropolitanas"
+      - "Autopistas Metropolitanas de Puerto Rico"
+      - "Autopistas Metropolitanas de Puerto Rico LLC"
+      - "Autopistas Metropolitanas de PR"
+      - "Metropistas"
+    parent_canonical: "Abertis Infraestructuras"
+    notes: |
+      Concessionaire for PR-22 expansion ("Metropistas" rebrand).
+      Separate legal entity from Autopistas de Puerto Rico.
+    evidence: "registries/manual_export_registry.yaml:act_transition_contracts"
+
+  - canonical_name: "AECOM"
+    aliases:
+      - "AECOM"
+      - "AECOM Caribe"
+      - "AECOM Caribe, LLP"
+      - "AECOM Caribe LLP"
+      - "AECOM Technical Services"
+      - "AECOM Technical Services Inc"
+      - "AECOM Technical Services, Inc."
+      - "AECOM USA"
+      - "AECOM USA Inc"
+      - "AECOM USA, Inc."
+    notes: |
+      AECOM subsidiaries surface across federal contracts, PR ACT, and
+      FEMA PA projects. Collapse to single parent for power-network
+      scoring; preserve sub-name in evidence trail.
+    evidence: "data/raw/documents/contractor_listings"
+
+  - canonical_name: "Arcadis"
+    aliases:
+      - "Arcadis"
+      - "Arcadis Caribe"
+      - "Arcadis Caribe PSC"
+      - "Arcadis Caribe, PSC"
+      - "Arcadis US"
+      - "Arcadis US Inc"
+      - "Arcadis US, Inc."
+      - "Arcadis NV"
+      - "Arcadis N.V."
+    notes: |
+      See "Consolidating 100% of Arcadis-Linked Online Contracts in
+      Puerto Rico" memo in data/raw/documents/contractor_listings.
+    evidence: "data/raw/documents/contractor_listings/Consolidating 100% of Arcadis-Linked Online Contracts in Puerto Rico.pdf"
+
+  - canonical_name: "Genera PR"
+    aliases:
+      - "Genera PR"
+      - "Genera PR LLC"
+      - "Genera Puerto Rico"
+      - "Genera Caribbean"
+      - "Genera Caribbean LLC"
+    notes: |
+      Thermal generation operator (succeeded PREPA generation function).
+    evidence: "registries/source_registry.yaml:prepa_luma_genera"
+
+  - canonical_name: "BPAS Trust"
+    aliases:
+      - "BPAS Trust"
+      - "BPAS Trust Services"
+      - "BPAS Trust Company"
+      - "BPAS Trust Co"
+      - "Benefit Plans Administrative Services Trust"
+    notes: |
+      Trust company surfaced in LDA filings; multiple corporate-suffix
+      variants need pre-collapse before lobbying anchor lookup.
+    evidence: "operator_blind_spot_report_2026_05_26"
+
+  - canonical_name: "International Equipment Logistics LLC"
+    aliases:
+      - "International Equipment Logistics"
+      - "International Equipment Logistics LLC"
+      - "International Equipment Logistics, LLC"
+      - "IEL"
+      - "IEL LLC"
+    notes: |
+      Disaster-recovery logistics vendor; LDA filings use the IEL
+      abbreviation which the default normalizer cannot reconnect to the
+      full name.
+    evidence: "operator_blind_spot_report_2026_05_26"
+
+  - canonical_name: "Gainwell Technologies"
+    aliases:
+      - "Gainwell"
+      - "Gainwell Technologies"
+      - "Gainwell Technologies LLC"
+      - "Gainwell Technologies, LLC"
+    notes: |
+      Medicaid systems vendor; LDA registrations sometimes use the bare
+      "Gainwell" without qualifier.
+    evidence: "operator_blind_spot_report_2026_05_26"
+
+  - canonical_name: "Puerto Rico Energy LLC"
+    aliases:
+      - "Puerto Rico Energy"
+      - "Puerto Rico Energy LLC"
+      - "Puerto Rico Energy, LLC"
+      - "PR Energy LLC"
+    notes: |
+      Generation/transmission lobbying entity; distinct from PREPA and
+      from Genera PR.
+    evidence: "operator_blind_spot_report_2026_05_26"
+
+  - canonical_name: "Puerto Rico Municipal Financing"
+    aliases:
+      - "PR Municipal Financing"
+      - "Puerto Rico Municipal Financing"
+      - "Puerto Rico Municipal Financing Agency"
+      - "PR Municipal Finance Agency"
+    notes: |
+      Municipal bond/finance vehicle. Anchor target for EMMA/MSRB
+      lobbying edges once bond outputs materialize.
+    evidence: "operator_blind_spot_report_2026_05_26"
+
+  # ----- ACT 2020 transition PDF — entity families surfaced 2026-05-27 -----
+
+  - canonical_name: "Ferrovial Agroman"
+    aliases:
+      - "Ferrovial Agroman"
+      - "Ferrovial Agroman SA"
+      - "Ferrovial Agroman S.A."
+      - "Ferrovial Agroman, S.A."
+      - "Ferrovial-Agroman SA"
+      - "Ferrovial- Agroman, SA"
+      - "Ferrovial Agroman LLC"
+      - "Ferrovial Agroman, LLC"
+    notes: |
+      Spanish-parented construction contractor; appears across the ACT
+      2020 transition PDF in four corporate-suffix variants (SA / S.A. /
+      LLC / hyphenated). Sister entity to Ferrovial Construccion PR LLC
+      (separate line of business — kept as its own canonical with a
+      parent_canonical link).
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Ferrovial Construccion PR"
+    aliases:
+      - "Ferrovial Construccion PR"
+      - "Ferrovial Construccion PR LLC"
+      - "Ferrovial Construccion PR, LLC"
+      - "Ferrovial Construccion Puerto Rico"
+      - "Ferrovial Construccion Puerto Rico LLC"
+    parent_canonical: "Ferrovial Agroman"
+    notes: |
+      PR operating entity of Ferrovial; shows up alongside Ferrovial
+      Agroman LLC across multiple ACT 2020 contracts. Kept separate
+      because the legal entities are distinct, but linked via
+      parent_canonical so power-network scoring can reach the parent.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Desarrolladora J.A."
+    aliases:
+      - "Desarrolladora J.A."
+      - "Desarrolladora J.A. Inc"
+      - "Desarrolladora J.A. Inc."
+      - "Desarrolladora J.A., Inc."
+      - "Desarrolladora J.A.. Inc."
+      - "Desarrolladora J.A.. Inc"
+      - "Desarrolladora JA Inc"
+      - "Desarrolladora JA, Inc."
+      - "Desarrolladora JA, Inc.."
+      - "Desarrolladora J A Inc"
+    notes: |
+      ACT 2020 PDF contains 5+ punctuation/typo variants of the same
+      contractor (trailing double-dot, missing comma, with/without
+      periods between J and A). All collapse to one canonical.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "CMA Architects & Engineers"
+    aliases:
+      - "CMA Architects & Engineers"
+      - "CMA Architects and Engineers"
+      - "CMA Architects and Engineers LLC"
+      - "CMA Architects and Engineers, LLC"
+      - "CMA Architects and Engineers LLP"
+      - "CMA Architects and Engineers, LLP"
+      - "CMA Architects & Engineers, LLP"
+      - "CMA Architects & Engineers,LLP"
+      - "CMA Architects & Engineers, L.L.P."
+      - "CMA Architecs & Engineers"
+      - "CMA Architecs & Engineers, L.L.P."
+      - "CMA Architecs & Engineers, LLP"
+    notes: |
+      Engineering firm appearing 8+ times across the ACT 2020 PDF with
+      legitimate variants (LLP vs LLC vs L.L.P.) AND the recurring typo
+      "Architecs" (missing T). Override captures both axes.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "CSA Architects & Engineers"
+    aliases:
+      - "CSA Architects & Engineers"
+      - "CSA Architects and Engineers"
+      - "CSA Architects and Engineers LLP"
+      - "CSA Architects and Engineers, LLP"
+      - "CSA Architects & Engineers, LLP"
+      - "CSA Architects & Engineers,LLP"
+      - "CSA Architects & Engineers LLP"
+    notes: |
+      Engineering firm; separate entity from CMA Architects (often
+      confused). Multiple punctuation variants in the ACT 2020 PDF.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Barrett, Hale & Alamo"
+    aliases:
+      - "Barrett, Hale & Alamo"
+      - "Barrett, Hale & Alamo, LLC"
+      - "Barrett Hale & Alamo, LLC"
+      - "Barret Hale & Alamo, LLC"
+      - "Barret, Hale & Alamo, LLC"
+      - "Barret Hale and Alamo LLC"
+    notes: |
+      Professional-services contractor; ACT 2020 PDF includes the
+      recurring typo "Barret" (single T) alongside the correct
+      "Barrett". Both must collapse for crossref scoring.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Behar-Ybarra & Associates"
+    aliases:
+      - "Behar-Ybarra & Associates"
+      - "Behar-Ybarra and Associates"
+      - "Behar-Ybarra & Associates, LLP"
+      - "Behar-Ybarra & Associates, LLC"
+      - "Behar-Ybarra and Associates, LLP"
+      - "Behar-Ybarra and Associates,LLP"
+      - "Behar Ybarra & Associates LLP"
+    notes: |
+      Consulting firm; appears with both LLP and LLC suffixes in the
+      ACT 2020 PDF (likely a re-registration). Collapse so the entity
+      surfaces once in the influence graph.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Jose A. Batlle & Asociados"
+    aliases:
+      - "Jose A. Batlle & Asociados"
+      - "Jose A. Batlle & Asociados, C.S.P."
+      - "Jose A. Batlle & Asociados CSP"
+      - "Jose A. Batlle y Asociados"
+      - "Ingenieros Jose A. Batlle & Asociados"
+      - "Ingenieros Jose A. Batlle & Asociados, CSP"
+      - "José A. Batlle & Asociados"
+      - "José A. Batlle & Asociados, C.S.P."
+      - "INGENIEROS JOSÉ A. BATLLE & ASOCIADOS, CSP"
+    notes: |
+      Engineering firm; the "Ingenieros" prefix is a professional
+      credential (engineer-led firm), not a separate legal entity.
+      Collapse both prefixed and unprefixed forms, and the accented
+      and unaccented José variants.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Integra Design Group"
+    aliases:
+      - "Integra Design Group"
+      - "Integra Design Group, PSC"
+      - "Integra Design Group PSC"
+      - "Integra Design Group Architects & Engineers"
+      - "Integra Design Group Architects & Engineers, PSC"
+      - "Integra Design Group Architects and Engineers, PSC"
+    notes: |
+      Engineering firm; the long-form "Architects & Engineers, PSC"
+      and short-form "PSC" both appear in the ACT 2020 PDF.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "EBP Design Group"
+    aliases:
+      - "EBP Design Group"
+      - "EBP Design Group PSC"
+      - "EBP Design Group, PSC"
+      - "EBP Design Group Consulting Engineers"
+      - "EBP Design Group, Consulting Engineers, P.S.C."
+      - "EBP Design Group Consulting Engineers, PSC"
+    notes: |
+      Consulting-engineering firm; variants differ only in the
+      "Consulting Engineers" qualifier and the P.S.C. / PSC
+      punctuation.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt"
+
+  - canonical_name: "Bermudez, Longo, Diaz-Masso"
+    aliases:
+      - "Bermudez, Longo, Diaz-Masso"
+      - "Bermudez, Longo, Diaz-Masso, LLC"
+      - "Bermudez Longo Diaz-Masso LLC"
+      - "Bermúdez, Longo, Díaz-Massó"
+      - "Bermúdez, Longo, Díaz-Massó, LLC"
+      - "BLDM"
+    notes: |
+      High-value PR contractor; appears in ACT 2020 and is flagged in
+      the operator bond-flow memo as a recurring LDA-registered
+      vendor. The "BLDM" abbreviation surfaces in lobbying filings.
+    evidence: "tests/fixtures/act_2020_transition_pasted.txt;operator_blind_spot_report_2026_05_26"
+
+  - canonical_name: "Maritime Transport Authority for Puerto Rico"
+    aliases:
+      - "Maritime Transport Authority for Puerto Rico"
+      - "Maritime Transport Authority for Puerto Rico and the Municipal Islands"
+      - "Maritime Transport Authority for Puerto Rico and t"
+      - "Autoridad de Transporte Maritimo"
+      - "Autoridad de Transporte Maritimo y Las Islas Municipales"
+      - "Autoridad de Transporte Marítimo"
+      - "Autoridad de Transporte Marítimo y las Islas Municipales"
+      - "Autoridad de Transporte Maritimo y Las Islas Munic"
+      - "AUTORIDAD DE TRANSPORTE MARITIMO Y LAS ISLAS MUNIC"
+      - "ATM"
+    notes: |
+      Puerto Rico government maritime-transport authority; ACT 2020
+      PDF shows both Spanish and English names (often truncated in
+      the source text), which the default normalizer can't bridge.
+      Truncated forms ("…y las Islas Munic", "…and t") added after
+      the operator's structured CSV extraction surfaced both
+      truncations as distinct normalized canonicals.
+    evidence: "tests/fixtures/act_transition/sample_rows.csv;reports/act_transition_alias_audit.md"
+
+  # -- Layer A: the 7 deferred families from PR #112's plan -------------------
+  # All surfaced in `Contratos_Vigentes_ACT.pdf` (source_dataset=ACT_2020) with
+  # at least one occurrence apiece. Single-form coverage today, but registering
+  # canonical names lets downstream cross-source joins reach these entities by
+  # their canonical label and pre-collapses any future spelling variants.
+
+  - canonical_name: "Obratec Contratista General"
+    aliases:
+      - "Obratec Contratista General"
+      - "Obratec Contratista General, Inc."
+      - "Obratec Contratista General Inc"
+      - "Obratec Contratista General LLC"
+      - "Obratec Contratista General, LLC"
+    notes: |
+      Recurring road-construction contractor on ACT §9(a)(12)
+      transition contracts (rows 2014-000202 K, 2016-000115 J,
+      2016-000116 L, 2017-000113 F, 2020-000183).
+    evidence: "tests/fixtures/act_transition/sample_rows.csv"
+
+  - canonical_name: "Klein Engineering"
+    aliases:
+      - "Klein Engineering"
+      - "Klein Engineering PSC"
+      - "Klein Engineering, PSC"
+      - "Klein Engineering LLC"
+      - "Klein Engineering, LLC"
+      - "KLEIN ENGINEERING, PSC"
+    notes: |
+      Consulting-engineering firm on ACT 2020 professional-services
+      contracts (rows 2019-000022 C, 2019-000109 B).
+    evidence: "tests/fixtures/act_transition/sample_rows.csv"
+
+  - canonical_name: "O & M Consulting Engineering"
+    aliases:
+      - "O & M Consulting Engineering"
+      - "O&M Consulting Engineering"
+      - "O & M Consulting Engineering PSC"
+      - "O & M Consulting Engineering, PSC"
+      - "O & M Consulting Engineering P.S.C."
+      - "O & M Consulting Engineering ,P.S.C."
+      - "O AND M Consulting Engineering"
+      - "OyM Consulting Engineering"
+    notes: |
+      Engineering firm; the raw PDF text uses a leading-comma
+      trailing-period quirk (`,P.S.C.`) that the default normalizer
+      preserves as whitespace, so the canonical with bare `O & M`
+      remains stable. Multiple ACT 2020 occurrences
+      (2019-000026 B/C, 2019-000042 E, 2019-000128 C, 2020-000261).
+    evidence: "tests/fixtures/act_transition/sample_rows.csv"
+
+  - canonical_name: "Allied Waste of Puerto Rico"
+    aliases:
+      - "Allied Waste of Puerto Rico"
+      - "Allied Waste of Puerto Rico Inc"
+      - "Allied Waste of Puerto Rico, Inc."
+      - "ALLIED WASTE OF PUERTO RICO, INC."
+    notes: |
+      Solid-waste vendor on ACT 2020 equipment-rental contracts
+      (rows 2020-000070, 2020-000070 A).
+    evidence: "tests/fixtures/act_transition/sample_rows.csv"
+
+  - canonical_name: "Piloto Construction"
+    aliases:
+      - "Piloto Construction"
+      - "Piloto Construction LLC"
+      - "Piloto Construction, LLC"
+      - "PILOTO CONSTRUCTION, LLC"
+    notes: |
+      Highway-construction prime on ACT 2020 contracts (rows
+      2020-000153, 2020-000198, 2020-000222).
+    evidence: "tests/fixtures/act_transition/sample_rows.csv"
+
+  - canonical_name: "M2A Group"
+    aliases:
+      - "M2A Group"
+      - "M2A Group PSC"
+      - "M2A Group, PSC"
+      - "M2A GROUP, PSC"
+    notes: |
+      Consulting firm on ACT 2020 professional-services contracts
+      (rows 2019-000227 A/B, 2020-000122 A/B).
+    evidence: "tests/fixtures/act_transition/sample_rows.csv"
+
+  - canonical_name: "Juan O. Virella Sanchez"
+    aliases:
+      - "Juan O. Virella Sanchez"
+      - "Juan O. Virella Sánchez"
+      - "Ing. Juan O. Virella Sanchez"
+      - "Ing. Juan O. Virella Sánchez"
+      - "Ingeniero Juan O. Virella Sanchez"
+      - "Ingeniero Juan O. Virella Sánchez"
+    notes: |
+      Individual professional engineer; ACT 2020 PDF uses both bare
+      name and `Ing.` credential-prefixed form (rows 2017-000095 D,
+      2017-000100 E, 2019-000030 C, 2019-000130 C/D, 2019-000168 D,
+      2019-000221, 2020-000228, 2020-000266). `Ing.` is a credential,
+      not a legal-entity differentiator — same pattern as
+      `Ingenieros José A. Batlle` already in this registry.
+    evidence: "tests/fixtures/act_transition/sample_rows.csv"
+
+  # -- Layer B: audit-surfaced clusters needing explicit alias entries --------
+  # Each of these has ≥2 distinct normalized forms that the default normalizer
+  # cannot bridge (typos, DBA chains). Identified via
+  # `scripts/audit_act_alias_coverage.py` against the operator's structured CSV.
+
+  - canonical_name: "Cooperativa de Servicios Integrados a la Ninez COSIANI"
+    aliases:
+      - "Cooperativa de Servicios Integrados a la Ninez COSIANI"
+      - "Cooperativa de Servicios Integrados a la Niñez (COSIANI)"
+      - "Cooperativa de Servicios Integraod a la Niñez (COSIANI)"
+      - "Cooperativa de Servicios Integraod a la Niñez COSIANI"
+      - "COSIANI"
+    notes: |
+      ACUDEN 2024 PDF has the typo `Integraod` (transposed `aod` vs
+      correct `ados`) recurring across 2023-001107 A-E. The correct
+      spelling `Integrados` appears on 2024-000530 A/B, 2024-000622,
+      2025-000216, 2025-000460. Typo bridges to canonical.
+    evidence: "tests/fixtures/act_transition/sample_rows.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Rajohnyari Day Care & Academy Bilingual School"
+    aliases:
+      - "Rajohnyari Day Care & Academy Bilingual School"
+      - "Rajohnyari Day Care & Academy Bilingual School Inc"
+      - "Rajohnyari Day Care & Academy Bilingual School Inc."
+      - "Rajohnyari Day Care and Academy Bilingual School Inc."
+      - "Rajonyari Day Care & Academy Bilingual School Inc."
+      - "Rajonyari Day Care and Academy Bilingual School Inc."
+    notes: |
+      Childcare operator; ACUDEN 2024 has both spellings —
+      `Rajohnyari` (with h) on 2023-000512 A-C, 2024-000550 A/B and
+      `Rajonyari` (without h) on 2025-000172 A. Typo bridge.
+    evidence: "tests/fixtures/act_transition/sample_rows.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Carmen Mangual Perez"
+    aliases:
+      - "Carmen Mangual Perez"
+      - "Carmen Mangual Pérez"
+      - "Centro Infantil Esquilin Mangual"
+      - "Centro Infantil Esquilín Mangual"
+      - "Centro Infantil Esquilin Mangual DBA Carmen Mangual Perez"
+      - "Centro Infantil Esquilín Mangual DBA Carmen Mangual Pérez"
+    notes: |
+      Childcare operator; appears in ACUDEN 2024 as bare individual
+      name (2024-000509 A/B, 2025-000282) and as DBA chain
+      `Centro Infantil Esquilín Mangual DBA Carmen Mangual Pérez`
+      (2024-000746, 2024-000746 A/B). Collapse so both forms map to
+      one entity for cross-source crossref.
+    evidence: "tests/fixtures/act_transition/sample_rows.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Jennifer Soto Santiago"
+    aliases:
+      - "Jennifer Soto Santiago"
+      - "Jennifer Soto Santiago d/b/a Centro Educativo ABC"
+      - "Jennifer Soto Santiago DBA Centro Educativo ABC"
+      - "Centro Educativo ABC"
+    notes: |
+      Childcare operator; ACUDEN 2024 has bare name on early rows
+      (2023-000255 A-C) and DBA chain on 2025-000423. Collapse so
+      both forms map to one entity.
+    evidence: "tests/fixtures/act_transition/sample_rows.csv;reports/act_transition_alias_audit.md"
+
+  # -- Layer C: typo/spelling clusters from the full extraction -----------------
+  # Surfaced by a difflib near-duplicate pass over the real 1,797-row extraction
+  # (scripts/build_act_transition_extract.py output). Each is a confirmed
+  # same-entity spelling/spacing/typo variant the default normalizer can't bridge
+  # and that accent-folding would NOT fix. Distinct-but-similar entities (CMA vs
+  # CSA Architects, Yabucoa vs Yauco, differing middle initials) are intentionally
+  # left un-merged. Evidence cites the real extraction's audit report.
+
+  - canonical_name: "Unlimited Learning Center"
+    aliases:
+      - "Unlimited Learning Center"
+      - "Unlimited Learning Center, Inc."
+      - "Unlimited Lerning Center Inc."
+    notes: |
+      ACUDEN 2024 childcare operator; "Lerning" (missing A) is a typo of
+      the same center (5 + 2 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "JJ Investment Group"
+    aliases:
+      - "JJ Investment Group"
+      - "JJ Investment Group LLC"
+      - "JJ Investmentt Group LLC"
+    notes: |
+      ACUDEN 2024 vendor; "Investmentt" (double-T) is a typo of the same
+      LLC (3 + 4 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "All Access Academics"
+    aliases:
+      - "All Access Academics"
+      - "All Access Academics LLC"
+      - "All Acess Academics LLC"
+    notes: |
+      ACUDEN 2024 operator; "Acess" (missing C) typo of the same LLC.
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Kiddiecare Preschool and Tutoring Center"
+    aliases:
+      - "Kiddiecare Preschool and Tutoring Center"
+      - "Kiddiecare Preschool and Tutoring Center LLC"
+      - "Kiddiecare Pre-School and Tutoring Center LLC"
+    notes: |
+      ACUDEN 2024 operator; "Pre-School" vs "Preschool" spacing variant
+      of the same LLC (3 + 2 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Adonai Day Care & Learning Center"
+    aliases:
+      - "Adonai Day Care & Learning Center"
+      - "Adonai Day Care & Learning Center, Corp."
+      - "Adonai Daycare and Learning Center Corp"
+    notes: |
+      ACUDEN 2024 operator; "Day Care" vs "Daycare" variant of the same
+      corp (3 + 1 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Octagon Consulting Group"
+    aliases:
+      - "Octagon Consulting Group"
+      - "Octagon Consulting Group LLC"
+      - "Octagon Consultant Group, Corp."
+    notes: |
+      Appears in both ACT 2020 ("Consultant Group, Corp.") and ACUDEN 2024
+      ("Consulting Group LLC") — same consulting firm, cross-source.
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "CDI Emmanuel"
+    aliases:
+      - "CDI Emmanuel"
+      - "CDI Emmanuel Inc"
+      - "CDI Emanuel, Inc."
+    notes: |
+      ACUDEN 2024 operator; "Emanuel" vs "Emmanuel" spelling variant of
+      the same center (2 + 1 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Little Kids Adventure Day Care Learning Center"
+    aliases:
+      - "Little Kids Adventure Day Care Learning Center"
+      - "Little Kids Adventure Day Care Learning Center Inc"
+      - "Little Kids Adventure Day Care and Leaning Center Inc."
+    notes: |
+      ACUDEN 2024 operator; "Leaning" (missing R) typo of the same center
+      (5 + 1 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Topee-Topee"
+    aliases:
+      - "Topee-Topee"
+      - "Topee-Topee, LLC"
+      - "Topeee Topee LLC"
+    notes: |
+      ACUDEN 2024 operator; "Topeee" (triple-E) typo of the same LLC
+      (5 + 1 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  - canonical_name: "Centro de Cuidado Amor"
+    aliases:
+      - "Centro de Cuidado Amor"
+      - "Centro de Cuidado Amor Inc"
+      - "Centro Cuidado Amor Inc."
+    notes: |
+      ACUDEN 2024 operator; the missing-"de" form is the same center
+      (7 + 1 rows).
+    evidence: "data/raw/act_transition/transition_contracts_extracted.csv;reports/act_transition_alias_audit.md"
+
+  # -- ASG (central procurement authority) ------------------------------------
+  - canonical_name: "Puerto Rico General Services Administration"
+    aliases:
+      - "Puerto Rico General Services Administration"
+      - "General Services Administration"
+      - "Administracion de Servicios Generales"
+      - "Administración de Servicios Generales"
+      - "Administracion de Servicios Generales de Puerto Rico"
+      - "Administración de Servicios Generales de Puerto Rico"
+      - "ASG"
+      - "AGS"
+    notes: |
+      Puerto Rico's central procurement authority under Ley 73-2019, which
+      runs the RUL/RUP bidder registries and the central subastas index.
+      Its own emergency-purchase table names buying agencies inconsistently
+      (bare acronyms like "DTOP"/"DRNA" alongside full Spanish names), and
+      ASG itself appears under both the Spanish name and the English
+      translation depending on the surface, which the default normalizer
+      cannot bridge across languages.
+    evidence: "data/reference/pr_public_money_entities.csv;registries/source_registry.yaml:asg_emergency_purchases"

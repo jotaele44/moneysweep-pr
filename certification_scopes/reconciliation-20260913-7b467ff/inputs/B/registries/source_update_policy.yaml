@@ -1,0 +1,201 @@
+# Source Update Policy — overlay for the registry-driven update controller.
+#
+# This overlay is keyed by source_id and MERGED against the canonical source
+# registry (registries/source_registry.json + extensions). Source metadata
+# (producer, outputs, validation thresholds, cadence) is NOT hand-copied here;
+# only policy overrides live in this file. Every source not listed below gets an
+# inferred effective policy from its readiness path_type + cadence (see
+# docs/SOURCE_UPDATE_CONTROLLER.md §policy-overlay-rules).
+#
+# Effective policy = explicit override (this file)
+#                  → manual_export_registry entry
+#                  → canonical source_registry authentication/manual_drop_dir
+#                  → readiness path_type inference.
+#
+# Schema: schemas/source_update_policy.schema.json (source_update_policy_v1).
+
+schema_version: source_update_policy_v1
+timezone: America/Puerto_Rico
+
+defaults:
+  execution_backend: github_actions
+  timeout_minutes: 60
+  max_retries: 2
+  empty_result_policy: preserve_previous
+  output_change_policy: row_count_or_hash
+  atomic_output_required: true
+  freshness_grace_hours: 24
+  row_regression_tolerance_pct: 40
+
+sources:
+  # -- Long-running/checkpointed sources.
+  - source_id: ocpr_contracts
+    trigger_type: schedule
+    enabled: true
+    cadence: weekly
+    runner: scripts/scrape_ocpr_contracts.py
+    execution_backend: self_hosted
+    timeout_minutes: 720
+    max_retries: 1
+    checkpoint_strategy: page_cursor
+    max_pages_per_run: 500
+    freshness_sla_hours: 336
+    empty_result_policy: preserve_previous
+    output_change_policy: row_count_or_hash
+    atomic_output_required: true
+
+  # The RDC list sweep is ~7,451 pages at the shared page_sleep, so it runs
+  # well past the 60-minute default a GitHub-hosted runner would give it. The
+  # registry is append-ordered, which is what makes a page cursor meaningful
+  # here: a resumed run picks up where it stopped rather than restarting.
+  #
+  # NOTE the detail-enrichment pass (scripts/enrich_rdc_details.py) is
+  # deliberately NOT scheduled. It is ~44,700 further requests against a small
+  # government host and is meant to be run in bounded batches by an operator.
+  - source_id: rdc_demandas_civiles
+    trigger_type: schedule
+    enabled: true
+    cadence: monthly
+    runner: scripts/scrape_rdc_demandas.py
+    execution_backend: self_hosted
+    timeout_minutes: 240
+    max_retries: 1
+    checkpoint_strategy: page_cursor
+    max_pages_per_run: 2000
+    freshness_sla_hours: 1080
+    empty_result_policy: preserve_previous
+    output_change_policy: row_count_or_hash
+    atomic_output_required: true
+
+  - source_id: sam_entities
+    trigger_type: schedule
+    enabled: true
+    cadence: monthly
+    runner: scripts/run_sam_pipeline.py
+    execution_backend: self_hosted
+    timeout_minutes: 90
+    max_retries: 0
+    checkpoint_strategy: entity_queue
+    freshness_sla_hours: 1080
+
+  - source_id: pr_fomb
+    trigger_type: schedule
+    enabled: true
+    cadence: weekly
+    runner: scripts/download_fomb.py
+    execution_backend: self_hosted
+    timeout_minutes: 240
+    max_retries: 1
+    checkpoint_strategy: entity_queue
+    freshness_sla_hours: 336
+    empty_result_policy: preserve_previous
+    output_change_policy: row_count_or_hash
+    atomic_output_required: true
+    notes: Producer persists its own document-ID queue plus ETag/Last-Modified/SHA-256 validators in data/raw/FOMB/checkpoint.json; self-hosted execution avoids truncating large first-pass backfills on hosted runners.
+
+  # Keep this canonical upstream schedulable even in lean controller images
+  # where optional HTTP/dataframe dependencies are installed only inside the
+  # execution environment. Live import probing must not disable its dependent
+  # EMMA revenue extraction policy.
+  - source_id: emma_bonds
+    trigger_type: schedule
+    enabled: true
+    cadence: weekly
+    runner: scripts/download_emma.py
+    freshness_sla_hours: 192
+
+  # -- Manual / dropzone sources: operator-supplied files, no credentialed
+  #    scraping. Ingested only when a new file hash is detected.
+  - source_id: pr_cabilderos
+    trigger_type: file_drop
+    enabled: true
+    runner: scripts/ingest_cabilderos.py
+    watch_paths:
+      - data/raw/Cabilderos/
+    filename_patterns:
+      - "*.csv"
+      - "*.xlsx"
+    dedupe_method: sha256
+    freshness_sla_hours: 2880
+
+  # -- Derived sources: run only after successful upstream completion or a
+  #    material upstream output change.
+  - source_id: prasa_contracts_master
+    trigger_type: dependency
+    enabled: true
+    runner: scripts/build_prasa_contracts_master.py
+    depends_on:
+      - prasa
+    output_change_policy: upstream_change
+    trigger_dependents_on: success_with_change
+    freshness_sla_hours: 9000
+
+  - source_id: emma_infra_revenue
+    trigger_type: dependency
+    enabled: true
+    runner: scripts/extract_emma_revenue.py
+    depends_on:
+      - emma_bonds
+    output_change_policy: upstream_change
+    freshness_sla_hours: 2400
+
+  # -- Event intake: producer-to-producer artifact dropped into intake/.
+  - source_id: centinelas_pre_official_signals
+    trigger_type: on_drop
+    enabled: true
+    runner: scripts/ingest_centinelas_signals.py
+    runner_args:
+      - "--build-bundle"
+    watch_paths:
+      - intake/
+    filename_patterns:
+      - "*.json"
+      - "*.jsonl"
+    dedupe_method: sha256
+    freshness_sla_hours: 168
+
+  # -- Disabled terminal sources: never scheduled, never executable.
+  #    hacienda_sut_ivu graduated to a real api_producer (scripts/download_hacienda_sut_ivu.py)
+  #    and was removed from this list — same as fta_ntd/census_gov_finances, it has no
+  #    override here and gets its effective policy inferred from path_type + cadence.
+  - source_id: pr_act_154_excise
+    trigger_type: disabled
+    enabled: false
+    runner: scripts/download_coverage_gap_intake.py
+    freshness_sla_hours: 0
+    notes: Disabled until a real scraper replaces the coverage-gap stub.
+
+  - source_id: nara_nextgen_catalog_v3
+    trigger_type: disabled
+    enabled: false
+    runner: scripts/download_nara_nextgen.py
+    freshness_sla_hours: 0
+    notes: Deferred stub — intentionally unimplemented NARA next-gen catalog.
+
+  - source_id: nara_catalog_aws_open_data
+    trigger_type: disabled
+    enabled: false
+    runner: scripts/download_nara_nextgen.py
+    freshness_sla_hours: 0
+    notes: Deferred stub — intentionally unimplemented NARA AWS open-data catalog.
+
+  - source_id: fpds_report_builder
+    trigger_type: disabled
+    enabled: false
+    runner: scripts/download_grants.py
+    freshness_sla_hours: 0
+    notes: Terminal semantic duplicate — covered by usaspending_prime; never materializes independently.
+
+  - source_id: fsrs_subawards
+    trigger_type: disabled
+    enabled: false
+    runner: scripts/download_fsrs.py
+    freshness_sla_hours: 0
+    notes: Terminal semantic duplicate — covered by usaspending_subawards; never materializes independently.
+
+  - source_id: congressional_earmarks
+    trigger_type: disabled
+    enabled: false
+    runner: scripts/download_earmarks.py
+    freshness_sla_hours: 0
+    notes: Terminal semantic duplicate — covered by usaspending_grants_gov; never materializes independently.

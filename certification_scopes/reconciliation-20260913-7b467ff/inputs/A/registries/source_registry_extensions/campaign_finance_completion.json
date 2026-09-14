@@ -1,0 +1,54 @@
+{
+  "extension_id": "campaign_finance_completion_v0_1",
+  "sources": [
+    {
+      "source_id": "oce_socrata_live",
+      "family": "political_finance",
+      "required": false,
+      "authentication": "none",
+      "source_url": "https://data.oce.pr.gov/resource/kdwd-nb6g.json",
+      "producer_script": "scripts/download_oce.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_oce_donations.csv"
+      ],
+      "update_cadence": "monthly",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "notes": "Public Socrata acquisition for OCE donations with explicit limit/offset pagination. Report exports remain operator-delivered and are separated by ingest_oce.py."
+    },
+    {
+      "source_id": "campaign_finance_entities",
+      "family": "political_finance",
+      "required": true,
+      "authentication": "none",
+      "producer_script": "scripts/build_campaign_finance_entities.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_campaign_finance_candidates.csv",
+        "data/staging/processed/pr_campaign_finance_committees.csv",
+        "data/staging/processed/pr_campaign_finance_recipient_resolution.csv",
+        "data/staging/processed/pr_campaign_finance_edges.csv"
+      ],
+      "update_cadence": "ad_hoc",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "notes": "Deterministic candidate/committee registry, Schedule B recipient resolution, and contribution/expenditure graph edges."
+    },
+    {
+      "source_id": "campaign_finance_materialization_gate",
+      "family": "political_finance",
+      "required": true,
+      "authentication": "none",
+      "producer_script": "scripts/validate_campaign_finance_materialization.py",
+      "expected_outputs": [
+        "data/manifests/campaign_finance/campaign_finance_validation.json"
+      ],
+      "update_cadence": "ad_hoc",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "notes": "Fail-closed validation for FEC Schedule A/B/E, PR donation feeds, entity resolution, graph edges, and conditional cross-reference outputs."
+    }
+  ]
+}

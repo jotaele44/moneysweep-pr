@@ -1,0 +1,13 @@
+{
+  "schema_version": "moneysweep.source_registry_override/v1",
+  "overrides": [
+    {
+      "source_id": "usaspending_prime",
+      "producer_script": "scripts/materialize_usaspending_prime.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_contracts_master.csv"
+      ],
+      "notes": "Current certification ownership correction: this source owns the federal-contract master only. The cross-source pr_all_awards_master.csv is a derived product produced by scripts/build_unified_master.py and must carry separate derived-product lineage. Historical manifests that attributed both outputs to usaspending_prime remain preserved but are non-authoritative for the current source definition."
+    }
+  ]
+}

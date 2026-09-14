@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moneysweep-pr.local/schemas/source_equivalence_claim.schema.json",
+  "title": "MoneySweep PR Source Equivalence Claim",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source_id",
+    "candidate_source",
+    "tests",
+    "comparison",
+    "missing_fields",
+    "extra_fields",
+    "evidence"
+  ],
+  "properties": {
+    "schema_version": {"const": "moneysweep.source_equivalence/v2"},
+    "source_id": {"type": "string", "minLength": 1},
+    "candidate_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "source_url", "authoritative"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "source_url": {"type": "string", "minLength": 1},
+        "authoritative": {"type": "boolean"}
+      }
+    },
+    "tests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "semantic_scope_match",
+        "temporal_scope_match",
+        "selection_equivalent",
+        "aggregation_equivalent"
+      ],
+      "properties": {
+        "semantic_scope_match": {"type": "boolean"},
+        "temporal_scope_match": {"type": "boolean"},
+        "selection_equivalent": {"type": "boolean"},
+        "aggregation_equivalent": {"type": "boolean"}
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "original_path",
+        "candidate_path",
+        "original_sha256",
+        "candidate_sha256",
+        "original_format",
+        "candidate_format",
+        "stable_key",
+        "compare_fields",
+        "field_mapping"
+      ],
+      "properties": {
+        "original_path": {"type": "string", "minLength": 1},
+        "candidate_path": {"type": "string", "minLength": 1},
+        "original_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "candidate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "original_format": {"$ref": "#/$defs/csv_format"},
+        "candidate_format": {"$ref": "#/$defs/csv_format"},
+        "stable_key": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "compare_fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "field_mapping": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "missing_fields": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "extra_fields": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "locator", "sha256"],
+        "properties": {
+          "kind": {"type": "string", "minLength": 1},
+          "locator": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "notes": {"type": "string"}
+  },
+  "$defs": {
+    "csv_format": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["encoding", "delimiter", "header_row"],
+      "properties": {
+        "encoding": {"enum": ["utf-8", "utf-8-sig"]},
+        "delimiter": {"type": "string", "minLength": 1, "maxLength": 1},
+        "header_row": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}

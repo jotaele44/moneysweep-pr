@@ -1,0 +1,329 @@
+name: Certification keyless materialization
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/certification-keyless-materialization.yml"
+      - "scripts/run_automatable_sources.py"
+      - "scripts/build_source_recovery_matrix.py"
+      - "tools/write_operator_evidence_receipt.py"
+      - "tools/operator_corpus_common.py"
+      - "moneysweep/runtime/source_registry.py"
+      - "registries/source_registry.json"
+      - "registries/source_registry_extensions/**"
+      - "registries/source_registry_overrides/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      count: ${{ steps.matrix.outputs.count }}
+      credential_count: ${{ steps.matrix.outputs.credential_count }}
+      automatable_total: ${{ steps.matrix.outputs.automatable_total }}
+      registry_total: ${{ steps.matrix.outputs.registry_total }}
+      source_ids_sha256: ${{ steps.matrix.outputs.source_ids_sha256 }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: matrix
+        name: Build automatable execution inventory from effective registry
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          from scripts.build_source_recovery_matrix import PATH_TYPES, _classify
+          from tools.operator_corpus_common import load_sources, source_ids_digest
+
+          root = Path(".")
+          sources, registry_paths = load_sources(root)
+          keyless = []
+          credential_gated = []
+          classified = []
+
+          for source in sources:
+              sid = str(source["source_id"])
+              path_type = _classify(source, root)
+              automatable = bool(PATH_TYPES.get(path_type, (False, ""))[0])
+              authentication = str(source.get("authentication") or "").strip()
+              classified.append(
+                  {
+                      "source_id": sid,
+                      "path_type": path_type,
+                      "automatable": automatable,
+                      "authentication": authentication,
+                      "producer_script": source.get("producer_script"),
+                  }
+              )
+              if not automatable:
+                  continue
+              if authentication == "none":
+                  keyless.append(sid)
+              else:
+                  credential_gated.append(
+                      {
+                          "source_id": sid,
+                          "authentication": authentication,
+                          "producer_script": source.get("producer_script", ""),
+                          "path_type": path_type,
+                      }
+                  )
+
+          keyless = sorted(set(keyless))
+          credential_gated = sorted(
+              credential_gated,
+              key=lambda item: item["source_id"],
+          )
+          automatable_total = len(keyless) + len(credential_gated)
+          digest = source_ids_digest(sources)
+          matrix = json.dumps({"source": keyless}, separators=(",", ":"))
+
+          Path("credential_gated_automatable.json").write_text(
+              json.dumps(
+                  {
+                      "schema_version": "moneysweep.credential_gated_automatable/v2",
+                      "registry_total": len(sources),
+                      "source_ids_sha256": digest,
+                      "automatable_total": automatable_total,
+                      "count": len(credential_gated),
+                      "sources": credential_gated,
+                      "execution_authorized": False,
+                      "policy": "Credentials are not discovered or consumed implicitly by certification CI.",
+                  },
+                  indent=2,
+                  sort_keys=True,
+              )
+              + "\n",
+              encoding="utf-8",
+          )
+          Path("current_automatable_inventory.json").write_text(
+              json.dumps(
+                  {
+                      "schema_version": "moneysweep.automatable_inventory/v2",
+                      "registry_total": len(sources),
+                      "source_ids_sha256": digest,
+                      "registry_paths": registry_paths,
+                      "automatable_total": automatable_total,
+                      "keyless_total": len(keyless),
+                      "credential_gated_total": len(credential_gated),
+                      "sources": sorted(classified, key=lambda item: item["source_id"]),
+                      "authority": "effective_runtime_registry_plus_recovery_classifier",
+                  },
+                  indent=2,
+                  sort_keys=True,
+              )
+              + "\n",
+              encoding="utf-8",
+          )
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write(f"matrix={matrix}\n")
+              out.write(f"count={len(keyless)}\n")
+              out.write(f"credential_count={len(credential_gated)}\n")
+              out.write(f"automatable_total={automatable_total}\n")
+              out.write(f"registry_total={len(sources)}\n")
+              out.write(f"source_ids_sha256={digest}\n")
+          print(f"registry_total={len(sources)}")
+          print(f"source_ids_sha256={digest}")
+          print(f"automatable_total={automatable_total}")
+          print(f"keyless_automatable={len(keyless)}")
+          print(f"credential_gated_automatable={len(credential_gated)}")
+          for sid in keyless:
+              print(f"keyless:{sid}")
+          for item in credential_gated:
+              print(
+                  "credential_gated:"
+                  f"{item['source_id']}:{item['authentication']}"
+              )
+          PY
+      - name: Upload current execution inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: current-automatable-inventory
+          path: |
+            current_automatable_inventory.json
+            credential_gated_automatable.json
+          if-no-files-found: error
+
+  materialize:
+    needs: prepare
+    if: needs.prepare.outputs.count != '0'
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run exact keyless source
+        id: run_source
+        continue-on-error: true
+        run: >-
+          python scripts/run_automatable_sources.py
+          --source "${{ matrix.source }}"
+          --no-require-egress
+      - name: Build immutable source evidence
+        if: always()
+        env:
+          SOURCE_ID: ${{ matrix.source }}
+          STEP_OUTCOME: ${{ steps.run_source.outcome }}
+          CERT_SCOPE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+          CERT_IMPLEMENTATION_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import shutil
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          from tools.operator_corpus_common import (
+              expected_outputs,
+              load_sources,
+              sha256_file,
+          )
+          from tools.write_operator_evidence_receipt import build_receipt
+
+          sid = os.environ["SOURCE_ID"]
+          sources, _ = load_sources(Path("."))
+          source_by_id = {
+              str(source["source_id"]): source for source in sources
+          }
+          source = source_by_id[sid]
+
+          declared_files = []
+          missing_expected = []
+          for expected in expected_outputs(source):
+              path = Path(expected)
+              if expected.endswith("/"):
+                  files = (
+                      sorted(item for item in path.rglob("*") if item.is_file())
+                      if path.is_dir()
+                      else []
+                  )
+                  if files:
+                      declared_files.extend(files)
+                  else:
+                      missing_expected.append(expected)
+              elif path.is_file():
+                  declared_files.append(path)
+              else:
+                  missing_expected.append(expected)
+
+          unique_files = []
+          seen = set()
+          for path in declared_files:
+              rel = path.as_posix()
+              if rel not in seen:
+                  seen.add(rel)
+                  unique_files.append(path)
+
+          out = Path("certification_out") / sid
+          evidence_dir = out / "operator_evidence"
+          file_dir = out / "files"
+          evidence_dir.mkdir(parents=True, exist_ok=True)
+          file_dir.mkdir(parents=True, exist_ok=True)
+
+          standardized_receipt = None
+          receipt_error = None
+          if unique_files:
+              producer = str(source.get("producer_script") or "").strip()
+              source_url = str(
+                  source.get("endpoint_url")
+                  or source.get("source_url")
+                  or ""
+              ).strip()
+              if not source_url:
+                  source_url = (
+                      "repository://jotaele44/moneysweep-pr/"
+                      + (producer or sid)
+                  )
+              try:
+                  standardized_receipt = build_receipt(
+                      root=Path("."),
+                      source_id=sid,
+                      outputs=[path.as_posix() for path in unique_files],
+                      producer_sha=os.environ["CERT_IMPLEMENTATION_SHA"],
+                      producer=producer or None,
+                      source_url=source_url,
+                      completed_at=datetime.now(timezone.utc).isoformat(),
+                      coverage_contract_pass=False,
+                  )
+              except Exception as exc:
+                  receipt_error = f"{type(exc).__name__}:{exc}"
+              else:
+                  (evidence_dir / f"{sid}.json").write_text(
+                      json.dumps(
+                          standardized_receipt,
+                          indent=2,
+                          sort_keys=True,
+                      )
+                      + "\n",
+                      encoding="utf-8",
+                  )
+
+          copied = []
+          for path in unique_files:
+              target = file_dir / path
+              target.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(path, target)
+              copied.append(
+                  {
+                      "path": path.as_posix(),
+                      "sha256": sha256_file(path),
+                      "bytes": path.stat().st_size,
+                  }
+              )
+
+          runner_summary = Path(
+              "data/staging/materialization_run_summary.json"
+          )
+          runner = (
+              json.loads(runner_summary.read_text(encoding="utf-8"))
+              if runner_summary.exists()
+              else None
+          )
+          execution_receipt = {
+              "schema_version": "moneysweep.keyless_execution/v2",
+              "source_id": sid,
+              "certification_scope_sha": os.environ["CERT_SCOPE_SHA"],
+              "certification_implementation_sha": os.environ[
+                  "CERT_IMPLEMENTATION_SHA"
+              ],
+              "generated_at": datetime.now(timezone.utc).isoformat(),
+              "registry_total": "${{ needs.prepare.outputs.registry_total }}",
+              "source_ids_sha256": "${{ needs.prepare.outputs.source_ids_sha256 }}",
+              "automatable_total": "${{ needs.prepare.outputs.automatable_total }}",
+              "workflow_step_outcome": os.environ["STEP_OUTCOME"],
+              "expected_outputs": expected_outputs(source),
+              "missing_expected_outputs": missing_expected,
+              "declared_files": copied,
+              "standardized_receipt_emitted": standardized_receipt is not None,
+              "standardized_receipt_error": receipt_error,
+              "coverage_contract_pass": False,
+              "runner_summary": runner,
+          }
+          (out / "execution_receipt.json").write_text(
+              json.dumps(execution_receipt, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(execution_receipt, indent=2, sort_keys=True))
+          PY
+      - name: Upload source certification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: keyless-${{ matrix.source }}
+          path: certification_out/${{ matrix.source }}/
+          if-no-files-found: error

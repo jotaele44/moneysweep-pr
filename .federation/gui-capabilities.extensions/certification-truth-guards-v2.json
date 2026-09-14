@@ -1,0 +1,31 @@
+{
+  "capabilities": [
+    {
+      "id": "certification-evidence-consistency-guards-v2",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Security primitives for diagnostic certification truth: strict parsing, byte/definition binding, execution consistency, freshness and release interlocks. This change adds no independently invokable end-user workflow or GUI control. Eventual operator-facing certification status, provenance and retry surfaces remain an explicit integration requirement; internal classification does not certify that future GUI workflow.",
+      "analysis": {
+        "files": [
+          "tools/certification_truth_guards.py",
+          "tools/derive_certification_truth.py",
+          "tools/certify_production.py"
+        ]
+      },
+      "backend": {
+        "files": [
+          "tools/certification_truth_guards.py",
+          "tools/derive_certification_truth.py",
+          "tools/certify_production.py"
+        ],
+        "tests": [
+          "tests/test_certification_truth_guards.py",
+          "tests/test_certification_truth.py",
+          "tests/test_certification_state_label.py"
+        ]
+      }
+    }
+  ],
+  "exceptions": []
+}

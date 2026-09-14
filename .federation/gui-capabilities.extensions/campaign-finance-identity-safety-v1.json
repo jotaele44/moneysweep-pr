@@ -1,0 +1,29 @@
+{
+  "capabilities": [
+    {
+      "id": "campaign-finance-identity-safety-v1",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Certification hardening for an existing campaign-finance capability. It does not add a duplicate user-facing control. The existing campaign-finance UI remains the canonical surface; these producers only change identity semantics so normalized-name matches remain candidate discovery until independently identified.",
+      "analysis": {
+        "files": [
+          "scripts/build_campaign_finance_entities_certified.py",
+          "scripts/validate_campaign_finance_materialization_certified.py",
+          "registries/source_registry_overrides/campaign_finance_identity_safety_v1.json"
+        ]
+      },
+      "backend": {
+        "files": [
+          "scripts/build_campaign_finance_entities_certified.py",
+          "scripts/validate_campaign_finance_materialization_certified.py",
+          "scripts/materialize_campaign_finance.py"
+        ],
+        "tests": [
+          "tests/test_campaign_finance_identity_safety.py"
+        ]
+      }
+    }
+  ],
+  "exceptions": []
+}
