@@ -1,0 +1,72 @@
+{
+  "schema_version": "moneysweep.required_source_closure/v1",
+  "generated_at": "2026-09-14T12:50:00Z",
+  "branch": "agent/production-certification-max-v2",
+  "scope_head_observed_before_receipt": "cb13d92f9c2c42d72c37fa16262cbb9f72e985f0",
+  "production_eligible": false,
+  "required_source_population": 16,
+  "required_blockers": [
+    {
+      "source_id": "usaspending_prime",
+      "state": "PARTIALLY_MATERIALIZED",
+      "blocker_class": "DERIVED_OUTPUT_MISSING_OR_UNBOUND",
+      "current_observation": "pr_contracts_master.csv is credited; pr_all_awards_master.csv remains the missing second registered output in the status ledger.",
+      "next_valid_action": "Run scripts/build_unified_master.py only from its declared upstream masters, preserve full lineage, then issue a current-scope receipt for both registered outputs.",
+      "forbidden_shortcut": "Do not copy, rename, synthesize, or substitute a report/summary artifact for pr_all_awards_master.csv.",
+      "falsifier": "Any missing required upstream, forbidden input path, schema failure, row-conservation failure, or receipt definition-digest mismatch keeps the source open."
+    },
+    {
+      "source_id": "hud_drgr_authorized",
+      "state": "NOT_MATERIALIZED",
+      "blocker_class": "AUTHORIZED_OPERATOR_EXPORT_REQUIRED",
+      "current_observation": "The bounded 2026-09-06 pursuit classified 9 candidates and found 0 authorized DRGR activity/project/drawdown exports. Six supporting CDBG-DR artifacts, one partial non-authorized dataset, and two empty/unresolved parquet manifestations were correctly denied source credit.",
+      "next_valid_action": "Obtain a non-empty authorized DRGR export through the credentialed portal, preserve original bytes and export metadata, ingest through scripts/ingest_hud_drgr_exports.py, validate, and bind a current-scope receipt.",
+      "forbidden_shortcut": "Do not treat CDBG-DR, HCV, transition PDFs, empty parquet tables, or similarly themed HUD records as DRGR-equivalent without a separately certified source-equivalence claim.",
+      "falsifier": "No authorized export bytes, zero rows, wrong table family, missing export provenance, or scope mismatch keeps the source open."
+    },
+    {
+      "source_id": "prasa",
+      "state": "PARTIALLY_MATERIALIZED",
+      "blocker_class": "OPERATOR_DROPZONE_EVIDENCE_INCOMPLETE",
+      "current_observation": "Status grants partial credit, but the canonical registered output data/staging/processed/pr_prasa_contracts.csv is not committed on the current continuation branch and therefore cannot be independently promoted from repository state alone.",
+      "next_valid_action": "Use an operator-provided PRASA procurement export in the registered dropzone, preserve raw bytes/hash/schema, run scripts/ingest_prasa.py, validate whole-row outputs, and bind a current-scope receipt.",
+      "forbidden_shortcut": "Do not infer full PRASA materialization from consulting-engineer reports, derived vendor aggregates, project PDFs, or similarly named AAA/PRASA documents.",
+      "falsifier": "Absent raw export, missing canonical output, schema mismatch, empty output, or unresolved source-definition binding keeps the source open."
+    },
+    {
+      "source_id": "campaign_finance_entities",
+      "state": "NOT_MATERIALIZED",
+      "blocker_class": "UPSTREAM_CAMPAIGN_FINANCE_MATERIALIZATION_REQUIRED",
+      "current_observation": "The required FEC contribution and committee CSVs are not committed at the current continuation head; downstream entity generation therefore cannot be granted credit without executing the registered upstream acquisitions.",
+      "next_valid_action": "Materialize the registered FEC/OCE upstream files, then run scripts/build_campaign_finance_entities.py and validate all four declared outputs as a single dependency-bound derivation.",
+      "forbidden_shortcut": "Do not hand-author candidate/committee/entity CSVs or infer missing federal inputs from names, summaries, or old report counts.",
+      "falsifier": "Any required upstream missing, entity-ID collision, unresolved mandatory schema field, empty required derived output, or receipt mismatch keeps the source open."
+    },
+    {
+      "source_id": "campaign_finance_materialization_gate",
+      "state": "NOT_MATERIALIZED",
+      "blocker_class": "DEPENDENT_VALIDATION_GATE",
+      "current_observation": "This gate depends on FEC Schedule A/B/E, PR donation feeds, derived campaign-finance entities, a complete FEC outflow acquisition manifest, and conditionally required cross-reference outputs.",
+      "next_valid_action": "After upstream campaign-finance materialization, execute scripts/validate_campaign_finance_materialization.py in blocking mode and preserve the generated manifest only if report.ok is true.",
+      "forbidden_shortcut": "Do not use --report-only, suppress blocking entries, or mark the gate successful merely because the validator script executes.",
+      "falsifier": "Any required file missing/below threshold/schema-invalid, incomplete outflow manifest, missing conditional derived output, or zero PR donation rows keeps the gate open."
+    }
+  ],
+  "dependency_order": [
+    "usaspending_prime",
+    "prasa",
+    "hud_drgr_authorized",
+    "campaign_finance_upstreams",
+    "campaign_finance_entities",
+    "campaign_finance_materialization_gate"
+  ],
+  "current_scope_constraints": {
+    "actions_infrastructure_bypass": "PERMITTED_ONLY_WHEN_RUNNER_STARTUP_IS_THE_SOLE_BLOCKER",
+    "manual_source_bypass": false,
+    "source_equivalence_requires_separate_certification": true,
+    "name_only_identity_allowed": false,
+    "count_equality_is_identity": false,
+    "historical_receipt_inheritance_allowed": false,
+    "production_activation_authorized": false
+  }
+}
