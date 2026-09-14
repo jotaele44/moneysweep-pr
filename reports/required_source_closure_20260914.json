@@ -1,19 +1,19 @@
 {
   "schema_version": "moneysweep.required_source_closure/v1",
-  "generated_at": "2026-09-14T12:50:00Z",
+  "generated_at": "2026-09-14T13:05:00Z",
   "branch": "agent/production-certification-max-v2",
-  "scope_head_observed_before_receipt": "cb13d92f9c2c42d72c37fa16262cbb9f72e985f0",
+  "scope_head_observed_before_receipt": "be73ae419d606103d015f21e787932a4c533165c",
   "production_eligible": false,
   "required_source_population": 16,
   "required_blockers": [
     {
       "source_id": "usaspending_prime",
-      "state": "PARTIALLY_MATERIALIZED",
-      "blocker_class": "DERIVED_OUTPUT_MISSING_OR_UNBOUND",
-      "current_observation": "pr_contracts_master.csv is credited; pr_all_awards_master.csv remains the missing second registered output in the status ledger.",
-      "next_valid_action": "Run scripts/build_unified_master.py only from its declared upstream masters, preserve full lineage, then issue a current-scope receipt for both registered outputs.",
-      "forbidden_shortcut": "Do not copy, rename, synthesize, or substitute a report/summary artifact for pr_all_awards_master.csv.",
-      "falsifier": "Any missing required upstream, forbidden input path, schema failure, row-conservation failure, or receipt definition-digest mismatch keeps the source open."
+      "state": "BLOCKED_INPUT_CORPUS",
+      "blocker_class": "REQUIRED_BUILD_INPUT_BYTES_NOT_PRESENT_IN_GIT_MANIFESTATION",
+      "current_observation": "Historical/current readiness surfaces report partial materialization, but the current Git manifestation does not contain data/staging/processed/pr_contracts_master.csv, the required canonical master set, the required expansion inputs, or pr_all_awards_master.csv. Report-state is discovery only and cannot prove byte-state.",
+      "next_valid_action": "Recover or mount the authoritative current-scope build inputs in a frozen evidence root; run tools/audit_unified_master_inputs.py; only on READY_TO_BUILD run scripts/build_unified_master.py with require_all_inputs=True, then hash every input/output and issue a current-definition receipt.",
+      "forbidden_shortcut": "Do not infer byte presence from source_registry_status/materialization_readiness, copy or rename old output files, synthesize pr_all_awards_master.csv, or substitute report/summary artifacts for declared build inputs.",
+      "falsifier": "Any required input byte absent or invalid, forbidden/symlinked input path, schema/row-width failure, build conservation failure, or receipt definition-digest mismatch keeps the source open."
     },
     {
       "source_id": "hud_drgr_authorized",
@@ -53,7 +53,8 @@
     }
   ],
   "dependency_order": [
-    "usaspending_prime",
+    "usaspending_prime_input_corpus",
+    "usaspending_prime_build",
     "prasa",
     "hud_drgr_authorized",
     "campaign_finance_upstreams",
@@ -67,6 +68,7 @@
     "name_only_identity_allowed": false,
     "count_equality_is_identity": false,
     "historical_receipt_inheritance_allowed": false,
-    "production_activation_authorized": false
+    "production_activation_authorized": false,
+    "report_state_is_byte_evidence": false
   }
 }
