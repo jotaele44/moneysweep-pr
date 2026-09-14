@@ -1,8 +1,8 @@
 {
   "schema_version": "moneysweep.required_source_closure/v1",
-  "generated_at": "2026-09-14T13:05:00Z",
+  "generated_at": "2026-09-14T13:14:00Z",
   "branch": "agent/production-certification-max-v2",
-  "scope_head_observed_before_receipt": "be73ae419d606103d015f21e787932a4c533165c",
+  "scope_head_observed_before_receipt": "9f756180ebd9c1b851377b74e1aca6d7968a6e4d",
   "production_eligible": false,
   "required_source_population": 16,
   "required_blockers": [
@@ -11,6 +11,8 @@
       "state": "BLOCKED_INPUT_CORPUS",
       "blocker_class": "REQUIRED_BUILD_INPUT_BYTES_NOT_PRESENT_IN_GIT_MANIFESTATION",
       "current_observation": "Historical/current readiness surfaces report partial materialization, but the current Git manifestation does not contain data/staging/processed/pr_contracts_master.csv, the required canonical master set, the required expansion inputs, or pr_all_awards_master.csv. Report-state is discovery only and cannot prove byte-state.",
+      "audit_tool": "tools/audit_unified_master_inputs.py",
+      "audit_execution_state": "NOT_EXECUTED_AGAINST_AUTHORITATIVE_OPERATOR_CORPUS",
       "next_valid_action": "Recover or mount the authoritative current-scope build inputs in a frozen evidence root; run tools/audit_unified_master_inputs.py; only on READY_TO_BUILD run scripts/build_unified_master.py with require_all_inputs=True, then hash every input/output and issue a current-definition receipt.",
       "forbidden_shortcut": "Do not infer byte presence from source_registry_status/materialization_readiness, copy or rename old output files, synthesize pr_all_awards_master.csv, or substitute report/summary artifacts for declared build inputs.",
       "falsifier": "Any required input byte absent or invalid, forbidden/symlinked input path, schema/row-width failure, build conservation failure, or receipt definition-digest mismatch keeps the source open."
@@ -52,9 +54,26 @@
       "falsifier": "Any required file missing/below threshold/schema-invalid, incomplete outflow manifest, missing conditional derived output, or zero PR donation rows keeps the gate open."
     }
   ],
+  "execution_population": {
+    "automatable_total": 116,
+    "keyless_total": 104,
+    "credential_gated_total": 12,
+    "planner": "tools/build_keyless_execution_waves.py",
+    "planner_execution_state": "NOT_EXECUTED_AGAINST_FULL_WORKSPACE",
+    "waves": [
+      "W1_SCHEDULE_INDEPENDENT",
+      "W2_OPERATOR_TRIGGERED",
+      "W3_DEPENDENCY_GATED"
+    ],
+    "readiness_is_execution_evidence": false,
+    "reported_output_presence_is_execution_evidence": false
+  },
   "dependency_order": [
     "usaspending_prime_input_corpus",
     "usaspending_prime_build",
+    "keyless_schedule_independent",
+    "keyless_operator_triggered",
+    "keyless_dependency_gated",
     "prasa",
     "hud_drgr_authorized",
     "campaign_finance_upstreams",
