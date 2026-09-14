@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from scripts import audit_hud_drgr_authorized_sources as audit
 
 
