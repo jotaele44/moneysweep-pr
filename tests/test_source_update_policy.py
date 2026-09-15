@@ -100,7 +100,12 @@ def test_known_overrides_take_effect():
     assert POLICIES["centinelas_pre_official_signals"].trigger_type == "on_drop"
     assert POLICIES["prasa_contracts_master"].trigger_type == "dependency"
     assert POLICIES["prasa_contracts_master"].depends_on == ["prasa"]
-    assert POLICIES["hacienda_sut_ivu"].trigger_type == "disabled"
+    # hacienda_sut_ivu graduated to api_producer (scripts/download_hacienda_sut_ivu.py):
+    # no override remains, so its trigger_type/cadence come from inference — same
+    # mechanism as its already-graduated siblings fta_ntd/census_gov_finances.
+    assert POLICIES["hacienda_sut_ivu"].trigger_type == "schedule"
+    assert POLICIES["hacienda_sut_ivu"].cadence == "monthly"
+    assert POLICIES["pr_act_154_excise"].trigger_type == "disabled"
 
 
 def test_manual_export_patterns_propagate_from_registry_entry():

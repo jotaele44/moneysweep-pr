@@ -5,15 +5,15 @@
   "by_wired_status": {
     "deferred": 2,
     "manual_dropzone": 42,
-    "scraper_stub": 2,
+    "scraper_stub": 1,
     "semantic_duplicate": 3,
     "wired_adapter": 41,
-    "wired_producer": 74
+    "wired_producer": 75
   },
   "by_acquisition_status": {
     "acquired_ingested": 6,
-    "automated": 114,
-    "not_acquired": 44
+    "automated": 115,
+    "not_acquired": 43
   },
   "by_materialization_status": {
     "fully_materialized": 17,

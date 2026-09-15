@@ -155,13 +155,9 @@ sources:
     freshness_sla_hours: 168
 
   # -- Disabled terminal sources: never scheduled, never executable.
-  - source_id: hacienda_sut_ivu
-    trigger_type: disabled
-    enabled: false
-    runner: scripts/download_coverage_gap_intake.py
-    freshness_sla_hours: 0
-    notes: Disabled until a real scraper replaces the coverage-gap stub.
-
+  #    hacienda_sut_ivu graduated to a real api_producer (scripts/download_hacienda_sut_ivu.py)
+  #    and was removed from this list — same as fta_ntd/census_gov_finances, it has no
+  #    override here and gets its effective policy inferred from path_type + cadence.
   - source_id: pr_act_154_excise
     trigger_type: disabled
     enabled: false

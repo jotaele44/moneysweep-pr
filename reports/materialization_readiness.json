@@ -1,8 +1,8 @@
 {
   "schema_version": "r5_readiness_v1",
   "total_sources": 164,
-  "automatable_total": 115,
-  "automatable_ready": 115,
+  "automatable_total": 116,
+  "automatable_ready": 116,
   "automatable_not_ready": [],
   "automatable_needs_key_count": 12,
   "automatable_required_keys": [
@@ -18,12 +18,12 @@
   ],
   "queued_excluded": {
     "manual_export": 42,
-    "scraper_needed": 2,
+    "scraper_needed": 1,
     "deferred_stub": 2,
     "semantic_duplicate": 3,
     "broken_producer": 0
   },
-  "queued_excluded_total": 49,
+  "queued_excluded_total": 48,
   "source_count_provenance": {
     "computed_from_live_registry": true,
     "registry_schema_version": "r5_source_registry_v1",

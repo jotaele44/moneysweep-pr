@@ -63,7 +63,7 @@ gao_ig_audits,federal,False,api_producer,wired_producer,automated,not_materializ
 gleif_lei,entity_resolution,False,api_producer,wired_producer,automated,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,1,False,,no coverage contract declared
 grants_gov,federal,False,api_adapter,wired_adapter,automated,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,1,False,,no coverage contract declared
 hacienda,territorial,False,api_producer,wired_producer,automated,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,1,False,,no coverage contract declared
-hacienda_sut_ivu,territorial,False,scraper_needed,scraper_stub,not_acquired,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,0,False,,no coverage contract declared
+hacienda_sut_ivu,territorial,False,api_producer,wired_producer,automated,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,0,True,,no coverage contract declared
 haf,federal,False,api_adapter,wired_adapter,automated,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,1,False,,no coverage contract declared
 hhs_grants,federal,False,api_adapter,wired_adapter,automated,not_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,1,False,,no coverage contract declared
 highergov_supplemental,federal,False,api_adapter,wired_adapter,automated,partially_materialized,uncontracted,not_applicable,unknown,uncertified,empty,False,0,1,False,,no coverage contract declared

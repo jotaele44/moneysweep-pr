@@ -1,16 +1,16 @@
 {
   "schema_version": "federation_source_status_reconciliation_v1",
   "active_vector": "PREP_TRANCHE_B_MANUAL_SOURCE_INGESTION",
-  "reconciled_at": "2026-07-11",
+  "reconciled_at": "2026-09-08",
   "status": "CONTROL_PLANE_RECONCILED",
   "canonical_source_count": 164,
   "source_count_file": "reports/materialization_readiness.json",
-  "automatable_total": 115,
-  "automatable_ready": 115,
-  "queued_excluded_total": 49,
+  "automatable_total": 116,
+  "automatable_ready": 116,
+  "queued_excluded_total": 48,
   "queued_excluded": {
     "manual_export": 42,
-    "scraper_needed": 2,
+    "scraper_needed": 1,
     "deferred_stub": 2,
     "semantic_duplicate": 3,
     "broken_producer": 0
@@ -32,14 +32,15 @@
     "Registry grew from 84 to 136 sources after the June 2026 federation readiness audit as new manual-export, SBA disaster-loan, and fiscal sources were registered.",
     "scraper_needed reduced from 15 to 2 (2026-06-22): 13 sources with real scraping implementations promoted from scraper_needed to api_producer. Only hacienda_sut_ivu and pr_act_154_excise remain as true stubs.",
     "Reconciled from 136 to 141 sources and 90 to 95 automatable (2026-06-28): federation.json and this reconciliation file were lagging reports/materialization_readiness.json (141 total / 95 automatable / 95 ready). OpenStates runtime key added to match materialization truth. No readiness flag changed.",
-    "Reconciled from 141 to 144 sources and 95 to 99 automatable (2026-07-11, gap-closure phase1a): this file, federation.json (143/98), and current_status.json's materialization_readiness_truth block (136/90) had all drifted from reports/materialization_readiness.json. tests/test_source_count_reconciliation.py now pins every committed count surface to that file so silent drift fails CI."
+    "Reconciled from 141 to 144 sources and 95 to 99 automatable (2026-07-11, gap-closure phase1a): this file, federation.json (143/98), and current_status.json's materialization_readiness_truth block (136/90) had all drifted from reports/materialization_readiness.json. tests/test_source_count_reconciliation.py now pins every committed count surface to that file so silent drift fails CI.",
+    "hacienda_sut_ivu promoted scraper_needed -> api_producer (2026-09-08): scripts/download_hacienda_sut_ivu.py parses the live monthly IVU/SUT distribution PDFs from hacienda.pr.gov. automatable_total/automatable_ready 115 -> 116, queued_excluded_total 49 -> 48 (scraper_needed 2 -> 1). Only pr_act_154_excise remains a true stub."
   ],
   "federation_gate": {
     "ready_for_hub_discovery": true,
     "ready_for_live_execution": false,
     "live_execution_blockers": [
       "Tranche B manual ingestion not fully materialized (7 empty output files created; operator must drop source files)",
-      "2 scraper-needed stubs remain (hacienda_sut_ivu, pr_act_154_excise)",
+      "1 scraper-needed stub remains (pr_act_154_excise)",
       "Runtime keys are local operator requirements",
       "Strict preflight must pass before producer execution"
     ]
