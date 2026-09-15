@@ -10,17 +10,17 @@ _Read-only re-projection of `reports/source_recovery_matrix.csv` + live producer
 | --- | --- | --- | --- |
 | `wired_materializing` | 16 | 15 | Wired and producing output on disk now. |
 | `wired_offline_ready` | 3 | 3 | Wired; materializes fully offline from a committed input (no operator file/network). |
-| `wired_ready_unmaterialized` | 92 | 88 | Wired and ready; just needs a run (network egress). |
+| `wired_ready_unmaterialized` | 93 | 89 | Wired and ready; just needs a run (network egress). |
 | `wired_needs_key` | 10 | 8 | Wired and automatable, but requires an API key (gated by the registry auth). |
 | `wired_not_set_to_materialize` | 5 | 3 | Wired but produces nothing by design (deferred stub / sibling duplicate). |
 | `queued_manual` | 39 | 39 | Wired, but waits on an operator-delivered manual export. |
-| `queued_scraper` | 2 | 2 | Declared, but needs a scraping adapter for a PR-gov HTML/PDF surface. |
+| `queued_scraper` | 1 | 1 | Declared, but needs a scraping adapter for a PR-gov HTML/PDF surface. |
 | `broken` | 0 | 0 | Producer is missing / fails import / has no callable entrypoint. |
 | `not_considered` | 5 | 0 | Real-world financial source with no registry entry yet. |
 
 ## The four questions
 
-1. **Which financial sources are wired?** 155 are wired to a producer — 15 producing output now, 3 able to materialize fully offline from committed inputs, 96 automatable & ready to run (incl. key-gated), 41 wired but queued behind a manual export or scraper.
+1. **Which financial sources are wired?** 155 are wired to a producer — 15 producing output now, 3 able to materialize fully offline from committed inputs, 97 automatable & ready to run (incl. key-gated), 40 wired but queued behind a manual export or scraper.
 2. **Which don't work?** 0 have a structural producer defect (missing / import error / no entrypoint). Runtime correctness beyond import is not verified offline — see caveat below.
 3. **Which aren't set to materialize anything?** 3 produce nothing by design (deferred stubs + semantic duplicates of sibling sources).
 4. **Which haven't even been considered?** 5 real-world financial sources have no registry entry (see `financial_source_coverage_gaps.md`).
@@ -40,10 +40,10 @@ _Read-only re-projection of `reports/source_recovery_matrix.csv` + live producer
 | `municipal_finance` | 3 | 0 | 2 |
 | `nonprofit_funding` | 1 | 0 | 0 |
 | `political_finance` | 8 | 2 | 2 |
-| `territorial_spending` | 30 | 2 | 11 |
+| `territorial_spending` | 30 | 2 | 10 |
 | `uncategorized` | 15 | 3 | 0 |
 
-## Producer/source-id name mismatches (44)
+## Producer/source-id name mismatches (43)
 
 Sources whose `source_id` is not recoverable from the producer filename. Legitimate for shared aggregators, but a registry-enumeration risk worth tracking (a rename or audit keyed on filenames can silently miss these).
 
@@ -60,7 +60,6 @@ Sources whose `source_id` is not recoverable from the producer filename. Legitim
 | `fema_pa_openfema_v2` | `download_openfema_pa_projects.py` | federal_awards |
 | `financialdata_net` | `enrich_financialdata_entities.py` | commercial_enrichment |
 | `fpds_report_builder` | `download_grants.py` | federal_awards |
-| `hacienda_sut_ivu` | `download_coverage_gap_intake.py` | territorial_spending |
 | `highergov_supplemental` | `fetch_highergov_api.py` | federal_awards |
 | `hud_drgr_authorized` | `ingest_hud_drgr_exports.py` | manual_financial |
 | `legislapr_discovery` | `probe_legislapr_detail.py` | uncategorized |

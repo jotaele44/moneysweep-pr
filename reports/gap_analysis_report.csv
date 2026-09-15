@@ -100,7 +100,7 @@ country PR + jurisdiction US-PR, de-duped by LEI). Corporate identity
 (legal name, status, legal form, local registration number,",empty,uncontracted,uncertified
 grants_gov,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_grants_master.csv,,empty,uncontracted,uncertified
 hacienda,territorial,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_hacienda_revenues.csv,,empty,uncontracted,uncertified
-hacienda_sut_ivu,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_hacienda_sut_ivu.csv,"PR Treasury Sales & Use Tax (IVU/SUT) collections by fiscal year / month / NAICS, plus COFIM municipal IVU — the largest PR consumption-tax revenue stream, not otherwise captured. Scraper surface (hac",empty,uncontracted,uncertified
+hacienda_sut_ivu,territorial,False,none,1,0,1,0,not_materialized,0,0,data/staging/processed/pr_hacienda_sut_ivu.csv,"PR Treasury Sales & Use Tax (IVU/SUT) collections by fiscal year / month / tax-tranche category (5.5% SUT, 4.5% SUT Surcharge, 4% Services SUT, 0.5% FAM SUT, 1% Municipal SUT, Subtotal, Penalties, Tot",empty,uncontracted,uncertified
 haf,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_haf.csv,,empty,uncontracted,uncertified
 hhs_grants,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_hhs_master.csv,,empty,uncontracted,uncertified
 hud_cdbg_mit,federal,False,none,1,0,1,0,not_materialized,0,1,data/staging/processed/pr_cdbg_mit.csv,"HUD CDBG-Mitigation (CFDA 14.272) allocations to PR via USASpending. Distinct from CDBG-DR (hud_cdbg_dr_public) and DRGR reporting (hud_drgr_authorized).
