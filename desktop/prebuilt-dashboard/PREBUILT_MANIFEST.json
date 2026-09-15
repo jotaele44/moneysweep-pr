@@ -1,0 +1,128 @@
+{
+  "build_command": "npm ci --no-audit --no-fund && VITE_API_BASE=\"\" npm run build",
+  "build_env": {
+    "VITE_API_BASE": ""
+  },
+  "bundle_tree_sha256": "c70ef66648b577bd57f21e736edaf73450ee5bd4b7bbbf210e8a762e9160bc56",
+  "file_count": 22,
+  "files": [
+    {
+      "bytes": 829548,
+      "path": "assets/index-Cmsh3pZs.js",
+      "sha256": "521246c85364fde8da09c57560106ffb601da5fdd44cb54a21dc618c01a5c3c9"
+    },
+    {
+      "bytes": 55115,
+      "path": "assets/index-DJo2Q0tH.css",
+      "sha256": "1006d3d613324272739d43765a33b63868c04fa526d160d76891542f61a36cdc"
+    },
+    {
+      "bytes": 25960,
+      "path": "assets/inter-cyrillic-ext-wght-normal-BOeWTOD4.woff2",
+      "sha256": "ca157063339ac4ad418f214f3abfed119b0798ab4d377386ce5c9e5a7a435ebd"
+    },
+    {
+      "bytes": 18748,
+      "path": "assets/inter-cyrillic-wght-normal-DqGufNeO.woff2",
+      "sha256": "71d5ee93cc1e9f1d520a3a8b66456de18c7879d8df09d57fcd2eaff75fef0075"
+    },
+    {
+      "bytes": 11232,
+      "path": "assets/inter-greek-ext-wght-normal-DlzME5K_.woff2",
+      "sha256": "6e9e020a25f9b56d418f2c085b1d3c09725a4da23fe693a5b463064606732190"
+    },
+    {
+      "bytes": 18996,
+      "path": "assets/inter-greek-wght-normal-CkhJZR-_.woff2",
+      "sha256": "1be3448e292fbf05ffe176fe1e43f135013d50b1e7d324ad1a558f623d3bb6f6"
+    },
+    {
+      "bytes": 85068,
+      "path": "assets/inter-latin-ext-wght-normal-DO1Apj_S.woff2",
+      "sha256": "34b9c504cab7a73e37b746343a449132e56cf7b5481af2cb81dc74dcff25c956"
+    },
+    {
+      "bytes": 48256,
+      "path": "assets/inter-latin-wght-normal-Dx4kXJAl.woff2",
+      "sha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62"
+    },
+    {
+      "bytes": 10252,
+      "path": "assets/inter-vietnamese-wght-normal-CBcvBZtf.woff2",
+      "sha256": "5c66f9e07e90c6d4ac4922cc68d60de26c17b1858e677fb5e603fce3952b3ff2"
+    },
+    {
+      "bytes": 5328,
+      "path": "assets/jetbrains-mono-cyrillic-400-normal-BEIGL1Tu.woff2",
+      "sha256": "522f5827308102a9c0ea7860b5a11306043610ecf03d150ba32056a06e8c56e2"
+    },
+    {
+      "bytes": 6976,
+      "path": "assets/jetbrains-mono-cyrillic-400-normal-ugxPyKxw.woff",
+      "sha256": "67c9cc7864b4940dbfb246c7b452c1de8e96f140f334d363fcdd87dbfeadab72"
+    },
+    {
+      "bytes": 5664,
+      "path": "assets/jetbrains-mono-greek-400-normal-B9oWc5Lo.woff",
+      "sha256": "09f89e8369d7745ac5fe92e62a9ea13f66f40fd95b5495fac014c54b3a1ca6cc"
+    },
+    {
+      "bytes": 4228,
+      "path": "assets/jetbrains-mono-greek-400-normal-C190GLew.woff2",
+      "sha256": "365b7a8eaff022b13ed0561fde3890a04a30507d773ecd5adb3aca8e766a285c"
+    },
+    {
+      "bytes": 27496,
+      "path": "assets/jetbrains-mono-latin-400-normal-6-qcROiO.woff",
+      "sha256": "658b9ee07b0249cf910a8d6f3d812d46c962bae81d7379a0355b1db35c61586f"
+    },
+    {
+      "bytes": 21168,
+      "path": "assets/jetbrains-mono-latin-400-normal-V6pRDFza.woff2",
+      "sha256": "14425ba9c695763c1547f48a206b7aa60350a33ae23de09f0407877f3fcd89eb"
+    },
+    {
+      "bytes": 7336,
+      "path": "assets/jetbrains-mono-latin-ext-400-normal-Bc8Ftmh3.woff2",
+      "sha256": "505dfba8ecbe77e82765f36d317ed7ef4ac42719dc5f4ae68d1c483fd22d0d14"
+    },
+    {
+      "bytes": 10128,
+      "path": "assets/jetbrains-mono-latin-ext-400-normal-fXTG6kC5.woff",
+      "sha256": "e7131bbf591e1ed9b74e44e162f6a39affa00ac21654cb683585d085733f6355"
+    },
+    {
+      "bytes": 5372,
+      "path": "assets/jetbrains-mono-vietnamese-400-normal-CqNFfHCs.woff",
+      "sha256": "1dfe0f740fa86409034058e49474b01126ae9ea8c1ecda905917b90d57f03b00"
+    },
+    {
+      "bytes": 41710,
+      "path": "icon-180.png",
+      "sha256": "bbb8bf49e51d649e3fbe8ad6d0a3ae2cf4ac8e3187721546691e37b2074147a9"
+    },
+    {
+      "bytes": 46553,
+      "path": "icon-192.png",
+      "sha256": "3dbcbcc45392f6aa4d9a2122873003c16c5e7e0e694ed1516c6e5ed67e8b7f5a"
+    },
+    {
+      "bytes": 306150,
+      "path": "icon-512.png",
+      "sha256": "bf2d722330142271121146fe2ad669931c24603fbc16cf39917bdc2df9308500"
+    },
+    {
+      "bytes": 3865,
+      "path": "index.html",
+      "sha256": "967d36f8143ad56dea9ab895540df9410f40b575111b7a9e837d7d1aa808341d"
+    }
+  ],
+  "generated_at": "2026-09-08T13:20:59Z",
+  "generated_by": {
+    "node": "v22.22.2",
+    "npm": "10.9.7"
+  },
+  "schema_version": "moneysweep_prebuilt_dashboard_v1",
+  "source_fingerprint": "20ce225bebf1b785d821038695eab9d5020ca1a9b5c6fb8e6cabb00c6cfa88e2",
+  "total_bytes": 1595149
+}

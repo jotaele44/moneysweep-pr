@@ -164,6 +164,35 @@ npm run dev
 
 Desktop and packaged-app procedures are governed separately by the shared `prii_desktop` runtime and its coordinated PR sequence.
 
+## 11. Desktop wrapper prerequisites
+
+The double-click wrapper at the repo root is a developer convenience around this
+checkout, not the distributable app (see `desktop/README.md`). Its first run needs:
+
+- **Python 3.11+** — the bootstrap interpreter only; later runs use `.venv`.
+- **Network access, or a wheelhouse** — for the Python packages. Two requirements
+  resolve from `git+https://` URLs, so `git` must also be present. To run entirely
+  offline, follow `docs/DESKTOP_OFFLINE_BOOTSTRAP.md`.
+- **Node.js — not required.** A prebuilt dashboard is committed at
+  `desktop/prebuilt-dashboard/`. To build the dashboard from source instead:
+
+  ```bash
+  python3 desktop/setup.py --build-frontend    # or PRII_FORCE_FRONTEND_BUILD=1
+  ```
+
+Regenerate the committed bundle after changing anything under `dashboard/`:
+
+```bash
+make prebuilt-dashboard        # needs Node.js
+make prebuilt-dashboard-check  # verify without rebuilding
+```
+
+To see what is blocking a first run:
+
+```bash
+python3 desktop/preflight.py
+```
+
 ## Troubleshooting
 
 | Problem | Resolution |
