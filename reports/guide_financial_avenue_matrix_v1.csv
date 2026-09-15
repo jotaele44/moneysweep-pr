@@ -2,8 +2,8 @@ avenue_id,canonical,binding_state,base_source_ids,proposed_overlay_source_ids,se
 GFAV-001,commercial_banking,AUTHORITATIVE_ROUTE,fdic;fhlb,,INTERSECTION,OPEN
 GFAV-002,capital_markets,AUTHORITATIVE_ROUTE,sec_edgar;sec_13f_nport,,INTERSECTION,OPEN
 GFAV-003,economic_development_bank_financing,AUTHORITATIVE_ROUTE,bde_loans,,INTERSECTION,OPEN
-GFAV-004,international_financial_entities,ABSENT,,ocif_guide_financial_classes,A_ONLY,OPEN
-GFAV-005,insurance_companies,ABSENT,,ocs_insurer_registry,A_ONLY,OPEN
+GFAV-004,international_financial_entities,AUTHORITATIVE_ROUTE,ocif_guide_financial_classes,,INTERSECTION,OPEN
+GFAV-005,insurance_companies,AUTHORITATIVE_ROUTE,ocs_insurer_registry,,INTERSECTION,OPEN
 GFAV-006,real_estate_investment_trusts,CANDIDATE_NOT_IDENTITY,sec_edgar,,INTERSECTION,OPEN
 GFAV-007,registered_investment_companies,CANDIDATE_NOT_IDENTITY,sec_edgar;sec_13f_nport,ocif_guide_financial_classes,INTERSECTION,OPEN
 GFAV-008,resident_individual_investors,SUPPORTING_ROUTE,pr_act_60_decrees;ddec_incentives,,INTERSECTION,OPEN
@@ -18,7 +18,7 @@ GFAV-016,infrastructure_renewable_energy,SUPPORTING_ROUTE,pr_act_60_decrees;ddec
 GFAV-017,agriculture_agroindustrial,SUPPORTING_ROUTE,pr_act_60_decrees;ddec_incentives;usda_farm_subsidies,,INTERSECTION,OPEN
 GFAV-018,film_creative,SUPPORTING_ROUTE,pr_act_60_decrees;ddec_incentives,,INTERSECTION,OPEN
 GFAV-019,young_entrepreneurship,SUPPORTING_ROUTE,pr_act_60_decrees;ddec_incentives,,INTERSECTION,OPEN
-GFAV-020,foreign_trade_zones,ABSENT,,ftz_board_pr,A_ONLY,OPEN
+GFAV-020,foreign_trade_zones,AUTHORITATIVE_ROUTE,ftz_board_pr,,INTERSECTION,OPEN
 GFAV-021,qualified_opportunity_zone_priority_projects,AUTHORITATIVE_ROUTE,opportunity_zones;pr_act_60_decrees;ddec_incentives,,INTERSECTION,OPEN
 GFAV-022,vieques_culebra_special_incentives,SUPPORTING_ROUTE,pr_act_60_decrees;ddec_incentives,,INTERSECTION,OPEN
 GFAV-023,pymes_special_incentives,SUPPORTING_ROUTE,pr_act_60_decrees;ddec_incentives;bde_loans;sba_loans,,INTERSECTION,OPEN

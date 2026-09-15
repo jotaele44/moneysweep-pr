@@ -2709,6 +2709,61 @@
       "promotion_rule": "cross_confirmed_only",
       "canonical_required": true,
       "notes": "Derived corridor-join ledger. Maps STIP/TIP roadway projects onto the\nRoadWatch segment network via route-km measures and spatial overlay, then\npromotes route-only projects to segment-level candidates. Each row is a\nmanual-review candidate until accepted; a valid Cell_ID on both sides is\nrequired before cross-repo promotion (docs/SPATIAL_OVERLAY_JOIN_RULES.md).\nModelled on the legislative_fiscal_link_candidates link-candidate ledger.\n"
+    },
+    {
+      "source_id": "ocif_guide_financial_classes",
+      "family": "financial_regulation",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://concesionarios.ocif.pr.gov/es/License/Index",
+      "producer_script": "scripts/scrape_ocif_guide_financial_classes.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_ocif_guide_financial_classes.csv"
+      ],
+      "schema_version": "r5_ocif_license_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly",
+      "canonical_required": true,
+      "notes": "Official OCIF concessionaire registry. Guide-bounded classes are ENTIDAD FINANCIERA INTERNACIONAL, ENTIDAD BANCARIA INTERNACIONAL, FONDO DE CAPITAL PRIVADO LEY 185-2014, EXEMPT REPORTING ADVISORS and INVESTMENT ADVISOR. Preserves license type and license number exactly. A license/adviser record must never be promoted to a fund, beneficial-owner or investment-company identity without an authoritative binding. Promoted from registries/source_registry_overlays/guide_financial_avenues_v1.yaml after live materialization (see reports/guide_financial_avenue_coverage_v1.md)."
+    },
+    {
+      "source_id": "ocs_insurer_registry",
+      "family": "financial_regulation",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://www.ocs.pr.gov/consumidores/aseguradores-del-pais",
+      "producer_script": "scripts/scrape_ocs_insurers.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_ocs_insurers.csv",
+        "data/staging/processed/pr_ocs_insurer_annual_reports.csv"
+      ],
+      "schema_version": "r5_ocs_insurer_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "quarterly",
+      "canonical_required": true,
+      "notes": "Official Puerto Rico Office of the Commissioner of Insurance domestic insurer list plus the per-insurer annual financial-report index. The annual-report index is embedded in the live page as inline CMS JS object-literal records (temp_array['anio']/['name']/['anchor']), not as visible anchor tags; the current-listing and annual-report grains are distinct observation grains and are never collapsed into one identity. Promoted from registries/source_registry_overlays/guide_financial_avenues_v1.yaml after live materialization (see reports/guide_financial_avenue_coverage_v1.md)."
+    },
+    {
+      "source_id": "ftz_board_pr",
+      "family": "federal_financial_incentive",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://ofis.trade.gov/",
+      "producer_script": "scripts/scrape_ftz_board_pr.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_ftz_zones_sites.csv"
+      ],
+      "schema_version": "r5_ftz_pr_v1",
+      "validation_threshold": {
+        "min_rows": 3
+      },
+      "update_cadence": "quarterly",
+      "canonical_required": true,
+      "notes": "U.S. Foreign-Trade Zones Board OFIS public zone/site data for Puerto Rico. The discovery denominator is frozen to Zones 7, 61 and 163; the producer verifies each zone number from its authoritative detail page and fails closed if any expected zone is missing or replaced. Promoted from registries/source_registry_overlays/guide_financial_avenues_v1.yaml after live materialization (see reports/guide_financial_avenue_coverage_v1.md)."
     }
   ]
 }
