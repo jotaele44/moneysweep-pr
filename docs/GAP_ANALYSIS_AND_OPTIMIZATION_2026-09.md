@@ -1,7 +1,7 @@
 # moneysweep-pr — Gap Analysis & Code Optimization Review
 
-_Generated 2026-09-12 against `claude/gap-analysis-code-optimization-72zkfr`, branched from
-`main` at `b16cf31`._
+_Findings measured 2026-09-12 against `main` at `b16cf31`; revised 2026-09-15 after merging
+`main` at `7b467ff`, which resolved findings A1-A4 independently. Section A records that._
 
 Unlike `RECOMMENDATIONS.md` and the retired `docs/CODE_GAP_AND_WORKFLOW_AUDIT.md`, this
 review is **not advisory-only**. The findings marked **FIXED** were corrected in the same
@@ -18,7 +18,8 @@ contradicted an existing document, the contradiction is called out.
 |--------|-------|
 | Toolchain | `ruff==0.16.5`, `mypy==2.3.1` — the versions pinned in `requirements-dev.txt`, not sandbox defaults |
 | Python | 3.11.15 (the `.python-version` / `pyproject.toml` baseline) |
-| Suite baseline | 2,945 passed · 1 failed · 9 skipped · **54.57%** coverage, 135s |
+| Suite at `b16cf31` (as found) | 2,945 passed · 1 failed · 9 skipped · **54.57%** coverage |
+| Suite after this PR, merged with `7b467ff` | **2,947 passed · 0 failed · 9 skipped · 54.65%** |
 | Measured | working tree, git object store, and the GitHub Actions API |
 
 > **A version caveat that changed a finding.** An initial pass using the sandbox's
@@ -29,56 +30,86 @@ contradicted an existing document, the contradiction is called out.
 
 ---
 
-## A. Gating quality bar — three gates were red on `main`
+## A. Gating quality bar — three gates were red, and `main` fixed them first
 
-All three trace to `fca3264` ("Preserve HUD DRGR pursuit and validator drift repair"), one of
-three consecutive **direct-to-`main` pushes** (`fca3264`, `936fba9`, `f17bc8a`) that carry no
-`(#NNN)` merge suffix, unlike the 26 commits before them. They bypassed both the pull-request
-path and the `AGENTS.md` required change protocol.
+This section is the one the review got overtaken on, and it is recorded that way rather than
+rewritten to look prescient.
 
-| # | Finding | Evidence | Status |
-|---|---------|----------|--------|
-| A1 | `ruff check .` failed | `F401` unused `pathlib.Path`, `tests/test_audit_hud_drgr_authorized_sources.py:1` | **FIXED** |
-| A2 | `ruff format --check .` failed | 2 files unformatted | **FIXED** |
-| A3 | GUI-capability parity failed | `.federation/check_gui_parity_with_extensions.py` exits 1 on pristine `origin/main` with 9 unpaired candidates for `scripts/audit_hud_drgr_authorized_sources.py`, which landed with no classification | **FIXED** |
+When this branch was cut from `b16cf31` (2026-09-12), three gating checks were red on `main`,
+all traceable to `fca3264` — one of three consecutive **direct-to-`main` pushes**
+(`fca3264`, `936fba9`, `f17bc8a`) carrying no `(#NNN)` merge suffix, unlike the 26 commits
+before them. They bypassed both the pull-request path and the `AGENTS.md` change protocol:
 
-A3 was fixed through the documented `exceptions` mechanism in
-`.federation/gui-capabilities.json`, mirroring the existing
-`compare-entity-products-terminal-analysis` precedent. **`gui-parity-baseline.json` was
-deliberately left untouched** — `AGENTS.md` forbids regenerating it to clear a gate.
+| # | Finding as measured at `b16cf31` | Resolution |
+|---|---|---|
+| A1 | `ruff check .` failed — `F401` unused `pathlib.Path`, `tests/test_audit_hud_drgr_authorized_sources.py:1` | Fixed on `main` |
+| A2 | `ruff format --check .` failed — 2 files unformatted | Fixed on `main` |
+| A3 | GUI-capability parity exited 1 with 9 unpaired candidates for `scripts/audit_hud_drgr_authorized_sources.py`, which landed unclassified | Fixed on `main`, **better than this PR's attempt** |
+| A4 | The skillpack conformance gate failed on every PR by construction | Fixed on `main` |
 
-### A4 — The skillpack conformance gate is self-invalidating by construction — **NOT FIXED**
+**All four were resolved independently on `main` between 2026-09-12 and 2026-09-15**, while
+this branch was blocked behind the Actions outage. This PR originally fixed A1–A3 and
+recommended a fix for A4; those changes have been withdrawn from it in favour of main's,
+and the analysis is kept because the *pattern* it documents is still live (see below).
 
-`tests/test_unified_skillpack_conformance.py::test_full_conformance` is the suite's single
-failure, and it is structural rather than incidental:
+### A3 — main's fix is the better one, and this PR deferred to it
+
+This branch classified the script through the `exceptions[]` mechanism in
+`.federation/gui-capabilities.json`, mirroring the `compare-entity-products-terminal-analysis`
+precedent. `main` instead added a capability classification —
+`.federation/gui-capabilities.extensions/hud-drgr-authorized-pursuit.json`,
+`classification: "internal"`, covering the identical 9 candidate IDs and binding
+`tests/test_audit_hud_drgr_authorized_sources.py` as its backend test, with
+`tests/test_hud_drgr_gui_classification.py` asserting the shape.
+
+That is the right call and this PR's waiver was removed rather than merged alongside it.
+An `exceptions[]` entry is a **time-limited waiver** — this one carried
+`expires_on: 2026-12-01` — so it would have re-opened the gate in December for something
+that is permanently and correctly classified as internal infrastructure. `AGENTS.md`
+explicitly permits the classification route: "Pure infrastructure may be classified
+`internal` with a concrete rationale."
+
+### A4 — the gate was self-invalidating by construction, and is no longer enforced
+
+`tools/validate_unified_skillpacks.py` ran:
 
 ```
-tools/validate_unified_skillpacks.py:129
-    git diff --name-only {pinned_base_commit}..HEAD
+git diff --name-only {pinned_base_commit}..HEAD
 → any path outside manifest["allowed_change_paths"] is an error
 ```
 
-`allowed_change_paths` is four entries (`.claude/skillpacks/`, the conformance workflow, the
-validator, its test). `pinned_base_commit` lives in `.claude/skillpacks/{BINDING,MANIFEST}.json`
-and currently reads `fca3264`. The failure today is:
+`allowed_change_paths` is four entries. `pinned_base_commit` tracked `main`'s tip, so **every
+commit touching anything else failed the gate until someone re-pinned — and re-pinning is
+itself a commit that moves `main`, re-invalidating the pin.** Commits `936fba9` ("Refresh
+skillpack conformance baseline") and `f17bc8a` ("Rebind skillpack conformance baseline") are
+two consecutive direct pushes doing exactly that.
+
+`main` has since removed the enforcement, and its own code comment reaches the same
+diagnosis independently — "a repo-wide change-freeze that blocked ordinary, unrelated PRs
+(see `governance/change_log.json`)". The check is now informational. `test_full_conformance`
+passes.
+
+### A5 — the direct-push pattern is still live — **NOT FIXED**
+
+The underlying process gap that produced A1–A4 has not closed, and reproduced during this
+review. `scripts/download_hacienda_sut_ivu.py` landed via `a38025a` ("Graduate
+hacienda_sut_ivu to a live PDF producer", #582) **without the classification `AGENTS.md`
+step 1 requires**, so the parity gate is red on `main` again at `7b467ff`:
 
 ```
-out-of-scope change: docs/BACKEND_ASSESSMENT_AND_DEVELOPMENT_PLAN.md
+FAIL gui-parity ... new=5 manifest_issues=0
+ANALYSIS_NOT_GUI_RENDERED: analysis_module:scripts/download_hacienda_sut_ivu.py
+ANALYSIS_NOT_GUI_RENDERED: ...:discover_pdf_urls | :parse_pdf | :run
+TERMINAL_REQUIRED:         cli_surface:scripts/download_hacienda_sut_ivu.py
 ```
 
-— a documentation file added by PR #578 *after* the pin was set.
+Verified on a clean worktree of `origin/main`; not introduced by this PR, and deliberately
+not fixed here — classifying another team's new producer is their call, and doing it
+silently is how the inventory drifts in the first place.
 
-**Every commit that touches anything outside those four paths fails this gate until someone
-re-pins; re-pinning is itself a commit that moves `main`, which re-invalidates the pin on the
-next change.** Commits `936fba9` ("Refresh skillpack conformance baseline") and `f17bc8a`
-("Rebind skillpack conformance baseline") are two consecutive direct pushes doing exactly
-this. This PR also trips it, and deliberately does not re-pin: chasing the pin would paper
-over the defect.
-
-_Recommendation:_ the gate should compare the **merge-base** against `HEAD`, or scope the
-diff to the skillpack surface it actually governs, rather than pinning to a moving branch tip.
-
----
+_Recommendation:_ this is the third instance of the same gap in one month. The durable fix
+is making the parity gate a required status check on `main` so an unclassified capability
+cannot land, rather than repairing the inventory after the fact.
 
 ## B. The gates measured less than they appeared to
 
@@ -253,9 +284,9 @@ from being committed — a 100 KB derived manifest that is never a source of tru
 
 | # | Finding | Evidence |
 |---|---------|----------|
-| D1 | The skillpack pin is stale again | See A4 |
+| D1 | ~~The skillpack pin is stale again~~ — **resolved on `main`**, enforcement removed | See A4 |
 | D2 | `reports/current_status.json` — the declared machine-readable source of truth — is stale | `main_sha: 3155201…` (PR #486) vs. actual `main`; `generated_at: 2026-08-20`; self-declares `evidence_snapshot_state: "STALE_NOT_RECERTIFIED"` |
-| D3 | `STATUS.md` test baseline is stale | Dated 2026-07-26; its own text warns the preceding row was ~10 weeks and ~1,900 tests out of date. Current measured baseline: **2,945 passed · 9 skipped · 54.75%** |
+| D3 | `STATUS.md` test baseline is stale | Dated 2026-07-26; its own text warns the preceding row was ~10 weeks and ~1,900 tests out of date. Current measured baseline: **2,947 passed · 9 skipped · 54.65%** |
 | D4 | Case-manager write API has no authentication | `server/backend/case_manager_api.py:155,192,207,224,…` — `X-Case-Clearance` and `X-Case-Actor` are plain `Header(default=None)` parameters. No `Depends`, `Security`, `HTTPBearer`, or middleware anywhere in the router. Any caller can self-assert `restricted` clearance or any actor identity. **Confirms in code** the claim in `docs/BACKEND_ASSESSMENT_AND_DEVELOPMENT_PLAN.md`; it remains the most concrete active security gap and is sequenced first in that document's plan |
 
 ---
@@ -265,7 +296,7 @@ from being committed — a 100 KB derived manifest that is never a source of tru
 | # | Area | Recommendation | Effort | Risk | Priority |
 |---|------|----------------|--------|------|----------|
 | D4 | Security | Real identity for case-manager clearance/actor; interim shared-secret gate on write endpoints | M | Med | **P0** |
-| A4 | CI correctness | Make the skillpack gate diff against merge-base, not a pinned branch tip | S | Low | **P0** |
+| A5 | Process | Make GUI-capability parity a required status check so an unclassified capability cannot land (3rd recurrence in a month) | S | Low | **P0** |
 | B2 | Test coverage | Cover `desktop/secrets.py` (0%, credential handling) and `server/backend/main.py` (35%) | M | Low | P1 |
 | C2 | Duplication | Finish or retire the `BaseDownloader` migration (63 non-adopters) | L | Med | P1 |
 | B4 | Architecture | Decompose `run_all_legacy.py` (2,073 LOC); bring into type + coverage scope | L | Med | P1 |
@@ -275,14 +306,23 @@ from being committed — a 100 KB derived manifest that is never a source of tru
 
 ## Verification of the changes in this PR
 
+Measured on the merge of this branch with `main` at `7b467ff`, using the pinned toolchain
+from `requirements-dev.txt` (`ruff==0.16.5`, `mypy==2.3.1`), not sandbox defaults:
+
 ```
-ruff check .                                        All checks passed
-ruff format --check .                               1100 files already formatted
-python -m mypy                                      Success: 558 source files
-python .federation/check_gui_parity_with_extensions.py   PASS (baseline untouched)
-python -m pytest -q                                 2945 passed · 9 skipped · 54.75%
-python -m pytest --collect-only -q                  2954 collected, no INTERNALERROR
+ruff check .                                             All checks passed
+ruff format --check .                                    1103 files already formatted
+python -m mypy                                           Success: 559 source files
+python -m compileall moneysweep scripts tests            OK
+python -m pytest -q                                      2947 passed · 9 skipped · 54.65%
+python .federation/check_gui_parity_with_extensions.py   FAIL  new=5 manifest_issues=0
 ```
 
-The one remaining failure, `test_unified_skillpack_conformance`, is finding A4 — pre-existing,
-structural, and reproduced on pristine `origin/main`.
+The suite is **fully green** — the one failure present when this review began
+(`test_unified_skillpack_conformance`) is gone, because `main` removed that gate's
+enforcement (A4).
+
+The parity gate is red, and **not on account of this PR**: all 5 unpaired candidates belong
+to `scripts/download_hacienda_sut_ivu.py`, which arrived from `main` via #582. The identical
+failure reproduces on a clean worktree of `origin/main` at `7b467ff` — same count, same five
+candidate IDs. That is finding A5, left deliberately unfixed here.

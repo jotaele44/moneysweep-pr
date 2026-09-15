@@ -1281,24 +1281,6 @@
         "analysis_symbol:scripts/compare_entity_products.py:main",
         "cli_surface:scripts/compare_entity_products.py"
       ]
-    },
-    {
-      "id": "audit-hud-drgr-authorized-sources-terminal-analysis",
-      "reason": "scripts/audit_hud_drgr_authorized_sources.py landed on main via fca3264 (a direct push that skipped the AGENTS.md change protocol, so no classification accompanied it) and has left the GUI-parity gate red ever since. It is a terminal-only HUD DRGR source-authorization audit that prints a receipt to stdout and has no user-facing GUI surface. Excepted pending either a GUI rendering of its receipt or its classification as pipeline tooling -- mirrors compare-entity-products-terminal-analysis.",
-      "owner": "jotaele44",
-      "tracking": "docs/GAP_ANALYSIS_AND_OPTIMIZATION_2026-09.md",
-      "expires_on": "2026-12-01",
-      "candidate_ids": [
-        "analysis_module:scripts/audit_hud_drgr_authorized_sources.py",
-        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:build_receipt",
-        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_csv",
-        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_parquet",
-        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_path",
-        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:main",
-        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:sha256_file",
-        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:utc_now",
-        "cli_surface:scripts/audit_hud_drgr_authorized_sources.py"
-      ]
     }
   ]
 }
