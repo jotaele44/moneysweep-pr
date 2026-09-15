@@ -28,7 +28,10 @@ def health() -> dict[str, str]:
     # first call, so this also verifies startup succeeded.
     try:
         case_manager_api._services()
-        case_manager_api._repository.connection.execute("SELECT 1").fetchone()
+        repository = case_manager_api._repository
+        if repository is None:  # pragma: no cover - _services() always sets it
+            raise RuntimeError("case repository was not initialised")
+        repository.connection.execute("SELECT 1").fetchone()
     except Exception as exc:
         raise HTTPException(500, "case database unavailable") from exc
     return {"status": "ok", "service": "case-manager-phase-1"}

@@ -9,15 +9,16 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
 from typing import Any
 
 try:
     import yaml
-except ImportError:  # pragma: no cover
-    print("PyYAML is required. Install with: pip install PyYAML", file=sys.stderr)
-    sys.exit(2)
+except ImportError as exc:  # pragma: no cover
+    # Raise rather than sys.exit() -- see the note in
+    # scripts/regenerate_registry_json.py. This module in particular was
+    # aborting the entire pytest collection run.
+    raise ImportError("PyYAML is required. Install with: pip install PyYAML") from exc
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_YAML = ROOT / "registries" / "source_registry.yaml"
