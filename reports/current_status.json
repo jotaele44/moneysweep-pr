@@ -36,12 +36,12 @@
   },
   "materialization_readiness_truth": {
     "total_sources": 164,
-    "automatable_total": 115,
-    "automatable_ready": 115,
-    "queued_excluded_total": 49,
+    "automatable_total": 116,
+    "automatable_ready": 116,
+    "queued_excluded_total": 48,
     "queued_excluded": {
       "manual_export": 42,
-      "scraper_needed": 2,
+      "scraper_needed": 1,
       "deferred_stub": 2,
       "semantic_duplicate": 3,
       "broken_producer": 0
