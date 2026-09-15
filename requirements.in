@@ -20,4 +20,4 @@ pdfplumber>=0.11.10
 # SBA disaster-loan workbook importer
 openpyxl>=3.1.5
 # Shared maintenance core pinned to an immutable TheHub commit.
-prii-maintenance @ git+https://github.com/jotaele44/thehub-pr.git@f2b81769924689b4d959554928810b1d7b7ef3d6#subdirectory=packages/prii_maintenance
+prii-maintenance @ https://github.com/jotaele44/thehub-pr/archive/f2b81769924689b4d959554928810b1d7b7ef3d6.zip#subdirectory=packages/prii_maintenance

@@ -44,7 +44,7 @@ pluggy==1.6.0
     # via
     #   pytest
     #   pytest-cov
-prii-maintenance @ git+https://github.com/jotaele44/thehub-pr.git@f2b81769924689b4d959554928810b1d7b7ef3d6#subdirectory=packages/prii_maintenance
+prii-maintenance @ https://github.com/jotaele44/thehub-pr/archive/f2b81769924689b4d959554928810b1d7b7ef3d6.zip#subdirectory=packages/prii_maintenance
     # via -r requirements.in
 pyarrow==25.0.1
     # via -r requirements.in
