@@ -1,5 +1,5 @@
 {
-  "manifest_version": "0.1",
+  "manifest_version": "0.2",
   "scope": "Puerto Rico fiscal-year GDP/GNP macro reconciliation, FY2010-FY2025",
   "retrieval_date_utc": "2026-09-16",
   "certification_state": "PROVISIONAL",
@@ -35,17 +35,57 @@
       "source_bytes_frozen": false,
       "sha256": null,
       "canonicality": "CURRENT_AUTHORITATIVE_BUT_NOT_BYTE_FROZEN",
-      "notes": "FY2021 is internally contradictory within this manifestation: Table 1 and Table 9 use GNP 73,357.2 / GDP 106,426.6, while Table 10 uses GNP 72,950.6 / GDP 106,368.9. MoneySweep preserves all conflicting observations and leaves FY2021 unresolved."
+      "notes": "Table 10 carries the older FY2021 pair GNP 72,950.6 / GDP 106,368.9, while Table 1 and Table 9 carry GNP 73,357.2 / GDP 106,426.6. Authoritative revision-lineage evidence from the 2022, 2023 and 2024 Planning Board publications shows the older pair precedes the later revised pair; the Table 10 row is therefore preserved as SUPERSEDED/TIME rather than deleted."
     }
   ],
+  "fy2021_adjudication": {
+    "state": "PROVISIONAL_RESOLVED_BY_AUTHORITATIVE_REVISION_LINEAGE",
+    "canonical_candidate": {
+      "gnp_millions": 73357.2,
+      "gdp_millions": 106426.6,
+      "computed_gap_millions": 33069.4
+    },
+    "superseded_candidate": {
+      "gnp_millions": 72950.6,
+      "gdp_millions": 106368.9,
+      "computed_gap_millions": 33418.3
+    },
+    "evidence": [
+      {
+        "vintage": "2022",
+        "url": "https://jp.pr.gov/wp-content/uploads/2024/02/IEG-2022-GRAY.pdf",
+        "role": "OLDER_REVISION",
+        "observation": "Reports FY2021 GDP 106,368.9."
+      },
+      {
+        "vintage": "2023",
+        "url": "https://jp.pr.gov/wp-content/uploads/2024/07/IEG2023-OCE-SA-2024-08598.pdf",
+        "role": "LATER_REVISION",
+        "observation": "Reports FY2021 GDP 106,426.6."
+      },
+      {
+        "vintage": "2024",
+        "url": "https://jp.pr.gov/wp-content/uploads/2025/04/APENDICE-ESTADISTICO-2024.pdf",
+        "role": "LATER_REVISION_CORROBORATION",
+        "observation": "Reports FY2021 GNP 73,357.2 and GDP 106,426.6."
+      },
+      {
+        "vintage": "2025",
+        "url": "https://jp.pr.gov/wp-content/uploads/2026/03/INGRESO-Y-PRODUCTO-2025-rev-11.17.25-9-25am.pdf",
+        "role": "CURRENT_MANIFESTATION",
+        "observation": "Table 1 and Table 9 continue the later revised pair; Table 10 retains the older pair."
+      }
+    ],
+    "limit": "This resolves value succession, not byte identity. Source bytes and hashes remain unfrozen."
+  },
   "ledger": {
     "path": "data/staging/processed/macro/pr_gdp_gnp_ledger_v0.csv",
     "row_count": 22,
     "fiscal_year_denominator": 16,
     "fiscal_year_min": 2010,
     "fiscal_year_max": 2025,
-    "unresolved_fiscal_years": [2021],
-    "superseded_rows": 4,
+    "unresolved_fiscal_years": [],
+    "superseded_rows": 5,
     "raw_strings_preserved": true,
     "amount_unit": "USD_MILLIONS",
     "published_precision_millions": 0.1,
@@ -53,11 +93,12 @@
   },
   "certification_boundary": {
     "macro_identity": "PROVISIONAL",
-    "fy2021": "UNRESOLVED",
+    "fy2021": "PROVISIONAL",
     "country_destination": "OPEN",
+    "factor_income_decomposition": "OPEN",
     "sector_attribution": "OPEN",
-    "entity_attribution": "BLOCKED_UNTIL_MACRO_CLOSURE",
+    "entity_attribution": "BLOCKED_UNTIL_MACRO_SOURCE_FREEZE_AND_GATES",
     "retention_rate": "OPEN",
-    "reason": "Source bytes are not frozen in this vector and FY2021 contains an unresolved same-authority table contradiction."
+    "reason": "Annual value succession is bounded, but source bytes are not frozen and repository CI jobs are not starting; certification remains blocked."
   }
 }
