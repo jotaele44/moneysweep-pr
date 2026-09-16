@@ -72,22 +72,31 @@ def test_historical_overlaps_are_preserved_not_deleted() -> None:
     assert all(row["superseded_by_observation_id"] for row in old_overlap)
 
 
-def test_fy2021_conflict_is_preserved_and_unresolved() -> None:
+def test_fy2021_revision_lineage_preserves_superseded_conflict() -> None:
     rows = [row for row in _rows() if int(row["fiscal_year"]) == 2021]
     assert len(rows) == 3
-    assert all(row["candidate_state"] == "UNRESOLVED" for row in rows)
-    assert all(row["certification_state"] == "UNRESOLVED" for row in rows)
-    assert all(row["contradiction_class"] == "SCOPE" for row in rows)
-    pairs = {(row["gdp_millions"], row["gnp_millions"]) for row in rows}
-    assert pairs == {("106426.6", "73357.2"), ("106368.9", "72950.6")}
+
+    current = [row for row in rows if row["candidate_state"] == "CURRENT"]
+    superseded = [row for row in rows if row["candidate_state"] == "SUPERSEDED"]
+    assert len(current) == 2
+    assert len(superseded) == 1
+    assert {(row["gdp_millions"], row["gnp_millions"]) for row in current} == {
+        ("106426.6", "73357.2")
+    }
+
+    stale = superseded[0]
+    assert (stale["gdp_millions"], stale["gnp_millions"]) == ("106368.9", "72950.6")
+    assert stale["contradiction_class"] == "TIME"
+    assert stale["superseded_by_observation_id"] == "MACRO_JP2025_T9_FY2021"
+    assert stale["certification_state"] == "SUPERSEDED"
 
 
-def test_no_other_latest_vintage_year_has_conflicting_value_pairs() -> None:
+def test_all_current_rows_have_one_value_pair_per_fiscal_year() -> None:
     grouped: dict[int, set[tuple[str, str]]] = defaultdict(set)
     for row in _rows():
-        if row["publication_vintage"] == "2025" and int(row["fiscal_year"]) != 2021:
+        if row["candidate_state"] == "CURRENT":
             grouped[int(row["fiscal_year"])].add((row["gdp_millions"], row["gnp_millions"]))
-    assert grouped
+    assert set(grouped) == set(range(2010, 2026))
     assert all(len(value_pairs) == 1 for value_pairs in grouped.values())
 
 
@@ -124,7 +133,7 @@ def test_published_identity_closure_distinguishes_exact_rounding_and_failure() -
     assert failed.state == MacroClosureState.FAIL
 
 
-def test_adjudicator_fails_closed_on_latest_vintage_conflict() -> None:
+def test_adjudicator_fails_closed_on_unadjudicated_latest_vintage_conflict() -> None:
     observations = [
         _obs("MACRO_A", 2021, "2025", "TABLE_9", "73357.2", "106426.6"),
         _obs("MACRO_B", 2021, "2025", "TABLE_10", "72950.6", "106368.9"),
@@ -132,9 +141,35 @@ def test_adjudicator_fails_closed_on_latest_vintage_conflict() -> None:
     assert adjudicate_latest_manifestation(observations) is None
 
 
+def test_adjudicator_ignores_explicitly_superseded_stale_revision() -> None:
+    observations = [
+        _obs("MACRO_A", 2021, "2025", "TABLE_9", "73357.2", "106426.6"),
+        _obs(
+            "MACRO_B",
+            2021,
+            "2025",
+            "TABLE_10",
+            "72950.6",
+            "106368.9",
+            MacroCandidateState.SUPERSEDED,
+        ),
+    ]
+    result = adjudicate_latest_manifestation(observations)
+    assert result is not None
+    assert result.observation_id == "MACRO_A"
+
+
 def test_adjudicator_uses_later_agreeing_manifestation_without_deleting_history() -> None:
     observations = [
-        _obs("MACRO_OLD", 2018, "2019", "TABLE_9", "67824.7", "100978.9", MacroCandidateState.HISTORICAL),
+        _obs(
+            "MACRO_OLD",
+            2018,
+            "2019",
+            "TABLE_9",
+            "67824.7",
+            "100978.9",
+            MacroCandidateState.HISTORICAL,
+        ),
         _obs("MACRO_NEW_A", 2018, "2025", "TABLE_1", "67601.1", "100958.1"),
         _obs("MACRO_NEW_B", 2018, "2025", "TABLE_9", "67601.1", "100958.1"),
     ]
