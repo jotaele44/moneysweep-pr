@@ -58,11 +58,20 @@
   "allOf": [
     {
       "if": {"properties": {"measurement_type": {"const": "FLOW"}}, "required": ["measurement_type"]},
-      "then": {"required": ["amount", "pr_retention_state"]}
+      "then": {
+        "required": ["amount", "pr_retention_state"],
+        "properties": {"amount": {"type": "number"}}
+      }
     },
     {
       "if": {"properties": {"flow_direction": {"enum": ["INTO_PR", "OUT_OF_PR", "THROUGH_PR"]}}, "required": ["flow_direction"]},
-      "then": {"required": ["source_jurisdiction", "destination_jurisdiction"]}
+      "then": {
+        "required": ["source_jurisdiction", "destination_jurisdiction"],
+        "properties": {
+          "source_jurisdiction": {"type": "string", "minLength": 1},
+          "destination_jurisdiction": {"type": "string", "minLength": 1}
+        }
+      }
     }
   ],
   "additionalProperties": true
