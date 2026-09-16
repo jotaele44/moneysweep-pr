@@ -1,0 +1,63 @@
+{
+  "manifest_version": "0.1",
+  "scope": "Puerto Rico fiscal-year GDP/GNP macro reconciliation, FY2010-FY2025",
+  "retrieval_date_utc": "2026-09-16",
+  "certification_state": "PROVISIONAL",
+  "source_manifests": [
+    {
+      "manifestation_id": "JP_AE2019",
+      "authority": "Puerto Rico Planning Board / Junta de Planificacion",
+      "title": "Apendice Estadistico del Informe Economico a la Gobernadora 2019",
+      "publication_vintage": "2019",
+      "publication_date": null,
+      "publication_date_precision": "MONTH_ONLY_MARCH_2020_IN_DOCUMENT",
+      "url": "https://docs.pr.gov/files/JP-Junta%20de%20Planificacion/Programa%20de%20Planificaci%C3%B3n%20Econ%C3%B3mica%20y%20Social/Apendice%20Estadistico/Publicaciones/Apendice-Estadistico-2019.pdf",
+      "tables_used": ["TABLE_9_MAJOR_INDUSTRY"],
+      "fiscal_years_observed": [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019],
+      "source_bytes_frozen": false,
+      "sha256": null,
+      "canonicality": "HISTORICAL_AUTHORITATIVE_MANIFESTATION",
+      "notes": "FY2016-FY2019 observations are retained as superseded historical manifestations after later Planning Board publication values were observed. Different values establish revision/change, not prior byte identity."
+    },
+    {
+      "manifestation_id": "JP_IP2025",
+      "authority": "Puerto Rico Planning Board / Junta de Planificacion",
+      "title": "Ingreso y Producto 2025 / Income and Product 2025",
+      "publication_vintage": "2025",
+      "publication_date": null,
+      "url": "https://jp.pr.gov/wp-content/uploads/2026/03/INGRESO-Y-PRODUCTO-2025-rev-11.17.25-9-25am.pdf",
+      "tables_used": [
+        "TABLE_1_SELECTED_SERIES",
+        "TABLE_9_MAJOR_INDUSTRY",
+        "TABLE_10_DETAILED_INDUSTRY"
+      ],
+      "fiscal_years_observed": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+      "source_bytes_frozen": false,
+      "sha256": null,
+      "canonicality": "CURRENT_AUTHORITATIVE_BUT_NOT_BYTE_FROZEN",
+      "notes": "FY2021 is internally contradictory within this manifestation: Table 1 and Table 9 use GNP 73,357.2 / GDP 106,426.6, while Table 10 uses GNP 72,950.6 / GDP 106,368.9. MoneySweep preserves all conflicting observations and leaves FY2021 unresolved."
+    }
+  ],
+  "ledger": {
+    "path": "data/staging/processed/macro/pr_gdp_gnp_ledger_v0.csv",
+    "row_count": 22,
+    "fiscal_year_denominator": 16,
+    "fiscal_year_min": 2010,
+    "fiscal_year_max": 2025,
+    "unresolved_fiscal_years": [2021],
+    "superseded_rows": 4,
+    "raw_strings_preserved": true,
+    "amount_unit": "USD_MILLIONS",
+    "published_precision_millions": 0.1,
+    "rounding_budget_rule": "1.5 * published_precision for GDP - GNP versus independently rounded reported rest-of-world amount"
+  },
+  "certification_boundary": {
+    "macro_identity": "PROVISIONAL",
+    "fy2021": "UNRESOLVED",
+    "country_destination": "OPEN",
+    "sector_attribution": "OPEN",
+    "entity_attribution": "BLOCKED_UNTIL_MACRO_CLOSURE",
+    "retention_rate": "OPEN",
+    "reason": "Source bytes are not frozen in this vector and FY2021 contains an unresolved same-authority table contradiction."
+  }
+}
