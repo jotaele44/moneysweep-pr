@@ -33,6 +33,16 @@ def _fake_derive(*, root: Path, scope_dir: Path, **kwargs):
     }
 
 
+def _assert_tool_binding(manifest: dict) -> None:
+    binding = manifest["scope_binding"]
+    identity = manifest["scope_identity"]
+    digest = binding["scope_binding_tool_sha256"]
+    assert len(digest) == 64
+    assert all(char in "0123456789abcdef" for char in digest)
+    assert identity["scope_binding_tool_sha256"] == digest
+    assert identity["scope_binding_schema_version"] == binding["schema_version"]
+
+
 def test_distinct_evidence_repo_sha_is_bound(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     root = tmp_path / "scope"
     evidence = tmp_path / "evidence"
@@ -61,6 +71,7 @@ def test_distinct_evidence_repo_sha_is_bound(tmp_path: Path, monkeypatch: pytest
     assert binding["path_strings_are_identity"] is False
     assert result["scope_manifest"]["scope_identity"]["evidence_repository_sha"] == "d" * 40
     assert result["scope_manifest"]["scope_id"] != "c" * 64
+    _assert_tool_binding(result["scope_manifest"])
 
 
 def test_same_repo_binds_same_sha(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -81,6 +92,7 @@ def test_same_repo_binds_same_sha(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
     binding = result["scope_manifest"]["scope_binding"]
     assert binding["evidence_repository_same_as_scope"] is True
     assert binding["evidence_repository_sha"] == binding["scope_repository_sha"] == "a" * 40
+    _assert_tool_binding(result["scope_manifest"])
 
 
 def test_missing_distinct_evidence_head_fails_closed(
