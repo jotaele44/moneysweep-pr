@@ -17,16 +17,20 @@
       "analysis": {
         "files": [
           "data/staging/processed/macro/pr_gdp_gnp_ledger_v0.csv",
+          "data/staging/processed/macro/pr_factor_income_ledger_v0.csv",
           "data/manifests/macro/pr_gdp_gnp_sources_v0.json",
+          "registries/capital_flow_macro_sources.json",
           "schemas/capital_flow_observation.schema.json",
-          "schemas/macro_account_observation.schema.json"
+          "schemas/macro_account_observation.schema.json",
+          "schemas/factor_income_observation.schema.json"
         ]
       },
       "tests": {
         "backend": [
           "tests/test_capital_flow_model.py",
           "tests/test_capital_flow_schema_contracts.py",
-          "tests/test_macro_account_ledger.py"
+          "tests/test_macro_account_ledger.py",
+          "tests/test_factor_income_ledger.py"
         ]
       },
       "candidate_ids": [
