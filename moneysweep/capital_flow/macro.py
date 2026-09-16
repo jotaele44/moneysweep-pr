@@ -26,7 +26,7 @@ class MacroObservation:
     fiscal_year: int
     manifestation_id: str
     source_table: str
-    publication_date: str
+    publication_vintage: str
     gnp_millions: Decimal
     gdp_millions: Decimal
     reported_less_rest_of_world_millions: Decimal | None
@@ -91,23 +91,22 @@ def published_identity_closure(
 def adjudicate_latest_manifestation(
     observations: Iterable[MacroObservation],
 ) -> MacroObservation | None:
-    """Return a canonical annual observation only when latest evidence is unique.
+    """Return a canonical annual observation only when latest evidence agrees.
 
     Older manifestations may be preserved as historical/superseded. If the
-    latest publication contains multiple non-superseded candidates with
-    different GDP or GNP values, fail closed and return None.
+    latest publication vintage contains multiple non-superseded candidates with
+    different GDP or GNP values, fail closed and return None. Deterministic row
+    ordering is used only after the values agree; it is not identity evidence.
     """
 
     rows = [row for row in observations if row.candidate_state != MacroCandidateState.SUPERSEDED]
     if not rows:
         return None
 
-    latest_date = max(row.publication_date for row in rows)
-    latest = [row for row in rows if row.publication_date == latest_date]
+    latest_vintage = max(row.publication_vintage for row in rows)
+    latest = [row for row in rows if row.publication_vintage == latest_vintage]
     value_pairs = {(row.gdp_millions, row.gnp_millions) for row in latest}
     if len(value_pairs) != 1:
         return None
 
-    # Multiple tables with the same values are corroborating manifestations, not
-    # separate identities. Return deterministically only after value agreement.
     return sorted(latest, key=lambda row: (row.source_table, row.observation_id))[0]
