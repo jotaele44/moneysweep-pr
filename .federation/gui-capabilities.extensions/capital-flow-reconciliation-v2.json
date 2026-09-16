@@ -10,20 +10,33 @@
       "backend": {
         "files": [
           "moneysweep/capital_flow/__init__.py",
-          "moneysweep/capital_flow/model.py"
+          "moneysweep/capital_flow/model.py",
+          "moneysweep/capital_flow/macro.py"
+        ]
+      },
+      "analysis": {
+        "files": [
+          "data/staging/processed/macro/pr_gdp_gnp_ledger_v0.csv",
+          "data/manifests/macro/pr_gdp_gnp_sources_v0.json",
+          "schemas/capital_flow_observation.schema.json",
+          "schemas/macro_account_observation.schema.json"
         ]
       },
       "tests": {
         "backend": [
           "tests/test_capital_flow_model.py",
-          "tests/test_capital_flow_schema_contracts.py"
+          "tests/test_capital_flow_schema_contracts.py",
+          "tests/test_macro_account_ledger.py"
         ]
       },
       "candidate_ids": [
         "python_module:moneysweep/capital_flow/model.py",
+        "python_module:moneysweep/capital_flow/macro.py",
         "python_symbol:moneysweep/capital_flow/model.py:arithmetic_closure",
         "python_symbol:moneysweep/capital_flow/model.py:derive_gdp_gnp_gap",
-        "python_symbol:moneysweep/capital_flow/model.py:retention_rates"
+        "python_symbol:moneysweep/capital_flow/model.py:retention_rates",
+        "python_symbol:moneysweep/capital_flow/macro.py:published_identity_closure",
+        "python_symbol:moneysweep/capital_flow/macro.py:adjudicate_latest_manifestation"
       ]
     }
   ]
