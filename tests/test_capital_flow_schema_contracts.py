@@ -67,10 +67,16 @@ def test_facility_parent_and_beneficial_owner_are_separate_fields() -> None:
     assert len({"facility_location", "immediate_parent_id", "ultimate_parent_id", "beneficial_owner_id"}) == 4
 
 
-def test_flow_requires_amount_and_retention_state() -> None:
+def test_flow_requires_nonnull_amount_and_retention_state() -> None:
     validator = Draft202012Validator(_schema())
     row = _valid_flow()
     validator.validate(row)
+
+    for amount_value in (None,):
+        broken = dict(row)
+        broken["amount"] = amount_value
+        with pytest.raises(ValidationError):
+            validator.validate(broken)
 
     missing_amount = dict(row)
     missing_amount.pop("amount")
@@ -83,14 +89,19 @@ def test_flow_requires_amount_and_retention_state() -> None:
         validator.validate(missing_retention)
 
 
-def test_cross_boundary_flow_requires_both_jurisdictions() -> None:
+def test_cross_boundary_flow_requires_nonnull_jurisdictions() -> None:
     validator = Draft202012Validator(_schema())
     row = _valid_flow()
     for field in ("source_jurisdiction", "destination_jurisdiction"):
-        broken = dict(row)
-        broken.pop(field)
+        missing = dict(row)
+        missing.pop(field)
         with pytest.raises(ValidationError):
-            validator.validate(broken)
+            validator.validate(missing)
+
+        null_value = dict(row)
+        null_value[field] = None
+        with pytest.raises(ValidationError):
+            validator.validate(null_value)
 
 
 def test_macro_aggregate_does_not_require_entity_assignment() -> None:
