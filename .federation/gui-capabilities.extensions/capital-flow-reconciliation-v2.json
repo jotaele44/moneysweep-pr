@@ -1,0 +1,30 @@
+{
+  "extension_id": "capital-flow-reconciliation-v2",
+  "capabilities": [
+    {
+      "id": "capital-flow-reconciliation-runtime",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Internal MoneySweep V2 accounting and reconciliation core. It introduces no independent human-facing workflow; GUI exposure requires a later backend-to-GUI parity vector.",
+      "backend": {
+        "files": [
+          "moneysweep/capital_flow/__init__.py",
+          "moneysweep/capital_flow/model.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_capital_flow_model.py",
+          "tests/test_capital_flow_schema_contracts.py"
+        ]
+      },
+      "candidate_ids": [
+        "python_module:moneysweep/capital_flow/model.py",
+        "python_symbol:moneysweep/capital_flow/model.py:arithmetic_closure",
+        "python_symbol:moneysweep/capital_flow/model.py:derive_gdp_gnp_gap",
+        "python_symbol:moneysweep/capital_flow/model.py:retention_rates"
+      ]
+    }
+  ]
+}
