@@ -1,0 +1,180 @@
+version: '1.0'
+schema_version: om_contract_taxonomy_v1
+classification_policy:
+  default_class: non_om
+  review_class: om_review
+  positive_class: om
+  minimum_positive_score: 2
+  minimum_review_score: 1
+  negative_terms_override_single_positive: true
+  evidence_fields:
+    - service_description
+    - contract_type
+    - source_file
+    - agency
+categories:
+  operations:
+    label: Operations and operator services
+    terms:
+      - operation
+      - operations
+      - operator
+      - operación
+      - operaciones
+      - operador
+      - administración operacional
+  preventive_maintenance:
+    label: Preventive maintenance
+    terms:
+      - preventive maintenance
+      - preventative maintenance
+      - mantenimiento preventivo
+      - scheduled maintenance
+  corrective_maintenance:
+    label: Corrective and emergency maintenance
+    terms:
+      - corrective maintenance
+      - emergency maintenance
+      - repair and maintenance
+      - mantenimiento correctivo
+      - reparación y mantenimiento
+  facilities_management:
+    label: Facilities and building management
+    terms:
+      - facilities management
+      - facility maintenance
+      - building maintenance
+      - mantenimiento de facilidades
+      - mantenimiento de edificios
+      - janitorial
+      - custodial
+      - limpieza
+  asset_management:
+    label: Asset and lifecycle management
+    terms:
+      - asset management
+      - lifecycle management
+      - gestión de activos
+      - manejo de activos
+  inspection_testing:
+    label: Inspection, testing, and calibration
+    terms:
+      - inspection services
+      - testing services
+      - calibration
+      - inspección
+      - pruebas
+      - calibración
+  it_systems_maintenance:
+    label: IT, software, and systems maintenance
+    terms:
+      - software maintenance
+      - hardware maintenance
+      - systems maintenance
+      - application support
+      - managed services
+      - mantenimiento de software
+      - mantenimiento de sistemas
+      - soporte técnico
+  vegetation_management:
+    label: Vegetation and right-of-way maintenance
+    terms:
+      - vegetation management
+      - right of way maintenance
+      - tree trimming
+      - brush clearing
+      - manejo de vegetación
+      - desganche
+      - poda
+  utilities_water:
+    label: Water and wastewater O&M
+    terms:
+      - water system operation
+      - wastewater operation
+      - treatment plant operation
+      - pump station maintenance
+      - operación de planta
+      - operación de acueducto
+      - alcantarillado
+  utilities_power:
+    label: Electric-system O&M
+    terms:
+      - power plant operation
+      - grid maintenance
+      - transmission maintenance
+      - distribution maintenance
+      - generación
+      - transmisión
+      - distribución
+      - mantenimiento eléctrico
+  roads_bridges:
+    label: Roads, bridges, and highway O&M
+    terms:
+      - road maintenance
+      - highway maintenance
+      - bridge maintenance
+      - pavement maintenance
+      - mantenimiento de carreteras
+      - mantenimiento de puentes
+      - conservación vial
+  transit:
+    label: Transit system O&M
+    terms:
+      - transit operations
+      - bus operations
+      - rail operations
+      - rolling stock maintenance
+      - operaciones de transporte
+      - mantenimiento de flota
+      - tren urbano
+  ports_airports:
+    label: Port and airport O&M
+    terms:
+      - airport operations
+      - port operations
+      - marine terminal operations
+      - airfield maintenance
+      - operaciones aeroportuarias
+      - operaciones portuarias
+  concessions:
+    label: Concessions and long-term operating agreements
+    terms:
+      - concession agreement
+      - operation and maintenance agreement
+      - o&m agreement
+      - public private partnership
+      - alianza público privada
+      - contrato de concesión
+negative_terms:
+  - new construction
+  - diseño y construcción
+  - design-build
+  - demolition only
+  - adquisición de equipo
+  - equipment purchase
+  - professional legal services
+  - bond counsel
+  - underwriting
+jurisdiction_classes:
+  - central_government
+  - public_corporation
+  - municipality
+  - p3_concession
+  - federal_prime
+  - federal_subaward
+source_priority:
+  - ocpr_contracts
+  - agency_contract_portal
+  - p3_authority
+  - asg_emergency_purchases
+  - compras_pr
+  - cor3
+  - usaspending_prime
+  - usaspending_subawards
+certification_constraints:
+  require_all_78_municipalities_accounted: true
+  require_all_registered_public_corporations_accounted: true
+  require_ocpr_full_materialization: true
+  require_zero_unexplained_duplicates: true
+  require_explicit_gap_ledger: true
+  prohibit_complete_claim_when_blocked: true

@@ -1,0 +1,136 @@
+version: "1.0"
+schema_version: guide_financial_avenue_bindings_v1
+scope_id: GUIDE_BOUNDED_100_PERCENT
+base_registry_snapshot:
+  ref: 6ccd83fbb0ef7ad33d692cc36b27a94433500fcd
+  expected_source_count: 158
+  source_ids_sha256: 673659d9c53e8428e21052d95819ff35023e90142756686e73a9c9f1b326bbf2
+  source_ids_file: reports/guide_financial_avenue_source_audit_v1.csv
+
+allowed_binding_states:
+  - AUTHORITATIVE_ROUTE
+  - SUPPORTING_ROUTE
+  - CANDIDATE_NOT_IDENTITY
+  - ABSENT
+
+# This mapping is deliberately source-route coverage, not certification.
+# A route can exist while the source is unmaterialized or semantically incomplete.
+bindings:
+  GFAV-001:
+    state: AUTHORITATIVE_ROUTE
+    source_ids: [fdic, fhlb]
+    note: FDIC/FHLB cover regulated banking institutions and bank-system finance; not every OCIF class.
+  GFAV-002:
+    state: AUTHORITATIVE_ROUTE
+    source_ids: [sec_edgar, sec_13f_nport]
+    note: SEC filings and holdings cover U.S. capital-market issuers/positions; Puerto Rico has no separate stock exchange in the guide.
+  GFAV-003:
+    state: AUTHORITATIVE_ROUTE
+    source_ids: [bde_loans]
+    note: Dedicated Economic Development Bank loan lane; currently manual-export dependent.
+  GFAV-004:
+    state: ABSENT
+    source_ids: []
+    note: No dedicated OCIF international-financial-entity denominator in the frozen base registry.
+  GFAV-005:
+    state: ABSENT
+    source_ids: []
+    note: No dedicated Office of the Commissioner of Insurance insurer denominator in the frozen base registry.
+  GFAV-006:
+    state: CANDIDATE_NOT_IDENTITY
+    source_ids: [sec_edgar]
+    note: SEC may discover REIT issuers, but it is not a Puerto Rico REIT tax-election denominator.
+  GFAV-007:
+    state: CANDIDATE_NOT_IDENTITY
+    source_ids: [sec_edgar, sec_13f_nport]
+    note: SEC filings can discover investment companies/funds, but do not by themselves prove Puerto Rico registration under the guide's local regime.
+  GFAV-008:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives]
+  GFAV-009:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives]
+  GFAV-010:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives]
+  GFAV-011:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives]
+    note: Incentive route only; insurer/reinsurer regulatory denominator is separate.
+  GFAV-012:
+    state: AUTHORITATIVE_ROUTE
+    source_ids: [p3_authority, act_transition_ppp]
+    note: Dedicated P3 authority route plus materialized ACT transition concession evidence.
+  GFAV-013:
+    state: SUPPORTING_ROUTE
+    source_ids: [ddec_incentives]
+    note: Incentive route exists, but the private-equity fund regulatory denominator is absent from the frozen base registry.
+  GFAV-014:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives, tourism_room_tax]
+  GFAV-015:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives]
+  GFAV-016:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives, eia_power_sector]
+  GFAV-017:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives, usda_farm_subsidies]
+  GFAV-018:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives]
+  GFAV-019:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives]
+  GFAV-020:
+    state: ABSENT
+    source_ids: []
+    note: Federal Register references are discovery, not a dedicated FTZ Board Puerto Rico zone/site denominator.
+  GFAV-021:
+    state: AUTHORITATIVE_ROUTE
+    source_ids: [opportunity_zones, pr_act_60_decrees, ddec_incentives]
+  GFAV-022:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives]
+  GFAV-023:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives, bde_loans, sba_loans]
+  GFAV-024:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives]
+  GFAV-025:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives]
+  GFAV-026:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives, research_grants, sbir]
+  GFAV-027:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives]
+  GFAV-028:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives, sbir]
+  GFAV-029:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives, hhs_grants]
+  GFAV-030:
+    state: SUPPORTING_ROUTE
+    source_ids: [pr_act_60_decrees, ddec_incentives, epa_grants]
+
+proposed_overlay_bindings:
+  GFAV-004: [ocif_guide_financial_classes]
+  GFAV-005: [ocs_insurer_registry]
+  GFAV-007: [ocif_guide_financial_classes]
+  GFAV-011: [ocs_insurer_registry, pr_act_60_decrees, ddec_incentives]
+  GFAV-013: [ocif_guide_financial_classes, ddec_incentives]
+  GFAV-020: [ftz_board_pr]
+
+certification_exclusions:
+  - >-
+    scripts/download_act60.py contains a seed fallback when live sources fail.
+    Rows whose provenance is known_seed_data are NONCANONICAL and cannot satisfy
+    an avenue denominator or current-beneficiary certification.
+  - >-
+    CANDIDATE_NOT_IDENTITY routes count as representation for set accounting but
+    never as identity or denominator proof.

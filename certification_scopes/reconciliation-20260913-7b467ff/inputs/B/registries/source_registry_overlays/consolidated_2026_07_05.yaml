@@ -1,0 +1,35 @@
+# Overlay: sources consolidated into data/raw on 2026-07-05.
+# Additive overlay — does not modify the base source_registry.yaml.
+version: "1.0"
+overlay_id: consolidated_2026_07_05
+notes: >
+  New raw source directories added during the data consolidation. The dropzone
+  sources (donaciones_pr, contralor_electoral, oficina_contralor,
+  dcaa_active_contractors, fpds_report_builder) already exist in the base
+  registry and were populated in place. The entries below register the
+  previously-unregistered directories.
+
+sources:
+  - source_id: usaspending_fy2026_pr_slice
+    family: federal
+    required: false
+    authentication: manual_export
+    raw_dir: data/raw/usaspending/
+    inputs: [FY2026_All_Contracts_PR.csv]
+    notes: PR slice (1,157 rows) of USASpending FY2026 All Contracts bulk archive. Supplements usaspending_prime.
+
+  - source_id: legislative_openstates_pr
+    family: legislative
+    required: false
+    authentication: manual_export
+    raw_dir: data/raw/legislative/
+    inputs: [openstates/2017-2020, openstates/2021-2024, openstates/2025-2028, roster]
+    notes: OpenStates PR bills (3 cycles) + legislator roster. Feeds legislative-fiscal linkage.
+
+  - source_id: entity_resolution_aids
+    family: entity_resolution
+    required: false
+    authentication: manual_export
+    raw_dir: data/raw/entity_resolution_aids/
+    inputs: [employer_data_cumulative2001-2024_redacted.xlsx, Contractor Index.rtf]
+    notes: Crosswalk/alias aids for entity resolution. Not asserted as PR spending.

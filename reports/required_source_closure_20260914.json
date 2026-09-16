@@ -1,0 +1,90 @@
+{
+  "schema_version": "moneysweep.required_source_closure/v1",
+  "generated_at": "2026-09-14T13:18:00Z",
+  "branch": "agent/production-certification-max-v2",
+  "scope_head_observed_before_receipt": "91f9e68f41f51e63c4d847c830831863cf063ddc",
+  "production_eligible": false,
+  "required_source_population": 16,
+  "required_blockers": [
+    {
+      "source_id": "usaspending_prime",
+      "state": "BLOCKED_INPUT_CORPUS",
+      "blocker_class": "REQUIRED_BUILD_INPUT_BYTES_NOT_PRESENT_IN_GIT_MANIFESTATION",
+      "current_observation": "Historical/current readiness surfaces report partial materialization, but the current Git manifestation does not contain data/staging/processed/pr_contracts_master.csv, the required canonical master set, the required expansion inputs, or pr_all_awards_master.csv. Report-state is discovery only and cannot prove byte-state.",
+      "audit_tool": "tools/audit_unified_master_inputs.py",
+      "audit_execution_state": "NOT_EXECUTED_AGAINST_AUTHORITATIVE_OPERATOR_CORPUS",
+      "historical_workflow_artifact_discovery": "UNAVAILABLE_THROUGH_CURRENT_CONNECTOR_SCOPE",
+      "next_valid_action": "Recover or mount the authoritative current-scope build inputs in a frozen evidence root; run tools/audit_unified_master_inputs.py; only on READY_TO_BUILD run scripts/build_unified_master.py with require_all_inputs=True, then hash every input/output and issue a current-definition receipt.",
+      "forbidden_shortcut": "Do not infer byte presence from source_registry_status/materialization_readiness, copy or rename old output files, synthesize pr_all_awards_master.csv, or substitute report/summary artifacts for declared build inputs.",
+      "falsifier": "Any required input byte absent or invalid, forbidden/symlinked input path, schema/row-width failure, build conservation failure, or receipt definition-digest mismatch keeps the source open."
+    },
+    {
+      "source_id": "hud_drgr_authorized",
+      "state": "NOT_MATERIALIZED",
+      "blocker_class": "AUTHORIZED_OPERATOR_EXPORT_REQUIRED",
+      "current_observation": "The bounded 2026-09-06 pursuit classified 9 candidates and found 0 authorized DRGR activity/project/drawdown exports. Six supporting CDBG-DR artifacts, one partial non-authorized dataset, and two empty/unresolved parquet manifestations were correctly denied source credit.",
+      "next_valid_action": "Obtain a non-empty authorized DRGR export through the credentialed portal, preserve original bytes and export metadata, ingest through scripts/ingest_hud_drgr_exports.py, validate, and bind a current-scope receipt.",
+      "forbidden_shortcut": "Do not treat CDBG-DR, HCV, transition PDFs, empty parquet tables, or similarly themed HUD records as DRGR-equivalent without a separately certified source-equivalence claim.",
+      "falsifier": "No authorized export bytes, zero rows, wrong table family, missing export provenance, or scope mismatch keeps the source open."
+    },
+    {
+      "source_id": "prasa",
+      "state": "PARTIALLY_MATERIALIZED",
+      "blocker_class": "OPERATOR_DROPZONE_EVIDENCE_INCOMPLETE",
+      "current_observation": "Status grants partial credit, but the canonical registered output data/staging/processed/pr_prasa_contracts.csv is not committed on the current continuation branch and therefore cannot be independently promoted from repository state alone.",
+      "next_valid_action": "Use an operator-provided PRASA procurement export in the registered dropzone, preserve raw bytes/hash/schema, run scripts/ingest_prasa.py, validate whole-row outputs, and bind a current-scope receipt.",
+      "forbidden_shortcut": "Do not infer full PRASA materialization from consulting-engineer reports, derived vendor aggregates, project PDFs, or similarly named AAA/PRASA documents.",
+      "falsifier": "Absent raw export, missing canonical output, schema mismatch, empty output, or unresolved source-definition binding keeps the source open."
+    },
+    {
+      "source_id": "campaign_finance_entities",
+      "state": "NOT_MATERIALIZED",
+      "blocker_class": "UPSTREAM_CAMPAIGN_FINANCE_MATERIALIZATION_REQUIRED",
+      "current_observation": "The required FEC contribution and committee CSVs are not committed at the current continuation head; downstream entity generation therefore cannot be granted credit without executing the registered upstream acquisitions.",
+      "next_valid_action": "Materialize the registered FEC/OCE upstream files, then run scripts/build_campaign_finance_entities.py and validate all four declared outputs as a single dependency-bound derivation.",
+      "forbidden_shortcut": "Do not hand-author candidate/committee/entity CSVs or infer missing federal inputs from names, summaries, or old report counts.",
+      "falsifier": "Any required upstream missing, entity-ID collision, unresolved mandatory schema field, empty required derived output, or receipt mismatch keeps the source open."
+    },
+    {
+      "source_id": "campaign_finance_materialization_gate",
+      "state": "NOT_MATERIALIZED",
+      "blocker_class": "DEPENDENT_VALIDATION_GATE",
+      "current_observation": "This gate depends on FEC Schedule A/B/E, PR donation feeds, derived campaign-finance entities, a complete FEC outflow acquisition manifest, and conditionally required cross-reference outputs.",
+      "next_valid_action": "After upstream campaign-finance materialization, execute scripts/validate_campaign_finance_materialization.py in blocking mode and preserve the generated manifest only if report.ok is true.",
+      "forbidden_shortcut": "Do not use --report-only, suppress blocking entries, or mark the gate successful merely because the validator script executes.",
+      "falsifier": "Any required file missing/below threshold/schema-invalid, incomplete outflow manifest, missing conditional derived output, or zero PR donation rows keeps the gate open."
+    }
+  ],
+  "execution_population": {
+    "automatable_total": 116,
+    "keyless_total": 104,
+    "credential_gated_total": 12,
+    "planner": "tools/build_keyless_execution_waves.py",
+    "planner_execution_state": "NOT_EXECUTED_AGAINST_FULL_WORKSPACE",
+    "waves": ["W1_SCHEDULE_INDEPENDENT", "W2_OPERATOR_TRIGGERED", "W3_DEPENDENCY_GATED"],
+    "readiness_is_execution_evidence": false,
+    "reported_output_presence_is_execution_evidence": false
+  },
+  "dependency_order": [
+    "usaspending_prime_input_corpus",
+    "usaspending_prime_build",
+    "keyless_schedule_independent",
+    "keyless_operator_triggered",
+    "keyless_dependency_gated",
+    "prasa",
+    "hud_drgr_authorized",
+    "campaign_finance_upstreams",
+    "campaign_finance_entities",
+    "campaign_finance_materialization_gate"
+  ],
+  "current_scope_constraints": {
+    "actions_infrastructure_bypass": "PERMITTED_ONLY_WHEN_RUNNER_STARTUP_IS_THE_SOLE_BLOCKER",
+    "manual_source_bypass": false,
+    "source_equivalence_requires_separate_certification": true,
+    "name_only_identity_allowed": false,
+    "count_equality_is_identity": false,
+    "historical_receipt_inheritance_allowed": false,
+    "production_activation_authorized": false,
+    "report_state_is_byte_evidence": false
+  }
+}

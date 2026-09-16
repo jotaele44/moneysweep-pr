@@ -1,0 +1,246 @@
+version: "1.2"
+schema_version: guide_public_denominator_adjudications_v1
+scope_id: GUIDE_BOUNDED_100_PERCENT
+as_of_utc: "2026-08-26T00:00:00Z"
+
+scope_invariant: >-
+  GUIDE_BOUNDED_100_PERCENT is a bounded audit of the frozen 2021 Kevane Grant
+  Thornton guide and is never equivalent to ALL_PUERTO_RICO_FINANCE.
+
+promotion_policy:
+  stable_id_required_for_entity_merge: true
+  name_only_identity_promotion: false
+  search_absence_is_zero_membership_proof: false
+  seed_or_fallback_rows_can_certify: false
+  historical_states_may_be_overwritten: false
+  public_sources_before_foia: true
+
+adjudications:
+  GFAV-006:
+    canonical: real_estate_investment_trusts
+    class_binding_state: AUTHORITATIVE_CLASS_CONFIRMED
+    member_denominator_state: PUBLIC_MEMBER_DENOMINATOR_DEMONSTRABLY_INACCESSIBLE
+    certification_state: OPEN
+    authoritative_class_evidence:
+      - authority: Departamento de Hacienda de Puerto Rico
+        title: Administrative Determination No. 11-13
+        url: https://hacienda.pr.gov/publicaciones/determinacion-administrativa-num-11-13
+        fact: >-
+          Hacienda expressly treats a real estate investment trust as a distinct
+          Puerto Rico taxpayer/entity class for the cited reporting rule.
+      - authority: Departamento de Hacienda de Puerto Rico
+        title: Codigo de Rentas Internas de Puerto Rico de 2011
+        url: https://hacienda.pr.gov/sites/default/files/codigo_de_rentas_internas.pdf
+        fact: >-
+          Section 1082.01 defines a Puerto Rico fideicomiso de inversiones en
+          bienes raices and its qualification requirements, independently from
+          financial institutions and insurance companies.
+      - authority: Departamento de Hacienda de Puerto Rico
+        title: Codigo de Rentas Internas - Section 1061.14
+        url: https://hacienda.pr.gov/sites/default/files/publicaciones/codigo_de_rentas_internas_8-27-2014.pdf
+        fact: >-
+          A Puerto Rico real-estate investment trust subject to Section 1082.01
+          must file an annual tax return containing income, receipts,
+          disbursements and other information required to administer the tax law.
+    public_access_blockers:
+      - authority: Departamento de Hacienda de Puerto Rico
+        title: Orden Administrativa 20-09 - Acceso a Informacion Publica
+        url: https://hacienda.pr.gov/sites/default/files/oa_20-09_1_0.pdf
+        state: TAX_INFORMATION_EXCLUDED_FROM_PUBLIC_RECORD
+        fact: >-
+          Hacienda's public-information procedure states that tax information
+          submitted by a taxpayer or authorized representative is excluded from
+          the definition of public document for these access requests.
+      - authority: Departamento de Hacienda de Puerto Rico
+        title: Carta de Derechos del Contribuyente
+        url: https://hacienda.pr.gov/sobre-hacienda/carta-de-derechos-del-contribuyente-secs-100001-100004
+        state: TAX_INFORMATION_CONFIDENTIAL
+        fact: >-
+          Taxpayers are guaranteed confidentiality of information submitted to
+          Hacienda.
+    searched_public_authority_families:
+      - Departamento de Hacienda de Puerto Rico
+      - Oficina del Comisionado de Instituciones Financieras
+      - Departamento de Desarrollo Economico y Comercio
+      - Instituto de Estadisticas de Puerto Rico
+      - Portal de Transicion Gubernamental 2024
+    unresolved_residue:
+      - >-
+        The statutory class and filing obligation are authoritative, but no
+        public named roster or denominator count is published on the reachable
+        public surfaces. The tax-return source family that could establish the
+        complete class is expressly confidential/non-public.
+      - >-
+        SEC issuer classification, entity names, property holdings, and issuer
+        self-description remain candidate/supporting evidence only and cannot
+        substitute for Puerto Rico statutory/tax identity.
+
+  GFAV-007:
+    canonical: registered_investment_companies
+    class_binding_state: AUTHORITATIVE_CLASS_CONFIRMED
+    member_denominator_state: AUTHORITATIVE_COUNT_CLOSED_MEMBER_ROSTER_INACCESSIBLE
+    authoritative_member_count: 48
+    authoritative_member_count_period: "2024-2025 transition report snapshot"
+    certification_state: OPEN
+    authoritative_class_evidence:
+      - authority: Oficina del Comisionado de Instituciones Financieras
+        title: Reglamentacion de Valores - Companias de Inversion
+        url: https://www.ocif.pr.gov/
+        fact: >-
+          OCIF separately identifies Companias de Inversion and the Puerto Rico
+          Investment Companies Act of 2013, Act No. 93-2013, plus the earlier
+          Act No. 6-1954.
+      - authority: Oficina del Comisionado de Instituciones Financieras
+        title: Reportes Proveedores
+        url: https://ocif.pr.gov/reportes-proveedores
+        fact: >-
+          OCIF publishes a separate Companias de Inversion reporting family,
+          including Report of Condition, investment-asset schedules, income
+          statements, and changes in net assets.
+      - authority: Oficina del Comisionado de Instituciones Financieras
+        title: Informe de Transicion 2024
+        url: https://transicion2024.pr.gov/Agencias/075/Informe%20status%20planes%20unidades%20administrativas/Informe%20de%20Transici%C3%B3n%202024.pdf
+        fact: >-
+          The OCIF transition report states 48 Puerto Rico investment companies
+          and reports 48 for every fiscal-year column from 2020-2021 through
+          2024-2025, independently distinguishing investment advisers, registered
+          agents, investment-capital funds and private-equity funds.
+      - authority: Oficina del Comisionado de Instituciones Financieras
+        title: Investment Companies statistics
+        url: https://docs.pr.gov/files/OCIF/ESTADISTICAS/Investment%20Companies.pdf
+        fact: >-
+          OCIF publishes aggregate balance-sheet, asset/capital and income
+          statistics for Investment Companies as a separate supervised industry.
+    member_roster_access_evidence:
+      - authority: Oficina del Comisionado de Instituciones Financieras
+        title: Securities Registration
+        url: https://eric.ocif.pr.gov/web/
+        state: LOGIN_GATED
+        fact: >-
+          The dedicated OCIF securities-registration application exposes a login
+          surface rather than an anonymous member-level investment-company roster.
+      - authority: Oficina del Comisionado de Instituciones Financieras
+        title: Public concessionaire search
+        url: https://concesionarios.ocif.pr.gov/
+        state: PUBLIC_BUT_DIFFERENT_LICENSE_UNIVERSE
+        fact: >-
+          The public concessionaire system exposes many financial license types,
+          including investment advisers and private funds, but no located public
+          Compania de Inversion member list equivalent to the 48-count securities
+          denominator.
+    identity_non_equivalences:
+      - "INVESTMENT_COMPANY != INVESTMENT_ADVISOR"
+      - "INVESTMENT_COMPANY != EXEMPT_REPORTING_ADVISOR"
+      - "INVESTMENT_COMPANY != BROKER_DEALER"
+      - "INVESTMENT_COMPANY != PRIVATE_EQUITY_FUND"
+      - "INVESTMENT_COMPANY != SEC_13F_MANAGER"
+      - "INVESTMENT_COMPANY != SEC_NPORT_FUND"
+    unresolved_residue:
+      - >-
+        The authoritative denominator count is closed at 48 for the cited
+        transition snapshot, but the corresponding 48 member identities and
+        stable Puerto Rico registration identifiers are not anonymously exposed
+        on reachable public OCIF surfaces.
+
+  ACT60_CATEGORY_AND_BENEFICIARY:
+    guide_avenues:
+      - GFAV-008
+      - GFAV-009
+      - GFAV-010
+      - GFAV-011
+      - GFAV-013
+      - GFAV-014
+      - GFAV-015
+      - GFAV-016
+      - GFAV-017
+      - GFAV-018
+      - GFAV-019
+      - GFAV-021
+      - GFAV-022
+      - GFAV-023
+      - GFAV-024
+      - GFAV-025
+      - GFAV-026
+      - GFAV-027
+      - GFAV-028
+      - GFAV-029
+      - GFAV-030
+    category_denominator_state: CLOSED_TEMPORAL_CROSSWALK
+    category_crosswalk_registry: registries/guide_act60_temporal_crosswalk_v1.yaml
+    beneficiary_denominator_state: PUBLIC_MEMBER_DENOMINATOR_DEMONSTRABLY_INACCESSIBLE
+    certification_state: OPEN
+    authoritative_public_evidence:
+      - authority: Oficina de Gerencia y Presupuesto
+        title: Codigo de Incentivos de Puerto Rico - Ley 60-2019 segun enmendada
+        url: https://bvirtualogp.pr.gov/ogp/BVirtual/LeyesOrganicas/pdf/60-2019.pdf
+        fact: >-
+          The current code groups incentives into ten top-level categories,
+          provides special overlays for PYMES and Vieques/Culebra, preserves
+          prospectively unaffected pre-Act-60 decrees, and contains explicit
+          current/superseded provisions used by the frozen temporal crosswalk.
+      - authority: Departamento de Desarrollo Economico y Comercio
+        title: Carta Circular DDEC (OIN) 2025-006
+        url: https://incentives.ddec.pr.gov/pdf/opendocs/Carta%20Circular%20DDEC%20%28OIN%29%202025-006%205.3.25.pdf
+        fact: >-
+          OIN processes, evaluates and monitors applications, granted decrees,
+          and decree amendments, while predecessor-law matters remain relevant.
+      - authority: Instituto de Estadisticas de Puerto Rico / DDEC
+        title: Casos Radicados y Aprobados de Solicitudes de Decretos de Leyes de Incentivos
+        url: https://www.estadisticas.pr.gov/productos/casos-radicados-y-aprobados-de-solicitudes-de-decretos-de-leyes-de-incentivos
+        fact: >-
+          All cases filed from 2020-01-01 are reported under Act 60, while cases
+          approved in 2020 are under predecessor laws; the statistical series
+          includes Act 73-2008, Act 83-2010, Act 20-2012, Act 22-2012 and Act
+          273-2012 and is organized by month/year/law/section.
+      - authority: Instituto de Estadisticas de Puerto Rico
+        title: Performance Evaluation Of Economic Incentives - Data Assessment and ROI Analysis
+        url: https://www.estadisticas.pr.gov/productos/performance-evaluation-of-economic-incentives-data-assessment-and-return-on-investment-roi-analysis
+        fact: >-
+          The official evaluation states that predecessor-law decrees constitute
+          the majority of active decrees and must be considered alongside Act 60;
+          beneficiary infrastructure used for the evaluation does not itself
+          establish a complete public member-level roster.
+      - authority: Instituto de Estadisticas de Puerto Rico / DDEC-PRIDCO
+        title: Directorio de Empresas Operando DDEC-PRIDCO
+        url: https://www.estadisticas.pr.gov/productos/directorio-de-empresas-operando-ddec-pridco
+        fact: >-
+          IEPR describes a monthly directory whose reference population is
+          companies/projects operating under DDEC-PRIDCO incentive programs, but
+          the current public product page states that the product contains no files.
+    public_access_blockers:
+      - authority: Departamento de Desarrollo Economico y Comercio
+        title: Incentives transaction portal
+        url: https://incentives.ddec.pr.gov/Security/Login
+        state: LOGIN_GATED
+        fact: >-
+          The transactional incentives system requires authentication and its
+          anonymous landing page does not expose the complete current/historical
+          decree-beneficiary ledger.
+      - authority: Instituto de Estadisticas de Puerto Rico / DDEC-PRIDCO
+        title: Directorio de Empresas Operando DDEC-PRIDCO
+        state: PUBLIC_METADATA_NO_CURRENT_FILE
+        fact: >-
+          The public metadata describes a beneficiary-like operating-company
+          directory but explicitly presents no downloadable product files.
+    temporal_invariants:
+      - "PREDECESSOR_DECREE != ACT60_DECREE"
+      - "2020_FILED_ACT60 != 2020_APPROVED_PREDECESSOR_BY_DEFAULT"
+      - "SUPERSEDED_DECREE_STATE_MUST_BE_RETAINED"
+    noncanonical_evidence:
+      - pr_act_60_decrees known-seed fallback rows
+    unresolved_residue:
+      - >-
+        The category/temporal taxonomy is now separately closed, but the public
+        IEPR decree series remains statistical/category-level evidence rather
+        than a complete beneficiary/decree roster with stable decree IDs.
+      - >-
+        Public metadata and statistical reports do not establish the complete
+        current plus historical beneficiary/decree denominator needed for
+        member-level certification, while the transactional source is login-gated.
+
+certification_state: OPEN
+certification_reason: >-
+  Category/temporal taxonomy is closed, but materialization of the three missing
+  source routes, a public REIT member denominator, the 48 investment-company
+  member identities, and the Act 60/predecessor beneficiary/decree denominator
+  have not all reached zero residue.

@@ -1,0 +1,28 @@
+{
+  "adjudication": {
+    "aggregation_equivalent": true,
+    "field_mapping_complete": false,
+    "reason": "The candidate is a point-in-time active-contract subset and has not been shown to equal the yearly operator-export procurement universe.",
+    "row_universe_match": false,
+    "selection_equivalent": false,
+    "semantic_scope_match": "partial",
+    "temporal_scope_match": false
+  },
+  "candidate_name": "PRASA 2024 transition active-contracts report",
+  "candidate_scope": {
+    "expected_pages": 36,
+    "extractor_floor_rows": 100,
+    "point_in_time": "2024-09-24",
+    "report_subject": "active contracts at transition"
+  },
+  "candidate_url": "https://transicion2024.pr.gov/Agencias/163/Informe%20Contratos%20Vigentes/Contratos%20Vigentes%20al%2024%20de%20septiembre%20de%202024%20%28Informe%29.pdf",
+  "registered_scope": {
+    "authentication": "manual_export",
+    "expected_output": "data/staging/processed/pr_prasa_contracts.csv",
+    "manual_drop_dir": "data/raw/PRASA/",
+    "producer_script": "scripts/ingest_prasa.py",
+    "update_cadence": "yearly"
+  },
+  "schema_version": "moneysweep.source_equivalence_basis/v1",
+  "source_id": "prasa"
+}

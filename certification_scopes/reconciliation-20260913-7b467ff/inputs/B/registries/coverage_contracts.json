@@ -1,0 +1,381 @@
+{
+  "schema_version": "coverage_contracts_v1",
+  "defaults": {
+    "production_fixtures_forbidden": true,
+    "pagination_required": false
+  },
+  "contracts": [
+    {
+      "source_id": "act_transition_contracts",
+      "contract_version": 1,
+      "canonical_grain": "contract",
+      "geography_scope": "PR",
+      "period": {
+        "start": "1991-12-20",
+        "end": "2020-12-31",
+        "period_type": "snapshot"
+      },
+      "authoritative_universe_method": "committed_extract_page_validation",
+      "authoritative_universe_ref": "data/raw/act_transition/reextraction_2026-07/page_extraction_validation.csv",
+      "authoritative_universe_total": 656,
+      "uniqueness_key": [
+        "contract_number",
+        "contractor_name"
+      ],
+      "minimum_coverage_pct": 98.0,
+      "required_field_thresholds": {
+        "contractor_name": 99.0,
+        "contract_number": 99.0,
+        "amount": 95.0
+      },
+      "monetary_reconciliation": {
+        "amount_field": "amount",
+        "tolerance_pct": 1.0,
+        "reference_total": null
+      },
+      "notes": "ACT (Autoridad de Carreteras y Transportaci\u00f3n) contracts in force at the 2020 transition. Snapshot corpus: the universe is the committed page-validated extract, not a live portal."
+    },
+    {
+      "source_id": "acuden_2024_transition",
+      "contract_version": 1,
+      "canonical_grain": "contract",
+      "geography_scope": "PR",
+      "period": {
+        "start": "2015-01-01",
+        "end": "2024-12-31",
+        "period_type": "snapshot"
+      },
+      "authoritative_universe_method": "committed_extract_page_validation",
+      "authoritative_universe_ref": "data/raw/act_transition/reextraction_2026-07/page_extraction_validation.csv",
+      "authoritative_universe_total": 1147,
+      "uniqueness_key": [
+        "contract_number",
+        "contractor_name"
+      ],
+      "minimum_coverage_pct": 98.0,
+      "required_field_thresholds": {
+        "contractor_name": 99.0,
+        "contract_number": 99.0,
+        "amount": 95.0
+      },
+      "monetary_reconciliation": {
+        "amount_field": "amount",
+        "tolerance_pct": 1.0,
+        "reference_total": null
+      },
+      "notes": "ACUDEN contracts in force at the 2024 transition; shares the committed extract with act_transition_contracts (source_dataset is the split key)."
+    },
+    {
+      "source_id": "usaspending_prime",
+      "contract_version": 1,
+      "canonical_grain": "award",
+      "geography_scope": "PR",
+      "period": {
+        "start": "2007-10-01",
+        "end": null,
+        "period_type": "rolling"
+      },
+      "authoritative_universe_method": "api_metadata",
+      "authoritative_universe_ref": "https://api.usaspending.gov/api/v2/search/spending_by_award_count/",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "contract_id",
+        "award_date",
+        "vendor_name",
+        "obligated_amount"
+      ],
+      "minimum_coverage_pct": 95.0,
+      "pagination_required": true,
+      "notes": "Denominator from the keyless PR-scoped count endpoint (the coverage audit's --probe layer). 2007-10-01 is the API's earliest searchable window; earlier awards need the bulk-download lane and a contract bump."
+    },
+    {
+      "source_id": "usaspending_subawards",
+      "contract_version": 1,
+      "canonical_grain": "subaward",
+      "geography_scope": "PR",
+      "period": {
+        "start": "2007-10-01",
+        "end": null,
+        "period_type": "rolling"
+      },
+      "authoritative_universe_method": "api_metadata",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "subaward_number"
+      ],
+      "minimum_coverage_pct": 95.0,
+      "pagination_required": true
+    },
+    {
+      "source_id": "fsrs_subawards",
+      "contract_version": 1,
+      "canonical_grain": "subaward",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "api_metadata",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "subaward_number"
+      ],
+      "minimum_coverage_pct": 95.0,
+      "pagination_required": true,
+      "notes": "DUPLICATE POLICY (program rule 4): semantic duplicate of usaspending_subawards \u2014 corroboration/enrichment lane only. Its rows must never be added to usaspending_subawards rows in any total-financial-flow metric; reconciliation compares the two lanes instead."
+    },
+    {
+      "source_id": "fema_pa_openfema_v2",
+      "contract_version": 1,
+      "canonical_grain": "project",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "api_metadata",
+      "authoritative_universe_ref": "https://www.fema.gov/api/open/v2/PublicAssistanceApplicantsProgramDeliveries",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "id"
+      ],
+      "minimum_coverage_pct": 98.0,
+      "pagination_required": true
+    },
+    {
+      "source_id": "fema_hmgp",
+      "contract_version": 1,
+      "canonical_grain": "project",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "api_metadata",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "id"
+      ],
+      "minimum_coverage_pct": 90.0,
+      "pagination_required": true,
+      "notes": "HMGP subapplication counts are not published as a single total; the OpenFEMA dataset count is the working denominator. Current holdings are a 25-row seed (baseline audit) \u2014 expect below_contract until re-pulled."
+    },
+    {
+      "source_id": "hud_cdbg_dr_public",
+      "contract_version": 1,
+      "canonical_grain": "activity",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "bulk_file_metadata",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "grant_number",
+        "activity_number"
+      ],
+      "minimum_coverage_pct": 95.0
+    },
+    {
+      "source_id": "hud_drgr_authorized",
+      "contract_version": 1,
+      "canonical_grain": "activity",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "operator_attestation",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "grant_number",
+        "activity_number"
+      ],
+      "minimum_coverage_pct": 95.0,
+      "notes": "Authorized DRGR exports are operator-delivered (manual dropzone); the operator attests the export scope per drop. Unverifiable until the first attested drop lands."
+    },
+    {
+      "source_id": "cor3",
+      "contract_version": 1,
+      "canonical_grain": "project",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "portal_count",
+      "authoritative_universe_ref": "https://recovery.pr.gov",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "project_id"
+      ],
+      "minimum_coverage_pct": 95.0,
+      "notes": "Project/procurement/disbursement grains must stay separate when the operator export lands (program rule: COR3 vs FEMA PA records are linked, never merged)."
+    },
+    {
+      "source_id": "sam_entities",
+      "contract_version": 1,
+      "canonical_grain": "entity",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "bulk_file_metadata",
+      "authoritative_universe_ref": "SAM_PUBLIC_MONTHLY_V2 extract record count (PR-filtered)",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "uei"
+      ],
+      "minimum_coverage_pct": 95.0,
+      "notes": "Denominator = PR-registered entities in the monthly public extract, not per-entity API paging (which is capped; see baseline audit \"capped\" finding)."
+    },
+    {
+      "source_id": "lda",
+      "contract_version": 1,
+      "canonical_grain": "filing",
+      "geography_scope": "US",
+      "authoritative_universe_method": "api_metadata",
+      "authoritative_universe_ref": "https://lda.senate.gov/api/v1/filings/ (count for PR-interest registrants)",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "filing_uuid"
+      ],
+      "minimum_coverage_pct": 98.0,
+      "pagination_required": true
+    },
+    {
+      "source_id": "pr_cabilderos",
+      "contract_version": 1,
+      "canonical_grain": "registration",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "document_index",
+      "authoritative_universe_ref": "Registro de Cabilderos registry PDF (April 2026 snapshot, 81 pages)",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "registro_cabildero_num",
+        "client_name"
+      ],
+      "minimum_coverage_pct": 95.0,
+      "notes": "One-to-many lobbyist-client registrations. Universe = the April 2026 authoritative registry PDF once parsed; the 2025-03-26 roster (1,175 pairs) plus 23 certificate-only records are the current acquired corpus."
+    },
+    {
+      "source_id": "fec",
+      "contract_version": 1,
+      "canonical_grain": "transaction",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "api_metadata",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "sub_id"
+      ],
+      "minimum_coverage_pct": 95.0,
+      "pagination_required": true,
+      "notes": "Baseline audit flagged a fixture/placeholder suspicion on this lane \u2014 production_fixtures_forbidden (default) makes any fixture rows fail the materiality gate outright."
+    },
+    {
+      "source_id": "donaciones_pr",
+      "contract_version": 1,
+      "canonical_grain": "donation",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "operator_attestation",
+      "authoritative_universe_ref": "CEE Donaciones export (Donaciones_20260320.csv)",
+      "authoritative_universe_total": 4686,
+      "uniqueness_key": [
+        "donor_name",
+        "candidatura",
+        "amount",
+        "event_date"
+      ],
+      "minimum_coverage_pct": 98.0,
+      "notes": "Bounded snapshot contract: the 2026-03-20 CEE export is the attested universe for this version. Uniqueness key is provisional until first ingest confirms the export's column semantics; bump contract_version when the full portal scrape replaces the snapshot."
+    },
+    {
+      "source_id": "ocpr_contracts",
+      "contract_version": 1,
+      "canonical_grain": "contract",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "portal_count",
+      "authoritative_universe_ref": "https://consultacontratos.ocpr.gov.pr",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "contract_id"
+      ],
+      "minimum_coverage_pct": 95.0,
+      "pagination_required": true,
+      "notes": "Denominator must come from paginated portal counts, NOT the observed ~5.56M maximum contract-identifier range (program risk: identifier ranges exaggerate corpus size)."
+    },
+    {
+      "source_id": "oficina_contralor",
+      "contract_version": 1,
+      "canonical_grain": "audit_report",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "document_index",
+      "authoritative_universe_ref": "https://iapconsulta.ocpr.gov.pr",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "report_id"
+      ],
+      "minimum_coverage_pct": 95.0,
+      "notes": "Separate lane from ocpr_contracts (audits vs contracts; program rule)."
+    },
+    {
+      "source_id": "compras_pr",
+      "contract_version": 1,
+      "canonical_grain": "award",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "api_metadata",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "solicitation_id"
+      ],
+      "minimum_coverage_pct": 90.0,
+      "pagination_required": true
+    },
+    {
+      "source_id": "emma_bonds",
+      "contract_version": 1,
+      "canonical_grain": "security",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "portal_count",
+      "authoritative_universe_ref": "EMMA MSRB PR issuer/obligor search",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "cusip"
+      ],
+      "minimum_coverage_pct": 90.0,
+      "pagination_required": true,
+      "notes": "Current holdings are a 35-row seed (baseline audit) vs full PR issuer coverage; issue metadata and disclosure-document metadata are separate grains when scaled up."
+    },
+    {
+      "source_id": "sba_disaster_loans_pr",
+      "contract_version": 1,
+      "canonical_grain": "loan",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "api_metadata",
+      "authoritative_universe_total": null,
+      "uniqueness_key": [
+        "loan_id"
+      ],
+      "minimum_coverage_pct": 90.0
+    },
+    {
+      "source_id": "asg_emergency_purchases",
+      "contract_version": 1,
+      "canonical_grain": "contract",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "portal_count",
+      "authoritative_universe_ref": "https://asg.pr.gov/comprasemergencias",
+      "authoritative_universe_total": 1406,
+      "uniqueness_key": [
+        "control_number"
+      ],
+      "minimum_coverage_pct": 95.0,
+      "pagination_required": true,
+      "notes": "Measured 2026-07-27: 141 declared pages at 10 rows, last page 6 -> 1,406 emergency purchase orders. Append-mostly, so the total grows; a shortfall against it means the walk stopped early, not that the corpus shrank. Grain is `contract` rather than `transaction` deliberately \u2014 ASG renders no date, so these rows carry no transaction_date and must not be promoted to transaction grain."
+    },
+    {
+      "source_id": "asg_suppliers",
+      "contract_version": 1,
+      "canonical_grain": "entity",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "portal_count",
+      "authoritative_universe_ref": "https://asg.pr.gov/suplidores",
+      "authoritative_universe_total": 4665,
+      "uniqueness_key": [
+        "registration_id"
+      ],
+      "minimum_coverage_pct": 95.0,
+      "pagination_required": true,
+      "notes": "Measured 2026-07-27: 47 declared pages at 100 vendors, last page 65 -> 4,665 registered bidders. Each vendor occupies two table rows (a summary row and a collapsed detail row), so a naive row count doubles the denominator; registration_id (the ASG Licitador ID) is the uniqueness key."
+    },
+    {
+      "source_id": "rdc_demandas_civiles",
+      "contract_version": 1,
+      "canonical_grain": "claim",
+      "geography_scope": "PR",
+      "authoritative_universe_method": "portal_count",
+      "authoritative_universe_ref": "https://justicia1.justicia.pr.gov/rdc",
+      "authoritative_universe_total": 44706,
+      "uniqueness_key": [
+        "rdc_case_uid"
+      ],
+      "minimum_coverage_pct": 95.0,
+      "pagination_required": true,
+      "notes": "Measured 2026-08-16: the \"Ultima\" pagination link declares 7,451 pages at six rows, and page 7451 was fetched and found full at six -> 44,706 cases. That is a portal_count denominator in the sense this file requires, not a maximum identifier range. The registry is append-ordered, so the total grows; a shortfall against it means the sweep stopped early, not that the corpus shrank.\nGrain is `claim`, not `payment`: Cuant\u00eda Reclamada is an amount demanded and most rows never become a disbursement. Cantidad Adjudicada is the awarded figure where one exists, and is blank on unresolved cases \u2014 it must not be read as money paid.\nuniqueness_key is the surrogate rdc_case_uid rather than N\u00fam del Caso, which is not unique across the corpus. Coverage is counted over the list sweep; detail enrichment (scripts/enrich_rdc_details.py) fills the party fields incrementally and is deliberately not part of this denominator."
+    }
+  ]
+}

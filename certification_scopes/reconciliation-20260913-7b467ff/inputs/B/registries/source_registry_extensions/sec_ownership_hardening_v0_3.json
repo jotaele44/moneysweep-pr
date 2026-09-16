@@ -1,0 +1,64 @@
+{
+  "extension_id": "sec_ownership_hardening_v0_3",
+  "sources": [
+    {
+      "source_id": "sec_equity_identity_v2",
+      "family": "capital_control",
+      "required": false,
+      "authentication": "none",
+      "source_url": "https://www.sec.gov/files/company_tickers.json",
+      "producer_script": "scripts/download_sec_equity_v2.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_sec_companies_v2.csv",
+        "data/staging/processed/pr_sec_financials_v2.csv",
+        "data/staging/processed/pr_sec_share_denominators_v2.csv",
+        "data/manifests/sec_equity_v2/receipt.json"
+      ],
+      "update_cadence": "quarterly",
+      "validation_threshold": {"min_rows": 1},
+      "notes": "Fail-closed BPOP/OFG/EVTC ticker-CIK rematerialization. No name-only repair or synthetic financial fallback."
+    },
+    {
+      "source_id": "sec_holdings_discovery_v2",
+      "family": "capital_control",
+      "required": false,
+      "authentication": "none",
+      "producer_script": "scripts/rematerialize_sec_holdings_discovery_v2.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_sec_holdings_discovery_v2.csv"
+      ],
+      "update_cadence": "ad_hoc",
+      "validation_threshold": {"min_rows": 1},
+      "notes": "Preserves legacy municipal/debt discovery while separating FORM13FFILENUMBER from CIK and prohibiting corporate-equity promotion."
+    },
+    {
+      "source_id": "sec_13f_bpop_golden_freeze",
+      "family": "capital_control",
+      "required": false,
+      "authentication": "none",
+      "source_url": "https://www.sec.gov/data-research/sec-markets-data/form-13f-data-sets",
+      "producer_script": "scripts/acquire_sec13f_bpop_golden.py",
+      "expected_outputs": [
+        "data/manifests/capital_control/bpop_8q_freeze_manifest.json"
+      ],
+      "update_cadence": "ad_hoc",
+      "validation_threshold": {"min_rows": 1},
+      "notes": "Exact eight-archive authoritative byte freeze for BPOP 2024Q2-2026Q1, with archive/member SHA-256."
+    },
+    {
+      "source_id": "sec_13f_bpop_8q_certification",
+      "family": "capital_control",
+      "required": false,
+      "authentication": "none",
+      "producer_script": "scripts/certify_bpop_sec13f_8q.py",
+      "expected_outputs": [
+        "data/staging/processed/capital_control/sec13f_pr_golden_holdings.csv",
+        "data/staging/processed/capital_control/sec13f_pr_golden_investors.csv",
+        "data/manifests/capital_control/bpop_sec13f_8q_certification.json"
+      ],
+      "update_cadence": "ad_hoc",
+      "validation_threshold": {"min_rows": 1},
+      "notes": "Bounded fail-closed BPOP eight-quarter ownership certification plus OFG/EVTC parser regressions. Deep Dive promotion is a separate downstream vector."
+    }
+  ]
+}

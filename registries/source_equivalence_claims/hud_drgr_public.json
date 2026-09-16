@@ -1,0 +1,27 @@
+{
+  "schema_version": "moneysweep.source_equivalence/v1",
+  "source_id": "hud_drgr_authorized",
+  "candidate_source": {
+    "name": "HUD CDBG-DR public monthly reports / public reporting surfaces",
+    "source_url": "https://www.hud.gov/hud-partners/community-cdbg-dr-reports",
+    "authoritative": true
+  },
+  "tests": {
+    "semantic_scope_match": false,
+    "temporal_scope_match": false,
+    "row_universe_match": false,
+    "field_mapping_complete": false,
+    "selection_equivalent": false,
+    "aggregation_equivalent": false
+  },
+  "missing_fields": [],
+  "extra_fields": [],
+  "evidence": [
+    {
+      "kind": "bounded_equivalence_basis",
+      "locator": "evidence/source_equivalence/hud_drgr_public_basis.json",
+      "sha256": "32c116ac342b1b911fc7214138fad57523fa559c5cd3c6762874c3d98ff3505d"
+    }
+  ],
+  "notes": "Public HUD reporting is authoritative for what it publishes, but it is not proven to expose the registered authorized DRGR activity/project export universe. No substitution credit is permitted."
+}

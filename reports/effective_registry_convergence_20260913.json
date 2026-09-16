@@ -1,0 +1,100 @@
+{
+  "schema_version": "moneysweep.effective_registry_convergence/v1",
+  "state": "PROVISIONAL",
+  "production_eligible": false,
+  "implementation_head_before_receipt": "e6f549cce6b59d125dc86efdfeb7f22676d81dc0",
+  "effective_profile": "root JSON + direct JSON extensions + direct JSON overrides",
+  "source_population": {
+    "total": 164,
+    "required": 16,
+    "automatable": 116,
+    "excluded": 48,
+    "source_ids_sha256": "4c551385f00ca6df4332ee1643d0ef7a6ab85172632d945d35be285cd94f5826",
+    "arithmetic": "116+48=164"
+  },
+  "historical_transition": {
+    "A_commit": "9694590a5019879e8d50288f046521bcbc3493c6",
+    "B_commit": "7b467ff99a98fa0ea600d9b6b5b62b6b666baa76",
+    "A_total": 162,
+    "B_total": 164,
+    "A_ONLY": [],
+    "B_ONLY": ["pr_fomb", "pr_fomb_special_reports"],
+    "required_symmetric_difference": []
+  },
+  "transition_definition_rebind_required": [
+    "fema_pa_openfema_v2",
+    "fpds_report_builder",
+    "fsrs_subawards",
+    "hacienda_sut_ivu",
+    "usaspending_prime"
+  ],
+  "loader_convergence_rebind_required": [
+    "cor3",
+    "pr_cabilderos"
+  ],
+  "receipt_rebind_required_ids": [
+    "cor3",
+    "fema_pa_openfema_v2",
+    "fpds_report_builder",
+    "fsrs_subawards",
+    "hacienda_sut_ivu",
+    "pr_cabilderos",
+    "usaspending_prime"
+  ],
+  "new_source_ids_requiring_current_scope_evidence": [
+    "pr_fomb",
+    "pr_fomb_special_reports"
+  ],
+  "loader_convergence": {
+    "before": {
+      "certification": "root YAML + direct JSON extensions",
+      "runtime": "root JSON + direct JSON extensions + direct JSON overrides",
+      "definition_difference_at_B": ["cor3", "pr_cabilderos"],
+      "state": "PROFILES_NOT_EQUIVALENT"
+    },
+    "candidate": {
+      "certification": "root JSON + direct JSON extensions + direct JSON overrides",
+      "runtime": "root JSON + direct JSON extensions + direct JSON overrides",
+      "source_id_difference_expected": [],
+      "definition_difference_expected": [],
+      "state": "PROFILE_CONVERGED_CODE_PATH"
+    }
+  },
+  "parser_hardening": {
+    "duplicate_json_keys": "REJECT",
+    "nonfinite_json_numbers": "REJECT",
+    "unknown_override_source": "REJECT",
+    "duplicate_override_source": "REJECT",
+    "override_required_change": "REJECT",
+    "override_source_id_change": "REJECT",
+    "yaml_extension_auto_promotion": false
+  },
+  "certification_gate_effect": {
+    "G0_expected_after_code_convergence": "PASS_IF_ALL_OTHER_SCOPE_IDENTITIES_MATCH",
+    "G1_expected_current_control_plane": "PASS_IF_CURRENT_REPORTS_RECONCILE",
+    "G3": "FAIL_UNTIL_CURRENT_REQUIRED_EVIDENCE_CLOSES",
+    "G5": "FAIL_UNTIL_116_BOUND_EXECUTIONS_CLOSE",
+    "G6": "FAIL_UNTIL_CURRENT_VALIDATION_CONTRACTS_CLOSE",
+    "G8": "BLOCKED_SCOPE_BOUND_CORPUS_REPLAY_UNIMPLEMENTED",
+    "G9": "BLOCKED_SCOPE_BOUND_CANONICAL_REPLAY_UNIMPLEMENTED",
+    "G10": "FAIL_UNTIL_CURRENT_FRESHNESS_EVIDENCE_CLOSES",
+    "G11": "BLOCKED_SCOPE_BOUND_FEDERATION_REPLAY_UNIMPLEMENTED",
+    "G12": "BLOCKED_AUTHENTICATED_ACTIVATION_UNIMPLEMENTED"
+  },
+  "policy": {
+    "historical_scope_superseded": false,
+    "old_receipts_auto_migrated": false,
+    "name_only_identity_allowed": false,
+    "count_equality_is_identity": false,
+    "production_activation_authorized": false
+  },
+  "verification": {
+    "bounded_transition_tests": "PASS",
+    "bounded_prior_guard_tests": "PASS",
+    "new_effective_registry_tests": "BOUNDED_LOCAL_PASS_5_OF_5",
+    "new_effective_registry_test_scope": "isolated exact algorithm reproduction for canonical JSON selection, override-bound definition digest, duplicate-key rejection, non-finite-number rejection, and immutable required override",
+    "full_repository_tests": "UNEXECUTED",
+    "hosted_actions_state": "PRE_EXECUTION_INFRASTRUCTURE_FAILURE_OBSERVED",
+    "production_certificate": "NOT_ISSUED"
+  }
+}

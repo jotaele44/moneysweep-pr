@@ -1,0 +1,196 @@
+{
+  "version": "1.0",
+  "schema_version": "government_entity_registry_v1",
+  "government_entity_registry": {
+    "registry_version": "1.0.0",
+    "schema_manifest": {
+      "contract_version": "1.0.0",
+      "governance": "internal_derived",
+      "schemas": [
+        "schemas/government_entities.schema.json",
+        "schemas/government_entity_names.schema.json",
+        "schemas/government_entity_identifiers.schema.json",
+        "schemas/government_entity_relationships.schema.json",
+        "schemas/government_entity_source_assertions.schema.json",
+        "schemas/government_entity_resolution_events.schema.json",
+        "schemas/government_entity_conflicts.schema.json",
+        "schemas/government_entity_coverage_audit.schema.json"
+      ]
+    },
+    "canonical_id_policy": {
+      "id_prefix": "GOV_",
+      "id_pattern": "^GOV_[A-Z0-9]{4,}$",
+      "assignment": "registry_assigned",
+      "immutable": true,
+      "name_derived": false,
+      "description": "Government entity IDs are immutable, registry-assigned, opaque identifiers. They MUST NOT be generated from the current or any preferred name (gate NAME_DERIVED_ID_NOT_USED_FOR_NEW_GOV_ENTITIES). A rename never mints a new ID; the ID is stable across renames, reorganizations, and status changes (gate CANONICAL_ID_STABLE)."
+    },
+    "evidence_tiers": [
+      {
+        "tier": "T1",
+        "description": "Primary official record (statute, constitution, official gazette, filing)."
+      },
+      {
+        "tier": "T2",
+        "description": "Authoritative government dataset or portal."
+      },
+      {
+        "tier": "T3",
+        "description": "Secondary official or derived source."
+      },
+      {
+        "tier": "T4",
+        "description": "Unofficial or inferred; requires human verification before use."
+      }
+    ],
+    "entity_types": {
+      "config_ref": "config/government_entities/entity_types.yml",
+      "schema_version": "government_entity_types_v1"
+    },
+    "identifier_schemes": {
+      "config_ref": "config/government_entities/identifier_schemes.yml",
+      "schema_version": "government_entity_identifier_schemes_v1",
+      "namespaced_required": true
+    },
+    "relationship_types": {
+      "config_ref": "config/government_entities/relationship_types.yml",
+      "schema_version": "government_entity_relationship_types_v1"
+    },
+    "resolution_policy": {
+      "config_ref": "config/government_entities/resolution_policy.yml",
+      "schema_version": "government_entity_resolution_policy_v1"
+    },
+    "source_provenance_requirements": {
+      "assertion_schema": "schemas/government_entity_source_assertions.schema.json",
+      "required_for": [
+        "entity",
+        "name",
+        "identifier",
+        "relationship"
+      ],
+      "required_fields": [
+        "source_id",
+        "source_locator",
+        "evidence_tier",
+        "retrieved_at",
+        "content_hash",
+        "verification_status"
+      ],
+      "description": "Every entity, name, identifier, and relationship must reference a source_assertion_id that resolves to a source-assertion record (gate PROVENANCE_REQUIRED)."
+    },
+    "temporal_validity_rules": {
+      "interval_fields": [
+        "valid_from",
+        "valid_to"
+      ],
+      "open_interval": "valid_to = null means currently valid",
+      "non_overlap": {
+        "description": "Preferred names per entity, and identifiers per (scheme, source_system), must not have overlapping valid intervals (gate TEMPORAL_NONOVERLAP)."
+      },
+      "rename_continuity": {
+        "description": "A rename is modeled as a new name row (name_type former/official) on the SAME entity_id plus a renamed_to relationship. Rename continuity is kept SEPARATE from merger, split, abolition, and function transfer, which change legal identity or functions."
+      },
+      "succession_symmetry": {
+        "description": "predecessor_of/successor_of (and the possible_* variants) must be recorded as symmetric pairs (gate SUCCESSION_SYMMETRY). Private operators and concessionaires are never modeled as legal successors."
+      }
+    },
+    "coverage_dimensions": {
+      "audit_schema": "schemas/government_entity_coverage_audit.schema.json",
+      "dimensions": [
+        {
+          "id": "municipality",
+          "gate": "MUNICIPALITY_COMPLETE",
+          "description": "All 78 Puerto Rico municipalities resolve to canonical entities."
+        },
+        {
+          "id": "current_entity",
+          "gate": "CURRENT_ENTITY_COMPLETE",
+          "description": "All currently-active government entities are represented."
+        },
+        {
+          "id": "source_code",
+          "gate": "SOURCE_CODE_COMPLETE",
+          "description": "Every source-system entity code maps to a canonical entity."
+        }
+      ]
+    },
+    "validation_gates": [
+      {
+        "id": "SCHEMA_VALID",
+        "description": "All records validate against their government-entity schemas."
+      },
+      {
+        "id": "CANONICAL_ID_STABLE",
+        "description": "entity_id is stable across renames and reorganizations."
+      },
+      {
+        "id": "IDENTIFIER_NAMESPACED",
+        "description": "Every identifier carries a known identifier_scheme."
+      },
+      {
+        "id": "NO_UNSCOPED_CODE",
+        "description": "No bare/unscoped source code is accepted as an identifier."
+      },
+      {
+        "id": "TEMPORAL_NONOVERLAP",
+        "description": "Preferred names and scoped identifiers have non-overlapping intervals."
+      },
+      {
+        "id": "RELATIONSHIP_VALID",
+        "description": "relationship_type is in the controlled vocabulary and well-formed."
+      },
+      {
+        "id": "SUCCESSION_SYMMETRY",
+        "description": "Succession relations are recorded as symmetric pairs."
+      },
+      {
+        "id": "NO_SELF_RELATION",
+        "description": "subject_entity_id and object_entity_id differ."
+      },
+      {
+        "id": "PROVENANCE_REQUIRED",
+        "description": "Every record references a resolvable source assertion."
+      },
+      {
+        "id": "MUNICIPALITY_COMPLETE",
+        "description": "Municipality coverage dimension is complete."
+      },
+      {
+        "id": "CURRENT_ENTITY_COMPLETE",
+        "description": "Current-entity coverage dimension is complete."
+      },
+      {
+        "id": "SOURCE_CODE_COMPLETE",
+        "description": "Source-code coverage dimension is complete."
+      },
+      {
+        "id": "ROUND_TRIP_RESOLUTION",
+        "description": "Resolution events reproduce the same entity from raw values."
+      },
+      {
+        "id": "CONFLICT_QUEUE_EMPTY_OR_ACCEPTED",
+        "description": "The conflict queue is empty or every open conflict is accepted with provenance."
+      },
+      {
+        "id": "COVERAGE_REPORT_GENERATED",
+        "description": "A coverage audit exists for each coverage dimension."
+      },
+      {
+        "id": "LEGACY_PROJECTION_VALID",
+        "description": "Legacy agency/entity outputs still project correctly from canonical records."
+      },
+      {
+        "id": "EXPORTED_SCHEMA_UNCHANGED",
+        "description": "No exported moneysweep_* or canonical_v1 schema is modified by this work."
+      },
+      {
+        "id": "REGISTRY_YAML_JSON_SYNC",
+        "description": "The registry YAML and generated JSON are equivalent."
+      },
+      {
+        "id": "NAME_DERIVED_ID_NOT_USED_FOR_NEW_GOV_ENTITIES",
+        "description": "New government entity IDs are never derived from a name."
+      }
+    ]
+  }
+}

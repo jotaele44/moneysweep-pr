@@ -1,0 +1,15 @@
+{
+  "capabilities": [
+    {
+      "id": "certification-registry-transition-audit-v1",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Read-only repository reconciliation guard over immutable Git objects. Compares registry IDs, whole definitions and loader profiles; never acquires source data, promotes production, or exposes a new end-user action. Operator-facing certification results remain a separate GUI integration requirement.",
+      "analysis": {"files": ["tools/audit_registry_transition.py"]},
+      "backend": {"files": ["tools/audit_registry_transition.py"]},
+      "tests": {"backend": ["tests/test_registry_transition_audit.py"]}
+    }
+  ],
+  "exceptions": []
+}

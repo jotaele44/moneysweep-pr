@@ -1,0 +1,224 @@
+schema_version: "0.1.0"
+registry_id: dateas_pr_metadata_only
+created_at_utc: "2026-08-04T23:27:00Z"
+source:
+  source_id: dateas_pr_discovery
+  name: Dateas Puerto Rico Open Data index
+  base_url: https://www.dateas.com/es/explore/Puerto%2BRico
+  source_class: secondary_aggregator
+  evidence_tier: T4
+  ingestion_mode: metadata_only
+  canonical_record_eligible: false
+  automated_row_extraction: false
+  person_profile_extraction: false
+  public_redistribution: false
+  terms_url: https://www.dateas.com/es/tos
+  terms_assessment: restricted_copy_download_integration_and_third_party_transfer
+  content_hash_status: pending_network_enabled_operator_fetch
+  content_hash_note: No Dateas page bytes are stored in this registry; page_content_sha256 remains null until a bounded operator fetch records exact response bytes and headers.
+policy:
+  permitted:
+    - dataset_title_census
+    - landing_page_url_census
+    - stated_source_census
+    - stated_coverage_census
+    - declared_field_census
+    - authoritative_source_resolution
+  prohibited:
+    - row_scraping
+    - record_page_crawling
+    - person_profile_enrichment
+    - canonical_entity_promotion
+    - public_redistribution_of_dateas_content
+    - scheduled_polling
+  promotion_rule: Resolve and ingest first-party source bytes independently; Dateas remains discovery provenance only.
+datasets:
+  - id: dateas_aep_government_centers
+    title: Centros de Gobierno de la Autoridad de Edificios Públicos de Puerto Rico
+    category: economia_gobierno_leyes
+    landing_page: https://www.dateas.com/es/explore/centros-gobierno-puerto-rico
+    page_content_sha256: null
+    stated_source: Autoridad de Edificios Públicos de Puerto Rico
+    stated_coverage: not_stated
+    declared_fields: [edificio, direccion, coordenadas, region, municipio]
+    personal_data: low
+    authoritative_resolution:
+      status: unresolved
+      authority: Autoridad de Edificios Públicos
+      official_url: https://www.aep.pr.gov/
+    classification: unresolved
+
+  - id: dateas_pr_courts
+    title: Centros Judiciales y Tribunales de Puerto Rico
+    category: economia_gobierno_leyes
+    landing_page: https://www.dateas.com/es/explore/centros-judiciales-tribunales-puerto-rico
+    page_content_sha256: null
+    stated_source: not_stated
+    stated_coverage: not_stated
+    declared_fields: [nombre_inmueble, direccion, region, coordenadas, municipio]
+    personal_data: low
+    authoritative_resolution:
+      status: official_query_system_resolved
+      authority: Poder Judicial de Puerto Rico
+      official_url: https://poderjudicial.pr/
+    classification: official_source_resolved
+
+  - id: dateas_aep_police_facilities
+    title: Cuarteles y Comandancias de la Autoridad de Edificios Públicos
+    category: economia_gobierno_leyes
+    landing_page: https://www.dateas.com/es/explore/cuarteles-comandancias-aep-puerto-rico
+    page_content_sha256: null
+    stated_source: Autoridad de Edificios Públicos de Puerto Rico
+    stated_coverage: not_stated
+    declared_fields: [edificio, direccion, region, coordenadas, municipio]
+    personal_data: low
+    authoritative_resolution:
+      status: unresolved
+      authority: Autoridad de Edificios Públicos
+      official_url: https://www.aep.pr.gov/
+    classification: unresolved
+
+  - id: dateas_ocpr_government_entities
+    title: Listado de Entidades Gubernamentales de Puerto Rico
+    category: economia_gobierno_leyes
+    landing_page: https://www.dateas.com/es/explore/entidades-gubernamentales-puerto-rico
+    page_content_sha256: null
+    stated_source: Oficina del Contralor de Puerto Rico
+    stated_coverage: not_stated
+    declared_fields: [entidad, codigo_entidad, agencia, posee_contratos]
+    personal_data: low
+    authoritative_resolution:
+      status: official_query_system_resolved
+      authority: Oficina del Contralor de Puerto Rico
+      official_url: https://consultacontratos.ocpr.gov.pr/
+    classification: official_source_resolved
+
+  - id: dateas_ogpe_construction_permits
+    title: Permisos de Construcción otorgados por la OGPE
+    category: economia_gobierno_leyes
+    landing_page: https://www.dateas.com/es/explore/permisos-construccion-ogpe
+    page_content_sha256: null
+    stated_source: OGPe SIP Pemas
+    stated_coverage: historical_snapshot_last_updated_2018-08-10
+    declared_fields: [numero_caso, tramite, tipo_proyecto, fecha_radicacion, catastro, direccion, municipio, region, status, adjudicacion, fecha_adjudicacion, coordenadas, proyecto, publico_privado, rural_urbano, dueno_proyecto, costo_estimado]
+    personal_data: medium
+    authoritative_resolution:
+      status: official_dataset_resolved
+      authority: Instituto de Estadisticas de Puerto Rico and OGPe
+      official_url: https://datos.estadisticas.pr/dataset/pemas-permisos-de-construccion
+    classification: historical_only
+
+  - id: dateas_ogpe_processed_permits_2014_2015
+    title: Permisos emitidos por la Oficina de Gerencia de Permisos (OGPe)
+    category: economia_gobierno_leyes
+    landing_page: https://www.dateas.com/es/explore/permisos-tramites-ogpe
+    page_content_sha256: null
+    stated_source: Oficina de Gerencia de Permisos
+    stated_coverage: 2014-2015
+    declared_fields: [tipo_permiso, estado, status]
+    personal_data: medium
+    authoritative_resolution:
+      status: official_dataset_family_resolved
+      authority: Instituto de Estadisticas de Puerto Rico and OGPe
+      official_url: https://datos.estadisticas.pr/dataset?organization=oficina-de-gerencia-de-permisos-ogpe
+    classification: historical_only
+
+  - id: dateas_pr_schools
+    title: Escuelas de Puerto Rico
+    category: educacion
+    landing_page: https://www.dateas.com/es/explore/escuelas-puerto-rico
+    page_content_sha256: null
+    stated_source: not_stated
+    stated_coverage: not_stated
+    declared_fields: [school_name]
+    personal_data: low
+    authoritative_resolution:
+      status: official_authority_resolved_dataset_unresolved
+      authority: Departamento de Educacion de Puerto Rico
+      official_url: https://de.pr.gov/
+    classification: unresolved
+
+  - id: dateas_procomer_pineapple_importers
+    title: Empresas Estadounidenses Importadoras de Piña procedente de Costa Rica
+    category: empresas_negocios
+    landing_page: https://www.dateas.com/es/explore/empresas-estadounidenses-importadoras-pina
+    page_content_sha256: null
+    stated_source: PROCOMER Costa Rica
+    stated_coverage: not_stated
+    declared_fields: [compania, ciudad, estado]
+    personal_data: low
+    authoritative_resolution:
+      status: out_of_scope_non_pr_dataset
+      authority: PROCOMER
+      official_url: https://www.procomer.com/
+    classification: rejected
+
+  - id: dateas_pr_corporations_2016
+    title: Registro de Corporaciones de Puerto Rico
+    category: empresas_negocios
+    landing_page: https://www.dateas.com/es/explore/corporaciones-puerto-rico
+    page_content_sha256: null
+    stated_source: Departamento de Estado de Puerto Rico
+    stated_coverage: updated_through_2016-12
+    declared_fields: [nombre, registro, estado, tipo, jurisdiccion]
+    personal_data: medium
+    authoritative_resolution:
+      status: official_query_system_resolved
+      authority: Departamento de Estado de Puerto Rico
+      official_url: https://rceweb.estado.pr.gov/
+    classification: historical_only
+
+  - id: dateas_pr_suicide_counts_2010_2014
+    title: Registros de Suicidios en Puerto Rico (2010/2014)
+    category: miscelaneas
+    landing_page: https://www.dateas.com/es/explore/suicidios-puerto-rico
+    page_content_sha256: null
+    stated_source: Policia de Puerto Rico
+    stated_coverage: 2010_to_2014-07-31
+    declared_fields: [municipio, region, count_2010, count_2012, count_2013, count_2014]
+    personal_data: aggregate_only
+    authoritative_resolution:
+      status: authoritative_series_unresolved
+      authority: Policia de Puerto Rico
+      official_url: https://policia.pr.gov/
+    classification: historical_only
+
+  - id: dateas_pr_tourism_lodging_directory
+    title: Directorio de Alojamientos Turísticos de Puerto Rico
+    category: productos_servicios
+    landing_page: https://www.dateas.com/es/explore/alojamientos-hoteles-puerto-rico
+    page_content_sha256: null
+    stated_source: Compania de Turismo de Puerto Rico
+    stated_coverage: not_stated
+    declared_fields: [nombre, habitaciones, ubicacion, municipio, sector, region, clase]
+    personal_data: low
+    authoritative_resolution:
+      status: official_authority_resolved_dataset_unresolved
+      authority: Compania de Turismo de Puerto Rico
+      official_url: https://www.discoverpuertorico.com/places-to-stay
+    classification: unresolved
+
+  - id: dateas_pr_hotels_2016
+    title: Listado de Hoteles de Puerto Rico
+    category: productos_servicios
+    landing_page: https://www.dateas.com/es/explore/hoteles-puerto-rico
+    page_content_sha256: null
+    stated_source: Departamento de Estado de Puerto Rico
+    stated_coverage: updated_through_2016-12
+    declared_fields: [hotel, direccion, geolocalizacion]
+    personal_data: low
+    authoritative_resolution:
+      status: source_attribution_questionable
+      authority: Departamento de Estado de Puerto Rico
+      official_url: https://www.estado.pr.gov/
+    classification: unresolved
+
+summary:
+  total_entries: 12
+  official_source_resolved: 2
+  historical_only: 5
+  unresolved: 4
+  rejected: 1
+  deprecated: 0
+  canonical_eligible: 0
+  row_ingestion_enabled: 0
