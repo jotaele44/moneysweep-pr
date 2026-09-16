@@ -42,6 +42,14 @@ def _digest(value: object) -> str:
     return hashlib.sha256(_canonical_json(value)).hexdigest()
 
 
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def derive_scope_bound(
     *,
     root: Path,
@@ -60,6 +68,7 @@ def derive_scope_bound(
     evidence_sha = _git_head(evidence_root)
     if evidence_sha is None:
         raise EvidenceError("evidence_repository_head_unavailable")
+    binding_tool_sha = _file_sha256(Path(__file__).resolve())
 
     result = derive(
         root=root,
@@ -85,6 +94,8 @@ def derive_scope_bound(
             "scope_repository_sha": root_sha,
             "evidence_repository_sha": evidence_sha,
             "evidence_repository_same_as_scope": evidence_root == root,
+            "scope_binding_schema_version": SCHEMA_VERSION,
+            "scope_binding_tool_sha256": binding_tool_sha,
         }
     )
     manifest["scope_identity"] = bound
@@ -94,6 +105,7 @@ def derive_scope_bound(
         "scope_repository_sha": root_sha,
         "evidence_repository_sha": evidence_sha,
         "evidence_repository_same_as_scope": evidence_root == root,
+        "scope_binding_tool_sha256": binding_tool_sha,
         "path_strings_are_identity": False,
     }
     manifest_path.write_text(
@@ -142,6 +154,9 @@ def main() -> int:
                 ],
                 "evidence_repository_sha": result["scope_manifest"]["scope_binding"][
                     "evidence_repository_sha"
+                ],
+                "scope_binding_tool_sha256": result["scope_manifest"]["scope_binding"][
+                    "scope_binding_tool_sha256"
                 ],
             },
             sort_keys=True,
