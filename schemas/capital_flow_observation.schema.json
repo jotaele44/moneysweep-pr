@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moneysweep.pr/schemas/capital_flow_observation.schema.json",
+  "title": "MoneySweep Capital Flow Observation",
+  "type": "object",
+  "required": [
+    "observation_id",
+    "measurement_type",
+    "flow_direction",
+    "economic_category",
+    "currency",
+    "period_start",
+    "period_end",
+    "source_manifestation_id",
+    "source_record_id",
+    "certification_state"
+  ],
+  "properties": {
+    "observation_id": {"type": "string", "pattern": "^FLOW_[A-Za-z0-9_.:-]+$"},
+    "source_entity_id": {"type": ["string", "null"], "minLength": 1},
+    "destination_entity_id": {"type": ["string", "null"], "minLength": 1},
+    "amount": {"type": ["number", "null"]},
+    "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+    "period_start": {"type": "string", "format": "date"},
+    "period_end": {"type": "string", "format": "date"},
+    "measurement_type": {
+      "type": "string",
+      "enum": ["FLOW", "STOCK", "RATE", "BALANCE", "VALUATION", "COUNT", "UNKNOWN"]
+    },
+    "economic_category": {"type": "string", "minLength": 1},
+    "flow_direction": {
+      "type": "string",
+      "enum": ["INTO_PR", "WITHIN_PR", "OUT_OF_PR", "THROUGH_PR", "UNKNOWN"]
+    },
+    "source_jurisdiction": {"type": ["string", "null"]},
+    "destination_jurisdiction": {"type": ["string", "null"]},
+    "pr_retention_state": {
+      "type": "string",
+      "enum": ["RETAINED_PR", "ACCRUES_NONRESIDENT", "MIXED", "NOT_APPLICABLE", "UNKNOWN"]
+    },
+    "source_manifestation_id": {"type": "string", "minLength": 1},
+    "source_record_id": {"type": "string", "minLength": 1},
+    "source_document_sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "facility_location": {"type": ["string", "null"]},
+    "legal_domicile": {"type": ["string", "null"]},
+    "tax_residence": {"type": ["string", "null"]},
+    "economic_residence": {"type": ["string", "null"]},
+    "immediate_parent_id": {"type": ["string", "null"]},
+    "ultimate_parent_id": {"type": ["string", "null"]},
+    "beneficial_owner_id": {"type": ["string", "null"]},
+    "owner_jurisdiction": {"type": ["string", "null"]},
+    "certification_state": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "OPEN", "BLOCKED", "PROVISIONAL", "AUDIT_ONLY", "NONCANONICAL", "CANDIDATE_NOT_IDENTITY", "UNRESOLVED", "SUPERSEDED"]
+    },
+    "notes": {"type": ["string", "null"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"measurement_type": {"const": "FLOW"}}, "required": ["measurement_type"]},
+      "then": {"required": ["amount", "pr_retention_state"]}
+    },
+    {
+      "if": {"properties": {"flow_direction": {"enum": ["INTO_PR", "OUT_OF_PR", "THROUGH_PR"]}}, "required": ["flow_direction"]},
+      "then": {"required": ["source_jurisdiction", "destination_jurisdiction"]}
+    }
+  ],
+  "additionalProperties": true
+}
