@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 try:
+    from tools.certification_truth_guards import aware_datetime, digest_json
     from tools.operator_corpus_common import (
         expected_outputs,
         load_sources,
@@ -16,6 +17,7 @@ try:
         validate_receipt,
     )
 except ModuleNotFoundError:  # pragma: no cover - direct script execution fallback
+    from certification_truth_guards import aware_datetime, digest_json  # type: ignore[no-redef]
     from operator_corpus_common import (  # type: ignore[no-redef]
         expected_outputs,
         load_sources,
@@ -25,7 +27,8 @@ except ModuleNotFoundError:  # pragma: no cover - direct script execution fallba
         validate_receipt,
     )
 
-ASSEMBLY_SCHEMA_VERSION = "moneysweep.keyless_operator_workspace/v2"
+ASSEMBLY_SCHEMA_VERSION = "moneysweep.keyless_operator_workspace/v3"
+CANONICAL_EXECUTION_SCHEMA_VERSION = "moneysweep.source_execution/v1"
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -74,6 +77,7 @@ def _receipt_binding_errors(
     receipt: dict[str, Any],
     source: dict[str, Any],
     registry_digest: str,
+    execution: dict[str, Any],
     execution_expected: list[str],
 ) -> list[str]:
     errors = list(validate_receipt(receipt))
@@ -87,12 +91,25 @@ def _receipt_binding_errors(
         errors.append("receipt_registry_digest_mismatch")
     if registry.get("source_definition_sha256") != source_definition_digest(source):
         errors.append("receipt_source_definition_digest_mismatch")
+    if execution.get("source_ids_sha256") != registry_digest:
+        errors.append("execution_registry_digest_mismatch")
 
     acquisition = receipt.get("acquisition")
     acquisition = acquisition if isinstance(acquisition, dict) else {}
     registered_producer = str(source.get("producer_script") or "").strip()
     if acquisition.get("producer") != registered_producer:
         errors.append("receipt_producer_mismatch")
+    if execution.get("certification_implementation_sha") != acquisition.get("producer_sha"):
+        errors.append("execution_producer_sha_mismatch")
+
+    started = aware_datetime(acquisition.get("started_at"))
+    completed = aware_datetime(acquisition.get("completed_at"))
+    if started is None or completed is None or started > completed:
+        errors.append("receipt_execution_time_unproven")
+    if execution.get("started_at") != acquisition.get("started_at"):
+        errors.append("execution_started_at_mismatch")
+    if execution.get("completed_at") != acquisition.get("completed_at"):
+        errors.append("execution_completed_at_mismatch")
 
     expected = expected_outputs(source)
     if execution_expected != expected:
@@ -123,6 +140,19 @@ def _receipt_binding_errors(
     return sorted(set(errors))
 
 
+def _canonical_execution(receipt: dict[str, Any], source_id: str) -> dict[str, Any]:
+    acquisition = receipt["acquisition"]
+    return {
+        "schema_version": CANONICAL_EXECUTION_SCHEMA_VERSION,
+        "source_id": source_id,
+        "evidence_receipt_sha256": digest_json(receipt),
+        "producer_git_sha": acquisition["producer_sha"],
+        "started_at": acquisition["started_at"],
+        "completed_at": acquisition["completed_at"],
+        "execution_status": "SUCCESS",
+    }
+
+
 def assemble(
     *,
     artifacts_root: Path,
@@ -148,8 +178,10 @@ def assemble(
         shutil.rmtree(workspace_root)
     receipts_dir = workspace_root / "receipts"
     executions_dir = workspace_root / "execution_receipts"
+    raw_executions_dir = workspace_root / "raw_execution_receipts"
     receipts_dir.mkdir(parents=True, exist_ok=True)
     executions_dir.mkdir(parents=True, exist_ok=True)
+    raw_executions_dir.mkdir(parents=True, exist_ok=True)
 
     seen_sources: set[str] = set()
     claimed_paths: dict[str, str] = {}
@@ -169,6 +201,9 @@ def assemble(
         if source is None:
             raise RuntimeError(f"unknown keyless source_id for current registry: {source_id}")
 
+        if execution.get("schema_version") != "moneysweep.keyless_execution/v2":
+            raise RuntimeError(f"unsupported keyless execution schema for {source_id}")
+
         bundle_root = execution_path.parent
         declared_files = execution.get("declared_files")
         if not isinstance(declared_files, list):
@@ -179,6 +214,11 @@ def assemble(
         ):
             raise RuntimeError(f"expected_outputs must be a string list for {source_id}")
         execution_expected = [str(item) for item in execution_expected_raw]
+        missing_expected = execution.get("missing_expected_outputs")
+        if not isinstance(missing_expected, list):
+            raise RuntimeError(f"missing_expected_outputs must be a list for {source_id}")
+        workflow_success = execution.get("workflow_step_outcome") == "success"
+        execution_complete = workflow_success and not missing_expected
 
         receipt_path = bundle_root / "operator_evidence" / f"{source_id}.json"
         standardized_claim = execution.get("standardized_receipt_emitted") is True
@@ -191,8 +231,14 @@ def assemble(
                 receipt=receipt,
                 source=source,
                 registry_digest=registry_digest,
+                execution=execution,
                 execution_expected=execution_expected,
             )
+            if not workflow_success:
+                receipt_errors.append("execution_workflow_step_not_success")
+            if missing_expected:
+                receipt_errors.append("execution_missing_expected_outputs")
+            receipt_errors = sorted(set(receipt_errors))
             receipt_valid = not receipt_errors
         elif standardized_claim:
             receipt_errors.append("claimed_standardized_receipt_missing")
@@ -240,6 +286,7 @@ def assemble(
                 )
                 copied_paths.append(rel)
 
+        canonical_execution: dict[str, Any] | None = None
         if receipt_valid:
             assert receipt is not None
             receipt_path_set = {
@@ -250,10 +297,15 @@ def assemble(
             if receipt_path_set != declared_path_set:
                 raise RuntimeError(f"execution/receipt output inventory mismatch: {source_id}")
             shutil.copy2(receipt_path, receipts_dir / f"{source_id}.json")
+            canonical_execution = _canonical_execution(receipt, source_id)
+            (executions_dir / f"{source_id}.json").write_text(
+                json.dumps(canonical_execution, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
         else:
             blockers.append(f"{source_id}:standardized_receipt_invalid_or_missing")
 
-        shutil.copy2(execution_path, executions_dir / f"{source_id}.json")
+        shutil.copy2(execution_path, raw_executions_dir / f"{source_id}.json")
         runner = execution.get("runner_summary")
         runner = runner if isinstance(runner, dict) else {}
         ran = runner.get("ran")
@@ -265,11 +317,18 @@ def assemble(
         status = str(source_run.get("status") or runner.get("status") or "UNKNOWN")
         source_rows = source_run.get("rows")
         positive = isinstance(source_rows, int) and not isinstance(source_rows, bool) and source_rows > 0
-        if not positive:
+        coverage_pass = bool(
+            receipt_valid
+            and receipt is not None
+            and isinstance(receipt.get("validation"), dict)
+            and receipt["validation"].get("coverage_contract_pass") is True
+        )
+        row_evidence_acceptable = positive or coverage_pass
+        if not row_evidence_acceptable:
             blockers.append(f"{source_id}:nonpositive_or_unproven_rows")
-        if execution.get("missing_expected_outputs"):
+        if missing_expected:
             blockers.append(f"{source_id}:missing_expected_outputs")
-        if execution.get("workflow_step_outcome") != "success":
+        if not workflow_success:
             blockers.append(f"{source_id}:workflow_step_not_success")
 
         rows.append(
@@ -278,10 +337,14 @@ def assemble(
                 "runner_status": status,
                 "rows": source_rows,
                 "positive_rows": positive,
+                "coverage_contract_pass": coverage_pass,
+                "row_evidence_acceptable": row_evidence_acceptable,
                 "workflow_step_outcome": execution.get("workflow_step_outcome"),
-                "missing_expected_outputs": execution.get("missing_expected_outputs") or [],
+                "execution_complete": execution_complete,
+                "missing_expected_outputs": missing_expected,
                 "standardized_receipt_emitted": standardized_claim,
                 "standardized_receipt_valid": receipt_valid,
+                "canonical_execution_emitted": canonical_execution is not None,
                 "receipt_errors": sorted(set(receipt_errors)),
                 "source_definition_sha256": source_definition_digest(source),
                 "promoted_workspace_files": sorted(copied_paths),
@@ -302,7 +365,9 @@ def assemble(
         "artifact_source_count": len(seen_sources),
         "expected_keyless_count": expected_keyless_count,
         "valid_receipt_count": sum(row["standardized_receipt_valid"] for row in rows),
+        "canonical_execution_count": sum(row["canonical_execution_emitted"] for row in rows),
         "positive_row_source_count": sum(row["positive_rows"] for row in rows),
+        "row_evidence_acceptable_count": sum(row["row_evidence_acceptable"] for row in rows),
         "workspace_output_count": len(claimed_paths),
         "authority_asserted": False,
         "policy": {
@@ -313,6 +378,8 @@ def assemble(
             "receipt_registry_binding_required": True,
             "receipt_source_definition_binding_required": True,
             "receipt_registered_producer_binding_required": True,
+            "failed_execution_output_promotion_allowed": False,
+            "canonical_execution_receipt_required": True,
             "historical_receipt_inheritance_allowed": False,
         },
         "sources": sorted(rows, key=lambda item: item["source_id"]),
@@ -344,7 +411,8 @@ def main() -> int:
             {
                 "artifact_source_count": manifest["artifact_source_count"],
                 "valid_receipt_count": manifest["valid_receipt_count"],
-                "positive_row_source_count": manifest["positive_row_source_count"],
+                "canonical_execution_count": manifest["canonical_execution_count"],
+                "row_evidence_acceptable_count": manifest["row_evidence_acceptable_count"],
                 "blocker_count": len(manifest["blockers"]),
                 "authority_asserted": False,
             },
