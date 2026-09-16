@@ -18,39 +18,54 @@ Puerto Rico Planning Board, *Apendice Estadistico del Informe Economico a la Gob
 
 ### JP_IP2025
 
-Puerto Rico Planning Board, *Ingreso y Producto 2025 / Income and Product 2025*. The ledger uses Table 9 as the primary current observation surface and preserves the conflicting Table 1 and Table 10 FY2021 observations.
+Puerto Rico Planning Board, *Ingreso y Producto 2025 / Income and Product 2025*. Table 9 is the primary current observation surface. Table 1 provides a corroborating FY2021 manifestation, while Table 10 retains an older FY2021 revision that is preserved as a superseded observation rather than deleted.
 
-## FY2021 contradiction
+## FY2021 revision adjudication
 
-The 2025 publication contains two incompatible FY2021 macro value pairs:
+The 2025 publication contains two FY2021 macro value pairs:
 
-- Table 1 / Table 9 manifestation: GNP 73,357.2; GDP 106,426.6; computed GDP-GNP 33,069.4 million.
-- Table 10 manifestation: GNP 72,950.6; GDP 106,368.9; computed GDP-GNP 33,418.3 million.
+- later revised pair, carried by Table 1 / Table 9: GNP 73,357.2; GDP 106,426.6; computed GDP-GNP 33,069.4 million;
+- older pair, carried by Table 10: GNP 72,950.6; GDP 106,368.9; computed GDP-GNP 33,418.3 million.
 
-Both appear under the same Planning Board publication vintage. Count equality, majority-of-tables, deterministic ordering, or nearest arithmetic fit are not sufficient adjudication evidence. FY2021 therefore remains `UNRESOLVED` and blocks any certified continuous FY2010-FY2025 canonical series.
+This is not resolved by table count, deterministic ordering, or arithmetic proximity. The adjudication uses authoritative temporal revision lineage:
+
+1. the Planning Board's 2022 economic report carries the older FY2021 GDP 106,368.9;
+2. the 2023 economic report carries revised FY2021 GDP 106,426.6;
+3. the 2024 Statistical Appendix carries FY2021 GNP 73,357.2 and GDP 106,426.6;
+4. the 2025 summary and major-industry tables continue the later revised pair.
+
+Accordingly, the older Table 10 pair is classified `SUPERSEDED` with contradiction class `TIME`, and the later pair is the `PROVISIONAL` current candidate. The displaced observation remains in the ledger. This establishes value succession only; it does not prove byte identity between source manifestations.
 
 ## Revision handling
 
-Earlier observations are never deleted. Later authoritative manifestations may displace an older value only at the canonical-view layer. Displaced rows remain `SUPERSEDED` with an explicit successor observation identifier.
+Earlier observations are never deleted. Later authoritative manifestations may displace an older value only after authoritative revision evidence supports the succession. Displaced rows remain `SUPERSEDED` with an explicit successor observation identifier.
 
 Current bounded state:
 
 - fiscal-year denominator: 16 years (FY2010-FY2025)
 - observation rows: 22
-- historical superseded rows: 4
-- unresolved fiscal years: 1 (FY2021)
+- superseded rows: 5
+- unresolved fiscal years at the value-selection layer: 0
 - source bytes frozen: no
 - macro ledger certification: `PROVISIONAL`
-- entity attribution: `BLOCKED_UNTIL_MACRO_CLOSURE`
+- factor-income decomposition: `OPEN`
+- country destination: `OPEN`
+- entity attribution: `BLOCKED_UNTIL_MACRO_SOURCE_FREEZE_AND_GATES`
+
+## Certification blocker
+
+The annual value-selection layer is provisionally closed, but the macro ledger is not certified. Exact source bytes have not yet been frozen and SHA-256 hashes are null. In addition, the repository's pull-request CI jobs are currently being created but returning failure without reported execution steps, so CI cannot presently certify this vector.
 
 ## Required next gates
 
 1. Acquire and freeze the exact authoritative source bytes.
-2. Record byte size and SHA-256 for each manifestation.
-3. Determine the Planning Board revision lineage controlling FY2021; do not resolve by table count.
-4. Re-run row-count, stable-ID, fiscal-year coverage, revision, and arithmetic-closure tests.
-5. Materialize one canonical annual view only when every fiscal year has a unique latest authoritative value pair.
-6. Only then begin factor-income decomposition, sector allocation, entity binding, owner-jurisdiction attribution, and retention metrics.
+2. Record byte size and SHA-256 for each source manifestation.
+3. Preserve the FY2021 revision evidence and superseded stale observation.
+4. Re-run row-count, stable-ID, fiscal-year coverage, revision, and arithmetic-closure tests when CI execution is available.
+5. Materialize one canonical annual view from the provisionally closed value series.
+6. Decompose factor income before any sector or entity attribution.
+7. Bind sectors to entities only where source evidence permits; never allocate residual aggregates to companies by assumption.
+8. Compute owner-jurisdiction and retention metrics only after destination arithmetic closes.
 
 ## Interpretation safeguards
 
