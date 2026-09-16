@@ -14,7 +14,75 @@ Python 3.11+, Node.js, and network access.
 **Do not certify the committed wrapper as the downloadable self-contained app.**
 
 It remains useful for source development and repair, but its identity and
-prerequisites are different from a frozen release artifact.
+prerequisites are different from a frozen release artifact. The committed
+prebuilt dashboard described below does **not** change that classification: the
+wrapper still requires an externally installed Python 3.11+, still installs
+Python packages (from the network or an operator-supplied wheelhouse), and is
+still unsigned, so it still costs one macOS Gatekeeper approval per machine.
+
+### Prebuilt dashboard bundle
+
+`desktop/prebuilt-dashboard/` holds a committed `vite build` output plus
+`PREBUILT_MANIFEST.json`. `desktop/setup.py` copies it into `dashboard/dist`
+instead of running `npm ci` + `npm run build`, which is what removes Node.js from
+the wrapper's first-run prerequisites.
+
+Regenerate it whenever `dashboard/` sources change:
+
+```bash
+make prebuilt-dashboard        # or: python3 scripts/build_prebuilt_dashboard.py --build
+python3 scripts/build_prebuilt_dashboard.py --check
+```
+
+`tests/test_desktop_prebuilt_dashboard.py` recomputes the manifest's
+`source_fingerprint` from the working tree and fails when the two diverge, so a
+dashboard change that forgets the regeneration is caught in CI without needing
+Node on the runner.
+
+Selection order in `setup_frontend()`: an existing `dashboard/dist` wins (a
+developer's own build is never clobbered), then the prebuilt bundle, then npm.
+Force a real build with `--build-frontend`, `--force`, or
+`PRII_FORCE_FRONTEND_BUILD=1`.
+
+The bundle lives outside `dashboard/` on purpose: `.gitignore` eats any directory
+named `dist`/`build` at any depth, and `dashboard/eslint.config.js` is a rendered
+federation template that cannot gain a local `ignores` entry. It is deliberately
+**not** added to `desktop/pyinstaller.spec` — the frozen build compiles the
+dashboard with npm in CI, and bundling both would double its frontend payload.
+
+### Offline first run
+
+Setup installs from `desktop/wheelhouse/` (or `$PRII_WHEELHOUSE`) when that
+directory contains wheels, making the whole first run work with no network. See
+`docs/DESKTOP_OFFLINE_BOOTSTRAP.md`.
+
+`python3 desktop/preflight.py` reports which prerequisite is blocking setup —
+checkout integrity, writability, Python version, `venv`, dashboard availability,
+`git`, host reachability, free disk — instead of the single catch-all message the
+launcher used to show. Network hosts are probed only when installation work
+actually remains.
+
+### macOS Gatekeeper
+
+An unsigned bundle always costs **one** approval per machine; nothing in this
+repository can remove it, and nothing here weakens system assessment policy
+(`spctl` is never invoked). What the wrapper does do is make that approval the
+only step: after a successful run, `setup.py` clears `com.apple.quarantine` from
+the launchers, so subsequent launches — including the `.app` — open cleanly.
+
+Start from `PRII-MONEYSWEEP.command` rather than the `.app` when the folder came
+from a browser download. Terminal runs `.command` files in place, whereas macOS
+runs a quarantined `.app` from a temporary read-only copy where the checkout
+beside it is missing.
+
+`docs/APPLE_NOTARIZATION_RUNBOOK.md` covers the only route to zero approvals: a
+Developer ID certificate and notarization, which apply to the frozen build below.
+
+Note that the repo-root launchers (`Fix-Gatekeeper.command`, the `.command`,
+`.sh`, `.bat`, and the `.app` executable) are rendered federation templates
+shared with five sibling repositories. Improving them is a coordinated change in
+`thehub-pr/federation-templates/`, not a local edit — see
+`tests/test_federation_template_boundary.py`.
 
 ## 2. Self-contained standalone build — canonical distribution target
 

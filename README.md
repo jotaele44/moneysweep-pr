@@ -14,14 +14,42 @@ The pipeline acquires, normalizes, validates, and cross-links public procurement
 
 ## Desktop app
 
-Double-click launchers at the repo root start the local desktop app (first run
-installs dependencies, later runs work offline):
+Double-click launchers at the repo root start the local desktop app:
 
 - `PRII-MONEYSWEEP.command` (macOS) / `PRII-MONEYSWEEP.app`
 - `PRII-MONEYSWEEP.bat` (Windows)
 - `PRII-MONEYSWEEP.sh` (Linux)
 
-See [`desktop/README.md`](desktop/README.md) for details.
+**Node.js is not required.** A prebuilt dashboard ships in the repository, so the
+first run only needs Python 3.11+ and one-time network access for Python
+packages. To skip the network too, see
+[`docs/DESKTOP_OFFLINE_BOOTSTRAP.md`](docs/DESKTOP_OFFLINE_BOOTSTRAP.md).
+
+### macOS: getting it without the Gatekeeper detour
+
+macOS marks anything a *browser* downloads with a quarantine flag, and this
+wrapper is not signed with a paid Apple Developer ID. Fetching the repository
+without a browser therefore avoids the prompt entirely:
+
+```bash
+git clone https://github.com/jotaele44/moneysweep-pr.git
+open moneysweep-pr/PRII-MONEYSWEEP.app
+```
+
+If you did download a ZIP through a browser, open
+**`PRII-MONEYSWEEP.command`** first rather than the `.app`. Approve it once
+(right-click → Open; on macOS 15+ use System Settings → Privacy & Security →
+Open Anyway), and setup clears the quarantine flag from the folder as it
+finishes — so every later launch, including the `.app`, opens with no prompt.
+
+Opening the `.app` first from a quarantined folder is the case that used to
+require moving the folder and running a repair script: macOS runs a quarantined
+bundle from a temporary read-only copy where the checkout beside it is missing.
+Starting from the `.command` avoids that entirely.
+
+See [`desktop/README.md`](desktop/README.md) for details, and
+[`docs/APPLE_NOTARIZATION_RUNBOOK.md`](docs/APPLE_NOTARIZATION_RUNBOOK.md) for
+what removes the remaining one-time approval.
 
 ## Federation role
 
@@ -37,9 +65,9 @@ See [`desktop/README.md`](desktop/README.md) for details.
 
 moneysweep-pr is **not yet a production-certified master dataset**. The current state is a controlled buildout phase:
 
-- **Source registry:** 143 tracked source definitions (includes SBA disaster-loan sources; counts follow `reports/materialization_readiness.json`).
-- **Automatable sources:** 98 marked ready by the materialization-readiness gate (13 formerly scraper-queued PR-gov sources promoted after confirming real scraping implementations).
-- **Queued / excluded sources:** 38 manual-export sources, 2 scraper-needed stubs (hacienda_sut_ivu, pr_act_154_excise), semantic duplicates, and deferred stubs remain outside the automatable target.
+- **Source registry:** 164 tracked source definitions (includes SBA disaster-loan sources; counts follow `reports/materialization_readiness.json`).
+- **Automatable sources:** 116 marked ready by the materialization-readiness gate (14 formerly scraper-queued PR-gov sources promoted after confirming real scraping implementations, most recently hacienda_sut_ivu).
+- **Queued / excluded sources:** 42 manual-export sources, 1 scraper-needed stub (pr_act_154_excise), semantic duplicates, and deferred stubs remain outside the automatable target.
 - **Strict preflight:** required before producer execution or promotion.
 - **Current active work:** Tranche B manual-source ingestion (7 output files seeded; operator must drop source files to populate).
 - **Last recorded full test baseline:** 2018 passed, 6 skipped, 0 failed.

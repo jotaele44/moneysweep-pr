@@ -1,0 +1,33 @@
+{
+  "extension_id": "hud-drgr-authorized-pursuit",
+  "capabilities": [
+    {
+      "id": "hud-drgr-authorized-source-audit",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The HUD/DRGR authorized-source pursuit is a bounded, one-shot provenance audit over operator-local candidate files. It classifies possible evidence and writes a receipt, but never promotes data automatically; unresolved or merely supporting material remains fail-closed. The callable CLI is an implementation surface for audit execution, not a normal user workflow, so presenting it as a GUI capability would conflate certification machinery with certified HUD/DRGR data.",
+      "analysis": {
+        "files": [
+          "scripts/audit_hud_drgr_authorized_sources.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_audit_hud_drgr_authorized_sources.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/audit_hud_drgr_authorized_sources.py",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:build_receipt",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_csv",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_parquet",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_path",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:main",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:sha256_file",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:utc_now",
+        "cli_surface:scripts/audit_hud_drgr_authorized_sources.py"
+      ]
+    }
+  ]
+}

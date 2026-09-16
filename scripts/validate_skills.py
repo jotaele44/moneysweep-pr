@@ -33,15 +33,15 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import sys
 from pathlib import Path
 from typing import Any, Callable
 
 try:
     import yaml
-except ImportError:  # pragma: no cover
-    print("PyYAML is required: pip install PyYAML", file=sys.stderr)
-    sys.exit(2)
+except ImportError as exc:  # pragma: no cover
+    # Raise rather than sys.exit() -- see the note in
+    # scripts/regenerate_registry_json.py.
+    raise ImportError("PyYAML is required: pip install PyYAML") from exc
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = "skills"

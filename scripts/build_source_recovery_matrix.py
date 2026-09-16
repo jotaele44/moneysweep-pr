@@ -66,7 +66,6 @@ ADAPTER_SOURCE_IDS = set(ADAPTER_REGISTRY) | set(ENTITY_ADAPTER_REGISTRY)
 # have been promoted to api_producer so they appear in the automatable set.
 # Curated domain knowledge — kept explicit on purpose.
 SCRAPER_NEEDED = {
-    "hacienda_sut_ivu",  # download_coverage_gap_intake.py — intentional deferred stub
     "pr_act_154_excise",  # download_coverage_gap_intake.py — intentional deferred stub
 }
 

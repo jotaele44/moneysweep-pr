@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import html
 import json
 import os
 import re
@@ -64,7 +65,17 @@ ANNUAL_COLUMNS = [
     "retrieved_at_utc",
 ]
 _YEAR_RE = re.compile(r"^(20\d{2})$")
-_YEAR_ANY_RE = re.compile(r"(?<!\d)(20\d{2})(?!\d)")
+# The live "Informes Anuales" page has no visible per-insurer markup: the CMS
+# renders the year/name/PDF-anchor triples only into inline <script> blocks as
+# JS object-literal assignments for a client-side widget, e.g.:
+#   temp_array['anio'] = '2025';
+#   temp_array['name'] = 'Some Insurer, Inc.';
+#   temp_array['anchor'] = 'https://docs.pr.gov/files/.../2025/Some%20Insurer.pdf';
+_ANNUAL_RECORD_RE = re.compile(
+    r"temp_array\['anio'\]\s*=\s*'([^']*)';\s*"
+    r"temp_array\['name'\]\s*=\s*'((?:[^'\\]|\\.)*)';\s*"
+    r"temp_array\['anchor'\]\s*=\s*'([^']*)';"
+)
 
 
 def _clean(value: str) -> str:
@@ -164,60 +175,31 @@ def parse_insurers(page_html: str, *, source_url: str, retrieved_at: str) -> lis
     return rows
 
 
-def _nearest_year(node) -> str:
-    preceding = node.xpath(
-        "preceding::*[self::h1 or self::h2 or self::h3 or self::h4 or self::div or self::span]"
-    )
-    for cand in reversed(preceding):
-        text = _clean(cand.text_content())
-        match = _YEAR_RE.match(text)
-        if match:
-            return match.group(1)
-    return ""
-
-
-def _report_year(anchor, href: str, name: str) -> str:
-    """Resolve the report year without promoting an ambiguous date.
-
-    Webflow's live OCS index currently links insurer cards to internal
-    ``/informes-anuales/...`` CMS item pages rather than directly to the PDF.
-    Those slugs frequently carry the year. Prefer the surrounding year heading;
-    use a unique year token in the official href/display text only as a fallback.
-    """
-    nearest = _nearest_year(anchor)
-    if nearest:
-        return nearest
-    tokens = _YEAR_ANY_RE.findall(f"{href} {name}")
-    unique = sorted(set(tokens))
-    return unique[0] if len(unique) == 1 else ""
-
-
 def parse_annual_reports(
     page_html: str,
     *,
     source_url: str,
     retrieved_at: str,
 ) -> list[dict]:
-    doc = lxml_html.fromstring(page_html)
+    """Extract the per-insurer annual-report index from its embedded CMS data.
+
+    The live OCS "Informes Anuales" page has no visible ``<a href>`` per report:
+    the year/name/PDF-anchor triples exist only as JS object-literal assignments
+    inside inline ``<script>`` blocks (see ``_ANNUAL_RECORD_RE``). A generic
+    document-link scan over the rendered DOM instead picks up unrelated,
+    site-wide navigation PDFs (ethics law, strategic plan, liquidation notices)
+    that repeat identically on every OCS page.
+    """
     rows: list[dict] = []
     seen: set[tuple[str, str, str]] = set()
 
-    for anchor in doc.xpath("//a[@href]"):
-        href = str(anchor.get("href") or "").strip()
-        name = _clean(anchor.text_content())
-        if not href or not name:
+    for year_raw, name_raw, anchor_raw in _ANNUAL_RECORD_RE.findall(page_html):
+        year = _clean(html.unescape(year_raw))
+        name = _clean(html.unescape(name_raw))
+        anchor = html.unescape(anchor_raw).strip()
+        if not _YEAR_RE.match(year) or not name or not anchor:
             continue
-        lower = href.casefold()
-        is_direct_document = any(
-            token in lower for token in (".pdf", "document", "download", "media", "files")
-        )
-        is_official_report_item = "/informes-anuales/" in lower
-        if not (is_direct_document or is_official_report_item):
-            continue
-        year = _report_year(anchor, href, name)
-        if not year:
-            continue
-        report_url = urljoin(source_url, href)
+        report_url = urljoin(source_url, anchor)
         key = (year, name, report_url)
         if key in seen:
             continue
@@ -234,7 +216,7 @@ def parse_annual_reports(
         )
 
     if not rows:
-        raise RuntimeError("OCS annual-report parser found zero report links")
+        raise RuntimeError("OCS annual-report parser found zero embedded CMS records")
     return rows
 
 
