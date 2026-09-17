@@ -1,5 +1,5 @@
 {
-  "manifest_version": "1.0",
+  "manifest_version": "1.1",
   "snapshot_date_utc": "2026-09-17",
   "scope": "MoneySweep V2 bounded public-source exhaustion for FY2025 direct-investment-profit sector/entity/ownership/destination decomposition",
   "binding_specification": "MoneySweep V2 — VECTOR_C Full-Stack Exhaustion Report",
@@ -72,6 +72,15 @@
     "universal_exhaustion": "OPEN",
     "manifest_path": "data/manifests/macro/jp_questionnaire_universe_v1.json"
   },
+  "methodology_bridge": {
+    "state": "PASS_BOUNDED_MAJOR_FINDING",
+    "manifest_path": "data/manifests/macro/jp_methodology_bridge_v1.json",
+    "documented_sector_production_path": true,
+    "documented_current_fy2025_sector_amounts": false,
+    "identified_source_instruments": ["BP-11", "IP-11", "IP-546", "IP-553"],
+    "separate_public_form_discovery_for_identified_instruments": "NO_MATCH_IN_BOUNDED_SEARCH",
+    "effect": "The methodology establishes that direct-investment-firm profits are used to prepare industrial-sector base data and that JP maintains multi-source firm-level estimation/revision processes. It does not provide FY2025 sector amounts."
+  },
   "bop_iip_lineage": {
     "state": "PASS_BOUNDED_DISCOVERY",
     "manifest_path": "data/manifests/macro/jp_bop_iip_lineage_v1.json",
@@ -82,6 +91,7 @@
     "UNRETRIEVED_IS_NOT_ABSENT",
     "TOOL_FAILURE_IS_NOT_SOURCE_FAILURE",
     "PUBLIC_SOURCES_BEFORE_REQUESTS",
+    "METHODOLOGY_PROVES_PRODUCTION_PATH_NOT_CURRENT_AMOUNT",
     "INDUSTRY_GDP_IS_NOT_DIRECT_INVESTMENT_PROFIT",
     "INDUSTRY_NET_INCOME_IS_NOT_DIRECT_INVESTMENT_PROFIT",
     "HISTORICAL_SECTOR_SHARE_IS_NOT_CURRENT_SECTOR_SHARE",
