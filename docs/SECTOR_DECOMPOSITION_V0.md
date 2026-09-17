@@ -89,3 +89,5 @@ unless an independent authoritative binding source provides that allocation.
 ## Current public discovery result
 
 The Planning Board currently exposes downloadable `Tablas de Ingreso y Producto 2025`, a 2025 Statistical Appendix in Excel, Balance of Payments 2025 tables, and a macroeconomic data center. These are therefore the next authoritative public manifestations to exhaust before any request-based vector is considered. Public-source exhaustion is **not yet claimed**.
+
+The current tool environment can discover the authoritative XLSX endpoints but cannot retrieve their bytes for schema inspection. That limitation is recorded as `BLOCKED`, not as evidence that the workbooks lack the sector table.
