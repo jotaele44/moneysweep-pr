@@ -6,7 +6,7 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Internal MoneySweep V2 accounting, reconciliation, methodology-bridge, and bounded public-source exhaustion core. It introduces no independent human-facing workflow; GUI exposure requires a later backend-to-GUI parity vector.",
+      "rationale": "Internal MoneySweep V2 accounting, reconciliation, methodology-bridge, bounded public-source exhaustion, and workbook-audit core. It introduces no independent human-facing workflow; GUI exposure requires a later backend-to-GUI parity vector.",
       "backend": {
         "files": [
           "moneysweep/capital_flow/__init__.py",
@@ -28,7 +28,8 @@
           "registries/capital_flow_macro_sources.json",
           "schemas/capital_flow_observation.schema.json",
           "schemas/macro_account_observation.schema.json",
-          "schemas/factor_income_observation.schema.json"
+          "schemas/factor_income_observation.schema.json",
+          "scripts/audit_jp_macro_workbooks.py"
         ]
       },
       "tests": {
@@ -39,17 +40,20 @@
           "tests/test_factor_income_ledger.py",
           "tests/test_sector_decomposition_boundary.py",
           "tests/test_public_source_exhaustion_gates.py",
-          "tests/test_methodology_bridge.py"
+          "tests/test_methodology_bridge.py",
+          "tests/test_audit_jp_macro_workbooks.py"
         ]
       },
       "candidate_ids": [
         "python_module:moneysweep/capital_flow/model.py",
         "python_module:moneysweep/capital_flow/macro.py",
+        "analysis_module:scripts/audit_jp_macro_workbooks.py",
         "python_symbol:moneysweep/capital_flow/model.py:arithmetic_closure",
         "python_symbol:moneysweep/capital_flow/model.py:derive_gdp_gnp_gap",
         "python_symbol:moneysweep/capital_flow/model.py:retention_rates",
         "python_symbol:moneysweep/capital_flow/macro.py:published_identity_closure",
-        "python_symbol:moneysweep/capital_flow/macro.py:adjudicate_latest_manifestation"
+        "python_symbol:moneysweep/capital_flow/macro.py:adjudicate_latest_manifestation",
+        "analysis_symbol:scripts/audit_jp_macro_workbooks.py:audit_workbook"
       ]
     }
   ]
