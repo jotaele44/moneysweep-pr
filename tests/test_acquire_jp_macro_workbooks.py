@@ -41,12 +41,19 @@ class FakeSession:
         return self.response
 
 
+def _source() -> dict[str, str]:
+    return {
+        "id": "JP_IP_2025_XLSX",
+        "title": "Fixture",
+        "url": "https://example.test/a.xlsx",
+    }
+
+
 def test_acquire_one_freezes_exact_bytes_headers_and_hash(tmp_path: Path) -> None:
     data = _xlsx_bytes()
     session = FakeSession(FakeResponse(data))
-    source = {"id": "JP_IP_2025_XLSX", "title": "Fixture", "url": "https://example.test/a.xlsx"}
 
-    result = acquire_one(source, tmp_path, session=session)
+    result = acquire_one(_source(), tmp_path, session=session)
 
     raw = Path(result["path"])
     assert raw.read_bytes() == data
@@ -60,10 +67,9 @@ def test_acquire_one_freezes_exact_bytes_headers_and_hash(tmp_path: Path) -> Non
 
 def test_acquire_one_rejects_non_xlsx_payload(tmp_path: Path) -> None:
     session = FakeSession(FakeResponse(b"<html>not an xlsx</html>"))
-    source = {"id": "JP_IP_2025_XLSX", "title": "Fixture", "url": "https://example.test/a.xlsx"}
 
     try:
-        acquire_one(source, tmp_path, session=session)
+        acquire_one(_source(), tmp_path, session=session)
     except ValueError as exc:
         assert "not a ZIP/XLSX" in str(exc)
     else:
@@ -73,13 +79,7 @@ def test_acquire_one_rejects_non_xlsx_payload(tmp_path: Path) -> None:
 def test_acquire_all_preserves_failures_as_blocked_not_absent(tmp_path: Path) -> None:
     manifest = tmp_path / "sources.json"
     manifest.write_text(
-        json.dumps(
-            {
-                "mandatory_workbooks": [
-                    {"id": "JP_IP_2025_XLSX", "title": "Fixture", "url": "https://example.test/a.xlsx"}
-                ]
-            }
-        ),
+        json.dumps({"mandatory_workbooks": [_source()]}),
         encoding="utf-8",
     )
     session = FakeSession(FakeResponse(b"not-a-workbook"))
