@@ -85,3 +85,7 @@ unless an independent authoritative binding source provides that allocation.
 2. Freeze and inspect the 2025 Excel tables and balance-of-payments workbook if their downloadable files expose additional columns not represented in the PDF/index.
 3. Search successor/historical statistical series for a current continuation of the old direct-investment-profit-by-sector table.
 4. If public sources are exhausted and the denominator remains unavailable, keep sector attribution `BLOCKED`; do not substitute an allocation model as canonical fact.
+
+## Current public discovery result
+
+The Planning Board currently exposes downloadable `Tablas de Ingreso y Producto 2025`, a 2025 Statistical Appendix in Excel, Balance of Payments 2025 tables, and a macroeconomic data center. These are therefore the next authoritative public manifestations to exhaust before any request-based vector is considered. Public-source exhaustion is **not yet claimed**.
