@@ -1,0 +1,10 @@
+{
+  "contract_version":"1.0.0",
+  "registry_authority":"thehub-pr/.federation/statistical-routing-manifest.json",
+  "repo":"moneysweep-pr",
+  "primary_domains":["Economia y Finanzas","Trabajo"],
+  "secondary_domains":["Demografia y Poblacion","Educacion","Geografia","Proteccion Social","Transportacion","Turismo y Cultura","Violencia y Justicia","Vivienda y Construccion"],
+  "ingest_policy":"consume routed datasets by reference/provenance; do not become a second canonical catalog",
+  "identity_policy":"reuse federation canonical entity authority; no second ownership resolver",
+  "guardrails":["aggregate != company","sector != company","contribution != influence","tax expenditure != automatic net loss","unknown != zero"]
+}
