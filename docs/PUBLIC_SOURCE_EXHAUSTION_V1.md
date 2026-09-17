@@ -52,7 +52,9 @@ The manifest is `data/manifests/macro/jp_questionnaire_universe_v1.json`.
 
 Most direct document links resolve to official `.doc` manifestations but the retrieval layer rejects `application/msword`. One currently listed property/casualty insurance manifestation returned 404 while the title remains listed publicly; this is classified as a broken manifestation candidate, **not** source absence.
 
-A blank questionnaire listing proves collection architecture, not respondent microdata or a published direct-investment-profit allocation.
+An independent official Puerto Rico Institute of Statistics / Comité de Coordinación de Estadísticas form inventory corroborates the architecture: the Income Net unit used industry-differentiated annual `Estado de Ingresos y Gastos` forms for private firms/nonprofits, with a separate Balance of Payments form family. This is preserved as `AUTHORITATIVE_SUPPORTING_NOT_CURRENT_MANIFESTATION_IDENTITY`, because a historical/administrative form inventory cannot establish that every code is currently active or bind any blank form to respondent microdata.
+
+A blank questionnaire or form inventory proves collection architecture, not respondent microdata or a published direct-investment-profit allocation.
 
 ## Methodology bridge
 
@@ -119,6 +121,8 @@ The following remain mandatory:
 - `INDUSTRY_NET_INCOME != DIRECT_INVESTMENT_PROFITS`
 - `HISTORICAL_SECTOR_SHARE != CURRENT_SECTOR_SHARE`
 - `METHODOLOGY_EXISTS != CURRENT_AMOUNT`
+- `FORM_ARCHITECTURE != RESPONDENT_MICRODATA`
+- `HISTORICAL_FORM_CODE != CURRENT_ACTIVE_FORM_IDENTITY`
 - `NATIONAL_ACCOUNTS_DI_PROFITS != BOP_DI_INCOME`
 - `AGGREGATE != SECTOR`
 - `SECTOR != COMPANY`
@@ -135,6 +139,8 @@ The following remain mandatory:
 | FY2022–FY2025 profit/dividend identities | PROVISIONAL CLOSED |
 | FY2021 factor-account alignment | UNRESOLVED |
 | Planning Board sector-production methodology | FACT / FOUND |
+| Questionnaire architecture | PASS / BOUNDED SUPPORTING |
+| Questionnaire respondent content | BLOCKED ARTIFACT RETRIEVAL |
 | Historical DI-profit sector table | PASS / HISTORICAL SUPPORT ONLY |
 | NA↔BOP direct-investment equivalence | FAIL / NONCOMPARABLE AS IDENTITY |
 | Current sector DI-profit allocation | BLOCKED |
