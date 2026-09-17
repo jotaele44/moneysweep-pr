@@ -1,0 +1,93 @@
+{
+  "manifest_version": "1.0",
+  "snapshot_date_utc": "2026-09-17",
+  "scope": "MoneySweep V2 bounded public-source exhaustion for FY2025 direct-investment-profit sector/entity/ownership/destination decomposition",
+  "binding_specification": "MoneySweep V2 — VECTOR_C Full-Stack Exhaustion Report",
+  "overall_state": "BOUNDED_EXHAUSTION_WITH_PUBLIC_ARTIFACT_BLOCKERS",
+  "public_source_exhaustion": "OPEN",
+  "foia_or_public_records_eligibility": "NOT_YET_REACHED",
+  "macro_target": {
+    "gdp_gnp_gap_millions": 41797.3,
+    "net_profit_received_rest_of_world_millions": -41560.4,
+    "profits_dividends_paid_rest_of_world_millions": 42660.6,
+    "dividends_paid_nonresidents_millions": 996.5,
+    "direct_investment_profits_millions": 41664.1,
+    "sector_classified_millions": 0.0,
+    "sector_unclassified_millions": 41664.1,
+    "sector_state": "BLOCKED_PUBLIC_SOURCE_DENOMINATOR"
+  },
+  "mandatory_workbooks": [
+    {
+      "id": "JP_IP_2025_XLSX",
+      "title": "Tablas de Ingreso y Producto 2025",
+      "url": "https://docs.pr.gov/files/JP-Junta%20de%20Planificacion/Programa%20de%20Planificaci%C3%B3n%20Econ%C3%B3mica%20y%20Social/Publicaciones/Ingreso%20y%20Producto/Ingreso%20y%20Producto/Tablas/Tablas%20de%20Ingreso%20y%20Producto%202025%20%281%29.xlsx?d=w6fb34bd4ce7b45459fcbdd761d7b3d28",
+      "logical_discovery": "PASS",
+      "web_fetch": "BLOCKED_UNSUPPORTED_XLSX_CONTENT_TYPE",
+      "container_fetch": "BLOCKED_DNS_RESOLUTION_OR_DOWNLOAD",
+      "raw_bytes_frozen": false,
+      "sha256": null,
+      "hidden_sheet_audit": "BLOCKED"
+    },
+    {
+      "id": "JP_BOP_IIP_2025_XLSX",
+      "title": "Tablas Balanza de Pagos y Posición de Inversión Internacional de Puerto Rico 2025",
+      "url": "https://docs.pr.gov/files/JP-Junta%20de%20Planificacion/Programa%20de%20Planificaci%C3%B3n%20Econ%C3%B3mica%20y%20Social/Publicaciones/Balanza%20de%20Pagos/Balanza%20de%20pagos/Tablas-Balanza-de-Pagos-y-Posicion-de-Inversion-Internacional-de-Puerto-Rico-2025.xlsx?d=w29e8bcc869ce4708a814c0a1109a9a26",
+      "logical_discovery": "PASS",
+      "web_fetch": "BLOCKED_UNSUPPORTED_XLSX_CONTENT_TYPE",
+      "container_fetch": "BLOCKED_DNS_RESOLUTION_OR_DOWNLOAD",
+      "raw_bytes_frozen": false,
+      "sha256": null,
+      "hidden_sheet_audit": "BLOCKED"
+    },
+    {
+      "id": "JP_APPENDIX_2025_XLSX",
+      "title": "Tablas – Apéndice Estadístico 2025",
+      "url": "https://docs.pr.gov/files/JP-Junta%20de%20Planificacion/Programa%20de%20Planificaci%C3%B3n%20Econ%C3%B3mica%20y%20Social/Apendice%20Estadistico/APENDICE-ESTADISTICO%20DEL%20IEG2025.xlsx?d=wfd90069539d9402aa5e418899ef01c42",
+      "logical_discovery": "PASS",
+      "web_fetch": "BLOCKED_UNSUPPORTED_XLSX_CONTENT_TYPE",
+      "container_fetch": "BLOCKED_DNS_RESOLUTION_OR_DOWNLOAD",
+      "raw_bytes_frozen": false,
+      "sha256": null,
+      "hidden_sheet_audit": "BLOCKED"
+    }
+  ],
+  "workbook_gate": {
+    "required_inspection": [
+      "ZIP_MEMBER_INVENTORY",
+      "VISIBLE_HIDDEN_VERYHIDDEN_SHEETS",
+      "FORMULA_MANIFESTATION",
+      "CACHED_VALUE_MANIFESTATION",
+      "PREAMBLE_AND_HEADER_DEPTH",
+      "MERGED_CELLS",
+      "FOOTNOTES_AND_UNITS",
+      "REVISION_MARKERS",
+      "WHOLE_ROW_SECTOR_CANDIDATES",
+      "SUM_TO_41664_1_TEST"
+    ],
+    "state": "BLOCKED_ARTIFACT_RETRIEVAL"
+  },
+  "questionnaire_discovery": {
+    "state": "PASS_BOUNDED",
+    "artifact_content_review": "BLOCKED_APPLICATION_MSWORD_OR_BROKEN_MANIFESTATION",
+    "universal_exhaustion": "OPEN",
+    "manifest_path": "data/manifests/macro/jp_questionnaire_universe_v1.json"
+  },
+  "bop_iip_lineage": {
+    "state": "PASS_BOUNDED_DISCOVERY",
+    "manifest_path": "data/manifests/macro/jp_bop_iip_lineage_v1.json",
+    "sector_or_country_di_income_bridge_found_in_parsed_public_pdfs": false,
+    "workbook_lineage_review": "OPEN_BLOCKED_XLSX"
+  },
+  "hard_gates": [
+    "UNRETRIEVED_IS_NOT_ABSENT",
+    "TOOL_FAILURE_IS_NOT_SOURCE_FAILURE",
+    "PUBLIC_SOURCES_BEFORE_REQUESTS",
+    "INDUSTRY_GDP_IS_NOT_DIRECT_INVESTMENT_PROFIT",
+    "INDUSTRY_NET_INCOME_IS_NOT_DIRECT_INVESTMENT_PROFIT",
+    "HISTORICAL_SECTOR_SHARE_IS_NOT_CURRENT_SECTOR_SHARE",
+    "AGGREGATE_IS_NOT_SECTOR",
+    "SECTOR_IS_NOT_COMPANY",
+    "REST_OF_WORLD_IS_NOT_UNITED_STATES",
+    "UNKNOWN_IS_NOT_ZERO"
+  ]
+}
