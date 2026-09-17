@@ -110,12 +110,25 @@ Every row remains `NONCOMPARABLE_AS_IDENTITY`. The consistent numerical relation
 
 FY2021 also retains the separate stale-macro-revision warning already encoded in the factor-income ledger.
 
+## Execution/CI boundary
+
+GitHub Actions currently creates workflow jobs for this branch but the observed jobs terminate with zero execution steps and no assigned runner. An independent local clone/run path is also blocked because the execution environment cannot resolve `github.com`.
+
+Accordingly:
+
+- `CI = BLOCKED_UNKNOWN_INFRASTRUCTURE`
+- workflow `failure` without executed steps is **not** evidence that implementation tests failed;
+- no CI PASS is claimed;
+- no implementation certification is inferred from script/commit success alone.
+
 ## Binding gates
 
 The following remain mandatory:
 
 - `UNRETRIEVED != ABSENT`
 - `TOOL_FAILURE != SOURCE_FAILURE`
+- `SCRIPT_SUCCESS != CERTIFICATION`
+- `WORKFLOW_FAILURE_WITH_ZERO_STEPS != TEST_FAILURE`
 - `PUBLIC_SOURCES_BEFORE_PUBLIC_RECORDS_REQUESTS`
 - `INDUSTRY_GDP != DIRECT_INVESTMENT_PROFITS`
 - `INDUSTRY_NET_INCOME != DIRECT_INVESTMENT_PROFITS`
@@ -150,6 +163,7 @@ The following remain mandatory:
 | United States share | UNKNOWN |
 | Public-source exhaustion | OPEN |
 | Public-records/FOIA escalation | NOT_YET_REACHED |
+| CI / local execution gate | BLOCKED UNKNOWN INFRASTRUCTURE |
 
 ## Required continuation
 
