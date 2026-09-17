@@ -44,10 +44,17 @@ def test_proxy_allocators_are_explicitly_forbidden() -> None:
     } <= forbidden
 
 
-def test_bounded_absence_is_not_universal_absence() -> None:
-    conclusion = _audit()["bounded_conclusion"]
-    assert "audited source set" in conclusion
-    assert "not a claim of universal source absence" in conclusion
+def test_public_source_exhaustion_remains_open_while_workbooks_are_unparsed() -> None:
+    audit = _audit()
+    assert audit["public_source_exhaustion_state"] == "OPEN_DOWNLOADABLE_WORKBOOKS_NOT_YET_PARSED"
+    assert len(audit["discovered_unparsed_public_manifestations"]) == 3
+    assert all(
+        item["state"] == "DISCOVERED_DOWNLOAD_ENDPOINT_UNPARSED"
+        for item in audit["discovered_unparsed_public_manifestations"]
+    )
+    conclusion = audit["bounded_conclusion"]
+    assert "parsed audited source set" in conclusion
+    assert "Public-source exhaustion is not claimed" in conclusion
 
 
 def test_current_balance_of_payments_measure_keeps_accounting_concept_separate() -> None:
