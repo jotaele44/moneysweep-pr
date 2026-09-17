@@ -1,5 +1,5 @@
 {
-  "manifest_version": "1.0",
+  "manifest_version": "1.1",
   "snapshot_date_utc": "2026-09-17",
   "scope": "Current publicly listed Puerto Rico Planning Board questionnaires relevant to Ingreso Neto / sector-source collection",
   "discovery_pages": [
@@ -43,9 +43,32 @@
     {"code":"JP-560.2","title":"Preliminar / Preliminary","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
     {"code":"JP-541","title":"Encuesta sobre el Valor de la Inversión en Obras de Construcción 2025","document_state":"LISTED_OFFICIAL_CONTENT_UNRETRIEVED","measurement_domain":"CONSTRUCTION_INVESTMENT_NOT_DIRECT_INVESTMENT_PROFITS"}
   ],
+  "official_form_inventory_corroboration": {
+    "source_authority": "Puerto Rico Institute of Statistics / Comité de Coordinación de Estadísticas",
+    "source_title": "Presentación Formularios",
+    "source_url": "https://cce.estadisticas.pr/sites/default/files/Documentos/Reuniones/Presentaci%C3%B3n%20Formularios.pdf",
+    "evidence_state": "AUTHORITATIVE_SUPPORTING_NOT_CURRENT_MANIFESTATION_IDENTITY",
+    "income_net_architecture": {
+      "form_type": "Estado de Ingresos y Gastos diferenciado por industria",
+      "unit": "Ingreso Neto",
+      "periodicity": "ANNUAL",
+      "recipient_universe": "Empresas privadas y organizaciones sin fines de lucro",
+      "form_codes_observed": [
+        "IP-110","IP-210","IP-220","IP-230","IP-310","IP-310-Bebidas","IP-420","IP-440","IP-440-Gasolineras","IP-480","IP-480-Aereo","IP-490","IP-510","IP-520","IP-520-A","IP-520-S","IP-530","IP-540","IP-540-A","IP-540-J","IP-540-P","IP-540-S","IP-540-V","IP-610","IP-620","IP-710","IP-720","IP-810"
+      ]
+    },
+    "bop_and_other_forms_observed": [
+      {"code":"JP-529","title":"Relación de Aportaciones y Donativos Federales Recibidos","unit":"Balanza de Pagos","periodicity":"ANNUAL"},
+      {"code":"JP-362","title":"Información para la Balanza de Pagos de Puerto Rico","unit":"Balanza de Pagos","periodicity":"ANNUAL"},
+      {"code":"JP-544","title":"Transacciones con el Exterior para la Balanza de Pagos","unit":"Balanza de Pagos","periodicity":"ANNUAL"},
+      {"code":"JP-536","title":"Estados de Ingresos y Gastos","unit":"Ingreso Neto","recipient_universe":"Corporaciones Públicas","periodicity":"ANNUAL"},
+      {"code":"JP-316","title":"Information for the Gross Product","unit":"Ingreso Neto","recipient_universe":"Corporaciones Públicas","periodicity":"ANNUAL"}
+    ],
+    "identity_boundary": "This source corroborates collection architecture and form roles. It does not prove that every historical form code is currently active or bind a form listing to respondent microdata."
+  },
   "interpretation": {
-    "what_discovery_proves": "JP currently exposes industry-specific collection instruments across a broad industry universe.",
-    "what_discovery_does_not_prove": "A blank form or listing does not establish respondent microdata, a published FY2025 direct-investment-profit sector allocation, ownership geography, or company-level dollar amounts.",
+    "what_discovery_proves": "JP currently exposes industry-specific collection instruments across a broad industry universe, independently corroborated by an official statistics form inventory.",
+    "what_discovery_does_not_prove": "A blank form, historical form inventory, or listing does not establish respondent microdata, a published FY2025 direct-investment-profit sector allocation, ownership geography, or company-level dollar amounts.",
     "content_review_state": "BLOCKED_ARTIFACT_RETRIEVAL",
     "public_source_exhaustion": "OPEN"
   },
