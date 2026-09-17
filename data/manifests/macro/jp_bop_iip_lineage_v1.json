@@ -1,0 +1,41 @@
+{
+  "manifest_version": "1.0",
+  "snapshot_date_utc": "2026-09-17",
+  "scope": "Puerto Rico Planning Board Balance of Payments / International Investment Position publication lineage relevant to direct-investment income and ownership/counterparty analysis",
+  "methodology_boundary": "BOP/IIP is a parallel BPM6/SNA-modernization measurement domain; do not substitute its direct-investment income totals for national-account profits of direct investments without an authoritative bridge.",
+  "publications": [
+    {"fiscal_year":2018,"pdf_discovered":true,"pdf_parsed":true,"xlsx_or_tables_listing":"NOT_CONFIRMED_IN_THIS_SNAPSHOT","direct_investment_measure_present":true,"sector_di_income_breakdown_found":false,"country_di_income_breakdown_found":false,"notes":"Modernized publication; direct-investment estimates resumed after long historical gap."},
+    {"fiscal_year":2019,"pdf_discovered":true,"pdf_parsed":true,"xlsx_or_tables_listing":"NOT_CONFIRMED_IN_THIS_SNAPSHOT","direct_investment_measure_present":true,"sector_di_income_breakdown_found":false,"country_di_income_breakdown_found":false},
+    {"fiscal_year":2020,"pdf_discovered":true,"pdf_parsed":true,"xlsx_or_tables_listing":"PUBLIC_TABLES_LISTING_DISCOVERED","direct_investment_measure_present":true,"sector_di_income_breakdown_found":false,"country_di_income_breakdown_found":false},
+    {"fiscal_year":2021,"pdf_discovered":true,"pdf_parsed":true,"xlsx_or_tables_listing":"PUBLIC_TABLES_LISTING_DISCOVERED","direct_investment_measure_present":true,"sector_di_income_breakdown_found":false,"country_di_income_breakdown_found":false},
+    {"fiscal_year":2022,"pdf_discovered":true,"pdf_parsed":"NOT_COMPLETED_IN_THIS_SNAPSHOT","xlsx_or_tables_listing":"PUBLICATION_LISTING_DISCOVERED","direct_investment_measure_present":"EXPECTED_FROM_SERIES_NOT_USED_AS_PROOF","sector_di_income_breakdown_found":false,"country_di_income_breakdown_found":false},
+    {"fiscal_year":2023,"pdf_discovered":true,"pdf_parsed":true,"xlsx_or_tables_listing":"PUBLIC_TABLES_LISTING_DISCOVERED","direct_investment_measure_present":true,"sector_di_income_breakdown_found":false,"country_di_income_breakdown_found":false},
+    {"fiscal_year":2024,"pdf_discovered":true,"pdf_parsed":"NOT_COMPLETED_IN_THIS_SNAPSHOT","xlsx_or_tables_listing":"PUBLIC_TABLES_LISTING_DISCOVERED","direct_investment_measure_present":"EXPECTED_FROM_SERIES_NOT_USED_AS_PROOF","sector_di_income_breakdown_found":false,"country_di_income_breakdown_found":false},
+    {"fiscal_year":2025,"pdf_discovered":true,"pdf_parsed":true,"xlsx_or_tables_listing":"EXACT_XLSX_ENDPOINT_RESOLVED_BUT_BYTES_UNRETRIEVED","direct_investment_measure_present":true,"sector_di_income_breakdown_found":false,"country_di_income_breakdown_found":false,
+      "fy2025_primary_income": {
+        "compensation_credit_millions":3555.8,
+        "compensation_debit_millions":746.0,
+        "investment_income_credit_millions":2455.0,
+        "investment_income_debit_millions":46720.2,
+        "direct_investment_credit_millions":844.8,
+        "direct_investment_debit_millions":43249.7,
+        "portfolio_investment_credit_millions":1610.2,
+        "portfolio_investment_debit_millions":3470.4,
+        "other_primary_income_credit_millions":498.1,
+        "other_primary_income_debit_millions":7125.4,
+        "total_primary_income_credit_millions":6508.9,
+        "total_primary_income_debit_millions":54591.6,
+        "total_primary_income_balance_millions":-48082.7
+      }
+    }
+  ],
+  "cross_account_check": {
+    "fy2025_national_accounts_direct_investment_profits_millions":41664.1,
+    "fy2025_bop_direct_investment_income_debit_millions":43249.7,
+    "difference_millions":1585.6,
+    "difference_pct_of_national_accounts_di_profit":3.806,
+    "equivalence_state":"FAIL_NONCOMPARABLE_AS_IDENTITY"
+  },
+  "lineage_state": "PUBLIC_PDF_LINEAGE_BOUNDED_PASS_WORKBOOK_LINEAGE_OPEN",
+  "next_gate": "Acquire/freeze all available 2018-2025 BOP/IIP table workbooks; inventory schemas and hidden sheets; test whether sector or counterparty-geography dimensions appear in any vintage and whether later publications supersede them."
+}
