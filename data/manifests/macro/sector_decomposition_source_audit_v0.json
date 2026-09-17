@@ -1,8 +1,9 @@
 {
-  "manifest_version": "0.1",
+  "manifest_version": "0.2",
   "scope": "Current public-source audit for Puerto Rico direct-investment-profit sector decomposition",
   "audit_date_utc": "2026-09-17",
   "certification_state": "BLOCKED",
+  "public_source_exhaustion_state": "OPEN_DOWNLOADABLE_WORKBOOKS_NOT_YET_PARSED",
   "target_measure": {
     "name": "profits_of_direct_investments",
     "fiscal_year": 2025,
@@ -57,6 +58,23 @@
       "notes": "Historical sector shares cannot be carried forward to FY2022-FY2025."
     }
   ],
+  "discovered_unparsed_public_manifestations": [
+    {
+      "name": "Tablas Balanza de Pagos y Posicion de Inversion Internacional de Puerto Rico 2025",
+      "format": "XLSX",
+      "state": "DISCOVERED_DOWNLOAD_ENDPOINT_UNPARSED"
+    },
+    {
+      "name": "Tablas - Apendice Estadistico 2025",
+      "format": "XLSX",
+      "state": "DISCOVERED_DOWNLOAD_ENDPOINT_UNPARSED"
+    },
+    {
+      "name": "Tablas de Ingreso y Producto 2025",
+      "format": "XLSX",
+      "state": "DISCOVERED_DOWNLOAD_ENDPOINT_UNPARSED"
+    }
+  ],
   "forbidden_proxy_allocators": [
     "INDUSTRY_GDP_SHARE",
     "INDUSTRY_GROSS_PRODUCT_SHARE",
@@ -68,7 +86,7 @@
     "TAX_INCENTIVE_SHARE",
     "HISTORICAL_SECTOR_SHARE"
   ],
-  "bounded_conclusion": "No current public authoritative sector allocation of the FY2025 national-accounts direct-investment-profit aggregate was located in the audited source set. Sector attribution remains blocked; this is not a claim of universal source absence.",
+  "bounded_conclusion": "No current public authoritative sector allocation of the FY2025 national-accounts direct-investment-profit aggregate was located in the parsed audited source set. Sector attribution remains blocked. Public-source exhaustion is not claimed because discovered authoritative XLSX manifestations remain unparsed.",
   "next_public_source_targets": [
     "Planning Board downloadable Ingreso y Producto 2025 Excel tables",
     "Planning Board 2025 Statistical Appendix Excel tables",
