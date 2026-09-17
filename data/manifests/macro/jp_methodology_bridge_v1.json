@@ -1,0 +1,81 @@
+{
+  "manifest_version": "1.0",
+  "snapshot_date_utc": "2026-09-17",
+  "scope": "Planning Board methodology bridge for direct-investment profits, industry aggregation, and rest-of-world treatment",
+  "authority": "Puerto Rico Planning Board / Junta de Planificacion",
+  "source": {
+    "title": "Metodologia de Procesos de Cuentas Economicas / Metodologia Cuentas Sociales",
+    "document_date": "2018-03",
+    "current_publication_manifestation": "https://jp.pr.gov/wp-content/uploads/2023/11/Metodologia-Cuentas-Sociales.pdf",
+    "publication_manifestation_year": 2023,
+    "raw_bytes_frozen": false,
+    "sha256": null
+  },
+  "findings": [
+    {
+      "id": "DI_PROFIT_BASE_BY_INDUSTRIAL_SECTOR",
+      "state": "FACT_METHODOLOGY",
+      "description": "The methodology states that a CRIM-based direct-investment-firm study collects profit information used to prepare base data by industrial sector.",
+      "implication": "A sectoral statistical production mechanism exists in the documented methodology; this does not prove that a FY2025 public sector table is currently published."
+    },
+    {
+      "id": "DI_FIRM_UNIVERSE_CONTROL",
+      "state": "FACT_METHODOLOGY",
+      "description": "The base study is designed to cover the universe of direct-investment firms, maintain a register, trace missing returns, and prioritize important firms; sectors with few firms should be covered as a universe.",
+      "implication": "Text-search absence or a partial company list cannot establish the direct-investment firm denominator."
+    },
+    {
+      "id": "MULTISOURCE_DI_PROFIT_DATABASE",
+      "state": "FACT_METHODOLOGY",
+      "description": "The methodology calls for a Balance of Payments unit database combining all sources for direct-investment-firm profits over a series of years, drawing on CRIM/tax-return information, questionnaires, Income Net data, and Hacienda information.",
+      "implication": "Current published aggregates may derive from confidential/multi-source firm-level inputs; public industry context cannot substitute for the missing published allocation."
+    },
+    {
+      "id": "ANNUAL_INTERPOLATION_AND_REVISION",
+      "state": "FACT_METHODOLOGY",
+      "description": "When base-year figures exist, intermediate-year estimates may be established with indicators and later revised; calendar-year company profits should be converted to fiscal-year basis.",
+      "implication": "A current annual sector estimate may contain estimation/revision layers and cannot be reconstructed reliably from a single unrelated current-year proxy."
+    },
+    {
+      "id": "NET_INCOME_COMPANY_TO_NAICS_AGGREGATION",
+      "state": "FACT_METHODOLOGY",
+      "description": "Income Net survey information is collected by company and aggregated by industry following NAICS; JP publishes Income Net tables by industrial sector, legal sector, and payment type.",
+      "implication": "Income Net has a company-to-industry source architecture but remains a distinct measurement domain from direct-investment profits unless an authoritative bridge is supplied."
+    },
+    {
+      "id": "IP11_SOURCE_ROLE",
+      "state": "FACT_METHODOLOGY",
+      "description": "IP-11 is used for Hacienda/tax-return-derived Income Net information and can support sales, wages, profits, interest paid, and interest received estimates.",
+      "implication": "IP-11 is a high-priority source instrument for methodology/source-lineage exhaustion, not itself a public FY2025 DI-profit sector table."
+    },
+    {
+      "id": "PARENT_COMPANY_EXPENSE_TREATMENT",
+      "state": "FACT_METHODOLOGY",
+      "description": "Administrative and other charges assigned by parent companies to Puerto Rico direct-investment firms are treated as payments deducted in establishing profits and recorded as miscellaneous payments from a Puerto Rico resident to a nonresident.",
+      "source_inputs": ["Hacienda income-tax returns", "IP-11", "IP-546"],
+      "implication": "Parent-company charges are a separate rest-of-world payment mechanism and must not be conflated with the direct-investment-profit aggregate."
+    }
+  ],
+  "source_instruments_identified": [
+    "BP-11",
+    "IP-11",
+    "IP-546",
+    "IP-553",
+    "industry-specific Ingreso Neto questionnaires"
+  ],
+  "public_search_result_for_instruments": {
+    "BP-11": "NO_SEPARATE_PUBLIC_FORM_LOCATED_IN_BOUNDED_SEARCH",
+    "IP-11": "NO_SEPARATE_PUBLIC_FORM_LOCATED_IN_BOUNDED_SEARCH",
+    "IP-546": "NO_SEPARATE_PUBLIC_FORM_LOCATED_IN_BOUNDED_SEARCH",
+    "IP-553": "NO_SEPARATE_PUBLIC_FORM_LOCATED_IN_BOUNDED_SEARCH",
+    "industry_specific_ingreso_neto": "CURRENT_LISTINGS_DISCOVERED_ARTIFACT_CONTENT_BLOCKED"
+  },
+  "current_sector_bridge_state": "METHODOLOGY_PROVES_SECTOR_PRODUCTION_PATH_BUT_CURRENT_PUBLIC_2025_TABLE_UNRETRIEVED",
+  "certification_effect": {
+    "sector_allocation": "BLOCKED",
+    "company_allocation": "BLOCKED_UPSTREAM",
+    "public_source_exhaustion": "OPEN",
+    "foia_or_public_records": "NOT_YET_REACHED"
+  },
+  "hard_boundary": "Documented methodology is evidence of how the statistical system can construct sector-level direct-investment-profit estimates; it is not evidence of the actual FY2025 sector amounts."
+}
