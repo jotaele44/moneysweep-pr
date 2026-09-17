@@ -1,0 +1,6 @@
+fiscal_year,na_di_profits_millions,bop_di_income_debit_millions,delta_bop_minus_na_millions,delta_pct_of_na,state,na_source_vintage,bop_source_vintage,notes
+2021,34174.4,36063.8,1889.4,5.529,NONCOMPARABLE_AS_IDENTITY,2025,2025,"Parallel diagnostic only; FY2021 national-account factor context remains stale relative to selected revised macro denominator."
+2022,36466.2,37618.9,1152.7,3.161,NONCOMPARABLE_AS_IDENTITY,2025,2025,"Parallel diagnostic only."
+2023,37512.6,38865.2,1352.6,3.606,NONCOMPARABLE_AS_IDENTITY,2025,2025,"Parallel diagnostic only."
+2024,40857.7,42332.2,1474.5,3.609,NONCOMPARABLE_AS_IDENTITY,2025,2025,"Parallel diagnostic only."
+2025,41664.1,43249.7,1585.6,3.806,NONCOMPARABLE_AS_IDENTITY,2025,2025,"Parallel diagnostic only."
