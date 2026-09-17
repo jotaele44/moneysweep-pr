@@ -6,7 +6,7 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Internal MoneySweep V2 accounting, reconciliation, methodology-bridge, bounded public-source exhaustion, workbook-audit, and historical sector-lineage core. It introduces no independent human-facing workflow; GUI exposure requires a later backend-to-GUI parity vector.",
+      "rationale": "Internal MoneySweep V2 accounting, reconciliation, methodology-bridge, bounded public-source exhaustion, workbook-audit, historical sector-lineage, and cross-account diagnostic core. It introduces no independent human-facing workflow; GUI exposure requires a later backend-to-GUI parity vector.",
       "backend": {
         "files": [
           "moneysweep/capital_flow/__init__.py",
@@ -18,6 +18,7 @@
         "files": [
           "data/staging/processed/macro/pr_gdp_gnp_ledger_v0.csv",
           "data/staging/processed/macro/pr_factor_income_ledger_v0.csv",
+          "data/staging/processed/macro/pr_na_bop_di_bridge_v0.csv",
           "data/manifests/macro/pr_gdp_gnp_sources_v0.json",
           "data/manifests/macro/sector_decomposition_source_audit_v0.json",
           "data/manifests/macro/jp_public_exhaustion_v1.json",
@@ -43,7 +44,8 @@
           "tests/test_public_source_exhaustion_gates.py",
           "tests/test_methodology_bridge.py",
           "tests/test_audit_jp_macro_workbooks.py",
-          "tests/test_di_profit_sector_lineage.py"
+          "tests/test_di_profit_sector_lineage.py",
+          "tests/test_na_bop_di_bridge.py"
         ]
       },
       "candidate_ids": [
