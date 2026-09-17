@@ -6,7 +6,7 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Internal MoneySweep V2 accounting and reconciliation core. It introduces no independent human-facing workflow; GUI exposure requires a later backend-to-GUI parity vector.",
+      "rationale": "Internal MoneySweep V2 accounting, reconciliation, and bounded public-source exhaustion core. It introduces no independent human-facing workflow; GUI exposure requires a later backend-to-GUI parity vector.",
       "backend": {
         "files": [
           "moneysweep/capital_flow/__init__.py",
@@ -20,6 +20,10 @@
           "data/staging/processed/macro/pr_factor_income_ledger_v0.csv",
           "data/manifests/macro/pr_gdp_gnp_sources_v0.json",
           "data/manifests/macro/sector_decomposition_source_audit_v0.json",
+          "data/manifests/macro/jp_public_exhaustion_v1.json",
+          "data/manifests/macro/jp_questionnaire_universe_v1.json",
+          "data/manifests/macro/jp_bop_iip_lineage_v1.json",
+          "docs/PUBLIC_SOURCE_EXHAUSTION_V1.md",
           "registries/capital_flow_macro_sources.json",
           "schemas/capital_flow_observation.schema.json",
           "schemas/macro_account_observation.schema.json",
@@ -32,7 +36,8 @@
           "tests/test_capital_flow_schema_contracts.py",
           "tests/test_macro_account_ledger.py",
           "tests/test_factor_income_ledger.py",
-          "tests/test_sector_decomposition_boundary.py"
+          "tests/test_sector_decomposition_boundary.py",
+          "tests/test_public_source_exhaustion_gates.py"
         ]
       },
       "candidate_ids": [
