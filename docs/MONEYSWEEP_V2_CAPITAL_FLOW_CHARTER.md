@@ -34,11 +34,18 @@ Policy interpretation is downstream of economic-flow and identity closure.
 - Lobbying is not influence.
 - Contribution is not quid pro quo.
 - Macro aggregate is not company-specific flow.
+- Sector aggregate is not company-specific flow.
+- Sector GDP is not a direct-investment-profit allocation.
+- Historical sector share is not current sector share.
 - `UNKNOWN` is not zero.
 - Require arithmetic closure at every decomposition layer.
 - Historical policy evidence does not automatically prove current causal effect.
 - Hard recipient/ownership evidence overrides geographic or corporate-profile inference.
 - Lens Realignment is permitted only when empirical decomposition shows another metric better explains Puerto Rico capital retention.
+
+## Public-source exhaustion before request escalation
+
+Request/FOIA escalation is downstream of public-source exhaustion. A source family is not publicly exhausted while known authoritative downloadable manifestations, successor series, tables, workbooks, archives, or public data-center records remain uninspected. A tool-access or parser limitation is `BLOCKED`, not evidence that the source or requested field is absent.
 
 ## Measurement taxonomy
 
@@ -176,8 +183,9 @@ Until those conditions are met, outputs remain `PASS` for implementation, `PROVI
 3. Add annual macro-account schema and GDP−GNP arithmetic closure.
 4. Build Puerto Rico macro ledger from authoritative source manifestations.
 5. Decompose factor/property income into source-supported categories.
-6. Bind sector and entity observations without forcing allocation of aggregates.
-7. Reuse the existing capital-control graph for parent/owner adjudication.
-8. Add retention metrics only after denominator and destination closure.
-9. Connect tax incentives, lobbying, campaign finance, and policy downstream.
-10. Add human-facing workflows only with full federation GUI parity.
+6. Exhaust authoritative current sector-profit manifestations before sector allocation; never use proxy shares as canonical allocations.
+7. Bind sector and entity observations without forcing allocation of aggregates.
+8. Reuse the existing capital-control graph for parent/owner adjudication.
+9. Add retention metrics only after denominator and destination closure.
+10. Connect tax incentives, lobbying, campaign finance, and policy downstream.
+11. Add human-facing workflows only with full federation GUI parity.
