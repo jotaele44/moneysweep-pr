@@ -21,6 +21,10 @@ import requests
 
 DEFAULT_MANIFEST = Path("data/manifests/macro/jp_public_exhaustion_v1.json")
 USER_AGENT = "MoneySweep-V2-Public-Source-Audit/1.0"
+XLSX_ACCEPT = (
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,"
+    "application/octet-stream;q=0.9,*/*;q=0.1"
+)
 
 
 def _sha256(data: bytes) -> str:
@@ -59,7 +63,7 @@ def acquire_one(
     retrieved_utc = datetime.now(timezone.utc).isoformat()
     response = session.get(
         url,
-        headers={"User-Agent": USER_AGENT, "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream;q=0.9,*/*;q=0.1"},
+        headers={"User-Agent": USER_AGENT, "Accept": XLSX_ACCEPT},
         timeout=timeout,
         allow_redirects=True,
     )
@@ -77,7 +81,10 @@ def acquire_one(
     headers_path = header_dir / f"{filename}.headers.json"
     raw_path.write_bytes(data)
     headers = {str(key): str(value) for key, value in response.headers.items()}
-    headers_path.write_text(json.dumps(headers, indent=2, sort_keys=True), encoding="utf-8")
+    headers_path.write_text(
+        json.dumps(headers, indent=2, sort_keys=True),
+        encoding="utf-8",
+    )
 
     return {
         "source_id": source_id,
@@ -134,7 +141,8 @@ def acquire_all(
     }
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "source_manifest.json").write_text(
-        json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8"
+        json.dumps(payload, indent=2, ensure_ascii=False),
+        encoding="utf-8",
     )
     return payload
 
@@ -146,7 +154,8 @@ def main() -> int:
     args = parser.parse_args()
 
     payload = acquire_all(args.manifest, args.out_dir)
-    print(json.dumps({key: payload[key] for key in ("expected_count", "frozen_count", "failure_count", "complete")}, indent=2))
+    summary_keys = ("expected_count", "frozen_count", "failure_count", "complete")
+    print(json.dumps({key: payload[key] for key in summary_keys}, indent=2))
     return 0 if payload["complete"] else 2
 
 
