@@ -47,8 +47,10 @@ def test_questionnaire_discovery_does_not_promote_sector_amounts() -> None:
 
     assert interpretation["content_review_state"] == "BLOCKED_ARTIFACT_RETRIEVAL"
     assert interpretation["public_source_exhaustion"] == "OPEN"
-    assert "does not prove" in interpretation["what_discovery_does_not_prove"].lower()
-    assert "fy2025" in interpretation["what_discovery_does_not_prove"].lower()
+    boundary = interpretation["what_discovery_does_not_prove"].lower()
+    assert "respondent microdata" in boundary
+    assert "fy2025" in boundary
+    assert "company-level dollar amounts" in boundary
 
 
 def test_broken_manifestation_is_not_source_absence() -> None:
