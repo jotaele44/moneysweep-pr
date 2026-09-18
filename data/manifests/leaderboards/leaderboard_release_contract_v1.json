@@ -1,0 +1,125 @@
+{
+  "schema_version": "moneysweep.leaderboard-release-contract/v1",
+  "repository": "jotaele44/moneysweep-pr",
+  "branch": "feature/moneysweep-leaderboard-plane",
+  "scope": "financial leaderboard producer plane",
+  "certification_scope": "moneysweep.leaderboard.production-v1",
+  "ranking_contract": "moneysweep.leaderboard/v1.1",
+  "ontology_contract": "moneysweep.financial-category-ontology/v1.1",
+  "certification_state": "BLOCKED",
+  "certification_issued": false,
+  "promotion_authorized": false,
+  "non_blocking_waivers": [
+    {
+      "id": "GITHUB_ACTIONS_EXECUTION",
+      "state": "WAIVED_BY_USER",
+      "asserts_pass": false,
+      "reason": "GitHub Actions runner acquisition is excluded as a blocker for this certification attempt; no unexecuted workflow is represented as passing."
+    }
+  ],
+  "blockers": [
+    {
+      "id": "HISTORICAL_MATERIALIZATION",
+      "state": "OPEN",
+      "reason": "Git-source replay is implemented; the two debt_issuance source manifestations must still be materialized as hash-verified snapshots and compared."
+    },
+    {
+      "id": "CERTIFIED_DEBT_SNAPSHOT",
+      "state": "OPEN",
+      "reason": "The production scope is bounded to debt_issuance; one current frozen snapshot must satisfy scope accounting/identity/runtime gates and be promoted to PASS by the scoped certifier."
+    },
+    {
+      "id": "THEHUB_EXACT_REPLAY",
+      "state": "OPEN",
+      "reason": "TheHub PR #285 is prepared; exact producer package replay must trust receipt, release, scope, and package SHA-256 values after producer certification."
+    }
+  ],
+  "closed_scope_decisions": [
+    {
+      "id": "ONTOLOGY_DENOMINATOR",
+      "state": "PASS",
+      "reason": "All 21 ontology categories are classified; production scope includes debt_issuance and explicitly excludes the other 20 without treating absence as zero."
+    },
+    {
+      "id": "HISTORICAL_SOURCE_DISCOVERY",
+      "state": "PASS",
+      "reason": "Repository history supplies a real debt source transition from 11 instruments/5 issuers to 20 instruments/14 issuers; replay preserves this as a dataset delta rather than automatic economic activity."
+    },
+    {
+      "id": "CERTIFICATION_RUNTIME_MODEL",
+      "state": "PASS",
+      "reason": "Ranking runtime and certification/release runtime are separately manifested to avoid circular release hashes; the exported package carries the certification-runtime manifest and digest."
+    },
+    {
+      "id": "EXACT_PACKAGE_TRUST_MODEL",
+      "state": "PASS",
+      "reason": "TheHub consumer requires the exact package SHA-256 in addition to receipt, release-manifest, and certification-scope SHA-256 trust bindings."
+    }
+  ],
+  "required_gates": [
+    "ONTOLOGY_SCHEMA",
+    "ONTOLOGY_DENOMINATOR_CLOSED",
+    "CERTIFICATION_SCOPE_CLOSED",
+    "ADAPTER_REGISTRY_CLOSED",
+    "NO_NAME_ONLY_IDENTITY",
+    "NO_CROSS_MEASURE_AGGREGATION",
+    "CURRENCY_PARTITION",
+    "TOP_N_TIE_BOUNDARY",
+    "NULL_EXPLICIT",
+    "IDENTITY_UNRESOLVED_EXPLICIT",
+    "MANY_TO_MANY_FAIL_CLOSED",
+    "ROW_ACCOUNTING_CLOSED",
+    "STABLE_ID_UNIQUENESS",
+    "SNAPSHOT_HASH_VALID",
+    "SNAPSHOT_COMPLETE_CANDIDATE_UNIVERSE",
+    "SNAPSHOT_COMPARABILITY",
+    "SOURCE_CHANGE_MOVEMENT_GUARD",
+    "RANKING_RUNTIME_MANIFEST_FROZEN",
+    "CERTIFICATION_RUNTIME_MANIFEST_FROZEN",
+    "PRODUCER_COMMIT_BOUND",
+    "SOURCE_MANIFESTATION_HASHES_EXPORTED",
+    "ENTITY_DRILLDOWN_WHOLE_ROW_CONSERVATION",
+    "SPATIAL_HANDOFF_NO_GEOMETRY_PROMOTION",
+    "THEHUB_CONSUMER_CONTRACT",
+    "CROSS_REPOSITORY_REPLAY",
+    "RECEIPT_RELEASE_SCOPE_HASH_TRUST",
+    "EXACT_PACKAGE_SHA256_TRUST",
+    "ZERO_MATERIAL_UNRESOLVED_RESIDUE_INSIDE_CERTIFIED_SCOPE"
+  ],
+  "implemented_surfaces": {
+    "backend": [
+      "server/backend/leaderboards.py",
+      "server/backend/leaderboard_adapters.py",
+      "server/backend/leaderboard_history.py",
+      "server/backend/leaderboard_investigation.py",
+      "server/backend/leaderboard_entities.py"
+    ],
+    "snapshot_materializer": "scripts/materialize_leaderboard_snapshot.py",
+    "git_history_materializer": "scripts/materialize_leaderboard_git_snapshot.py",
+    "snapshot_certifier": "scripts/certify_leaderboard_snapshot.py",
+    "release_finalizer": "scripts/finalize_leaderboard_release.py",
+    "certification_runtime_provenance": "scripts/leaderboard_release_provenance.py",
+    "certification_scope": "data/manifests/leaderboards/leaderboard_certification_scope_v1.json",
+    "history_source_refs": "data/manifests/leaderboards/debt_history_source_refs_v1.json",
+    "certification_receipt": "data/manifests/leaderboards/MONEYSWEEP_LEADERBOARD_CERTIFICATION.json",
+    "ontology_adapter_coverage": "data/manifests/leaderboards/ontology_adapter_coverage_v1.json",
+    "federation_exporter": "scripts/export_leaderboard_package.py",
+    "federation_export_schema": "schemas/leaderboard_export_package.schema.json",
+    "frontend": "dashboard/src/components/FinancialLeaderboards.jsx",
+    "api_client": "dashboard/src/lib/api.js",
+    "gui_capability": ".federation/gui-capabilities.extensions/financial-leaderboards-v1.json",
+    "thehub_consumer_pr": "jotaele44/thehub-pr#285"
+  },
+  "promotion_rules": {
+    "money_sweep_is_financial_authority": true,
+    "thehub_is_cross_producer_product_surface": true,
+    "spiderweb_is_geometry_authority": true,
+    "thehub_must_not_recompute_money_sweep_rankings": true,
+    "thehub_must_verify_receipt_release_scope_and_exact_package_hashes": true,
+    "snapshot_runtime_and_producer_commit_must_match_export": true,
+    "certification_runtime_manifest_must_be_frozen": true,
+    "source_and_runtime_manifestations_must_be_exported": true,
+    "provisional_snapshots_cannot_be_promoted": true,
+    "diagnostic_ui_does_not_imply_certification": true
+  }
+}

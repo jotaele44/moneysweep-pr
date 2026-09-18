@@ -41,10 +41,8 @@ EXPECTED = {
     "municipalities": ["municipality_id", "name", "region"],
 }
 
-app = FastAPI(title="moneysweep-pr API", version="0.2.0")
+app = FastAPI(title="moneysweep-pr API", version="0.3.0")
 
-# Dev CORS. Defaults to the Vite dev origins; override with a comma-separated
-# MONEYSWEEP_CORS_ORIGINS when the frontend runs on a different port/host.
 _default_origins = "http://localhost:5173,http://127.0.0.1:5173"
 _origins = [
     o.strip()
@@ -76,7 +74,7 @@ def _load() -> None:
         DATA[name] = df
 
 
-_load()  # eager load at import → fail fast on missing files / header drift
+_load()
 
 
 def _num(v):
@@ -275,14 +273,14 @@ def stats():
     }
 
 
-# Optional domains are loaded lazily from staging outputs so the core dashboard
-# still boots when their materialized datasets are absent.
 from server.backend.api_keys import router as api_keys_router  # noqa: E402
 from server.backend.campaign_finance import router as campaign_finance_router  # noqa: E402
 from server.backend.government_changes import router as government_changes_router  # noqa: E402
+from server.backend.leaderboards import create_router as create_leaderboard_router  # noqa: E402
 from server.backend.ownership_api import router as ownership_router  # noqa: E402
 
 app.include_router(api_keys_router)
 app.include_router(campaign_finance_router)
 app.include_router(government_changes_router)
+app.include_router(create_leaderboard_router(DATA))
 app.include_router(ownership_router)
