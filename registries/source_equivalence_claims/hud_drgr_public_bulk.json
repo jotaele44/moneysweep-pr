@@ -1,0 +1,27 @@
+{
+  "schema_version": "moneysweep.source_equivalence/v1",
+  "source_id": "hud_drgr_authorized",
+  "candidate_source": {
+    "name": "HUD DRGR public or bulk data surfaces",
+    "source_url": "https://drgr.hud.gov/",
+    "authoritative": true
+  },
+  "tests": {
+    "semantic_scope_match": false,
+    "temporal_scope_match": false,
+    "row_universe_match": false,
+    "field_mapping_complete": false,
+    "selection_equivalent": false,
+    "aggregation_equivalent": false
+  },
+  "missing_fields": [],
+  "extra_fields": [],
+  "evidence": [
+    {
+      "kind": "equivalence_status_note",
+      "locator": "docs/equivalence_evidence/hud_drgr_public_bulk.md",
+      "sha256": "12d2f5fcec857de89a61d71b3db7d0e7e44eb26baa0253cf143a3f49387f0a63"
+    }
+  ],
+  "notes": "Fail closed. Public availability is not evidence that the candidate matches the authorized PR DRGR activity/project export universe."
+}
