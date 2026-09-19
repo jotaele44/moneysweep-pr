@@ -1,0 +1,18 @@
+{
+  "binding_schema_version": "spiderweb.cell_source_binding.v0.1",
+  "certification_state": "PROVISIONAL",
+  "consumer": "moneysweep-pr",
+  "consumption_rule": "Consume Cell_ID, Cell_Set_ID and neighbour/parent relations. Do not recompute spatial membership, do not fetch or render canonical geometry, and do not publish a competing grid. Same Cell_ID everywhere, different payload everywhere.",
+  "contracts": [
+    "federation_cell_index@1",
+    "cell_domain_summary@1",
+    "record_cell_binding@1",
+    "cell_profile@1"
+  ],
+  "control_plane": "thehub-pr",
+  "generation": "federation-spatial-index/1",
+  "geometry_authority": "spiderweb-pr",
+  "geometry_version": "pr_grid_geometry_v0_1",
+  "grid_version": "pr_grid_full_cell_index_saturated_v1",
+  "identity_default": "CANDIDATE_NOT_IDENTITY"
+}
