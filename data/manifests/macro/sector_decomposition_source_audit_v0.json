@@ -1,0 +1,97 @@
+{
+  "manifest_version": "0.2",
+  "scope": "Current public-source audit for Puerto Rico direct-investment-profit sector decomposition",
+  "audit_date_utc": "2026-09-17",
+  "certification_state": "BLOCKED",
+  "public_source_exhaustion_state": "OPEN_DOWNLOADABLE_WORKBOOKS_NOT_YET_PARSED",
+  "target_measure": {
+    "name": "profits_of_direct_investments",
+    "fiscal_year": 2025,
+    "amount_millions": 41664.1,
+    "source_family": "Puerto Rico Planning Board national accounts",
+    "sector_denominator_state": "BLOCKED_PUBLIC_SOURCE_DENOMINATOR"
+  },
+  "audited_sources": [
+    {
+      "source_id": "jp_income_product_2025",
+      "authority": "Puerto Rico Planning Board / Junta de Planificacion",
+      "url": "https://jp.pr.gov/wp-content/uploads/2026/03/INGRESO-Y-PRODUCTO-2025-rev-11.17.25-9-25am.pdf",
+      "current": true,
+      "observed_measurements": [
+        "GDP_GNP",
+        "NET_PROFIT_REST_OF_WORLD",
+        "PROFITS_DIVIDENDS_PAID_REST_OF_WORLD",
+        "DIVIDENDS_PAID_NONRESIDENTS",
+        "DIRECT_INVESTMENT_PROFITS",
+        "INDUSTRY_GROSS_PRODUCT_GDP",
+        "INDUSTRY_NET_INCOME",
+        "INDUSTRY_FUNCTIONAL_INCOME"
+      ],
+      "sector_direct_investment_profit_allocation_found": false,
+      "admissibility": "AUTHORITATIVE_AGGREGATE_AND_SECTOR_CONTEXT",
+      "notes": "Detailed industrial tables are not documented as a decomposition of direct-investment profits."
+    },
+    {
+      "source_id": "jp_balance_payments_2025",
+      "authority": "Puerto Rico Planning Board / Junta de Planificacion",
+      "url": "https://jp.pr.gov/wp-content/uploads/2026/01/Balanza-de-Pagos-2025-1.pdf",
+      "current": true,
+      "observed_measurements": [
+        "DIRECT_INVESTMENT_INCOME_CREDIT",
+        "DIRECT_INVESTMENT_INCOME_DEBIT",
+        "DIRECT_INVESTMENT_FINANCIAL_ACCOUNT"
+      ],
+      "sector_direct_investment_profit_allocation_found": false,
+      "admissibility": "AUTHORITATIVE_AGGREGATE_DIFFERENT_ACCOUNTING_CONCEPT",
+      "notes": "Do not equate balance-of-payments direct-investment income debit with national-accounts profits of direct investments without authoritative reconciliation."
+    },
+    {
+      "source_id": "jp_economic_report_1995",
+      "authority": "Puerto Rico Planning Board / Junta de Planificacion",
+      "url": "https://jp.pr.gov/wp-content/uploads/2021/09/Informe-Economico-al-Gobernador-1995.pdf",
+      "current": false,
+      "observed_measurements": [
+        "DIRECT_INVESTMENT_PROFITS_BY_SECTOR"
+      ],
+      "sector_direct_investment_profit_allocation_found": true,
+      "admissibility": "HISTORICAL_SUPPORTING_ONLY",
+      "notes": "Historical sector shares cannot be carried forward to FY2022-FY2025."
+    }
+  ],
+  "discovered_unparsed_public_manifestations": [
+    {
+      "name": "Tablas Balanza de Pagos y Posicion de Inversion Internacional de Puerto Rico 2025",
+      "format": "XLSX",
+      "state": "DISCOVERED_DOWNLOAD_ENDPOINT_UNPARSED"
+    },
+    {
+      "name": "Tablas - Apendice Estadistico 2025",
+      "format": "XLSX",
+      "state": "DISCOVERED_DOWNLOAD_ENDPOINT_UNPARSED"
+    },
+    {
+      "name": "Tablas de Ingreso y Producto 2025",
+      "format": "XLSX",
+      "state": "DISCOVERED_DOWNLOAD_ENDPOINT_UNPARSED"
+    }
+  ],
+  "forbidden_proxy_allocators": [
+    "INDUSTRY_GDP_SHARE",
+    "INDUSTRY_GROSS_PRODUCT_SHARE",
+    "INDUSTRY_NET_INCOME_SHARE",
+    "PAYROLL_SHARE",
+    "EMPLOYMENT_SHARE",
+    "EXPORT_SHARE",
+    "FACILITY_COUNT_SHARE",
+    "TAX_INCENTIVE_SHARE",
+    "HISTORICAL_SECTOR_SHARE"
+  ],
+  "bounded_conclusion": "No current public authoritative sector allocation of the FY2025 national-accounts direct-investment-profit aggregate was located in the parsed audited source set. Sector attribution remains blocked. Public-source exhaustion is not claimed because discovered authoritative XLSX manifestations remain unparsed.",
+  "next_public_source_targets": [
+    "Planning Board downloadable Ingreso y Producto 2025 Excel tables",
+    "Planning Board 2025 Statistical Appendix Excel tables",
+    "Planning Board Balance of Payments 2025 downloadable tables",
+    "Planning Board macro data center successor series",
+    "later/historical continuation of direct-investment-profit-by-sector table"
+  ]
+}

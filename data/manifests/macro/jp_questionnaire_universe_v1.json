@@ -1,0 +1,76 @@
+{
+  "manifest_version": "1.1",
+  "snapshot_date_utc": "2026-09-17",
+  "scope": "Current publicly listed Puerto Rico Planning Board questionnaires relevant to Ingreso Neto / sector-source collection",
+  "discovery_pages": [
+    "https://www.jp.pr.gov/planificacion-economica-social?f3e4806a_page=2",
+    "https://www.jp.pr.gov/planificacion-economica-social?f3e4806a_page=3",
+    "https://www.jp.pr.gov/planificacion-economica-social?f3e4806a_page=4",
+    "https://www.jp.pr.gov/estudios-e-investigacion/centro-de-datos-macroeconomicos"
+  ],
+  "state": "DISCOVERED_CONTENT_NOT_EXHAUSTED",
+  "forms": [
+    {"code":"IP-110","title":"Agricultura / Agriculture","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-210","title":"Minería / Mining","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-220","title":"Utilidades / Utilities","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-230","title":"Construcción / Construction","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-310","title":"Manufactura / Manufacturing","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD","url":"https://docs.pr.gov/files/JP-Junta%20de%20Planificacion/Programa%20de%20Planificaci%C3%B3n%20Econ%C3%B3mica%20y%20Social/Instrumentos%20de%20trabajo/Cuestionarios%20%28Ingreso%20Neto%2C%20Construcci%C3%B3n%2C%20Balanza%20de%20Pagos%29/Balanza%20de%20Pagos/Ingreso%20Neto/IP-310-Manufactura-Manufacturing.doc?d=wf5306ec764c24e3ab414db98f635aad2"},
+    {"code":"IP-310b","title":"Manufacturas de Bebidas / Beverage Manufacturing","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-420","title":"Comercio al Por Mayor / Wholesalers","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-440","title":"Comercio al Detal / Retail Trade","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-440g","title":"Estaciones de Gasolina / Gas Stations","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-480","title":"Transportación / Transportation","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-480a","title":"Transportación Aérea / Air Transportation","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-490","title":"Correos y Mensajeros / Couriers and Messengers","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-510","title":"Informática / Information","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-520","title":"Finanzas y Seguros / Finance and Insurance","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD","url":"https://docs.pr.gov/files/JP-Junta%20de%20Planificacion/Programa%20de%20Planificaci%C3%B3n%20Econ%C3%B3mica%20y%20Social/Instrumentos%20de%20trabajo/Cuestionarios%20%28Ingreso%20Neto%2C%20Construcci%C3%B3n%2C%20Balanza%20de%20Pagos%29/Balanza%20de%20Pagos/Ingreso%20Neto/IP-520-Finanzas-y-Seguros-Finance-and-Insurance.doc?d=w05b1a7c636cd491e882e3dcb7a9787c2"},
+    {"code":"IP-520a","title":"Agencias, Corretaje y Otros / Agencies, Brokerages and Other Related Activities","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD","duplicate_listing_observed":true},
+    {"code":"IP-520s","title":"Empresas Aseguradoras y Actividades Relacionadas / Insurance Carriers and Related Activities","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-530","title":"Inmobiliaria y Arrendamientos / Real Estate and Rental","document_state":"LISTED_OFFICIAL_CONTENT_UNRETRIEVED"},
+    {"code":"IP-540","title":"Servicios Profesionales, Técnicos y Científicos / Professional, Scientific and Technical Enterprises","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-540J","title":"Administración de Empresas / Management of Companies","document_state":"LISTED_OFFICIAL_CONTENT_UNRETRIEVED"},
+    {"code":"IP-540P","title":"Organización de Viajes y Servicios de Reservación / Travel Arrangement and Reservation Services","document_state":"LISTED_OFFICIAL_CONTENT_UNRETRIEVED"},
+    {"code":"IP-540S","title":"Servicios Administrativos y de Apoyo / Administrative Services and Support","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-540v","title":"Veterinarios y Otros Servicios de Animales / Veterinarians Offices","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-610","title":"Servicios de Educación / Educational Services","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-620","title":"Servicios de Salud / Health Care and Social Services","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-710","title":"Arte, Entretenimiento y Recreación / Art, Entertainment and Recreation","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-720","title":"Alojamiento y Servicios de Comida / Accommodation and Food Services","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"IP-810","title":"Otros Servicios / Other Services","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"JP-560-63110","title":"Seguros Domésticos de Vida / Domestic Life Insurance","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD","duplicate_listing_observed":true},
+    {"code":"JP-560-63111","title":"Organizaciones de Servicio de Salud / Health Service Organizations","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"JP-560-63210","title":"Seguros Domésticos Propiedad y Contingencia / Domestic Property and Casualty Insurance","document_state":"LISTED_BUT_CLICKED_MANIFESTATION_404","source_absence":false},
+    {"code":"JP-560.2","title":"Preliminar / Preliminary","document_state":"RESOLVED_OFFICIAL_DOC_BLOCKED_MSWORD"},
+    {"code":"JP-541","title":"Encuesta sobre el Valor de la Inversión en Obras de Construcción 2025","document_state":"LISTED_OFFICIAL_CONTENT_UNRETRIEVED","measurement_domain":"CONSTRUCTION_INVESTMENT_NOT_DIRECT_INVESTMENT_PROFITS"}
+  ],
+  "official_form_inventory_corroboration": {
+    "source_authority": "Puerto Rico Institute of Statistics / Comité de Coordinación de Estadísticas",
+    "source_title": "Presentación Formularios",
+    "source_url": "https://cce.estadisticas.pr/sites/default/files/Documentos/Reuniones/Presentaci%C3%B3n%20Formularios.pdf",
+    "evidence_state": "AUTHORITATIVE_SUPPORTING_NOT_CURRENT_MANIFESTATION_IDENTITY",
+    "income_net_architecture": {
+      "form_type": "Estado de Ingresos y Gastos diferenciado por industria",
+      "unit": "Ingreso Neto",
+      "periodicity": "ANNUAL",
+      "recipient_universe": "Empresas privadas y organizaciones sin fines de lucro",
+      "form_codes_observed": [
+        "IP-110","IP-210","IP-220","IP-230","IP-310","IP-310-Bebidas","IP-420","IP-440","IP-440-Gasolineras","IP-480","IP-480-Aereo","IP-490","IP-510","IP-520","IP-520-A","IP-520-S","IP-530","IP-540","IP-540-A","IP-540-J","IP-540-P","IP-540-S","IP-540-V","IP-610","IP-620","IP-710","IP-720","IP-810"
+      ]
+    },
+    "bop_and_other_forms_observed": [
+      {"code":"JP-529","title":"Relación de Aportaciones y Donativos Federales Recibidos","unit":"Balanza de Pagos","periodicity":"ANNUAL"},
+      {"code":"JP-362","title":"Información para la Balanza de Pagos de Puerto Rico","unit":"Balanza de Pagos","periodicity":"ANNUAL"},
+      {"code":"JP-544","title":"Transacciones con el Exterior para la Balanza de Pagos","unit":"Balanza de Pagos","periodicity":"ANNUAL"},
+      {"code":"JP-536","title":"Estados de Ingresos y Gastos","unit":"Ingreso Neto","recipient_universe":"Corporaciones Públicas","periodicity":"ANNUAL"},
+      {"code":"JP-316","title":"Information for the Gross Product","unit":"Ingreso Neto","recipient_universe":"Corporaciones Públicas","periodicity":"ANNUAL"}
+    ],
+    "identity_boundary": "This source corroborates collection architecture and form roles. It does not prove that every historical form code is currently active or bind a form listing to respondent microdata."
+  },
+  "interpretation": {
+    "what_discovery_proves": "JP currently exposes industry-specific collection instruments across a broad industry universe, independently corroborated by an official statistics form inventory.",
+    "what_discovery_does_not_prove": "A blank form, historical form inventory, or listing does not establish respondent microdata, a published FY2025 direct-investment-profit sector allocation, ownership geography, or company-level dollar amounts.",
+    "content_review_state": "BLOCKED_ARTIFACT_RETRIEVAL",
+    "public_source_exhaustion": "OPEN"
+  },
+  "next_gate": "Acquire original DOC/DOCX questionnaire bytes and instructions; freeze SHA256; inspect exact fields, definitions, industry scope, residency/ownership questions, and aggregation instructions before drawing any sector-bridge conclusion."
+}

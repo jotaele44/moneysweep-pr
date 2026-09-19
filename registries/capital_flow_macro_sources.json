@@ -1,0 +1,62 @@
+{
+  "version": "0.2",
+  "scope": "MoneySweep V2 Puerto Rico macro reconciliation sources",
+  "sources": [
+    {
+      "source_id": "jp_statistical_appendix_2019",
+      "authority": "Puerto Rico Planning Board / Junta de Planificacion",
+      "family": "macro_accounts",
+      "endpoint_url": "https://docs.pr.gov/files/JP-Junta%20de%20Planificacion/Programa%20de%20Planificaci%C3%B3n%20Econ%C3%B3mica%20y%20Social/Apendice%20Estadistico/Publicaciones/Apendice-Estadistico-2019.pdf",
+      "publication_vintage": "2019",
+      "coverage": {"fiscal_year_start": 2010, "fiscal_year_end": 2019},
+      "tables": ["TABLE_9_MAJOR_INDUSTRY"],
+      "acquisition_mode": "authoritative_document",
+      "update_cadence": "historical_frozen_source_candidate",
+      "canonical_role": "historical_manifestation_and_pre_2016_anchor",
+      "producer": null,
+      "status": "REGISTERED_PROVISIONAL"
+    },
+    {
+      "source_id": "jp_income_product_2025",
+      "authority": "Puerto Rico Planning Board / Junta de Planificacion",
+      "family": "macro_accounts",
+      "endpoint_url": "https://jp.pr.gov/wp-content/uploads/2026/03/INGRESO-Y-PRODUCTO-2025-rev-11.17.25-9-25am.pdf",
+      "publication_vintage": "2025",
+      "coverage": {"fiscal_year_start": 2016, "fiscal_year_end": 2025},
+      "tables": ["TABLE_1_SELECTED_SERIES", "TABLE_9_MAJOR_INDUSTRY", "TABLE_10_DETAILED_INDUSTRY"],
+      "acquisition_mode": "authoritative_document",
+      "update_cadence": "annual_successor_check",
+      "canonical_role": "current_macro_series_candidate",
+      "producer": null,
+      "status": "REGISTERED_PROVISIONAL",
+      "revision_adjudications": [
+        {
+          "fiscal_year": 2021,
+          "class": "TIME",
+          "state": "PROVISIONAL_RESOLVED",
+          "current_candidate": {"gnp_millions": 73357.2, "gdp_millions": 106426.6},
+          "superseded_candidate": {"gnp_millions": 72950.6, "gdp_millions": 106368.9},
+          "evidence": [
+            {
+              "publication_vintage": "2022",
+              "url": "https://jp.pr.gov/wp-content/uploads/2024/02/IEG-2022-GRAY.pdf",
+              "role": "older_revision"
+            },
+            {
+              "publication_vintage": "2023",
+              "url": "https://jp.pr.gov/wp-content/uploads/2024/07/IEG2023-OCE-SA-2024-08598.pdf",
+              "role": "later_revision"
+            },
+            {
+              "publication_vintage": "2024",
+              "url": "https://jp.pr.gov/wp-content/uploads/2025/04/APENDICE-ESTADISTICO-2024.pdf",
+              "role": "later_revision_corroboration"
+            }
+          ],
+          "notes": "The 2025 detailed table preserves an older value pair, but later authoritative Planning Board publication vintages establish the revised pair. The stale observation remains preserved as SUPERSEDED; this is not a byte-identity finding."
+        }
+      ]
+    }
+  ],
+  "promotion_gate": "No source becomes required in the global source_registry.json until an idempotent producer freezes bytes, SHA256, schema, row count, and revision lineage."
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moneysweep.pr/schemas/factor_income_observation.schema.json",
+  "title": "MoneySweep Rest-of-World Factor Income Observation",
+  "type": "object",
+  "required": [
+    "observation_id",
+    "fiscal_year",
+    "manifestation_id",
+    "publication_vintage",
+    "component",
+    "amount_millions",
+    "direction",
+    "macro_revision_alignment",
+    "certification_state"
+  ],
+  "properties": {
+    "observation_id": {"type": "string", "pattern": "^FACTOR_[A-Za-z0-9_.:-]+$"},
+    "fiscal_year": {"type": "integer", "minimum": 1900, "maximum": 2100},
+    "manifestation_id": {"type": "string", "minLength": 1},
+    "publication_vintage": {"type": "string", "pattern": "^[0-9]{4}([-.][A-Za-z0-9]+)?$"},
+    "source_table": {"type": "string", "minLength": 1},
+    "component": {
+      "type": "string",
+      "enum": [
+        "NET_PROFIT_RECEIVED_REST_OF_WORLD",
+        "DIVIDENDS_RECEIVED_ABROAD",
+        "PROFITS_DIVIDENDS_PAID_REST_OF_WORLD",
+        "DIVIDENDS_PAID_NONRESIDENTS",
+        "DIRECT_INVESTMENT_PROFITS"
+      ]
+    },
+    "amount_millions": {"type": "number"},
+    "raw_value": {"type": "string"},
+    "direction": {"type": "string", "enum": ["INTO_PR", "OUT_OF_PR", "NET"]},
+    "macro_revision_alignment": {
+      "type": "string",
+      "enum": ["ALIGNED", "STALE_MACRO_REVISION_CONTEXT", "UNKNOWN"]
+    },
+    "source_document_sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "source_bytes_frozen": {"type": "boolean"},
+    "certification_state": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "OPEN", "BLOCKED", "PROVISIONAL", "UNRESOLVED", "SUPERSEDED"]
+    },
+    "notes": {"type": ["string", "null"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"source_bytes_frozen": {"const": true}}, "required": ["source_bytes_frozen"]},
+      "then": {
+        "required": ["source_document_sha256"],
+        "properties": {"source_document_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+      }
+    }
+  ],
+  "additionalProperties": true
+}

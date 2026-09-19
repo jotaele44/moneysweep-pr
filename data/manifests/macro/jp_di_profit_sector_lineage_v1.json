@@ -1,0 +1,48 @@
+{
+  "manifest_version": "1.0",
+  "snapshot_date_utc": "2026-09-17",
+  "scope": "Bounded public publication lineage for Puerto Rico Planning Board direct-investment profits by sector",
+  "state": "PASS_BOUNDED_LINEAGE_NOT_CURRENT_DENOMINATOR",
+  "observations": [
+    {
+      "publication": "Informe Economico al Gobernador 1995",
+      "publication_year": 1995,
+      "table_title_raw": "GANANCIAS (PERDIDAS) DE LAS INVERSIONES DIRECTAS POR SECTOR",
+      "fiscal_years": [1992, 1993, 1994, 1995],
+      "sector_allocation_present": true,
+      "fy1995_total_millions": 14329.5,
+      "fy1995_manufacturing_millions": 13694.3,
+      "fy1995_manufacturing_share_pct_reported": 95.6,
+      "admissibility": "HISTORICAL_SUPPORTING_ONLY",
+      "carry_forward_to_2025": false
+    },
+    {
+      "publication": "Informe Economico al Gobernador 2020",
+      "publication_year": 2020,
+      "definition_present": true,
+      "definition": "Ganancia de las inversiones directas del resto del mundo",
+      "current_sector_allocation_found_in_parsed_public_report": false,
+      "admissibility": "CONCEPT_CONTINUITY_ONLY"
+    },
+    {
+      "publication": "Economic Report to the Governor 2022",
+      "publication_year": 2022,
+      "definition_present": true,
+      "definition": "Ganancia de las inversiones directas del resto del mundo",
+      "current_sector_allocation_found_in_parsed_public_report": false,
+      "admissibility": "CONCEPT_CONTINUITY_ONLY"
+    }
+  ],
+  "methodology_binding": {
+    "sector_production_path_documented": true,
+    "statement": "Planning Board methodology states that direct-investment-firm profit information is used to prepare base data by industrial sector.",
+    "current_fy2025_sector_values_recovered": false
+  },
+  "bounded_conclusion": "An explicit sector-level direct-investment-profit table is verified historically and the underlying statistical concept/production path continues in later methodology, but no current FY2025 public sector allocation has been recovered from the parsed public report set. Historical shares must not be carried forward.",
+  "hard_gates": [
+    "HISTORICAL_SECTOR_SHARE_IS_NOT_CURRENT_SECTOR_SHARE",
+    "CONCEPT_CONTINUITY_IS_NOT_CURRENT_VALUE_CONTINUITY",
+    "METHODOLOGY_EXISTS_IS_NOT_CURRENT_AMOUNT",
+    "UNRETRIEVED_WORKBOOK_IS_NOT_ABSENT"
+  ]
+}

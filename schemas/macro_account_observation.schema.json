@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moneysweep.pr/schemas/macro_account_observation.schema.json",
+  "title": "MoneySweep Puerto Rico Macro Account Observation",
+  "type": "object",
+  "required": [
+    "observation_id",
+    "fiscal_year",
+    "manifestation_id",
+    "source_table",
+    "publication_vintage",
+    "gnp_millions",
+    "gdp_millions",
+    "computed_gap_millions",
+    "candidate_state",
+    "certification_state"
+  ],
+  "properties": {
+    "observation_id": {"type": "string", "pattern": "^MACRO_[A-Za-z0-9_.:-]+$"},
+    "fiscal_year": {"type": "integer", "minimum": 1900, "maximum": 2100},
+    "manifestation_id": {"type": "string", "minLength": 1},
+    "source_table": {"type": "string", "minLength": 1},
+    "publication_vintage": {"type": "string", "pattern": "^[0-9]{4}([-.][A-Za-z0-9]+)?$"},
+    "publication_date": {"type": ["string", "null"], "format": "date"},
+    "source_url": {"type": "string", "format": "uri"},
+    "source_document_sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "source_bytes_frozen": {"type": "boolean"},
+    "value_status": {
+      "type": "string",
+      "enum": ["FINAL", "REVISED", "PRELIMINARY", "UNMARKED", "UNKNOWN"]
+    },
+    "gnp_millions": {"type": "number"},
+    "gdp_millions": {"type": "number"},
+    "computed_gap_millions": {"type": "number"},
+    "reported_less_rest_of_world_millions": {"type": ["number", "null"]},
+    "published_precision_millions": {"type": "number", "exclusiveMinimum": 0},
+    "closure_state": {
+      "type": "string",
+      "enum": ["EXACT", "WITHIN_DECLARED_ROUNDING_BUDGET", "FAIL", "UNRESOLVED"]
+    },
+    "candidate_state": {
+      "type": "string",
+      "enum": ["CURRENT", "HISTORICAL", "SUPERSEDED", "UNRESOLVED"]
+    },
+    "contradiction_class": {
+      "type": ["string", "null"],
+      "enum": ["TIME", "SCHEMA", "COUNT", "SCOPE", null]
+    },
+    "superseded_by_observation_id": {"type": ["string", "null"]},
+    "certification_state": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "OPEN", "BLOCKED", "PROVISIONAL", "AUDIT_ONLY", "NONCANONICAL", "UNRESOLVED", "SUPERSEDED"]
+    },
+    "notes": {"type": ["string", "null"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"candidate_state": {"const": "SUPERSEDED"}}, "required": ["candidate_state"]},
+      "then": {"required": ["superseded_by_observation_id"]}
+    },
+    {
+      "if": {"properties": {"source_bytes_frozen": {"const": true}}, "required": ["source_bytes_frozen"]},
+      "then": {
+        "required": ["source_document_sha256"],
+        "properties": {"source_document_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+      }
+    }
+  ],
+  "additionalProperties": true
+}
