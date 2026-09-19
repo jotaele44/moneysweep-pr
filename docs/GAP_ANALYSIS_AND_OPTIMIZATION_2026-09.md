@@ -89,12 +89,14 @@ diagnosis independently — "a repo-wide change-freeze that blocked ordinary, un
 (see `governance/change_log.json`)". The check is now informational. `test_full_conformance`
 passes.
 
-### A5 — the direct-push pattern is still live — **NOT FIXED**
+### A5 — capabilities are landing unclassified — **instance closed; prevention still open**
 
-The underlying process gap that produced A1–A4 has not closed, and reproduced during this
-review. `scripts/download_hacienda_sut_ivu.py` landed via `a38025a` ("Graduate
-hacienda_sut_ivu to a live PDF producer", #582) **without the classification `AGENTS.md`
-step 1 requires**, so the parity gate is red on `main` again at `7b467ff`:
+> **Amended 2026-09-19.** As first written this finding was wrong on its stated cause, and has
+> since gone stale on its facts. Both corrections are below rather than quietly edited out.
+
+**As measured at `7b467ff`.** `scripts/download_hacienda_sut_ivu.py` landed via `a38025a`
+("Graduate hacienda_sut_ivu to a live PDF producer", #582) **without the classification
+`AGENTS.md` step 1 requires**, so the parity gate was red on `main`:
 
 ```
 FAIL gui-parity ... new=5 manifest_issues=0
@@ -103,13 +105,45 @@ ANALYSIS_NOT_GUI_RENDERED: ...:discover_pdf_urls | :parse_pdf | :run
 TERMINAL_REQUIRED:         cli_surface:scripts/download_hacienda_sut_ivu.py
 ```
 
-Verified on a clean worktree of `origin/main`; not introduced by this PR, and deliberately
-not fixed here — classifying another team's new producer is their call, and doing it
-silently is how the inventory drifts in the first place.
+That was accurate when written, and verified on a clean worktree of `origin/main`.
 
-_Recommendation:_ this is the third instance of the same gap in one month. The durable fix
-is making the parity gate a required status check on `main` so an unclassified capability
-cannot land, rather than repairing the inventory after the fact.
+#### Correction 1 — the cause was mis-attributed
+
+This finding was originally titled "the direct-push pattern is still live" and presented #582
+as another instance of the direct-to-`main` pushes behind A1–A4. **It is not.** `a38025a`
+carries a `(#582)` suffix and a single parent: it came through the pull-request path. The
+A1–A4 commits did not:
+
+| Commit | Route |
+|---|---|
+| `a38025a` — hacienda SUT/IVU producer (#582) | **pull request** |
+| `fca3264` — HUD DRGR pursuit + validator drift | direct push, no PR |
+| `936fba9` — refresh skillpack baseline | direct push, no PR |
+| `f17bc8a` — rebind skillpack baseline | direct push, no PR |
+
+The recurring gap is not *how* the commit arrived but that **a capability can land
+unclassified either way**. Review did not catch it on the PR route.
+
+#### Correction 2 — the instance is closed and the gate is green
+
+`b306731` ("Classify the hacienda SUT/IVU producer for GUI parity", #587) landed shortly after
+this finding was written, adding
+`.federation/gui-capabilities.extensions/hacienda-sut-ivu-producer.json`
+(`classification: "internal"`, `requires_terminal: false`, covering exactly the 5 candidate IDs
+listed above) plus `tests/test_hacienda_sut_ivu_gui_classification.py` — the same mechanism
+`main` used for the HUD DRGR script in A3. On `main` at `255eff2`:
+
+```
+PASS gui-parity  current=2945 mapped=746 legacy=2195 new=0 manifest_issues=0
+```
+
+_Recommendation (unchanged, and better supported by Correction 1):_ make the GUI-parity gate a
+**required status check** on `main`. Two structurally different routes — an unreviewed direct
+push and a reviewed pull request — each let an unclassified capability through, and each was
+repaired only after the fact. Human review is demonstrably not the control that catches this;
+an enforced gate is. The remediation loop itself is working (both instances closed within
+hours, through the correct classification mechanism rather than a baseline regeneration), so
+what remains is prevention, not active breakage.
 
 ## B. The gates measured less than they appeared to
 
@@ -296,7 +330,7 @@ from being committed — a 100 KB derived manifest that is never a source of tru
 | # | Area | Recommendation | Effort | Risk | Priority |
 |---|------|----------------|--------|------|----------|
 | D4 | Security | Real identity for case-manager clearance/actor; interim shared-secret gate on write endpoints | M | Med | **P0** |
-| A5 | Process | Make GUI-capability parity a required status check so an unclassified capability cannot land (3rd recurrence in a month) | S | Low | **P0** |
+| A5 | Process | Make GUI-capability parity a required status check so an unclassified capability cannot land — it has slipped through on both the direct-push and the reviewed-PR route | S | Low | P1 |
 | B2 | Test coverage | Cover `desktop/secrets.py` (0%, credential handling) and `server/backend/main.py` (35%) | M | Low | P1 |
 | C2 | Duplication | Finish or retire the `BaseDownloader` migration (63 non-adopters) | L | Med | P1 |
 | B4 | Architecture | Decompose `run_all_legacy.py` (2,073 LOC); bring into type + coverage scope | L | Med | P1 |
