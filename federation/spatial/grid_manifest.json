@@ -1,0 +1,27 @@
+{
+  "authority": "spiderweb-pr",
+  "columns": [
+    "Cell_ID",
+    "Row_Index",
+    "Column_Index",
+    "Pixel_X_Min",
+    "Pixel_Y_Min",
+    "Pixel_X_Max",
+    "Pixel_Y_Max",
+    "Centroid_X",
+    "Centroid_Y",
+    "Dark_Pixel_Count",
+    "Total_Pixel_Count",
+    "Land_Pixel_Ratio",
+    "Classification"
+  ],
+  "dataset": "pr_grid_full_cell_index_saturated",
+  "grid": {
+    "columns": 384,
+    "rows": 256
+  },
+  "mirrored_from": "spiderweb-pr",
+  "note": "Read-only snapshot of the canonical federation cell address space. Hashes and versions only; this repository does not carry the grid bytes and is not a geometry producer.",
+  "rows": 98304,
+  "sha256": "17733f3f18c8a644e31c1eb25fb27b73b4bf353c6de57d5203c4311e05d64483"
+}
