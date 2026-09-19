@@ -3,7 +3,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EXTENSION = ROOT / ".federation/gui-capabilities.extensions/case-manager-authorization-boundary.json"
+EXTENSION = (\n    ROOT / ".federation/gui-capabilities.extensions/case-manager-authorization-boundary.json"\n)
 
 
 def test_case_manager_authorization_is_internal_security_boundary() -> None:
