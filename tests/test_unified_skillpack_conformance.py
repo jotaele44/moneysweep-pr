@@ -33,13 +33,24 @@ class UnifiedSkillpackConformanceTests(unittest.TestCase):
             self.assertIn(f'<a id="{target}"></a>', skill, entry["capability_id"])
 
     def test_spatial_scope_remains_exact(self) -> None:
+        # main removed the repo-wide change-freeze this test used to exercise
+        # (see governance/change_log.json): is_allowed_path is gone and
+        # allowed_change_paths is now a passive record. Do not reinstate that
+        # enforcement here. The property this attestation still owns is that the
+        # entries it added are exact files, not a widened directory or a glob.
         manifest = json.loads((ROOT / ".claude/skillpacks/MANIFEST.json").read_text())
         allowed = manifest["allowed_change_paths"]
-        self.assertTrue(MODULE.is_allowed_path("federation/spatial/grid_manifest.json", allowed))
-        self.assertTrue(MODULE.is_allowed_path("tests/test_no_secret_leakage.py", allowed))
-        self.assertFalse(MODULE.is_allowed_path("federation/spatial/unreviewed.json", allowed))
-        self.assertFalse(MODULE.is_allowed_path("tests/test_unreviewed.py", allowed))
-        self.assertFalse(MODULE.is_allowed_path("governance/unreviewed.json", allowed))
+        for spatial_path in (
+            "federation/spatial/grid_manifest.json",
+            "federation/spatial/geometry_manifest.json",
+            "federation/spatial/registry_version.json",
+        ):
+            self.assertIn(spatial_path, allowed)
+        self.assertNotIn("federation/spatial/", allowed)
+        for entry in allowed:
+            self.assertNotIn("*", entry, entry)
+            if entry.endswith("/"):
+                self.assertEqual(entry, ".claude/skillpacks/", entry)
 
     def test_spatial_disposition_does_not_replace_repo_compatibility(self) -> None:
         receipt = json.loads((ROOT / "governance/federation_compatibility.json").read_text())
