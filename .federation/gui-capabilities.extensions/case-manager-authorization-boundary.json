@@ -1,0 +1,27 @@
+{
+  "extension_id": "case-manager-authorization-boundary",
+  "capabilities": [
+    {
+      "id": "case-manager-authorization-boundary",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The Case Manager authentication middleware is an internal security boundary, not a user-facing capability. It derives actor and maximum clearance from server-side runtime configuration, constrains public reads, and fails writes closed without configured authentication. Exposing install_case_auth or CasePrincipal as a GUI action would duplicate and weaken the security boundary; user-facing account or case controls remain in their canonical UI homes.",
+      "analysis": {
+        "files": [
+          "server/backend/case_manager_auth.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_case_manager_auth.py"
+        ]
+      },
+      "candidate_ids": [
+        "python_module:server/backend/case_manager_auth.py",
+        "python_symbol:server/backend/case_manager_auth.py:CasePrincipal",
+        "python_symbol:server/backend/case_manager_auth.py:install_case_auth"
+      ]
+    }
+  ]
+}
