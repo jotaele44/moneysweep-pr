@@ -4,7 +4,7 @@
   "producer": {
     "repository": "jotaele44/moneysweep-pr",
     "branch": "main",
-    "commit": "17c21ac2f3675895d890bf51a508167de50943c9",
+    "commit": "255eff223e1e3c99135c2b1b7e3aa4c72faea8c6",
     "producer_script": "scripts/run_contract_finance_geo_reasoning.py",
     "input_mode": "canonical_masters",
     "source_inputs": [
@@ -14,7 +14,7 @@
   },
   "hash_policy": {
     "primary_hash_algorithm": "git_blob_sha",
-    "note": "Git blob SHAs are recorded from GitHub Contents API at producer commit 17c21ac2f3675895d890bf51a508167de50943c9. SHA-256 is not recorded in this manifest because connector responses may truncate large file content."
+    "note": "All 11 required artifact blob identities were reverified unchanged at producer commit 255eff223e1e3c99135c2b1b7e3aa4c72faea8c6 on 2026-09-19 before rebinding this manifest. The manifest therefore changes provenance metadata only, not evidence bytes."
   },
   "consumer_contract": {
     "consume_declared_outputs_only": true,
@@ -117,8 +117,8 @@
     "false_pr_municipio_code_count": 0,
     "input_record_count": 6,
     "density_record_count": 6,
-    "input_total_amount": 2260000.0,
-    "density_total_amount": 2260000.0
+    "input_total_amount": 2260000,
+    "density_total_amount": 2260000
   },
   "spiderweb_consumer_requirements": [
     "Load this manifest first.",
