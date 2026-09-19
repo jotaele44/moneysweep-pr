@@ -38,6 +38,26 @@ def test_is_finance_relevant():
     assert not is_finance_relevant({"labels": []})
 
 
+def test_signal_id_fallback_preserves_centinalas_identity(tmp_path):
+    intake = tmp_path / "intake"
+    intake.mkdir()
+    payload = {
+        "signal_id": "CENT-SIG-real-001",
+        "source_url": "https://example.com/real",
+        "title": "Finance signal",
+        "labels": ["FINANCIAL"],
+        "captured_at": "2026-07-01T00:00:00+00:00",
+        "published_at": "2026-07-01T00:00:00+00:00",
+        "evidence_tier": "T1",
+        "is_synthetic": False,
+    }
+    (intake / "CENT-SIG-real-001.json").write_text(json.dumps(payload), encoding="utf-8")
+    result = ingest_centinelas_drops(intake, root=REPO_ROOT)
+    assert result["count"] == 1
+    assert result["awards"][0]["centinelas_item_id"] == "CENT-SIG-real-001"
+    assert result["awards"][0]["award_id"] == "CS-CENT-CENT-SIG-real-001"
+
+
 def test_no_files(tmp_path):
     result = ingest_centinelas_drops(tmp_path / "intake", root=REPO_ROOT)
     assert result["status"] == "NO_FILES"
