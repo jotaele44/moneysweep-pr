@@ -64,7 +64,7 @@ jobs:
           p=pathlib.Path("exports/centinelas_intake/funding_awards.jsonl")
           rows=[json.loads(x) for x in p.read_text().splitlines() if x.strip()] if p.exists() else []
           assert len(rows)>=1, "MoneySweep produced no funding_awards candidate"
-          assert any((r.get("lineage") or {}).get("source_signal_id")=="CENT-SIG-7666a971f7032f8c" or "7666a971f7032f8c" in json.dumps(r) for r in rows), rows[:2]
+          assert any(r.get("centinelas_item_id")=="CENT-SIG-7666a971f7032f8c" for r in rows), rows[:2]
           print(json.dumps({"funding_awards":len(rows)},indent=2))
           PY
       - name: Regenerate MoneySweep federation package
@@ -80,7 +80,7 @@ jobs:
           manifest=json.load(open("data/exports/canonical_v1_federation/manifest.json"))
           awards_path=pathlib.Path("exports/centinelas_intake/funding_awards.jsonl")
           awards=[json.loads(x) for x in awards_path.read_text().splitlines() if x.strip()]
-          matching=[r for r in awards if "7666a971f7032f8c" in json.dumps(r)]
+          matching=[r for r in awards if r.get("centinelas_item_id")=="CENT-SIG-7666a971f7032f8c"]
           assert matching, "No output row can be traced to the frozen Centinelas signal"
           files=[]
           for p in [
