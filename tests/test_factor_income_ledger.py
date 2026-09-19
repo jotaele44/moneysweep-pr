@@ -59,11 +59,20 @@ def test_rest_of_world_profit_identity_closes_exactly() -> None:
         ], year
 
 
-def test_paid_profit_decomposition_closes_exactly() -> None:
+def test_paid_profit_decomposition_preserves_published_precision_nonclosure() -> None:
+    expected_delta = {2021: Decimal("0.0"), 2022: Decimal("0.1"), 2023: Decimal("0.0"), 2024: Decimal("0.0"), 2025: Decimal("0.0")}
     for year, values in _amounts_by_year().items():
-        assert values["DIVIDENDS_PAID_NONRESIDENTS"] + values["DIRECT_INVESTMENT_PROFITS"] == values[
-            "PROFITS_DIVIDENDS_PAID_REST_OF_WORLD"
-        ], year
+        aggregate = values["PROFITS_DIVIDENDS_PAID_REST_OF_WORLD"]
+        components = values["DIVIDENDS_PAID_NONRESIDENTS"] + values["DIRECT_INVESTMENT_PROFITS"]
+        assert aggregate - components == expected_delta[year], year
+
+
+def test_fy2022_authoritative_displayed_values_are_never_silently_corrected() -> None:
+    values = _amounts_by_year()[2022]
+    assert values["DIVIDENDS_PAID_NONRESIDENTS"] == Decimal("616.4")
+    assert values["DIRECT_INVESTMENT_PROFITS"] == Decimal("36466.2")
+    assert values["PROFITS_DIVIDENDS_PAID_REST_OF_WORLD"] == Decimal("37082.7")
+    assert values["PROFITS_DIVIDENDS_PAID_REST_OF_WORLD"] != Decimal("37082.6")
 
 
 def test_fy2021_is_preserved_but_blocked_from_current_macro_reconciliation() -> None:
