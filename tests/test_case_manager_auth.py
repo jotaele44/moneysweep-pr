@@ -51,12 +51,17 @@ def test_authenticated_identity_cannot_be_spoofed_or_elevated(client, monkeypatc
     auth = {"Authorization": f"Bearer {marker}"}
 
     assert client.post("/cases", json=payload("missing auth")).status_code == 401
-    assert client.get("/cases", headers={**auth, "X-Case-Clearance": "restricted"}).status_code == 403
-    assert client.post(
-        "/cases",
-        headers={**auth, "X-Case-Actor": "different-actor"},
-        json=payload("spoofed actor"),
-    ).status_code == 403
+    assert (
+        client.get("/cases", headers={**auth, "X-Case-Clearance": "restricted"}).status_code == 403
+    )
+    assert (
+        client.post(
+            "/cases",
+            headers={**auth, "X-Case-Actor": "different-actor"},
+            json=payload("spoofed actor"),
+        ).status_code
+        == 403
+    )
 
 
 def test_authenticated_write_uses_server_identity(client, monkeypatch):
@@ -93,9 +98,7 @@ def test_invalid_bearer_and_clearance_syntax_are_rejected(client, monkeypatch):
     monkeypatch.setenv("MONEYSWEEP_CASE_ACTOR", "verified-operator")
     monkeypatch.setenv("MONEYSWEEP_CASE_CLEARANCE", "restricted")
 
-    assert client.get(
-        "/cases", headers={"Authorization": "Bearer wrong-value"}
-    ).status_code == 401
+    assert client.get("/cases", headers={"Authorization": "Bearer wrong-value"}).status_code == 401
     assert client.get("/cases", headers={"X-Case-Clearance": "admin"}).status_code == 400
 
 
@@ -107,9 +110,7 @@ def test_invalid_bearer_and_clearance_syntax_are_rejected(client, monkeypatch):
         ("verified-operator", "owner"),
     ],
 )
-def test_invalid_server_identity_configuration_fails_closed(
-    client, monkeypatch, actor, clearance
-):
+def test_invalid_server_identity_configuration_fails_closed(client, monkeypatch, actor, clearance):
     marker = "fixture-value"
     monkeypatch.setenv("PRII_WRITE_TOKEN", marker)
     monkeypatch.setenv("MONEYSWEEP_CASE_ACTOR", actor)

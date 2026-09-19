@@ -59,9 +59,7 @@ def _configured_principal() -> tuple[str, CasePrincipal] | None:
     try:
         actor.encode("latin-1")
     except UnicodeEncodeError as exc:
-        raise RuntimeError(
-            "MONEYSWEEP_CASE_ACTOR must be HTTP-header-safe Latin-1 text"
-        ) from exc
+        raise RuntimeError("MONEYSWEEP_CASE_ACTOR must be HTTP-header-safe Latin-1 text") from exc
     if clearance not in _VISIBILITY_RANK:
         raise RuntimeError(
             "MONEYSWEEP_CASE_CLEARANCE must be one of public|internal|restricted "
