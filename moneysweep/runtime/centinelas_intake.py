@@ -158,7 +158,7 @@ def build_candidates(
     for payload in payloads:
         frame_rows.append(
             {
-                "item_id": _first_str(payload.get("item_id")),
+                "item_id": _first_str(payload.get("item_id")) or _first_str(payload.get("signal_id")),
                 "municipality": _municipality_hint(payload, root),
                 "amount": _amount(payload),
                 "event_date": _event_date(payload),
