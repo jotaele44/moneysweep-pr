@@ -1,0 +1,131 @@
+name: Centinelas recovery handoff proof
+
+on:
+  push:
+    branches: [chatgpt/centinelas-recovery-handoff-20260918]
+    paths: [.github/workflows/centinelas-recovery-handoff.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  consume:
+    runs-on: ubuntu-latest
+    env:
+      CENTINELAS_FROZEN_COMMIT: caf086598a4f99e2eb0ca4aac6d51e2d9bd46321
+      CENTINELAS_ITEM_ID: CENT-SIG-7666a971f7032f8c
+      RECOVERY_NOW: 2026-09-19T04:05:00+00:00
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Materialize exact frozen Centinelas signal
+        run: |
+          python - <<'PY'
+          import json, urllib.request, os, hashlib, pathlib
+          commit=os.environ["CENTINELAS_FROZEN_COMMIT"]
+          item=os.environ["CENTINELAS_ITEM_ID"]
+          url=f"https://raw.githubusercontent.com/jotaele44/centinelas-pr/{commit}/data/signals/live_signals.jsonl"
+          raw=urllib.request.urlopen(url,timeout=30).read()
+          rows=[json.loads(x) for x in raw.decode("utf-8").splitlines() if x.strip()]
+          hits=[r for r in rows if r.get("signal_id")==item]
+          assert len(hits)==1, (item,len(hits))
+          sig=hits[0]
+          assert sig.get("is_synthetic") is False
+          assert "FINANCIAL" in (sig.get("labels") or []), sig.get("labels")
+          pathlib.Path("intake").mkdir(exist_ok=True)
+          pathlib.Path(f"intake/{item}.json").write_text(json.dumps(sig,ensure_ascii=False),encoding="utf-8")
+          pathlib.Path("recovery").mkdir(exist_ok=True)
+          receipt={
+            "schema":"centinelas-to-moneysweep-recovery-input/v1",
+            "transport":"CONNECTOR_MEDIATED_RECOVERY",
+            "centinelas_frozen_commit":commit,
+            "centinelas_signal_id":item,
+            "source_file_sha256":hashlib.sha256(raw).hexdigest(),
+            "signal_payload_sha256":hashlib.sha256(json.dumps(sig,ensure_ascii=False,sort_keys=True,separators=(",",":")).encode()).hexdigest(),
+            "synthetic":False,
+            "labels":sig.get("labels",[]),
+          }
+          pathlib.Path("recovery/input-receipt.json").write_text(json.dumps(receipt,indent=2),encoding="utf-8")
+          print(json.dumps(receipt,indent=2))
+          PY
+      - name: Install MoneySweep dependencies
+        run: pip install -r requirements.txt
+      - name: Run actual MoneySweep Centinelas consumer
+        run: |
+          python3 scripts/ingest_centinelas_signals.py --intake-dir intake --output-dir exports/centinelas_intake | tee recovery/ingest-result.json
+      - name: Assert consumer produced a finance candidate
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path("exports/centinelas_intake/funding_awards.jsonl")
+          rows=[json.loads(x) for x in p.read_text().splitlines() if x.strip()] if p.exists() else []
+          assert len(rows)>=1, "MoneySweep produced no funding_awards candidate"
+          assert any((r.get("lineage") or {}).get("source_signal_id")=="CENT-SIG-7666a971f7032f8c" or "7666a971f7032f8c" in json.dumps(r) for r in rows), rows[:2]
+          print(json.dumps({"funding_awards":len(rows)},indent=2))
+          PY
+      - name: Regenerate MoneySweep federation package
+        run: |
+          python3 scripts/federation_export.py --mode test --now "$RECOVERY_NOW" | tee recovery/federation-export-result.json
+      - name: Build consumer acknowledgement
+        run: |
+          python - <<'PY'
+          import json, hashlib, pathlib, os
+          inp=json.load(open("recovery/input-receipt.json"))
+          ingest=json.load(open("recovery/ingest-result.json"))
+          export=json.load(open("recovery/federation-export-result.json"))
+          manifest=json.load(open("data/exports/canonical_v1_federation/manifest.json"))
+          awards_path=pathlib.Path("exports/centinelas_intake/funding_awards.jsonl")
+          awards=[json.loads(x) for x in awards_path.read_text().splitlines() if x.strip()]
+          matching=[r for r in awards if "7666a971f7032f8c" in json.dumps(r)]
+          assert matching, "No output row can be traced to the frozen Centinelas signal"
+          files=[]
+          for p in [
+            awards_path,
+            pathlib.Path("exports/centinelas_intake/transactions.jsonl"),
+            pathlib.Path("data/exports/canonical_v1_federation/manifest.json"),
+            pathlib.Path("data/exports/canonical_v1_federation/funding_awards.jsonl"),
+          ]:
+            if p.exists():
+              b=p.read_bytes(); files.append({"path":str(p),"bytes":len(b),"sha256":hashlib.sha256(b).hexdigest()})
+          ack={
+            "schema":"moneysweep-centinelas-consumer-ack/v1",
+            "state":"ACKNOWLEDGED",
+            "transport":"CONNECTOR_MEDIATED_RECOVERY",
+            "production_transport_equivalent":False,
+            "consumer":"moneysweep-pr",
+            "consumer_source_head":"255eff223e1e3c99135c2b1b7e3aa4c72faea8c6",
+            "centinelas_signal_id":inp["centinelas_signal_id"],
+            "centinelas_frozen_commit":inp["centinelas_frozen_commit"],
+            "input_payload_sha256":inp["signal_payload_sha256"],
+            "ingest":ingest,
+            "matching_candidate_count":len(matching),
+            "package_id":manifest.get("package_id"),
+            "export_stream_counts":export.get("stream_counts"),
+            "files":files,
+            "invariants":{
+              "non_synthetic_input":True,
+              "exact_signal_id_preserved":True,
+              "consumer_candidate_created":len(matching)>=1,
+              "federation_package_contains_funding_awards":"funding_awards" in (export.get("stream_counts") or {}) and export["stream_counts"]["funding_awards"]>=1
+            }
+          }
+          assert all(ack["invariants"].values()), ack["invariants"]
+          pathlib.Path("recovery/consumer-ack.json").write_text(json.dumps(ack,indent=2),encoding="utf-8")
+          print(json.dumps(ack,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: moneysweep-centinelas-consumer-ack
+          path: |
+            recovery/input-receipt.json
+            recovery/ingest-result.json
+            recovery/federation-export-result.json
+            recovery/consumer-ack.json
+            exports/centinelas_intake/funding_awards.jsonl
+            exports/centinelas_intake/transactions.jsonl
+            data/exports/canonical_v1_federation/manifest.json
+            data/exports/canonical_v1_federation/funding_awards.jsonl
