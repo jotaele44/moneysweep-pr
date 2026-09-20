@@ -81,9 +81,9 @@
       "severity": "ARCHITECTURAL",
       "architecture_change_required": true,
       "proposed_resolution": "Add PRE_AWARD_PROCUREMENT_CANDIDATE to CORE_SUPPORT. Such sources may seed procurement discovery but cannot emit certified CONTRACT_EVENT/MONEY_EVENT solely from solicitation records.",
-      "implemented_resolution": "PENDING_AMENDMENT_004",
+      "implemented_resolution": "architecture/v4/source_mapping_contract.yaml adds PRE_AWARD_PROCUREMENT_CANDIDATE; sam_opportunities maps to it; regression added in test_v01_source_domain_mapping.py.",
       "regression_id": "V4-R004-PREAWARD-NOT-CONTRACT",
-      "state": "OPEN"
+      "state": "RESOLVED_PENDING_TEST_EXECUTION"
     }
   ]
 }
