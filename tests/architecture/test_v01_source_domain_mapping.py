@@ -59,3 +59,23 @@ def test_direct_benefit_sources_are_not_forced_into_intergovernmental():
     for source_id in expected:
         assert rows[source_id]["targets"] == "SOCIAL_BENEFITS_AND_HOUSEHOLD_TRANSFERS"
         assert rows[source_id]["mapping_state"] == "MAPPED"
+
+
+def test_prasa_lineage_conflict_remains_partial():
+    rows = {
+        row["source_id"]: row
+        for row in csv.DictReader(MAPPING.read_text(encoding="utf-8").splitlines())
+    }
+    blocked = {"prasa_completed_projects_ppp", "prasa_consulting_engineer_ppp"}
+    assert {source_id for source_id, row in rows.items() if row["mapping_state"] == "PARTIAL"} == blocked
+
+
+def test_preaward_sam_opportunities_is_not_procurement_event():
+    rows = {
+        row["source_id"]: row
+        for row in csv.DictReader(MAPPING.read_text(encoding="utf-8").splitlines())
+    }
+    row = rows["sam_opportunities"]
+    assert row["target_type"] == "CORE_SUPPORT"
+    assert row["targets"] == "PRE_AWARD_PROCUREMENT_CANDIDATE"
+    assert row["mapping_state"] == "MAPPED"
