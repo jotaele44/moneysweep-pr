@@ -1,0 +1,66 @@
+{
+  "version": "v4.0.0-rc1",
+  "contradictions": [
+    {
+      "contradiction_id": "V01-COUNT-001",
+      "class": [
+        "COUNT",
+        "TIME"
+      ],
+      "observations": [
+        {
+          "source": "README.md",
+          "value": 164,
+          "claim": "tracked source definitions"
+        },
+        {
+          "source": "reports/current_status.json",
+          "value": 167,
+          "claim": "source_registry_current.total_sources"
+        },
+        {
+          "source": "reports/materialization_readiness.json",
+          "value": 167,
+          "claim": "total_sources"
+        },
+        {
+          "source": "reports/source_registry_status.csv",
+          "value": 167,
+          "claim": "status rows"
+        },
+        {
+          "source": "runtime loader census",
+          "value": 167,
+          "claim": "156 base + 11 extension sources"
+        }
+      ],
+      "adjudication_state": "RESOLVED",
+      "preferred_observation": 167,
+      "resolution": "README.md count is stale at baseline head; runtime loader and generated status artifacts close at 167.",
+      "superseded_observation": 164
+    },
+    {
+      "contradiction_id": "V01-COUNT-002",
+      "class": [
+        "COUNT",
+        "SOURCE"
+      ],
+      "observations": [
+        {
+          "source": "registries/source_registry.json",
+          "value": 156,
+          "claim": "base registry only"
+        },
+        {
+          "source": "reports/source_registry_status.csv",
+          "value": 167,
+          "claim": "loaded registry status"
+        }
+      ],
+      "adjudication_state": "RESOLVED",
+      "preferred_observation": 167,
+      "resolution": "Runtime loader appends 11 sources from four JSON extension registries; 156 + 11 = 167 with identical loaded/status ID sets.",
+      "superseded_observation": null
+    }
+  ]
+}
