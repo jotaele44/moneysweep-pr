@@ -1,6 +1,6 @@
 version: "4.0.0-rc1"
 contract: source_mapping
-amendment: "V4-A001"
+amendments: ["V4-A001", "V4-A002"]
 
 target_types:
   - DOMAIN
