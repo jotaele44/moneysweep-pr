@@ -1,0 +1,13 @@
+{
+  "version": "v4.0.0-rc1",
+  "repository_head_sha": "15e8f6f11bea8e4d2ac69eb813afcdbef05ccf33",
+  "source_count": 167,
+  "unique_source_ids": 167,
+  "mapping_state_counts": {
+    "PARTIAL": 102,
+    "MAPPED": 65
+  },
+  "unresolved_source_ids": [],
+  "arithmetic_closure": "PASS",
+  "note": "This is a conservative source-level mapping pass from authoritative registry metadata. PARTIAL rows require schema/record-level adjudication before constitutional freeze."
+}
