@@ -14,6 +14,7 @@ core_support_capabilities:
   - GEOSPATIAL_SUPPORT
   - POLICY_CONTEXT
   - PRE_OFFICIAL_CANDIDATE
+  - PRE_AWARD_PROCUREMENT_CANDIDATE
 
 rules:
   - A source with target_type DOMAIN must name at least one registered analytical domain.
@@ -21,6 +22,7 @@ rules:
   - CORE_SUPPORT is not an analytical domain and must not contribute directly to domain aggregation.
   - POLICY_CONTEXT may inform domain interpretation but is not itself a certified money flow.
   - PRE_OFFICIAL_CANDIDATE must remain non-official until an explicit downstream promotion/binding gate passes.
+  - PRE_AWARD_PROCUREMENT_CANDIDATE may seed procurement discovery but must not become a CONTRACT_EVENT or MONEY_EVENT without downstream award/execution evidence.
   - Support-only sources may feed one or more domains downstream through typed bindings without being forced into a domain at census time.
   - Every source family must have at least one mapping target of type DOMAIN or CORE_SUPPORT.
   - UNKNOWN or UNRESOLVED mappings remain explicit and block constitutional freeze when in release scope.
@@ -40,6 +42,9 @@ regression:
     - family: pre_officialization
       target_type: CORE_SUPPORT
       capability: PRE_OFFICIAL_CANDIDATE
+    - source_id: sam_opportunities
+      target_type: CORE_SUPPORT
+      capability: PRE_AWARD_PROCUREMENT_CANDIDATE
   forbidden_behavior:
     - forcing entity_resolution into CORPORATE_CAPITAL solely because it resolves companies
     - forcing provenance_archival into PUBLIC_FINANCE solely because documents may concern finance
