@@ -4,9 +4,15 @@
   "source_count": 167,
   "unique_source_ids": 167,
   "mapping_state_counts": {
-    "MAPPED": 127,
-    "PARTIAL": 40
+    "MAPPED": 163,
+    "PARTIAL": 4
   },
+  "partial_source_ids": [
+    "dol_whd_osha",
+    "prasa_completed_projects_ppp",
+    "prasa_consulting_engineer_ppp",
+    "usaspending_loans"
+  ],
   "arithmetic_closure": "PASS",
-  "note": "Second conservative adjudication pass. MAPPED promotions use source-specific registry semantics; remaining PARTIAL rows require further source/schema review."
+  "note": "Third adjudication pass. Remaining PARTIAL rows are intentionally retained for mixed-grain/lineage ambiguity and require schema/producer inspection."
 }
