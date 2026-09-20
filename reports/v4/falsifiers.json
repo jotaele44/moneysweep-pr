@@ -1,0 +1,23 @@
+{
+  "version": "v4.0.0-rc1",
+  "falsifiers": [
+    {
+      "falsifier_id": "V4-F001-CORE-SUPPORT-SOURCE",
+      "detected_at": "2026-09-20",
+      "source_or_fixture": [
+        "registries/source_registry.json",
+        "registries/source_registry_extensions/nara_nextgen.json"
+      ],
+      "domain": null,
+      "contract": "SOURCE_TO_DOMAIN_MAPPING",
+      "observed_behavior": "The runtime registry contains source families whose primary role is shared evidence support rather than an analytical domain, including entity_resolution and provenance_archival.",
+      "expected_behavior": "The frozen rc1 contract required every mapped source family to map to at least one analytical domain.",
+      "severity": "ARCHITECTURAL",
+      "architecture_change_required": true,
+      "proposed_resolution": "Permit source_mapping_target_type=CORE_SUPPORT in addition to DOMAIN. CORE_SUPPORT must name a specific shared-kernel capability such as IDENTITY_RESOLUTION or PROVENANCE_ARCHIVAL and must not be treated as an analytical domain or aggregated finding source.",
+      "implemented_resolution": "PENDING_AMENDMENT_001",
+      "regression_id": "V4-R001-CORE-SUPPORT-NOT-FORCED-INTO-DOMAIN",
+      "state": "OPEN"
+    }
+  ]
+}
