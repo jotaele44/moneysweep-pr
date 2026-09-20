@@ -39,9 +39,9 @@
       "severity": "ARCHITECTURAL",
       "architecture_change_required": true,
       "proposed_resolution": "Extend CORE_SUPPORT with POLICY_CONTEXT and PRE_OFFICIAL_CANDIDATE. These targets may feed downstream domain events only after explicit promotion/binding and cannot be counted as officialized money or domain-certified findings.",
-      "implemented_resolution": "PENDING_AMENDMENT_002",
+      "implemented_resolution": "architecture/v4/source_mapping_contract.yaml (V4-A002) plus tests/architecture/test_source_mapping_contract.py",
       "regression_id": "V4-R002-CONTEXT-CANDIDATES-NOT-DOMAIN-FINDINGS",
-      "state": "OPEN"
+      "state": "RESOLVED_PENDING_TEST_EXECUTION"
     }
   ]
 }
