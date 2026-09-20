@@ -20,10 +20,19 @@ import json
 from pathlib import Path
 
 import pytest
-from fastapi.testclient import TestClient
 
-from server.backend import case_manager_api
-from server.backend.case_manager_app import app
+# ci.yml's "Compile and pytest" job installs requirements.txt only, which has no
+# fastapi -- the backend's deps live in server/backend/requirements.txt. Guard
+# before importing it so this file skips cleanly there instead of failing
+# collection for the whole run, matching tests/test_case_manager_app_health.py
+# and tests/test_api_keys_endpoint.py.
+pytest.importorskip("fastapi")
+pytest.importorskip("httpx")
+
+from fastapi.testclient import TestClient  # noqa: E402
+
+from server.backend import case_manager_api  # noqa: E402
+from server.backend.case_manager_app import app  # noqa: E402
 
 INTERNAL_TOKEN = "internal-token-for-tests"
 RESTRICTED_TOKEN = "restricted-token-for-tests"
