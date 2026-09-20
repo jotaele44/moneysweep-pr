@@ -67,6 +67,23 @@
       "implemented_resolution": "architecture/v4/domain_registry.yaml adds SOCIAL_BENEFITS_AND_HOUSEHOLD_TRANSFERS; mapping matrix routes direct-benefit sources there; tests/architecture/test_v01_source_domain_mapping.py adds regression.",
       "regression_id": "V4-R003-DIRECT-BENEFITS-NOT-INTERGOVERNMENTAL",
       "state": "RESOLVED_PENDING_TEST_EXECUTION"
+    },
+    {
+      "falsifier_id": "V4-F004-PREAWARD-PROCUREMENT-CANDIDATE",
+      "detected_at": "2026-09-20",
+      "source_or_fixture": [
+        "sam_opportunities"
+      ],
+      "domain": null,
+      "contract": "SOURCE_TO_DOMAIN_MAPPING",
+      "observed_behavior": "SAM Opportunities is a pre-award solicitation/bid-notice source. It describes potential procurement activity before award and execution.",
+      "expected_behavior": "Candidate/discovery sources must not be promoted into certified procurement events without an explicit downstream award/execution binding.",
+      "severity": "ARCHITECTURAL",
+      "architecture_change_required": true,
+      "proposed_resolution": "Add PRE_AWARD_PROCUREMENT_CANDIDATE to CORE_SUPPORT. Such sources may seed procurement discovery but cannot emit certified CONTRACT_EVENT/MONEY_EVENT solely from solicitation records.",
+      "implemented_resolution": "PENDING_AMENDMENT_004",
+      "regression_id": "V4-R004-PREAWARD-NOT-CONTRACT",
+      "state": "OPEN"
     }
   ]
 }
