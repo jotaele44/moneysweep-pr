@@ -42,6 +42,31 @@
       "implemented_resolution": "architecture/v4/source_mapping_contract.yaml (V4-A002) plus tests/architecture/test_source_mapping_contract.py",
       "regression_id": "V4-R002-CONTEXT-CANDIDATES-NOT-DOMAIN-FINDINGS",
       "state": "RESOLVED_PENDING_TEST_EXECUTION"
+    },
+    {
+      "falsifier_id": "V4-F003-DIRECT-BENEFICIARY-TRANSFER-DOMAIN",
+      "detected_at": "2026-09-20",
+      "source_or_fixture": [
+        "ssa",
+        "snap_nap",
+        "wic",
+        "va_benefits",
+        "fema_individual_assistance",
+        "medicare_advantage",
+        "medicare_parts",
+        "hud_hcv_section8",
+        "irs_ctc_eitc_pr"
+      ],
+      "domain": null,
+      "contract": "DOMAIN_REGISTRY",
+      "observed_behavior": "The runtime source denominator contains direct household/beneficiary transfer and benefit flows that are not intergovernmental and do not fit public-finance procurement/corporate domains without semantic distortion.",
+      "expected_behavior": "Every analytical money source must have a domain whose primary unit and reconciliation semantics match the actual flow.",
+      "severity": "ARCHITECTURAL",
+      "architecture_change_required": true,
+      "proposed_resolution": "Add SOCIAL_BENEFITS_AND_HOUSEHOLD_TRANSFERS as an analytical domain for direct government-to-household/individual benefit, assistance, subsidy, and entitlement flows. Keep award/authorization/payment/receipt stages distinct.",
+      "implemented_resolution": "PENDING_AMENDMENT_003",
+      "regression_id": "V4-R003-DIRECT-BENEFITS-NOT-INTERGOVERNMENTAL",
+      "state": "OPEN"
     }
   ]
 }
