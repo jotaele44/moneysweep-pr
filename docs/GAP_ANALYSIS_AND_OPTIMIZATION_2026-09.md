@@ -314,14 +314,30 @@ from being committed — a 100 KB derived manifest that is never a source of tru
 
 ---
 
-## D. Governance drift — **NOT FIXED**
+## D. Governance drift — D4 **FIXED**; D1–D3 open
 
 | # | Finding | Evidence |
 |---|---------|----------|
 | D1 | ~~The skillpack pin is stale again~~ — **resolved on `main`**, enforcement removed | See A4 |
 | D2 | `reports/current_status.json` — the declared machine-readable source of truth — is stale | `main_sha: 3155201…` (PR #486) vs. actual `main`; `generated_at: 2026-08-20`; self-declares `evidence_snapshot_state: "STALE_NOT_RECERTIFIED"` |
 | D3 | `STATUS.md` test baseline is stale | Dated 2026-07-26; its own text warns the preceding row was ~10 weeks and ~1,900 tests out of date. Current measured baseline: **2,947 passed · 9 skipped · 54.65%** |
-| D4 | Case-manager write API has no authentication | `server/backend/case_manager_api.py:155,192,207,224,…` — `X-Case-Clearance` and `X-Case-Actor` are plain `Header(default=None)` parameters. No `Depends`, `Security`, `HTTPBearer`, or middleware anywhere in the router. Any caller can self-assert `restricted` clearance or any actor identity. **Confirms in code** the claim in `docs/BACKEND_ASSESSMENT_AND_DEVELOPMENT_PLAN.md`; it remains the most concrete active security gap and is sequenced first in that document's plan |
+| D4 | ~~Case-manager write API has no authentication~~ — **FIXED** (interim) | `server/backend/case_manager_api.py` derived identity from headers: `_actor()` returned `value or "anonymous"`, `_clearance()` returned `value or "public"`, so absent headers still authorized. Two concrete defects: `X-Case-Clearance: restricted` set the caller's rank in `VISIBILITY_RANK` directly (**privilege escalation**), and `X-Case-Actor` was recorded as the actor on all 11 write commands (**audit-trail forgery**). Both are now derived from a verified credential via `server/backend/case_manager_auth.py` and are unreadable from the request; unconfigured deployments **fail closed** with 503 rather than reverting to the old behavior. See A6 for what remains. |
+
+
+### D4 follow-up — what the interim boundary does not cover
+
+The fix binds identity to a credential; it is not the federation-wide identity provider
+`docs/CASE_MANAGER_PHASE_1_API_CONTRACT.md` anticipates. Still outstanding:
+
+- **Tokens are long-lived and hand-issued.** No rotation, expiry, or revocation beyond editing
+  the identity file. Acceptable for a loopback-only service; not for a networked one.
+- **Loopback is the transport boundary.** The service is still only safe to run bound to
+  localhost. It is now *enforced* (403 off-box) rather than assumed, but that is a floor, not
+  a substitute for transport auth.
+- **The router remains unmounted on the main app**, served only by the standalone
+  `case_manager_app`. Mounting it anywhere reachable would need the provider first.
+- **No per-route authorization.** Any recognized identity may call any write route; clearance
+  governs reads only. Command-level authorization is provider work.
 
 ---
 
@@ -329,7 +345,7 @@ from being committed — a 100 KB derived manifest that is never a source of tru
 
 | # | Area | Recommendation | Effort | Risk | Priority |
 |---|------|----------------|--------|------|----------|
-| D4 | Security | Real identity for case-manager clearance/actor; interim shared-secret gate on write endpoints | M | Med | **P0** |
+| D4 | Security | ~~Real identity for case-manager clearance/actor~~ — interim boundary landed; replace with the federation-wide identity provider when `thehub-pr` ships it | M | Low | P2 |
 | A5 | Process | Make GUI-capability parity a required status check so an unclassified capability cannot land — it has slipped through on both the direct-push and the reviewed-PR route | S | Low | P1 |
 | B2 | Test coverage | Cover `desktop/secrets.py` (0%, credential handling) and `server/backend/main.py` (35%) | M | Low | P1 |
 | C2 | Duplication | Finish or retire the `BaseDownloader` migration (63 non-adopters) | L | Med | P1 |

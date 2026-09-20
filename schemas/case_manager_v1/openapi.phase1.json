@@ -2,10 +2,12 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MoneySweep Case Manager API",
-    "version": "0.12.0",
-    "description": "Command-oriented Case Manager service with append-only audit events and no canonical-evidence mutation."
+    "version": "0.13.0",
+    "description": "Command-oriented Case Manager service with append-only audit events and no canonical-evidence mutation. All routes require an X-Case-Token credential; the acting identity and read clearance are derived from it."
   },
   "servers": [{"url": "http://localhost:8001"}],
+  "security": [{"caseToken": []}],
+  "components": {"securitySchemes": {"caseToken": {"type": "apiKey", "in": "header", "name": "X-Case-Token", "description": "Token whose SHA-256 digest appears in the identity store (MONEYSWEEP_CASE_IDENTITIES); determines both actor and clearance. Loopback-only: 403 off-box, 503 unconfigured, 401 missing or unknown."}}},
   "paths": {
     "/cases": {
       "get": {"operationId": "getCases", "responses": {"200": {"description": "Visible cases"}}},

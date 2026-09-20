@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 from typing import Literal
 
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from moneysweep.case_manager.ids import deterministic_id
@@ -26,6 +26,7 @@ from moneysweep.case_manager.repository import (
     SQLiteCaseManagerRepository,
 )
 from moneysweep.case_manager.service import CaseCommandService, CaseQueryService
+from server.backend.case_manager_auth import Identity, resolve_identity
 
 ROOT = Path(__file__).resolve().parents[2]
 DATABASE_PATH = Path(os.environ.get("MONEYSWEEP_CASE_DB", ROOT / "data" / "case_manager.sqlite3"))
@@ -48,14 +49,6 @@ def configure_repository(repository: SQLiteCaseManagerRepository | None) -> None
     """Test hook; production callers use the configured SQLite path."""
     global _repository
     _repository = repository
-
-
-def _actor(value: str | None) -> str:
-    return value or "anonymous"
-
-
-def _clearance(value: str | None) -> str:
-    return value or "public"
 
 
 def _raise(exc: Exception) -> None:
@@ -152,14 +145,14 @@ class SnapshotCreate(BaseModel):
 
 
 @router.get("")
-def get_cases(x_case_clearance: str | None = Header(default=None)):
-    return _services()[1].list_cases(_clearance(x_case_clearance))
+def get_cases(identity: Identity = Depends(resolve_identity)):
+    return _services()[1].list_cases(identity.clearance)
 
 
 @router.get("/{case_id}")
-def get_case(case_id: str, x_case_clearance: str | None = Header(default=None)):
+def get_case(case_id: str, identity: Identity = Depends(resolve_identity)):
     try:
-        result = _services()[1].get_case(case_id, _clearance(x_case_clearance))
+        result = _services()[1].get_case(case_id, identity.clearance)
     except Exception as exc:
         _raise(exc)
     if result is None:
@@ -180,22 +173,22 @@ def get_case_collection(
         "snapshots",
         "audit-events",
     ],
-    x_case_clearance: str | None = Header(default=None),
+    identity: Identity = Depends(resolve_identity),
 ):
     try:
-        return _services()[1].get_case_collection(case_id, collection, _clearance(x_case_clearance))
+        return _services()[1].get_case_collection(case_id, collection, identity.clearance)
     except Exception as exc:
         _raise(exc)
 
 
 @router.post("", status_code=201)
-def create_case(payload: CaseCreate, x_case_actor: str | None = Header(default=None)):
+def create_case(payload: CaseCreate, identity: Identity = Depends(resolve_identity)):
     case = Case(
         case_id=deterministic_id("case", payload.title, payload.case_type, payload.scope),
         **payload.model_dump(),
     )
     try:
-        return _services()[0].create_case(case, _actor(x_case_actor))
+        return _services()[0].create_case(case, identity.actor)
     except Exception as exc:
         _raise(exc)
 
@@ -204,7 +197,7 @@ def create_case(payload: CaseCreate, x_case_actor: str | None = Header(default=N
 def link_evidence(
     case_id: str,
     payload: EvidenceLinkCreate,
-    x_case_actor: str | None = Header(default=None),
+    identity: Identity = Depends(resolve_identity),
 ):
     record = CaseEvidence(
         case_evidence_id=deterministic_id(
@@ -214,14 +207,14 @@ def link_evidence(
         **payload.model_dump(),
     )
     try:
-        return _services()[0].link_evidence(record, _actor(x_case_actor))
+        return _services()[0].link_evidence(record, identity.actor)
     except Exception as exc:
         _raise(exc)
 
 
 @router.post("/{case_id}/claims", status_code=201)
 def create_claim(
-    case_id: str, payload: ClaimCreate, x_case_actor: str | None = Header(default=None)
+    case_id: str, payload: ClaimCreate, identity: Identity = Depends(resolve_identity)
 ):
     claim = Claim(
         claim_id=deterministic_id("claim", case_id, payload.statement),
@@ -229,7 +222,7 @@ def create_claim(
         **payload.model_dump(),
     )
     try:
-        return _services()[0].create_claim(claim, _actor(x_case_actor))
+        return _services()[0].create_claim(claim, identity.actor)
     except Exception as exc:
         _raise(exc)
 
@@ -239,7 +232,7 @@ def link_claim_evidence(
     case_id: str,
     claim_id: str,
     payload: ClaimEvidenceCreate,
-    x_case_actor: str | None = Header(default=None),
+    identity: Identity = Depends(resolve_identity),
 ):
     record = ClaimEvidence(
         claim_evidence_id=deterministic_id(
@@ -249,7 +242,7 @@ def link_claim_evidence(
         **payload.model_dump(),
     )
     try:
-        return _services()[0].link_claim_evidence(case_id, record, _actor(x_case_actor))
+        return _services()[0].link_claim_evidence(case_id, record, identity.actor)
     except Exception as exc:
         _raise(exc)
 
@@ -258,7 +251,7 @@ def link_claim_evidence(
 def create_contradiction(
     case_id: str,
     payload: ContradictionCreate,
-    x_case_actor: str | None = Header(default=None),
+    identity: Identity = Depends(resolve_identity),
 ):
     record = Contradiction(
         contradiction_id=deterministic_id("contradiction", case_id, *sorted(payload.claim_ids)),
@@ -270,7 +263,7 @@ def create_contradiction(
         visibility=payload.visibility,
     )
     try:
-        return _services()[0].create_contradiction(record, _actor(x_case_actor))
+        return _services()[0].create_contradiction(record, identity.actor)
     except Exception as exc:
         _raise(exc)
 
@@ -280,7 +273,7 @@ def resolve_contradiction(
     case_id: str,
     contradiction_id: str,
     payload: ContradictionResolution,
-    x_case_actor: str | None = Header(default=None),
+    identity: Identity = Depends(resolve_identity),
 ):
     try:
         return _services()[0].resolve_contradiction(
@@ -289,7 +282,7 @@ def resolve_contradiction(
             status=payload.status,
             rationale=payload.rationale,
             reviewer=payload.reviewer,
-            actor=_actor(x_case_actor),
+            actor=identity.actor,
             visibility=payload.visibility,
         )
     except Exception as exc:
@@ -297,14 +290,14 @@ def resolve_contradiction(
 
 
 @router.post("/{case_id}/leads", status_code=201)
-def create_lead(case_id: str, payload: LeadCreate, x_case_actor: str | None = Header(default=None)):
+def create_lead(case_id: str, payload: LeadCreate, identity: Identity = Depends(resolve_identity)):
     lead = Lead(
         lead_id=deterministic_id("lead", case_id, payload.question),
         case_id=case_id,
         **payload.model_dump(),
     )
     try:
-        return _services()[0].create_lead(lead, _actor(x_case_actor))
+        return _services()[0].create_lead(lead, identity.actor)
     except Exception as exc:
         _raise(exc)
 
@@ -314,14 +307,14 @@ def close_lead(
     case_id: str,
     lead_id: str,
     payload: LeadClosure,
-    x_case_actor: str | None = Header(default=None),
+    identity: Identity = Depends(resolve_identity),
 ):
     try:
         return _services()[0].close_lead(
             case_id=case_id,
             lead_id=lead_id,
             closure_evidence_ids=tuple(payload.closure_evidence_ids),
-            actor=_actor(x_case_actor),
+            actor=identity.actor,
             visibility=payload.visibility,
         )
     except Exception as exc:
@@ -330,7 +323,7 @@ def close_lead(
 
 @router.post("/{case_id}/findings", status_code=201)
 def create_finding(
-    case_id: str, payload: FindingCreate, x_case_actor: str | None = Header(default=None)
+    case_id: str, payload: FindingCreate, identity: Identity = Depends(resolve_identity)
 ):
     finding = Finding(
         finding_id=deterministic_id("finding", case_id, payload.claim_id, payload.conclusion),
@@ -339,7 +332,7 @@ def create_finding(
         **payload.model_dump(),
     )
     try:
-        return _services()[0].create_finding(finding, _actor(x_case_actor))
+        return _services()[0].create_finding(finding, identity.actor)
     except Exception as exc:
         _raise(exc)
 
@@ -349,13 +342,13 @@ def accept_finding(
     case_id: str,
     finding_id: str,
     payload: FindingAcceptance,
-    x_case_actor: str | None = Header(default=None),
+    identity: Identity = Depends(resolve_identity),
 ):
     try:
         return _services()[0].accept_finding(
             case_id=case_id,
             finding_id=finding_id,
-            actor=_actor(x_case_actor),
+            actor=identity.actor,
             visibility=payload.visibility,
         )
     except Exception as exc:
@@ -364,7 +357,7 @@ def accept_finding(
 
 @router.post("/{case_id}/snapshots", status_code=201)
 def create_snapshot(
-    case_id: str, payload: SnapshotCreate, x_case_actor: str | None = Header(default=None)
+    case_id: str, payload: SnapshotCreate, identity: Identity = Depends(resolve_identity)
 ):
     snapshot = CaseSnapshot(
         case_snapshot_id=deterministic_id("case_snapshot", case_id, payload.manifest_sha256),
@@ -373,6 +366,6 @@ def create_snapshot(
         **payload.model_dump(exclude={"evidence_ids"}),
     )
     try:
-        return _services()[0].create_snapshot(snapshot, _actor(x_case_actor))
+        return _services()[0].create_snapshot(snapshot, identity.actor)
     except Exception as exc:
         _raise(exc)
