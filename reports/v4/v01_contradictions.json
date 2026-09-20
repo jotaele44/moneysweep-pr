@@ -61,6 +61,36 @@
       "preferred_observation": 167,
       "resolution": "Runtime loader appends 11 sources from four JSON extension registries; 156 + 11 = 167 with identical loaded/status ID sets.",
       "superseded_observation": null
+    },
+    {
+      "contradiction_id": "V01-SOURCE-003",
+      "class": [
+        "SOURCE",
+        "IDENTITY",
+        "SCOPE"
+      ],
+      "source_family_ids": [
+        "prasa_completed_projects_ppp",
+        "prasa_consulting_engineer_ppp"
+      ],
+      "observations": [
+        {
+          "source": "registries/source_registry.json",
+          "observation": "Both source IDs are PRASA/AAA sources and point to scripts/parse_aaa_ports_pdf.py with expected output data/staging/processed/pr_ports_airports_contracts.csv."
+        },
+        {
+          "source": "scripts/parse_aaa_ports_pdf.py",
+          "observation": "Parser hard-codes AGENCY='AUTORIDAD DE LOS PUERTOS', writes pr_ports_airports_contracts.csv, discovers *AAA*.pdf and *ports*.pdf, and therefore does not discover FY2024 CER_Final.pdf."
+        },
+        {
+          "source": "docs/PPP_REGISTRY.md",
+          "observation": "Both PRASA sources are explicitly BLOCKED because the corresponding operator PDFs are not present in the repository."
+        }
+      ],
+      "adjudication_state": "OPEN_BLOCKED_SOURCE_LINEAGE",
+      "preferred_observation": null,
+      "resolution": "Do not promote either source mapping or materialization. A source-specific producer/output repair and real input validation are required before either can leave PARTIAL.",
+      "superseded_observation": null
     }
   ]
 }
