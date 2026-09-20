@@ -67,7 +67,7 @@ def test_prasa_lineage_conflict_remains_partial():
         for row in csv.DictReader(MAPPING.read_text(encoding="utf-8").splitlines())
     }
     blocked = {"prasa_completed_projects_ppp", "prasa_consulting_engineer_ppp"}
-    assert {source_id for source_id, row in rows.items() if row["mapping_state"] == "PARTIAL"} == blocked
+    assert {\n        source_id for source_id, row in rows.items() if row["mapping_state"] == "PARTIAL"\n    } == blocked
 
 
 def test_preaward_sam_opportunities_is_not_procurement_event():
