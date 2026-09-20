@@ -4,15 +4,13 @@
   "source_count": 167,
   "unique_source_ids": 167,
   "mapping_state_counts": {
-    "MAPPED": 163,
-    "PARTIAL": 4
+    "MAPPED": 165,
+    "PARTIAL": 2
   },
   "partial_source_ids": [
-    "dol_whd_osha",
     "prasa_completed_projects_ppp",
-    "prasa_consulting_engineer_ppp",
-    "usaspending_loans"
+    "prasa_consulting_engineer_ppp"
   ],
   "arithmetic_closure": "PASS",
-  "note": "Third adjudication pass. Remaining PARTIAL rows are intentionally retained for mixed-grain/lineage ambiguity and require schema/producer inspection."
+  "note": "Fourth adjudication pass. Remaining partials are both PRASA sources whose registered identity/producer/output lineage conflicts with the Ports Authority parser."
 }
