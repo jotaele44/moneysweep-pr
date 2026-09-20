@@ -37,3 +37,24 @@ def test_partial_mapping_residue_remains_visible():
     partial = [row for row in rows if row["mapping_state"] == "PARTIAL"]
     assert partial
     assert len(partial) == 102
+
+
+def test_direct_benefit_sources_are_not_forced_into_intergovernmental():
+    rows = {
+        row["source_id"]: row
+        for row in csv.DictReader(MAPPING.read_text(encoding="utf-8").splitlines())
+    }
+    expected = {
+        "ssa",
+        "snap_nap",
+        "wic",
+        "va_benefits",
+        "fema_individual_assistance",
+        "medicare_advantage",
+        "medicare_parts",
+        "hud_hcv_section8",
+        "irs_ctc_eitc_pr",
+    }
+    for source_id in expected:
+        assert rows[source_id]["targets"] == "SOCIAL_BENEFITS_AND_HOUSEHOLD_TRANSFERS"
+        assert rows[source_id]["mapping_state"] == "MAPPED"
