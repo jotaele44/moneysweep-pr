@@ -17,7 +17,13 @@
       "proposed_resolution": "Permit source_mapping_target_type=CORE_SUPPORT in addition to DOMAIN. CORE_SUPPORT must name a specific shared-kernel capability such as IDENTITY_RESOLUTION or PROVENANCE_ARCHIVAL and must not be treated as an analytical domain or aggregated finding source.",
       "implemented_resolution": "architecture/v4/source_mapping_contract.yaml (V4-A001) plus tests/architecture/test_source_mapping_contract.py",
       "regression_id": "V4-R001-CORE-SUPPORT-NOT-FORCED-INTO-DOMAIN",
-      "state": "RESOLVED_PENDING_TEST_EXECUTION"
+      "state": "RESOLVED",
+      "test_evidence": {
+        "head_sha": "0588f870291a18d61d47b7b8baa4317b00715b7e",
+        "workflow": "Tests",
+        "run_id": 35526634520,
+        "conclusion": "success"
+      }
     }
   ]
 }
