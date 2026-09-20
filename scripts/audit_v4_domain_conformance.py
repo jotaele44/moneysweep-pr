@@ -52,7 +52,9 @@ def audit() -> dict[str, Any]:
             if target not in domains and target not in support:
                 invalid_targets.append({"source_id": row["source_id"], "target": target})
 
-    partial_ids = sorted(row["source_id"] for row in rows if row["mapping_state"] == "PARTIAL")
+    partial_ids = sorted(
+        row["source_id"] for row in rows if row["mapping_state"] == "PARTIAL"
+    )
     mapped_ids = sorted(row["source_id"] for row in rows if row["mapping_state"] == "MAPPED")
     unresolved_ids = sorted(
         row["source_id"]
