@@ -64,9 +64,9 @@
       "severity": "ARCHITECTURAL",
       "architecture_change_required": true,
       "proposed_resolution": "Add SOCIAL_BENEFITS_AND_HOUSEHOLD_TRANSFERS as an analytical domain for direct government-to-household/individual benefit, assistance, subsidy, and entitlement flows. Keep award/authorization/payment/receipt stages distinct.",
-      "implemented_resolution": "PENDING_AMENDMENT_003",
+      "implemented_resolution": "architecture/v4/domain_registry.yaml adds SOCIAL_BENEFITS_AND_HOUSEHOLD_TRANSFERS; mapping matrix routes direct-benefit sources there; tests/architecture/test_v01_source_domain_mapping.py adds regression.",
       "regression_id": "V4-R003-DIRECT-BENEFITS-NOT-INTERGOVERNMENTAL",
-      "state": "OPEN"
+      "state": "RESOLVED_PENDING_TEST_EXECUTION"
     }
   ]
 }
