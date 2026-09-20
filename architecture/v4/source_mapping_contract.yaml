@@ -1,0 +1,35 @@
+version: "4.0.0-rc1"
+contract: source_mapping
+amendment: "V4-A001"
+
+target_types:
+  - DOMAIN
+  - CORE_SUPPORT
+
+core_support_capabilities:
+  - IDENTITY_RESOLUTION
+  - PROVENANCE_ARCHIVAL
+  - SOURCE_ACQUISITION
+  - SCHEMA_VALIDATION
+  - GEOSPATIAL_SUPPORT
+
+rules:
+  - A source with target_type DOMAIN must name at least one registered analytical domain.
+  - A source with target_type CORE_SUPPORT must name at least one core_support_capability.
+  - CORE_SUPPORT is not an analytical domain and must not contribute directly to domain aggregation.
+  - Support-only sources may feed one or more domains downstream through typed bindings without being forced into a domain at census time.
+  - Every source family must have at least one mapping target of type DOMAIN or CORE_SUPPORT.
+  - UNKNOWN or UNRESOLVED mappings remain explicit and block constitutional freeze when in release scope.
+
+regression:
+  id: V4-R001-CORE-SUPPORT-NOT-FORCED-INTO-DOMAIN
+  positive_examples:
+    - family: entity_resolution
+      target_type: CORE_SUPPORT
+      capability: IDENTITY_RESOLUTION
+    - family: provenance_archival
+      target_type: CORE_SUPPORT
+      capability: PROVENANCE_ARCHIVAL
+  forbidden_behavior:
+    - forcing entity_resolution into CORPORATE_CAPITAL solely because it resolves companies
+    - forcing provenance_archival into PUBLIC_FINANCE solely because documents may concern finance
