@@ -1,0 +1,33 @@
+{
+  "extension_id": "case-manager-authorization-boundary",
+  "capabilities": [
+    {
+      "id": "case-manager-authorization-boundary",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Security infrastructure for the Case Manager service boundary, not a user capability. server/backend/case_manager_auth.py resolves the acting identity and read clearance from a verified credential instead of from client-supplied X-Case-Actor / X-Case-Clearance headers, closing the privilege escalation and audit-trail forgery recorded as finding D4 in docs/GAP_ANALYSIS_AND_OPTIMIZATION_2026-09.md. server/backend/local_request.py is the loopback trust boundary it shares with the API-key store. Neither module has or should have a GUI surface: they are enforcement that runs underneath every /cases route, and AGENTS.md classifies security-sensitive controls as internal while still requiring user-relevant outcomes to surface. The outcomes here are HTTP status codes on the Case Manager API itself (403 off-box, 503 unconfigured, 401 unknown token), which its own consumers receive directly. The Case Manager's absent dashboard workflow is tracked separately by the existing case-manager-phase-1-gui-gap exception; this entry does not widen or substitute for it.",
+      "backend": {
+        "files": [
+          "server/backend/case_manager_auth.py",
+          "server/backend/local_request.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_case_manager_auth.py"
+        ]
+      },
+      "candidate_ids": [
+        "python_module:server/backend/case_manager_auth.py",
+        "python_module:server/backend/local_request.py",
+        "python_symbol:server/backend/case_manager_auth.py:Identity",
+        "python_symbol:server/backend/case_manager_auth.py:configure_identities",
+        "python_symbol:server/backend/case_manager_auth.py:load_identities",
+        "python_symbol:server/backend/case_manager_auth.py:resolve_identity",
+        "python_symbol:server/backend/case_manager_auth.py:token_digest",
+        "python_symbol:server/backend/local_request.py:require_loopback"
+      ]
+    }
+  ]
+}
