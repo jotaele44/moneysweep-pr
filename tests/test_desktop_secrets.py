@@ -14,6 +14,8 @@ tests machine-dependent and could write to the developer's own keychain.
 
 from __future__ import annotations
 
+import os
+
 import pytest
 
 pytest.importorskip("keyring")
@@ -150,8 +152,6 @@ def test_presence_never_returns_secret_values(vault: FakeVault) -> None:
 def test_activation_injects_vault_keys_then_restores(vault: FakeVault) -> None:
     secrets.set_secret("SAM_API_KEY", "vault-value")
 
-    import os
-
     with secrets.activated_credentials() as injected:
         assert "SAM_API_KEY" in injected
         assert os.environ["SAM_API_KEY"] == "vault-value"
@@ -164,8 +164,6 @@ def test_activation_never_overwrites_an_existing_env_value(vault: FakeVault, mon
     secrets.set_secret("SAM_API_KEY", "vault-value")
     monkeypatch.setenv("SAM_API_KEY", "caller-value")
 
-    import os
-
     with secrets.activated_credentials() as injected:
         assert "SAM_API_KEY" not in injected
         assert os.environ["SAM_API_KEY"] == "caller-value"
@@ -176,13 +174,17 @@ def test_activation_never_overwrites_an_existing_env_value(vault: FakeVault, mon
 def test_activation_restores_env_even_when_the_body_raises(vault: FakeVault) -> None:
     secrets.set_secret("EIA_API_KEY", "vault-value")
 
-    import os
-
-    with pytest.raises(RuntimeError, match="boom"):
+    def activate_then_fail() -> None:
         with secrets.activated_credentials():
             assert os.environ["EIA_API_KEY"] == "vault-value"
             raise RuntimeError("boom")
 
+    with pytest.raises(RuntimeError, match="boom"):
+        activate_then_fail()
+
+    # Reachable: pytest.raises suppresses the matching exception. Kept as a call
+    # rather than an inline `raise` so static analysis sees the normal-return
+    # path too -- CodeQL flagged the inline form as unreachable code.
     assert "EIA_API_KEY" not in os.environ
 
 
