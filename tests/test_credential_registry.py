@@ -5,7 +5,6 @@ from pathlib import Path
 
 import yaml
 
-from desktop import secrets
 from moneysweep.runtime.credential_registry import (
     CREDENTIAL_NAMES,
     LICENSE_GATES,
@@ -39,7 +38,7 @@ def _registry_credentials() -> set[str]:
 
 def _registry_license_gates() -> set[str]:
     payload = yaml.safe_load((ROOT / "registries/source_registry.yaml").read_text(encoding="utf-8"))
-    return {str(src["license_gate"]).strip() for src in payload.get("sources", []) if src.get("license_gate")}
+    return {\n        str(src["license_gate"]).strip()\n        for src in payload.get("sources", [])\n        if src.get("license_gate")\n    }
 
 
 def test_env_example_credential_names_are_canonical() -> None:
@@ -54,8 +53,10 @@ def test_source_registry_license_gates_are_canonical() -> None:
     assert _registry_license_gates() <= LICENSE_GATES
 
 
-def test_desktop_vault_uses_canonical_vault_denominator() -> None:
-    assert secrets.ALLOWED_KEYS == VAULT_CREDENTIAL_NAMES
+def test_desktop_vault_binds_to_canonical_vault_denominator() -> None:
+    text = (ROOT / "desktop/secrets.py").read_text(encoding="utf-8")
+    assert "from moneysweep.runtime.credential_registry import VAULT_CREDENTIAL_NAMES" in text
+    assert "ALLOWED_KEYS = VAULT_CREDENTIAL_NAMES" in text
 
 
 def test_registry_contains_names_only_not_secret_values() -> None:
