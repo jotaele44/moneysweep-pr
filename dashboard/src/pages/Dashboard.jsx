@@ -10,14 +10,23 @@ import GovernmentChanges from '@/components/GovernmentChanges'
 import DataSources from '@/components/DataSources'
 import ApiKeysPanel from '@/components/ApiKeysPanel'
 import OwnershipDeepDive from '@/components/OwnershipDeepDive'
+import ProgramTimeline from '@/components/ProgramTimeline'
 import brandMark from "@/assets/icon-64.png?inline";
+
+const PROGRAM_TIMELINE = [
+  { id:'money-ingest', phase:'NOW', title:'Public-money source intake', detail:'Freeze and ingest contract, award, vendor, payment, and entity source manifestations.', category:'Acquisition' },
+  { id:'money-entity', phase:'NEXT', title:'Entity identity resolution', detail:'Bind vendors and recipients using stable IDs and authoritative evidence rather than normalized names alone.', category:'Identity' },
+  { id:'money-contracts', phase:'NEXT', title:'Contract and payment reconciliation', detail:'Close amounts, dates, amendments, and cardinality without synthesizing records through aggregation.', category:'Contracts' },
+  { id:'money-rel', phase:'QUEUED', title:'Relationship analysis', detail:'Explore bounded relationships only after source and entity identity gates pass.', category:'Analysis' },
+  { id:'money-receipt', phase:'BLOCKED', title:'Federation handoff receipts', detail:'Production acknowledgement and final LOCKSTEP receipts wait on upstream producer freshness and credentials.', category:'Federation' },
+]
 
 // API Keys writes to a local backend .env file — no backend exists in the
 // OFFLINE/standalone export, so the tab is hidden entirely there.
 const OFFLINE = import.meta.env.VITE_OFFLINE === '1'
 
 const TABS = [
-  'contracts', 'entities', 'government-changes', 'graph', 'municipios', 'campaign-finance',
+  'activity', 'contracts', 'entities', 'government-changes', 'graph', 'municipios', 'campaign-finance',
   ...(OFFLINE ? [] : ['data-sources', 'api-keys']),
   'ownership',
 ]
@@ -47,7 +56,8 @@ export default function Dashboard() {
       <div className="min-h-0 flex-1 p-3">
         <Tabs value={tab} onValueChange={setTab} className="flex h-full flex-col">
           <div className="overflow-x-auto pb-1">
-            <TabsList className={`grid h-auto min-w-[760px] ${OFFLINE ? 'grid-cols-7' : 'grid-cols-9'} bg-card`}>
+            <TabsList className={`grid h-auto min-w-[760px] ${OFFLINE ? 'grid-cols-8' : 'grid-cols-10'} bg-card`}>
+              <TabsTrigger value="activity" className={triggerClass}>Activity</TabsTrigger>
               <TabsTrigger value="contracts" className={triggerClass}>Contracts</TabsTrigger>
               <TabsTrigger value="entities" className={triggerClass}>Entities</TabsTrigger>
               <TabsTrigger value="government-changes" className={triggerClass}>Gov Changes</TabsTrigger>
@@ -60,6 +70,7 @@ export default function Dashboard() {
             </TabsList>
           </div>
           <div className="mt-2 min-h-0 flex-1 overflow-hidden rounded-lg border border-border bg-background/40">
+            <TabsContent value="activity" className="m-0 h-full overflow-y-auto p-3"><ProgramTimeline items={PROGRAM_TIMELINE} /></TabsContent>
             <TabsContent value="contracts" className="m-0 h-full"><ContractsTable /></TabsContent>
             <TabsContent value="entities" className="m-0 h-full"><EntitiesTable /></TabsContent>
             <TabsContent value="government-changes" className="m-0 h-full"><GovernmentChanges /></TabsContent>
