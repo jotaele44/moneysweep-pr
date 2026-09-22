@@ -1,7 +1,7 @@
 {
   "schema_version": "prii_repo_compatibility_receipt_v1",
   "repo": "moneysweep-pr",
-  "central_baseline": "2026-09-01",
+  "central_baseline": "2026-08-31",
   "central_governance_repo": "jotaele44/thehub-pr",
   "central_governance_pr": 218,
   "central_governance_url": "https://github.com/jotaele44/thehub-pr/pull/218",
@@ -32,7 +32,7 @@
   "drift_reconciliation": {
     "cause_pr": 585,
     "cause_commit": "e2ed593",
-    "cause_change": "source_truth count update total_sources 164→167; automatable_total 115→119; automatable_ready 115→119; queued_excluded_total 49→48",
+    "cause_change": "source_truth count update total_sources 164→167; automatable_total 115→119; automatable_ready 115→119; queued_excluded_total 49’48",
     "reviewed_at": "2026-09-22",
     "reviewed_head": "105ab0e6f2ab87aae4bdcda39a988b75390a770b",
     "finding": "COMPATIBLE",
