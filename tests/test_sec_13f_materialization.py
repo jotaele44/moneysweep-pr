@@ -185,3 +185,17 @@ def test_value_total_mismatch_fails_closed(tmp_path: Path) -> None:
 
     with pytest.raises(SECAcquisitionError, match="table-value reconciliation failed"):
         materialize_sec_13f(_client(target, wrong_value), target, tmp_path)
+
+
+def test_value_total_reconciles_when_value_scale_is_not_one(tmp_path: Path) -> None:
+    # `tableValueTotal` in the primary document stays on the raw (unscaled)
+    # axis regardless of `value_scale` (it is the filer-declared sum of the
+    # information table's raw <value> elements, e.g. legacy filings reported
+    # in thousands). A non-1.0 value_scale must not spuriously fail
+    # reconciliation just because the parsed total is reported in dollars.
+    target = _target(value_scale=1000.0)
+    result = materialize_sec_13f(_client(target), target, tmp_path)
+
+    assert result.certification_status == "PASS"
+    assert str(result.declared_table_value_total) == "300"
+    assert str(result.parsed_table_value_total) == "300000.0"
