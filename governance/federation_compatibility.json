@@ -1,7 +1,7 @@
 {
   "schema_version": "prii_repo_compatibility_receipt_v1",
   "repo": "moneysweep-pr",
-  "central_baseline": "2026-09-01",
+  "central_baseline": "2026-08-31",
   "central_governance_repo": "jotaele44/thehub-pr",
   "central_governance_pr": 218,
   "central_governance_url": "https://github.com/jotaele44/thehub-pr/pull/218",
@@ -28,5 +28,14 @@
     "scripts/build_contract_finance_bundle.py"
   ],
   "spatial_generation": "federation-spatial-index/1",
-  "spatial_note": "Compatible with the federation spatial index generation. This repository consumes the canonical Cell_ID address space and publishes no geometry of its own; its CELL_PROFILE index lands in a later wave."
+  "spatial_note": "Compatible with the federation spatial index generation. This repository consumes the canonical Cell_ID address space and publishes no geometry of its own; its CELL_PROFILE index lands in a later wave.",
+  "drift_reconciliation": {
+    "cause_pr": 585,
+    "cause_commit": "e2ed593",
+    "cause_change": "source_truth count update total_sources 164→167; automatable_total 115→119; automatable_ready 115→119; queued_excluded_total 49’48",
+    "reviewed_at": "2026-09-22",
+    "reviewed_head": "105ab0e6f2ab87aae4bdcda39a988b75390a770b",
+    "finding": "COMPATIBLE",
+    "rationale": "source_truth metadata only; export contract schemas and generation federation-spatial-index/1 unchanged; all eight attested contracts remain valid"
+  }
 }
