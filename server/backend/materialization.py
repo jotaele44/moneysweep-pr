@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 
 from desktop.secrets import (
@@ -31,6 +31,7 @@ from desktop.secrets import (
 )
 from desktop.workspace import bootstrap_workspace, resource_root
 from moneysweep.runtime.source_registry import load_source_registry, source_by_id
+from server.backend.local_request import require_loopback
 from server.backend.materialization_security import (
     public_run_summary,
     write_offline_receipt,
@@ -40,7 +41,17 @@ from scripts.run_automatable_sources import (
     select_sources,
 )
 
-router = APIRouter(prefix="/materialization", tags=["materialization"])
+# This router controls the OS credential vault (read presence, write, delete,
+# and activate credentials for real third-party API calls) and accepts
+# arbitrary file uploads. It is mounted directly on the desktop app with no
+# other auth layer, so every route here must be restricted to the loopback
+# interface -- applied once at the router level so no individual handler can
+# be added later without this protection (see server/backend/local_request.py).
+router = APIRouter(
+    prefix="/materialization",
+    tags=["materialization"],
+    dependencies=[Depends(require_loopback)],
+)
 
 
 class ApiRunRequest(BaseModel):

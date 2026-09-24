@@ -21,7 +21,7 @@ from .models import (
     Lead,
     Visibility,
 )
-from .repository import SQLiteCaseManagerRepository
+from .repository import CaseManagerNotFound, SQLiteCaseManagerRepository
 
 VISIBILITY_RANK = {"public": 0, "internal": 1, "restricted": 2}
 
@@ -347,7 +347,18 @@ class CaseQueryService:
             raise ValueError("unsupported collection")
         # Parent visibility dominates child visibility. A public child cannot leak
         # the existence/content of a restricted case when the case ID is guessed.
-        if self.get_case(case_id, clearance) is None:
+        # `get_case` returns None both when the case is genuinely absent and when
+        # it exists but is filtered out by clearance; a missing case additionally
+        # raises CaseManagerNotFound from the underlying fetch. Catch that here so
+        # both situations produce the identical [] response from this method --
+        # otherwise "exists but restricted" (a caught None, [] here) and "does not
+        # exist" (an uncaught exception, mapped to 404 by the API layer) would
+        # remain distinguishable, defeating the guard this comment describes.
+        try:
+            case = self.get_case(case_id, clearance)
+        except CaseManagerNotFound:
+            return []
+        if case is None:
             return []
         return VisibilityPolicy(clearance).filter(
             self.repository.fetch_case_rows(aliases[collection], case_id)

@@ -94,7 +94,8 @@
           "dashboard/src/components/RelationshipGraph.jsx",
           "dashboard/src/components/MunicipalityAggregates.jsx",
           "dashboard/src/components/StatsBar.jsx",
-          "dashboard/src/components/StatsDistributions.jsx"
+          "dashboard/src/components/StatsDistributions.jsx",
+          "dashboard/src/components/ProgramTimeline.jsx"
         ],
         "discoverability": [
           "dashboard/src/pages/Dashboard.jsx"
