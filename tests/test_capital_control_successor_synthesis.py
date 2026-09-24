@@ -38,7 +38,8 @@ def test_only_material_overlap_is_adjudicated_whole_file() -> None:
     adjudication = manifest["overlap_adjudication"]
     assert adjudication["pr520_vs_pr527_path_intersection"] == []
     assert adjudication["pr520_vs_current_main_material_intersection"] == [
-        "moneysweep/capital_control/__init__.py"
+        "moneysweep/capital_control/__init__.py",
+        "scripts/entity_resolution.py",
     ]
     assert adjudication["pr527_vs_current_main_material_intersection"] == [
         "dashboard/src/lib/api.js"
@@ -62,6 +63,12 @@ def test_only_material_overlap_is_adjudicated_whole_file() -> None:
     api_source = api.read_text(encoding="utf-8")
     assert "resolveOfflineSnapshot" in api_source
     assert "setApiKey" in api_source
+
+    entity_resolution = adjudication["scripts/entity_resolution.py"]
+    entity_snapshot = ROOT / entity_resolution["source_snapshot"]
+    entity_current = ROOT / "scripts" / "entity_resolution.py"
+    assert _git_blob_sha(entity_snapshot) == entity_resolution["pr520_blob"]
+    assert _git_blob_sha(entity_current) == entity_resolution["current_main_blob"]
 
 
 def test_successor_source_lineage_and_hold_are_exact() -> None:
