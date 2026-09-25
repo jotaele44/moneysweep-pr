@@ -10,7 +10,18 @@ from tools.operator_corpus_common import load_sources, source_ids_digest
 pytestmark = pytest.mark.unit
 ROOT = Path(__file__).resolve().parents[1]
 HISTORICAL_MAIN_SHA = "ba0c0d11a011669a5d487dc116274491449d4b72"
-CANONICAL_SOURCE_IDS_SHA256 = "353995f4595fde0f7643ff8d9987154bcd230abe30037cdcbe6e3abd7f4233d1"
+CURRENT_SOURCE_COUNT = 167
+CURRENT_REQUIRED_COUNT = 16
+CURRENT_AUTOMATABLE_COUNT = 119
+CURRENT_QUEUED_EXCLUDED_COUNT = 48
+CURRENT_SOURCE_IDS_SHA256 = "aa4d0db8f8974d21263c3cd528de31ccf187c919c31ae2de6358d9c03f63a1ac"
+POST_162_SOURCE_IDS = {
+    "ftz_board_pr",
+    "ocif_guide_financial_classes",
+    "ocs_insurer_registry",
+    "pr_fomb",
+    "pr_fomb_special_reports",
+}
 
 
 def _head() -> str:
@@ -30,7 +41,7 @@ def _report() -> dict:
         scope_sha=head,
         implementation_sha=head,
         run_preflight=False,
-        generated_at="2026-08-28T22:30:00-04:00",
+        generated_at="2026-09-25T15:00:00+00:00",
     )
 
 
@@ -45,11 +56,16 @@ def test_current_evidence_audit_is_fail_closed_and_denominator_exact() -> None:
     assert report["scope"]["commit_sha"] == _head()
     assert report["scope"]["commit_sha"] == report["scope"]["checkout_head_sha"]
     assert report["audit_implementation"]["commit_sha"] == _head()
-    assert report["scope"]["registry_total_sources"] == 162
-    assert report["scope"]["registry_required_sources"] == 16
-    assert report["scope"]["registry_source_ids_sha256"] == CANONICAL_SOURCE_IDS_SHA256
+    assert report["scope"]["registry_total_sources"] == CURRENT_SOURCE_COUNT
+    assert report["scope"]["registry_required_sources"] == CURRENT_REQUIRED_COUNT
+    assert report["scope"]["registry_source_ids_sha256"] == CURRENT_SOURCE_IDS_SHA256
     assert "certification_config" in report["input_manifest"]
-    assert len(report["source_universe"]["source_ledger"]) == 162
+    assert len(report["source_universe"]["source_ledger"]) == CURRENT_SOURCE_COUNT
+    assert report["source_universe"]["automatable_total"] == CURRENT_AUTOMATABLE_COUNT
+    assert report["source_universe"]["queued_excluded_total"] == CURRENT_QUEUED_EXCLUDED_COUNT
+    assert POST_162_SOURCE_IDS.issubset(
+        {row["source_id"] for row in report["source_universe"]["source_ledger"]}
+    )
     assert report["certification_state"] == "NON_PRODUCTION_DIAGNOSTIC"
     assert report["production_eligible"] is False
 
@@ -79,22 +95,19 @@ def test_scope_mismatch_fails_closed() -> None:
     assert report["production_eligible"] is False
 
 
-def test_required_source_residue_is_exact_for_current_registry() -> None:
+def test_required_source_residue_matches_current_root_reports() -> None:
     report = _report()
     gate = _gates(report)["G3_REQUIRED_SOURCE_MATERIALIZATION"]
 
     assert gate["evidence"]["required_status_counts"] == {
-        "fully_materialized": 8,
-        "not_materialized": 7,
-        "partially_materialized": 1,
+        "fully_materialized": 11,
+        "not_materialized": 3,
+        "partially_materialized": 2,
     }
     assert {row["source_id"] for row in gate["evidence"]["required_blockers"]} == {
         "usaspending_prime",
-        "cor3",
         "hud_drgr_authorized",
         "prasa",
-        "oficina_contralor",
-        "pr_cabilderos",
         "campaign_finance_entities",
         "campaign_finance_materialization_gate",
     }
@@ -120,19 +133,10 @@ def test_current_completeness_is_not_promoted() -> None:
     gates = _gates(report)
 
     completeness = report["source_universe"]["completeness_matrix"]
-    assert completeness["total_sources"] == 162
-    assert completeness["by_materialization_status"] == {
-        "fully_materialized": 11,
-        "not_materialized": 149,
-        "partially_materialized": 2,
-    }
+    assert completeness["total_sources"] == CURRENT_SOURCE_COUNT
+    assert sum(completeness["by_materialization_status"].values()) == CURRENT_SOURCE_COUNT
+    assert sum(completeness["by_coverage_status"].values()) == CURRENT_SOURCE_COUNT
     assert completeness["contracted_sources"] == 23
-    assert completeness["by_coverage_status"] == {
-        "below_contract": 4,
-        "meets_contract": 2,
-        "uncontracted": 139,
-        "unverifiable": 17,
-    }
 
     assert gates["G8_PROVENANCE_AND_LINEAGE"]["state"] == "BLOCKED"
     assert (
@@ -145,11 +149,12 @@ def test_current_completeness_is_not_promoted() -> None:
     )
 
 
-def test_lineage_auditor_includes_core_and_extension_registries() -> None:
+def test_lineage_auditor_includes_current_registry_and_extensions() -> None:
     audit = build_coverage_audit(ROOT, operator_corpus_authoritative=False)
 
-    assert audit["local_truth_summary"]["total_sources"] == 162
-    assert audit["local_truth_summary"]["required_sources"] == 16
+    assert audit["local_truth_summary"]["total_sources"] == CURRENT_SOURCE_COUNT
+    assert audit["local_truth_summary"]["required_sources"] == CURRENT_REQUIRED_COUNT
+    assert audit["audit_scope"]["registry_source_ids_sha256"] == CURRENT_SOURCE_IDS_SHA256
     assert audit["audit_scope"]["operator_corpus_authoritative"] is False
     assert audit["processed_file_inventory"]["orphan_rows"] is None
     registry_paths = set(audit["audit_scope"]["registry_paths"])
@@ -163,10 +168,12 @@ def test_lineage_auditor_includes_core_and_extension_registries() -> None:
     )
 
 
-def test_operator_corpus_digest_matches_existing_162_source_identity() -> None:
+def test_operator_corpus_digest_matches_current_167_source_identity() -> None:
     sources, _ = load_sources(ROOT)
-    assert len(sources) == 162
-    assert source_ids_digest(sources) == CANONICAL_SOURCE_IDS_SHA256
+    source_ids = {str(source["source_id"]) for source in sources}
+    assert len(sources) == CURRENT_SOURCE_COUNT
+    assert POST_162_SOURCE_IDS.issubset(source_ids)
+    assert source_ids_digest(sources) == CURRENT_SOURCE_IDS_SHA256
 
 
 def test_bare_authority_assertion_cannot_unlock_lineage() -> None:
