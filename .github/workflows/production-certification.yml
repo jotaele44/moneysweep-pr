@@ -12,8 +12,13 @@ on:
       - "tools/build_operator_corpus.py"
       - "tools/verify_operator_corpus.py"
       - "tools/write_operator_evidence_receipt.py"
+      - "tools/derive_certification_truth.py"
+      - "tools/verify_source_equivalence.py"
+      - "schemas/source_equivalence_claim.schema.json"
       - "tests/test_production_certification.py"
       - "tests/test_operator_corpus.py"
+      - "tests/test_certification_truth.py"
+      - "tests/test_source_equivalence.py"
       - "reports/**"
       - "registries/**"
       - "scripts/**"
@@ -61,7 +66,18 @@ jobs:
           python -m pytest \
             tests/test_production_certification.py \
             tests/test_operator_corpus.py \
+            tests/test_certification_truth.py \
+            tests/test_source_equivalence.py \
             -q -o addopts=""
+
+      - name: Derive checkout-bound certification truth
+        working-directory: implementation
+        run: |
+          python tools/derive_certification_truth.py \
+            --root ../scope \
+            --evidence-root ../scope \
+            --scope-dir build/certification-scope-ci \
+            --as-of "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
       - name: Regenerate current-denominator lineage evidence
         working-directory: implementation
@@ -95,6 +111,7 @@ jobs:
             --config registries/production_certification.yaml \
             --scope-sha "$CERT_SCOPE_SHA" \
             --implementation-sha "$CERT_IMPLEMENTATION_SHA" \
+            --truth-root build/certification-scope-ci \
             --run-preflight \
             --output reports/production_certification.ci.json
 
@@ -115,13 +132,20 @@ jobs:
           g7 = json.loads(
               Path("reports/entity_resolution_certification_audit.ci.json").read_text(encoding="utf-8")
           )
-          canonical_digest = (
-              "353995f4595fde0f7643ff8d9987154bcd230abe30037cdcbe6e3abd7f4233d1"
+          truth = json.loads(
+              Path("build/certification-scope-ci/reports/certification_truth.json").read_text(
+                  encoding="utf-8"
+              )
           )
+          total = truth["registry"]["total_sources"]
+          digest = truth["registry"]["source_ids_sha256"]
           checks = {
-              "source_ledger_162": len(report["source_universe"]["source_ledger"]) == 162,
-              "lineage_denominator_162": lineage["local_truth_summary"]["total_sources"] == 162,
-              "lineage_registry_digest_canonical": lineage["audit_scope"]["registry_source_ids_sha256"] == canonical_digest,
+              "source_ledger_matches_current_truth": len(report["source_universe"]["source_ledger"]) == total,
+              "lineage_denominator_matches_current_truth": lineage["local_truth_summary"]["total_sources"] == total,
+              "lineage_registry_digest_matches_truth": lineage["audit_scope"]["registry_source_ids_sha256"] == digest,
+              "report_registry_digest_matches_truth": report["scope"]["registry_source_ids_sha256"] == digest,
+              "derived_truth_is_bound": report["scope"]["truth_scope_id"] is not None,
+              "derived_readiness_is_authoritative_input": report["input_manifest"]["materialization_readiness"]["identity"] == "DERIVED_CERTIFICATION_SCOPE_TRUTH",
               "ci_lineage_not_operator_authoritative": lineage["audit_scope"]["operator_corpus_authoritative"] is False,
               "ci_lineage_proof_absent": "operator_corpus_proof_not_supplied" in lineage["audit_scope"]["authority_blockers"],
               "ci_lineage_orphans_fail_closed": lineage["processed_file_inventory"]["orphan_rows"] is None,
@@ -148,4 +172,5 @@ jobs:
             implementation/reports/production_certification.ci.json
             implementation/reports/materialization_coverage_audit.ci.json
             implementation/reports/entity_resolution_certification_audit.ci.json
+            implementation/build/certification-scope-ci/**
           if-no-files-found: error
