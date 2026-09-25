@@ -62,6 +62,16 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _sha256_json(value: object) -> str:
+    payload = json.dumps(
+        value,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
 def _head(root: Path) -> str:
     return subprocess.run(
         ["git", "rev-parse", "HEAD"],
@@ -143,6 +153,8 @@ def _validate_truth_scope(
     *,
     truth_root: Path | None,
     paths: dict[str, Path],
+    expected_scope_sha: str,
+    expected_implementation_sha: str,
 ) -> tuple[dict[str, Any] | None, list[str]]:
     if truth_root is None:
         return None, []
@@ -161,6 +173,18 @@ def _validate_truth_scope(
     scope_id = manifest.get("scope_id")
     if not isinstance(scope_id, str) or not re.fullmatch(r"[0-9a-f]{64}", scope_id):
         blockers.append("truth_scope_id_invalid")
+
+    identity = manifest.get("scope_identity")
+    if not isinstance(identity, dict):
+        identity = {}
+        blockers.append("truth_scope_identity_missing")
+    else:
+        if scope_id != _sha256_json(identity):
+            blockers.append("truth_scope_id_digest_mismatch")
+        if identity.get("scope_repository_sha") != expected_scope_sha:
+            blockers.append("truth_scope_repository_sha_mismatch")
+        if identity.get("implementation_sha") != expected_implementation_sha:
+            blockers.append("truth_scope_implementation_sha_mismatch")
 
     artifacts = manifest.get("artifacts")
     if not isinstance(artifacts, dict):
@@ -193,6 +217,8 @@ def _validate_truth_scope(
             blockers.append("certification_truth_sha256_mismatch")
         if truth_record.get("bytes") != truth_path.stat().st_size:
             blockers.append("certification_truth_bytes_mismatch")
+        if identity.get("truth_sha256") != truth_record.get("sha256"):
+            blockers.append("truth_scope_identity_truth_sha256_mismatch")
 
     return manifest, sorted(set(blockers))
 
@@ -223,6 +249,8 @@ def build_report(
     truth_scope, truth_scope_blockers = _validate_truth_scope(
         truth_root=truth_root,
         paths=paths,
+        expected_scope_sha=scope_sha,
+        expected_implementation_sha=implementation_sha,
     )
 
     readiness = _json(paths["materialization_readiness"])
