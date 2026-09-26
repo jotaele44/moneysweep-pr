@@ -67,6 +67,7 @@ def build_receipt(
     registry_root: Path | None = None,
     outputs: list[str],
     producer_sha: str,
+    inputs: list[str] | None = None,
     producer: str | None = None,
     source_url: str | None = None,
     started_at: str | None = None,
@@ -92,30 +93,46 @@ def build_receipt(
     if not outputs:
         raise RuntimeError("at least one output is required")
 
+    def artifact_record(value: str) -> dict[str, Any]:
+        rel = safe_relative_path(value).as_posix()
+        path = root / rel
+        if not path.exists() or not path.is_file():
+            raise RuntimeError(f"artifact is missing for {source_id}: {rel}")
+        rows = csv_rows(path)
+        return {
+            "path": rel,
+            "sha256": sha256_file(path),
+            "bytes": path.stat().st_size,
+            "rows": rows,
+            "content_type": ("text/csv" if path.suffix.lower() == ".csv" else None),
+        }
+
+    input_records: list[dict[str, Any]] = []
+    input_paths: set[str] = set()
+    for value in inputs or []:
+        record = artifact_record(value)
+        rel = str(record["path"])
+        if rel in input_paths:
+            raise RuntimeError(f"duplicate input path: {rel}")
+        input_paths.add(rel)
+        input_records.append(record)
+
     output_records: list[dict[str, Any]] = []
     actual_paths: set[str] = set()
     positive_checks: list[bool] = []
     for value in outputs:
-        rel = safe_relative_path(value).as_posix()
+        record = artifact_record(value)
+        rel = str(record["path"])
         if rel in actual_paths:
             raise RuntimeError(f"duplicate output path: {rel}")
         actual_paths.add(rel)
         if not _declared(rel, expected):
             raise RuntimeError(f"output is not declared for {source_id}: {rel}")
-        path = root / rel
-        if not path.exists() or not path.is_file():
-            raise RuntimeError(f"output is missing for {source_id}: {rel}")
-        rows = csv_rows(path)
-        positive_checks.append(rows > 0 if rows is not None else path.stat().st_size > 0)
-        output_records.append(
-            {
-                "path": rel,
-                "sha256": sha256_file(path),
-                "bytes": path.stat().st_size,
-                "rows": rows,
-                "content_type": ("text/csv" if path.suffix.lower() == ".csv" else None),
-            }
+        rows = record["rows"]
+        positive_checks.append(
+            rows > 0 if rows is not None else int(record["bytes"]) > 0
         )
+        output_records.append(record)
 
     expected_complete = all(_expected_satisfied(item, actual_paths) for item in expected)
     resolved_url = (
@@ -142,6 +159,11 @@ def build_receipt(
             "source_ids_sha256": source_ids_digest(sources),
             "source_definition_sha256": source_definition_digest(source),
         },
+        **(
+            {"inputs": sorted(input_records, key=lambda item: item["path"])}
+            if input_records
+            else {}
+        ),
         "outputs": sorted(output_records, key=lambda item: item["path"]),
         "validation": {
             "schema_valid": True,
@@ -163,6 +185,7 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path("."))
     parser.add_argument("--source-id", required=True)
     parser.add_argument("--registry-root", type=Path)
+    parser.add_argument("--input", action="append", default=[], dest="inputs")
     parser.add_argument("--output", action="append", required=True, dest="outputs")
     parser.add_argument("--producer-sha")
     parser.add_argument("--producer")
@@ -190,6 +213,7 @@ def main() -> int:
         registry_root=args.registry_root,
         outputs=args.outputs,
         producer_sha=producer_sha,
+        inputs=args.inputs,
         producer=args.producer,
         source_url=args.source_url,
         started_at=args.started_at,
