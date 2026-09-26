@@ -43,6 +43,26 @@ jobs:
         continue-on-error: true
         run: python scripts/scrape_iapconsulta.py --force
 
+      - name: Probe current COR3 producer fail-closed
+        id: cor3
+        continue-on-error: true
+        run: python scripts/download_cor3.py --force
+
+      - name: Acquire public OCE Socrata donations
+        id: oce
+        continue-on-error: true
+        run: python scripts/download_oce.py --force
+
+      - name: Acquire official Justice cabilderos registry
+        id: cabilderos
+        continue-on-error: true
+        run: python scripts/download_cabilderos.py --force
+
+      - name: Acquire official PRASA transition contracts
+        id: prasa
+        continue-on-error: true
+        run: python scripts/download_prasa_contracts.py --force
+
       - name: Acquire USAspending-backed prime contract corpus
         id: usaspending
         continue-on-error: true
@@ -66,26 +86,6 @@ jobs:
           # failure here must not erase positive-row USAspending acquisition
           # evidence or be mistaken for a network-acquisition failure.
           python scripts/build_unified_master.py --force
-
-      - name: Probe current COR3 producer fail-closed
-        id: cor3
-        continue-on-error: true
-        run: python scripts/download_cor3.py --force
-
-      - name: Acquire public OCE Socrata donations
-        id: oce
-        continue-on-error: true
-        run: python scripts/download_oce.py --force
-
-      - name: Acquire official Justice cabilderos registry
-        id: cabilderos
-        continue-on-error: true
-        run: python scripts/download_cabilderos.py --force
-
-      - name: Acquire official PRASA transition contracts
-        id: prasa
-        continue-on-error: true
-        run: python scripts/download_prasa_contracts.py --force
 
       - name: Record acquisition evidence
         if: always()
