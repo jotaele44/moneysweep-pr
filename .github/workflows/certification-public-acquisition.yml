@@ -1,0 +1,416 @@
+name: Production certification public acquisition
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/certification-public-acquisition.yml"
+      - "schemas/operator_evidence_receipt.schema.json"
+      - "tools/operator_corpus_common.py"
+      - "tools/write_operator_evidence_receipt.py"
+      - "scripts/scrape_iapconsulta.py"
+      - "scripts/download_cor3.py"
+      - "scripts/ingest_cor3.py"
+      - "scripts/auto_download.py"
+      - "scripts/normalize_expansion_inputs.py"
+      - "scripts/deduplicate_master.py"
+      - "scripts/build_unified_master.py"
+      - "scripts/download_oce.py"
+      - "scripts/ingest_oce.py"
+      - "scripts/download_cabilderos.py"
+      - "scripts/ingest_cabilderos.py"
+      - "scripts/download_prasa_contracts.py"
+      - "scripts/ingest_prasa.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-acquisition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Acquire full OCPR corpus
+        id: ocpr
+        continue-on-error: true
+        run: python scripts/scrape_iapconsulta.py --force
+
+      - name: Probe current COR3 producer fail-closed
+        id: cor3
+        continue-on-error: true
+        run: python scripts/download_cor3.py --force
+
+      - name: Acquire public OCE Socrata donations
+        id: oce
+        continue-on-error: true
+        run: python scripts/download_oce.py --force
+
+      - name: Acquire official Justice cabilderos registry
+        id: cabilderos
+        continue-on-error: true
+        run: python scripts/download_cabilderos.py --force
+
+      - name: Acquire official PRASA transition contracts
+        id: prasa
+        continue-on-error: true
+        run: python scripts/download_prasa_contracts.py --force
+
+      - name: Acquire USAspending-backed prime contract corpus
+        id: usaspending
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          # Historical provenance for pr_contracts_master is:
+          # auto_download -> normalize_expansion_inputs -> deduplicate_master.
+          # Run the FPDS manifest separately so its post-2007 windows can use the
+          # script's USAspending fallback, then add the native USAspending lanes.
+          python scripts/auto_download.py --force --only=fpds
+          python scripts/auto_download.py --force --only=usaspending
+          python scripts/normalize_expansion_inputs.py
+          python scripts/deduplicate_master.py
+
+      - name: Probe unified all-awards derivation
+        id: unified
+        continue-on-error: true
+        run: |
+          # This is intentionally a separate derived-product probe. A clean CI
+          # checkout does not contain the full gitignored operator corpus, so a
+          # failure here must not erase positive-row USAspending acquisition
+          # evidence or be mistaken for a network-acquisition failure.
+          python scripts/build_unified_master.py --force
+
+      - name: Record acquisition evidence
+        if: always()
+        env:
+          OCPR_OUTCOME: ${{ steps.ocpr.outcome }}
+          USASPENDING_OUTCOME: ${{ steps.usaspending.outcome }}
+          UNIFIED_OUTCOME: ${{ steps.unified.outcome }}
+          COR3_OUTCOME: ${{ steps.cor3.outcome }}
+          OCE_OUTCOME: ${{ steps.oce.outcome }}
+          CABILDEROS_OUTCOME: ${{ steps.cabilderos.outcome }}
+          PRASA_OUTCOME: ${{ steps.prasa.outcome }}
+          CERT_SCOPE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+          CERT_IMPLEMENTATION_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python - <<'PY'
+          import csv
+          import hashlib
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          paths = [
+              Path("data/staging/processed/pr_contralor_audits.csv"),
+              Path("data/staging/processed/pr_contracts_master.csv"),
+              Path("data/staging/processed/pr_all_awards_master.csv"),
+              Path("data/staging/processed/pr_cor3_projects.csv"),
+              Path("data/staging/processed/pr_oce_donations.csv"),
+              Path("data/manifests/campaign_finance/oce_socrata_latest.json"),
+              Path("data/staging/processed/pr_cabilderos.csv"),
+              Path("data/raw/Cabilderos/justice_registry.csv"),
+              Path("data/raw/Cabilderos/justice_registry.html"),
+              Path("data/manifests/cabilderos/justice_registry_latest.json"),
+              Path("data/staging/processed/pr_prasa_contracts.csv"),
+              Path("data/raw/PRASA/Contratos_Vigentes_2024-09-24.csv"),
+              Path("data/raw/PRASA/Contratos_Vigentes_2024-09-24.pdf"),
+              Path("data/manifests/prasa/contracts_vigentes_2024.json"),
+          ]
+          artifacts = []
+          for path in paths:
+              item = {
+                  "path": str(path),
+                  "exists": path.exists(),
+                  "bytes": path.stat().st_size if path.exists() else 0,
+              }
+              if path.exists():
+                  item["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+                  if path.suffix.lower() == ".csv":
+                      try:
+                          with path.open("r", encoding="utf-8-sig", newline="") as fh:
+                              item["data_rows"] = max(sum(1 for _ in csv.reader(fh)) - 1, 0)
+                      except Exception as exc:
+                          item["row_error"] = str(exc)
+              artifacts.append(item)
+
+          report = {
+              "generated_at": datetime.now(timezone.utc).isoformat(),
+              "certification_scope_sha": os.environ["CERT_SCOPE_SHA"],
+              "certification_implementation_sha": os.environ["CERT_IMPLEMENTATION_SHA"],
+              "steps": {
+                  "oficina_contralor": os.environ["OCPR_OUTCOME"],
+                  "usaspending_contract_acquisition": os.environ["USASPENDING_OUTCOME"],
+                  "all_awards_derivation_probe": os.environ["UNIFIED_OUTCOME"],
+                  "cor3": os.environ["COR3_OUTCOME"],
+                  "oce_socrata_live": os.environ["OCE_OUTCOME"],
+                  "pr_cabilderos_justice": os.environ["CABILDEROS_OUTCOME"],
+                  "prasa_official_transition": os.environ["PRASA_OUTCOME"],
+              },
+              "artifacts": artifacts,
+              "semantics": {
+                  "pr_contracts_master": "USAspending/FPDS-backed acquisition product",
+                  "pr_all_awards_master": (
+                      "cross-source derived product; absence in clean CI is not a "
+                      "USAspending acquisition failure and remains a G3/operator-corpus blocker"
+                  ),
+                  "pr_cabilderos": (
+                      "official Puerto Rico Department of Justice Registro de Cabilderos; "
+                      "not federal LDA substitution"
+                  ),
+                  "prasa": (
+                      "official AAA/PRASA contracts-vigentes snapshot published by the "
+                      "Puerto Rico 2024 transition portal"
+                  ),
+              },
+          }
+          out = Path("reports/certification_public_acquisition.json")
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+          print(out.read_text())
+          PY
+
+      - name: Emit registry-bound operator evidence receipts
+        if: always()
+        env:
+          CERT_IMPLEMENTATION_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          lanes = [
+              {
+                  "source_id": "oficina_contralor",
+                  "producer": "scripts/scrape_iapconsulta.py",
+                  "source_url": "https://iapconsulta.ocpr.gov.pr/",
+                  "outputs": ["data/staging/processed/pr_contralor_audits.csv"],
+              },
+              {
+                  "source_id": "usaspending_prime",
+                  "producer": (
+                      "scripts/auto_download.py -> scripts/normalize_expansion_inputs.py "
+                      "-> scripts/deduplicate_master.py"
+                  ),
+                  "source_url": "https://api.usaspending.gov/",
+                  "outputs": [
+                      "data/staging/processed/pr_contracts_master.csv",
+                      "data/staging/processed/pr_all_awards_master.csv",
+                  ],
+              },
+              {
+                  "source_id": "cor3",
+                  "producer": "scripts/download_cor3.py",
+                  "source_url": "https://recovery.pr.gov/",
+                  "outputs": ["data/staging/processed/pr_cor3_projects.csv"],
+              },
+              {
+                  "source_id": "contralor_electoral",
+                  "producer": "scripts/download_oce.py",
+                  "source_url": "https://oce.pr.gov/",
+                  "outputs": ["data/staging/processed/pr_oce_donations.csv"],
+              },
+              {
+                  "source_id": "pr_cabilderos",
+                  "producer": "scripts/download_cabilderos.py",
+                  "source_url": "https://registrodecabilderos.pr.gov/Lobbyist/Details",
+                  "outputs": ["data/staging/processed/pr_cabilderos.csv"],
+              },
+              {
+                  "source_id": "prasa",
+                  "producer": "scripts/download_prasa_contracts.py",
+                  "source_url": (
+                      "https://transicion2024.pr.gov/Agencias/163/Informe%20Contratos%20Vigentes/"
+                      "Contratos%20Vigentes%20al%2024%20de%20septiembre%20de%202024%20%28Informe%29.pdf"
+                  ),
+                  "outputs": ["data/staging/processed/pr_prasa_contracts.csv"],
+              },
+          ]
+          emitted = []
+          skipped = []
+          for lane in lanes:
+              outputs = [path for path in lane["outputs"] if Path(path).is_file()]
+              if not outputs:
+                  skipped.append({"source_id": lane["source_id"], "reason": "no_output_bytes"})
+                  continue
+              command = [
+                  "python",
+                  "tools/write_operator_evidence_receipt.py",
+                  "--source-id",
+                  lane["source_id"],
+                  "--producer-sha",
+                  os.environ["CERT_IMPLEMENTATION_SHA"],
+                  "--producer",
+                  lane["producer"],
+                  "--source-url",
+                  lane["source_url"],
+                  "--coverage-contract-pass",
+                  "false",
+              ]
+              for output in outputs:
+                  command.extend(["--output", output])
+              subprocess.run(command, check=True)
+              emitted.append({"source_id": lane["source_id"], "outputs": outputs})
+          print(json.dumps({"emitted": emitted, "skipped": skipped}, indent=2))
+          PY
+
+      - name: Upload public acquisition evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: certification-public-acquisition
+          path: |
+            reports/certification_public_acquisition.json
+            data/manifests/operator_evidence/*.json
+            data/staging/processed/pr_contralor_audits.csv
+            data/staging/processed/pr_contracts_master.csv
+            data/staging/processed/pr_all_awards_master.csv
+            data/staging/processed/pr_cor3_projects.csv
+            data/staging/processed/pr_oce_donations.csv
+            data/manifests/campaign_finance/oce_socrata_latest.json
+            data/staging/processed/pr_cabilderos.csv
+            data/raw/Cabilderos/justice_registry.csv
+            data/raw/Cabilderos/justice_registry.html
+            data/manifests/cabilderos/justice_registry_latest.json
+            data/staging/processed/pr_prasa_contracts.csv
+            data/raw/PRASA/Contratos_Vigentes_2024-09-24.csv
+            data/raw/PRASA/Contratos_Vigentes_2024-09-24.pdf
+            data/manifests/prasa/contracts_vigentes_2024.json
+          if-no-files-found: warn
+
+      - name: Enforce positive-row public acquisition evidence
+        if: always()
+        env:
+          OCPR_OUTCOME: ${{ steps.ocpr.outcome }}
+          USASPENDING_OUTCOME: ${{ steps.usaspending.outcome }}
+          COR3_OUTCOME: ${{ steps.cor3.outcome }}
+          OCE_OUTCOME: ${{ steps.oce.outcome }}
+          CABILDEROS_OUTCOME: ${{ steps.cabilderos.outcome }}
+          PRASA_OUTCOME: ${{ steps.prasa.outcome }}
+        run: |
+          python - <<'PY'
+          import csv
+          import json
+          import os
+          from pathlib import Path
+
+          outcomes = {
+              "oficina_contralor": os.environ["OCPR_OUTCOME"],
+              "usaspending_prime_contract_acquisition": os.environ["USASPENDING_OUTCOME"],
+              "cor3": os.environ["COR3_OUTCOME"],
+              "oce_socrata_live": os.environ["OCE_OUTCOME"],
+              "pr_cabilderos_justice": os.environ["CABILDEROS_OUTCOME"],
+              "prasa_official_transition": os.environ["PRASA_OUTCOME"],
+          }
+          failures = [
+              f"{name}:step_{outcome}"
+              for name, outcome in outcomes.items()
+              if outcome != "success"
+          ]
+
+          # pr_all_awards_master is deliberately not listed here: it is a
+          # cross-source derived product that can only be certified in the full
+          # operator workspace after its upstream masters are mounted.
+          required_csvs = {
+              "oficina_contralor": [Path("data/staging/processed/pr_contralor_audits.csv")],
+              "usaspending_prime_contract_acquisition": [
+                  Path("data/staging/processed/pr_contracts_master.csv")
+              ],
+              "cor3": [Path("data/staging/processed/pr_cor3_projects.csv")],
+              "oce_socrata_live": [Path("data/staging/processed/pr_oce_donations.csv")],
+              "pr_cabilderos_justice": [Path("data/staging/processed/pr_cabilderos.csv")],
+              "prasa_official_transition": [Path("data/staging/processed/pr_prasa_contracts.csv")],
+          }
+
+          evidence = {}
+          for source_id, paths in required_csvs.items():
+              evidence[source_id] = []
+              for path in paths:
+                  if not path.exists():
+                      failures.append(f"{source_id}:missing:{path}")
+                      evidence[source_id].append(
+                          {"path": str(path), "exists": False, "data_rows": None}
+                      )
+                      continue
+                  try:
+                      with path.open("r", encoding="utf-8-sig", newline="") as fh:
+                          data_rows = max(sum(1 for _ in csv.reader(fh)) - 1, 0)
+                  except Exception as exc:
+                      failures.append(f"{source_id}:unreadable:{path}:{exc}")
+                      evidence[source_id].append(
+                          {"path": str(path), "exists": True, "data_rows": None}
+                      )
+                      continue
+                  evidence[source_id].append(
+                      {"path": str(path), "exists": True, "data_rows": data_rows}
+                  )
+                  if data_rows < 1:
+                      failures.append(f"{source_id}:zero_rows:{path}")
+
+          oce_manifest = Path("data/manifests/campaign_finance/oce_socrata_latest.json")
+          if not oce_manifest.exists():
+              failures.append(f"oce_socrata_live:missing:{oce_manifest}")
+          else:
+              try:
+                  evidence["oce_socrata_manifest"] = json.loads(
+                      oce_manifest.read_text(encoding="utf-8")
+                  )
+              except Exception as exc:
+                  failures.append(f"oce_socrata_live:invalid_manifest:{exc}")
+
+          cabilderos_manifest = Path("data/manifests/cabilderos/justice_registry_latest.json")
+          if not cabilderos_manifest.exists():
+              failures.append(f"pr_cabilderos_justice:missing:{cabilderos_manifest}")
+          else:
+              try:
+                  payload = json.loads(cabilderos_manifest.read_text(encoding="utf-8"))
+                  evidence["pr_cabilderos_justice_manifest"] = payload
+                  if payload.get("status") != "complete":
+                      failures.append("pr_cabilderos_justice:manifest_not_complete")
+                  if int(payload.get("registry_rows", 0)) < 1:
+                      failures.append("pr_cabilderos_justice:manifest_zero_registry_rows")
+                  if int(payload.get("client_relationships", 0)) < 1:
+                      failures.append("pr_cabilderos_justice:manifest_zero_client_relationships")
+                  if payload.get("source_url") != "https://registrodecabilderos.pr.gov/Lobbyist/Details":
+                      failures.append("pr_cabilderos_justice:unexpected_source_url")
+              except Exception as exc:
+                  failures.append(f"pr_cabilderos_justice:invalid_manifest:{exc}")
+
+          prasa_manifest = Path("data/manifests/prasa/contracts_vigentes_2024.json")
+          if not prasa_manifest.exists():
+              failures.append(f"prasa_official_transition:missing:{prasa_manifest}")
+          else:
+              try:
+                  payload = json.loads(prasa_manifest.read_text(encoding="utf-8"))
+                  evidence["prasa_official_transition_manifest"] = payload
+                  if payload.get("status") != "complete":
+                      failures.append("prasa_official_transition:manifest_not_complete")
+                  if int(payload.get("page_count", 0)) != 36:
+                      failures.append("prasa_official_transition:unexpected_page_count")
+                  if int(payload.get("contract_rows", 0)) < 100:
+                      failures.append("prasa_official_transition:below_contract_row_floor")
+                  if payload.get("snapshot_as_of") != "2024-09-24":
+                      failures.append("prasa_official_transition:unexpected_snapshot_date")
+              except Exception as exc:
+                  failures.append(f"prasa_official_transition:invalid_manifest:{exc}")
+
+          print(
+              json.dumps(
+                  {"outcomes": outcomes, "evidence": evidence, "failures": failures},
+                  indent=2,
+              )
+          )
+          if failures:
+              raise SystemExit(
+                  "public acquisition certification failed: " + "; ".join(failures)
+              )
+          PY

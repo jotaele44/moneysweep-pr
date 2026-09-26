@@ -40,6 +40,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib
+import inspect
 import json
 import os
 import sys
@@ -143,6 +144,45 @@ def select_sources(
     return selected
 
 
+def _invoke_entrypoint(fn, root: Path):
+    """Invoke a producer using only explicitly supported execution controls.
+
+    This avoids the old broad TypeError fallback, which could mistake an internal
+    producer bug for an incompatible call signature and then invoke the function
+    a second time with different arguments.
+    """
+    signature = inspect.signature(fn)
+    kwargs: dict[str, Any] = {}
+    supported = {
+        "root": root,
+        "output_dir": root,
+        "live": True,
+        "dry_run": False,
+    }
+    unsupported_required: list[str] = []
+
+    for name, parameter in signature.parameters.items():
+        if name in supported and parameter.kind in {
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            inspect.Parameter.KEYWORD_ONLY,
+        }:
+            kwargs[name] = supported[name]
+            continue
+        if parameter.kind in {
+            inspect.Parameter.VAR_POSITIONAL,
+            inspect.Parameter.VAR_KEYWORD,
+        }:
+            continue
+        if parameter.default is inspect.Parameter.empty:
+            unsupported_required.append(name)
+
+    if unsupported_required:
+        raise TypeError(
+            "unsupported required producer parameters: " + ", ".join(sorted(unsupported_required))
+        )
+    return fn(**kwargs)
+
+
 def run_one(root: Path, src: dict, logger) -> dict:
     sid = src.get("source_id", "")
     producer = src.get("producer_script", "") or ""
@@ -162,14 +202,7 @@ def run_one(root: Path, src: dict, logger) -> dict:
         return result
     t0 = time.time()
     try:
-        res = fn(root=root)
-    except TypeError:
-        try:
-            res = fn()
-        except Exception as exc:
-            result["status"] = "ERROR"
-            result["error"] = f"{type(exc).__name__}: {exc}"
-            return result
+        res = _invoke_entrypoint(fn, root)
     except Exception as exc:
         result["status"] = "ERROR"
         result["error"] = f"{type(exc).__name__}: {exc}"

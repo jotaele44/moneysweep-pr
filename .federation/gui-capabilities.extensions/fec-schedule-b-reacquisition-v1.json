@@ -1,0 +1,28 @@
+{
+  "capabilities": [
+    {
+      "id": "fec-schedule-b-certified-reacquisition",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Page-resumable FEC Schedule B acquisition is an operator-side evidence/materialization control used to populate the certified campaign-finance corpus. It is intentionally fail-closed, credential-gated, checkpointed, and non-interactive; it does not create a separate end-user dashboard capability.",
+      "candidate_ids": [
+        "analysis_module:scripts/download_fec_schedule_b_resumable.py",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:assemble",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:checkpoint_path",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:committee_ids",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:current_cycle",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:main",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:normalize_rows",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:request_json",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:run",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:sha256_file",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:utc_now",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:valid_checkpoint",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:write_json",
+        "cli_surface:scripts/download_fec_schedule_b_resumable.py"
+      ]
+    }
+  ],
+  "exceptions": []
+}
