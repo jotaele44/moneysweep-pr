@@ -1,0 +1,34 @@
+# OpenAI-runtime agent manifest for moneysweep-certify-public-finance-release.
+# SKILL.md is canonical; keep fields synced with skill-registry.yaml.
+schema_version: prii_openai_agent_v1
+name: moneysweep-certify-public-finance-release
+description: >-
+  Read-only terminal certification for a bounded MoneySweep public-finance
+  release. Requires exact frozen source identity, passing data/rendered gates,
+  a persisted TheHub consumer receipt, production evidence when in scope,
+  native/physical-device proof when in scope, and full-SAM identity proof before
+  exhaustive vendor certification. Fails closed at nonzero material residue.
+instructions_ref: ../SKILL.md
+owner_repo: jotaele44/moneysweep-pr
+default_mode: read_only
+allowed_modes: [read_only]
+command_ids: []
+stop_conditions:
+  - current-head drift from the frozen release
+  - full SAM manifestation absent while exhaustive vendor identity is claimed
+  - current TheHub persisted consumer receipt absent
+  - required production or native/physical-device evidence absent
+  - fabricated contradiction, supersession, expected-absence, or zero-result state
+  - nonzero material release residue
+result_envelope:
+  - status
+  - release_revision
+  - denominators
+  - passed_gates
+  - open_gates
+  - blockers
+  - manifestations
+  - receipts
+  - contradictions
+  - residue
+  - next_safe_action
