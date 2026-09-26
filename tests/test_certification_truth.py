@@ -47,6 +47,34 @@ def _registry(root: Path, source: dict) -> None:
     )
 
 
+def _coverage_contract(
+    root: Path,
+    *,
+    universe_total: int | None,
+    pagination_required: bool,
+) -> None:
+    path = root / "registries/coverage_contracts.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "schema_version": "coverage_contracts_v1",
+        "defaults": {"production_fixtures_forbidden": True},
+        "contracts": [
+            {
+                "source_id": "alpha",
+                "contract_version": 1,
+                "canonical_grain": "award",
+                "geography_scope": "PR",
+                "authoritative_universe_method": "api_metadata",
+                "authoritative_universe_total": universe_total,
+                "uniqueness_key": ["id"],
+                "minimum_coverage_pct": 95.0,
+                "pagination_required": pagination_required,
+            }
+        ],
+    }
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
 def _csv(root: Path, rel: str, rows: list[str]) -> Path:
     path = root / rel
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -151,6 +179,7 @@ def test_truth_scope_is_deterministic_and_does_not_invent_coverage(
     root = tmp_path / "repo"
     source = _source(min_rows=1)
     _registry(root, source)
+    _coverage_contract(root, universe_total=None, pagination_required=True)
     output = _csv(root, source["expected_outputs"][0], ["1", "2"])
     _receipt(root, source, output)
     monkeypatch.setattr(truth, "_classify", lambda source, root: "api_producer")
@@ -177,6 +206,40 @@ def test_truth_scope_is_deterministic_and_does_not_invent_coverage(
     source_truth = first["truth"]["sources"][0]
     assert source_truth["materialization_status"] == "fully_materialized"
     assert source_truth["coverage_status"] == "unverifiable"
-    assert "receipt_coverage_not_proven" in source_truth["coverage_blockers"]
+    assert any(
+        "authoritative_universe_total not yet measured" in blocker
+        for blocker in source_truth["coverage_blockers"]
+    )
+    assert "pagination_completeness_not_proven" in source_truth["coverage_blockers"]
+    assert "receipt_coverage_not_proven" not in source_truth["coverage_blockers"]
     assert first["truth"]["summary"]["required_fully_materialized"] == 1
     assert first["truth"]["summary"]["automatable_total"] == 1
+
+def test_measured_contract_is_not_controlled_by_receipt_coverage_boolean(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    root = tmp_path / "repo"
+    source = _source(min_rows=1)
+    _registry(root, source)
+    _coverage_contract(root, universe_total=2, pagination_required=False)
+    output = _csv(root, source["expected_outputs"][0], ["1", "2"])
+    _receipt(root, source, output)
+    monkeypatch.setattr(truth, "_classify", lambda source, root: "api_producer")
+
+    result = truth.derive(
+        root=root,
+        evidence_root=root,
+        receipts_dir=root / "receipts",
+        scope_dir=root / "scope",
+        as_of=datetime(2026, 8, 31, 12, 30, tzinfo=timezone.utc),
+        operator_corpus_id="b" * 64,
+    )
+
+    source_truth = result["truth"]["sources"][0]
+    assert source_truth["coverage_status"] == "meets_contract"
+    assert source_truth["coverage_blockers"] == []
+    assert source_truth["coverage_evidence"]["unique_rows"] == 2
+    assert source_truth["coverage_evidence"]["receipt_coverage_claim"] is False
+    assert result["truth"]["summary"]["coverage"]["meets_contract"] == 1
+
