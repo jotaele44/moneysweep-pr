@@ -24,11 +24,28 @@
     "candidate_source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "source_url", "authoritative"],
+      "required": [
+        "source_id",
+        "name",
+        "source_url",
+        "authoritative"
+      ],
       "properties": {
-        "name": {"type": "string", "minLength": 1},
-        "source_url": {"type": "string", "minLength": 1},
-        "authoritative": {"type": "boolean"}
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authoritative": {
+          "type": "boolean"
+        }
       }
     },
     "tests": {
@@ -43,22 +60,38 @@
         "aggregation_equivalent"
       ],
       "properties": {
-        "semantic_scope_match": {"type": "boolean"},
-        "temporal_scope_match": {"type": "boolean"},
-        "row_universe_match": {"type": "boolean"},
-        "field_mapping_complete": {"type": "boolean"},
-        "selection_equivalent": {"type": "boolean"},
-        "aggregation_equivalent": {"type": "boolean"}
+        "semantic_scope_match": {
+          "type": "boolean"
+        },
+        "temporal_scope_match": {
+          "type": "boolean"
+        },
+        "row_universe_match": {
+          "type": "boolean"
+        },
+        "field_mapping_complete": {
+          "type": "boolean"
+        },
+        "selection_equivalent": {
+          "type": "boolean"
+        },
+        "aggregation_equivalent": {
+          "type": "boolean"
+        }
       }
     },
     "missing_fields": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "uniqueItems": true
     },
     "extra_fields": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "uniqueItems": true
     },
     "evidence": {
@@ -67,10 +100,20 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["kind", "locator", "sha256"],
+        "required": [
+          "kind",
+          "locator",
+          "sha256"
+        ],
         "properties": {
-          "kind": {"type": "string", "minLength": 1},
-          "locator": {"type": "string", "minLength": 1},
+          "kind": {
+            "type": "string",
+            "minLength": 1
+          },
+          "locator": {
+            "type": "string",
+            "minLength": 1
+          },
           "sha256": {
             "type": "string",
             "pattern": "^[0-9a-f]{64}$"
@@ -78,6 +121,8 @@
         }
       }
     },
-    "notes": {"type": "string"}
+    "notes": {
+      "type": "string"
+    }
   }
 }
