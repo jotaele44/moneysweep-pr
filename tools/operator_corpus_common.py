@@ -9,7 +9,7 @@ from typing import Any
 
 import yaml
 
-RECEIPT_SCHEMA_VERSION = "moneysweep.operator_evidence/v1"
+# Registry cardinality is derived at runtime; historical 162/167 counts are never trust inputs.\nRECEIPT_SCHEMA_VERSION = "moneysweep.operator_evidence/v1"
 CORPUS_SCHEMA_VERSION = "moneysweep.operator_corpus/v1"
 VERIFICATION_SCHEMA_VERSION = "moneysweep.operator_corpus_verification/v1"
 
