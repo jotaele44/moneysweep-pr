@@ -81,7 +81,8 @@
   "overlap_adjudication": {
     "pr520_vs_pr527_path_intersection": [],
     "pr520_vs_current_main_material_intersection": [
-      "moneysweep/capital_control/__init__.py"
+      "moneysweep/capital_control/__init__.py",
+      "scripts/entity_resolution.py"
     ],
     "pr527_vs_current_main_material_intersection": [
       "dashboard/src/lib/api.js"
@@ -100,7 +101,13 @@
       "decision": "PRESERVE_CAPITAL_CONTROL_OFFLINE_RESOLUTION_AND_CURRENT_MAIN_DESKTOP_AND_API_CLIENTS"
     },
     "all_other_pr520_paths": "EXACT_BLOB_REUSE",
-    "all_other_pr527_paths": "EXACT_BLOB_REUSE"
+    "all_other_pr527_paths": "EXACT_BLOB_REUSE",
+    "scripts/entity_resolution.py": {
+      "pr520_blob": "49baeb5fd916a8fc522974b464b2257aea07ff50",
+      "current_main_blob": "0a8313de49c13f046568d9155c221bd9f0840802",
+      "source_snapshot": "data/manifests/capital_control/source_inputs/pr520/scripts/entity_resolution.py",
+      "decision": "PRESERVE_PR520_SOURCE_BLOB_AS_IMMUTABLE_SNAPSHOT_AND_KEEP_CURRENT_MAIN_ENTITY_RESOLUTION_FIX"
+    }
   },
   "invariants": {
     "no_raw_mutation": true,
