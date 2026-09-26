@@ -259,7 +259,8 @@
           "scripts/validate_live_fetch_dispatch.py",
           "scripts/check_status_freshness.py",
           "scripts/run_automatable_sources_scoped.py",
-          "moneysweep/orchestrator/cli_legacy.py"
+          "moneysweep/orchestrator/cli_legacy.py",
+          "moneysweep/runtime/credential_registry.py"
         ]
       },
       "tests": {
@@ -267,9 +268,15 @@
           "tests/test_live_fetch_dispatch.py",
           "tests/test_materializer_credential_scope.py",
           "tests/test_status_freshness.py",
-          "tests/test_workflow_static_validation.py"
+          "tests/test_workflow_static_validation.py",
+          "tests/test_credential_registry.py"
         ]
-      }
+      },
+      "candidate_ids": [
+        "python_module:moneysweep/runtime/credential_registry.py",
+        "python_symbol:moneysweep/runtime/credential_registry.py:CredentialSpec",
+        "python_symbol:moneysweep/runtime/credential_registry.py:credential_spec"
+      ]
     },
     {
       "id": "service-health",
@@ -755,7 +762,7 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing \u2014 zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
+      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing — zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
       "backend": {
         "files": [
           "scripts/scrape_rdc_demandas.py",
