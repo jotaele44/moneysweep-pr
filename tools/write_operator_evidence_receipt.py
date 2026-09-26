@@ -64,6 +64,7 @@ def build_receipt(
     *,
     root: Path,
     source_id: str,
+    registry_root: Path | None = None,
     outputs: list[str],
     producer_sha: str,
     producer: str | None = None,
@@ -74,7 +75,8 @@ def build_receipt(
     coverage_contract_pass: bool = False,
 ) -> dict[str, Any]:
     root = root.resolve()
-    sources, _ = load_sources(root)
+    registry_root = (registry_root or root).resolve()
+    sources, _ = load_sources(registry_root)
     source_by_id = {str(source["source_id"]): source for source in sources}
     source = source_by_id.get(source_id)
     if source is None:
@@ -160,6 +162,7 @@ def main() -> int:
     )
     parser.add_argument("--root", type=Path, default=Path("."))
     parser.add_argument("--source-id", required=True)
+    parser.add_argument("--registry-root", type=Path)
     parser.add_argument("--output", action="append", required=True, dest="outputs")
     parser.add_argument("--producer-sha")
     parser.add_argument("--producer")
@@ -184,6 +187,7 @@ def main() -> int:
     receipt = build_receipt(
         root=root,
         source_id=args.source_id,
+        registry_root=args.registry_root,
         outputs=args.outputs,
         producer_sha=producer_sha,
         producer=args.producer,
