@@ -73,7 +73,7 @@ jobs:
       - name: Derive checkout-bound certification truth
         working-directory: implementation
         run: |
-          python tools/derive_certification_truth.py \
+          python -m tools.derive_certification_truth \
             --root ../scope \
             --evidence-root ../scope \
             --scope-dir build/certification-scope-ci \
