@@ -372,6 +372,17 @@ jobs:
             --scope-dir build/keyless-certification-scope \
             --operator-corpus-id "$CORPUS_ID" \
             --as-of "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      - name: Evaluate G0-G12 against regenerated keyless truth
+        run: |
+          python -m tools.certify_production \
+            --root . \
+            --config registries/production_certification.yaml \
+            --truth-root build/keyless-certification-scope \
+            --scope-sha "${{ github.event.pull_request.head.sha || github.sha }}" \
+            --implementation-sha "${{ github.event.pull_request.head.sha || github.sha }}" \
+            --run-preflight \
+            --output reports/keyless_production_certification.json
+
       - name: Upload assembled keyless certification evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -382,6 +393,7 @@ jobs:
             reports/keyless_public_adapters.json
             reports/keyless_certification_derivations.json
             reports/keyless_operator_corpus_verification.json
+            reports/keyless_production_certification.json
             build/keyless-operator-corpus/manifest.json
             build/keyless-operator-corpus/receipts/
             build/keyless-certification-scope/
