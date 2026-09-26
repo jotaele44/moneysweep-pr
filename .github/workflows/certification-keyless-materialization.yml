@@ -11,6 +11,7 @@ on:
       - "tools/build_operator_corpus.py"
       - "tools/verify_operator_corpus.py"
       - "tools/derive_certification_truth.py"
+      - "tools/run_certification_derivations.py"
       - "reports/source_recovery_matrix.csv"
       - "reports/source_registry_status.csv"
       - "registries/source_registry.yaml"
@@ -312,6 +313,15 @@ jobs:
             --workspace-root build/keyless-evidence \
             --receipts-dir build/keyless-receipts \
             --output reports/keyless_evidence_assembly.json
+      - name: Run dependency-bearing certification derivations
+        run: |
+          python -m tools.run_certification_derivations \
+            --registry-root . \
+            --workspace build/keyless-evidence \
+            --receipts-dir build/keyless-receipts \
+            --producer-sha "${{ github.event.pull_request.head.sha || github.sha }}" \
+            --output reports/keyless_certification_derivations.json
+
       - name: Build content-addressed keyless corpus
         run: |
           python -m tools.build_operator_corpus \
@@ -357,6 +367,7 @@ jobs:
           name: keyless-certification-evidence
           path: |
             reports/keyless_evidence_assembly.json
+            reports/keyless_certification_derivations.json
             reports/keyless_operator_corpus_verification.json
             build/keyless-operator-corpus/manifest.json
             build/keyless-operator-corpus/receipts/
