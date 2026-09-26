@@ -65,6 +65,7 @@ def verify(
     *,
     root: Path,
     corpus_root: Path,
+    operator_root: Path | None = None,
     require_operator_snapshot: bool = True,
 ) -> dict[str, Any]:
     """Verify corpus bytes and, by default, the complete operator snapshot.
@@ -75,6 +76,7 @@ def verify(
     operator-corpus authority.
     """
     root = root.resolve()
+    operator_root = (operator_root or root).resolve()
     corpus_root = corpus_root.resolve()
     errors: list[str] = []
     sources, registry_paths = load_sources(root)
@@ -263,7 +265,7 @@ def verify(
     unreceipted_operator: list[str] = []
     receipt_missing_operator: list[str] = []
     if require_operator_snapshot:
-        operator_processed = _processed_inventory(root)
+        operator_processed = _processed_inventory(operator_root)
         unreceipted_operator = sorted(operator_processed - manifest_processed)
         receipt_missing_operator = sorted(manifest_processed - operator_processed)
         if unreceipted_operator:
@@ -324,12 +326,18 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Verify an operator corpus fail-closed.")
     parser.add_argument("--root", type=Path, default=Path("."))
     parser.add_argument("--corpus-root", type=Path, default=Path("build/operator-corpus"))
+    parser.add_argument("--operator-root", type=Path)
     parser.add_argument(
         "--output", type=Path, default=Path("reports/operator_corpus_verification.json")
     )
     args = parser.parse_args()
 
-    report = verify(root=args.root, corpus_root=args.corpus_root, require_operator_snapshot=True)
+    report = verify(
+        root=args.root,
+        corpus_root=args.corpus_root,
+        operator_root=args.operator_root,
+        require_operator_snapshot=True,
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(
