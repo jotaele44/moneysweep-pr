@@ -73,8 +73,15 @@ def _processed_inventory(root: Path) -> set[str]:
     }
 
 
-def build(*, root: Path, receipts_dir: Path, corpus_root: Path) -> dict[str, Any]:
+def build(
+    *,
+    root: Path,
+    receipts_dir: Path,
+    corpus_root: Path,
+    evidence_root: Path | None = None,
+) -> dict[str, Any]:
     root = root.resolve()
+    evidence_root = (evidence_root or root).resolve()
     receipts_dir = receipts_dir.resolve()
     corpus_root = corpus_root.resolve()
     sources, registry_paths = load_sources(root)
@@ -123,7 +130,7 @@ def build(*, root: Path, receipts_dir: Path, corpus_root: Path) -> dict[str, Any
             if not _output_allowed(rel, expected):
                 raise RuntimeError(f"undeclared promotion output for {source_id}: {rel}")
 
-            artifact = root / rel
+            artifact = evidence_root / rel
             if not artifact.exists() or not artifact.is_file():
                 raise RuntimeError(f"receipt artifact missing for {source_id}: {rel}")
             actual_sha = sha256_file(artifact)
@@ -174,7 +181,7 @@ def build(*, root: Path, receipts_dir: Path, corpus_root: Path) -> dict[str, Any
             }
         )
 
-    operator_processed = _processed_inventory(root)
+    operator_processed = _processed_inventory(evidence_root)
     receipted_processed = {
         path for path in receipt_output_paths if path.startswith("data/staging/processed/")
     }
@@ -207,10 +214,16 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Build a content-addressed operator corpus.")
     parser.add_argument("--root", type=Path, default=Path("."))
     parser.add_argument("--receipts", type=Path, required=True)
+    parser.add_argument("--evidence-root", type=Path)
     parser.add_argument("--corpus-root", type=Path, default=Path("build/operator-corpus"))
     args = parser.parse_args()
 
-    manifest = build(root=args.root, receipts_dir=args.receipts, corpus_root=args.corpus_root)
+    manifest = build(
+        root=args.root,
+        evidence_root=args.evidence_root,
+        receipts_dir=args.receipts,
+        corpus_root=args.corpus_root,
+    )
     print(
         json.dumps(
             {
