@@ -129,9 +129,7 @@ def build_receipt(
         if not _declared(rel, expected):
             raise RuntimeError(f"output is not declared for {source_id}: {rel}")
         rows = record["rows"]
-        positive_checks.append(
-            rows > 0 if rows is not None else int(record["bytes"]) > 0
-        )
+        positive_checks.append(rows > 0 if rows is not None else int(record["bytes"]) > 0)
         output_records.append(record)
 
     expected_complete = all(_expected_satisfied(item, actual_paths) for item in expected)

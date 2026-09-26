@@ -178,8 +178,7 @@ def _invoke_entrypoint(fn, root: Path):
 
     if unsupported_required:
         raise TypeError(
-            "unsupported required producer parameters: "
-            + ", ".join(sorted(unsupported_required))
+            "unsupported required producer parameters: " + ", ".join(sorted(unsupported_required))
         )
     return fn(**kwargs)
 

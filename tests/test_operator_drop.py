@@ -29,9 +29,7 @@ def _registry(root: Path) -> None:
                         "authentication": "manual_export",
                         "endpoint_url": "https://example.invalid/alpha",
                         "producer_script": "scripts/ingest_alpha.py",
-                        "expected_outputs": [
-                            "data/staging/processed/alpha.csv"
-                        ],
+                        "expected_outputs": ["data/staging/processed/alpha.csv"],
                         "validation_threshold": {"min_rows": 1},
                         "manual_drop_dir": "data/manual/alpha/",
                         "update_cadence": "monthly",
@@ -127,9 +125,7 @@ def test_operator_drop_preserves_raw_inputs_through_corpus(
         receipts_dir=receipts,
         corpus_root=corpus,
     )
-    assert manifest["sources"][0]["inputs"][0]["path"] == (
-        "data/manual/alpha/export.csv"
-    )
+    assert manifest["sources"][0]["inputs"][0]["path"] == ("data/manual/alpha/export.csv")
     verification = verify_operator_corpus(
         root=registry_root,
         operator_root=workspace,

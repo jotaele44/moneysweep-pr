@@ -194,9 +194,7 @@ def verify(
             if not isinstance(input_artifact, dict):
                 source_errors.append("invalid_manifest_input")
                 continue
-            rel = safe_relative_path(
-                str(input_artifact.get("path", ""))
-            ).as_posix()
+            rel = safe_relative_path(str(input_artifact.get("path", ""))).as_posix()
             manifest_input_paths.add(rel)
             receipt_input = receipt_input_by_path.get(rel)
             if receipt_input is None:
@@ -204,9 +202,7 @@ def verify(
             else:
                 for key in ("sha256", "bytes", "rows"):
                     if receipt_input.get(key) != input_artifact.get(key):
-                        source_errors.append(
-                            f"receipt_manifest_input_{key}_mismatch:{rel}"
-                        )
+                        source_errors.append(f"receipt_manifest_input_{key}_mismatch:{rel}")
 
             object_rel = safe_relative_path(str(input_artifact.get("object", "")))
             object_path = corpus_root / object_rel
@@ -227,12 +223,8 @@ def verify(
                     source_errors.append(f"input_{label}_csv_unreadable:{rel}")
                 if actual_rows != expected_rows:
                     source_errors.append(f"input_{label}_rows_mismatch:{rel}")
-        extra_receipt_inputs = sorted(
-            set(receipt_input_by_path) - manifest_input_paths
-        )
-        source_errors.extend(
-            f"manifest_input_missing:{rel}" for rel in extra_receipt_inputs
-        )
+        extra_receipt_inputs = sorted(set(receipt_input_by_path) - manifest_input_paths)
+        source_errors.extend(f"manifest_input_missing:{rel}" for rel in extra_receipt_inputs)
 
         outputs = entry.get("outputs")
         if not isinstance(outputs, list):

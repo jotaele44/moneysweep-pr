@@ -119,9 +119,7 @@ def execute(
 
     sources = load_source_registry(registry_root).get("sources", [])
     source_by_id = {
-        str(source["source_id"]): source
-        for source in sources
-        if source.get("source_id")
+        str(source["source_id"]): source for source in sources if source.get("source_id")
     }
     dag = _combined_dag()
     order = _topological_order(dag)
@@ -206,15 +204,10 @@ def execute(
         receipt_path = None
         receipt_error = None
         if output_paths:
-            source_url = str(
-                source.get("endpoint_url")
-                or source.get("source_url")
-                or ""
-            ).strip()
+            source_url = str(source.get("endpoint_url") or source.get("source_url") or "").strip()
             if not source_url:
-                source_url = (
-                    "repository://jotaele44/moneysweep-pr/"
-                    + str(source.get("producer_script") or source_id)
+                source_url = "repository://jotaele44/moneysweep-pr/" + str(
+                    source.get("producer_script") or source_id
                 )
             try:
                 receipt = build_receipt(
@@ -251,9 +244,7 @@ def execute(
                 "after": after,
                 "runner_result": runner_result,
                 "outputs": after_outputs,
-                "receipt_path": (
-                    receipt_path.as_posix() if receipt_path is not None else None
-                ),
+                "receipt_path": (receipt_path.as_posix() if receipt_path is not None else None),
                 "receipt_error": receipt_error,
             }
         )

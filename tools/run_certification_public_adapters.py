@@ -128,9 +128,7 @@ def execute(
                 "source_url": source_url,
                 "runner_result": runner_result,
                 "outputs": outputs,
-                "receipt_path": (
-                    receipt_path.as_posix() if receipt_path is not None else None
-                ),
+                "receipt_path": (receipt_path.as_posix() if receipt_path is not None else None),
                 "receipt_error": receipt_error,
             }
         )
@@ -151,8 +149,7 @@ def execute(
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Run bounded public certification adapters inside the assembled "
-            "operator workspace."
+            "Run bounded public certification adapters inside the assembled operator workspace."
         )
     )
     parser.add_argument("--registry-root", type=Path, default=Path("."))

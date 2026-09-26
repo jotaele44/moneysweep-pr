@@ -164,9 +164,7 @@ def assemble(
                 )
 
         evidence_dir = artifact_dir / "operator_evidence"
-        receipt_candidates = (
-            sorted(evidence_dir.glob("*.json")) if evidence_dir.is_dir() else []
-        )
+        receipt_candidates = sorted(evidence_dir.glob("*.json")) if evidence_dir.is_dir() else []
         if len(receipt_candidates) > 1:
             structural_errors.append(f"{source_id}:multiple_operator_receipts")
         if receipt_candidates:
@@ -221,9 +219,7 @@ def assemble(
                 try:
                     _copy_verified(receipt_path, target)
                 except (OSError, RuntimeError) as exc:
-                    structural_errors.append(
-                        f"{source_id}:receipt_copy:{type(exc).__name__}:{exc}"
-                    )
+                    structural_errors.append(f"{source_id}:receipt_copy:{type(exc).__name__}:{exc}")
 
         if result["receipt_valid"]:
             validation = receipt.get("validation") or {}

@@ -128,15 +128,11 @@ def build(
         ) -> dict[str, Any]:
             rel = safe_relative_path(str(record.get("path", ""))).as_posix()
             if require_declared_output and not _output_allowed(rel, expected):
-                raise RuntimeError(
-                    f"undeclared promotion output for {source_id}: {rel}"
-                )
+                raise RuntimeError(f"undeclared promotion output for {source_id}: {rel}")
 
             artifact = evidence_root / rel
             if not artifact.exists() or not artifact.is_file():
-                raise RuntimeError(
-                    f"receipt {kind} artifact missing for {source_id}: {rel}"
-                )
+                raise RuntimeError(f"receipt {kind} artifact missing for {source_id}: {rel}")
             actual_sha = sha256_file(artifact)
             actual_bytes = artifact.stat().st_size
             actual_rows = csv_rows(artifact)
@@ -154,9 +150,7 @@ def build(
             if not object_path.exists():
                 shutil.copy2(artifact, object_path)
             elif sha256_file(object_path) != actual_sha:
-                raise RuntimeError(
-                    f"content-addressed object collision: {actual_sha}"
-                )
+                raise RuntimeError(f"content-addressed object collision: {actual_sha}")
 
             mounted = mount_dir / rel
             mounted.parent.mkdir(parents=True, exist_ok=True)
@@ -174,9 +168,7 @@ def build(
         for input_record in receipt.get("inputs") or []:
             rel = safe_relative_path(str(input_record.get("path", ""))).as_posix()
             if rel in seen_input_paths:
-                raise RuntimeError(
-                    f"duplicate input path in receipt {source_id}: {rel}"
-                )
+                raise RuntimeError(f"duplicate input path in receipt {source_id}: {rel}")
             seen_input_paths.add(rel)
             input_records.append(
                 materialize_artifact(
@@ -191,9 +183,7 @@ def build(
         for output in receipt["outputs"]:
             rel = safe_relative_path(str(output.get("path", ""))).as_posix()
             if rel in seen_output_paths:
-                raise RuntimeError(
-                    f"duplicate output path in receipt {source_id}: {rel}"
-                )
+                raise RuntimeError(f"duplicate output path in receipt {source_id}: {rel}")
             seen_output_paths.add(rel)
             materialized = materialize_artifact(
                 output,

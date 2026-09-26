@@ -217,11 +217,7 @@ def _coverage_csv_paths(
         path = evidence_root / rel
         if value.endswith("/"):
             if path.is_dir():
-                paths.extend(
-                    item
-                    for item in sorted(path.rglob("*.csv"))
-                    if item.is_file()
-                )
+                paths.extend(item for item in sorted(path.rglob("*.csv")) if item.is_file())
         elif path.is_file() and path.suffix.lower() == ".csv":
             paths.append(path)
     return paths
@@ -237,30 +233,38 @@ def _coverage_state(
     evidence_root: Path,
 ) -> tuple[str, list[str], dict[str, Any]]:
     if contract is None:
-        return "uncontracted", ["no_coverage_contract_declared"], {
-            "unique_rows": None,
-            "field_completeness_pct": {},
-            "authoritative_universe_total": None,
-            "pagination_complete": None,
-        }
+        return (
+            "uncontracted",
+            ["no_coverage_contract_declared"],
+            {
+                "unique_rows": None,
+                "field_completeness_pct": {},
+                "authoritative_universe_total": None,
+                "pagination_complete": None,
+            },
+        )
     if materialization != "fully_materialized":
-        return "unverifiable", ["source_not_fully_materialized"], {
-            "unique_rows": None,
-            "field_completeness_pct": {},
-            "authoritative_universe_total": contract.get(
-                "authoritative_universe_total"
-            ),
-            "pagination_complete": None,
-        }
+        return (
+            "unverifiable",
+            ["source_not_fully_materialized"],
+            {
+                "unique_rows": None,
+                "field_completeness_pct": {},
+                "authoritative_universe_total": contract.get("authoritative_universe_total"),
+                "pagination_complete": None,
+            },
+        )
     if any(not output["usable"] for output in outputs):
-        return "unverifiable", ["unusable_output"], {
-            "unique_rows": None,
-            "field_completeness_pct": {},
-            "authoritative_universe_total": contract.get(
-                "authoritative_universe_total"
-            ),
-            "pagination_complete": None,
-        }
+        return (
+            "unverifiable",
+            ["unusable_output"],
+            {
+                "unique_rows": None,
+                "field_completeness_pct": {},
+                "authoritative_universe_total": contract.get("authoritative_universe_total"),
+                "pagination_complete": None,
+            },
+        )
 
     csv_paths = _coverage_csv_paths(
         evidence_root=evidence_root,
@@ -277,31 +281,21 @@ def _coverage_state(
                     fieldnames.update(str(name) for name in reader.fieldnames)
                 rows.extend(dict(row) for row in reader)
         except (OSError, UnicodeDecodeError, csv.Error):
-            blockers.append(
-                "coverage_csv_unreadable:"
-                + path.relative_to(evidence_root).as_posix()
-            )
+            blockers.append("coverage_csv_unreadable:" + path.relative_to(evidence_root).as_posix())
 
     if not csv_paths:
         blockers.append("coverage_measurement_requires_csv_output")
     if not rows and csv_paths:
         blockers.append("coverage_measurement_has_no_rows")
 
-    uniqueness_key = [
-        str(name) for name in (contract.get("uniqueness_key") or [])
-    ]
+    uniqueness_key = [str(name) for name in (contract.get("uniqueness_key") or [])]
     missing_key_fields = sorted(set(uniqueness_key) - fieldnames)
     if missing_key_fields:
-        blockers.append(
-            "uniqueness_key_fields_missing:" + ",".join(missing_key_fields)
-        )
+        blockers.append("uniqueness_key_fields_missing:" + ",".join(missing_key_fields))
         unique_rows = len(rows)
     elif uniqueness_key:
         unique_rows = len(
-            {
-                tuple(str(row.get(name) or "").strip() for name in uniqueness_key)
-                for row in rows
-            }
+            {tuple(str(row.get(name) or "").strip() for name in uniqueness_key) for row in rows}
         )
     else:
         unique_rows = len(rows)
@@ -312,13 +306,8 @@ def _coverage_state(
     for name in sorted(required_thresholds):
         if name not in fieldnames:
             continue
-        nonempty = sum(
-            bool(str(row.get(name) or "").strip())
-            for row in rows
-        )
-        field_completeness[name] = (
-            round(100.0 * nonempty / len(rows), 6) if rows else 0.0
-        )
+        nonempty = sum(bool(str(row.get(name) or "").strip()) for row in rows)
+        field_completeness[name] = round(100.0 * nonempty / len(rows), 6) if rows else 0.0
 
     receipt_validation: dict[str, Any] = {}
     receipt_valid = receipt is not None and not validate_receipt(receipt)
@@ -358,17 +347,14 @@ def _coverage_state(
         "uniqueness_key": uniqueness_key,
         "field_completeness_pct": field_completeness,
         "authoritative_universe_total": universe_total,
-        "authoritative_universe_method": contract.get(
-            "authoritative_universe_method"
-        ),
+        "authoritative_universe_method": contract.get("authoritative_universe_method"),
         "minimum_coverage_pct": contract.get("minimum_coverage_pct"),
         "pagination_required": contract.get("pagination_required") is True,
         "pagination_complete": pagination_complete,
-        "receipt_coverage_claim": receipt_validation.get(
-            "coverage_contract_pass"
-        ),
+        "receipt_coverage_claim": receipt_validation.get("coverage_contract_pass"),
     }
     return status, sorted(set([*reasons, *blockers])), metrics
+
 
 def _freshness_state(
     *,

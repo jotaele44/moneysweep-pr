@@ -357,6 +357,7 @@ def test_schema_valid_flag_cannot_hide_invalid_receipt_contract(
             corpus_root=root / "build" / "operator-corpus",
         )
 
+
 def test_registry_overrides_are_part_of_effective_source_definition(tmp_path: Path) -> None:
     root = tmp_path / "repo"
     source = _source("alpha", ["data/staging/processed/alpha.csv"])
@@ -385,4 +386,3 @@ def test_registry_overrides_are_part_of_effective_source_definition(tmp_path: Pa
     assert sources[0]["official_custodian"] == "Test Custodian"
     assert "registries/source_registry_overrides/effective.json" in registry_paths
     assert source_definition_digest(sources[0]) != source_definition_digest(source)
-

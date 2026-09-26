@@ -215,6 +215,7 @@ def test_truth_scope_is_deterministic_and_does_not_invent_coverage(
     assert first["truth"]["summary"]["required_fully_materialized"] == 1
     assert first["truth"]["summary"]["automatable_total"] == 1
 
+
 def test_measured_contract_is_not_controlled_by_receipt_coverage_boolean(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -242,4 +243,3 @@ def test_measured_contract_is_not_controlled_by_receipt_coverage_boolean(
     assert source_truth["coverage_evidence"]["unique_rows"] == 2
     assert source_truth["coverage_evidence"]["receipt_coverage_claim"] is False
     assert result["truth"]["summary"]["coverage"]["meets_contract"] == 1
-

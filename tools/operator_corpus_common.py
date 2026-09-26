@@ -101,13 +101,9 @@ def load_sources(root: Path) -> tuple[list[dict[str, Any]], list[str]]:
                     raise RuntimeError(f"invalid source registry override: {path}")
                 source_id = str(override.get("source_id") or "").strip()
                 if not source_id:
-                    raise RuntimeError(
-                        f"source registry override missing source_id: {path}"
-                    )
+                    raise RuntimeError(f"source registry override missing source_id: {path}")
                 if source_id in seen_overrides:
-                    raise RuntimeError(
-                        f"duplicate source registry override: {source_id}"
-                    )
+                    raise RuntimeError(f"duplicate source registry override: {source_id}")
                 seen_overrides.add(source_id)
                 if source_id not in by_id:
                     raise RuntimeError(
@@ -115,21 +111,11 @@ def load_sources(root: Path) -> tuple[list[dict[str, Any]], list[str]]:
                     )
                 base = by_id[source_id]
                 for immutable in ("source_id", "required"):
-                    if (
-                        immutable in override
-                        and override[immutable] != base.get(immutable)
-                    ):
+                    if immutable in override and override[immutable] != base.get(immutable):
                         raise RuntimeError(
-                            f"{source_id}: override may not change immutable field "
-                            f"{immutable}"
+                            f"{source_id}: override may not change immutable field {immutable}"
                         )
-                base.update(
-                    {
-                        key: value
-                        for key, value in override.items()
-                        if key != "source_id"
-                    }
-                )
+                base.update({key: value for key, value in override.items() if key != "source_id"})
                 by_id[source_id] = base
             registry_paths.append(path.relative_to(root).as_posix())
         sources = [by_id[str(source["source_id"])] for source in sources]
@@ -280,9 +266,7 @@ def validate_receipt(receipt: dict[str, Any]) -> list[str]:
                 continue
             extra_artifact = sorted(set(artifact) - allowed_artifact)
             if extra_artifact:
-                errors.append(
-                    f"{prefix}_unexpected_keys:" + ",".join(extra_artifact)
-                )
+                errors.append(f"{prefix}_unexpected_keys:" + ",".join(extra_artifact))
             path = artifact.get("path")
             if not isinstance(path, str) or not path.strip():
                 errors.append(f"{prefix}_path_missing")
@@ -298,17 +282,11 @@ def validate_receipt(receipt: dict[str, Any]) -> list[str]:
             if not _is_hex(artifact.get("sha256"), 64):
                 errors.append(f"{prefix}_sha256_invalid")
             size = artifact.get("bytes")
-            if (
-                not isinstance(size, int)
-                or isinstance(size, bool)
-                or size < 0
-            ):
+            if not isinstance(size, int) or isinstance(size, bool) or size < 0:
                 errors.append(f"{prefix}_bytes_invalid")
             rows = artifact.get("rows")
             if rows is not None and (
-                not isinstance(rows, int)
-                or isinstance(rows, bool)
-                or rows < 0
+                not isinstance(rows, int) or isinstance(rows, bool) or rows < 0
             ):
                 errors.append(f"{prefix}_rows_invalid")
             if "rows" not in artifact:

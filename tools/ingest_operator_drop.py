@@ -50,9 +50,7 @@ def validate_manifest(manifest: dict[str, Any]) -> list[str]:
         errors.append("unexpected_top_level_keys:" + ",".join(extra))
     if manifest.get("schema_version") != DROP_SCHEMA_VERSION:
         errors.append("schema_version_mismatch")
-    if not isinstance(manifest.get("source_id"), str) or not str(
-        manifest.get("source_id")
-    ).strip():
+    if not isinstance(manifest.get("source_id"), str) or not str(manifest.get("source_id")).strip():
         errors.append("source_id_missing")
     if not _parse_datetime(manifest.get("obtained_at")):
         errors.append("obtained_at_invalid")
@@ -69,13 +67,9 @@ def validate_manifest(manifest: dict[str, Any]) -> list[str]:
     }
     extra_provenance = sorted(set(provenance) - allowed_provenance)
     if extra_provenance:
-        errors.append(
-            "unexpected_provenance_keys:" + ",".join(extra_provenance)
-        )
+        errors.append("unexpected_provenance_keys:" + ",".join(extra_provenance))
     for key in ("source_url", "retrieval_method"):
-        if not isinstance(provenance.get(key), str) or not provenance.get(
-            key, ""
-        ).strip():
+        if not isinstance(provenance.get(key), str) or not provenance.get(key, "").strip():
             errors.append(f"provenance_{key}_missing")
 
     files = manifest.get("files")
@@ -148,9 +142,7 @@ def ingest(
         raise RuntimeError("operator drop manifest must contain an object")
     contract_errors = validate_manifest(payload)
     if contract_errors:
-        raise RuntimeError(
-            "invalid operator drop manifest: " + "; ".join(contract_errors)
-        )
+        raise RuntimeError("invalid operator drop manifest: " + "; ".join(contract_errors))
 
     sources, _ = load_sources(registry_root)
     source_by_id = {str(source["source_id"]): source for source in sources}
@@ -160,44 +152,38 @@ def ingest(
         raise RuntimeError(f"operator drop source is not registered: {source_id}")
 
     ingest_script = str(
-        source.get("authorized_manual_ingest_script")
-        or source.get("producer_script")
-        or ""
+        source.get("authorized_manual_ingest_script") or source.get("producer_script") or ""
     ).strip()
     drop_dir_value = str(
-        source.get("authorized_manual_drop_dir")
-        or source.get("manual_drop_dir")
-        or ""
+        source.get("authorized_manual_drop_dir") or source.get("manual_drop_dir") or ""
     ).strip()
     if not ingest_script or not drop_dir_value:
-        raise RuntimeError(
-            f"{source_id}: no registered manual ingest boundary"
-        )
+        raise RuntimeError(f"{source_id}: no registered manual ingest boundary")
     drop_dir = safe_relative_path(drop_dir_value)
     if not (
         str(source.get("authentication") or "") == "manual_export"
         or source.get("authorized_manual_ingest_script")
     ):
-        raise RuntimeError(
-            f"{source_id}: source is not authorized for operator-drop ingestion"
-        )
+        raise RuntimeError(f"{source_id}: source is not authorized for operator-drop ingestion")
 
     files_root = bundle_root / "files"
     declared: dict[str, dict[str, Any]] = {
-        safe_relative_path(str(item["path"])).as_posix(): item
-        for item in payload["files"]
+        safe_relative_path(str(item["path"])).as_posix(): item for item in payload["files"]
     }
-    actual = {
-        path.relative_to(files_root).as_posix()
-        for path in files_root.rglob("*")
-        if path.is_file()
-    } if files_root.is_dir() else set()
+    actual = (
+        {
+            path.relative_to(files_root).as_posix()
+            for path in files_root.rglob("*")
+            if path.is_file()
+        }
+        if files_root.is_dir()
+        else set()
+    )
     if set(declared) != actual:
         missing = sorted(set(declared) - actual)
         undeclared = sorted(actual - set(declared))
         raise RuntimeError(
-            "operator drop file inventory mismatch: "
-            f"missing={missing}; undeclared={undeclared}"
+            f"operator drop file inventory mismatch: missing={missing}; undeclared={undeclared}"
         )
 
     staged_inputs: list[str] = []
@@ -214,9 +200,7 @@ def ingest(
         staged_rel = (drop_dir / rel).as_posix()
         staged = workspace / staged_rel
         staged.parent.mkdir(parents=True, exist_ok=True)
-        if staged.exists() and (
-            not staged.is_file() or sha256_file(staged) != actual_sha
-        ):
+        if staged.exists() and (not staged.is_file() or sha256_file(staged) != actual_sha):
             raise RuntimeError(
                 f"operator drop conflicts with existing workspace bytes: {staged_rel}"
             )
@@ -277,9 +261,7 @@ def ingest(
         "input_files": input_evidence,
         "runner_result": runner_result,
         "outputs": outputs,
-        "receipt_path": (
-            receipt_path.as_posix() if receipt_path is not None else None
-        ),
+        "receipt_path": (receipt_path.as_posix() if receipt_path is not None else None),
         "receipt_error": receipt_error,
         "materialization_candidate": receipt_path is not None,
         "coverage_contract_pass": False,
