@@ -1,0 +1,93 @@
+{
+  "version": "v4.0.0-rc1",
+  "phase": "V01",
+  "state": "OPEN",
+  "repository_head_sha": "15e8f6f11bea8e4d2ac69eb813afcdbef05ccf33",
+  "authoritative_loader": "moneysweep/runtime/source_registry.py::load_source_registry",
+  "base_registry": {
+    "path": "registries/source_registry.json",
+    "source_count": 156,
+    "unique_source_ids": 156
+  },
+  "extension_registries": [
+    {
+      "path": "registries/source_registry_extensions/campaign_finance_completion.json",
+      "count": 3
+    },
+    {
+      "path": "registries/source_registry_extensions/fomb.json",
+      "count": 2
+    },
+    {
+      "path": "registries/source_registry_extensions/nara_nextgen.json",
+      "count": 2
+    },
+    {
+      "path": "registries/source_registry_extensions/sec_ownership_hardening_v0_3.json",
+      "count": 4
+    }
+  ],
+  "override_registry": {
+    "path": "registries/source_registry_overrides/wave0_provenance_corrections.json",
+    "override_count": 2,
+    "source_ids": [
+      "cor3",
+      "pr_cabilderos"
+    ],
+    "count_mutation_permitted": false
+  },
+  "arithmetic": {
+    "base_sources": 156,
+    "extension_sources": 11,
+    "loaded_sources": 167,
+    "unique_loaded_source_ids": 167,
+    "status_csv_rows": 167,
+    "status_csv_unique_source_ids": 167,
+    "unexplained_source_id_residue": 0
+  },
+  "required_source_count": 16,
+  "authentication_counts": {
+    "none": 112,
+    "manual_export": 42,
+    "api_key:HIGHERGOV_API_KEY": 1,
+    "api_key:EIA_API_KEY": 1,
+    "api_key:FRED_API_KEY": 1,
+    "api_key:FAC_API_KEY": 2,
+    "api_key:FEC_API_KEY": 2,
+    "api_key:FINANCIALDATA_API_KEY": 1,
+    "api_key:SAM_API_KEY": 2,
+    "api_key:CENSUS_API_KEY": 1,
+    "api_key:OPENSTATES_API_KEY": 1,
+    "api_key:NARA_API_KEY": 1
+  },
+  "family_counts": {
+    "federal": 65,
+    "entity_resolution": 6,
+    "territorial": 30,
+    "manual_export": 6,
+    "infrastructure": 20,
+    "infrastructure_revenue": 6,
+    "municipal": 3,
+    "bonds": 2,
+    "lobbying": 2,
+    "political_finance": 8,
+    "nonprofit": 1,
+    "optional_commercial_enrichment": 1,
+    "territorial_legislation": 5,
+    "pre_officialization": 1,
+    "financial_regulation": 2,
+    "federal_financial_incentive": 1,
+    "territorial_fiscal_oversight": 2,
+    "provenance_archival": 2,
+    "capital_control": 4
+  },
+  "denominator_state": "BOUNDED_COMPLETE_FOR_RUNTIME_SOURCE_REGISTRY",
+  "remaining_gates": [
+    "source-to-domain mapping",
+    "schema inspection across source manifestations",
+    "stable-ID audit",
+    "temporal coverage audit",
+    "raw-vs-derived manifestation classification"
+  ],
+  "certification": "OPEN"
+}
