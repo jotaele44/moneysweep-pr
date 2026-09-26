@@ -45,7 +45,7 @@ def test_live_v2_projection_matches_canonical_fema_master_schema() -> None:
     assert len(projected) == 2
     assert projected.loc[0, "award_id"] == "FEMA-PA-4339-1234"
     assert projected.loc[0, "obligated_amount"] == 125000.0
-    assert projected.loc[0, "fiscal_year"] == 2026
+    assert projected.loc[0, "fiscal_year"] == "2026"
     assert projected.loc[1, "award_id"] == "FEMA-PA-4473"
     assert projected.loc[1, "obligated_amount"] == 5000.0
     assert projected.loc[1, "description"] == "B"
