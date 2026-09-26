@@ -12,6 +12,9 @@ on:
       - "tools/verify_operator_corpus.py"
       - "tools/derive_certification_truth.py"
       - "tools/run_certification_derivations.py"
+      - "tools/run_certification_public_adapters.py"
+      - "scripts/download_prasa_contracts.py"
+      - "scripts/download_cabilderos.py"
       - "reports/source_recovery_matrix.csv"
       - "reports/source_registry_status.csv"
       - "registries/source_registry.yaml"
@@ -313,6 +316,15 @@ jobs:
             --workspace-root build/keyless-evidence \
             --receipts-dir build/keyless-receipts \
             --output reports/keyless_evidence_assembly.json
+      - name: Acquire bounded public manual-source adapters in shared workspace
+        run: |
+          python -m tools.run_certification_public_adapters \
+            --registry-root . \
+            --workspace build/keyless-evidence \
+            --receipts-dir build/keyless-receipts \
+            --producer-sha "${{ github.event.pull_request.head.sha || github.sha }}" \
+            --output reports/keyless_public_adapters.json
+
       - name: Run dependency-bearing certification derivations
         run: |
           python -m tools.run_certification_derivations \
@@ -367,6 +379,7 @@ jobs:
           name: keyless-certification-evidence
           path: |
             reports/keyless_evidence_assembly.json
+            reports/keyless_public_adapters.json
             reports/keyless_certification_derivations.json
             reports/keyless_operator_corpus_verification.json
             build/keyless-operator-corpus/manifest.json
