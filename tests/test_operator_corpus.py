@@ -356,3 +356,33 @@ def test_schema_valid_flag_cannot_hide_invalid_receipt_contract(
             receipts_dir=receipts,
             corpus_root=root / "build" / "operator-corpus",
         )
+
+def test_registry_overrides_are_part_of_effective_source_definition(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    source = _source("alpha", ["data/staging/processed/alpha.csv"])
+    _write_registry(root, source)
+    override_dir = root / "registries" / "source_registry_overrides"
+    override_dir.mkdir(parents=True)
+    override = {
+        "schema_version": "source_registry_overrides_v1",
+        "source_overrides": [
+            {
+                "source_id": "alpha",
+                "endpoint_url": "https://example.invalid/effective",
+                "official_custodian": "Test Custodian",
+            }
+        ],
+    }
+    override_path = override_dir / "effective.json"
+    override_path.write_text(
+        json.dumps(override, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    sources, registry_paths = load_sources(root)
+
+    assert sources[0]["endpoint_url"] == "https://example.invalid/effective"
+    assert sources[0]["official_custodian"] == "Test Custodian"
+    assert "registries/source_registry_overrides/effective.json" in registry_paths
+    assert source_definition_digest(sources[0]) != source_definition_digest(source)
+
