@@ -81,6 +81,59 @@ def load_sources(root: Path) -> tuple[list[dict[str, Any]], list[str]]:
     duplicates = sorted(source_id for source_id, count in counts.items() if count > 1)
     if duplicates:
         raise RuntimeError("duplicate source IDs: " + ", ".join(duplicates))
+
+    # Apply the same canonical JSON override plane as the runtime registry
+    # loader. These files refine source provenance/producer metadata but may not
+    # change source identity or the required-source denominator.
+    override_dir = root / "registries" / "source_registry_overrides"
+    if override_dir.exists():
+        by_id = {str(source["source_id"]): dict(source) for source in sources}
+        seen_overrides: set[str] = set()
+        for path in sorted(override_dir.glob("*.json")):
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            overrides = payload.get("source_overrides") or []
+            if not isinstance(overrides, list):
+                raise RuntimeError(
+                    f"source registry override must contain source_overrides list: {path}"
+                )
+            for override in overrides:
+                if not isinstance(override, dict):
+                    raise RuntimeError(f"invalid source registry override: {path}")
+                source_id = str(override.get("source_id") or "").strip()
+                if not source_id:
+                    raise RuntimeError(
+                        f"source registry override missing source_id: {path}"
+                    )
+                if source_id in seen_overrides:
+                    raise RuntimeError(
+                        f"duplicate source registry override: {source_id}"
+                    )
+                seen_overrides.add(source_id)
+                if source_id not in by_id:
+                    raise RuntimeError(
+                        f"source registry override targets unknown source: {source_id}"
+                    )
+                base = by_id[source_id]
+                for immutable in ("source_id", "required"):
+                    if (
+                        immutable in override
+                        and override[immutable] != base.get(immutable)
+                    ):
+                        raise RuntimeError(
+                            f"{source_id}: override may not change immutable field "
+                            f"{immutable}"
+                        )
+                base.update(
+                    {
+                        key: value
+                        for key, value in override.items()
+                        if key != "source_id"
+                    }
+                )
+                by_id[source_id] = base
+            registry_paths.append(path.relative_to(root).as_posix())
+        sources = [by_id[str(source["source_id"])] for source in sources]
+
     return sources, registry_paths
 
 
