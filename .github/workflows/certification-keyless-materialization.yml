@@ -7,6 +7,10 @@ on:
       - "scripts/run_automatable_sources.py"
       - "tools/write_operator_evidence_receipt.py"
       - "tools/operator_corpus_common.py"
+      - "tools/assemble_certification_evidence.py"
+      - "tools/build_operator_corpus.py"
+      - "tools/verify_operator_corpus.py"
+      - "tools/derive_certification_truth.py"
       - "reports/source_recovery_matrix.csv"
       - "reports/source_registry_status.csv"
       - "registries/source_registry.yaml"
@@ -280,3 +284,82 @@ jobs:
           name: keyless-${{ matrix.source }}
           path: certification_out/${{ matrix.source }}/
           if-no-files-found: error
+
+  aggregate:
+    needs:
+      - prepare
+      - materialize
+    if: always() && needs.prepare.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Download per-source keyless evidence
+        uses: actions/download-artifact@v4
+        with:
+          pattern: keyless-*
+          path: build/keyless-artifacts
+      - name: Assemble source evidence workspace
+        run: |
+          python -m tools.assemble_certification_evidence \
+            --registry-root . \
+            --artifacts-root build/keyless-artifacts \
+            --workspace-root build/keyless-evidence \
+            --receipts-dir build/keyless-receipts \
+            --output reports/keyless_evidence_assembly.json
+      - name: Build content-addressed keyless corpus
+        run: |
+          python -m tools.build_operator_corpus \
+            --root . \
+            --evidence-root build/keyless-evidence \
+            --receipts build/keyless-receipts \
+            --corpus-root build/keyless-operator-corpus
+      - name: Verify keyless operator snapshot fail-closed
+        id: verify_corpus
+        continue-on-error: true
+        run: |
+          python -m tools.verify_operator_corpus \
+            --root . \
+            --operator-root build/keyless-evidence \
+            --corpus-root build/keyless-operator-corpus \
+            --output reports/keyless_operator_corpus_verification.json
+      - name: Derive keyless certification truth
+        run: |
+          CORPUS_ID="$(
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          print(
+              json.loads(
+                  Path("build/keyless-operator-corpus/manifest.json").read_text(
+                      encoding="utf-8"
+                  )
+              )["corpus_id"]
+          )
+          PY
+          )"
+          python -m tools.derive_certification_truth \
+            --root . \
+            --evidence-root build/keyless-operator-corpus/mount \
+            --receipts-dir build/keyless-operator-corpus/receipts \
+            --scope-dir build/keyless-certification-scope \
+            --operator-corpus-id "$CORPUS_ID" \
+            --as-of "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      - name: Upload assembled keyless certification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: keyless-certification-evidence
+          path: |
+            reports/keyless_evidence_assembly.json
+            reports/keyless_operator_corpus_verification.json
+            build/keyless-operator-corpus/manifest.json
+            build/keyless-operator-corpus/receipts/
+            build/keyless-certification-scope/
+          if-no-files-found: warn
+
