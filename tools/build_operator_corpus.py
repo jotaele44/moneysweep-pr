@@ -120,29 +120,33 @@ def build(
         if receipt_registry.get("source_definition_sha256") != definition_digest:
             raise RuntimeError(f"source definition digest mismatch for receipt: {source_id}")
 
-        output_records: list[dict[str, Any]] = []
-        seen_output_paths: set[str] = set()
-        for output in receipt["outputs"]:
-            rel = safe_relative_path(str(output.get("path", ""))).as_posix()
-            if rel in seen_output_paths:
-                raise RuntimeError(f"duplicate output path in receipt {source_id}: {rel}")
-            seen_output_paths.add(rel)
-            if not _output_allowed(rel, expected):
-                raise RuntimeError(f"undeclared promotion output for {source_id}: {rel}")
+        def materialize_artifact(
+            record: dict[str, Any],
+            *,
+            kind: str,
+            require_declared_output: bool,
+        ) -> dict[str, Any]:
+            rel = safe_relative_path(str(record.get("path", ""))).as_posix()
+            if require_declared_output and not _output_allowed(rel, expected):
+                raise RuntimeError(
+                    f"undeclared promotion output for {source_id}: {rel}"
+                )
 
             artifact = evidence_root / rel
             if not artifact.exists() or not artifact.is_file():
-                raise RuntimeError(f"receipt artifact missing for {source_id}: {rel}")
+                raise RuntimeError(
+                    f"receipt {kind} artifact missing for {source_id}: {rel}"
+                )
             actual_sha = sha256_file(artifact)
             actual_bytes = artifact.stat().st_size
             actual_rows = csv_rows(artifact)
             if artifact.suffix.lower() == ".csv" and actual_rows is None:
                 raise RuntimeError(f"unreadable CSV for {source_id}: {rel}")
-            if output.get("sha256") != actual_sha:
+            if record.get("sha256") != actual_sha:
                 raise RuntimeError(f"sha256 mismatch for {source_id}: {rel}")
-            if output.get("bytes") != actual_bytes:
+            if record.get("bytes") != actual_bytes:
                 raise RuntimeError(f"byte-count mismatch for {source_id}: {rel}")
-            if output.get("rows") != actual_rows:
+            if record.get("rows") != actual_rows:
                 raise RuntimeError(f"row-count mismatch for {source_id}: {rel}")
 
             object_path = objects_dir / actual_sha[:2] / actual_sha[2:]
@@ -150,21 +154,54 @@ def build(
             if not object_path.exists():
                 shutil.copy2(artifact, object_path)
             elif sha256_file(object_path) != actual_sha:
-                raise RuntimeError(f"content-addressed object collision: {actual_sha}")
+                raise RuntimeError(
+                    f"content-addressed object collision: {actual_sha}"
+                )
 
             mounted = mount_dir / rel
             mounted.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(object_path, mounted)
-            receipt_output_paths.add(rel)
-            output_records.append(
-                {
-                    "path": rel,
-                    "sha256": actual_sha,
-                    "bytes": actual_bytes,
-                    "rows": actual_rows,
-                    "object": f"objects/sha256/{actual_sha[:2]}/{actual_sha[2:]}",
-                }
+            return {
+                "path": rel,
+                "sha256": actual_sha,
+                "bytes": actual_bytes,
+                "rows": actual_rows,
+                "object": f"objects/sha256/{actual_sha[:2]}/{actual_sha[2:]}",
+            }
+
+        input_records: list[dict[str, Any]] = []
+        seen_input_paths: set[str] = set()
+        for input_record in receipt.get("inputs") or []:
+            rel = safe_relative_path(str(input_record.get("path", ""))).as_posix()
+            if rel in seen_input_paths:
+                raise RuntimeError(
+                    f"duplicate input path in receipt {source_id}: {rel}"
+                )
+            seen_input_paths.add(rel)
+            input_records.append(
+                materialize_artifact(
+                    input_record,
+                    kind="input",
+                    require_declared_output=False,
+                )
             )
+
+        output_records: list[dict[str, Any]] = []
+        seen_output_paths: set[str] = set()
+        for output in receipt["outputs"]:
+            rel = safe_relative_path(str(output.get("path", ""))).as_posix()
+            if rel in seen_output_paths:
+                raise RuntimeError(
+                    f"duplicate output path in receipt {source_id}: {rel}"
+                )
+            seen_output_paths.add(rel)
+            materialized = materialize_artifact(
+                output,
+                kind="output",
+                require_declared_output=True,
+            )
+            receipt_output_paths.add(rel)
+            output_records.append(materialized)
 
         receipt_copy = receipt_copy_dir / f"{source_id}.json"
         receipt_copy.write_text(
@@ -177,6 +214,11 @@ def build(
                 "source_definition_sha256": definition_digest,
                 "receipt_sha256": sha256_file(receipt_copy),
                 "receipt_path": f"receipts/{source_id}.json",
+                **(
+                    {"inputs": sorted(input_records, key=lambda item: item["path"])}
+                    if input_records
+                    else {}
+                ),
                 "outputs": sorted(output_records, key=lambda item: item["path"]),
             }
         )
