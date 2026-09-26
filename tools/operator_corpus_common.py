@@ -193,6 +193,7 @@ def validate_receipt(receipt: dict[str, Any]) -> list[str]:
         "source_id",
         "acquisition",
         "registry",
+        "inputs",
         "outputs",
         "validation",
     }
@@ -255,45 +256,69 @@ def validate_receipt(receipt: dict[str, Any]) -> list[str]:
     if not _is_hex(registry.get("source_definition_sha256"), 64):
         errors.append("receipt_source_definition_digest_invalid")
 
-    outputs = receipt.get("outputs")
-    if not isinstance(outputs, list) or not outputs:
-        errors.append("receipt_outputs_missing")
-        outputs = []
-    seen_paths: set[str] = set()
-    allowed_output = {"path", "sha256", "bytes", "rows", "content_type"}
-    for index, output in enumerate(outputs):
-        prefix = f"receipt_output_{index}"
-        if not isinstance(output, dict):
-            errors.append(f"{prefix}_invalid")
-            continue
-        extra_output = sorted(set(output) - allowed_output)
-        if extra_output:
-            errors.append(f"{prefix}_unexpected_keys:" + ",".join(extra_output))
-        path = output.get("path")
-        if not isinstance(path, str) or not path.strip():
-            errors.append(f"{prefix}_path_missing")
-        else:
-            try:
-                normalized = safe_relative_path(path).as_posix()
-            except ValueError:
-                errors.append(f"{prefix}_path_unsafe")
+    def validate_artifacts(
+        key: str,
+        *,
+        required: bool,
+    ) -> None:
+        artifacts = receipt.get(key)
+        if artifacts is None and not required:
+            return
+        if not isinstance(artifacts, list) or (required and not artifacts):
+            errors.append(f"receipt_{key}_missing")
+            return
+        if artifacts is None:
+            return
+
+        seen_paths: set[str] = set()
+        allowed_artifact = {"path", "sha256", "bytes", "rows", "content_type"}
+        singular = key[:-1] if key.endswith("s") else key
+        for index, artifact in enumerate(artifacts):
+            prefix = f"receipt_{singular}_{index}"
+            if not isinstance(artifact, dict):
+                errors.append(f"{prefix}_invalid")
+                continue
+            extra_artifact = sorted(set(artifact) - allowed_artifact)
+            if extra_artifact:
+                errors.append(
+                    f"{prefix}_unexpected_keys:" + ",".join(extra_artifact)
+                )
+            path = artifact.get("path")
+            if not isinstance(path, str) or not path.strip():
+                errors.append(f"{prefix}_path_missing")
             else:
-                if normalized in seen_paths:
-                    errors.append(f"{prefix}_path_duplicate")
-                seen_paths.add(normalized)
-        if not _is_hex(output.get("sha256"), 64):
-            errors.append(f"{prefix}_sha256_invalid")
-        size = output.get("bytes")
-        if not isinstance(size, int) or isinstance(size, bool) or size < 0:
-            errors.append(f"{prefix}_bytes_invalid")
-        rows = output.get("rows")
-        if rows is not None and (not isinstance(rows, int) or isinstance(rows, bool) or rows < 0):
-            errors.append(f"{prefix}_rows_invalid")
-        if "rows" not in output:
-            errors.append(f"{prefix}_rows_missing")
-        content_type = output.get("content_type")
-        if content_type is not None and not isinstance(content_type, str):
-            errors.append(f"{prefix}_content_type_invalid")
+                try:
+                    normalized = safe_relative_path(path).as_posix()
+                except ValueError:
+                    errors.append(f"{prefix}_path_unsafe")
+                else:
+                    if normalized in seen_paths:
+                        errors.append(f"{prefix}_path_duplicate")
+                    seen_paths.add(normalized)
+            if not _is_hex(artifact.get("sha256"), 64):
+                errors.append(f"{prefix}_sha256_invalid")
+            size = artifact.get("bytes")
+            if (
+                not isinstance(size, int)
+                or isinstance(size, bool)
+                or size < 0
+            ):
+                errors.append(f"{prefix}_bytes_invalid")
+            rows = artifact.get("rows")
+            if rows is not None and (
+                not isinstance(rows, int)
+                or isinstance(rows, bool)
+                or rows < 0
+            ):
+                errors.append(f"{prefix}_rows_invalid")
+            if "rows" not in artifact:
+                errors.append(f"{prefix}_rows_missing")
+            content_type = artifact.get("content_type")
+            if content_type is not None and not isinstance(content_type, str):
+                errors.append(f"{prefix}_content_type_invalid")
+
+    validate_artifacts("inputs", required=False)
+    validate_artifacts("outputs", required=True)
 
     validation = receipt.get("validation")
     if not isinstance(validation, dict):
