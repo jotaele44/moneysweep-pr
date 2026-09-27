@@ -2,7 +2,7 @@
   "binding_schema_version": "spiderweb.cell_source_binding.v0.1",
   "certification_state": "PROVISIONAL",
   "consumer": "moneysweep-pr",
-  "consumption_rule": "Consume Cell_ID, Cell_Set_ID and neighbour/parent relations. Do not recompute spatial membership, do not fetch or render canonical geometry, and do not publish a competing grid. Same Cell_ID everywhere, different payload everywhere.",
+  "consumption_rule": "Consume producer-issued Cell_Set_ID/member Cell_IDs and neighbour/parent relations. While the Spiderweb transform is PROVISIONAL, preserve the full uncertainty Cell_Set and never promote a single Cell_ID or Anchor_Cell_ID to a certified location. Do not recompute spatial membership, fetch/render canonical geometry, or publish a competing grid.",
   "contracts": [
     "federation_cell_index@1",
     "cell_domain_summary@1",
@@ -14,5 +14,14 @@
   "geometry_authority": "spiderweb-pr",
   "geometry_version": "pr_grid_geometry_v0_1",
   "grid_version": "pr_grid_full_cell_index_saturated_v1",
-  "identity_default": "CANDIDATE_NOT_IDENTITY"
+  "identity_default": "CANDIDATE_NOT_IDENTITY",
+  "record_binding_schema_version": "spiderweb.record_cell_binding.v0.2",
+  "provisional_resolution_policy": {
+    "exact_cell_claims_permitted": false,
+    "required_binding_surface": "Cell_Set_ID",
+    "uncertainty_required": true,
+    "uncertainty_semantics": "CONSERVATIVE_DISCOVERY_ENVELOPE_NOT_CONFIDENCE_INTERVAL",
+    "producer_evidence": "jotaele44/spiderweb-pr#393",
+    "rule": "While Spiderweb geometry certification is PROVISIONAL, coordinate-derived membership must preserve the full producer Cell_Set and must not collapse Anchor_Cell_ID or any member Cell_ID into a certified location."
+  }
 }
