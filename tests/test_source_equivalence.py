@@ -44,17 +44,31 @@ def _root(tmp_path: Path) -> Path:
         ),
         encoding="utf-8",
     )
-    evidence = root / "reports/alpha_equivalence.json"
-    evidence.parent.mkdir(parents=True)
-    evidence.write_text('{"comparison":"alpha-vs-beta","pass":true}\n', encoding="utf-8")
+    data = root / "data"
+    data.mkdir()
+    (data / "alpha.csv").write_text(
+        "record_id,value\nA,10\nB,20\n",
+        encoding="utf-8",
+    )
+    (data / "beta.csv").write_text(
+        "record_id,value\nA,10\nB,20\n",
+        encoding="utf-8",
+    )
     return root
 
 
-def _claim(root: Path) -> dict:
-    evidence = root / "reports/alpha_equivalence.json"
-    digest = hashlib.sha256(evidence.read_bytes()).hexdigest()
+def _evidence(root: Path, locator: str) -> dict:
+    path = root / locator
     return {
-        "schema_version": "moneysweep.source_equivalence/v1",
+        "kind": "source_snapshot",
+        "locator": locator,
+        "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+    }
+
+
+def _claim(root: Path) -> dict:
+    return {
+        "schema_version": "moneysweep.source_equivalence/v2",
         "source_id": "alpha",
         "candidate_source": {
             "source_id": "beta",
@@ -73,12 +87,15 @@ def _claim(root: Path) -> dict:
         "missing_fields": [],
         "extra_fields": [],
         "evidence": [
-            {
-                "kind": "comparison_manifest",
-                "locator": "reports/alpha_equivalence.json",
-                "sha256": digest,
-            }
+            _evidence(root, "data/alpha.csv"),
+            _evidence(root, "data/beta.csv"),
         ],
+        "row_set_comparison": {
+            "a_locator": "data/alpha.csv",
+            "b_locator": "data/beta.csv",
+            "key_fields": ["record_id"],
+            "identity_basis": "stable_id",
+        },
     }
 
 
@@ -130,8 +147,8 @@ def test_registered_candidate_source_is_required(tmp_path: Path) -> None:
 def test_tampered_evidence_prevents_certified_equivalence(tmp_path: Path) -> None:
     root = _root(tmp_path)
     claim = _claim(root)
-    (root / "reports/alpha_equivalence.json").write_text(
-        '{"comparison":"tampered"}\n',
+    (root / "data/alpha.csv").write_text(
+        "record_id,value\nA,999\nB,20\n",
         encoding="utf-8",
     )
 
@@ -140,6 +157,7 @@ def test_tampered_evidence_prevents_certified_equivalence(tmp_path: Path) -> Non
     assert report["certified_equivalent"] is False
     assert "evidence_not_byte_verified" in report["blockers"]
     assert "evidence_0_sha256_mismatch" in report["errors"]
+    assert "a_comparison_bytes_not_verified" in report["blockers"]
 
 
 def test_complete_claim_can_be_certified_equivalent(tmp_path: Path) -> None:
@@ -150,6 +168,90 @@ def test_complete_claim_can_be_certified_equivalent(tmp_path: Path) -> None:
     assert report["certified_equivalent"] is True
     assert report["decision"] == "CERTIFIED_EQUIVALENT"
     assert report["blockers"] == []
-    assert report["policy"]["silent_substitution_allowed"] is False
-    assert report["policy"]["candidate_must_be_registered"] is True
-    assert report["evidence_verification"][0]["sha256_match"] is True
+    algebra = report["row_set_comparison"]
+    assert algebra["intersection"] == 2
+    assert algebra["a_only"] == 0
+    assert algebra["b_only"] == 0
+    assert algebra["union"] == 2
+    assert algebra["symmetric_difference"] == 0
+    assert report["policy"]["computed_set_algebra_required"] is True
+    assert report["policy"]["name_only_identity_allowed"] is False
+
+
+def test_a_only_and_b_only_are_computed_and_block_certification(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    (root / "data/alpha.csv").write_text(
+        "record_id,value\nA,10\nB,20\n",
+        encoding="utf-8",
+    )
+    (root / "data/beta.csv").write_text(
+        "record_id,value\nA,10\nC,30\n",
+        encoding="utf-8",
+    )
+    claim = _claim(root)
+
+    report = verify(root=root, claim=claim)
+
+    assert report["certified_equivalent"] is False
+    algebra = report["row_set_comparison"]
+    assert algebra["intersection"] == 1
+    assert algebra["a_only"] == 1
+    assert algebra["b_only"] == 1
+    assert algebra["union"] == 3
+    assert algebra["symmetric_difference"] == 2
+    assert algebra["a_only_keys"] == [["B"]]
+    assert algebra["b_only_keys"] == [["C"]]
+    assert "computed_row_universe_mismatch" in report["blockers"]
+
+
+def test_name_only_identity_is_disallowed(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    (root / "data/alpha.csv").write_text("name,value\nSame,10\n", encoding="utf-8")
+    (root / "data/beta.csv").write_text("name,value\nSame,10\n", encoding="utf-8")
+    claim = _claim(root)
+    claim["evidence"] = [
+        _evidence(root, "data/alpha.csv"),
+        _evidence(root, "data/beta.csv"),
+    ]
+    claim["row_set_comparison"]["key_fields"] = ["name"]
+
+    report = verify(root=root, claim=claim)
+
+    assert report["certified_equivalent"] is False
+    assert "name_only_identity_disallowed" in report["blockers"]
+
+
+def test_duplicate_and_null_identity_keys_fail_closed(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    (root / "data/alpha.csv").write_text(
+        "record_id,value\nA,10\nA,11\n,12\n",
+        encoding="utf-8",
+    )
+    (root / "data/beta.csv").write_text(
+        "record_id,value\nA,10\n,12\n",
+        encoding="utf-8",
+    )
+    claim = _claim(root)
+
+    report = verify(root=root, claim=claim)
+
+    assert report["certified_equivalent"] is False
+    algebra = report["row_set_comparison"]
+    assert algebra["a_duplicate_key_rows"] == 1
+    assert algebra["a_null_key_rows"] == 1
+    assert algebra["b_null_key_rows"] == 1
+    assert "a_duplicate_identity_keys" in report["blockers"]
+    assert "a_null_identity_keys" in report["blockers"]
+    assert "b_null_identity_keys" in report["blockers"]
+
+
+def test_missing_key_field_fails_closed(tmp_path: Path) -> None:
+    root = _root(tmp_path)
+    claim = _claim(root)
+    claim["row_set_comparison"]["key_fields"] = ["stable_missing_id"]
+
+    report = verify(root=root, claim=claim)
+
+    assert report["certified_equivalent"] is False
+    assert "a_missing_key_fields:stable_missing_id" in report["blockers"]
+    assert "b_missing_key_fields:stable_missing_id" in report["blockers"]
