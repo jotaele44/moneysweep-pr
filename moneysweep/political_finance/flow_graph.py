@@ -47,6 +47,8 @@ RESOLUTION_COLUMNS = [
     "resolved_entity_id",
     "resolved_name",
     "resolution_method",
+    "identity_state",
+    "candidate_entity_ids",
     "confidence",
     "review_required",
 ]
@@ -165,13 +167,45 @@ def _entity_index(frames: Iterable[tuple[str, pd.DataFrame]]) -> dict[str, list[
     return index
 
 
-def resolve_recipient(name: object, index: Mapping[str, list[Resolution]]) -> Resolution | None:
-    """Resolve a free-text recipient only when the normalized match is unique."""
+def recipient_candidates(
+    name: object,
+    index: Mapping[str, list[Resolution]],
+) -> list[Resolution]:
+    """Return the full name-discovery candidate set without promoting identity."""
     candidates = index.get(normalize_name(name), [])
-    unique = {c.entity_id: c for c in candidates}
-    if len(unique) != 1:
+    unique = {candidate.entity_id: candidate for candidate in candidates}
+    return [unique[key] for key in sorted(unique)]
+
+
+def resolve_recipient(name: object, index: Mapping[str, list[Resolution]]) -> Resolution | None:
+    """Name-only resolution is intentionally disabled.
+
+    This compatibility function remains importable for callers that previously
+    expected it, but determinism or a unique normalized-name candidate is not
+    identity evidence. Callers should use :func:`recipient_candidates` for
+    discovery and require an independent authoritative binding to resolve.
+    """
+    del name, index
+    return None
+
+
+def _fec_entity_id(raw_id: object) -> tuple[str, str] | None:
+    value = str(raw_id or "").strip().upper()
+    if not value:
         return None
-    return next(iter(unique.values()))
+    if value.startswith("C"):
+        return f"fec_committee:{value}", "POLITICAL_COMMITTEE"
+    if value.startswith(("H", "S", "P")):
+        return f"fec_candidate:{value}", "CANDIDATE"
+    return None
+
+
+def _stable_source_identity(row: Mapping[str, object], source: str) -> str | None:
+    for key in ("contributor_id", "donor_id", "entity_id", "uei", "ein"):
+        value = row.get(key)
+        if value not in (None, "") and not pd.isna(value):
+            return f"{source}:{key}:{str(value).strip()}"
+    return None
 
 
 def _record_id(row: Mapping[str, object], fallback: str) -> str:
@@ -250,8 +284,10 @@ def build_political_finance_graph(
         }
 
     if committees is not None:
-        for i, row in enumerate(committees.fillna("").to_dict("records")):
-            cid = str(row.get("committee_id") or _stable_id("committee", row.get("name")))
+        for row in committees.fillna("").to_dict("records"):
+            cid = str(row.get("committee_id") or "").strip().upper()
+            if not cid:
+                continue
             add_entity(
                 f"fec_committee:{cid}",
                 classify_committee(row),
@@ -272,16 +308,17 @@ def build_political_finance_graph(
         for i, row in enumerate(frame.fillna("").to_dict("records")):
             rid = _record_id(row, str(i))
             donor_name = row.get("contributor_name") or row.get("donor_name") or row.get("name")
-            committee_id = str(row.get("committee_id") or row.get("recipient_committee_id") or "")
+            donor_id = _stable_source_identity(row, source)
+            committee_id = str(
+                row.get("committee_id") or row.get("recipient_committee_id") or ""
+            ).strip().upper()
+            target = _fec_entity_id(committee_id)
+            if donor_id is None or target is None or target[1] != "POLITICAL_COMMITTEE":
+                continue
+            target_id, _ = target
             committee_name = row.get("committee_name") or row.get("recipient_name") or committee_id
-            donor_id = _stable_id("donor", donor_name)
-            target_id = (
-                f"fec_committee:{committee_id}"
-                if committee_id
-                else _stable_id("committee", committee_name)
-            )
-            add_entity(donor_id, "DONOR", donor_name, source, rid, 0.90)
-            add_entity(target_id, "POLITICAL_COMMITTEE", committee_name, source, rid, 0.85)
+            add_entity(donor_id, "DONOR", donor_name, source, rid, 1.0)
+            add_entity(target_id, "POLITICAL_COMMITTEE", committee_name, source, rid, 1.0)
             add_edge(
                 donor_id,
                 target_id,
@@ -301,68 +338,124 @@ def build_political_finance_graph(
                     (k for k in ("contribution_receipt_date", "date", "donation_date") if k in row),
                     "",
                 ),
-                confidence=0.95,
+                confidence=1.0,
             )
 
     if disbursements is not None:
         for i, row in enumerate(disbursements.fillna("").to_dict("records")):
             rid = _record_id(row, str(i))
-            source_id = f"fec_committee:{row.get('committee_id', '')}"
-            add_entity(
-                source_id, "POLITICAL_COMMITTEE", row.get("committee_name"), "fec_schedule_b", rid
+            source_binding = _fec_entity_id(row.get("committee_id", ""))
+            recipient_raw_id = (
+                row.get("recipient_committee_id")
+                or row.get("recipient_id")
+                or row.get("candidate_id")
+                or ""
             )
-            resolution = resolve_recipient(row.get("recipient_name"), index)
-            if resolution:
-                target_id = resolution.entity_id
-                target_name = resolution.name
-                confidence = resolution.confidence
-                method = resolution.method
+            target_binding = _fec_entity_id(recipient_raw_id)
+            name_candidates = recipient_candidates(row.get("recipient_name"), index)
+            candidate_entity_ids = [candidate.entity_id for candidate in name_candidates]
+
+            if source_binding is not None and source_binding[1] == "POLITICAL_COMMITTEE":
+                source_id, _ = source_binding
+                add_entity(
+                    source_id,
+                    "POLITICAL_COMMITTEE",
+                    row.get("committee_name"),
+                    "fec_schedule_b",
+                    rid,
+                    1.0,
+                )
             else:
-                target_name = row.get("recipient_name")
-                target_id = _stable_id("unresolved_recipient", target_name)
-                confidence = 0.40
-                method = "unresolved"
-            add_entity(
-                target_id, "DOWNSTREAM_RECIPIENT", target_name, "fec_schedule_b", rid, confidence
-            )
-            add_edge(
-                source_id,
-                target_id,
-                "DISBURSED_TO",
-                row,
-                "fec_schedule_b",
-                rid,
-                "disbursement_amount",
-                "disbursement_date",
-                confidence,
-            )
+                source_id = ""
+
+            if target_binding is not None:
+                target_id, target_type = target_binding
+                target_name = row.get("recipient_name") or recipient_raw_id
+                method = "authoritative_fec_id"
+                identity_state = "AUTHORITATIVE_ID"
+                confidence = 1.0
+                add_entity(
+                    target_id,
+                    target_type,
+                    target_name,
+                    "fec_schedule_b",
+                    rid,
+                    confidence,
+                )
+                if source_id:
+                    add_edge(
+                        source_id,
+                        target_id,
+                        "DISBURSED_TO",
+                        row,
+                        "fec_schedule_b",
+                        rid,
+                        "disbursement_amount",
+                        "disbursement_date",
+                        confidence,
+                    )
+                resolved_id = target_id
+                resolved_name = str(target_name or "")
+                review_required = False
+            else:
+                method = "name_candidate_only" if name_candidates else "unresolved"
+                identity_state = (
+                    "CANDIDATE_NOT_IDENTITY" if name_candidates else "UNRESOLVED"
+                )
+                confidence = 0.0
+                resolved_id = ""
+                resolved_name = ""
+                review_required = True
+
             resolutions.append(
                 {
                     "source_id": "fec_schedule_b",
                     "source_record_id": rid,
                     "raw_recipient_name": row.get("recipient_name", ""),
-                    "resolved_entity_id": target_id if resolution else "",
-                    "resolved_name": target_name if resolution else "",
+                    "resolved_entity_id": resolved_id,
+                    "resolved_name": resolved_name,
                     "resolution_method": method,
+                    "identity_state": identity_state,
+                    "candidate_entity_ids": json.dumps(
+                        candidate_entity_ids,
+                        ensure_ascii=False,
+                        sort_keys=True,
+                    ),
                     "confidence": confidence,
-                    "review_required": not bool(resolution),
+                    "review_required": review_required,
                 }
             )
 
     if independent_expenditures is not None:
         for i, row in enumerate(independent_expenditures.fillna("").to_dict("records")):
             rid = _record_id(row, str(i))
-            committee_id = f"fec_committee:{row.get('committee_id', '')}"
-            candidate_key = row.get("candidate_id") or row.get("candidate_name")
-            candidate_id = f"fec_candidate:{candidate_key}"
+            committee_binding = _fec_entity_id(row.get("committee_id", ""))
+            candidate_binding = _fec_entity_id(row.get("candidate_id", ""))
+            if (
+                committee_binding is None
+                or committee_binding[1] != "POLITICAL_COMMITTEE"
+                or candidate_binding is None
+                or candidate_binding[1] != "CANDIDATE"
+            ):
+                continue
+            committee_id, _ = committee_binding
+            candidate_id, _ = candidate_binding
             add_entity(
                 committee_id,
                 "POLITICAL_COMMITTEE",
                 row.get("committee_name"),
                 "fec_schedule_e",
                 rid,
+                1.0,
             )
-            add_entity(candidate_id, "CANDIDATE", row.get("candidate_name"), "fec_schedule_e", rid)
+            add_entity(
+                candidate_id,
+                "CANDIDATE",
+                row.get("candidate_name"),
+                "fec_schedule_e",
+                rid,
+                1.0,
+            )
             indicator = normalize_name(row.get("support_oppose_indicator"))
             edge_type = (
                 "INDEPENDENT_EXPENDITURE_AGAINST"
