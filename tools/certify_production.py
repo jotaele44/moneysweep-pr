@@ -375,6 +375,12 @@ def build_report(
 
     freshness_by_id = {row["source_id"]: row for row in freshness_rows}
     freshness_missing = sorted(automatable - set(freshness_by_id))
+    automatable_execution_unproven = sorted(
+        source_id
+        for source_id in automatable
+        if source_id not in freshness_by_id
+        or not _bool(freshness_by_id[source_id].get("receipt_valid", "false"))
+    )
     freshness_nonfresh = sorted(
         source_id
         for source_id in automatable
@@ -588,24 +594,33 @@ def build_report(
         )
     )
 
-    g5 = not automatable_unmaterialized and not freshness_missing
+    g5 = not automatable_unmaterialized and not automatable_execution_unproven
     gates.append(
         _gate(
             "G5_AUTOMATABLE_EXECUTION",
             PASS if g5 else FAIL,
             (
-                "All automatable sources are materialized."
+                "All automatable sources have usable outputs and valid execution receipts."
                 if g5
-                else "Automatable execution is incomplete."
+                else "Automatable execution evidence is incomplete."
             ),
             {
                 "automatable_total": len(automatable),
                 "unmaterialized_count": len(automatable_unmaterialized),
                 "unmaterialized": automatable_unmaterialized,
                 "freshness_missing": freshness_missing,
+                "execution_receipt_unproven_count": len(automatable_execution_unproven),
+                "execution_receipt_unproven": automatable_execution_unproven,
                 "truth_scope_id": truth_scope_id,
             },
-            automatable_unmaterialized + freshness_missing,
+            sorted(
+                set(
+                    [
+                        *automatable_unmaterialized,
+                        *automatable_execution_unproven,
+                    ]
+                )
+            ),
         )
     )
 
