@@ -201,7 +201,8 @@ jobs:
 
           standardized_receipt = None
           receipt_error = None
-          if unique_files:
+          execution_succeeded = os.environ["STEP_OUTCOME"] == "success"
+          if unique_files and execution_succeeded:
               producer = str(source.get("producer_script") or "").strip()
               source_url = str(
                   source.get("endpoint_url")
@@ -236,6 +237,8 @@ jobs:
                       + "\n",
                       encoding="utf-8",
                   )
+          elif unique_files:
+              receipt_error = "execution_not_successful_no_acquisition_receipt"
 
           copied = []
           for path in unique_files:
@@ -266,6 +269,7 @@ jobs:
                   "CERT_IMPLEMENTATION_SHA"
               ],
               "workflow_step_outcome": os.environ["STEP_OUTCOME"],
+              "execution_succeeded": execution_succeeded,
               "generated_at": datetime.now(timezone.utc).isoformat(),
               "expected_outputs": expected_outputs(source),
               "missing_expected_outputs": missing_expected,
