@@ -627,11 +627,39 @@ def build_report(
     coverage_status = completeness.get("by_coverage_status", {})
     materiality = completeness.get("by_materiality_label", {})
     excluded = readiness.get("queued_excluded_total", 0)
+    coverage_results = completeness.get("source_results")
+    coverage_results = coverage_results if isinstance(coverage_results, list) else []
+    coverage_result_ids = [
+        str(item.get("source_id") or "")
+        for item in coverage_results
+        if isinstance(item, dict)
+    ]
+    coverage_duplicate_ids = sorted(
+        {
+            source_id
+            for source_id in coverage_result_ids
+            if source_id and coverage_result_ids.count(source_id) > 1
+        }
+    )
+    coverage_by_id = {
+        str(item.get("source_id")): item
+        for item in coverage_results
+        if isinstance(item, dict) and item.get("source_id")
+    }
+    coverage_missing_ids = sorted(unique_ids - set(coverage_by_id))
+    coverage_unknown_ids = sorted(set(coverage_by_id) - unique_ids)
+    in_scope_coverage_failures = sorted(
+        source_id
+        for source_id in automatable
+        if source_id not in coverage_by_id
+        or coverage_by_id[source_id].get("coverage_status") != "meets_contract"
+    )
     g6 = (
-        coverage_status.get("below_contract", 0) == 0
-        and coverage_status.get("unverifiable", 0) == 0
-        and coverage_status.get("uncontracted", 0) == excluded
-        and materiality.get("empty", 0) <= excluded
+        len(coverage_results) == total
+        and not coverage_duplicate_ids
+        and not coverage_missing_ids
+        and not coverage_unknown_ids
+        and not in_scope_coverage_failures
     )
     gates.append(
         _gate(
@@ -647,13 +675,29 @@ def build_report(
                 "coverage_status": coverage_status,
                 "materiality": materiality,
                 "queued_excluded_total": excluded,
+                "in_scope_source_count": len(automatable),
+                "in_scope_source_ids": sorted(automatable),
+                "in_scope_coverage_failures": in_scope_coverage_failures,
+                "coverage_result_count": len(coverage_results),
+                "coverage_duplicate_ids": coverage_duplicate_ids,
+                "coverage_missing_ids": coverage_missing_ids,
+                "coverage_unknown_ids": coverage_unknown_ids,
                 "truth_scope_id": truth_scope_id,
             },
-            [
-                key
-                for key in ("below_contract", "unverifiable", "uncontracted")
-                if coverage_status.get(key, 0)
-            ],
+            (
+                []
+                if g6
+                else sorted(
+                    set(
+                        [
+                            *in_scope_coverage_failures,
+                            *coverage_duplicate_ids,
+                            *coverage_missing_ids,
+                            *coverage_unknown_ids,
+                        ]
+                    )
+                )
+            ),
         )
     )
 
