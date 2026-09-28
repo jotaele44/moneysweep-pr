@@ -18,6 +18,18 @@ def _bool(value: object) -> bool:
     return str(value).strip().lower() in {"1", "true", "yes", "y"}
 
 
+def _name_only(fields: list[str]) -> bool:
+    if not fields:
+        return False
+    tokens = [field.casefold().replace("-", "_") for field in fields]
+    return all(
+        token in {"name", "normalized_name", "canonical_name"}
+        or token.endswith("_name")
+        or token.startswith("name_")
+        for token in tokens
+    )
+
+
 def _load_recovery(path: Path) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8-sig", newline="") as fh:
         return list(csv.DictReader(fh))
@@ -117,6 +129,8 @@ def build(
 
             if not uniqueness_key:
                 blockers.append("identity_key_missing")
+            elif _name_only(uniqueness_key):
+                blockers.append("identity_key_name_only")
             if universe_total is None:
                 blockers.append("authoritative_denominator_unmeasured")
             elif isinstance(universe_total, bool) or not isinstance(
@@ -128,6 +142,8 @@ def build(
 
             if "identity_key_missing" in blockers:
                 state = "IDENTITY_KEY_MISSING"
+            elif "identity_key_name_only" in blockers:
+                state = "IDENTITY_KEY_NAME_ONLY"
             elif any(
                 blocker.startswith("authoritative_denominator")
                 for blocker in blockers
