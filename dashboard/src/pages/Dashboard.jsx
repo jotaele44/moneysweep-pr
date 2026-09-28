@@ -70,7 +70,7 @@ export default function Dashboard() {
             </TabsList>
           </div>
           <div className="mt-2 min-h-0 flex-1 overflow-hidden rounded-lg border border-border bg-background/40">
-            <TabsContent value="activity" className="m-0 h-full overflow-y-auto p-3"><ProgramTimeline items={PROGRAM_TIMELINE} /></TabsContent>
+            <TabsContent value="activity" className="m-0 h-full overflow-y-auto p-3"><ProgramTimeline producerId="moneysweep-pr" items={PROGRAM_TIMELINE} /></TabsContent>
             <TabsContent value="contracts" className="m-0 h-full"><ContractsTable /></TabsContent>
             <TabsContent value="entities" className="m-0 h-full"><EntitiesTable /></TabsContent>
             <TabsContent value="government-changes" className="m-0 h-full"><GovernmentChanges /></TabsContent>
