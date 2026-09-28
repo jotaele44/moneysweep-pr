@@ -22,6 +22,8 @@ from tools.audit_entity_resolution_certification import (
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = ROOT / "registries" / "production_certification.yaml"
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
+HEX64 = re.compile(r"^[0-9a-f]{64}$")
+ACTIVATION_SCHEMA_VERSION = "moneysweep.production_activation/v1"
 PASS, FAIL, BLOCKED, OPEN = "PASS", "FAIL", "BLOCKED", "OPEN"
 TRUTH_INPUTS = {
     "materialization_readiness",
@@ -96,6 +98,94 @@ def _gate(
         "evidence": evidence,
         "blockers": blockers or [],
     }
+
+
+def _validate_activation_receipt(
+    *,
+    path: Path,
+    scope_id: str | None,
+    scope_sha: str,
+    implementation_sha: str,
+    certificate_sha256: str,
+) -> tuple[bool, dict[str, Any], list[str]]:
+    blockers: list[str] = []
+    evidence: dict[str, Any] = {
+        "path": str(path),
+        "exists": path.is_file(),
+        "receipt_sha256": None,
+        "schema_version": None,
+        "scope_id": None,
+        "scope_sha": None,
+        "implementation_sha": None,
+        "certificate_sha256": None,
+        "authorized_by": None,
+        "authorization_timestamp": None,
+        "authorization_channel": None,
+    }
+    if not path.is_file():
+        return False, evidence, ["production_activation_receipt_missing"]
+
+    try:
+        receipt = _json(path)
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError):
+        return False, evidence, ["production_activation_receipt_unreadable"]
+
+    evidence["receipt_sha256"] = _sha256(path)
+    for key in (
+        "schema_version",
+        "scope_id",
+        "scope_sha",
+        "implementation_sha",
+        "certificate_sha256",
+        "authorized_by",
+        "authorization_timestamp",
+        "authorization_channel",
+    ):
+        evidence[key] = receipt.get(key)
+
+    allowed = {
+        "schema_version",
+        "scope_id",
+        "scope_sha",
+        "implementation_sha",
+        "certificate_sha256",
+        "authorized_by",
+        "authorization_timestamp",
+        "authorization_channel",
+    }
+    unexpected = sorted(set(receipt) - allowed)
+    if unexpected:
+        blockers.append("production_activation_receipt_unexpected_keys:" + ",".join(unexpected))
+    if receipt.get("schema_version") != ACTIVATION_SCHEMA_VERSION:
+        blockers.append("production_activation_schema_mismatch")
+    if scope_id is None or receipt.get("scope_id") != scope_id:
+        blockers.append("production_activation_scope_id_mismatch")
+    if receipt.get("scope_sha") != scope_sha:
+        blockers.append("production_activation_scope_sha_mismatch")
+    if receipt.get("implementation_sha") != implementation_sha:
+        blockers.append("production_activation_implementation_sha_mismatch")
+    if receipt.get("certificate_sha256") != certificate_sha256:
+        blockers.append("production_activation_certificate_hash_mismatch")
+    if not isinstance(receipt.get("authorized_by"), str) or not receipt["authorized_by"].strip():
+        blockers.append("production_activation_authorized_by_missing")
+    if (
+        not isinstance(receipt.get("authorization_channel"), str)
+        or not receipt["authorization_channel"].strip()
+    ):
+        blockers.append("production_activation_channel_missing")
+    timestamp = receipt.get("authorization_timestamp")
+    if not isinstance(timestamp, str) or not timestamp.strip():
+        blockers.append("production_activation_timestamp_missing")
+    else:
+        try:
+            parsed = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+        except ValueError:
+            blockers.append("production_activation_timestamp_invalid")
+        else:
+            if parsed.tzinfo is None:
+                blockers.append("production_activation_timestamp_timezone_missing")
+
+    return not blockers, evidence, sorted(set(blockers))
 
 
 def _preflight(root: Path) -> dict[str, Any]:
@@ -693,8 +783,23 @@ def build_report(
     )
 
     upstream_nonpass = [gate["id"] for gate in gates if gate["state"] != PASS]
-    activation = bool(
-        historical_status.get("preservation", {}).get("production_activation_authorized")
+    technical_certificate_payload = {
+        "schema_version": "moneysweep.technical_eligibility/v1",
+        "scope_sha": scope_sha,
+        "implementation_sha": implementation_sha,
+        "truth_scope_id": truth_scope_id,
+        "registry_source_ids_sha256": digest,
+        "input_manifest": input_manifest,
+        "gates_g0_g11": gates,
+    }
+    technical_certificate_sha256 = _sha256_json(technical_certificate_payload)
+    activation_receipt_path = root / "reports" / "production_activation_receipt.json"
+    activation, activation_evidence, activation_blockers = _validate_activation_receipt(
+        path=activation_receipt_path,
+        scope_id=truth_scope_id,
+        scope_sha=scope_sha,
+        implementation_sha=implementation_sha,
+        certificate_sha256=technical_certificate_sha256,
     )
     g12 = not upstream_nonpass and activation
     gates.append(
@@ -702,15 +807,18 @@ def build_report(
             "G12_RELEASE_CERTIFICATION",
             PASS if g12 else BLOCKED,
             (
-                "All gates pass and activation is authorized."
+                "G0-G11 pass and the activation receipt is bound to this technical certificate."
                 if g12
                 else "Release certification remains blocked."
             ),
             {
                 "upstream_nonpass_gates": upstream_nonpass,
+                "technical_eligibility": not upstream_nonpass,
+                "technical_certificate_sha256": technical_certificate_sha256,
+                "activation_receipt": activation_evidence,
                 "production_activation_authorized": activation,
             },
-            upstream_nonpass + ([] if activation else ["production_activation_not_authorized"]),
+            sorted(set([*upstream_nonpass, *activation_blockers])),
         )
     )
 
@@ -768,6 +876,9 @@ def build_report(
             "source_ledger": source_ledger,
         },
         "gates": gates,
+        "technical_eligibility": not upstream_nonpass,
+        "technical_certificate_sha256": technical_certificate_sha256,
+        "awaiting_activation": not upstream_nonpass and not activation,
         "certification_state": (
             config["states"]["certified"] if all_pass else config["states"]["non_production"]
         ),
