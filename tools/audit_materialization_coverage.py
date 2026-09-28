@@ -47,6 +47,86 @@ def _sha256(path: Path) -> str | None:
         return None
 
 
+def _usable_output(source: dict[str, Any], path: Path, rel: str) -> dict[str, Any]:
+    """Evaluate materialization from usable bytes rather than path existence."""
+    threshold = source.get("validation_threshold") or {}
+    min_rows = threshold.get("min_rows", 1)
+    if not isinstance(min_rows, int) or isinstance(min_rows, bool) or min_rows < 0:
+        min_rows = 1
+
+    if rel.endswith("/"):
+        exists = path.exists() and path.is_dir()
+        file_count = sum(1 for item in path.rglob("*") if item.is_file()) if exists else 0
+        usable = exists and file_count > 0
+        return {
+            "path": rel,
+            "exists": exists,
+            "usable": usable,
+            "data_rows": None,
+            "sha256": None,
+            "reason": None if usable else "directory_empty_or_missing",
+        }
+
+    if not path.exists() or not path.is_file():
+        return {
+            "path": rel,
+            "exists": False,
+            "usable": False,
+            "data_rows": None,
+            "sha256": None,
+            "reason": "missing",
+        }
+
+    suffix = path.suffix.lower()
+    if suffix == ".csv":
+        rows = _row_count(path)
+        usable = rows is not None and rows >= min_rows
+        if rows is None:
+            reason = "csv_unreadable"
+        elif rows < min_rows:
+            reason = f"below_min_rows:{rows}<{min_rows}"
+        else:
+            reason = None
+        return {
+            "path": rel,
+            "exists": True,
+            "usable": usable,
+            "data_rows": rows,
+            "min_rows": min_rows,
+            "sha256": _sha256(path),
+            "reason": reason,
+        }
+
+    size = path.stat().st_size
+    if suffix == ".json":
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            usable = False
+            reason = "json_empty_or_invalid"
+        else:
+            usable = payload not in (None, "", [], {})
+            reason = None if usable else "json_empty_or_invalid"
+        return {
+            "path": rel,
+            "exists": True,
+            "usable": usable,
+            "data_rows": None,
+            "sha256": _sha256(path),
+            "reason": reason,
+        }
+
+    usable = size > 0
+    return {
+        "path": rel,
+        "exists": True,
+        "usable": usable,
+        "data_rows": None,
+        "sha256": _sha256(path),
+        "reason": None if usable else "empty_file",
+    }
+
+
 def _as_paths(value: Any) -> list[str]:
     if not value:
         return []
@@ -276,42 +356,37 @@ def build(
             required_total += 1
 
         present = 0
+        usable = 0
         total_rows = 0
         unreadable = 0
         output_evidence: list[dict[str, Any]] = []
         for rel in outputs:
             declared.setdefault(rel, []).append(source_id)
-            path = evidence_root / rel
-            exists = path.exists()
-            rows = (
-                _row_count(path)
-                if exists and path.is_file() and path.suffix.lower() == ".csv"
-                else None
-            )
-            if exists:
+            output = _usable_output(source, evidence_root / rel, rel)
+            if output["exists"]:
                 present += 1
+            if output["usable"]:
+                usable += 1
+            rows = output.get("data_rows")
             if rows is not None:
-                total_rows += rows
-            elif exists and path.is_file() and path.suffix.lower() == ".csv":
+                total_rows += int(rows)
+            elif (
+                output["exists"]
+                and str(output.get("path", "")).lower().endswith(".csv")
+                and output.get("reason") == "csv_unreadable"
+            ):
                 unreadable += 1
-            output_evidence.append(
-                {
-                    "path": rel,
-                    "exists": exists,
-                    "data_rows": rows,
-                    "sha256": _sha256(path) if exists and path.is_file() else None,
-                }
-            )
+            output_evidence.append(output)
 
         if not outputs:
             status = "no_outputs_declared"
             no_outputs += 1
-        elif present == len(outputs):
+        elif usable == len(outputs):
             status = "fully_materialized"
             full += 1
             if source.get("required") is True:
                 required_full += 1
-        elif present:
+        elif usable:
             status = "partially_materialized"
             partial += 1
         else:
@@ -325,6 +400,7 @@ def build(
                 "required": bool(source.get("required")),
                 "expected_output_count": len(outputs),
                 "present_count": present,
+                "usable_count": usable,
                 "local_rows": total_rows,
                 "unreadable_csv_count": unreadable,
                 "local_status": status,
