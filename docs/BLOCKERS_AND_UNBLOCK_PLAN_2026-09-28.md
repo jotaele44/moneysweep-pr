@@ -2,6 +2,8 @@
 
 **Audit date:** 2026-09-28 · **`main` at audit:** `2a76aa0` (branch-protected) · **Production status:** `NON_PRODUCTION_DIAGNOSTIC`, pause lock active
 
+**Post-audit update (2026-09-28 20:35Z):** the record_cell_binding v0.2 series was pushed straight to `main` after the audit. The Cell_Set PR #623 now conflicts with `main` and is superseded (X-05).
+
 This document lists every blocker that the repository, its CI, and its GitHub issues and pull requests recorded as of the audit date, then gives an ordered plan to clear them. It changes no code, gate, ledger, or status file.
 
 Cross-repository blockers (IDs `X-nn`) are described in full in
@@ -62,7 +64,7 @@ Each blocker is counted once, under its primary type.
 
 | PR | State | Action |
 |---|---|---|
-| #623 Cell_Set uncertainty contract | Head checks green | Merge together with the other five repos (X-05) |
+| #623 Cell_Set uncertainty contract | Conflicts with `main` since the post-audit v0.2 series, which already carries the contract in `federation/spatial/registry_version.json` | Confirm v0.2 covers it, then close as superseded (X-05) |
 | #612 credential-name registry | RED: CodeQL, pytest, ruff, pre-commit, test (3.13) | Fix or close |
 | #602 v4.0.0-rc1 census (draft) | RED: 9 checks | Fix or close |
 | #619 main → `agent/max-production-certification-v2` | STACKED; 19 cancelled checks | Decide whether v2 is superseded by v3 (#620). If so, close #619 and archive the v2 branch |
@@ -120,7 +122,7 @@ Each blocker is counted once, under its primary type.
 ## Federation-wide blockers that affect this repo
 - X-01: the completion gate is red daily.
 - X-02: dependabot backlog and template drift.
-- X-05: the Cell_Set PR set.
+- X-05: the Cell_Set PR set, now superseded by v0.2 on `main`.
 - X-07: stale normalized ledgers.
 
 See the thehub document for details.
