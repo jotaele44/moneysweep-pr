@@ -5,6 +5,7 @@ on:
     paths:
       - "registries/production_certification.yaml"
       - "schemas/operator_evidence_receipt.schema.json"
+      - "schemas/production_activation_receipt.schema.json"
       - "tools/certify_production.py"
       - "tools/build_certification_blocker_graph.py"
       - "tools/audit_materialization_coverage.py"
@@ -17,6 +18,7 @@ on:
       - "tools/verify_source_equivalence.py"
       - "schemas/source_equivalence_claim.schema.json"
       - "tests/test_production_certification.py"
+      - "tests/test_production_activation_receipt.py"
       - "tests/test_certification_blocker_graph.py"
       - "tests/test_operator_corpus.py"
       - "tests/test_certification_evidence_assembly.py"
@@ -68,6 +70,7 @@ jobs:
         run: |
           python -m pytest \
             tests/test_production_certification.py \
+            tests/test_production_activation_receipt.py \
             tests/test_certification_blocker_graph.py \
             tests/test_operator_corpus.py \
             tests/test_certification_evidence_assembly.py \
