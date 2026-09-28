@@ -8,6 +8,7 @@ database. Every emitted node and edge carries provenance and confidence.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import unicodedata
 from dataclasses import dataclass
