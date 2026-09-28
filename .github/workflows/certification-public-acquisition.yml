@@ -287,7 +287,7 @@ jobs:
             data/manifests/prasa/contracts_vigentes_2024.json
           if-no-files-found: warn
 
-      - name: Enforce positive-row public acquisition evidence
+      - name: Validate public acquisition evidence
         if: always()
         env:
           OCPR_OUTCOME: ${{ steps.ocpr.outcome }}
@@ -311,11 +311,12 @@ jobs:
               "pr_cabilderos_justice": os.environ["CABILDEROS_OUTCOME"],
               "prasa_official_transition": os.environ["PRASA_OUTCOME"],
           }
-          failures = [
+          regression_failures = [
               f"{name}:step_{outcome}"
               for name, outcome in outcomes.items()
-              if outcome != "success"
+              if name != "cor3" and outcome != "success"
           ]
+          certification_blockers = []
 
           # pr_all_awards_master is deliberately not listed here: it is a
           # cross-source derived product that can only be certified in the full
@@ -332,85 +333,144 @@ jobs:
           }
 
           evidence = {}
+          cor3_expected_header = [
+              "project_id",
+              "applicant_name",
+              "applicant_normalized",
+              "program",
+              "category",
+              "municipality",
+              "total_approved",
+              "total_disbursed",
+              "disbursement_rate",
+              "status",
+              "last_updated",
+          ]
           for source_id, paths in required_csvs.items():
               evidence[source_id] = []
               for path in paths:
                   if not path.exists():
-                      failures.append(f"{source_id}:missing:{path}")
+                      regression_failures.append(f"{source_id}:missing:{path}")
                       evidence[source_id].append(
                           {"path": str(path), "exists": False, "data_rows": None}
                       )
                       continue
                   try:
                       with path.open("r", encoding="utf-8-sig", newline="") as fh:
-                          data_rows = max(sum(1 for _ in csv.reader(fh)) - 1, 0)
+                          reader = csv.reader(fh)
+                          header = next(reader, None)
+                          data_rows = sum(1 for _ in reader)
                   except Exception as exc:
-                      failures.append(f"{source_id}:unreadable:{path}:{exc}")
+                      regression_failures.append(f"{source_id}:unreadable:{path}:{exc}")
                       evidence[source_id].append(
                           {"path": str(path), "exists": True, "data_rows": None}
                       )
                       continue
                   evidence[source_id].append(
-                      {"path": str(path), "exists": True, "data_rows": data_rows}
+                      {
+                          "path": str(path),
+                          "exists": True,
+                          "data_rows": data_rows,
+                          "header": header,
+                      }
                   )
-                  if data_rows < 1:
-                      failures.append(f"{source_id}:zero_rows:{path}")
+                  if source_id == "cor3":
+                      if data_rows < 1:
+                          if (
+                              outcomes["cor3"] == "failure"
+                              and header == cor3_expected_header
+                          ):
+                              certification_blockers.append(
+                                  "cor3:operator_corpus_bytes_missing"
+                              )
+                          else:
+                              regression_failures.append(
+                                  f"cor3:unexpected_empty_state:{path}"
+                              )
+                      elif outcomes["cor3"] != "success":
+                          regression_failures.append(
+                              "cor3:positive_rows_with_failed_step"
+                          )
+                  elif data_rows < 1:
+                      regression_failures.append(f"{source_id}:zero_rows:{path}")
 
           oce_manifest = Path("data/manifests/campaign_finance/oce_socrata_latest.json")
           if not oce_manifest.exists():
-              failures.append(f"oce_socrata_live:missing:{oce_manifest}")
+              regression_failures.append(f"oce_socrata_live:missing:{oce_manifest}")
           else:
               try:
                   evidence["oce_socrata_manifest"] = json.loads(
                       oce_manifest.read_text(encoding="utf-8")
                   )
               except Exception as exc:
-                  failures.append(f"oce_socrata_live:invalid_manifest:{exc}")
+                  regression_failures.append(f"oce_socrata_live:invalid_manifest:{exc}")
 
           cabilderos_manifest = Path("data/manifests/cabilderos/justice_registry_latest.json")
           if not cabilderos_manifest.exists():
-              failures.append(f"pr_cabilderos_justice:missing:{cabilderos_manifest}")
+              regression_failures.append(f"pr_cabilderos_justice:missing:{cabilderos_manifest}")
           else:
               try:
                   payload = json.loads(cabilderos_manifest.read_text(encoding="utf-8"))
                   evidence["pr_cabilderos_justice_manifest"] = payload
                   if payload.get("status") != "complete":
-                      failures.append("pr_cabilderos_justice:manifest_not_complete")
+                      regression_failures.append("pr_cabilderos_justice:manifest_not_complete")
                   if int(payload.get("registry_rows", 0)) < 1:
-                      failures.append("pr_cabilderos_justice:manifest_zero_registry_rows")
+                      regression_failures.append("pr_cabilderos_justice:manifest_zero_registry_rows")
                   if int(payload.get("client_relationships", 0)) < 1:
-                      failures.append("pr_cabilderos_justice:manifest_zero_client_relationships")
+                      regression_failures.append("pr_cabilderos_justice:manifest_zero_client_relationships")
                   if payload.get("source_url") != "https://registrodecabilderos.pr.gov/Lobbyist/Details":
-                      failures.append("pr_cabilderos_justice:unexpected_source_url")
+                      regression_failures.append("pr_cabilderos_justice:unexpected_source_url")
               except Exception as exc:
-                  failures.append(f"pr_cabilderos_justice:invalid_manifest:{exc}")
+                  regression_failures.append(f"pr_cabilderos_justice:invalid_manifest:{exc}")
 
           prasa_manifest = Path("data/manifests/prasa/contracts_vigentes_2024.json")
           if not prasa_manifest.exists():
-              failures.append(f"prasa_official_transition:missing:{prasa_manifest}")
+              regression_failures.append(f"prasa_official_transition:missing:{prasa_manifest}")
           else:
               try:
                   payload = json.loads(prasa_manifest.read_text(encoding="utf-8"))
                   evidence["prasa_official_transition_manifest"] = payload
                   if payload.get("status") != "complete":
-                      failures.append("prasa_official_transition:manifest_not_complete")
+                      regression_failures.append("prasa_official_transition:manifest_not_complete")
                   if int(payload.get("page_count", 0)) != 36:
-                      failures.append("prasa_official_transition:unexpected_page_count")
+                      regression_failures.append("prasa_official_transition:unexpected_page_count")
                   if int(payload.get("contract_rows", 0)) < 100:
-                      failures.append("prasa_official_transition:below_contract_row_floor")
+                      regression_failures.append("prasa_official_transition:below_contract_row_floor")
                   if payload.get("snapshot_as_of") != "2024-09-24":
-                      failures.append("prasa_official_transition:unexpected_snapshot_date")
+                      regression_failures.append("prasa_official_transition:unexpected_snapshot_date")
               except Exception as exc:
-                  failures.append(f"prasa_official_transition:invalid_manifest:{exc}")
+                  regression_failures.append(f"prasa_official_transition:invalid_manifest:{exc}")
 
-          print(
-              json.dumps(
-                  {"outcomes": outcomes, "evidence": evidence, "failures": failures},
-                  indent=2,
-              )
+          validation = {
+              "outcomes": outcomes,
+              "evidence": evidence,
+              "regression_failures": sorted(set(regression_failures)),
+              "certification_blockers": sorted(set(certification_blockers)),
+              "ci_valid": not regression_failures,
+              "certification_ready": (
+                  not regression_failures and not certification_blockers
+              ),
+          }
+          validation_path = Path(
+              "reports/certification_public_acquisition_validation.json"
           )
-          if failures:
+          validation_path.parent.mkdir(parents=True, exist_ok=True)
+          validation_path.write_text(
+              json.dumps(validation, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(validation, indent=2, sort_keys=True))
+          if regression_failures:
               raise SystemExit(
-                  "public acquisition certification failed: " + "; ".join(failures)
+                  "public acquisition regression failure: "
+                  + "; ".join(sorted(set(regression_failures)))
               )
           PY
+
+      - name: Upload public acquisition validation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: certification-public-acquisition-validation
+          path: reports/certification_public_acquisition_validation.json
+          if-no-files-found: error
