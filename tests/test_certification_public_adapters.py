@@ -70,9 +70,7 @@ def test_failed_adapter_preserves_bytes_without_minting_fresh_receipt(
     )
     result = report["sources"][0]
 
-    assert result["state"] == "PUBLIC_ADAPTER_NO_OUTPUT" or result["state"] == (
-        "PUBLIC_ADAPTER_OUTPUT_RECEIPTED_WITH_RUNNER_BLOCKER"
-    )
+    assert result["state"] == "PUBLIC_ADAPTER_EXECUTION_FAILED_WITH_OUTPUT"
     assert result["outputs"] == ["data/staging/processed/fixture.csv"]
     assert result["receipt_path"] is None
     assert result["receipt_error"] == (
