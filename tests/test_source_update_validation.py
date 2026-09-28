@@ -46,6 +46,42 @@ def _write(root, rows: int):
     (p / "out.csv").write_text(body)
 
 
+def test_directory_output_snapshot_is_deterministic_and_does_not_follow_symlinks(tmp_path):
+    raw = tmp_path / "data" / "raw"
+    raw.mkdir(parents=True)
+    (raw / "a.txt").write_text("alpha", encoding="utf-8")
+    nested = raw / "nested"
+    nested.mkdir()
+    (nested / "b.txt").write_text("beta", encoding="utf-8")
+    outside = tmp_path / "outside.txt"
+    outside.write_text("outside-v1", encoding="utf-8")
+    (raw / "outside-link").symlink_to(outside)
+
+    first = snapshot_outputs(tmp_path, ["data/raw"])["data/raw"]
+    outside.write_text("outside-v2", encoding="utf-8")
+    second = snapshot_outputs(tmp_path, ["data/raw"])["data/raw"]
+
+    assert first.exists is True
+    assert first.row_count is None
+    assert first.size_bytes == len("alpha") + len("beta")
+    assert first.sha256 == second.sha256
+
+
+def test_directory_and_csv_outputs_validate_together(tmp_path):
+    raw = tmp_path / "data" / "raw"
+    raw.mkdir(parents=True)
+    (raw / "evidence.pdf").write_bytes(b"%PDF-frozen-evidence")
+    _write(tmp_path, 3)
+    expected = ["data/raw", "data/out.csv"]
+    before = snapshot_outputs(tmp_path, expected)
+    after = snapshot_outputs(tmp_path, expected)
+    entry = _entry(min_rows=1)
+    entry["expected_outputs"] = expected
+    res = validate_outputs(tmp_path, _pol(), entry, before, after)
+    assert res["passed"] is True
+    assert res["status"] == "SUCCESS_NO_CHANGE"
+
+
 def test_missing_output_fails(tmp_path):
     (tmp_path / "data").mkdir()
     before = snapshot_outputs(tmp_path, ["data/out.csv"])
