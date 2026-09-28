@@ -69,7 +69,8 @@ def test_current_evidence_audit_is_fail_closed_and_denominator_exact() -> None:
     assert report["certification_state"] == "NON_PRODUCTION_DIAGNOSTIC"
     assert report["production_eligible"] is False
 
-    assert gates["G0_SCOPE_FREEZE"]["state"] == "PASS"
+    assert gates["G0_SCOPE_FREEZE"]["state"] == "FAIL"
+    assert "derived_truth_scope_required" in gates["G0_SCOPE_FREEZE"]["blockers"]
     assert gates["G1_CONTROL_PLANE_RECONCILIATION"]["state"] == "PASS"
     assert gates["G2_STRICT_PREFLIGHT"]["state"] == "OPEN"
     assert gates["G3_REQUIRED_SOURCE_MATERIALIZATION"]["state"] == "FAIL"
