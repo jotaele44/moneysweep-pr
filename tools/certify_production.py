@@ -783,14 +783,28 @@ def build_report(
     )
 
     upstream_nonpass = [gate["id"] for gate in gates if gate["state"] != PASS]
+    technical_certificate_inputs = {
+        name: {
+            "sha256": item.get("sha256"),
+            "identity": item.get("identity"),
+        }
+        for name, item in sorted(input_manifest.items())
+    }
     technical_certificate_payload = {
         "schema_version": "moneysweep.technical_eligibility/v1",
         "scope_sha": scope_sha,
         "implementation_sha": implementation_sha,
         "truth_scope_id": truth_scope_id,
         "registry_source_ids_sha256": digest,
-        "input_manifest": input_manifest,
-        "gates_g0_g11": gates,
+        "input_manifest": technical_certificate_inputs,
+        "gates_g0_g11": [
+            {
+                "id": gate["id"],
+                "state": gate["state"],
+                "blockers": sorted(set(gate.get("blockers") or [])),
+            }
+            for gate in gates
+        ],
     }
     technical_certificate_sha256 = _sha256_json(technical_certificate_payload)
     activation_receipt_path = root / "reports" / "production_activation_receipt.json"
