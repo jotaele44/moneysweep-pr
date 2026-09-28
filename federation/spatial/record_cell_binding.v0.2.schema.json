@@ -5,37 +5,58 @@
   "description": "Fail-closed federation record spatial binding. VERIFIED transforms may bind a record to an exact Cell_ID. PROVISIONAL transforms must bind to a content-addressed Cell_Set with explicit uncertainty metadata; a single exact Cell_ID is forbidden.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["Repository","Record_ID","Spatial_Role","Binding_Method","Certification_State","Resolution_State","Identity_Default"],
+  "required": ["Repository", "Record_ID", "Spatial_Role", "Binding_Method", "Certification_State", "Resolution_State", "Identity_Default"],
   "properties": {
-    "Repository": {"type":"string","enum":["spiderweb-pr","aguayluz-pr","skywatcher-pr","centinelas-pr","moneysweep-pr","ovnis-pr","thehub-pr"]},
-    "Record_ID": {"type":"string","minLength":1},
-    "Cell_ID": {"type":["string","null"],"pattern":"^R(?:0|[1-9][0-9]{0,2})_C(?:0|[1-9][0-9]{0,2})$"},
-    "Cell_Set_ID": {"type":"string","pattern":"^CS_[0-9a-f]{16}$"},
-    "Cell_Set_SHA256": {"type":"string","pattern":"^[0-9a-f]{64}$"},
-    "Member_Cell_IDs": {"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string","pattern":"^R(?:0|[1-9][0-9]{0,2})_C(?:0|[1-9][0-9]{0,2})$"}},
-    "Anchor_Cell_ID": {"type":["string","null"],"pattern":"^R(?:0|[1-9][0-9]{0,2})_C(?:0|[1-9][0-9]{0,2})$"},
-    "Spatial_Role": {"type":"string","enum":["POINT_LOCATION","INTERSECTS","ORIGIN","DESTINATION","PATH","PRIMARY","SECONDARY","AOI"]},
-    "Overlap_Fraction": {"type":"number","minimum":0,"maximum":1},
-    "Binding_Method": {"type":"string","enum":["RESOLVER_POINT","RESOLVER_BBOX","RESOLVER_POLYGON","PROVIDER_ASSERTED","MANUAL"]},
-    "Binding_Version": {"type":"string"},
-    "Geometry_Version": {"type":"string"},
-    "Certification_State": {"type":"string","enum":["VERIFIED","PROVISIONAL"]},
-    "Resolution_State": {"type":"string","enum":["VERIFIED_CELL_SET","PROVISIONAL_UNCERTAINTY_CELL_SET"]},
-    "Uncertainty_Radius_Km": {"type":"number","minimum":0},
-    "Uncertainty_Basis": {"type":"string"},
-    "Uncertainty_Semantics": {"type":"string","enum":["NONE","CONSERVATIVE_DISCOVERY_ENVELOPE_NOT_CONFIDENCE_INTERVAL"]},
-    "Identity_Default": {"type":"string","const":"CANDIDATE_NOT_IDENTITY"},
-    "Valid_From": {"type":["string","null"]},
-    "Valid_To": {"type":["string","null"]}
+    "Repository": {"type": "string", "enum": ["spiderweb-pr", "aguayluz-pr", "skywatcher-pr", "centinelas-pr", "moneysweep-pr", "ovnis-pr", "thehub-pr"]},
+    "Record_ID": {"type": "string", "minLength": 1},
+    "Cell_ID": {"type": ["string", "null"], "pattern": "^R(?:0|[1-9][0-9]{0,2})_C(?:0|[1-9][0-9]{0,2})$"},
+    "Cell_Set_ID": {"type": "string", "pattern": "^CS_[0-9a-f]{16}$"},
+    "Cell_Set_SHA256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "Member_Cell_IDs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^R(?:0|[1-9][0-9]{0,2})_C(?:0|[1-9][0-9]{0,2})$"}
+    },
+    "Anchor_Cell_ID": {"type": ["string", "null"], "pattern": "^R(?:0|[1-9][0-9]{0,2})_C(?:0|[1-9][0-9]{0,2})$"},
+    "Spatial_Role": {"type": "string", "enum": ["POINT_LOCATION", "INTERSECTS", "ORIGIN", "DESTINATION", "PATH", "PRIMARY", "SECONDARY", "AOI"]},
+    "Overlap_Fraction": {"type": "number", "minimum": 0, "maximum": 1},
+    "Binding_Method": {"type": "string", "enum": ["RESOLVER_POINT", "RESOLVER_BBOX", "RESOLVER_POLYGON", "PROVIDER_ASSERTED", "MANUAL"]},
+    "Binding_Version": {"type": "string"},
+    "Geometry_Version": {"type": "string"},
+    "Certification_State": {"type": "string", "enum": ["VERIFIED", "PROVISIONAL"]},
+    "Resolution_State": {"type": "string", "enum": ["VERIFIED_CELL_SET", "PROVISIONAL_UNCERTAINTY_CELL_SET"]},
+    "Uncertainty_Radius_Km": {"type": "number", "minimum": 0},
+    "Uncertainty_Basis": {"type": "string"},
+    "Uncertainty_Semantics": {"type": "string", "enum": ["NONE", "CONSERVATIVE_DISCOVERY_ENVELOPE_NOT_CONFIDENCE_INTERVAL"]},
+    "Identity_Default": {"type": "string", "const": "CANDIDATE_NOT_IDENTITY"},
+    "Valid_From": {"type": ["string", "null"]},
+    "Valid_To": {"type": ["string", "null"]}
   },
   "allOf": [
     {
-      "if":{"properties":{"Certification_State":{"const":"VERIFIED"}},"required":["Certification_State"]},
-      "then":{"required":["Cell_ID"],"properties":{"Resolution_State":{"const":"VERIFIED_CELL_SET"},"Uncertainty_Radius_Km":{"const":0},"Uncertainty_Semantics":{"const":"NONE"}}}
+      "if": {"properties": {"Certification_State": {"const": "VERIFIED"}}, "required": ["Certification_State"]},
+      "then": {
+        "required": ["Cell_ID"],
+        "properties": {
+          "Resolution_State": {"const": "VERIFIED_CELL_SET"},
+          "Uncertainty_Radius_Km": {"const": 0},
+          "Uncertainty_Semantics": {"const": "NONE"}
+        }
+      }
     },
     {
-      "if":{"properties":{"Certification_State":{"const":"PROVISIONAL"}},"required":["Certification_State"]},
-      "then":{"required":["Cell_Set_ID","Cell_Set_SHA256","Member_Cell_IDs","Uncertainty_Radius_Km","Uncertainty_Basis","Uncertainty_Semantics"],"properties":{"Cell_ID":{"type":"null"},"Resolution_State":{"const":"PROVISIONAL_UNCERTAINTY_CELL_SET"},"Uncertainty_Radius_Km":{"exclusiveMinimum":0},"Uncertainty_Basis":{"minLength":1},"Uncertainty_Semantics":{"const":"CONSERVATIVE_DISCOVERY_ENVELOPE_NOT_CONFIDENCE_INTERVAL"}}}
+      "if": {"properties": {"Certification_State": {"const": "PROVISIONAL"}}, "required": ["Certification_State"]},
+      "then": {
+        "required": ["Cell_Set_ID", "Cell_Set_SHA256", "Member_Cell_IDs", "Uncertainty_Radius_Km", "Uncertainty_Basis", "Uncertainty_Semantics"],
+        "properties": {
+          "Cell_ID": {"type": "null"},
+          "Resolution_State": {"const": "PROVISIONAL_UNCERTAINTY_CELL_SET"},
+          "Uncertainty_Radius_Km": {"exclusiveMinimum": 0},
+          "Uncertainty_Basis": {"minLength": 1},
+          "Uncertainty_Semantics": {"const": "CONSERVATIVE_DISCOVERY_ENVELOPE_NOT_CONFIDENCE_INTERVAL"}
+        }
+      }
     }
   ]
 }
