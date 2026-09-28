@@ -50,6 +50,38 @@ def snapshot_output(root: Path, rel: str) -> OutputSnapshot:
     p = root / rel
     if not p.exists():
         return OutputSnapshot(path=rel, exists=False)
+
+    if p.is_dir():
+        # A few source contracts intentionally declare a raw-evidence directory
+        # alongside a processed file. Snapshot directories deterministically
+        # instead of trying to open them as files. Symlinks are represented by
+        # their link target text and are never followed outside the declared tree.
+        h = hashlib.sha256()
+        size_bytes = 0
+        mtimes: list[float] = [p.stat().st_mtime]
+        for child in sorted(p.rglob("*"), key=lambda item: item.relative_to(p).as_posix()):
+            relative = child.relative_to(p).as_posix()
+            if child.is_symlink():
+                target = child.readlink().as_posix()
+                h.update(f"L\\0{relative}\\0{target}\\n".encode("utf-8"))
+                mtimes.append(child.lstat().st_mtime)
+                continue
+            if not child.is_file():
+                continue
+            st = child.stat()
+            digest = sha256_file(child)
+            h.update(f"F\\0{relative}\\0{st.st_size}\\0{digest}\\n".encode("utf-8"))
+            size_bytes += st.st_size
+            mtimes.append(st.st_mtime)
+        return OutputSnapshot(
+            path=rel,
+            exists=True,
+            size_bytes=size_bytes,
+            sha256=h.hexdigest(),
+            row_count=None,
+            mtime=max(mtimes),
+        )
+
     st = p.stat()
     return OutputSnapshot(
         path=rel,
