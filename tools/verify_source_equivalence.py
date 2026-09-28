@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import csv
+import hashlib
 import json
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -20,8 +23,8 @@ except ModuleNotFoundError:  # pragma: no cover - direct script execution fallba
         source_definition_digest,
     )
 
-SCHEMA_VERSION = "moneysweep.source_equivalence/v1"
-REPORT_VERSION = "moneysweep.source_equivalence_verification/v2"
+SCHEMA_VERSION = "moneysweep.source_equivalence/v2"
+REPORT_VERSION = "moneysweep.source_equivalence_verification/v3"
 TEST_KEYS = (
     "semantic_scope_match",
     "temporal_scope_match",
@@ -30,6 +33,11 @@ TEST_KEYS = (
     "selection_equivalent",
     "aggregation_equivalent",
 )
+IDENTITY_BASES = {
+    "stable_id",
+    "authoritative_binding",
+    "certified_composite_key",
+}
 
 
 def _hex64(value: object) -> bool:
@@ -37,6 +45,18 @@ def _hex64(value: object) -> bool:
         isinstance(value, str)
         and len(value) == 64
         and all(char in "0123456789abcdef" for char in value)
+    )
+
+
+def _name_only(fields: list[str]) -> bool:
+    if not fields:
+        return False
+    tokens = [field.casefold().replace("-", "_") for field in fields]
+    return all(
+        token in {"name", "normalized_name", "canonical_name"}
+        or token.endswith("_name")
+        or token.startswith("name_")
+        for token in tokens
     )
 
 
@@ -50,6 +70,7 @@ def validate_claim_shape(claim: dict[str, Any]) -> list[str]:
         "missing_fields",
         "extra_fields",
         "evidence",
+        "row_set_comparison",
         "notes",
     }
     extra = sorted(set(claim) - allowed)
@@ -118,6 +139,30 @@ def validate_claim_shape(claim: dict[str, Any]) -> list[str]:
             errors.append(f"{prefix}_locator_missing")
         if not _hex64(item.get("sha256")):
             errors.append(f"{prefix}_sha256_invalid")
+
+    comparison = claim.get("row_set_comparison")
+    if not isinstance(comparison, dict):
+        errors.append("row_set_comparison_missing")
+        comparison = {}
+    allowed_comparison = {"a_locator", "b_locator", "key_fields", "identity_basis"}
+    comparison_extra = sorted(set(comparison) - allowed_comparison)
+    if comparison_extra:
+        errors.append("unexpected_row_set_comparison_keys:" + ",".join(comparison_extra))
+    for locator_key in ("a_locator", "b_locator"):
+        value = comparison.get(locator_key)
+        if not isinstance(value, str) or not value.strip():
+            errors.append(f"{locator_key}_missing")
+    key_fields = comparison.get("key_fields")
+    if (
+        not isinstance(key_fields, list)
+        or not key_fields
+        or any(not isinstance(item, str) or not item for item in key_fields)
+    ):
+        errors.append("key_fields_invalid")
+    elif len(key_fields) != len(set(key_fields)):
+        errors.append("key_fields_duplicates")
+    if comparison.get("identity_basis") not in IDENTITY_BASES:
+        errors.append("identity_basis_invalid")
     return sorted(set(errors))
 
 
@@ -168,6 +213,151 @@ def _verify_evidence(root: Path, evidence: object) -> tuple[list[dict[str, Any]]
     return results, errors
 
 
+def _canonical_key_digest(keys: set[tuple[str, ...]]) -> str:
+    serial = [list(key) for key in sorted(keys)]
+    payload = json.dumps(serial, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _load_key_set(path: Path, key_fields: list[str]) -> dict[str, Any]:
+    with path.open("r", encoding="utf-8-sig", newline="") as fh:
+        reader = csv.DictReader(fh)
+        fieldnames = list(reader.fieldnames or [])
+        missing_fields = [field for field in key_fields if field not in fieldnames]
+        if missing_fields:
+            return {
+                "error": "missing_key_fields",
+                "missing_key_fields": missing_fields,
+                "row_count": 0,
+                "unique_key_count": 0,
+                "duplicate_key_rows": 0,
+                "null_key_rows": 0,
+                "keys": set(),
+            }
+
+        keys: list[tuple[str, ...]] = []
+        null_key_rows = 0
+        for row in reader:
+            key = tuple(row.get(field, "") for field in key_fields)
+            if any(value == "" for value in key):
+                null_key_rows += 1
+            keys.append(key)
+
+    counts = Counter(keys)
+    return {
+        "error": None,
+        "missing_key_fields": [],
+        "row_count": len(keys),
+        "unique_key_count": len(counts),
+        "duplicate_key_rows": sum(count - 1 for count in counts.values() if count > 1),
+        "null_key_rows": null_key_rows,
+        "keys": set(counts),
+    }
+
+
+def _compute_row_set_comparison(
+    *,
+    root: Path,
+    comparison: object,
+    evidence_results: list[dict[str, Any]],
+) -> tuple[dict[str, Any] | None, list[str], list[str]]:
+    errors: list[str] = []
+    blockers: list[str] = []
+    if not isinstance(comparison, dict):
+        return None, ["row_set_comparison_missing"], ["row_set_comparison_unverified"]
+
+    a_locator = str(comparison.get("a_locator") or "")
+    b_locator = str(comparison.get("b_locator") or "")
+    key_fields = comparison.get("key_fields")
+    key_fields = key_fields if isinstance(key_fields, list) else []
+    key_fields = [str(item) for item in key_fields]
+    identity_basis = comparison.get("identity_basis")
+
+    if _name_only(key_fields):
+        blockers.append("name_only_identity_disallowed")
+
+    verified_locators = {
+        str(item.get("locator"))
+        for item in evidence_results
+        if item.get("exists") is True and item.get("sha256_match") is True
+    }
+    for label, locator in (("a", a_locator), ("b", b_locator)):
+        if locator not in verified_locators:
+            blockers.append(f"{label}_comparison_bytes_not_verified")
+
+    try:
+        a_rel = safe_relative_path(a_locator)
+        b_rel = safe_relative_path(b_locator)
+    except ValueError:
+        errors.append("row_set_locator_not_repository_relative")
+        return None, errors, blockers
+
+    a_path = root / a_rel
+    b_path = root / b_rel
+    if a_path.suffix.lower() != ".csv" or b_path.suffix.lower() != ".csv":
+        blockers.append("row_set_comparison_requires_csv")
+    if blockers and (
+        "a_comparison_bytes_not_verified" in blockers
+        or "b_comparison_bytes_not_verified" in blockers
+        or "row_set_comparison_requires_csv" in blockers
+    ):
+        return None, errors, blockers
+
+    try:
+        a = _load_key_set(a_path, key_fields)
+        b = _load_key_set(b_path, key_fields)
+    except (OSError, UnicodeDecodeError, csv.Error) as exc:
+        errors.append(f"row_set_csv_unreadable:{type(exc).__name__}")
+        return None, errors, [*blockers, "row_set_comparison_unverified"]
+
+    for label, result in (("a", a), ("b", b)):
+        if result["error"] == "missing_key_fields":
+            blockers.append(
+                f"{label}_missing_key_fields:" + ",".join(result["missing_key_fields"])
+            )
+        if result["duplicate_key_rows"]:
+            blockers.append(f"{label}_duplicate_identity_keys")
+        if result["null_key_rows"]:
+            blockers.append(f"{label}_null_identity_keys")
+
+    a_keys = a["keys"]
+    b_keys = b["keys"]
+    intersection = a_keys & b_keys
+    a_only = a_keys - b_keys
+    b_only = b_keys - a_keys
+    union = a_keys | b_keys
+    symmetric_difference = a_keys ^ b_keys
+
+    if a_only or b_only:
+        blockers.append("computed_row_universe_mismatch")
+
+    result = {
+        "identity_basis": identity_basis,
+        "key_fields": key_fields,
+        "a_locator": a_locator,
+        "b_locator": b_locator,
+        "a_row_count": a["row_count"],
+        "b_row_count": b["row_count"],
+        "a_unique_key_count": a["unique_key_count"],
+        "b_unique_key_count": b["unique_key_count"],
+        "a_duplicate_key_rows": a["duplicate_key_rows"],
+        "b_duplicate_key_rows": b["duplicate_key_rows"],
+        "a_null_key_rows": a["null_key_rows"],
+        "b_null_key_rows": b["null_key_rows"],
+        "intersection": len(intersection),
+        "a_only": len(a_only),
+        "b_only": len(b_only),
+        "union": len(union),
+        "symmetric_difference": len(symmetric_difference),
+        "a_only_keys": [list(key) for key in sorted(a_only)],
+        "b_only_keys": [list(key) for key in sorted(b_only)],
+        "intersection_sha256": _canonical_key_digest(intersection),
+        "union_sha256": _canonical_key_digest(union),
+        "symmetric_difference_sha256": _canonical_key_digest(symmetric_difference),
+    }
+    return result, errors, sorted(set(blockers))
+
+
 def verify(*, root: Path, claim: dict[str, Any]) -> dict[str, Any]:
     root = root.resolve()
     errors = validate_claim_shape(claim)
@@ -195,8 +385,14 @@ def verify(*, root: Path, claim: dict[str, Any]) -> dict[str, Any]:
 
     evidence_results, evidence_errors = _verify_evidence(root, claim.get("evidence"))
     errors.extend(evidence_errors)
+    row_set, row_errors, row_blockers = _compute_row_set_comparison(
+        root=root,
+        comparison=claim.get("row_set_comparison"),
+        evidence_results=evidence_results,
+    )
+    errors.extend(row_errors)
 
-    blockers: list[str] = []
+    blockers: list[str] = list(row_blockers)
     if candidate.get("authoritative") is not True:
         blockers.append("candidate_not_authoritative")
     for key in TEST_KEYS:
@@ -206,9 +402,12 @@ def verify(*, root: Path, claim: dict[str, Any]) -> dict[str, Any]:
         blockers.append("missing_fields_present")
     if evidence_errors or not evidence_results:
         blockers.append("evidence_not_byte_verified")
+    if row_set is None:
+        blockers.append("row_set_comparison_unverified")
     if errors:
         blockers.append("claim_contract_invalid")
 
+    blockers = sorted(set(blockers))
     if not blockers:
         decision = "CERTIFIED_EQUIVALENT"
     else:
@@ -239,16 +438,22 @@ def verify(*, root: Path, claim: dict[str, Any]) -> dict[str, Any]:
         "extra_fields": (
             claim.get("extra_fields") if isinstance(claim.get("extra_fields"), list) else []
         ),
+        "row_set_comparison": row_set,
         "evidence_count": len(claim.get("evidence") or []),
         "evidence_verification": evidence_results,
         "errors": sorted(set(errors)),
-        "blockers": sorted(set(blockers)),
+        "blockers": blockers,
         "policy": {
             "silent_substitution_allowed": False,
             "certification_requires_all_tests": True,
             "missing_fields_allowed_for_certified_equivalence": False,
             "candidate_must_be_registered": True,
             "evidence_bytes_must_match_claimed_hashes": True,
+            "computed_set_algebra_required": True,
+            "name_only_identity_allowed": False,
+            "duplicate_identity_keys_allowed": False,
+            "null_identity_keys_allowed": False,
+            "zero_symmetric_difference_required": True,
         },
     }
 
