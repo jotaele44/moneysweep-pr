@@ -77,3 +77,24 @@ Every promoted row must retain source manifestation and lineage sufficient to re
 ## Promotion separation
 
 Technical certification and production activation are separate controls. The certifier never rewrites `federation.json`, historical status reports, or authorization flags merely to produce a green result. `CERTIFIED` is possible only after the evidence gates pass and an explicit production-activation authorization exists.
+
+## Source-equivalence proof
+
+A source substitution cannot be certified from names, proximity, matching row counts, or manually asserted Boolean tests. Equivalence claims use `moneysweep.source_equivalence/v2` and must bind both compared CSV manifestations by SHA-256, declare an identity basis, and compute the row-universe set algebra from raw key strings:
+
+- `INTERSECTION`
+- `A_ONLY`
+- `B_ONLY`
+- `UNION`
+- `SYMMETRIC_DIFFERENCE`
+
+`CERTIFIED_EQUIVALENT` requires zero A-only/B-only/symmetric-difference residue, no duplicate or null identity keys, no name-only identity basis, no missing required fields, all semantic/temporal/selection/aggregation checks passing, and verified evidence bytes. Otherwise the result remains `PARTIAL_EQUIVALENCE`, `UNPROVEN`, or `NON_EQUIVALENT`.
+
+## Technical eligibility and activation
+
+G12 does not consume a historical Boolean authorization. After G0-G11 are evaluated, the certifier computes a deterministic `technical_certificate_sha256` from the frozen scope/implementation identities, registry digest, canonical input hashes/identities, and G0-G11 states/blockers. Runner-local paths are excluded.
+
+Production activation then requires `reports/production_activation_receipt.json` conforming to `moneysweep.production_activation/v1`. The receipt must bind the exact `scope_id`, scope SHA, implementation SHA, and `technical_certificate_sha256`, and must record the explicit authorizer, timestamp with timezone, and authorization channel. Missing, stale, mismatched, malformed, or extra-key receipts leave G12 `BLOCKED`.
+
+The report exposes `technical_eligibility`, `technical_certificate_sha256`, and `awaiting_activation` separately from `production_eligible`. Technical eligibility never implies production activation.
+
