@@ -85,9 +85,11 @@ def execute(
             }
 
         outputs = _present_outputs(workspace, source)
+        runner_status = str(runner_result.get("status") or "").lower()
+        positive_runner = runner_status in {"complete", "ok", "cached"}
         receipt_path = None
         receipt_error = None
-        if outputs:
+        if outputs and positive_runner:
             try:
                 receipt = build_receipt(
                     root=workspace,
@@ -108,9 +110,8 @@ def execute(
                     json.dumps(receipt, indent=2, sort_keys=True) + "\n",
                     encoding="utf-8",
                 )
-
-        runner_status = str(runner_result.get("status") or "").lower()
-        positive_runner = runner_status in {"complete", "ok", "cached"}
+        elif outputs:
+            receipt_error = "execution_not_successful_no_acquisition_receipt"
         if receipt_path is not None and positive_runner:
             state = "PUBLIC_ADAPTER_RECEIPTED"
         elif receipt_path is not None:
