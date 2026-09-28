@@ -75,7 +75,24 @@ def test_current_evidence_audit_is_fail_closed_and_denominator_exact() -> None:
     assert gates["G3_REQUIRED_SOURCE_MATERIALIZATION"]["state"] == "FAIL"
     assert gates["G4_FULL_SOURCE_CLASSIFICATION"]["state"] == "PASS"
     assert gates["G5_AUTOMATABLE_EXECUTION"]["state"] == "FAIL"
+    assert (
+        gates["G5_AUTOMATABLE_EXECUTION"]["evidence"][
+            "execution_receipt_unproven_count"
+        ]
+        == CURRENT_AUTOMATABLE_COUNT
+    )
     assert gates["G6_SOURCE_VALIDATION_AND_COVERAGE_CONTRACTS"]["state"] == "FAIL"
+    assert (
+        gates["G6_SOURCE_VALIDATION_AND_COVERAGE_CONTRACTS"]["evidence"][
+            "coverage_result_count"
+        ]
+        == 0
+    )
+    assert len(
+        gates["G6_SOURCE_VALIDATION_AND_COVERAGE_CONTRACTS"]["evidence"][
+            "coverage_missing_ids"
+        ]
+    ) == CURRENT_SOURCE_COUNT
     assert gates["G7_ENTITY_RESOLUTION"]["state"] == "PASS"
     assert gates["G8_PROVENANCE_AND_LINEAGE"]["state"] == "BLOCKED"
     assert gates["G9_CANONICAL_MASTER_INVARIANTS"]["state"] == "BLOCKED"
