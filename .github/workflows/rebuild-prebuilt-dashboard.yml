@@ -1,0 +1,40 @@
+name: Rebuild prebuilt dashboard
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/rebuild-prebuilt-dashboard.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: dashboard/package-lock.json
+      - name: Rebuild committed prebuilt dashboard
+        run: python3 scripts/build_prebuilt_dashboard.py --build
+      - name: Verify bundle freshness
+        run: python3 scripts/build_prebuilt_dashboard.py --check
+      - name: Commit regenerated bundle
+        run: |
+          if git diff --quiet -- desktop/prebuilt-dashboard; then
+            echo "No prebuilt dashboard changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add desktop/prebuilt-dashboard
+          git commit -m "Regenerate prebuilt dashboard for activity timeline"
+          git push origin HEAD:main
