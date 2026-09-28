@@ -8,6 +8,7 @@ on:
       - "schemas/production_activation_receipt.schema.json"
       - "tools/certify_production.py"
       - "tools/build_certification_blocker_graph.py"
+      - "tools/build_coverage_contract_backlog.py"
       - "tools/audit_materialization_coverage.py"
       - "tools/audit_entity_resolution_certification.py"
       - "tools/operator_corpus_common.py"
@@ -20,6 +21,7 @@ on:
       - "tests/test_production_certification.py"
       - "tests/test_production_activation_receipt.py"
       - "tests/test_certification_blocker_graph.py"
+      - "tests/test_coverage_contract_backlog.py"
       - "tests/test_operator_corpus.py"
       - "tests/test_certification_evidence_assembly.py"
       - "tests/test_certification_truth.py"
@@ -73,6 +75,7 @@ jobs:
             tests/test_production_certification.py \
             tests/test_production_activation_receipt.py \
             tests/test_certification_blocker_graph.py \
+            tests/test_coverage_contract_backlog.py \
             tests/test_operator_corpus.py \
             tests/test_certification_evidence_assembly.py \
             tests/test_operator_drop.py \
@@ -125,6 +128,13 @@ jobs:
             --truth-root build/certification-scope-ci \
             --run-preflight \
             --output reports/production_certification.ci.json
+
+      - name: Build coverage contract backlog
+        working-directory: implementation
+        run: |
+          python -m tools.build_coverage_contract_backlog \
+            --root ../scope \
+            --output reports/coverage_contract_backlog.ci.json
 
       - name: Build certification blocker graph
         working-directory: implementation
@@ -190,6 +200,7 @@ jobs:
           path: |
             implementation/reports/production_certification.ci.json
             implementation/reports/certification_blocker_graph.ci.json
+            implementation/reports/coverage_contract_backlog.ci.json
             implementation/reports/materialization_coverage_audit.ci.json
             implementation/reports/entity_resolution_certification_audit.ci.json
             implementation/build/certification-scope-ci/**
