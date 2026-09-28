@@ -424,11 +424,14 @@ def build_report(
 
     truth_scope_id = truth_scope.get("scope_id") if truth_scope else None
     truth_identity = truth_scope.get("scope_identity") if truth_scope else {}
+    truth_scope_present = truth_root is not None and truth_scope is not None
     truth_digest_match = (
-        truth_root is None or truth_identity.get("registry_source_ids_sha256") == digest
+        truth_scope_present
+        and truth_identity.get("registry_source_ids_sha256") == digest
     )
     g0 = (
-        bool(HEX40.fullmatch(scope_sha))
+        truth_scope_present
+        and bool(HEX40.fullmatch(scope_sha))
         and bool(HEX40.fullmatch(implementation_sha))
         and scope_sha == actual_scope_head
         and total == len(status_rows)
@@ -437,9 +440,11 @@ def build_report(
     )
     g0_blockers: list[str] = []
     if not g0:
+        if not truth_scope_present:
+            g0_blockers.append("derived_truth_scope_required")
         if truth_scope_blockers:
             g0_blockers.extend(truth_scope_blockers)
-        if not truth_digest_match:
+        if truth_scope_present and not truth_digest_match:
             g0_blockers.append("truth_scope_registry_digest_mismatch")
         if not g0_blockers:
             g0_blockers.append("scope_implementation_or_denominator_mismatch")
