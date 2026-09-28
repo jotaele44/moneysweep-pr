@@ -23,6 +23,7 @@ on:
       - "tests/test_operator_corpus.py"
       - "tests/test_certification_evidence_assembly.py"
       - "tests/test_certification_truth.py"
+      - "tests/test_certification_public_adapters.py"
       - "tests/test_source_equivalence.py"
       - "reports/**"
       - "registries/**"
@@ -76,6 +77,7 @@ jobs:
             tests/test_certification_evidence_assembly.py \
             tests/test_operator_drop.py \
             tests/test_certification_truth.py \
+            tests/test_certification_public_adapters.py \
             tests/test_source_equivalence.py \
             -q -o addopts=""
 
