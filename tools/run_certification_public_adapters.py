@@ -114,8 +114,8 @@ def execute(
             receipt_error = "execution_not_successful_no_acquisition_receipt"
         if receipt_path is not None and positive_runner:
             state = "PUBLIC_ADAPTER_RECEIPTED"
-        elif receipt_path is not None:
-            state = "PUBLIC_ADAPTER_OUTPUT_RECEIPTED_WITH_RUNNER_BLOCKER"
+        elif outputs and not positive_runner:
+            state = "PUBLIC_ADAPTER_EXECUTION_FAILED_WITH_OUTPUT"
         elif outputs:
             state = "PUBLIC_ADAPTER_RECEIPT_FAILED"
         else:
