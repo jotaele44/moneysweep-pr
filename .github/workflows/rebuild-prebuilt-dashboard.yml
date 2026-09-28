@@ -21,7 +21,7 @@ jobs:
           python-version: "3.13"
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "22.22.2"
           cache: npm
           cache-dependency-path: dashboard/package-lock.json
       - name: Rebuild committed prebuilt dashboard
