@@ -3,7 +3,7 @@
   "build_env": {
     "VITE_API_BASE": ""
   },
-  "bundle_tree_sha256": "47338f3186a765edda11be1a50c802f5c4ea3ac90e21f21bb0902a54e6eb28bd",
+  "bundle_tree_sha256": "210972e00398e94fd63e8503824f0e71961476b62b6692e0c93f57c6a5fe01bc",
   "file_count": 22,
   "files": [
     {
@@ -12,9 +12,9 @@
       "sha256": "c60fc5b63e51757cd75b1663eca5d98be31cb9b56fe90f587fe38de7f0bc4b24"
     },
     {
-      "bytes": 836335,
-      "path": "assets/index-CAGe-rqG.js",
-      "sha256": "193ba5392a0924fd5b2b5f049bc6ca6c36022f72493a190e337bc390460044a6"
+      "bytes": 839423,
+      "path": "assets/index-CnJqNZ5K.js",
+      "sha256": "64fbd6bb561ce7c7f16f7137eb9af5d2f1474cce6ddaf84a42fca48c8fa02301"
     },
     {
       "bytes": 25960,
@@ -114,15 +114,15 @@
     {
       "bytes": 3865,
       "path": "index.html",
-      "sha256": "fb6c5dff8c252c118e0696b84235b28b56afd1bdff4b83d2ffda819e3d680668"
+      "sha256": "c3776137064b7b203716a144af6c0391d2a3704c9cc54c1113214733b3d702c8"
     }
   ],
-  "generated_at": "2026-09-23T03:33:08Z",
+  "generated_at": "2026-09-28T00:32:44Z",
   "generated_by": {
     "node": "v22.22.2",
     "npm": "10.9.7"
   },
   "schema_version": "moneysweep_prebuilt_dashboard_v1",
-  "source_fingerprint": "43ec5e46881a0ec915df3e485480caa9bdf2b6211daef467fdacfd64490bf9d3",
-  "total_bytes": 1603048
+  "source_fingerprint": "0ed8ee7f7227fe5cdd7506a3886ca2ba139b276c75d4029712ed5e6d1f9899c7",
+  "total_bytes": 1606136
 }
