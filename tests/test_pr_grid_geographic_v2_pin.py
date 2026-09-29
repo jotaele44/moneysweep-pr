@@ -5,8 +5,7 @@ from pathlib import Path
 
 PIN = json.loads(
     (
-        Path(__file__).resolve().parents[1]
-        / "federation/spatial/pr_grid_geographic_v2.pin.json"
+        Path(__file__).resolve().parents[1] / "federation/spatial/pr_grid_geographic_v2.pin.json"
     ).read_text()
 )
 
@@ -44,7 +43,6 @@ def test_pr_grid_v2_pin_is_exact():
 
 def test_provider_blockers_do_not_promote_source_certification():
     blockers = {
-        row["id"]: row["affects_grid_identity"]
-        for row in PIN["external_provider_blockers"]
+        row["id"]: row["affects_grid_identity"] for row in PIN["external_provider_blockers"]
     }
     assert blockers == {"QA-D24-001": False, "QA-D24-003": False}
