@@ -45,7 +45,13 @@ def test_name_only_identity_is_blocked():
 
 def test_missing_unit_period_scope_and_hash_fail_closed():
     row = _valid_row()
-    for key in ("metric_unit", "period_start", "period_end", "geographic_scope", "source_snapshot_sha256"):
+    for key in (
+        "metric_unit",
+        "period_start",
+        "period_end",
+        "geographic_scope",
+        "source_snapshot_sha256",
+    ):
         row[key] = ""
     decision = evaluate_ranking_row(row)
     assert decision.eligible is False
