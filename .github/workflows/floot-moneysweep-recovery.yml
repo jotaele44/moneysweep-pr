@@ -1,0 +1,185 @@
+name: Floot MoneySweep Exact Recovery
+
+on:
+  push:
+    branches:
+      - recovery/floot-moneysweep-20260929
+    paths:
+      - .recovery/**
+      - .github/workflows/floot-moneysweep-recovery.yml
+
+permissions:
+  contents: read
+
+jobs:
+  exact-frozen-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      EXPECTED_B64_SHA256: c9717645efa77797090807b5596575c3ab1ccd5a648db05651f975979aa38338
+      EXPECTED_ZIP_SHA256: 252ec2d3c75a3a79eab25e61614a11d77227c19bd50741171f7a29684efece13
+      EXPECTED_GIT_TREE: 7986e17f2f25764656d4fa3b50c2e5256c169d62
+      RECOVERY_B64: .recovery/floot-moneysweep-20260929.zip.b64
+    steps:
+      - name: Checkout recovery branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Verify exact transported archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual_b64="$(sha256sum "$RECOVERY_B64" | awk '{print $1}')"
+          test "$actual_b64" = "$EXPECTED_B64_SHA256"
+          base64 --decode "$RECOVERY_B64" > /tmp/moneysweep-floot.zip
+          actual_zip="$(sha256sum /tmp/moneysweep-floot.zip | awk '{print $1}')"
+          test "$actual_zip" = "$EXPECTED_ZIP_SHA256"
+          rm -rf /tmp/moneysweep-frozen
+          mkdir -p /tmp/moneysweep-frozen
+          unzip -q /tmp/moneysweep-floot.zip -d /tmp/moneysweep-frozen
+          cd /tmp/moneysweep-frozen
+          git init -q
+          git config user.name recovery
+          git config user.email recovery@example.invalid
+          git config core.autocrlf false
+          git add -A
+          actual_tree="$(git write-tree)"
+          echo "actual_tree=$actual_tree"
+          test "$actual_tree" = "$EXPECTED_GIT_TREE"
+          rm -rf .git
+
+      - name: Prepare isolated mutable reconstruction copy
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/moneysweep-work
+          cp -a /tmp/moneysweep-frozen /tmp/moneysweep-work
+          mkdir -p "$GITHUB_WORKSPACE/.recovery/artifacts"
+          cp /tmp/moneysweep-work/package.json "$GITHUB_WORKSPACE/.recovery/artifacts/package.original.json"
+          {
+            echo "node=$(node --version)"
+            echo "npm=$(npm --version)"
+            echo "runner_os=$RUNNER_OS"
+            echo "runner_arch=$RUNNER_ARCH"
+            echo "zip_sha256=$EXPECTED_ZIP_SHA256"
+            echo "git_tree=$EXPECTED_GIT_TREE"
+            echo "spec_files_discovered=$(find /tmp/moneysweep-work/helpers -type f \( -name '*.spec.ts' -o -name '*.spec.tsx' \) | wc -l | tr -d ' ')"
+            echo "empty_spec_files=$(find /tmp/moneysweep-work/helpers -type f \( -name '*.spec.ts' -o -name '*.spec.tsx' \) -size -20c | wc -l | tr -d ' ')"
+          } | tee "$GITHUB_WORKSPACE/.recovery/artifacts/environment.txt"
+          find /tmp/moneysweep-work/helpers -type f \( -name '*.spec.ts' -o -name '*.spec.tsx' \) -print | sort > "$GITHUB_WORKSPACE/.recovery/artifacts/spec-files.txt"
+
+      - name: Restore application dependency graph
+        id: deps
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/moneysweep-work
+          npm install --ignore-scripts --legacy-peer-deps 2>&1 | tee "$GITHUB_WORKSPACE/.recovery/artifacts/npm-install-app.log"
+          npm install --save-dev --ignore-scripts --legacy-peer-deps \
+            vitest@3.2.4 jsdom@26.1.0 @testing-library/react@16.2.0 @testing-library/dom@10.4.1 \
+            2>&1 | tee "$GITHUB_WORKSPACE/.recovery/artifacts/npm-install-test-harness.log"
+          cp package.json "$GITHUB_WORKSPACE/.recovery/artifacts/package.reconstructed.json"
+          cp package-lock.json "$GITHUB_WORKSPACE/.recovery/artifacts/package-lock.json"
+          sha256sum \
+            "$GITHUB_WORKSPACE/.recovery/artifacts/package.original.json" \
+            "$GITHUB_WORKSPACE/.recovery/artifacts/package.reconstructed.json" \
+            "$GITHUB_WORKSPACE/.recovery/artifacts/package-lock.json" \
+            | tee "$GITHUB_WORKSPACE/.recovery/artifacts/dependency-sha256.txt"
+
+      - name: Create Jasmine-compatible recovery harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/moneysweep-work/vitest.recovery.setup.mjs <<'EOF'
+          import { afterEach, expect, vi } from "vitest";
+          expect.extend({
+            toBeTrue(received) { const pass = received === true; return { pass, message: () => `expected ${received} to be true` }; },
+            toBeFalse(received) { const pass = received === false; return { pass, message: () => `expected ${received} to be false` }; },
+          });
+          function augmentSpy(spy) {
+            Object.defineProperty(spy, "and", { configurable: true, value: {
+              returnValue(value) { spy.mockReturnValue(value); return spy; },
+              resolveTo(value) { spy.mockResolvedValue(value); return spy; },
+              rejectWith(value) { spy.mockRejectedValue(value); return spy; },
+              callFake(fn) { spy.mockImplementation(fn); return spy; },
+            }});
+            Object.defineProperty(spy, "calls", { configurable: true, value: {
+              mostRecent() { const args = spy.mock.calls.at(-1) ?? []; return { args }; },
+              count() { return spy.mock.calls.length; },
+              allArgs() { return [...spy.mock.calls]; },
+            }});
+            return spy;
+          }
+          globalThis.spyOn = (object, method) => augmentSpy(vi.spyOn(object, method));
+          globalThis.jasmine = {
+            createSpy(name) { const spy = vi.fn(); try { Object.defineProperty(spy, "name", { value: name, configurable: true }); } catch {} return augmentSpy(spy); },
+            any(constructor) { return expect.any(constructor); },
+            objectContaining(value) { return expect.objectContaining(value); },
+            arrayContaining(value) { return expect.arrayContaining(value); },
+          };
+          if (typeof window !== "undefined" && typeof window.matchMedia !== "function") {
+            Object.defineProperty(window, "matchMedia", { configurable: true, writable: true, value: (query) => ({
+              matches: false, media: query, onchange: null,
+              addListener: vi.fn(), removeListener: vi.fn(), addEventListener: vi.fn(), removeEventListener: vi.fn(),
+              dispatchEvent: vi.fn(() => false),
+            })});
+          }
+          afterEach(() => { vi.restoreAllMocks(); });
+          EOF
+
+          cat > /tmp/moneysweep-work/vitest.recovery.config.mjs <<'EOF'
+          import { defineConfig } from "vitest/config";
+          import react from "@vitejs/plugin-react-swc";
+          export default defineConfig({
+            plugins: [react()],
+            test: {
+              globals: true,
+              environment: "jsdom",
+              setupFiles: ["./vitest.recovery.setup.mjs"],
+              include: ["helpers/**/*.spec.ts", "helpers/**/*.spec.tsx"],
+              exclude: ["helpers/useDebounce.spec.tsx"],
+            },
+          });
+          EOF
+          cp /tmp/moneysweep-work/vitest.recovery.config.mjs "$GITHUB_WORKSPACE/.recovery/artifacts/vitest.recovery.config.mjs"
+          cp /tmp/moneysweep-work/vitest.recovery.setup.mjs "$GITHUB_WORKSPACE/.recovery/artifacts/vitest.recovery.setup.mjs"
+
+      - name: Execute recovered MoneySweep specs
+        id: tests
+        shell: bash
+        run: |
+          set -uo pipefail
+          cd /tmp/moneysweep-work
+          ./node_modules/.bin/vitest run --config vitest.recovery.config.mjs --reporter=verbose \
+            2>&1 | tee "$GITHUB_WORKSPACE/.recovery/artifacts/vitest.log"
+          status=${PIPESTATUS[0]}
+          printf '%s\n' "$status" | tee "$GITHUB_WORKSPACE/.recovery/artifacts/vitest.exit-code.txt"
+          exit "$status"
+
+      - name: Freeze recovery receipt
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          cd "$GITHUB_WORKSPACE"
+          {
+            echo "archive_sha256=$EXPECTED_ZIP_SHA256"
+            echo "archive_base64_sha256=$EXPECTED_B64_SHA256"
+            echo "source_git_tree=$EXPECTED_GIT_TREE"
+            echo "dependency_step=${{ steps.deps.outcome }}"
+            echo "test_step=${{ steps.tests.outcome }}"
+            echo "reconstruction_harness=vitest@3.2.4 jsdom@26.1.0 testing-library-react@16.2.0 testing-library-dom@10.4.1 jasmine-compat-v2 archive-react-swc matchMedia-default"
+            echo "empty_placeholder_spec=helpers/useDebounce.spec.tsx"
+            echo "classification=RECONSTRUCTION_EXECUTION_NOT_HISTORICAL_DEPENDENCY_IDENTITY"
+          } > .recovery/artifacts/recovery-receipt.txt
+          find .recovery/artifacts -maxdepth 1 -type f ! -name artifact-sha256.txt -print0 | sort -z | xargs -0 sha256sum > .recovery/artifacts/artifact-sha256.txt
+          cat .recovery/artifacts/recovery-receipt.txt
+          cat .recovery/artifacts/artifact-sha256.txt
+
+      - name: Upload recovery evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: floot-moneysweep-exact-recovery
+          path: .recovery/artifacts/
+          if-no-files-found: error
+          retention-days: 30
