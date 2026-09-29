@@ -94,6 +94,11 @@ jobs:
           expect.extend({
             toBeTrue(received) { const pass = received === true; return { pass, message: () => `expected ${received} to be true` }; },
             toBeFalse(received) { const pass = received === false; return { pass, message: () => `expected ${received} to be false` }; },
+            toHaveSize(received, expected) {
+              const size = typeof received?.size === "number" ? received.size : typeof received?.length === "number" ? received.length : undefined;
+              const pass = size === expected;
+              return { pass, message: () => `expected size ${expected}, received ${size}` };
+            },
           });
           function augmentSpy(spy) {
             Object.defineProperty(spy, "and", { configurable: true, value: {
@@ -137,6 +142,7 @@ jobs:
               setupFiles: ["./vitest.recovery.setup.mjs"],
               include: ["helpers/**/*.spec.ts", "helpers/**/*.spec.tsx"],
               exclude: ["helpers/useDebounce.spec.tsx"],
+              environmentMatchGlobs: [["helpers/moneySweepResponsiveQa.spec.tsx", "node"]],
             },
           });
           EOF
@@ -167,7 +173,7 @@ jobs:
             echo "source_git_tree=$EXPECTED_GIT_TREE"
             echo "dependency_step=${{ steps.deps.outcome }}"
             echo "test_step=${{ steps.tests.outcome }}"
-            echo "reconstruction_harness=vitest@3.2.4 jsdom@26.1.0 testing-library-react@16.2.0 testing-library-dom@10.4.1 jasmine-compat-v2 archive-react-swc matchMedia-default"
+            echo "reconstruction_harness=vitest@3.2.4 jsdom@26.1.0 testing-library-react@16.2.0 testing-library-dom@10.4.1 jasmine-compat-v3 toHaveSize archive-react-swc matchMedia-default responsive-node-env"
             echo "empty_placeholder_spec=helpers/useDebounce.spec.tsx"
             echo "classification=RECONSTRUCTION_EXECUTION_NOT_HISTORICAL_DEPENDENCY_IDENTITY"
           } > .recovery/artifacts/recovery-receipt.txt
