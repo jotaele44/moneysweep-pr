@@ -1,0 +1,29 @@
+{
+  "capabilities": [
+    {
+      "id": "pr500-ranking-eligibility-gate",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Pure evidence-policy primitive used upstream of ranking construction. It emits no human-facing ranking or analysis artifact and intentionally has no standalone GUI workflow; any future ranking output must be surfaced separately with provenance.",
+      "backend": {
+        "files": [
+          "moneysweep/ranking/__init__.py",
+          "moneysweep/ranking/eligibility.py"
+        ],
+        "symbols": [
+          "moneysweep/ranking/eligibility.py:EligibilityDecision",
+          "moneysweep/ranking/eligibility.py:evaluate_ranking_row"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_ranking_eligibility.py",
+          "tests/test_fdic_ranking_safeguards.py",
+          "tests/test_fac_snapshot_safeguards.py"
+        ]
+      }
+    }
+  ],
+  "exceptions": []
+}
