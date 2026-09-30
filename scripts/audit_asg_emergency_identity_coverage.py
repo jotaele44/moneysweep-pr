@@ -138,6 +138,12 @@ def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
         blockers.append("DUPLICATE_CONTROL_NUMBER")
     if universe_total is None:
         blockers.append("CURRENT_DENOMINATOR_UNMEASURED")
+    if name_only:
+        blockers.append("NAME_ONLY_VENDOR_IDENTITY_RESIDUE")
+    if missing_vendor:
+        blockers.append("MISSING_VENDOR_IDENTITY_RESIDUE")
+    if invalid_amount:
+        blockers.append("INVALID_AMOUNT_RESIDUE")
     if not candidate_rows:
         blockers.append("NO_SOURCE_NATIVE_AMOUNT_ROWS")
 
