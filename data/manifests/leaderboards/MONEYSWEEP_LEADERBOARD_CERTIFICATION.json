@@ -17,19 +17,14 @@
   ],
   "blockingResidue": [
     {
-      "id": "HISTORICAL_MATERIALIZATION",
+      "id": "PRODUCER_RUNTIME_CERTIFICATION",
       "state": "OPEN",
-      "reason": "The pinned debt history source refs and replay engine exist; both source refs still need to be materialized into hash-verified snapshots under one frozen ranking runtime."
-    },
-    {
-      "id": "CERTIFIED_DEBT_SNAPSHOT",
-      "state": "OPEN",
-      "reason": "The production scope contains only debt_issuance; its current frozen snapshot must pass the scoped snapshot certifier with zero unresolved/excluded residue."
+      "reason": "Independent replay verified the pinned debt source manifests and expected ranking delta. Exact MoneySweep Python/ranking runtime execution remains required to produce FROZEN canonical history snapshots and certify the current debt_issuance snapshot with zero unresolved/excluded residue."
     },
     {
       "id": "THEHUB_EXACT_REPLAY",
       "state": "OPEN",
-      "reason": "TheHub consumer is scope-bound and fail-closed; exact package bytes must replay with receipt, release, scope, and package SHA-256 values trusted."
+      "reason": "TheHub consumer has been forward-ported onto current main; exact PASS producer package replay with receipt, release, scope, and package hashes trusted remains required."
     }
   ],
   "closedDecisions": [
@@ -57,9 +52,16 @@
       "id": "EXACT_PACKAGE_TRUST",
       "state": "PASS",
       "reason": "TheHub requires an operator-trusted exact package SHA-256 in addition to trusted receipt, release-manifest, and certification-scope hashes."
+    },
+    {
+      "id": "HISTORICAL_INDEPENDENT_REPLAY",
+      "state": "PASS",
+      "reason": "Independent replay matched the frozen source-history arithmetic and explicitly assertsApplicationRuntimePass=false.",
+      "evidencePath": "data/manifests/leaderboards/independent_replay/debt_history_independent_replay_v1.json",
+      "evidenceReceiptSha256": "a520cb9e3b8bf894635954380ccee6ab03e2cc09e6833cf6e60553d10677fda3"
     }
   ],
   "promotionAuthorized": false,
   "certificationPhraseAuthorized": false,
-  "note": "GitHub Actions execution is waived as a blocker but is not represented as passing. Design and static contracts are closed; promotion remains fail-closed until the three execution/materialization residues are closed on frozen artifacts."
+  "note": "GitHub Actions execution is waived as a blocker but is not represented as passing. Debt source/history arithmetic is independently verified and frozen; promotion remains fail-closed pending exact MoneySweep application-runtime certification and exact TheHub package replay."
 }

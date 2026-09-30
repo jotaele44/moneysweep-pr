@@ -19,19 +19,14 @@
   ],
   "blockers": [
     {
-      "id": "HISTORICAL_MATERIALIZATION",
+      "id": "PRODUCER_RUNTIME_CERTIFICATION",
       "state": "OPEN",
-      "reason": "Git-source replay is implemented; the two debt_issuance source manifestations must still be materialized as hash-verified snapshots and compared."
-    },
-    {
-      "id": "CERTIFIED_DEBT_SNAPSHOT",
-      "state": "OPEN",
-      "reason": "The production scope is bounded to debt_issuance; one current frozen snapshot must satisfy scope accounting/identity/runtime gates and be promoted to PASS by the scoped certifier."
+      "reason": "Independent replay has frozen and verified both pinned debt source manifestations and the expected dataset delta. The exact MoneySweep Python/ranking runtime must still replay both refs under one runtimeManifest.state=FROZEN, certify the current debt_issuance snapshot with zero unresolved/excluded residue, and freeze the resulting producer release artifacts."
     },
     {
       "id": "THEHUB_EXACT_REPLAY",
       "state": "OPEN",
-      "reason": "TheHub PR #285 is prepared; exact producer package replay must trust receipt, release, scope, and package SHA-256 values after producer certification."
+      "reason": "TheHub consumer has been forward-ported onto current main. Exact PASS producer package replay must still trust the frozen receipt, release, scope, and package SHA-256 values."
     }
   ],
   "closed_scope_decisions": [
@@ -54,6 +49,13 @@
       "id": "EXACT_PACKAGE_TRUST_MODEL",
       "state": "PASS",
       "reason": "TheHub consumer requires the exact package SHA-256 in addition to receipt, release-manifest, and certification-scope SHA-256 trust bindings."
+    },
+    {
+      "id": "HISTORICAL_INDEPENDENT_REPLAY",
+      "state": "PASS",
+      "reason": "An independent implementation replayed the exact pinned debt source commits and matched the frozen 11→20 instrument, 5→14 issuer and NEW=9/EXITED=0/UP=0/DOWN=2/UNCHANGED=3 delta with zero existing-issuer value changes. This verifies source/ranking arithmetic only and does not assert the MoneySweep Python runtime passed.",
+      "evidencePath": "data/manifests/leaderboards/independent_replay/debt_history_independent_replay_v1.json",
+      "evidenceReceiptSha256": "a520cb9e3b8bf894635954380ccee6ab03e2cc09e6833cf6e60553d10677fda3"
     }
   ],
   "required_gates": [
@@ -120,6 +122,7 @@
     "certification_runtime_manifest_must_be_frozen": true,
     "source_and_runtime_manifestations_must_be_exported": true,
     "provisional_snapshots_cannot_be_promoted": true,
-    "diagnostic_ui_does_not_imply_certification": true
+    "diagnostic_ui_does_not_imply_certification": true,
+    "independent_replay_does_not_substitute_for_application_runtime": true
   }
 }
