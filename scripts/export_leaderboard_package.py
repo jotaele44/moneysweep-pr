@@ -4,8 +4,10 @@
 The exporter never recomputes rankings. It packages separately certified,
 hash-verified snapshots and binds them to the exact PASS producer receipt,
 release manifest, bounded certification scope, and certification runtime.
-TheHub separately trusts the exact package SHA-256, which binds all of these
-fields without creating a release-receipt self-reference.
+Producer certification and federation promotion are intentionally separate:
+the package is emitted from immutable producer-PASS / promotion-closed evidence,
+then TheHub replay authorizes a separate federation-promotion receipt. TheHub
+trusts the exact package SHA-256, so no producer hash is mutated after replay.
 """
 
 from __future__ import annotations
@@ -52,8 +54,11 @@ def load_pass_receipt(path: Path) -> dict:
         raise SystemExit("BLOCKED: leaderboard certification receipt is not PASS/issued")
     if receipt.get("zeroMaterialUnresolvedResidue") is not True:
         raise SystemExit("BLOCKED: certification receipt does not attest zero material unresolved residue")
-    if receipt.get("promotionAuthorized") is not True:
-        raise SystemExit("BLOCKED: certification receipt does not authorize federation promotion")
+    # Package emission is a producer-certification action, not federation
+    # promotion. Keeping these immutable producer hashes stable is what lets
+    # TheHub trust and replay the exact package without a circular self-reference.
+    if receipt.get("promotionAuthorized") is not False:
+        raise SystemExit("BLOCKED: producer receipt must remain promotion-closed until TheHub replay")
     return receipt
 
 
@@ -104,8 +109,10 @@ def main() -> int:
     load_pass_receipt(args.receipt)
     release = _load_json(args.release_manifest)
     scope = _load_json(args.scope)
-    if release.get("certification_state") != "PASS" or release.get("promotion_authorized") is not True:
-        raise SystemExit("BLOCKED: release manifest is not PASS/promotion-authorized")
+    if release.get("certification_state") != "PASS":
+        raise SystemExit("BLOCKED: release manifest is not producer PASS")
+    if release.get("promotion_authorized") is not False:
+        raise SystemExit("BLOCKED: producer release must remain promotion-closed until TheHub replay")
     if scope.get("schemaVersion") != "moneysweep.leaderboard-certification-scope/v1":
         raise SystemExit("BLOCKED: unsupported certification scope schema")
     scope_id = str(scope.get("scopeId") or "")
