@@ -30,8 +30,9 @@ from pathlib import Path
 from typing import Any
 
 from scripts.certify_leaderboard_snapshot import certify
+from scripts.leaderboard_release_provenance import CERTIFICATION_RUNTIME_FILES
 from scripts.materialize_leaderboard_git_snapshot import _replay_ranking, _resolve_commit
-from scripts.materialize_leaderboard_snapshot import _runtime_manifest
+from scripts.materialize_leaderboard_snapshot import RUNTIME_FILES, _runtime_manifest
 from server.backend.leaderboard_history import (
     SNAPSHOT_DIR,
     compare,
@@ -70,6 +71,52 @@ def _sha_bytes(raw: bytes) -> str:
 
 def _sha_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _git_blob(commit: str, relative_path: Path) -> bytes:
+    try:
+        result = subprocess.run(
+            ["git", "show", f"{commit}:{relative_path.as_posix()}"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            timeout=20,
+        )
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+        raise SystemExit(
+            f"release blocked: cannot bind runtime file to {commit}: {relative_path.as_posix()}"
+        ) from exc
+    return result.stdout
+
+
+def _assert_paths_bound_to_commit(paths: list[Path], commit: str) -> None:
+    errors: list[str] = []
+    seen: set[str] = set()
+    for path in paths:
+        try:
+            relative = path.resolve().relative_to(ROOT.resolve())
+        except ValueError:
+            errors.append(f"outside-repository:{path}")
+            continue
+        key = relative.as_posix()
+        if key in seen:
+            continue
+        seen.add(key)
+        if not path.exists():
+            errors.append(f"missing:{key}")
+            continue
+        try:
+            committed = _git_blob(commit, relative)
+        except SystemExit:
+            errors.append(f"unbound:{key}")
+            continue
+        if committed != path.read_bytes():
+            errors.append(f"dirty:{key}")
+    if errors:
+        raise SystemExit(
+            "release blocked: runtime/certification bytes are not exactly bound to "
+            f"producer commit {commit}: {', '.join(errors)}"
+        )
 
 
 def _write_atomic(path: Path, raw: bytes) -> None:
@@ -338,6 +385,11 @@ def main() -> int:
         raise SystemExit("release blocked: exact ranking runtime commit unresolved")
     if any(item.get("state") == "MISSING" for item in runtime.get("files") or []):
         raise SystemExit("release blocked: ranking runtime manifestation incomplete")
+
+    _assert_paths_bound_to_commit(
+        list(RUNTIME_FILES) + list(CERTIFICATION_RUNTIME_FILES),
+        runtime_commit,
+    )
 
     refs = history_refs.get("sourceRefs") or []
     if len(refs) != 2 or [item.get("role") for item in refs] != ["baseline", "current"]:

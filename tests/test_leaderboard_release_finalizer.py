@@ -118,3 +118,31 @@ def test_producer_documents_keep_actions_waiver_and_gate_promotion():
     assert promoted_receipt["promotionAuthorized"] is True
     assert promoted_receipt["certificationPhraseAuthorized"] is True
     assert promoted_receipt["blockingResidue"] == []
+
+
+
+def test_runtime_files_must_match_exact_producer_commit(tmp_path: Path, monkeypatch):
+    clean = tmp_path / "runtime.py"
+    clean.write_bytes(b"committed\n")
+    monkeypatch.setattr(finalizer, "ROOT", tmp_path)
+    monkeypatch.setattr(finalizer, "_git_blob", lambda commit, relative: b"committed\n")
+
+    finalizer._assert_paths_bound_to_commit([clean], "a" * 40)
+
+    clean.write_bytes(b"dirty\n")
+    with pytest.raises(SystemExit, match="dirty:runtime.py"):
+        finalizer._assert_paths_bound_to_commit([clean], "a" * 40)
+
+
+def test_runtime_binding_rejects_unresolvable_or_missing_paths(tmp_path: Path, monkeypatch):
+    clean = tmp_path / "runtime.py"
+    clean.write_bytes(b"committed\n")
+    missing = tmp_path / "missing.py"
+    monkeypatch.setattr(finalizer, "ROOT", tmp_path)
+
+    def fail_blob(commit, relative):
+        raise SystemExit("unresolvable")
+
+    monkeypatch.setattr(finalizer, "_git_blob", fail_blob)
+    with pytest.raises(SystemExit, match=r"unbound:runtime\.py.*missing:missing\.py"):
+        finalizer._assert_paths_bound_to_commit([clean, missing], "b" * 40)
