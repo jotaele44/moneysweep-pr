@@ -44,7 +44,7 @@
       "evidenceCount": 2,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 16314000000.0,
+      "metricValue": 16314000000,
       "rank": 1,
       "recordCount": 2
     },
@@ -61,7 +61,7 @@
       "evidenceCount": 3,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 11800000000.0,
+      "metricValue": 11800000000,
       "rank": 2,
       "recordCount": 3
     },
@@ -78,7 +78,7 @@
       "evidenceCount": 2,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 4108400000.0,
+      "metricValue": 4108400000,
       "rank": 3,
       "recordCount": 2
     },
@@ -95,7 +95,7 @@
       "evidenceCount": 2,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 1193000000.0,
+      "metricValue": 1193000000,
       "rank": 4,
       "recordCount": 2
     },
@@ -112,7 +112,7 @@
       "evidenceCount": 2,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 1150000000.0,
+      "metricValue": 1150000000,
       "rank": 5,
       "recordCount": 2
     }
@@ -163,7 +163,7 @@
   "schemaVersion": "moneysweep.leaderboard-snapshot/v1.1",
   "snapshotId": "debt_issuance:git:d5ce11735409",
   "snapshotMode": "HISTORICAL_GIT_SOURCE_REPLAY",
-  "snapshotSha256": "b9175612433a6e19ee6c145c898f2ce45848e455f38da7d99e60c98fcf4f8b5f",
+  "snapshotSha256": "a9e9846ba5e7902e7cfbb5454b61fec0a40af5c0c4d7ffa15a9e81f76f33d63b",
   "sourceManifestations": [
     {
       "bytes": 3185,
