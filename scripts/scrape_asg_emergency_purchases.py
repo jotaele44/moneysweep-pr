@@ -9,7 +9,7 @@ the only page on the ASG site that carries dollar amounts in its markup:
     Número de Control ASG | Número Orden de Compra | Bienes o servicios a
     adquirir | Proveedor | Costo | Agencia
 
-Roughly 1,400 rows over 141 pages, spanning three declared emergencies, which
+Historically ~1,400 rows over 141 pages; live verification on 2026-09-30 shows\n144 declared pages. The exact refreshed row denominator remains open until a\nfull pull completes. The control number spans declared emergencies and
 the control number encodes as ``<FY>-ASG-<PROGRAMME>-<SEQ>``:
 
     20-ASG-CV19-765   COVID-19            (the bulk of the file)
@@ -24,9 +24,9 @@ Two things about the endpoint shape the scraper:
 
 * Paging is a plain query param (``?page=N&order_by=-creado``), but requesting a
   page past the end **clamps to the last page** instead of returning an empty
-  one — ``?page=999`` serves the same six rows as ``?page=141``. A
+  one — a request past the end serves the last page again. A
   walk-until-empty loop would never terminate, so the page count is read from
-  the "Página 1 de 141" marker, with a repeated-page check as a backstop in case
+  the "Página 1 de N" marker, with a repeated-page check as a backstop in case
   that marker ever moves.
 * No date column is rendered — and there is no other way to get one. There is no
   JSON API (``/api/comprasemergencias``, ``.json`` and ``?format=json`` all fail),
@@ -157,7 +157,7 @@ def _page_url(page: int) -> str:
 
 
 def declared_page_count(html: str) -> int | None:
-    """Total pages from the "Página 1 de 141" marker, or None if absent."""
+    """Total pages from the live "Página 1 de N" marker, or None if absent."""
     match = _PAGE_COUNT_RE.search(html)
     return int(match.group(1)) if match else None
 
@@ -181,7 +181,24 @@ def _clean(value: Any) -> str:
     return " ".join(str(value).split())
 
 
-def split_vendor_identity(value: object) -> tuple[str, str, str, str]:\n    """Return source label, display name, registration ID and identity state.\n\n    Only an explicit trailing numeric ASG token in the Proveedor cell is\n    promoted to identity. Legacy name-only rows remain unresolved.\n    """\n    source_label = _clean(value)\n    if not source_label:\n        return "", "", "", "UNRESOLVED_MISSING_VENDOR"\n    match = _VENDOR_ID_RE.match(source_label)\n    if not match:\n        return source_label, source_label, "", "UNRESOLVED_NAME_ONLY"\n    name = _clean(match.group(1))\n    registration_id = match.group(2)\n    return source_label, name, registration_id, "SOURCE_NATIVE_ASG_LICITADOR_ID"\n\n\ndef _normalize_row(record: dict, creado_rank: int | None = None) -> dict:
+def split_vendor_identity(value: object) -> tuple[str, str, str, str]:
+    """Return source label, display name, registration ID and identity state.
+
+    Only an explicit trailing numeric ASG token in the Proveedor cell is
+    promoted to identity. Legacy name-only rows remain unresolved.
+    """
+    source_label = _clean(value)
+    if not source_label:
+        return "", "", "", "UNRESOLVED_MISSING_VENDOR"
+    match = _VENDOR_ID_RE.match(source_label)
+    if not match:
+        return source_label, source_label, "", "UNRESOLVED_NAME_ONLY"
+    name = _clean(match.group(1))
+    registration_id = match.group(2)
+    return source_label, name, registration_id, "SOURCE_NATIVE_ASG_LICITADOR_ID"
+
+
+def _normalize_row(record: dict, creado_rank: int | None = None) -> dict:
     """One raw table row (keyed by its Spanish heading) to a canonical row.
 
     ``creado_rank`` is the row's 1-based position in the ``-creado`` ordering.
