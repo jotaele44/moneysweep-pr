@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "moneysweep.asg-emergency-source-readiness/v1",
+  "state": "SOURCE_READY_EXECUTION_OPEN",
+  "auditedMainCommit": "0121a91c09fdbb740230f930962fc2d266347d72",
+  "sourceId": "asg_emergency_purchases",
+  "identityContract": {
+    "scheme": "asg_licitador_id",
+    "promotionRule": "Only an explicit trailing numeric ASG token in the official Proveedor field is source-native identity.",
+    "nameOnlyPromotionAllowed": false,
+    "missingIdentityState": "UNRESOLVED"
+  },
+  "coverageContract": {
+    "historicalUniverseTotal": 1406,
+    "historicalDeclaredPages": 141,
+    "liveObservedDeclaredPages": 144,
+    "authoritativeUniverseTotal": null,
+    "state": "UNVERIFIABLE_REFRESH_REQUIRED"
+  },
+  "execution": {
+    "full144PagePull": {
+      "state": "NOT_EXECUTED",
+      "blockingReason": "NETWORK_CAPABLE_EXECUTION_LANE_METERED_LIMIT"
+    },
+    "pytest": {
+      "state": "NOT_EXECUTED",
+      "assertsPass": false
+    },
+    "githubActions": {
+      "state": "WAIVED_BY_USER",
+      "assertsPass": false
+    },
+    "staticSourceAudit": {
+      "state": "PASS",
+      "checks": [
+        "source-native ID extraction is explicit and namespaced",
+        "name-only identities remain unresolved",
+        "stale 1406 denominator cannot satisfy completeness",
+        "coverage floor failure blocks promotion",
+        "duplicate/missing control numbers block promotion",
+        "invalid amounts block promotion",
+        "YAML and generated JSON ASG registry entries are semantically aligned"
+      ]
+    }
+  },
+  "leaderboard": {
+    "ontologyExpanded": false,
+    "productionScopeExpanded": false,
+    "adapterPromoted": false,
+    "promotionGate": "FULL_SOURCE_MATERIALIZATION_AND_ZERO_RESIDUE"
+  }
+}
