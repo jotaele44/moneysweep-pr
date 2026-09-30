@@ -10,7 +10,7 @@
   "certification_issued": true,
   "certification_scope": "moneysweep.leaderboard.production-v1",
   "certification_state": "PASS",
-  "certified_snapshot_sha256": "b838636e2643d36ba1d881a232843506209385ee0770be5462e39023cb2c0cc4",
+  "certified_snapshot_sha256": "6da3a18c9392d822ec397f75546c1b66b53c0a34b7c304396ed40d7178d452ed",
   "closed_scope_decisions": [
     {
       "id": "ONTOLOGY_DENOMINATOR",
@@ -33,7 +33,7 @@
       "state": "PASS"
     }
   ],
-  "history_comparison_sha256": "6c426152d6225d770eb5a7fba13172e5da7ccfe92ffb699c4811d90dc31e4011",
+  "history_comparison_sha256": "6decf3cbbccd4329fefbd79acf452d4e16a7bf38436560135c54c4f91ecb8e71",
   "implemented_surfaces": {
     "api_client": "dashboard/src/lib/api.js",
     "backend": [
