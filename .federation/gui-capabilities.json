@@ -755,7 +755,7 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing \u2014 zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
+      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing — zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
       "backend": {
         "files": [
           "scripts/scrape_rdc_demandas.py",
@@ -1225,6 +1225,83 @@
         "cli_surface:scripts/download_pr_assistance_denominator.py",
         "cli_surface:scripts/recover_pr_assistance_failed_shards.py"
       ]
+    },
+    {
+      "id": "financial-entity-leaderboards",
+      "classification": "analysis",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Evidence-preserving financial rankings with explicit measure/identity contracts, frozen history controls, typed investigation signals and entity neighborhoods. Unsupported or unmaterialized categories fail closed. The production certification scope is explicitly bounded to debt_issuance; independent Git-source replay verifies the frozen history arithmetic but does not substitute for MoneySweep application-runtime certification. MoneySweep exposes municipality references but does not claim geometry authority; TheHub consumes only exact certified package bytes.",
+      "backend": {
+        "files": [
+          "server/backend/leaderboards.py",
+          "server/backend/leaderboard_adapters.py",
+          "server/backend/leaderboard_history.py",
+          "server/backend/leaderboard_investigation.py",
+          "server/backend/leaderboard_entities.py",
+          "server/backend/main.py",
+          "config/financial_category_ontology.json"
+        ],
+        "endpoints": [
+          "GET /leaderboards/categories",
+          "GET /leaderboards/top",
+          "GET /leaderboards/history",
+          "GET /leaderboards/movers",
+          "GET /leaderboards/signals",
+          "GET /leaderboards/entity/{entity_id}"
+        ]
+      },
+      "analysis": {
+        "files": [
+          "scripts/materialize_leaderboard_snapshot.py",
+          "scripts/materialize_leaderboard_git_snapshot.py",
+          "scripts/certify_leaderboard_snapshot.py",
+          "scripts/finalize_leaderboard_release.py",
+          "scripts/export_leaderboard_package.py",
+          "scripts/leaderboard_release_provenance.py",
+          "data/manifests/leaderboards/leaderboard_certification_scope_v1.json",
+          "data/manifests/leaderboards/debt_history_source_refs_v1.json",
+          "schemas/leaderboard_export_package.schema.json",
+          "data/manifests/leaderboards/independent_replay/debt_baseline_v1.json",
+          "data/manifests/leaderboards/independent_replay/debt_current_v1.json",
+          "data/manifests/leaderboards/independent_replay/debt_history_independent_replay_v1.json"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/lib/api.js",
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/FinancialLeaderboards.jsx"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_leaderboards.py",
+          "tests/test_leaderboard_adapters.py",
+          "tests/test_leaderboard_history.py",
+          "tests/test_leaderboard_git_history.py",
+          "tests/test_leaderboard_debt_history_expected.py",
+          "tests/test_leaderboard_snapshot_certification.py",
+          "tests/test_leaderboard_release_finalizer.py",
+          "tests/test_leaderboard_release_provenance.py",
+          "tests/test_leaderboard_independent_replay_evidence.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/financial-leaderboards.spec.mjs"
+        ]
+      }
     }
   ],
   "exceptions": [

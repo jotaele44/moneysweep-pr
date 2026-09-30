@@ -1,0 +1,154 @@
+{
+  "applicationRuntimeCertification": "NOT_ASSERTED",
+  "categoryId": "debt_issuance",
+  "classification": "DATASET_CHANGE_CONTROL_DELTA",
+  "currentSnapshotId": "debt_issuance:git:1be586b5ae13",
+  "currentSnapshotSha256": "eda8c650a2d516061e0780df75e0284954019a960cdf764b0b9963f952458010",
+  "economicChangeInferenceAllowed": false,
+  "existingEntityValueChanges": 0,
+  "expectedDeltaMatched": true,
+  "metricType": "DEBT_ISSUED_PAR",
+  "movementCounts": {
+    "DOWN": 2,
+    "EXITED": 0,
+    "NEW": 9,
+    "UNCHANGED": 3,
+    "UP": 0
+  },
+  "movementState": "COMPARABLE_SNAPSHOT_DELTA",
+  "movements": [
+    {
+      "currentRank": 2,
+      "entityDisplayName": "Commonwealth of Puerto Rico",
+      "entityId": "entity_125b538f289a4708",
+      "movementState": "UNCHANGED",
+      "priorRank": 2,
+      "rankDelta": 0,
+      "valueDelta": 0
+    },
+    {
+      "currentRank": 9,
+      "entityDisplayName": "Puerto Rico Convention Center District Authority",
+      "entityId": "entity_2c16f9ae54df7e1e",
+      "movementState": "NEW",
+      "priorRank": null,
+      "rankDelta": null,
+      "valueDelta": 469900000
+    },
+    {
+      "currentRank": 1,
+      "entityDisplayName": "Puerto Rico Sales Tax Financing Corporation",
+      "entityId": "entity_5204a3d8f84bbfcd",
+      "movementState": "UNCHANGED",
+      "priorRank": 1,
+      "rankDelta": 0,
+      "valueDelta": 0
+    },
+    {
+      "currentRank": 11,
+      "entityDisplayName": "Puerto Rico Industrial Development Company",
+      "entityId": "entity_5f99300da364ea64",
+      "movementState": "NEW",
+      "priorRank": null,
+      "rankDelta": null,
+      "valueDelta": 240000000
+    },
+    {
+      "currentRank": 5,
+      "entityDisplayName": "Puerto Rico Electric Power Authority",
+      "entityId": "entity_6c1d858c1babe390",
+      "movementState": "DOWN",
+      "priorRank": 4,
+      "rankDelta": -1,
+      "valueDelta": 0
+    },
+    {
+      "currentRank": 8,
+      "entityDisplayName": "Puerto Rico Infrastructure Financing Authority",
+      "entityId": "entity_7cf79ff780fb8279",
+      "movementState": "NEW",
+      "priorRank": null,
+      "rankDelta": null,
+      "valueDelta": 500000000
+    },
+    {
+      "currentRank": 4,
+      "entityDisplayName": "Puerto Rico Public Finance Corporation",
+      "entityId": "entity_b14376987d82d5ee",
+      "movementState": "NEW",
+      "priorRank": null,
+      "rankDelta": null,
+      "valueDelta": 1255000000
+    },
+    {
+      "currentRank": 3,
+      "entityDisplayName": "Puerto Rico Highways and Transportation Authority",
+      "entityId": "entity_b182f85acf46f69b",
+      "movementState": "UNCHANGED",
+      "priorRank": 3,
+      "rankDelta": 0,
+      "valueDelta": 0
+    },
+    {
+      "currentRank": 6,
+      "entityDisplayName": "Puerto Rico Aqueduct and Sewer Authority",
+      "entityId": "entity_c5fb8a7f44e8ff18",
+      "movementState": "DOWN",
+      "priorRank": 5,
+      "rankDelta": -1,
+      "valueDelta": 0
+    },
+    {
+      "currentRank": 13,
+      "entityDisplayName": "Puerto Rico Housing Finance Authority",
+      "entityId": "entity_c6aa8887d7248228",
+      "movementState": "NEW",
+      "priorRank": null,
+      "rankDelta": null,
+      "valueDelta": 180000000
+    },
+    {
+      "currentRank": 10,
+      "entityDisplayName": "University of Puerto Rico",
+      "entityId": "entity_cc41784f4b40b6ff",
+      "movementState": "NEW",
+      "priorRank": null,
+      "rankDelta": null,
+      "valueDelta": 359000000
+    },
+    {
+      "currentRank": 7,
+      "entityDisplayName": "Government Development Bank for Puerto Rico",
+      "entityId": "entity_d363e4ddf2ce6a5d",
+      "movementState": "NEW",
+      "priorRank": null,
+      "rankDelta": null,
+      "valueDelta": 900000000
+    },
+    {
+      "currentRank": 14,
+      "entityDisplayName": "Puerto Rico Municipal Finance Agency",
+      "entityId": "entity_e73c9879d715653a",
+      "movementState": "NEW",
+      "priorRank": null,
+      "rankDelta": null,
+      "valueDelta": 155000000
+    },
+    {
+      "currentRank": 12,
+      "entityDisplayName": "Puerto Rico Ports Authority",
+      "entityId": "entity_efcec09764306ade",
+      "movementState": "NEW",
+      "priorRank": null,
+      "rankDelta": null,
+      "valueDelta": 220000000
+    }
+  ],
+  "priorSnapshotId": "debt_issuance:git:d5ce11735409",
+  "priorSnapshotSha256": "56252feca32f4261528cb8992d93bdaaff55be2c62efdedbe98c04714039d370",
+  "receiptSha256": "a520cb9e3b8bf894635954380ccee6ab03e2cc09e6833cf6e60553d10677fda3",
+  "runtimeManifestationChanged": false,
+  "schemaVersion": "moneysweep.leaderboard-independent-history-replay/v1",
+  "sourceManifestationChanged": true,
+  "verifierState": "PASS"
+}
