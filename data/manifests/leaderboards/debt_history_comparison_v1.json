@@ -2,7 +2,7 @@
   "categoryId": "debt_issuance",
   "classification": "DATASET_CHANGE_CONTROL_DELTA",
   "currentSnapshotId": "debt_issuance:git:1be586b5ae13",
-  "currentSnapshotSha256": "4d697a801d7d75c2904df563a3778fc58a472b6c9761d5a533bb10f3dad420a0",
+  "currentSnapshotSha256": "11614dacd8769ca9369b6f09da4f6b77b643e03058d22a0a7399ea2bbe8e85f9",
   "economicChangeInferenceAllowed": false,
   "metricType": "DEBT_ISSUED_PAR",
   "movementCounts": {
@@ -14,8 +14,8 @@
   },
   "movementState": "COMPARABLE_SNAPSHOT_DELTA",
   "priorSnapshotId": "debt_issuance:git:d5ce11735409",
-  "priorSnapshotSha256": "b9175612433a6e19ee6c145c898f2ce45848e455f38da7d99e60c98fcf4f8b5f",
-  "receiptSha256": "6c426152d6225d770eb5a7fba13172e5da7ccfe92ffb699c4811d90dc31e4011",
+  "priorSnapshotSha256": "a9e9846ba5e7902e7cfbb5454b61fec0a40af5c0c4d7ffa15a9e81f76f33d63b",
+  "receiptSha256": "6decf3cbbccd4329fefbd79acf452d4e16a7bf38436560135c54c4f91ecb8e71",
   "runtimeManifestationChanged": false,
   "schemaVersion": "moneysweep.leaderboard-history-comparison/v1",
   "sourceManifestationChanged": true
