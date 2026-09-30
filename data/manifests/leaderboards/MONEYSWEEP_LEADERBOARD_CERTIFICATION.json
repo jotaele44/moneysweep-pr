@@ -1,65 +1,59 @@
 {
-  "schemaVersion": "moneysweep.leaderboard-certification/v1",
-  "state": "BLOCKED",
-  "certificationIssued": false,
-  "zeroMaterialUnresolvedResidue": false,
-  "scope": "financial leaderboard producer plane",
-  "scopeId": "moneysweep.leaderboard.production-v1",
-  "branch": "feature/moneysweep-leaderboard-plane",
-  "rankingContractVersion": "moneysweep.leaderboard/v1.1",
-  "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.1",
-  "nonBlockingWaivers": [
-    {
-      "id": "GITHUB_ACTIONS_EXECUTION",
-      "state": "WAIVED_BY_USER",
-      "assertsPass": false
-    }
-  ],
   "blockingResidue": [
     {
-      "id": "HISTORICAL_MATERIALIZATION",
-      "state": "OPEN",
-      "reason": "The pinned debt history source refs and replay engine exist; both source refs still need to be materialized into hash-verified snapshots under one frozen ranking runtime."
-    },
-    {
-      "id": "CERTIFIED_DEBT_SNAPSHOT",
-      "state": "OPEN",
-      "reason": "The production scope contains only debt_issuance; its current frozen snapshot must pass the scoped snapshot certifier with zero unresolved/excluded residue."
-    },
-    {
       "id": "THEHUB_EXACT_REPLAY",
-      "state": "OPEN",
-      "reason": "TheHub consumer is scope-bound and fail-closed; exact package bytes must replay with receipt, release, scope, and package SHA-256 values trusted."
+      "reason": "Producer certification passed; federation promotion awaits exact TheHub package replay.",
+      "state": "OPEN"
     }
   ],
+  "branch": "continuation/moneysweep-leaderboard-production-v1",
+  "certificationIssued": true,
+  "certificationPhraseAuthorized": false,
+  "certifiedSnapshotSha256": "b838636e2643d36ba1d881a232843506209385ee0770be5462e39023cb2c0cc4",
   "closedDecisions": [
     {
       "id": "ONTOLOGY_SCOPE",
-      "state": "PASS",
-      "reason": "All 21 categories are classified; certification includes debt_issuance and explicitly excludes the other 20 without treating absence as zero."
+      "reason": "All 21 categories are classified; certification includes debt_issuance and explicitly excludes the other 20 without treating absence as zero.",
+      "state": "PASS"
     },
     {
       "id": "HISTORY_SOURCE_REFS",
-      "state": "PASS",
-      "reason": "Debt source history is pinned to immutable Git commits with an expected source-change delta and economic inference disabled when source bytes differ."
+      "reason": "Debt source history is pinned to immutable Git commits with an expected source-change delta and economic inference disabled when source bytes differ.",
+      "state": "PASS"
     },
     {
       "id": "PRODUCER_CONSUMER_AUTHORITY_BOUNDARY",
-      "state": "PASS",
-      "reason": "MoneySweep remains financial authority, TheHub consumes certified rows without recomputation, and Spiderweb remains geometry authority."
+      "reason": "MoneySweep remains financial authority, TheHub consumes certified rows without recomputation, and Spiderweb remains geometry authority.",
+      "state": "PASS"
     },
     {
       "id": "CERTIFICATION_RUNTIME_PROVENANCE",
-      "state": "PASS",
-      "reason": "Certification/export/finalization code and immutable release contracts are carried in a separate frozen certification-runtime manifestation, avoiding circular ranking-release hashes."
+      "reason": "Certification/export/finalization code and immutable release contracts are carried in a separate frozen certification-runtime manifestation, avoiding circular ranking-release hashes.",
+      "state": "PASS"
     },
     {
       "id": "EXACT_PACKAGE_TRUST",
-      "state": "PASS",
-      "reason": "TheHub requires an operator-trusted exact package SHA-256 in addition to trusted receipt, release-manifest, and certification-scope hashes."
+      "reason": "TheHub requires an operator-trusted exact package SHA-256 in addition to trusted receipt, release-manifest, and certification-scope hashes.",
+      "state": "PASS"
     }
   ],
+  "historyComparisonSha256": "6c426152d6225d770eb5a7fba13172e5da7ccfe92ffb699c4811d90dc31e4011",
+  "nonBlockingWaivers": [
+    {
+      "assertsPass": false,
+      "id": "GITHUB_ACTIONS_EXECUTION",
+      "state": "WAIVED_BY_USER"
+    }
+  ],
+  "note": "Bounded producer scope certified; federation promotion remains closed pending exact TheHub replay.",
+  "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.1",
   "promotionAuthorized": false,
-  "certificationPhraseAuthorized": false,
-  "note": "GitHub Actions execution is waived as a blocker but is not represented as passing. Design and static contracts are closed; promotion remains fail-closed until the three execution/materialization residues are closed on frozen artifacts."
+  "rankingContractVersion": "moneysweep.leaderboard/v1.1",
+  "runtimeProducerCommit": "6d37d675d49285057ab43c88d294e8a5e8e52beb",
+  "schemaVersion": "moneysweep.leaderboard-certification/v1",
+  "scope": "financial leaderboard producer plane",
+  "scopeId": "moneysweep.leaderboard.production-v1",
+  "scopeSha256": "b12bfc8911d7c2978edacfc9f9f0ce781d7f890fc385034d7359f36aa4433218",
+  "state": "PASS",
+  "zeroMaterialUnresolvedResidue": true
 }
