@@ -504,10 +504,10 @@ sources:
     site that carries dollar amounts in its markup. Current rows may render the
     ASG Licitador ID directly in Proveedor as Vendor Name (12345); the scraper
     promotes only that explicit source-native token to asg_licitador_id while
-    leaving legacy name-only rows unresolved. Spans declared emergencies,
-    which the control number encodes as <FY>-ASG-<PROGRAMME>-<SEQ>: CV19
-    (COVID-19, the bulk), TTF (Tormenta Tropical Fiona) and EPI (current
-    epidemiological) — so it cross-links with the FEMA / COR3 / CDBG-DR streams.
+    leaving legacy name-only rows unresolved. Control numbers encode declared
+    emergencies as <FY>-ASG-<PROGRAMME>-<SEQ>, including CV19, TTF, EPI and the
+    live 2026 AAA-labelled programme (label unresolved here) — so the source
+    cross-links with the FEMA / COR3 / CDBG-DR streams.
 
     Distinct from ocpr_contracts: that is the Comptroller''s record of executed
     contracts, and emergency purchase orders largely bypass it.
