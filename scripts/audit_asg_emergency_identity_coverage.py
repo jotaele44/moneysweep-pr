@@ -81,6 +81,7 @@ def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
         "control_number",
         "vendor_name",
         "vendor_registration_id",
+        "vendor_identity_scheme",
         "vendor_identity_state",
         "obligation_amount",
     }
@@ -88,9 +89,11 @@ def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
 
     control_numbers = [str(row.get("control_number") or "").strip() for row in rows]
     duplicates = len(control_numbers) - len(set(control_numbers))
+    missing_control_numbers = sum(1 for value in control_numbers if not value)
     source_native = 0
     name_only = 0
     missing_vendor = 0
+    identity_scheme_mismatch = 0
     valid_amount = 0
     invalid_amount = 0
     candidate_rows = 0
@@ -99,11 +102,14 @@ def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
     for row in rows:
         state = str(row.get("vendor_identity_state") or "").strip()
         registration_id = str(row.get("vendor_registration_id") or "").strip()
+        identity_scheme = str(row.get("vendor_identity_scheme") or "").strip()
         vendor_name = str(row.get("vendor_name") or "").strip()
         amount = _amount(row.get("obligation_amount"))
 
         if state == SOURCE_NATIVE and registration_id:
             source_native += 1
+            if identity_scheme != "asg_licitador_id":
+                identity_scheme_mismatch += 1
         elif vendor_name:
             name_only += 1
         else:
@@ -136,12 +142,18 @@ def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
         blockers.append("MISSING_REQUIRED_COLUMNS")
     if duplicates:
         blockers.append("DUPLICATE_CONTROL_NUMBER")
+    if missing_control_numbers:
+        blockers.append("MISSING_CONTROL_NUMBER")
+    if coverage_state != "MEETS_CONTRACT":
+        blockers.append("COVERAGE_NOT_CLOSED")
     if universe_total is None:
         blockers.append("CURRENT_DENOMINATOR_UNMEASURED")
     if name_only:
         blockers.append("NAME_ONLY_VENDOR_IDENTITY_RESIDUE")
     if missing_vendor:
         blockers.append("MISSING_VENDOR_IDENTITY_RESIDUE")
+    if identity_scheme_mismatch:
+        blockers.append("IDENTITY_SCHEME_MISMATCH")
     if invalid_amount:
         blockers.append("INVALID_AMOUNT_RESIDUE")
     if not candidate_rows:
@@ -155,10 +167,12 @@ def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
         "inputRecords": len(rows),
         "uniqueControlNumbers": len(set(control_numbers)),
         "duplicateControlNumbers": duplicates,
+        "missingControlNumbers": missing_control_numbers,
         "identity": {
             "sourceNativeRows": source_native,
             "nameOnlyRows": name_only,
             "missingVendorRows": missing_vendor,
+            "identitySchemeMismatchRows": identity_scheme_mismatch,
             "identityScheme": "asg_licitador_id",
             "nameOnlyPromotionAllowed": False,
         },
