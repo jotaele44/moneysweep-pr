@@ -189,3 +189,39 @@ def test_thehub_checkout_binding_rejects_dirty_consumer_bytes(tmp_path: Path, mo
     path.write_bytes(b"dirty\n")
     with pytest.raises(SystemExit, match="dirty:server/backend/moneysweep_leaderboards.py"):
         finalizer._assert_thehub_checkout_bound_to_head(tmp_path)
+
+
+
+def test_current_source_must_equal_producer_commit_and_worktree(tmp_path: Path, monkeypatch):
+    relative = Path("data/canonical_v1/debt_instruments.csv")
+    path = tmp_path / relative
+    path.parent.mkdir(parents=True)
+    committed = b"debt_id,issuer_entity_id,par_amount,currency\n"
+    path.write_bytes(committed)
+    monkeypatch.setattr(finalizer, "ROOT", tmp_path)
+    monkeypatch.setattr(finalizer, "_git_blob", lambda commit, rel: committed)
+
+    snapshot = {
+        "sourceManifestations": [
+            {
+                "path": relative.as_posix(),
+                "sha256": finalizer._sha_bytes(committed),
+            }
+        ]
+    }
+    finalizer._assert_current_source_bound_to_producer(snapshot, "d" * 40)
+
+    stale = {
+        "sourceManifestations": [
+            {
+                "path": relative.as_posix(),
+                "sha256": "0" * 64,
+            }
+        ]
+    }
+    with pytest.raises(SystemExit, match="stale:data/canonical_v1/debt_instruments.csv"):
+        finalizer._assert_current_source_bound_to_producer(stale, "d" * 40)
+
+    path.write_bytes(b"dirty\n")
+    with pytest.raises(SystemExit, match="dirty-worktree:data/canonical_v1/debt_instruments.csv"):
+        finalizer._assert_current_source_bound_to_producer(snapshot, "d" * 40)

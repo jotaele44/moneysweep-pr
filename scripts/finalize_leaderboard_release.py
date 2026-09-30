@@ -188,6 +188,38 @@ def _assert_thehub_checkout_bound_to_head(thehub_root: Path) -> str:
     return commit
 
 
+def _assert_current_source_bound_to_producer(snapshot: dict[str, Any], producer_commit: str) -> None:
+    manifests = snapshot.get("sourceManifestations") or []
+    if not manifests:
+        raise SystemExit("release blocked: current certified source manifestation is empty")
+    errors: list[str] = []
+    for item in manifests:
+        relative_text = str(item.get("path") or "")
+        expected_sha = str(item.get("sha256") or "")
+        if not relative_text or len(expected_sha) != 64:
+            errors.append(f"invalid-manifest:{relative_text or '<blank>'}")
+            continue
+        relative = Path(relative_text)
+        path = ROOT / relative
+        try:
+            committed = _git_blob(producer_commit, relative)
+        except SystemExit:
+            errors.append(f"unbound:{relative_text}")
+            continue
+        committed_sha = _sha_bytes(committed)
+        if committed_sha != expected_sha:
+            errors.append(f"stale:{relative_text}")
+        if not path.exists():
+            errors.append(f"missing-worktree:{relative_text}")
+        elif path.read_bytes() != committed:
+            errors.append(f"dirty-worktree:{relative_text}")
+    if errors:
+        raise SystemExit(
+            "release blocked: pinned current source is not byte-equivalent to "
+            f"producer commit {producer_commit}: {', '.join(errors)}"
+        )
+
+
 def _write_atomic(path: Path, raw: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_suffix(path.suffix + ".tmp")
@@ -268,7 +300,13 @@ def _verify_expected_delta(result: dict[str, Any], expected: dict[str, Any]) -> 
         raise SystemExit("release blocked: existing-entity value delta count does not match frozen expectation")
 
 
-def _history_receipt(prior: dict[str, Any], current: dict[str, Any], movement: dict[str, Any]) -> dict[str, Any]:
+def _history_receipt(
+    prior: dict[str, Any],
+    current: dict[str, Any],
+    movement: dict[str, Any],
+    *,
+    producer_commit: str,
+) -> dict[str, Any]:
     receipt = {
         "schemaVersion": "moneysweep.leaderboard-history-comparison/v1",
         "categoryId": "debt_issuance",
@@ -283,6 +321,8 @@ def _history_receipt(prior: dict[str, Any], current: dict[str, Any], movement: d
         "runtimeManifestationChanged": movement["runtimeManifestationChanged"],
         "economicChangeInferenceAllowed": movement["economicChangeInferenceAllowed"],
         "classification": "DATASET_CHANGE_CONTROL_DELTA",
+        "producerCommit": producer_commit,
+        "currentSourceEquivalentToProducerCommit": True,
     }
     receipt["receiptSha256"] = _sha_bytes(
         json.dumps(receipt, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -533,9 +573,15 @@ def main() -> int:
         raise SystemExit("release blocked: expected exactly baseline/current debt source refs")
     prior = _history_snapshot(source_ref=refs[0], runtime=runtime)
     current = _history_snapshot(source_ref=refs[1], runtime=runtime)
+    _assert_current_source_bound_to_producer(current, runtime_commit)
     movement = compare(prior, current, limit=25)
     _verify_expected_delta(movement, history_refs.get("expectedDelta") or {})
-    history_receipt = _history_receipt(prior, current, movement)
+    history_receipt = _history_receipt(
+        prior,
+        current,
+        movement,
+        producer_commit=runtime_commit,
+    )
     certified, certified_path = _reuse_or_certify(current, scope)
 
     scope_hash = _sha_file(SCOPE_PATH)
