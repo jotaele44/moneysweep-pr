@@ -146,3 +146,46 @@ def test_runtime_binding_rejects_unresolvable_or_missing_paths(tmp_path: Path, m
     monkeypatch.setattr(finalizer, "_git_blob", fail_blob)
     with pytest.raises(SystemExit, match=r"unbound:runtime\.py.*missing:missing\.py"):
         finalizer._assert_paths_bound_to_commit([clean, missing], "b" * 40)
+
+
+
+def test_thehub_replay_receipt_binds_both_commits_and_exact_hashes(tmp_path: Path):
+    package = tmp_path / "package.json"
+    producer_receipt = tmp_path / "receipt.json"
+    release = tmp_path / "release.json"
+    scope = tmp_path / "scope.json"
+    package.write_bytes(b"package\n")
+    producer_receipt.write_bytes(b"receipt\n")
+    release.write_bytes(b"release\n")
+    scope.write_bytes(b"scope\n")
+
+    result = finalizer._thehub_replay_receipt(
+        producer_commit="a" * 40,
+        consumer_commit="b" * 40,
+        package_path=package,
+        receipt_path=producer_receipt,
+        release_path=release,
+        scope_path=scope,
+    )
+    assert result["state"] == "PASS"
+    assert result["producerCommit"] == "a" * 40
+    assert result["consumerCommit"] == "b" * 40
+    assert result["githubActionsExecution"] == "WAIVED_BY_USER"
+    assert result["assertsGithubActionsPass"] is False
+    assert len(result["replayReceiptSha256"]) == 64
+
+
+def test_thehub_checkout_binding_rejects_dirty_consumer_bytes(tmp_path: Path, monkeypatch):
+    relative = Path("server/backend/moneysweep_leaderboards.py")
+    path = tmp_path / relative
+    path.parent.mkdir(parents=True)
+    path.write_bytes(b"clean\n")
+
+    monkeypatch.setattr(finalizer, "THEHUB_RUNTIME_RELATIVE_PATHS", [relative])
+    monkeypatch.setattr(finalizer, "_repo_git_head", lambda root: "c" * 40)
+    monkeypatch.setattr(finalizer, "_repo_git_blob", lambda root, commit, rel: b"clean\n")
+    assert finalizer._assert_thehub_checkout_bound_to_head(tmp_path) == "c" * 40
+
+    path.write_bytes(b"dirty\n")
+    with pytest.raises(SystemExit, match="dirty:server/backend/moneysweep_leaderboards.py"):
+        finalizer._assert_thehub_checkout_bound_to_head(tmp_path)
