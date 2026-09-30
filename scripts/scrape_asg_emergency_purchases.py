@@ -9,12 +9,15 @@ the only page on the ASG site that carries dollar amounts in its markup:
     Número de Control ASG | Número Orden de Compra | Bienes o servicios a
     adquirir | Proveedor | Costo | Agencia
 
-Historically ~1,400 rows over 141 pages; live verification on 2026-09-30 shows\n144 declared pages. The exact refreshed row denominator remains open until a\nfull pull completes. The control number spans declared emergencies and
-the control number encodes as ``<FY>-ASG-<PROGRAMME>-<SEQ>``:
+Historically ~1,400 rows over 141 pages; live verification on 2026-09-30 shows
+144 declared pages. The exact refreshed row denominator remains open until a
+full pull completes. Control numbers encode emergency programmes as
+``<FY>-ASG-<PROGRAMME>-<SEQ>``. Examples include:
 
-    20-ASG-CV19-765   COVID-19            (the bulk of the file)
+    20-ASG-CV19-765   COVID-19
     22-ASG-TTF-296    Tormenta Tropical Fiona
-    26-ASG-EPI-0010   current epidemiological emergency
+    26-ASG-EPI-0010   epidemiological emergency
+    26-ASG-AAA-0033   current 2026 AAA-labelled programme (label unresolved here)
 
 This is deliberately NOT covered by the ``ocpr_contracts`` source. That registry
 is the Comptroller's record of executed *contracts*; emergency purchase orders
