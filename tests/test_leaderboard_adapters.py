@@ -112,3 +112,35 @@ def test_campaign_name_derived_committee_identity_is_not_ranked(monkeypatch, tmp
     result = adapters.campaign_contributions_received(_core(), limit=25, start_year=None, end_year=None, municipality=None, entity_type=None, currency="USD")
     assert [row["entityId"] for row in result["rows"]] == ["fec_committee:C001"]
     assert result["accounting"]["unresolvedRecords"] == 1
+
+@pytest.mark.unit
+def test_contract_award_without_materialized_amount_is_open_not_provisional(monkeypatch):
+    data = _core()
+    data["contracts"] = pd.DataFrame([
+        {
+            "contract_id": "c1",
+            "contractor_entity_id": "e1",
+            "awarding_entity_id": "e2",
+            "award_amount": "",
+            "currency": "USD",
+            "start_date": "2025-01-01",
+            "evidence_id": "ev1",
+        }
+    ])
+    monkeypatch.setattr(adapters, "_manifest", lambda path: {"path": path.name, "sha256": "a" * 64, "bytes": 1, "modifiedAt": "x"})
+    result = adapters.contract_awards(
+        data,
+        limit=25,
+        start_year=None,
+        end_year=None,
+        municipality=None,
+        entity_type=None,
+        currency="USD",
+    )
+    assert result["certificationState"] == "OPEN"
+    assert result["candidateCount"] == 0
+    assert result["accounting"]["retainedRecords"] == 0
+    assert result["accounting"]["excludedRecords"] == 1
+    assert result["accounting"]["arithmeticClosed"] is True
+    assert "lack award_amount" in result["reason"]
+
