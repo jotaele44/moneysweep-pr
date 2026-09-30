@@ -245,7 +245,7 @@ def contract_awards(
         agg["evidenceCount"] = len(agg.pop("evidenceIds"))
         rows.append(agg)
     _currency_guard(rows, currency)
-    return _finalize(
+    result = _finalize(
         category_id="contract_award",
         label="Government contract awards",
         metric_type="AWARDED",
@@ -272,6 +272,13 @@ def contract_awards(
             "geography": "LOCATED_IN candidate sets; multi-location identities unresolved",
         },
     )
+    if not rows and accounting["excludedRecords"] > 0:
+        result["certificationState"] = "OPEN"
+        result["reason"] = (
+            "Canonical contract identities are present, but all in-scope rows lack "
+            "award_amount; no financial ranking can be certified from this source."
+        )
+    return result
 
 
 def debt_issuance(

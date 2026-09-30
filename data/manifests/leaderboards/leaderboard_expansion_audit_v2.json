@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "moneysweep.leaderboard-expansion-audit/v2",
+  "auditedMainCommit": "4ebe5a57473409a3ba876f6bfb354f03111907c8",
+  "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.1",
+  "rankingContractVersion": "moneysweep.leaderboard/v1.1",
+  "adapterBackedCategoryCount": 7,
+  "alreadyCertifiedCategoryCount": 1,
+  "additionalCertifiableCategoryCount": 0,
+  "productionV2ScopeExpansionAuthorized": false,
+  "categories": [
+    {
+      "categoryId": "debt_issuance",
+      "adapter": "canonical_debt",
+      "state": "CERTIFIED_PRODUCTION_V1",
+      "blockingDimension": null,
+      "sourceState": "MATERIALIZED",
+      "note": "Already certified under moneysweep.leaderboard.production-v1."
+    },
+    {
+      "categoryId": "contract_award",
+      "adapter": "canonical_contracts",
+      "state": "OPEN",
+      "blockingDimension": "AWARD_AMOUNT_MATERIALIZATION",
+      "sourceState": "MATERIALIZED_MEASURE_EMPTY",
+      "inputRecords": 3,
+      "retainedRecords": 0,
+      "excludedRecords": 3,
+      "candidateCount": 0,
+      "sourcePaths": [
+        "data/reference/pr_public_contracts.csv",
+        "data/canonical_v1/contracts.csv"
+      ],
+      "note": "All three committed contract rows have blank award_amount; stable contractor identity alone cannot support a financial ranking."
+    },
+    {
+      "categoryId": "federal_obligation",
+      "adapter": "federal_awards_contracts",
+      "state": "OPEN_NOT_MATERIALIZED",
+      "blockingDimension": "SOURCE_MATERIALIZATION",
+      "sourceState": "MISSING",
+      "sourcePaths": ["data/staging/processed/pr_all_awards_master.csv"]
+    },
+    {
+      "categoryId": "federal_grant",
+      "adapter": "federal_awards_grants",
+      "state": "OPEN_NOT_MATERIALIZED",
+      "blockingDimension": "SOURCE_MATERIALIZATION",
+      "sourceState": "MISSING",
+      "sourcePaths": ["data/staging/processed/pr_all_awards_master.csv"]
+    },
+    {
+      "categoryId": "disaster_assistance",
+      "adapter": "federal_awards_disaster",
+      "state": "OPEN_NOT_MATERIALIZED",
+      "blockingDimension": "SOURCE_MATERIALIZATION",
+      "sourceState": "MISSING",
+      "sourcePaths": ["data/staging/processed/pr_all_awards_master.csv"]
+    },
+    {
+      "categoryId": "federal_assistance",
+      "adapter": "federal_awards_assistance",
+      "state": "OPEN_NOT_MATERIALIZED",
+      "blockingDimension": "SOURCE_MATERIALIZATION",
+      "sourceState": "MISSING",
+      "sourcePaths": ["data/staging/processed/pr_all_awards_master.csv"]
+    },
+    {
+      "categoryId": "campaign_contribution_received",
+      "adapter": "campaign_finance_receipts",
+      "state": "OPEN_NOT_MATERIALIZED",
+      "blockingDimension": "SOURCE_MATERIALIZATION",
+      "sourceState": "MISSING",
+      "sourcePaths": [
+        "data/staging/processed/pr_campaign_finance_edges.csv",
+        "data/staging/processed/pr_campaign_finance_committees.csv"
+      ]
+    }
+  ],
+  "processedContractSourceAudit": {
+    "state": "NO_COMMITTED_MATERIALIZATION",
+    "checkedPaths": [
+      "data/staging/processed/pr_ocpr_contracts.csv",
+      "data/staging/processed/pr_asg_emergency_purchases.csv",
+      "data/staging/processed/pr_compras_awards.csv",
+      "data/staging/processed/pr_cor3_projects.csv",
+      "data/staging/processed/pr_contracts_master.csv",
+      "data/staging/processed/pr_subawards_master.csv",
+      "data/staging/processed/pr_prasa_contracts.csv",
+      "data/staging/processed/pr_prepa_contracts.csv",
+      "data/staging/processed/pr_dtop_road_contracts.csv",
+      "data/staging/processed/pr_transit_contracts.csv",
+      "data/staging/processed/pr_ports_airports_contracts.csv",
+      "data/staging/processed/pr_p3_contracts.csv"
+    ],
+    "materializedCount": 0
+  },
+  "decision": {
+    "state": "NO_SCOPE_EXPANSION",
+    "reason": "No additional adapter-backed category has both a committed materialized financial measure and the required stable identity contract.",
+    "preserveProductionV1Unchanged": true
+  }
+}
