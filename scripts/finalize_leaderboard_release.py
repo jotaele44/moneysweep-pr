@@ -6,10 +6,11 @@ The finalizer performs the non-CI release chain in one fail-closed transaction:
 2. verify the expected dataset-delta movement receipt;
 3. certify the current debt snapshot against the bounded production scope;
 4. issue producer PASS while federation promotion remains closed;
-5. when a TheHub checkout is supplied, temporarily authorize promotion,
-   generate the exact package, run TheHub's consumer/cross-repo regressions,
-   mount the exact package at TheHub's default product path, verify that mount,
-   and roll promotion back if any replay step fails.
+5. when a TheHub checkout is supplied, emit the exact producer-certified
+   package while producer promotion remains closed, run TheHub's consumer/
+   cross-repo regressions, mount and verify the exact package, then write a
+   separate immutable federation-promotion receipt binding the producer hashes,
+   package SHA-256, and TheHub consumer head.
 
 GitHub Actions execution can be waived by scope policy, but this script never
 represents that waiver as a passing test result. Frozen snapshots and comparison
@@ -49,6 +50,7 @@ RECEIPT_PATH = LEADERBOARD_DIR / "MONEYSWEEP_LEADERBOARD_CERTIFICATION.json"
 HISTORY_RECEIPT_PATH = LEADERBOARD_DIR / "debt_history_comparison_v1.json"
 CERTIFIED_DIR = LEADERBOARD_DIR / "certified_snapshots"
 PACKAGE_PATH = ROOT / "data" / "exports" / "leaderboards" / "leaderboard_package.json"
+PROMOTION_RECEIPT_PATH = LEADERBOARD_DIR / "leaderboard_federation_promotion_v1.json"
 
 
 def _load(path: Path) -> dict[str, Any]:
@@ -70,6 +72,21 @@ def _sha_bytes(raw: bytes) -> str:
 
 def _sha_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _git_head_at(root: Path) -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    value = result.stdout.strip().lower()
+    if len(value) != 40 or any(ch not in "0123456789abcdef" for ch in value):
+        raise RuntimeError(f"invalid git HEAD for {root}: {value!r}")
+    return value
 
 
 def _write_atomic(path: Path, raw: bytes) -> None:
@@ -223,6 +240,31 @@ def _producer_documents(
         else "Bounded producer scope certified; federation promotion remains closed pending exact TheHub replay."
     )
     return release, receipt
+
+
+def _promotion_document(
+    *,
+    runtime_commit: str,
+    thehub_commit: str,
+    package_sha256: str,
+) -> dict[str, Any]:
+    return {
+        "schemaVersion": "moneysweep.leaderboard-federation-promotion/v1",
+        "state": "PASS",
+        "scopeId": "moneysweep.leaderboard.production-v1",
+        "runtimeProducerCommit": runtime_commit,
+        "thehubConsumerCommit": thehub_commit,
+        "receiptSha256": _sha_file(RECEIPT_PATH),
+        "releaseManifestSha256": _sha_file(RELEASE_PATH),
+        "scopeSha256": _sha_file(SCOPE_PATH),
+        "packageSha256": package_sha256,
+        "promotionAuthorized": True,
+        "certificationPhraseAuthorized": True,
+        "githubActions": {
+            "state": "WAIVED_BY_USER",
+            "assertsPass": False,
+        },
+    }
 
 
 def _run_export(runtime_commit: str) -> None:
@@ -392,30 +434,25 @@ def main() -> int:
     if not (thehub_root / "tests" / "test_moneysweep_leaderboard_crossrepo.py").exists():
         raise SystemExit(f"release blocked: TheHub consumer checkout not found at {thehub_root}")
 
-    promoted_release, promoted_receipt = _producer_documents(
-        release_template=producer_release,
-        receipt_template=producer_receipt,
-        runtime_commit=runtime_commit,
-        certified_snapshot=certified,
-        history_receipt=history_receipt,
-        scope_hash=scope_hash,
-        promote=True,
-    )
-    previous_release = RELEASE_PATH.read_bytes()
-    previous_receipt = RECEIPT_PATH.read_bytes()
+    # Producer receipt/release are package-bound immutable trust inputs. Do not
+    # mutate them after replay: doing so would invalidate the hashes TheHub just
+    # trusted. Federation promotion is a separate receipt.
     previous_package = PACKAGE_PATH.read_bytes() if PACKAGE_PATH.exists() else None
     target = thehub_root / "data" / "aggregate" / "moneysweep" / "leaderboard_package.json"
     previous_target = target.read_bytes() if target.exists() else None
+    previous_promotion = PROMOTION_RECEIPT_PATH.read_bytes() if PROMOTION_RECEIPT_PATH.exists() else None
     try:
-        _write_atomic(RELEASE_PATH, _render(promoted_release))
-        _write_atomic(RECEIPT_PATH, _render(promoted_receipt))
         _run_export(runtime_commit)
         _run_thehub_replay(thehub_root)
         _write_atomic(target, PACKAGE_PATH.read_bytes())
         _run_thehub_mounted_check(thehub_root)
+        promotion = _promotion_document(
+            runtime_commit=runtime_commit,
+            thehub_commit=_git_head_at(thehub_root),
+            package_sha256=_sha_file(PACKAGE_PATH),
+        )
+        _write_immutable(PROMOTION_RECEIPT_PATH, _render(promotion))
     except Exception as exc:
-        _write_atomic(RELEASE_PATH, previous_release)
-        _write_atomic(RECEIPT_PATH, previous_receipt)
         if previous_package is None:
             if PACKAGE_PATH.exists():
                 PACKAGE_PATH.unlink()
@@ -426,6 +463,11 @@ def main() -> int:
                 target.unlink()
         else:
             _write_atomic(target, previous_target)
+        if previous_promotion is None:
+            if PROMOTION_RECEIPT_PATH.exists():
+                PROMOTION_RECEIPT_PATH.unlink()
+        else:
+            _write_atomic(PROMOTION_RECEIPT_PATH, previous_promotion)
         raise SystemExit(f"promotion rolled back: {exc}") from exc
 
     print(
@@ -441,6 +483,9 @@ def main() -> int:
                 "packageSha256": _sha_file(PACKAGE_PATH),
                 "thehubPackage": str(target),
                 "promotionAuthorized": True,
+                "producerReceiptPromotionClosed": True,
+                "promotionReceipt": str(PROMOTION_RECEIPT_PATH),
+                "promotionReceiptSha256": _sha_file(PROMOTION_RECEIPT_PATH),
             },
             indent=2,
         )
