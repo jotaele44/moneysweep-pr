@@ -38,7 +38,21 @@
         "coverage floor failure blocks promotion",
         "duplicate/missing control numbers block promotion",
         "invalid amounts block promotion",
-        "YAML and generated JSON ASG registry entries are semantically aligned"
+        "YAML and generated JSON ASG registry entries are semantically aligned",
+        "restartable materializer promotes only after declared page denominator closes"
+      ]
+    },
+    "restartableMaterializer": {
+      "state": "IMPLEMENTED_NOT_EXECUTED",
+      "script": "scripts/materialize_asg_emergency_purchases_resumable.py",
+      "safeguards": [
+        "checkpoint binds declared page count and work-file SHA-256",
+        "partial runs never promote staging output",
+        "resume continues from next page",
+        "mid-run page-count drift blocks",
+        "repeated page blocks",
+        "duplicate or missing control_number blocks promotion",
+        "completion receipt records exact authoritativeUniverseTotal"
       ]
     }
   },
