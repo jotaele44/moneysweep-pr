@@ -101,7 +101,11 @@ EMERGENCY_PURCHASE_COLUMNS = [
     "control_number",
     "contract_number",
     "description",
+    "vendor_source_label",
     "vendor_name",
+    "vendor_registration_id",
+    "vendor_identity_scheme",
+    "vendor_identity_state",
     "obligation_amount",
     "awarding_agency",
     "fiscal_year",
@@ -141,6 +145,7 @@ EMERGENCY_PROGRAMMES = {
 # 26-ASG-EPI-0010 -> ("26", "EPI"). The middle token is always "ASG".
 _CONTROL_RE = re.compile(r"^\s*(\d{2})-ASG-([A-Z0-9]+)-", re.I)
 _PAGE_COUNT_RE = re.compile(r"P[áa]gina\s*\d+\s*de\s*(\d+)", re.I)
+_VENDOR_ID_RE = re.compile(r"^(.*?)\s*\((\d+)\)\s*$")
 
 
 class _RateLimited(Exception):
@@ -176,7 +181,7 @@ def _clean(value: Any) -> str:
     return " ".join(str(value).split())
 
 
-def _normalize_row(record: dict, creado_rank: int | None = None) -> dict:
+def split_vendor_identity(value: object) -> tuple[str, str, str, str]:\n    """Return source label, display name, registration ID and identity state.\n\n    Only an explicit trailing numeric ASG token in the Proveedor cell is\n    promoted to identity. Legacy name-only rows remain unresolved.\n    """\n    source_label = _clean(value)\n    if not source_label:\n        return "", "", "", "UNRESOLVED_MISSING_VENDOR"\n    match = _VENDOR_ID_RE.match(source_label)\n    if not match:\n        return source_label, source_label, "", "UNRESOLVED_NAME_ONLY"\n    name = _clean(match.group(1))\n    registration_id = match.group(2)\n    return source_label, name, registration_id, "SOURCE_NATIVE_ASG_LICITADOR_ID"\n\n\ndef _normalize_row(record: dict, creado_rank: int | None = None) -> dict:
     """One raw table row (keyed by its Spanish heading) to a canonical row.
 
     ``creado_rank`` is the row's 1-based position in the ``-creado`` ordering.
@@ -187,6 +192,14 @@ def _normalize_row(record: dict, creado_rank: int | None = None) -> dict:
     row = {col: "" for col in EMERGENCY_PURCHASE_COLUMNS}
     for heading, canonical in COL_MAP.items():
         row[canonical] = _clean(record.get(heading))
+    source_label, vendor_name, registration_id, identity_state = split_vendor_identity(
+        record.get("Proveedor")
+    )
+    row["vendor_source_label"] = source_label
+    row["vendor_name"] = vendor_name
+    row["vendor_registration_id"] = registration_id
+    row["vendor_identity_scheme"] = "asg_licitador_id" if registration_id else ""
+    row["vendor_identity_state"] = identity_state
     row.update(
         {
             "fiscal_year": fiscal_year,
@@ -394,6 +407,10 @@ def _run(root=None, force: bool = False, max_pages: int | None = None) -> dict:
     logger.info(f"  Total records:  {len(frame):,}")
     logger.info(f"  By emergency:   {frame['emergency_programme_code'].value_counts().to_dict()}")
     logger.info(f"  Unique vendors: {frame['vendor_name'].nunique():,}")
+    logger.info(
+        "  Source-native vendor IDs: "
+        f"{(frame['vendor_registration_id'].astype(str).str.strip() != '').sum():,}"
+    )
     if "obligation_amount_canonical" in frame.columns:
         logger.info(f"  Total value:    ${frame['obligation_amount_canonical'].sum():,.2f}")
 
