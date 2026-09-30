@@ -19,7 +19,7 @@
       "state": "WAIVED_BY_USER"
     },
     "scopeId": "moneysweep.leaderboard.production-v1",
-    "sourceSnapshotSha256": "4d697a801d7d75c2904df563a3778fc58a472b6c9761d5a533bb10f3dad420a0",
+    "sourceSnapshotSha256": "11614dacd8769ca9369b6f09da4f6b77b643e03058d22a0a7399ea2bbe8e85f9",
     "state": "PASS",
     "zeroMaterialUnresolvedResidue": true
   },
@@ -56,7 +56,7 @@
       "evidenceCount": 2,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 16314000000.0,
+      "metricValue": 16314000000,
       "rank": 1,
       "recordCount": 2
     },
@@ -73,7 +73,7 @@
       "evidenceCount": 3,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 11800000000.0,
+      "metricValue": 11800000000,
       "rank": 2,
       "recordCount": 3
     },
@@ -90,7 +90,7 @@
       "evidenceCount": 2,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 4108400000.0,
+      "metricValue": 4108400000,
       "rank": 3,
       "recordCount": 2
     },
@@ -107,7 +107,7 @@
       "evidenceCount": 1,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 1255000000.0,
+      "metricValue": 1255000000,
       "rank": 4,
       "recordCount": 1
     },
@@ -124,7 +124,7 @@
       "evidenceCount": 2,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 1193000000.0,
+      "metricValue": 1193000000,
       "rank": 5,
       "recordCount": 2
     },
@@ -141,7 +141,7 @@
       "evidenceCount": 2,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 1150000000.0,
+      "metricValue": 1150000000,
       "rank": 6,
       "recordCount": 2
     },
@@ -158,7 +158,7 @@
       "evidenceCount": 1,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 900000000.0,
+      "metricValue": 900000000,
       "rank": 7,
       "recordCount": 1
     },
@@ -175,7 +175,7 @@
       "evidenceCount": 1,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 500000000.0,
+      "metricValue": 500000000,
       "rank": 8,
       "recordCount": 1
     },
@@ -192,7 +192,7 @@
       "evidenceCount": 1,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 469900000.0,
+      "metricValue": 469900000,
       "rank": 9,
       "recordCount": 1
     },
@@ -209,7 +209,7 @@
       "evidenceCount": 1,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 359000000.0,
+      "metricValue": 359000000,
       "rank": 10,
       "recordCount": 1
     },
@@ -226,7 +226,7 @@
       "evidenceCount": 1,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 240000000.0,
+      "metricValue": 240000000,
       "rank": 11,
       "recordCount": 1
     },
@@ -243,7 +243,7 @@
       "evidenceCount": 1,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 220000000.0,
+      "metricValue": 220000000,
       "rank": 12,
       "recordCount": 1
     },
@@ -260,7 +260,7 @@
       "evidenceCount": 1,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 180000000.0,
+      "metricValue": 180000000,
       "rank": 13,
       "recordCount": 1
     },
@@ -277,7 +277,7 @@
       "evidenceCount": 1,
       "financialValueState": "MEASURED_PAR_AMOUNT",
       "metricType": "DEBT_ISSUED_PAR",
-      "metricValue": 155000000.0,
+      "metricValue": 155000000,
       "rank": 14,
       "recordCount": 1
     }
@@ -328,7 +328,7 @@
   "schemaVersion": "moneysweep.leaderboard-snapshot/v1.1",
   "snapshotId": "debt_issuance:git:1be586b5ae13",
   "snapshotMode": "HISTORICAL_GIT_SOURCE_REPLAY",
-  "snapshotSha256": "b838636e2643d36ba1d881a232843506209385ee0770be5462e39023cb2c0cc4",
+  "snapshotSha256": "6da3a18c9392d822ec397f75546c1b66b53c0a34b7c304396ed40d7178d452ed",
   "sourceManifestations": [
     {
       "bytes": 5708,
