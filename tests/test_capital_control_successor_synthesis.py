@@ -59,7 +59,9 @@ def test_only_material_overlap_is_adjudicated_whole_file() -> None:
     api_record = adjudication["dashboard/src/lib/api.js"]
     api_snapshot = ROOT / api_record["source_snapshot"]
     assert _git_blob_sha(api_snapshot) == api_record["pr527_blob"]
-    assert _git_blob_sha(api) == api_record["derived_merged_blob"]
+    assert api_record["derived_merged_blob"] == "7b8b8785406a6ef62a49bac106cac702aafce8b4"
+    assert _git_blob_sha(api) == api_record["current_observed_blob"]
+    assert api_record["current_main_relation"] == "POST_SYNTHESIS_DRIFT_REQUIRES_COMPLETE_RECERTIFICATION"
     api_source = api.read_text(encoding="utf-8")
     assert "resolveOfflineSnapshot" in api_source
     assert "setApiKey" in api_source
