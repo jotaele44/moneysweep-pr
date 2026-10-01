@@ -62,3 +62,7 @@ select = ["E4", "E7", "E9", "F"]
 "scripts/build_export_streams.py" = ["E402"]
 "tests/test_new_downloaders.py" = ["E402"]
 "tests/test_ingest_manual_data.py" = ["E402"]
+# `_competition_ranks` is intentionally re-exported through leaderboards.py
+# for the established backend/test compatibility surface. Its exact file bytes
+# are also frozen in the production-v1 leaderboard runtime manifestation.
+"server/backend/leaderboards.py" = ["F401"]
