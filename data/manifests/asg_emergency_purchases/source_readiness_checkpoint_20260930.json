@@ -14,12 +14,15 @@
     "historicalDeclaredPages": 141,
     "liveObservedDeclaredPages": 144,
     "authoritativeUniverseTotal": null,
-    "state": "UNVERIFIABLE_REFRESH_REQUIRED"
+    "state": "UNVERIFIABLE_REFRESH_REQUIRED",
+    "liveVerificationDate": "2026-10-01",
+    "currentPageCountState": "CONFIRMED_BY_CURRENT_OFFICIAL_INDEX"
   },
   "execution": {
     "full144PagePull": {
       "state": "NOT_EXECUTED",
-      "blockingReason": "NETWORK_CAPABLE_EXECUTION_LANE_METERED_LIMIT"
+      "blockingReason": "NETWORK_CAPABLE_FLOOT_EXECUTION_LANE_DAILY_QUOTA_EXHAUSTED",
+      "alternativeCurrentEvidence": "data/manifests/asg_emergency_purchases/live_index_verification_20261001.json"
     },
     "pytest": {
       "state": "NOT_EXECUTED",
@@ -60,6 +63,16 @@
     "ontologyExpanded": false,
     "productionScopeExpanded": false,
     "adapterPromoted": false,
-    "promotionGate": "FULL_SOURCE_MATERIALIZATION_AND_ZERO_RESIDUE"
+    "promotionGate": "FULL_SOURCE_MATERIALIZATION_AND_ZERO_RESIDUE",
+    "wholeSourceCandidate": {
+      "state": "BLOCKED_BY_VISIBLE_NAME_ONLY_IDENTITY_RESIDUE",
+      "certificationPhraseAuthorized": false
+    },
+    "boundedSourceNativeCandidate": {
+      "state": "OPEN_PENDING_FULL_MATERIALIZATION",
+      "scopeManifest": "data/manifests/asg_emergency_purchases/source_native_scope_candidate_v1.json",
+      "claimsCompleteASGEmergencyUniverse": false,
+      "certificationPhraseAuthorized": false
+    }
   }
 }
