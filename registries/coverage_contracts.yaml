@@ -338,7 +338,7 @@ contracts:
     notes: >-
       Historical measurement 2026-07-27: 141 declared pages at 10 rows, last
       page 6 -> 1,406 emergency purchase orders. Live verification on
-      2026-09-30 shows 144 declared pages, so 1,406 is no longer accepted as the
+      2026-10-01 shows 144 declared pages, so 1,406 is no longer accepted as the
       current denominator. authoritative_universe_total stays null until a full
       144-page refresh measures the last-page tail and freezes the new exact
       total. This makes coverage unverifiable rather than allowing a stale
