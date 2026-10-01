@@ -69,11 +69,14 @@ def _coverage_contract(path: Path) -> dict[str, Any] | None:
 def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
     if not input_path.exists():
         return {
-            "schemaVersion": "moneysweep.asg-emergency-identity-coverage/v1",
+            "schemaVersion": "moneysweep.asg-emergency-identity-coverage/v2",
             "state": "OPEN_NOT_MATERIALIZED",
             "sourcePath": str(input_path.relative_to(ROOT)) if input_path.is_relative_to(ROOT) else str(input_path),
             "leaderboardPromotionReady": False,
+            "wholeSourceLeaderboardReady": False,
+            "boundedSourceNativeLeaderboardReady": False,
             "blockingResidue": ["SOURCE_NOT_MATERIALIZED"],
+            "boundedSourceNativeBlockingResidue": ["SOURCE_NOT_MATERIALIZED"],
         }
 
     rows = list(csv.DictReader(input_path.open(newline="", encoding="utf-8")))
@@ -96,6 +99,7 @@ def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
     identity_scheme_mismatch = 0
     valid_amount = 0
     invalid_amount = 0
+    source_native_invalid_amount = 0
     candidate_rows = 0
     candidate_total = 0.0
 
@@ -117,10 +121,17 @@ def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
 
         if amount is None:
             invalid_amount += 1
+            if state == SOURCE_NATIVE and registration_id:
+                source_native_invalid_amount += 1
         else:
             valid_amount += 1
 
-        if state == SOURCE_NATIVE and registration_id and amount is not None:
+        if (
+            state == SOURCE_NATIVE
+            and registration_id
+            and identity_scheme == "asg_licitador_id"
+            and amount is not None
+        ):
             candidate_rows += 1
             candidate_total += amount
 
@@ -159,8 +170,26 @@ def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
     if not candidate_rows:
         blockers.append("NO_SOURCE_NATIVE_AMOUNT_ROWS")
 
+    bounded_blockers: list[str] = []
+    if missing_columns:
+        bounded_blockers.append("MISSING_REQUIRED_COLUMNS")
+    if duplicates:
+        bounded_blockers.append("DUPLICATE_CONTROL_NUMBER")
+    if missing_control_numbers:
+        bounded_blockers.append("MISSING_CONTROL_NUMBER")
+    if coverage_state != "MEETS_CONTRACT":
+        bounded_blockers.append("COVERAGE_NOT_CLOSED")
+    if universe_total is None:
+        bounded_blockers.append("CURRENT_DENOMINATOR_UNMEASURED")
+    if identity_scheme_mismatch:
+        bounded_blockers.append("IDENTITY_SCHEME_MISMATCH")
+    if source_native_invalid_amount:
+        bounded_blockers.append("SOURCE_NATIVE_INVALID_AMOUNT_RESIDUE")
+    if not candidate_rows:
+        bounded_blockers.append("NO_SOURCE_NATIVE_AMOUNT_ROWS")
+
     result = {
-        "schemaVersion": "moneysweep.asg-emergency-identity-coverage/v1",
+        "schemaVersion": "moneysweep.asg-emergency-identity-coverage/v2",
         "state": "PASS" if not blockers else "OPEN",
         "sourcePath": str(input_path.relative_to(ROOT)) if input_path.is_relative_to(ROOT) else str(input_path),
         "sourceSha256": _sha256(input_path),
@@ -179,6 +208,7 @@ def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
         "financialValue": {
             "validAmountRows": valid_amount,
             "invalidAmountRows": invalid_amount,
+            "sourceNativeInvalidAmountRows": source_native_invalid_amount,
             "candidateRows": candidate_rows,
             "candidateAmountTotal": round(candidate_total, 2),
             "measure": "ASG_EMERGENCY_PURCHASE_COST",
@@ -191,6 +221,22 @@ def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
         },
         "missingRequiredColumns": missing_columns,
         "blockingResidue": blockers,
+        "boundedSourceNativeBlockingResidue": bounded_blockers,
+        "wholeSourceLeaderboardReady": not blockers,
+        "boundedSourceNativeLeaderboardReady": not bounded_blockers,
+        "boundedSourceNativeScope": {
+            "scopeDefinition": (
+                "vendor_identity_state=SOURCE_NATIVE_ASG_LICITADOR_ID "
+                "AND vendor_identity_scheme=asg_licitador_id"
+            ),
+            "sourceNativeRows": source_native,
+            "eligibleRowsWithValidAmount": candidate_rows,
+            "outOfScopeNameOnlyRows": name_only,
+            "outOfScopeMissingVendorRows": missing_vendor,
+            "sourceNativeInvalidAmountRows": source_native_invalid_amount,
+            "wholeSourceCoverageStillRequired": True,
+            "claimsCompleteASGEmergencyUniverse": False,
+        },
         "leaderboardPromotionReady": not blockers,
     }
     return result
