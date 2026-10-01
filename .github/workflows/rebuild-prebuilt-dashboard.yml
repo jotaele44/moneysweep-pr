@@ -1,7 +1,7 @@
 name: Rebuild prebuilt dashboard
 on:
   push:
-    branches: [chatgpt/moneysweep-leaderboard-parity-20261001]
+    branches: [main]
     paths:
       - ".github/workflows/rebuild-prebuilt-dashboard.yml"
 
@@ -36,9 +36,13 @@ jobs:
             echo "No prebuilt dashboard changes."
             exit 0
           fi
-          branch="${GITHUB_REF_NAME}"
+          branch="automation/prebuilt-dashboard-activity-plane"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
           git add desktop/prebuilt-dashboard
-          git commit -m "Regenerate prebuilt dashboard for current PR head"
-          git push origin HEAD:"$branch"
+          git commit -m "Regenerate prebuilt dashboard for activity timeline"
+          git push --force-with-lease origin "$branch"
+          if ! gh pr view "$branch" --json number >/dev/null 2>&1; then
+            gh pr create --base main --head "$branch" --title "Regenerate prebuilt dashboard for activity timeline" --body "Regenerates the committed desktop prebuilt bundle after the PROGRAM_ACTIVITY_EVENT/v1 dashboard source changes. The workflow runs the canonical build and freshness check before opening this PR."
+          fi
