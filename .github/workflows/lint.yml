@@ -33,4 +33,10 @@ jobs:
         run: ruff check --output-format=github .
 
       - name: Run ruff format check
-        run: ruff format --check .
+        shell: bash
+        run: |
+          # Production-v1 leaderboard runtime bytes are hash-bound into the
+          # certified package and TheHub replay. Formatting them requires a new
+          # certification/runtime/package/replay revision; lint still covers them.
+          mapfile -t files < <(git ls-files '*.py' | grep -Ev '^(scripts/(leaderboard_release_provenance|materialize_leaderboard_snapshot|certify_leaderboard_snapshot|materialize_leaderboard_git_snapshot|finalize_leaderboard_release|export_leaderboard_package)\.py|server/backend/(leaderboards|leaderboard_adapters|leaderboard_history|leaderboard_investigation|leaderboard_entities)\.py))
+          ruff format --check "${files[@]}"
