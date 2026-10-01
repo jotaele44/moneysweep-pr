@@ -9,14 +9,20 @@
     "declaredPagesState": "CONFIRMED_CURRENT_OFFICIAL_INDEX",
     "authoritativeUniverseTotal": null,
     "lastPageTailMeasured": false,
-    "fullSourceBytesFrozen": false
+    "fullSourceBytesFrozen": false,
+    "lastPageTailState": "OPEN_NOT_RECOVERABLE_FROM_CURRENT_PUBLIC_INDEX",
+    "exactRowDenominatorState": "OPEN"
   },
   "identityEvidence": {
     "scheme": "asg_licitador_id",
     "currentVisiblePageRows": 10,
     "currentVisiblePageSourceNativeIdRows": 8,
     "currentVisiblePageNameOnlyRows": 2,
-    "supplierRegistryCrossChecks": ["4381", "13947", "28546"],
+    "supplierRegistryCrossChecks": [
+      "4381",
+      "13947",
+      "28546"
+    ],
     "nameOnlyPromotionAllowed": false
   },
   "readiness": {
@@ -55,5 +61,12 @@
     "ontologyExpanded": false,
     "adapterPromoted": false,
     "certificationPhraseAuthorized": false
+  },
+  "integration": {
+    "mainSynced": true,
+    "syncedMainCommit": "c972f7a956f4126faffd5f47a5f54a6c8ebd2fd1",
+    "syncMergeCommit": "1a3785e55d7c0c91b45fcb8365ffb0d6cb5f5309",
+    "behindMainAtSync": 0,
+    "mergeStrategy": "MERGE_COMMIT_NO_REBASE_NO_FORCE_UPDATE"
   }
 }
