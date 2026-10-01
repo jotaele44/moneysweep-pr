@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "moneysweep.asg-emergency-source-readiness/v2",
+  "observedAt": "2026-10-01",
+  "state": "EXECUTION_OPEN",
+  "sourceId": "asg_emergency_purchases",
+  "liveSource": {
+    "url": "https://www.asg.pr.gov/comprasemergencias",
+    "declaredPages": 144,
+    "declaredPagesState": "CONFIRMED_CURRENT_OFFICIAL_INDEX",
+    "authoritativeUniverseTotal": null,
+    "lastPageTailMeasured": false,
+    "fullSourceBytesFrozen": false
+  },
+  "identityEvidence": {
+    "scheme": "asg_licitador_id",
+    "currentVisiblePageRows": 10,
+    "currentVisiblePageSourceNativeIdRows": 8,
+    "currentVisiblePageNameOnlyRows": 2,
+    "supplierRegistryCrossChecks": ["4381", "13947", "28546"],
+    "nameOnlyPromotionAllowed": false
+  },
+  "readiness": {
+    "wholeSource": {
+      "state": "BLOCKED",
+      "reason": "Current source visibly contains name-only vendor rows."
+    },
+    "boundedSourceNativeScope": {
+      "state": "OPEN_PENDING_FULL_MATERIALIZATION",
+      "scopeManifest": "data/manifests/asg_emergency_purchases/source_native_scope_candidate_v1.json",
+      "claimsCompleteASGEmergencyUniverse": false
+    }
+  },
+  "execution": {
+    "isolatedLogicReplay": {
+      "state": "PASS",
+      "testsExecuted": 12,
+      "testsPassed": 12,
+      "receipt": "data/manifests/asg_emergency_purchases/isolated_logic_replay_20261001.json"
+    },
+    "repositoryPytest": {
+      "state": "NOT_EXECUTED",
+      "assertsPass": false
+    },
+    "full144PageMaterialization": {
+      "state": "NOT_EXECUTED",
+      "blockingReason": "NETWORK_CAPABLE_FLOOT_EXECUTION_LANE_DAILY_QUOTA_EXHAUSTED"
+    },
+    "githubActions": {
+      "state": "WAIVED_BY_USER",
+      "assertsPass": false
+    }
+  },
+  "productionEffect": {
+    "productionV1Modified": false,
+    "ontologyExpanded": false,
+    "adapterPromoted": false,
+    "certificationPhraseAuthorized": false
+  }
+}
