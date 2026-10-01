@@ -14,7 +14,7 @@ def _receipt(**overrides):
         "state": "PASS",
         "certificationIssued": True,
         "zeroMaterialUnresolvedResidue": True,
-        "promotionAuthorized": True,
+        "promotionAuthorized": False,
     }
     payload.update(overrides)
     return payload
@@ -40,9 +40,9 @@ def test_zero_residue_attestation_is_required(tmp_path: Path):
 
 
 @pytest.mark.unit
-def test_explicit_promotion_authorization_is_required(tmp_path: Path):
-    path = _write(tmp_path / "receipt.json", _receipt(promotionAuthorized=False))
-    with pytest.raises(SystemExit, match="authorize federation promotion"):
+def test_package_emission_requires_promotion_to_remain_closed(tmp_path: Path):
+    path = _write(tmp_path / "receipt.json", _receipt(promotionAuthorized=True))
+    with pytest.raises(SystemExit, match="promotion-closed"):
         load_pass_receipt(path)
 
 

@@ -56,7 +56,9 @@ def certification_runtime_manifest() -> dict[str, Any]:
 
 def certification_runtime_sha256(manifest: dict[str, Any] | None = None) -> str:
     value = manifest if manifest is not None else certification_runtime_manifest()
-    payload = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    payload = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+        "utf-8"
+    )
     return hashlib.sha256(payload).hexdigest()
 
 

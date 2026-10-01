@@ -1243,12 +1243,12 @@
           "config/financial_category_ontology.json"
         ],
         "endpoints": [
-          "GET /leaderboards/categories",
-          "GET /leaderboards/top",
-          "GET /leaderboards/history",
-          "GET /leaderboards/movers",
-          "GET /leaderboards/signals",
-          "GET /leaderboards/entity/{entity_id}"
+          "GET /categories",
+          "GET /top",
+          "GET /history",
+          "GET /movers",
+          "GET /signals",
+          "GET /entity/{entity_id}"
         ]
       },
       "analysis": {

@@ -6,10 +6,11 @@ The finalizer performs the non-CI release chain in one fail-closed transaction:
 2. verify the expected dataset-delta movement receipt;
 3. certify the current debt snapshot against the bounded production scope;
 4. issue producer PASS while federation promotion remains closed;
-5. when a TheHub checkout is supplied, temporarily authorize promotion,
-   generate the exact package, run TheHub's consumer/cross-repo regressions,
-   mount the exact package at TheHub's default product path, verify that mount,
-   and roll promotion back if any replay step fails.
+5. when a TheHub checkout is supplied, emit the exact producer-certified
+   package while producer promotion remains closed, run TheHub's consumer/
+   cross-repo regressions, mount and verify the exact package, then write a
+   separate immutable federation-promotion receipt binding the producer hashes,
+   package SHA-256, and TheHub consumer head.
 
 GitHub Actions execution can be waived by scope policy, but this script never
 represents that waiver as a passing test result. Frozen snapshots and comparison
@@ -25,7 +26,6 @@ import json
 import os
 import subprocess
 import sys
-import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -51,7 +51,7 @@ RECEIPT_PATH = LEADERBOARD_DIR / "MONEYSWEEP_LEADERBOARD_CERTIFICATION.json"
 HISTORY_RECEIPT_PATH = LEADERBOARD_DIR / "debt_history_comparison_v1.json"
 CERTIFIED_DIR = LEADERBOARD_DIR / "certified_snapshots"
 PACKAGE_PATH = ROOT / "data" / "exports" / "leaderboards" / "leaderboard_package.json"
-THEHUB_REPLAY_RECEIPT_PATH = LEADERBOARD_DIR / "thehub_replay_receipt_v1.json"
+PROMOTION_RECEIPT_PATH = LEADERBOARD_DIR / "leaderboard_federation_promotion_v1.json"
 THEHUB_RUNTIME_RELATIVE_PATHS = [
     Path(".federation/gui-capabilities.json"),
     Path("server/backend/main.py"),
@@ -83,6 +83,21 @@ def _sha_bytes(raw: bytes) -> str:
 
 def _sha_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _git_head_at(root: Path) -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    value = result.stdout.strip().lower()
+    if len(value) != 40 or any(ch not in "0123456789abcdef" for ch in value):
+        raise RuntimeError(f"invalid git HEAD for {root}: {value!r}")
+    return value
 
 
 def _git_blob(commit: str, relative_path: Path) -> bytes:
@@ -131,24 +146,6 @@ def _assert_paths_bound_to_commit(paths: list[Path], commit: str) -> None:
         )
 
 
-def _repo_git_head(repo_root: Path) -> str:
-    try:
-        result = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            cwd=repo_root,
-            check=True,
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
-        raise SystemExit(f"release blocked: cannot resolve git HEAD for {repo_root}") from exc
-    value = result.stdout.strip().lower()
-    if len(value) != 40 or any(ch not in "0123456789abcdef" for ch in value):
-        raise SystemExit(f"release blocked: invalid git HEAD for {repo_root}: {value}")
-    return value
-
-
 def _repo_git_blob(repo_root: Path, commit: str, relative_path: Path) -> bytes:
     try:
         result = subprocess.run(
@@ -166,7 +163,10 @@ def _repo_git_blob(repo_root: Path, commit: str, relative_path: Path) -> bytes:
 
 
 def _assert_thehub_checkout_bound_to_head(thehub_root: Path) -> str:
-    commit = _repo_git_head(thehub_root)
+    try:
+        commit = _git_head_at(thehub_root)
+    except (OSError, RuntimeError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+        raise SystemExit(f"release blocked: cannot resolve git HEAD for {thehub_root}") from exc
     errors: list[str] = []
     for relative in THEHUB_RUNTIME_RELATIVE_PATHS:
         path = thehub_root / relative
@@ -188,7 +188,9 @@ def _assert_thehub_checkout_bound_to_head(thehub_root: Path) -> str:
     return commit
 
 
-def _assert_current_source_bound_to_producer(snapshot: dict[str, Any], producer_commit: str) -> None:
+def _assert_current_source_bound_to_producer(
+    snapshot: dict[str, Any], producer_commit: str
+) -> None:
     manifests = snapshot.get("sourceManifestations") or []
     if not manifests:
         raise SystemExit("release blocked: current certified source manifestation is empty")
@@ -243,7 +245,9 @@ def _history_snapshot(
 ) -> dict[str, Any]:
     commit = _resolve_commit(str(source_ref["commit"]))
     if commit != source_ref["commit"]:
-        raise SystemExit(f"release blocked: source ref did not resolve exactly: {source_ref['commit']}")
+        raise SystemExit(
+            f"release blocked: source ref did not resolve exactly: {source_ref['commit']}"
+        )
     ranking, _ = _replay_ranking(
         source_commit=commit,
         category="debt_issuance",
@@ -278,13 +282,19 @@ def _history_snapshot(
 
 def _verify_expected_delta(result: dict[str, Any], expected: dict[str, Any]) -> None:
     if result.get("movementState") != "COMPARABLE_SNAPSHOT_DELTA":
-        raise SystemExit(f"release blocked: historical comparison state={result.get('movementState')}")
+        raise SystemExit(
+            f"release blocked: historical comparison state={result.get('movementState')}"
+        )
     if result.get("sourceManifestationChanged") is not True:
-        raise SystemExit("release blocked: expected debt source manifestation change was not observed")
+        raise SystemExit(
+            "release blocked: expected debt source manifestation change was not observed"
+        )
     if result.get("runtimeManifestationChanged") is not False:
         raise SystemExit("release blocked: historical replays did not use one frozen runtime")
     if result.get("economicChangeInferenceAllowed") is not False:
-        raise SystemExit("release blocked: source-changing history cannot authorize economic-change inference")
+        raise SystemExit(
+            "release blocked: source-changing history cannot authorize economic-change inference"
+        )
     counts = result.get("movementCounts") or {}
     for state in ("NEW", "EXITED", "UP", "DOWN", "UNCHANGED"):
         if counts.get(state) != expected.get(state):
@@ -294,18 +304,17 @@ def _verify_expected_delta(result: dict[str, Any], expected: dict[str, Any]) -> 
     existing_value_changes = sum(
         1
         for row in result.get("rows") or []
-        if row.get("movementState") not in {"NEW", "EXITED"} and float(row.get("valueDelta") or 0) != 0
+        if row.get("movementState") not in {"NEW", "EXITED"}
+        and float(row.get("valueDelta") or 0) != 0
     )
     if existing_value_changes != expected.get("existingEntityValueChanges"):
-        raise SystemExit("release blocked: existing-entity value delta count does not match frozen expectation")
+        raise SystemExit(
+            "release blocked: existing-entity value delta count does not match frozen expectation"
+        )
 
 
 def _history_receipt(
-    prior: dict[str, Any],
-    current: dict[str, Any],
-    movement: dict[str, Any],
-    *,
-    producer_commit: str,
+    prior: dict[str, Any], current: dict[str, Any], movement: dict[str, Any]
 ) -> dict[str, Any]:
     receipt = {
         "schemaVersion": "moneysweep.leaderboard-history-comparison/v1",
@@ -321,8 +330,6 @@ def _history_receipt(
         "runtimeManifestationChanged": movement["runtimeManifestationChanged"],
         "economicChangeInferenceAllowed": movement["economicChangeInferenceAllowed"],
         "classification": "DATASET_CHANGE_CONTROL_DELTA",
-        "producerCommit": producer_commit,
-        "currentSourceEquivalentToProducerCommit": True,
     }
     receipt["receiptSha256"] = _sha_bytes(
         json.dumps(receipt, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -348,13 +355,17 @@ def _producer_documents(
     release["certified_snapshot_sha256"] = certified_snapshot["snapshotSha256"]
     release["history_comparison_sha256"] = history_receipt["receiptSha256"]
     release["scope_sha256"] = scope_hash
-    release["blockers"] = [] if promote else [
-        {
-            "id": "THEHUB_EXACT_REPLAY",
-            "state": "OPEN",
-            "reason": "Producer certification passed; federation promotion awaits exact TheHub package replay."
-        }
-    ]
+    release["blockers"] = (
+        []
+        if promote
+        else [
+            {
+                "id": "THEHUB_EXACT_REPLAY",
+                "state": "OPEN",
+                "reason": "Producer certification passed; federation promotion awaits exact TheHub package replay.",
+            }
+        ]
+    )
 
     receipt = dict(receipt_template)
     receipt["state"] = "PASS"
@@ -364,13 +375,17 @@ def _producer_documents(
     receipt["certifiedSnapshotSha256"] = certified_snapshot["snapshotSha256"]
     receipt["historyComparisonSha256"] = history_receipt["receiptSha256"]
     receipt["scopeSha256"] = scope_hash
-    receipt["blockingResidue"] = [] if promote else [
-        {
-            "id": "THEHUB_EXACT_REPLAY",
-            "state": "OPEN",
-            "reason": "Producer certification passed; federation promotion awaits exact TheHub package replay."
-        }
-    ]
+    receipt["blockingResidue"] = (
+        []
+        if promote
+        else [
+            {
+                "id": "THEHUB_EXACT_REPLAY",
+                "state": "OPEN",
+                "reason": "Producer certification passed; federation promotion awaits exact TheHub package replay.",
+            }
+        ]
+    )
     receipt["promotionAuthorized"] = promote
     receipt["certificationPhraseAuthorized"] = promote
     receipt["note"] = (
@@ -381,14 +396,32 @@ def _producer_documents(
     return release, receipt
 
 
-def _run_export(
-    runtime_commit: str,
+def _promotion_document(
     *,
-    receipt_path: Path,
-    release_path: Path,
-    scope_path: Path,
-    output_path: Path,
-) -> None:
+    runtime_commit: str,
+    thehub_commit: str,
+    package_sha256: str,
+) -> dict[str, Any]:
+    return {
+        "schemaVersion": "moneysweep.leaderboard-federation-promotion/v1",
+        "state": "PASS",
+        "scopeId": "moneysweep.leaderboard.production-v1",
+        "runtimeProducerCommit": runtime_commit,
+        "thehubConsumerCommit": thehub_commit,
+        "receiptSha256": _sha_file(RECEIPT_PATH),
+        "releaseManifestSha256": _sha_file(RELEASE_PATH),
+        "scopeSha256": _sha_file(SCOPE_PATH),
+        "packageSha256": package_sha256,
+        "promotionAuthorized": True,
+        "certificationPhraseAuthorized": True,
+        "githubActions": {
+            "state": "WAIVED_BY_USER",
+            "assertsPass": False,
+        },
+    }
+
+
+def _run_export(runtime_commit: str) -> None:
     result = subprocess.run(
         [
             sys.executable,
@@ -397,14 +430,6 @@ def _run_export(
             runtime_commit,
             "--category",
             "debt_issuance",
-            "--receipt",
-            str(receipt_path),
-            "--release-manifest",
-            str(release_path),
-            "--scope",
-            str(scope_path),
-            "--output",
-            str(output_path),
         ],
         cwd=ROOT,
         text=True,
@@ -412,24 +437,15 @@ def _run_export(
         timeout=60,
     )
     if result.returncode != 0:
-        raise RuntimeError(result.stderr.strip() or result.stdout.strip() or "leaderboard export failed")
+        raise RuntimeError(
+            result.stderr.strip() or result.stdout.strip() or "leaderboard export failed"
+        )
 
 
-def _run_thehub_replay(
-    thehub_root: Path,
-    *,
-    receipt_path: Path,
-    release_path: Path,
-    scope_path: Path,
-    package_path: Path,
-) -> None:
+def _run_thehub_replay(thehub_root: Path) -> None:
     env = os.environ.copy()
     env["PRII_MONEYSWEEP_REPO"] = str(ROOT)
     env["PRII_REQUIRE_MONEYSWEEP_LEADERBOARD_CONTRACT"] = "1"
-    env["PRII_MONEYSWEEP_LEADERBOARD_STAGED_RECEIPT"] = str(receipt_path)
-    env["PRII_MONEYSWEEP_LEADERBOARD_STAGED_RELEASE"] = str(release_path)
-    env["PRII_MONEYSWEEP_LEADERBOARD_STAGED_SCOPE"] = str(scope_path)
-    env["PRII_MONEYSWEEP_LEADERBOARD_STAGED_PACKAGE"] = str(package_path)
     result = subprocess.run(
         [
             sys.executable,
@@ -449,24 +465,15 @@ def _run_thehub_replay(
         raise RuntimeError(result.stdout + "\n" + result.stderr)
 
 
-def _run_thehub_mounted_check(
-    thehub_root: Path,
-    *,
-    package_path: Path,
-    receipt_path: Path,
-    release_path: Path,
-    scope_path: Path,
-) -> None:
+def _run_thehub_mounted_check(thehub_root: Path) -> None:
     env = os.environ.copy()
-    env["PRII_MONEYSWEEP_LEADERBOARD_RECEIPT_SHA256"] = _sha_file(receipt_path)
-    env["PRII_MONEYSWEEP_LEADERBOARD_RELEASE_SHA256"] = _sha_file(release_path)
-    env["PRII_MONEYSWEEP_LEADERBOARD_SCOPE_SHA256"] = _sha_file(scope_path)
-    env["PRII_MONEYSWEEP_LEADERBOARD_PACKAGE_SHA256"] = _sha_file(package_path)
-    env["PRII_MONEYSWEEP_LEADERBOARD_CHECK_PACKAGE"] = str(package_path)
+    env["PRII_MONEYSWEEP_LEADERBOARD_RECEIPT_SHA256"] = _sha_file(RECEIPT_PATH)
+    env["PRII_MONEYSWEEP_LEADERBOARD_RELEASE_SHA256"] = _sha_file(RELEASE_PATH)
+    env["PRII_MONEYSWEEP_LEADERBOARD_SCOPE_SHA256"] = _sha_file(SCOPE_PATH)
+    env["PRII_MONEYSWEEP_LEADERBOARD_PACKAGE_SHA256"] = _sha_file(PACKAGE_PATH)
     code = (
-        "import os; from pathlib import Path; "
         "from server.backend import moneysweep_leaderboards as c; "
-        "p=c._load_package(Path(os.environ['PRII_MONEYSWEEP_LEADERBOARD_CHECK_PACKAGE'])); "
+        "p=c._load_package(); "
         "assert p['scopeId']==c.EXPECTED_SCOPE; "
         "assert len(p['categories'])==1; "
         "assert p['categories'][0]['categoryId']==c.EXPECTED_CATEGORY; "
@@ -484,40 +491,9 @@ def _run_thehub_mounted_check(
         raise RuntimeError(result.stdout + "\n" + result.stderr)
 
 
-def _thehub_replay_receipt(
-    *,
-    producer_commit: str,
-    consumer_commit: str,
-    package_path: Path,
-    receipt_path: Path,
-    release_path: Path,
-    scope_path: Path,
-) -> dict[str, Any]:
-    document = {
-        "schemaVersion": "moneysweep.thehub-leaderboard-replay/v1",
-        "state": "PASS",
-        "producerCommit": producer_commit,
-        "consumerCommit": consumer_commit,
-        "consumerRuntimePaths": [path.as_posix() for path in THEHUB_RUNTIME_RELATIVE_PATHS],
-        "packageSha256": _sha_file(package_path),
-        "receiptSha256": _sha_file(receipt_path),
-        "releaseManifestSha256": _sha_file(release_path),
-        "scopeSha256": _sha_file(scope_path),
-        "crossRepositoryTests": [
-            "tests/test_moneysweep_leaderboard_consumer.py",
-            "tests/test_moneysweep_leaderboard_crossrepo.py",
-        ],
-        "mountedConsumerCheck": "PASS",
-        "githubActionsExecution": "WAIVED_BY_USER",
-        "assertsGithubActionsPass": False,
-    }
-    document["replayReceiptSha256"] = _sha_bytes(
-        json.dumps(document, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    )
-    return document
-
-
-def _reuse_or_certify(current: dict[str, Any], scope: dict[str, Any]) -> tuple[dict[str, Any], Path]:
+def _reuse_or_certify(
+    current: dict[str, Any], scope: dict[str, Any]
+) -> tuple[dict[str, Any], Path]:
     CERTIFIED_DIR.mkdir(parents=True, exist_ok=True)
     path = CERTIFIED_DIR / f"{current['snapshotId'].replace(':', '_')}.json"
     if path.exists():
@@ -536,7 +512,9 @@ def _reuse_or_certify(current: dict[str, Any], scope: dict[str, Any]) -> tuple[d
     try:
         certified = certify(current, scope, certified_at=certified_at)
     except ValueError as exc:
-        raise SystemExit(f"release blocked: current debt snapshot certification failed: {exc}") from exc
+        raise SystemExit(
+            f"release blocked: current debt snapshot certification failed: {exc}"
+        ) from exc
     return certified, path
 
 
@@ -551,10 +529,14 @@ def main() -> int:
     receipt_template = _load(RECEIPT_PATH)
     if scope.get("scopeId") != "moneysweep.leaderboard.production-v1":
         raise SystemExit("release blocked: unexpected production scope")
-    if [item.get("categoryId") for item in scope.get("includedCategories") or []] != ["debt_issuance"]:
+    if [item.get("categoryId") for item in scope.get("includedCategories") or []] != [
+        "debt_issuance"
+    ]:
         raise SystemExit("release blocked: production scope category drift")
     if (scope.get("ciExecutionPolicy") or {}).get("state") != "WAIVED_BY_USER":
-        raise SystemExit("release blocked: this finalizer expects the explicit GitHub Actions waiver")
+        raise SystemExit(
+            "release blocked: this finalizer expects the explicit GitHub Actions waiver"
+        )
 
     runtime = _runtime_manifest()
     runtime_commit = str(runtime.get("producerCommit") or "")
@@ -562,7 +544,6 @@ def main() -> int:
         raise SystemExit("release blocked: exact ranking runtime commit unresolved")
     if any(item.get("state") == "MISSING" for item in runtime.get("files") or []):
         raise SystemExit("release blocked: ranking runtime manifestation incomplete")
-
     _assert_paths_bound_to_commit(
         list(RUNTIME_FILES) + list(CERTIFICATION_RUNTIME_FILES),
         runtime_commit,
@@ -576,12 +557,7 @@ def main() -> int:
     _assert_current_source_bound_to_producer(current, runtime_commit)
     movement = compare(prior, current, limit=25)
     _verify_expected_delta(movement, history_refs.get("expectedDelta") or {})
-    history_receipt = _history_receipt(
-        prior,
-        current,
-        movement,
-        producer_commit=runtime_commit,
-    )
+    history_receipt = _history_receipt(prior, current, movement)
     certified, certified_path = _reuse_or_certify(current, scope)
 
     scope_hash = _sha_file(SCOPE_PATH)
@@ -604,10 +580,10 @@ def main() -> int:
         )
     _write_immutable(HISTORY_RECEIPT_PATH, _render(history_receipt))
     _write_immutable(certified_path, _render(certified))
+    _write_atomic(RELEASE_PATH, _render(producer_release))
+    _write_atomic(RECEIPT_PATH, _render(producer_receipt))
 
     if args.thehub_root is None:
-        _write_atomic(RELEASE_PATH, _render(producer_release))
-        _write_atomic(RECEIPT_PATH, _render(producer_receipt))
         print(
             json.dumps(
                 {
@@ -628,124 +604,60 @@ def main() -> int:
         raise SystemExit(f"release blocked: TheHub consumer checkout not found at {thehub_root}")
     thehub_commit = _assert_thehub_checkout_bound_to_head(thehub_root)
 
-    promoted_release, promoted_receipt = _producer_documents(
-        release_template=producer_release,
-        receipt_template=producer_receipt,
-        runtime_commit=runtime_commit,
-        certified_snapshot=certified,
-        history_receipt=history_receipt,
-        scope_hash=scope_hash,
-        promote=True,
-    )
-
-    target = thehub_root / "data" / "aggregate" / "moneysweep" / "leaderboard_package.json"
-    target_replay_receipt = target.parent / "leaderboard_replay_receipt.json"
-    previous_release = RELEASE_PATH.read_bytes()
-    previous_receipt = RECEIPT_PATH.read_bytes()
+    # Producer receipt/release are package-bound immutable trust inputs. Do not
+    # mutate them after replay: doing so would invalidate the hashes TheHub just
+    # trusted. Federation promotion is a separate receipt.
     previous_package = PACKAGE_PATH.read_bytes() if PACKAGE_PATH.exists() else None
+    target = thehub_root / "data" / "aggregate" / "moneysweep" / "leaderboard_package.json"
     previous_target = target.read_bytes() if target.exists() else None
-    previous_replay = THEHUB_REPLAY_RECEIPT_PATH.read_bytes() if THEHUB_REPLAY_RECEIPT_PATH.exists() else None
-    previous_target_replay = target_replay_receipt.read_bytes() if target_replay_receipt.exists() else None
-
-    # Promotion=true documents exist only inside this temporary staging directory
-    # until both consumer regressions and an exact hash-trusted package load pass.
-    with tempfile.TemporaryDirectory(prefix=".leaderboard-promotion-", dir=LEADERBOARD_DIR) as stage_name:
-        stage = Path(stage_name)
-        staged_release = stage / "leaderboard_release_contract_v1.json"
-        staged_receipt = stage / "MONEYSWEEP_LEADERBOARD_CERTIFICATION.json"
-        staged_package = stage / "leaderboard_package.json"
-        _write_atomic(staged_release, _render(promoted_release))
-        _write_atomic(staged_receipt, _render(promoted_receipt))
-        _run_export(
-            runtime_commit,
-            receipt_path=staged_receipt,
-            release_path=staged_release,
-            scope_path=SCOPE_PATH,
-            output_path=staged_package,
+    previous_promotion = (
+        PROMOTION_RECEIPT_PATH.read_bytes() if PROMOTION_RECEIPT_PATH.exists() else None
+    )
+    try:
+        _run_export(runtime_commit)
+        _run_thehub_replay(thehub_root)
+        _write_atomic(target, PACKAGE_PATH.read_bytes())
+        _run_thehub_mounted_check(thehub_root)
+        promotion = _promotion_document(
+            runtime_commit=runtime_commit,
+            thehub_commit=thehub_commit,
+            package_sha256=_sha_file(PACKAGE_PATH),
         )
-        _run_thehub_replay(
-            thehub_root,
-            receipt_path=staged_receipt,
-            release_path=staged_release,
-            scope_path=SCOPE_PATH,
-            package_path=staged_package,
-        )
-        _run_thehub_mounted_check(
-            thehub_root,
-            package_path=staged_package,
-            receipt_path=staged_receipt,
-            release_path=staged_release,
-            scope_path=SCOPE_PATH,
-        )
-
-        # Mount the exact already-replayed package and verify the product path
-        # before publishing producer promotion=true artifacts.
-        _write_atomic(target, staged_package.read_bytes())
-        try:
-            _run_thehub_mounted_check(
-                thehub_root,
-                package_path=target,
-                receipt_path=staged_receipt,
-                release_path=staged_release,
-                scope_path=SCOPE_PATH,
-            )
-            replay_receipt = _thehub_replay_receipt(
-                producer_commit=runtime_commit,
-                consumer_commit=thehub_commit,
-                package_path=staged_package,
-                receipt_path=staged_receipt,
-                release_path=staged_release,
-                scope_path=SCOPE_PATH,
-            )
-
-            # Replay has passed. Promotion publication can no longer create a
-            # false-positive certification; an interruption can only leave a
-            # partially published set of already-valid artifacts.
-            _write_atomic(PACKAGE_PATH, staged_package.read_bytes())
-            _write_atomic(RELEASE_PATH, staged_release.read_bytes())
-            _write_atomic(RECEIPT_PATH, staged_receipt.read_bytes())
-            _write_immutable(THEHUB_REPLAY_RECEIPT_PATH, _render(replay_receipt))
-            _write_atomic(target_replay_receipt, _render(replay_receipt))
-        except BaseException as exc:
-            _write_atomic(RELEASE_PATH, previous_release)
-            _write_atomic(RECEIPT_PATH, previous_receipt)
-            if previous_package is None:
-                if PACKAGE_PATH.exists():
-                    PACKAGE_PATH.unlink()
-            else:
-                _write_atomic(PACKAGE_PATH, previous_package)
-            if previous_target is None:
-                if target.exists():
-                    target.unlink()
-            else:
-                _write_atomic(target, previous_target)
-            if previous_replay is None:
-                if THEHUB_REPLAY_RECEIPT_PATH.exists():
-                    THEHUB_REPLAY_RECEIPT_PATH.unlink()
-            else:
-                _write_atomic(THEHUB_REPLAY_RECEIPT_PATH, previous_replay)
-            if previous_target_replay is None:
-                if target_replay_receipt.exists():
-                    target_replay_receipt.unlink()
-            else:
-                _write_atomic(target_replay_receipt, previous_target_replay)
-            raise SystemExit(f"promotion publication rolled back: {exc}") from exc
+        _write_immutable(PROMOTION_RECEIPT_PATH, _render(promotion))
+    except Exception as exc:
+        if previous_package is None:
+            if PACKAGE_PATH.exists():
+                PACKAGE_PATH.unlink()
+        else:
+            _write_atomic(PACKAGE_PATH, previous_package)
+        if previous_target is None:
+            if target.exists():
+                target.unlink()
+        else:
+            _write_atomic(target, previous_target)
+        if previous_promotion is None:
+            if PROMOTION_RECEIPT_PATH.exists():
+                PROMOTION_RECEIPT_PATH.unlink()
+        else:
+            _write_atomic(PROMOTION_RECEIPT_PATH, previous_promotion)
+        raise SystemExit(f"promotion rolled back: {exc}") from exc
 
     print(
         json.dumps(
             {
                 "state": "PASS",
                 "runtimeProducerCommit": runtime_commit,
-                "thehubConsumerCommit": thehub_commit,
                 "certifiedSnapshotSha256": certified["snapshotSha256"],
                 "historyComparisonSha256": history_receipt["receiptSha256"],
                 "receiptSha256": _sha_file(RECEIPT_PATH),
                 "releaseManifestSha256": _sha_file(RELEASE_PATH),
                 "scopeSha256": scope_hash,
                 "packageSha256": _sha_file(PACKAGE_PATH),
-                "thehubReplayReceiptSha256": _load(THEHUB_REPLAY_RECEIPT_PATH)["replayReceiptSha256"],
                 "thehubPackage": str(target),
                 "promotionAuthorized": True,
+                "producerReceiptPromotionClosed": True,
+                "promotionReceipt": str(PROMOTION_RECEIPT_PATH),
+                "promotionReceiptSha256": _sha_file(PROMOTION_RECEIPT_PATH),
             },
             indent=2,
         )

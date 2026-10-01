@@ -57,19 +57,35 @@ def canonical_entity_drilldown(data: dict[str, pd.DataFrame], entity_id: str) ->
     edge_rows = edges[
         (edges["source_node_id"] == entity_id) | (edges["target_node_id"] == entity_id)
     ]
-    debt_rows = debt[debt.get("issuer_entity_id", pd.Series(dtype=str)) == entity_id] if not debt.empty else debt
-    lobby_rows = lobbying[
-        (lobbying.get("lobbyist_entity_id", pd.Series(dtype=str)) == entity_id)
-        | (lobbying.get("client_entity_id", pd.Series(dtype=str)) == entity_id)
-    ] if not lobbying.empty else lobbying
-    property_rows = properties[properties.get("owner_entity_id", pd.Series(dtype=str)) == entity_id] if not properties.empty else properties
+    debt_rows = (
+        debt[debt.get("issuer_entity_id", pd.Series(dtype=str)) == entity_id]
+        if not debt.empty
+        else debt
+    )
+    lobby_rows = (
+        lobbying[
+            (lobbying.get("lobbyist_entity_id", pd.Series(dtype=str)) == entity_id)
+            | (lobbying.get("client_entity_id", pd.Series(dtype=str)) == entity_id)
+        ]
+        if not lobbying.empty
+        else lobbying
+    )
+    property_rows = (
+        properties[properties.get("owner_entity_id", pd.Series(dtype=str)) == entity_id]
+        if not properties.empty
+        else properties
+    )
 
     located = edge_rows[
         (edge_rows.get("edge_type", pd.Series(dtype=str)) == "LOCATED_IN")
         & (edge_rows.get("source_node_id", pd.Series(dtype=str)) == entity_id)
     ]
     muni_ids = sorted(set(located.get("target_node_id", pd.Series(dtype=str)).astype(str)) - {""})
-    muni_rows = municipalities[municipalities["municipality_id"].isin(muni_ids)] if muni_ids else municipalities.iloc[0:0]
+    muni_rows = (
+        municipalities[municipalities["municipality_id"].isin(muni_ids)]
+        if muni_ids
+        else municipalities.iloc[0:0]
+    )
 
     return {
         "entityId": entity_id,
@@ -103,7 +119,14 @@ def source_native_drilldown(entity_id: str) -> dict[str, Any]:
         uei = entity_id.split(":", 1)[1]
         path = PROCESSED / "pr_all_awards_master.csv"
         frame = _read(path)
-        rows = frame[frame.get("recipient_uei", pd.Series(dtype=str)).astype(str).str.upper() == uei.upper()] if not frame.empty else frame
+        rows = (
+            frame[
+                frame.get("recipient_uei", pd.Series(dtype=str)).astype(str).str.upper()
+                == uei.upper()
+            ]
+            if not frame.empty
+            else frame
+        )
         return {
             "entityId": entity_id,
             "identityState": "SOURCE_NATIVE_UEI",
@@ -116,16 +139,27 @@ def source_native_drilldown(entity_id: str) -> dict[str, Any]:
         fec_id = entity_id.split(":", 1)[1]
         committees = _read(PROCESSED / "pr_campaign_finance_committees.csv")
         edges = _read(PROCESSED / "pr_campaign_finance_edges.csv")
-        committee_rows = committees[committees.get("fec_committee_id", pd.Series(dtype=str)) == fec_id] if not committees.empty else committees
-        edge_rows = edges[
-            (edges.get("source_entity_id", pd.Series(dtype=str)) == fec_id)
-            | (edges.get("target_entity_id", pd.Series(dtype=str)) == fec_id)
-        ] if not edges.empty else edges
+        committee_rows = (
+            committees[committees.get("fec_committee_id", pd.Series(dtype=str)) == fec_id]
+            if not committees.empty
+            else committees
+        )
+        edge_rows = (
+            edges[
+                (edges.get("source_entity_id", pd.Series(dtype=str)) == fec_id)
+                | (edges.get("target_entity_id", pd.Series(dtype=str)) == fec_id)
+            ]
+            if not edges.empty
+            else edges
+        )
         return {
             "entityId": entity_id,
             "identityState": "AUTHORITATIVE_FEC_COMMITTEE_ID",
             "canonicalEntity": None,
-            "datasets": {"committee": _records(committee_rows), "campaignFinanceEdges": _records(edge_rows)},
+            "datasets": {
+                "committee": _records(committee_rows),
+                "campaignFinanceEdges": _records(edge_rows),
+            },
             "counts": {"committee": len(committee_rows), "campaignFinanceEdges": len(edge_rows)},
             "mapHandoff": {"state": "UNRESOLVED_NO_AUTHORITATIVE_SPATIAL_BINDING"},
         }

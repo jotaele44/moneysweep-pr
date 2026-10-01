@@ -22,6 +22,7 @@ import subprocess
 from datetime import UTC, datetime
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
+from typing import Any
 
 from server.backend.leaderboard_history import SNAPSHOT_DIR, make_snapshot, verify_snapshot
 from server.backend.main import DATA
@@ -68,7 +69,7 @@ def _git_head() -> str:
 
 
 def _runtime_manifest() -> dict:
-    files = []
+    files: list[dict[str, Any]] = []
     for path in RUNTIME_FILES:
         if not path.exists():
             files.append({"path": str(path.relative_to(ROOT)), "state": "MISSING"})
@@ -147,11 +148,31 @@ def main() -> int:
         existing = json.loads(path.read_text(encoding="utf-8"))
         if existing != snapshot:
             raise SystemExit(f"refusing to overwrite non-identical snapshot: {path}")
-        print(json.dumps({"state": "PASS", "path": str(path), "snapshotSha256": snapshot["snapshotSha256"], "idempotent": True}, indent=2))
+        print(
+            json.dumps(
+                {
+                    "state": "PASS",
+                    "path": str(path),
+                    "snapshotSha256": snapshot["snapshotSha256"],
+                    "idempotent": True,
+                },
+                indent=2,
+            )
+        )
         return 0
 
     path.write_text(json.dumps(snapshot, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps({"state": "PASS", "path": str(path), "snapshotSha256": snapshot["snapshotSha256"], "idempotent": False}, indent=2))
+    print(
+        json.dumps(
+            {
+                "state": "PASS",
+                "path": str(path),
+                "snapshotSha256": snapshot["snapshotSha256"],
+                "idempotent": False,
+            },
+            indent=2,
+        )
+    )
     return 0
 
 

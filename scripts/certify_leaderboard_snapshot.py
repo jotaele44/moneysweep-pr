@@ -18,7 +18,9 @@ from typing import Any
 from server.backend.leaderboard_history import snapshot_sha256, verify_snapshot
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_SCOPE = ROOT / "data" / "manifests" / "leaderboards" / "leaderboard_certification_scope_v1.json"
+DEFAULT_SCOPE = (
+    ROOT / "data" / "manifests" / "leaderboards" / "leaderboard_certification_scope_v1.json"
+)
 DEFAULT_OUT_DIR = ROOT / "data" / "manifests" / "leaderboards" / "certified_snapshots"
 
 
@@ -112,7 +114,9 @@ def certification_errors(snapshot: dict[str, Any], scope: dict[str, Any]) -> lis
     return sorted(set(errors))
 
 
-def certify(snapshot: dict[str, Any], scope: dict[str, Any], *, certified_at: str) -> dict[str, Any]:
+def certify(
+    snapshot: dict[str, Any], scope: dict[str, Any], *, certified_at: str
+) -> dict[str, Any]:
     errors = certification_errors(snapshot, scope)
     if errors:
         raise ValueError(";".join(errors))
@@ -157,10 +161,30 @@ def main() -> int:
         existing = _load_json(path)
         if existing != certified:
             raise SystemExit(f"refusing to overwrite non-identical certified snapshot: {path}")
-        print(json.dumps({"state": "PASS", "idempotent": True, "path": str(path), "snapshotSha256": certified["snapshotSha256"]}, indent=2))
+        print(
+            json.dumps(
+                {
+                    "state": "PASS",
+                    "idempotent": True,
+                    "path": str(path),
+                    "snapshotSha256": certified["snapshotSha256"],
+                },
+                indent=2,
+            )
+        )
         return 0
     path.write_text(json.dumps(certified, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps({"state": "PASS", "idempotent": False, "path": str(path), "snapshotSha256": certified["snapshotSha256"]}, indent=2))
+    print(
+        json.dumps(
+            {
+                "state": "PASS",
+                "idempotent": False,
+                "path": str(path),
+                "snapshotSha256": certified["snapshotSha256"],
+            },
+            indent=2,
+        )
+    )
     return 0
 
 

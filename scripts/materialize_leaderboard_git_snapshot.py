@@ -61,7 +61,9 @@ def _resolve_commit(value: str) -> str:
             timeout=10,
         )
     except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
-        raise SystemExit(f"historical snapshot blocked: unresolved git commit/ref {value!r}") from exc
+        raise SystemExit(
+            f"historical snapshot blocked: unresolved git commit/ref {value!r}"
+        ) from exc
     commit = result.stdout.strip().lower()
     if len(commit) != 40 or any(ch not in "0123456789abcdef" for ch in commit):
         raise SystemExit(f"historical snapshot blocked: invalid resolved commit {commit!r}")
@@ -79,7 +81,9 @@ def _commit_timestamp(commit: str) -> str:
             timeout=10,
         )
     except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
-        raise SystemExit(f"historical snapshot blocked: cannot read commit timestamp {commit}") from exc
+        raise SystemExit(
+            f"historical snapshot blocked: cannot read commit timestamp {commit}"
+        ) from exc
     value = result.stdout.strip()
     if not value:
         raise SystemExit(f"historical snapshot blocked: empty commit timestamp {commit}")
@@ -109,7 +113,9 @@ def _read_csv(raw: bytes) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def _source_manifest(relative_path: str, raw: bytes, commit: str, committed_at: str) -> dict[str, Any]:
+def _source_manifest(
+    relative_path: str, raw: bytes, commit: str, committed_at: str
+) -> dict[str, Any]:
     return {
         "path": relative_path,
         "bytes": len(raw),
@@ -258,11 +264,31 @@ def main() -> int:
         existing = json.loads(path.read_text(encoding="utf-8"))
         if existing != snapshot:
             raise SystemExit(f"refusing to overwrite non-identical historical snapshot: {path}")
-        print(json.dumps({"state": "PASS", "path": str(path), "snapshotSha256": snapshot["snapshotSha256"], "idempotent": True}, indent=2))
+        print(
+            json.dumps(
+                {
+                    "state": "PASS",
+                    "path": str(path),
+                    "snapshotSha256": snapshot["snapshotSha256"],
+                    "idempotent": True,
+                },
+                indent=2,
+            )
+        )
         return 0
 
     path.write_text(json.dumps(snapshot, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps({"state": "PASS", "path": str(path), "snapshotSha256": snapshot["snapshotSha256"], "idempotent": False}, indent=2))
+    print(
+        json.dumps(
+            {
+                "state": "PASS",
+                "path": str(path),
+                "snapshotSha256": snapshot["snapshotSha256"],
+                "idempotent": False,
+            },
+            indent=2,
+        )
+    )
     return 0
 
 

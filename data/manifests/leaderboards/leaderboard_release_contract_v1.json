@@ -1,63 +1,87 @@
 {
-  "schema_version": "moneysweep.leaderboard-release-contract/v1",
-  "repository": "jotaele44/moneysweep-pr",
-  "branch": "feature/moneysweep-leaderboard-plane",
-  "scope": "financial leaderboard producer plane",
-  "certification_scope": "moneysweep.leaderboard.production-v1",
-  "ranking_contract": "moneysweep.leaderboard/v1.1",
-  "ontology_contract": "moneysweep.financial-category-ontology/v1.1",
-  "certification_state": "BLOCKED",
-  "certification_issued": false,
-  "promotion_authorized": false,
-  "non_blocking_waivers": [
-    {
-      "id": "GITHUB_ACTIONS_EXECUTION",
-      "state": "WAIVED_BY_USER",
-      "asserts_pass": false,
-      "reason": "GitHub Actions runner acquisition is excluded as a blocker for this certification attempt; no unexecuted workflow is represented as passing."
-    }
-  ],
   "blockers": [
     {
-      "id": "PRODUCER_RUNTIME_CERTIFICATION",
-      "state": "OPEN",
-      "reason": "Independent replay has frozen and verified both pinned debt source manifestations and the expected dataset delta. The exact MoneySweep Python/ranking runtime must still replay both refs under one runtimeManifest.state=FROZEN, certify the current debt_issuance snapshot with zero unresolved/excluded residue, and freeze the resulting producer release artifacts."
-    },
-    {
       "id": "THEHUB_EXACT_REPLAY",
-      "state": "OPEN",
-      "reason": "TheHub consumer has been forward-ported onto current main. Exact PASS producer package replay must still trust the frozen receipt, release, scope, and package SHA-256 values."
+      "reason": "Producer certification passed; federation promotion awaits exact TheHub package replay.",
+      "state": "OPEN"
     }
   ],
+  "branch": "continuation/moneysweep-leaderboard-production-v1",
+  "certification_issued": true,
+  "certification_scope": "moneysweep.leaderboard.production-v1",
+  "certification_state": "PASS",
+  "certified_snapshot_sha256": "6da3a18c9392d822ec397f75546c1b66b53c0a34b7c304396ed40d7178d452ed",
   "closed_scope_decisions": [
     {
       "id": "ONTOLOGY_DENOMINATOR",
-      "state": "PASS",
-      "reason": "All 21 ontology categories are classified; production scope includes debt_issuance and explicitly excludes the other 20 without treating absence as zero."
+      "reason": "All 21 ontology categories are classified; production scope includes debt_issuance and explicitly excludes the other 20 without treating absence as zero.",
+      "state": "PASS"
     },
     {
       "id": "HISTORICAL_SOURCE_DISCOVERY",
-      "state": "PASS",
-      "reason": "Repository history supplies a real debt source transition from 11 instruments/5 issuers to 20 instruments/14 issuers; replay preserves this as a dataset delta rather than automatic economic activity."
+      "reason": "Repository history supplies a real debt source transition from 11 instruments/5 issuers to 20 instruments/14 issuers; replay preserves this as a dataset delta rather than automatic economic activity.",
+      "state": "PASS"
     },
     {
       "id": "CERTIFICATION_RUNTIME_MODEL",
-      "state": "PASS",
-      "reason": "Ranking runtime and certification/release runtime are separately manifested to avoid circular release hashes; the exported package carries the certification-runtime manifest and digest."
+      "reason": "Ranking runtime and certification/release runtime are separately manifested to avoid circular release hashes; the exported package carries the certification-runtime manifest and digest.",
+      "state": "PASS"
     },
     {
       "id": "EXACT_PACKAGE_TRUST_MODEL",
-      "state": "PASS",
-      "reason": "TheHub consumer requires the exact package SHA-256 in addition to receipt, release-manifest, and certification-scope SHA-256 trust bindings."
-    },
-    {
-      "id": "HISTORICAL_INDEPENDENT_REPLAY",
-      "state": "PASS",
-      "reason": "An independent implementation replayed the exact pinned debt source commits and matched the frozen 11→20 instrument, 5→14 issuer and NEW=9/EXITED=0/UP=0/DOWN=2/UNCHANGED=3 delta with zero existing-issuer value changes. This verifies source/ranking arithmetic only and does not assert the MoneySweep Python runtime passed.",
-      "evidencePath": "data/manifests/leaderboards/independent_replay/debt_history_independent_replay_v1.json",
-      "evidenceReceiptSha256": "a520cb9e3b8bf894635954380ccee6ab03e2cc09e6833cf6e60553d10677fda3"
+      "reason": "TheHub consumer requires the exact package SHA-256 in addition to receipt, release-manifest, and certification-scope SHA-256 trust bindings.",
+      "state": "PASS"
     }
   ],
+  "history_comparison_sha256": "6decf3cbbccd4329fefbd79acf452d4e16a7bf38436560135c54c4f91ecb8e71",
+  "implemented_surfaces": {
+    "api_client": "dashboard/src/lib/api.js",
+    "backend": [
+      "server/backend/leaderboards.py",
+      "server/backend/leaderboard_adapters.py",
+      "server/backend/leaderboard_history.py",
+      "server/backend/leaderboard_investigation.py",
+      "server/backend/leaderboard_entities.py"
+    ],
+    "certification_receipt": "data/manifests/leaderboards/MONEYSWEEP_LEADERBOARD_CERTIFICATION.json",
+    "certification_runtime_provenance": "scripts/leaderboard_release_provenance.py",
+    "certification_scope": "data/manifests/leaderboards/leaderboard_certification_scope_v1.json",
+    "federation_export_schema": "schemas/leaderboard_export_package.schema.json",
+    "federation_exporter": "scripts/export_leaderboard_package.py",
+    "frontend": "dashboard/src/components/FinancialLeaderboards.jsx",
+    "git_history_materializer": "scripts/materialize_leaderboard_git_snapshot.py",
+    "gui_capability": ".federation/gui-capabilities.extensions/financial-leaderboards-v1.json",
+    "history_source_refs": "data/manifests/leaderboards/debt_history_source_refs_v1.json",
+    "ontology_adapter_coverage": "data/manifests/leaderboards/ontology_adapter_coverage_v1.json",
+    "release_finalizer": "scripts/finalize_leaderboard_release.py",
+    "snapshot_certifier": "scripts/certify_leaderboard_snapshot.py",
+    "snapshot_materializer": "scripts/materialize_leaderboard_snapshot.py",
+    "thehub_consumer_pr": "jotaele44/thehub-pr#285"
+  },
+  "non_blocking_waivers": [
+    {
+      "asserts_pass": false,
+      "id": "GITHUB_ACTIONS_EXECUTION",
+      "reason": "GitHub Actions runner acquisition is excluded as a blocker for this certification attempt; no unexecuted workflow is represented as passing.",
+      "state": "WAIVED_BY_USER"
+    }
+  ],
+  "ontology_contract": "moneysweep.financial-category-ontology/v1.1",
+  "promotion_authorized": false,
+  "promotion_rules": {
+    "certification_runtime_manifest_must_be_frozen": true,
+    "diagnostic_ui_does_not_imply_certification": true,
+    "money_sweep_is_financial_authority": true,
+    "provisional_snapshots_cannot_be_promoted": true,
+    "snapshot_runtime_and_producer_commit_must_match_export": true,
+    "source_and_runtime_manifestations_must_be_exported": true,
+    "spiderweb_is_geometry_authority": true,
+    "thehub_is_cross_producer_product_surface": true,
+    "thehub_must_not_recompute_money_sweep_rankings": true,
+    "thehub_must_verify_receipt_release_scope_and_exact_package_hashes": true
+  },
+  "ranking_contract": "moneysweep.leaderboard/v1.1",
+  "repository": "jotaele44/moneysweep-pr",
   "required_gates": [
     "ONTOLOGY_SCHEMA",
     "ONTOLOGY_DENOMINATOR_CLOSED",
@@ -88,41 +112,8 @@
     "EXACT_PACKAGE_SHA256_TRUST",
     "ZERO_MATERIAL_UNRESOLVED_RESIDUE_INSIDE_CERTIFIED_SCOPE"
   ],
-  "implemented_surfaces": {
-    "backend": [
-      "server/backend/leaderboards.py",
-      "server/backend/leaderboard_adapters.py",
-      "server/backend/leaderboard_history.py",
-      "server/backend/leaderboard_investigation.py",
-      "server/backend/leaderboard_entities.py"
-    ],
-    "snapshot_materializer": "scripts/materialize_leaderboard_snapshot.py",
-    "git_history_materializer": "scripts/materialize_leaderboard_git_snapshot.py",
-    "snapshot_certifier": "scripts/certify_leaderboard_snapshot.py",
-    "release_finalizer": "scripts/finalize_leaderboard_release.py",
-    "certification_runtime_provenance": "scripts/leaderboard_release_provenance.py",
-    "certification_scope": "data/manifests/leaderboards/leaderboard_certification_scope_v1.json",
-    "history_source_refs": "data/manifests/leaderboards/debt_history_source_refs_v1.json",
-    "certification_receipt": "data/manifests/leaderboards/MONEYSWEEP_LEADERBOARD_CERTIFICATION.json",
-    "ontology_adapter_coverage": "data/manifests/leaderboards/ontology_adapter_coverage_v1.json",
-    "federation_exporter": "scripts/export_leaderboard_package.py",
-    "federation_export_schema": "schemas/leaderboard_export_package.schema.json",
-    "frontend": "dashboard/src/components/FinancialLeaderboards.jsx",
-    "api_client": "dashboard/src/lib/api.js",
-    "gui_capability": ".federation/gui-capabilities.extensions/financial-leaderboards-v1.json",
-    "thehub_consumer_pr": "jotaele44/thehub-pr#285"
-  },
-  "promotion_rules": {
-    "money_sweep_is_financial_authority": true,
-    "thehub_is_cross_producer_product_surface": true,
-    "spiderweb_is_geometry_authority": true,
-    "thehub_must_not_recompute_money_sweep_rankings": true,
-    "thehub_must_verify_receipt_release_scope_and_exact_package_hashes": true,
-    "snapshot_runtime_and_producer_commit_must_match_export": true,
-    "certification_runtime_manifest_must_be_frozen": true,
-    "source_and_runtime_manifestations_must_be_exported": true,
-    "provisional_snapshots_cannot_be_promoted": true,
-    "diagnostic_ui_does_not_imply_certification": true,
-    "independent_replay_does_not_substitute_for_application_runtime": true
-  }
+  "runtime_producer_commit": "6d37d675d49285057ab43c88d294e8a5e8e52beb",
+  "schema_version": "moneysweep.leaderboard-release-contract/v1",
+  "scope": "financial leaderboard producer plane",
+  "scope_sha256": "b12bfc8911d7c2978edacfc9f9f0ce781d7f890fc385034d7359f36aa4433218"
 }

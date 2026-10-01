@@ -1,0 +1,25 @@
+{
+  "corrections": [
+    {
+      "artifact": "baseline debt snapshot",
+      "correctedSnapshotSha256": "a9e9846ba5e7902e7cfbb5454b61fec0a40af5c0c4d7ffa15a9e81f76f33d63b",
+      "failedClaimedSnapshotSha256": "b9175612433a6e19ee6c145c898f2ce45848e455f38da7d99e60c98fcf4f8b5f",
+      "state": "SUPERSEDED_INVALID_SEMANTIC_HASH"
+    },
+    {
+      "artifact": "current debt snapshot",
+      "correctedSnapshotSha256": "11614dacd8769ca9369b6f09da4f6b77b643e03058d22a0a7399ea2bbe8e85f9",
+      "failedClaimedSnapshotSha256": "4d697a801d7d75c2904df563a3778fc58a472b6c9761d5a533bb10f3dad420a0",
+      "state": "SUPERSEDED_INVALID_SEMANTIC_HASH"
+    },
+    {
+      "artifact": "certified current debt snapshot",
+      "correctedSnapshotSha256": "6da3a18c9392d822ec397f75546c1b66b53c0a34b7c304396ed40d7178d452ed",
+      "failedClaimedSnapshotSha256": "b838636e2643d36ba1d881a232843506209385ee0770be5462e39023cb2c0cc4",
+      "state": "SUPERSEDED_INVALID_SEMANTIC_HASH"
+    }
+  ],
+  "note": "The failed values remain preserved in Git history. Current branch artifacts were corrected only after canonical JSON recomputation matched the repository verifier.",
+  "schemaVersion": "moneysweep.leaderboard-materialization-corrections/v1",
+  "state": "FROZEN"
+}

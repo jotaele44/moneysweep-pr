@@ -46,7 +46,7 @@ def _number(value: object) -> float | None:
     if value is None or value == "":
         return None
     try:
-        number = float(value)
+        number = float(value) if isinstance(value, (str, int, float)) else float(str(value))
     except (TypeError, ValueError):
         return None
     return number if pd.notna(number) else None
@@ -69,7 +69,9 @@ def _competition_ranks(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
-def _entity_maps(data: dict[str, pd.DataFrame]) -> tuple[dict[str, pd.Series], dict[str, set[str]], dict[str, str]]:
+def _entity_maps(
+    data: dict[str, pd.DataFrame],
+) -> tuple[dict[str, pd.Series], dict[str, set[str]], dict[str, str]]:
     entities = data["entities"]
     edges = data["edges"]
     municipalities = data["municipalities"]
@@ -126,7 +128,9 @@ def _finalize(
 ) -> dict[str, Any]:
     _competition_ranks(rows)
     complete_rows = rows
-    visible = complete_rows if limit is None else [row for row in complete_rows if row["rank"] <= limit]
+    visible = (
+        complete_rows if limit is None else [row for row in complete_rows if row["rank"] <= limit]
+    )
     currencies = sorted({row["currency"] for row in complete_rows})
     _close(accounting)
     return {
@@ -245,7 +249,7 @@ def contract_awards(
         agg["evidenceCount"] = len(agg.pop("evidenceIds"))
         rows.append(agg)
     _currency_guard(rows, currency)
-    return _finalize(
+    result = _finalize(
         category_id="contract_award",
         label="Government contract awards",
         metric_type="AWARDED",
@@ -272,6 +276,13 @@ def contract_awards(
             "geography": "LOCATED_IN candidate sets; multi-location identities unresolved",
         },
     )
+    if not rows and accounting["excludedRecords"] > 0:
+        result["certificationState"] = "OPEN"
+        result["reason"] = (
+            "Canonical contract identities are present, but all in-scope rows lack "
+            "award_amount; no financial ranking can be certified from this source."
+        )
+    return result
 
 
 def debt_issuance(
@@ -411,7 +422,10 @@ def _federal_awards(
             limit=limit,
             filters={"startYear": start_year, "endYear": end_year, "currency": currency},
             manifests=[],
-            methodology={"identity": "recipient_uei", "currency": "MoneySweep federal-award master monetary fields are USD"},
+            methodology={
+                "identity": "recipient_uei",
+                "currency": "MoneySweep federal-award master monetary fields are USD",
+            },
             certification_state="OPEN_NO_MATCHING_CURRENCY",
             reason="The standardized federal-award master is denominated in USD.",
         )
@@ -501,7 +515,9 @@ def federal_contract_obligations(data: dict[str, pd.DataFrame], **kwargs) -> dic
         data,
         category_id="federal_obligation",
         label="Federal contract obligations",
-        category_filter=lambda source, category: category in {"contract", "contracts"} or source == "contracts",
+        category_filter=lambda source, category: (
+            category in {"contract", "contracts"} or source == "contracts"
+        ),
         **kwargs,
     )
 
@@ -511,7 +527,9 @@ def federal_grants(data: dict[str, pd.DataFrame], **kwargs) -> dict[str, Any]:
         data,
         category_id="federal_grant",
         label="Federal grant obligations",
-        category_filter=lambda source, category: category in {"grant", "grants"} or source == "grants",
+        category_filter=lambda source, category: (
+            category in {"grant", "grants"} or source == "grants"
+        ),
         **kwargs,
     )
 
@@ -534,7 +552,9 @@ def federal_assistance(data: dict[str, pd.DataFrame], **kwargs) -> dict[str, Any
         data,
         category_id="federal_assistance",
         label="Federal assistance obligations",
-        category_filter=lambda source, category: source in assistance_sources or category in {"grant", "grants", "assistance"},
+        category_filter=lambda source, category: (
+            source in assistance_sources or category in {"grant", "grants", "assistance"}
+        ),
         **kwargs,
     )
 
@@ -561,15 +581,21 @@ def campaign_contributions_received(
     currency: str | None,
 ) -> dict[str, Any]:
     if municipality or entity_type:
-        raise HTTPException(422, "campaign committee geography/entity-type filters require an authoritative crosswalk")
+        raise HTTPException(
+            422,
+            "campaign committee geography/entity-type filters require an authoritative crosswalk",
+        )
     if currency and currency.upper() != "USD":
         return _finalize(
             category_id="campaign_contribution_received",
             label="Campaign contributions received by authoritative FEC committee",
             metric_type="CONTRIBUTIONS_RECEIVED",
-            rows=[], accounting=_accounting(0), limit=limit,
+            rows=[],
+            accounting=_accounting(0),
+            limit=limit,
             filters={"startYear": start_year, "endYear": end_year, "currency": currency},
-            manifests=[], methodology={"currency": "FEC monetary receipts are USD"},
+            manifests=[],
+            methodology={"currency": "FEC monetary receipts are USD"},
             certification_state="OPEN_NO_MATCHING_CURRENCY",
             reason="The FEC receipt plane is denominated in USD.",
         )
@@ -580,9 +606,12 @@ def campaign_contributions_received(
             category_id="campaign_contribution_received",
             label="Campaign contributions received by authoritative FEC committee",
             metric_type="CONTRIBUTIONS_RECEIVED",
-            rows=[], accounting=_accounting(0), limit=limit,
+            rows=[],
+            accounting=_accounting(0),
+            limit=limit,
             filters={"startYear": start_year, "endYear": end_year, "currency": "USD"},
-            manifests=[], methodology={"identity": "authoritative FEC committee ID required"},
+            manifests=[],
+            methodology={"identity": "authoritative FEC committee ID required"},
             certification_state="OPEN_NOT_MATERIALIZED",
             reason="campaign-finance graph/committee materialization is not mounted in this checkout",
         )
@@ -646,7 +675,9 @@ def campaign_contributions_received(
         category_id="campaign_contribution_received",
         label="Campaign contributions received by authoritative FEC committee",
         metric_type="CONTRIBUTIONS_RECEIVED",
-        rows=rows, accounting=accounting, limit=limit,
+        rows=rows,
+        accounting=accounting,
+        limit=limit,
         filters={"startYear": start_year, "endYear": end_year, "currency": "USD"},
         manifests=[_manifest(edges_path), _manifest(committees_path)],
         methodology={

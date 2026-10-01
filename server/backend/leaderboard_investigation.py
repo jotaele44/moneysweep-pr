@@ -88,7 +88,9 @@ def build_signals(ranking: dict[str, Any], movers: dict[str, Any] | None = None)
             signals.append(
                 {
                     "signalType": signal_type,
-                    "state": "COMPUTED_COMPARABLE_DELTA" if inference_allowed else "COMPUTED_MANIFESTATION_DELTA",
+                    "state": "COMPUTED_COMPARABLE_DELTA"
+                    if inference_allowed
+                    else "COMPUTED_MANIFESTATION_DELTA",
                     "entityId": movement.get("entityId"),
                     "entityDisplayName": movement.get("entityDisplayName"),
                     "priorRank": movement.get("priorRank"),

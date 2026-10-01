@@ -146,6 +146,8 @@ def compare(prior: dict[str, Any], current: dict[str, Any], *, limit: int = 10) 
         before = old.get(entity_id)
         after = new.get(entity_id)
         if before is None:
+            if after is None:
+                raise RuntimeError(f"entity {entity_id} absent from both snapshot indexes")
             state = "NEW"
             prior_rank = None
             current_rank = after.get("rank")
@@ -165,7 +167,9 @@ def compare(prior: dict[str, Any], current: dict[str, Any], *, limit: int = 10) 
                 if prior_rank is not None and current_rank is not None
                 else None
             )
-            value_delta = float(after.get("metricValue") or 0) - float(before.get("metricValue") or 0)
+            value_delta = float(after.get("metricValue") or 0) - float(
+                before.get("metricValue") or 0
+            )
             if rank_delta and rank_delta > 0:
                 state = "UP"
             elif rank_delta and rank_delta < 0:
@@ -185,7 +189,11 @@ def compare(prior: dict[str, Any], current: dict[str, Any], *, limit: int = 10) 
             }
         )
 
-    movers = [row for row in deltas if row["movementState"] != "UNCHANGED"]
+    movers = [
+        row
+        for row in deltas
+        if row["movementState"] != "UNCHANGED" or float(row["valueDelta"] or 0) != 0
+    ]
     movers.sort(
         key=lambda row: (
             -abs(int(row["rankDelta"] or 0)),
@@ -193,14 +201,17 @@ def compare(prior: dict[str, Any], current: dict[str, Any], *, limit: int = 10) 
             row["entityId"],
         )
     )
-    prior_manifest = {item.get("path"): item.get("sha256") for item in prior.get("sourceManifestations") or []}
-    current_manifest = {item.get("path"): item.get("sha256") for item in current.get("sourceManifestations") or []}
+    prior_manifest = {
+        item.get("path"): item.get("sha256") for item in prior.get("sourceManifestations") or []
+    }
+    current_manifest = {
+        item.get("path"): item.get("sha256") for item in current.get("sourceManifestations") or []
+    }
     source_changed = prior_manifest != current_manifest
     runtime_changed = _runtime_key(prior) != _runtime_key(current)
-    runtime_unspecified = (
-        (prior.get("runtimeManifest") or {}).get("state") == "UNSPECIFIED"
-        or (current.get("runtimeManifest") or {}).get("state") == "UNSPECIFIED"
-    )
+    runtime_unspecified = (prior.get("runtimeManifest") or {}).get("state") == "UNSPECIFIED" or (
+        current.get("runtimeManifest") or {}
+    ).get("state") == "UNSPECIFIED"
     inference_allowed = not source_changed and not runtime_changed and not runtime_unspecified
     if source_changed and runtime_changed:
         reason = "source and runtime manifestations changed; movement is a dataset/runtime delta and must not be labeled economic activity"

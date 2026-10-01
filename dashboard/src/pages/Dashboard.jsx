@@ -57,7 +57,7 @@ export default function Dashboard() {
       <div className="min-h-0 flex-1 p-3">
         <Tabs value={tab} onValueChange={setTab} className="flex h-full flex-col">
           <div className="overflow-x-auto pb-1">
-            <TabsList className={`grid h-auto min-w-[760px] ${OFFLINE ? 'grid-cols-9' : 'grid-cols-11'} bg-card`}>
+            <TabsList className={`grid h-auto min-w-[880px] ${OFFLINE ? 'grid-cols-9' : 'grid-cols-11'} bg-card`}>
               <TabsTrigger value="activity" className={triggerClass}>Activity</TabsTrigger>
               <TabsTrigger value="contracts" className={triggerClass}>Contracts</TabsTrigger>
               <TabsTrigger value="leaderboards" className={triggerClass}>Top Entities</TabsTrigger>

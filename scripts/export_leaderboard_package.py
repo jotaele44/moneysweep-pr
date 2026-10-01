@@ -4,8 +4,10 @@
 The exporter never recomputes rankings. It packages separately certified,
 hash-verified snapshots and binds them to the exact PASS producer receipt,
 release manifest, bounded certification scope, and certification runtime.
-TheHub separately trusts the exact package SHA-256, which binds all of these
-fields without creating a release-receipt self-reference.
+Producer certification and federation promotion are intentionally separate:
+the package is emitted from immutable producer-PASS / promotion-closed evidence,
+then TheHub replay authorizes a separate federation-promotion receipt. TheHub
+trusts the exact package SHA-256, so no producer hash is mutated after replay.
 """
 
 from __future__ import annotations
@@ -24,9 +26,15 @@ from scripts.leaderboard_release_provenance import (
 from server.backend.leaderboard_history import verify_snapshot
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_RECEIPT = ROOT / "data" / "manifests" / "leaderboards" / "MONEYSWEEP_LEADERBOARD_CERTIFICATION.json"
-DEFAULT_RELEASE = ROOT / "data" / "manifests" / "leaderboards" / "leaderboard_release_contract_v1.json"
-DEFAULT_SCOPE = ROOT / "data" / "manifests" / "leaderboards" / "leaderboard_certification_scope_v1.json"
+DEFAULT_RECEIPT = (
+    ROOT / "data" / "manifests" / "leaderboards" / "MONEYSWEEP_LEADERBOARD_CERTIFICATION.json"
+)
+DEFAULT_RELEASE = (
+    ROOT / "data" / "manifests" / "leaderboards" / "leaderboard_release_contract_v1.json"
+)
+DEFAULT_SCOPE = (
+    ROOT / "data" / "manifests" / "leaderboards" / "leaderboard_certification_scope_v1.json"
+)
 CERTIFIED_SNAPSHOT_DIR = ROOT / "data" / "manifests" / "leaderboards" / "certified_snapshots"
 DEFAULT_OUT = ROOT / "data" / "exports" / "leaderboards" / "leaderboard_package.json"
 
@@ -51,19 +59,32 @@ def load_pass_receipt(path: Path) -> dict:
     if receipt.get("state") != "PASS" or receipt.get("certificationIssued") is not True:
         raise SystemExit("BLOCKED: leaderboard certification receipt is not PASS/issued")
     if receipt.get("zeroMaterialUnresolvedResidue") is not True:
-        raise SystemExit("BLOCKED: certification receipt does not attest zero material unresolved residue")
-    if receipt.get("promotionAuthorized") is not True:
-        raise SystemExit("BLOCKED: certification receipt does not authorize federation promotion")
+        raise SystemExit(
+            "BLOCKED: certification receipt does not attest zero material unresolved residue"
+        )
+    # Package emission is a producer-certification action, not federation
+    # promotion. Keeping these immutable producer hashes stable is what lets
+    # TheHub trust and replay the exact package without a circular self-reference.
+    if receipt.get("promotionAuthorized") is not False:
+        raise SystemExit(
+            "BLOCKED: producer receipt must remain promotion-closed until TheHub replay"
+        )
     return receipt
 
 
 def _scope_categories(scope: dict) -> set[str]:
-    return {str(item.get("categoryId")) for item in scope.get("includedCategories") or [] if item.get("categoryId")}
+    return {
+        str(item.get("categoryId"))
+        for item in scope.get("includedCategories") or []
+        if item.get("categoryId")
+    }
 
 
 def latest_certified_snapshot(category: str) -> dict:
     if not CERTIFIED_SNAPSHOT_DIR.exists():
-        raise SystemExit(f"BLOCKED: certified snapshot directory not found: {CERTIFIED_SNAPSHOT_DIR}")
+        raise SystemExit(
+            f"BLOCKED: certified snapshot directory not found: {CERTIFIED_SNAPSHOT_DIR}"
+        )
     candidates = []
     for path in sorted(CERTIFIED_SNAPSHOT_DIR.glob("*.json")):
         try:
@@ -83,7 +104,9 @@ def latest_certified_snapshot(category: str) -> dict:
         candidates.append(snapshot)
     if not candidates:
         raise SystemExit(f"BLOCKED: no certified PASS snapshot for category {category}")
-    candidates.sort(key=lambda row: (str(row.get("capturedAt") or ""), str(row.get("snapshotId") or "")))
+    candidates.sort(
+        key=lambda row: (str(row.get("capturedAt") or ""), str(row.get("snapshotId") or ""))
+    )
     return candidates[-1]
 
 
@@ -104,8 +127,12 @@ def main() -> int:
     load_pass_receipt(args.receipt)
     release = _load_json(args.release_manifest)
     scope = _load_json(args.scope)
-    if release.get("certification_state") != "PASS" or release.get("promotion_authorized") is not True:
-        raise SystemExit("BLOCKED: release manifest is not PASS/promotion-authorized")
+    if release.get("certification_state") != "PASS":
+        raise SystemExit("BLOCKED: release manifest is not producer PASS")
+    if release.get("promotion_authorized") is not False:
+        raise SystemExit(
+            "BLOCKED: producer release must remain promotion-closed until TheHub replay"
+        )
     if scope.get("schemaVersion") != "moneysweep.leaderboard-certification-scope/v1":
         raise SystemExit("BLOCKED: unsupported certification scope schema")
     scope_id = str(scope.get("scopeId") or "")
@@ -134,7 +161,9 @@ def main() -> int:
         if runtime_manifest.get("state") != "FROZEN":
             raise SystemExit(f"BLOCKED: snapshot runtime manifestation is not frozen: {category}")
         if runtime_manifest.get("producerCommit") != producer_commit:
-            raise SystemExit(f"BLOCKED: snapshot producer commit does not match export commit: {category}")
+            raise SystemExit(
+                f"BLOCKED: snapshot producer commit does not match export commit: {category}"
+            )
         category_payloads.append(
             {
                 "categoryId": snapshot["categoryId"],

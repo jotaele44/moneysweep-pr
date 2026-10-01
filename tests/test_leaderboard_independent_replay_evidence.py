@@ -22,7 +22,9 @@ def _canonical_sha256(value: dict, *, omit: str | None = None) -> str:
     payload = dict(value)
     if omit:
         payload.pop(omit, None)
-    raw = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    raw = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+        "utf-8"
+    )
     return hashlib.sha256(raw).hexdigest()
 
 
@@ -43,9 +45,14 @@ def test_independent_debt_history_replay_is_frozen_and_bounded():
 
     receipt = dict(history)
     receipt.pop("receiptSha256")
-    assert hashlib.sha256(
-        json.dumps(receipt, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
-    ).hexdigest() == EXPECTED_RECEIPT_SHA256
+    assert (
+        hashlib.sha256(
+            json.dumps(receipt, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+                "utf-8"
+            )
+        ).hexdigest()
+        == EXPECTED_RECEIPT_SHA256
+    )
     assert history["receiptSha256"] == EXPECTED_RECEIPT_SHA256
 
     for snapshot, expected_rows, expected_input in ((baseline, 5, 11), (current, 14, 20)):
@@ -69,4 +76,6 @@ def test_independent_replay_does_not_occupy_canonical_snapshot_namespace():
     evidence_paths = {BASELINE.resolve(), CURRENT.resolve()}
     assert all(path.parent == EVIDENCE_DIR.resolve() for path in evidence_paths)
     if canonical.exists():
-        assert not evidence_paths.intersection({path.resolve() for path in canonical.glob("*.json")})
+        assert not evidence_paths.intersection(
+            {path.resolve() for path in canonical.glob("*.json")}
+        )

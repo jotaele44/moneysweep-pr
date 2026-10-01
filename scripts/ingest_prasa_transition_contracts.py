@@ -1,7 +1,7 @@
 """Parse the PRASA 2024 transition contract PDF into the PRASA contract table.
 
 The source is the ACT transition agency 163 "Contratos Vigentes" report. This
-parser is intentionally narrow: it accepts the stable ``pdftotext -layout``
+parser is intentionally narrow: it accepts the stable layout-preserving text
 shape of that report and writes the existing ``pr_prasa_contracts.csv`` schema.
 It does not claim that arbitrary PRASA PDFs are machine-readable contract feeds.
 """
@@ -18,6 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
+import pdfplumber
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -31,7 +32,7 @@ DEFAULT_SOURCE = Path(
 
 CONTRACT_RE = re.compile(
     r"^(?P<contract_id>\d{4}-\d{6}(?:-[A-Z])?)\s+"
-    r"(?P<vendor_name>.+?)\s{2,}"
+    r"(?P<vendor_name>.+?)\s+"
     r"(?P<award_date>\d{1,2}[-/][A-Za-zÁÉÍÓÚáéíóúñÑ.]+[-/]\d{2,4})\s+"
     r"(?P<start_date>\d{1,2}[-/][A-Za-zÁÉÍÓÚáéíóúñÑ.]+[-/]\d{2,4})\s+"
     r"(?P<end_date>\d{1,2}[-/][A-Za-zÁÉÍÓÚáéíóúñÑ.]+[-/]\d{2,4})\s+"
@@ -88,8 +89,9 @@ def _pdf_text(path: Path) -> str:
             text=True,
             timeout=60,
         )
-    except FileNotFoundError as exc:
-        raise RuntimeError("pdftotext is required to parse the PRASA transition PDF") from exc
+    except FileNotFoundError:
+        with pdfplumber.open(path) as pdf:
+            return "\n".join(page.extract_text(layout=True) or "" for page in pdf.pages)
     except subprocess.CalledProcessError as exc:
         raise RuntimeError(f"pdftotext failed for {path}: {exc.stderr}") from exc
     return result.stdout
