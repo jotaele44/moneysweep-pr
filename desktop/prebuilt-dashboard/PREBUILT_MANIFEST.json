@@ -117,12 +117,12 @@
       "sha256": "c5ca1cafa68726ff4acbf6a2f7f2a7e0f02ec5fa748a967b23762a9c278d35f7"
     }
   ],
-  "generated_at": "2026-10-01T16:28:58Z",
+  "generated_at": "2026-10-01T16:36:23Z",
   "generated_by": {
     "node": "v22.22.2",
     "npm": "10.9.7"
   },
   "schema_version": "moneysweep_prebuilt_dashboard_v1",
-  "source_fingerprint": "a95603604a2b0fbc70851fce7a71c2158c8446ac08d44ed63158f2917a5ba91f",
+  "source_fingerprint": "69a2e1e623e598a44db00420080126147d8b4b7cda7a7347f123cf54f22b0c07",
   "total_bytes": 1617805
 }
