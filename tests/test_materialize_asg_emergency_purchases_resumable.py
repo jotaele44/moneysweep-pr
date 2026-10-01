@@ -124,8 +124,14 @@ def test_live_page_count_change_blocks_resume(monkeypatch, tmp_path: Path):
 @pytest.mark.unit
 def test_duplicate_control_number_refuses_promotion(monkeypatch, tmp_path: Path):
     pages = {
-        1: [_record("26-ASG-AAA-0001")],
-        2: [_record("26-ASG-AAA-0001")],
+        1: [
+            _record("26-ASG-AAA-0001"),
+            _record("26-ASG-AAA-0002"),
+        ],
+        2: [
+            _record("26-ASG-AAA-0001"),
+            _record("26-ASG-AAA-0003"),
+        ],
     }
     _wire(monkeypatch, pages, 2)
     with pytest.raises(RuntimeError, match="duplicate control_number"):
