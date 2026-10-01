@@ -146,6 +146,7 @@ def compare(prior: dict[str, Any], current: dict[str, Any], *, limit: int = 10) 
         before = old.get(entity_id)
         after = new.get(entity_id)
         if before is None:
+            assert after is not None
             state = "NEW"
             prior_rank = None
             current_rank = after.get("rank")

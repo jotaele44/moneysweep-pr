@@ -12,7 +12,7 @@ import hashlib
 from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 import pandas as pd
 from fastapi import HTTPException
@@ -46,7 +46,7 @@ def _number(value: object) -> float | None:
     if value is None or value == "":
         return None
     try:
-        number = float(value)
+        number = float(cast(Any, value))
     except (TypeError, ValueError):
         return None
     return number if pd.notna(number) else None

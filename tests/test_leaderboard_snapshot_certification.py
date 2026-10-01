@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from copy import deepcopy
-
 import pytest
 
 from scripts.certify_leaderboard_snapshot import certification_errors, certify
