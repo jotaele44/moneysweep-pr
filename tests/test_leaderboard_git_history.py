@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 
-import pandas as pd
 import pytest
 
 from scripts import materialize_leaderboard_git_snapshot as replay

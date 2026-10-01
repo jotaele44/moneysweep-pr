@@ -53,7 +53,11 @@ repos:
       - id: ruff-format
         name: ruff format (changed files)
         # The repo-wide reformat landed in Wave C; this keeps changed files
-        # formatted. The CI `ruff format --check .` job is the gating counterpart.
+        # formatted. The CI format gate mirrors this exact frozen-runtime exclusion.
+        # These files are byte-bound into moneysweep.leaderboard.production-v1
+        # and TheHub's exact replay receipt. Reformat only under a new certified
+        # runtime/package/replay revision.
+        exclude: ^(scripts/(leaderboard_release_provenance|materialize_leaderboard_snapshot|certify_leaderboard_snapshot|materialize_leaderboard_git_snapshot|finalize_leaderboard_release|export_leaderboard_package)\.py|server/backend/(leaderboards|leaderboard_adapters|leaderboard_history|leaderboard_investigation|leaderboard_entities)\.py)$
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v2.3.1

@@ -39,7 +39,13 @@ def _ranking(rows, source_hash):
         "certificationState": "PROVISIONAL",
         "topN": None,
         "candidateCount": len(rows),
-        "filters": {"startYear": None, "endYear": None, "municipality": None, "entityType": None, "currency": "USD"},
+        "filters": {
+            "startYear": None,
+            "endYear": None,
+            "municipality": None,
+            "entityType": None,
+            "currency": "USD",
+        },
         "currencies": ["USD"],
         "accounting": {
             "inputRecords": 11 if len(rows) == 5 else 20,
