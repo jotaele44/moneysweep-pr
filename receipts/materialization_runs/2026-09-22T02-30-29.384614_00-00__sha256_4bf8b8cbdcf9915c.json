@@ -1,0 +1,34 @@
+{
+  "dry_run": false,
+  "egress_ok": null,
+  "error_count": 1,
+  "ok_count": 0,
+  "ran": [
+    {
+      "database": {
+        "error": "",
+        "files": 0,
+        "rows": 0,
+        "source": "fec_committees",
+        "status": "NO_DATA"
+      },
+      "error": "HttpRequestFailed: HTTP 403: {\n  \"error\": {\n    \"code\": \"API_KEY_INVALID\",\n    \"message\": \"An invalid api_key was supplied. Get one at https://api.data.gov/signup/\"\n  }\n}",
+      "producer": "scripts/download_fec_committees.py",
+      "rows": null,
+      "source": "fec_committees",
+      "status": "ERROR"
+    }
+  ],
+  "registry_root": "/Users/jotaele/fed-repos/moneysweep-pr",
+  "schema_version": "1.0.0",
+  "selected": [
+    "fec_committees"
+  ],
+  "selected_count": 1,
+  "started_utc": "2026-09-22T02:30:29.384614+00:00",
+  "status": "OK",
+  "workspace_rebind": {
+    "PROJECT_ROOT": "/Users/jotaele/fed-repos/moneysweep-pr"
+  },
+  "workspace_root": "/Users/jotaele/fed-repos/moneysweep-pr"
+}

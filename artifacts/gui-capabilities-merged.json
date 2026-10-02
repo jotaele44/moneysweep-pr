@@ -94,8 +94,7 @@
           "dashboard/src/components/RelationshipGraph.jsx",
           "dashboard/src/components/MunicipalityAggregates.jsx",
           "dashboard/src/components/StatsBar.jsx",
-          "dashboard/src/components/StatsDistributions.jsx",
-          "dashboard/src/components/ProgramTimeline.jsx"
+          "dashboard/src/components/StatsDistributions.jsx"
         ],
         "discoverability": [
           "dashboard/src/pages/Dashboard.jsx"
@@ -759,7 +758,7 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing \u2014 zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
+      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing — zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
       "backend": {
         "files": [
           "scripts/scrape_rdc_demandas.py",
@@ -1458,25 +1457,6 @@
       ]
     },
     {
-      "id": "entity-network-kernel-v1",
-      "classification": "internal",
-      "status": "active",
-      "requires_terminal": false,
-      "rationale": "Additive cross-sector graph semantics, sector profiles, and fail-closed ingestion policy. This slice is backend infrastructure only and exposes no new human-facing workflow.",
-      "backend": {
-        "files": [
-          "moneysweep/entity_network/__init__.py",
-          "moneysweep/entity_network/models.py",
-          "moneysweep/entity_network/policy.py"
-        ]
-      },
-      "tests": {
-        "backend": [
-          "tests/test_entity_network_kernel.py"
-        ]
-      }
-    },
-    {
       "id": "hud-drgr-source-audit",
       "classification": "operator",
       "status": "active",
@@ -1693,6 +1673,581 @@
         "python_symbol:moneysweep/runtime/source_database.py:database_path",
         "python_symbol:moneysweep/runtime/source_database.py:materialize_source",
         "python_symbol:moneysweep/runtime/source_database.py:materialize_sources"
+      ]
+    },
+    {
+      "id": "capital-control-federal-registry-adapter-runtime",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Internal evidence sanitization and authoritative-binding adapter for the canonical capital-control resolver; it does not introduce an independent user workflow or GUI surface.",
+      "backend": {
+        "files": [
+          "moneysweep/capital_control/federal_registry_adapter.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_capital_control_successor_synthesis.py"
+        ]
+      },
+      "candidate_ids": [
+        "python_module:moneysweep/capital_control/federal_registry_adapter.py",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:adjudicate_registry_candidate",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:candidate_evidence_json",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:candidate_identifier",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:candidate_record",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:certified_record",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:is_certified_binding",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:sanitize_legacy_record"
+      ]
+    },
+    {
+      "id": "capital-control-resolution-core-runtime",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Canonical MoneySweep identifier/event/entity/property/financial resolution infrastructure. This is intentionally internal backend and orchestration logic; no new GUI surface is claimed by this migration slice.",
+      "backend": {
+        "files": [
+          "moneysweep/capital_control/resolution_core/__init__.py",
+          "moneysweep/capital_control/resolution_core/attribution.py",
+          "moneysweep/capital_control/resolution_core/change_detection.py",
+          "moneysweep/capital_control/resolution_core/contradictions.py",
+          "moneysweep/capital_control/resolution_core/engine.py",
+          "moneysweep/capital_control/resolution_core/equivalence.py",
+          "moneysweep/capital_control/resolution_core/finance.py",
+          "moneysweep/capital_control/resolution_core/gates.py",
+          "moneysweep/capital_control/resolution_core/identity.py",
+          "moneysweep/capital_control/resolution_core/joins.py",
+          "moneysweep/capital_control/resolution_core/models.py",
+          "moneysweep/capital_control/resolution_core/namespace.py",
+          "moneysweep/capital_control/resolution_core/property_project.py"
+        ]
+      },
+      "analysis": {
+        "files": [
+          "scripts/entity_resolution.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_resolution_core_golden_001.py",
+          "tests/test_resolution_core_contracts.py",
+          "tests/test_resolution_core_hardening.py",
+          "tests/test_entity_resolution_core_gate.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_symbol:scripts/entity_resolution.py:adjudicate_usaspending_candidate",
+        "python_module:moneysweep/capital_control/resolution_core/__init__.py",
+        "python_module:moneysweep/capital_control/resolution_core/attribution.py",
+        "python_module:moneysweep/capital_control/resolution_core/change_detection.py",
+        "python_module:moneysweep/capital_control/resolution_core/contradictions.py",
+        "python_module:moneysweep/capital_control/resolution_core/engine.py",
+        "python_module:moneysweep/capital_control/resolution_core/equivalence.py",
+        "python_module:moneysweep/capital_control/resolution_core/finance.py",
+        "python_module:moneysweep/capital_control/resolution_core/gates.py",
+        "python_module:moneysweep/capital_control/resolution_core/identity.py",
+        "python_module:moneysweep/capital_control/resolution_core/joins.py",
+        "python_module:moneysweep/capital_control/resolution_core/models.py",
+        "python_module:moneysweep/capital_control/resolution_core/namespace.py",
+        "python_module:moneysweep/capital_control/resolution_core/property_project.py",
+        "python_symbol:moneysweep/capital_control/resolution_core/attribution.py:FinancialAttribution",
+        "python_symbol:moneysweep/capital_control/resolution_core/attribution.py:attribute_financial_instrument",
+        "python_symbol:moneysweep/capital_control/resolution_core/change_detection.py:BaselineDiff",
+        "python_symbol:moneysweep/capital_control/resolution_core/change_detection.py:ChangeState",
+        "python_symbol:moneysweep/capital_control/resolution_core/change_detection.py:diff_baseline",
+        "python_symbol:moneysweep/capital_control/resolution_core/contradictions.py:Contradiction",
+        "python_symbol:moneysweep/capital_control/resolution_core/contradictions.py:adjudicate_contradiction",
+        "python_symbol:moneysweep/capital_control/resolution_core/engine.py:ResolutionCore",
+        "python_symbol:moneysweep/capital_control/resolution_core/engine.py:make_proposition",
+        "python_symbol:moneysweep/capital_control/resolution_core/equivalence.py:EquivalenceSets",
+        "python_symbol:moneysweep/capital_control/resolution_core/equivalence.py:compute_equivalence_sets",
+        "python_symbol:moneysweep/capital_control/resolution_core/finance.py:GrantClosure",
+        "python_symbol:moneysweep/capital_control/resolution_core/finance.py:close_grant",
+        "python_symbol:moneysweep/capital_control/resolution_core/finance.py:validate_amount",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:DenominatorResult",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:UnlockResult",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:evaluate_foia_gate",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:evaluate_public_denominator",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:evaluate_unlock",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:federation_unlock",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:funding_unlock",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:parcel_unlock",
+        "python_symbol:moneysweep/capital_control/resolution_core/identity.py:Candidate",
+        "python_symbol:moneysweep/capital_control/resolution_core/identity.py:Resolution",
+        "python_symbol:moneysweep/capital_control/resolution_core/identity.py:resolve_candidates",
+        "python_symbol:moneysweep/capital_control/resolution_core/joins.py:assert_no_unsafe_many_to_many",
+        "python_symbol:moneysweep/capital_control/resolution_core/joins.py:classify_join_cardinality",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:Cardinality",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:CertificationState",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:DependencyState",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:EvidenceBasis",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:FinancialAmount",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:NamespaceBinding",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:Proposition",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:PropositionType",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:SourceManifestation",
+        "python_symbol:moneysweep/capital_control/resolution_core/namespace.py:NamespaceOccupancyResult",
+        "python_symbol:moneysweep/capital_control/resolution_core/namespace.py:NamespaceRegistry",
+        "python_symbol:moneysweep/capital_control/resolution_core/property_project.py:PropertyProjectBinding",
+        "python_symbol:moneysweep/capital_control/resolution_core/property_project.py:SpatialState",
+        "python_symbol:moneysweep/capital_control/resolution_core/property_project.py:bind_property_project"
+      ]
+    },
+    {
+      "id": "dashboard-node-runtime-bootstrap",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The desktop bootstrap validates the dashboard's Node.js engine before installing frontend dependencies. It is an internal setup invariant, not a separate interactive GUI capability.",
+      "candidate_ids": [
+        "python_symbol:desktop/setup.py:node_version_supported"
+      ]
+    },
+    {
+      "id": "database-certification-operator-workflow",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Database release certification and provenance remediation are automatable operator/audit workflows. They produce immutable manifests and certification bundles consumed by governance and release processes; they are not interactive end-user dashboard capabilities and do not depend on an interactive terminal.",
+      "candidate_ids": [
+        "analysis_module:scripts/certify_database_release.py",
+        "analysis_module:scripts/remediate_canonical_evidence_provenance.py",
+        "analysis_symbol:scripts/certify_database_release.py:build_report",
+        "analysis_symbol:scripts/certify_database_release.py:main",
+        "analysis_symbol:scripts/certify_database_release.py:write_atomic_release",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:apply",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:atomic_csv",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:main",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:plan",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:read_rows",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:sha256",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:target_evidence",
+        "cli_surface:scripts/certify_database_release.py",
+        "cli_surface:scripts/remediate_canonical_evidence_provenance.py"
+      ]
+    },
+    {
+      "id": "database-certification-validation-backend",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "These modules are fail-closed validation primitives invoked by tests, CI, release certification, and Case Manager persistence. They have no independent user-facing interaction contract; GUI exposure would weaken rather than improve the audit boundary.",
+      "candidate_ids": [
+        "python_module:moneysweep/validation/case_manager_sqlite.py",
+        "python_module:moneysweep/validation/evidence_provenance.py",
+        "python_module:moneysweep/validation/federation_package.py",
+        "python_symbol:moneysweep/validation/canonical_v1_schema.py:validate_denominator_headers_and_rows",
+        "python_symbol:moneysweep/validation/canonical_v1_schema.py:validate_primary_key_uniqueness",
+        "python_symbol:moneysweep/validation/case_manager_sqlite.py:SQLiteReport",
+        "python_symbol:moneysweep/validation/case_manager_sqlite.py:certify_sqlite",
+        "python_symbol:moneysweep/validation/evidence_provenance.py:ProvenanceReport",
+        "python_symbol:moneysweep/validation/evidence_provenance.py:audit_evidence",
+        "python_symbol:moneysweep/validation/evidence_provenance.py:binding_key_for",
+        "python_symbol:moneysweep/validation/evidence_provenance.py:load_bindings",
+        "python_symbol:moneysweep/validation/federation_package.py:FederationReport",
+        "python_symbol:moneysweep/validation/federation_package.py:certify_federation_package"
+      ]
+    },
+    {
+      "id": "desktop-data-materialization",
+      "classification": "operator",
+      "status": "active",
+      "requires_terminal": false,
+      "backend": {
+        "files": [
+          "desktop/secrets.py",
+          "desktop/workspace.py",
+          "server/backend/desktop_app.py",
+          "server/backend/materialization.py",
+          "server/backend/materialization_security.py"
+        ],
+        "endpoints": [
+          "GET /status",
+          "GET /sources",
+          "GET /credentials",
+          "PUT /credentials/{key_name}",
+          "DELETE /credentials/{key_name}",
+          "POST /offline/upload",
+          "POST /offline/{source_id}/run",
+          "POST /api/run"
+        ],
+        "symbols": [
+          "desktop/secrets.py:activated_credentials",
+          "desktop/secrets.py:delete_secret",
+          "desktop/secrets.py:get_secret",
+          "desktop/secrets.py:presence",
+          "desktop/secrets.py:set_secret",
+          "desktop/workspace.py:bootstrap_workspace",
+          "desktop/workspace.py:resource_root",
+          "desktop/workspace.py:workspace_root",
+          "server/backend/materialization.py:ApiRunRequest",
+          "server/backend/materialization.py:CredentialWriteRequest",
+          "server/backend/materialization.py:credential_delete",
+          "server/backend/materialization.py:credential_status",
+          "server/backend/materialization.py:credential_write",
+          "server/backend/materialization.py:materialization_sources",
+          "server/backend/materialization.py:materialization_status",
+          "server/backend/materialization.py:run_api_sources",
+          "server/backend/materialization.py:run_offline_source",
+          "server/backend/materialization.py:upload_offline_file",
+          "server/backend/materialization_security.py:public_run_summary",
+          "server/backend/materialization_security.py:write_offline_receipt"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/lib/api.js",
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/DataSources.jsx"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_backend_materialization.py",
+          "tests/test_desktop_workspace.py",
+          "tests/test_desktop_materialization_runtime.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/data-sources.spec.mjs"
+        ]
+      }
+    },
+    {
+      "id": "fomb-source-materialization",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The FOMB collectors are provenance-preserving source materialization workers. Their normalized outputs feed existing MoneySweep data surfaces; they do not define a separate interactive analysis workflow.",
+      "candidate_ids": [
+        "analysis_module:scripts/download_fomb.py",
+        "analysis_module:scripts/download_fomb_special_reports.py",
+        "analysis_symbol:scripts/download_fomb.py:AjaxConfig",
+        "analysis_symbol:scripts/download_fomb.py:Link",
+        "analysis_symbol:scripts/download_fomb.py:main",
+        "analysis_symbol:scripts/download_fomb.py:run",
+        "analysis_symbol:scripts/download_fomb_special_reports.py:run",
+        "cli_surface:scripts/download_fomb.py"
+      ]
+    },
+    {
+      "id": "dateas-metadata-discovery",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The Dateas adapter is deliberately metadata-only and fail-closed: it cannot fetch rows, poll, or promote canonical data. It records discovery provenance for first-party source resolution rather than exposing a user workflow.",
+      "candidate_ids": [
+        "python_module:moneysweep/query/adapters/dateas_pr_metadata.py",
+        "python_symbol:moneysweep/query/adapters/dateas_pr_metadata.py:DateasPRMetadataOnlyAdapter"
+      ]
+    },
+    {
+      "id": "guide-financial-avenue-audit-pipeline",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Bounded source-audit and authoritative-source materialization pipeline used to generate certified financial-avenue evidence and reports; it is CI/operator plumbing, not a separate human-facing dashboard workflow.",
+      "analysis": {
+        "files": [
+          "scripts/audit_guide_financial_avenues.py",
+          "scripts/finalize_guide_financial_freeze.py",
+          "scripts/scrape_ftz_board_pr.py",
+          "scripts/scrape_ocif_guide_financial_classes.py",
+          "scripts/scrape_ocs_insurers.py"
+        ],
+        "symbols": [
+          "scripts/audit_guide_financial_avenues.py:compute",
+          "scripts/audit_guide_financial_avenues.py:load_inputs",
+          "scripts/audit_guide_financial_avenues.py:main",
+          "scripts/audit_guide_financial_avenues.py:metrics_payload",
+          "scripts/audit_guide_financial_avenues.py:run",
+          "scripts/audit_guide_financial_avenues.py:validate_inputs",
+          "scripts/audit_guide_financial_avenues.py:write_outputs",
+          "scripts/finalize_guide_financial_freeze.py:build_certification",
+          "scripts/finalize_guide_financial_freeze.py:csv_schema",
+          "scripts/finalize_guide_financial_freeze.py:latest_manifest",
+          "scripts/finalize_guide_financial_freeze.py:main",
+          "scripts/finalize_guide_financial_freeze.py:materialized_projection",
+          "scripts/finalize_guide_financial_freeze.py:run",
+          "scripts/finalize_guide_financial_freeze.py:sha256_file",
+          "scripts/finalize_guide_financial_freeze.py:validate_source_snapshot",
+          "scripts/scrape_ftz_board_pr.py:main",
+          "scripts/scrape_ftz_board_pr.py:parse_zone",
+          "scripts/scrape_ftz_board_pr.py:run",
+          "scripts/scrape_ocif_guide_financial_classes.py:fetch_class",
+          "scripts/scrape_ocif_guide_financial_classes.py:main",
+          "scripts/scrape_ocif_guide_financial_classes.py:parse_page",
+          "scripts/scrape_ocif_guide_financial_classes.py:run",
+          "scripts/scrape_ocs_insurers.py:main",
+          "scripts/scrape_ocs_insurers.py:parse_annual_reports",
+          "scripts/scrape_ocs_insurers.py:parse_insurers",
+          "scripts/scrape_ocs_insurers.py:run"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_guide_financial_avenue_audit.py",
+          "tests/test_guide_financial_source_parsers.py"
+        ]
+      }
+    },
+    {
+      "id": "haf-contract-validation",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The HAF contract validator is a fail-closed CI and governance primitive. It validates repository metadata and cross-file bindings without creating a separate end-user workflow or requiring an interactive terminal.",
+      "candidate_ids": [
+        "analysis_module:scripts/validate_haf_contract.py",
+        "analysis_symbol:scripts/validate_haf_contract.py:main",
+        "analysis_symbol:scripts/validate_haf_contract.py:validate"
+      ]
+    },
+    {
+      "id": "hud-drgr-authorized-source-audit",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The HUD/DRGR authorized-source pursuit is a bounded, one-shot provenance audit over operator-local candidate files. It classifies possible evidence and writes a receipt, but never promotes data automatically; unresolved or merely supporting material remains fail-closed. The callable CLI is an implementation surface for audit execution, not a normal user workflow, so presenting it as a GUI capability would conflate certification machinery with certified HUD/DRGR data.",
+      "analysis": {
+        "files": [
+          "scripts/audit_hud_drgr_authorized_sources.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_audit_hud_drgr_authorized_sources.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/audit_hud_drgr_authorized_sources.py",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:build_receipt",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_csv",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_parquet",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_path",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:main",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:sha256_file",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:utc_now",
+        "cli_surface:scripts/audit_hud_drgr_authorized_sources.py"
+      ]
+    },
+    {
+      "id": "issuer-sec13f-certification-runtime",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The issuer-parameterized SEC 13F certifier and its exact-head certification lock are fail-closed audit/certification infrastructure. They intentionally remain non-GUI while issuer certification is independently gated. GUI or Deep Dive exposure is a separate promotion decision permitted only after an issuer reaches zero-residue PASS; mapping the certifier or lock itself to a user-facing surface would incorrectly conflate backend certification machinery with certified issuer data. Their callable CLIs are implementation surfaces, not user-required terminal workflows.",
+      "analysis": {
+        "files": [
+          "scripts/certify_sec13f_issuer.py",
+          "scripts/sec13f_certification_lock.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/skill_contract/test_sec13f_issuer_certifier_contract.py",
+          "tests/test_sec13f_certification_lock.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/certify_sec13f_issuer.py",
+        "analysis_module:scripts/sec13f_certification_lock.py",
+        "analysis_symbol:scripts/certify_sec13f_issuer.py:main",
+        "analysis_symbol:scripts/certify_sec13f_issuer.py:run",
+        "analysis_symbol:scripts/sec13f_certification_lock.py:CertificationLockError",
+        "analysis_symbol:scripts/sec13f_certification_lock.py:build_parser",
+        "analysis_symbol:scripts/sec13f_certification_lock.py:build_preflight_receipt",
+        "analysis_symbol:scripts/sec13f_certification_lock.py:main",
+        "analysis_symbol:scripts/sec13f_certification_lock.py:validate_semantic_boundaries",
+        "analysis_symbol:scripts/sec13f_certification_lock.py:validate_vector_parent",
+        "analysis_symbol:scripts/sec13f_certification_lock.py:verify_post_merge",
+        "cli_surface:scripts/certify_sec13f_issuer.py",
+        "cli_surface:scripts/sec13f_certification_lock.py"
+      ]
+    },
+    {
+      "id": "ownership-and-capital-deep-dive",
+      "classification": "analysis",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Separately gated read-only promotion of the independently certified BPOP SEC 13F eight-quarter scope. The GUI does not broaden certification to OFG/EVTC, does not redownload evidence, and keeps provider metric equivalence OPEN.",
+      "backend": {
+        "files": [
+          "moneysweep/capital_control/deep_dive.py",
+          "server/backend/ownership_api.py",
+          "server/backend/main.py"
+        ],
+        "endpoints": [
+          "GET /status",
+          "GET /{ticker}"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/lib/api.js",
+          "dashboard/src/lib/hooks.js",
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/OwnershipDeepDive.jsx"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_ownership_deep_dive.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/ownership-deep-dive.spec.mjs"
+        ]
+      },
+      "candidate_ids": [
+        "python_module:moneysweep/capital_control/deep_dive.py",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:OwnershipDeepDiveError",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:CertifiedOwnershipScope",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:load_certification",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:load_materialized_holdings",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:build_ownership_deep_dive",
+        "python_module:server/backend/ownership_api.py",
+        "python_symbol:server/backend/ownership_api.py:ownership_status",
+        "python_symbol:server/backend/ownership_api.py:ownership_deep_dive",
+        "backend_endpoint:server/backend/ownership_api.py:GET /status",
+        "backend_endpoint:server/backend/ownership_api.py:GET /{ticker}"
+      ]
+    },
+    {
+      "id": "prasa-transition-contract-ingest",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The PRASA transition-contract ingester is an offline, provenance-preserving source materialization step. Its CSV and receipt feed existing MoneySweep data surfaces; it is not a separate interactive analysis capability.",
+      "candidate_ids": [
+        "analysis_module:scripts/ingest_prasa_transition_contracts.py",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:main",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:parse_prasa_transition_contracts",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:run",
+        "cli_surface:scripts/ingest_prasa_transition_contracts.py"
+      ]
+    },
+    {
+      "id": "prasa-transition-contracts-ingest",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "A narrow, offline PDF-to-CSV parser for one specific archived PRASA transition-agency report (ACT agency 163 'Contratos Vigentes'). It accepts only the stable pdftotext -layout shape of that one report and writes the existing pr_prasa_contracts.csv schema consumed by downstream pipeline steps; it does not claim general PRASA-PDF ingestion. Same category as build_source_drop_manifest.py: an offline evidence-acquisition script feeding existing pipeline outputs, not a separate interactive dashboard capability.",
+      "candidate_ids": [
+        "analysis_module:scripts/ingest_prasa_transition_contracts.py",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:main",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:parse_prasa_transition_contracts",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:run",
+        "cli_surface:scripts/ingest_prasa_transition_contracts.py"
+      ]
+    },
+    {
+      "id": "sec-ownership-hardening-runtime",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Authoritative SEC acquisition, identifier adjudication, source freezing, and bounded BPOP ownership certification are offline backend infrastructure. They intentionally remain non-user-facing until code CI and the real eight-quarter data certification both pass and a separate Deep Dive promotion vector is approved.",
+      "backend": {
+        "files": [
+          "moneysweep/capital_control/sec13f.py",
+          "moneysweep/sec_equity_identity.py"
+        ]
+      },
+      "analysis": {
+        "files": [
+          "scripts/acquire_sec13f_bpop_golden.py",
+          "scripts/certify_bpop_sec13f_8q.py",
+          "scripts/download_sec_equity_v2.py",
+          "scripts/rematerialize_sec_holdings_discovery_v2.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_sec_ownership_hardening_v0_3.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/acquire_sec13f_bpop_golden.py",
+        "analysis_module:scripts/certify_bpop_sec13f_8q.py",
+        "analysis_module:scripts/download_sec_equity_v2.py",
+        "analysis_module:scripts/rematerialize_sec_holdings_discovery_v2.py",
+        "analysis_symbol:scripts/acquire_sec13f_bpop_golden.py:archive_audit",
+        "analysis_symbol:scripts/acquire_sec13f_bpop_golden.py:main",
+        "analysis_symbol:scripts/acquire_sec13f_bpop_golden.py:run",
+        "analysis_symbol:scripts/acquire_sec13f_bpop_golden.py:sha256_file",
+        "analysis_symbol:scripts/certify_bpop_sec13f_8q.py:main",
+        "analysis_symbol:scripts/certify_bpop_sec13f_8q.py:run",
+        "analysis_symbol:scripts/download_sec_equity_v2.py:main",
+        "analysis_symbol:scripts/download_sec_equity_v2.py:run",
+        "analysis_symbol:scripts/rematerialize_sec_holdings_discovery_v2.py:classify_identifier",
+        "analysis_symbol:scripts/rematerialize_sec_holdings_discovery_v2.py:main",
+        "analysis_symbol:scripts/rematerialize_sec_holdings_discovery_v2.py:run",
+        "cli_surface:scripts/acquire_sec13f_bpop_golden.py",
+        "cli_surface:scripts/certify_bpop_sec13f_8q.py",
+        "cli_surface:scripts/download_sec_equity_v2.py",
+        "cli_surface:scripts/rematerialize_sec_holdings_discovery_v2.py",
+        "python_module:moneysweep/capital_control/sec13f.py",
+        "python_module:moneysweep/sec_equity_identity.py",
+        "python_symbol:moneysweep/capital_control/sec13f.py:ArchiveMemberDigest",
+        "python_symbol:moneysweep/capital_control/sec13f.py:FilingRestatementAdjudication",
+        "python_symbol:moneysweep/capital_control/sec13f.py:FilingRestatementLineage",
+        "python_symbol:moneysweep/capital_control/sec13f.py:RestatementAdjudication",
+        "python_symbol:moneysweep/capital_control/sec13f.py:RestatementIssue",
+        "python_symbol:moneysweep/capital_control/sec13f.py:Sec13FArchiveAudit",
+        "python_symbol:moneysweep/capital_control/sec13f.py:Sec13FBulkAdapter",
+        "python_symbol:moneysweep/capital_control/sec13f.py:Sec13FError",
+        "python_symbol:moneysweep/capital_control/sec13f.py:adjudicate_sec13f_restatements",
+        "python_symbol:moneysweep/capital_control/sec13f.py:adjudicate_sec13f_filing_restatements",
+        "python_symbol:moneysweep/sec_equity_identity.py:SecIdentityError",
+        "python_symbol:moneysweep/sec_equity_identity.py:SecIssuerBinding",
+        "python_symbol:moneysweep/sec_equity_identity.py:canonical_cik",
+        "python_symbol:moneysweep/sec_equity_identity.py:require_binding",
+        "python_symbol:moneysweep/sec_equity_identity.py:require_submission_identity",
+        "python_symbol:moneysweep/sec_equity_identity.py:ticker_map"
+      ]
+    },
+    {
+      "id": "source-drop-evidence-manifest",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Preservation-first source-drop inventory, hashing, schema inspection, and controlled staging are offline evidence-pipeline operations. The generated manifests feed existing ingestion workflows; they are not a separate interactive dashboard capability.",
+      "candidate_ids": [
+        "analysis_module:scripts/build_source_drop_manifest.py",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:build_records",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:inspect_csv",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:inspect_path",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:inspect_xlsx",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:main",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:sha256_file",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:utc_now",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:write_outputs",
+        "cli_surface:scripts/build_source_drop_manifest.py"
       ]
     }
   ],
