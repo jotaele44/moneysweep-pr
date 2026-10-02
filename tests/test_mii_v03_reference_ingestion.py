@@ -92,10 +92,7 @@ def test_declared_sector_denominator_and_node_residue_close_without_synthesis() 
 
 
 def test_water_count_contradiction_is_not_silently_repaired() -> None:
-    coverage = {
-        row["mii_label"]: row
-        for row in _load("coverage_ledger.json")["sectors"]
-    }
+    coverage = {row["mii_label"]: row for row in _load("coverage_ledger.json")["sectors"]}
     water = coverage["WATER"]
     assert water["declared_curated_nodes"] == 4
     assert water["node_evidence_tally_sum"] == 3
@@ -123,12 +120,8 @@ def test_edge_arithmetic_closes_but_row_level_edges_remain_blocked() -> None:
     assert edge["internal_edges_computed"] == 154
     assert edge["sum_ecosystem_board_edges"] == 272
     assert 154 + 2 * 59 == 272
-    assert edge["row_level_edge_ingest_state"] == (
-        "BLOCKED_SOURCE_ARTIFACT_NOT_EXPOSED"
-    )
-    assert reconciliation["materialized_from_visible_pdf"][
-        "row_level_edges_materialized"
-    ] == 0
+    assert edge["row_level_edge_ingest_state"] == ("BLOCKED_SOURCE_ARTIFACT_NOT_EXPOSED")
+    assert reconciliation["materialized_from_visible_pdf"]["row_level_edges_materialized"] == 0
 
 
 def test_source_contradiction_denominator_is_exactly_six() -> None:
@@ -150,13 +143,9 @@ def test_source_vector_binding_is_not_source_exhaustion() -> None:
 
     assert len(by_vector) == 10
     assert by_vector["MII-SRC-02"]["binding_state"] == "MISSING_ADAPTER"
-    assert by_vector["MII-SRC-06"]["binding_state"] == (
-        "PARTIAL_MISSING_PREB_ADAPTER"
-    )
+    assert by_vector["MII-SRC-06"]["binding_state"] == ("PARTIAL_MISSING_PREB_ADAPTER")
     assert by_vector["MII-SRC-07"]["binding_state"] == "CANDIDATE_NOT_EQUIVALENT"
-    assert by_vector["MII-SRC-08"]["binding_state"] == (
-        "PARTIAL_MISSING_PRIDCO_LEASE_ADAPTER"
-    )
+    assert by_vector["MII-SRC-08"]["binding_state"] == ("PARTIAL_MISSING_PRIDCO_LEASE_ADAPTER")
     assert "Registration or materialization does not prove" in bindings["semantics"]
 
 
