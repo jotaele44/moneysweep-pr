@@ -40,14 +40,20 @@
         ]
       },
       "frontend": {
-        "routes": ["/"],
-        "e2e_routes": ["/"],
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
         "components": [
           "dashboard/src/lib/api.js",
           "dashboard/src/pages/Dashboard.jsx",
           "dashboard/src/components/FinancialLeaderboards.jsx"
         ],
-        "discoverability": ["dashboard/src/pages/Dashboard.jsx"]
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
       },
       "tests": {
         "backend": [
@@ -60,8 +66,12 @@
           "tests/test_leaderboard_release_finalizer.py",
           "tests/test_leaderboard_release_provenance.py"
         ],
-        "contract": ["tests/test_gui_parity.py"],
-        "e2e": ["dashboard/tests/financial-leaderboards.spec.mjs"]
+        "contract": [
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/financial-leaderboards.spec.mjs"
+        ]
       }
     }
   ]

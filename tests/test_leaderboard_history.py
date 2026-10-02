@@ -131,7 +131,7 @@ def test_source_hash_change_blocks_economic_change_inference():
     result = compare(prior, current)
     assert result["sourceManifestationChanged"] is True
     assert result["economicChangeInferenceAllowed"] is False
-    assert any(row["entityId"] == "entity_a" for row in result["rows"])
+    assert "dataset delta" in result["reason"]
 
 
 @pytest.mark.unit
