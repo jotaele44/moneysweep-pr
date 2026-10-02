@@ -132,7 +132,10 @@ data/raw/follow_the_money/funding_flows_sf133.csv
 data/logs/**
 data/cache/**
 !data/logs/.gitkeep
-.claude/
+# Claude Code: ignore local state, but keep the shared project settings (the Stop
+# hook that runs the docs-sync check) tracked.
+.claude/*
+!.claude/settings.json
 
 # Machine-specific cypher-shell discovery output emitted by PREPA load launchers
 outputs/**/cypher_shell_candidates.txt
