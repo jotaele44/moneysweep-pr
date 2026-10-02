@@ -220,7 +220,7 @@ skills:
       - "claiming source exhaustion from registry presence or materialization alone"
     synthetic_data_policy: reject_in_production
     provenance_policy: required
-    confidence_policy: evidence_state_controls_certification
+    confidence_policy: required_when_inferred
     review_queue_policy: required_for_ambiguity
 
   - schema_version: prii_skill_contract_v1
