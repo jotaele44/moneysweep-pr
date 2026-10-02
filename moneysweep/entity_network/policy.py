@@ -34,9 +34,7 @@ def assert_no_money_flow_as_relationship(relation_type: str) -> None:
     """Reject money-movement verbs from the ordinary relationship graph."""
     token = relation_type.strip().upper()
     if token in _MONEY_FLOW_RELATION_TYPES:
-        raise ValueError(
-            f"{token} is a money-flow semantic and must use MoneyFlowObservation"
-        )
+        raise ValueError(f"{token} is a money-flow semantic and must use MoneyFlowObservation")
 
 
 def resolve_entity_candidates(candidates: Iterable[Candidate]) -> Resolution:
@@ -47,10 +45,7 @@ def resolve_entity_candidates(candidates: Iterable[Candidate]) -> Resolution:
 def promotable_relationship(assertion: RelationshipAssertion) -> bool:
     """Only binding evidence in PASS state may promote an assertion."""
     assert_no_money_flow_as_relationship(assertion.relation_type)
-    return (
-        assertion.state is CertificationState.PASS
-        and assertion.evidence_basis in BINDING_BASES
-    )
+    return assertion.state is CertificationState.PASS and assertion.evidence_basis in BINDING_BASES
 
 
 def index_sector_memberships(
