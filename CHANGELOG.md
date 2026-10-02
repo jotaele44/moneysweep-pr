@@ -27,9 +27,9 @@ A bump to the **federation export** version is what the release-tagging workflow
 ### Fixed
 - **Desktop Setup & Diagnostics no longer hangs on "Saving configuration and
   starting the app…".** A backend that failed or was slow to import left the
-  setup page frozen with no error; the shared `prii-desktop` runtime now shows
-  the splash first and renders an error screen with **Try Again** and a launcher
-  log on any startup failure. `requirements-desktop.txt` pins the fixed runtime.
+  setup page frozen with no error. The visible-error screen with **Try Again**
+  ships in the shared `prii-desktop` runtime (thehub-pr#335); this repo picks it
+  up when the federation template pin in `requirements-desktop.txt` is bumped.
 - **Source launches no longer fail while importing the backend.** Every launcher
   runs `python desktop/launch.py`, which put `desktop/` first on `sys.path` so
   `desktop/secrets.py` shadowed the standard-library `secrets` module and
