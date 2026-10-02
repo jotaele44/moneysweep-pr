@@ -21,6 +21,7 @@ from scripts.scrape_asg_emergency_purchases import (
     fetch_all_records,
     fiscal_year_and_programme,
     parse_records,
+    split_vendor_identity,
 )
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -57,11 +58,45 @@ def test_parse_records_on_a_page_without_the_table_returns_empty():
     assert parse_records("<html><body><h1>Error</h1></body></html>") == []
 
 
+
+
+@pytest.mark.unit
+def test_source_native_vendor_id_is_extracted_without_name_inference():
+    assert split_vendor_identity("Caribbean Composting Inc. (4381)") == (
+        "Caribbean Composting Inc. (4381)",
+        "Caribbean Composting Inc.",
+        "4381",
+        "SOURCE_NATIVE_ASG_LICITADOR_ID",
+    )
+    assert split_vendor_identity("Puerto Rico Wire Products, Inc.") == (
+        "Puerto Rico Wire Products, Inc.",
+        "Puerto Rico Wire Products, Inc.",
+        "",
+        "UNRESOLVED_NAME_ONLY",
+    )
+    assert split_vendor_identity("") == ("", "", "", "UNRESOLVED_MISSING_VENDOR")
+
+
+@pytest.mark.unit
+def test_normalize_preserves_raw_vendor_label_and_source_native_id():
+    record = dict(parse_records(PURCHASES_HTML)[0])
+    record["Proveedor"] = "A1 Generator Services Incorporated (28546)"
+    row = _normalize_row(record)
+    assert row["vendor_source_label"] == "A1 Generator Services Incorporated (28546)"
+    assert row["vendor_name"] == "A1 Generator Services Incorporated"
+    assert row["vendor_registration_id"] == "28546"
+    assert row["vendor_identity_scheme"] == "asg_licitador_id"
+    assert row["vendor_identity_state"] == "SOURCE_NATIVE_ASG_LICITADOR_ID"
+
 @pytest.mark.unit
 def test_normalize_row_emits_exactly_the_declared_columns():
     row = _normalize_row(parse_records(PURCHASES_HTML)[0])
     assert list(row.keys()) == EMERGENCY_PURCHASE_COLUMNS
+    assert row["vendor_source_label"] == "Salud Para Todos"
     assert row["vendor_name"] == "Salud Para Todos"
+    assert row["vendor_registration_id"] == ""
+    assert row["vendor_identity_scheme"] == ""
+    assert row["vendor_identity_state"] == "UNRESOLVED_NAME_ONLY"
     assert row["awarding_agency"] == "Departamento de Salud"
     assert row["contract_number"] == "36725"
     # The raw money string is preserved; post_ingest adds the parsed companion.

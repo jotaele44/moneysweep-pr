@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "moneysweep.asg-emergency-source-native-scope-candidate/v1",
+  "scopeId": "moneysweep.leaderboard.asg-emergency-source-native-candidate-v1",
+  "state": "OPEN_CANDIDATE_NOT_PRODUCTION",
+  "sourceId": "asg_emergency_purchases",
+  "categoryCandidate": "asg_emergency_purchase_cost",
+  "measure": "ASG_EMERGENCY_PURCHASE_COST",
+  "currency": "USD",
+  "identity": {
+    "scheme": "asg_licitador_id",
+    "inScopeRule": "vendor_identity_state=SOURCE_NATIVE_ASG_LICITADOR_ID AND vendor_identity_scheme=asg_licitador_id",
+    "nameOnlyPromotionAllowed": false
+  },
+  "coverage": {
+    "fullSourceMaterializationRequired": true,
+    "wholeSourceControlNumberArithmeticRequired": true,
+    "claimsCompleteASGEmergencyUniverse": false,
+    "outOfScopeIdentityRowsAllowedOnlyWhenExplicitlyCounted": true
+  },
+  "promotionGates": [
+    "FULL_SOURCE_MATERIALIZATION",
+    "EXACT_CURRENT_SOURCE_DENOMINATOR",
+    "ZERO_DUPLICATE_OR_MISSING_CONTROL_NUMBER_RESIDUE",
+    "ZERO_IDENTITY_NAMESPACE_MISMATCH",
+    "ZERO_INVALID_AMOUNT_RESIDUE_AMONG_SOURCE_NATIVE_ROWS",
+    "NONZERO_SOURCE_NATIVE_RANKING_DENOMINATOR",
+    "FROZEN_SOURCE_BYTES_AND_SHA256",
+    "FROZEN_RUNTIME_AND_PRODUCER_COMMIT",
+    "SNAPSHOT_HASH_VALIDATION",
+    "COMPETITION_RANKING_VALIDATION",
+    "EXPLICIT_WHOLE_SOURCE_EXCLUSION_ARITHMETIC",
+    "THEHUB_EXACT_HASH_REPLAY"
+  ],
+  "prohibitedClaims": [
+    "all ASG emergency purchases",
+    "all ASG vendors",
+    "total ASG emergency spending",
+    "name-resolved vendor identity",
+    "UEI identity for ASG Licitador IDs"
+  ],
+  "productionOntologyEffect": "NONE",
+  "certificationPhraseAuthorized": false
+}
