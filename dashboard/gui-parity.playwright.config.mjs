@@ -16,7 +16,8 @@ function findRepositoryRoot(start) {
 
 const frontendRoot = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = findRepositoryRoot(frontendRoot);
-const frontendUrl = "http://127.0.0.1:5173";
+const frontendPort = process.env.GUI_FRONTEND_PORT || "5173";
+const frontendUrl = `http://127.0.0.1:${frontendPort}`;
 const backendUrl = "http://127.0.0.1:8000";
 const seedScript = path.join(repositoryRoot, "server", "ingestion", "seed_demo.py");
 const backendCommand = fs.existsSync(seedScript)
@@ -31,6 +32,7 @@ export default defineConfig({
     "api-keys.spec.mjs",
     "data-sources.spec.mjs",
     "financial-leaderboards.spec.mjs",
+    "hud-drgr-audit.spec.mjs",
   ],
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
@@ -56,6 +58,8 @@ export default defineConfig({
       cwd: repositoryRoot,
       env: {
         ...process.env,
+        ALLOWED_ORIGINS: frontendUrl,
+        MONEYSWEEP_CORS_ORIGINS: frontendUrl,
         PYTHONPATH: [
           path.join(repositoryRoot, "src"),
           repositoryRoot,
@@ -69,7 +73,7 @@ export default defineConfig({
       timeout: 120_000,
     },
     {
-      command: "npm run dev -- --host 127.0.0.1 --port 5173 --strictPort",
+      command: `npm run dev -- --host 127.0.0.1 --port ${frontendPort} --strictPort`,
       cwd: frontendRoot,
       env: {
         ...process.env,

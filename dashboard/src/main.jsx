@@ -22,3 +22,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </ErrorBoundary>
   </React.StrictMode>,
 )
+
+// Archive design is isolated from the existing backend and semantic tokens.
+import "./zip-design/tokens.css";
+import "./zip-design/adaptation.css";
