@@ -1,0 +1,57 @@
+{
+  "schema_version": "mii_v0_3_reconciliation_v1",
+  "source_pdf_sha256": "4e99ddb6efa80ef36909429f27a315064367c57449ad1e4f9dcc301d802925b3",
+  "declared": {
+    "v02_registry_entities": 105783,
+    "v02_accepted_relationships": 0,
+    "curated_nodes_distinct": 223,
+    "edges_distinct": 213,
+    "edge_evidence_A": 139,
+    "edge_evidence_B": 43,
+    "edge_evidence_C": 31,
+    "cross_ecosystem_edges": 59,
+    "registry_name_candidates_never_merged": 234
+  },
+  "materialized_from_visible_pdf": {
+    "rendered_card_manifestations": 256,
+    "distinct_visible_card_signatures": 182,
+    "visible_registry_name_only_candidates": 28,
+    "row_level_edges_materialized": 0,
+    "observed_visible_node_cards_sha256": "7523d02a8ff44b809ba999eb4c64e2bf385943d6db2cae4a5b589be76899a313",
+    "observed_visible_registry_candidates_sha256": "3d057e2c9dda648893c24beb0116c675b5fb3dc256750717adde5a3f359ddd54"
+  },
+  "node_arithmetic": {
+    "sum_declared_curated_nodes": 223,
+    "distinct_visible_card_signatures": 182,
+    "unmaterialized_declared_node_residue": 41,
+    "closure_expression": "182 + 41 = 223",
+    "closure": true,
+    "note": "The 41-row residue is counted only; no placeholder node records are synthesized."
+  },
+  "edge_arithmetic": {
+    "sum_ecosystem_board_edges": 272,
+    "global_distinct_edges": 213,
+    "cross_ecosystem_edges": 59,
+    "internal_edges_computed": 154,
+    "closure_expression": "(213 - 59) + (2 * 59) = 272",
+    "closure": true,
+    "row_level_edge_ingest_state": "BLOCKED_SOURCE_ARTIFACT_NOT_EXPOSED",
+    "note": "Aggregate arithmetic closes, but neither supplied source exposes a complete row-level 213-edge table; no edge rows are synthesized."
+  },
+  "source_taxonomy_non_equivalences": [
+    "registry_name_candidates_never_merged (234) != sum of per-ecosystem core_candidates",
+    "MII evidence A/B/C != canonical MoneySweep identity evidence bases",
+    "visible rendered card manifestations != distinct canonical entities",
+    "coverage ledger count equality != identity proof"
+  ],
+  "contradiction_ids": [
+    "V3C-001",
+    "V3C-002",
+    "V3C-003",
+    "V3C-004",
+    "V3C-005",
+    "V3C-006",
+    "MII-INGEST-COUNT-001",
+    "MII-INGEST-COUNT-002"
+  ]
+}
