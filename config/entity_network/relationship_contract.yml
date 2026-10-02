@@ -1,0 +1,97 @@
+version: "1.0"
+schema_version: "moneysweep_entity_network_relationship_contract_v1"
+
+rules:
+  money_flow_is_separate: true
+  sector_membership_is_identity_evidence: false
+  dependency_is_money_flow: false
+  parent_is_beneficial_owner: false
+  facility_is_legal_entity: false
+  source_manifestation_is_canonical_entity: false
+  unknown_amount_defaults_to_zero: false
+
+relationship_types:
+  - id: ALIAS_OF
+    family: IDENTITY_LINEAGE
+  - id: FORMERLY_KNOWN_AS
+    family: IDENTITY_LINEAGE
+  - id: PARENT_OF
+    family: OWNERSHIP_CONTROL
+    inverse: SUBSIDIARY_OF
+  - id: SUBSIDIARY_OF
+    family: OWNERSHIP_CONTROL
+    inverse: PARENT_OF
+  - id: ACQUIRED_BY
+    family: IDENTITY_LINEAGE
+  - id: MERGED_INTO
+    family: IDENTITY_LINEAGE
+  - id: OWNS
+    family: OWNERSHIP_CONTROL
+  - id: CONTROLS
+    family: OWNERSHIP_CONTROL
+  - id: OPERATES
+    family: FACILITY
+  - id: LEASES
+    family: FACILITY
+  - id: LOCATED_AT
+    family: FACILITY
+  - id: AWARDS_TO
+    family: PROCUREMENT
+  - id: CONTRACTS_WITH
+    family: PROCUREMENT
+  - id: PRIME_OF
+    family: PROCUREMENT
+  - id: SUBCONTRACTOR_OF
+    family: PROCUREMENT
+  - id: REGULATED_BY
+    family: REGULATORY
+  - id: LICENSED_BY
+    family: REGULATORY
+  - id: PERMITTED_BY
+    family: REGULATORY
+  - id: SUPPLIED_BY
+    family: INFRASTRUCTURE
+  - id: DEPENDENCY_ON
+    family: INFRASTRUCTURE
+  - id: FUNDED_BY
+    family: GOVERNANCE
+  - id: OVERSEEN_BY
+    family: GOVERNANCE
+  - id: CONCESSION_FROM
+    family: GOVERNANCE
+  - id: PARTNERS_WITH
+    family: RESEARCH_WORKFORCE
+  - id: MEMBER_OF
+    family: RESEARCH_WORKFORCE
+  - id: TRAINS_FOR
+    family: RESEARCH_WORKFORCE
+
+money_flow_types:
+  - PAYMENT
+  - DISBURSEMENT
+  - OBLIGATION
+  - REIMBURSEMENT
+  - INVESTMENT
+  - LOAN
+  - DISTRIBUTION
+  - DIVIDEND
+  - FEE
+  - PURCHASE
+  - UNKNOWN
+
+non_equivalences:
+  - left: DEPENDENCY_ON
+    right: MONEY_FLOW
+    rule: Infrastructure dependency never proves a payment.
+  - left: PARENT_OF
+    right: BENEFICIAL_OWNER_OF
+    rule: Immediate parentage never proves ultimate beneficial ownership.
+  - left: LOCATED_AT
+    right: DOMICILED_IN
+    rule: Facility location never proves legal domicile.
+  - left: SECTOR_MEMBERSHIP
+    right: ENTITY_IDENTITY
+    rule: Same-sector classification is discovery context only.
+  - left: SOURCE_MANIFESTATION
+    right: CANONICAL_ENTITY
+    rule: A source record must pass identity adjudication before promotion.
