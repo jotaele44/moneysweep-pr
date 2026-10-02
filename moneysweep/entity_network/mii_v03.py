@@ -136,8 +136,7 @@ def validate_reference_bundle(reference_dir: Path) -> dict[str, Any]:
 
     node = reconciliation["node_arithmetic"]
     if (
-        node["distinct_visible_card_signatures"]
-        + node["unmaterialized_declared_node_residue"]
+        node["distinct_visible_card_signatures"] + node["unmaterialized_declared_node_residue"]
         != 223
     ):
         raise MIIReferenceError("visible-node + residue arithmetic does not close")
@@ -150,13 +149,9 @@ def validate_reference_bundle(reference_dir: Path) -> dict[str, Any]:
     if edge["row_level_edge_ingest_state"] != "BLOCKED_SOURCE_ARTIFACT_NOT_EXPOSED":
         raise MIIReferenceError("row-level edge ingest must remain blocked")
 
-    source_ids = {
-        row["contradiction_id"] for row in contradictions["source_contradictions"]
-    }
+    source_ids = {row["contradiction_id"] for row in contradictions["source_contradictions"]}
     if source_ids != {f"V3C-00{index}" for index in range(1, 7)}:
-        raise MIIReferenceError(
-            "source contradiction denominator must be V3C-001..V3C-006"
-        )
+        raise MIIReferenceError("source contradiction denominator must be V3C-001..V3C-006")
     if len(exhaustion["vectors"]) != 10:
         raise MIIReferenceError("exhaustion ledger must contain exactly 10 source vectors")
     if len(bindings["bindings"]) != 10:
@@ -171,9 +166,7 @@ def validate_reference_bundle(reference_dir: Path) -> dict[str, Any]:
         "sector_count": len(sectors),
         "source_vector_count": len(exhaustion["vectors"]),
         "source_contradiction_count": len(source_ids),
-        "ingest_contradiction_count": len(
-            contradictions["ingest_contradictions"]
-        ),
+        "ingest_contradiction_count": len(contradictions["ingest_contradictions"]),
         "row_level_edge_state": edge["row_level_edge_ingest_state"],
     }
 
@@ -217,10 +210,7 @@ def _page_lines(page: Any) -> dict[float, list[dict[str, Any]]]:
         use_text_flow=False,
     ):
         lines[round(float(word["top"]), 1)].append(word)
-    return {
-        top: sorted(words, key=lambda item: item["x0"])
-        for top, words in lines.items()
-    }
+    return {top: sorted(words, key=lambda item: item["x0"]) for top, words in lines.items()}
 
 
 def _words_in_column(
@@ -238,9 +228,7 @@ def extract_visible_node_cards(pdf_path: Path) -> list[dict[str, Any]]:
     cards: list[dict[str, Any]] = []
     with pdfplumber.open(pdf_path) as document:
         if len(document.pages) != PDF_PAGE_COUNT:
-            raise MIIReferenceError(
-                "unexpected PDF page count during node extraction"
-            )
+            raise MIIReferenceError("unexpected PDF page count during node extraction")
         for page_number, board_sector in BOARD_BY_PAGE.items():
             page = document.pages[page_number - 1]
             lines = _page_lines(page)
@@ -280,15 +268,12 @@ def extract_visible_node_cards(pdf_path: Path) -> list[dict[str, Any]]:
                                 (
                                     gap,
                                     previous_top,
-                                    " ".join(
-                                        word["text"] for word in previous_words
-                                    ),
+                                    " ".join(word["text"] for word in previous_words),
                                 )
                             )
                     if not candidates:
                         raise MIIReferenceError(
-                            "node card has no preceding name: "
-                            f"page={page_number} top={top}"
+                            f"node card has no preceding name: page={page_number} top={top}"
                         )
                     _, name_top, raw_name = min(candidates)
                     raw_location = None
@@ -343,9 +328,7 @@ def extract_visible_registry_candidates(
         )
         for top in tops:
             for left, right, sector in halves:
-                words = [
-                    word for word in lines[top] if left <= word["x0"] < right
-                ]
+                words = [word for word in lines[top] if left <= word["x0"] < right]
                 tokens = [word["text"] for word in words]
                 if not {
                     "registry",
@@ -361,18 +344,14 @@ def extract_visible_registry_candidates(
                     if gap >= 20:
                         continue
                     previous_words = [
-                        word
-                        for word in lines[previous_top]
-                        if left <= word["x0"] < right
+                        word for word in lines[previous_top] if left <= word["x0"] < right
                     ]
                     if previous_words:
                         prior.append(
                             (
                                 gap,
                                 previous_top,
-                                " ".join(
-                                    word["text"] for word in previous_words
-                                ),
+                                " ".join(word["text"] for word in previous_words),
                             )
                         )
                 amount_text = None
@@ -387,9 +366,7 @@ def extract_visible_registry_candidates(
                         raw_name = text
                         name_top = previous_top
                 if raw_name is None:
-                    raise MIIReferenceError(
-                        "registry candidate missing raw name"
-                    )
+                    raise MIIReferenceError("registry candidate missing raw name")
                 payload = {
                     "page": 9,
                     "sector": sector,
@@ -438,26 +415,15 @@ def assert_observed_source_counts(
     """Gate extraction against the frozen run without synthesizing missing rows."""
     unique_signatures = {visible_card_signature(row) for row in cards}
     if len(cards) != 256:
-        raise MIIReferenceError(
-            "expected 256 rendered card manifestations, "
-            f"got {len(cards)}"
-        )
+        raise MIIReferenceError(f"expected 256 rendered card manifestations, got {len(cards)}")
     if len(unique_signatures) != 182:
         raise MIIReferenceError(
-            "expected 182 distinct visible card signatures, "
-            f"got {len(unique_signatures)}"
+            f"expected 182 distinct visible card signatures, got {len(unique_signatures)}"
         )
     if len(candidates) != 28:
-        raise MIIReferenceError(
-            f"expected 28 visible registry candidates, got {len(candidates)}"
-        )
-    if any(
-        row["identity_state"] != "CANDIDATE_NOT_IDENTITY"
-        for row in candidates
-    ):
-        raise MIIReferenceError(
-            "registry candidate identity state was promoted"
-        )
+        raise MIIReferenceError(f"expected 28 visible registry candidates, got {len(candidates)}")
+    if any(row["identity_state"] != "CANDIDATE_NOT_IDENTITY" for row in candidates):
+        raise MIIReferenceError("registry candidate identity state was promoted")
 
     by_code = Counter(signature[1] for signature in unique_signatures)
     expected = {
@@ -472,9 +438,7 @@ def assert_observed_source_counts(
         "RS": 19,
     }
     if dict(by_code) != expected:
-        raise MIIReferenceError(
-            f"visible card code counts changed: {dict(by_code)}"
-        )
+        raise MIIReferenceError(f"visible card code counts changed: {dict(by_code)}")
     return {
         "rendered_card_manifestations": len(cards),
         "distinct_visible_card_signatures": len(unique_signatures),
@@ -484,9 +448,7 @@ def assert_observed_source_counts(
 
 def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     if not rows:
-        raise MIIReferenceError(
-            f"refusing to write empty extraction: {path.name}"
-        )
+        raise MIIReferenceError(f"refusing to write empty extraction: {path.name}")
     path.parent.mkdir(parents=True, exist_ok=True)
     fields = list(rows[0])
     with path.open("w", encoding="utf-8", newline="") as handle:
