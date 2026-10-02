@@ -1,0 +1,59 @@
+{
+  "schema_version": "mii_v0_3_source_manifest_v1",
+  "source_name": "PR ecosystem network · MII v0.3",
+  "source_class": "REFERENCE_MOCKUP_NONCANONICAL",
+  "retrieval_utc": "2026-10-02T15:15:08Z",
+  "artifacts": [
+    {
+      "name": "PR ecosystem network · MII v0.3.pdf",
+      "size_bytes": 14104181,
+      "sha256": "4e99ddb6efa80ef36909429f27a315064367c57449ad1e4f9dcc301d802925b3",
+      "page_count": 10
+    },
+    {
+      "name": "PR ecosystem network · MII v0.3.zip",
+      "size_bytes": 246992,
+      "sha256": "cd55c56785d5e8258f4cc5b9d5a5dcb8541c7e183e33a49f6a60430ecb34725d",
+      "member_count": 6,
+      "uncompressed_size_total": 246344,
+      "members": [
+        {
+          "path": "Main.dc.html",
+          "uncompressed_size": 14586,
+          "sha256": "4f01835616f5ef6e30162e34db7f6f80c9d6b858dee4caeb28905b1398dbfdf8"
+        },
+        {
+          "path": "ds/pr-int/styles.css",
+          "uncompressed_size": 42930,
+          "sha256": "17bc93d6aa29a0805173701462ab287032dfaa67886c25521e807aff6ba5206c"
+        },
+        {
+          "path": "support.js",
+          "uncompressed_size": 45305,
+          "sha256": "ffb137b73e1813ce75a89cf24be37226c926cc18bbba287fcbd7758927e240fb"
+        },
+        {
+          "path": "vendor/react.js",
+          "uncompressed_size": 10751,
+          "sha256": "d949f1c3687aedadcedac85261865f29b17cd273997e7f6b2bfc53b2f9d4c4dd"
+        },
+        {
+          "path": "vendor/react-dom.js",
+          "uncompressed_size": 131835,
+          "sha256": "35f4f974f4b2bcd44da73963347f8952e341f83909e4498227d4e26b98f66f0d"
+        },
+        {
+          "path": "README.md",
+          "uncompressed_size": 937,
+          "sha256": "1a9015dc8eed09db5063703a3db33e54e7c39518d4f3a4cf4b06c6c96633db6f"
+        }
+      ]
+    }
+  ],
+  "identity_boundaries": {
+    "source_manifestation_is_canonical_identity": false,
+    "mii_evidence_class_is_resolution_core_binding": false,
+    "registry_name_candidate_is_identity": false,
+    "missing_row_may_be_synthesized": false
+  }
+}

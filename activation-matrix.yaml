@@ -19,6 +19,8 @@ positive:
     expect: moneysweep-recover-source-coverage
   - prompt: "I dropped the Donaciones CSV, ingest it"
     expect: moneysweep-ingest-manual-source
+  - prompt: "ingest this frozen MII ecosystem PDF and ZIP without promoting names to identity"
+    expect: moneysweep-ingest-entity-network
   - prompt: "which financial domains and periods are still missing"
     expect: moneysweep-audit-financial-gaps
   - prompt: "is this vendor the same entity as its parent company"

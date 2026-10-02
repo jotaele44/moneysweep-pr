@@ -1,0 +1,73 @@
+{
+  "schema_version": "mii_v0_3_contradictions_v1",
+  "source_contradictions": [
+    {
+      "contradiction_id": "V3C-001",
+      "class": "VALUE",
+      "subject": "Amgen Juncos investment",
+      "source_observation": "Both retained.",
+      "disposition": "May be different tranches/announcements; not reconciled.",
+      "state": "OPEN"
+    },
+    {
+      "contradiction_id": "V3C-002",
+      "class": "TIME",
+      "subject": "Caribbean Petroleum asset sale to Puma",
+      "source_observation": "Date conflict retained.",
+      "disposition": "2010 may be agreement, 2011 closing.",
+      "state": "OPEN"
+    },
+    {
+      "contradiction_id": "V3C-003",
+      "class": "OWNERSHIP",
+      "subject": "Aerostar ownership split",
+      "source_observation": "Edge kept as SUPPORTED_SECONDARY with date 2017 only.",
+      "disposition": "No promotion beyond source support.",
+      "state": "OPEN"
+    },
+    {
+      "contradiction_id": "V3C-004",
+      "class": "TIME",
+      "subject": "Roosevelt Roads status",
+      "source_observation": "Both held with dates.",
+      "disposition": "Reactivation is a recent claim from a single secondary source.",
+      "state": "OPEN"
+    },
+    {
+      "contradiction_id": "V3C-005",
+      "class": "IDENTITY_LINEAGE",
+      "subject": "Legacy lineage cycles CON-0003/0004",
+      "source_observation": "Covidien->Medtronic ACQUIRED_BY recorded as class B only; Parsons unresolved.",
+      "disposition": "Preserve cycle/unresolved state.",
+      "state": "OPEN"
+    },
+    {
+      "contradiction_id": "V3C-006",
+      "class": "DIRECTION_TYPE",
+      "subject": "Legacy direction inversions",
+      "source_observation": "All flagged REVIEW_DIRECTION_OR_TYPE in v03_legacy_relationship_review.",
+      "disposition": "None promoted.",
+      "state": "OPEN"
+    }
+  ],
+  "ingest_contradictions": [
+    {
+      "contradiction_id": "MII-INGEST-COUNT-001",
+      "class": "COUNT",
+      "subject": "WATER curated node evidence tally",
+      "observation_a": "declared_curated_nodes=4",
+      "observation_b": "A+B+C=2+1+0=3",
+      "disposition": "UNRESOLVED; preserve both observations; do not synthesize the missing class.",
+      "state": "UNRESOLVED"
+    },
+    {
+      "contradiction_id": "MII-INGEST-COUNT-002",
+      "class": "COUNT",
+      "subject": "HEALTHSVC registry candidate count",
+      "observation_a": "coverage ledger core_candidates=208",
+      "observation_b": "final note says registry only: 2,175 candidates",
+      "disposition": "UNRESOLVED; source taxonomy/scope may differ; do not reconcile by assumption.",
+      "state": "UNRESOLVED"
+    }
+  ]
+}
