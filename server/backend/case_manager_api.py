@@ -33,6 +33,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DATABASE_PATH = Path(os.environ.get("MONEYSWEEP_CASE_DB", ROOT / "data" / "case_manager.sqlite3"))
 MIGRATION_PATH = ROOT / "migrations" / "001_case_manager_v1.sql"
 
+
 def _require_local_request(request: Request) -> None:
     host = request.client.host if request.client else ""
     try:

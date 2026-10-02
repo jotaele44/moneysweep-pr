@@ -24,7 +24,9 @@ def main() -> int:
         wanted = set(args.source)
         sources = [source for source in sources if source["source_id"] in wanted]
     elif not args.include_manual:
-        sources = [source for source in sources if source.get("required") or source.get("producer_script")]
+        sources = [
+            source for source in sources if source.get("required") or source.get("producer_script")
+        ]
     print(json.dumps(materialize_sources(args.root, sources), indent=2, sort_keys=True))
     return 0
 
