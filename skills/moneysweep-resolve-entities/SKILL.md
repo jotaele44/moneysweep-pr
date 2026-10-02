@@ -98,28 +98,3 @@ Emit `{status, proposition_type, cardinality, candidates, selected_id,
 evidence_basis, source_manifestations, blockers, contradictions, superseded,
 next_safe_action}`. Confidence is descriptive only; evidence state controls
 certification.
-
-## Entity-network ingestion integration
-
-When an ingestion path participates in the cross-sector entity network, route it
-through `moneysweep.entity_network` after candidate discovery. This layer composes
-`resolution_core`; it never replaces it.
-
-- Preserve source manifestation != canonical entity.
-- Preserve entity != facility and parent != beneficial owner.
-- Model sector membership as N:N, evidence-backed, and temporally bounded.
-- Same-sector membership is discovery context only and never proves identity.
-- Keep structural relationships separate from direct money-flow observations.
-- `DEPENDENCY_ON` never implies payment; monetary movement belongs in
-  `MoneyFlowObservation`.
-- Unknown monetary amount remains null; never rewrite unknown as zero.
-- Reject exact duplicate membership observations and unsafe accidental M:N joins.
-- Relationship promotion requires `PASS` plus a binding evidence basis.
-- New source adapters may generate candidate sets but may not write around the
-  canonical identity/evidence state machines.
-
-For sector-aware ingestion, use the versioned contracts in
-`config/entity_network/sector_profiles.yml` and
-`config/entity_network/relationship_contract.yml`. Preserve source-specific
-vocabularies as RAW metadata when they do not map cleanly to the canonical
-relationship vocabulary; do not coerce an unknown edge into the nearest type.
