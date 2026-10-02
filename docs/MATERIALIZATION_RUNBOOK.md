@@ -1,137 +1,161 @@
-# Materialization Runbook — Filling All Automatable Sources
+# Materialization Runbook — Filling Automatable Sources
 
-This is the operator procedure to materialize every **automatable** source to
-100% success. The target set and per-source path are defined by the readiness
-classifier (`scripts/build_source_recovery_matrix.py`) and proved by the gate
-test (`tests/test_materialization_readiness.py`).
+## Authority
 
-> **Environment requirement:** this must run where outbound HTTPS is allowed.
-> The default Claude-Code web sandbox blocks egress (HTTP 403), so no producer
-> or adapter can fetch data there. Run this on a machine/CI with network access.
+The materialization target is computed from the live source registry by
+`scripts/build_source_recovery_matrix.py` and certified by
+`tests/test_materialization_readiness.py`.
 
-## Readiness snapshot (current)
+**Do not copy source counts from this prose into operational logic.** The sole
+authoritative count surface is:
 
-`reports/materialization_readiness.json` is the **only** authoritative count
-surface — it is regenerated from the live registry and byte-pinned by
-`tests/test_materialization_readiness.py` and
-`tests/test_source_count_reconciliation.py`. Do not freeze its numbers into
-prose; earlier revisions of this runbook did (124/68/56) and drifted three
-registry generations behind. At this writing the report says:
+`reports/materialization_readiness.json`
 
-- **144** total registered sources
-- **99 automatable** — all structurally `ready` (adapter or importable producer
-  + declared outputs). This is the fill target. Includes the free, keyless
-  entity-resolution sources `gleif_lei` and `sec_officers` that replace the
-  removed paid OpenCorporates source.
-- Automatable sources that need an API key at run time: see
-  `automatable_required_keys` in the readiness report (and optional,
-  license-gated `FINANCIALDATA_API_KEY`, disabled by default). OpenCorporates was
-  removed entirely; its replacements (`gleif_lei`, `sec_officers`) are keyless.
-- **45 queued / excluded** (not part of the automatable target), per the
-  report's `queued_excluded` breakdown:
-  - `manual_export` (38) — operator-supplied files (see step 3); includes the
-    infrastructure revenue (toll/fare/utility-rate/port-fee) and infrastructure
-    contract (DTOP roads, ports/airports, transit) dropzones.
-  - `scraper_needed` (2) — `hacienda_sut_ivu`, `pr_act_154_excise`; true stubs.
-  - `semantic_duplicate` (3) — covered by a sibling source; never materialize alone.
-  - `deferred_stub` (2) — NARA; intentionally unimplemented.
+That artifact records `total_sources`, `automatable_total`,
+`automatable_ready`, queued/excluded breakdowns, required credential names, and
+the SHA-256 of the source-ID denominator. Historical counts in earlier runbook
+revisions are superseded.
 
-## Procedure
+## Source classes
 
-### 1. Install dependencies
+The generated recovery matrix separates:
+
+- automatable adapters/producers — target for network materialization;
+- `manual_export` — operator-supplied files in registered dropzones;
+- `scraper_needed` — structurally incomplete source implementation;
+- `semantic_duplicate` — covered by a sibling source, never materialize alone;
+- `deferred_stub` — intentionally unimplemented;
+- any future classifier state emitted by the current matrix.
+
+Do not infer class from a source name.
+
+## CLI/network procedure
+
+### 1. Install the pinned core runtime
+
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.lock
 ```
 
-### 2. Provide API keys
-Copy `.env.example` to `.env` and fill the keys needed for full coverage
-(template values shown — replace each with your real key in `.env`, never here):
-```
-SAM_API_KEY=paste_your_key_here            # required for sam_entities (entity adapter)
-LDA_API_KEY=paste_your_key_here            # lobbying
-FEC_API_KEY=paste_your_key_here            # campaign finance (DEMO_KEY works, capped)
-OPENCORPORATES_API_TOKEN=paste_your_key_here
-HIGHERGOV_API_KEY=paste_your_key_here
-```
-Adapter sources without a key will skip or run limited (non-fatal) — they remain
-structurally ready, but won't reach 100% rows until the key is set.
+For source-development paths that intentionally exercise unpinned minimum
+constraints, `requirements.txt` remains available; it is not the preferred
+certification input.
 
-### 3. (Optional) Drop manual-export files
-Only needed to materialize the queued `manual_export` sources. Per
-`registries/manual_export_registry.yaml`, place files in each source's
-`expected_drop_dir` (e.g. `data/manual/hud_drgr/`, `data/raw/act_transition/`,
-`data/raw/OCE/`). These are **not** part of the automatable target; skip if you
-only want the automatable set. For the five **required** operator-gated sources
-(cor3, hud_drgr_authorized, oficina_contralor, pr_cabilderos, prasa), the
-per-source export procedure, cadence, and staleness rules live in
-`docs/MANUAL_SOURCE_OPERATIONS.md` (enforced by the `source_freshness` gate).
+### 2. Configure credentials where required
 
-### 4. Confirm the gate before running
+Local source-development runs may use environment variables / `.env`. Never
+commit secrets. The desktop application instead stores keyed credentials in the
+OS credential vault; see `docs/DESKTOP_DATA_POPULATION.md`.
+
+The current required credential names are generated into
+`reports/materialization_readiness.json -> automatable_required_keys`.
+
+### 3. Stage manual exports when applicable
+
+Manual source destinations, filename patterns, expected columns, and validation
+rules are defined by `registries/manual_export_registry.yaml`. Required
+operator-gated source procedures and staleness rules are documented in
+`docs/MANUAL_SOURCE_OPERATIONS.md`.
+
+Manual exports are outside the automatable denominator. Do not treat a missing
+manual file as an API zero-row result.
+
+### 4. Preflight
+
 ```bash
-python3 run_all.py --only-setup --strict-preflight   # expect 0 structural errors
+python3 run_all.py --only-setup --strict-preflight
 python3 -m pytest tests/test_materialization_readiness.py -q
 ```
 
-### 5. Materialize
-- **Adapter-backed sources** (35) — on-demand query path:
-  ```bash
-  python -m moneysweep.query --source <source_id> [--fy 2020,2021 ...]
-  ```
-- **Full pipeline** (producers + downstream) — registry-driven orchestrator:
-  ```bash
-  python3 run_all.py --strict-preflight
-  ```
-  Use the documented `--skip-*` flags to scope a run.
+Expected result: zero structural errors and
+`automatable_ready == automatable_total` in the generated readiness artifact.
 
-### 6. Regenerate reports and verify
+### 5. Dry-run the exact selection
+
+```bash
+python3 scripts/run_automatable_sources.py --dry-run
+python3 scripts/run_automatable_sources.py --source <source_id> --dry-run
+python3 scripts/run_automatable_sources.py --family <family> --dry-run
+```
+
+Dry-run is discovery/selection only. It must execute zero producers.
+
+### 6. Materialize
+
+For a bounded source-first run:
+
+```bash
+python3 scripts/run_automatable_sources.py --source <source_id>
+```
+
+For the complete current automatable set:
+
+```bash
+python3 scripts/run_automatable_sources.py
+```
+
+The runner:
+
+- loads source identity from the authoritative registry;
+- performs an outbound-egress preflight;
+- executes registry-declared producers;
+- captures each source result independently so one source failure does not erase
+  the rest of the candidate set;
+- writes a latest summary to
+  `data/staging/materialization_run_summary.json`;
+- writes a versioned run receipt under `receipts/materialization_runs/` when
+  executed in the desktop/workspace architecture.
+
+When egress is blocked, the runner executes no producers and reports
+`egress_blocked`. That state must not be interpreted as source absence.
+
+## Desktop procedure
+
+The self-contained desktop application exposes the same data plane through the
+**Data Sources** tab:
+
+- **Offline files** — registered dropzone + SHA-256 staging + explicit producer
+  invocation;
+- **API materialization** — source-level dry-run/live operation;
+- **API credentials** — OS credential-vault management with no secret echo.
+
+The desktop application uses an immutable bundled registry and a writable
+per-user workspace. Legacy producer path globals are rebound into that workspace
+before producer import so a successful run cannot silently write into the
+signed application bundle.
+
+See `docs/DESKTOP_DATA_POPULATION.md`.
+
+## CI live materialization
+
+The manual workflow `.github/workflows/materialize-sources.yml` remains the
+remote egress-capable path. `mode=fetch` requires exact confirmation `YES`; a
+preflight dispatch does not authorize live fetching. Secrets are passed only to
+the live producer step, and materialized outputs are uploaded as workflow
+artifacts rather than committed automatically.
+
+## Verification
+
+Regenerate the derived coverage surfaces after materialization:
+
 ```bash
 python3 scripts/gap_analysis_builder.py
 python3 scripts/build_source_recovery_matrix.py
 ```
-Success criteria:
-- `reports/materialization_readiness.json`: `automatable_ready == automatable_total`.
-- `reports/gap_analysis_report.json`: every **automatable** source shows
-  `fully_materialized` (note: overall `coverage_rate` is over *all* registered
-  sources, so it will not reach 1.0 while the queued sources remain
-  unmaterialized — judge success against the automatable subset and
-  `required_coverage_rate`).
 
-## Definition of done (per source)
+Judge automatable completion against the generated automatable denominator, not
+overall registered-source coverage while manual/deferred classes remain queued.
+`reports/gap_analysis_report.json` may also expose an overall `coverage_rate`.
+That metric spans the entire registered-source denominator, including
+manual/deferred classes, so it is contextual only and must not replace
+`automatable_ready == automatable_total` or source-specific validation
+thresholds for the automatable completion claim.
 
-A source is `fully_materialized` (`scripts/gap_analysis_builder.py::_source_status`)
-when **every** `expected_output` exists on disk, is non-empty, and — for CSVs —
-has `row_count ≥ validation_threshold.min_rows`.
+## Per-source definition of done
 
-## Out of scope (separate, future work)
+A source is `fully_materialized` only when every declared expected output exists,
+is non-empty, and satisfies source-specific validation thresholds such as
+minimum row counts and required schema.
 
-Building the remaining `scraper_needed` PR-gov adapters (`hacienda_sut_ivu`,
-`pr_act_154_excise`) and integrating the manual datasets
-(ACT/ACUDEN/PRASA/cabilderos/DCAA). Until then, those sources stay
-queued and excluded from the automatable target by design.
-
-## Live materialization (egress-capable runner)
-
-When outbound HTTPS is available (a GitHub Actions runner or a networked
-machine), drive the automatable set with the runner rather than the full
-`run_all.py` orchestrator:
-
-```bash
-python3 scripts/run_automatable_sources.py --dry-run      # list the automatable selection
-python3 scripts/run_automatable_sources.py                # run all automatable (needs egress + keys)
-python3 scripts/run_automatable_sources.py --source pr_general_fund_revenues
-python3 scripts/run_automatable_sources.py --family territorial
-```
-
-The runner reuses the readiness classifier for selection, runs an egress
-preflight (`scripts/check_network_egress.py`) and **skips all producers when
-egress is blocked** (exits 0, summary marks `egress_blocked`), and captures each
-producer's result so one failure never aborts the run. A run summary is written
-to `data/staging/materialization_run_summary.json` (gitignored). API keys are
-read from the environment / `.env` (`SAM_API_KEY`, `FEC_API_KEY`, `FAC_API_KEY`,
-`CENSUS_API_KEY`, `LDA_API_KEY`, `DATA_GOV_API_KEY`, plus HigherGov /
-OpenCorporates / FinancialData where used).
-
-CI: trigger **Actions → "Materialize automatable sources"**
-(`.github/workflows/materialize-sources.yml`, manual `workflow_dispatch`, confirm
-`YES`). It exports the repo secrets, runs the runner, and uploads
-`data/staging/processed` + the run summary as artifacts (never committed).
+HTTP 200, process exit 0, `status=OK`, filename match, or equal row count alone
+is not source certification and never proves entity identity.

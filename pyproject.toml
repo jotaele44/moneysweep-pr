@@ -17,8 +17,20 @@ no_implicit_optional = true
 # import outside them (e.g. tests/, archive/) are followed for symbols but their
 # own errors are not reported.
 follow_imports = "silent"
+# server/, shared/, readiness/ and desktop/ joined the checked scope in the
+# 2026-09 gap analysis. server/ and server/backend/ carry no __init__.py and are
+# implicit namespace packages, so server/backend/case_manager_app.py's
+# `from . import case_manager_api` only resolves for mypy with the two settings
+# below. Adding __init__.py files instead would work for mypy but would inject a
+# new python_module candidate into the GUI-parity inventory --
+# scripts/check_gui_parity.py rglobs every .py under discovery.backend_roots --
+# and AGENTS.md forbids regenerating gui-parity-baseline.json to clear a gate.
+namespace_packages = true
+explicit_package_bases = true
 # moneysweep/ (package) + scripts/ (CLI/pipeline) are both checked and clean.
-files = ["moneysweep", "scripts"]
+# run_all_legacy.py (2073 LOC) remains out of scope; decomposing it is tracked
+# separately in docs/GAP_ANALYSIS_AND_OPTIMIZATION_2026-09.md (finding B4).
+files = ["moneysweep", "scripts", "server", "shared", "readiness", "desktop"]
 exclude = "(^archive/|tests/)"
 
 [tool.ruff]

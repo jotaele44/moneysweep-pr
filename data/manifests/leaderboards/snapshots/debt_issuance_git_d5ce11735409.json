@@ -1,0 +1,191 @@
+{
+  "accounting": {
+    "arithmeticClosed": true,
+    "excludedRecords": 0,
+    "inScopeRecords": 11,
+    "inputRecords": 11,
+    "outOfScopeRecords": 0,
+    "retainedRecords": 11,
+    "unresolvedRecords": 0
+  },
+  "candidateCount": 5,
+  "capturedAt": "2026-06-01T12:40:24Z",
+  "categoryId": "debt_issuance",
+  "certificationState": "PROVISIONAL",
+  "currencies": [
+    "USD"
+  ],
+  "filters": {
+    "currency": "USD",
+    "endYear": null,
+    "entityType": null,
+    "municipality": null,
+    "startYear": null
+  },
+  "methodology": {
+    "aggregation": "par_amount summed by issuer and currency",
+    "identity": "canonical_v1 issuer_entity_id only",
+    "nonEquivalence": "par amount is issuance face value, not outstanding debt, debt service, expenditure, or cash received",
+    "nulls": "missing par_amount excluded; blank currency unresolved"
+  },
+  "metricType": "DEBT_ISSUED_PAR",
+  "rankingVersion": "moneysweep.leaderboard/v1.1",
+  "rows": [
+    {
+      "canonicalEntityId": "entity_5204a3d8f84bbfcd",
+      "currency": "USD",
+      "debtClasses": [
+        "COFINA"
+      ],
+      "entityDisplayName": "Puerto Rico Sales Tax Financing Corporation",
+      "entityId": "entity_5204a3d8f84bbfcd",
+      "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+      "entityType": "fund",
+      "evidenceCount": 2,
+      "financialValueState": "MEASURED_PAR_AMOUNT",
+      "metricType": "DEBT_ISSUED_PAR",
+      "metricValue": 16314000000,
+      "rank": 1,
+      "recordCount": 2
+    },
+    {
+      "canonicalEntityId": "entity_125b538f289a4708",
+      "currency": "USD",
+      "debtClasses": [
+        "GO"
+      ],
+      "entityDisplayName": "Commonwealth of Puerto Rico",
+      "entityId": "entity_125b538f289a4708",
+      "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+      "entityType": "agency",
+      "evidenceCount": 3,
+      "financialValueState": "MEASURED_PAR_AMOUNT",
+      "metricType": "DEBT_ISSUED_PAR",
+      "metricValue": 11800000000,
+      "rank": 2,
+      "recordCount": 3
+    },
+    {
+      "canonicalEntityId": "entity_b182f85acf46f69b",
+      "currency": "USD",
+      "debtClasses": [
+        "HTA"
+      ],
+      "entityDisplayName": "Puerto Rico Highways and Transportation Authority",
+      "entityId": "entity_b182f85acf46f69b",
+      "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+      "entityType": "agency",
+      "evidenceCount": 2,
+      "financialValueState": "MEASURED_PAR_AMOUNT",
+      "metricType": "DEBT_ISSUED_PAR",
+      "metricValue": 4108400000,
+      "rank": 3,
+      "recordCount": 2
+    },
+    {
+      "canonicalEntityId": "entity_6c1d858c1babe390",
+      "currency": "USD",
+      "debtClasses": [
+        "PREPA"
+      ],
+      "entityDisplayName": "Puerto Rico Electric Power Authority",
+      "entityId": "entity_6c1d858c1babe390",
+      "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+      "entityType": "utility",
+      "evidenceCount": 2,
+      "financialValueState": "MEASURED_PAR_AMOUNT",
+      "metricType": "DEBT_ISSUED_PAR",
+      "metricValue": 1193000000,
+      "rank": 4,
+      "recordCount": 2
+    },
+    {
+      "canonicalEntityId": "entity_c5fb8a7f44e8ff18",
+      "currency": "USD",
+      "debtClasses": [
+        "PRASA"
+      ],
+      "entityDisplayName": "Puerto Rico Aqueduct and Sewer Authority",
+      "entityId": "entity_c5fb8a7f44e8ff18",
+      "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+      "entityType": "utility",
+      "evidenceCount": 2,
+      "financialValueState": "MEASURED_PAR_AMOUNT",
+      "metricType": "DEBT_ISSUED_PAR",
+      "metricValue": 1150000000,
+      "rank": 5,
+      "recordCount": 2
+    }
+  ],
+  "runtimeManifest": {
+    "files": [
+      {
+        "bytes": 7481,
+        "path": "config/financial_category_ontology.json",
+        "sha256": "e09186e0897c090761df8714d4372c35dd80490ce4e095915d6f790efa9fbb86"
+      },
+      {
+        "bytes": 9145,
+        "path": "server/backend/leaderboards.py",
+        "sha256": "1fdfe50ad0e127cb26662f96b11a957cfe2357e9edc255436bd2b31e489b9e04"
+      },
+      {
+        "bytes": 26453,
+        "path": "server/backend/leaderboard_adapters.py",
+        "sha256": "89e7605e9bd64dc9daed252dd8297f1ba7d80dc4164c2e8aac81d57d1e2a316f"
+      },
+      {
+        "bytes": 10681,
+        "path": "server/backend/leaderboard_history.py",
+        "sha256": "9c32c4878742e56f038c39abe15140f5c0057bdea481e5f56dfed712d86247db"
+      },
+      {
+        "bytes": 5939,
+        "path": "server/backend/leaderboard_investigation.py",
+        "sha256": "d5a68c990488436a9c068e0fb61a1f7c7b5efaf2ea312160a583867b063201c1"
+      },
+      {
+        "bytes": 6125,
+        "path": "server/backend/leaderboard_entities.py",
+        "sha256": "7a3b01c880876116333e4f4e57a29374a128a8f488b64115d04d99a1c77bb6f5"
+      }
+    ],
+    "packages": {
+      "fastapi": "0.128.2",
+      "pandas": "2.2.3",
+      "pydantic": "2.13.4"
+    },
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "producerCommit": "6d37d675d49285057ab43c88d294e8a5e8e52beb",
+    "python": "3.13.5",
+    "state": "FROZEN"
+  },
+  "schemaVersion": "moneysweep.leaderboard-snapshot/v1.1",
+  "snapshotId": "debt_issuance:git:d5ce11735409",
+  "snapshotMode": "HISTORICAL_GIT_SOURCE_REPLAY",
+  "snapshotSha256": "a9e9846ba5e7902e7cfbb5454b61fec0a40af5c0c4d7ffa15a9e81f76f33d63b",
+  "sourceManifestations": [
+    {
+      "bytes": 3185,
+      "manifestationType": "GIT_COMMIT_BLOB",
+      "path": "data/canonical_v1/debt_instruments.csv",
+      "sha256": "3f7d5d0b1636daaad8c17c57a1f688ed519af45d39498619aff7e9d3d8270b64",
+      "sourceCommit": "d5ce11735409aedc8a0e15f7af359226dfb6e154",
+      "sourceCommittedAt": "2026-06-01T12:40:24+00:00"
+    },
+    {
+      "bytes": 3608,
+      "manifestationType": "GIT_COMMIT_BLOB",
+      "path": "data/canonical_v1/entities.csv",
+      "sha256": "e56ed578228e09cc6a1b41c165da6d71900ed64cfcaf8f1351f5667e4f614489",
+      "sourceCommit": "d5ce11735409aedc8a0e15f7af359226dfb6e154",
+      "sourceCommittedAt": "2026-06-01T12:40:24+00:00"
+    }
+  ],
+  "sourceVersion": {
+    "commit": "d5ce11735409aedc8a0e15f7af359226dfb6e154",
+    "committedAt": "2026-06-01T12:40:24Z",
+    "economicActivityInference": false,
+    "type": "GIT_COMMIT"
+  }
+}

@@ -1,5 +1,11 @@
 # Execution Roadmap — Current vs Target State
 
+> **Historical plan notice (2026-08-19):** This table describes the original R5
+> sequencing and is not a current certification artifact. Several “missing” layers
+> have since landed. Use `docs/ROAD_TO_100.md` and `reports/current_status.json`
+> for current blockers; the status file explicitly distinguishes refreshed HEAD
+> metadata from older, not-recertified materialization evidence.
+
 This roadmap restates the mission pipeline order (steps 1 → 15 in the takeover
 brief) and shows each layer's current vs target state.
 

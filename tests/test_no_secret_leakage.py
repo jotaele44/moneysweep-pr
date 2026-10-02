@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -17,11 +18,15 @@ SCANNER = REPO_ROOT / "scripts" / "scan_for_secrets.py"
 def test_scan_for_secrets_exits_clean():
     """The repo must contain zero detected secrets."""
     assert SCANNER.exists(), "scripts/scan_for_secrets.py is required for this gate"
+    subprocess_env = {
+        name: value for name, value in os.environ.items() if not name.startswith("COV_CORE_")
+    }
     proc = subprocess.run(
         [sys.executable, str(SCANNER), "--root", str(REPO_ROOT), "--json"],
         capture_output=True,
         text=True,
         check=False,
+        env=subprocess_env,
         timeout=30,
     )
     # Exit code 0 = clean, 3 = leaks. We require 0.

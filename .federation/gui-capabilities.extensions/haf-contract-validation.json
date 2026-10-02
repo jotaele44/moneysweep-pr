@@ -1,0 +1,17 @@
+{
+  "capabilities": [
+    {
+      "id": "haf-contract-validation",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The HAF contract validator is a fail-closed CI and governance primitive. It validates repository metadata and cross-file bindings without creating a separate end-user workflow or requiring an interactive terminal.",
+      "candidate_ids": [
+        "analysis_module:scripts/validate_haf_contract.py",
+        "analysis_symbol:scripts/validate_haf_contract.py:main",
+        "analysis_symbol:scripts/validate_haf_contract.py:validate"
+      ]
+    }
+  ],
+  "exceptions": []
+}

@@ -1,22 +1,10 @@
 """Canonical Entity Relationship Model v1 — schema & integrity validator.
 
-Stdlib-only (no `jsonschema` dependency). Validates the `data/canonical_v1/`
-CSV tables against the draft-07 JSON Schemas in `schemas/canonical_v1/`,
-interpreting the subset of JSON Schema the model uses: ``required``, ``type``
-(string/number/integer/boolean), ``enum``, ``pattern``, ``minLength``,
-``minimum``/``maximum``.
-
-Because CSV cells are always strings, an empty cell is treated as an absent
-field (so optional-but-blank columns never fail). Beyond per-row schema
-validation this module also enforces three model invariants:
-
-* **Referential integrity** — every foreign key resolves to an existing
-  primary key (``no broken reference``).
-* **Controlled-vocabulary gate** — ``edges.edge_type`` must be one of the 15
-  approved verbs (``no unknown verb``); offenders are reported for routing to
-  ``review_queue.csv``.
-* **Evidence-presence gate** — every edge carries a non-empty ``evidence_id``
-  that resolves to an ``evidence.csv`` row (``no provenance -> no edge``).
+Stdlib-only (no ``jsonschema`` dependency). This validator is intentionally
+fail-closed: the discovered canonical CSV denominator must match the registered
+table denominator, headers must exactly match schema properties, primary keys
+must be unique, foreign keys must resolve, and every graph edge must carry
+resolvable provenance.
 
 CLI::
 
@@ -30,6 +18,7 @@ import csv
 import json
 import re
 import sys
+from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -52,6 +41,11 @@ TABLES: dict[str, tuple[str, str, str]] = {
         "lobbying_record_id",
     ),
     "funding_sources": ("funding_sources.schema.json", "funding_sources.csv", "funding_source_id"),
+    "revenue_streams": (
+        "revenue_streams.schema.json",
+        "revenue_streams.csv",
+        "revenue_stream_id",
+    ),
     "properties": ("properties.schema.json", "properties.csv", "property_id"),
     "municipalities": ("municipalities.schema.json", "municipalities.csv", "municipality_id"),
     "edges": ("edges.schema.json", "edges.csv", "edge_id"),
@@ -83,6 +77,11 @@ FOREIGN_KEYS: dict[str, dict[str, str]] = {
         "evidence_id": "evidence",
     },
     "funding_sources": {"administering_entity_id": "entities", "evidence_id": "evidence"},
+    "revenue_streams": {
+        "collecting_entity_id": "entities",
+        "pledged_debt_id": "debt_instruments",
+        "evidence_id": "evidence",
+    },
     "properties": {
         "owner_entity_id": "entities",
         "municipality_id": "municipalities",
@@ -101,6 +100,7 @@ NODE_TYPE_TABLE: dict[str, str] = {
     "DebtInstrument": "debt_instruments",
     "LobbyingRecord": "lobbying_records",
     "FundingSource": "funding_sources",
+    "RevenueStream": "revenue_streams",
     "Property": "properties",
     "Municipality": "municipalities",
 }
@@ -147,11 +147,6 @@ class ValidationReport:
         }
 
 
-# --------------------------------------------------------------------------- #
-# JSON-Schema subset interpreter
-# --------------------------------------------------------------------------- #
-
-
 def load_schema(table: str, root: Path | None = None) -> dict[str, Any]:
     root = root or REPO_ROOT
     schema_file = TABLES[table][0]
@@ -159,10 +154,6 @@ def load_schema(table: str, root: Path | None = None) -> dict[str, Any]:
 
 
 def _check_value(value: str, prop: dict[str, Any]) -> str | None:
-    """Validate a single non-empty CSV cell against a property schema.
-
-    Returns an error string, or None when valid.
-    """
     declared = prop.get("type")
     if declared in ("number", "integer"):
         try:
@@ -180,7 +171,6 @@ def _check_value(value: str, prop: dict[str, Any]) -> str | None:
         if value.lower() not in ("true", "false", "1", "0"):
             return f"expected boolean, got {value!r}"
         return None
-    # string-like
     if "enum" in prop and value not in prop["enum"]:
         return f"{value!r} not in enum {prop['enum']}"
     if "pattern" in prop and not re.fullmatch(prop["pattern"], value):
@@ -191,14 +181,11 @@ def _check_value(value: str, prop: dict[str, Any]) -> str | None:
 
 
 def validate_row(row: dict[str, str], schema: dict[str, Any]) -> list[str]:
-    """Return a list of error strings for one row (empty == valid)."""
     errors: list[str] = []
     required = set(schema.get("required", []))
     props = schema.get("properties", {})
 
     def _cell(col: str) -> str:
-        # CSV cells are strings, but in-memory rows may carry native types
-        # (float confidence, bool current, ...) -> coerce for uniform checks.
         raw = row.get(col)
         return "" if raw is None else str(raw).strip()
 
@@ -208,16 +195,11 @@ def validate_row(row: dict[str, str], schema: dict[str, Any]) -> list[str]:
     for col, prop in props.items():
         value = _cell(col)
         if value == "":
-            continue  # empty CSV cell == absent; only `required` cares
+            continue
         msg = _check_value(value, prop)
         if msg:
             errors.append(f"field '{col}': {msg}")
     return errors
-
-
-# --------------------------------------------------------------------------- #
-# CSV loading + table-level validation
-# --------------------------------------------------------------------------- #
 
 
 def _read_csv(path: Path) -> list[dict[str, str]]:
@@ -232,6 +214,48 @@ def load_all_tables(root: Path | None = None) -> dict[str, list[dict[str, str]]]
     return {t: _read_csv(root / DATA_DIR / TABLES[t][1]) for t in TABLES}
 
 
+def validate_denominator_headers_and_rows(
+    report: ValidationReport, root: Path | None = None
+) -> None:
+    root = root or REPO_ROOT
+    data_dir = root / DATA_DIR
+    expected_files = {csv_name for _schema, csv_name, _pk in TABLES.values()}
+    actual_files = {path.name for path in data_dir.glob("*.csv") if path.is_file()}
+
+    for name in sorted(expected_files - actual_files):
+        report.add(f"[denominator] registered canonical table missing: {name}")
+    for name in sorted(actual_files - expected_files):
+        report.add(f"[denominator] unregistered canonical table present: {name}")
+
+    for table, (_schema_name, csv_name, _pk) in TABLES.items():
+        path = data_dir / csv_name
+        if not path.exists():
+            continue
+        schema = load_schema(table, root)
+        expected_header = list(schema.get("properties", {}).keys())
+        with path.open(newline="", encoding="utf-8") as fh:
+            reader = csv.reader(fh)
+            header = next(reader, [])
+            duplicate_headers = sorted(k for k, n in Counter(header).items() if n > 1)
+            if duplicate_headers:
+                report.add(f"[{table}] duplicate header columns: {duplicate_headers}")
+            if header != expected_header:
+                missing = [col for col in expected_header if col not in header]
+                unexpected = [col for col in header if col not in expected_header]
+                if missing or unexpected:
+                    report.add(
+                        f"[{table}] header/schema mismatch missing={missing} unexpected={unexpected}"
+                    )
+                else:
+                    report.add(f"[{table}] header order differs from schema property order")
+            expected_width = len(header)
+            for line_no, row in enumerate(reader, start=2):
+                if len(row) != expected_width:
+                    report.add(
+                        f"[{table}:{line_no}] row width {len(row)} != header width {expected_width}"
+                    )
+
+
 def validate_schema(
     tables: dict[str, list[dict[str, str]]], report: ValidationReport, root: Path | None = None
 ) -> None:
@@ -243,6 +267,25 @@ def validate_schema(
                 report.add(f"[{table}:{i}] {msg}")
 
 
+def validate_primary_key_uniqueness(
+    tables: dict[str, list[dict[str, str]]], report: ValidationReport
+) -> None:
+    for table, rows in tables.items():
+        pk = TABLES[table][2]
+        seen: dict[str, int] = {}
+        for i, row in enumerate(rows, start=1):
+            value = (row.get(pk) or "").strip()
+            if not value:
+                report.add(f"[{table}:{i}] empty primary key '{pk}'")
+                continue
+            if value in seen:
+                report.add(
+                    f"[{table}:{i}] duplicate primary key '{pk}'={value!r}; first row={seen[value]}"
+                )
+            else:
+                seen[value] = i
+
+
 def validate_referential_integrity(
     tables: dict[str, list[dict[str, str]]], report: ValidationReport
 ) -> None:
@@ -252,14 +295,12 @@ def validate_referential_integrity(
         }
         for t, rows in tables.items()
     }
-    # Declared single-target foreign keys.
     for table, fkmap in FOREIGN_KEYS.items():
         for i, row in enumerate(tables.get(table, []), start=1):
             for col, target in fkmap.items():
                 val = (row.get(col) or "").strip()
                 if val and val not in pks.get(target, set()):
                     report.add(f"[{table}:{i}] broken reference '{col}'={val!r} -> {target}")
-    # Edge endpoints resolve against the table named by their node_type.
     for i, row in enumerate(tables.get("edges", []), start=1):
         for type_col, id_col in (
             ("source_node_type", "source_node_id"),
@@ -279,10 +320,6 @@ def validate_referential_integrity(
 def validate_controlled_vocab(
     tables: dict[str, list[dict[str, str]]], report: ValidationReport
 ) -> list[dict[str, str]]:
-    """Flag edges whose verb is outside the controlled vocabulary.
-
-    Returns the offending rows so callers can route them to review_queue.
-    """
     offenders: list[dict[str, str]] = []
     for i, row in enumerate(tables.get("edges", []), start=1):
         verb = (row.get("edge_type") or "").strip()
@@ -295,7 +332,6 @@ def validate_controlled_vocab(
 def validate_evidence_presence(
     tables: dict[str, list[dict[str, str]]], report: ValidationReport
 ) -> None:
-    """Enforce 'no provenance -> no edge': every edge needs a resolvable evidence_id."""
     evidence_ids = {(r.get("evidence_id") or "").strip() for r in tables.get("evidence", [])}
     for i, row in enumerate(tables.get("edges", []), start=1):
         ev = (row.get("evidence_id") or "").strip()
@@ -308,17 +344,14 @@ def validate_evidence_presence(
 def validate_all(root: Path | None = None) -> ValidationReport:
     root = root or REPO_ROOT
     report = ValidationReport()
+    validate_denominator_headers_and_rows(report, root)
     tables = load_all_tables(root)
     validate_schema(tables, report, root)
+    validate_primary_key_uniqueness(tables, report)
     validate_referential_integrity(tables, report)
     validate_controlled_vocab(tables, report)
     validate_evidence_presence(tables, report)
     return report
-
-
-# --------------------------------------------------------------------------- #
-# CLI
-# --------------------------------------------------------------------------- #
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -333,7 +366,6 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     report = validate_all(Path(args.root).resolve())
-
     if args.json:
         print(json.dumps(report.to_dict(), indent=2))
     else:
@@ -345,7 +377,6 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  - {err}")
         if len(report.errors) > 200:
             print(f"  ... and {len(report.errors) - 200} more")
-
     if report.ok or args.allow_failed:
         return 0
     return 1

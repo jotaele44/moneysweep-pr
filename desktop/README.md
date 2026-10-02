@@ -1,95 +1,200 @@
-# Run MONEYSWEEP as a desktop app
+# MoneySweep desktop application
 
-Double-click the launcher for your system in the repo root:
+MoneySweep has two desktop launch surfaces. They are intentionally classified
+differently.
 
-| System | File |
-|---|---|
-| macOS | `PRII-MONEYSWEEP.command` |
-| Windows | `PRII-MONEYSWEEP.bat` |
-| Linux | `PRII-MONEYSWEEP.sh` |
+## 1. Source-checkout developer wrapper — not the distribution
 
-The **first run** needs an internet connection once: it creates a private
-`.venv`, installs the Python dependencies, and builds the dashboard
-(requires [Python 3.10+](https://www.python.org/downloads/) and
-[Node.js](https://nodejs.org) to be installed). Every later run starts
-instantly and **works offline** — the app serves the data committed in this
-repository from a local server and shows it in a native window.
+The repository-root launchers (`PRII-MONEYSWEEP.command`, `.bat`, `.sh`, and the
+committed lightweight `PRII-MONEYSWEEP.app`) are developer conveniences around
+the source checkout. They may create a private `.venv`, install dependencies,
+and build the dashboard. First setup can therefore require externally installed
+Python 3.11+, Node.js, and network access.
 
-Offline caveat: map basemap tiles are fetched from the internet
-(OpenStreetMap), so without a connection the map background is blank while
-all data, tables, and charts keep working.
+**Do not certify the committed wrapper as the downloadable self-contained app.**
 
-## How it works
+It remains useful for source development and repair, but its identity and
+prerequisites are different from a frozen release artifact. The committed
+prebuilt dashboard described below does **not** change that classification: the
+wrapper still requires an externally installed Python 3.11+, still installs
+Python packages (from the network or an operator-supplied wheelhouse), and is
+still unsigned, so it still costs one macOS Gatekeeper approval per machine.
 
-- `desktop/config.py` — the only per-repo file (title, paths, requirements).
-- `desktop/app_server.py` — reuses the existing FastAPI backend and also
-  serves the built dashboard from the same port (no CORS, one process).
-- `desktop/launch.py` — picks a free port, starts uvicorn, opens a native
-  [pywebview](https://pywebview.flowrl.com/) window (falls back to the
-  default browser). Flags: `--no-window`, `--browser`, `--smoke`.
-- `desktop/setup.py` — idempotent one-time setup (`--force` to redo).
+### Prebuilt dashboard bundle
 
-## Command line
+`desktop/prebuilt-dashboard/` holds a committed `vite build` output plus
+`PREBUILT_MANIFEST.json`. `desktop/setup.py` copies it into `dashboard/dist`
+instead of running `npm ci` + `npm run build`, which is what removes Node.js from
+the wrapper's first-run prerequisites.
+
+Regenerate it whenever `dashboard/` sources change:
 
 ```bash
-python desktop/setup.py          # one-time setup
-.venv/bin/python desktop/launch.py            # native window
-.venv/bin/python desktop/launch.py --browser  # browser tab instead
-.venv/bin/python desktop/launch.py --no-window  # server only
+make prebuilt-dashboard        # or: python3 scripts/build_prebuilt_dashboard.py --build
+python3 scripts/build_prebuilt_dashboard.py --check
 ```
 
-## macOS app icon
+`tests/test_desktop_prebuilt_dashboard.py` recomputes the manifest's
+`source_fingerprint` from the working tree and fails when the two diverge, so a
+dashboard change that forgets the regeneration is caught in CI without needing
+Node on the runner.
 
-`PRII-MONEYSWEEP.app` is a double-click macOS app (Apple-silicon and Intel). Double-click
-it in Finder and the dashboard opens in its own window — no Terminal. The first
-launch runs the one-time setup (needs internet once, plus Node.js for the
-dashboard build); after that it starts straight away and works offline.
+Selection order in `setup_frontend()`: an existing `dashboard/dist` wins (a
+developer's own build is never clobbered), then the prebuilt bundle, then npm.
+Force a real build with `--build-frontend`, `--force`, or
+`PRII_FORCE_FRONTEND_BUILD=1`.
 
-Because the app is a small self-locating wrapper around `desktop/launch.py`, it
-must stay at the repo root (it finds the repo from its own location). If macOS
-blocks the first open, see **If macOS won't open the app** below.
-No-Python-required standalone builds are still produced separately by the
-`desktop-build` workflow.
+The bundle lives outside `dashboard/` on purpose: `.gitignore` eats any directory
+named `dist`/`build` at any depth, and `dashboard/eslint.config.js` is a rendered
+federation template that cannot gain a local `ignores` entry. It is deliberately
+**not** added to `desktop/pyinstaller.spec` — the frozen build compiles the
+dashboard with npm in CI, and bundling both would double its frontend payload.
 
-## If macOS won't open the app
+### Offline first run
 
-The app is safe — it's an open-source launcher script you can read in
-`Contents/MacOS/`. macOS blocks it only because it isn't signed with a paid
-Apple Developer ID or notarized by Apple, so the first open may show *"cannot be
-opened because Apple cannot check it for malicious software"* or an
-*"unidentified developer"* notice. That's macOS quarantining files downloaded
-from the internet (it happens especially with GitHub's **Download ZIP**). Any
-one of the following clears it — you only do this once per download:
+Setup installs from `desktop/wheelhouse/` (or `$PRII_WHEELHOUSE`) when that
+directory contains wheels, making the whole first run work with no network. See
+`docs/DESKTOP_OFFLINE_BOOTSTRAP.md`.
 
-- **Easiest — run the helper.** Double-click **`Fix-Gatekeeper.command`** in the
-  repo root, then open the app normally. If the helper is itself blocked,
-  right-click it → **Open** to run it once.
-- **Terminal (always works).** Paste this into Terminal (pasting a command is
-  never blocked), then press Return:
-  ```bash
-  xattr -dr com.apple.quarantine "/path/to/moneysweep-pr/PRII-MONEYSWEEP.app"
-  ```
-  Tip: type `xattr -dr com.apple.quarantine ` (with a trailing space) and drag
-  the app onto the Terminal window to fill in its path.
-- **System Settings.** Double-click the app, let macOS block it, then open
-  **System Settings → Privacy & Security**, scroll to the message naming the app,
-  and click **Open Anyway**. On macOS Sequoia 15 and later this replaces the old
-  right-click → **Open** trick.
+`python3 desktop/preflight.py` reports which prerequisite is blocking setup —
+checkout integrity, writability, Python version, `venv`, dashboard availability,
+`git`, host reachability, free disk — instead of the single catch-all message the
+launcher used to show. Network hosts are probed only when installation work
+actually remains.
 
-### "First-run setup could not finish" after Open Anyway
+### macOS Gatekeeper
 
-**Open Anyway** permits *this one launch*; it does not clear the quarantine
-flag. While that flag is set, macOS keeps running the app from a throwaway
-read-only copy under `/private/var/folders/…/AppTranslocation/…` — and only the
-`.app` is copied there, so the checkout it needs is missing and no `.venv` can
-be written. The app now detects this and names the real cause instead of
-blaming the network.
+An unsigned bundle always costs **one** approval per machine; nothing in this
+repository can remove it, and nothing here weakens system assessment policy
+(`spctl` is never invoked). What the wrapper does do is make that approval the
+only step: after a successful run, `setup.py` clears `com.apple.quarantine` from
+the launchers, so subsequent launches — including the `.app` — open cleanly.
 
-Clear the quarantine rather than only permitting the launch: run
-`Fix-Gatekeeper.command`, or the `xattr -dr` command above, or move the folder
-somewhere else in Finder. Moving it defeats translocation on its own, which is
-why dragging the folder out of Downloads (or the Trash) is usually quickest.
+Start from `PRII-MONEYSWEEP.command` rather than the `.app` when the folder came
+from a browser download. Terminal runs `.command` files in place, whereas macOS
+runs a quarantined `.app` from a temporary read-only copy where the checkout
+beside it is missing.
 
-Genuine setup failures — no internet on the first run, or Node.js missing —
-write their output to `$TMPDIR/prii-moneysweep-pr-setup.log`, and the failure
-message names that file.
+`docs/APPLE_NOTARIZATION_RUNBOOK.md` covers the only route to zero approvals: a
+Developer ID certificate and notarization, which apply to the frozen build below.
+
+Note that the repo-root launchers (`Fix-Gatekeeper.command`, the `.command`,
+`.sh`, `.bat`, and the `.app` executable) are rendered federation templates
+shared with five sibling repositories. Improving them is a coordinated change in
+`thehub-pr/federation-templates/`, not a local edit — see
+`tests/test_federation_template_boundary.py`.
+
+## 2. Self-contained standalone build — canonical distribution target
+
+`.github/workflows/desktop-build.yml` builds the standalone application with
+PyInstaller on macOS, Windows, and Linux. The macOS output is
+`PRII-MONEYSWEEP.app`, also packaged as ZIP and DMG.
+
+The frozen build contains:
+
+- Python runtime and complete MoneySweep Python dependency set;
+- real DuckDB and PyArrow runtime;
+- FastAPI/uvicorn desktop backend;
+- pywebview native-window runtime;
+- operating-system credential-vault integration;
+- compiled dashboard;
+- source registries and schemas;
+- registry-declared producer modules;
+- materialization readiness + production-status metadata;
+- seed `data/canonical_v1`.
+
+It must not download or install runtime dependencies on first launch.
+
+## First boot
+
+The application bundle is immutable. On startup MoneySweep creates a writable
+per-user workspace and copies only missing seed canonical files.
+
+Default macOS workspace:
+
+`~/Library/Application Support/PRII-MONEYSWEEP/`
+
+The bootstrap is idempotent and never overwrites existing workspace data. A
+receipt is written to:
+
+`receipts/desktop_bootstrap_latest.json`
+
+The app then starts one local same-origin FastAPI server on a free loopback port
+and opens the dashboard in a native window. The browser fallback remains
+available through the shared `prii_desktop` launcher.
+
+## Data Sources tab
+
+The standalone desktop composition adds a **Data Sources** dashboard tab.
+
+### Offline files
+
+Select a registered manual source, choose a local export, then **Stage + hash**.
+MoneySweep stores it only under that source's registered workspace dropzone,
+computes SHA-256, preserves same-name/different-byte collisions, and writes an
+offline-ingest receipt. The state remains `STAGED_NOT_PROMOTED`.
+
+**Materialize staged source** invokes the registered producer against the local
+workspace. Producer success is not automatic canonical promotion.
+
+### API materialization
+
+Select one source and perform **Dry run** before **Fetch + materialize**. Live
+runs retain the existing egress gate and source-level failure reporting.
+Versioned receipts are stored under `receipts/materialization_runs/`.
+
+The GUI intentionally does not expose a one-click run-all operation.
+
+### Credentials
+
+Keyed API credentials are saved through the OS credential vault (macOS
+Keychain on Mac). The GUI and API expose only configured/not-configured status;
+secret values are never returned or written into workspace receipts.
+
+See `docs/DESKTOP_DATA_POPULATION.md` for the complete ingestion contract.
+
+## Frozen runtime certification
+
+The CI matrix first builds a console form of the exact PyInstaller runtime and
+runs both:
+
+```bash
+PRII-MONEYSWEEP --smoke
+PRII-MONEYSWEEP --selftest
+```
+
+`--selftest` verifies real DuckDB/PyArrow imports, bundle/workspace separation,
+source-denominator closure, automatable-selection closure, a zero-execution
+dry-run, and secret non-disclosure.
+
+The final package receives `DESKTOP_RELEASE_MANIFEST.json` with exact byte sizes
+and SHA-256 digests. See `docs/DESKTOP_RELEASE_CERTIFICATION.md`.
+
+## macOS signing and notarization
+
+An unsigned CI artifact may be retained for testing, but it is **not** the final
+`download -> double-click -> READY` release.
+
+A public `desktop-v*` macOS release must pass all three on the exact app:
+
+```bash
+codesign --verify --deep --strict --verbose=2 PRII-MONEYSWEEP.app
+xcrun stapler validate PRII-MONEYSWEEP.app
+spctl --assess --type execute --verbose=4 PRII-MONEYSWEEP.app
+```
+
+The workflow intentionally fails closed at this gate until Developer-ID signing
+and notarization are configured. No Gatekeeper-bypass helper is part of the
+release contract.
+
+## Production-data release gate
+
+Desktop buildability and production-data validity are independent.
+
+CI can build diagnostic candidates, but a `desktop-v*` public release remains
+blocked unless:
+
+`data/exports/production_status.json -> production_status == PRODUCTION_VALIDATED`
+
+This prevents a technically self-contained application from being published as
+a production MoneySweep release while the bundled data remains diagnostic.

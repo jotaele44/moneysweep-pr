@@ -10,22 +10,17 @@ key value; only ever reports set/not-set, per docs/SECRET_HANDLING_POLICY.md.
 
 from __future__ import annotations
 
-import re
-
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
+from server.backend.local_request import require_loopback
+
 router = APIRouter(tags=["api-keys"])
-_LOCAL_ORIGIN = re.compile(r"^https?://(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$")
 
 
 def _require_local_request(request: Request) -> None:
-    client_host = request.client.host if request.client else ""
-    if client_host not in {"127.0.0.1", "::1"}:
-        raise HTTPException(status_code=403, detail="API-key writes require loopback")
-    origin = request.headers.get("origin")
-    if origin and not _LOCAL_ORIGIN.fullmatch(origin):
-        raise HTTPException(status_code=403, detail="untrusted request origin")
+    """Thin alias kept so existing call sites and tests are undisturbed."""
+    require_loopback(request, detail="API-key writes require loopback")
 
 
 class SetKeyRequest(BaseModel):

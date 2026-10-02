@@ -1,0 +1,187 @@
+version: "1.0"
+schema_version: guide_financial_avenues_v1
+scope_id: GUIDE_BOUNDED_100_PERCENT
+source:
+  title: "Doing business in Puerto Rico - Business guide 2021"
+  publisher: "Kevane Grant Thornton"
+  publication_year: 2021
+  laws_current_through: "2020-12-31"
+  local_filename: "doing-business-in-puerto-rico-guide-2021(1).pdf"
+  byte_size: 764432
+  sha256: "f43f8ca103f4d709d012c82ada082c1b175a02467b82c6ad9125a9159bf7a5a8"
+  boundedness_note: >-
+    The guide states that it does not cover the subject exhaustively. This
+    denominator certifies only financial avenues explicitly mentioned by this
+    frozen guide manifestation; it must never be promoted to an exhaustive
+    denominator for all Puerto Rico finance.
+
+inclusion_rule: >-
+  Include an explicitly named financing channel, regulated financial/investment
+  vehicle, or tax-incentive/economic-development avenue that can direct capital,
+  credit, investment, or a tax benefit to a person, entity, project, or sector.
+  Preserve raw guide terminology separately from the canonical lane label.
+
+exclusion_rule: >-
+  Exclude ordinary compliance taxes, filing deadlines, entity-form mechanics,
+  payroll/benefit obligations, and descriptive macroeconomic statistics unless
+  the guide presents them as a financing, investment, or incentive avenue.
+
+certification_rule: >-
+  GUIDE_BOUNDED_100_PERCENT may PASS only when every canonical avenue below has
+  a frozen authoritative public-source binding, a materialized source
+  manifestation, explicit inclusion/exclusion semantics, schema and row-count
+  closure, duplicate/null/identity/temporal/provenance gates passed, and zero
+  unresolved residue inside the avenue claim. Registry presence or scraper code
+  alone is insufficient.
+
+avenues:
+  - avenue_id: GFAV-001
+    canonical: commercial_banking
+    raw_mentions: ["Banking system"]
+    guide_pages: [16]
+    class: financing_channel
+  - avenue_id: GFAV-002
+    canonical: capital_markets
+    raw_mentions: ["Capital markets", "U.S. stock markets"]
+    guide_pages: [16]
+    class: financing_channel
+  - avenue_id: GFAV-003
+    canonical: economic_development_bank_financing
+    raw_mentions: ["Economic Development Bank of Puerto Rico", "financial assistance to private small and medium sized business (PyMES)"]
+    guide_pages: [16]
+    class: financing_channel
+  - avenue_id: GFAV-004
+    canonical: international_financial_entities
+    raw_mentions: ["International financial entities (IFEs)", "international banking"]
+    guide_pages: [24, 44]
+    class: regulated_financial_vehicle
+  - avenue_id: GFAV-005
+    canonical: insurance_companies
+    raw_mentions: ["Insurance companies"]
+    guide_pages: [24]
+    class: regulated_financial_vehicle
+  - avenue_id: GFAV-006
+    canonical: real_estate_investment_trusts
+    raw_mentions: ["Real estate investment trusts (REITs)"]
+    guide_pages: [24, 25]
+    class: investment_vehicle
+  - avenue_id: GFAV-007
+    canonical: registered_investment_companies
+    raw_mentions: ["Registered investment companies"]
+    guide_pages: [25, 26]
+    class: investment_vehicle
+  - avenue_id: GFAV-008
+    canonical: resident_individual_investors
+    raw_mentions: ["Resident individual investors"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-009
+    canonical: difficult_recruitment_professionals
+    raw_mentions: ["Professionals of difficult recruitment"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-010
+    canonical: export_goods_services
+    raw_mentions: ["Exportation of goods or services", "export services"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-011
+    canonical: international_insurers_reinsurers
+    raw_mentions: ["International insurers and reinsurers", "international insurers"]
+    guide_pages: [12, 44]
+    class: tax_incentive
+  - avenue_id: GFAV-012
+    canonical: public_private_partnerships
+    raw_mentions: ["Public-private partnerships"]
+    guide_pages: [44]
+    class: financing_channel
+  - avenue_id: GFAV-013
+    canonical: private_equity_capital_investment_funds
+    raw_mentions: ["Private equity funds", "capital investment funds"]
+    guide_pages: [12, 44]
+    class: investment_vehicle
+  - avenue_id: GFAV-014
+    canonical: tourism_cruise_hotels
+    raw_mentions: ["Tourism and Cruise-ship industry", "hotels and related tourist activities", "tourism"]
+    guide_pages: [12, 44]
+    class: tax_incentive
+  - avenue_id: GFAV-015
+    canonical: manufacturing
+    raw_mentions: ["Manufacturing", "manufacturing operations"]
+    guide_pages: [12, 44]
+    class: tax_incentive
+  - avenue_id: GFAV-016
+    canonical: infrastructure_renewable_energy
+    raw_mentions: ["Infrastructure, including renewable energy"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-017
+    canonical: agriculture_agroindustrial
+    raw_mentions: ["Agroindustrial activities", "agriculture"]
+    guide_pages: [12, 44]
+    class: tax_incentive
+  - avenue_id: GFAV-018
+    canonical: film_creative
+    raw_mentions: ["Film and creative industries", "feature films"]
+    guide_pages: [12, 44]
+    class: tax_incentive
+  - avenue_id: GFAV-019
+    canonical: young_entrepreneurship
+    raw_mentions: ["Entrepreneurship for young individuals"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-020
+    canonical: foreign_trade_zones
+    raw_mentions: ["Foreign trade zones"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-021
+    canonical: qualified_opportunity_zone_priority_projects
+    raw_mentions: ["Priority Projects for qualified opportunity zones (OZs)"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-022
+    canonical: vieques_culebra_special_incentives
+    raw_mentions: ["Special incentives are available for operations in the municipalities of Vieques and Culebra"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-023
+    canonical: pymes_special_incentives
+    raw_mentions: ["small and medium businesses (PYMES)"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-024
+    canonical: strategic_projects
+    raw_mentions: ["strategic projects"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-025
+    canonical: pioneer_activities
+    raw_mentions: ["pioneer activities"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-026
+    canonical: scientific_research_development
+    raw_mentions: ["scientific research and development", "research and development tax credits"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-027
+    canonical: recycling
+    raw_mentions: ["recycling businesses"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-028
+    canonical: technology
+    raw_mentions: ["technology"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-029
+    canonical: hospital_facilities
+    raw_mentions: ["hospital facilities"]
+    guide_pages: [44]
+    class: tax_incentive
+  - avenue_id: GFAV-030
+    canonical: solid_waste_disposal
+    raw_mentions: ["solid waste disposal facilities"]
+    guide_pages: [12]
+    class: tax_incentive

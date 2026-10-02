@@ -28,8 +28,7 @@ defaults:
   row_regression_tolerance_pct: 40
 
 sources:
-  # -- Long-running sources: durable/self-hosted execution, excluded from the
-  #    GitHub-hosted cron schedules (the scheduled workflows skip self_hosted).
+  # -- Long-running/checkpointed sources.
   - source_id: ocpr_contracts
     trigger_type: schedule
     enabled: true
@@ -78,6 +77,21 @@ sources:
     max_retries: 0
     checkpoint_strategy: entity_queue
     freshness_sla_hours: 1080
+
+  - source_id: pr_fomb
+    trigger_type: schedule
+    enabled: true
+    cadence: weekly
+    runner: scripts/download_fomb.py
+    execution_backend: self_hosted
+    timeout_minutes: 240
+    max_retries: 1
+    checkpoint_strategy: entity_queue
+    freshness_sla_hours: 336
+    empty_result_policy: preserve_previous
+    output_change_policy: row_count_or_hash
+    atomic_output_required: true
+    notes: Producer persists its own document-ID queue plus ETag/Last-Modified/SHA-256 validators in data/raw/FOMB/checkpoint.json; self-hosted execution avoids truncating large first-pass backfills on hosted runners.
 
   # Keep this canonical upstream schedulable even in lean controller images
   # where optional HTTP/dataframe dependencies are installed only inside the
@@ -141,15 +155,9 @@ sources:
     freshness_sla_hours: 168
 
   # -- Disabled terminal sources: never scheduled, never executable.
-  #    Deferred stubs + semantic duplicates stay permanently disabled under the
-  #    current readiness invariant.
-  - source_id: hacienda_sut_ivu
-    trigger_type: disabled
-    enabled: false
-    runner: scripts/download_coverage_gap_intake.py
-    freshness_sla_hours: 0
-    notes: Disabled until a real scraper replaces the coverage-gap stub.
-
+  #    hacienda_sut_ivu graduated to a real api_producer (scripts/download_hacienda_sut_ivu.py)
+  #    and was removed from this list — same as fta_ntd/census_gov_finances, it has no
+  #    override here and gets its effective policy inferred from path_type + cadence.
   - source_id: pr_act_154_excise
     trigger_type: disabled
     enabled: false

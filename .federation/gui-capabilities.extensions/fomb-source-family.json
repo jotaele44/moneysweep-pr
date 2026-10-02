@@ -1,0 +1,33 @@
+{
+  "capabilities": [
+    {
+      "id": "fomb-source-materialization",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The FOMB collectors are provenance-preserving source materialization workers. Their normalized outputs feed existing MoneySweep data surfaces; they do not define a separate interactive analysis workflow.",
+      "candidate_ids": [
+        "analysis_module:scripts/download_fomb.py",
+        "analysis_module:scripts/download_fomb_special_reports.py",
+        "analysis_symbol:scripts/download_fomb.py:AjaxConfig",
+        "analysis_symbol:scripts/download_fomb.py:Link",
+        "analysis_symbol:scripts/download_fomb.py:main",
+        "analysis_symbol:scripts/download_fomb.py:run",
+        "analysis_symbol:scripts/download_fomb_special_reports.py:run",
+        "cli_surface:scripts/download_fomb.py"
+      ]
+    },
+    {
+      "id": "dateas-metadata-discovery",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The Dateas adapter is deliberately metadata-only and fail-closed: it cannot fetch rows, poll, or promote canonical data. It records discovery provenance for first-party source resolution rather than exposing a user workflow.",
+      "candidate_ids": [
+        "python_module:moneysweep/query/adapters/dateas_pr_metadata.py",
+        "python_symbol:moneysweep/query/adapters/dateas_pr_metadata.py:DateasPRMetadataOnlyAdapter"
+      ]
+    }
+  ],
+  "exceptions": []
+}

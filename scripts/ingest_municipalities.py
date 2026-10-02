@@ -1,18 +1,12 @@
 """Ingest the 78 Puerto Rico municipalities into Canonical v1 ``municipalities.csv``.
 
-Source surface: the committed reference dataset
-``data/reference/pr_municipalities.csv`` (public, non-PII). This is the first
-*populated* canonical_v1 table and the geographic anchor for ``LOCATED_IN``
-edges. It is evidence-first: one accepted ``evidence.csv`` row (Tier T1,
-registry, manual) is created per municipality before the node row, and the
-node references it via ``evidence_id``.
+The committed ``data/reference/pr_municipalities.csv`` is a useful normalized
+geographic reference, but it is a transformed local dataset rather than the
+frozen authoritative Census/PR source manifestation. Source taxonomy therefore
+must not prove source identity. Municipality rows are emitted as T3/pending
+until an authoritative source binding is materialized.
 
 Roadmap: WS-K, tasks T147-T149. Stdlib only.
-
-CLI::
-
-    python scripts/ingest_municipalities.py            # writes the canonical tables
-    python scripts/ingest_municipalities.py --check     # validate coverage only
 """
 
 from __future__ import annotations
@@ -54,7 +48,6 @@ MUNI_COLUMNS = [
 
 
 def _aliases(ref_row: dict[str, str]) -> str:
-    """Merge the reference aliases with the Spanish canonical name (de-duped)."""
     parts: list[str] = []
     for piece in (ref_row.get("aliases") or "").split("|"):
         piece = piece.strip()
@@ -67,25 +60,25 @@ def _aliases(ref_row: dict[str, str]) -> str:
 
 
 def build_rows(root: Path | None = None) -> tuple[list[dict[str, Any]], list[Evidence]]:
-    """Return (municipality rows, evidence rows) built from the reference dataset."""
     root = root or REPO_ROOT
     muni_rows: list[dict[str, Any]] = []
     evidence_rows: list[Evidence] = []
     with (root / REFERENCE).open(newline="", encoding="utf-8") as fh:
-        for i, ref in enumerate(csv.DictReader(fh), start=2):  # line 1 is header
+        for i, ref in enumerate(csv.DictReader(fh), start=2):
             name = (ref.get("canonical_name") or "").strip()
             if not name:
                 continue
             county_fips = (ref.get("county_fips") or "").strip()
             claim = f"Puerto Rico municipality '{name}' (county FIPS {county_fips})"
             ev = make_evidence(
-                source_type="registry",
+                source_type="other",
                 source_name=SOURCE_NAME,
                 source_path_or_url=REFERENCE,
                 page_or_line_ref=f"row {i}",
                 claim=claim,
                 extraction_method="manual",
-                review_status="accepted",
+                evidence_tier="T3",
+                review_status="pending",
             )
             evidence_rows.append(ev)
             muni_rows.append(
@@ -98,7 +91,7 @@ def build_rows(root: Path | None = None) -> tuple[list[dict[str, Any]], list[Evi
                     "aliases": _aliases(ref),
                     "confidence": ev.confidence,
                     "evidence_id": ev.evidence_id,
-                    "review_status": "accepted",
+                    "review_status": "pending",
                     "notes": "",
                 }
             )
@@ -114,7 +107,6 @@ def write_municipalities(rows: list[dict[str, Any]], out_path: Path) -> None:
 
 
 def check_coverage(rows: list[dict[str, Any]]) -> list[str]:
-    """Return a list of coverage problems (empty == full, valid coverage)."""
     problems: list[str] = []
     if len(rows) != EXPECTED_COUNT:
         problems.append(f"expected {EXPECTED_COUNT} municipalities, got {len(rows)}")
@@ -124,6 +116,8 @@ def check_coverage(rows: list[dict[str, Any]]) -> list[str]:
     fips = [r["county_fips"] for r in rows if r["county_fips"]]
     if len(set(fips)) != len(fips):
         problems.append("duplicate county_fips values present")
+    if any(r.get("review_status") != "pending" for r in rows):
+        problems.append("noncanonical municipality reference unexpectedly promoted")
     return problems
 
 
@@ -141,6 +135,7 @@ def ingest(root: Path | None = None) -> dict[str, Any]:
         "producer_script": "scripts/ingest_municipalities.py",
         "producer_phase": "CANONICAL_V1_MUNICIPALITIES_INGEST",
         "source_inputs": [REFERENCE],
+        "source_identity_state": "NONCANONICAL_REFERENCE_DATASET",
         "output": MUNI_OUT,
         "row_count": len(muni_rows),
         "expected_count": EXPECTED_COUNT,

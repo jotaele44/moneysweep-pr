@@ -111,3 +111,9 @@ def test_build_manifest_emits_spiderweb_handshake():
     assert fed["consumer_component"] == "query-hub"
     assert fed["contract"] == "moneysweep-pr-export"
     assert fed["producer_repo"] == "moneysweep-pr"
+
+
+@pytest.mark.unit
+def test_committed_hub_package_validates_with_optional_money_streams():
+    package = Path(__file__).resolve().parents[1] / "data" / "exports" / "canonical_v1_federation"
+    assert validate_package(package, mode="test") == []

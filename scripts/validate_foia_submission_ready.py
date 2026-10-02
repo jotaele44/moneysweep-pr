@@ -1,9 +1,9 @@
 """Pre-submission readiness validator for the FOIA request program.
 
-Checks every condition that must be satisfied before the 9 FOIA requests can be
-submitted:
+Checks every condition that must be satisfied before active FOIA requests can
+be submitted:
 
-  1. All 9 letter files exist in ``docs/foia_letters/``.
+  1. All tracked letter files exist in ``docs/foia_letters/``.
   2. ``data/reference/foia_requester.json`` contains no literal ``{{...}}``
      placeholder values (requester name and contact must be filled by the operator).
   3. Every request row has a non-empty ``priority`` and a valid ``request_status``.
@@ -32,17 +32,12 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PRIORITY_QUEUE = "reports/foia_priority_queue.csv"
 REQUESTER_CONFIG = "data/reference/foia_requester.json"
 LETTERS_DIR = "docs/foia_letters"
+REQUEST_SCHEMA = "schemas/foia_request.schema.json"
 
-VALID_STATUSES = {
-    "planned",
-    "drafted",
-    "submitted",
-    "awaiting_response",
-    "partial_yield",
-    "fulfilled",
-    "denied",
-    "appealed",
-}
+
+def _valid_statuses(root: Path) -> set[str]:
+    schema = json.loads((root / REQUEST_SCHEMA).read_text(encoding="utf-8"))
+    return set(schema["properties"]["request_status"]["enum"])
 
 
 def validate(root: Path | None = None) -> list[str]:
@@ -68,6 +63,7 @@ def validate(root: Path | None = None) -> list[str]:
         queue = list(csv.DictReader(fh))
 
     letters_dir = root / LETTERS_DIR
+    valid_statuses = _valid_statuses(root)
     for row in queue:
         letter = letters_dir / f"{row['request_id']}.md"
         if not letter.exists():
@@ -78,7 +74,7 @@ def validate(root: Path | None = None) -> list[str]:
         if not (row.get("priority") or "").strip():
             problems.append(f"{row['request_id']}: missing priority")
         st = (row.get("request_status") or "").strip()
-        if st not in VALID_STATUSES:
+        if st not in valid_statuses:
             problems.append(f"{row['request_id']}: invalid request_status {st!r}")
 
     return problems

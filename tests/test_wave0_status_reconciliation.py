@@ -39,8 +39,8 @@ def test_current_status_matches_authoritative_readiness() -> None:
 def test_status_records_pr448_postmerge_and_pr452_draft_state() -> None:
     status = _read("reports/current_status.json")
     assert status["schema_version"] == "moneysweep_current_status_v8"
-    assert status["main_sha"] == "9e911203a05cf8f2e99c762161b7ec18de8cef73"
-    assert status["active_pr"] == 452
+    assert status["main_sha"] == "315520119c47b0f271f19531d53de8454d99f41a"
+    assert status["active_pr"] is None
     merge = status["merge_record"]
     assert merge["pr_number"] == 448
     assert merge["state"] == "MERGED"

@@ -4,17 +4,18 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
 
 try:
     import yaml
-except ImportError:
-    print(
-        "PyYAML is required to regenerate registry JSONs. Install with: pip install PyYAML",
-        file=sys.stderr,
-    )
-    sys.exit(2)
+except ImportError as exc:  # pragma: no cover
+    # Raise rather than sys.exit(): this module is imported by tests and by
+    # pre-commit, and a module-level exit takes the whole interpreter down
+    # (pytest reports INTERNALERROR and collects nothing) instead of failing
+    # this one import.
+    raise ImportError(
+        "PyYAML is required to regenerate registry JSONs. Install with: pip install PyYAML"
+    ) from exc
 
 REGISTRY_PAIRS = [
     ("source_registry.yaml", "source_registry.json"),

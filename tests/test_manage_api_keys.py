@@ -21,8 +21,9 @@ def _expected_key_count() -> int:
 
 
 def test_known_keys_parses_all_real_vars_with_expected_required_flags():
-    keys = {k.name: k for k in known_keys(REAL_EXAMPLE)}
-    assert len(keys) == _expected_key_count()
+    parsed_keys = known_keys(REAL_EXAMPLE)
+    keys = {k.name: k for k in parsed_keys}
+    assert len(keys) == len(parsed_keys)
 
     for required_name in (
         "SAM_API_KEY",
@@ -41,9 +42,11 @@ def test_known_keys_parses_all_real_vars_with_expected_required_flags():
         "CENSUS_API_KEY",
         "FELT_API_KEY",
         "FINANCIALDATA_API_KEY",
+        "FINANCIALDATA_LICENSE_APPROVED",
         "X_API_KEY",
         "PROPUBLICA_API_KEY",
         "CMS_APP_TOKEN",
+        "SOCRATA_APP_TOKEN",
     ):
         assert keys[optional_name].required is False, optional_name
 
@@ -59,6 +62,14 @@ def test_set_key_rejects_unknown_name(tmp_path):
     env = tmp_path / ".env"
     with pytest.raises(ValueError, match="unknown key"):
         set_key("NOT_A_REAL_KEY", "value", env_path=env, example_path=REAL_EXAMPLE)
+    assert not env.exists()
+
+
+@pytest.mark.parametrize("name", ["MONEYSWEEP_CORS_ORIGINS", "MONEYSWEEP_CASE_DB"])
+def test_set_key_rejects_noncredential_configuration(tmp_path, name):
+    env = tmp_path / ".env"
+    with pytest.raises(ValueError, match="unknown key"):
+        set_key(name, "unsafe-remote-override", env_path=env, example_path=REAL_EXAMPLE)
     assert not env.exists()
 
 
@@ -121,5 +132,7 @@ def test_key_status_never_includes_a_value_field(tmp_path):
 
 def test_key_status_missing_env_reports_everything_unset(tmp_path):
     status = key_status(env_path=tmp_path / "nope.env", example_path=REAL_EXAMPLE)
+    expected_names = {key.name for key in known_keys(REAL_EXAMPLE)}
     assert len(status) == _expected_key_count()
+    assert {row["name"] for row in status} == expected_names
     assert all(row["is_set"] is False for row in status)

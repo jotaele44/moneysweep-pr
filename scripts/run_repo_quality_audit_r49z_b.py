@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -12,12 +14,28 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from moneysweep.pipeline.repo_quality_audit import run_repo_quality_audit
 
 
+def _print_redacted_hygiene_locations(root: Path) -> None:
+    """Print finding locations without emitting secret-like source excerpts."""
+    path = root / "data" / "review_queue" / "repo_hygiene_followups_r4_9z_b.csv"
+    if not path.exists():
+        return
+    with path.open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle):
+            if row.get("category") != "possible_secret":
+                continue
+            details = str(row.get("details", ""))
+            match = re.match(r"line\s+(\d+):", details)
+            line = match.group(1) if match else "unknown"
+            print(f"possible_secret_location: {row.get('item', '')}:{line}:possible_secret")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run R4.9Z-B repo quality and CI hardening audit")
     parser.add_argument("--root", default=".", help="Project root")
     args = parser.parse_args()
+    root = Path(args.root)
 
-    status = run_repo_quality_audit(Path(args.root))
+    status = run_repo_quality_audit(root)
     print(f"r4_9z_b_gate_passed: {status.get('r4_9z_b_gate_passed')}")
     print(f"production_status: {status.get('production_status')}")
     print(f"phase_7_8_blocked: {status.get('phase_7_8_blocked')}")
@@ -28,6 +46,7 @@ def main() -> int:
     print(f"production_inputs_staged: {status.get('production_inputs_staged')}")
     print(f"forbidden_artifact_usage: {status.get('forbidden_artifact_usage')}")
     print(f"possible_secret_findings: {status.get('possible_secret_findings')}")
+    _print_redacted_hygiene_locations(root)
     print(json.dumps(status, indent=2))
 
     print("wrote: docs/REPO_QUALITY_STATUS_AFTER_R4_9Z.md")

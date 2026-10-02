@@ -1,0 +1,123 @@
+name: PR assistance denominator
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_fy:
+        description: First federal fiscal year
+        required: false
+        default: "2000"
+      end_fy:
+        description: Last federal fiscal year
+        required: false
+        default: "2026"
+  pull_request:
+    paths:
+      - "scripts/download_pr_assistance_denominator.py"
+      - "tests/test_pr_assistance_denominator.py"
+      - ".github/workflows/pr-assistance-denominator.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  contract-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      # The repository's global pytest configuration enforces whole-repo coverage.
+      # This narrow contract gate validates only this lane; the normal Tests
+      # workflow remains authoritative for repository-wide coverage.
+      - run: pytest -q --no-cov tests/test_pr_assistance_denominator.py
+      - run: ruff check scripts/download_pr_assistance_denominator.py tests/test_pr_assistance_denominator.py
+      - run: ruff format --check scripts/download_pr_assistance_denominator.py tests/test_pr_assistance_denominator.py
+
+  plan:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      start_fy: ${{ steps.matrix.outputs.start_fy }}
+      end_fy: ${{ steps.matrix.outputs.end_fy }}
+    steps:
+      - id: matrix
+        shell: python
+        env:
+          START_FY_INPUT: ${{ inputs.start_fy }}
+          END_FY_INPUT: ${{ inputs.end_fy }}
+        run: |
+          import json, os
+          start = int(os.environ.get("START_FY_INPUT") or "2000")
+          end = int(os.environ.get("END_FY_INPUT") or "2026")
+          if start > end:
+              raise SystemExit("start_fy must be <= end_fy")
+          rows = [{"fy": fy, "nexus": nexus} for fy in range(start, end + 1) for nexus in ("recipient", "pop")]
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write(f"matrix={json.dumps({'include': rows}, separators=(',', ':'))}\n")
+              out.write(f"start_fy={start}\n")
+              out.write(f"end_fy={end}\n")
+
+  prime-shards:
+    needs: [contract-test, plan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install pandas requests
+      - name: Acquire native USAspending shard
+        run: >-
+          python scripts/download_pr_assistance_denominator.py shard
+          --fy ${{ matrix.fy }}
+          --nexus ${{ matrix.nexus }}
+          --output-dir artifact
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr-assistance-${{ matrix.nexus }}-fy${{ matrix.fy }}
+          path: artifact/
+          if-no-files-found: error
+          retention-days: 14
+
+  aggregate-prime:
+    needs: [plan, prime-shards]
+    if: ${{ always() && needs.prime-shards.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install pandas requests
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: pr-assistance-*
+          path: shards
+          merge-multiple: true
+      - name: Aggregate and classify current SAM financial programs
+        run: >-
+          python scripts/download_pr_assistance_denominator.py aggregate
+          --input-dir shards
+          --output-dir denominator
+          --start-fy ${{ needs.plan.outputs.start_fy }}
+          --end-fy ${{ needs.plan.outputs.end_fy }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr-assistance-denominator
+          path: denominator/
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,6 @@
+2026-08-26 15:58:34 [INFO] OCIF class: ENTIDAD FINANCIERA INTERNACIONAL
+2026-08-26 15:58:34 [INFO] OCIF class: ENTIDAD BANCARIA INTERNACIONAL
+2026-08-26 15:58:34 [INFO] OCIF class: FONDO DE CAPITAL PRIVADO LEY 185-2014
+2026-08-26 15:58:34 [INFO] OCIF class: EXEMPT REPORTING ADVISORS
+2026-08-26 15:58:35 [INFO] OCIF class: INVESTMENT ADVISOR
+OCIF guide classes: 988 rows -> /home/runner/work/moneysweep-pr/moneysweep-pr/data/staging/processed/pr_ocif_guide_financial_classes.csv

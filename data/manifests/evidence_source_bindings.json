@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0",
+  "policy": "Source taxonomy is not canonical source identity. T1 requires status=authoritative plus stable authority identity; local authoritative manifestations also require SHA256. A transformed or curated local dataset is not promoted merely because its rows describe official facts.",
+  "t1_source_denominator": 3,
+  "bindings": [
+    {
+      "binding_key": "data/reference/pr_municipalities.csv",
+      "status": "noncanonical",
+      "source_class": "internal_reference_dataset",
+      "stable_id": null,
+      "authority_url": null,
+      "sha256": null,
+      "reason": "Committed transformed reference dataset containing canonical names, regions and aliases. The current evidence rows cite this local manifestation rather than an independently frozen authoritative Census/PR source. Preserve as geographic reference; T1 remains OPEN until direct authority binding is materialized."
+    },
+    {
+      "binding_key": "data/raw/top250_power_registry.csv",
+      "status": "unresolved",
+      "source_class": "derived_raw_registry",
+      "stable_id": null,
+      "authority_url": null,
+      "sha256": null,
+      "reason": "Evidence rows cite a derived raw registry that is not present in the committed repository snapshot. Its upstream source-by-source authority denominator cannot be reconstructed from the current Git manifestation, so T1 identity is unresolved."
+    },
+    {
+      "binding_key": "data/reference/pr_public_money_entities.csv",
+      "status": "noncanonical",
+      "source_class": "internal_reference_seed",
+      "stable_id": null,
+      "authority_url": null,
+      "sha256": null,
+      "reason": "Curated repository reference surface; not itself an external primary official registry. Preserve as discovery/context until independently bound."
+    }
+  ]
+}

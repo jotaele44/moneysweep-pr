@@ -1,0 +1,333 @@
+{
+  "all_snapshot_gates_pass": true,
+  "generated_at_utc": "2026-08-26T16:25:40+00:00",
+  "schema_version": "guide_financial_live_freeze_v1",
+  "scope_id": "GUIDE_BOUNDED_100_PERCENT",
+  "scope_limitation": "GUIDE_BOUNDED_100_PERCENT != ALL_PUERTO_RICO_FINANCE",
+  "snapshot_root": "data/raw/guide_financial_avenue_snapshots",
+  "source_states": {
+    "ftz_board_pr": "PASS",
+    "ocif_guide_financial_classes": "PASS",
+    "ocs_insurer_registry": "PASS"
+  },
+  "sources": [
+    {
+      "errors": [],
+      "manifest_path": "data/raw/guide_financial_avenue_snapshots/ocif_guide_financial_classes/2026-08-26T155834+0000/manifest.json",
+      "manifest_sha256": "c78affb6e1eaeb206f3398d1c0f6490a66532f7f0012f4bfb083ddd3746cec39",
+      "processed_outputs": [
+        {
+          "byte_size": 383795,
+          "column_count": 24,
+          "columns": [
+            "source_record_id",
+            "license_type_raw",
+            "institution_name_raw",
+            "dba_raw",
+            "status_raw",
+            "address_raw",
+            "phone_raw",
+            "approval_date_raw",
+            "license_number_raw",
+            "nmls_raw",
+            "contact_name_raw",
+            "crd_raw",
+            "depository_raw",
+            "source_page",
+            "source_url",
+            "retrieved_at_utc",
+            "geo_municipality_code",
+            "geo_municipality_name",
+            "geo_county_fips",
+            "geo_zip",
+            "geo_lat",
+            "geo_lon",
+            "geo_attribution_source",
+            "geo_attribution_confidence"
+          ],
+          "path": "data/staging/processed/pr_ocif_guide_financial_classes.csv",
+          "row_count": 988,
+          "schema_fingerprint_sha256": "6f8e290906b2190a14fb408799e8878bacb6a08fa483dddb7e678a522b562d97",
+          "sha256": "83b8e6c78bf705f3505e5b00d07756804aedb3d412179567b65316583ce62455"
+        }
+      ],
+      "raw_manifestation_count": 13,
+      "raw_manifestations": [
+        {
+          "byte_size": 97754,
+          "index": 0,
+          "raw_file": "e55012ef8288_page_0001.html",
+          "retained_rows": 43,
+          "retrieved_at_utc": "2026-08-26T15:58:34+00:00",
+          "sha256": "626b20b6e95f0cfdb68f98eb91bc3170616f6281fd2c1c3fd194c1f468423bca",
+          "url": "https://concesionarios.ocif.pr.gov/es/License/Index?LicenseTypeFilter=ENTIDAD+FINANCIERA+INTERNACIONAL&Page=1&PageSize=100"
+        },
+        {
+          "byte_size": 82738,
+          "index": 1,
+          "raw_file": "82b429d7fa71_page_0001.html",
+          "retained_rows": 21,
+          "retrieved_at_utc": "2026-08-26T15:58:34+00:00",
+          "sha256": "9bc548b773f8f3e83bf797c4e8f2f84de4c140c15604ef154ec873be4186fcbb",
+          "url": "https://concesionarios.ocif.pr.gov/es/License/Index?LicenseTypeFilter=ENTIDAD+BANCARIA+INTERNACIONAL&Page=1&PageSize=100"
+        },
+        {
+          "byte_size": 81288,
+          "index": 2,
+          "raw_file": "ee6d2ecd5547_page_0001.html",
+          "retained_rows": 21,
+          "retrieved_at_utc": "2026-08-26T15:58:34+00:00",
+          "sha256": "2cac161394a3fd2c4e48ee2036c9d8695c51f8db9938084c522f2b5a42e9c9c8",
+          "url": "https://concesionarios.ocif.pr.gov/es/License/Index?LicenseTypeFilter=FONDO+DE+CAPITAL+PRIVADO+LEY+185-2014&Page=1&PageSize=100"
+        },
+        {
+          "byte_size": 131836,
+          "index": 3,
+          "raw_file": "4e91615a952d_page_0001.html",
+          "retained_rows": 100,
+          "retrieved_at_utc": "2026-08-26T15:58:35+00:00",
+          "sha256": "d9a4707e681830f5e291d26cdd53916ae4493efc7dc4e0746dbea6e9560edfcc",
+          "url": "https://concesionarios.ocif.pr.gov/es/License/Index?LicenseTypeFilter=EXEMPT+REPORTING+ADVISORS&Page=1&PageSize=100"
+        },
+        {
+          "byte_size": 103206,
+          "index": 4,
+          "raw_file": "4e91615a952d_page_0002.html",
+          "retained_rows": 55,
+          "retrieved_at_utc": "2026-08-26T15:58:35+00:00",
+          "sha256": "51b7243353598a5a667272c4e2a20ab91536ecc2b99afdfdd8b46e406021714e",
+          "url": "https://concesionarios.ocif.pr.gov/es/License/Index?LicenseTypeFilter=EXEMPT+REPORTING+ADVISORS&Page=2&PageSize=100"
+        },
+        {
+          "byte_size": 132034,
+          "index": 5,
+          "raw_file": "c0122f094604_page_0001.html",
+          "retained_rows": 100,
+          "retrieved_at_utc": "2026-08-26T15:58:35+00:00",
+          "sha256": "a418a647ace33acef90589ddeb9c85fa89d1f9f5c2bf999fc5bdcf4b04f43ab0",
+          "url": "https://concesionarios.ocif.pr.gov/es/License/Index?LicenseTypeFilter=INVESTMENT+ADVISOR&Page=1&PageSize=100"
+        },
+        {
+          "byte_size": 132361,
+          "index": 6,
+          "raw_file": "c0122f094604_page_0002.html",
+          "retained_rows": 100,
+          "retrieved_at_utc": "2026-08-26T15:58:36+00:00",
+          "sha256": "b10414f603802d1e0bdaa28d7289389eadb36ebb8d3738f4604d92cb192d4b3d",
+          "url": "https://concesionarios.ocif.pr.gov/es/License/Index?LicenseTypeFilter=INVESTMENT+ADVISOR&Page=2&PageSize=100"
+        },
+        {
+          "byte_size": 132243,
+          "index": 7,
+          "raw_file": "c0122f094604_page_0003.html",
+          "retained_rows": 100,
+          "retrieved_at_utc": "2026-08-26T15:58:36+00:00",
+          "sha256": "6cc8210c24ed072ba8c8fe1d955fbb34250cf3fc719944c9a4d9b6aa6ec953d6",
+          "url": "https://concesionarios.ocif.pr.gov/es/License/Index?LicenseTypeFilter=INVESTMENT+ADVISOR&Page=3&PageSize=100"
+        },
+        {
+          "byte_size": 132077,
+          "index": 8,
+          "raw_file": "c0122f094604_page_0004.html",
+          "retained_rows": 100,
+          "retrieved_at_utc": "2026-08-26T15:58:37+00:00",
+          "sha256": "3abcc2e73d0e2fc51ef4d688e32ee18bd1369387fc8f521f6cee3f6ee820d496",
+          "url": "https://concesionarios.ocif.pr.gov/es/License/Index?LicenseTypeFilter=INVESTMENT+ADVISOR&Page=4&PageSize=100"
+        },
+        {
+          "byte_size": 131900,
+          "index": 9,
+          "raw_file": "c0122f094604_page_0005.html",
+          "retained_rows": 100,
+          "retrieved_at_utc": "2026-08-26T15:58:37+00:00",
+          "sha256": "0dab1e44d10af40a9b902be07922e26c124ce5e8f9ac8a7aba8f13d3da19ef1f",
+          "url": "https://concesionarios.ocif.pr.gov/es/License/Index?LicenseTypeFilter=INVESTMENT+ADVISOR&Page=5&PageSize=100"
+        },
+        {
+          "byte_size": 132098,
+          "index": 10,
+          "raw_file": "c0122f094604_page_0006.html",
+          "retained_rows": 100,
+          "retrieved_at_utc": "2026-08-26T15:58:37+00:00",
+          "sha256": "42c48c6abf47be6f52ca9bd89d8aa632f5e26383e3081ba7b3d6d0c59706de48",
+          "url": "https://concesionarios.ocif.pr.gov/es/License/Index?LicenseTypeFilter=INVESTMENT+ADVISOR&Page=6&PageSize=100"
+        },
+        {
+          "byte_size": 131796,
+          "index": 11,
+          "raw_file": "c0122f094604_page_0007.html",
+          "retained_rows": 100,
+          "retrieved_at_utc": "2026-08-26T15:58:38+00:00",
+          "sha256": "bd14fff3dd10f62ac425f78f055f867ee82d83a1e79a58b75472997da07cf6ae",
+          "url": "https://concesionarios.ocif.pr.gov/es/License/Index?LicenseTypeFilter=INVESTMENT+ADVISOR&Page=7&PageSize=100"
+        },
+        {
+          "byte_size": 98831,
+          "index": 12,
+          "raw_file": "c0122f094604_page_0008.html",
+          "retained_rows": 48,
+          "retrieved_at_utc": "2026-08-26T15:58:38+00:00",
+          "sha256": "68798fac2aff112de9761f7593725e8a0d55145678613945070cf7b12c00ffad",
+          "url": "https://concesionarios.ocif.pr.gov/es/License/Index?LicenseTypeFilter=INVESTMENT+ADVISOR&Page=8&PageSize=100"
+        }
+      ],
+      "run_started_at_utc": "2026-08-26T15:58:34+00:00",
+      "source_id": "ocif_guide_financial_classes",
+      "state": "PASS"
+    },
+    {
+      "errors": [],
+      "manifest_path": "data/raw/guide_financial_avenue_snapshots/ocs_insurer_registry/2026-08-26T162540+0000/manifest.json",
+      "manifest_sha256": "46f55792cff4cb486259937fe5d4f5fc2dc000616279e0c25167200c4f433a44",
+      "processed_outputs": [
+        {
+          "byte_size": 9889,
+          "column_count": 13,
+          "columns": [
+            "source_record_id",
+            "insurer_name_raw",
+            "website_raw",
+            "source_url",
+            "retrieved_at_utc",
+            "geo_municipality_code",
+            "geo_municipality_name",
+            "geo_county_fips",
+            "geo_zip",
+            "geo_lat",
+            "geo_lon",
+            "geo_attribution_source",
+            "geo_attribution_confidence"
+          ],
+          "path": "data/staging/processed/pr_ocs_insurers.csv",
+          "row_count": 41,
+          "schema_fingerprint_sha256": "a1c0989620243342dcbad8d71fd135193b24a5b3b51f72ddc8182604408e9802",
+          "sha256": "b9c1916e5c90ddfba19cef106d48bc6d4a3f61fd69c74a39479a47e647bb79e4"
+        },
+        {
+          "byte_size": 510,
+          "column_count": 14,
+          "columns": [
+            "source_record_id",
+            "report_year_raw",
+            "insurer_name_raw",
+            "report_url",
+            "source_url",
+            "retrieved_at_utc",
+            "geo_municipality_code",
+            "geo_municipality_name",
+            "geo_county_fips",
+            "geo_zip",
+            "geo_lat",
+            "geo_lon",
+            "geo_attribution_source",
+            "geo_attribution_confidence"
+          ],
+          "path": "data/staging/processed/pr_ocs_insurer_annual_reports.csv",
+          "row_count": 1,
+          "schema_fingerprint_sha256": "87928296935b32838b6ca8bf5e652d0ff21633cae4d91f71a9cb40be6a0611fe",
+          "sha256": "f9049319e18d302bcc7e2ce2a9b860dc515ca7c24a4d9b42f5b6aba7ffeb0c97"
+        }
+      ],
+      "raw_manifestation_count": 2,
+      "raw_manifestations": [
+        {
+          "byte_size": 55031,
+          "index": 0,
+          "raw_file": "current_insurers.html",
+          "retained_rows": 41,
+          "retrieved_at_utc": "2026-08-26T16:25:40+00:00",
+          "sha256": "187e49fd3dfef8d1a96460afa48c564bea229f1ce4798041c40d83f55e1fbe1d",
+          "url": "https://www.ocs.pr.gov/consumidores/aseguradores-del-pais"
+        },
+        {
+          "byte_size": 317175,
+          "index": 1,
+          "raw_file": "annual_reports.html",
+          "retained_rows": 1,
+          "retrieved_at_utc": "2026-08-26T16:25:40+00:00",
+          "sha256": "4ed14892036b35a747e8901b4142ace5d2baddd637fbf7d61451c5c387f243f5",
+          "url": "https://www.ocs.pr.gov/regulados/informes-anuales"
+        }
+      ],
+      "run_started_at_utc": "2026-08-26T16:25:40+00:00",
+      "source_id": "ocs_insurer_registry",
+      "state": "PASS"
+    },
+    {
+      "errors": [],
+      "manifest_path": "data/raw/guide_financial_avenue_snapshots/ftz_board_pr/2026-08-26T155841+0000/manifest.json",
+      "manifest_sha256": "e91e9acdef78ef719102e08e93f6fa44bf28e51352ee4dae76eb2c90eab5b6d2",
+      "processed_outputs": [
+        {
+          "byte_size": 13516,
+          "column_count": 26,
+          "columns": [
+            "source_record_id",
+            "record_type",
+            "zone_number_raw",
+            "approved_date_raw",
+            "grantee_raw",
+            "location_raw",
+            "zone_status_raw",
+            "port_of_entry_raw",
+            "activation_limit_raw",
+            "total_activated_acres_raw",
+            "site_number_raw",
+            "site_name_raw",
+            "site_status_raw",
+            "activated_acres_raw",
+            "sunset_expiration_lapse_date_raw",
+            "source_detail_id",
+            "source_url",
+            "retrieved_at_utc",
+            "geo_municipality_code",
+            "geo_municipality_name",
+            "geo_county_fips",
+            "geo_zip",
+            "geo_lat",
+            "geo_lon",
+            "geo_attribution_source",
+            "geo_attribution_confidence"
+          ],
+          "path": "data/staging/processed/pr_ftz_zones_sites.csv",
+          "row_count": 44,
+          "schema_fingerprint_sha256": "496f32d0ad2739e48b529d76507a00fcb62a45345cf26d0d7747494f7687ed59",
+          "sha256": "04b580f677b5a44d7e9782da88f88966294ba007c15175cd3b9f7a0b705c3c7a"
+        }
+      ],
+      "raw_manifestation_count": 3,
+      "raw_manifestations": [
+        {
+          "byte_size": 59081,
+          "index": 0,
+          "raw_file": "zone_007_detail_103.html",
+          "retained_rows": 16,
+          "retrieved_at_utc": "2026-08-26T15:58:42+00:00",
+          "sha256": "6582dece0bae67a181b2d8ef524309a34d87c4839d704408916ffb8bf0e76a36",
+          "url": "https://ofis.trade.gov/Zones/Details/103"
+        },
+        {
+          "byte_size": 48783,
+          "index": 1,
+          "raw_file": "zone_061_detail_239.html",
+          "retained_rows": 15,
+          "retrieved_at_utc": "2026-08-26T15:58:42+00:00",
+          "sha256": "61edd20f061ab1533f42a4a267c0794be0808cd7f70fc78ffb2054d7e8e8a246",
+          "url": "https://ofis.trade.gov/Zones/Details/239"
+        },
+        {
+          "byte_size": 44632,
+          "index": 2,
+          "raw_file": "zone_163_detail_115.html",
+          "retained_rows": 13,
+          "retrieved_at_utc": "2026-08-26T15:58:42+00:00",
+          "sha256": "e381e1df7aece4110767a329844d4075b7271ea398718b30a060dfc4be2c0066",
+          "url": "https://ofis.trade.gov/Zones/Details/115"
+        }
+      ],
+      "run_started_at_utc": "2026-08-26T15:58:41+00:00",
+      "source_id": "ftz_board_pr",
+      "state": "PASS"
+    }
+  ]
+}

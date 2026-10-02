@@ -1,0 +1,17 @@
+{
+  "certificationPhraseAuthorized": true,
+  "githubActions": {
+    "assertsPass": false,
+    "state": "WAIVED_BY_USER"
+  },
+  "packageSha256": "86ad2e178972b794c1afbe042cf0f51a098080f73030e7efa7a376ff85a8c4ea",
+  "promotionAuthorized": true,
+  "receiptSha256": "71cb956016f979765e0e23d49bb87daeb9addc656600037a51fa7f21b8a79dc4",
+  "releaseManifestSha256": "ba04992871263e63c1ea5028a5d9e6d2cf75d6dcb18bf2cea64622853f57c64d",
+  "runtimeProducerCommit": "6d37d675d49285057ab43c88d294e8a5e8e52beb",
+  "schemaVersion": "moneysweep.leaderboard-federation-promotion/v1",
+  "scopeId": "moneysweep.leaderboard.production-v1",
+  "scopeSha256": "b12bfc8911d7c2978edacfc9f9f0ce781d7f890fc385034d7359f36aa4433218",
+  "state": "PASS",
+  "thehubConsumerCommit": "b0b789757bfa15c9ba1e7547224167a3f5b6714a"
+}

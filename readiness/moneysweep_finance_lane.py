@@ -195,7 +195,7 @@ def build_moneysweep_finance_lane(input_dir, output_dir=None) -> dict[str, Any]:
 
     routed = sum(1 for r in rows) - len(discrepancy)
     normalized_count = sum(len(v) for v in tables.values())
-    report = {
+    report: dict[str, Any] = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "lane_id": LANE_ID,
         "input_dir": str(root),

@@ -63,7 +63,10 @@ moneysweep-pr/
 
 ## Incoming Operator — Getting Started
 
-1. **Read** `SETUP.md` for clone and installation instructions.
+1. **Read** `SETUP.md` for clone and installation instructions. (Or, for a
+   local look at the data without a manual setup, double-click
+   `PRII-MONEYSWEEP.command` / `.sh` / `.bat` at the repo root — see
+   `desktop/README.md`.)
 2. **Read** `STATUS.md` for current pipeline state.
 3. **Read** `docs/OPERATOR_NEXT_ACTIONS_AFTER_R4_9Z.md` for what must happen before the production rebuild can resume.
 4. **Do not** run download retries, ingest rows, or stage production inputs until source blockers are resolved (see `reports/gap_analysis_report.csv`).

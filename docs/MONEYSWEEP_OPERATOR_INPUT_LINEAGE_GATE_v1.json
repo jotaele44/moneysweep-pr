@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0.0",
+  "repository": "jotaele44/moneysweep-pr",
+  "recorded_at": "2026-08-05T00:16:00Z",
+  "main_sha": "e14b9b8f4eb05b446a2da2072b0e247486b58e1e",
+  "score_before": 61.70,
+  "score_after": 61.70,
+  "score_change": "none: no new qualifying evidence is on main",
+  "frozen_pull_requests": [
+    {"number":451,"state":"open","draft":false,"mergeable":true,"head_sha":"20acce3296da671bc2fb854b0fe3a000574040ee","gate":"Schedule A artifact restoration failed before Schedule B/E execution"},
+    {"number":453,"state":"open","draft":true,"mergeable":false,"head_sha":"039226bb950c5ba2cc0f172fcd68c23d22912459","gate":"completed OCPR receipt, 78 municipalities, public corporations, coverage and duplicate adjudication"},
+    {"number":457,"state":"open","draft":true,"mergeable":false,"head_sha":"e847588f8db848ff63ec33c0d668a3a50d95b0f0","gate":"isolated-checkout final-head validation"},
+    {"number":458,"state":"open","draft":false,"mergeable":false,"head_sha":"e5d8c4f7136eb8460c22a051220d90224880e201","gate":"current-main reconciliation and final workflows"},
+    {"number":459,"state":"open","draft":true,"mergeable":false,"head_sha":"506c8b62bbfdcdb81daa98bea85aa462bca56286","gate":"human disposition of rescued deletions and audit outputs"}
+  ],
+  "official_source_locations": [
+    {"id":"COR3","custodian":"Puerto Rico Central Office for Recovery, Reconstruction and Resiliency","landing_url":"https://recovery.pr.gov/en/what-is-transparency","status":"located_not_materialized","required_bytes":"official project workbook or machine-readable project export","retrieved_at":null,"size_bytes":null,"sha256":null},
+    {"id":"HUD_DRGR","custodian":"U.S. Department of Housing and Urban Development","landing_url":"https://drgr.hud.gov/public/index.html","status":"located_not_materialized","required_bytes":"Puerto Rico activity and project bulk exports","retrieved_at":null,"size_bytes":null,"sha256":null},
+    {"id":"PR_JUSTICE_LOBBYISTS","custodian":"Puerto Rico Department of Justice","landing_url":"https://registrodecabilderos.pr.gov/Lobbyist/Details","status":"live_registry_located_no_complete_export","required_bytes":"current complete machine-readable registry export","retrieved_at":null,"size_bytes":null,"sha256":null},
+    {"id":"PRASA_CONTRACTS","custodian":"Puerto Rico Aqueduct and Sewer Authority","landing_url":"https://www.acueductos.pr.gov/nuestra-aaa/sistema-integrado-de-compras","status":"procurement_portal_located_no_contract_export","required_bytes":"filtered official executed-contract export","retrieved_at":null,"size_bytes":null,"sha256":null}
+  ],
+  "fec_failure": {
+    "workflow_run_id": 30961943379,
+    "job_id": 92167591876,
+    "failed_step": "Restore certified Schedule A contributions by hash",
+    "expected_rows": 15260,
+    "expected_sha256": "35c18e9ac66f7b6a9286624a1ff84a7d64e775cbb96db7aa149f60b042c45464",
+    "finding": "No retained campaign-finance artifact contained the certified Schedule A output",
+    "failure_artifact_id": 8913275058,
+    "failure_artifact_sha256": "09edc667da2e3a57a6194ac0ab55a339d57aa01a14a4731de67d52df3cf83d71",
+    "schedule_b_executed": false,
+    "schedule_e_executed": false,
+    "strict_ok": false
+  },
+  "entity_master_lineage": {
+    "status": "not_closed",
+    "credit_rule": "Every entity_master row must resolve to declared source inputs or be excluded from credited output",
+    "new_rows_credited": 0
+  },
+  "production_status": "NON_PRODUCTION_DIAGNOSTIC",
+  "completion": {
+    "required_source_closure": false,
+    "ocpr_closure": false,
+    "fec_closure": false,
+    "entity_lineage_closure": false
+  }
+}

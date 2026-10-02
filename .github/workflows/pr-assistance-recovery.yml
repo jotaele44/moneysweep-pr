@@ -1,0 +1,105 @@
+name: PR assistance failed-shard recovery
+
+on:
+  pull_request:
+    paths:
+      - "scripts/recover_pr_assistance_failed_shards.py"
+      - ".github/workflows/pr-assistance-recovery.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: python -m py_compile scripts/recover_pr_assistance_failed_shards.py
+      - run: ruff check scripts/recover_pr_assistance_failed_shards.py
+      - run: ruff format --check scripts/recover_pr_assistance_failed_shards.py
+
+  recover:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - {fy: 2003, nexus: recipient}
+          - {fy: 2003, nexus: pop}
+          - {fy: 2020, nexus: recipient}
+          - {fy: 2020, nexus: pop}
+          - {fy: 2021, nexus: recipient}
+          - {fy: 2021, nexus: pop}
+          - {fy: 2022, nexus: recipient}
+          - {fy: 2022, nexus: pop}
+          - {fy: 2023, nexus: recipient}
+          - {fy: 2023, nexus: pop}
+          - {fy: 2024, nexus: recipient}
+          - {fy: 2024, nexus: pop}
+          - {fy: 2025, nexus: recipient}
+          - {fy: 2025, nexus: pop}
+          - {fy: 2026, nexus: recipient}
+          - {fy: 2026, nexus: pop}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install pandas requests
+      - name: Recover failed native USAspending shard
+        run: >-
+          python -m scripts.recover_pr_assistance_failed_shards
+          --fy ${{ matrix.fy }}
+          --nexus ${{ matrix.nexus }}
+          --output-dir artifact
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr-assistance-recovery-${{ matrix.nexus }}-fy${{ matrix.fy }}
+          path: artifact/
+          if-no-files-found: error
+          retention-days: 14
+
+  certify-recovery:
+    needs: recover
+    if: ${{ always() && needs.recover.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: pr-assistance-recovery-*
+          path: recovered
+          merge-multiple: true
+      - name: Require all 16 canonical recovery receipts
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          expected = {(2003, "recipient"), (2003, "pop")}
+          expected |= {(fy, nexus) for fy in range(2020, 2027) for nexus in ("recipient", "pop")}
+          receipts = []
+          for path in Path("recovered").rglob("*.receipt.json"):
+              row = json.loads(path.read_text(encoding="utf-8"))
+              if row.get("status") == "complete":
+                  receipts.append(row)
+          observed = {(int(row["fiscal_year"]), str(row["nexus"])) for row in receipts}
+          if observed != expected:
+              raise SystemExit(f"recovery denominator mismatch: observed={sorted(observed)} expected={sorted(expected)}")
+          print(f"PASS: recovered {len(observed)}/16 failed canonical FY×nexus shards")
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr-assistance-recovery-certified
+          path: recovered/
+          retention-days: 14

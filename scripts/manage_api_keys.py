@@ -26,6 +26,11 @@ ENV_EXAMPLE_PATH = PROJECT_ROOT / ".env.example"
 # it must never count as "set".
 PLACEHOLDER_VALUE = "paste_your_key_here"
 MAX_KEY_VALUE_LENGTH = 8192
+CREDENTIAL_NAME_SUFFIXES = (
+    "_API_KEY",
+    "_APP_TOKEN",
+    "_LICENSE_APPROVED",
+)
 
 
 class UnknownKeyError(ValueError):
@@ -74,6 +79,8 @@ def known_keys(example_path: Path | None = None) -> list[KeyInfo]:
             continue
         if "=" in line:
             name = line.split("=", 1)[0].strip()
+            if not name.endswith(CREDENTIAL_NAME_SUFFIXES):
+                continue
             description = comment_block[-1] if comment_block else ""
             # Scan the whole block (not just its first line) for the nearest
             # Required/Optional/Recommended marker: unrelated file-header

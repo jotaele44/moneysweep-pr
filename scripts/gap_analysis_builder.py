@@ -66,13 +66,30 @@ def _file_status(root: Path, rel_path: str) -> dict:
         # Clean checkout: the gitignored master is absent. Fall back to the
         # committed staging manifest so coverage reflects reality, not 0%.
         entry = _staging_manifest(root).get(rel_path)
-        if entry and entry.get("row_count", 0) >= 1:
-            return {
-                "status": "present",
-                "size_bytes": entry.get("size_bytes", 0),
-                "row_count": entry["row_count"],
-                "source": "manifest",
-            }
+        if entry:
+            size = entry.get("size_bytes", 0)
+            row_count = entry.get("row_count", 0)
+            if row_count >= 1:
+                return {
+                    "status": "present",
+                    "size_bytes": size,
+                    "row_count": row_count,
+                    "source": "manifest",
+                }
+            if entry.get("status") == "header_only":
+                return {
+                    "status": "header_only",
+                    "size_bytes": size,
+                    "row_count": 0,
+                    "source": "manifest",
+                }
+            if entry.get("status") == "empty":
+                return {
+                    "status": "empty",
+                    "size_bytes": size,
+                    "row_count": 0,
+                    "source": "manifest",
+                }
         return {"status": "missing", "size_bytes": 0, "row_count": 0}
     size = p.stat().st_size
     if size == 0:

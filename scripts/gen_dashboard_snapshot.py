@@ -17,6 +17,7 @@ from server.backend import campaign_finance as campaign  # noqa: E402
 ENDPOINTS = {
     "/health": backend.health,
     "/contracts": backend.contracts,
+    "/contracts?status=ACTIVE": lambda: backend.contracts(status="ACTIVE"),
     "/entities": backend.entities,
     "/edges": backend.edges,
     "/municipalities": backend.municipalities,

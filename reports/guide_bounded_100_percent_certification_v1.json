@@ -1,0 +1,84 @@
+{
+  "act60_crosswalk_registry": "registries/guide_act60_temporal_crosswalk_v1.yaml",
+  "act60_crosswalk_registry_sha256": "127178c0b5e00ecf494732efd41c050ecfb7aed296661c638b8eb0d9895a432b",
+  "base_set_metrics": {
+    "a_only": [
+      "GFAV-004",
+      "GFAV-005",
+      "GFAV-020"
+    ],
+    "a_only_count": 3,
+    "b_only_count": 0,
+    "intersection_count": 27,
+    "symmetric_difference": [
+      "GFAV-004",
+      "GFAV-005",
+      "GFAV-020"
+    ],
+    "symmetric_difference_count": 3,
+    "union_count": 30
+  },
+  "base_source_count": 158,
+  "certification_state": "OPEN",
+  "generated_at_utc": "2026-08-26T16:25:40+00:00",
+  "guide_avenue_count": 30,
+  "materialized_set_metrics": {
+    "a_count": 30,
+    "a_only": [],
+    "a_only_count": 0,
+    "b_materialized_count": 30,
+    "b_only": [],
+    "b_only_count": 0,
+    "historical_base_projection": {
+      "a_only": [
+        "GFAV-004",
+        "GFAV-005",
+        "GFAV-020"
+      ],
+      "a_only_count": 3,
+      "b_only_count": 0,
+      "intersection_count": 27,
+      "symmetric_difference": [
+        "GFAV-004",
+        "GFAV-005",
+        "GFAV-020"
+      ],
+      "symmetric_difference_count": 3,
+      "union_count": 30
+    },
+    "intersection_count": 30,
+    "materialized_overlay_promotions": {
+      "ftz_board_pr": [
+        "GFAV-020"
+      ],
+      "ocif_guide_financial_classes": [
+        "GFAV-004"
+      ],
+      "ocs_insurer_registry": [
+        "GFAV-005"
+      ]
+    },
+    "symmetric_difference": [],
+    "symmetric_difference_count": 0,
+    "union_count": 30
+  },
+  "public_denominator_registry": "registries/guide_public_denominator_adjudications_v1.yaml",
+  "public_denominator_registry_sha256": "cab809de9fb3274c7cfc500165bb19f946a9853954aac61b51b927a12d385e7b",
+  "residue": {
+    "act60_crosswalk_open": [],
+    "materialized_a_only": [],
+    "materialized_symmetric_difference": [],
+    "public_denominator_open": [
+      "ACT60_CATEGORY_AND_BENEFICIARY",
+      "GFAV-006",
+      "GFAV-007"
+    ],
+    "source_snapshot_failures": []
+  },
+  "schema_version": "guide_bounded_100_percent_certification_v1",
+  "scope_id": "GUIDE_BOUNDED_100_PERCENT",
+  "scope_limitation": "GUIDE_BOUNDED_100_PERCENT != ALL_PUERTO_RICO_FINANCE",
+  "source_snapshot_report": "reports/guide_financial_live_freeze_v1.json",
+  "source_snapshot_report_sha256": "9e480a3ae6999a0458eae5d145c89c2213904daea051f647a4970b6f31b2520b",
+  "unresolved_residue_count": 3
+}

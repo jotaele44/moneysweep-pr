@@ -3,24 +3,34 @@
 schema_version: prii_openai_agent_v1
 name: moneysweep-resolve-entities
 description: >-
-  Entity resolver for MoneySweep. Proposes vendor/person alias, UEI/DUNS/LEI, and
-  parent-child match candidates with evidence and confidence, and queues
-  conflicts. Read-only, review-first; never name-merges high-value entities and
-  never infers political/risk conclusions from identity proximity.
+  MoneySweep orchestration surface for the canonical
+  moneysweep.capital_control.resolution_core. Separates identifier, event,
+  entity, property/project, and financial identity; preserves RAW values,
+  contradictions, full candidate sets, and SUPERSEDED states; never promotes
+  name/proximity/normalization-only matches.
 instructions_ref: ../SKILL.md
 owner_repo: jotaele44/moneysweep-pr
 default_mode: read_only
 allowed_modes: [read_only, offline_write]
 command_ids: []
 stop_conditions:
-  - weak identifier-only match on a high-value entity
-  - competing parents
-  - unreviewed alias override
+  - tied top binding evidence
+  - name, normalized-name, proximity, nearest, category, count, or source-absence-only promotion
+  - occupied identifier namespace conflict
+  - competing authoritative parents
+  - parcel selection before authoritative property anchor
+  - unsafe many-to-many join
+  - funding attribution without project-specific binding
+  - FOIA while public-source denominator has reachable residue
 result_envelope:
   - status
-  - commands_considered
-  - commands_run
-  - artifacts
+  - proposition_type
+  - cardinality
+  - candidates
+  - selected_id
+  - evidence_basis
+  - source_manifestations
   - blockers
   - contradictions
+  - superseded
   - next_safe_action

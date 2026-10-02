@@ -15,12 +15,17 @@ Inputs (no network):
   - the live query-adapter registries (``ADAPTER_REGISTRY`` + ``ENTITY_ADAPTER_REGISTRY``)
   - per-source producer health via ``pipeline_preflight.classify_source_readiness``
 
-Outputs (under ``reports/``, deterministic / byte-identical on re-run):
+Outputs (under ``reports/`` by default, deterministic / byte-identical on re-run):
   - ``source_recovery_matrix.csv``     — per-source readiness row
   - ``source_recovery_matrix.md``      — roll-up by path_type
   - ``materialization_readiness.json`` — headline readiness summary (the gate number)
 
-Read-only triage: no network, no writes outside ``reports/``, no registry edits.
+The existing executable identity accepts optional ``--root`` and ``--out``
+arguments for TheHub's typed GUI action contract. ``--check`` regenerates into
+an isolated temporary directory and byte-compares the declared outputs, so a
+validation run cannot overwrite the reference artifacts.
+
+Read-only triage: no network, no registry edits.
 """
 
 from __future__ import annotations
@@ -29,6 +34,7 @@ import csv
 import hashlib
 import json
 import sys
+import tempfile
 from collections import Counter
 from pathlib import Path
 
@@ -47,6 +53,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 OUT_CSV = REPO_ROOT / "reports" / "source_recovery_matrix.csv"
 OUT_MD = REPO_ROOT / "reports" / "source_recovery_matrix.md"
 OUT_JSON = REPO_ROOT / "reports" / "materialization_readiness.json"
+OUTPUT_NAMES = (
+    "source_recovery_matrix.csv",
+    "source_recovery_matrix.md",
+    "materialization_readiness.json",
+)
 
 ADAPTER_SOURCE_IDS = set(ADAPTER_REGISTRY) | set(ENTITY_ADAPTER_REGISTRY)
 
@@ -55,7 +66,6 @@ ADAPTER_SOURCE_IDS = set(ADAPTER_REGISTRY) | set(ENTITY_ADAPTER_REGISTRY)
 # have been promoted to api_producer so they appear in the automatable set.
 # Curated domain knowledge — kept explicit on purpose.
 SCRAPER_NEEDED = {
-    "hacienda_sut_ivu",  # download_coverage_gap_intake.py — intentional deferred stub
     "pr_act_154_excise",  # download_coverage_gap_intake.py — intentional deferred stub
 }
 
@@ -169,8 +179,8 @@ def build_rows(root: Path | None = None) -> list[dict]:
     """Readiness rows for every registered source.
 
     ``root`` defaults to this repo checkout; callers reporting against another
-    tree (e.g. build_completeness_matrix --root) must pass it so registry,
-    outputs, and preflight all read from the same tree.
+    tree must pass it so registry, outputs, and preflight all read from the same
+    tree.
     """
     root = root or REPO_ROOT
     sources = load_source_registry(root).get("sources", [])
@@ -188,10 +198,7 @@ def build_rows(root: Path | None = None) -> list[dict]:
         has_adapter = sid in ADAPTER_SOURCE_IDS
         preflight = classify_source_readiness(root, src)["readiness_status"]
         producer_importable = preflight not in STRUCTURAL_STATUSES
-        # Structurally ready = automatable, has a working entrypoint, and declares outputs.
         ready = bool(automatable and (has_adapter or producer_importable) and total > 0)
-        # Inferred trigger for the informational column; the source_update_policy
-        # overlay is authoritative at controller runtime (spec §17).
         dag_parents = list(REQUIRED_DAG.get(sid, []))
         trigger_type = (
             infer_trigger_type(path_type, cadence, dag_parents, path_type == "manual_export")
@@ -225,12 +232,13 @@ def build_rows(root: Path | None = None) -> list[dict]:
     return rows
 
 
-def build_summary(rows: list[dict]) -> dict:
+def build_summary(rows: list[dict], root: Path | None = None) -> dict:
+    root = root or REPO_ROOT
     automatable = [r for r in rows if r["automatable"]]
     queued = Counter(r["path_type"] for r in rows if not r["automatable"])
     needs_key = sorted({r["needs_key"] for r in automatable if r["needs_key"]})
     snapshot = build_registry_snapshot([{"source_id": r["source_id"]} for r in rows])
-    reg = load_source_registry(REPO_ROOT)
+    reg = load_source_registry(root)
     return {
         "schema_version": "r5_readiness_v1",
         "total_sources": len(rows),
@@ -241,8 +249,6 @@ def build_summary(rows: list[dict]) -> dict:
         "automatable_required_keys": needs_key,
         "queued_excluded": {k: queued.get(k, 0) for k in QUEUED_PATH_TYPES},
         "queued_excluded_total": sum(queued.values()),
-        # Count provenance: the count is always computed from the live registry;
-        # historical narrative counts are non-authoritative snapshots (spec §16).
         "source_count_provenance": {
             "computed_from_live_registry": True,
             "registry_schema_version": str(reg.get("schema_version") or ""),
@@ -293,26 +299,102 @@ def _write_md(rows: list[dict], summary: dict) -> None:
         members = sorted(r["source_id"] for r in rows if r["path_type"] == pt)
         lines.append(f"## {pt} ({len(members)})")
         lines.append("")
-        for m in members:
-            lines.append(f"- `{m}`")
+        for member in members:
+            lines.append(f"- `{member}`")
         lines.append("")
     OUT_MD.write_text("\n".join(lines), encoding="utf-8")
 
 
-def main() -> int:
-    rows = build_rows()
-    summary = build_summary(rows)
+def _set_outputs(out: Path) -> None:
+    global OUT_CSV, OUT_MD, OUT_JSON
+    OUT_CSV = out / OUTPUT_NAMES[0]
+    OUT_MD = out / OUTPUT_NAMES[1]
+    OUT_JSON = out / OUTPUT_NAMES[2]
+
+
+def _build(root: Path, out: Path) -> dict:
+    _set_outputs(out)
+    rows = build_rows(root)
+    summary = build_summary(rows, root)
+    out.mkdir(parents=True, exist_ok=True)
     _write_csv(rows)
     _write_md(rows, summary)
     OUT_JSON.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
-    print(f"wrote {OUT_CSV.relative_to(REPO_ROOT)} ({len(rows)} rows)")
-    print(f"wrote {OUT_MD.relative_to(REPO_ROOT)}")
-    print(f"wrote {OUT_JSON.relative_to(REPO_ROOT)}")
-    print(
-        f"  automatable_ready={summary['automatable_ready']}/"
-        f"{summary['automatable_total']}  queued={summary['queued_excluded_total']}"
-    )
-    return 0
+    return {
+        "status": "PASS",
+        "row_count": len(rows),
+        "automatable_ready": summary["automatable_ready"],
+        "automatable_total": summary["automatable_total"],
+        "queued_excluded_total": summary["queued_excluded_total"],
+        "outputs": [str(out / name) for name in OUTPUT_NAMES],
+    }
+
+
+def _check(root: Path, expected_out: Path) -> dict:
+    global OUT_CSV, OUT_MD, OUT_JSON
+    original_outputs = (OUT_CSV, OUT_MD, OUT_JSON)
+    try:
+        with tempfile.TemporaryDirectory(prefix="moneysweep-source-recovery-") as tmp:
+            generated = Path(tmp)
+            result = _build(root, generated)
+            mismatches: list[str] = []
+            for name in OUTPUT_NAMES:
+                expected = expected_out / name
+                candidate = generated / name
+                if not expected.is_file():
+                    mismatches.append(f"missing expected output: {expected}")
+                elif expected.read_bytes() != candidate.read_bytes():
+                    mismatches.append(f"byte mismatch: {expected}")
+            result["status"] = "PASS" if not mismatches else "FAIL"
+            result["mismatches"] = mismatches
+            result["outputs"] = [str(expected_out / name) for name in OUTPUT_NAMES]
+            return result
+    finally:
+        OUT_CSV, OUT_MD, OUT_JSON = original_outputs
+
+
+def _parse_args(argv: list[str]) -> tuple[Path, Path, bool, bool]:
+    """Parse the small typed contract without creating a second CLI framework surface."""
+    root = REPO_ROOT
+    out = REPO_ROOT / "reports"
+    check = False
+    json_output = False
+    index = 0
+    while index < len(argv):
+        token = argv[index]
+        if token in {"--root", "--out"}:
+            if index + 1 >= len(argv):
+                raise ValueError(f"{token} requires a path")
+            value = Path(argv[index + 1]).expanduser().resolve()
+            if token == "--root":
+                root = value
+            else:
+                out = value
+            index += 2
+            continue
+        if token == "--check":
+            check = True
+        elif token == "--json":
+            json_output = True
+        else:
+            raise ValueError(f"unknown argument: {token}")
+        index += 1
+    return root, out, check, json_output
+
+
+def main(argv: list[str] | None = None) -> int:
+    try:
+        root, out, check, json_output = _parse_args(list(sys.argv[1:] if argv is None else argv))
+        result = _check(root, out) if check else _build(root, out)
+    except Exception as exc:  # fail closed for manager/CI callers
+        result = {"status": "FAIL", "error": f"{type(exc).__name__}: {exc}"}
+        json_output = "--json" in (sys.argv[1:] if argv is None else argv)
+
+    if json_output:
+        print(json.dumps(result, sort_keys=True))
+    else:
+        print(result)
+    return 0 if result.get("status") == "PASS" else 1
 
 
 if __name__ == "__main__":

@@ -1,0 +1,19 @@
+version: "1.0"
+schema_version: "r5_source_registry_overlay_v1"
+
+# PROMOTED — these three sources now live in registries/source_registry.yaml and
+# are counted by the live registry. This file is retained as the historical
+# definition record; it is NOT loaded at runtime, and edits here have no effect.
+# Change the main registry instead, then run scripts/regenerate_registry_json.py.
+#
+# Promotion does not certify GUIDE_BOUNDED_100_PERCENT: the three route gaps
+# (GFAV-004/005/020) are closed, but REIT/registered-investment-company
+# denominators, Act 60 incentive-category classification, and full
+# temporal/identity/provenance closure remain open — see
+# reports/guide_financial_avenue_coverage_v1.md.
+# All three sources that were staged here (ocif_guide_financial_classes,
+# ocs_insurer_registry, ftz_board_pr) are now promoted into
+# registries/source_registry.yaml. scripts/audit_guide_financial_avenues.py
+# fails closed if this overlay's source_ids collide with the base registry,
+# so promoted entries are removed here rather than left duplicated.
+sources: []

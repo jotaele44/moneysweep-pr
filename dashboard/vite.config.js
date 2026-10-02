@@ -15,7 +15,7 @@ export default defineConfig({
   base: offline ? './' : '/',
   plugins: [react(), ...(offline ? [viteSingleFile()] : [])],
   resolve: {
-    alias: { '@': path.resolve(__dirname, './src') },
+    alias: { '@': path.resolve(import.meta.dirname, './src') },
   },
   build: offline ? { outDir: 'export-standalone' } : {},
   server: {

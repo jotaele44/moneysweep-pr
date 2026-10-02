@@ -140,10 +140,20 @@
       "sha256": "9c88d0568cf1ab6ef14644186441c0fb43f9343a7209d39c373caab7cf22fcf8",
       "size_bytes": 149812
     },
+    "data/staging/processed/pr_cabilderos.csv": {
+      "row_count": 2668,
+      "sha256": "3ceafe6cc8e8dd0f0b35e4ba05d58dd500bc8d7a11a038eef352e7f52d156d2b",
+      "size_bytes": 522002
+    },
     "data/staging/processed/pr_cdbg_dr_master.csv": {
       "row_count": 3808,
       "sha256": "18e33b1d79024e302d6e0f1ae272c3dcd621b6ae70316857289b886a4089404e",
       "size_bytes": 2707911
+    },
+    "data/staging/processed/pr_contralor_audits.csv": {
+      "row_count": 85,
+      "sha256": "4a08a41080322c1cefc2bc728978ddfe6ad40b4ab0cda391a82b982ba0bd14aa",
+      "size_bytes": 4090
     },
     "data/staging/processed/pr_contracts_master.csv": {
       "row_count": 5147,
@@ -151,9 +161,14 @@
       "size_bytes": 1780406
     },
     "data/staging/processed/pr_cor3_projects.csv": {
-      "row_count": 0,
-      "sha256": "0c9eb91263e51edf80343e2d93ef4de37b770a3997b46604df344a6a784fabfa",
-      "size_bytes": 146
+      "row_count": 1481,
+      "sha256": "5abfc4385c69f19ed4963516bf4a393a116f4627817e4273d5b8302a62afd04b",
+      "size_bytes": 196718
+    },
+    "data/staging/processed/pr_donaciones.csv": {
+      "row_count": 9156,
+      "sha256": "9ce470071eb16ff00b418cd02a3a26feb2b10a819dab9f412dc49ea42c188a6b",
+      "size_bytes": 1122141
     },
     "data/staging/processed/pr_emma_bonds.csv": {
       "row_count": 20,
@@ -190,6 +205,17 @@
       "sha256": "14da3e6e4b2b68dc975946d08d752e94719eccd0443cdb76f6acbb143dcd8d72",
       "size_bytes": 862719
     },
+    "data/staging/processed/pr_oce_donations.csv": {
+      "row_count": 6474,
+      "sha256": "469c010f33f062deb489dbb4267043daed4308805e60e16af340c869777b0f7b",
+      "size_bytes": 554203
+    },
+    "data/staging/processed/pr_prasa_contracts.csv": {
+      "row_count": 0,
+      "sha256": "1ed890263aec8cb89d5701ac1b4ce5007ddab715e246e27a356ec62aa440b140",
+      "size_bytes": 146,
+      "status": "header_only"
+    },
     "data/staging/processed/pr_subawards_master.csv": {
       "row_count": 5989,
       "sha256": "276d2675ecb2946c8a970dd216388280916d21d4bb2bbabd5f831d85c41cfb59",
@@ -201,7 +227,7 @@
       "size_bytes": 59368
     }
   },
-  "generated_at": "2026-07-11T18:59:33Z",
+  "generated_at": "2026-09-01T01:57:49Z",
   "note": "Row counts for the gitignored data/staging/processed masters. Committed source of truth for coverage reports in a clean checkout (the CSVs themselves are too large to track \u2014 see size-guard). Regenerate with scripts/build_staging_manifest.py after a data refresh.",
   "schema_version": "staging_masters_v1"
 }

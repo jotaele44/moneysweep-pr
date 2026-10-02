@@ -51,6 +51,7 @@ YIELD_BY_REQUEST_STATUS = {
     "fulfilled": "received",
     "denied": "no_response",
     "appealed": "pending",
+    "superseded": "gap_closed",
 }
 
 COLUMNS = [
@@ -95,6 +96,8 @@ def build_rows(root: Path | None = None) -> list[dict[str, Any]]:
         source_id = req["target_source_id"]
         req_status = req["request_status"]
         gap = blockers.get(source_id) or f"source {source_id} unmaterialized"
+        if req_status == "superseded":
+            gap = "pipeline_status=fully_materialized; request superseded by frozen source evidence"
         rows.append(
             {
                 "request_id": req["request_id"],

@@ -1,21 +1,27 @@
 """Coverage-gap intake — deferred producer (intentionally not implemented).
 
-Registered ``producer_script`` for P1 financial sources promoted from the
+Registered ``producer_script`` for a P1 financial source promoted from the
 coverage-gap backlog (``reports/financial_source_coverage_gaps.md``) into the
-registry as tracked intake stubs:
+registry as a tracked intake stub:
 
-  - ``hacienda_sut_ivu``           PR Treasury Sales & Use Tax (IVU/SUT) collections (scraper surface)
   - ``pr_act_154_excise``          Act 154 excise on foreign controlled corporations (scraper surface)
 
 (``census_gov_finances`` and ``fta_ntd`` graduated to real producers —
-``scripts/download_census_gov_finances.py`` and ``scripts/download_fta_ntd.py``.)
+``scripts/download_census_gov_finances.py`` and ``scripts/download_fta_ntd.py``.
+``hacienda_sut_ivu`` graduated the same way — ``scripts/download_hacienda_sut_ivu.py`` —
+once direct testing showed hacienda.pr.gov *is* reachable with no key required; this
+module's "no network egress" premise did not hold for that source. ``pr_act_154_excise``
+remains here because no Hacienda page matching the described $1.8B/yr foreign-controlled-
+corporation excise line has been identified yet — see README's queued-sources note. That is
+a source-discovery gap, not an environment/egress one, and needs its own investigation
+before a real adapter can be written; guessing at a page and parsing it blind is exactly
+the failure mode this stub avoids.)
 
 Like ``scripts/download_nara_nextgen.py``, declaring this producer keeps the
 readiness preflight honest: each source resolves to a real, importable, callable
 producer instead of a fatal ``missing_producer`` structural error, while ``run``
-performs no network I/O and materializes nothing — so the sources correctly remain
-``not_materialized`` until a real fetcher/adapter is built (network egress or an
-API key is required, which the buildout environment does not have).
+performs no network I/O and materializes nothing — so the source correctly remains
+``not_materialized`` until its source page is identified and a real adapter is built.
 
 Usage:
   python3 scripts/download_coverage_gap_intake.py [--source <source_id>]
@@ -32,10 +38,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts.config import PROJECT_ROOT, setup_logging
 
 # Source IDs this producer serves (mirrors the registry entries).
-COVERAGE_GAP_SOURCE_IDS = (
-    "hacienda_sut_ivu",
-    "pr_act_154_excise",
-)
+COVERAGE_GAP_SOURCE_IDS = ("pr_act_154_excise",)
 
 
 def run(root: Path | None = None, source_id: str | None = None, **_kwargs) -> dict:
@@ -49,8 +52,8 @@ def run(root: Path | None = None, source_id: str | None = None, **_kwargs) -> di
     targets = [source_id] if source_id else list(COVERAGE_GAP_SOURCE_IDS)
     for sid in targets:
         logger.info(
-            f"[coverage_gap_intake] {sid}: fetcher/adapter not yet built — needs network "
-            f"egress or API key. Skipping (0 rows, not_materialized)."
+            f"[coverage_gap_intake] {sid}: source page not yet identified — no adapter "
+            f"built. Skipping (0 rows, not_materialized)."
         )
     return {
         "rows": 0,

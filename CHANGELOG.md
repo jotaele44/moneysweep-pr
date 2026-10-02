@@ -25,6 +25,36 @@ A bump to the **federation export** version is what the release-tagging workflow
 ## [Unreleased]
 
 ### Added
+- **Desktop wrapper first run no longer requires Node.js or a browser-download
+  repair ritual.** A prebuilt dashboard is committed at
+  `desktop/prebuilt-dashboard/` and copied into `dashboard/dist` by
+  `desktop/setup.py`, replacing the `npm ci` + `vite build` that made Node.js a
+  hard prerequisite of every fresh checkout. `scripts/build_prebuilt_dashboard.py`
+  regenerates it (`make prebuilt-dashboard`), and
+  `tests/test_desktop_prebuilt_dashboard.py` fails when dashboard sources change
+  without a regeneration — without needing Node on the runner.
+- **`desktop/preflight.py`** reports which prerequisite is actually blocking setup
+  (checkout integrity, writability, Python version, `venv`, dashboard
+  availability, `git`, PyPI/GitHub reachability, free disk) in place of the single
+  catch-all "needs internet and Node.js" dialog. Network hosts are probed only
+  when package installation still remains.
+- **Offline first run** via an operator-supplied wheel cache at
+  `desktop/wheelhouse/` (or `$PRII_WHEELHOUSE`), documented in
+  `docs/DESKTOP_OFFLINE_BOOTSTRAP.md`.
+- **`docs/APPLE_NOTARIZATION_RUNBOOK.md`** — activation steps for the
+  already-implemented signing/notarization path in `desktop-build.yml`, and an
+  explicit statement of what it does and does not cover.
+
+### Changed
+- After a successful run on macOS, `desktop/setup.py` clears
+  `com.apple.quarantine` from the repo-root launchers, so later launches
+  (including `PRII-MONEYSWEEP.app`) open without a Gatekeeper prompt. Targets are
+  enumerated rather than walked recursively, so the multi-hundred-megabyte `data/`
+  tree is never traversed. No system-wide assessment policy is touched.
+- `README.md` now documents the browser-free install (`git clone` sets no
+  quarantine flag) and directs browser-ZIP users to `PRII-MONEYSWEEP.command`
+  first, which avoids macOS App Translocation entirely.
+
 - **Government-flow coverage expansion — 25 new sources** (`docs/GOVERNMENT_FLOW_COVERAGE.md`),
   taking the registry from 88 → **113** tracked sources (automatable 57 → **65**,
   queued/excluded 31 → **48**):

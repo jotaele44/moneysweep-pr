@@ -1,0 +1,4 @@
+gate,command,result,log
+hud_drgr_pursuit,scripts/audit_hud_drgr_authorized_sources.py,PASS,logs/01_hud_drgr_pursuit.log
+hud_drgr_ingest,scripts/ingest_hud_drgr_exports.py --force,PASS,logs/02_ingest_hud_drgr_exports.log
+legacy_validator,scripts/validate_export.py --package data/exports/canonical_v1_federation --mode test,PASS,logs/03_validate_export.log

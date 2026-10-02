@@ -51,3 +51,4 @@ def test_check_coverage_flags_shortfall():
     rows = [{"municipality_id": "muni_pr_x", "county_fips": "72001"}]
     problems = im.check_coverage(rows)
     assert any("expected 78" in p for p in problems)
+    assert any("noncanonical municipality reference" in p for p in problems)

@@ -1,0 +1,1 @@
+{"schema_version":"thehub_admin_boundary_consumer_v1","contract_version":"1.0.0","repository":"moneysweep-pr","plane":"BOUNDED_OPERATIONAL","federation_global_admin":false,"token_audience":"repository-operation","hub_outage_behavior":"LOCAL_OPERATIONS_CONTINUE_GLOBAL_MUTATIONS_FAIL_CLOSED","admin_kit_allowed":false}

@@ -193,7 +193,7 @@ jobs:
       - name: Upload issuer certification evidence
         id: evidence_upload
         if: always() && steps.target.outputs.ticker != ''
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: sec-ownership-${{ steps.target.outputs.ticker }}-certification
           path: |
@@ -239,7 +239,7 @@ jobs:
 
       - name: Upload exact-head lock receipt
         if: always() && steps.target.outputs.ticker != '' && steps.evidence_upload.outcome == 'success'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: sec-ownership-${{ steps.target.outputs.ticker }}-certification-lock
           path: artifacts/sec-ownership-issuer-certification/final-lock-receipt.json

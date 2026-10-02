@@ -1,0 +1,15 @@
+{
+  "capabilities": [
+    {
+      "id": "dashboard-node-runtime-bootstrap",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The desktop bootstrap validates the dashboard's Node.js engine before installing frontend dependencies. It is an internal setup invariant, not a separate interactive GUI capability.",
+      "candidate_ids": [
+        "python_symbol:desktop/setup.py:node_version_supported"
+      ]
+    }
+  ],
+  "exceptions": []
+}

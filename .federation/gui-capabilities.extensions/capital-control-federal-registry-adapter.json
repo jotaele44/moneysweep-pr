@@ -1,0 +1,32 @@
+{
+  "extension_id": "capital-control-federal-registry-adapter",
+  "capabilities": [
+    {
+      "id": "capital-control-federal-registry-adapter-runtime",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Internal evidence sanitization and authoritative-binding adapter for the canonical capital-control resolver; it does not introduce an independent user workflow or GUI surface.",
+      "backend": {
+        "files": [
+          "moneysweep/capital_control/federal_registry_adapter.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_capital_control_successor_synthesis.py"
+        ]
+      },
+      "candidate_ids": [
+        "python_module:moneysweep/capital_control/federal_registry_adapter.py",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:adjudicate_registry_candidate",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:candidate_evidence_json",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:candidate_identifier",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:candidate_record",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:certified_record",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:is_certified_binding",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:sanitize_legacy_record"
+      ]
+    }
+  ]
+}

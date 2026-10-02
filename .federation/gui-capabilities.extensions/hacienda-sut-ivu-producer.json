@@ -1,0 +1,24 @@
+{
+  "extension_id": "hacienda-sut-ivu-producer",
+  "capabilities": [
+    {
+      "id": "hacienda-sut-ivu-producer",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Registered source producer for PR Treasury IVU/SUT monthly collections. It fetches the live Hacienda PDFs and materializes data/staging/processed/pr_hacienda_sut_ivu.csv; the resulting rows reach operators through the existing public-money-intelligence-dashboard capability, exactly like every other ingested source, rather than through a surface of their own. Its CLI is an implementation surface for scheduled and operator-initiated materialization, not a user-facing workflow, and it promotes nothing automatically.",
+      "analysis": {
+        "files": [
+          "scripts/download_hacienda_sut_ivu.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/download_hacienda_sut_ivu.py",
+        "analysis_symbol:scripts/download_hacienda_sut_ivu.py:discover_pdf_urls",
+        "analysis_symbol:scripts/download_hacienda_sut_ivu.py:parse_pdf",
+        "analysis_symbol:scripts/download_hacienda_sut_ivu.py:run",
+        "cli_surface:scripts/download_hacienda_sut_ivu.py"
+      ]
+    }
+  ]
+}

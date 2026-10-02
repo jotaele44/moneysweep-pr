@@ -1,0 +1,43 @@
+{
+  "schema_version": "r5_source_registry_extension_v1",
+  "sources": [
+    {
+      "source_id": "pr_fomb",
+      "family": "territorial_fiscal_oversight",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://oversightboard.pr.gov/documents/",
+      "producer_script": "scripts/download_fomb.py",
+      "expected_outputs": [
+        "data/manifests/fomb_documents_manifest.jsonl",
+        "data/staging/processed/pr_fomb_documents.csv",
+        "data/staging/processed/pr_fomb_contract_reviews.csv",
+        "data/staging/processed/pr_fomb_fiscal_versions.csv",
+        "data/staging/processed/pr_fomb_crosswalk.csv"
+      ],
+      "schema_version": "fomb_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "weekly",
+      "notes": "Financial Oversight and Management Board for Puerto Rico public source family. Enumerates documents, contract reviews, fiscal plans, budgets, fiscal correspondence, reapportionments, quarterly financial reports, debt, legislative review, and FOMB reports. Raw discovery responses and downloaded document bytes are preserved with SHA-256 provenance; superseded fiscal records and duplicate-content observations are never destructively dropped."
+    },
+    {
+      "source_id": "pr_fomb_special_reports",
+      "family": "territorial_fiscal_oversight",
+      "required": false,
+      "authentication": "none",
+      "endpoint_url": "https://oversightboard.pr.gov/reports/",
+      "producer_script": "scripts/download_fomb_special_reports.py",
+      "expected_outputs": [
+        "data/staging/processed/pr_fomb_special_reports.csv"
+      ],
+      "schema_version": "fomb_v1",
+      "validation_threshold": {
+        "min_rows": 1
+      },
+      "update_cadence": "monthly",
+      "notes": "Dedicated special and investigative report surface. Kept distinct from /fomb-reports/ so monthly/annual financial reporting and special-purpose reports retain separate provenance."
+    }
+  ]
+}

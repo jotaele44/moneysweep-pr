@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react'
+import { FederationButton, FederationDegradedState } from '@pr-federation/react'
+import { AlertTriangle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Table, TableHeader, TableBody, TableRow, TableCell } from '@/components/ui/table'
 import QueryBoundary from '@/components/QueryBoundary'
@@ -137,6 +139,31 @@ export default function CampaignFinance() {
         <Metric label="CEE + OCE" value={((sourceCounts.cee ?? 0) + (sourceCounts.oce ?? 0)).toLocaleString()} />
         <Metric label="Federal outflows" value={(summary.totalFederalOutflowRows ?? 0).toLocaleString()} />
       </div>
+      {summaryQuery.isError && (
+        <FederationDegradedState
+          inline
+          role="alert"
+          className="ms-state-banner border-b border-border bg-muted/30 px-3 py-2 text-xs"
+          icon={<AlertTriangle className="h-4 w-4" />}
+          title="Campaign-finance summary failed to load"
+          description={summaryQuery.error?.message}
+          action={
+            <FederationButton variant="secondary" onClick={() => summaryQuery.refetch()}>
+              Retry
+            </FederationButton>
+          }
+        />
+      )}
+      {!summaryQuery.isPending && !summaryQuery.isError && !summary.hasData && (
+        <div role="status" className="border-b border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+          {summary.emptyState || 'No campaign-finance datasets are materialized.'}
+        </div>
+      )}
+      {summary.hasData && summary.updatedAt && (
+        <div className="border-b border-border px-3 py-1 text-[10px] text-muted-foreground">
+          Latest materialized file: {new Date(summary.updatedAt).toLocaleString()}
+        </div>
+      )}
 
       <div className="ms-filter-bar flex flex-wrap items-center justify-between gap-2 p-2">
         <div className="flex items-center gap-2">

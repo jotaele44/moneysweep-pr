@@ -168,7 +168,11 @@ def run(root: Path, page_length: int, max_pages: int | None, reset: bool) -> dic
                 checkpoint.update(status="BLOCKED_PAGE_FETCH", updated_at=utc_now())
                 atomic_json(checkpoint_path, checkpoint)
                 return checkpoint
-            reported_total = int(data.get("recordsTotal") or data.get("recordsFiltered") or 0)
+            # OCPR's current DataTables contract reports the returned page size in
+            # recordsTotal and the complete unfiltered registry size in
+            # recordsFiltered. Using recordsTotal first can falsely promote a
+            # one-page smoke as a complete registry.
+            reported_total = int(data.get("recordsFiltered") or data.get("recordsTotal") or 0)
             if reported_total <= 0:
                 checkpoint.update(status="BLOCKED_INVALID_TOTAL", updated_at=utc_now())
                 atomic_json(checkpoint_path, checkpoint)

@@ -51,7 +51,12 @@ def test_list_api_keys_never_includes_a_value(client):
     response = client.get("/api-keys")
     assert response.status_code == 200
     rows = response.json()
-    assert len(rows) == len(known_keys(REAL_EXAMPLE))
+    registry = known_keys(REAL_EXAMPLE)
+    expected_names = {key.name for key in registry}
+    actual_names = [row["name"] for row in rows]
+    assert len(expected_names) == len(registry)
+    assert len(actual_names) == len(expected_names)
+    assert set(actual_names) == expected_names
     for row in rows:
         assert set(row.keys()) == {"name", "description", "required", "is_set"}
 
@@ -60,6 +65,12 @@ def test_post_unknown_key_returns_404(client):
     response = client.post("/api-keys/NOT_A_REAL_KEY", json={"value": "x"})
     assert response.status_code == 404
     assert "x" not in response.text
+
+
+@pytest.mark.parametrize("name", ["MONEYSWEEP_CORS_ORIGINS", "MONEYSWEEP_CASE_DB"])
+def test_post_noncredential_configuration_returns_404(client, name):
+    response = client.post(f"/api-keys/{name}", json={"value": "unsafe-remote-override"})
+    assert response.status_code == 404
 
 
 def test_post_known_key_sets_it_and_never_echoes_the_value(client):

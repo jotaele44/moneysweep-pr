@@ -1,0 +1,44 @@
+{
+  "schema_version": "moneysweep_local_pdf_conservation_v2",
+  "status": "PROVISIONAL_BOUNDED_CERTIFICATION",
+  "generated_at": "2026-08-25T02:04:00Z",
+  "scope": "10 frozen financial PDFs from the 2026-08-24 operator corpus",
+  "file_count": 10,
+  "file_bytes": 13355043,
+  "raw_text_page_provenance": {
+    "pass": 10,
+    "open": 0,
+    "rule": "Every nonblank pdftotext -layout line is conserved with page/line provenance and frozen page-text hashes."
+  },
+  "structured_record_conservation": {
+    "pass_bounded": 9,
+    "open": 1,
+    "source_bound_queryable_eligible": 8,
+    "nonqueryable": 2
+  },
+  "queryability_policy": "A source is queryable-eligible only when record arithmetic closes, provenance is complete, unresolved record residue is zero, and authoritative source-family binding is resolved. This receipt does not activate production query paths or award canonical source credit.",
+  "canonical_certification": false,
+  "production_query_activation": false,
+  "promotion_authorized": false,
+  "binding_adjudication": {
+    "subcontractingdirectory.772857981.pdf": {
+      "state": "UNRESOLVED_REGISTRY_BINDING",
+      "record_conservation": "PASS_BOUNDED",
+      "queryable_eligible": false,
+      "canonical_source_credit": false,
+      "reason": "No matching source_id exists in the inspected current registry and the PDF lacks authoritative issuer metadata. Category, name, or semantic similarity is insufficient to bind it to USAspending subawards, FSRS, DCAA, or another source family."
+    }
+  },
+  "sources": [
+    {"source_key":"ACT","pdf_sha256":"ff9f5a5c726e293943810343249dae4304fd0eb1bc820be90733360046c409bf","pages":41,"raw_text_records":1573,"structured_records":656,"retained":656,"excluded":0,"unresolved":0,"provenance_complete":656,"record_conservation":"PASS_BOUNDED","binding":"BINDING","queryable_eligible":true},
+    {"source_key":"ACUDEN","pdf_sha256":"79c160b984aff5fc0ac06aa473f8f77f045e3010bf2a53cd5b3563e4dcb769d9","pages":49,"raw_text_records":3900,"structured_records":1147,"retained":1147,"excluded":0,"unresolved":0,"provenance_complete":1147,"record_conservation":"PASS_BOUNDED","binding":"BINDING","queryable_eligible":true},
+    {"source_key":"DCAA_2007","pdf_sha256":"b22cbe7204ccdf15a865688319005a0132387db1cd6ea9d409ee8fa6b6fcf8fb","pages":150,"raw_text_records":5978,"structured_records":5228,"retained":5228,"excluded":0,"unresolved":0,"provenance_complete":5228,"record_conservation":"PASS_BOUNDED","binding":"BINDING","queryable_eligible":true},
+    {"source_key":"DCAA_2012","pdf_sha256":"44bb31aebc54ac26bd931e3f7763620dc9c526e1e3dbaf75567d713f6f523f82","pages":105,"raw_text_records":5975,"structured_records":5658,"retained":5658,"excluded":0,"unresolved":0,"provenance_complete":5658,"record_conservation":"PASS_BOUNDED","binding":"BINDING","queryable_eligible":true,"no_cage_records":274},
+    {"source_key":"DCAA_2013","pdf_sha256":"602643429b805ace90f3e4ae7037b9bdac1957c3336a890476c1d90f24b3d560","pages":116,"raw_text_records":6494,"structured_records":6030,"retained":6030,"excluded":0,"unresolved":0,"provenance_complete":6030,"record_conservation":"PASS_BOUNDED","binding":"BINDING","queryable_eligible":true,"no_cage_records":336},
+    {"source_key":"PRASA_COMPLETED","pdf_sha256":"30128a1c1c738ba0473fd3e604cbe44dea7ddac99bc7c2cfce5a6006d6c6583c","pages":7,"raw_text_records":1447,"structured_records":127,"retained":127,"excluded":0,"unresolved":0,"provenance_complete":127,"record_conservation":"PASS_BOUNDED","binding":"BINDING","queryable_eligible":true},
+    {"source_key":"PR_CABILDEROS","pdf_sha256":"4f2ef633380749c96e68da75afc4170ca0f09b450bc46eca1b70aa1c2ff05696","pages":8,"raw_text_records":410,"structured_records":36,"retained":36,"excluded":0,"unresolved":0,"provenance_complete":36,"record_conservation":"PASS_BOUNDED","binding":"BINDING","queryable_eligible":true},
+    {"source_key":"LDA","pdf_sha256":"0614d0f3121a86e457fc2300c93a9b6be94c603e7f0bed5626cd19bde21b4dc2","pages":56,"raw_text_records":1861,"structured_records":601,"retained":601,"excluded":0,"unresolved":0,"provenance_complete":601,"record_conservation":"PASS_BOUNDED","binding":"BINDING","queryable_eligible":true},
+    {"source_key":"SUBCONTRACTING_DIRECTORY","pdf_sha256":"b2069fdaf1f16fd72ef37a03d339a10c01bf4710d20f40fd1142f20306ff7bb1","pages":258,"raw_text_records":7113,"structured_records":2272,"retained":2272,"excluded":0,"unresolved":0,"provenance_complete":2272,"record_conservation":"PASS_BOUNDED","binding":"UNRESOLVED_REGISTRY_BINDING","queryable_eligible":false,"canonical_source_credit":false},
+    {"source_key":"PRASA_CER","pdf_sha256":"c07a004100fce2b3757ec84180f0742b1831cbc804b06a8402fec24cd8663a44","pages":225,"raw_text_records":8859,"structured_records":0,"retained":0,"excluded":0,"unresolved":0,"provenance_complete":0,"record_conservation":"OPEN","binding":"BINDING","queryable_eligible":false,"reason":"RAW_TEXT_PAGE_PROVENANCE_PASS_BUT_CURRENT_MONEYSWEEP_PRODUCER_REQUIRES_OPERATOR_EXTRACTED_CSV_AND_DOES_NOT_DEFINE_A_DIRECT_PDF_STRUCTURED_RECORD_GRAMMAR"}
+  ]
+}

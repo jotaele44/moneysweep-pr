@@ -1,0 +1,67 @@
+{
+  "schema": "moneysweep.issuer-sec13f-certification-vector/v1",
+  "vector_id": "EVTC_SEC13F_v1",
+  "state": "PASS",
+  "promotion_state": "PROMOTION_ELIGIBLE",
+  "parent_main_sha": "f5068c8e2583f790f945aa09903ddce312fad27d",
+  "generalized_engine_main_sha": "df78f15f7c36b98bc6ecfae37c7e775ec487ead3",
+  "generalized_engine_pr_head_sha": "a72acf65c7bf064f9a76f483e78f89ee5cba5171",
+  "post_ofg_main_sha": "fca18c1af321a3e75d6d1cbbbbd7a7fc3680cdba",
+  "certification_protocol_main_sha": "333752afcb2979cc230738c2acd44ba1b9714c77",
+  "true_head_lock_main_sha": "f5068c8e2583f790f945aa09903ddce312fad27d",
+  "parent_bpop_certification": "BPOP_SEC13F_8Q_v1_REFERENCE_ONLY_NOT_INHERITED",
+  "parent_ofg_certification": "OFG_SEC13F_v1_REFERENCE_ONLY_NOT_INHERITED",
+  "certification_inheritance": "FORBIDDEN",
+  "issuer": {
+    "ticker": "EVTC",
+    "canonical_name": "EVERTEC, Inc.",
+    "issuer_id": "ISSUER_CIK_0001559865",
+    "cik": "0001559865",
+    "cusip": "30040P103"
+  },
+  "negative_identity_gate": {
+    "forbidden_ticker": "EVRI",
+    "near_name_identity": "FORBIDDEN",
+    "name_only_identity": "FORBIDDEN"
+  },
+  "source_policy": {
+    "frozen_bpop_snapshot_may_be_reused_for_overlapping_sec13f_archive_bytes": true,
+    "mutable_evidence_redownload": "FORBIDDEN_UNLESS_NEW_VERSIONED_SNAPSHOT_IS_EXPLICITLY_CREATED",
+    "source_manifestation_is_not_canonical_identity": true
+  },
+  "frozen_evidence": {
+    "snapshot_artifact_id": "9598537414",
+    "freeze_manifest_sha256": "3234edd4cfe97535b462b34d89bc1e8175d0d983f4a2976de9a84acfc67d9e27",
+    "denominators_sha256": "ac773f11b5fb736c96bf64231207ddb3254cb0d2e07755eecf4a2131001498ec",
+    "generalized_audit_run_id": "33149056349",
+    "post_merge_audit_run_id": "33150067491",
+    "ofg_exact_head_golden_audit_run_id": "33186392042",
+    "generalized_audit_result": "PASS"
+  },
+  "required_gates": [
+    "define_exact_EVTC_period_denominator",
+    "freeze_exact_archive_denominator_and_member_hashes",
+    "verify_EVTC_stable_issuer_binding",
+    "verify_EVRI_does_not_satisfy_EVTC_identity",
+    "preserve_whole_source_observations",
+    "source_record_id_unique",
+    "observation_id_unique",
+    "filing_level_amendment_lineage_closed",
+    "active_plus_superseded_arithmetic_closed",
+    "exact_historical_share_denominator_each_certified_period",
+    "issuer_percentage_arithmetic_closed",
+    "provider_equivalence_OPEN",
+    "zero_unresolved_residue_inside_claim",
+    "independent_exact_head_CI_PASS",
+    "exact_parent_and_merge_base_lock_PASS",
+    "true_pr_head_sha_lock_PASS",
+    "evidence_artifact_bound_to_true_pr_head"
+  ],
+  "provider_equivalence": "OPEN",
+  "aggregation_policy": "WHOLE_SOURCE_OBSERVATIONS_ONLY_NO_CROSS_HOLDER_SUMMATION",
+  "synthetic_row_identity": "FORBIDDEN",
+  "deep_dive_promotion": "ELIGIBLE",
+  "unresolved_residue": [],
+  "blockers": [],
+  "certification_rule": "EVTC promotion is valid only if this issuer-specific vector independently reproduces PASS with zero unresolved residue on its true PR head using the frozen SEC snapshot, exact-parent/merge-base lock, and evidence-artifact binding to that true head. BPOP PASS, OFG PASS, generalized-engine PASS, ticker similarity, and parser regression coverage are reference evidence only and never certification inheritance."
+}

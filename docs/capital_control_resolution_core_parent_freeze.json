@@ -1,0 +1,38 @@
+{
+  "freeze_id": "CAPITAL_CONTROL_PARENT_FREEZE_2026-08-27",
+  "repository": "jotaele44/moneysweep-pr",
+  "base_branch": "main",
+  "base_commit": "437d02f96699a402a328def1d266980f5ee29788",
+  "base_tree": "5d9381fcf139f22b82cd12dc1af44d1c8341f632",
+  "capital_control_module_blobs": {
+    "moneysweep/capital_control/__init__.py": "6201ea9e3c3c5248036e6fa6172e9ad9f8871920",
+    "moneysweep/capital_control/analytics.py": "39c0097816893ad8977609386d7ab80209ce51cc",
+    "moneysweep/capital_control/identity.py": "81cb49be72d2fdb300714a1fcd28ccc428a3e9fb",
+    "moneysweep/capital_control/ingestion.py": "3d4ae3a8d81800760aa3750d14ba883178af3196",
+    "moneysweep/capital_control/models.py": "929f73374fdf5d0deba73d97febaf8f9f9d6f686",
+    "moneysweep/capital_control/source_adapter.py": "227a4b9ef732192c38ebbd30971ae77630330c9d",
+    "moneysweep/capital_control/supersession.py": "c27978d031913183f838c05dd1b902634f51ac03",
+    "moneysweep/capital_control/validation.py": "c6388dce37cf589f0de91c30d26bd07a8fbb74ce"
+  },
+  "open_overlap_scan": [
+    {
+      "pr": 519,
+      "title": "feat: harden SEC ownership pipeline with BPOP golden certification",
+      "treatment": "DO_NOT_OVERWRITE; preserve as GOLDEN_002 contract and reconcile before merge"
+    },
+    {
+      "pr": 484,
+      "title": "Add capital and control investor layer",
+      "treatment": "LEGACY/OVERLAP REVIEW REQUIRED; main already contains capital_control module surface"
+    }
+  ],
+  "migration_policy": {
+    "raw_mutation": false,
+    "heuristic_identity_promotion": false,
+    "parcel_requires_authoritative_property_anchor": true,
+    "federation_requires_stable_id_bridge": true,
+    "funding_requires_project_specific_binding": true,
+    "foia_requires_public_source_exhaustion": true,
+    "remove_existing_resolver_before_parity": false
+  }
+}

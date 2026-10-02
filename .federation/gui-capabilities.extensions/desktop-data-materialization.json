@@ -1,0 +1,81 @@
+{
+  "extension_id": "desktop-data-materialization",
+  "capabilities": [
+    {
+      "id": "desktop-data-materialization",
+      "classification": "operator",
+      "status": "active",
+      "requires_terminal": false,
+      "backend": {
+        "files": [
+          "desktop/secrets.py",
+          "desktop/workspace.py",
+          "server/backend/desktop_app.py",
+          "server/backend/materialization.py",
+          "server/backend/materialization_security.py"
+        ],
+        "endpoints": [
+          "GET /status",
+          "GET /sources",
+          "GET /credentials",
+          "PUT /credentials/{key_name}",
+          "DELETE /credentials/{key_name}",
+          "POST /offline/upload",
+          "POST /offline/{source_id}/run",
+          "POST /api/run"
+        ],
+        "symbols": [
+          "desktop/secrets.py:activated_credentials",
+          "desktop/secrets.py:delete_secret",
+          "desktop/secrets.py:get_secret",
+          "desktop/secrets.py:presence",
+          "desktop/secrets.py:set_secret",
+          "desktop/workspace.py:bootstrap_workspace",
+          "desktop/workspace.py:resource_root",
+          "desktop/workspace.py:workspace_root",
+          "server/backend/materialization.py:ApiRunRequest",
+          "server/backend/materialization.py:CredentialWriteRequest",
+          "server/backend/materialization.py:credential_delete",
+          "server/backend/materialization.py:credential_status",
+          "server/backend/materialization.py:credential_write",
+          "server/backend/materialization.py:materialization_sources",
+          "server/backend/materialization.py:materialization_status",
+          "server/backend/materialization.py:run_api_sources",
+          "server/backend/materialization.py:run_offline_source",
+          "server/backend/materialization.py:upload_offline_file",
+          "server/backend/materialization_security.py:public_run_summary",
+          "server/backend/materialization_security.py:write_offline_receipt"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/lib/api.js",
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/DataSources.jsx"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_backend_materialization.py",
+          "tests/test_desktop_workspace.py",
+          "tests/test_desktop_materialization_runtime.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/data-sources.spec.mjs"
+        ]
+      }
+    }
+  ]
+}

@@ -1,7 +1,8 @@
 name: desktop-build
 
-# Builds the standalone double-click desktop app (PyInstaller) for each OS.
-# Runs on demand, and attaches the bundles to the release on desktop-v* tags.
+# Builds the self-contained double-click desktop app for each OS.
+# Public desktop-v* releases remain fail-closed behind production-data status,
+# source/dependency security, and macOS Developer-ID/notarization validation.
 
 on:
   workflow_dispatch:
@@ -12,15 +13,26 @@ on:
     branches: [main]
     paths:
       - "desktop/**"
+      - "server/backend/**"
+      - "scripts/run_automatable_sources.py"
+      - "scripts/scan_for_secrets.py"
+      - "scripts/run_production_status_gate.py"
+      - "requirements.txt"
+      - "requirements.lock"
       - "requirements-desktop.txt"
+      - "registries/**"
+      - "schemas/**"
+      - "reports/materialization_readiness.json"
+      - "data/exports/production_status.json"
+      - "dashboard/**"
       - ".github/workflows/desktop-build.yml"
 
 permissions:
   contents: write
 
-# Serialise runs on the same ref without cancelling. This workflow can
-# publish, write data, or hand off to another repo, and killing it
-# mid-flight risks leaving that work half-done.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
@@ -42,14 +54,82 @@ jobs:
 
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: "22"
+          node-version: "22.22.2"
+
+      - name: Derive desktop build identity
+        shell: python
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          import json, os, pathlib, re
+
+          ref = os.environ["GITHUB_REF"]
+          ci_sha = os.environ["GITHUB_SHA"]
+          run_number = int(os.environ["GITHUB_RUN_NUMBER"])
+          match = re.fullmatch(r"refs/tags/desktop-v(\d+)\.(\d+)\.(\d+)", ref)
+          public_release = match is not None
+          if public_release:
+              app_version = ".".join(match.groups())
+          else:
+              # Numeric three-component version keeps CI bundles identifiable
+              # without pretending that an unsigned PR artifact is a release.
+              app_version = f"0.0.{run_number}"
+
+          source_head_sha = os.environ.get("PR_HEAD_SHA") or ci_sha
+          base_sha = os.environ.get("PR_BASE_SHA") or ""
+          release_tag_target_sha = ci_sha if public_release else ""
+          build_version = str(run_number)
+          identity = {
+              "schema_version": "moneysweep_desktop_build_identity_v1",
+              "app_version": app_version,
+              "build_version": build_version,
+              "base_sha": base_sha,
+              "source_head_sha": source_head_sha,
+              "ci_execution_sha": ci_sha,
+              "release_tag_target_sha": release_tag_target_sha,
+              "github_ref": ref,
+              "github_event_name": os.environ["GITHUB_EVENT_NAME"],
+              "github_run_id": os.environ["GITHUB_RUN_ID"],
+              "github_run_number": run_number,
+              "public_release": public_release,
+          }
+          pathlib.Path("build-metadata").mkdir(exist_ok=True)
+          pathlib.Path("build-metadata/DESKTOP_BUILD_IDENTITY.json").write_text(
+              json.dumps(identity, indent=2) + "\n", encoding="utf-8"
+          )
+          security_state = {
+              "schema_version": "moneysweep_distribution_security_v1",
+              "public_release": public_release,
+              "state": "PENDING_PUBLIC_RELEASE_SECURITY_GATES" if public_release else "NOT_RUN_NON_PUBLIC_BUILD",
+          }
+          pathlib.Path("build-metadata/DISTRIBUTION_SECURITY_STATUS.json").write_text(
+              json.dumps(security_state, indent=2) + "\n", encoding="utf-8"
+          )
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env:
+              env.write(f"MONEYSWEEP_APP_VERSION={app_version}\n")
+              env.write(f"MONEYSWEEP_BUILD_VERSION={build_version}\n")
+              env.write(f"MONEYSWEEP_SOURCE_HEAD_SHA={source_head_sha}\n")
+              env.write(f"MONEYSWEEP_BASE_SHA={base_sha}\n")
+              env.write(f"MONEYSWEEP_RELEASE_TAG_TARGET_SHA={release_tag_target_sha}\n")
+              env.write(f"MONEYSWEEP_PUBLIC_RELEASE={'1' if public_release else '0'}\n")
+
+      - name: Source secret gate
+        shell: bash
+        run: python scripts/scan_for_secrets.py --root .
+
+      - name: Install frontend dependencies
+        run: npm ci --no-audit --no-fund
+        working-directory: dashboard
+
+      - name: Frontend dependency security gate
+        run: npm audit --audit-level=moderate
+        working-directory: dashboard
 
       - name: Build frontend (same-origin)
         env:
           VITE_API_BASE: ""
-        run: |
-          npm ci --no-audit --no-fund
-          npm run build
+        run: npm run build
         working-directory: dashboard
 
       - name: Assert isolated checkout
@@ -58,26 +138,247 @@ jobs:
 
       - name: Install Python dependencies
         shell: bash
+        env:
+          GIT_CONFIG_COUNT: "1"
+          GIT_CONFIG_KEY_0: core.longpaths
+          GIT_CONFIG_VALUE_0: "true"
         run: |
           python -m pip install --upgrade pip
-          pip install -r server/backend/requirements.txt -r requirements-desktop.txt pyinstaller
+          pip install \
+            -r requirements.lock \
+            -r server/backend/requirements.txt \
+            -r requirements-desktop.txt \
+            pyinstaller
 
-      - name: Freeze console build (for smoke test)
+      - name: Recompute production status on exact checkout
+        shell: bash
+        run: python scripts/run_production_status_gate.py --root .
+
+      - name: Refuse public release unless production-validated
+        if: startsWith(github.ref, 'refs/tags/desktop-v')
+        shell: python
+        run: |
+          import json, pathlib, sys
+
+          RELEASE_READY = "PRODUCTION_VALIDATED"
+          status = json.loads(
+              pathlib.Path("data/exports/production_status.json").read_text(encoding="utf-8")
+          )
+          state = status.get("production_status")
+          if state != RELEASE_READY:
+              print(
+                  f"::error::Refusing public desktop release: production_status is "
+                  f"{state!r}; only {RELEASE_READY!r} may proceed to signing/notarization."
+              )
+              sys.exit(1)
+          print(f"production_status={state!r}; public release may proceed")
+
+      - name: Freeze resolved dependency inventory
+        shell: bash
+        run: |
+          python --version > build-metadata/PYTHON_VERSION.txt 2>&1
+          node --version > build-metadata/NODE_VERSION.txt 2>&1
+          pip freeze --all | LC_ALL=C sort > build-metadata/FROZEN_DEPENDENCIES.txt
+
+      - name: Assert real forensic/materialization dependencies
+        shell: python
+        run: |
+          import duckdb, pyarrow, pandas, fastapi, multipart, keyring
+          print("duckdb", duckdb.__version__)
+          print("pyarrow", pyarrow.__version__)
+          print("pandas", pandas.__version__)
+          print("fastapi", fastapi.__version__)
+          print("keyring", keyring.__version__ if hasattr(keyring, "__version__") else "installed")
+
+      - name: Freeze console build for certification
         env:
           PRII_CONSOLE: "1"
         run: pyinstaller desktop/pyinstaller.spec --distpath dist-smoke --noconfirm
 
-      - name: Smoke test frozen app
+      - name: Smoke and data-plane self-test exact frozen executable
         shell: python
         run: |
-          import pathlib, subprocess, sys
+          import os, pathlib, shutil, subprocess, sys, tempfile
+
           name = "PRII-MONEYSWEEP"
           exe = pathlib.Path("dist-smoke") / name / (name + (".exe" if sys.platform == "win32" else ""))
-          result = subprocess.run([str(exe), "--smoke"], timeout=120)
-          sys.exit(result.returncode)
+          workspace = pathlib.Path(tempfile.mkdtemp(prefix="moneysweep-frozen-selftest-"))
+          env = os.environ.copy()
+          env["MONEYSWEEP_WORKSPACE_ROOT"] = str(workspace)
 
-      - name: Freeze desktop app (windowed release)
+          smoke = subprocess.run([str(exe), "--smoke"], timeout=120, env=env)
+          if smoke.returncode:
+              raise SystemExit(smoke.returncode)
+
+          selftest = subprocess.run([str(exe), "--selftest"], timeout=120, env=env)
+          if selftest.returncode:
+              raise SystemExit(selftest.returncode)
+
+          receipt = workspace / "receipts" / "desktop_bootstrap_latest.json"
+          if not receipt.exists():
+              raise SystemExit("frozen self-test did not create bootstrap receipt")
+          shutil.rmtree(workspace, ignore_errors=True)
+
+      - name: Freeze desktop app (windowed release candidate)
         run: pyinstaller desktop/pyinstaller.spec --distpath dist-desktop --noconfirm
+
+      - name: Require signing configuration for public macOS release
+        if: runner.os == 'macOS' && startsWith(github.ref, 'refs/tags/desktop-v')
+        shell: bash
+        env:
+          P12_B64: ${{ secrets.APPLE_DEVELOPER_ID_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_P12_PASSWORD }}
+          SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for name in P12_B64 P12_PASSWORD SIGNING_IDENTITY APPLE_ID APPLE_TEAM_ID APPLE_APP_PASSWORD; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error::Missing required macOS release signing/notarization secret: $name"
+              exit 1
+            fi
+          done
+
+      - name: Sign and notarize public macOS release candidate
+        if: runner.os == 'macOS' && startsWith(github.ref, 'refs/tags/desktop-v')
+        shell: bash
+        env:
+          P12_B64: ${{ secrets.APPLE_DEVELOPER_ID_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_P12_PASSWORD }}
+          SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        run: |
+          set -euo pipefail
+          app="dist-desktop/PRII-MONEYSWEEP.app"
+          cert="$RUNNER_TEMP/moneysweep-developer-id.p12"
+          keychain="$RUNNER_TEMP/moneysweep-signing.keychain-db"
+          keychain_password="$(openssl rand -hex 24)"
+
+          python - <<'PY'
+          import base64, os, pathlib
+          pathlib.Path(os.environ["RUNNER_TEMP"], "moneysweep-developer-id.p12").write_bytes(
+              base64.b64decode(os.environ["P12_B64"], validate=True)
+          )
+          PY
+
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$cert" -k "$keychain" -P "$P12_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s \
+            -k "$keychain_password" "$keychain"
+          security list-keychains -d user -s "$keychain"
+
+          codesign --force --deep --options runtime --timestamp \
+            --sign "$SIGNING_IDENTITY" "$app"
+          codesign --verify --deep --strict --verbose=2 "$app" \
+            > build-metadata/CODESIGN_VERIFY.txt 2>&1
+
+          ditto -c -k --keepParent "$app" "$RUNNER_TEMP/PRII-MONEYSWEEP-notarize.zip"
+          xcrun notarytool submit "$RUNNER_TEMP/PRII-MONEYSWEEP-notarize.zip" \
+            --apple-id "$APPLE_ID" \
+            --team-id "$APPLE_TEAM_ID" \
+            --password "$APPLE_APP_PASSWORD" \
+            --wait --output-format json \
+            > build-metadata/NOTARIZATION.json
+          xcrun stapler staple "$app" > build-metadata/STAPLER_STAPLE.txt 2>&1
+          xcrun stapler validate "$app" > build-metadata/STAPLER_VALIDATE.txt 2>&1
+          spctl --assess --type execute --verbose=4 "$app" \
+            > build-metadata/GATEKEEPER_ASSESS.txt 2>&1
+
+          python - <<'PY'
+          import json, pathlib
+          p = pathlib.Path("build-metadata/DISTRIBUTION_SECURITY_STATUS.json")
+          data = json.loads(p.read_text(encoding="utf-8"))
+          data["state"] = "SIGNED_NOTARIZED_STAPLED_GATEKEEPER_PASSED"
+          data["codesign_verified"] = True
+          data["notarization_accepted"] = True
+          data["stapler_validated"] = True
+          data["gatekeeper_passed"] = True
+          p.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+          PY
+
+      - name: Clean signing material
+        if: always() && runner.os == 'macOS' && startsWith(github.ref, 'refs/tags/desktop-v')
+        shell: bash
+        run: |
+          rm -f "$RUNNER_TEMP/moneysweep-developer-id.p12" "$RUNNER_TEMP/PRII-MONEYSWEEP-notarize.zip"
+          security delete-keychain "$RUNNER_TEMP/moneysweep-signing.keychain-db" 2>/dev/null || true
+
+      - name: Freeze post-security application member identity
+        if: runner.os == 'macOS'
+        shell: python
+        run: |
+          import hashlib, json, os, pathlib, stat
+
+          app = pathlib.Path("dist-desktop/PRII-MONEYSWEEP.app")
+          if not app.is_dir():
+              raise SystemExit("macOS .app missing before member freeze")
+
+          def sha256_file(path):
+              h = hashlib.sha256()
+              with path.open("rb") as f:
+                  for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          records = []
+          regular = symlinks = 0
+          for path in sorted(app.rglob("*"), key=lambda p: p.relative_to(app).as_posix()):
+              rel = path.relative_to(app).as_posix()
+              st = path.lstat()
+              mode = format(stat.S_IMODE(st.st_mode), "04o")
+              if path.is_symlink():
+                  target = os.readlink(path)
+                  target_bytes = target.encode("utf-8")
+                  records.append({
+                      "path": rel,
+                      "type": "symlink",
+                      "mode": mode,
+                      "target": target,
+                      "target_sha256": hashlib.sha256(target_bytes).hexdigest(),
+                  })
+                  symlinks += 1
+              elif path.is_file():
+                  records.append({
+                      "path": rel,
+                      "type": "file",
+                      "mode": mode,
+                      "bytes": st.st_size,
+                      "sha256": sha256_file(path),
+                      "executable": bool(st.st_mode & (stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)),
+                  })
+                  regular += 1
+
+          canonical = json.dumps(records, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+          tree_sha256 = hashlib.sha256(canonical).hexdigest()
+          identity = json.loads(pathlib.Path("build-metadata/DESKTOP_BUILD_IDENTITY.json").read_text())
+          security = json.loads(pathlib.Path("build-metadata/DISTRIBUTION_SECURITY_STATUS.json").read_text())
+          payload = {
+              "schema_version": "moneysweep_app_member_manifest_v3",
+              "canonicalization": "sorted relative POSIX paths; lstat; symlinks not followed; canonical JSON records",
+              "app_name": app.name,
+              "app_version": identity["app_version"],
+              "build_version": identity["build_version"],
+              "source_head_sha": identity["source_head_sha"],
+              "ci_execution_sha": identity["ci_execution_sha"],
+              "distribution_security_state": security["state"],
+              "member_count": len(records),
+              "regular_file_count": regular,
+              "symlink_count": symlinks,
+              "tree_sha256": tree_sha256,
+              "members": records,
+          }
+          pathlib.Path("dist-desktop/APP_MEMBER_MANIFEST.json").write_text(
+              json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+          )
+          print(f"app_member_count={len(records)}")
+          print(f"app_tree_sha256={tree_sha256}")
+          print(f"distribution_security_state={security['state']}")
 
       - name: Package bundle
         shell: bash
@@ -102,57 +403,99 @@ jobs:
             -ov -format UDZO "PRII-MONEYSWEEP-macOS.dmg"
           rm -rf "$staging"
 
+      - name: Copy build-resolution evidence
+        shell: bash
+        run: |
+          cp build-metadata/FROZEN_DEPENDENCIES.txt dist-desktop/
+          cp build-metadata/PYTHON_VERSION.txt dist-desktop/
+          cp build-metadata/NODE_VERSION.txt dist-desktop/
+          cp build-metadata/DESKTOP_BUILD_IDENTITY.json dist-desktop/
+          cp build-metadata/DISTRIBUTION_SECURITY_STATUS.json dist-desktop/
+          for f in CODESIGN_VERIFY.txt NOTARIZATION.json STAPLER_STAPLE.txt STAPLER_VALIDATE.txt GATEKEEPER_ASSESS.txt; do
+            if [ -f "build-metadata/$f" ]; then cp "build-metadata/$f" dist-desktop/; fi
+          done
+
+      - name: Freeze artifact byte identities
+        shell: python
+        run: |
+          import hashlib, json, os, pathlib, platform
+
+          dist = pathlib.Path("dist-desktop")
+          files = sorted(
+              p for p in dist.glob("PRII-MONEYSWEEP-*")
+              if p.is_file() and p.suffix in {".zip", ".dmg"}
+          )
+          if not files:
+              raise SystemExit("no packaged desktop artifacts found")
+
+          def sha256(path):
+              h = hashlib.sha256()
+              with path.open("rb") as f:
+                  for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          readiness = json.loads(pathlib.Path("reports/materialization_readiness.json").read_text())
+          production = json.loads(pathlib.Path("data/exports/production_status.json").read_text())
+          identity = json.loads((dist / "DESKTOP_BUILD_IDENTITY.json").read_text())
+          security = json.loads((dist / "DISTRIBUTION_SECURITY_STATUS.json").read_text())
+          deps = dist / "FROZEN_DEPENDENCIES.txt"
+          app_manifest = dist / "APP_MEMBER_MANIFEST.json"
+          manifest = {
+              "schema_version": "1.2.0",
+              "app_version": identity["app_version"],
+              "build_version": identity["build_version"],
+              "base_sha": identity["base_sha"],
+              "source_head_sha": identity["source_head_sha"],
+              "ci_execution_sha": identity["ci_execution_sha"],
+              "release_tag_target_sha": identity["release_tag_target_sha"],
+              "github_ref": identity["github_ref"],
+              "runner_os": os.environ["RUNNER_OS"],
+              "python_version": platform.python_version(),
+              "source_ids_sha256": readiness["source_count_provenance"]["source_ids_sha256"],
+              "registered_sources": readiness["total_sources"],
+              "automatable_sources": readiness["automatable_total"],
+              "production_status": production["production_status"],
+              "distribution_security": security,
+              "dependency_inventory": {
+                  "name": deps.name,
+                  "bytes": deps.stat().st_size,
+                  "sha256": sha256(deps),
+              },
+              "app_member_manifest": None if not app_manifest.exists() else {
+                  "name": app_manifest.name,
+                  "bytes": app_manifest.stat().st_size,
+                  "sha256": sha256(app_manifest),
+                  "tree_sha256": json.loads(app_manifest.read_text())["tree_sha256"],
+              },
+              "artifacts": [
+                  {"name": p.name, "bytes": p.stat().st_size, "sha256": sha256(p)}
+                  for p in files
+              ],
+          }
+          (dist / "DESKTOP_RELEASE_MANIFEST.json").write_text(
+              json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+          )
+
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: PRII-MONEYSWEEP-${{ runner.os }}
           path: |
             dist-desktop/PRII-MONEYSWEEP-*.zip
             dist-desktop/PRII-MONEYSWEEP-*.dmg
-
-      # A desktop-v* tag is the one route in this repo that publishes a public
-      # GitHub Release (the step below creates it if absent), and until now it
-      # consulted nothing. Every other guardrail — production-status-gate.yml,
-      # release-tag.yml — is scoped to pushes and PRs, so a tag walked straight
-      # past all of them. release-tag.yml records why that matters: this project
-      # "has not cut a software release yet", and only the federation contract
-      # is tagged. Publishing a desktop bundle while the pipeline is paused
-      # would ship an accountability tool backed by the diagnostic dataset.
-      # Fail rather than skip: an accidental tag should say why it stopped, not
-      # look green having published nothing. shell: python because this job runs
-      # on the windows runner too.
-      #
-      # Allowlist, not denylist. Only PRODUCTION_VALIDATED publishes; every other
-      # value — including a missing key, a typo, and PARTIAL_PRODUCTION — stops
-      # here. PARTIAL_PRODUCTION is the case that makes this matter: it is
-      # produced legitimately when the WARN gates fail (absent bond actor layer,
-      # parent UEI coverage under 0.90) and its own status message is "major
-      # layers still require validation", so it is not a release-ready state.
-      # Values are defined in moneysweep/validation/production_status.py; a
-      # rename there makes this gate refuse to publish rather than wrongly
-      # publish, and tests/test_desktop_release_gate.py keeps the two in step.
-      - name: Refuse to publish unless the pipeline is production-validated
-        if: startsWith(github.ref, 'refs/tags/desktop-v')
-        shell: python
-        run: |
-          import json, pathlib, sys
-
-          RELEASE_READY = "PRODUCTION_VALIDATED"
-
-          status = json.loads(
-              pathlib.Path("data/exports/production_status.json").read_text(
-                  encoding="utf-8"
-              )
-          )
-          state = status.get("production_status")
-          if state != RELEASE_READY:
-              print(
-                  f"::error::Refusing to publish a release: production_status is "
-                  f"{state!r}, and only {RELEASE_READY!r} may publish. The "
-                  f"preconditions are in docs/RESUMPTION_CHECKLIST.md. Builds "
-                  f"remain available as workflow artifacts, which need no tag."
-              )
-              sys.exit(1)
-          print(f"production_status={state!r}; release publishing allowed")
+            dist-desktop/DESKTOP_RELEASE_MANIFEST.json
+            dist-desktop/APP_MEMBER_MANIFEST.json
+            dist-desktop/DESKTOP_BUILD_IDENTITY.json
+            dist-desktop/DISTRIBUTION_SECURITY_STATUS.json
+            dist-desktop/CODESIGN_VERIFY.txt
+            dist-desktop/NOTARIZATION.json
+            dist-desktop/STAPLER_STAPLE.txt
+            dist-desktop/STAPLER_VALIDATE.txt
+            dist-desktop/GATEKEEPER_ASSESS.txt
+            dist-desktop/FROZEN_DEPENDENCIES.txt
+            dist-desktop/PYTHON_VERSION.txt
+            dist-desktop/NODE_VERSION.txt
+          if-no-files-found: ignore
 
       - name: Attach to release
         if: startsWith(github.ref, 'refs/tags/desktop-v')
@@ -161,3 +504,13 @@ jobs:
           files: |
             dist-desktop/PRII-MONEYSWEEP-*.zip
             dist-desktop/PRII-MONEYSWEEP-*.dmg
+            dist-desktop/DESKTOP_RELEASE_MANIFEST.json
+            dist-desktop/APP_MEMBER_MANIFEST.json
+            dist-desktop/DESKTOP_BUILD_IDENTITY.json
+            dist-desktop/DISTRIBUTION_SECURITY_STATUS.json
+            dist-desktop/CODESIGN_VERIFY.txt
+            dist-desktop/NOTARIZATION.json
+            dist-desktop/STAPLER_STAPLE.txt
+            dist-desktop/STAPLER_VALIDATE.txt
+            dist-desktop/GATEKEEPER_ASSESS.txt
+            dist-desktop/FROZEN_DEPENDENCIES.txt

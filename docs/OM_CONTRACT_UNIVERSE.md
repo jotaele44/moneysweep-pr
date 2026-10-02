@@ -25,6 +25,11 @@ The first command is a provisional smoke run. The second resumes from its signed
 4. raw row count equals the OCPR-reported total; and
 5. a completion receipt is written.
 
+The live endpoint currently returns the page length in `recordsTotal` and the
+full unfiltered registry size in `recordsFiltered`; the resumable materializer
+uses `recordsFiltered` as the completion denominator and tests this contract to
+prevent a bounded smoke from being promoted as a complete registry.
+
 Interrupted, failed, or `--max-pages` runs remain under `data/staging/checkpoints/ocpr_contracts/` and cannot be mistaken for complete source materialization.
 
 ## Build diagnostic universe

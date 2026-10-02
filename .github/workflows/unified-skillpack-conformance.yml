@@ -1,0 +1,17 @@
+name: Unified Skillpack Conformance
+on:
+  pull_request:
+    paths: ['.claude/skillpacks/**','tools/validate_unified_skillpacks.py','tests/test_unified_skillpack_conformance.py','.github/workflows/unified-skillpack-conformance.yml']
+  push:
+    branches: ['chore/unified-skillpacks-v1.0.0-*']
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python tools/validate_unified_skillpacks.py --root .
+      - run: python -m unittest discover -s tests -p 'test_unified_skillpack_conformance.py'

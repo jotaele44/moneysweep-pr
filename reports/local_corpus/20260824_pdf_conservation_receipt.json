@@ -1,0 +1,11 @@
+{
+  "schema_version": "moneysweep_local_pdf_conservation_v1",
+  "status": "SUPERSEDED",
+  "generated_at": "2026-08-25T01:55:00Z",
+  "superseded_at": "2026-08-25T02:04:00Z",
+  "superseded_by": "reports/local_corpus/20260824_pdf_conservation_receipt_v2.json",
+  "scope": "10 frozen financial PDFs from the 2026-08-24 operator corpus",
+  "reason": "The original receipt correctly recorded 9/10 bounded structured record-conservation passes, but incorrectly counted the subcontracting directory as source-queryable despite its UNRESOLVED_REGISTRY_BINDING. Source queryability requires both conservation/provenance closure and a resolved authoritative source-family binding. The corrected count is 8/10; PRASA CER remains structured-OPEN and the subcontracting directory remains nonqueryable pending binding adjudication.",
+  "canonical_certification": false,
+  "promotion_authorized": false
+}

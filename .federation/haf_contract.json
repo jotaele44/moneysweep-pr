@@ -1,0 +1,17 @@
+{
+  "schema_version": "haf_repo_contract_v2",
+  "haf_contract_version": "2.0.0",
+  "framework_compatibility": ">=0.4.0,<1.0.0",
+  "program_id": "moneysweep-pr",
+  "repository_full_name": "jotaele44/moneysweep-pr",
+  "federation_role": "public_money_intelligence_node",
+  "certification_required": true,
+  "raw_snapshot_policy": "PRESERVE_OR_IMMUTABLE_REFERENCE",
+  "identity_policy": "EVIDENCE_PRIORITY_FAIL_CLOSED",
+  "unresolved_policy": "FAIL_CLOSED",
+  "canonical_export_required": true,
+  "adapter_state": "COMPATIBLE_PENDING_CI",
+  "native_contract": "federation.json",
+  "native_test_command": "python3 -m pytest tests/ -q",
+  "canonical_export_command": "python3 scripts/federation_export.py --mode test"
+}

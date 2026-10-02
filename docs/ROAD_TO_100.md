@@ -1,6 +1,7 @@
 # Road to 100 — normalized federation score
 
-**Audit date:** 2026-08-04  
+**Metadata refresh:** 2026-08-19 at `57cd18e4e8fba55160dcba42a5146dcf914c14e7`
+**Evidence audit date:** 2026-08-04 (not recertified by the metadata refresh)
 **Scoring model:** code completeness 20%; main-branch availability 15%; CI enforcement 15%; data materialization 15%; operator verification 15%; GUI completeness 10%; federation readiness 10%.
 
 ## Current normalized score: 61.70 / 100
@@ -21,8 +22,8 @@ This repository remains `NON_PRODUCTION_DIAGNOSTIC`. The normalized score does n
 
 - The Wave 0 architecture, source registry, ingestion framework, desktop/frontend improvements and release guard are substantially implemented.
 - Required sources remain incomplete: COR3, HUD DRGR, cabilderos and PRASA.
-- PR #453 is the O&M contract-universe candidate; its OCPR materialization and completeness gates remain unresolved.
-- PR #457 is the isolated-clone candidate.
+- PR #453 merged; its code is present, while OCPR materialization and completeness gates remain unresolved.
+- Isolated setup no longer depends on a sibling checkout: requirements pin the shared package to an immutable Git source. This does not certify live-source execution.
 - PR #458 is a release-safety guard and should land before any desktop tag can be considered.
 - PR #459 is rescued audit/staging state, not certified production data.
 - FEC Schedule E and related reconciliation remain operator-run work.

@@ -20,12 +20,18 @@ const frontendUrl = "http://127.0.0.1:5173";
 const backendUrl = "http://127.0.0.1:8000";
 const seedScript = path.join(repositoryRoot, "server", "ingestion", "seed_demo.py");
 const backendCommand = fs.existsSync(seedScript)
-  ? "python server/ingestion/seed_demo.py && python -m uvicorn server.backend.main:app --host 127.0.0.1 --port 8000"
-  : "python -m uvicorn server.backend.main:app --host 127.0.0.1 --port 8000";
+  ? "python3 server/ingestion/seed_demo.py && python3 -m uvicorn server.backend.main:app --host 127.0.0.1 --port 8000"
+  : "python3 -m uvicorn server.backend.main:app --host 127.0.0.1 --port 8000";
 
 export default defineConfig({
   testDir: "./tests",
-  testMatch: ["gui-parity.spec.mjs", "campaign-finance.spec.mjs", "api-keys.spec.mjs"],
+  testMatch: [
+    "gui-parity.spec.mjs",
+    "campaign-finance.spec.mjs",
+    "api-keys.spec.mjs",
+    "data-sources.spec.mjs",
+    "financial-leaderboards.spec.mjs",
+  ],
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
   workers: 1,

@@ -38,7 +38,9 @@ docs/BUILD_EXECUTION_SEQUENCE.md or the issue it closes. -->
 - [ ] Analytical/background results expose applicable progress, freshness,
       provenance, errors, and artifact access in the GUI
 - [ ] End-to-end GUI tests were added or updated and
-      `python scripts/check_gui_parity.py` passes
+      `python .federation/check_gui_parity_with_extensions.py` passes (the CI
+      gate — wraps `scripts/check_gui_parity.py` against the manifest merged
+      with `.federation/gui-capabilities.extensions/*.json`)
 - [ ] Any `internal` or `staged` exception includes its rationale, owner,
       tracking reference, and expiry
 

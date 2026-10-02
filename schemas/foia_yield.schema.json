@@ -25,7 +25,8 @@
         "partial_yield",
         "fulfilled",
         "denied",
-        "appealed"
+        "appealed",
+        "superseded"
       ]
     },
     "records_received": {"type": "integer", "minimum": 0},

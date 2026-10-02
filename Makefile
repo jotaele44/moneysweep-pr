@@ -13,7 +13,7 @@ PYTHON_BASELINE ?= 3.11
 .DEFAULT_GOAL := help
 
 .PHONY: help install-dev compileall lint format format-check type test test-fast cov \
-        lock lock-check precommit check
+        lock lock-check precommit check prebuilt-dashboard prebuilt-dashboard-check
 
 help:  ## List available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -49,6 +49,12 @@ cov:  ## pytest with a terminal coverage report
 
 lock:  ## Recompile requirements.lock from requirements.in for the local baseline
 	uv pip compile requirements.in --universal --python-version $(PYTHON_BASELINE) -o requirements.lock
+
+prebuilt-dashboard:  ## Rebuild the committed desktop dashboard bundle (needs Node.js)
+	python3 scripts/build_prebuilt_dashboard.py --build
+
+prebuilt-dashboard-check:  ## Fail if the committed dashboard bundle is stale or corrupt
+	python3 scripts/build_prebuilt_dashboard.py --check
 
 lock-check:  ## Fail if requirements.lock is stale vs requirements.in (CI: lockfile.yml)
 	uv pip compile requirements.in --universal --python-version $(PYTHON_BASELINE) -o - \

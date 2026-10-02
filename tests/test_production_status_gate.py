@@ -20,6 +20,7 @@ def _metrics(**overrides):
         "unique_entities": 150,
         "bond_actor_count": 3,
         "parent_uei_coverage": 0.95,
+        "parent_uei_required_coverage": 0.90,
         "fixture_or_synthetic_data_detected": False,
         "fixture_or_synthetic_reasons": [],
     }
@@ -55,6 +56,20 @@ def test_status_partial_when_parent_uei_coverage_below_threshold():
     status, blockers = evaluate_production_status(_metrics(parent_uei_coverage=0.5))
     assert status == STATUS_PARTIAL
     assert any(b["metric"] == "parent_uei_coverage" for b in blockers)
+
+
+def test_status_uses_source_specific_parent_uei_threshold():
+    status, blockers = evaluate_production_status(
+        _metrics(parent_uei_coverage=0.05, parent_uei_required_coverage=0.05)
+    )
+    assert status == STATUS_VALIDATED
+    assert blockers == []
+
+    status, blockers = evaluate_production_status(
+        _metrics(parent_uei_coverage=0.049, parent_uei_required_coverage=0.05)
+    )
+    assert status == STATUS_PARTIAL
+    assert blockers[0]["required_gate"] == ">= 0.05 for full production"
 
 
 def test_status_validated_when_all_gates_pass():

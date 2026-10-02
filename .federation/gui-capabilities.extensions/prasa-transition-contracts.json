@@ -1,0 +1,19 @@
+{
+  "capabilities": [
+    {
+      "id": "prasa-transition-contracts-ingest",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "A narrow, offline PDF-to-CSV parser for one specific archived PRASA transition-agency report (ACT agency 163 'Contratos Vigentes'). It accepts only the stable pdftotext -layout shape of that one report and writes the existing pr_prasa_contracts.csv schema consumed by downstream pipeline steps; it does not claim general PRASA-PDF ingestion. Same category as build_source_drop_manifest.py: an offline evidence-acquisition script feeding existing pipeline outputs, not a separate interactive dashboard capability.",
+      "candidate_ids": [
+        "analysis_module:scripts/ingest_prasa_transition_contracts.py",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:main",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:parse_prasa_transition_contracts",
+        "analysis_symbol:scripts/ingest_prasa_transition_contracts.py:run",
+        "cli_surface:scripts/ingest_prasa_transition_contracts.py"
+      ]
+    }
+  ],
+  "exceptions": []
+}
