@@ -1,0 +1,79 @@
+{
+  "_comment": "Documentation-sync policy for moneysweep-pr (thehub-pr ADR 0010). Read by tools/check_docs_sync.py. couplings: when a covered path changes, the doc must change in the same diff, or the commit/PR says 'Docs-Impact: none - <reason>'. Seeded conservatively: each coupling was replayed over this repo's recent history and never fired. Add couplings for docs that enumerate things; do not add ones that fire on routine work.",
+  "schema_version": "prii_docs_sync_v1",
+  "mode": "enforce",
+  "base_branch": "main",
+  "exempt_docs": [
+    "AUDIT.md",
+    "CHANGELOG.md",
+    "HANDOFF.md",
+    "STATUS.md",
+    "RECOMMENDATIONS.md",
+    "docs/audit/**",
+    "docs/*AUDIT*.md",
+    "docs/*PLAN*.md",
+    "docs/*LEDGER*",
+    "docs/*RECONCILIATION*",
+    "docs/**/*20[0-9][0-9]-[0-9][0-9]*"
+  ],
+  "ignore_refs": [
+    "data/**",
+    "outputs/**",
+    "reports/*.local.*",
+    "desktop/wheelhouse/**",
+    "node_modules/**"
+  ],
+  "couplings": [
+    {
+      "doc": "README.md",
+      "covers": [
+        "PRII-MONEYSWEEP.*",
+        "PRII-MONEYSWEEP.app/**"
+      ],
+      "on": ["add", "delete", "rename"],
+      "why": "'Desktop app' lists one double-click launcher per platform."
+    },
+    {
+      "doc": "README.md",
+      "covers": [
+        "run_all.py",
+        "scripts/update_sources.py",
+        "scripts/run_sam_pipeline.py",
+        "scripts/entity_resolution.py",
+        "scripts/gap_analysis_builder.py",
+        "scripts/build_source_recovery_matrix.py"
+      ],
+      "on": ["delete", "rename"],
+      "why": "'Quick start' and 'Running the pipeline' tell operators to run these inside code blocks that the reference check does not read."
+    },
+    {
+      "doc": "README.md",
+      "covers": [
+        "reports/current_status.json",
+        "reports/current_blockers.md",
+        "reports/next_actions.md",
+        "reports/materialization_readiness.json",
+        "reports/source_registry_status.csv"
+      ],
+      "on": ["delete", "rename"],
+      "why": "'Current operating state' names these as the source-of-truth status files, inside a code block."
+    },
+    {
+      "doc": "CONTRIBUTING.md",
+      "covers": [
+        ".github/workflows/lint.yml",
+        ".github/workflows/mypy.yml",
+        ".github/workflows/ci.yml",
+        ".github/workflows/tests.yml",
+        ".github/workflows/lockfile.yml",
+        ".github/workflows/docs-sync.yml",
+        "requirements-dev.txt",
+        "requirements.in",
+        "requirements.lock",
+        "pytest.ini"
+      ],
+      "on": ["delete", "rename"],
+      "why": "The quality-gates table names the CI workflow behind each gate, and the notes name the dev pins, the lock files and the pytest markers, all as bare file names that the reference check skips."
+    }
+  ]
+}
