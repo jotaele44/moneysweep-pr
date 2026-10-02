@@ -17,8 +17,8 @@
     "distinct_visible_card_signatures": 182,
     "visible_registry_name_only_candidates": 28,
     "row_level_edges_materialized": 0,
-    "observed_visible_node_cards_sha256": "7523d02a8ff44b809ba999eb4c64e2bf385943d6db2cae4a5b589be76899a313",
-    "observed_visible_registry_candidates_sha256": "3d057e2c9dda648893c24beb0116c675b5fb3dc256750717adde5a3f359ddd54"
+    "observed_visible_node_cards_sha256": "f54de82e8d04eb0e6c2bac4a549b45463706b545ece9ff0b1021d84894be440c",
+    "observed_visible_registry_candidates_sha256": "8d3ef4957db0c654372596506a7f0bce1b00c388ef82c380d19c84a55818dbcc"
   },
   "node_arithmetic": {
     "sum_declared_curated_nodes": 223,
