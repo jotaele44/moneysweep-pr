@@ -1,0 +1,7 @@
+{
+  "_comment": "Documentation-sync policy for moneysweep-pr, read by tools/check_docs_sync.py (federation template; ADR 0004/0010 in thehub-pr). Starts in report mode with no couplings so the check runs on every PR without ever blocking one. To make it bite, add couplings (a doc plus the paths it describes) and flip mode to \"enforce\" once the couplings have been replayed over recent history.",
+  "schema_version": "prii_docs_sync_v1",
+  "mode": "report",
+  "base_branch": "main",
+  "couplings": []
+}
