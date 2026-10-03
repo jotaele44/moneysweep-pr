@@ -1,0 +1,22 @@
+{
+  "extension_id": "v4-domain-conformance-audit",
+  "capabilities": [
+    {
+      "id": "v4-domain-conformance-audit",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Read-only architecture conformance validator for the MoneySweep v4.0.0-rc1 migration gate. It produces no end-user analysis surface and performs no source acquisition or promotion; its results are governance receipts consumed by development/certification workflows.",
+      "analysis": {
+        "files": [
+          "scripts/audit_v4_domain_conformance.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/audit_v4_domain_conformance.py",
+        "analysis_symbol:scripts/audit_v4_domain_conformance.py:audit",
+        "analysis_symbol:scripts/audit_v4_domain_conformance.py:main"
+      ]
+    }
+  ]
+}
