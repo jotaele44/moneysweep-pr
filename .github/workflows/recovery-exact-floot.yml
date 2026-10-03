@@ -1,0 +1,42 @@
+name: Exact Floot recovery — MoneySweep
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-floot-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout recovery branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "22"
+      - name: Execute exact recovered tree
+        shell: bash
+        run: bash .recovery/moneysweep-exact/run_exact.sh
+      - name: Upload recovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: moneysweep-exact-floot-recovery
+          if-no-files-found: error
+          path: |
+            ${{ runner.temp }}/recovered/package.original.json
+            ${{ runner.temp }}/recovered/package.json
+            ${{ runner.temp }}/recovered/package-lock.json
+            ${{ runner.temp }}/recovered/recovery-hashes.txt
+            ${{ runner.temp }}/recovered/recovery-environment.txt
+            ${{ runner.temp }}/recovered/recovery-vitest.log
+            ${{ runner.temp }}/recovered/recovery-test-exit.txt
+            ${{ runner.temp }}/recovered/recovery-spec-files.txt
+            ${{ runner.temp }}/recovered/recovery-spec-classification.tsv
+      - name: Enforce suite result
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "${{ runner.temp }}/recovered/recovery-test-exit.txt"
+          exit "$(cat "${{ runner.temp }}/recovered/recovery-test-exit.txt")"
