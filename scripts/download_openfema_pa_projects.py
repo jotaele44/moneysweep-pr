@@ -18,6 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from scripts._download_utils import derive_fiscal_year as _derive_fiscal_year
 from scripts.parquet_utils import pq_read, pq_write
 from scripts.config import PROJECT_ROOT, setup_logging
 from scripts.build_unified_master import _normalize_name
@@ -52,6 +53,23 @@ RETRY_SLEEP = 30
 
 NORMALIZED_DIR = PROJECT_ROOT / "data" / "normalized"
 OUTPUT_PATH = NORMALIZED_DIR / "fema_pa_projects_v2.parquet"
+
+LEGACY_MASTER_COLUMNS = [
+    "award_id",
+    "recipient_name",
+    "recipient_uei",
+    "awarding_agency",
+    "awarding_sub_agency",
+    "obligated_amount",
+    "award_date",
+    "fiscal_year",
+    "pop_state",
+    "pop_county",
+    "description",
+    "source_file",
+    "source_dataset",
+    "award_category",
+]
 
 PA_V2_COLUMNS = [
     "disaster_number",
@@ -276,6 +294,63 @@ def _fetch_pa_applicants(logger) -> list[dict]:
         return []
 
 
+def _clean_value(value) -> str:
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return ""
+    return str(value)
+
+
+def _legacy_master_from_v2(df: pd.DataFrame) -> pd.DataFrame:
+    """Project the authoritative v2 rows into the long-standing FEMA master schema."""
+    rows = []
+    for record in df.to_dict(orient="records"):
+        disaster = _clean_value(record.get("disaster_number")).strip()
+        pw_number = _clean_value(record.get("pw_number")).strip()
+        award_id = "FEMA-PA-" + (disaster or "UNKNOWN")
+        if pw_number:
+            award_id += "-" + pw_number
+
+        project_amount = record.get("project_amount")
+        federal_share = record.get("federal_share_obligated")
+        amount = project_amount
+        if amount is None or (isinstance(amount, float) and pd.isna(amount)) or amount == 0:
+            amount = federal_share
+        if amount is None or (isinstance(amount, float) and pd.isna(amount)):
+            amount = 0
+
+        award_date = _clean_value(record.get("pw_date")).split("T")[0]
+        description = _clean_value(record.get("application_title")).strip()
+        if not description:
+            description = _clean_value(record.get("damage_category")).strip()
+
+        rows.append(
+            {
+                "award_id": award_id,
+                "recipient_name": _clean_value(record.get("applicant_name")),
+                "recipient_uei": "",
+                "awarding_agency": "Federal Emergency Management Agency",
+                "awarding_sub_agency": "",
+                "obligated_amount": amount,
+                "award_date": award_date,
+                "fiscal_year": _derive_fiscal_year(award_date),
+                "pop_state": "PR",
+                "pop_county": _clean_value(record.get("county")),
+                "description": description,
+                "source_file": "data/normalized/fema_pa_projects_v2.parquet",
+                "source_dataset": "fema_pa",
+                "award_category": "disaster_assistance",
+            }
+        )
+    return pd.DataFrame(rows, columns=LEGACY_MASTER_COLUMNS)
+
+
+def _write_legacy_master(df: pd.DataFrame, root: Path) -> Path:
+    master_path = root / "data" / "staging" / "processed" / "pr_fema_pa_master.csv"
+    master_path.parent.mkdir(parents=True, exist_ok=True)
+    _legacy_master_from_v2(df).to_csv(master_path, index=False)
+    return master_path
+
+
 # ---------------------------------------------------------------------------
 # Public run() interface
 # ---------------------------------------------------------------------------
@@ -291,7 +366,13 @@ def run(root=None, force=False) -> dict:
         logger.info("Output already exists and --force not set: %s", out_path)
         try:
             existing = pq_read(out_path)
-            return {"rows": len(existing), "path": str(out_path), "status": "CACHED"}
+            master_path = _write_legacy_master(existing, effective_root)
+            return {
+                "rows": len(existing),
+                "path": str(out_path),
+                "canonical_path": str(master_path),
+                "status": "CACHED",
+            }
         except Exception as exc:
             logger.warning("Could not read cached file (%s); re-downloading.", exc)
 
@@ -320,7 +401,13 @@ def run(root=None, force=False) -> dict:
         )
         empty_df = pd.DataFrame(columns=PA_V2_COLUMNS)
         pq_write(empty_df, out_path)
-        return {"rows": 0, "path": str(out_path), "status": "EMPTY"}
+        master_path = _write_legacy_master(empty_df, effective_root)
+        return {
+            "rows": 0,
+            "path": str(out_path),
+            "canonical_path": str(master_path),
+            "status": "EMPTY",
+        }
 
     # Build applicant enrichment lookup: applicantId → applicant_name
     applicant_lookup: dict[str, str] = {}
@@ -342,8 +429,15 @@ def run(root=None, force=False) -> dict:
 
     df = pd.DataFrame(mapped, columns=PA_V2_COLUMNS)
     pq_write(df, out_path)
+    master_path = _write_legacy_master(df, effective_root)
     logger.info("Saved %d PA v2 records to %s", len(df), out_path)
-    return {"rows": len(df), "path": str(out_path), "status": "OK"}
+    logger.info("Projected %d rows to canonical FEMA master %s", len(df), master_path)
+    return {
+        "rows": len(df),
+        "path": str(out_path),
+        "canonical_path": str(master_path),
+        "status": "OK",
+    }
 
 
 # ---------------------------------------------------------------------------
