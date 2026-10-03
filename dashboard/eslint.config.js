@@ -8,6 +8,7 @@ export default [
   {
     files: [
       "src/components/**/*.{js,mjs,cjs,jsx}",
+      "src/zip-design/**/*.{js,jsx}",
       "src/pages/**/*.{js,mjs,cjs,jsx}",
       "src/Layout.jsx",
     ],

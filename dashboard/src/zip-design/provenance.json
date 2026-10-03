@@ -1,0 +1,33 @@
+{
+  "archive": "MoneySweep PR.zip",
+  "archive_sha256": "4592f71f5ba3912f6995f15bdaa78ac1c003712742908a28cb3a5f3d4f13ab37",
+  "repository_remote": "https://github.com/jotaele44/moneysweep-pr.git",
+  "base_head": "fca326476f9811553888c4cc02a1fff20cc303fe",
+  "mode": "frontend adaptation; existing data and auth retained",
+  "source_members": [
+    {
+      "path": "pages/_index.module.css",
+      "size": 13885,
+      "sha256": "96538c144b26db612bf262f6453e5a33cf06a14d071b1e271d5f254f667b8343"
+    },
+    {
+      "path": "global.css",
+      "size": 3819,
+      "sha256": "930ab22a8c569c75756067ac2606183b2243b5cbc5a9a35f9b30d8c3d694051a"
+    }
+  ],
+  "excluded": "Archive server, credentials, database and certification claims are not imported as authority.",
+  "integration_scope": "Archive-derived design tokens, app navigation/chrome and responsive dashboard layout; existing production pages, data clients and auth remain the functional implementation.",
+  "not_claimed": [
+    "Full ZIP application replacement",
+    "Floot server/database migration",
+    "Pixel-identical archive reproduction",
+    "New backend feature parity",
+    "Federation-wide certification"
+  ],
+  "adapted_components": [
+    "src/zip-design/tokens.css",
+    "src/zip-design/Overview.module.css",
+    "src/zip-design/adaptation.css"
+  ]
+}
