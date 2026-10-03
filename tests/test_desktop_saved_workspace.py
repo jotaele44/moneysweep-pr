@@ -108,3 +108,28 @@ def test_launch_script_does_not_shadow_stdlib_secrets(tmp_path):
     output = result.stdout + result.stderr
     assert "token_hex" not in output, output[-2000:]
     assert '"selftest"' in result.stdout, output[-2000:]
+
+
+def test_script_dir_filter_is_skipped_in_a_frozen_app(tmp_path):
+    """In a PyInstaller app this directory is the extraction root; removing it from
+    sys.path made ``import prii_desktop`` fail in the frozen self-test (CI build)."""
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    script = Path(launch.__file__).resolve()
+    probe = (
+        "import runpy, sys\n"
+        "sys.frozen = True\n"
+        f"here = {str(script.parent)!r}\n"
+        "sys.path.insert(0, here)\n"
+        "try:\n"
+        f"    runpy.run_path({str(script)!r}, run_name='probe')\n"
+        "except BaseException:\n"
+        "    pass\n"
+        "print('KEPT' if here in sys.path else 'REMOVED')\n"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", probe], capture_output=True, text=True, timeout=120
+    )
+    assert "KEPT" in result.stdout, result.stdout + result.stderr

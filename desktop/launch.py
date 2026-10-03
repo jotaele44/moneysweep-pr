@@ -12,12 +12,15 @@ import os
 import sys
 from pathlib import Path
 
-# Running ``python desktop/launch.py`` puts this directory first on sys.path, where
-# ``desktop/secrets.py`` shadows the standard-library ``secrets`` module and breaks
-# the backend import (starlette: "cannot import name 'token_hex'"). Drop it; the
-# ``desktop`` package is imported from the repository root instead.
 _HERE = Path(__file__).resolve().parent
-sys.path[:] = [entry for entry in sys.path if Path(entry or ".").resolve() != _HERE]
+if not getattr(sys, "frozen", False):
+    # Running ``python desktop/launch.py`` puts this directory first on sys.path,
+    # where ``desktop/secrets.py`` shadows the standard-library ``secrets`` module
+    # and breaks the backend import (starlette: "cannot import name 'token_hex'").
+    # Drop it; the ``desktop`` package is imported from the repository root instead.
+    # Skipped in a frozen app, where this directory is PyInstaller's extraction
+    # root and must stay importable.
+    sys.path[:] = [entry for entry in sys.path if Path(entry or ".").resolve() != _HERE]
 sys.path.insert(0, str(_HERE.parent))
 
 from prii_desktop import DesktopConfig, launch  # noqa: E402
