@@ -39,9 +39,9 @@ build_candidate() {
   for f in "$@"; do
     test -f "$PAYLOAD/$f"
     if [ "$f" = "chunk-004.b64" ]; then
-      tr -d '\\r\\n' < "$RUNNER_TEMP/chunk-004.exact.b64" >> "$b64"
+      tr -d '\r\n' < "$RUNNER_TEMP/chunk-004.exact.b64" >> "$b64"
     else
-      tr -d '\\r\\n' < "$PAYLOAD/$f" >> "$b64"
+      tr -d '\r\n' < "$PAYLOAD/$f" >> "$b64"
     fi
   done
   base64 -d "$b64" > "$ARCHIVE" 2>/dev/null || return 1
