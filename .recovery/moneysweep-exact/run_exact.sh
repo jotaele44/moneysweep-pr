@@ -5,10 +5,49 @@ ARCHIVE="$RUNNER_TEMP/moneysweep_exact.tar.gz"
 rm -rf "$ROOT"
 mkdir -p "$ROOT"
 
-test -f .recovery/moneysweep-exact/moneysweep_exact.tar.gz
-cp .recovery/moneysweep-exact/moneysweep_exact.tar.gz "$ARCHIVE"
-echo "64ea47f4d62852f07e4e47a930003119f9d14821002bcc2bb7f5049135340d4d  $ARCHIVE" | sha256sum -c -
+PAYLOAD=".recovery/moneysweep-exact/payload"
+EXPECTED_ARCHIVE_SHA="64ea47f4d62852f07e4e47a930003119f9d14821002bcc2bb7f5049135340d4d"
+
+build_candidate() {
+  local label="$1"; shift
+  local b64="$RUNNER_TEMP/$label.b64"
+  : > "$b64"
+  for f in "$@"; do
+    test -f "$PAYLOAD/$f"
+    tr -d '\\r\\n' < "$PAYLOAD/$f" >> "$b64"
+  done
+  base64 -d "$b64" > "$ARCHIVE" 2>/dev/null || return 1
+  test "$(sha256sum "$ARCHIVE" | awk '{print $1}')" = "$EXPECTED_ARCHIVE_SHA"
+}
+
+matched=0
+build_candidate split_tail chunk-000.b64 chunk-001.b64 chunk-002.b64 chunk-003.b64 chunk-004.b64 chunk-005.b64 chunk-006.b64 chunk-007.b64 chunk-008a.b64 chunk-008b.b64 chunk-008c.b64 chunk-009a.b64 chunk-009b.b64 chunk-009c.b64 && matched=1 || true
+if [ "$matched" = 0 ]; then
+  build_candidate full_008_split_009 chunk-000.b64 chunk-001.b64 chunk-002.b64 chunk-003.b64 chunk-004.b64 chunk-005.b64 chunk-006.b64 chunk-007.b64 chunk-008.b64 chunk-009a.b64 chunk-009b.b64 chunk-009c.b64 && matched=1 || true
+fi
+test "$matched" = 1
+echo "$EXPECTED_ARCHIVE_SHA  $ARCHIVE" | sha256sum -c -
 tar -xzf "$ARCHIVE" -C "$ROOT"
+
+python - <<'PY'
+from pathlib import Path
+import hashlib, os
+root=Path(os.environ["RUNNER_TEMP"])/"recovered"
+rows=[]
+for p in sorted(root.rglob("*")):
+    if p.is_file():
+        data=p.read_bytes()
+        rows.append(f"{hashlib.sha256(data).hexdigest()}  {len(data)}  {p.relative_to(root).as_posix()}")
+manifest=("\\n".join(rows)+"\\n").encode()
+if len(rows)!=223:
+    raise SystemExit(f"expected 223 files, got {len(rows)}")
+got=hashlib.sha256(manifest).hexdigest()
+expected="759cac6dc72b29f622e925dff1844c5ce0ec1fddad1832101a868fbbd6d70490"
+if got!=expected:
+    raise SystemExit(f"member manifest hash mismatch: {got}")
+Path(".recovery/moneysweep-exact/member_manifest.txt").write_bytes(manifest)
+print("RECOVERY_ARCHIVE_AND_MANIFEST_RECONSTRUCTION=PASS")
+PY
 
 python - <<'PY'
 from pathlib import Path
