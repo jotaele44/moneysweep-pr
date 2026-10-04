@@ -6,6 +6,12 @@ canonical staging CSV until the complete live page denominator closes. The
 checkpoint binds page order, declared page count, row count, last-page
 signature, and the SHA-256 of the work file.
 
+The authoritative completeness ordering is `-numerocontrol`, which is stable
+across the 2026-10-04 144-page verification. The default `-creado` ordering is
+retained only for recency observations because concurrent page requests can
+shift rows between pages and produced duplicate control numbers during the same
+crawl.
+
 A partial or interrupted run therefore cannot masquerade as a complete source.
 The completion receipt measures the exact current row denominator but does not
 itself authorize a leaderboard; identity/amount residue is adjudicated
@@ -28,7 +34,8 @@ from scripts.config import PROJECT_ROOT, setup_logging
 
 STATE_DIR_REL = "data/staging/checkpoints/asg_emergency_purchases"
 OUT_PATH_REL = asg.OUT_PATH_REL
-SCHEMA_VERSION = "asg_emergency_resumable_checkpoint_v1"
+SCHEMA_VERSION = "asg_emergency_resumable_checkpoint_v2"
+ORDER_BY = "-numerocontrol"
 
 
 def sha256(path: Path) -> str:
@@ -63,7 +70,7 @@ def initial_checkpoint() -> dict:
     return {
         "schemaVersion": SCHEMA_VERSION,
         "sourceUrl": asg.BASE_URL,
-        "ordering": "-creado",
+        "ordering": ORDER_BY,
         "nextPage": 1,
         "declaredPages": None,
         "writtenRawRows": 0,
@@ -86,7 +93,7 @@ def load_checkpoint(checkpoint_path: Path, work_path: Path, reset: bool) -> dict
         raise RuntimeError("Unsupported ASG checkpoint schema")
     if checkpoint.get("sourceUrl") != asg.BASE_URL:
         raise RuntimeError("Checkpoint source URL does not match configured ASG endpoint")
-    if checkpoint.get("ordering") != "-creado":
+    if checkpoint.get("ordering") != ORDER_BY:
         raise RuntimeError("Checkpoint ordering contract changed")
     if checkpoint.get("writtenRawRows", 0):
         if not work_path.exists():
@@ -170,7 +177,7 @@ def promote(root: Path, work_path: Path, checkpoint: dict, receipt_path: Path) -
         "schemaVersion": "asg_emergency_completion_receipt_v1",
         "status": "COMPLETE",
         "sourceUrl": asg.BASE_URL,
-        "ordering": "-creado",
+        "ordering": ORDER_BY,
         "declaredPages": declared_pages,
         "rawRows": len(rows),
         "authoritativeUniverseTotal": len(frame),
@@ -211,7 +218,7 @@ def run(root: Path, max_pages: int | None, reset: bool) -> dict:
                 atomic_json(checkpoint_path, checkpoint)
                 return receipt
 
-            html = asg._fetch_page(session, next_page, logger)
+            html = asg._fetch_page(session, next_page, logger, order_by=ORDER_BY)
             if html is None:
                 checkpoint.update(status="BLOCKED_PAGE_FETCH", updatedAt=utc_now())
                 atomic_json(checkpoint_path, checkpoint)
@@ -255,8 +262,8 @@ def run(root: Path, max_pages: int | None, reset: bool) -> dict:
 
             base_rank = int(checkpoint["writtenRawRows"])
             normalized = [
-                asg._normalize_row(record, creado_rank=base_rank + offset)
-                for offset, record in enumerate(records, start=1)
+                asg._normalize_row(record, creado_rank=None)
+                for record in records
             ]
             append_rows(work_path, normalized)
 
