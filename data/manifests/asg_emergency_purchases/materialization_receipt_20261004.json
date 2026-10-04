@@ -60,6 +60,12 @@
       "storagePath": "/_cdn/static/asg-emergency/20261004-stable/asg_emergency_materialization_receipt_numerocontrol.json",
       "bytes": 4333,
       "sha256": "d320edf144160e49e484d3d4b2b60f01611a7d1ca4c7fa8151e3e2d8df75c5e2"
+    },
+    "sourceNativeSubset": {
+      "path": "data/manifests/asg_emergency_purchases/source_native_rows_v1.csv",
+      "rows": 21,
+      "bytes": 4823,
+      "sha256": "b1b59b7ed2f6ecc15ee00066d7a3e983017d879691c8f785f9da7315f5e229f6"
     }
   },
   "supersededNonAuthoritativeManifestation": {
