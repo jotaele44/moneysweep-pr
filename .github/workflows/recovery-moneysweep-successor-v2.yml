@@ -1,0 +1,81 @@
+name: MoneySweep recovery successor v2 — source coverage and ranking
+on:
+  push:
+    branches: [recovery/floot-baseline-2026-09-30]
+    paths:
+      - ".recovery/moneysweep-successor-v2/**"
+      - ".github/workflows/recovery-moneysweep-successor-v2.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  successor-v2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "22"
+      - name: Reproduce exact 45-test baseline
+        shell: bash
+        run: bash .recovery/moneysweep-exact/run_exact.sh
+      - name: Apply successor overlays v1-v2
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/recovered"
+          echo "8fcfe41d3552f2f28026bb7b01c1b3500941c961c6db9254d32b46de3ed45c84  .recovery/moneysweep-successor-v1/overlay.tar.gz" | sha256sum -c -
+          echo "97ee65c78ab6cf301a87636dedc7a73f00cedb477d3d28589ccfcbd621f16210  .recovery/moneysweep-successor-v2/overlay.tar.gz" | sha256sum -c -
+          tar -xzf .recovery/moneysweep-successor-v1/overlay.tar.gz -C "$ROOT"
+          tar -xzf .recovery/moneysweep-successor-v2/overlay.tar.gz -C "$ROOT"
+          cd "$ROOT"
+          echo "5812a37b4aca1e56d9466a83472afce187f901b97c6f150b71b220b13ed10204  helpers/moneySweepSourceCoverage.tsx" | sha256sum -c -
+          echo "a578de40e44cd17c694a57691f9e2160691f148f1780c78e72c91ed34365ad5d  helpers/moneySweepSourceCoverage.spec.tsx" | sha256sum -c -
+          sha256sum helpers/moneySweepIdentity.tsx helpers/moneySweepIdentity.spec.tsx helpers/moneySweepSourceCoverage.tsx helpers/moneySweepSourceCoverage.spec.tsx > successor-v2-overlay-hashes.txt
+      - name: Execute successor v2 regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/recovered"
+          mapfile -t exec_specs < <(awk -F '\t' '$2=="EXECUTABLE"{print $1}' recovery-spec-classification.tsv)
+          exec_specs+=(helpers/moneySweepIdentity.spec.tsx helpers/moneySweepSourceCoverage.spec.tsx)
+          set +e
+          npx vitest run --config recovery.vitest.config.mts --reporter=verbose "${exec_specs[@]}" 2>&1 | tee successor-v2-vitest.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "$status" > successor-v2-test-exit.txt
+          test "$status" = "0"
+          grep -q "moneySweepSourceCoverage.spec.tsx" successor-v2-vitest.log
+          grep -q "18 passed" successor-v2-vitest.log
+          grep -q "75 passed" successor-v2-vitest.log
+      - name: Freeze successor v2 receipt
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP/recovered"
+          {
+            echo "schema=moneysweep-recovery-successor/v2"
+            echo "baseline_tests=45"
+            echo "successor_v1_tests=60"
+            echo "successor_v2_tests=75"
+            echo "source_identity=IMMUTABLE_HASH_REQUIRED"
+            echo "no_data=EVIDENCE_REQUIRED"
+            echo "coverage=PUBLIC_AND_RESOLVABLE_SEPARATE"
+            echo "ranking=STABLE_ID_ONLY"
+            echo "null_value=EXCLUDE_NOT_ZERO"
+            echo "state=PASS"
+          } > successor-v2-receipt.txt
+          sha256sum package-lock.json successor-v2-overlay-hashes.txt successor-v2-vitest.log successor-v2-receipt.txt > successor-v2-evidence-hashes.txt
+      - name: Upload successor v2 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: moneysweep-recovery-successor-v2
+          if-no-files-found: error
+          path: |
+            ${{ runner.temp }}/recovered/package-lock.json
+            ${{ runner.temp }}/recovered/successor-v2-overlay-hashes.txt
+            ${{ runner.temp }}/recovered/successor-v2-vitest.log
+            ${{ runner.temp }}/recovered/successor-v2-test-exit.txt
+            ${{ runner.temp }}/recovered/successor-v2-receipt.txt
+            ${{ runner.temp }}/recovered/successor-v2-evidence-hashes.txt
