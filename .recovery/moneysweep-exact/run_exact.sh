@@ -21,9 +21,9 @@ build_candidate() {
 }
 
 matched=0
-build_candidate split_tail chunk-000.b64 chunk-001.b64 chunk-002.b64 chunk-003.b64 chunk-004.b64 chunk-005.b64 chunk-006.b64 chunk-007.b64 chunk-008a.b64 chunk-008b.b64 chunk-008c.b64 chunk-009a.b64 chunk-009b.b64 chunk-009c.b64 && matched=1 || true
+build_candidate split_tail chunk-000.b64 chunk-001.b64 chunk-002.b64 chunk-003.b64 chunk-004.b64 chunk-005.b64 chunk-006.b64 chunk-007.b64 chunk-008a.b64 chunk-008b.b64 chunk-008c.b64 chunk-009a.b64 chunk-009b.b64 chunk-009c.b64 chunk-010.b64 && matched=1 || true
 if [ "$matched" = 0 ]; then
-  build_candidate full_008_split_009 chunk-000.b64 chunk-001.b64 chunk-002.b64 chunk-003.b64 chunk-004.b64 chunk-005.b64 chunk-006.b64 chunk-007.b64 chunk-008.b64 chunk-009a.b64 chunk-009b.b64 chunk-009c.b64 && matched=1 || true
+  build_candidate full_008_split_009 chunk-000.b64 chunk-001.b64 chunk-002.b64 chunk-003.b64 chunk-004.b64 chunk-005.b64 chunk-006.b64 chunk-007.b64 chunk-008.b64 chunk-009a.b64 chunk-009b.b64 chunk-009c.b64 chunk-010.b64 && matched=1 || true
 fi
 test "$matched" = 1
 echo "$EXPECTED_ARCHIVE_SHA  $ARCHIVE" | sha256sum -c -
