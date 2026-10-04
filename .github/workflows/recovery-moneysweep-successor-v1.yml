@@ -37,8 +37,10 @@ jobs:
         run: |
           set -euo pipefail
           cd "$RUNNER_TEMP/recovered"
+          mapfile -t exec_specs < <(awk -F '\\t' '$2=="EXECUTABLE"{print $1}' recovery-spec-classification.tsv)
+          exec_specs+=(helpers/moneySweepIdentity.spec.tsx)
           set +e
-          npx vitest run --config recovery.vitest.config.mts --reporter=verbose 2>&1 | tee successor-v1-vitest.log
+          npx vitest run --config recovery.vitest.config.mts --reporter=verbose "${exec_specs[@]}" 2>&1 | tee successor-v1-vitest.log
           status=${PIPESTATUS[0]}
           set -e
           echo "$status" > successor-v1-test-exit.txt
