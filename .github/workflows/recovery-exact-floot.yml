@@ -1,6 +1,9 @@
 name: Exact Floot recovery — MoneySweep
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - recovery/floot-baseline-2026-09-30
 permissions:
   contents: read
 jobs:
