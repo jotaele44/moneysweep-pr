@@ -1,0 +1,8 @@
+overlay_sha256  97ee65c78ab6cf301a87636dedc7a73f00cedb477d3d28589ccfcbd621f16210
+helpers/moneySweepSourceCoverage.tsx  5812a37b4aca1e56d9466a83472afce187f901b97c6f150b71b220b13ed10204
+helpers/moneySweepSourceCoverage.spec.tsx  a578de40e44cd17c694a57691f9e2160691f148f1780c78e72c91ed34365ad5d
+predecessor_successor_v1_tests  60
+successor_added_specs  1
+successor_added_tests  15
+expected_successor_executable_specs  18
+expected_successor_tests  75
