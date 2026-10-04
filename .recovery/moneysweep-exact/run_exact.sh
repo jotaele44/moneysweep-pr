@@ -66,7 +66,7 @@ for p in sorted(root.rglob("*")):
     if p.is_file():
         data=p.read_bytes()
         rows.append(f"{hashlib.sha256(data).hexdigest()}  {len(data)}  {p.relative_to(root).as_posix()}")
-manifest=("\\n".join(rows)+"\\n").encode()
+manifest=bytes([10]).join(row.encode() for row in rows)+bytes([10])
 if len(rows)!=223:
     raise SystemExit(f"expected 223 files, got {len(rows)}")
 got=hashlib.sha256(manifest).hexdigest()
