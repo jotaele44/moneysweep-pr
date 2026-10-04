@@ -354,6 +354,14 @@ def test_asg_source_native_adapter_conserves_full_source_and_bounded_subset():
     assert result["methodology"]["excludedNameOnlyRows"] == 1408
     assert result["methodology"]["excludedMissingVendorRows"] == 2
     assert "does not claim all ASG emergency purchases" in result["methodology"]["scopeBoundary"]
+    assert result["sourceVersion"]["type"] == "LIVE_PORTAL_MATERIALIZATION"
+    assert result["sourceVersion"]["sourceId"] == "asg_emergency_purchases"
+    assert result["sourceVersion"]["authoritativeUniverseTotal"] == 1431
+    assert result["sourceVersion"]["sourceSha256"] == "6c615470f7a658789fd6d46c569c6e603f068732781723fb13087982726db969"
+    assert result["sourceVersion"]["rawBundleSha256"] == "10eadc6520408f5b4ef1679788b8e760e9a01a68d92c67bcee636d8e0b35c6d2"
+    assert len(result["sourceManifestations"]) == 4
+    assert result["sourceManifestations"][2]["manifestationType"] == "FLOOT_OBJECT_STORAGE"
+    assert result["sourceManifestations"][3]["manifestationType"] == "FLOOT_OBJECT_STORAGE_RAW_PAGE_BUNDLE"
 
 
 @pytest.mark.unit
