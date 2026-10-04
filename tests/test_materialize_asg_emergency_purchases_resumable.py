@@ -39,7 +39,14 @@ def _record(control: str, vendor: str = "Vendor One (12345)", amount: str = "$10
 def _wire(monkeypatch, pages: dict[int, list[dict]], declared_pages: int | dict[int, int]):
     monkeypatch.setattr(mat, "setup_logging", lambda *_: _Logger())
     monkeypatch.setattr(mat.asg, "build_session", lambda *a, **k: _FakeSession())
-    monkeypatch.setattr(mat.asg, "_fetch_page", lambda _session, page, _logger: f"page:{page}" if page in pages else None)
+    observed_orders = []
+    monkeypatch.setattr(
+        mat.asg,
+        "_fetch_page",
+        lambda _session, page, _logger, order_by="-creado": (
+            observed_orders.append(order_by) or (f"page:{page}" if page in pages else None)
+        ),
+    )
     if isinstance(declared_pages, dict):
         monkeypatch.setattr(
             mat.asg,
@@ -58,11 +65,12 @@ def _wire(monkeypatch, pages: dict[int, list[dict]], declared_pages: int | dict[
         "apply_post_ingest",
         lambda frame, source_id, root: frame,
     )
+    return observed_orders
 
 
 @pytest.mark.unit
 def test_partial_run_never_promotes_output(monkeypatch, tmp_path: Path):
-    _wire(
+    orders = _wire(
         monkeypatch,
         {
             1: [_record("26-ASG-AAA-0001")],
@@ -71,6 +79,7 @@ def test_partial_run_never_promotes_output(monkeypatch, tmp_path: Path):
         2,
     )
     result = mat.run(tmp_path, max_pages=1, reset=True)
+    assert orders == ["-numerocontrol"]
     assert result["status"] == "PROVISIONAL_MAX_PAGES"
     assert result["nextPage"] == 2
     assert result["pagesCompleted"] == 1
@@ -87,7 +96,7 @@ def test_resume_closes_denominator_and_promotes_once_complete(monkeypatch, tmp_p
         1: [_record("26-ASG-AAA-0001", "Vendor One (12345)", "$10.00")],
         2: [_record("26-ASG-AAA-0002", "Vendor Two (22222)", "$20.00")],
     }
-    _wire(monkeypatch, pages, 2)
+    orders = _wire(monkeypatch, pages, 2)
     first = mat.run(tmp_path, max_pages=1, reset=True)
     assert first["status"] == "PROVISIONAL_MAX_PAGES"
 
@@ -103,6 +112,8 @@ def test_resume_closes_denominator_and_promotes_once_complete(monkeypatch, tmp_p
     frame = pd.read_csv(output, dtype=str)
     assert list(frame["control_number"]) == ["26-ASG-AAA-0001", "26-ASG-AAA-0002"]
     assert list(frame["vendor_registration_id"]) == ["12345", "22222"]
+    assert frame["creado_rank"].fillna("").eq("").all()
+    assert orders == ["-numerocontrol", "-numerocontrol"]
 
 
 @pytest.mark.unit
