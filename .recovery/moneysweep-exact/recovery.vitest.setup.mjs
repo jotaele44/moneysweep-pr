@@ -2,6 +2,10 @@ import { vi, expect } from "vitest";
 expect.extend({
   toBeTrue(received){return {pass:received===true,message:()=>`expected ${received} to be true`}},
   toBeFalse(received){return {pass:received===false,message:()=>`expected ${received} to be false`}},
+  toHaveSize(received,expected){
+    const actual = received?.size ?? received?.length;
+    return {pass:actual===expected,message:()=>`expected size ${expected}, received ${actual}`};
+  },
 });
 function compat(spy){
   const api=spy;
