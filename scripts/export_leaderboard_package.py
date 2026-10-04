@@ -19,6 +19,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from scripts.leaderboard_release_provenance import (
+    CERTIFICATION_RUNTIME_CORE_FILES,
     certification_runtime_manifest,
     certification_runtime_sha256,
     validate_certification_runtime,
@@ -29,6 +30,10 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RECEIPT = ROOT / "data" / "manifests" / "leaderboards" / "MONEYSWEEP_LEADERBOARD_CERTIFICATION.json"
 DEFAULT_RELEASE = ROOT / "data" / "manifests" / "leaderboards" / "leaderboard_release_contract_v1.json"
 DEFAULT_SCOPE = ROOT / "data" / "manifests" / "leaderboards" / "leaderboard_certification_scope_v1.json"
+DEFAULT_EXPORT_SCHEMA = ROOT / "schemas" / "leaderboard_export_package.schema.json"
+DEFAULT_DEBT_RUNTIME_EXTRA = (
+    ROOT / "data" / "manifests" / "leaderboards" / "debt_history_source_refs_v1.json"
+)
 CERTIFIED_SNAPSHOT_DIR = ROOT / "data" / "manifests" / "leaderboards" / "certified_snapshots"
 DEFAULT_OUT = ROOT / "data" / "exports" / "leaderboards" / "leaderboard_package.json"
 
@@ -99,6 +104,14 @@ def main() -> int:
     parser.add_argument("--receipt", type=Path, default=DEFAULT_RECEIPT)
     parser.add_argument("--release-manifest", type=Path, default=DEFAULT_RELEASE)
     parser.add_argument("--scope", type=Path, default=DEFAULT_SCOPE)
+    parser.add_argument("--export-schema", type=Path, default=DEFAULT_EXPORT_SCHEMA)
+    parser.add_argument(
+        "--certification-runtime-extra",
+        action="append",
+        type=Path,
+        default=None,
+        help="Additional immutable certification-runtime file; repeat as needed.",
+    )
     parser.add_argument("--output", type=Path, default=DEFAULT_OUT)
     args = parser.parse_args()
 
@@ -120,8 +133,19 @@ def main() -> int:
         raise SystemExit("BLOCKED: certification scope has no scopeId")
     included = _scope_categories(scope)
 
-    cert_runtime = certification_runtime_manifest()
-    cert_runtime_errors = validate_certification_runtime(cert_runtime)
+    runtime_extra = args.certification_runtime_extra
+    if runtime_extra is None:
+        runtime_extra = [DEFAULT_DEBT_RUNTIME_EXTRA]
+    runtime_files = [
+        *CERTIFICATION_RUNTIME_CORE_FILES,
+        args.export_schema.resolve(),
+        args.scope.resolve(),
+        *(item.resolve() for item in runtime_extra),
+    ]
+    if len({str(path) for path in runtime_files}) != len(runtime_files):
+        raise SystemExit("BLOCKED: duplicate certification-runtime file")
+    cert_runtime = certification_runtime_manifest(runtime_files)
+    cert_runtime_errors = validate_certification_runtime(cert_runtime, runtime_files)
     if cert_runtime_errors:
         raise SystemExit(f"BLOCKED: certification runtime is not frozen: {cert_runtime_errors}")
     cert_runtime_hash = certification_runtime_sha256(cert_runtime)
