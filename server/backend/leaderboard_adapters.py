@@ -387,6 +387,36 @@ def asg_emergency_source_native(
     if len(frame) != source_native_total:
         receipt_valid = False
 
+    subset_integrity_rows = 0
+    subset_integrity_entities: set[str] = set()
+    subset_integrity_amount = 0.0
+    if receipt_valid:
+        for _, row in frame.iterrows():
+            registration_id = str(row.get("vendor_registration_id") or "").strip()
+            scheme = str(row.get("vendor_identity_scheme") or "").strip()
+            state = str(row.get("vendor_identity_state") or "").strip()
+            amount = _money(row.get("obligation_amount"))
+            if (
+                not registration_id
+                or scheme != "asg_licitador_id"
+                or state != "SOURCE_NATIVE_ASG_LICITADOR_ID"
+                or amount is None
+            ):
+                receipt_valid = False
+                break
+            subset_integrity_rows += 1
+            subset_integrity_entities.add(registration_id)
+            subset_integrity_amount += amount
+
+        if (
+            subset_integrity_rows != int(financial.get("boundedEligibleRows") or -1)
+            or len(subset_integrity_entities)
+            != int(financial.get("boundedEligibleEntityCount") or -1)
+            or round(subset_integrity_amount, 2)
+            != round(float(financial.get("boundedEligibleAmountTotal") or -1), 2)
+        ):
+            receipt_valid = False
+
     if not receipt_valid:
         return _finalize(
             category_id="asg_emergency_purchase_source_native",
@@ -467,27 +497,6 @@ def asg_emergency_source_native(
         agg["controlNumbers"] = sorted(agg["controlNumbers"])
         agg["metricValue"] = round(float(agg["metricValue"]), 2)
         rows.append(agg)
-
-    total_retained = sum(int(row["recordCount"]) for row in rows)
-    total_amount = round(sum(float(row["metricValue"]) for row in rows), 2)
-    if (
-        total_retained != int(financial.get("boundedEligibleRows") or -1)
-        or len(rows) != int(financial.get("boundedEligibleEntityCount") or -1)
-        or total_amount != round(float(financial.get("boundedEligibleAmountTotal") or -1), 2)
-    ):
-        return _finalize(
-            category_id="asg_emergency_purchase_source_native",
-            label="ASG emergency purchase cost — source-native Licitador subset",
-            metric_type="ASG_EMERGENCY_PURCHASE_COST",
-            rows=[],
-            accounting=_accounting(universe_total),
-            limit=limit,
-            filters={"startYear": start_year, "endYear": end_year, "currency": "USD"},
-            manifests=[subset_manifest, receipt_manifest],
-            methodology={"identity": "source-native asg_licitador_id required"},
-            certification_state="OPEN_SUBSET_ARITHMETIC_MISMATCH",
-            reason="ASG source-native aggregation does not reproduce the frozen receipt.",
-        )
 
     return _finalize(
         category_id="asg_emergency_purchase_source_native",
