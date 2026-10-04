@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
+    environmentMatchGlobs: [["helpers/moneySweepResponsiveQa.spec.tsx", "node"]],
     setupFiles: ["./recovery.vitest.setup.mjs"],
     restoreMocks: false,
     clearMocks: true,
