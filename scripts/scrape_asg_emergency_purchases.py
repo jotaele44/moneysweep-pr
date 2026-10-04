@@ -155,8 +155,8 @@ class _RateLimited(Exception):
     """Internal marker so a 429 is retried by with_retry (mirrors base_downloader)."""
 
 
-def _page_url(page: int) -> str:
-    return f"{BASE_URL}?page={page}&order_by=-creado"
+def _page_url(page: int, order_by: str = "-creado") -> str:
+    return f"{BASE_URL}?page={page}&order_by={order_by}"
 
 
 def declared_page_count(html: str) -> int | None:
@@ -286,11 +286,16 @@ def parse_records(html: str) -> list[dict]:
     return [r for r in records if _clean(r.get("Número de Control ASG"))]
 
 
-def _fetch_page(session: requests.Session, page: int, logger) -> str | None:
+def _fetch_page(
+    session: requests.Session,
+    page: int,
+    logger,
+    order_by: str = "-creado",
+) -> str | None:
     """GET one listing page. None on a terminal 4xx or retry exhaustion."""
 
     def _once() -> str | None:
-        resp = session.get(_page_url(page), timeout=HTTP.timeout)
+        resp = session.get(_page_url(page, order_by=order_by), timeout=HTTP.timeout)
         if resp.status_code == 429:
             logger.warning(f"  Rate limited on page {page} — sleeping {HTTP.rate_limit_sleep}s")
             time.sleep(HTTP.rate_limit_sleep)
