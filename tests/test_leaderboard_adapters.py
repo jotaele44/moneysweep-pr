@@ -314,3 +314,83 @@ def test_contract_award_without_materialized_amount_is_open_not_provisional(monk
     assert result["accounting"]["excludedRecords"] == 1
     assert result["accounting"]["arithmeticClosed"] is True
     assert "lack award_amount" in result["reason"]
+
+@pytest.mark.unit
+def test_asg_source_native_adapter_conserves_full_source_and_bounded_subset():
+    result = adapters.asg_emergency_source_native(
+        _core(),
+        limit=25,
+        start_year=None,
+        end_year=None,
+        municipality=None,
+        entity_type=None,
+        currency="USD",
+    )
+
+    assert result["certificationState"] == "PROVISIONAL_BOUNDED_SOURCE_NATIVE"
+    assert result["metricType"] == "ASG_EMERGENCY_PURCHASE_COST"
+    assert result["candidateCount"] == 10
+    assert result["accounting"]["inputRecords"] == 1431
+    assert result["accounting"]["outOfScopeRecords"] == 1410
+    assert result["accounting"]["retainedRecords"] == 21
+    assert result["accounting"]["excludedRecords"] == 0
+    assert result["accounting"]["unresolvedRecords"] == 0
+    assert result["accounting"]["arithmeticClosed"] is True
+    assert round(sum(row["metricValue"] for row in result["rows"]), 2) == 4423664.82
+
+    first = result["rows"][0]
+    assert first["rank"] == 1
+    assert first["entityId"] == "asg_licitador_id:23388"
+    assert first["canonicalEntityId"] is None
+    assert first["entityResolutionState"] == "SOURCE_NATIVE_ASG_LICITADOR_ID"
+    assert first["metricValue"] == 1744085.0
+    assert first["recordCount"] == 1
+    assert all(
+        row["entityResolutionState"] == "SOURCE_NATIVE_ASG_LICITADOR_ID"
+        for row in result["rows"]
+    )
+    assert result["methodology"]["fullSourceUniverse"] == 1431
+    assert result["methodology"]["eligibleSourceNativeRows"] == 21
+    assert result["methodology"]["excludedNameOnlyRows"] == 1408
+    assert result["methodology"]["excludedMissingVendorRows"] == 2
+    assert "does not claim all ASG emergency purchases" in result["methodology"]["scopeBoundary"]
+
+
+@pytest.mark.unit
+def test_asg_source_native_filter_preserves_full_source_accounting():
+    result = adapters.asg_emergency_source_native(
+        _core(),
+        limit=25,
+        start_year=2027,
+        end_year=None,
+        municipality=None,
+        entity_type=None,
+        currency="USD",
+    )
+
+    assert result["candidateCount"] == 0
+    assert result["rows"] == []
+    assert result["accounting"]["inputRecords"] == 1431
+    assert result["accounting"]["outOfScopeRecords"] == 1431
+    assert result["accounting"]["retainedRecords"] == 0
+    assert result["accounting"]["unresolvedRecords"] == 0
+    assert result["accounting"]["excludedRecords"] == 0
+    assert result["accounting"]["arithmeticClosed"] is True
+
+
+@pytest.mark.unit
+def test_asg_source_native_non_usd_fails_closed_without_cross_currency_inference():
+    result = adapters.asg_emergency_source_native(
+        _core(),
+        limit=25,
+        start_year=None,
+        end_year=None,
+        municipality=None,
+        entity_type=None,
+        currency="EUR",
+    )
+
+    assert result["certificationState"] == "OPEN_NO_MATCHING_CURRENCY"
+    assert result["candidateCount"] == 0
+    assert result["rows"] == []
+
