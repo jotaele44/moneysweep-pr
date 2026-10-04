@@ -89,7 +89,7 @@ contracts:
     period: {start: "2007-10-01", end: null, period_type: rolling}
     authoritative_universe_method: api_metadata
     authoritative_universe_ref: https://api.usaspending.gov/api/v2/search/spending_by_award_count/
-    authoritative_universe_total: null
+    authoritative_universe_total: 1431
     uniqueness_key: [contract_id, award_date, vendor_name, obligated_amount]
     minimum_coverage_pct: 95.0
     pagination_required: true
@@ -336,15 +336,16 @@ contracts:
     minimum_coverage_pct: 95.0
     pagination_required: true
     notes: >-
-      Historical measurement 2026-07-27: 141 declared pages at 10 rows, last
-      page 6 -> 1,406 emergency purchase orders. Live verification on
-      2026-10-01 shows 144 declared pages, so 1,406 is no longer accepted as the
-      current denominator. authoritative_universe_total stays null until a full
-      144-page refresh measures the last-page tail and freezes the new exact
-      total. This makes coverage unverifiable rather than allowing a stale
-      denominator to pass. Grain is `contract` rather than `transaction`
-      deliberately — ASG renders no date, so these rows carry no
-      transaction_date and must not be promoted to transaction grain.
+      Current measurement 2026-10-04: authoritative completeness walk uses
+      order_by=-numerocontrol and closes 144 pages as 143 pages x 10 rows plus
+      a 1-row page 144 -> 1,431 unique control numbers, with zero duplicate or
+      missing control numbers. The default order_by=-creado is explicitly
+      non-authoritative for completeness: the same 144-page concurrent walk
+      produced 112 duplicate occurrences because rows can shift between pages.
+      Historical 2026-07-27 measurement was 1,406 rows over 141 pages. Grain is
+      `contract` rather than `transaction` deliberately — ASG renders no
+      date, so these rows carry no transaction_date and must not be promoted to
+      transaction grain.
 
   - source_id: asg_suppliers
     contract_version: 1
