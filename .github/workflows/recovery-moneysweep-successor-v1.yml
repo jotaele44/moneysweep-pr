@@ -1,0 +1,76 @@
+name: MoneySweep recovery successor v1 — identity lifecycle
+on:
+  push:
+    branches: [recovery/floot-baseline-2026-09-30]
+    paths:
+      - ".recovery/moneysweep-successor-v1/**"
+      - ".github/workflows/recovery-moneysweep-successor-v1.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  successor-v1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "22"
+      - name: Reproduce exact 45-test baseline
+        shell: bash
+        run: bash .recovery/moneysweep-exact/run_exact.sh
+      - name: Apply successor v1 overlay
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/recovered"
+          OVERLAY=".recovery/moneysweep-successor-v1/overlay.tar.gz"
+          echo "8fcfe41d3552f2f28026bb7b01c1b3500941c961c6db9254d32b46de3ed45c84  $OVERLAY" | sha256sum -c -
+          tar -xzf "$OVERLAY" -C "$ROOT"
+          cd "$ROOT"
+          echo "f10d1fbff1bcae994ab2febcbb9f8fbbfef88d1611f95bf9eb90215beff0bf71  helpers/moneySweepIdentity.tsx" | sha256sum -c -
+          echo "d39960329353820a50de63a0675c1217bc95ea93b68eaab026a1e584083d01a8  helpers/moneySweepIdentity.spec.tsx" | sha256sum -c -
+          sha256sum helpers/moneySweepIdentity.tsx helpers/moneySweepIdentity.spec.tsx > successor-v1-overlay-hashes.txt
+      - name: Execute successor v1 regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/recovered"
+          set +e
+          npx vitest run --config recovery.vitest.config.mts --reporter=verbose 2>&1 | tee successor-v1-vitest.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "$status" > successor-v1-test-exit.txt
+          test "$status" = "0"
+          grep -q "moneySweepIdentity.spec.tsx" successor-v1-vitest.log
+          grep -q "17 passed" successor-v1-vitest.log
+          grep -q "60 passed" successor-v1-vitest.log
+      - name: Freeze successor v1 receipt
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP/recovered"
+          {
+            echo "schema=moneysweep-recovery-successor/v1"
+            echo "baseline_tests=45"
+            echo "successor_tests=60"
+            echo "identity=AUTHORITATIVE_IDENTIFIER_ONLY"
+            echo "normalized_name=DISCOVERY_ONLY"
+            echo "temporal_government_identity=NO_ZERO_ROW_FABRICATION"
+            echo "claim_states=ASSERTED,CONTRADICTED,SUPERSEDED,UNRESOLVED"
+            echo "state=PASS"
+          } > successor-v1-receipt.txt
+          sha256sum package-lock.json successor-v1-overlay-hashes.txt successor-v1-vitest.log successor-v1-receipt.txt > successor-v1-evidence-hashes.txt
+      - name: Upload successor v1 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: moneysweep-recovery-successor-v1
+          if-no-files-found: error
+          path: |
+            ${{ runner.temp }}/recovered/package-lock.json
+            ${{ runner.temp }}/recovered/successor-v1-overlay-hashes.txt
+            ${{ runner.temp }}/recovered/successor-v1-vitest.log
+            ${{ runner.temp }}/recovered/successor-v1-test-exit.txt
+            ${{ runner.temp }}/recovered/successor-v1-receipt.txt
+            ${{ runner.temp }}/recovered/successor-v1-evidence-hashes.txt
