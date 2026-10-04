@@ -498,7 +498,25 @@ def asg_emergency_source_native(
         agg["metricValue"] = round(float(agg["metricValue"]), 2)
         rows.append(agg)
 
-    return _finalize(
+    canonical_source = frozen.get("canonicalStagingCsv") or {}
+    raw_bundle = frozen.get("rawPageBundle") or {}
+    source_manifestations = [
+        subset_manifest,
+        receipt_manifest,
+        {
+            "path": str(canonical_source.get("storagePath") or ""),
+            "bytes": int(canonical_source.get("bytes") or 0),
+            "sha256": str(canonical_source.get("sha256") or ""),
+            "manifestationType": "FLOOT_OBJECT_STORAGE",
+        },
+        {
+            "path": str(raw_bundle.get("storagePath") or ""),
+            "bytes": int(raw_bundle.get("bytes") or 0),
+            "sha256": str(raw_bundle.get("sha256") or ""),
+            "manifestationType": "FLOOT_OBJECT_STORAGE_RAW_PAGE_BUNDLE",
+        },
+    ]
+    result = _finalize(
         category_id="asg_emergency_purchase_source_native",
         label="ASG emergency purchase cost — source-native Licitador subset",
         metric_type="ASG_EMERGENCY_PURCHASE_COST",
@@ -506,7 +524,7 @@ def asg_emergency_source_native(
         accounting=accounting,
         limit=limit,
         filters={"startYear": start_year, "endYear": end_year, "currency": "USD"},
-        manifests=[subset_manifest, receipt_manifest],
+        manifests=source_manifestations,
         methodology={
             "identity": "explicit source-native ASG Licitador ID only; names are display-only",
             "aggregation": "ASG emergency-purchase Costo summed by asg_licitador_id",
@@ -524,6 +542,17 @@ def asg_emergency_source_native(
             "to rows carrying a source-native ASG Licitador ID."
         ),
     )
+    result["sourceVersion"] = {
+        "type": "LIVE_PORTAL_MATERIALIZATION",
+        "sourceId": "asg_emergency_purchases",
+        "capturedAt": str(receipt.get("observedAt") or ""),
+        "ordering": "-numerocontrol",
+        "authoritativeUniverseTotal": universe_total,
+        "sourceSha256": str(canonical_source.get("sha256") or ""),
+        "rawBundleSha256": str(raw_bundle.get("sha256") or ""),
+        "economicActivityInference": False,
+    }
+    return result
 
 
 def debt_issuance(
