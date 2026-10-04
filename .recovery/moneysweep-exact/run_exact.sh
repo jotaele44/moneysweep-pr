@@ -7,6 +7,30 @@ mkdir -p "$ROOT"
 
 PAYLOAD=".recovery/moneysweep-exact/payload"
 EXPECTED_ARCHIVE_SHA="64ea47f4d62852f07e4e47a930003119f9d14821002bcc2bb7f5049135340d4d"
+EXPECTED_CHUNK004_SHA="ee6e2502bfbd53dfbef846f5d7d7e93ec6966131a1037c79e41bfa528f2f0a60"
+
+python - <<'PY'
+from pathlib import Path
+import hashlib, os
+p=Path(".recovery/moneysweep-exact/payload/chunk-004.b64")
+s="".join(p.read_text().split())
+expected="ee6e2502bfbd53dfbef846f5d7d7e93ec6966131a1037c79e41bfa528f2f0a60"
+if hashlib.sha256(s.encode()).hexdigest()!=expected:
+    if len(s)!=15001:
+        raise SystemExit(f"chunk-004 unexpected length {len(s)}")
+    matches=[]
+    for i in range(len(s)):
+        c=s[:i]+s[i+1:]
+        if hashlib.sha256(c.encode()).hexdigest()==expected:
+            matches.append((i,c))
+    if len(matches)!=1:
+        raise SystemExit(f"chunk-004 repair candidates={len(matches)}")
+    i,s=matches[0]
+    print(f"CHUNK004_SELF_REPAIR=PASS removed_index={i}")
+else:
+    print("CHUNK004_ALREADY_EXACT=PASS")
+Path(os.environ["RUNNER_TEMP"]).joinpath("chunk-004.exact.b64").write_text(s)
+PY
 
 build_candidate() {
   local label="$1"; shift
@@ -14,7 +38,11 @@ build_candidate() {
   : > "$b64"
   for f in "$@"; do
     test -f "$PAYLOAD/$f"
-    tr -d '\\r\\n' < "$PAYLOAD/$f" >> "$b64"
+    if [ "$f" = "chunk-004.b64" ]; then
+      tr -d '\\r\\n' < "$RUNNER_TEMP/chunk-004.exact.b64" >> "$b64"
+    else
+      tr -d '\\r\\n' < "$PAYLOAD/$f" >> "$b64"
+    fi
   done
   base64 -d "$b64" > "$ARCHIVE" 2>/dev/null || return 1
   test "$(sha256sum "$ARCHIVE" | awk '{print $1}')" = "$EXPECTED_ARCHIVE_SHA"
