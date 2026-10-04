@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "moneysweep.leaderboard-certification/v1",
+  "scope": "ASG emergency source-native leaderboard producer plane",
+  "scopeId": "moneysweep.leaderboard.asg-emergency-source-native-v1",
+  "branch": "feature/asg-emergency-source-native-identity",
+  "state": "PASS",
+  "certificationIssued": true,
+  "zeroMaterialUnresolvedResidue": true,
+  "promotionAuthorized": false,
+  "certificationPhraseAuthorized": false,
+  "rankingContractVersion": "moneysweep.leaderboard/v1.1",
+  "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.1",
+  "runtimeProducerCommit": "e963f4258a78c9b30427df7a7e9b4edf83f00692",
+  "sourceSnapshotSha256": "929250f76bdd770f302e8ae6b025105dd28c4c2ad3b164419d05ab317d934e83",
+  "certifiedSnapshotSha256": "9e9e2b96bd7b54ce7154eb3607d2ece8eacf30e92482be9deabab48d5d387cb1",
+  "certifiedSnapshotFileSha256": "4c8f6a23d53e24699db8b31e57f18c445dc329a770910da8ce6b589ff3f5f804",
+  "scopeSha256": "9b22125120a8a0592050f58b766272f3a25bf0e8308e82cf1df452487682710c",
+  "exportSchemaSha256": "2ae063e739e567d88ecde6b39715bb07d58800f6b2eaf455d2d6b723bf73109f",
+  "sourceMaterializationReceiptSha256": "1ebfe24ebb8c5c0daac7ce4c95c40508c1d98722b43d0b62c13853f4ab43ee38",
+  "supersessionLedgerSha256": "f5600709648509f436501dd019f6e96bf6986ed36d479675a4d47d8fbee22681",
+  "sourceUniverse": {
+    "authoritativeUniverseTotal": 1431,
+    "sourceNativeRows": 21,
+    "nameOnlyRows": 1408,
+    "missingVendorRows": 2,
+    "identityArithmeticClosed": true,
+    "wholeSourceLeaderboardReady": false,
+    "boundedSourceNativeLeaderboardReady": true
+  },
+  "executionEvidence": {
+    "focusedPytest": {
+      "state": "PASS",
+      "testsExecuted": 48,
+      "testsPassed": 48,
+      "producerCodeCommit": "e963f4258a78c9b30427df7a7e9b4edf83f00692"
+    },
+    "fullRepositoryPytest": {
+      "state": "NOT_EXECUTED",
+      "assertsPass": false
+    },
+    "githubActions": {
+      "state": "WAIVED_BY_USER",
+      "assertsPass": false
+    }
+  },
+  "closedDecisions": [
+    {
+      "id": "FULL_SOURCE_MATERIALIZATION",
+      "state": "PASS",
+      "reason": "Stable -numerocontrol walk closed 144 pages at 1,431/1,431 unique control numbers with zero duplicate or missing control IDs."
+    },
+    {
+      "id": "BOUNDED_IDENTITY_SCOPE",
+      "state": "PASS",
+      "reason": "Exactly 21 rows carry explicit source-native ASG Licitador IDs; 1,408 name-only and 2 missing-vendor rows remain explicitly outside the certified identity scope."
+    },
+    {
+      "id": "FINANCIAL_MEASURE",
+      "state": "PASS",
+      "reason": "All 1,431 source rows have parseable ASG Costo values; all 21 source-native rows retain valid USD amounts."
+    },
+    {
+      "id": "PRODUCER_RUNTIME",
+      "state": "PASS",
+      "reason": "Exact producer code commit e963f4258a78c9b30427df7a7e9b4edf83f00692 passed the 48-test focused release chain."
+    },
+    {
+      "id": "WHOLE_SOURCE_CLAIM_BOUNDARY",
+      "state": "PASS",
+      "reason": "Certification explicitly prohibits claims of all ASG vendors, all ASG emergency purchases by identified vendor, or total ASG emergency spending by identified vendor."
+    }
+  ],
+  "blockingResidue": [
+    {
+      "id": "THEHUB_EXACT_REPLAY",
+      "state": "OPEN",
+      "reason": "Producer certification passed; federation promotion awaits exact TheHub package replay."
+    }
+  ],
+  "nonBlockingWaivers": [
+    {
+      "id": "GITHUB_ACTIONS_EXECUTION",
+      "state": "WAIVED_BY_USER",
+      "assertsPass": false
+    }
+  ],
+  "note": "Bounded source-native producer scope certified; whole-source identity closure is not claimed and federation promotion remains closed pending exact TheHub replay."
+}
