@@ -25,7 +25,7 @@ largely bypass it, which is exactly why they are worth holding separately.
 
 Two things about the endpoint shape the scraper:
 
-* Paging is a plain query param (``?page=N&order_by=numerocontrol``), but requesting a
+* Paging is a plain query param (``?page=N&order_by=-numerocontrol``), but requesting a
   page past the end **clamps to the last page** instead of returning an empty
   one — a request past the end serves the last page again. A
   walk-until-empty loop would never terminate, so the page count is read from
@@ -155,7 +155,7 @@ class _RateLimited(Exception):
     """Internal marker so a 429 is retried by with_retry (mirrors base_downloader)."""
 
 
-def _page_url(page: int, order_by: str = "-creado") -> str:
+def _page_url(page: int, order_by: str = "-numerocontrol") -> str:
     return f"{BASE_URL}?page={page}&order_by={order_by}"
 
 
@@ -290,7 +290,7 @@ def _fetch_page(
     session: requests.Session,
     page: int,
     logger,
-    order_by: str = "-creado",
+    order_by: str = "-numerocontrol",
 ) -> str | None:
     """GET one listing page. None on a terminal 4xx or retry exhaustion."""
 
@@ -402,9 +402,11 @@ def _run(root=None, force: bool = False, max_pages: int | None = None) -> dict:
             "errors": ["No records fetched from asg.pr.gov/comprasemergencias"],
         }
 
-    # Records arrive in -creado order, so enumeration position IS the rank.
+    # Completeness crawls use stable control-number ordering. They therefore
+    # must not manufacture a creation-time rank; creado_rank is reserved for
+    # separately declared recency observations using -creado.
     frame = pd.DataFrame(
-        [_normalize_row(r, creado_rank=i) for i, r in enumerate(raw_records, start=1)],
+        [_normalize_row(r, creado_rank=None) for r in raw_records],
         columns=EMERGENCY_PURCHASE_COLUMNS,
     )
     frame = frame.drop_duplicates(subset=["control_number"])
