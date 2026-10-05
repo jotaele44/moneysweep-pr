@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "moneysweep.leaderboard-expansion-audit/v3",
+  "auditedProducerCommit": "a91b78e2a69d06f042c48098a22435e4173ef19f",
+  "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.1",
+  "rankingContractVersion": "moneysweep.leaderboard/v1.1",
+  "declaredCategoryCount": 22,
+  "adapterBackedCategoryCount": 8,
+  "alreadyCertifiedCategoryCount": 1,
+  "additionalCertifiableCategoryCount": 1,
+  "productionV2ScopeExpansionAuthorized": true,
+  "newlyAdmittedCategory": {
+    "categoryId": "asg_emergency_purchase_source_native",
+    "adapter": "asg_emergency_source_native",
+    "state": "SOURCE_READY_CURRENT_RANKING_ONLY",
+    "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+    "identityNamespace": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+    "currencyUniverse": [
+      "USD"
+    ],
+    "fullSourceUniverse": 1431,
+    "retainedRecords": 21,
+    "outOfScopeRecords": 1410,
+    "unresolvedRecords": 0,
+    "excludedRecords": 0,
+    "candidateEntityCount": 10,
+    "boundedEligibleAmountTotal": 4423664.82,
+    "sourceNativeIdentityCount": 10,
+    "supplierRegistryAllIdsMatched": true,
+    "wholeSourceLeaderboardReady": false,
+    "currentRankingCertificationEligible": true,
+    "historyCertificationEligible": false,
+    "reason": "Full source pagination and row arithmetic close under stable control-number ordering. The ranking is explicitly limited to the 21 rows carrying source-native ASG Licitador IDs; 1,408 name-only and 2 missing-vendor rows remain visible as out-of-scope exclusions."
+  },
+  "productionV1Preservation": {
+    "state": "UNCHANGED",
+    "scopeId": "moneysweep.leaderboard.production-v1",
+    "note": "Debt production-v1 package/receipt/release/promotion artifacts are not modified by the v2 scope."
+  },
+  "blockersRemainingForASG": [
+    "SECOND_COMPARABLE_FROZEN_SNAPSHOT_FOR_MOVERS_HISTORY",
+    "THEHUB_EXACT_HASH_REPLAY_FOR_PRODUCTION_V2"
+  ],
+  "decision": {
+    "state": "AUTHORIZE_BOUNDED_CURRENT_RANKING_SCOPE",
+    "productionV2ScopeId": "moneysweep.leaderboard.production-v2",
+    "topMoversCertified": false,
+    "historicalMovementCertified": false
+  }
+}
