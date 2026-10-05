@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "moneysweep.leaderboard-certification/v2",
+  "state": "PASS",
+  "certificationIssued": true,
+  "zeroMaterialUnresolvedResidue": true,
+  "scopeId": "moneysweep.leaderboard.production-v2",
+  "packageAssemblerCommit": "5f833d18fd47ad0692aadcded2f5f2f7d8f14df1",
+  "categorySnapshotSha256": {
+    "debt_issuance": "a6750570ecb3d829cd1b581db272fd5405f40b4b5a83b24a9c2131ba88b7540b",
+    "asg_emergency_purchase_source_native": "8d64257fb8056e35fe307600435647665e8562ff6bee1a978bdfacc44a9834a8"
+  },
+  "promotionAuthorized": false,
+  "certificationPhraseAuthorized": false,
+  "historyCertification": {
+    "debt_issuance": true,
+    "asg_emergency_purchase_source_native": false
+  },
+  "githubActions": {
+    "state": "WAIVED_BY_USER",
+    "assertsPass": false,
+    "blocking": false
+  },
+  "repositoryPytest": {
+    "state": "NOT_EXECUTED",
+    "assertsPass": false
+  },
+  "blockingResidue": [
+    {
+      "id": "THEHUB_V2_EXACT_REPLAY",
+      "state": "OPEN",
+      "reason": "Producer current-ranking certification is closed; federation promotion awaits exact TheHub v2 package replay."
+    }
+  ],
+  "productionV1Preservation": {
+    "state": "UNCHANGED",
+    "scopeId": "moneysweep.leaderboard.production-v1"
+  }
+}
