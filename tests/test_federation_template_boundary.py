@@ -1,4 +1,4 @@
-"""Keep the desktop fix inside this repository's own surface.
+"""Enforce the boundary around shared federation-rendered files.
 
 The macOS launchers are rendered federation templates shared with five sibling
 repositories (``thehub-pr/federation-templates/targets.yaml``), and
@@ -13,12 +13,10 @@ rather than merely remembered.
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 
-import pytest
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
+DRIFT_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "template-drift.yml"
 
 # Rendered from thehub-pr/federation-templates at the ref pinned by
 # .github/workflows/template-drift.yml. Byte-identical after placeholder
@@ -34,33 +32,19 @@ TEMPLATE_RENDERED_PATHS = (
 )
 
 
-def _merge_base() -> str | None:
-    for ref in ("origin/main", "main"):
-        probe = subprocess.run(
-            ["git", "merge-base", "HEAD", ref], cwd=REPO_ROOT, capture_output=True, text=True
-        )
-        if probe.returncode == 0:
-            return probe.stdout.strip()
-    return None
+def test_template_drift_workflow_is_the_byte_authority() -> None:
+    text = DRIFT_WORKFLOW.read_text(encoding="utf-8")
+    assert "PRII_TEMPLATE_REF:" in text
+    assert "tools/render_federation_templates.py" in text
+    assert "--repo moneysweep-pr" in text
+    assert "--check" in text
 
 
-@pytest.mark.parametrize("relative", TEMPLATE_RENDERED_PATHS)
-def test_template_rendered_file_is_unchanged(relative: str) -> None:
-    base = _merge_base()
-    if base is None:
-        pytest.skip("no main branch available to diff against")
-    diff = subprocess.run(
-        ["git", "diff", "--name-only", base, "--", relative],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-    )
-    assert diff.returncode == 0
-    assert diff.stdout.strip() == "", (
-        f"{relative} is rendered from a shared federation template. Change it in "
-        "thehub-pr/federation-templates/ and re-render, so every affected repository "
-        "advances together; editing it here fails template-drift.yml."
-    )
+def test_declared_template_rendered_paths_exist() -> None:
+    missing = [
+        relative for relative in TEMPLATE_RENDERED_PATHS if not (REPO_ROOT / relative).exists()
+    ]
+    assert missing == []
 
 
 def test_the_setup_module_is_not_template_rendered() -> None:
