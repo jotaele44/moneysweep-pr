@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "moneysweep.leaderboard-certification-scope/v1",
+  "scopeId": "moneysweep.leaderboard.production-v2",
+  "rankingContractVersion": "moneysweep.leaderboard/v1.1",
+  "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.1",
+  "includedCategories": [
+    {
+      "categoryId": "debt_issuance",
+      "metricType": "DEBT_ISSUED_PAR",
+      "identityNamespace": "CANONICAL_V1_ENTITY_ID",
+      "currencyUniverse": [
+        "USD"
+      ],
+      "requiredAccounting": {
+        "arithmeticClosed": true,
+        "unresolvedRecords": 0,
+        "excludedRecords": 0
+      },
+      "historyRequired": true
+    },
+    {
+      "categoryId": "asg_emergency_purchase_source_native",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "identityNamespace": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "currencyUniverse": [
+        "USD"
+      ],
+      "requiredAccounting": {
+        "arithmeticClosed": true,
+        "unresolvedRecords": 0,
+        "excludedRecords": 0
+      },
+      "historyRequired": false,
+      "currentRankingOnly": true,
+      "scopeBoundary": "Only rows carrying explicit source-native ASG Licitador IDs are ranked. Name-only and missing-vendor rows remain explicit out-of-scope records and this category does not claim all ASG emergency purchases or total ASG emergency spending."
+    }
+  ],
+  "excludedCategoryIds": [
+    "contract_award",
+    "federal_obligation",
+    "federal_grant",
+    "disaster_assistance",
+    "federal_assistance",
+    "campaign_contribution_received",
+    "campaign_donor_contribution",
+    "government_payment",
+    "procurement",
+    "infrastructure_project",
+    "loan",
+    "guarantee",
+    "subsidy_incentive",
+    "tax_incentive",
+    "lobbying_expenditure",
+    "property_assessment",
+    "legal_judgment",
+    "bankruptcy_claim",
+    "municipal_expenditure",
+    "public_revenue"
+  ],
+  "arithmetic": {
+    "ontologyCategoryCount": 22,
+    "includedCategoryCount": 2,
+    "excludedCategoryCount": 20,
+    "unclassifiedCategoryCount": 0,
+    "closed": true
+  },
+  "ciExecutionPolicy": {
+    "state": "WAIVED_BY_USER",
+    "blocking": false,
+    "assertsPass": false
+  },
+  "rules": {
+    "onlyIncludedCategoriesMayBeCertified": true,
+    "diagnosticCategoriesRemainVisible": true,
+    "absenceIsNotZero": true,
+    "noNameOnlyIdentity": true,
+    "noCrossMeasureAggregation": true,
+    "topMoversRequireFrozenHistory": true,
+    "sourceChangeSuppressesEconomicInference": true,
+    "thehubMustNotRecomputeRankings": true,
+    "spiderwebRemainsGeometryAuthority": true,
+    "boundedIdentityScopesMustExposeWholeSourceExclusionArithmetic": true
+  }
+}
