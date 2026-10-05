@@ -1,0 +1,314 @@
+{
+  "schemaVersion": "moneysweep.leaderboard-snapshot/v1.1",
+  "snapshotId": "asg_emergency_purchase_source_native:20261005T134917Z",
+  "capturedAt": "2026-10-05T13:49:17Z",
+  "categoryId": "asg_emergency_purchase_source_native",
+  "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+  "rankingVersion": "moneysweep.leaderboard/v1.1",
+  "filters": {
+    "startYear": null,
+    "endYear": null,
+    "currency": "USD"
+  },
+  "currencies": [
+    "USD"
+  ],
+  "candidateCount": 10,
+  "accounting": {
+    "inputRecords": 1431,
+    "outOfScopeRecords": 1410,
+    "retainedRecords": 21,
+    "excludedRecords": 0,
+    "unresolvedRecords": 0,
+    "inScopeRecords": 21,
+    "arithmeticClosed": true
+  },
+  "rows": [
+    {
+      "entityId": "asg_licitador_id:23388",
+      "canonicalEntityId": null,
+      "entityDisplayName": "Sonnell Truck Center LLC",
+      "entityType": "asg_supplier",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 1744085,
+      "currency": "USD",
+      "recordCount": 1,
+      "sourceDisplayNames": [
+        "Sonnell Truck Center LLC"
+      ],
+      "controlNumbers": [
+        "26-ASG-AAA-0028"
+      ],
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "rank": 1
+    },
+    {
+      "entityId": "asg_licitador_id:56227",
+      "canonicalEntityId": null,
+      "entityDisplayName": "Duenas Leasing LLC",
+      "entityType": "asg_supplier",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 1474425,
+      "currency": "USD",
+      "recordCount": 2,
+      "sourceDisplayNames": [
+        "Duenas Leasing LLC"
+      ],
+      "controlNumbers": [
+        "26-ASG-AAA-0008",
+        "26-ASG-AAA-0016"
+      ],
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "rank": 2
+    },
+    {
+      "entityId": "asg_licitador_id:10329",
+      "canonicalEntityId": null,
+      "entityDisplayName": "La Casa del Camionero",
+      "entityType": "asg_supplier",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 297908.8,
+      "currency": "USD",
+      "recordCount": 4,
+      "sourceDisplayNames": [
+        "La Casa del Camionero",
+        "La Casa del Camionero, Inc."
+      ],
+      "controlNumbers": [
+        "26-ASG-AAA-0007",
+        "26-ASG-AAA-0014",
+        "26-ASG-AAA-0024",
+        "26-ASG-AAA-0025"
+      ],
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "rank": 3
+    },
+    {
+      "entityId": "asg_licitador_id:28546",
+      "canonicalEntityId": null,
+      "entityDisplayName": "A1 Generator Services Incorporated",
+      "entityType": "asg_supplier",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 293629.35,
+      "currency": "USD",
+      "recordCount": 7,
+      "sourceDisplayNames": [
+        "A1 Generator Services Incorporated"
+      ],
+      "controlNumbers": [
+        "26-ASG-AAA-0001",
+        "26-ASG-AAA-0002",
+        "26-ASG-AAA-0003",
+        "26-ASG-AAA-0004",
+        "26-ASG-AAA-0005",
+        "26-ASG-AAA-0009",
+        "26-ASG-AAA-0010"
+      ],
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "rank": 4
+    },
+    {
+      "entityId": "asg_licitador_id:1174",
+      "canonicalEntityId": null,
+      "entityDisplayName": "Autos Vega Inc.",
+      "entityType": "asg_supplier",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 278050,
+      "currency": "USD",
+      "recordCount": 1,
+      "sourceDisplayNames": [
+        "Autos Vega Inc."
+      ],
+      "controlNumbers": [
+        "26-ASG-AAA-0011"
+      ],
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "rank": 5
+    },
+    {
+      "entityId": "asg_licitador_id:303",
+      "canonicalEntityId": null,
+      "entityDisplayName": "Teselta LLC",
+      "entityType": "asg_supplier",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 187180,
+      "currency": "USD",
+      "recordCount": 2,
+      "sourceDisplayNames": [
+        "Teselta LLC"
+      ],
+      "controlNumbers": [
+        "26-ASG-AAA-0017",
+        "26-ASG-AAA-0029"
+      ],
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "rank": 6
+    },
+    {
+      "entityId": "asg_licitador_id:437",
+      "canonicalEntityId": null,
+      "entityDisplayName": "Mendez & Co.",
+      "entityType": "asg_supplier",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 71003.52,
+      "currency": "USD",
+      "recordCount": 1,
+      "sourceDisplayNames": [
+        "Mendez & Co."
+      ],
+      "controlNumbers": [
+        "26-ASG-AAA-0027"
+      ],
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "rank": 7
+    },
+    {
+      "entityId": "asg_licitador_id:4381",
+      "canonicalEntityId": null,
+      "entityDisplayName": "Caribbean Composting Inc.",
+      "entityType": "asg_supplier",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 47200,
+      "currency": "USD",
+      "recordCount": 1,
+      "sourceDisplayNames": [
+        "Caribbean Composting Inc."
+      ],
+      "controlNumbers": [
+        "26-ASG-AAA-0033"
+      ],
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "rank": 8
+    },
+    {
+      "entityId": "asg_licitador_id:13947",
+      "canonicalEntityId": null,
+      "entityDisplayName": "ALL GREEN CLEANING & MAINTENANCE, LLC",
+      "entityType": "asg_supplier",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 20624.4,
+      "currency": "USD",
+      "recordCount": 1,
+      "sourceDisplayNames": [
+        "ALL GREEN CLEANING & MAINTENANCE, LLC"
+      ],
+      "controlNumbers": [
+        "26-ASG-AAA-0031"
+      ],
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "rank": 9
+    },
+    {
+      "entityId": "asg_licitador_id:25833",
+      "canonicalEntityId": null,
+      "entityDisplayName": "Almacen El Ahorro LLC",
+      "entityType": "asg_supplier",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 9558.75,
+      "currency": "USD",
+      "recordCount": 1,
+      "sourceDisplayNames": [
+        "Almacen El Ahorro LLC"
+      ],
+      "controlNumbers": [
+        "26-ASG-AAA-0030"
+      ],
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "rank": 10
+    }
+  ],
+  "sourceManifestations": [
+    {
+      "path": "data/manifests/asg_emergency_purchases/source_native_rows_v1.csv",
+      "bytes": 4823,
+      "sha256": "b1b59b7ed2f6ecc15ee00066d7a3e983017d879691c8f785f9da7315f5e229f6"
+    },
+    {
+      "path": "data/manifests/asg_emergency_purchases/materialization_receipt_20261005.json",
+      "bytes": 3134,
+      "sha256": "34a0fc223aff9b8d21f0ffbd80197b3f02566e934451c578ce04486db765cc01"
+    },
+    {
+      "path": "public/static/asg_emergency_20261005_numerocontrol_bundle.json.gz",
+      "bytes": 2920891,
+      "sha256": "de52749e1d1329f961acbb006182e48d8c4ff22430fd1cbc26121255d987ad40",
+      "manifestationType": "FLOOT_OBJECT_STORAGE_RAW_AND_PARSED_BUNDLE"
+    }
+  ],
+  "runtimeManifest": {
+    "state": "FROZEN",
+    "producerCommit": "a91b78e2a69d06f042c48098a22435e4173ef19f",
+    "python": "3.13.5",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "packages": {
+      "fastapi": "0.128.2",
+      "pandas": "2.2.3",
+      "pydantic": "2.13.4"
+    },
+    "files": [
+      {
+        "path": "config/financial_category_ontology.json",
+        "bytes": 8047,
+        "sha256": "d629c73df3bd4d4bb0e335952398c19999c40886601cbce551d440f8c98728fa"
+      },
+      {
+        "path": "server/backend/leaderboards.py",
+        "bytes": 9145,
+        "sha256": "1fdfe50ad0e127cb26662f96b11a957cfe2357e9edc255436bd2b31e489b9e04"
+      },
+      {
+        "path": "server/backend/leaderboard_adapters.py",
+        "bytes": 39943,
+        "sha256": "162417c93b883faeb0f93213a91257b5d16da6a0b941f19456719261eede97db"
+      },
+      {
+        "path": "server/backend/leaderboard_history.py",
+        "bytes": 10795,
+        "sha256": "7166897277f24359b3d3dfde88772b556669845d1542c8d9a877a7c1ffee1f74"
+      },
+      {
+        "path": "server/backend/leaderboard_investigation.py",
+        "bytes": 5939,
+        "sha256": "d5a68c990488436a9c068e0fb61a1f7c7b5efaf2ea312160a583867b063201c1"
+      },
+      {
+        "path": "server/backend/leaderboard_entities.py",
+        "bytes": 6125,
+        "sha256": "7a3b01c880876116333e4f4e57a29374a128a8f488b64115d04d99a1c77bb6f5"
+      }
+    ]
+  },
+  "methodology": {
+    "identity": "explicit source-native ASG Licitador ID only; names are display-only",
+    "aggregation": "ASG emergency-purchase Costo summed by asg_licitador_id",
+    "fullSourceUniverse": 1431,
+    "eligibleSourceNativeRows": 21,
+    "excludedNameOnlyRows": 1408,
+    "excludedMissingVendorRows": 2,
+    "scopeBoundary": "does not claim all ASG emergency purchases or total ASG emergency spending",
+    "completenessOrdering": "numerocontrol",
+    "currency": "USD"
+  },
+  "certificationState": "PROVISIONAL_BOUNDED_SOURCE_NATIVE",
+  "sourceVersion": {
+    "type": "LIVE_PORTAL_MATERIALIZATION",
+    "sourceId": "asg_emergency_purchases",
+    "capturedAt": "2026-10-05T13:49:17.183Z",
+    "ordering": "numerocontrol",
+    "authoritativeUniverseTotal": 1431,
+    "sourceSha256": "c5e6a34a8b5d29b75f739f2e0b3cefdbb98bcf50eb0010cfad246dadf770d139",
+    "rawBundleSha256": "de52749e1d1329f961acbb006182e48d8c4ff22430fd1cbc26121255d987ad40",
+    "economicActivityInference": false
+  },
+  "snapshotSha256": "c35654d056e8537a4ba09fa6bac32e0936ee194861599453cc88ccf946104fd3"
+}
