@@ -376,6 +376,10 @@ def asg_emergency_source_native(
             identity.get("arithmeticClosed") is True,
             financial.get("invalidAmountRows") == 0,
             financial.get("sourceNativeInvalidAmountRows") == 0,
+            int(identity.get("distinctSourceNativeIds") or 0)
+            == int(financial.get("boundedEligibleEntityCount") or -1),
+            (identity.get("supplierRegistryCrossCheck") or {}).get("allCandidateIdsMatched")
+            is True,
             readiness.get("boundedSourceNativeLeaderboardReady") is True,
             readiness.get("wholeSourceLeaderboardReady") is False,
             str(expected_subset.get("sha256") or "") == subset_manifest["sha256"],
