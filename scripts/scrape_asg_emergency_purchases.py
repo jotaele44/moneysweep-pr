@@ -25,7 +25,7 @@ largely bypass it, which is exactly why they are worth holding separately.
 
 Two things about the endpoint shape the scraper:
 
-* Paging is a plain query param (``?page=N&order_by=-creado``), but requesting a
+* Paging is a plain query param (``?page=N&order_by=numerocontrol``), but requesting a
   page past the end **clamps to the last page** instead of returning an empty
   one — a request past the end serves the last page again. A
   walk-until-empty loop would never terminate, so the page count is read from
