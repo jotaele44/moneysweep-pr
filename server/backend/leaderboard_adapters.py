@@ -349,6 +349,10 @@ def asg_emergency_source_native(
 
     subset_manifest = _manifest(subset_path)
     receipt_manifest = _manifest(receipt_path)
+    # File mtimes are checkout-local metadata, not source identity. Keep ASG
+    # snapshot manifestations byte/hash-stable across environments.
+    subset_manifest.pop("modifiedAt", None)
+    receipt_manifest.pop("modifiedAt", None)
     try:
         receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
