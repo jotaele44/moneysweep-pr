@@ -16,6 +16,7 @@ from scripts.scrape_asg_emergency_purchases import (
     EMERGENCY_PURCHASE_COLUMNS,
     _carry_forward_first_seen,
     _normalize_row,
+    _page_url,
     _run,
     declared_page_count,
     fetch_all_records,
@@ -128,6 +129,11 @@ def test_unknown_emergency_code_still_yields_a_fiscal_year():
 def test_unparseable_control_number_is_blank_not_a_guess():
     assert fiscal_year_and_programme("") == ("", "", "")
     assert fiscal_year_and_programme("not-a-control-number") == ("", "", "")
+
+
+@pytest.mark.unit
+def test_default_page_url_uses_stable_control_number_ordering():
+    assert _page_url(7).endswith("?page=7&order_by=-numerocontrol")
 
 
 @pytest.mark.unit
