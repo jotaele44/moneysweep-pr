@@ -311,7 +311,7 @@ def asg_emergency_source_native(
     they are never name-resolved or silently dropped.
     """
     subset_path = ASG_EVIDENCE / "source_native_rows_v1.csv"
-    receipt_path = ASG_EVIDENCE / "materialization_receipt_20261004.json"
+    receipt_path = ASG_EVIDENCE / "materialization_receipt_20261005.json"
 
     if municipality or entity_type:
         raise HTTPException(
@@ -498,22 +498,36 @@ def asg_emergency_source_native(
         agg["metricValue"] = round(float(agg["metricValue"]), 2)
         rows.append(agg)
 
-    canonical_source = frozen.get("canonicalStagingCsv") or {}
-    raw_bundle = frozen.get("rawPageBundle") or {}
+    canonical_source = frozen.get("canonicalParsedCorpus") or {}
+    raw_bundle = frozen.get("rawAndParsedBundle") or {}
+    if (
+        int(canonical_source.get("rows") or 0) != universe_total
+        or not str(canonical_source.get("sha256") or "")
+        or not str(raw_bundle.get("storagePath") or "")
+        or not str(raw_bundle.get("sha256") or "")
+    ):
+        return _finalize(
+            category_id="asg_emergency_purchase_source_native",
+            label="ASG emergency purchase cost — source-native Licitador subset",
+            metric_type="ASG_EMERGENCY_PURCHASE_COST",
+            rows=[],
+            accounting=_accounting(universe_total),
+            limit=limit,
+            filters={"startYear": start_year, "endYear": end_year, "currency": "USD"},
+            manifests=[subset_manifest, receipt_manifest],
+            methodology={"identity": "source-native asg_licitador_id required"},
+            certification_state="OPEN_INVALID_SOURCE_RECEIPT",
+            reason="ASG October 5 corpus or acquisition-bundle binding is incomplete.",
+        )
+
     source_manifestations = [
         subset_manifest,
         receipt_manifest,
         {
-            "path": str(canonical_source.get("storagePath") or ""),
-            "bytes": int(canonical_source.get("bytes") or 0),
-            "sha256": str(canonical_source.get("sha256") or ""),
-            "manifestationType": "FLOOT_OBJECT_STORAGE",
-        },
-        {
             "path": str(raw_bundle.get("storagePath") or ""),
             "bytes": int(raw_bundle.get("bytes") or 0),
             "sha256": str(raw_bundle.get("sha256") or ""),
-            "manifestationType": "FLOOT_OBJECT_STORAGE_RAW_PAGE_BUNDLE",
+            "manifestationType": "FLOOT_OBJECT_STORAGE_RAW_AND_PARSED_BUNDLE",
         },
     ]
     result = _finalize(
@@ -533,7 +547,7 @@ def asg_emergency_source_native(
             "excludedNameOnlyRows": name_only_total,
             "excludedMissingVendorRows": missing_vendor_total,
             "scopeBoundary": "does not claim all ASG emergency purchases or total ASG emergency spending",
-            "completenessOrdering": "-numerocontrol",
+            "completenessOrdering": "numerocontrol",
             "currency": "USD",
         },
         certification_state="PROVISIONAL_BOUNDED_SOURCE_NATIVE",
@@ -546,7 +560,7 @@ def asg_emergency_source_native(
         "type": "LIVE_PORTAL_MATERIALIZATION",
         "sourceId": "asg_emergency_purchases",
         "capturedAt": str(receipt.get("observedAt") or ""),
-        "ordering": "-numerocontrol",
+        "ordering": "numerocontrol",
         "authoritativeUniverseTotal": universe_total,
         "sourceSha256": str(canonical_source.get("sha256") or ""),
         "rawBundleSha256": str(raw_bundle.get("sha256") or ""),
