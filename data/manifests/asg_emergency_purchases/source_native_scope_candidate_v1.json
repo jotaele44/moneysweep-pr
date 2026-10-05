@@ -15,7 +15,10 @@
     "fullSourceMaterializationRequired": true,
     "wholeSourceControlNumberArithmeticRequired": true,
     "claimsCompleteASGEmergencyUniverse": false,
-    "outOfScopeIdentityRowsAllowedOnlyWhenExplicitlyCounted": true
+    "outOfScopeIdentityRowsAllowedOnlyWhenExplicitlyCounted": true,
+    "stablePaginationOrdering": "numerocontrol",
+    "rejectedPaginationOrdering": "-creado",
+    "rejectedOrderingReason": "Live 2026-10-05 crawl produced 1431 rendered rows but only 1319 unique controls due page instability; numerocontrol produced 1431/1431 unique controls."
   },
   "promotionGates": [
     "FULL_SOURCE_MATERIALIZATION",
