@@ -1,6 +1,7 @@
 import hashlib
 import json
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 import pytest
@@ -232,76 +233,76 @@ def test_sql_migration_is_idempotent_from_clean_state():
 
 
 def test_sql_migration_creates_required_indexes():
-    database = _database()
-    index_rows = database.execute("SELECT name FROM sqlite_master WHERE type='index'")
-    names = {row[0] for row in index_rows}
-    expected = {
-        "idx_case_evidence_case",
-        "idx_case_evidence_evidence",
-        "idx_claims_case",
-        "idx_claim_evidence_claim",
-        "idx_claim_evidence_evidence",
-        "idx_case_entities_case",
-        "idx_case_events_case_occurred",
-        "idx_contradictions_case_status",
-        "idx_leads_case_status",
-        "idx_findings_case_status",
-        "idx_case_audit_events_case_sequence",
-    }
-    assert expected.issubset(names)
+    with closing(_database()) as database:
+        index_rows = database.execute("SELECT name FROM sqlite_master WHERE type='index'")
+        names = {row[0] for row in index_rows}
+        expected = {
+            "idx_case_evidence_case",
+            "idx_case_evidence_evidence",
+            "idx_claims_case",
+            "idx_claim_evidence_claim",
+            "idx_claim_evidence_evidence",
+            "idx_case_entities_case",
+            "idx_case_events_case_occurred",
+            "idx_contradictions_case_status",
+            "idx_leads_case_status",
+            "idx_findings_case_status",
+            "idx_case_audit_events_case_sequence",
+        }
+        assert expected.issubset(names)
 
 
 def test_sql_rejects_invalid_visibility_and_json():
-    database = _database()
-    database.execute(
-        "INSERT INTO cases(case_id,title,case_type,status,scope,visibility) "
-        "VALUES('case_x','X','audit','open','scope','internal')"
-    )
-    with pytest.raises(sqlite3.IntegrityError):
+    with closing(_database()) as database:
         database.execute(
-            "INSERT INTO case_events VALUES"
-            "('case_event_x','case_x','status','2026-01-01','X','[]',NULL,1,'secret')"
+            "INSERT INTO cases(case_id,title,case_type,status,scope,visibility) "
+            "VALUES('case_x','X','audit','open','scope','internal')"
         )
-    with pytest.raises(sqlite3.IntegrityError):
-        database.execute(
-            "INSERT INTO contradictions VALUES"
-            "('contradiction_x','case_x','not-json','temporal','high','open',"
-            "NULL,NULL,'internal')"
-        )
+        with pytest.raises(sqlite3.IntegrityError):
+            database.execute(
+                "INSERT INTO case_events VALUES"
+                "('case_event_x','case_x','status','2026-01-01','X','[]',NULL,1,'secret')"
+            )
+        with pytest.raises(sqlite3.IntegrityError):
+            database.execute(
+                "INSERT INTO contradictions VALUES"
+                "('contradiction_x','case_x','not-json','temporal','high','open',"
+                "NULL,NULL,'internal')"
+            )
 
 
 def test_sql_foreign_keys_are_restrictive():
-    database = _database()
-    database.execute(
-        "INSERT INTO cases(case_id,title,case_type,status,scope,visibility) "
-        "VALUES('case_x','X','audit','open','scope','internal')"
-    )
-    database.execute(
-        "INSERT INTO claims VALUES"
-        "('claim_x','case_x','X','test','pending',0.5,'inferred','internal')"
-    )
-    with pytest.raises(sqlite3.IntegrityError):
-        database.execute("DELETE FROM cases WHERE case_id='case_x'")
+    with closing(_database()) as database:
+        database.execute(
+            "INSERT INTO cases(case_id,title,case_type,status,scope,visibility) "
+            "VALUES('case_x','X','audit','open','scope','internal')"
+        )
+        database.execute(
+            "INSERT INTO claims VALUES"
+            "('claim_x','case_x','X','test','pending',0.5,'inferred','internal')"
+        )
+        with pytest.raises(sqlite3.IntegrityError):
+            database.execute("DELETE FROM cases WHERE case_id='case_x'")
 
 
 def test_sql_migration_blocks_audit_event_mutation():
-    database = _database()
-    database.execute(
-        "INSERT INTO cases(case_id,title,case_type,status,scope,visibility) "
-        "VALUES('case_x','X','audit','open','scope','internal')"
-    )
-    database.execute(
-        "INSERT INTO case_audit_events"
-        "(audit_event_id,case_id,sequence,occurred_at,actor,action,object_type,"
-        "object_id,payload_sha256,previous_event_sha256,visibility) VALUES"
-        "('audit_event_x','case_x',1,'2026-01-01','tester','create',"
-        "'case','case_x',?,NULL,'internal')",
-        ("a" * 64,),
-    )
-    with pytest.raises(sqlite3.IntegrityError):
-        database.execute("UPDATE case_audit_events SET actor='other'")
-    with pytest.raises(sqlite3.IntegrityError):
-        database.execute("DELETE FROM case_audit_events")
+    with closing(_database()) as database:
+        database.execute(
+            "INSERT INTO cases(case_id,title,case_type,status,scope,visibility) "
+            "VALUES('case_x','X','audit','open','scope','internal')"
+        )
+        database.execute(
+            "INSERT INTO case_audit_events"
+            "(audit_event_id,case_id,sequence,occurred_at,actor,action,object_type,"
+            "object_id,payload_sha256,previous_event_sha256,visibility) VALUES"
+            "('audit_event_x','case_x',1,'2026-01-01','tester','create',"
+            "'case','case_x',?,NULL,'internal')",
+            ("a" * 64,),
+        )
+        with pytest.raises(sqlite3.IntegrityError):
+            database.execute("UPDATE case_audit_events SET actor='other'")
+        with pytest.raises(sqlite3.IntegrityError):
+            database.execute("DELETE FROM case_audit_events")
 
 
 def test_fixture_is_read_only_and_not_promoted():
