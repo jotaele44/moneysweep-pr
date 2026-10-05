@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "moneysweep.leaderboard-release/v2",
+  "scopeId": "moneysweep.leaderboard.production-v2",
+  "certification_state": "PASS",
+  "certification_issued": true,
+  "promotion_authorized": false,
+  "package_assembler_commit": "5f833d18fd47ad0692aadcded2f5f2f7d8f14df1",
+  "included_categories": [
+    "debt_issuance",
+    "asg_emergency_purchase_source_native"
+  ],
+  "certified_snapshot_sha256": {
+    "debt_issuance": "a6750570ecb3d829cd1b581db272fd5405f40b4b5a83b24a9c2131ba88b7540b",
+    "asg_emergency_purchase_source_native": "8d64257fb8056e35fe307600435647665e8562ff6bee1a978bdfacc44a9834a8"
+  },
+  "current_ranking_certified": true,
+  "historical_movement_certified": {
+    "debt_issuance": true,
+    "asg_emergency_purchase_source_native": false
+  },
+  "blockers": [
+    {
+      "id": "THEHUB_V2_EXACT_REPLAY",
+      "state": "OPEN"
+    }
+  ],
+  "github_actions": {
+    "state": "WAIVED_BY_USER",
+    "assertsPass": false
+  },
+  "repository_pytest": {
+    "state": "NOT_EXECUTED",
+    "assertsPass": false
+  },
+  "production_v1_preserved": true
+}
