@@ -137,10 +137,26 @@ def promote(root: Path, work_path: Path, checkpoint: dict, receipt_path: Path) -
     controls = [str(row.get("control_number") or "").strip() for row in rows]
     if any(not value for value in controls):
         raise RuntimeError("Refusing promotion: one or more rows lack control_number")
-    if len(set(controls)) != len(controls):
-        raise RuntimeError("Refusing promotion: duplicate control_number observed")
 
-    frame = pd.DataFrame(rows, columns=asg.EMERGENCY_PURCHASE_COLUMNS)
+    canonical_by_control: dict[str, dict] = {}
+    duplicate_manifestations = 0
+    duplicate_groups: set[str] = set()
+    for row in rows:
+        control = str(row.get("control_number") or "").strip()
+        payload = {key: row.get(key) for key in asg.EMERGENCY_PURCHASE_COLUMNS}
+        existing = canonical_by_control.get(control)
+        if existing is None:
+            canonical_by_control[control] = payload
+            continue
+        if existing != payload:
+            raise RuntimeError(
+                f"Refusing promotion: conflicting payloads share control_number {control}"
+            )
+        duplicate_manifestations += 1
+        duplicate_groups.add(control)
+
+    canonical_rows = list(canonical_by_control.values())
+    frame = pd.DataFrame(canonical_rows, columns=asg.EMERGENCY_PURCHASE_COLUMNS)
     output = root / OUT_PATH_REL
     output.parent.mkdir(parents=True, exist_ok=True)
 
@@ -180,8 +196,10 @@ def promote(root: Path, work_path: Path, checkpoint: dict, receipt_path: Path) -
         "ordering": ORDER_BY,
         "declaredPages": declared_pages,
         "rawRows": len(rows),
+        "exactDuplicateManifestations": duplicate_manifestations,
+        "exactDuplicateGroups": len(duplicate_groups),
         "authoritativeUniverseTotal": len(frame),
-        "uniqueControlNumbers": len(set(controls)),
+        "uniqueControlNumbers": len(canonical_by_control),
         "pagesCompleted": int(checkpoint["pagesCompleted"]),
         "workSha256": sha256(work_path),
         "outputPath": OUT_PATH_REL,
