@@ -104,7 +104,7 @@ contracts:
     geography_scope: PR
     period: {start: "2007-10-01", end: null, period_type: rolling}
     authoritative_universe_method: api_metadata
-    authoritative_universe_total: null
+    authoritative_universe_total: 1319
     uniqueness_key: [subaward_number]
     minimum_coverage_pct: 95.0
     pagination_required: true
