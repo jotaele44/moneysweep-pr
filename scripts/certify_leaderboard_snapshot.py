@@ -107,7 +107,11 @@ def certification_errors(snapshot: dict[str, Any], scope: dict[str, Any]) -> lis
                 errors.append("sourceManifestations.hash")
                 break
 
-    if snapshot.get("certificationState") not in {"PROVISIONAL", "PASS"}:
+    if snapshot.get("certificationState") not in {
+        "PROVISIONAL",
+        "PROVISIONAL_BOUNDED_SOURCE_NATIVE",
+        "PASS",
+    }:
         errors.append("certificationState.input")
     return sorted(set(errors))
 
