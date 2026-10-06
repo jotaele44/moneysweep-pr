@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "moneysweep.asg-emergency-execution-block/v1",
+  "observedAt": "2026-10-03T20:29:28Z",
+  "state": "BLOCKED_EXTERNAL_EXECUTION_CAPACITY",
+  "floot": {
+    "projectId": "cba06a5a-dc59-42d1-bf5b-8b7d5148bb1d",
+    "projectName": "MoneySweep PR",
+    "dailyBuildActionLimit": 1000,
+    "state": "DAILY_LIMIT_EXHAUSTED",
+    "resetAt": "2026-10-04T00:00:00Z",
+    "failedCallsCountTowardLimit": false
+  },
+  "fallbacks": {
+    "directContainerNetwork": "DNS_UNAVAILABLE",
+    "directWebTerminalPage": "CACHE_MISS",
+    "hostedMaterializationEndpoint": "LOOPBACK_ONLY_BY_DESIGN",
+    "currentMainMaterialization": "NOT_PRESENT"
+  },
+  "currentOfficialIndex": {
+    "declaredPages": 144,
+    "pageSize": 10,
+    "computedUniverseLowerBound": 1431,
+    "computedUniverseUpperBound": 1440,
+    "exactUniverseTotal": null
+  },
+  "effect": {
+    "fullSourceMaterializationExecuted": false,
+    "exactDenominatorClosed": false,
+    "leaderboardPromotionAuthorized": false
+  }
+}
