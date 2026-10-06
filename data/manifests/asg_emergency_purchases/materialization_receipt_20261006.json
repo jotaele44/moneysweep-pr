@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "moneysweep.asg-emergency-materialization-receipt/v1",
+  "observedAt": "2026-10-06T04:43:07.661Z",
+  "state": "SOURCE_MATERIALIZED",
+  "sourceId": "asg_emergency_purchases",
+  "sourceUrl": "https://www.asg.pr.gov/comprasemergencias",
+  "authoritativeCompletenessOrdering": "numerocontrol",
+  "declaredPages": 144,
+  "pageRowArithmetic": {
+    "fullPages": 143,
+    "rowsPerFullPage": 10,
+    "lastPageRows": 1,
+    "total": 1431
+  },
+  "authoritativeUniverseTotal": 1431,
+  "uniqueControlNumbers": 1431,
+  "duplicateControlNumbers": 0,
+  "missingControlNumbers": 0,
+  "identity": {
+    "sourceNativeRows": 21,
+    "nameOnlyRows": 1408,
+    "missingVendorRows": 2,
+    "arithmeticClosed": true,
+    "arithmetic": "1431 = 21 + 1408 + 2",
+    "identityScheme": "asg_licitador_id",
+    "distinctSourceNativeIds": 10,
+    "supplierRegistryCrossCheck": {
+      "declaredPages": 47,
+      "renderedRows": 4645,
+      "uniqueRegistrationIds": 4644,
+      "allCandidateIdsMatched": true,
+      "matchedIds": ["303","437","1174","4381","10329","13947","23388","25833","28546","56227"]
+    }
+  },
+  "financialValue": {
+    "validAmountRows": 1431,
+    "invalidAmountRows": 0,
+    "sourceNativeInvalidAmountRows": 0,
+    "boundedEligibleRows": 21,
+    "boundedEligibleEntityCount": 10,
+    "boundedEligibleAmountTotal": 4423664.82,
+    "wholeSourceDisplayedAmountTotal": 320435174.04,
+    "measure": "ASG_EMERGENCY_PURCHASE_COST",
+    "currency": "USD"
+  },
+  "frozenArtifacts": {
+    "rawAndParsedBundle": {
+      "storagePath": "public/static/asg_emergency_numerocontrol_20261006T044307.jsonl",
+      "cdnPath": "/_cdn/static/asg_emergency_numerocontrol_20261006T044307.jsonl",
+      "bytes": 577094,
+      "sha256": "7f89f5a74fd51a9fdbae0f0194c85da357b9a9cb1d6835f6aae0be37ee991b07"
+    },
+    "pageManifest": {
+      "storagePath": "public/static/asg_emergency_numerocontrol_pages_20261006T044307.json",
+      "cdnPath": "/_cdn/static/asg_emergency_numerocontrol_pages_20261006T044307.json",
+      "bytes": 66429,
+      "sha256": "b0ae3fb9f2560c7fc53c532c306513df464093c7fac2381608579ce0af51c36c"
+    },
+    "canonicalParsedCorpus": {
+      "rows": 1431,
+      "sha256": "7f89f5a74fd51a9fdbae0f0194c85da357b9a9cb1d6835f6aae0be37ee991b07"
+    },
+    "sourceNativeCandidateSet": {
+      "rows": 21,
+      "sha256": "515817535d6ee22410204c8e363c262cf386927b4f3c51b070380b0f3c02daa0"
+    },
+    "sourceNativeSubset": {
+      "path": "data/manifests/asg_emergency_purchases/source_native_rows_v1.csv",
+      "rows": 21,
+      "bytes": 4823,
+      "sha256": "b1b59b7ed2f6ecc15ee00066d7a3e983017d879691c8f785f9da7315f5e229f6"
+    }
+  },
+  "supersededNonAuthoritativeManifestation": {
+    "ordering": "-creado",
+    "observedAt": "2026-10-06T04:38:59.972Z",
+    "state": "SUPERSEDED_FOR_COMPLETENESS_PAGINATION_DRIFT",
+    "renderedRows": 1431,
+    "uniqueControlNumbers": 1319,
+    "duplicateOccurrences": 112,
+    "duplicateControlGroups": 59,
+    "conflictingDuplicateGroups": 0,
+    "allDuplicateGroupsExactContent": true,
+    "rawArtifact": {
+      "storagePath": "public/static/asg_emergency_raw_20261006T043859.jsonl",
+      "bytes": 582448,
+      "sha256": "e374a3864fe752be3528620d54c1d9b3319430a8a0c2db0461ca8ddbf34463bd"
+    },
+    "deduplicatedArtifact": {
+      "storagePath": "public/static/asg_emergency_canonical_20261006T043859.jsonl",
+      "bytes": 531964,
+      "sha256": "61fcd1d3d13ac4bb8c0194960d07c1d861dc118a5cd662beea184a592aefc8a1"
+    },
+    "pageManifest": {
+      "storagePath": "public/static/asg_emergency_pages_20261006T043859.json",
+      "bytes": 65551,
+      "sha256": "938070d561b37be709de0458f16ca27f4f2b4db7a24be206dd34c69cce319dea"
+    }
+  },
+  "readiness": {
+    "wholeSourceLeaderboardReady": false,
+    "boundedSourceNativeLeaderboardReady": true,
+    "wholeSourceBlockingResidue": [
+      "NAME_ONLY_VENDOR_IDENTITY_RESIDUE",
+      "MISSING_VENDOR_IDENTITY_RESIDUE"
+    ],
+    "boundedSourceNativeBlockingResidue": []
+  },
+  "certificationEffect": "SOURCE_READY_ONLY"
+}
