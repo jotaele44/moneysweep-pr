@@ -509,6 +509,7 @@ def asg_emergency_source_native(
     canonical_source = frozen.get("canonicalParsedCorpus") or {}
     raw_bundle = frozen.get("rawAndParsedBundle") or {}
     page_manifest = frozen.get("pageManifest") or {}
+    supplier_verification = frozen.get("supplierRegistryVerification") or {}
     if (
         int(canonical_source.get("rows") or 0) != universe_total
         or not str(canonical_source.get("sha256") or "")
@@ -516,6 +517,8 @@ def asg_emergency_source_native(
         or not str(raw_bundle.get("sha256") or "")
         or not str(page_manifest.get("storagePath") or "")
         or not str(page_manifest.get("sha256") or "")
+        or not str(supplier_verification.get("storagePath") or "")
+        or not str(supplier_verification.get("sha256") or "")
     ):
         return _finalize(
             category_id="asg_emergency_purchase_source_native",
@@ -545,6 +548,12 @@ def asg_emergency_source_native(
             "bytes": int(page_manifest.get("bytes") or 0),
             "sha256": str(page_manifest.get("sha256") or ""),
             "manifestationType": "FLOOT_OBJECT_STORAGE_PAGE_MANIFEST",
+        },
+        {
+            "path": str(supplier_verification.get("storagePath") or ""),
+            "bytes": int(supplier_verification.get("bytes") or 0),
+            "sha256": str(supplier_verification.get("sha256") or ""),
+            "manifestationType": "FLOOT_OBJECT_STORAGE_SUPPLIER_ID_VERIFICATION",
         },
     ]
     result = _finalize(
