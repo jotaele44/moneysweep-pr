@@ -30,7 +30,8 @@ jobs:
           tar -xzf .recovery/moneysweep-successor-v1/overlay.tar.gz -C "$ROOT"
           tar -xzf .recovery/moneysweep-successor-v2/overlay.tar.gz -C "$ROOT"
           cp .recovery/moneysweep-successor-v3/moneySweepDataLayers.tsx "$ROOT/helpers/moneySweepDataLayers.tsx"
-          cp .recovery/moneysweep-successor-v3/moneySweepDataLayers.spec.tsx "$ROOT/helpers/moneySweepDataLayers.spec.tsx"\n          cp .recovery/moneysweep-successor-v3/moneySweepAccessDbParity.spec.tsx "$ROOT/helpers/moneySweepAccessDbParity.spec.tsx"
+          cp .recovery/moneysweep-successor-v3/moneySweepDataLayers.spec.tsx "$ROOT/helpers/moneySweepDataLayers.spec.tsx"
+          cp .recovery/moneysweep-successor-v3/moneySweepAccessDbParity.spec.tsx "$ROOT/helpers/moneySweepAccessDbParity.spec.tsx"
           cd "$ROOT"
           sha256sum helpers/moneySweepIdentity.tsx helpers/moneySweepIdentity.spec.tsx helpers/moneySweepSourceCoverage.tsx helpers/moneySweepSourceCoverage.spec.tsx helpers/moneySweepDataLayers.tsx helpers/moneySweepDataLayers.spec.tsx > successor-v3-overlay-hashes.txt
       - name: Execute successor v3 regression
