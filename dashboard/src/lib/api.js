@@ -80,7 +80,7 @@ export const getCampaignFinanceReports = (f = {}) =>
   fetchJSON(`/campaign-finance/reports${qs(f)}`, [])
 
 export const getLeaderboardCategories = () => fetchJSON('/leaderboards/categories', {
-  schemaVersion: 'moneysweep.financial-category-ontology/v1.1',
+  schemaVersion: 'moneysweep.financial-category-ontology/v1.2',
   rankingContractVersion: 'moneysweep.leaderboard/v1.1',
   rules: {}, categories: [],
 })
