@@ -133,7 +133,7 @@ def test_live_page_count_change_blocks_resume(monkeypatch, tmp_path: Path):
 
 
 @pytest.mark.unit
-def test_duplicate_control_number_refuses_promotion(monkeypatch, tmp_path: Path):
+def test_exact_duplicate_source_manifestation_is_deduplicated(monkeypatch, tmp_path: Path):
     pages = {
         1: [
             _record("26-ASG-AAA-0001"),
@@ -145,7 +145,28 @@ def test_duplicate_control_number_refuses_promotion(monkeypatch, tmp_path: Path)
         ],
     }
     _wire(monkeypatch, pages, 2)
-    with pytest.raises(RuntimeError, match="duplicate control_number"):
+    result = mat.run(tmp_path, max_pages=None, reset=True)
+    assert result["status"] == "COMPLETE"
+    assert result["rawRows"] == 4
+    assert result["exactDuplicateManifestations"] == 1
+    assert result["exactDuplicateGroups"] == 1
+    assert result["authoritativeUniverseTotal"] == 3
+    assert result["uniqueControlNumbers"] == 3
+
+@pytest.mark.unit
+def test_conflicting_duplicate_control_number_refuses_promotion(monkeypatch, tmp_path: Path):
+    pages = {
+        1: [
+            _record("26-ASG-AAA-0001", "Vendor One (12345)", "$10.00"),
+            _record("26-ASG-AAA-0002"),
+        ],
+        2: [
+            _record("26-ASG-AAA-0001", "Vendor One (12345)", "$11.00"),
+            _record("26-ASG-AAA-0003"),
+        ],
+    }
+    _wire(monkeypatch, pages, 2)
+    with pytest.raises(RuntimeError, match="conflicting payloads share control_number"):
         mat.run(tmp_path, max_pages=None, reset=True)
     assert not (tmp_path / mat.OUT_PATH_REL).exists()
 
