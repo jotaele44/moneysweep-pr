@@ -1,6 +1,6 @@
 {
   "schemaVersion": "moneysweep.asg-emergency-source-materialization/v1",
-  "state": "PASS",
+  "state": "SUPERSEDED_NON_AUTHORITATIVE_ORDERING",
   "capturedAt": "2026-10-06T04:38:59.972Z",
   "source": {
     "sourceId": "asg_emergency_purchases",
@@ -66,10 +66,12 @@
     }
   },
   "certificationEffect": {
-    "sourceMaterializationClosed": true,
+    "sourceMaterializationClosed": false,
     "wholeSourceLeaderboardReady": false,
-    "boundedSourceNativeLeaderboardMayProceedToAdapterEvaluation": true,
+    "boundedSourceNativeLeaderboardMayProceedToAdapterEvaluation": false,
     "productionOntologyExpanded": false,
     "certificationPhraseAuthorized": false
-  }
+  },
+  "authoritativeReceipt": "data/manifests/asg_emergency_purchases/materialization_receipt_20261006.json",
+  "note": "This receipt was produced from the -creado view, which repeats exact rows across pages. It is retained as pagination-drift evidence only. The authoritative completeness manifestation uses control-number ordering and is frozen in materialization_receipt_20261006.json."
 }
