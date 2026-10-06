@@ -406,9 +406,10 @@ def test_asg_coverage_contracts_fail_closed_on_drifted_emergency_denominator():
     assert emergency["canonical_grain"] == "contract"
     assert emergency["uniqueness_key"] == ["control_number"]
     assert emergency["authoritative_universe_method"] == "portal_count"
-    assert emergency["authoritative_universe_total"] is None
+    assert emergency["authoritative_universe_total"] == 1319
     assert emergency["pagination_required"] is True
-    assert "144 declared pages" in emergency["notes"]
+    assert "1,431 raw row manifestations" in emergency["notes"]
+    assert "1,319 canonical source records" in emergency["notes"]
 
     suppliers = by_id["asg_suppliers"]
     assert suppliers["canonical_grain"] == "entity"
