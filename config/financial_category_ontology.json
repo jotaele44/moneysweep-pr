@@ -1,5 +1,5 @@
 {
-  "schema_version": "moneysweep.financial-category-ontology/v1.1",
+  "schema_version": "moneysweep.financial-category-ontology/v1.2",
   "ranking_contract_version": "moneysweep.leaderboard/v1.1",
   "rules": {
     "currency_policy": "Rank only comparable values within one currency; do not FX-convert implicitly.",
