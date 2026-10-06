@@ -28,8 +28,21 @@
       "declaredPages": 47,
       "renderedRows": 4645,
       "uniqueRegistrationIds": 4644,
+      "duplicateRegistrationOccurrences": 1,
       "allCandidateIdsMatched": true,
-      "matchedIds": ["303","437","1174","4381","10329","13947","23388","25833","28546","56227"]
+      "verifiedAt": "2026-10-06T04:52:39.688Z",
+      "matchedIds": [
+        "303",
+        "437",
+        "1174",
+        "4381",
+        "10329",
+        "13947",
+        "23388",
+        "25833",
+        "28546",
+        "56227"
+      ]
     }
   },
   "financialValue": {
@@ -69,6 +82,12 @@
       "rows": 21,
       "bytes": 4823,
       "sha256": "b1b59b7ed2f6ecc15ee00066d7a3e983017d879691c8f785f9da7315f5e229f6"
+    },
+    "supplierRegistryVerification": {
+      "storagePath": "public/static/asg_suppliers_verification_20261006T045239.json",
+      "cdnPath": "/_cdn/static/asg_suppliers_verification_20261006T045239.json",
+      "bytes": 12019,
+      "sha256": "983ce04f2dd8495a9a925fdb64469e43e556f4a263a1256940bb495d6cc66261"
     }
   },
   "supersededNonAuthoritativeManifestation": {
