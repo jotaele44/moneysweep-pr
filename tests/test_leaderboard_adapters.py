@@ -358,10 +358,11 @@ def test_asg_source_native_adapter_conserves_full_source_and_bounded_subset():
     assert result["sourceVersion"]["sourceId"] == "asg_emergency_purchases"
     assert result["sourceVersion"]["authoritativeUniverseTotal"] == 1431
     assert result["sourceVersion"]["ordering"] == "numerocontrol"
-    assert result["sourceVersion"]["sourceSha256"] == "c5e6a34a8b5d29b75f739f2e0b3cefdbb98bcf50eb0010cfad246dadf770d139"
-    assert result["sourceVersion"]["rawBundleSha256"] == "de52749e1d1329f961acbb006182e48d8c4ff22430fd1cbc26121255d987ad40"
-    assert len(result["sourceManifestations"]) == 3
-    assert result["sourceManifestations"][2]["manifestationType"] == "FLOOT_OBJECT_STORAGE_RAW_AND_PARSED_BUNDLE"
+    assert result["sourceVersion"]["sourceSha256"] == "7f89f5a74fd51a9fdbae0f0194c85da357b9a9cb1d6835f6aae0be37ee991b07"
+    assert result["sourceVersion"]["rawBundleSha256"] == "7f89f5a74fd51a9fdbae0f0194c85da357b9a9cb1d6835f6aae0be37ee991b07"
+    assert len(result["sourceManifestations"]) == 4
+    assert result["sourceManifestations"][2]["manifestationType"] == "FLOOT_OBJECT_STORAGE_AUTHORITATIVE_CORPUS"
+    assert result["sourceManifestations"][3]["manifestationType"] == "FLOOT_OBJECT_STORAGE_PAGE_MANIFEST"
 
 
 @pytest.mark.unit
