@@ -1,0 +1,93 @@
+name: MoneySweep recovery successor v3 — data layers
+on:
+  push:
+    branches: [recovery/floot-baseline-2026-09-30]
+    paths:
+      - ".recovery/moneysweep-successor-v3/**"
+      - ".github/workflows/recovery-moneysweep-successor-v3.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  successor-v3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "22"
+      - name: Reproduce exact 45-test baseline
+        shell: bash
+        run: bash .recovery/moneysweep-exact/run_exact.sh
+      - name: Apply successor overlays v1-v3
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/recovered"
+          echo "8fcfe41d3552f2f28026bb7b01c1b3500941c961c6db9254d32b46de3ed45c84  .recovery/moneysweep-successor-v1/overlay.tar.gz" | sha256sum -c -
+          echo "97ee65c78ab6cf301a87636dedc7a73f00cedb477d3d28589ccfcbd621f16210  .recovery/moneysweep-successor-v2/overlay.tar.gz" | sha256sum -c -
+          tar -xzf .recovery/moneysweep-successor-v1/overlay.tar.gz -C "$ROOT"
+          tar -xzf .recovery/moneysweep-successor-v2/overlay.tar.gz -C "$ROOT"
+          cp .recovery/moneysweep-successor-v3/moneySweepDataLayers.tsx "$ROOT/helpers/moneySweepDataLayers.tsx"
+          cp .recovery/moneysweep-successor-v3/moneySweepDataLayers.spec.tsx "$ROOT/helpers/moneySweepDataLayers.spec.tsx"
+          cd "$ROOT"
+          sha256sum helpers/moneySweepIdentity.tsx helpers/moneySweepIdentity.spec.tsx helpers/moneySweepSourceCoverage.tsx helpers/moneySweepSourceCoverage.spec.tsx helpers/moneySweepDataLayers.tsx helpers/moneySweepDataLayers.spec.tsx > successor-v3-overlay-hashes.txt
+      - name: Execute successor v3 regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/recovered"
+          mapfile -t exec_specs < <(awk -F '\t' '$2=="EXECUTABLE"{print $1}' recovery-spec-classification.tsv)
+          exec_specs+=(helpers/moneySweepIdentity.spec.tsx helpers/moneySweepSourceCoverage.spec.tsx helpers/moneySweepDataLayers.spec.tsx)
+          set +e
+          npx vitest run --config recovery.vitest.config.mts --reporter=verbose "${exec_specs[@]}" 2>&1 | tee successor-v3-vitest.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "$status" > successor-v3-test-exit.txt
+          test "$status" = "0"
+          grep -q "19 passed" successor-v3-vitest.log
+          grep -q "86 passed" successor-v3-vitest.log
+      - name: Production build
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/recovered"
+          set +e
+          npx vite build 2>&1 | tee successor-v3-build.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "$status" > successor-v3-build-exit.txt
+          test "$status" = "0"
+      - name: Freeze successor v3 receipt
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP/recovered"
+          {
+            echo "schema=moneysweep-recovery-successor/v3"
+            echo "baseline_tests=45"
+            echo "successor_v2_tests=75"
+            echo "successor_v3_tests=86"
+            echo "data_layers=RAW_NORMALIZED_CANONICAL_SEPARATE"
+            echo "name_only_identity=DENY"
+            echo "stable_identity=UEI_CAGE_EXPLICIT_BINDING_ONLY"
+            echo "row_arithmetic=SOURCE_EQUALS_ADMITTED_PLUS_EXCLUDED_PLUS_UNRESOLVED"
+            echo "source_provenance=REQUIRED"
+            echo "state=PASS"
+          } > successor-v3-receipt.txt
+          sha256sum package-lock.json successor-v3-overlay-hashes.txt successor-v3-vitest.log successor-v3-build.log successor-v3-receipt.txt > successor-v3-evidence-hashes.txt
+      - name: Upload successor v3 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: moneysweep-recovery-successor-v3
+          if-no-files-found: error
+          path: |
+            ${{ runner.temp }}/recovered/package-lock.json
+            ${{ runner.temp }}/recovered/successor-v3-overlay-hashes.txt
+            ${{ runner.temp }}/recovered/successor-v3-vitest.log
+            ${{ runner.temp }}/recovered/successor-v3-test-exit.txt
+            ${{ runner.temp }}/recovered/successor-v3-build.log
+            ${{ runner.temp }}/recovered/successor-v3-build-exit.txt
+            ${{ runner.temp }}/recovered/successor-v3-receipt.txt
+            ${{ runner.temp }}/recovered/successor-v3-evidence-hashes.txt
