@@ -360,9 +360,10 @@ def test_asg_source_native_adapter_conserves_full_source_and_bounded_subset():
     assert result["sourceVersion"]["ordering"] == "numerocontrol"
     assert result["sourceVersion"]["sourceSha256"] == "7f89f5a74fd51a9fdbae0f0194c85da357b9a9cb1d6835f6aae0be37ee991b07"
     assert result["sourceVersion"]["rawBundleSha256"] == "7f89f5a74fd51a9fdbae0f0194c85da357b9a9cb1d6835f6aae0be37ee991b07"
-    assert len(result["sourceManifestations"]) == 4
+    assert len(result["sourceManifestations"]) == 5
     assert result["sourceManifestations"][2]["manifestationType"] == "FLOOT_OBJECT_STORAGE_AUTHORITATIVE_CORPUS"
     assert result["sourceManifestations"][3]["manifestationType"] == "FLOOT_OBJECT_STORAGE_PAGE_MANIFEST"
+    assert result["sourceManifestations"][4]["manifestationType"] == "FLOOT_OBJECT_STORAGE_SUPPLIER_ID_VERIFICATION"
 
 
 @pytest.mark.unit
