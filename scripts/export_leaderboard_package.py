@@ -131,6 +131,9 @@ def main() -> int:
     scope_id = str(scope.get("scopeId") or "")
     if not scope_id:
         raise SystemExit("BLOCKED: certification scope has no scopeId")
+    ontology_contract = str(scope.get("ontologyContractVersion") or "")
+    if not ontology_contract:
+        raise SystemExit("BLOCKED: certification scope has no ontologyContractVersion")
     included = _scope_categories(scope)
 
     runtime_extra = args.certification_runtime_extra
@@ -188,7 +191,7 @@ def main() -> int:
         "producer": "moneysweep-pr",
         "producerCommit": producer_commit,
         "rankingContractVersion": "moneysweep.leaderboard/v1.1",
-        "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.1",
+        "ontologyContractVersion": ontology_contract,
         "scopeId": scope_id,
         "generatedAt": datetime.now(tz=UTC).replace(microsecond=0).isoformat(),
         "certification": {
