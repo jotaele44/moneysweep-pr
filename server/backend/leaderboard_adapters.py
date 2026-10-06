@@ -311,7 +311,7 @@ def asg_emergency_source_native(
     they are never name-resolved or silently dropped.
     """
     subset_path = ASG_EVIDENCE / "source_native_rows_v1.csv"
-    receipt_path = ASG_EVIDENCE / "materialization_receipt_20261005.json"
+    receipt_path = ASG_EVIDENCE / "materialization_receipt_20261006.json"
 
     if municipality or entity_type:
         raise HTTPException(
@@ -508,11 +508,14 @@ def asg_emergency_source_native(
 
     canonical_source = frozen.get("canonicalParsedCorpus") or {}
     raw_bundle = frozen.get("rawAndParsedBundle") or {}
+    page_manifest = frozen.get("pageManifest") or {}
     if (
         int(canonical_source.get("rows") or 0) != universe_total
         or not str(canonical_source.get("sha256") or "")
         or not str(raw_bundle.get("storagePath") or "")
         or not str(raw_bundle.get("sha256") or "")
+        or not str(page_manifest.get("storagePath") or "")
+        or not str(page_manifest.get("sha256") or "")
     ):
         return _finalize(
             category_id="asg_emergency_purchase_source_native",
@@ -525,7 +528,7 @@ def asg_emergency_source_native(
             manifests=[subset_manifest, receipt_manifest],
             methodology={"identity": "source-native asg_licitador_id required"},
             certification_state="OPEN_INVALID_SOURCE_RECEIPT",
-            reason="ASG October 5 corpus or acquisition-bundle binding is incomplete.",
+            reason="ASG October 6 authoritative corpus or manifestation binding is incomplete.",
         )
 
     source_manifestations = [
@@ -535,7 +538,13 @@ def asg_emergency_source_native(
             "path": str(raw_bundle.get("storagePath") or ""),
             "bytes": int(raw_bundle.get("bytes") or 0),
             "sha256": str(raw_bundle.get("sha256") or ""),
-            "manifestationType": "FLOOT_OBJECT_STORAGE_RAW_AND_PARSED_BUNDLE",
+            "manifestationType": "FLOOT_OBJECT_STORAGE_AUTHORITATIVE_CORPUS",
+        },
+        {
+            "path": str(page_manifest.get("storagePath") or ""),
+            "bytes": int(page_manifest.get("bytes") or 0),
+            "sha256": str(page_manifest.get("sha256") or ""),
+            "manifestationType": "FLOOT_OBJECT_STORAGE_PAGE_MANIFEST",
         },
     ]
     result = _finalize(
