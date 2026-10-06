@@ -30,7 +30,7 @@ jobs:
           tar -xzf .recovery/moneysweep-successor-v1/overlay.tar.gz -C "$ROOT"
           tar -xzf .recovery/moneysweep-successor-v2/overlay.tar.gz -C "$ROOT"
           cp .recovery/moneysweep-successor-v3/moneySweepDataLayers.tsx "$ROOT/helpers/moneySweepDataLayers.tsx"
-          cp .recovery/moneysweep-successor-v3/moneySweepDataLayers.spec.tsx "$ROOT/helpers/moneySweepDataLayers.spec.tsx"
+          cp .recovery/moneysweep-successor-v3/moneySweepDataLayers.spec.tsx "$ROOT/helpers/moneySweepDataLayers.spec.tsx"\n          cp .recovery/moneysweep-successor-v3/moneySweepAccessDbParity.spec.tsx "$ROOT/helpers/moneySweepAccessDbParity.spec.tsx"
           cd "$ROOT"
           sha256sum helpers/moneySweepIdentity.tsx helpers/moneySweepIdentity.spec.tsx helpers/moneySweepSourceCoverage.tsx helpers/moneySweepSourceCoverage.spec.tsx helpers/moneySweepDataLayers.tsx helpers/moneySweepDataLayers.spec.tsx > successor-v3-overlay-hashes.txt
       - name: Execute successor v3 regression
@@ -39,15 +39,15 @@ jobs:
           set -euo pipefail
           cd "$RUNNER_TEMP/recovered"
           mapfile -t exec_specs < <(awk -F '\t' '$2=="EXECUTABLE"{print $1}' recovery-spec-classification.tsv)
-          exec_specs+=(helpers/moneySweepIdentity.spec.tsx helpers/moneySweepSourceCoverage.spec.tsx helpers/moneySweepDataLayers.spec.tsx)
+          exec_specs+=(helpers/moneySweepIdentity.spec.tsx helpers/moneySweepSourceCoverage.spec.tsx helpers/moneySweepDataLayers.spec.tsx helpers/moneySweepAccessDbParity.spec.tsx)
           set +e
           npx vitest run --config recovery.vitest.config.mts --reporter=verbose "${exec_specs[@]}" 2>&1 | tee successor-v3-vitest.log
           status=${PIPESTATUS[0]}
           set -e
           echo "$status" > successor-v3-test-exit.txt
           test "$status" = "0"
-          grep -q "19 passed" successor-v3-vitest.log
-          grep -q "86 passed" successor-v3-vitest.log
+          grep -q "20 passed" successor-v3-vitest.log
+          grep -q "90 passed" successor-v3-vitest.log
       - name: Production build
         shell: bash
         run: |
@@ -67,7 +67,7 @@ jobs:
             echo "schema=moneysweep-recovery-successor/v3"
             echo "baseline_tests=45"
             echo "successor_v2_tests=75"
-            echo "successor_v3_tests=86"
+            echo "successor_v3_tests=90"\n            echo "write_auth_acl=NOT_APPLICABLE_READ_ONLY_SURFACE"\n            echo "db_schema_tables=5"
             echo "data_layers=RAW_NORMALIZED_CANONICAL_SEPARATE"
             echo "name_only_identity=DENY"
             echo "stable_identity=UEI_CAGE_EXPLICIT_BINDING_ONLY"
