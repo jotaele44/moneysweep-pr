@@ -52,6 +52,7 @@ def test_valid_pass_receipt_is_accepted(tmp_path: Path):
     path = _write(tmp_path / "receipt.json", receipt)
     assert load_pass_receipt(path) == receipt
 
+
 @pytest.mark.unit
 def test_asg_export_schema_is_strictly_bounded():
     root = Path(__file__).resolve().parents[1]
@@ -75,4 +76,3 @@ def test_asg_export_schema_is_strictly_bounded():
     row = category["rows"]["items"]["properties"]
     assert row["entityResolutionState"]["const"] == "SOURCE_NATIVE_ASG_LICITADOR_ID"
     assert row["entityId"]["pattern"] == "^asg_licitador_id:[0-9]+$"
-

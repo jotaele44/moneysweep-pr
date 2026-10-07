@@ -22,18 +22,18 @@
         "contract_number",
         "contractor_name"
       ],
-      "minimum_coverage_pct": 98,
+      "minimum_coverage_pct": 98.0,
       "required_field_thresholds": {
-        "contractor_name": 99,
-        "contract_number": 99,
-        "amount": 95
+        "contractor_name": 99.0,
+        "contract_number": 99.0,
+        "amount": 95.0
       },
       "monetary_reconciliation": {
         "amount_field": "amount",
-        "tolerance_pct": 1,
+        "tolerance_pct": 1.0,
         "reference_total": null
       },
-      "notes": "ACT (Autoridad de Carreteras y Transportación) contracts in force at the 2020 transition. Snapshot corpus: the universe is the committed page-validated extract, not a live portal."
+      "notes": "ACT (Autoridad de Carreteras y Transportaci\u00f3n) contracts in force at the 2020 transition. Snapshot corpus: the universe is the committed page-validated extract, not a live portal."
     },
     {
       "source_id": "acuden_2024_transition",
@@ -52,15 +52,15 @@
         "contract_number",
         "contractor_name"
       ],
-      "minimum_coverage_pct": 98,
+      "minimum_coverage_pct": 98.0,
       "required_field_thresholds": {
-        "contractor_name": 99,
-        "contract_number": 99,
-        "amount": 95
+        "contractor_name": 99.0,
+        "contract_number": 99.0,
+        "amount": 95.0
       },
       "monetary_reconciliation": {
         "amount_field": "amount",
-        "tolerance_pct": 1,
+        "tolerance_pct": 1.0,
         "reference_total": null
       },
       "notes": "ACUDEN contracts in force at the 2024 transition; shares the committed extract with act_transition_contracts (source_dataset is the split key)."
@@ -84,7 +84,7 @@
         "vendor_name",
         "obligated_amount"
       ],
-      "minimum_coverage_pct": 95,
+      "minimum_coverage_pct": 95.0,
       "pagination_required": true,
       "notes": "Denominator from the keyless PR-scoped count endpoint (the coverage audit's --probe layer). 2007-10-01 is the API's earliest searchable window; earlier awards need the bulk-download lane and a contract bump."
     },
@@ -103,7 +103,7 @@
       "uniqueness_key": [
         "subaward_number"
       ],
-      "minimum_coverage_pct": 95,
+      "minimum_coverage_pct": 95.0,
       "pagination_required": true
     },
     {
@@ -116,9 +116,9 @@
       "uniqueness_key": [
         "subaward_number"
       ],
-      "minimum_coverage_pct": 95,
+      "minimum_coverage_pct": 95.0,
       "pagination_required": true,
-      "notes": "DUPLICATE POLICY (program rule 4): semantic duplicate of usaspending_subawards — corroboration/enrichment lane only. Its rows must never be added to usaspending_subawards rows in any total-financial-flow metric; reconciliation compares the two lanes instead."
+      "notes": "DUPLICATE POLICY (program rule 4): semantic duplicate of usaspending_subawards \u2014 corroboration/enrichment lane only. Its rows must never be added to usaspending_subawards rows in any total-financial-flow metric; reconciliation compares the two lanes instead."
     },
     {
       "source_id": "fema_pa_openfema_v2",
@@ -131,7 +131,7 @@
       "uniqueness_key": [
         "id"
       ],
-      "minimum_coverage_pct": 98,
+      "minimum_coverage_pct": 98.0,
       "pagination_required": true
     },
     {
@@ -144,9 +144,9 @@
       "uniqueness_key": [
         "id"
       ],
-      "minimum_coverage_pct": 90,
+      "minimum_coverage_pct": 90.0,
       "pagination_required": true,
-      "notes": "HMGP subapplication counts are not published as a single total; the OpenFEMA dataset count is the working denominator. Current holdings are a 25-row seed (baseline audit) — expect below_contract until re-pulled."
+      "notes": "HMGP subapplication counts are not published as a single total; the OpenFEMA dataset count is the working denominator. Current holdings are a 25-row seed (baseline audit) \u2014 expect below_contract until re-pulled."
     },
     {
       "source_id": "hud_cdbg_dr_public",
@@ -159,7 +159,7 @@
         "grant_number",
         "activity_number"
       ],
-      "minimum_coverage_pct": 95
+      "minimum_coverage_pct": 95.0
     },
     {
       "source_id": "hud_drgr_authorized",
@@ -172,7 +172,7 @@
         "grant_number",
         "activity_number"
       ],
-      "minimum_coverage_pct": 95,
+      "minimum_coverage_pct": 95.0,
       "notes": "Authorized DRGR exports are operator-delivered (manual dropzone); the operator attests the export scope per drop. Unverifiable until the first attested drop lands."
     },
     {
@@ -186,7 +186,7 @@
       "uniqueness_key": [
         "project_id"
       ],
-      "minimum_coverage_pct": 95,
+      "minimum_coverage_pct": 95.0,
       "notes": "Project/procurement/disbursement grains must stay separate when the operator export lands (program rule: COR3 vs FEMA PA records are linked, never merged)."
     },
     {
@@ -200,7 +200,7 @@
       "uniqueness_key": [
         "uei"
       ],
-      "minimum_coverage_pct": 95,
+      "minimum_coverage_pct": 95.0,
       "notes": "Denominator = PR-registered entities in the monthly public extract, not per-entity API paging (which is capped; see baseline audit \"capped\" finding)."
     },
     {
@@ -214,7 +214,7 @@
       "uniqueness_key": [
         "filing_uuid"
       ],
-      "minimum_coverage_pct": 98,
+      "minimum_coverage_pct": 98.0,
       "pagination_required": true
     },
     {
@@ -229,7 +229,7 @@
         "registro_cabildero_num",
         "client_name"
       ],
-      "minimum_coverage_pct": 95,
+      "minimum_coverage_pct": 95.0,
       "notes": "One-to-many lobbyist-client registrations. Universe = the April 2026 authoritative registry PDF once parsed; the 2025-03-26 roster (1,175 pairs) plus 23 certificate-only records are the current acquired corpus."
     },
     {
@@ -242,9 +242,9 @@
       "uniqueness_key": [
         "sub_id"
       ],
-      "minimum_coverage_pct": 95,
+      "minimum_coverage_pct": 95.0,
       "pagination_required": true,
-      "notes": "Baseline audit flagged a fixture/placeholder suspicion on this lane — production_fixtures_forbidden (default) makes any fixture rows fail the materiality gate outright."
+      "notes": "Baseline audit flagged a fixture/placeholder suspicion on this lane \u2014 production_fixtures_forbidden (default) makes any fixture rows fail the materiality gate outright."
     },
     {
       "source_id": "donaciones_pr",
@@ -260,7 +260,7 @@
         "amount",
         "event_date"
       ],
-      "minimum_coverage_pct": 98,
+      "minimum_coverage_pct": 98.0,
       "notes": "Bounded snapshot contract: the 2026-03-20 CEE export is the attested universe for this version. Uniqueness key is provisional until first ingest confirms the export's column semantics; bump contract_version when the full portal scrape replaces the snapshot."
     },
     {
@@ -274,7 +274,7 @@
       "uniqueness_key": [
         "contract_id"
       ],
-      "minimum_coverage_pct": 95,
+      "minimum_coverage_pct": 95.0,
       "pagination_required": true,
       "notes": "Denominator must come from paginated portal counts, NOT the observed ~5.56M maximum contract-identifier range (program risk: identifier ranges exaggerate corpus size)."
     },
@@ -289,7 +289,7 @@
       "uniqueness_key": [
         "report_id"
       ],
-      "minimum_coverage_pct": 95,
+      "minimum_coverage_pct": 95.0,
       "notes": "Separate lane from ocpr_contracts (audits vs contracts; program rule)."
     },
     {
@@ -302,7 +302,7 @@
       "uniqueness_key": [
         "solicitation_id"
       ],
-      "minimum_coverage_pct": 90,
+      "minimum_coverage_pct": 90.0,
       "pagination_required": true
     },
     {
@@ -316,7 +316,7 @@
       "uniqueness_key": [
         "cusip"
       ],
-      "minimum_coverage_pct": 90,
+      "minimum_coverage_pct": 90.0,
       "pagination_required": true,
       "notes": "Current holdings are a 35-row seed (baseline audit) vs full PR issuer coverage; issue metadata and disclosure-document metadata are separate grains when scaled up."
     },
@@ -330,7 +330,7 @@
       "uniqueness_key": [
         "loan_id"
       ],
-      "minimum_coverage_pct": 90
+      "minimum_coverage_pct": 90.0
     },
     {
       "source_id": "asg_emergency_purchases",
@@ -343,9 +343,9 @@
       "uniqueness_key": [
         "control_number"
       ],
-      "minimum_coverage_pct": 95,
+      "minimum_coverage_pct": 95.0,
       "pagination_required": true,
-      "notes": "Authoritative live refresh completed 2026-10-06 using control-number ordering: 144 declared pages, 1,431 rows, 1,431 unique control_number values, zero duplicates and zero conflicts; page 144 contains one row. A separate -creado manifestation also returned 1,431 rendered rows but only 1,319 unique control numbers because 112 exact duplicate manifestations were repeated across 59 groups. That ordering is retained as non-authoritative pagination-drift evidence and is not used for the completeness denominator. Grain is `contract` rather than `transaction` deliberately — ASG renders no date, so these rows carry no transaction_date and must not be promoted to transaction grain."
+      "notes": "Authoritative live refresh completed 2026-10-06 using control-number ordering: 144 declared pages, 1,431 raw row manifestations, 1,431 unique control_number values, zero duplicates and zero conflicts; page 144 contains one row. A separate -creado manifestation also returned 1,431 rendered rows but only 1,319 unique control numbers because 112 exact duplicate manifestations were repeated across 59 groups. That ordering is retained as non-authoritative pagination-drift evidence and is not used for the completeness denominator. Grain is `contract` rather than `transaction` deliberately \u2014 ASG renders no date, so these rows carry no transaction_date and must not be promoted to transaction grain."
     },
     {
       "source_id": "asg_suppliers",
@@ -358,7 +358,7 @@
       "uniqueness_key": [
         "registration_id"
       ],
-      "minimum_coverage_pct": 95,
+      "minimum_coverage_pct": 95.0,
       "pagination_required": true,
       "notes": "Measured 2026-07-27: 47 declared pages at 100 vendors, last page 65 -> 4,665 registered bidders. Each vendor occupies two table rows (a summary row and a collapsed detail row), so a naive row count doubles the denominator; registration_id (the ASG Licitador ID) is the uniqueness key."
     },
@@ -373,9 +373,9 @@
       "uniqueness_key": [
         "rdc_case_uid"
       ],
-      "minimum_coverage_pct": 95,
+      "minimum_coverage_pct": 95.0,
       "pagination_required": true,
-      "notes": "Measured 2026-08-16: the \"Ultima\" pagination link declares 7,451 pages at six rows, and page 7451 was fetched and found full at six -> 44,706 cases. That is a portal_count denominator in the sense this file requires, not a maximum identifier range. The registry is append-ordered, so the total grows; a shortfall against it means the sweep stopped early, not that the corpus shrank.\nGrain is `claim`, not `payment`: Cuantía Reclamada is an amount demanded and most rows never become a disbursement. Cantidad Adjudicada is the awarded figure where one exists, and is blank on unresolved cases — it must not be read as money paid.\nuniqueness_key is the surrogate rdc_case_uid rather than Núm del Caso, which is not unique across the corpus. Coverage is counted over the list sweep; detail enrichment (scripts/enrich_rdc_details.py) fills the party fields incrementally and is deliberately not part of this denominator."
+      "notes": "Measured 2026-08-16: the \"Ultima\" pagination link declares 7,451 pages at six rows, and page 7451 was fetched and found full at six -> 44,706 cases. That is a portal_count denominator in the sense this file requires, not a maximum identifier range. The registry is append-ordered, so the total grows; a shortfall against it means the sweep stopped early, not that the corpus shrank.\nGrain is `claim`, not `payment`: Cuant\u00eda Reclamada is an amount demanded and most rows never become a disbursement. Cantidad Adjudicada is the awarded figure where one exists, and is blank on unresolved cases \u2014 it must not be read as money paid.\nuniqueness_key is the surrogate rdc_case_uid rather than N\u00fam del Caso, which is not unique across the corpus. Coverage is counted over the list sweep; detail enrichment (scripts/enrich_rdc_details.py) fills the party fields incrementally and is deliberately not part of this denominator."
     }
   ]
 }

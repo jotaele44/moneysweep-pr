@@ -20,7 +20,7 @@
         "parent_uei_coverage_pct": 0.05
       },
       "update_cadence": "weekly",
-      "notes": "USAspending API + bulk archive. No key required.\nTop recipients are PR government agencies (PRDOH, ADSEF, PRDE, PRHA) —\nno corporate parent_uei is expected for these entities.\n"
+      "notes": "USAspending API + bulk archive. No key required.\nTop recipients are PR government agencies (PRDOH, ADSEF, PRDE, PRHA) \u2014\nno corporate parent_uei is expected for these entities.\n"
     },
     {
       "source_id": "usaspending_subawards",
@@ -91,7 +91,7 @@
       "schema_version": "r5_v1",
       "validation_threshold": {
         "min_rows": 1,
-        "parent_uei_coverage_pct_govt": 0,
+        "parent_uei_coverage_pct_govt": 0.0,
         "parent_uei_coverage_pct_corporate": 0.002
       },
       "update_cadence": "monthly",
@@ -234,7 +234,7 @@
       },
       "manual_drop_dir": "data/manual/hud_drgr/",
       "update_cadence": "monthly",
-      "notes": "Credentialed DRGR portal — operator must export and drop manifests in manual_drop_dir."
+      "notes": "Credentialed DRGR portal \u2014 operator must export and drop manifests in manual_drop_dir."
     },
     {
       "source_id": "hud_hcv_section8",
@@ -481,7 +481,7 @@
       },
       "manual_drop_dir": "data/raw/act_transition/",
       "update_cadence": "ad_hoc",
-      "notes": "PR ACT transition contract files (Autopistas, Ferrovial, LPC&D, etc.). Manual export. Shares the data/raw/act_transition/ dropzone with acuden_2024_transition; the committed extract's source_dataset column (ACT_2020) is the split key. Source PDFs are archived under \"data/raw/Vigentes al Momento de Transición/\"."
+      "notes": "PR ACT transition contract files (Autopistas, Ferrovial, LPC&D, etc.). Manual export. Shares the data/raw/act_transition/ dropzone with acuden_2024_transition; the committed extract's source_dataset column (ACT_2020) is the split key. Source PDFs are archived under \"data/raw/Vigentes al Momento de Transici\u00f3n/\"."
     },
     {
       "source_id": "acuden_2024_transition",
@@ -534,7 +534,7 @@
         "min_rows": 1
       },
       "update_cadence": "monthly",
-      "notes": "PR Comptroller (OCPR) audit AND investigation reports (Regular/Especial/ Investigaciones — all three report types live in this one source) on government entities, scraped live from the public iapconsulta.ocpr.gov.pr search API (no auth/session needed). scripts/ingest_contralor.py remains as a manual-dropzone fallback (data/raw/Oficina del Contralor/) if the scraper ever breaks. NOTE the OCPR contract registry (consultacontratos.ocpr.gov.pr) is a separate product still needing a dedicated scraper."
+      "notes": "PR Comptroller (OCPR) audit AND investigation reports (Regular/Especial/ Investigaciones \u2014 all three report types live in this one source) on government entities, scraped live from the public iapconsulta.ocpr.gov.pr search API (no auth/session needed). scripts/ingest_contralor.py remains as a manual-dropzone fallback (data/raw/Oficina del Contralor/) if the scraper ever breaks. NOTE the OCPR contract registry (consultacontratos.ocpr.gov.pr) is a separate product still needing a dedicated scraper."
     },
     {
       "source_id": "compras_pr",
@@ -569,7 +569,7 @@
         "min_rows": 1
       },
       "update_cadence": "weekly",
-      "notes": "ASG emergency (no-bid) purchase orders — agency, vendor, purchase-order number and cost. Live verification on 2026-10-01 shows 144 declared pages, superseding the historical 141-page denominator. The only page on the ASG site that carries dollar amounts in its markup. Current rows may render the ASG Licitador ID directly in Proveedor as Vendor Name (12345); the scraper promotes only that explicit source-native token to asg_licitador_id while leaving legacy name-only rows unresolved. Control numbers encode declared emergencies as <FY>-ASG-<PROGRAMME>-<SEQ>, including CV19, TTF, EPI and the live 2026 AAA-labelled programme (label unresolved here) — so the source cross-links with the FEMA / COR3 / CDBG-DR streams.\nDistinct from ocpr_contracts: that is the Comptroller's record of executed contracts, and emergency purchase orders largely bypass it.\nKNOWN GAP: the table renders no date column. order_by=-creado proves the server holds one but it is not exposed, so fiscal_year is derived from the control-number prefix and no transaction_date is claimed. These stay at contracts_master grain and must not be promoted to transaction grain (which requires transaction_date) until a real date is available.\n"
+      "notes": "ASG emergency (no-bid) purchase orders \u2014 agency, vendor, purchase-order number and cost. Live verification on 2026-10-01 shows 144 declared pages, superseding the historical 141-page denominator. The only page on the ASG site that carries dollar amounts in its markup. Current rows may render the ASG Licitador ID directly in Proveedor as Vendor Name (12345); the scraper promotes only that explicit source-native token to asg_licitador_id while leaving legacy name-only rows unresolved. Control numbers encode declared emergencies as <FY>-ASG-<PROGRAMME>-<SEQ>, including CV19, TTF, EPI and the live 2026 AAA-labelled programme (label unresolved here) \u2014 so the source cross-links with the FEMA / COR3 / CDBG-DR streams.\nDistinct from ocpr_contracts: that is the Comptroller's record of executed contracts, and emergency purchase orders largely bypass it.\nKNOWN GAP: the table renders no date column. order_by=-creado proves the server holds one but it is not exposed, so fiscal_year is derived from the control-number prefix and no transaction_date is claimed. These stay at contracts_master grain and must not be promoted to transaction grain (which requires transaction_date) until a real date is available.\n"
     },
     {
       "source_id": "asg_suppliers",
@@ -586,7 +586,7 @@
         "min_rows": 1
       },
       "update_cadence": "monthly",
-      "notes": "ASG registered-bidder registry (RUL — Registro Único de Licitadores, and RUP — Registro Único de Proveedores), ~4,700 vendors over 47 pages. Each vendor carries a Licitador ID, a stable government-issued identifier for a PR government bidder that no other registered source provides; it is registered as the asg_licitador_id scheme in the entity-resolution identifier hierarchy. Also yields a fiscal-address municipality for geo attribution. Emits the shared contractor-reference schema (CONTRACTOR_COLUMNS) plus geo_zip.\n"
+      "notes": "ASG registered-bidder registry (RUL \u2014 Registro \u00danico de Licitadores, and RUP \u2014 Registro \u00danico de Proveedores), ~4,700 vendors over 47 pages. Each vendor carries a Licitador ID, a stable government-issued identifier for a PR government bidder that no other registered source provides; it is registered as the asg_licitador_id scheme in the entity-resolution identifier hierarchy. Also yields a fiscal-address municipality for geo attribution. Emits the shared contractor-reference schema (CONTRACTOR_COLUMNS) plus geo_zip.\n"
     },
     {
       "source_id": "rdc_demandas_civiles",
@@ -603,7 +603,7 @@
         "min_rows": 1
       },
       "update_cadence": "monthly",
-      "notes": "Registro de Demandas Civiles — the registry the Departamento de Justicia must publish under Ley Núm. 1-2003: every civil claim filed against a government agency, instrumentality or municipality, with the amount demanded (Cuantía Reclamada) and the amount awarded (Cantidad Adjudicada). This is public money leaving the treasury through the courts rather than through a contract — no other registered source covers it. ~44,700 cases over 7,451 pages; no API, no bulk export.\nEXPECTED OUTPUTS cover only the scheduled producer. The update controller runs producer_script alone and fails the run OUTPUT_MISSING unless every declared path exists, so pr_rdc_demandas_parties.csv is deliberately NOT declared: it is written by the operator-run enrichment pass below, and gating scheduled sweeps on it would fail every refresh until someone ran enrichment by hand.\nTWO-STAGE LANE. scripts/scrape_rdc_demandas.py sweeps the list view. scripts/enrich_rdc_details.py is a separate resumable pass over the per-case detail pages, which are the ONLY place the defendant agency (Demandado) is a structured field — that field is the join to government_entity_registry. A full enrichment is ~44,700 further requests against a small government host, so it is bounded per run (--limit / --max-runtime) and must never be wired into a blocking pipeline stage.\nKNOWN GAP: Núm del Caso is not unique (observed values include \"09\", \"105\", \"1000\"), yet the detail route keys on it alone, so the app may serve the wrong case. Rows are keyed by the surrogate rdc_case_uid and sharing rows are flagged case_number_ambiguous; the detail pass skips them unless --include-ambiguous is given, and marks anything so fetched review_status=ambiguous_key rather than verified.\nThe registry renders no FILING date — only a resolution date, and only once a case is resolved. first_seen_at is carried forward per case as an honest upper bound and must not be read as the filing date.\nPII: captions and party tables name private individuals. This is an official public registry published under Ley 1-2003, the same posture as the cabilderos and campaign-finance sources.\n"
+      "notes": "Registro de Demandas Civiles \u2014 the registry the Departamento de Justicia must publish under Ley N\u00fam. 1-2003: every civil claim filed against a government agency, instrumentality or municipality, with the amount demanded (Cuant\u00eda Reclamada) and the amount awarded (Cantidad Adjudicada). This is public money leaving the treasury through the courts rather than through a contract \u2014 no other registered source covers it. ~44,700 cases over 7,451 pages; no API, no bulk export.\nEXPECTED OUTPUTS cover only the scheduled producer. The update controller runs producer_script alone and fails the run OUTPUT_MISSING unless every declared path exists, so pr_rdc_demandas_parties.csv is deliberately NOT declared: it is written by the operator-run enrichment pass below, and gating scheduled sweeps on it would fail every refresh until someone ran enrichment by hand.\nTWO-STAGE LANE. scripts/scrape_rdc_demandas.py sweeps the list view. scripts/enrich_rdc_details.py is a separate resumable pass over the per-case detail pages, which are the ONLY place the defendant agency (Demandado) is a structured field \u2014 that field is the join to government_entity_registry. A full enrichment is ~44,700 further requests against a small government host, so it is bounded per run (--limit / --max-runtime) and must never be wired into a blocking pipeline stage.\nKNOWN GAP: N\u00fam del Caso is not unique (observed values include \"09\", \"105\", \"1000\"), yet the detail route keys on it alone, so the app may serve the wrong case. Rows are keyed by the surrogate rdc_case_uid and sharing rows are flagged case_number_ambiguous; the detail pass skips them unless --include-ambiguous is given, and marks anything so fetched review_status=ambiguous_key rather than verified.\nThe registry renders no FILING date \u2014 only a resolution date, and only once a case is resolved. first_seen_at is carried forward per case as an honest upper bound and must not be read as the filing date.\nPII: captions and party tables name private individuals. This is an official public registry published under Ley 1-2003, the same posture as the cabilderos and campaign-finance sources.\n"
     },
     {
       "source_id": "aafaf",
@@ -823,7 +823,7 @@
         "min_rows": 0
       },
       "update_cadence": "monthly",
-      "notes": "PR environmental enforcement (EPA ICIS-FE&C / ECHO) — federal penalties assessed against PR facilities. Automatable via the public, keyless ECHO Enforcement Case Search REST API (echodata.epa.gov; X_API_KEY sent opportunistically as an api.data.gov rate-limit header). Materialized by scripts/download_epa_echo_icis.py (endpoint/fields confirmed on first live run).\n"
+      "notes": "PR environmental enforcement (EPA ICIS-FE&C / ECHO) \u2014 federal penalties assessed against PR facilities. Automatable via the public, keyless ECHO Enforcement Case Search REST API (echodata.epa.gov; X_API_KEY sent opportunistically as an api.data.gov rate-limit header). Materialized by scripts/download_epa_echo_icis.py (endpoint/fields confirmed on first live run).\n"
     },
     {
       "source_id": "emma_bonds",
@@ -945,7 +945,7 @@
       },
       "manual_drop_dir": "data/raw/Donaciones/",
       "update_cadence": "ad_hoc",
-      "notes": "PR State Election Commission (CEE/CEEPUR) state-level donation registry. ingest_donaciones.py is a dropzone reader for operator-delivered CEE CSV exports — no network code. Previously mislabeled as using ingest_fec.py (federal FEC) with a wrong output path. Cross-references federal FEC via analyze_political_crossref.py."
+      "notes": "PR State Election Commission (CEE/CEEPUR) state-level donation registry. ingest_donaciones.py is a dropzone reader for operator-delivered CEE CSV exports \u2014 no network code. Previously mislabeled as using ingest_fec.py (federal FEC) with a wrong output path. Cross-references federal FEC via analyze_political_crossref.py."
     },
     {
       "source_id": "follow_the_money",
@@ -1021,7 +1021,7 @@
         "min_rows": 1
       },
       "update_cadence": "ad_hoc",
-      "notes": "NGO / OSFL identity, funding, and coverage layer built from IRS EO BMF, TEOS, PR state registry, and USASpending drops. Also drives the NGO ↔ political-donation crossref (analyze_political_crossref: build_ngo_donation_crossref → data/staging/processed/ngos/ ngo_political_donations.csv) which is intentionally NOT declared as an expected_output to avoid preflight gate failures (matches the convention used by `fec` for pr_fec_crossref.csv).\n"
+      "notes": "NGO / OSFL identity, funding, and coverage layer built from IRS EO BMF, TEOS, PR state registry, and USASpending drops. Also drives the NGO \u2194 political-donation crossref (analyze_political_crossref: build_ngo_donation_crossref \u2192 data/staging/processed/ngos/ ngo_political_donations.csv) which is intentionally NOT declared as an expected_output to avoid preflight gate failures (matches the convention used by `fec` for pr_fec_crossref.csv).\n"
     },
     {
       "source_id": "sba_loans",
@@ -1820,7 +1820,7 @@
         "min_rows": 0
       },
       "update_cadence": "ad_hoc",
-      "notes": "OPTIONAL commercial provider for public-market entity resolution (CUSIP / ISIN / FIGI / LEI / CIK / ticker crosswalks). NOT a required source — never wired into coverage gates. Live use requires BOTH FINANCIALDATA_API_KEY and FINANCIALDATA_LICENSE_APPROVED=true. Default mode is dry-run/mock with synthetic fixtures. Raw vendor payloads are never persisted. See docs/financialdata_provider.md.\n"
+      "notes": "OPTIONAL commercial provider for public-market entity resolution (CUSIP / ISIN / FIGI / LEI / CIK / ticker crosswalks). NOT a required source \u2014 never wired into coverage gates. Live use requires BOTH FINANCIALDATA_API_KEY and FINANCIALDATA_LICENSE_APPROVED=true. Default mode is dry-run/mock with synthetic fixtures. Raw vendor payloads are never persisted. See docs/financialdata_provider.md.\n"
     },
     {
       "source_id": "usaspending_loans",
@@ -1871,7 +1871,7 @@
         "min_rows": 1
       },
       "update_cadence": "weekly",
-      "notes": "SAM.gov exclusions (debarment) list — suspended/excluded parties. Screening complement to sam_entities and ofac_sdn. Requires SAM_API_KEY.\n"
+      "notes": "SAM.gov exclusions (debarment) list \u2014 suspended/excluded parties. Screening complement to sam_entities and ofac_sdn. Requires SAM_API_KEY.\n"
     },
     {
       "source_id": "sam_opportunities",
@@ -2044,7 +2044,7 @@
         "min_rows": 1
       },
       "update_cadence": "ad_hoc",
-      "notes": "Canonical PR Comptroller (OCPR) contract registry — every PR government contract (~1.34M records). Distinct from oficina_contralor (audit reports only). Scraped live from the public consultacontratos.ocpr.gov.pr search API (anti-forgery token from one GET, then JSON search POSTs). The endpoint is slow (~20s per 100-row page), so a full materialization is a multi-hour/multi-day background job by design, same shape as the SAM.gov full-registry pull. scripts/ingest_ocpr_contracts.py remains as a manual-dropzone fallback if the scraper ever breaks.\n"
+      "notes": "Canonical PR Comptroller (OCPR) contract registry \u2014 every PR government contract (~1.34M records). Distinct from oficina_contralor (audit reports only). Scraped live from the public consultacontratos.ocpr.gov.pr search API (anti-forgery token from one GET, then JSON search POSTs). The endpoint is slow (~20s per 100-row page), so a full materialization is a multi-hour/multi-day background job by design, same shape as the SAM.gov full-registry pull. scripts/ingest_ocpr_contracts.py remains as a manual-dropzone fallback if the scraper ever breaks.\n"
     },
     {
       "source_id": "ddec_incentives",
@@ -2295,7 +2295,7 @@
         "min_rows": 0
       },
       "update_cadence": "monthly",
-      "notes": "PR Treasury Sales & Use Tax (IVU/SUT) collections by fiscal year / month / tax-tranche category (5.5% SUT, 4.5% SUT Surcharge, 4% Services SUT, 0.5% FAM SUT, 1% Municipal SUT, Subtotal, Penalties, Total SUT Collections, Unallocated balances, General Fund) — the largest PR consumption-tax revenue stream, not otherwise captured. Live PDF producer (scripts/download_hacienda_sut_ivu.py); promoted from scraper_needed to api_producer. Scoped to the current single-fiscal-year report template only (recent fiscal years, monthly-updated); older multi-year-table PDFs (pre-FY2018-19-era) use an incompatible layout and are out of scope — see that script's docstring. NAICS-level and COFIM-municipal-IVU breakdowns are a separate Hacienda report not covered by this adapter.\n"
+      "notes": "PR Treasury Sales & Use Tax (IVU/SUT) collections by fiscal year / month / tax-tranche category (5.5% SUT, 4.5% SUT Surcharge, 4% Services SUT, 0.5% FAM SUT, 1% Municipal SUT, Subtotal, Penalties, Total SUT Collections, Unallocated balances, General Fund) \u2014 the largest PR consumption-tax revenue stream, not otherwise captured. Live PDF producer (scripts/download_hacienda_sut_ivu.py); promoted from scraper_needed to api_producer. Scoped to the current single-fiscal-year report template only (recent fiscal years, monthly-updated); older multi-year-table PDFs (pre-FY2018-19-era) use an incompatible layout and are out of scope \u2014 see that script's docstring. NAICS-level and COFIM-municipal-IVU breakdowns are a separate Hacienda report not covered by this adapter.\n"
     },
     {
       "source_id": "census_gov_finances",
@@ -2329,7 +2329,7 @@
         "min_rows": 0
       },
       "update_cadence": "yearly",
-      "notes": "FTA National Transit Database — financial, funding-source, and operating-expense data for PR transit agencies (PRHTA, PRITA, Ports Authority). Automatable via the Socrata SODA API on data.transportation.gov; materialized by scripts/download_fta_ntd.py (NTD resource id confirmed on first live run).\n"
+      "notes": "FTA National Transit Database \u2014 financial, funding-source, and operating-expense data for PR transit agencies (PRHTA, PRITA, Ports Authority). Automatable via the Socrata SODA API on data.transportation.gov; materialized by scripts/download_fta_ntd.py (NTD resource id confirmed on first live run).\n"
     },
     {
       "source_id": "pr_act_154_excise",
@@ -2346,7 +2346,7 @@
         "min_rows": 0
       },
       "update_cadence": "monthly",
-      "notes": "Act 154 excise tax on foreign controlled corporations — historically ~$1.8B/yr and 13-21% of the General Fund, the single largest GF revenue line. Hacienda statistics surface; queued for a scraping adapter (scraper_needed).\n"
+      "notes": "Act 154 excise tax on foreign controlled corporations \u2014 historically ~$1.8B/yr and 13-21% of the General Fund, the single largest GF revenue line. Hacienda statistics surface; queued for a scraping adapter (scraper_needed).\n"
     },
     {
       "source_id": "pr_income_tax_collections",
@@ -2363,7 +2363,7 @@
         "min_rows": 0
       },
       "update_cadence": "yearly",
-      "notes": "PR individual & corporate income tax collections — the income-contribution series from the Instituto de Estadisticas / Datos.PR CKAN portal. Largest recurring General Fund revenue category. Automatable via the CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py.\n"
+      "notes": "PR individual & corporate income tax collections \u2014 the income-contribution series from the Instituto de Estadisticas / Datos.PR CKAN portal. Largest recurring General Fund revenue category. Automatable via the CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py.\n"
     },
     {
       "source_id": "pr_general_fund_revenues",
@@ -2380,7 +2380,7 @@
         "min_rows": 0
       },
       "update_cadence": "monthly",
-      "notes": "Consolidated PR General Fund net revenues by source (Instituto de Estadisticas \"Ingresos Netos al Fondo General\") — one authoritative series covering Act 154, income tax, IVU, arbitrios, licenses, lottery, customs, and rum cover-over. Automatable via the Datos.PR CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py.\n"
+      "notes": "Consolidated PR General Fund net revenues by source (Instituto de Estadisticas \"Ingresos Netos al Fondo General\") \u2014 one authoritative series covering Act 154, income tax, IVU, arbitrios, licenses, lottery, customs, and rum cover-over. Automatable via the Datos.PR CKAN API (datos.estadisticas.pr); materialized by scripts/download_estadisticas_pr.py.\n"
     },
     {
       "source_id": "estadisticas_pr_external_trade",
@@ -2451,7 +2451,7 @@
       },
       "manual_drop_dir": "data/raw/PRASA/completed/",
       "update_cadence": "yearly",
-      "notes": "P0 - PRASA completed projects — FEMA 406 / COR3 recovery-infrastructure join bridge. Operator-delivered CSV extracts.\n"
+      "notes": "P0 - PRASA completed projects \u2014 FEMA 406 / COR3 recovery-infrastructure join bridge. Operator-delivered CSV extracts.\n"
     },
     {
       "source_id": "legislapr_discovery",
@@ -2545,7 +2545,7 @@
       "schema_version": "legislative_crosswalk_v1",
       "validation_threshold": {
         "min_rows": 1,
-        "high_confidence_rate_pct": 0
+        "high_confidence_rate_pct": 0.0
       },
       "update_cadence": "weekly",
       "tier": "T2_operational",
