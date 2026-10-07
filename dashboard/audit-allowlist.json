@@ -1,5 +1,5 @@
 {
-  "_comment": "Advisories the frontend dependency gate (scripts/check_npm_audit.py) tolerates. Every entry needs a rationale and an expiry; an expired entry fails the gate. Remove an entry as soon as a fix exists.",
+  "_comment": "Advisories the frontend dependency gate (tools/check_npm_audit.py) tolerates. Every entry needs a rationale and an expiry; an expired entry fails the gate. Remove an entry as soon as a fix exists.",
   "advisories": [
     {
       "id": "GHSA-vfj7-8cjw-p6xm",

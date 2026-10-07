@@ -4,7 +4,7 @@ import datetime as dt
 import json
 from pathlib import Path
 
-from scripts.check_npm_audit import evaluate, main
+from tools.check_npm_audit import evaluate, main
 
 TODAY = dt.date(2026, 10, 7)
 
@@ -90,7 +90,7 @@ def test_npm_error_payload_fails_closed(tmp_path):
 
 def test_committed_allowlist_is_valid_and_unexpired():
     path = Path(__file__).resolve().parents[1] / "dashboard" / "audit-allowlist.json"
-    from scripts.check_npm_audit import load_allowlist
+    from tools.check_npm_audit import load_allowlist
 
     allowed, problems = load_allowlist(path, dt.date.today())
     assert problems == []

@@ -27,7 +27,7 @@ A bump to the **federation export** version is what the release-tagging workflow
 ### Changed
 - **Frontend `npm audit` gate now uses an expiring allow-list instead of failing
   on advisories that cannot be fixed.** `desktop-build.yml` runs
-  `scripts/check_npm_audit.py`, which still fails on any advisory at or above
+  `tools/check_npm_audit.py`, which still fails on any advisory at or above
   `moderate` that is not listed in `dashboard/audit-allowlist.json`, fails on an
   expired or reason-less entry, and fails closed if `npm audit` returns no
   report. Two build-time-only advisories with no usable fix are listed, each
