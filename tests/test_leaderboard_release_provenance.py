@@ -41,6 +41,7 @@ def test_certification_runtime_validation_fails_closed_on_missing_file_state(mon
     assert "state" in errors
     assert "file.sha256" in errors
 
+
 def test_custom_certification_runtime_binds_selected_scope_and_schema(monkeypatch, tmp_path):
     schema = tmp_path / "schema.json"
     scope = tmp_path / "scope.json"
@@ -63,4 +64,3 @@ def test_custom_runtime_validation_rejects_wrong_file_denominator(monkeypatch, t
     monkeypatch.setattr(provenance, "ROOT", tmp_path)
     manifest = provenance.certification_runtime_manifest([one])
     assert "files" in provenance.validate_certification_runtime(manifest, [one, two])
-

@@ -27,11 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_INPUT = ROOT / "data" / "staging" / "processed" / "pr_asg_emergency_purchases.csv"
 DEFAULT_COVERAGE = ROOT / "registries" / "coverage_contracts.json"
 DEFAULT_OUTPUT = (
-    ROOT
-    / "data"
-    / "manifests"
-    / "asg_emergency_purchases"
-    / "identity_coverage_latest.json"
+    ROOT / "data" / "manifests" / "asg_emergency_purchases" / "identity_coverage_latest.json"
 )
 
 SOURCE_NATIVE = "SOURCE_NATIVE_ASG_LICITADOR_ID"
@@ -61,7 +57,11 @@ def _coverage_contract(path: Path) -> dict[str, Any] | None:
     except (OSError, json.JSONDecodeError):
         return None
     return next(
-        (item for item in data.get("contracts") or [] if item.get("source_id") == "asg_emergency_purchases"),
+        (
+            item
+            for item in data.get("contracts") or []
+            if item.get("source_id") == "asg_emergency_purchases"
+        ),
         None,
     )
 
@@ -71,7 +71,9 @@ def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
         return {
             "schemaVersion": "moneysweep.asg-emergency-identity-coverage/v2",
             "state": "OPEN_NOT_MATERIALIZED",
-            "sourcePath": str(input_path.relative_to(ROOT)) if input_path.is_relative_to(ROOT) else str(input_path),
+            "sourcePath": str(input_path.relative_to(ROOT))
+            if input_path.is_relative_to(ROOT)
+            else str(input_path),
             "leaderboardPromotionReady": False,
             "wholeSourceLeaderboardReady": False,
             "boundedSourceNativeLeaderboardReady": False,
@@ -145,7 +147,7 @@ def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
         coverage_pct = None
     else:
         coverage_pct = 100.0 * len(set(control_numbers)) / float(universe_total)
-        floor = float(contract.get("minimum_coverage_pct") or 100.0)
+        floor = float((contract or {}).get("minimum_coverage_pct") or 100.0)
         coverage_state = "MEETS_CONTRACT" if coverage_pct >= floor else "BELOW_CONTRACT"
 
     blockers: list[str] = []
@@ -191,7 +193,9 @@ def audit(input_path: Path, coverage_path: Path) -> dict[str, Any]:
     result = {
         "schemaVersion": "moneysweep.asg-emergency-identity-coverage/v2",
         "state": "PASS" if not blockers else "OPEN",
-        "sourcePath": str(input_path.relative_to(ROOT)) if input_path.is_relative_to(ROOT) else str(input_path),
+        "sourcePath": str(input_path.relative_to(ROOT))
+        if input_path.is_relative_to(ROOT)
+        else str(input_path),
         "sourceSha256": _sha256(input_path),
         "inputRecords": len(rows),
         "uniqueControlNumbers": len(set(control_numbers)),
