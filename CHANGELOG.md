@@ -24,6 +24,19 @@ A bump to the **federation export** version is what the release-tagging workflow
 
 ## [Unreleased]
 
+### Changed
+- **Frontend `npm audit` gate now uses an expiring allow-list instead of failing
+  on advisories that cannot be fixed.** `desktop-build.yml` runs
+  `scripts/check_npm_audit.py`, which still fails on any advisory at or above
+  `moderate` that is not listed in `dashboard/audit-allowlist.json`, fails on an
+  expired or reason-less entry, and fails closed if `npm audit` returns no
+  report. Two build-time-only advisories with no usable fix are listed, each
+  with a rationale and an expiry of 2027-01-05: `braces` GHSA-vfj7-8cjw-p6xm (no
+  patched release) and `postcss-selector-parser` GHSA-rj75-hqrm-r3gf (Tailwind 3
+  pins the 6.x line). `source-map-js` is fixed by a lockfile bump to 1.2.2; the
+  prebuilt dashboard bundle manifest was regenerated for the new fingerprint.
+  This unblocks the packaged-app build and its frozen self-test in CI.
+
 ### Fixed
 - **Cleared the CI failures that were already red on `main`** (separate from the
   desktop Setup fix): two unused imports (`server/backend/case_manager_api.py`,
