@@ -174,19 +174,11 @@ def promote(root: Path, work_path: Path, checkpoint: dict, receipt_path: Path) -
     os.replace(temp, output)
 
     source_native = int(
-        (
-            frame["vendor_identity_state"].astype(str)
-            == "SOURCE_NATIVE_ASG_LICITADOR_ID"
-        ).sum()
+        (frame["vendor_identity_state"].astype(str) == "SOURCE_NATIVE_ASG_LICITADOR_ID").sum()
     )
-    name_only = int(
-        (frame["vendor_identity_state"].astype(str) == "UNRESOLVED_NAME_ONLY").sum()
-    )
+    name_only = int((frame["vendor_identity_state"].astype(str) == "UNRESOLVED_NAME_ONLY").sum())
     missing_vendor = int(
-        (
-            frame["vendor_identity_state"].astype(str)
-            == "UNRESOLVED_MISSING_VENDOR"
-        ).sum()
+        (frame["vendor_identity_state"].astype(str) == "UNRESOLVED_MISSING_VENDOR").sum()
     )
 
     receipt = {
@@ -279,10 +271,7 @@ def run(root: Path, max_pages: int | None, reset: bool) -> dict:
                 return checkpoint
 
             base_rank = int(checkpoint["writtenRawRows"])
-            normalized = [
-                asg._normalize_row(record, creado_rank=None)
-                for record in records
-            ]
+            normalized = [asg._normalize_row(record, creado_rank=None) for record in records]
             append_rows(work_path, normalized)
 
             checkpoint["writtenRawRows"] = base_rank + len(normalized)

@@ -59,8 +59,6 @@ def test_parse_records_on_a_page_without_the_table_returns_empty():
     assert parse_records("<html><body><h1>Error</h1></body></html>") == []
 
 
-
-
 @pytest.mark.unit
 def test_source_native_vendor_id_is_extracted_without_name_inference():
     assert split_vendor_identity("Caribbean Composting Inc. (4381)") == (
@@ -88,6 +86,7 @@ def test_normalize_preserves_raw_vendor_label_and_source_native_id():
     assert row["vendor_registration_id"] == "28546"
     assert row["vendor_identity_scheme"] == "asg_licitador_id"
     assert row["vendor_identity_state"] == "SOURCE_NATIVE_ASG_LICITADOR_ID"
+
 
 @pytest.mark.unit
 def test_normalize_row_emits_exactly_the_declared_columns():

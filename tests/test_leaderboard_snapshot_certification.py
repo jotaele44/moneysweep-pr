@@ -145,6 +145,7 @@ def test_category_outside_scope_cannot_be_certified():
     snapshot["snapshotSha256"] = snapshot_sha256(snapshot)
     assert "scope.category" in certification_errors(snapshot, _scope())
 
+
 @pytest.mark.unit
 def test_explicit_bounded_source_native_provisional_state_is_certifiable():
     snapshot = _snapshot()
@@ -164,4 +165,3 @@ def test_unknown_provisional_variant_fails_closed():
 
     snapshot["snapshotSha256"] = snapshot_sha256(snapshot)
     assert "certificationState.input" in certification_errors(snapshot, _scope())
-
