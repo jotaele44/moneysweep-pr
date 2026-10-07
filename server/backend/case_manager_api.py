@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from typing import Literal
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from moneysweep.case_manager.ids import deterministic_id
@@ -32,6 +32,7 @@ from server.backend.case_manager_auth import Identity, resolve_identity
 ROOT = Path(__file__).resolve().parents[2]
 DATABASE_PATH = Path(os.environ.get("MONEYSWEEP_CASE_DB", ROOT / "data" / "case_manager.sqlite3"))
 MIGRATION_PATH = ROOT / "migrations" / "001_case_manager_v1.sql"
+
 
 def _require_local_request(request: Request) -> None:
     host = request.client.host if request.client else ""

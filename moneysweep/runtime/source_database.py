@@ -51,9 +51,7 @@ def _iter_files(root: Path, expected: str) -> list[Path]:
         return sorted(
             item
             for item in path.rglob("*")
-            if item.is_file()
-            and item.suffix.lower() in SUPPORTED_SUFFIXES
-            and _within(root, item)
+            if item.is_file() and item.suffix.lower() in SUPPORTED_SUFFIXES and _within(root, item)
         )
     return []
 
@@ -214,7 +212,13 @@ def materialize_source(root: Path, source: dict[str, Any]) -> dict[str, Any]:
         status = "ERROR"
     finally:
         connection.close()
-    return {"source": source_id, "status": status, "files": len(files), "rows": row_count, "error": error}
+    return {
+        "source": source_id,
+        "status": status,
+        "files": len(files),
+        "rows": row_count,
+        "error": error,
+    }
 
 
 def materialize_sources(root: Path, sources: list[dict[str, Any]]) -> dict[str, Any]:

@@ -12,7 +12,6 @@ never returned, written to receipts, or persisted in the MoneySweep workspace.
 from __future__ import annotations
 
 import hashlib
-import ipaddress
 import json
 import uuid
 from datetime import datetime, timezone

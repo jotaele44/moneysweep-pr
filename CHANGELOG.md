@@ -25,6 +25,17 @@ A bump to the **federation export** version is what the release-tagging workflow
 ## [Unreleased]
 
 ### Fixed
+- **Cleared the CI failures that were already red on `main`** (separate from the
+  desktop Setup fix): two unused imports (`server/backend/case_manager_api.py`,
+  `server/backend/materialization.py`) and five files `ruff format` flagged (the
+  byte-bound leaderboard runtime files stay excluded, as in `lint.yml`); the
+  `httpx2` dependency that recent Starlette needs for `TestClient`, declared in
+  `ci.yml`, `tests.yml` and `requirements-dev.txt` (it made
+  `tests/test_hud_drgr_audit_api.py` fail at collection); that test's client
+  fixture now connects from loopback, as the hardened local-only guard requires;
+  and the committed prebuilt dashboard bundle, regenerated with
+  `scripts/build_prebuilt_dashboard.py --build` on Node 22.22.2. The frontend
+  `npm audit` gate is unchanged and still fails on `braces` (see the PR).
 - **Desktop Setup & Diagnostics no longer hangs on "Saving configuration and
   starting the app…".** A backend that failed or was slow to import left the
   setup page frozen with no error. The visible-error screen with **Try Again**

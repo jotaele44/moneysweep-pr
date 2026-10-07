@@ -26,10 +26,13 @@ def test_materialize_source_is_idempotent_and_preserves_provenance(tmp_path):
     assert first["rows"] == second["rows"] == 2
     connection = sqlite3.connect(tmp_path / "data/moneysweep_sources.sqlite3")
     try:
-        assert connection.execute(
-            "SELECT COUNT(*) FROM financial_records WHERE source_id=?",
-            ("sample_financial_source",),
-        ).fetchone()[0] == 2
+        assert (
+            connection.execute(
+                "SELECT COUNT(*) FROM financial_records WHERE source_id=?",
+                ("sample_financial_source",),
+            ).fetchone()[0]
+            == 2
+        )
         payload = json.loads(
             connection.execute("SELECT payload_json FROM financial_records").fetchone()[0]
         )
