@@ -337,8 +337,9 @@ contracts:
     pagination_required: true
     notes: >-
       Authoritative live refresh completed 2026-10-06 using control-number
-      ordering: 144 declared pages, 1,431 rows, 1,431 unique control_number
-      values, zero duplicates and zero conflicts; page 144 contains one row. A
+      ordering: 144 declared pages, 1,431 raw row manifestations, 1,431 unique
+      control_number values, zero duplicates and zero conflicts; page 144
+      contains one row. A
       separate -creado manifestation also returned 1,431 rendered rows but only
       1,319 unique control numbers because 112 exact duplicate manifestations were
       repeated across 59 groups. That ordering is retained as non-authoritative
