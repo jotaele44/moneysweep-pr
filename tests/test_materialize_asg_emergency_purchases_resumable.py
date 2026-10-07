@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pandas as pd
@@ -152,6 +151,7 @@ def test_exact_duplicate_source_manifestation_is_deduplicated(monkeypatch, tmp_p
     assert result["exactDuplicateGroups"] == 1
     assert result["authoritativeUniverseTotal"] == 3
     assert result["uniqueControlNumbers"] == 3
+
 
 @pytest.mark.unit
 def test_conflicting_duplicate_control_number_refuses_promotion(monkeypatch, tmp_path: Path):
