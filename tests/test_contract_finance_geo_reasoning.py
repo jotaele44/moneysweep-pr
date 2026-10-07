@@ -375,7 +375,8 @@ def test_san_juan_bias_flags_hq_row(tmp_path, synthetic_inputs):
     )
     summary = json.loads((out / "san_juan_hq_bias_summary.json").read_text())
     assert summary["biased_record_count"] == 1  # the A2 headquarters row
-    rows = list(csv.DictReader((out / "san_juan_hq_bias_report.csv").open()))
+    with (out / "san_juan_hq_bias_report.csv").open() as handle:
+        rows = list(csv.DictReader(handle))
     assert any(r["record_id"] == "A2" for r in rows)
 
 

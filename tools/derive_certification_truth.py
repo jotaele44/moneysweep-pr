@@ -400,7 +400,7 @@ def derive(
     evidence_class = (
         "verified_operator_corpus_mount" if operator_corpus_id else "checkout_or_operator_workspace"
     )
-    truth = {
+    truth: dict[str, Any] = {
         "schema_version": TRUTH_SCHEMA_VERSION,
         "as_of": as_of.isoformat(),
         "registry": {

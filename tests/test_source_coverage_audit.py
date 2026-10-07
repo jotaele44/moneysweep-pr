@@ -154,13 +154,9 @@ def test_source_coverage_csv_has_required_columns(tmp_path: Path):
 
     run_audit(tmp_path)
 
-    rows = list(
-        csv.DictReader(
-            (tmp_path / "data" / "exports" / "source_coverage_audit.csv").open(
-                "r", encoding="utf-8"
-            )
-        )
-    )
+    report = tmp_path / "data" / "exports" / "source_coverage_audit.csv"
+    with report.open("r", encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
     assert rows
 
     required = {

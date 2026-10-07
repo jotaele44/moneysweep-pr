@@ -59,8 +59,10 @@ def test_offline_run_materializes_municipal_and_facility_outputs(tmp_path):
     muni = out_dir / "pr_ftm_municipal_bridge.csv"
     fac = out_dir / "pr_ftm_facility_matches.csv"
 
-    muni_rows = list(csv.DictReader(muni.open(encoding="utf-8")))
-    fac_rows = list(csv.DictReader(fac.open(encoding="utf-8")))
+    with muni.open(encoding="utf-8") as handle:
+        muni_rows = list(csv.DictReader(handle))
+    with fac.open(encoding="utf-8") as handle:
+        fac_rows = list(csv.DictReader(handle))
 
     assert muni_rows, "municipal bridge should be non-empty from committed inputs"
     assert fac_rows, "facility matches should be non-empty from committed inputs"

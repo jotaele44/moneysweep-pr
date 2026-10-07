@@ -273,7 +273,7 @@ def build_report(
     total = readiness["total_sources"]
     required_total = len(required)
     digest = readiness["source_count_provenance"]["source_ids_sha256"]
-    input_manifest = {
+    input_manifest: dict[str, dict[str, Any]] = {
         "certification_config": {
             "path": "registries/production_certification.yaml",
             "sha256": _sha256(config_path),
@@ -299,7 +299,8 @@ def build_report(
     gates: list[dict[str, Any]] = []
 
     truth_scope_id = truth_scope.get("scope_id") if truth_scope else None
-    truth_identity = truth_scope.get("scope_identity") if truth_scope else {}
+    truth_identity_value = truth_scope.get("scope_identity") if truth_scope else None
+    truth_identity = truth_identity_value if isinstance(truth_identity_value, dict) else {}
     truth_digest_match = (
         truth_root is None or truth_identity.get("registry_source_ids_sha256") == digest
     )

@@ -64,6 +64,8 @@ def _services() -> tuple[CaseCommandService, CaseQueryService]:
 def configure_repository(repository: SQLiteCaseManagerRepository | None) -> None:
     """Test hook; production callers use the configured SQLite path."""
     global _repository
+    if _repository is not None and _repository is not repository:
+        _repository.close()
     _repository = repository
 
 

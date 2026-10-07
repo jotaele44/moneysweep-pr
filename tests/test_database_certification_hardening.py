@@ -24,6 +24,13 @@ from scripts import remediate_canonical_evidence_provenance as remediation
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
+@pytest.fixture
+def sqlite_connection():
+    connection = sqlite3.connect(":memory:")
+    yield connection
+    connection.close()
+
+
 def test_database_release_certifier_direct_entrypoint_is_cwd_independent(tmp_path: Path):
     result = subprocess.run(
         [sys.executable, str(REPO_ROOT / "scripts/certify_database_release.py"), "--help"],
@@ -236,11 +243,12 @@ def _case(case_key: str, visibility: str = "internal") -> Case:
     )
 
 
-def test_configured_catalog_rejects_dangling_case_evidence(tmp_path: Path):
+def test_configured_catalog_rejects_dangling_case_evidence(tmp_path: Path, sqlite_connection):
     evidence_path = tmp_path / "evidence.csv"
     _write_csv(evidence_path, ["evidence_id"], [{"evidence_id": "evidence_real"}])
-    connection = sqlite3.connect(":memory:")
-    repository = SQLiteCaseManagerRepository(connection, canonical_evidence_path=evidence_path)
+    repository = SQLiteCaseManagerRepository(
+        sqlite_connection, canonical_evidence_path=evidence_path
+    )
     repository.apply_migration(REPO_ROOT / "migrations/001_case_manager_v1.sql")
     commands = CaseCommandService(repository)
     case = _case("catalog")
@@ -257,9 +265,8 @@ def test_configured_catalog_rejects_dangling_case_evidence(tmp_path: Path):
         )
 
 
-def test_parent_case_visibility_dominates_public_child():
-    connection = sqlite3.connect(":memory:")
-    repository = SQLiteCaseManagerRepository(connection)
+def test_parent_case_visibility_dominates_public_child(sqlite_connection):
+    repository = SQLiteCaseManagerRepository(sqlite_connection)
     repository.apply_migration(REPO_ROOT / "migrations/001_case_manager_v1.sql")
     commands = CaseCommandService(repository)
     queries = CaseQueryService(repository)
@@ -280,9 +287,8 @@ def test_parent_case_visibility_dominates_public_child():
     assert len(queries.get_case_collection(case.case_id, "claims", "restricted")) == 1
 
 
-def test_cross_case_finding_is_rejected():
-    connection = sqlite3.connect(":memory:")
-    repository = SQLiteCaseManagerRepository(connection)
+def test_cross_case_finding_is_rejected(sqlite_connection):
+    repository = SQLiteCaseManagerRepository(sqlite_connection)
     repository.apply_migration(REPO_ROOT / "migrations/001_case_manager_v1.sql")
     commands = CaseCommandService(repository)
     case_a = _case("a")

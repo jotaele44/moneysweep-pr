@@ -101,7 +101,8 @@ def test_missing_changed_endpoint_produces_readiness_warning(tmp_path: Path):
 def test_all_normalized_rows_contain_required_provenance_fields(tmp_path: Path):
     lda.run(output_dir=tmp_path, live=False)
     path = tmp_path / "data/staging/processed/lda_filings.csv"
-    rows = list(csv.DictReader(path.open()))
+    with path.open() as handle:
+        rows = list(csv.DictReader(handle))
     assert rows
     required = {
         "source_id",

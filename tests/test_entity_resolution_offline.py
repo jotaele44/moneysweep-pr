@@ -27,7 +27,8 @@ def test_default_entity_resolution_does_not_call_live_api(tmp_path, monkeypatch)
         lambda *_: (_ for _ in ()).throw(AssertionError("live API called")),
     )
     output = er.run(root=tmp_path, top_n=10)
-    rows = list(csv.DictReader(output.open(encoding="utf-8")))
+    with output.open(encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
     assert rows[0]["source"] == "offline_unresolved"
 
 
@@ -56,7 +57,8 @@ def test_default_entity_resolution_reuses_existing_cache(tmp_path):
         encoding="utf-8",
     )
     output = er.run(root=tmp_path, top_n=10)
-    rows = list(csv.DictReader(output.open(encoding="utf-8")))
+    with output.open(encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
     assert rows[0]["source"] == "cache"
     assert rows[0]["parent_uei"] == "PARENTUEI001"
     assert rows[0]["identity_status"] == "PASS"
