@@ -387,7 +387,9 @@ _SCHEME = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 # Anything that is a glob, placeholder, shell syntax, URL fragment or scoped
 # package name rather than a plain repo path.
 _NOT_A_PATH = re.compile(r"[*<>{}$|;=,()\[\]\"'\\!?^~@]")
-_LOCATOR = re.compile(r"(::[\w.\[\]-]+|:\d+(?:-\d+)?)$")  # pytest node id / file:line
+# A trailing locator is not part of the path: pytest node id (::name), line number
+# (:42 or :42-50) or symbol (:name, :Class.method).
+_LOCATOR = re.compile(r"(::[\w.\[\]-]+|:\d+(?:-\d+)?|:[A-Za-z_][\w.]*)$")
 
 
 def _strip_markup(text: str) -> str:
