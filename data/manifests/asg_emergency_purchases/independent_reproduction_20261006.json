@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "moneysweep.asg-emergency-independent-reproduction/v1",
+  "observedAt": "2026-10-06T21:55:00Z",
+  "state": "PASS",
+  "source": {
+    "url": "https://www.asg.pr.gov/comprasemergencias",
+    "ordering": "-numerocontrol",
+    "declaredPages": 144,
+    "pagesFetched": 144,
+    "authoritativeUniverseTotal": 1431,
+    "uniqueControlNumbers": 1431,
+    "duplicateControlGroups": 0,
+    "conflictingDuplicateGroups": 0,
+    "missingControlNumbers": 0,
+    "normalizedCsvSha256": "fa892790c31b7334152d8bc6319156456ea6807572612898b8ca3b5cbcc3d5ae",
+    "rawPageManifestSha256": "c541f991092b849a5eb914215d913bc859deb5130ec85f9ae15c4742935a2905",
+    "storageArtifact": "public/static/asg_emergency_authoritative_fa892790c31b7334152d8bc6319156456ea6807572612898b8ca3b5cbcc3d5ae.csv",
+    "receiptStorageArtifact": "public/static/asg_emergency_authoritative_receipt_bcf4fac0f7c29f035eee7ecd6c09295c3965d42d474410951f677c38b17ba4a5.json"
+  },
+  "identity": {
+    "sourceNativeRows": 21,
+    "nameOnlyRows": 1408,
+    "missingVendorRows": 2,
+    "distinctSourceNativeIds": 10,
+    "allCandidateIdsMatchedOfficialSupplierRegistry": true,
+    "matchedIds": ["303", "437", "1174", "4381", "10329", "13947", "23388", "25833", "28546", "56227"]
+  },
+  "financialValue": {
+    "validAmountRows": 1431,
+    "invalidAmountRows": 0,
+    "sourceNativeInvalidAmountRows": 0,
+    "eligibleSourceNativeRows": 21,
+    "eligibleSourceNativeVendors": 10,
+    "eligibleSourceNativeAmountTotal": 4423664.82,
+    "currency": "USD",
+    "measure": "ASG_EMERGENCY_PURCHASE_COST"
+  },
+  "certifiedSubsetComparison": {
+    "committedSubsetPath": "data/manifests/asg_emergency_purchases/source_native_rows_v1.csv",
+    "liveRows": 21,
+    "committedRows": 21,
+    "addedRows": 0,
+    "missingRows": 0,
+    "changedRankingRelevantRows": 0,
+    "fieldsCompared": [
+      "control_number",
+      "vendor_source_label",
+      "vendor_name",
+      "vendor_registration_id",
+      "vendor_identity_scheme",
+      "vendor_identity_state",
+      "obligation_amount"
+    ]
+  },
+  "nonAuthoritativeOrderingControl": {
+    "ordering": "-creado",
+    "renderedRows": 1431,
+    "uniqueControlNumbers": 1319,
+    "exactDuplicateManifestations": 112,
+    "duplicateControlGroups": 59,
+    "conflictingDuplicateGroups": 0,
+    "state": "PAGINATION_DRIFT_NOT_COMPLETENESS_AUTHORITY"
+  },
+  "certificationEffect": {
+    "producerPackageChanged": false,
+    "certifiedRankingChanged": false,
+    "wholeSourceIdentityClaimAuthorized": false,
+    "boundedSourceNativeCertificationRemainsValid": true
+  }
+}

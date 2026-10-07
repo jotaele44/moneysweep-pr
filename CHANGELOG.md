@@ -24,6 +24,57 @@ A bump to the **federation export** version is what the release-tagging workflow
 
 ## [Unreleased]
 
+### Changed
+- **Frontend `npm audit` gate now uses an expiring allow-list instead of failing
+  on advisories that cannot be fixed.** `desktop-build.yml` runs
+  `tools/check_npm_audit.py`, which still fails on any advisory at or above
+  `moderate` that is not listed in `dashboard/audit-allowlist.json`, fails on an
+  expired or reason-less entry, and fails closed if `npm audit` returns no
+  report. Two build-time-only advisories with no usable fix are listed, each
+  with a rationale and an expiry of 2027-01-05: `braces` GHSA-vfj7-8cjw-p6xm (no
+  patched release) and `postcss-selector-parser` GHSA-rj75-hqrm-r3gf (Tailwind 3
+  pins the 6.x line). `source-map-js` is fixed by a lockfile bump to 1.2.2; the
+  prebuilt dashboard bundle manifest was regenerated for the new fingerprint.
+  This unblocks the packaged-app build and its frozen self-test in CI.
+
+### Fixed
+- **Cleared the checks #656 merged red.** `mypy` (`audit_asg_emergency_identity_coverage`
+  narrowed the optional coverage contract), the `ruff` format gate (eight files) and one
+  unused import; `registries/coverage_contracts.yaml` now matches its JSON (the 1,431
+  denominator was on `usaspending_prime`/`usaspending_subawards` instead of
+  `asg_emergency_purchases`) with `reports/completeness_matrix.csv` and
+  `reports/source_registry_status.csv` regenerated from their tools; one ASG note phrase
+  aligned with the test that asserts it (counts unchanged); and the new ASG scripts are
+  classified `internal` in a GUI-parity extension (baseline untouched).
+- **Cleared the CI failures that were already red on `main`** (separate from the
+  desktop Setup fix): two unused imports (`server/backend/case_manager_api.py`,
+  `server/backend/materialization.py`) and five files `ruff format` flagged (the
+  byte-bound leaderboard runtime files stay excluded, as in `lint.yml`); the
+  `httpx2` dependency that recent Starlette needs for `TestClient`, declared in
+  `ci.yml`, `tests.yml` and `requirements-dev.txt` (it made
+  `tests/test_hud_drgr_audit_api.py` fail at collection); that test's client
+  fixture now connects from loopback, as the hardened local-only guard requires;
+  and the committed prebuilt dashboard bundle, regenerated with
+  `scripts/build_prebuilt_dashboard.py --build` on Node 22.22.2. The frontend
+  `npm audit` gate is unchanged and still fails on `braces` (see the PR).
+- **Desktop Setup & Diagnostics no longer hangs on "Saving configuration and
+  starting the app…".** A backend that failed or was slow to import left the
+  setup page frozen with no error. The visible-error screen with **Try Again**
+  ships in the shared `prii-desktop` runtime (thehub-pr#335); this repo picks it
+  up when the federation template pin in `requirements-desktop.txt` is bumped.
+- **Source launches no longer fail while importing the backend.** Every launcher
+  runs `python desktop/launch.py`, which put `desktop/` first on `sys.path` so
+  `desktop/secrets.py` shadowed the standard-library `secrets` module and
+  starlette raised `cannot import name 'token_hex'`; `desktop/launch.py` now
+  removes its own directory from `sys.path` (regression test in
+  `tests/test_desktop_saved_workspace.py`).
+- **The workspace folder chosen in Setup & Diagnostics is now actually used.**
+  `desktop/config.py` exports it through `MONEYSWEEP_WORKSPACE_ROOT` and
+  re-bootstraps the data tree on Save/Repair (`SETUP_ACTION`), and
+  `desktop/launch.py` applies the saved choice before bootstrapping on later
+  launches (an explicit `MONEYSWEEP_WORKSPACE_ROOT` still wins). Previously the
+  data root stayed in `~/Library/Application Support/PRII-MONEYSWEEP`.
+
 ### Added
 - **Desktop wrapper first run no longer requires Node.js or a browser-download
   repair ritual.** A prebuilt dashboard is committed at

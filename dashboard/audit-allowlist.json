@@ -1,0 +1,17 @@
+{
+  "_comment": "Advisories the frontend dependency gate (tools/check_npm_audit.py) tolerates. Every entry needs a rationale and an expiry; an expired entry fails the gate. Remove an entry as soon as a fix exists.",
+  "advisories": [
+    {
+      "id": "GHSA-vfj7-8cjw-p6xm",
+      "package": "braces",
+      "reason": "Stack exhaustion on deeply nested brace patterns. No patched release exists (affected range '*', latest 3.0.3). Reached only through tailwindcss and vite-plugin-singlefile at build time, on this repo's own source globs; nothing from the braces chain ships in the bundle or runs in the desktop app.",
+      "expires": "2027-01-05"
+    },
+    {
+      "id": "GHSA-rj75-hqrm-r3gf",
+      "package": "postcss-selector-parser",
+      "reason": "Quadratic-time selector parsing (fixed in 7.1.6). tailwindcss 3.x and postcss-nested pin the 6.x line, so it cannot be upgraded without moving Tailwind. Build-time only, parsing this repo's own CSS; not shipped.",
+      "expires": "2027-01-05"
+    }
+  ]
+}

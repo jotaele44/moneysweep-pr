@@ -1,0 +1,111 @@
+/* ZIP tokens isolated from the existing semantic contract. Fonts use bundled/system families. */
+
+:root {
+  /* Overlay layers */
+  --zip-z-overlay: 400;
+
+  --zip-z-spotlight: 1000; /* Tutorial spotlights/guided help */
+
+  /* System layers */
+  --zip-z-critical: 2000; /* Critical system notifications */
+
+  /* spacing */
+  --zip-spacing-1: 0.25rem;
+  --zip-spacing-2: 0.5rem;
+  --zip-spacing-3: 0.75rem;
+  --zip-spacing-4: 1rem;
+  --zip-spacing-6: 1.5rem;
+  --zip-spacing-8: 2rem;
+  --zip-spacing-12: 3rem;
+  --zip-spacing-16: 4rem;
+  --zip-spacing-20: 5rem;
+}
+
+:root {
+  --zip-background: hsl(215, 30%, 6%);
+  --zip-foreground: hsl(194, 78%, 94%);
+  --zip-surface: hsl(214, 28%, 9%);
+  --zip-surface-foreground: hsl(194, 72%, 92%);
+  --zip-sidebar: hsl(215, 30%, 7%);
+  --zip-sidebar-foreground: hsl(194, 70%, 90%);
+  --zip-card: hsl(214, 25%, 11%);
+  --zip-card-foreground: hsl(194, 72%, 92%);
+  --zip-popup: hsl(214, 24%, 12%);
+  --zip-popup-foreground: hsl(194, 72%, 92%);
+  --zip-primary: hsl(187, 100%, 50%);
+  --zip-primary-foreground: hsl(215, 32%, 7%);
+  --zip-secondary: hsl(214, 20%, 16%);
+  --zip-secondary-foreground: hsl(194, 60%, 86%);
+  --zip-accent: hsl(170, 100%, 39%);
+  --zip-accent-foreground: hsl(215, 32%, 7%);
+  --zip-muted: hsl(214, 20%, 14%);
+  --zip-muted-foreground: hsl(211, 14%, 60%);
+  --zip-success: hsl(157, 72%, 44%);
+  --zip-success-foreground: hsl(215, 32%, 7%);
+  --zip-error: hsl(0, 78%, 59%);
+  --zip-error-foreground: hsl(0, 0%, 98%);
+  --zip-warning: hsl(39, 95%, 56%);
+  --zip-warning-foreground: hsl(215, 32%, 7%);
+  --zip-info: hsl(187, 100%, 50%);
+  --zip-info-foreground: hsl(215, 32%, 7%);
+  --zip-info-hover: hsl(187, 92%, 44%);
+  --zip-info-active: hsl(187, 85%, 38%);
+  --zip-border: hsl(211, 22%, 19%);
+  --zip-font-family-base: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --zip-font-family-display: 'Bricolage Grotesque', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --zip-font-family-monospace: 'JetBrains Mono', ui-monospace, monospace;
+  --zip-font-family-cursive: cursive;
+  --zip-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  --zip-shadow-md: 0 14px 38px rgba(0, 0, 0, 0.28);
+  --zip-shadow-lg: 0 24px 56px rgba(0, 0, 0, 0.36);
+  --zip-shadow-focus: 0 0 0 3px hsla(187, 100%, 50%, 0.2);
+  --zip-radius-sm: 0.45rem;
+  --zip-radius: 0.7rem;
+  --zip-radius-md: 0.9rem;
+  --zip-radius-lg: 1.15rem;
+  --zip-radius-full: 9999px;
+  --zip-animation-duration-fast: 120ms;
+  --zip-animation-duration-normal: 180ms;
+  --zip-animation-duration-slow: 280ms;
+  --zip-chart-color-1: hsl(187, 100%, 50%);
+  --zip-chart-color-2: hsl(170, 100%, 39%);
+  --zip-chart-color-3: hsl(258, 90%, 66%);
+  --zip-chart-color-4: hsl(39, 95%, 56%);
+  --zip-chart-color-5: hsl(350, 89%, 60%);
+  --zip-signal-glow: 0 0 18px rgba(0, 229, 255, 0.22);
+  --zip-signal-border: rgba(0, 229, 255, 0.28);
+  --zip-panel-glass: rgba(15, 25, 35, 0.9);
+}
+
+:root.dark, :root[data-theme="dark"] {
+  --zip-background: hsl(215, 30%, 6%);
+  --zip-foreground: hsl(194, 78%, 94%);
+  --zip-surface: hsl(214, 28%, 9%);
+  --zip-surface-foreground: hsl(194, 72%, 92%);
+  --zip-sidebar: hsl(215, 30%, 7%);
+  --zip-sidebar-foreground: hsl(194, 70%, 90%);
+  --zip-card: hsl(214, 25%, 11%);
+  --zip-card-foreground: hsl(194, 72%, 92%);
+  --zip-popup: hsl(214, 24%, 12%);
+  --zip-popup-foreground: hsl(194, 72%, 92%);
+  --zip-primary: hsl(187, 100%, 50%);
+  --zip-primary-foreground: hsl(215, 32%, 7%);
+  --zip-secondary: hsl(214, 20%, 16%);
+  --zip-secondary-foreground: hsl(194, 60%, 86%);
+  --zip-accent: hsl(170, 100%, 39%);
+  --zip-accent-foreground: hsl(215, 32%, 7%);
+  --zip-muted: hsl(214, 20%, 14%);
+  --zip-muted-foreground: hsl(211, 14%, 60%);
+  --zip-success: hsl(157, 72%, 44%);
+  --zip-success-foreground: hsl(215, 32%, 7%);
+  --zip-error: hsl(0, 78%, 59%);
+  --zip-error-foreground: hsl(0, 0%, 98%);
+  --zip-warning: hsl(39, 95%, 56%);
+  --zip-warning-foreground: hsl(215, 32%, 7%);
+  --zip-info: hsl(187, 100%, 50%);
+  --zip-info-foreground: hsl(215, 32%, 7%);
+  --zip-info-hover: hsl(187, 92%, 44%);
+  --zip-info-active: hsl(187, 85%, 38%);
+  --zip-border: hsl(211, 22%, 19%);
+}
+:root { --zip-font-family-base: "Inter Variable", Inter, system-ui, sans-serif; --zip-font-family-display: Georgia, serif; --zip-font-family-heading: "Inter Variable", Inter, system-ui, sans-serif; --zip-font-family-monospace: "JetBrains Mono", monospace; }

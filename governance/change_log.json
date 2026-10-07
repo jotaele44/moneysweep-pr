@@ -12,18 +12,15 @@
     },
     {
       "date": "2026-10-02",
-      "summary": "Adopted the change-coupled documentation gate defined by thehub-pr ADR 0010: the shared tools/check_docs_sync.py, a docs-sync workflow, a Claude Code Stop hook, CLAUDE.md, and this repo's .federation/docs-sync.json. Re-pinned PRII_TEMPLATE_REF to thehub-pr a86951e. The pre-commit hook, PR-template line and CONTRIBUTING sections this repo does not render from the hub were added by hand, and .gitignore now tracks .claude/settings.json. Tooling and workflow change only: no contract, schema or dependency edge changed. PROVISIONAL until docs-sync is a required status check on main.",
+      "summary": "Turned on the change-coupled documentation gate defined by thehub-pr ADR 0010. Its tooling (the shared tools/check_docs_sync.py, the docs-sync workflow, the Claude Code Stop hook and CLAUDE.md) came in with #648 in report mode with no couplings; this entry gives the repo its own .federation/docs-sync.json (four couplings, enforce mode) and re-pins PRII_TEMPLATE_REF from thehub-pr 796951e to 09e2e54, which carries the checker's fix for path:symbol references. The pre-commit hook, PR-template line and CONTRIBUTING sections this repo does not render from the hub were added by hand, and .gitignore now tracks .claude/settings.json. Tooling and workflow change only: no contract, schema or dependency edge changed. PROVISIONAL until docs-sync is a required status check on main.",
       "files": [
-        "tools/check_docs_sync.py",
-        ".github/workflows/docs-sync.yml",
-        ".github/workflows/template-drift.yml",
-        ".claude/settings.json",
-        ".gitignore",
-        "CLAUDE.md",
         ".federation/docs-sync.json",
         ".pre-commit-config.yaml",
         ".github/pull_request_template.md",
         "CONTRIBUTING.md",
+        ".gitignore",
+        ".github/workflows/template-drift.yml",
+        "tools/check_docs_sync.py",
         "governance/change_log.json"
       ]
     }

@@ -51,6 +51,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from moneysweep.runtime.source_registry import load_source_registry
+from moneysweep.runtime.source_database import materialize_source
 from scripts.build_source_recovery_matrix import PATH_TYPES, _classify
 from scripts.check_network_egress import run_checks
 from scripts.config import PROJECT_ROOT, setup_logging
@@ -238,12 +239,21 @@ def run(
             return summary
 
     summary["workspace_rebind"] = _bind_legacy_config_to_workspace(root)
-    summary["ran"] = [run_one(root, src, logger) for src in selected]
-    summary["status"] = "OK"
+    summary["ran"] = []
+    for src in selected:
+        result = run_one(root, src, logger)
+        # Import even failed/no-op producer results so the database records an
+        # explicit NO_DATA/ERROR state rather than silently omitting the source.
+        result["database"] = materialize_source(root, src)
+        summary["ran"].append(result)
     summary["ok_count"] = sum(1 for r in summary["ran"] if r["status"] in ("OK", "CACHED"))
+    error_statuses = {"ERROR", "IMPORT_ERROR", "NO_ENTRYPOINT"}
     summary["error_count"] = sum(
-        1 for r in summary["ran"] if r["status"] in ("ERROR", "IMPORT_ERROR", "NO_ENTRYPOINT")
+        1
+        for r in summary["ran"]
+        if r["status"] in error_statuses or r.get("database", {}).get("status") == "ERROR"
     )
+    summary["status"] = "ERROR" if summary["error_count"] else "OK"
     _write_summary(root, summary)
     return summary
 

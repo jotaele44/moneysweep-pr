@@ -111,7 +111,8 @@
           "tests/test_gui_parity.py"
         ],
         "e2e": [
-          "dashboard/tests/gui-parity.spec.mjs"
+          "dashboard/tests/gui-parity.spec.mjs",
+          "dashboard/tests/zip-design.spec.mjs"
         ]
       }
     },
@@ -162,7 +163,8 @@
           "tests/test_gui_parity.py"
         ],
         "e2e": [
-          "dashboard/tests/org-change-monitor.spec.mjs"
+          "dashboard/tests/org-change-monitor.spec.mjs",
+          "dashboard/tests/zip-design.spec.mjs"
         ]
       },
       "candidate_ids": [
@@ -243,7 +245,8 @@
           "dashboard/src/components/CampaignFinance.test.jsx"
         ],
         "e2e": [
-          "dashboard/tests/gui-parity.spec.mjs"
+          "dashboard/tests/gui-parity.spec.mjs",
+          "dashboard/tests/zip-design.spec.mjs"
         ]
       }
     },
@@ -332,7 +335,8 @@
           "tests/test_gui_parity.py"
         ],
         "e2e": [
-          "dashboard/tests/campaign-finance.spec.mjs"
+          "dashboard/tests/campaign-finance.spec.mjs",
+          "dashboard/tests/zip-design.spec.mjs"
         ]
       },
       "candidate_ids": [
@@ -755,7 +759,7 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing — zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
+      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing \u2014 zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
       "backend": {
         "files": [
           "scripts/scrape_rdc_demandas.py",
@@ -867,12 +871,9 @@
     },
     {
       "id": "postmerge-staged-analysis-and-api-surfaces",
-      "classification": "analysis",
-      "status": "staged",
+      "classification": "internal",
+      "status": "active",
       "requires_terminal": false,
-      "feature_flag": "postmerge-gui-parity-reconciliation",
-      "tracking": "https://github.com/jotaele44/moneysweep-pr/pull/480",
-      "expires_on": "2026-11-30",
       "candidate_ids": [
         "analysis_module:scripts/build_campaign_finance_entities.py",
         "analysis_module:scripts/build_federal_financial_program_registry.py",
@@ -1133,8 +1134,237 @@
         "python_symbol:server/backend/case_manager_api.py:link_claim_evidence",
         "python_symbol:server/backend/case_manager_api.py:link_evidence",
         "python_symbol:server/backend/case_manager_api.py:resolve_contradiction",
-        "python_symbol:server/backend/case_manager_app.py:health"
-      ]
+        "python_symbol:server/backend/case_manager_app.py:health",
+        "analysis_module:scripts/acquire_sec13f_bpop_golden.py",
+        "analysis_module:scripts/audit_guide_financial_avenues.py",
+        "analysis_module:scripts/build_source_drop_manifest.py",
+        "analysis_module:scripts/certify_bpop_sec13f_8q.py",
+        "analysis_module:scripts/certify_database_release.py",
+        "analysis_module:scripts/certify_sec13f_issuer.py",
+        "analysis_module:scripts/download_fomb.py",
+        "analysis_module:scripts/download_fomb_special_reports.py",
+        "analysis_module:scripts/download_hacienda_sut_ivu.py",
+        "analysis_module:scripts/download_sec_equity_v2.py",
+        "analysis_module:scripts/finalize_guide_financial_freeze.py",
+        "analysis_module:scripts/rematerialize_sec_holdings_discovery_v2.py",
+        "analysis_module:scripts/remediate_canonical_evidence_provenance.py",
+        "analysis_module:scripts/scrape_ftz_board_pr.py",
+        "analysis_module:scripts/scrape_ocif_guide_financial_classes.py",
+        "analysis_module:scripts/scrape_ocs_insurers.py",
+        "analysis_module:scripts/sec13f_certification_lock.py",
+        "analysis_module:scripts/validate_haf_contract.py",
+        "analysis_symbol:scripts/acquire_sec13f_bpop_golden.py:archive_audit",
+        "analysis_symbol:scripts/acquire_sec13f_bpop_golden.py:main",
+        "analysis_symbol:scripts/acquire_sec13f_bpop_golden.py:run",
+        "analysis_symbol:scripts/acquire_sec13f_bpop_golden.py:sha256_file",
+        "analysis_symbol:scripts/audit_guide_financial_avenues.py:compute",
+        "analysis_symbol:scripts/audit_guide_financial_avenues.py:load_inputs",
+        "analysis_symbol:scripts/audit_guide_financial_avenues.py:main",
+        "analysis_symbol:scripts/audit_guide_financial_avenues.py:metrics_payload",
+        "analysis_symbol:scripts/audit_guide_financial_avenues.py:run",
+        "analysis_symbol:scripts/audit_guide_financial_avenues.py:validate_inputs",
+        "analysis_symbol:scripts/audit_guide_financial_avenues.py:write_outputs",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:build_records",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:inspect_csv",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:inspect_path",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:inspect_xlsx",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:main",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:sha256_file",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:utc_now",
+        "analysis_symbol:scripts/build_source_drop_manifest.py:write_outputs",
+        "analysis_symbol:scripts/certify_bpop_sec13f_8q.py:main",
+        "analysis_symbol:scripts/certify_bpop_sec13f_8q.py:run",
+        "analysis_symbol:scripts/certify_database_release.py:build_report",
+        "analysis_symbol:scripts/certify_database_release.py:main",
+        "analysis_symbol:scripts/certify_database_release.py:write_atomic_release",
+        "analysis_symbol:scripts/certify_sec13f_issuer.py:main",
+        "analysis_symbol:scripts/certify_sec13f_issuer.py:run",
+        "analysis_symbol:scripts/download_fomb.py:AjaxConfig",
+        "analysis_symbol:scripts/download_fomb.py:Link",
+        "analysis_symbol:scripts/download_fomb.py:main",
+        "analysis_symbol:scripts/download_fomb.py:run",
+        "analysis_symbol:scripts/download_fomb_special_reports.py:run",
+        "analysis_symbol:scripts/download_hacienda_sut_ivu.py:discover_pdf_urls",
+        "analysis_symbol:scripts/download_hacienda_sut_ivu.py:parse_pdf",
+        "analysis_symbol:scripts/download_hacienda_sut_ivu.py:run",
+        "analysis_symbol:scripts/download_sec_equity_v2.py:main",
+        "analysis_symbol:scripts/download_sec_equity_v2.py:run",
+        "analysis_symbol:scripts/entity_resolution.py:adjudicate_usaspending_candidate",
+        "analysis_symbol:scripts/finalize_guide_financial_freeze.py:build_certification",
+        "analysis_symbol:scripts/finalize_guide_financial_freeze.py:csv_schema",
+        "analysis_symbol:scripts/finalize_guide_financial_freeze.py:latest_manifest",
+        "analysis_symbol:scripts/finalize_guide_financial_freeze.py:main",
+        "analysis_symbol:scripts/finalize_guide_financial_freeze.py:materialized_projection",
+        "analysis_symbol:scripts/finalize_guide_financial_freeze.py:run",
+        "analysis_symbol:scripts/finalize_guide_financial_freeze.py:sha256_file",
+        "analysis_symbol:scripts/finalize_guide_financial_freeze.py:validate_source_snapshot",
+        "analysis_symbol:scripts/rematerialize_sec_holdings_discovery_v2.py:classify_identifier",
+        "analysis_symbol:scripts/rematerialize_sec_holdings_discovery_v2.py:main",
+        "analysis_symbol:scripts/rematerialize_sec_holdings_discovery_v2.py:run",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:apply",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:atomic_csv",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:main",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:plan",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:read_rows",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:sha256",
+        "analysis_symbol:scripts/remediate_canonical_evidence_provenance.py:target_evidence",
+        "analysis_symbol:scripts/scrape_ftz_board_pr.py:main",
+        "analysis_symbol:scripts/scrape_ftz_board_pr.py:parse_zone",
+        "analysis_symbol:scripts/scrape_ftz_board_pr.py:run",
+        "analysis_symbol:scripts/scrape_ocif_guide_financial_classes.py:fetch_class",
+        "analysis_symbol:scripts/scrape_ocif_guide_financial_classes.py:main",
+        "analysis_symbol:scripts/scrape_ocif_guide_financial_classes.py:parse_page",
+        "analysis_symbol:scripts/scrape_ocif_guide_financial_classes.py:run",
+        "analysis_symbol:scripts/scrape_ocs_insurers.py:main",
+        "analysis_symbol:scripts/scrape_ocs_insurers.py:parse_annual_reports",
+        "analysis_symbol:scripts/scrape_ocs_insurers.py:parse_insurers",
+        "analysis_symbol:scripts/scrape_ocs_insurers.py:run",
+        "analysis_symbol:scripts/sec13f_certification_lock.py:CertificationLockError",
+        "analysis_symbol:scripts/sec13f_certification_lock.py:build_parser",
+        "analysis_symbol:scripts/sec13f_certification_lock.py:build_preflight_receipt",
+        "analysis_symbol:scripts/sec13f_certification_lock.py:main",
+        "analysis_symbol:scripts/sec13f_certification_lock.py:validate_semantic_boundaries",
+        "analysis_symbol:scripts/sec13f_certification_lock.py:validate_vector_parent",
+        "analysis_symbol:scripts/sec13f_certification_lock.py:verify_post_merge",
+        "analysis_symbol:scripts/validate_haf_contract.py:main",
+        "analysis_symbol:scripts/validate_haf_contract.py:validate",
+        "cli_surface:scripts/acquire_sec13f_bpop_golden.py",
+        "cli_surface:scripts/audit_guide_financial_avenues.py",
+        "cli_surface:scripts/build_source_drop_manifest.py",
+        "cli_surface:scripts/certify_bpop_sec13f_8q.py",
+        "cli_surface:scripts/certify_database_release.py",
+        "cli_surface:scripts/certify_sec13f_issuer.py",
+        "cli_surface:scripts/download_fomb.py",
+        "cli_surface:scripts/download_hacienda_sut_ivu.py",
+        "cli_surface:scripts/download_sec_equity_v2.py",
+        "cli_surface:scripts/finalize_guide_financial_freeze.py",
+        "cli_surface:scripts/rematerialize_sec_holdings_discovery_v2.py",
+        "cli_surface:scripts/remediate_canonical_evidence_provenance.py",
+        "cli_surface:scripts/scrape_ftz_board_pr.py",
+        "cli_surface:scripts/scrape_ocif_guide_financial_classes.py",
+        "cli_surface:scripts/scrape_ocs_insurers.py",
+        "cli_surface:scripts/sec13f_certification_lock.py",
+        "python_module:desktop/secrets.py",
+        "python_module:desktop/workspace.py",
+        "python_module:moneysweep/capital_control/deep_dive.py",
+        "python_module:moneysweep/capital_control/federal_registry_adapter.py",
+        "python_module:moneysweep/capital_control/resolution_core/__init__.py",
+        "python_module:moneysweep/capital_control/resolution_core/attribution.py",
+        "python_module:moneysweep/capital_control/resolution_core/change_detection.py",
+        "python_module:moneysweep/capital_control/resolution_core/contradictions.py",
+        "python_module:moneysweep/capital_control/resolution_core/engine.py",
+        "python_module:moneysweep/capital_control/resolution_core/equivalence.py",
+        "python_module:moneysweep/capital_control/resolution_core/finance.py",
+        "python_module:moneysweep/capital_control/resolution_core/gates.py",
+        "python_module:moneysweep/capital_control/resolution_core/identity.py",
+        "python_module:moneysweep/capital_control/resolution_core/joins.py",
+        "python_module:moneysweep/capital_control/resolution_core/models.py",
+        "python_module:moneysweep/capital_control/resolution_core/namespace.py",
+        "python_module:moneysweep/capital_control/resolution_core/property_project.py",
+        "python_module:moneysweep/capital_control/sec13f.py",
+        "python_module:moneysweep/query/adapters/dateas_pr_metadata.py",
+        "python_module:moneysweep/sec_equity_identity.py",
+        "python_module:moneysweep/validation/case_manager_sqlite.py",
+        "python_module:moneysweep/validation/evidence_provenance.py",
+        "python_module:moneysweep/validation/federation_package.py",
+        "python_module:server/backend/desktop_app.py",
+        "python_module:server/backend/materialization_security.py",
+        "python_module:server/backend/ownership_api.py",
+        "python_symbol:desktop/secrets.py:activated_credentials",
+        "python_symbol:desktop/secrets.py:delete_secret",
+        "python_symbol:desktop/secrets.py:get_secret",
+        "python_symbol:desktop/secrets.py:presence",
+        "python_symbol:desktop/secrets.py:set_secret",
+        "python_symbol:desktop/setup.py:node_version_supported",
+        "python_symbol:desktop/workspace.py:bootstrap_workspace",
+        "python_symbol:desktop/workspace.py:resource_root",
+        "python_symbol:desktop/workspace.py:workspace_root",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:CertifiedOwnershipScope",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:OwnershipDeepDiveError",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:build_ownership_deep_dive",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:load_certification",
+        "python_symbol:moneysweep/capital_control/deep_dive.py:load_materialized_holdings",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:adjudicate_registry_candidate",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:candidate_evidence_json",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:candidate_identifier",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:candidate_record",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:certified_record",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:is_certified_binding",
+        "python_symbol:moneysweep/capital_control/federal_registry_adapter.py:sanitize_legacy_record",
+        "python_symbol:moneysweep/capital_control/resolution_core/attribution.py:FinancialAttribution",
+        "python_symbol:moneysweep/capital_control/resolution_core/attribution.py:attribute_financial_instrument",
+        "python_symbol:moneysweep/capital_control/resolution_core/change_detection.py:BaselineDiff",
+        "python_symbol:moneysweep/capital_control/resolution_core/change_detection.py:ChangeState",
+        "python_symbol:moneysweep/capital_control/resolution_core/change_detection.py:diff_baseline",
+        "python_symbol:moneysweep/capital_control/resolution_core/contradictions.py:Contradiction",
+        "python_symbol:moneysweep/capital_control/resolution_core/contradictions.py:adjudicate_contradiction",
+        "python_symbol:moneysweep/capital_control/resolution_core/engine.py:ResolutionCore",
+        "python_symbol:moneysweep/capital_control/resolution_core/engine.py:make_proposition",
+        "python_symbol:moneysweep/capital_control/resolution_core/equivalence.py:EquivalenceSets",
+        "python_symbol:moneysweep/capital_control/resolution_core/equivalence.py:compute_equivalence_sets",
+        "python_symbol:moneysweep/capital_control/resolution_core/finance.py:GrantClosure",
+        "python_symbol:moneysweep/capital_control/resolution_core/finance.py:close_grant",
+        "python_symbol:moneysweep/capital_control/resolution_core/finance.py:validate_amount",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:DenominatorResult",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:UnlockResult",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:evaluate_foia_gate",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:evaluate_public_denominator",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:evaluate_unlock",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:federation_unlock",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:funding_unlock",
+        "python_symbol:moneysweep/capital_control/resolution_core/gates.py:parcel_unlock",
+        "python_symbol:moneysweep/capital_control/resolution_core/identity.py:Candidate",
+        "python_symbol:moneysweep/capital_control/resolution_core/identity.py:Resolution",
+        "python_symbol:moneysweep/capital_control/resolution_core/identity.py:resolve_candidates",
+        "python_symbol:moneysweep/capital_control/resolution_core/joins.py:assert_no_unsafe_many_to_many",
+        "python_symbol:moneysweep/capital_control/resolution_core/joins.py:classify_join_cardinality",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:Cardinality",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:CertificationState",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:DependencyState",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:EvidenceBasis",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:FinancialAmount",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:NamespaceBinding",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:Proposition",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:PropositionType",
+        "python_symbol:moneysweep/capital_control/resolution_core/models.py:SourceManifestation",
+        "python_symbol:moneysweep/capital_control/resolution_core/namespace.py:NamespaceOccupancyResult",
+        "python_symbol:moneysweep/capital_control/resolution_core/namespace.py:NamespaceRegistry",
+        "python_symbol:moneysweep/capital_control/resolution_core/property_project.py:PropertyProjectBinding",
+        "python_symbol:moneysweep/capital_control/resolution_core/property_project.py:SpatialState",
+        "python_symbol:moneysweep/capital_control/resolution_core/property_project.py:bind_property_project",
+        "python_symbol:moneysweep/capital_control/sec13f.py:ArchiveMemberDigest",
+        "python_symbol:moneysweep/capital_control/sec13f.py:FilingRestatementAdjudication",
+        "python_symbol:moneysweep/capital_control/sec13f.py:FilingRestatementLineage",
+        "python_symbol:moneysweep/capital_control/sec13f.py:RestatementAdjudication",
+        "python_symbol:moneysweep/capital_control/sec13f.py:RestatementIssue",
+        "python_symbol:moneysweep/capital_control/sec13f.py:Sec13FArchiveAudit",
+        "python_symbol:moneysweep/capital_control/sec13f.py:Sec13FBulkAdapter",
+        "python_symbol:moneysweep/capital_control/sec13f.py:Sec13FError",
+        "python_symbol:moneysweep/capital_control/sec13f.py:adjudicate_sec13f_filing_restatements",
+        "python_symbol:moneysweep/capital_control/sec13f.py:adjudicate_sec13f_restatements",
+        "python_symbol:moneysweep/query/adapters/dateas_pr_metadata.py:DateasPRMetadataOnlyAdapter",
+        "python_symbol:moneysweep/sec_equity_identity.py:SecIdentityError",
+        "python_symbol:moneysweep/sec_equity_identity.py:SecIssuerBinding",
+        "python_symbol:moneysweep/sec_equity_identity.py:canonical_cik",
+        "python_symbol:moneysweep/sec_equity_identity.py:require_binding",
+        "python_symbol:moneysweep/sec_equity_identity.py:require_submission_identity",
+        "python_symbol:moneysweep/sec_equity_identity.py:ticker_map",
+        "python_symbol:moneysweep/validation/canonical_v1_schema.py:validate_denominator_headers_and_rows",
+        "python_symbol:moneysweep/validation/canonical_v1_schema.py:validate_primary_key_uniqueness",
+        "python_symbol:moneysweep/validation/case_manager_sqlite.py:SQLiteReport",
+        "python_symbol:moneysweep/validation/case_manager_sqlite.py:certify_sqlite",
+        "python_symbol:moneysweep/validation/evidence_provenance.py:ProvenanceReport",
+        "python_symbol:moneysweep/validation/evidence_provenance.py:audit_evidence",
+        "python_symbol:moneysweep/validation/evidence_provenance.py:binding_key_for",
+        "python_symbol:moneysweep/validation/evidence_provenance.py:load_bindings",
+        "python_symbol:moneysweep/validation/federation_package.py:FederationReport",
+        "python_symbol:moneysweep/validation/federation_package.py:certify_federation_package",
+        "python_symbol:server/backend/materialization_security.py:public_run_summary",
+        "python_symbol:server/backend/materialization_security.py:write_offline_receipt",
+        "python_symbol:server/backend/ownership_api.py:ownership_deep_dive",
+        "python_symbol:server/backend/ownership_api.py:ownership_status"
+      ],
+      "rationale": "Batch acquisition, certification, provenance, and validation tools are internal operator-run pipeline infrastructure. Their outputs are surfaced by existing dashboard capabilities where user-relevant; they are not separate interactive GUI workflows."
     },
     {
       "id": "api-key-management",
@@ -1176,7 +1406,8 @@
           "tests/test_gui_parity.py"
         ],
         "e2e": [
-          "dashboard/tests/api-keys.spec.mjs"
+          "dashboard/tests/api-keys.spec.mjs",
+          "dashboard/tests/zip-design.spec.mjs"
         ]
       },
       "candidate_ids": [
@@ -1244,6 +1475,225 @@
           "tests/test_entity_network_kernel.py"
         ]
       }
+    },
+    {
+      "id": "hud-drgr-source-audit",
+      "classification": "operator",
+      "status": "active",
+      "requires_terminal": false,
+      "backend": {
+        "files": [
+          "server/backend/materialization.py"
+        ],
+        "endpoints": [
+          "GET /hud-drgr/audits",
+          "POST /hud-drgr/audits"
+        ],
+        "symbols": [
+          "server/backend/materialization.py:hud_drgr_audits",
+          "server/backend/materialization.py:create_hud_drgr_audit"
+        ]
+      },
+      "analysis": {
+        "files": [
+          "scripts/audit_hud_drgr_authorized_sources.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/audit_hud_drgr_authorized_sources.py",
+        "cli_surface:scripts/audit_hud_drgr_authorized_sources.py",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:utc_now",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:sha256_file",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_csv",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_parquet",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:inspect_path",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:build_receipt",
+        "analysis_symbol:scripts/audit_hud_drgr_authorized_sources.py:main"
+      ],
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/components/HudDrgrAudit.jsx",
+          "dashboard/src/components/DataSources.jsx",
+          "dashboard/src/lib/api.js",
+          "dashboard/src/lib/hudDrgrApi.js"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/DataSources.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_hud_drgr_audit_api.py",
+          "tests/test_audit_hud_drgr_authorized_sources.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/hud-drgr-audit.spec.mjs"
+        ]
+      }
+    },
+    {
+      "id": "materialization-control-plane",
+      "classification": "operator",
+      "status": "active",
+      "requires_terminal": false,
+      "backend": {
+        "files": [
+          "server/backend/materialization.py"
+        ],
+        "endpoints": [
+          "GET /status",
+          "GET /sources",
+          "GET /credentials",
+          "PUT /credentials/{key_name}",
+          "DELETE /credentials/{key_name}",
+          "POST /offline/upload",
+          "POST /offline/{source_id}/run",
+          "POST /api/run"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/components/DataSources.jsx",
+          "dashboard/src/components/HudDrgrAudit.jsx",
+          "dashboard/src/lib/api.js",
+          "dashboard/src/lib/hudDrgrApi.js"
+        ],
+        "discoverability": [
+          "dashboard/src/components/DataSources.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_hud_drgr_audit_api.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/hud-drgr-audit.spec.mjs"
+        ]
+      },
+      "candidate_ids": [
+        "backend_endpoint:server/backend/materialization.py:GET /status",
+        "backend_endpoint:server/backend/materialization.py:GET /sources",
+        "backend_endpoint:server/backend/materialization.py:GET /credentials",
+        "backend_endpoint:server/backend/materialization.py:PUT /credentials/{key_name}",
+        "backend_endpoint:server/backend/materialization.py:DELETE /credentials/{key_name}",
+        "backend_endpoint:server/backend/materialization.py:POST /offline/upload",
+        "backend_endpoint:server/backend/materialization.py:POST /offline/{source_id}/run",
+        "backend_endpoint:server/backend/materialization.py:POST /api/run"
+      ]
+    },
+    {
+      "id": "ownership-deep-dive",
+      "classification": "operator",
+      "status": "active",
+      "requires_terminal": false,
+      "backend": {
+        "files": [
+          "server/backend/ownership_api.py"
+        ],
+        "endpoints": [
+          "GET /status",
+          "GET /{ticker}"
+        ],
+        "symbols": [
+          "server/backend/ownership_api.py:ownership_status",
+          "server/backend/ownership_api.py:ownership_deep_dive"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/components/OwnershipDeepDive.jsx",
+          "dashboard/src/lib/api.js",
+          "dashboard/src/lib/hooks.js"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_ownership_deep_dive.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/zip-design.spec.mjs"
+        ]
+      },
+      "candidate_ids": [
+        "backend_endpoint:server/backend/ownership_api.py:GET /status",
+        "backend_endpoint:server/backend/ownership_api.py:GET /{ticker}",
+        "gui_control:dashboard/src/components/OwnershipDeepDive.jsx:select#bdfbad0a2f7e"
+      ]
+    },
+    {
+      "id": "source-database-materialization-runtime",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "The SQLite source contribution ledger is an internal materialization substrate invoked by the existing source runner and Materialization API. It records outputs and provenance for existing dashboard workflows; it does not add an independent user operation or replace the visible source-run status surface.",
+      "backend": {
+        "files": [
+          "moneysweep/runtime/source_database.py"
+        ],
+        "symbols": [
+          "moneysweep/runtime/source_database.py:database_path",
+          "moneysweep/runtime/source_database.py:materialize_source",
+          "moneysweep/runtime/source_database.py:materialize_sources"
+        ]
+      },
+      "analysis": {
+        "files": [
+          "scripts/materialize_sources_to_database.py",
+          "scripts/run_automatable_sources.py"
+        ],
+        "symbols": [
+          "scripts/materialize_sources_to_database.py:main"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_source_database.py",
+          "tests/test_run_automatable_sources.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/materialize_sources_to_database.py",
+        "analysis_symbol:scripts/materialize_sources_to_database.py:main",
+        "cli_surface:scripts/materialize_sources_to_database.py",
+        "python_module:moneysweep/runtime/source_database.py",
+        "python_symbol:moneysweep/runtime/source_database.py:database_path",
+        "python_symbol:moneysweep/runtime/source_database.py:materialize_source",
+        "python_symbol:moneysweep/runtime/source_database.py:materialize_sources"
+      ]
     }
   ],
   "exceptions": [

@@ -1,5 +1,5 @@
 {
-  "schema_version": "moneysweep.financial-category-ontology/v1.1",
+  "schema_version": "moneysweep.financial-category-ontology/v1.2",
   "ranking_contract_version": "moneysweep.leaderboard/v1.1",
   "rules": {
     "currency_policy": "Rank only comparable values within one currency; do not FX-convert implicitly.",
@@ -14,6 +14,7 @@
   "categories": [
     {"id":"contract_award","label":"Government contract awards","metric_type":"AWARDED","unit":"currency","adapter":"canonical_contracts","certification_state":"OPEN","reason":"canonical_v1 contracts have stable contractor_entity_id values, but the committed 3-row contract seed has award_amount blank on all 3 rows; current ranked candidate count is zero"},
     {"id":"debt_issuance","label":"Public debt issued (par amount)","metric_type":"DEBT_ISSUED_PAR","unit":"currency","adapter":"canonical_debt","certification_state":"PROVISIONAL","reason":"canonical_v1 debt instruments expose issuer_entity_id, par_amount, currency and evidence IDs; par amount is not outstanding debt or debt service"},
+    {"id":"asg_emergency_purchase_source_native","label":"ASG emergency purchase cost — source-native Licitador subset","metric_type":"ASG_EMERGENCY_PURCHASE_COST","unit":"currency","adapter":"asg_emergency_source_native","certification_state":"PROVISIONAL_BOUNDED_SOURCE_NATIVE","reason":"full ASG emergency-purchase source closes at 1,431 unique control numbers; ranking is limited to the 21 rows carrying explicit source-native asg_licitador_id values, while 1,410 rows remain outside this identity-bounded scope"},
     {"id":"federal_obligation","label":"Federal contract obligations","metric_type":"OBLIGATED","unit":"currency","adapter":"federal_awards_contracts","certification_state":"PROVISIONAL_DYNAMIC","reason":"uses source-native recipient_uei plus standardized obligated_amount when pr_all_awards_master.csv is mounted; absence returns OPEN_NOT_MATERIALIZED"},
     {"id":"federal_grant","label":"Federal grant obligations","metric_type":"OBLIGATED","unit":"currency","adapter":"federal_awards_grants","certification_state":"PROVISIONAL_DYNAMIC","reason":"uses source-native recipient_uei and grant-only obligated_amount from the unified federal-award master when mounted"},
     {"id":"disaster_assistance","label":"Disaster-recovery assistance obligations","metric_type":"OBLIGATED","unit":"currency","adapter":"federal_awards_disaster","certification_state":"PROVISIONAL_DYNAMIC","reason":"bounded to disaster-source families in the unified federal-award master; approved, paid and loan-principal measures remain separate"},
