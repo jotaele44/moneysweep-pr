@@ -1,0 +1,89 @@
+{
+  "version": "v4.0.0-rc1",
+  "falsifiers": [
+    {
+      "falsifier_id": "V4-F001-CORE-SUPPORT-SOURCE",
+      "detected_at": "2026-09-20",
+      "source_or_fixture": [
+        "registries/source_registry.json",
+        "registries/source_registry_extensions/nara_nextgen.json"
+      ],
+      "domain": null,
+      "contract": "SOURCE_TO_DOMAIN_MAPPING",
+      "observed_behavior": "The runtime registry contains source families whose primary role is shared evidence support rather than an analytical domain, including entity_resolution and provenance_archival.",
+      "expected_behavior": "The frozen rc1 contract required every mapped source family to map to at least one analytical domain.",
+      "severity": "ARCHITECTURAL",
+      "architecture_change_required": true,
+      "proposed_resolution": "Permit source_mapping_target_type=CORE_SUPPORT in addition to DOMAIN. CORE_SUPPORT must name a specific shared-kernel capability such as IDENTITY_RESOLUTION or PROVENANCE_ARCHIVAL and must not be treated as an analytical domain or aggregated finding source.",
+      "implemented_resolution": "architecture/v4/source_mapping_contract.yaml (V4-A001) plus tests/architecture/test_source_mapping_contract.py",
+      "regression_id": "V4-R001-CORE-SUPPORT-NOT-FORCED-INTO-DOMAIN",
+      "state": "RESOLVED",
+      "test_evidence": {
+        "head_sha": "0588f870291a18d61d47b7b8baa4317b00715b7e",
+        "workflow": "Tests",
+        "run_id": 35526634520,
+        "conclusion": "success"
+      }
+    },
+    {
+      "falsifier_id": "V4-F002-CROSS-DOMAIN-CONTEXT-SOURCE",
+      "detected_at": "2026-09-20",
+      "source_or_fixture": [
+        "family:territorial_legislation",
+        "family:pre_officialization"
+      ],
+      "domain": null,
+      "contract": "SOURCE_TO_DOMAIN_MAPPING",
+      "observed_behavior": "The runtime registry includes cross-domain contextual/candidate sources that inform later analytical domains but are not themselves domain findings or mere acquisition/provenance utilities.",
+      "expected_behavior": "V4-A001 CORE_SUPPORT vocabulary lacks a context/candidate capability and would otherwise force these sources into an analytical domain or an inaccurate support class.",
+      "severity": "ARCHITECTURAL",
+      "architecture_change_required": true,
+      "proposed_resolution": "Extend CORE_SUPPORT with POLICY_CONTEXT and PRE_OFFICIAL_CANDIDATE. These targets may feed downstream domain events only after explicit promotion/binding and cannot be counted as officialized money or domain-certified findings.",
+      "implemented_resolution": "architecture/v4/source_mapping_contract.yaml (V4-A002) plus tests/architecture/test_source_mapping_contract.py",
+      "regression_id": "V4-R002-CONTEXT-CANDIDATES-NOT-DOMAIN-FINDINGS",
+      "state": "RESOLVED_PENDING_TEST_EXECUTION"
+    },
+    {
+      "falsifier_id": "V4-F003-DIRECT-BENEFICIARY-TRANSFER-DOMAIN",
+      "detected_at": "2026-09-20",
+      "source_or_fixture": [
+        "ssa",
+        "snap_nap",
+        "wic",
+        "va_benefits",
+        "fema_individual_assistance",
+        "medicare_advantage",
+        "medicare_parts",
+        "hud_hcv_section8",
+        "irs_ctc_eitc_pr"
+      ],
+      "domain": null,
+      "contract": "DOMAIN_REGISTRY",
+      "observed_behavior": "The runtime source denominator contains direct household/beneficiary transfer and benefit flows that are not intergovernmental and do not fit public-finance procurement/corporate domains without semantic distortion.",
+      "expected_behavior": "Every analytical money source must have a domain whose primary unit and reconciliation semantics match the actual flow.",
+      "severity": "ARCHITECTURAL",
+      "architecture_change_required": true,
+      "proposed_resolution": "Add SOCIAL_BENEFITS_AND_HOUSEHOLD_TRANSFERS as an analytical domain for direct government-to-household/individual benefit, assistance, subsidy, and entitlement flows. Keep award/authorization/payment/receipt stages distinct.",
+      "implemented_resolution": "architecture/v4/domain_registry.yaml adds SOCIAL_BENEFITS_AND_HOUSEHOLD_TRANSFERS; mapping matrix routes direct-benefit sources there; tests/architecture/test_v01_source_domain_mapping.py adds regression.",
+      "regression_id": "V4-R003-DIRECT-BENEFITS-NOT-INTERGOVERNMENTAL",
+      "state": "RESOLVED_PENDING_TEST_EXECUTION"
+    },
+    {
+      "falsifier_id": "V4-F004-PREAWARD-PROCUREMENT-CANDIDATE",
+      "detected_at": "2026-09-20",
+      "source_or_fixture": [
+        "sam_opportunities"
+      ],
+      "domain": null,
+      "contract": "SOURCE_TO_DOMAIN_MAPPING",
+      "observed_behavior": "SAM Opportunities is a pre-award solicitation/bid-notice source. It describes potential procurement activity before award and execution.",
+      "expected_behavior": "Candidate/discovery sources must not be promoted into certified procurement events without an explicit downstream award/execution binding.",
+      "severity": "ARCHITECTURAL",
+      "architecture_change_required": true,
+      "proposed_resolution": "Add PRE_AWARD_PROCUREMENT_CANDIDATE to CORE_SUPPORT. Such sources may seed procurement discovery but cannot emit certified CONTRACT_EVENT/MONEY_EVENT solely from solicitation records.",
+      "implemented_resolution": "architecture/v4/source_mapping_contract.yaml adds PRE_AWARD_PROCUREMENT_CANDIDATE; sam_opportunities maps to it; regression added in test_v01_source_domain_mapping.py.",
+      "regression_id": "V4-R004-PREAWARD-NOT-CONTRACT",
+      "state": "RESOLVED_PENDING_TEST_EXECUTION"
+    }
+  ]
+}
