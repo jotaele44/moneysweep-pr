@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moneysweep-pr.local/schemas/operator_evidence_receipt.schema.json",
+  "title": "MoneySweep PR Operator Evidence Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source_id",
+    "acquisition",
+    "registry",
+    "outputs",
+    "validation"
+  ],
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "bytes"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "content_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": "moneysweep.operator_evidence/v1"
+    },
+    "source_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "acquisition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "producer",
+        "producer_sha",
+        "completed_at",
+        "source_url"
+      ],
+      "properties": {
+        "producer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "producer_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source_url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "http_status": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 100,
+          "maximum": 599
+        }
+      }
+    },
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_ids_sha256",
+        "source_definition_sha256"
+      ],
+      "properties": {
+        "source_ids_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_definition_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "schema_valid",
+        "positive_rows",
+        "coverage_contract_pass"
+      ],
+      "properties": {
+        "schema_valid": {
+          "const": true
+        },
+        "positive_rows": {
+          "type": "boolean"
+        },
+        "coverage_contract_pass": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

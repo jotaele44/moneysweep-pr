@@ -77,13 +77,29 @@ FILE_RULES: dict[str, dict[str, Any]] = {
         "path": "data/staging/processed/pr_campaign_finance_recipient_resolution.csv",
         "required": True,
         "min_rows": 1,
-        "columns": ["recipient_name", "resolved_entity_type", "review_status"],
+        "columns": [
+            "recipient_name",
+            "identity_state",
+            "candidate_set",
+            "resolved_entity_id",
+            "resolved_entity_type",
+            "match_method",
+            "review_status",
+        ],
     },
     "campaign_edges": {
         "path": "data/staging/processed/pr_campaign_finance_edges.csv",
         "required": True,
-        "min_rows": 1,
-        "columns": ["source_entity_id", "edge_type", "target_entity_id"],
+        "min_rows": 0,
+        "columns": [
+            "edge_id",
+            "source_entity_id",
+            "edge_type",
+            "target_entity_id",
+            "source_dataset",
+            "confidence",
+        ],
+        "allow_header_only": True,
     },
 }
 
@@ -224,19 +240,95 @@ def run(root: Path | None = None, *, strict: bool = False) -> dict:
     resolution_metrics: dict[str, int | float | None] = {
         "resolved": 0,
         "unresolved": 0,
+        "candidate_not_identity": 0,
         "resolution_rate": None,
+        "invalid_promotions": 0,
     }
     recipient_path = root / FILE_RULES["recipient_resolution"]["path"]
     if recipient_path.exists() and recipient["status"] == "ok":
         rdf = pd.read_csv(recipient_path, dtype=str, low_memory=False).fillna("")
-        resolved = int((rdf["resolved_entity_type"] != "unresolved").sum())
-        unresolved = int((rdf["resolved_entity_type"] == "unresolved").sum())
+        authoritative = (
+            (rdf["identity_state"] == "AUTHORITATIVE_ID")
+            & (rdf["match_method"] == "authoritative_recipient_id")
+            & (rdf["resolved_entity_id"].str.strip() != "")
+        )
+        invalid_promotions = (
+            (rdf["resolved_entity_id"].str.strip() != "")
+            & ~authoritative
+        )
+        resolved = int(authoritative.sum())
+        invalid_count = int(invalid_promotions.sum())
+        unresolved = int((~authoritative).sum())
+        candidate_only = int((rdf["identity_state"] == "CANDIDATE_NOT_IDENTITY").sum())
         total = resolved + unresolved
         resolution_metrics = {
             "resolved": resolved,
             "unresolved": unresolved,
+            "candidate_not_identity": candidate_only,
             "resolution_rate": resolved / total if total else None,
+            "invalid_promotions": invalid_count,
         }
+        if invalid_count:
+            blocking.append(
+                f"recipient_resolution:unsupported_identity_promotion:{invalid_count}"
+            )
+
+    edges_path = root / FILE_RULES["campaign_edges"]["path"]
+    edge_identity_metrics: dict[str, int] = {
+        "rows": 0,
+        "blank_endpoint_rows": 0,
+        "duplicate_edge_ids": 0,
+        "unknown_endpoint_rows": 0,
+        "non_authoritative_source_rows": 0,
+    }
+    if edges_path.exists() and files["campaign_edges"]["status"] == "ok":
+        edf = pd.read_csv(edges_path, dtype=str, low_memory=False).fillna("")
+        edge_identity_metrics["rows"] = len(edf)
+        blank_endpoints = (
+            (edf["source_entity_id"].str.strip() == "")
+            | (edf["target_entity_id"].str.strip() == "")
+        )
+        duplicate_edge_ids = edf["edge_id"].duplicated(keep=False)
+        allowed_sources = {"fec_schedule_b", "fec_schedule_e"}
+        non_authoritative_source = ~edf["source_dataset"].isin(allowed_sources)
+
+        known_entity_ids: set[str] = set()
+        for key, id_column in (
+            ("candidates", "candidate_entity_id"),
+            ("committees", "committee_entity_id"),
+        ):
+            entity_path = root / FILE_RULES[key]["path"]
+            if entity_path.exists() and files[key]["status"] == "ok":
+                entity_df = pd.read_csv(
+                    entity_path,
+                    dtype=str,
+                    low_memory=False,
+                ).fillna("")
+                if id_column in entity_df:
+                    known_entity_ids.update(
+                        entity_df[id_column][
+                            entity_df[id_column].str.strip() != ""
+                        ].astype(str)
+                    )
+
+        unknown_endpoints = (
+            ~edf["source_entity_id"].isin(known_entity_ids)
+            | ~edf["target_entity_id"].isin(known_entity_ids)
+        ) if len(edf) else pd.Series(dtype=bool)
+
+        edge_identity_metrics.update(
+            {
+                "blank_endpoint_rows": int(blank_endpoints.sum()),
+                "duplicate_edge_ids": int(duplicate_edge_ids.sum()),
+                "unknown_endpoint_rows": int(unknown_endpoints.sum()),
+                "non_authoritative_source_rows": int(
+                    non_authoritative_source.sum()
+                ),
+            }
+        )
+        for key, count in edge_identity_metrics.items():
+            if key != "rows" and count:
+                blocking.append(f"campaign_edges:{key}:{count}")
 
     report = {
         "manifest_type": "campaign_finance_materialization_validation",
@@ -253,6 +345,7 @@ def run(root: Path | None = None, *, strict: bool = False) -> dict:
             "federal_independent_expenditure_rows": files["fec_independent_expenditures"]["rows"],
             "pr_donation_rows": pr_feed_rows,
             "recipient_resolution": resolution_metrics,
+            "edge_identity": edge_identity_metrics,
         },
     }
     path = report_dir / "campaign_finance_validation.json"

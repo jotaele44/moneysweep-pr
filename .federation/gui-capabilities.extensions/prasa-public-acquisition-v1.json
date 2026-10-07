@@ -1,0 +1,28 @@
+{
+  "capabilities": [
+    {
+      "id": "prasa-official-transition-contract-acquisition",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Authoritative PRASA contract snapshot acquisition from the official Puerto Rico 2024 transition portal is an internal, non-interactive source-materialization capability. It feeds the existing PRASA ingester and emits immutable raw/processed evidence; it is not a separate end-user GUI feature.",
+      "candidate_ids": [
+        "analysis_module:scripts/download_prasa_contracts.py",
+        "analysis_symbol:scripts/download_prasa_contracts.py:utc_now",
+        "analysis_symbol:scripts/download_prasa_contracts.py:sha256_file",
+        "analysis_symbol:scripts/download_prasa_contracts.py:clean_cell",
+        "analysis_symbol:scripts/download_prasa_contracts.py:normalize_header",
+        "analysis_symbol:scripts/download_prasa_contracts.py:canonical_header",
+        "analysis_symbol:scripts/download_prasa_contracts.py:normalize_amount",
+        "analysis_symbol:scripts/download_prasa_contracts.py:parse_extracted_table",
+        "analysis_symbol:scripts/download_prasa_contracts.py:extract_pdf_contracts",
+        "analysis_symbol:scripts/download_prasa_contracts.py:write_csv",
+        "analysis_symbol:scripts/download_prasa_contracts.py:write_json",
+        "analysis_symbol:scripts/download_prasa_contracts.py:run",
+        "analysis_symbol:scripts/download_prasa_contracts.py:main",
+        "cli_surface:scripts/download_prasa_contracts.py"
+      ]
+    }
+  ],
+  "exceptions": []
+}

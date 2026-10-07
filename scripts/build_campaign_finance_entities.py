@@ -58,6 +58,8 @@ RECIPIENT_COLUMNS = [
     "recipient_resolution_id",
     "recipient_name",
     "normalized_name",
+    "identity_state",
+    "candidate_set",
     "resolved_entity_id",
     "resolved_entity_name",
     "resolved_entity_type",
@@ -115,6 +117,12 @@ def _committee_like(row: pd.Series) -> bool:
 
 
 def _group_entities(records, *, kind: str) -> pd.DataFrame:
+    """Build canonical FEC entities only from authoritative FEC identifiers.
+
+    ID-less source rows remain in their RAW/NORMALIZED source datasets. They are
+    discovery observations, not canonical entity identities, and therefore may
+    not be collapsed by normalized name.
+    """
     columns = CANDIDATE_COLUMNS if kind == "candidate" else COMMITTEE_COLUMNS
     if not records:
         return pd.DataFrame(columns=columns)
@@ -124,28 +132,21 @@ def _group_entities(records, *, kind: str) -> pd.DataFrame:
     output = []
     id_field = f"fec_{kind}_id"
     entity_field = f"{kind}_entity_id"
-    # Authoritative identity first: records carrying a FEC ID group by that ID
-    # (name variants collapse into aliases; distinct IDs sharing a name stay
-    # distinct). Only ID-less records fall back to normalized-name identity.
-    frame["_group_key"] = [
-        f"id:{fid}" if fid else f"name:{norm}"
-        for fid, norm in zip(
-            frame[id_field].map(lambda v: str(v).strip()), frame["normalized_name"]
-        )
-    ]
-    for _, group in frame.groupby("_group_key", sort=True):
+    frame[id_field] = frame[id_field].map(lambda value: str(value).strip())
+    frame = frame[frame[id_field] != ""]
+    if frame.empty:
+        return pd.DataFrame(columns=columns)
+
+    for fec_id, group in frame.groupby(id_field, sort=True):
         normalized = _first(group["normalized_name"])
-        fec_id = _first(group[id_field])
         sources = sorted(set(group["source"]))
-        confidence = (
-            (95 if kind == "candidate" else 96) if fec_id else 82 if len(sources) > 1 else 68
-        )
+        confidence = 100
         canonical = _first(group["name"])
         aliases = sorted(
             {str(v).strip() for v in group["name"] if str(v).strip() not in {"", canonical}}
         )
         common = {
-            entity_field: fec_id or stable_id(kind, normalized),
+            entity_field: fec_id,
             id_field: fec_id,
             "canonical_name": canonical,
             "normalized_name": normalized,
@@ -155,7 +156,7 @@ def _group_entities(records, *, kind: str) -> pd.DataFrame:
             "source_datasets": "|".join(sources),
             "source_record_count": len(group),
             "confidence": confidence,
-            "review_status": _status(confidence),
+            "review_status": "confirmed",
         }
         if kind == "candidate":
             common.update(
@@ -287,16 +288,52 @@ def build_committees(processed: Path) -> pd.DataFrame:
 
 
 def _resolution_index(processed: Path, candidates, committees):
-    index = {
-        row.normalized_name: (row.candidate_entity_id, row.canonical_name, "candidate", 96)
-        for row in candidates.itertuples()
-    }
-    index.update(
-        {
-            row.normalized_name: (row.committee_entity_id, row.canonical_name, "committee", 96)
-            for row in committees.itertuples()
-        }
-    )
+    """Return authoritative ID bindings plus name-only discovery candidates."""
+    id_index: dict[str, tuple[str, str, str]] = {}
+    name_candidates: dict[str, list[dict[str, str]]] = {}
+
+    def add_candidate(
+        *,
+        stable_id_value: str,
+        name: str,
+        entity_type: str,
+        authoritative_id: str,
+        source: str,
+    ) -> None:
+        stable_id_value = str(stable_id_value).strip()
+        authoritative_id = str(authoritative_id).strip()
+        normalized = _normalize(name)
+        if not stable_id_value or not authoritative_id:
+            return
+        id_index[authoritative_id] = (stable_id_value, name, entity_type)
+        if normalized:
+            name_candidates.setdefault(normalized, []).append(
+                {
+                    "entity_id": stable_id_value,
+                    "entity_name": name,
+                    "entity_type": entity_type,
+                    "authoritative_id": authoritative_id,
+                    "source": source,
+                }
+            )
+
+    for row in candidates.itertuples():
+        add_candidate(
+            stable_id_value=row.candidate_entity_id,
+            name=row.canonical_name,
+            entity_type="candidate",
+            authoritative_id=row.fec_candidate_id,
+            source="fec_candidate",
+        )
+    for row in committees.itertuples():
+        add_candidate(
+            stable_id_value=row.committee_entity_id,
+            name=row.canonical_name,
+            entity_type="committee",
+            authoritative_id=row.fec_committee_id,
+            source="fec_committee",
+        )
+
     sources = (
         ("ngos/ngos_master.csv", "legal_name", "ngo_id", "ngo"),
         ("entities_resolved.csv", "canonical_name", "entity_id", "entity"),
@@ -304,42 +341,99 @@ def _resolution_index(processed: Path, candidates, committees):
     )
     for filename, name_col, id_col, entity_type in sources:
         for _, row in _read(processed / filename).iterrows():
+            authoritative_id = str(row.get(id_col, "")).strip()
             name = str(row.get(name_col, "")).strip()
             normalized = _normalize(name)
-            if normalized and normalized not in index:
-                index[normalized] = (
-                    str(row.get(id_col, "")).strip() or stable_id(entity_type, normalized),
-                    name,
-                    entity_type,
-                    84,
-                )
-    return index
+            if not authoritative_id or not normalized:
+                continue
+            name_candidates.setdefault(normalized, []).append(
+                {
+                    "entity_id": authoritative_id,
+                    "entity_name": name,
+                    "entity_type": entity_type,
+                    "authoritative_id": authoritative_id,
+                    "source": filename,
+                }
+            )
+
+    for normalized, candidates_for_name in name_candidates.items():
+        deduped = {
+            (
+                item["entity_id"],
+                item["entity_type"],
+                item["authoritative_id"],
+                item["source"],
+            ): item
+            for item in candidates_for_name
+        }
+        name_candidates[normalized] = [
+            deduped[key] for key in sorted(deduped)
+        ]
+    return id_index, name_candidates
 
 
 def resolve_recipients(processed: Path, candidates, committees) -> pd.DataFrame:
     frame = _read(processed / "pr_fec_disbursements.csv")
     if frame.empty or "recipient_name" not in frame:
         return pd.DataFrame(columns=RECIPIENT_COLUMNS)
-    index = _resolution_index(processed, candidates, committees)
+    id_index, name_candidates = _resolution_index(processed, candidates, committees)
     frame["normalized_name"] = frame["recipient_name"].map(_normalize)
     frame["numeric_amount"] = pd.to_numeric(
         frame.get("disbursement_amount", ""), errors="coerce"
     ).fillna(0)
     output = []
     for normalized, group in frame[frame["normalized_name"] != ""].groupby("normalized_name"):
-        hit = index.get(normalized)
-        entity_id, entity_name, entity_type, confidence = hit or ("", "", "unresolved", 0)
+        direct_ids: set[str] = set()
+        for column in ("recipient_committee_id", "recipient_id", "candidate_id"):
+            if column in group:
+                direct_ids.update(
+                    str(value).strip()
+                    for value in group[column]
+                    if str(value).strip()
+                )
+        direct_matches = {
+            id_index[identifier]
+            for identifier in direct_ids
+            if identifier in id_index
+        }
+        candidates_for_name = name_candidates.get(normalized, [])
+        candidate_payload = json.dumps(candidates_for_name, ensure_ascii=False, sort_keys=True)
+
+        if len(direct_matches) == 1:
+            entity_id, entity_name, entity_type = next(iter(direct_matches))
+            confidence = 100
+            match_method = "authoritative_recipient_id"
+            identity_state = "AUTHORITATIVE_ID"
+            review_status = "confirmed"
+        else:
+            entity_id = ""
+            entity_name = ""
+            entity_type = "unresolved"
+            confidence = 0
+            review_status = "needs_review"
+            if len(direct_matches) > 1:
+                match_method = "authoritative_id_tie"
+                identity_state = "REVIEW_UNRESOLVED_TIE"
+            elif candidates_for_name:
+                match_method = "name_candidate_only"
+                identity_state = "CANDIDATE_NOT_IDENTITY"
+            else:
+                match_method = "unresolved"
+                identity_state = "UNRESOLVED"
+
         output.append(
             dict(
                 recipient_resolution_id=stable_id("recipient", normalized),
                 recipient_name=_first(group["recipient_name"]),
                 normalized_name=normalized,
+                identity_state=identity_state,
+                candidate_set=candidate_payload,
                 resolved_entity_id=entity_id,
                 resolved_entity_name=entity_name,
                 resolved_entity_type=entity_type,
-                match_method="exact_normalized_name" if hit else "unresolved",
+                match_method=match_method,
                 confidence=confidence,
-                review_status=_status(confidence) if confidence else "needs_review",
+                review_status=review_status,
                 total_disbursements=float(group["numeric_amount"].sum()),
                 disbursement_count=len(group),
                 committees_paying=_pipe(group.get("committee_name", [])),
@@ -353,48 +447,52 @@ def resolve_recipients(processed: Path, candidates, committees) -> pd.DataFrame:
 
 
 def build_edges(processed: Path, candidates, committees) -> pd.DataFrame:
+    """Emit only graph edges whose endpoints have authoritative FEC IDs."""
     candidate_ids = {
-        r.fec_candidate_id: r.candidate_entity_id
+        str(r.fec_candidate_id): str(r.candidate_entity_id)
         for r in candidates.itertuples()
-        if r.fec_candidate_id
+        if str(r.fec_candidate_id).strip()
     }
-    candidate_names = {r.normalized_name: r.candidate_entity_id for r in candidates.itertuples()}
     committee_ids = {
-        r.fec_committee_id: r.committee_entity_id
+        str(r.fec_committee_id): str(r.committee_entity_id)
         for r in committees.itertuples()
-        if r.fec_committee_id
+        if str(r.fec_committee_id).strip()
     }
     edges = []
-    for i, row in _read(processed / "pr_fec_contributions.csv").iterrows():
-        target = committee_ids.get(str(row.get("committee_id", "")))
-        donor = _normalize(row.get("contributor_name", ""))
-        if target and donor:
-            edges.append(
-                dict(
-                    edge_id=stable_id("cfedge", "fec_a", i, donor, target),
-                    source_entity_id=stable_id("donor", donor),
-                    source_entity_type="individual"
-                    if str(row.get("is_individual", "")).lower() == "true"
-                    else "organization",
-                    edge_type="CONTRIBUTED_TO",
-                    target_entity_id=target,
-                    target_entity_type="committee",
-                    amount=row.get("contribution_receipt_amount", ""),
-                    transaction_date=row.get("contribution_receipt_date", ""),
-                    cycle=row.get("cycle", ""),
-                    support_oppose_indicator="",
-                    source_dataset="fec_schedule_a",
-                    confidence=95,
-                )
+
+    for i, row in _read(processed / "pr_fec_disbursements.csv").iterrows():
+        source = committee_ids.get(str(row.get("committee_id", "")).strip())
+        recipient_id = str(
+            row.get("recipient_committee_id", "") or row.get("recipient_id", "")
+        ).strip()
+        target = committee_ids.get(recipient_id)
+        if not source or not target:
+            continue
+        record_id = str(row.get("sub_id", "") or row.get("transaction_id", "") or i)
+        edges.append(
+            dict(
+                edge_id=stable_id("cfedge", "fec_b", record_id, source, target),
+                source_entity_id=source,
+                source_entity_type="committee",
+                edge_type="TRANSFERRED_TO",
+                target_entity_id=target,
+                target_entity_type="committee",
+                amount=row.get("disbursement_amount", ""),
+                transaction_date=row.get("disbursement_date", ""),
+                cycle=row.get("cycle", ""),
+                support_oppose_indicator="",
+                source_dataset="fec_schedule_b",
+                confidence=100,
             )
-    for i, row in _read(processed / "pr_fec_independent_expenditures.csv").iterrows():
-        source = committee_ids.get(str(row.get("committee_id", "")))
-        target = candidate_ids.get(str(row.get("candidate_id", ""))) or candidate_names.get(
-            _normalize(row.get("candidate_name", ""))
         )
+
+    for i, row in _read(processed / "pr_fec_independent_expenditures.csv").iterrows():
+        source = committee_ids.get(str(row.get("committee_id", "")).strip())
+        target = candidate_ids.get(str(row.get("candidate_id", "")).strip())
         if not source or not target:
             continue
         indicator = str(row.get("support_oppose_indicator", ""))
+        record_id = str(row.get("sub_id", "") or row.get("transaction_id", "") or i)
         edge_type = (
             "SUPPORTED"
             if indicator.upper().startswith("S")
@@ -404,7 +502,7 @@ def build_edges(processed: Path, candidates, committees) -> pd.DataFrame:
         )
         edges.append(
             dict(
-                edge_id=stable_id("cfedge", "fec_e", i, source, target),
+                edge_id=stable_id("cfedge", "fec_e", record_id, source, target),
                 source_entity_id=source,
                 source_entity_type="committee",
                 edge_type=edge_type,
@@ -415,7 +513,7 @@ def build_edges(processed: Path, candidates, committees) -> pd.DataFrame:
                 cycle=row.get("cycle", ""),
                 support_oppose_indicator=indicator,
                 source_dataset="fec_schedule_e",
-                confidence=98,
+                confidence=100,
             )
         )
     return pd.DataFrame(edges, columns=EDGE_COLUMNS)

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moneysweep-pr.local/schemas/production_activation_receipt.schema.json",
+  "title": "MoneySweep PR Production Activation Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scope_id",
+    "scope_sha",
+    "implementation_sha",
+    "certificate_sha256",
+    "authorized_by",
+    "authorization_timestamp",
+    "authorization_channel"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "moneysweep.production_activation/v1"
+    },
+    "scope_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "scope_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "implementation_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "certificate_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "authorized_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authorization_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "authorization_channel": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

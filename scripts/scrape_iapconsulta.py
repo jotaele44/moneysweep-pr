@@ -272,7 +272,7 @@ def main():
     args = parser.parse_args()
     result = _run(force=args.force, max_pages=args.max_pages)
     print(f"\niapconsulta scrape complete: {result['rows']:,} audit/investigation records")
-    return 1 if result["errors"] and result["rows"] == 0 else 0
+    return 1 if result["errors"] else 0
 
 
 if __name__ == "__main__":
