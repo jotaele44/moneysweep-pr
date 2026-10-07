@@ -1462,17 +1462,24 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Additive cross-sector graph semantics, sector profiles, and fail-closed ingestion policy. This slice is backend infrastructure only and exposes no new human-facing workflow.",
+      "rationale": "Additive cross-sector graph semantics plus fail-closed MII v0.3 provisional ingestion/reconciliation. This remains internal backend/analysis infrastructure and exposes no new human-facing workflow.",
       "backend": {
         "files": [
           "moneysweep/entity_network/__init__.py",
           "moneysweep/entity_network/models.py",
-          "moneysweep/entity_network/policy.py"
+          "moneysweep/entity_network/policy.py",
+          "moneysweep/entity_network/mii_v03.py"
         ]
       },
       "tests": {
         "backend": [
-          "tests/test_entity_network_kernel.py"
+          "tests/test_entity_network_kernel.py",
+          "tests/test_mii_v03_reference_ingestion.py"
+        ]
+      },
+      "analysis": {
+        "files": [
+          "scripts/import_mii_v03_reference.py"
         ]
       }
     },
