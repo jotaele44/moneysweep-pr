@@ -1,0 +1,41 @@
+{
+  "capabilities": [
+    {
+      "id": "asg-emergency-purchases-materialization-pipeline",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Resumable, checkpointed ASG emergency-purchases materialization and the identity-coverage audit that certify the ASG source-native leaderboard plane (#656). They are certification and operator plumbing that feed the leaderboard and completeness surfaces already exposed in the dashboard; they are not a separate human-facing workflow.",
+      "analysis": {
+        "files": [
+          "scripts/audit_asg_emergency_identity_coverage.py",
+          "scripts/materialize_asg_emergency_purchases_resumable.py"
+        ],
+        "symbols": [
+          "scripts/audit_asg_emergency_identity_coverage.py:audit",
+          "scripts/audit_asg_emergency_identity_coverage.py:main",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:append_rows",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:atomic_json",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:initial_checkpoint",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:load_checkpoint",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:main",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:page_signature",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:paths",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:promote",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:run",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:sha256",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:utc_now",
+          "scripts/scrape_asg_emergency_purchases.py:split_vendor_identity"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_audit_asg_emergency_identity_coverage.py",
+          "tests/test_materialize_asg_emergency_purchases_resumable.py",
+          "tests/test_scrape_asg_emergency_purchases.py"
+        ]
+      }
+    }
+  ],
+  "exceptions": []
+}

@@ -25,6 +25,14 @@ A bump to the **federation export** version is what the release-tagging workflow
 ## [Unreleased]
 
 ### Fixed
+- **Cleared the checks #656 merged red.** `mypy` (`audit_asg_emergency_identity_coverage`
+  narrowed the optional coverage contract), the `ruff` format gate (eight files) and one
+  unused import; `registries/coverage_contracts.yaml` now matches its JSON (the 1,431
+  denominator was on `usaspending_prime`/`usaspending_subawards` instead of
+  `asg_emergency_purchases`) with `reports/completeness_matrix.csv` and
+  `reports/source_registry_status.csv` regenerated from their tools; one ASG note phrase
+  aligned with the test that asserts it (counts unchanged); and the new ASG scripts are
+  classified `internal` in a GUI-parity extension (baseline untouched).
 - **Cleared the CI failures that were already red on `main`** (separate from the
   desktop Setup fix): two unused imports (`server/backend/case_manager_api.py`,
   `server/backend/materialization.py`) and five files `ruff format` flagged (the
