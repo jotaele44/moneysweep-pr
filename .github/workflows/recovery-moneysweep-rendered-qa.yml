@@ -34,7 +34,7 @@ jobs:
           cp .recovery/moneysweep-successor-v3/moneySweepAccessDbParity.spec.tsx "$ROOT/helpers/moneySweepAccessDbParity.spec.tsx"
           cd "$ROOT"
           npx vite build
-          npm install --save-dev --no-audit --no-fund --ignore-scripts playwright@1.55.0
+          NPM_CONFIG_LEGACY_PEER_DEPS=true npm install --save-dev --no-audit --no-fund --ignore-scripts playwright@1.55.0
           npx playwright install --with-deps chromium
       - name: Render desktop and narrow iPhone
         shell: bash
