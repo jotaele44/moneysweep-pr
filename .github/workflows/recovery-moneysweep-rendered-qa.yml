@@ -1,0 +1,117 @@
+name: MoneySweep rendered QA — recovery successor v3
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [recovery/floot-baseline-2026-09-30]
+    paths:
+      - ".github/workflows/recovery-moneysweep-rendered-qa.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  rendered-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "22"
+      - name: Reconstruct exact successor v3
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash .recovery/moneysweep-exact/run_exact.sh
+          ROOT="$RUNNER_TEMP/recovered"
+          echo "8fcfe41d3552f2f28026bb7b01c1b3500941c961c6db9254d32b46de3ed45c84  .recovery/moneysweep-successor-v1/overlay.tar.gz" | sha256sum -c -
+          echo "97ee65c78ab6cf301a87636dedc7a73f00cedb477d3d28589ccfcbd621f16210  .recovery/moneysweep-successor-v2/overlay.tar.gz" | sha256sum -c -
+          tar -xzf .recovery/moneysweep-successor-v1/overlay.tar.gz -C "$ROOT"
+          tar -xzf .recovery/moneysweep-successor-v2/overlay.tar.gz -C "$ROOT"
+          cp .recovery/moneysweep-successor-v3/moneySweepDataLayers.tsx "$ROOT/helpers/moneySweepDataLayers.tsx"
+          cp .recovery/moneysweep-successor-v3/moneySweepDataLayers.spec.tsx "$ROOT/helpers/moneySweepDataLayers.spec.tsx"
+          cp .recovery/moneysweep-successor-v3/moneySweepAccessDbParity.spec.tsx "$ROOT/helpers/moneySweepAccessDbParity.spec.tsx"
+          cd "$ROOT"
+          npx vite build
+          npm install --save-dev --no-audit --no-fund --ignore-scripts playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Render desktop and narrow iPhone
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/recovered"
+          cd "$ROOT"
+          npx vite preview --host 127.0.0.1 --port 4173 > rendered-preview.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 60); do
+            curl -fsS http://127.0.0.1:4173/ >/dev/null && break
+            sleep 1
+          done
+          cat > rendered-qa.mjs <<'EOF'
+          import { chromium } from "playwright";
+          import fs from "node:fs";
+
+          const targets = [
+            { name: "desktop-1440", width: 1440, height: 1000 },
+            { name: "iphone-393", width: 393, height: 852 },
+            { name: "iphone-430", width: 430, height: 932 },
+          ];
+          const browser = await chromium.launch({ headless: true });
+          const results = [];
+          for (const target of targets) {
+            const page = await browser.newPage({ viewport: { width: target.width, height: target.height } });
+            const consoleErrors = [];
+            page.on("console", msg => { if (msg.type() === "error") consoleErrors.push(msg.text()); });
+            page.on("pageerror", error => consoleErrors.push(String(error)));
+            const response = await page.goto("http://127.0.0.1:4173/", { waitUntil: "networkidle" });
+            const metrics = await page.evaluate(() => ({
+              title: document.title,
+              bodyText: document.body.innerText,
+              documentClientWidth: document.documentElement.clientWidth,
+              documentScrollWidth: document.documentElement.scrollWidth,
+              bodyClientWidth: document.body.clientWidth,
+              bodyScrollWidth: document.body.scrollWidth,
+            }));
+            const horizontalOverflow =
+              metrics.documentScrollWidth > metrics.documentClientWidth ||
+              metrics.bodyScrollWidth > metrics.bodyClientWidth;
+            const brandPresent = /MoneySweep/i.test(metrics.bodyText);
+            await page.screenshot({ path: `rendered-${target.name}.png`, fullPage: true });
+            results.push({
+              ...target,
+              status: response?.status() ?? null,
+              finalUrl: page.url(),
+              brandPresent,
+              horizontalOverflow,
+              metrics: {
+                documentClientWidth: metrics.documentClientWidth,
+                documentScrollWidth: metrics.documentScrollWidth,
+                bodyClientWidth: metrics.bodyClientWidth,
+                bodyScrollWidth: metrics.bodyScrollWidth,
+              },
+              consoleErrors,
+            });
+            await page.close();
+          }
+          await browser.close();
+          fs.writeFileSync("rendered-qa.json", JSON.stringify(results, null, 2));
+          const failed = results.some(r => r.status !== 200 || !r.brandPresent || r.horizontalOverflow || r.consoleErrors.length);
+          if (failed) process.exit(1);
+          EOF
+          node rendered-qa.mjs | tee rendered-qa.log
+          sha256sum rendered-qa.json rendered-desktop-1440.png rendered-iphone-393.png rendered-iphone-430.png > rendered-qa-hashes.txt
+      - name: Upload rendered QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: moneysweep-recovery-rendered-qa-v3
+          if-no-files-found: error
+          path: |
+            ${{ runner.temp }}/recovered/rendered-qa.json
+            ${{ runner.temp }}/recovered/rendered-qa-hashes.txt
+            ${{ runner.temp }}/recovered/rendered-desktop-1440.png
+            ${{ runner.temp }}/recovered/rendered-iphone-393.png
+            ${{ runner.temp }}/recovered/rendered-iphone-430.png
+            ${{ runner.temp }}/recovered/rendered-preview.log
