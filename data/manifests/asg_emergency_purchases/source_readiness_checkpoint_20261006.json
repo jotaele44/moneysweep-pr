@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "moneysweep.asg-emergency-readiness-checkpoint/v1",
+  "observedAt": "2026-10-06",
+  "state": "SOURCE_AND_IDENTITY_READY_RUNTIME_CERTIFICATION_OPEN",
+  "source": {
+    "sourceId": "asg_emergency_purchases",
+    "authoritativeOrdering": "numerocontrol",
+    "declaredPages": 144,
+    "authoritativeUniverseTotal": 1431,
+    "uniqueControlNumbers": 1431,
+    "duplicateControlNumbers": 0,
+    "missingControlNumbers": 0,
+    "lastPageRows": 1,
+    "canonicalCorpusSha256": "7f89f5a74fd51a9fdbae0f0194c85da357b9a9cb1d6835f6aae0be37ee991b07",
+    "pageManifestSha256": "b0ae3fb9f2560c7fc53c532c306513df464093c7fac2381608579ce0af51c36c"
+  },
+  "nonAuthoritativeManifestation": {
+    "ordering": "-creado",
+    "renderedRows": 1431,
+    "uniqueControlNumbers": 1319,
+    "exactDuplicateManifestations": 112,
+    "exactDuplicateGroups": 59,
+    "conflictingDuplicateGroups": 0,
+    "state": "SUPERSEDED_FOR_COMPLETENESS_PAGINATION_DRIFT"
+  },
+  "identity": {
+    "sourceNativeRows": 21,
+    "nameOnlyRows": 1408,
+    "missingVendorRows": 2,
+    "distinctSourceNativeIds": 10,
+    "supplierRegistryDeclaredPages": 47,
+    "supplierRegistryRenderedRows": 4645,
+    "supplierRegistryUniqueRegistrationIds": 4644,
+    "supplierVerificationSha256": "983ce04f2dd8495a9a925fdb64469e43e556f4a263a1256940bb495d6cc66261",
+    "allCandidateIdsMatched": true
+  },
+  "financialValue": {
+    "validAmountRows": 1431,
+    "invalidAmountRows": 0,
+    "sourceNativeInvalidAmountRows": 0,
+    "wholeSourceDisplayedAmountTotal": 320435174.04,
+    "boundedSourceNativeAmountTotal": 4423664.82,
+    "currency": "USD",
+    "measure": "ASG_EMERGENCY_PURCHASE_COST"
+  },
+  "leaderboard": {
+    "wholeSourceState": "BLOCKED_BY_IDENTITY_RESIDUE",
+    "boundedSourceNativeState": "SOURCE_READY_PROVISIONAL_ADAPTER",
+    "categoryId": "asg_emergency_purchase_source_native",
+    "candidateRows": 21,
+    "candidateEntities": 10,
+    "certificationScope": "moneysweep.leaderboard.asg-source-native-v1",
+    "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.2",
+    "productionV1Modified": false
+  },
+  "contracts": {
+    "historicalOntologyV11Frozen": "config/financial_category_ontology_v1_1.json",
+    "liveOntology": "config/financial_category_ontology.json",
+    "liveOntologyVersion": "moneysweep.financial-category-ontology/v1.2",
+    "asgScope": "data/manifests/leaderboards/leaderboard_certification_scope_asg_source_native_v1.json",
+    "asgExportSchema": "schemas/leaderboard_asg_source_native_export_package.schema.json"
+  },
+  "execution": {
+    "livePurchaseMaterialization": "PASS",
+    "liveSupplierRegistryVerification": "PASS",
+    "repositoryPytest": {
+      "state": "NOT_EXECUTED",
+      "assertsPass": false
+    },
+    "githubActions": {
+      "state": "WAIVED_BY_USER",
+      "assertsPass": false
+    },
+    "exactRepositoryRuntimeSnapshot": {
+      "state": "OPEN",
+      "blocking": true
+    },
+    "thehubExactReplay": {
+      "state": "OPEN",
+      "blocking": true
+    }
+  },
+  "certificationPhraseAuthorized": false
+}

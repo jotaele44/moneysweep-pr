@@ -3,13 +3,13 @@
   "build_env": {
     "VITE_API_BASE": ""
   },
-  "bundle_tree_sha256": "6542b784cb40583b72ef1dd59957b7b4ba990e3d6af51f43c4241ca4e502db14",
+  "bundle_tree_sha256": "c5dc793674392c78d4a3dec60561e9840449345f3451b859e46ffe1bd778bd2f",
   "file_count": 22,
   "files": [
     {
-      "bytes": 855461,
-      "path": "assets/index-DYsJlyxl.js",
-      "sha256": "de29981387357bb2b05b9d772f595dc7f06c69eea7a0d0208543aa43ecf438d0"
+      "bytes": 855414,
+      "path": "assets/index-RMohccIK.js",
+      "sha256": "30416e14cbf059c257fc716ab1ddfa045ec9e39fca24d0661c4b56faf98f6e55"
     },
     {
       "bytes": 75512,
@@ -114,15 +114,15 @@
     {
       "bytes": 3865,
       "path": "index.html",
-      "sha256": "6064b56285af3a5aa3552b4965ff5f25a8dd65bae23142f798269d7111a57da3"
+      "sha256": "7756ea6010593f349b0d962f1af6174c13ecf7ff224d9d9e009208e18619ab3d"
     }
   ],
-  "generated_at": "2026-10-03T15:40:54Z",
+  "generated_at": "2026-10-07T15:00:25Z",
   "generated_by": {
     "node": "v26.8.2",
     "npm": "11.19.1"
   },
   "schema_version": "moneysweep_prebuilt_dashboard_v1",
-  "source_fingerprint": "e8327e13cdb443874bb9b593597a8289418625c6d4d6f9bd7939717ba4ec4087",
-  "total_bytes": 1641459
+  "source_fingerprint": "419bca0cbd56bdfd6cc162bafa136bf9f921e89039cb25a9a3004bea2578c6f6",
+  "total_bytes": 1641412
 }

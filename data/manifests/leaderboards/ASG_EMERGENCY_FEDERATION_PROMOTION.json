@@ -1,0 +1,28 @@
+{
+  "certificationPhraseAuthorized": true,
+  "githubActions": {
+    "assertsPass": false,
+    "state": "WAIVED_BY_USER"
+  },
+  "packageSha256": "6ecdad09a48cdbd4ae1076138a9b5017a5be82608b489871a50ce0d599680337",
+  "promotionAuthorized": true,
+  "producerCertificationReceiptSha256": "08eb30bfcc4033640ed215e2ee36f5fec4e93c4d3265f9728f7b262aa67c26ff",
+  "producerCommit": "e963f4258a78c9b30427df7a7e9b4edf83f00692",
+  "producerReleaseSha256": "15387cce4c12e905d9ed67caad189fd63a3a17c405eaeb8d98205f37f7e91a85",
+  "schemaVersion": "moneysweep.leaderboard-asg-federation-promotion/v1",
+  "scopeId": "moneysweep.leaderboard.asg-emergency-source-native-v1",
+  "scopeSha256": "9b22125120a8a0592050f58b766272f3a25bf0e8308e82cf1df452487682710c",
+  "state": "PASS",
+  "thehubConsumerCodeCommit": "ee9c1619dfa22cd619ee3cfc6903c8427850830f",
+  "thehubReplayReceiptCommit": "f499a4f05af6d299cd7c6869f83ce20692fa33bf",
+  "thehubReplayReceiptSha256": "0e7ad241eb54a18161f21bd1456596062fe49562742739bb074a2f26631cc746",
+  "wholeSourceClaimAuthorized": false,
+  "boundedScope": {
+    "inputRecords": 1431,
+    "outOfScopeIdentityRows": 1410,
+    "retainedSourceNativeRows": 21,
+    "rankedEntities": 10,
+    "metricTotal": 4423664.82,
+    "currency": "USD"
+  }
+}

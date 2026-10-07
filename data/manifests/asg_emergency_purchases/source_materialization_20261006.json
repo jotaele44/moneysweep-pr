@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "moneysweep.asg-emergency-source-materialization/v1",
+  "state": "SUPERSEDED_NON_AUTHORITATIVE_ORDERING",
+  "capturedAt": "2026-10-06T04:38:59.972Z",
+  "source": {
+    "sourceId": "asg_emergency_purchases",
+    "url": "https://www.asg.pr.gov/comprasemergencias",
+    "ordering": "-creado",
+    "declaredPages": 144,
+    "pagesFetched": 144,
+    "lastPage": {
+      "page": 144,
+      "rowCount": 1,
+      "firstControl": "22-ASG-TTF-268",
+      "lastControl": "22-ASG-TTF-268",
+      "htmlBytes": 107948,
+      "htmlSha256": "c22fdc10fd968fc0e831254f256835fdb8427c5d9db389014375dbcce65c79ad",
+      "controlSignatureSha256": "ab2ecb3c5c2786884d115f36d28243dbb17eb53bcd32de655ac33639ab4db4cd"
+    }
+  },
+  "arithmetic": {
+    "rawManifestations": 1431,
+    "canonicalSourceRecords": 1319,
+    "exactDuplicateManifestations": 112,
+    "exactDuplicateGroups": 59,
+    "conflictingDuplicateGroups": 0,
+    "closed": true,
+    "equation": "1431 = 1319 + 112"
+  },
+  "identity": {
+    "sourceNativeRows": 21,
+    "nameOnlyRows": 1296,
+    "missingVendorRows": 2,
+    "identityScheme": "asg_licitador_id",
+    "nameOnlyPromotionAllowed": false
+  },
+  "financialValue": {
+    "validAmountRows": 1319,
+    "invalidAmountRows": 0,
+    "sourceNativeInvalidAmountRows": 0,
+    "canonicalTotalAmount": 302236265.22,
+    "sourceNativeAmountTotal": 4423664.82,
+    "currency": "USD",
+    "measureLabel": "ASG_EMERGENCY_PURCHASE_COST"
+  },
+  "artifacts": {
+    "storageAuthority": "FLOOT_PROJECT_STORAGE",
+    "projectId": "cba06a5a-dc59-42d1-bf5b-8b7d5148bb1d",
+    "rawManifestations": {
+      "storageKey": "public/static/asg_emergency_raw_20261006T043859.jsonl",
+      "cdnPath": "/_cdn/static/asg_emergency_raw_20261006T043859.jsonl",
+      "bytes": 582448,
+      "sha256": "e374a3864fe752be3528620d54c1d9b3319430a8a0c2db0461ca8ddbf34463bd"
+    },
+    "canonicalSource": {
+      "storageKey": "public/static/asg_emergency_canonical_20261006T043859.jsonl",
+      "cdnPath": "/_cdn/static/asg_emergency_canonical_20261006T043859.jsonl",
+      "bytes": 531964,
+      "sha256": "61fcd1d3d13ac4bb8c0194960d07c1d861dc118a5cd662beea184a592aefc8a1"
+    },
+    "pageManifest": {
+      "storageKey": "public/static/asg_emergency_pages_20261006T043859.json",
+      "cdnPath": "/_cdn/static/asg_emergency_pages_20261006T043859.json",
+      "bytes": 65551,
+      "sha256": "938070d561b37be709de0458f16ca27f4f2b4db7a24be206dd34c69cce319dea"
+    }
+  },
+  "certificationEffect": {
+    "sourceMaterializationClosed": false,
+    "wholeSourceLeaderboardReady": false,
+    "boundedSourceNativeLeaderboardMayProceedToAdapterEvaluation": false,
+    "productionOntologyExpanded": false,
+    "certificationPhraseAuthorized": false
+  },
+  "authoritativeReceipt": "data/manifests/asg_emergency_purchases/materialization_receipt_20261006.json",
+  "note": "This receipt was produced from the -creado view, which repeats exact rows across pages. It is retained as pagination-drift evidence only. The authoritative completeness manifestation uses control-number ordering and is frozen in materialization_receipt_20261006.json."
+}

@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "moneysweep.leaderboard-certification-scope/v1",
+  "scopeId": "moneysweep.leaderboard.asg-emergency-source-native-v1",
+  "state": "CANDIDATE",
+  "rankingContractVersion": "moneysweep.leaderboard/v1.1",
+  "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.1",
+  "rankingPlane": "CURRENT_RANKING_ONLY",
+  "historicalMovementCertified": false,
+  "topMoversCertified": false,
+  "movementDerivedSignalsCertified": false,
+  "ciExecutionPolicy": {
+    "state": "WAIVED_BY_USER",
+    "blocking": false,
+    "assertsPass": false
+  },
+  "includedCategories": [
+    {
+      "categoryId": "asg_emergency_purchase_source_native",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "identityNamespace": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "currencyUniverse": [
+        "USD"
+      ],
+      "requiredAccounting": {
+        "inputRecords": 1431,
+        "outOfScopeRecords": 1410,
+        "retainedRecords": 21,
+        "excludedRecords": 0,
+        "unresolvedRecords": 0,
+        "inScopeRecords": 21,
+        "arithmeticClosed": true
+      },
+      "scopeBoundary": {
+        "fullSourceUniverse": 1431,
+        "eligibleSourceNativeRows": 21,
+        "excludedNameOnlyRows": 1408,
+        "excludedMissingVendorRows": 2,
+        "claimsCompleteASGEmergencyUniverse": false,
+        "prohibitedClaims": [
+          "all ASG emergency purchases",
+          "all ASG vendors",
+          "total ASG emergency spending"
+        ]
+      }
+    }
+  ],
+  "excludedUniverse": {
+    "nameOnlyRows": 1408,
+    "missingVendorRows": 2,
+    "state": "EXPLICIT_OUT_OF_SCOPE_IDENTITY_RESIDUE"
+  },
+  "githubActionsRequiredForThisCertification": false,
+  "zeroMaterialUnresolvedResidueAppliesWithinCertifiedScopeOnly": true
+}

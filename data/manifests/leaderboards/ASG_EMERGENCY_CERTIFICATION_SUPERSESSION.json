@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "moneysweep.asg-leaderboard-certification-state-supersession/v1",
+  "state": "FROZEN",
+  "canonicalScopeId": "moneysweep.leaderboard.asg-emergency-source-native-v1",
+  "canonicalProducerCertification": "data/manifests/leaderboards/ASG_EMERGENCY_LEADERBOARD_CERTIFICATION.json",
+  "canonicalReleaseContract": "data/manifests/leaderboards/leaderboard_release_contract_asg_emergency_v1.json",
+  "canonicalPromotionReceipt": "data/manifests/leaderboards/ASG_EMERGENCY_FEDERATION_PROMOTION.json",
+  "superseded": [
+    {
+      "path": "data/manifests/leaderboards/MONEYSWEEP_ASG_SOURCE_NATIVE_CERTIFICATION.json",
+      "scopeId": "moneysweep.leaderboard.asg-source-native-v1",
+      "state": "SUPERSEDED_PARALLEL_OPEN_SCOPE",
+      "reason": "A later bounded producer certification closed under the canonical asg-emergency-source-native-v1 scope."
+    },
+    {
+      "path": "data/manifests/leaderboards/leaderboard_release_contract_asg_source_native_v1.json",
+      "scopeId": "moneysweep.leaderboard.asg-source-native-v1",
+      "state": "SUPERSEDED_PARALLEL_OPEN_SCOPE",
+      "reason": "Replaced by the canonical ASG emergency source-native release contract and exact TheHub replay chain."
+    }
+  ],
+  "rules": {
+    "supersededReceiptsMayNotAuthorizePromotion": true,
+    "wholeSourceClaimAuthorized": false,
+    "canonicalScopeOnly": true
+  }
+}
