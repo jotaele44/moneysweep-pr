@@ -22,25 +22,25 @@
   },
   "by_coverage_status": {
     "below_contract": 3,
-    "meets_contract": 3,
+    "meets_contract": 5,
     "uncontracted": 144,
-    "unverifiable": 17
+    "unverifiable": 15
   },
   "by_reconciliation_status": {
     "not_applicable": 165,
     "not_evaluated": 2
   },
   "by_certification_status": {
-    "certified_complete": 1,
-    "provisional": 19,
+    "certified_complete": 2,
+    "provisional": 18,
     "uncertified": 147
   },
   "by_materiality_label": {
     "empty": 146,
     "partial": 3,
     "seed": 3,
-    "substantial": 12,
-    "validated_complete": 3
+    "substantial": 10,
+    "validated_complete": 5
   },
   "outputs": [
     "reports/completeness_matrix.csv",

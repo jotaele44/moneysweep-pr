@@ -76,3 +76,13 @@ for (const route of routes) {
     expect(runtimeFailures, runtimeFailures.join("\n")).toEqual([]);
   });
 }
+
+test("contract amounts are finite JSON numbers or null", async ({ page, request }) => {
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("#root")).toBeVisible();
+  const response = await request.get("http://127.0.0.1:8000/contracts");
+  expect(response.status()).toBe(200);
+  for (const contract of await response.json()) {
+    expect(contract.awardAmount === null || Number.isFinite(contract.awardAmount)).toBe(true);
+  }
+});

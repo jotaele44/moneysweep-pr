@@ -80,12 +80,12 @@ _load()  # eager load at import → fail fast on missing files / header drift
 
 
 def _num(v):
-    """Parse a possibly-blank money string → float or None (never NaN)."""
+    """Parse a possibly-blank money string → finite float or None."""
     if v is None or v == "":
         return None
     try:
         f = float(v)
-        return None if math.isnan(f) else f
+        return f if math.isfinite(f) else None
     except (TypeError, ValueError):
         return None
 

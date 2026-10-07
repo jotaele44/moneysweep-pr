@@ -108,7 +108,8 @@
         ],
         "contract": [
           "dashboard/tests/federation-pilot.test.mjs",
-          "tests/test_gui_parity.py"
+          "tests/test_gui_parity.py",
+          "tests/test_review_numeric_boundaries.py"
         ],
         "e2e": [
           "dashboard/tests/gui-parity.spec.mjs",
@@ -759,7 +760,7 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing \u2014 zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
+      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing — zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
       "backend": {
         "files": [
           "scripts/scrape_rdc_demandas.py",
@@ -1694,6 +1695,44 @@
         "python_symbol:moneysweep/runtime/source_database.py:materialize_source",
         "python_symbol:moneysweep/runtime/source_database.py:materialize_sources"
       ]
+    },
+    {
+      "id": "asg-emergency-materialization-integrity",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Producer acquisition and certification infrastructure: resumable page checkpoints and identity coverage audits feed the existing ASG emergency purchase leaderboard. They do not add a human workflow; rendering and scope warnings remain on the existing leaderboard. Completion receipts cannot authorize an uncertified ranking.",
+      "analysis": {
+        "files": [
+          "scripts/audit_asg_emergency_identity_coverage.py",
+          "scripts/materialize_asg_emergency_purchases_resumable.py",
+          "scripts/scrape_asg_emergency_purchases.py"
+        ],
+        "symbols": [
+          "scripts/audit_asg_emergency_identity_coverage.py:audit",
+          "scripts/audit_asg_emergency_identity_coverage.py:main",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:append_rows",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:atomic_json",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:initial_checkpoint",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:load_checkpoint",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:main",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:page_signature",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:paths",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:promote",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:run",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:sha256",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:utc_now",
+          "scripts/scrape_asg_emergency_purchases.py:split_vendor_identity"
+        ]
+      },
+      "tests": {
+        "contract": [
+          "tests/test_audit_asg_emergency_identity_coverage.py",
+          "tests/test_scrape_asg_suppliers.py",
+          "tests/test_scrape_asg_emergency_purchases.py",
+          "tests/test_materialize_asg_emergency_purchases_resumable.py"
+        ]
+      }
     }
   ],
   "exceptions": [

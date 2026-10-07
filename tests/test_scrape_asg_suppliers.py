@@ -391,9 +391,8 @@ def test_asg_is_seeded_as_a_government_agency():
 
 
 @pytest.mark.unit
-def test_asg_coverage_contracts_fail_closed_on_drifted_emergency_denominator():
-    """Supplier coverage remains measured; emergency coverage is intentionally
-    unverifiable until the drifted 144-page portal is fully remeasured."""
+def test_asg_coverage_contracts_match_frozen_emergency_denominator():
+    """Coverage uses the frozen authoritative walk, never the drifted recency walk."""
     from pathlib import Path
 
     import yaml
@@ -408,8 +407,14 @@ def test_asg_coverage_contracts_fail_closed_on_drifted_emergency_denominator():
     assert emergency["authoritative_universe_method"] == "portal_count"
     assert emergency["authoritative_universe_total"] == 1431
     assert emergency["pagination_required"] is True
-    assert "1,431 raw row manifestations" in emergency["notes"]
-    assert "1,431 unique control_number" in emergency["notes"]
+    import json
+
+    receipt = json.loads((root / "data/manifests/asg_emergency_purchases/materialization_receipt_20261006.json").read_text())
+    assert emergency["authoritative_universe_total"] == receipt["authoritativeUniverseTotal"]
+    assert receipt["uniqueControlNumbers"] == receipt["authoritativeUniverseTotal"]
+    assert receipt["duplicateControlNumbers"] == 0
+    assert "1,431 unique control numbers" in emergency["notes"]
+    assert "non-authoritative for completeness" in emergency["notes"]
 
     suppliers = by_id["asg_suppliers"]
     assert suppliers["canonical_grain"] == "entity"

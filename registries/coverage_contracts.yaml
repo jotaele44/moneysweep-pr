@@ -331,12 +331,12 @@ contracts:
     geography_scope: PR
     authoritative_universe_method: portal_count
     authoritative_universe_ref: https://asg.pr.gov/comprasemergencias
-    authoritative_universe_total: null
+    authoritative_universe_total: 1431
     uniqueness_key: [control_number]
     minimum_coverage_pct: 95.0
     pagination_required: true
     notes: >-
-      Current measurement 2026-10-04: authoritative completeness walk uses
+      Frozen measurement 2026-10-06 (data/manifests/asg_emergency_purchases/materialization_receipt_20261006.json): authoritative completeness walk uses
       order_by=-numerocontrol and closes 144 pages as 143 pages x 10 rows plus
       a 1-row page 144 -> 1,431 unique control numbers, with zero duplicate or
       missing control numbers. The default order_by=-creado is explicitly
