@@ -11,11 +11,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 
-# Committed, deterministic, generated report files that some tests regenerate
-# in place against the real repo root. Snapshotting + restoring them around
-# every test keeps the working tree clean and prevents one test leaving a
-# mutated file as a polluted baseline for another's committed-vs-regenerated
-# comparison. Content is captured and rewritten verbatim.
+# Committed checkout files that tests may regenerate or disturb in place.
+# Snapshotting and restoring their bytes and modes around every test keeps the
+# checkout reproducible and prevents collection order from changing results.
 #
 # Note: the strongest data-presence-dependent invariant
 # (test_status_csv_regenerates_identically) does NOT rely on this fixture — it
@@ -23,23 +21,27 @@ sys.path.insert(0, str(PROJECT_ROOT))
 # working-tree pollution regardless of collection order. This fixture is
 # defence-in-depth + working-tree hygiene for the registry-derived comparison
 # tests.
-_PROTECTED_REPORT_FILES = (
+_PROTECTED_CHECKOUT_FILES = (
     "reports/source_registry_status.csv",
     "reports/source_recovery_matrix.csv",
     "reports/source_recovery_matrix.md",
     "reports/materialization_readiness.json",
     "reports/gap_analysis_report.csv",
     "reports/gap_analysis_report.json",
+    "PRII-MONEYSWEEP.app/Contents/Info.plist",
+    "PRII-MONEYSWEEP.app/Contents/MacOS/PRII-MONEYSWEEP",
+    "PRII-MONEYSWEEP.app/Contents/PkgInfo",
+    "PRII-MONEYSWEEP.app/Contents/Resources/AppIcon.icns",
 )
 
 
 @pytest.fixture(autouse=True)
-def _restore_committed_reports():
-    """Restore committed report files to their pre-test bytes after each test."""
-    snapshots: dict[Path, bytes | None] = {}
-    for rel in _PROTECTED_REPORT_FILES:
+def _restore_committed_checkout_files():
+    """Restore protected checkout files to their pre-test bytes and modes."""
+    snapshots: dict[Path, tuple[bytes, int] | None] = {}
+    for rel in _PROTECTED_CHECKOUT_FILES:
         p = PROJECT_ROOT / rel
-        snapshots[p] = p.read_bytes() if p.exists() else None
+        snapshots[p] = (p.read_bytes(), p.stat().st_mode) if p.exists() else None
     try:
         yield
     finally:
@@ -47,9 +49,13 @@ def _restore_committed_reports():
             if original is None:
                 if p.exists():
                     p.unlink()
-            elif not p.exists() or p.read_bytes() != original:
+            else:
+                content, mode = original
                 p.parent.mkdir(parents=True, exist_ok=True)
-                p.write_bytes(original)
+                if not p.exists() or p.read_bytes() != content:
+                    p.write_bytes(content)
+                if p.stat().st_mode != mode:
+                    p.chmod(mode)
 
 
 @pytest.fixture

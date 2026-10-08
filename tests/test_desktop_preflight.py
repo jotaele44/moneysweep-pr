@@ -50,11 +50,11 @@ def test_repo_checkout_passes_its_own_preflight(monkeypatch) -> None:
     assert _by_id(report, "venv_available")["ok"]
 
 
-def test_node_is_not_required_when_the_prebuilt_bundle_is_present(monkeypatch) -> None:
+def test_node_is_not_required_when_the_prebuilt_bundle_is_present(monkeypatch, tmp_path) -> None:
     """The regression test for the dialog that wrongly blamed Node.js."""
     monkeypatch.setattr(preflight.shutil, "which", lambda command: None)
 
-    check = preflight.check_dashboard_bundle(REPO_ROOT)
+    check = preflight.check_dashboard_bundle(tmp_path)
 
     assert check["ok"]
     assert "prebuilt" in check["detail"].lower()
