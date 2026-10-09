@@ -11,6 +11,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional, Tuple, Union
+from urllib.parse import quote
 
 PIN_SCHEMA_VERSION = "pr_grid_geographic_v2_consumer_pin/1.0"
 GRID_ID = "PR_GRID_GEOGRAPHIC_V2"
@@ -39,6 +40,13 @@ EXPECTED_DEFAULT_LEVELS = {
 }
 EXPECTED_CONSUMERS = frozenset(EXPECTED_DEFAULT_LEVELS)
 _HASH_RE = re.compile(r"^[0-9a-f]{64}$")
+_CELL_ID_RE = re.compile(r"^PRG2:(L[0-3]):R([0-9]{3}):C([0-9]{4})$")
+LEVEL_DIMENSIONS = {
+    "L0": (67, 171),
+    "L1": (134, 342),
+    "L2": (268, 684),
+    "L3": (536, 1368),
+}
 
 
 class GridV2PinError(ValueError):
@@ -71,6 +79,34 @@ def validate_level(level: object) -> str:
             % (level, ", ".join(ALLOWED_LEVELS))
         )
     return level
+
+
+def validate_cell_id(cell_id: object, *, level: Optional[str] = None) -> str:
+    """Validate canonical V2 Cell_ID syntax, level identity, and row/column bounds."""
+    if not isinstance(cell_id, str):
+        raise GridV2PinError("Cell_ID must be a string")
+    match = _CELL_ID_RE.fullmatch(cell_id)
+    if match is None:
+        raise GridV2PinError("malformed V2 Cell_ID: %r" % (cell_id,))
+
+    cell_level, row_text, column_text = match.groups()
+    rows, columns = LEVEL_DIMENSIONS[cell_level]
+    row = int(row_text)
+    column = int(column_text)
+    if row >= rows or column >= columns:
+        raise GridV2PinError(
+            "Cell_ID out of range for %s: row=%d column=%d"
+            % (cell_level, row, column)
+        )
+
+    if level is not None:
+        selected_level = validate_level(level)
+        if cell_level != selected_level:
+            raise GridV2PinError(
+                "Cell_ID level %s does not match requested level %s"
+                % (cell_level, selected_level)
+            )
+    return cell_id
 
 
 def validate_pin_payload(
@@ -203,7 +239,12 @@ def load_pin(
     )
 
 
-def grid_identity(pin: GridV2Pin, *, level: Optional[str] = None) -> Dict[str, str]:
+def grid_identity(
+    pin: GridV2Pin,
+    *,
+    level: Optional[str] = None,
+    cell_id: Optional[str] = None,
+) -> Dict[str, str]:
     """Return the immutable identity envelope to stamp on grid-aware outputs."""
     selected_level = pin.default_level if level is None else validate_level(level)
     if selected_level not in pin.allowed_levels:
@@ -211,7 +252,7 @@ def grid_identity(pin: GridV2Pin, *, level: Optional[str] = None) -> Dict[str, s
             "grid level %s is not permitted for %s"
             % (selected_level, pin.consumer)
         )
-    return {
+    identity = {
         "Grid_ID": GRID_ID,
         "Grid_Version": GRID_VERSION,
         "Grid_Level": selected_level,
@@ -223,6 +264,57 @@ def grid_identity(pin: GridV2Pin, *, level: Optional[str] = None) -> Dict[str, s
         "Geometry_Authority": GEOMETRY_AUTHORITY,
         "Authority_Commit": AUTHORITY_COMMIT,
     }
+    if cell_id is not None:
+        identity["Cell_ID"] = validate_cell_id(cell_id, level=selected_level)
+    return identity
+
+
+def attach_grid_identity(
+    payload: Mapping[str, Any],
+    pin: GridV2Pin,
+    *,
+    level: Optional[str] = None,
+    cell_id: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Copy a payload and attach one validated immutable Grid_Identity envelope."""
+    output = dict(payload)
+    output["Grid_Identity"] = grid_identity(
+        pin,
+        level=level,
+        cell_id=cell_id,
+    )
+    return output
+
+
+def build_grid_deep_link(
+    pin: GridV2Pin,
+    *,
+    level: Optional[str] = None,
+    cell_id: str,
+    base_path: str = "",
+    as_of: Optional[str] = None,
+) -> str:
+    """Build the canonical federation deep link for one validated V2 cell."""
+    selected_level = pin.default_level if level is None else validate_level(level)
+    if selected_level not in pin.allowed_levels:
+        raise GridV2PinError(
+            "grid level %s is not permitted for %s"
+            % (selected_level, pin.consumer)
+        )
+    validated_cell = validate_cell_id(cell_id, level=selected_level)
+    prefix = base_path.rstrip("/")
+    path = "%s/grid/%s/%s/%s/%s" % (
+        prefix,
+        GRID_ID,
+        GRID_VERSION,
+        selected_level,
+        quote(validated_cell, safe=":"),
+    )
+    if as_of is not None:
+        if not isinstance(as_of, str) or not as_of.strip():
+            raise GridV2PinError("as_of cannot be blank")
+        path += "?as_of=" + quote(as_of, safe="")
+    return path
 
 
 def validate_pin_set(
