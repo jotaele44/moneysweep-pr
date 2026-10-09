@@ -34,5 +34,9 @@
       "id": "QA-D24-003",
       "affects_grid_identity": false
     }
-  ]
+  ],
+  "runtime_contract_version": "pr-grid-v2-runtime/1.0",
+  "runtime_authority_commit": "ef8404aa7a1954e88ae164155857961850d82a6a",
+  "runtime_authority_path": "federation/spatial/pr_grid_geographic_v2_runtime.py",
+  "runtime_module_sha256": "1e616e15ce5b22ac0623dcc2cc557a86c26a5eac9d4415b87d4cac71ec199956"
 }
