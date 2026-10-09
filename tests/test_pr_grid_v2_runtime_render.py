@@ -74,7 +74,6 @@ def test_unsupported_level_fails_closed():
 
 
 def test_cell_id_bounds_and_level_are_enforced():
-    pin = load_pin(PIN_PATH, expected_consumer=EXPECTED_CONSUMER)
     good = f"PRG2:{EXPECTED_LEVEL}:R000:C0000"
     assert validate_cell_id(good, level=EXPECTED_LEVEL) == good
 
