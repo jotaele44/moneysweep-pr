@@ -95,9 +95,7 @@ def validate_cell_id(cell_id: object, *, level: str | None = None) -> str:
     row = int(row_text)
     column = int(column_text)
     if row >= rows or column >= columns:
-        raise GridV2PinError(
-            f"Cell_ID out of range for {cell_level}: row={row} column={column}"
-        )
+        raise GridV2PinError(f"Cell_ID out of range for {cell_level}: row={row} column={column}")
 
     if level is not None:
         selected_level = validate_level(level)
@@ -140,15 +138,11 @@ def validate_pin_payload(
     if consumer not in EXPECTED_CONSUMERS:
         errors.append(f"unknown V2 consumer: {consumer!r}")
     if expected_consumer is not None and consumer != expected_consumer:
-        errors.append(
-            f"consumer must be {expected_consumer!r}, got {consumer!r}"
-        )
+        errors.append(f"consumer must be {expected_consumer!r}, got {consumer!r}")
 
     observed_levels = payload.get("allowed_levels")
     if observed_levels != list(ALLOWED_LEVELS):
-        errors.append(
-            f"allowed_levels must be {list(ALLOWED_LEVELS)!r}, got {observed_levels!r}"
-        )
+        errors.append(f"allowed_levels must be {list(ALLOWED_LEVELS)!r}, got {observed_levels!r}")
 
     default_level = payload.get("default_level")
     expected_default = EXPECTED_DEFAULT_LEVELS.get(str(consumer))
@@ -245,9 +239,7 @@ def grid_identity(
     """Return the immutable identity envelope to stamp on grid-aware outputs."""
     selected_level = pin.default_level if level is None else validate_level(level)
     if selected_level not in pin.allowed_levels:
-        raise GridV2PinError(
-            f"grid level {selected_level} is not permitted for {pin.consumer}"
-        )
+        raise GridV2PinError(f"grid level {selected_level} is not permitted for {pin.consumer}")
     identity = {
         "Grid_ID": GRID_ID,
         "Grid_Version": GRID_VERSION,
@@ -293,14 +285,11 @@ def build_grid_deep_link(
     """Build the canonical federation deep link for one validated V2 cell."""
     selected_level = pin.default_level if level is None else validate_level(level)
     if selected_level not in pin.allowed_levels:
-        raise GridV2PinError(
-            f"grid level {selected_level} is not permitted for {pin.consumer}"
-        )
+        raise GridV2PinError(f"grid level {selected_level} is not permitted for {pin.consumer}")
     validated_cell = validate_cell_id(cell_id, level=selected_level)
     prefix = base_path.rstrip("/")
     path = (
-        f"{prefix}/grid/{GRID_ID}/{GRID_VERSION}/{selected_level}/"
-        f"{quote(validated_cell, safe=':')}"
+        f"{prefix}/grid/{GRID_ID}/{GRID_VERSION}/{selected_level}/{quote(validated_cell, safe=':')}"
     )
     if as_of is not None:
         if not isinstance(as_of, str) or not as_of.strip():
