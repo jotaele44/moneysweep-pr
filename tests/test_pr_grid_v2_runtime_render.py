@@ -103,7 +103,4 @@ def test_cell_profile_identity_and_deep_link_are_canonical():
         level=EXPECTED_LEVEL,
         cell_id=cell_id,
     )
-    assert link == (
-        f"/grid/PR_GRID_GEOGRAPHIC_V2/2.0.0-rc1/"
-        f"{EXPECTED_LEVEL}/{cell_id}"
-    )
+    assert link == (f"/grid/PR_GRID_GEOGRAPHIC_V2/2.0.0-rc1/{EXPECTED_LEVEL}/{cell_id}")
