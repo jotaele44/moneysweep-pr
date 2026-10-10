@@ -46,6 +46,35 @@
   },
   "capabilities": [
     {
+      "id": "pr-grid-v2-runtime-contract",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Fail-closed federation contract utility for validating PR_GRID_GEOGRAPHIC_V2 consumer pins, stamping immutable grid identity, and generating canonical grid deep links. It is an internal runtime/governance primitive, not a standalone operator workflow; user-facing grid identity is surfaced through consuming Cell_Profile/API responses rather than a separate validator GUI.",
+      "analysis": {
+        "files": [
+          "federation/spatial/pr_grid_v2_runtime.py"
+        ],
+        "symbols": [
+          "federation/spatial/pr_grid_v2_runtime.py:GridV2Pin",
+          "federation/spatial/pr_grid_v2_runtime.py:GridV2PinError",
+          "federation/spatial/pr_grid_v2_runtime.py:attach_grid_identity",
+          "federation/spatial/pr_grid_v2_runtime.py:build_grid_deep_link",
+          "federation/spatial/pr_grid_v2_runtime.py:grid_identity",
+          "federation/spatial/pr_grid_v2_runtime.py:load_pin",
+          "federation/spatial/pr_grid_v2_runtime.py:validate_cell_id",
+          "federation/spatial/pr_grid_v2_runtime.py:validate_level",
+          "federation/spatial/pr_grid_v2_runtime.py:validate_pin_payload",
+          "federation/spatial/pr_grid_v2_runtime.py:validate_pin_set"
+        ]
+      },
+      "tests": {
+        "contract": [
+          "tests/test_pr_grid_v2_runtime.py"
+        ]
+      }
+    },
+    {
       "id": "public-money-intelligence-dashboard",
       "classification": "analysis",
       "status": "active",
@@ -759,7 +788,7 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing \u2014 zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
+      "rationale": "Batch ingestion for the rdc_demandas_civiles source (Registro de Demandas Civiles, Ley 1-2003): a paginated list sweep plus a resumable per-case detail pass. Both run offline and render nothing — zero references in dashboard/src. Their outputs (data/staging/processed/pr_rdc_demandas_civiles.csv and pr_rdc_demandas_parties.csv) reach the operator through the existing public-money-intelligence-dashboard capability, like every other ingested source. The detail pass is additionally operator-paced by design (~44,700 requests against a small government host, bounded per run via --limit / --max-runtime), so it is an operator-run batch job rather than an interactive workflow; it is deliberately not wired into a blocking pipeline stage.",
       "backend": {
         "files": [
           "scripts/scrape_rdc_demandas.py",
