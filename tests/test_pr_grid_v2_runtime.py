@@ -1,4 +1,5 @@
 """Consumer smoke tests for the shared PR grid V2 runtime."""
+
 from __future__ import annotations
 
 import copy
