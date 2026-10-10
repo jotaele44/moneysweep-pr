@@ -76,9 +76,7 @@ def _expect_equal(
 def validate_level(level: object) -> str:
     if not isinstance(level, str) or level not in ALLOWED_LEVELS:
         expected = ", ".join(ALLOWED_LEVELS)
-        raise GridV2PinError(
-            f"unsupported grid level {level!r}; expected one of {expected}"
-        )
+        raise GridV2PinError(f"unsupported grid level {level!r}; expected one of {expected}")
     return level
 
 
@@ -95,17 +93,13 @@ def validate_cell_id(cell_id: object, *, level: str | None = None) -> str:
     row = int(row_text)
     column = int(column_text)
     if row >= rows or column >= columns:
-        raise GridV2PinError(
-            f"Cell_ID out of range for {cell_level}: "
-            f"row={row} column={column}"
-        )
+        raise GridV2PinError(f"Cell_ID out of range for {cell_level}: row={row} column={column}")
 
     if level is not None:
         selected_level = validate_level(level)
         if cell_level != selected_level:
             raise GridV2PinError(
-                f"Cell_ID level {cell_level} does not match requested level "
-                f"{selected_level}"
+                f"Cell_ID level {cell_level} does not match requested level {selected_level}"
             )
     return cell_id
 
@@ -142,23 +136,17 @@ def validate_pin_payload(
     if consumer not in EXPECTED_CONSUMERS:
         errors.append(f"unknown V2 consumer: {consumer!r}")
     if expected_consumer is not None and consumer != expected_consumer:
-        errors.append(
-            f"consumer must be {expected_consumer!r}, got {consumer!r}"
-        )
+        errors.append(f"consumer must be {expected_consumer!r}, got {consumer!r}")
 
     observed_levels = payload.get("allowed_levels")
     if observed_levels != list(ALLOWED_LEVELS):
-        errors.append(
-            f"allowed_levels must be {list(ALLOWED_LEVELS)!r}, "
-            f"got {observed_levels!r}"
-        )
+        errors.append(f"allowed_levels must be {list(ALLOWED_LEVELS)!r}, got {observed_levels!r}")
 
     default_level = payload.get("default_level")
     expected_default = EXPECTED_DEFAULT_LEVELS.get(str(consumer))
     if expected_default is not None and default_level != expected_default:
         errors.append(
-            f"default_level for {consumer} must be {expected_default}, "
-            f"got {default_level!r}"
+            f"default_level for {consumer} must be {expected_default}, got {default_level!r}"
         )
 
     if required_level is not None:
@@ -168,9 +156,7 @@ def validate_pin_payload(
             errors.append(str(exc))
         else:
             if not isinstance(observed_levels, list) or required not in observed_levels:
-                errors.append(
-                    f"required level {required} is not enabled by this pin"
-                )
+                errors.append(f"required level {required} is not enabled by this pin")
 
     for key in (
         "grid_manifest_sha256",
@@ -193,9 +179,7 @@ def validate_pin_payload(
         observed_blockers = {}
         for row in blockers:
             if not isinstance(row, Mapping):
-                errors.append(
-                    "external_provider_blockers entries must be objects"
-                )
+                errors.append("external_provider_blockers entries must be objects")
                 continue
             blocker_id = row.get("id")
             affects = row.get("affects_grid_identity")
@@ -223,9 +207,7 @@ def load_pin(
     try:
         payload = json.loads(pin_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise GridV2PinError(
-            f"cannot load V2 grid pin {pin_path}: {exc}"
-        ) from exc
+        raise GridV2PinError(f"cannot load V2 grid pin {pin_path}: {exc}") from exc
     if not isinstance(payload, Mapping):
         raise GridV2PinError("V2 grid pin root must be an object")
 
@@ -255,9 +237,7 @@ def grid_identity(
     """Return the immutable identity envelope to stamp on grid-aware outputs."""
     selected_level = pin.default_level if level is None else validate_level(level)
     if selected_level not in pin.allowed_levels:
-        raise GridV2PinError(
-            f"grid level {selected_level} is not permitted for {pin.consumer}"
-        )
+        raise GridV2PinError(f"grid level {selected_level} is not permitted for {pin.consumer}")
     identity = {
         "Grid_ID": GRID_ID,
         "Grid_Version": GRID_VERSION,
@@ -309,8 +289,7 @@ def build_grid_deep_link(
     validated_cell = validate_cell_id(cell_id, level=selected_level)
     prefix = base_path.rstrip("/")
     path = (
-        f"{prefix}/grid/{GRID_ID}/{GRID_VERSION}/"
-        f"{selected_level}/{quote(validated_cell, safe=':')}"
+        f"{prefix}/grid/{GRID_ID}/{GRID_VERSION}/{selected_level}/{quote(validated_cell, safe=':')}"
     )
     if as_of is not None:
         if not isinstance(as_of, str) or not as_of.strip():
@@ -328,8 +307,7 @@ def validate_pin_set(
         missing = sorted(set(EXPECTED_CONSUMERS) - supplied)
         extra = sorted(supplied - set(EXPECTED_CONSUMERS))
         raise GridV2PinError(
-            f"consumer pin denominator mismatch: missing={missing!r} "
-            f"extra={extra!r}"
+            f"consumer pin denominator mismatch: missing={missing!r} extra={extra!r}"
         )
 
     validated = {}
@@ -350,7 +328,5 @@ def validate_pin_set(
         for pin in validated.values()
     }
     if len(identities) != 1:
-        raise GridV2PinError(
-            "consumer V2 pins do not share one authority identity"
-        )
+        raise GridV2PinError("consumer V2 pins do not share one authority identity")
     return validated
