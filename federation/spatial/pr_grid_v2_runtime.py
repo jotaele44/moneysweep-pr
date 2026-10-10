@@ -4,6 +4,7 @@ This module is single-sourced from thehub-pr/federation-templates and rendered
 byte-identically into federation consumers. Spiderweb remains the sole geometry
 authority; consumers validate and reference its immutable grid contract.
 """
+
 from __future__ import annotations
 
 import json
