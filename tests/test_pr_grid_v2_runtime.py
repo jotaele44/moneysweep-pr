@@ -33,12 +33,7 @@ def test_local_pin_loads_fail_closed_runtime():
 
 def test_exact_cell_identity_and_deep_link():
     pin = grid.load_pin(PIN_PATH, expected_consumer="moneysweep-pr")
-    sample = {
-        "L0": "PRG2:L0:R000:C0000",
-        "L1": "PRG2:L1:R000:C0000",
-        "L2": "PRG2:L2:R000:C0000",
-        "L3": "PRG2:L3:R000:C0000",
-    }["L1"]
+    sample = "PRG2:L1:R000:C0000"
     stamped = grid.attach_grid_identity(
         {"Record_Count": 0, "Data_State": "ZERO_RECORDS"},
         pin,
@@ -53,10 +48,7 @@ def test_exact_cell_identity_and_deep_link():
         cell_id=sample,
         base_path="",
     )
-    assert link == (
-        "/grid/PR_GRID_GEOGRAPHIC_V2/2.0.0-rc1/"
-        "L1/" + sample
-    )
+    assert link == "/grid/PR_GRID_GEOGRAPHIC_V2/2.0.0-rc1/L1/" + sample
 
 
 def test_wrong_manifest_hash_fails_closed(tmp_path):
