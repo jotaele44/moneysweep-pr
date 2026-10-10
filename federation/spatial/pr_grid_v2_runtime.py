@@ -8,9 +8,10 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Mapping, Optional, Tuple, Union
+from typing import Any
 from urllib.parse import quote
 
 PIN_SCHEMA_VERSION = "pr_grid_geographic_v2_consumer_pin/1.0"
@@ -29,7 +30,7 @@ MASK_SCHEMA_SHA256 = "0b31b717d274b19686bf7f47edbabdaec31c86800f2ca7f1e73ffb6636
 BINDING_SCHEMA_VERSION = "pr-grid-v2-binding/1.0"
 MASK_SCHEMA_VERSION = "pr-grid-v2-mask/1.0"
 
-ALLOWED_LEVELS: Tuple[str, ...] = ("L0", "L1", "L2", "L3")
+ALLOWED_LEVELS: tuple[str, ...] = ("L0", "L1", "L2", "L3")
 EXPECTED_DEFAULT_LEVELS = {
     "aguayluz-pr": "L1",
     "skywatcher-pr": "L2",
@@ -57,37 +58,37 @@ class GridV2PinError(ValueError):
 class GridV2Pin:
     consumer: str
     default_level: str
-    allowed_levels: Tuple[str, ...]
+    allowed_levels: tuple[str, ...]
     payload: Mapping[str, Any]
 
 
 def _expect_equal(
-    errors: list,
+    errors: list[str],
     payload: Mapping[str, Any],
     key: str,
     expected: Any,
 ) -> None:
     observed = payload.get(key)
     if observed != expected:
-        errors.append("%s must be %r, got %r" % (key, expected, observed))
+        errors.append(f"{key} must be {expected!r}, got {observed!r}")
 
 
 def validate_level(level: object) -> str:
     if not isinstance(level, str) or level not in ALLOWED_LEVELS:
+        expected = ", ".join(ALLOWED_LEVELS)
         raise GridV2PinError(
-            "unsupported grid level %r; expected one of %s"
-            % (level, ", ".join(ALLOWED_LEVELS))
+            f"unsupported grid level {level!r}; expected one of {expected}"
         )
     return level
 
 
-def validate_cell_id(cell_id: object, *, level: Optional[str] = None) -> str:
+def validate_cell_id(cell_id: object, *, level: str | None = None) -> str:
     """Validate canonical V2 Cell_ID syntax, level identity, and row/column bounds."""
     if not isinstance(cell_id, str):
         raise GridV2PinError("Cell_ID must be a string")
     match = _CELL_ID_RE.fullmatch(cell_id)
     if match is None:
-        raise GridV2PinError("malformed V2 Cell_ID: %r" % (cell_id,))
+        raise GridV2PinError(f"malformed V2 Cell_ID: {cell_id!r}")
 
     cell_level, row_text, column_text = match.groups()
     rows, columns = LEVEL_DIMENSIONS[cell_level]
@@ -95,16 +96,16 @@ def validate_cell_id(cell_id: object, *, level: Optional[str] = None) -> str:
     column = int(column_text)
     if row >= rows or column >= columns:
         raise GridV2PinError(
-            "Cell_ID out of range for %s: row=%d column=%d"
-            % (cell_level, row, column)
+            f"Cell_ID out of range for {cell_level}: "
+            f"row={row} column={column}"
         )
 
     if level is not None:
         selected_level = validate_level(level)
         if cell_level != selected_level:
             raise GridV2PinError(
-                "Cell_ID level %s does not match requested level %s"
-                % (cell_level, selected_level)
+                f"Cell_ID level {cell_level} does not match requested level "
+                f"{selected_level}"
             )
     return cell_id
 
@@ -112,9 +113,9 @@ def validate_cell_id(cell_id: object, *, level: Optional[str] = None) -> str:
 def validate_pin_payload(
     payload: Mapping[str, Any],
     *,
-    expected_consumer: Optional[str] = None,
-    required_level: Optional[str] = None,
-) -> list:
+    expected_consumer: str | None = None,
+    required_level: str | None = None,
+) -> list[str]:
     """Return validation errors; an empty list is the only compatible state."""
     errors: list[str] = []
 
@@ -139,25 +140,25 @@ def validate_pin_payload(
 
     consumer = payload.get("consumer")
     if consumer not in EXPECTED_CONSUMERS:
-        errors.append("unknown V2 consumer: %r" % (consumer,))
+        errors.append(f"unknown V2 consumer: {consumer!r}")
     if expected_consumer is not None and consumer != expected_consumer:
         errors.append(
-            "consumer must be %r, got %r" % (expected_consumer, consumer)
+            f"consumer must be {expected_consumer!r}, got {consumer!r}"
         )
 
     observed_levels = payload.get("allowed_levels")
     if observed_levels != list(ALLOWED_LEVELS):
         errors.append(
-            "allowed_levels must be %r, got %r"
-            % (list(ALLOWED_LEVELS), observed_levels)
+            f"allowed_levels must be {list(ALLOWED_LEVELS)!r}, "
+            f"got {observed_levels!r}"
         )
 
     default_level = payload.get("default_level")
     expected_default = EXPECTED_DEFAULT_LEVELS.get(str(consumer))
     if expected_default is not None and default_level != expected_default:
         errors.append(
-            "default_level for %s must be %s, got %r"
-            % (consumer, expected_default, default_level)
+            f"default_level for {consumer} must be {expected_default}, "
+            f"got {default_level!r}"
         )
 
     if required_level is not None:
@@ -167,7 +168,9 @@ def validate_pin_payload(
             errors.append(str(exc))
         else:
             if not isinstance(observed_levels, list) or required not in observed_levels:
-                errors.append("required level %s is not enabled by this pin" % required)
+                errors.append(
+                    f"required level {required} is not enabled by this pin"
+                )
 
     for key in (
         "grid_manifest_sha256",
@@ -177,7 +180,7 @@ def validate_pin_payload(
     ):
         value = payload.get(key)
         if not isinstance(value, str) or not _HASH_RE.fullmatch(value):
-            errors.append("%s must be a lowercase SHA-256" % key)
+            errors.append(f"{key} must be a lowercase SHA-256")
 
     blockers = payload.get("external_provider_blockers")
     expected_blockers = {
@@ -190,7 +193,9 @@ def validate_pin_payload(
         observed_blockers = {}
         for row in blockers:
             if not isinstance(row, Mapping):
-                errors.append("external_provider_blockers entries must be objects")
+                errors.append(
+                    "external_provider_blockers entries must be objects"
+                )
                 continue
             blocker_id = row.get("id")
             affects = row.get("affects_grid_identity")
@@ -200,25 +205,27 @@ def validate_pin_payload(
             observed_blockers[blocker_id] = affects
         if observed_blockers != expected_blockers:
             errors.append(
-                "external provider blockers must remain %r, got %r"
-                % (expected_blockers, observed_blockers)
+                "external provider blockers must remain "
+                f"{expected_blockers!r}, got {observed_blockers!r}"
             )
 
     return errors
 
 
 def load_pin(
-    path: Union[str, Path],
+    path: str | Path,
     *,
-    expected_consumer: Optional[str] = None,
-    required_level: Optional[str] = None,
+    expected_consumer: str | None = None,
+    required_level: str | None = None,
 ) -> GridV2Pin:
     """Load one pin and fail closed on any incompatibility."""
     pin_path = Path(path)
     try:
         payload = json.loads(pin_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise GridV2PinError("cannot load V2 grid pin %s: %s" % (pin_path, exc)) from exc
+        raise GridV2PinError(
+            f"cannot load V2 grid pin {pin_path}: {exc}"
+        ) from exc
     if not isinstance(payload, Mapping):
         raise GridV2PinError("V2 grid pin root must be an object")
 
@@ -242,15 +249,14 @@ def load_pin(
 def grid_identity(
     pin: GridV2Pin,
     *,
-    level: Optional[str] = None,
-    cell_id: Optional[str] = None,
-) -> Dict[str, str]:
+    level: str | None = None,
+    cell_id: str | None = None,
+) -> dict[str, str]:
     """Return the immutable identity envelope to stamp on grid-aware outputs."""
     selected_level = pin.default_level if level is None else validate_level(level)
     if selected_level not in pin.allowed_levels:
         raise GridV2PinError(
-            "grid level %s is not permitted for %s"
-            % (selected_level, pin.consumer)
+            f"grid level {selected_level} is not permitted for {pin.consumer}"
         )
     identity = {
         "Grid_ID": GRID_ID,
@@ -273,9 +279,9 @@ def attach_grid_identity(
     payload: Mapping[str, Any],
     pin: GridV2Pin,
     *,
-    level: Optional[str] = None,
-    cell_id: Optional[str] = None,
-) -> Dict[str, Any]:
+    level: str | None = None,
+    cell_id: str | None = None,
+) -> dict[str, Any]:
     """Copy a payload and attach one validated immutable Grid_Identity envelope."""
     output = dict(payload)
     output["Grid_Identity"] = grid_identity(
@@ -289,26 +295,22 @@ def attach_grid_identity(
 def build_grid_deep_link(
     pin: GridV2Pin,
     *,
-    level: Optional[str] = None,
+    level: str | None = None,
     cell_id: str,
     base_path: str = "",
-    as_of: Optional[str] = None,
+    as_of: str | None = None,
 ) -> str:
     """Build the canonical federation deep link for one validated V2 cell."""
     selected_level = pin.default_level if level is None else validate_level(level)
     if selected_level not in pin.allowed_levels:
         raise GridV2PinError(
-            "grid level %s is not permitted for %s"
-            % (selected_level, pin.consumer)
+            f"grid level {selected_level} is not permitted for {pin.consumer}"
         )
     validated_cell = validate_cell_id(cell_id, level=selected_level)
     prefix = base_path.rstrip("/")
-    path = "%s/grid/%s/%s/%s/%s" % (
-        prefix,
-        GRID_ID,
-        GRID_VERSION,
-        selected_level,
-        quote(validated_cell, safe=":"),
+    path = (
+        f"{prefix}/grid/{GRID_ID}/{GRID_VERSION}/"
+        f"{selected_level}/{quote(validated_cell, safe=':')}"
     )
     if as_of is not None:
         if not isinstance(as_of, str) or not as_of.strip():
@@ -318,16 +320,16 @@ def build_grid_deep_link(
 
 
 def validate_pin_set(
-    pin_paths: Mapping[str, Union[str, Path]]
-) -> Dict[str, GridV2Pin]:
+    pin_paths: Mapping[str, str | Path],
+) -> dict[str, GridV2Pin]:
     """Validate the complete six-consumer denominator against one authority."""
     supplied = set(pin_paths)
     if supplied != set(EXPECTED_CONSUMERS):
         missing = sorted(set(EXPECTED_CONSUMERS) - supplied)
         extra = sorted(supplied - set(EXPECTED_CONSUMERS))
         raise GridV2PinError(
-            "consumer pin denominator mismatch: missing=%r extra=%r"
-            % (missing, extra)
+            f"consumer pin denominator mismatch: missing={missing!r} "
+            f"extra={extra!r}"
         )
 
     validated = {}
@@ -348,5 +350,7 @@ def validate_pin_set(
         for pin in validated.values()
     }
     if len(identities) != 1:
-        raise GridV2PinError("consumer V2 pins do not share one authority identity")
+        raise GridV2PinError(
+            "consumer V2 pins do not share one authority identity"
+        )
     return validated
