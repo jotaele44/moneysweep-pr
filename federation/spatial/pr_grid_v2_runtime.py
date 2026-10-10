@@ -283,9 +283,7 @@ def build_grid_deep_link(
     """Build the canonical federation deep link for one validated V2 cell."""
     selected_level = pin.default_level if level is None else validate_level(level)
     if selected_level not in pin.allowed_levels:
-        raise GridV2PinError(
-            f"grid level {selected_level} is not permitted for {pin.consumer}"
-        )
+        raise GridV2PinError(f"grid level {selected_level} is not permitted for {pin.consumer}")
     validated_cell = validate_cell_id(cell_id, level=selected_level)
     prefix = base_path.rstrip("/")
     path = (
