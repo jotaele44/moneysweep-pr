@@ -66,8 +66,12 @@ def snapshot_output(root: Path, rel: str) -> OutputSnapshot:
         row_counts: list[int] = []
         latest_mtime = p.stat().st_mtime
         for member in members:
-            if member.is_symlink() or not member.is_file() or not _within_root(root, str(member.relative_to(root))):
+            if member.is_symlink() or not _within_root(root, str(member.relative_to(root))):
                 raise ValueError(f"unsafe directory output member: {rel}")
+            if member.is_dir():
+                continue
+            if not member.is_file():
+                raise ValueError(f"unsupported directory output member: {rel}")
             stat = member.stat()
             total_bytes += stat.st_size
             latest_mtime = max(latest_mtime, stat.st_mtime)
