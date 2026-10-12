@@ -1,6 +1,7 @@
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
-import { viteSingleFile } from 'vite-plugin-singlefile'
+import { inlineSingleFile } from './src/vite-plugins/inline-single-file.js'
 import path from 'node:path'
 
 // Auth-stripped, local-only scaffold.
@@ -13,7 +14,7 @@ const offline = process.env.VITE_OFFLINE === '1'
 export default defineConfig({
   logLevel: 'error',
   base: offline ? './' : '/',
-  plugins: [react(), ...(offline ? [viteSingleFile()] : [])],
+  plugins: [react(), tailwindcss(), ...(offline ? [inlineSingleFile()] : [])],
   resolve: {
     alias: { '@': path.resolve(import.meta.dirname, './src') },
   },
