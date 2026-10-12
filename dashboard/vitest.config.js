@@ -8,7 +8,7 @@ import react from '@vitejs/plugin-react';
 // landing tests one repo at a time.
 //
 // Deliberately separate from vite.config.js rather than merging it: the build
-// config carries offline-export plumbing (vite-plugin-singlefile) and a dev
+// config carries offline-export plumbing (the single-file inliner) and a dev
 // server port pinned to the backend's CORS allowlist, none of which a test run
 // needs or should depend on.
 //
