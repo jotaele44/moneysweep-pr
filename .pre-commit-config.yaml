@@ -94,3 +94,19 @@ repos:
           # when stubs exist on PyPI), even though per-commit runs that skip that
           # file pass. See .github/workflows/pre-commit.yml.
           - types-requests
+
+  # Documentation must not contradict the change. Local because the script is a
+  # rendered file in this very repo, and because it needs the whole index rather
+  # than the batches of file names pre-commit hands a hook. Stdlib only, so the
+  # hook environment installs nothing. At commit time a missing doc update is a
+  # warning (the message that could waive it is not written yet); a reference the
+  # commit breaks is an error. CI (docs-sync) is the authority on both.
+  - repo: local
+    hooks:
+      - id: docs-sync
+        name: docs-sync (references + co-change, staged)
+        entry: python tools/check_docs_sync.py --staged
+        language: python
+        pass_filenames: false
+        always_run: true
+        verbose: true # co-change findings are warnings here; show them
