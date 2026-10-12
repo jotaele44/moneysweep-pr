@@ -47,9 +47,55 @@ def count_rows(path: Path) -> int | None:
 
 
 def snapshot_output(root: Path, rel: str) -> OutputSnapshot:
+    """Hash file outputs or a directory's complete, sorted file manifestations.
+
+    Directory outputs (e.g. HigherGov) are not single files. Hash every
+    member's relative path, size and bytes; do not hash filesystem iteration
+    order or mtimes. Reject symlinks and non-file members rather than reading
+    outside the declared output boundary.
+    """
     p = root / rel
+    if not _within_root(root, rel) or p.is_symlink():
+        raise ValueError(f"output escapes or aliases the repository: {rel}")
     if not p.exists():
         return OutputSnapshot(path=rel, exists=False)
+    if p.is_dir():
+        members = sorted(p.rglob("*"), key=lambda item: item.relative_to(p).as_posix())
+        manifest: list[dict[str, Any]] = []
+        total_bytes = 0
+        row_counts: list[int] = []
+        latest_mtime = p.stat().st_mtime
+        for member in members:
+            if member.is_symlink() or not member.is_file() or not _within_root(root, str(member.relative_to(root))):
+                raise ValueError(f"unsafe directory output member: {rel}")
+            stat = member.stat()
+            total_bytes += stat.st_size
+            latest_mtime = max(latest_mtime, stat.st_mtime)
+            manifest.append(
+                {
+                    "path": member.relative_to(p).as_posix(),
+                    "bytes": stat.st_size,
+                    "sha256": sha256_file(member),
+                }
+            )
+            count = count_rows(member)
+            if count is not None:
+                row_counts.append(count)
+        payload = json.dumps(
+            {"schema": "directory-output/v1", "members": manifest},
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        return OutputSnapshot(
+            path=rel,
+            exists=True,
+            size_bytes=total_bytes,
+            sha256=hashlib.sha256(payload).hexdigest(),
+            row_count=sum(row_counts) if row_counts else (0 if not manifest else None),
+            mtime=latest_mtime,
+        )
+    if not p.is_file():
+        raise ValueError(f"unsupported output type: {rel}")
     st = p.stat()
     return OutputSnapshot(
         path=rel,
