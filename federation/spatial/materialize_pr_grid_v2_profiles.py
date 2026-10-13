@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Offline, receipt-bound Cell_Profile materialization for a domain repository."""
+
 from __future__ import annotations
 
 import argparse
@@ -13,7 +14,8 @@ from pr_grid_v2_runtime import GridV2PinError
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--pin", type=Path,
+        "--pin",
+        type=Path,
         default=Path(__file__).with_name("pr_grid_geographic_v2.pin.json"),
     )
     parser.add_argument("--records", type=Path, required=True)
@@ -27,16 +29,18 @@ def main() -> int:
     args = parser.parse_args()
     try:
         profiles, receipt = build_profiles(
-            pin_path=args.pin, records_path=args.records,
-            bindings_path=args.bindings, receipt_path=args.binding_receipt,
-            coverage_path=args.coverage, level=args.level,
+            pin_path=args.pin,
+            records_path=args.records,
+            bindings_path=args.bindings,
+            receipt_path=args.binding_receipt,
+            coverage_path=args.coverage,
+            level=args.level,
             requested_cells=tuple(args.cell_id),
         )
     except (ProfileError, GridV2PinError, OSError, ValueError) as exc:
         parser.exit(2, f"FAIL_CLOSED: {exc}\n")
     output = "".join(
-        json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n"
-        for row in profiles
+        json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n" for row in profiles
     )
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(output, encoding="utf-8")
