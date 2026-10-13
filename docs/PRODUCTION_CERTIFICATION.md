@@ -97,4 +97,3 @@ G12 does not consume a historical Boolean authorization. After G0-G11 are evalua
 Production activation then requires `reports/production_activation_receipt.json` conforming to `moneysweep.production_activation/v1`. The receipt must bind the exact `scope_id`, scope SHA, implementation SHA, and `technical_certificate_sha256`, and must record the explicit authorizer, timestamp with timezone, and authorization channel. Missing, stale, mismatched, malformed, or extra-key receipts leave G12 `BLOCKED`.
 
 The report exposes `technical_eligibility`, `technical_certificate_sha256`, and `awaiting_activation` separately from `production_eligible`. Technical eligibility never implies production activation.
-

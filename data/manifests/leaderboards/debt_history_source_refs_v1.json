@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "moneysweep.leaderboard-history-source-refs/v1",
+  "categoryId": "debt_issuance",
+  "metricType": "DEBT_ISSUED_PAR",
+  "rankingContractVersion": "moneysweep.leaderboard/v1.1",
+  "sourceRefs": [
+    {
+      "role": "baseline",
+      "commit": "d5ce11735409aedc8a0e15f7af359226dfb6e154",
+      "committedAt": "2026-06-01T12:40:24Z",
+      "debtInstrumentCount": 11,
+      "issuerCount": 5
+    },
+    {
+      "role": "current",
+      "commit": "1be586b5ae13c30a8e4a6a49bc6ae70dd2ddc5df",
+      "committedAt": "2026-09-03T16:35:24Z",
+      "debtInstrumentCount": 20,
+      "issuerCount": 14
+    }
+  ],
+  "expectedDelta": {
+    "NEW": 9,
+    "EXITED": 0,
+    "UP": 0,
+    "DOWN": 2,
+    "UNCHANGED": 3,
+    "existingEntityValueChanges": 0
+  },
+  "comparisonPolicy": {
+    "replayUnderCurrentRuntime": true,
+    "sourceChangeMeansDatasetDelta": true,
+    "economicInferenceOnSourceChange": false
+  }
+}

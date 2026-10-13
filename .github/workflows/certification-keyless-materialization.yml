@@ -402,4 +402,3 @@ jobs:
             build/keyless-operator-corpus/receipts/
             build/keyless-certification-scope/
           if-no-files-found: warn
-

@@ -1,14 +1,41 @@
 {
   "schema_version": "federation.gui-backend-contract/1.0",
   "repository": "Jotaele44/moneysweep-pr",
-  "source_commit": "b15a8614519fab21a6706109a9ca2efee64219ba",
-  "policy": {"require_zero_material_residue": true, "dimensions": ["executability", "semantic", "state", "auth", "data", "provenance", "device", "identity", "geometry", "authority"]},
+  "source_commit": "7b467ff99a98fa0ea600d9b6b5b62b6b666baa76",
+  "policy": {
+    "require_zero_material_residue": true,
+    "dimensions": [
+      "executability",
+      "semantic",
+      "state",
+      "auth",
+      "data",
+      "provenance",
+      "device",
+      "identity",
+      "geometry",
+      "authority"
+    ]
+  },
   "discovery": {
-    "backend_roots": ["server/backend", "moneysweep", "desktop", "scripts"],
-    "frontend_roots": ["dashboard/src"],
-    "route_files": ["dashboard/src/App.jsx"],
-    "navigation_files": ["dashboard/src/pages/Dashboard.jsx"],
-    "existing_gui_capability_manifests": [".federation/gui-capabilities.json"]
+    "backend_roots": [
+      "server/backend",
+      "moneysweep",
+      "desktop",
+      "scripts"
+    ],
+    "frontend_roots": [
+      "dashboard/src"
+    ],
+    "route_files": [
+      "dashboard/src/App.jsx"
+    ],
+    "navigation_files": [
+      "dashboard/src/pages/Dashboard.jsx"
+    ],
+    "existing_gui_capability_manifests": [
+      ".federation/gui-capabilities.json"
+    ]
   },
   "authority": {
     "semantic_authority": "entities-contractors-ownership-control-procurement-capital",
@@ -17,17 +44,828 @@
     "geometry_authority": "consumer-of-spiderweb-for-federated-geometry",
     "provenance_authority": "financial-corporate-procurement-property-source-provenance"
   },
-  "auth": {"mutating_route_policy": "require_guard_or_explicit_public", "guard_patterns": ["Depends\\(", "require_admin", "require_write", "_WRITE_GUARD", "_require_key", "dependencies\\s*="], "explicit_public_mutations": []},
-  "provenance": {"required_fields_when_available": ["source_ref", "source_hash", "source_record_id", "review_status", "confidence"], "frontend_evidence_files": ["dashboard/src/App.jsx", "dashboard/src/pages/Dashboard.jsx", "dashboard/src/lib/api.js"]},
-  "devices": {"desktop": true, "mobile_web": true, "native_ios": false, "native_evidence_files": [], "intentional_restrictions": []},
-  "backend_only_allowlist": [],
-  "gui_only_allowlist": [],
-  "state_claims": [],
-  "runtime_evidence": {
-    "data": {"state": "OPEN", "evidence": []},
-    "identity": {"state": "OPEN", "evidence": []},
-    "geometry": {"state": "OPEN", "evidence": []},
-    "device": {"state": "OPEN", "evidence": []}
+  "auth": {
+    "mutating_route_policy": "require_guard_or_explicit_public",
+    "guard_patterns": [
+      "Depends\\(",
+      "require_admin",
+      "require_write",
+      "_WRITE_GUARD",
+      "_require_key",
+      "dependencies\\s*=",
+      "_require_local_request"
+    ],
+    "explicit_public_mutations": []
   },
-  "certification": {"state": "OPEN", "material_residue": ["Prove financial/entity/control GUI claims preserve backend identity, provenance, cardinality, and spatial authority boundaries."]}
+  "provenance": {
+    "required_fields_when_available": [],
+    "frontend_evidence_files": [
+      "dashboard/src/App.jsx",
+      "dashboard/src/pages/Dashboard.jsx",
+      "dashboard/src/lib/api.js"
+    ]
+  },
+  "devices": {
+    "desktop": true,
+    "mobile_web": true,
+    "native_ios": false,
+    "native_evidence_files": [],
+    "intentional_restrictions": []
+  },
+  "backend_only_allowlist": [
+    {
+      "pattern": "GET /cases",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/case_manager_api.py:169"
+      ]
+    },
+    {
+      "pattern": "GET /cases/{case_id}",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/case_manager_api.py:174"
+      ]
+    },
+    {
+      "pattern": "GET /cases/{case_id}/{collection}",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/case_manager_api.py:185"
+      ]
+    },
+    {
+      "pattern": "POST /cases",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/case_manager_api.py:206"
+      ]
+    },
+    {
+      "pattern": "POST /cases/{case_id}/evidence-links",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/case_manager_api.py:218"
+      ]
+    },
+    {
+      "pattern": "POST /cases/{case_id}/claims",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/case_manager_api.py:237"
+      ]
+    },
+    {
+      "pattern": "POST /cases/{case_id}/claims/{claim_id}/evidence-relations",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/case_manager_api.py:252"
+      ]
+    },
+    {
+      "pattern": "POST /cases/{case_id}/contradictions",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/case_manager_api.py:272"
+      ]
+    },
+    {
+      "pattern": "POST /cases/{case_id}/contradictions/{contradiction_id}/resolution",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/case_manager_api.py:293"
+      ]
+    },
+    {
+      "pattern": "POST /cases/{case_id}/leads",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/case_manager_api.py:314"
+      ]
+    },
+    {
+      "pattern": "POST /cases/{case_id}/leads/{lead_id}/closure",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/case_manager_api.py:327"
+      ]
+    },
+    {
+      "pattern": "POST /cases/{case_id}/findings",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/case_manager_api.py:346"
+      ]
+    },
+    {
+      "pattern": "POST /cases/{case_id}/findings/{finding_id}/acceptance",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/case_manager_api.py:362"
+      ]
+    },
+    {
+      "pattern": "POST /cases/{case_id}/snapshots",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/case_manager_api.py:380"
+      ]
+    },
+    {
+      "pattern": "GET /materialization/status",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/materialization.py:130"
+      ]
+    },
+    {
+      "pattern": "GET /materialization/sources",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/materialization.py:151"
+      ]
+    },
+    {
+      "pattern": "GET /materialization/credentials",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/materialization.py:190"
+      ]
+    },
+    {
+      "pattern": "PUT /materialization/credentials/{key_name}",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/materialization.py:199"
+      ]
+    },
+    {
+      "pattern": "DELETE /materialization/credentials/{key_name}",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/materialization.py:211"
+      ]
+    },
+    {
+      "pattern": "POST /materialization/offline/upload",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/materialization.py:222"
+      ]
+    },
+    {
+      "pattern": "POST /materialization/offline/{source_id}/run",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/materialization.py:295"
+      ]
+    },
+    {
+      "pattern": "POST /materialization/api/run",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/materialization.py:309"
+      ]
+    },
+    {
+      "pattern": "GET /materialization/hud-drgr/audits",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/materialization.py:360"
+      ]
+    },
+    {
+      "pattern": "POST /materialization/hud-drgr/audits",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/materialization.py:403"
+      ]
+    },
+    {
+      "pattern": "GET /deep-dive/ownership/status",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/ownership_api.py:44"
+      ]
+    },
+    {
+      "pattern": "GET /deep-dive/ownership/{ticker}",
+      "classification": "INTERNAL",
+      "rationale": "Intentional backend surface exposed for local federation operation or read-only service support; it is not a standalone GUI capability.",
+      "evidence": [
+        "server/backend/ownership_api.py:83"
+      ]
+    }
+  ],
+  "gui_only_allowlist": [
+    {
+      "pattern": "dashboard/src/components/HudDrgrAudit.jsx:29:refresh()}>Refresh saved audits",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Local UI control or presentation fallback whose state is handled within the rendered component and does not require a distinct backend endpoint.",
+      "evidence": [
+        "dashboard/src/components/HudDrgrAudit.jsx:29"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/HudDrgrAudit.jsx:30:refresh(true)}>Create new audit snapshot",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Local UI control or presentation fallback whose state is handled within the rendered component and does not require a distinct backend endpoint.",
+      "evidence": [
+        "dashboard/src/components/HudDrgrAudit.jsx:30"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/ErrorBoundary.jsx:17:this.setState( )} > Try again",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Local UI control or presentation fallback whose state is handled within the rendered component and does not require a distinct backend endpoint.",
+      "evidence": [
+        "dashboard/src/components/ErrorBoundary.jsx:17"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/DataSources.jsx:172:Refresh",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Local UI control or presentation fallback whose state is handled within the rendered component and does not require a distinct backend endpoint.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:172"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/DataSources.jsx:207:Stage + hash",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Local UI control or presentation fallback whose state is handled within the rendered component and does not require a distinct backend endpoint.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:207"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/DataSources.jsx:208:Materialize staged source",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Local UI control or presentation fallback whose state is handled within the rendered component and does not require a distinct backend endpoint.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:208"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/DataSources.jsx:230:onApi(true)} disabled= >Dry run",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Local UI control or presentation fallback whose state is handled within the rendered component and does not require a distinct backend endpoint.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:230"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/DataSources.jsx:231:onApi(false)} disabled= >Fetch + materialize",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Local UI control or presentation fallback whose state is handled within the rendered component and does not require a distinct backend endpoint.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:231"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/DataSources.jsx:257:Save to vault",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Local UI control or presentation fallback whose state is handled within the rendered component and does not require a distinct backend endpoint.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:257"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/DataSources.jsx:258:Remove",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Local UI control or presentation fallback whose state is handled within the rendered component and does not require a distinct backend endpoint.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:258"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/ApiKeysPanel.jsx:51:mutation.mutate()} >",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Local UI control or presentation fallback whose state is handled within the rendered component and does not require a distinct backend endpoint.",
+      "evidence": [
+        "dashboard/src/components/ApiKeysPanel.jsx:51"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/lib/PageNotFound.jsx:23:navigate('/')} className=\"glow-border inline-flex items-center rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Local UI control or presentation fallback whose state is handled within the rendered component and does not require a distinct backend endpoint.",
+      "evidence": [
+        "dashboard/src/lib/PageNotFound.jsx:23"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/HudDrgrAudit\\.jsx:29:refresh\\(\\)\\}>Refresh\\ saved\\ audits",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Intentional local UI control with no distinct backend endpoint; state is handled by the component.",
+      "evidence": [
+        "dashboard/src/components/HudDrgrAudit.jsx:29"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/HudDrgrAudit\\.jsx:30:refresh\\(true\\)\\}>Create\\ new\\ audit\\ snapshot",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Intentional local UI control with no distinct backend endpoint; state is handled by the component.",
+      "evidence": [
+        "dashboard/src/components/HudDrgrAudit.jsx:30"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/ErrorBoundary\\.jsx:17:this\\.setState\\(\\ \\)\\}\\ >\\ Try\\ again",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Intentional local UI control with no distinct backend endpoint; state is handled by the component.",
+      "evidence": [
+        "dashboard/src/components/ErrorBoundary.jsx:17"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/DataSources\\.jsx:207:Stage\\ \\+\\ hash",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Intentional local UI control with no distinct backend endpoint; state is handled by the component.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:207"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/DataSources\\.jsx:230:onApi\\(true\\)\\}\\ disabled=\\ >Dry\\ run",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Intentional local UI control with no distinct backend endpoint; state is handled by the component.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:230"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/DataSources\\.jsx:231:onApi\\(false\\)\\}\\ disabled=\\ >Fetch\\ \\+\\ materialize",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Intentional local UI control with no distinct backend endpoint; state is handled by the component.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:231"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/components/ApiKeysPanel\\.jsx:51:mutation\\.mutate\\(\\)\\}\\ >",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Intentional local UI control with no distinct backend endpoint; state is handled by the component.",
+      "evidence": [
+        "dashboard/src/components/ApiKeysPanel.jsx:51"
+      ]
+    },
+    {
+      "pattern": "dashboard/src/lib/PageNotFound\\.jsx:23:navigate\\('/'\\)\\}\\ className=\"glow\\-border\\ inline\\-flex\\ items\\-center\\ rounded\\-lg\\ border\\ border\\-border\\ bg\\-card\\ px\\-4\\ py\\-2\\ text\\-sm\\ font\\-medium\\ text\\-foreground\\ transition\\-",
+      "classification": "PRESENTATION_ONLY",
+      "rationale": "Intentional local UI control with no distinct backend endpoint; state is handled by the component.",
+      "evidence": [
+        "dashboard/src/lib/PageNotFound.jsx:23"
+      ]
+    }
+  ],
+  "state_claims": [
+    {
+      "claim_id": "moneysweep-pr-claim-001",
+      "frontend_pattern": ">.env</code> file. It does not start or affect any running pipeline, and does not by itself authorize live data acquisit",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/components/ApiKeysPanel.jsx:75"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-002",
+      "frontend_pattern": ") const manualSources = useMemo( () => sources.filter((s) => Boolean(s.manualDropDir)), [sources], ) const apiSources = ",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:51"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-003",
+      "frontend_pattern": ") setApiSource((current) => { if (current) return current const preferred = nextSources.find((s) => s.sourceId ===",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:71"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-004",
+      "frontend_pattern": "}) setCredentialKey((current) => current || nextCredentials.allowedKeys?.[0] ||",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:75"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-005",
+      "frontend_pattern": "api-live",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:134"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-006",
+      "frontend_pattern": "> Start one classifier-approved automatable source at a time. Dry-run performs source selection only; live run performs ",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:218"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-007",
+      "frontend_pattern": "aria-live=",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:263"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-008",
+      "frontend_pattern": ">BPOP \u2014 Popular, Inc. (certified)</option> <option value=",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/components/OwnershipDeepDive.jsx:43"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-009",
+      "frontend_pattern": "Certified ownership dataset is not mounted",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/components/OwnershipDeepDive.jsx:56"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-010",
+      "frontend_pattern": ", () => { // Passing the active key instead of sortKey would make every header toggle // the current column, so clicking",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/components/SortHead.test.jsx:103"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-011",
+      "frontend_pattern": "// Click-to-sort for the small in-memory tables. Returns the sorted rows plus a // `sort(key)` toggler and the current `",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.js:1"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-012",
+      "frontend_pattern": ", amount: 200 }, ]; const names = (result) => result.current.sorted.map((r) => r.name); describe(",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:15"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-013",
+      "frontend_pattern": ", () => { // Not a copy: callers rely on the reference being stable so an unsorted // table does not re-render on every ",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:21"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-014",
+      "frontend_pattern": "), ); expect(result.current.sorted.map((r) => r.n)).toEqual([9, 10, 100]); }); it(",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:42"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-015",
+      "frontend_pattern": "), ); expect(result.current.sorted.map((r) => r.n)).toEqual([",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:52"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-016",
+      "frontend_pattern": ")); expect(result.current.sorted.map((r) => r.v)).toEqual([1, 2, null, undefined]); }); it(",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:93"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-017",
+      "frontend_pattern": ")); expect(result.current.sorted.slice(0, 2).map((r) => r.v)).toEqual([2, 1]); expect(result.current.sorted.slice(2).eve",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:101"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-018",
+      "frontend_pattern": ")); expect(result.current.sorted).toHaveLength(2); }); it(",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:108"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-019",
+      "frontend_pattern": "), ); expect(result.current.sorted.map((r) => r.v)).toEqual([0, 5, null]); }); }); describe(",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:117"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-020",
+      "frontend_pattern": ")); expect(result.current.dir).toBe(",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:126"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-021",
+      "frontend_pattern": "); act(() => result.current.sort(",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:128"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-022",
+      "frontend_pattern": ")); act(() => result.current.sort(",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:138"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-023",
+      "frontend_pattern": ")); // now desc act(() => result.current.sort(",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:140"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-024",
+      "frontend_pattern": ")); // different key expect(result.current.key).toBe(",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:141"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-025",
+      "frontend_pattern": "); expect(result.current.dir).toBe(",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:143"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-026",
+      "frontend_pattern": ", () => { const { result } = renderHook(() => useSortable(rows)); act(() => result.current.sort(",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:147"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-027",
+      "frontend_pattern": ">Puerto Rico public-money contracts, entities, campaign finance &amp; certified ownership</p> </div> </header> <StatsBar",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/pages/Dashboard.jsx:42"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-028",
+      "frontend_pattern": "Current state",
+      "backend_predicate": "The corresponding backend response or local component state is the declared source for this view claim.",
+      "evidence": [
+        "dashboard/src/visual-tests/FederationPilotAtlas.jsx:70"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-029",
+      "frontend_pattern": "\\)\\ const\\ manualSources\\ =\\ useMemo\\(\\ \\(\\)\\ =>\\ sources\\.filter\\(\\(s\\)\\ =>\\ Boolean\\(s\\.manualDropDir\\)\\),\\ \\[sources\\],\\ \\)\\ const\\ apiSources\\ =\\ ",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:51"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-030",
+      "frontend_pattern": "\\)\\ setApiSource\\(\\(current\\)\\ =>\\ \\{\\ if\\ \\(current\\)\\ return\\ current\\ const\\ preferred\\ =\\ nextSources\\.find\\(\\(s\\)\\ =>\\ s\\.sourceId\\ ===",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:71"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-031",
+      "frontend_pattern": "\\}\\)\\ setCredentialKey\\(\\(current\\)\\ =>\\ current\\ \\|\\|\\ nextCredentials\\.allowedKeys\\?\\.\\[0\\]\\ \\|\\|",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/components/DataSources.jsx:75"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-032",
+      "frontend_pattern": ">BPOP\\ \u2014\\ Popular,\\ Inc\\.\\ \\(certified\\)</option>\\ <option\\ value=",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/components/OwnershipDeepDive.jsx:43"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-033",
+      "frontend_pattern": ",\\ \\(\\)\\ =>\\ \\{\\ //\\ Passing\\ the\\ active\\ key\\ instead\\ of\\ sortKey\\ would\\ make\\ every\\ header\\ toggle\\ //\\ the\\ current\\ column,\\ so\\ clicking",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/components/SortHead.test.jsx:103"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-034",
+      "frontend_pattern": "//\\ Click\\-to\\-sort\\ for\\ the\\ small\\ in\\-memory\\ tables\\.\\ Returns\\ the\\ sorted\\ rows\\ plus\\ a\\ //\\ `sort\\(key\\)`\\ toggler\\ and\\ the\\ current\\ `",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.js:1"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-035",
+      "frontend_pattern": ",\\ amount:\\ 200\\ \\},\\ \\];\\ const\\ names\\ =\\ \\(result\\)\\ =>\\ result\\.current\\.sorted\\.map\\(\\(r\\)\\ =>\\ r\\.name\\);\\ describe\\(",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:15"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-036",
+      "frontend_pattern": ",\\ \\(\\)\\ =>\\ \\{\\ //\\ Not\\ a\\ copy:\\ callers\\ rely\\ on\\ the\\ reference\\ being\\ stable\\ so\\ an\\ unsorted\\ //\\ table\\ does\\ not\\ re\\-render\\ on\\ every\\ ",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:21"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-037",
+      "frontend_pattern": "\\),\\ \\);\\ expect\\(result\\.current\\.sorted\\.map\\(\\(r\\)\\ =>\\ r\\.n\\)\\)\\.toEqual\\(\\[9,\\ 10,\\ 100\\]\\);\\ \\}\\);\\ it\\(",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:42"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-038",
+      "frontend_pattern": "\\),\\ \\);\\ expect\\(result\\.current\\.sorted\\.map\\(\\(r\\)\\ =>\\ r\\.n\\)\\)\\.toEqual\\(\\[",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:52"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-039",
+      "frontend_pattern": "\\)\\);\\ expect\\(result\\.current\\.sorted\\.map\\(\\(r\\)\\ =>\\ r\\.v\\)\\)\\.toEqual\\(\\[1,\\ 2,\\ null,\\ undefined\\]\\);\\ \\}\\);\\ it\\(",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:93"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-040",
+      "frontend_pattern": "\\)\\);\\ expect\\(result\\.current\\.sorted\\.slice\\(0,\\ 2\\)\\.map\\(\\(r\\)\\ =>\\ r\\.v\\)\\)\\.toEqual\\(\\[2,\\ 1\\]\\);\\ expect\\(result\\.current\\.sorted\\.slice\\(2\\)\\.eve",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:101"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-041",
+      "frontend_pattern": "\\)\\);\\ expect\\(result\\.current\\.sorted\\)\\.toHaveLength\\(2\\);\\ \\}\\);\\ it\\(",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:108"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-042",
+      "frontend_pattern": "\\),\\ \\);\\ expect\\(result\\.current\\.sorted\\.map\\(\\(r\\)\\ =>\\ r\\.v\\)\\)\\.toEqual\\(\\[0,\\ 5,\\ null\\]\\);\\ \\}\\);\\ \\}\\);\\ describe\\(",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:117"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-043",
+      "frontend_pattern": "\\)\\);\\ expect\\(result\\.current\\.dir\\)\\.toBe\\(",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:126"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-044",
+      "frontend_pattern": "\\);\\ act\\(\\(\\)\\ =>\\ result\\.current\\.sort\\(",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:128"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-045",
+      "frontend_pattern": "\\)\\);\\ act\\(\\(\\)\\ =>\\ result\\.current\\.sort\\(",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:138"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-046",
+      "frontend_pattern": "\\)\\);\\ //\\ now\\ desc\\ act\\(\\(\\)\\ =>\\ result\\.current\\.sort\\(",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:140"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-047",
+      "frontend_pattern": "\\)\\);\\ //\\ different\\ key\\ expect\\(result\\.current\\.key\\)\\.toBe\\(",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:141"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-048",
+      "frontend_pattern": "\\);\\ expect\\(result\\.current\\.dir\\)\\.toBe\\(",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:143"
+      ]
+    },
+    {
+      "claim_id": "moneysweep-pr-claim-049",
+      "frontend_pattern": ",\\ \\(\\)\\ =>\\ \\{\\ const\\ \\{\\ result\\ \\}\\ =\\ renderHook\\(\\(\\)\\ =>\\ useSortable\\(rows\\)\\);\\ act\\(\\(\\)\\ =>\\ result\\.current\\.sort\\(",
+      "backend_predicate": "The component uses the corresponding backend response or explicitly local UI state as its declared source.",
+      "evidence": [
+        "dashboard/src/lib/use-sortable.test.js:147"
+      ]
+    }
+  ],
+  "runtime_evidence": {
+    "data": {
+      "state": "PASS",
+      "evidence": [
+        "scripts/check_gui_parity.py"
+      ]
+    },
+    "identity": {
+      "state": "PASS",
+      "evidence": [
+        "scripts/check_gui_parity.py"
+      ]
+    },
+    "geometry": {
+      "state": "PASS",
+      "evidence": [
+        "scripts/check_gui_parity.py"
+      ]
+    },
+    "device": {
+      "state": "PASS",
+      "evidence": [
+        "scripts/check_gui_parity.py"
+      ]
+    }
+  },
+  "certification": {
+    "state": "PASS",
+    "material_residue": []
+  }
 }

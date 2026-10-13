@@ -1,0 +1,35 @@
+{
+  "dry_run": false,
+  "egress_ok": null,
+  "error_count": 0,
+  "ok_count": 0,
+  "ran": [
+    {
+      "database": {
+        "error": "",
+        "files": 1,
+        "rows": 0,
+        "source": "federal_audit_clearinghouse",
+        "status": "NO_DATA"
+      },
+      "error": "",
+      "producer": "scripts/download_fac.py",
+      "rows": 0,
+      "seconds": 0.6,
+      "source": "federal_audit_clearinghouse",
+      "status": "NO_DATA"
+    }
+  ],
+  "registry_root": "/Users/jotaele/fed-repos/moneysweep-pr",
+  "schema_version": "1.0.0",
+  "selected": [
+    "federal_audit_clearinghouse"
+  ],
+  "selected_count": 1,
+  "started_utc": "2026-09-22T02:30:31.631367+00:00",
+  "status": "OK",
+  "workspace_rebind": {
+    "PROJECT_ROOT": "/Users/jotaele/fed-repos/moneysweep-pr"
+  },
+  "workspace_root": "/Users/jotaele/fed-repos/moneysweep-pr"
+}
