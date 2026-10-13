@@ -1,4 +1,5 @@
 """PR grid V2 domain profiles from Spiderweb-certified record bindings only."""
+
 from __future__ import annotations
 
 import hashlib
@@ -39,8 +40,13 @@ def load_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def build_profiles(
-    *, pin_path: Path, records_path: Path, bindings_path: Path,
-    receipt_path: Path, level: str, coverage_path: Path | None = None,
+    *,
+    pin_path: Path,
+    records_path: Path,
+    bindings_path: Path,
+    receipt_path: Path,
+    level: str,
+    coverage_path: Path | None = None,
     requested_cells: tuple[str, ...] = (),
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     pin = grid.load_pin(pin_path, required_level=level)
@@ -65,14 +71,22 @@ def build_profiles(
     records = {}
     for row in load_jsonl(records_path):
         rid = row.get("Record_ID")
-        if (row.get("Repository") != pin.consumer or not isinstance(rid, str)
-                or not rid or not isinstance(row.get("Category"), str)
-                or not row["Category"] or rid in records):
+        if (
+            row.get("Repository") != pin.consumer
+            or not isinstance(rid, str)
+            or not rid
+            or not isinstance(row.get("Category"), str)
+            or not row["Category"]
+            or rid in records
+        ):
             raise ProfileError("invalid, duplicate or foreign record metadata")
         records[rid] = row
     grouped: dict[str, dict[str, str]] = defaultdict(dict)
     for binding in bindings:
-        if binding.get("Grid_ID") != grid.GRID_ID or binding.get("Grid_Version") != grid.GRID_VERSION:
+        if (
+            binding.get("Grid_ID") != grid.GRID_ID
+            or binding.get("Grid_Version") != grid.GRID_VERSION
+        ):
             raise ProfileError("incorrect grid version in binding")
         bound_level = grid.validate_level(binding.get("Grid_Level"))
         grid.validate_cell_id(binding.get("Cell_ID"), level=bound_level)
@@ -92,15 +106,21 @@ def build_profiles(
     if coverage_path:
         coverage = json.loads(coverage_path.read_text(encoding="utf-8"))
         for field, value in {
-            "Repository": pin.consumer, "Grid_ID": grid.GRID_ID,
-            "Grid_Version": grid.GRID_VERSION, "Grid_Level": level,
+            "Repository": pin.consumer,
+            "Grid_ID": grid.GRID_ID,
+            "Grid_Version": grid.GRID_VERSION,
+            "Grid_Level": level,
             "Grid_Manifest_SHA256": grid.GRID_MANIFEST_SHA256,
             "Coverage_Manifest_State": "VERIFIED",
         }.items():
             if coverage.get(field) != value:
                 raise ProfileError("coverage evidence mismatch: " + field)
         evidence = coverage.get("Coverage_Evidence_SHA256")
-        if not isinstance(evidence, str) or len(evidence) != 64 or any(c not in "0123456789abcdef" for c in evidence):
+        if (
+            not isinstance(evidence, str)
+            or len(evidence) != 64
+            or any(c not in "0123456789abcdef" for c in evidence)
+        ):
             raise ProfileError("coverage evidence SHA256 is missing or invalid")
         cells = coverage.get("Coverage_Cells")
         if not isinstance(cells, list) or len(cells) != len(set(cells)):
@@ -117,19 +137,24 @@ def build_profiles(
             categories[records[rid]["Category"]] += 1
         state = "HAS_RECORDS" if ids else ("ZERO_RECORDS" if cid in covered else "NO_DATA")
         states[state] += 1
-        profiles.append({
-            "Schema_Version": PROFILE_VERSION,
-            "Grid_Identity": grid.grid_identity(pin, level=level, cell_id=cid),
-            "Repository": pin.consumer, "Profile_Type": DOMAIN_TYPES[pin.consumer],
-            "Cell_ID": cid, "Data_State": state,
-            "Coverage_State": "VERIFIED" if cid in covered else "UNKNOWN",
-            "Record_Count": len(ids), "Category_Count": len(categories),
-            "Categories": dict(sorted(categories.items())),
-            "Top_Record_IDs": ids[:25],
-            "Shared_Boundary_Record_Count": sum(s != "INTERIOR" for s in assigned.values()),
-            "Identity_Default": "CANDIDATE_NOT_IDENTITY",
-            "Geometry_Included": False,
-        })
+        profiles.append(
+            {
+                "Schema_Version": PROFILE_VERSION,
+                "Grid_Identity": grid.grid_identity(pin, level=level, cell_id=cid),
+                "Repository": pin.consumer,
+                "Profile_Type": DOMAIN_TYPES[pin.consumer],
+                "Cell_ID": cid,
+                "Data_State": state,
+                "Coverage_State": "VERIFIED" if cid in covered else "UNKNOWN",
+                "Record_Count": len(ids),
+                "Category_Count": len(categories),
+                "Categories": dict(sorted(categories.items())),
+                "Top_Record_IDs": ids[:25],
+                "Shared_Boundary_Record_Count": sum(s != "INTERIOR" for s in assigned.values()),
+                "Identity_Default": "CANDIDATE_NOT_IDENTITY",
+                "Geometry_Included": False,
+            }
+        )
     provenance = {
         "Grid_Identity": grid.grid_identity(pin, level=level),
         "Repository": pin.consumer,
