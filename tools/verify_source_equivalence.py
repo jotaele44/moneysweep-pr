@@ -312,9 +312,7 @@ def _compute_row_set_comparison(
 
     for label, result in (("a", a), ("b", b)):
         if result["error"] == "missing_key_fields":
-            blockers.append(
-                f"{label}_missing_key_fields:" + ",".join(result["missing_key_fields"])
-            )
+            blockers.append(f"{label}_missing_key_fields:" + ",".join(result["missing_key_fields"]))
         if result["duplicate_key_rows"]:
             blockers.append(f"{label}_duplicate_identity_keys")
         if result["null_key_rows"]:

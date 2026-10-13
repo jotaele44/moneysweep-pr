@@ -252,10 +252,7 @@ def run(root: Path | None = None, *, strict: bool = False) -> dict:
             & (rdf["match_method"] == "authoritative_recipient_id")
             & (rdf["resolved_entity_id"].str.strip() != "")
         )
-        invalid_promotions = (
-            (rdf["resolved_entity_id"].str.strip() != "")
-            & ~authoritative
-        )
+        invalid_promotions = (rdf["resolved_entity_id"].str.strip() != "") & ~authoritative
         resolved = int(authoritative.sum())
         invalid_count = int(invalid_promotions.sum())
         unresolved = int((~authoritative).sum())
@@ -269,9 +266,7 @@ def run(root: Path | None = None, *, strict: bool = False) -> dict:
             "invalid_promotions": invalid_count,
         }
         if invalid_count:
-            blocking.append(
-                f"recipient_resolution:unsupported_identity_promotion:{invalid_count}"
-            )
+            blocking.append(f"recipient_resolution:unsupported_identity_promotion:{invalid_count}")
 
     edges_path = root / FILE_RULES["campaign_edges"]["path"]
     edge_identity_metrics: dict[str, int] = {
@@ -284,9 +279,8 @@ def run(root: Path | None = None, *, strict: bool = False) -> dict:
     if edges_path.exists() and files["campaign_edges"]["status"] == "ok":
         edf = pd.read_csv(edges_path, dtype=str, low_memory=False).fillna("")
         edge_identity_metrics["rows"] = len(edf)
-        blank_endpoints = (
-            (edf["source_entity_id"].str.strip() == "")
-            | (edf["target_entity_id"].str.strip() == "")
+        blank_endpoints = (edf["source_entity_id"].str.strip() == "") | (
+            edf["target_entity_id"].str.strip() == ""
         )
         duplicate_edge_ids = edf["edge_id"].duplicated(keep=False)
         allowed_sources = {"fec_schedule_b", "fec_schedule_e"}
@@ -306,24 +300,24 @@ def run(root: Path | None = None, *, strict: bool = False) -> dict:
                 ).fillna("")
                 if id_column in entity_df:
                     known_entity_ids.update(
-                        entity_df[id_column][
-                            entity_df[id_column].str.strip() != ""
-                        ].astype(str)
+                        entity_df[id_column][entity_df[id_column].str.strip() != ""].astype(str)
                     )
 
         unknown_endpoints = (
-            ~edf["source_entity_id"].isin(known_entity_ids)
-            | ~edf["target_entity_id"].isin(known_entity_ids)
-        ) if len(edf) else pd.Series(dtype=bool)
+            (
+                ~edf["source_entity_id"].isin(known_entity_ids)
+                | ~edf["target_entity_id"].isin(known_entity_ids)
+            )
+            if len(edf)
+            else pd.Series(dtype=bool)
+        )
 
         edge_identity_metrics.update(
             {
                 "blank_endpoint_rows": int(blank_endpoints.sum()),
                 "duplicate_edge_ids": int(duplicate_edge_ids.sum()),
                 "unknown_endpoint_rows": int(unknown_endpoints.sum()),
-                "non_authoritative_source_rows": int(
-                    non_authoritative_source.sum()
-                ),
+                "non_authoritative_source_rows": int(non_authoritative_source.sum()),
             }
         )
         for key, count in edge_identity_metrics.items():

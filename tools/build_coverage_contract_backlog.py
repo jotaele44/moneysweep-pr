@@ -120,11 +120,7 @@ def build(
             universe_ref = contract.get("authoritative_universe_ref")
             universe_total = contract.get("authoritative_universe_total")
             raw_key = contract.get("uniqueness_key")
-            uniqueness_key = (
-                [str(item) for item in raw_key]
-                if isinstance(raw_key, list)
-                else []
-            )
+            uniqueness_key = [str(item) for item in raw_key] if isinstance(raw_key, list) else []
             pagination_required = bool(contract.get("pagination_required", False))
 
             if not uniqueness_key:
@@ -133,9 +129,7 @@ def build(
                 blockers.append("identity_key_name_only")
             if universe_total is None:
                 blockers.append("authoritative_denominator_unmeasured")
-            elif isinstance(universe_total, bool) or not isinstance(
-                universe_total, (int, float)
-            ):
+            elif isinstance(universe_total, bool) or not isinstance(universe_total, (int, float)):
                 blockers.append("authoritative_denominator_invalid")
             elif universe_total < 0:
                 blockers.append("authoritative_denominator_invalid")
@@ -144,10 +138,7 @@ def build(
                 state = "IDENTITY_KEY_MISSING"
             elif "identity_key_name_only" in blockers:
                 state = "IDENTITY_KEY_NAME_ONLY"
-            elif any(
-                blocker.startswith("authoritative_denominator")
-                for blocker in blockers
-            ):
+            elif any(blocker.startswith("authoritative_denominator") for blocker in blockers):
                 state = "DENOMINATOR_UNMEASURED"
             else:
                 state = "CONTRACT_STRUCTURALLY_READY"
@@ -173,19 +164,15 @@ def build(
         )
 
     automatable_rows = [row for row in rows if row["automatable"]]
-    automatable_state_counts = Counter(
-        row["contract_state"] for row in automatable_rows
-    )
+    automatable_state_counts = Counter(row["contract_state"] for row in automatable_rows)
     required_rows = [row for row in rows if row["required"]]
     required_state_counts = Counter(row["contract_state"] for row in required_rows)
 
     automatable_blockers = [
-        row for row in automatable_rows
-        if row["contract_state"] != "CONTRACT_STRUCTURALLY_READY"
+        row for row in automatable_rows if row["contract_state"] != "CONTRACT_STRUCTURALLY_READY"
     ]
     required_blockers = [
-        row for row in required_rows
-        if row["contract_state"] != "CONTRACT_STRUCTURALLY_READY"
+        row for row in required_rows if row["contract_state"] != "CONTRACT_STRUCTURALLY_READY"
     ]
 
     summary = {
@@ -217,9 +204,7 @@ def build(
             "materialization, coverage completeness, freshness, or certification."
         ),
         "summary": summary,
-        "automatable_blocker_ids": [
-            row["source_id"] for row in automatable_blockers
-        ],
+        "automatable_blocker_ids": [row["source_id"] for row in automatable_blockers],
         "required_blocker_ids": [row["source_id"] for row in required_blockers],
         "sources": rows,
     }

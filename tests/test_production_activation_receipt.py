@@ -104,6 +104,5 @@ def test_unexpected_keys_are_rejected(tmp_path: Path) -> None:
 
     assert valid is False
     assert any(
-        blocker.startswith("production_activation_receipt_unexpected_keys:")
-        for blocker in blockers
+        blocker.startswith("production_activation_receipt_unexpected_keys:") for blocker in blockers
     )

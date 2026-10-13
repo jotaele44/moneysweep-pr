@@ -310,9 +310,11 @@ def build_political_finance_graph(
             rid = _record_id(row, str(i))
             donor_name = row.get("contributor_name") or row.get("donor_name") or row.get("name")
             donor_id = _stable_source_identity(row, source)
-            committee_id = str(
-                row.get("committee_id") or row.get("recipient_committee_id") or ""
-            ).strip().upper()
+            committee_id = (
+                str(row.get("committee_id") or row.get("recipient_committee_id") or "")
+                .strip()
+                .upper()
+            )
             target = _fec_entity_id(committee_id)
             if donor_id is None or target is None or target[1] != "POLITICAL_COMMITTEE":
                 continue
@@ -400,9 +402,7 @@ def build_political_finance_graph(
                 review_required = False
             else:
                 method = "name_candidate_only" if name_candidates else "unresolved"
-                identity_state = (
-                    "CANDIDATE_NOT_IDENTITY" if name_candidates else "UNRESOLVED"
-                )
+                identity_state = "CANDIDATE_NOT_IDENTITY" if name_candidates else "UNRESOLVED"
                 confidence = 0.0
                 resolved_id = ""
                 resolved_name = ""

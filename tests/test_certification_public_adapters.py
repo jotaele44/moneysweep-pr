@@ -22,9 +22,7 @@ def _root(tmp_path: Path) -> tuple[Path, Path, Path]:
                         "authentication": "none",
                         "producer_script": "scripts/fixture.py",
                         "endpoint_url": "https://example.invalid/fixture",
-                        "expected_outputs": [
-                            "data/staging/processed/fixture.csv"
-                        ],
+                        "expected_outputs": ["data/staging/processed/fixture.csv"],
                         "validation_threshold": {"min_rows": 1},
                     }
                 ],
@@ -73,9 +71,7 @@ def test_failed_adapter_preserves_bytes_without_minting_fresh_receipt(
     assert result["state"] == "PUBLIC_ADAPTER_EXECUTION_FAILED_WITH_OUTPUT"
     assert result["outputs"] == ["data/staging/processed/fixture.csv"]
     assert result["receipt_path"] is None
-    assert result["receipt_error"] == (
-        "execution_not_successful_no_acquisition_receipt"
-    )
+    assert result["receipt_error"] == ("execution_not_successful_no_acquisition_receipt")
     assert not (receipts / "fixture.json").exists()
 
 

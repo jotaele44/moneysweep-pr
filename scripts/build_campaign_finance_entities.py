@@ -366,9 +366,7 @@ def _resolution_index(processed: Path, candidates, committees):
             ): item
             for item in candidates_for_name
         }
-        name_candidates[normalized] = [
-            deduped[key] for key in sorted(deduped)
-        ]
+        name_candidates[normalized] = [deduped[key] for key in sorted(deduped)]
     return id_index, name_candidates
 
 
@@ -387,14 +385,10 @@ def resolve_recipients(processed: Path, candidates, committees) -> pd.DataFrame:
         for column in ("recipient_committee_id", "recipient_id", "candidate_id"):
             if column in group:
                 direct_ids.update(
-                    str(value).strip()
-                    for value in group[column]
-                    if str(value).strip()
+                    str(value).strip() for value in group[column] if str(value).strip()
                 )
         direct_matches = {
-            id_index[identifier]
-            for identifier in direct_ids
-            if identifier in id_index
+            id_index[identifier] for identifier in direct_ids if identifier in id_index
         }
         candidates_for_name = name_candidates.get(normalized, [])
         candidate_payload = json.dumps(candidates_for_name, ensure_ascii=False, sort_keys=True)

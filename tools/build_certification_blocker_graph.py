@@ -95,9 +95,7 @@ def build_graph(
         depends_on = [str(item) for item in (definition.get("depends_on") or [])]
         unknown_dependencies = sorted(set(depends_on) - set(config_by_id))
         if unknown_dependencies:
-            raise RuntimeError(
-                f"{gate_id} has unknown dependencies: {unknown_dependencies}"
-            )
+            raise RuntimeError(f"{gate_id} has unknown dependencies: {unknown_dependencies}")
 
         for dependency in depends_on:
             edges.append(
@@ -163,9 +161,7 @@ def build_graph(
 
     nonpass = [node["id"] for node in gate_nodes if node["state"] != PASS]
     blocked_by_dependency = [
-        node["id"]
-        for node in gate_nodes
-        if node["state"] != PASS and node["dependency_blockers"]
+        node["id"] for node in gate_nodes if node["state"] != PASS and node["dependency_blockers"]
     ]
 
     return {

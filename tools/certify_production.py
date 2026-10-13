@@ -426,8 +426,7 @@ def build_report(
     truth_identity = truth_scope.get("scope_identity") if truth_scope else {}
     truth_scope_present = truth_root is not None and truth_scope is not None
     truth_digest_match = (
-        truth_scope_present
-        and truth_identity.get("registry_source_ids_sha256") == digest
+        truth_scope_present and truth_identity.get("registry_source_ids_sha256") == digest
     )
     g0 = (
         truth_scope_present
@@ -635,9 +634,7 @@ def build_report(
     coverage_results = completeness.get("source_results")
     coverage_results = coverage_results if isinstance(coverage_results, list) else []
     coverage_result_ids = [
-        str(item.get("source_id") or "")
-        for item in coverage_results
-        if isinstance(item, dict)
+        str(item.get("source_id") or "") for item in coverage_results if isinstance(item, dict)
     ]
     coverage_duplicate_ids = sorted(
         {

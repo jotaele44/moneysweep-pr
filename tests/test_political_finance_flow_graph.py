@@ -173,9 +173,7 @@ def test_stable_donor_and_authoritative_committee_ids_support_paths():
     )
 
     assert not graph["edges"]["edge_id"].duplicated().any()
-    donor = graph["entities"].loc[
-        graph["entities"]["entity_type"] == "DONOR", "entity_id"
-    ].iloc[0]
+    donor = graph["entities"].loc[graph["entities"]["entity_type"] == "DONOR", "entity_id"].iloc[0]
     paths = find_flow_paths(graph["edges"], donor, max_hops=4)
     assert paths["hop_count"].max() == 2
     assert normalize_name("Acme, Inc.") == "ACME INC"
