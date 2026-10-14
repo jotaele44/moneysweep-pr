@@ -35,14 +35,17 @@ def test_private_network_client_is_not_local(app):
 
 
 def test_audit_preserves_snapshots_and_get_does_not_refresh(client, tmp_path, monkeypatch):
-    assert client.get("/materialization/hud-drgr/audits").json()["audits"] == []
-    assert client.post("/materialization/hud-drgr/audits").status_code == 200
+    initial_response = client.get("/materialization/hud-drgr/audits")
+    assert initial_response.json()["audits"] == []
+    first_post_response = client.post("/materialization/hud-drgr/audits")
+    assert first_post_response.status_code == 200
     first = client.get("/materialization/hud-drgr/audits").json()["audits"][0]
     assert first["authorization"] == "UNPROVEN"
     assert first["receipt"]["arithmetic"]["authorized_candidates"] == 1
     raw = open(first["path"], "rb").read()
     assert first["sha256"] == hashlib.sha256(raw).hexdigest()
-    assert client.post("/materialization/hud-drgr/audits").status_code == 200
+    second_post_response = client.post("/materialization/hud-drgr/audits")
+    assert second_post_response.status_code == 200
     monkeypatch.setattr(audit, "build_receipt", lambda *_: pytest.fail("GET re-scanned sources"))
     results = client.get("/materialization/hud-drgr/audits").json()
     assert len(results["audits"]) == 2
@@ -59,15 +62,11 @@ def test_malformed_and_arithmetic_mismatch_are_visible(client, tmp_path):
 
     path = Path(row["path"])
     path.write_text(json.dumps(receipt))
-    assert (
-        client.get("/materialization/hud-drgr/audits").json()["audits"][0]["state"]
-        == "INVALID_RECEIPT"
-    )
+    malformed_response = client.get("/materialization/hud-drgr/audits")
+    assert malformed_response.json()["audits"][0]["state"] == "INVALID_RECEIPT"
     path.write_text("[]")
-    assert (
-        client.get("/materialization/hud-drgr/audits").json()["audits"][0]["state"]
-        == "INVALID_RECEIPT"
-    )
+    mismatch_response = client.get("/materialization/hud-drgr/audits")
+    assert mismatch_response.json()["audits"][0]["state"] == "INVALID_RECEIPT"
 
 
 def test_run_error_does_not_leak_exception(client, monkeypatch):

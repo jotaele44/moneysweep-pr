@@ -81,6 +81,22 @@ def test_parse_legislapr_detail_requires_cross_confirmation_for_candidate():
 
 
 @pytest.mark.unit
+def test_parse_legislapr_detail_rejects_confusable_confirmation_hosts():
+    html = SAMPLE_HTML.replace(
+        "https://openstates.org/", "https://openstates.org.attacker.example/"
+    ).replace(
+        "https://sutra.oslpr.org/medidas/",
+        "https://attacker.example/medidas/?next=https://sutra.oslpr.org/",
+    )
+
+    row = parse_legislapr_detail(html, "https://www.legislapr.com/bills/PS%20782")
+
+    assert row.openstates_url == ""
+    assert row.sutra_url == ""
+    assert row.promotion_status == "blocked_pending_canonical_confirmation"
+
+
+@pytest.mark.unit
 def test_parse_legislapr_detail_blocks_unconfirmed_records():
     row = parse_legislapr_detail(
         "<html><title>PS 782</title><p>Presupuesto y fondos</p></html>",
