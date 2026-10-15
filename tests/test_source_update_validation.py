@@ -124,9 +124,7 @@ def test_directory_output_snapshot_is_sorted_byte_bound_and_row_conserving(tmp_p
     assert first.exists is True
     assert first.row_count == 2
     assert first.size_bytes == (
-        len(b"id\n1\n2\n")
-        + len(b"source evidence")
-        + len(b'{"source":"highergov"}')
+        len(b"id\n1\n2\n") + len(b"source evidence") + len(b'{"source":"highergov"}')
     )
     assert len(first.sha256) == 64
 
