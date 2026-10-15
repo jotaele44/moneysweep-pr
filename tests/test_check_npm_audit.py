@@ -94,4 +94,5 @@ def test_committed_allowlist_is_valid_and_unexpired():
 
     allowed, problems = load_allowlist(path, dt.date.today())
     assert problems == []
-    assert allowed
+    # An empty list is valid, and the goal: no advisory is tolerated. This pins that the file parses.
+    assert isinstance(allowed, dict)
