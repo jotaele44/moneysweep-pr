@@ -116,26 +116,26 @@ def test_directory_output_snapshot_is_sorted_byte_bound_and_row_conserving(tmp_p
     rel = "data/raw/HigherGov"
     directory = tmp_path / rel
     directory.mkdir(parents=True)
-    (directory / "b.csv").write_text("id\\n1\\n2\\n", encoding="utf-8")
+    (directory / "b.csv").write_text("id\n1\n2\n", encoding="utf-8")
     (directory / "a.txt").write_bytes(b"source evidence")
     (directory / "nested").mkdir()
     (directory / "nested" / "c.json").write_text('{"source":"highergov"}', encoding="utf-8")
     first = snapshot_outputs(tmp_path, [rel])[rel]
     assert first.exists is True
     assert first.row_count == 2
-    assert first.size_bytes == len(b"id\\n1\\n2\\n") + len(b"source evidence") + len(b'{"source":"highergov"}')
+    assert first.size_bytes == (\n        len(b"id\n1\n2\n")\n        + len(b"source evidence")\n        + len(b'{"source":"highergov"}')\n    )
     assert len(first.sha256) == 64
 
     alternate = tmp_path / "alternate"
     other = alternate / rel
     other.mkdir(parents=True)
     (other / "a.txt").write_bytes(b"source evidence")
-    (other / "b.csv").write_text("id\\n1\\n2\\n", encoding="utf-8")
+    (other / "b.csv").write_text("id\n1\n2\n", encoding="utf-8")
     (other / "nested").mkdir()
     (other / "nested" / "c.json").write_text('{"source":"highergov"}', encoding="utf-8")
     assert snapshot_outputs(alternate, [rel])[rel].sha256 == first.sha256
 
-    (directory / "b.csv").write_text("id\\n1\\n3\\n", encoding="utf-8")
+    (directory / "b.csv").write_text("id\n1\n3\n", encoding="utf-8")
     changed = snapshot_outputs(tmp_path, [rel])[rel]
     assert changed.row_count == 2
     assert changed.sha256 != first.sha256
