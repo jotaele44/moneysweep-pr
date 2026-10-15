@@ -36,6 +36,16 @@ A bump to the **federation export** version is what the release-tagging workflow
   pins the 6.x line). `source-map-js` is fixed by a lockfile bump to 1.2.2; the
   prebuilt dashboard bundle manifest was regenerated for the new fingerprint.
   This unblocks the packaged-app build and its frozen self-test in CI.
+- **`tailwindcss-animate` is now a dashboard `devDependency`.** It is a Tailwind
+  plugin that `tailwind.config.js` loads at build time, but listing it under
+  `dependencies` made npm count `tailwindcss` and its whole transitive tree
+  (including `braces` and `postcss-selector-parser`) as runtime dependencies.
+  `npm audit --omit=dev` now audits the 101 runtime packages and finds none
+  vulnerable, where before it failed on build-time tooling. The frontend gate is
+  unchanged: it still audits the full tree against `dashboard/audit-allowlist.json`.
+  `package-lock.json` changes only `"dev": true` flags and the root manifest; the
+  prebuilt dashboard manifest was regenerated and the bundle assets are
+  byte-identical.
 
 ### Fixed
 - **Cleared the checks #656 merged red.** `mypy` (`audit_asg_emergency_identity_coverage`
@@ -55,8 +65,7 @@ A bump to the **federation export** version is what the release-tagging workflow
   `tests/test_hud_drgr_audit_api.py` fail at collection); that test's client
   fixture now connects from loopback, as the hardened local-only guard requires;
   and the committed prebuilt dashboard bundle, regenerated with
-  `scripts/build_prebuilt_dashboard.py --build` on Node 22.22.2. The frontend
-  `npm audit` gate is unchanged and still fails on `braces` (see the PR).
+  `scripts/build_prebuilt_dashboard.py --build` on Node 22.22.2.
 - **Desktop Setup & Diagnostics no longer hangs on "Saving configuration and
   starting the app…".** A backend that failed or was slow to import left the
   setup page frozen with no error. The visible-error screen with **Try Again**
