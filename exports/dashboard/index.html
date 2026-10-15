@@ -761,7 +761,7 @@
 <script>
   var DATA = JSON.parse(document.getElementById("data").textContent);
   function el(tag, html) { var e = document.createElement(tag); if (html != null) e.innerHTML = html; return e; }
-  function esc(s) { return String(s == null ? "" : s).replace(/[&<>]/g, function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
   function table(cols, rows, cell) {
     var t = el("table"), thead = el("thead"), tr = el("tr");
     cols.forEach(function(c){ tr.appendChild(el("th", esc(c))); });

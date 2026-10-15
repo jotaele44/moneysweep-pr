@@ -329,6 +329,22 @@ class TestOfflineFirstRun:
         assert summary["status_breakdown"][STATUS_RESOLVED_SOURCE_UEI] == 1
         assert summary["status_breakdown"][STATUS_DEFERRED_API] == 1
 
+    def test_dry_run_never_logs_api_key_value(self, tmp_path, monkeypatch):
+        key = "synthetic-sam-api-key"
+        messages = []
+
+        class Logger:
+            def info(self, message):
+                messages.append(message)
+
+        monkeypatch.setattr(se, "get_sam_api_key", lambda: key)
+        monkeypatch.setattr(se, "setup_logging", lambda *_args, **_kwargs: Logger())
+
+        se.run(root=tmp_path, use_api=True, dry_run=True)
+
+        assert key not in " ".join(messages)
+        assert "configured (value redacted)" in messages
+
     def test_transport_circuit_breaker_stops_residual(self, tmp_path, monkeypatch):
         self._master(
             tmp_path,

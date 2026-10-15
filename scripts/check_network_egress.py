@@ -53,6 +53,7 @@ def check_https_endpoint(url: str, timeout: float = 5.0) -> EgressCheck:
 
     try:
         context = ssl.create_default_context()
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
         with socket.create_connection((host, port), timeout=timeout) as raw_sock:
             with context.wrap_socket(raw_sock, server_hostname=host) as tls_sock:
                 tls_sock.settimeout(timeout)

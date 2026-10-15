@@ -174,45 +174,37 @@ def _fetch_usac_dataset(
     rows = []
     limit = 1000
     offset = 0
-    pr_values = ["PR", "Puerto Rico", "PUERTO RICO"]
+    while True:
+        params = {
+            "$limit": limit,
+            "$offset": offset,
+            "$where": f"{state_field}='PR' OR {state_field}='Puerto Rico'",
+        }
+        data = _get_json(session, url, params, logger)
+        if not data or not isinstance(data, list):
+            break
+        rows.extend(data)
+        if len(data) < limit:
+            break
+        offset += limit
 
-    for pr_val in pr_values[:1]:
+    if not rows:
+        # Try without where clause, filter client-side
         offset = 0
-        while True:
-            params = {
-                "$limit": limit,
-                "$offset": offset,
-                "$where": f"{state_field}='PR' OR {state_field}='Puerto Rico'",
-            }
+        while offset < 50000:
+            params = {"$limit": limit, "$offset": offset}
             data = _get_json(session, url, params, logger)
             if not data or not isinstance(data, list):
                 break
-            rows.extend(data)
+            pr_rows = [
+                r for r in data if str(r.get(state_field, "")).upper() in ("PR", "PUERTO RICO")
+            ]
+            rows.extend(pr_rows)
             if len(data) < limit:
                 break
             offset += limit
-
-        if not rows:
-            # Try without where clause, filter client-side
-            offset = 0
-            while offset < 50000:
-                params = {"$limit": limit, "$offset": offset}
-                data = _get_json(session, url, params, logger)
-                if not data or not isinstance(data, list):
-                    break
-                pr_rows = [
-                    r
-                    for r in data
-                    if any(
-                        str(r.get(state_field, "")).upper() in ("PR", "PUERTO RICO") for _ in [1]
-                    )
-                ]
-                rows.extend(pr_rows)
-                if len(data) < limit:
-                    break
-                offset += limit
-                if len(rows) > 5000:
-                    break
+            if len(rows) > 5000:
+                break
 
     for r in rows:
         r["_program_type"] = program_type
