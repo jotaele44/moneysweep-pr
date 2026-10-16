@@ -1,0 +1,81 @@
+import csv
+from pathlib import Path
+
+import yaml
+
+ROOT = Path(__file__).resolve().parents[2]
+MAPPING = ROOT / "manifests" / "v4" / "v01_source_domain_mapping.csv"
+DOMAINS = ROOT / "architecture" / "v4" / "domain_registry.yaml"
+CONTRACT = ROOT / "architecture" / "v4" / "source_mapping_contract.yaml"
+
+
+def test_v01_mapping_denominator_is_exact():
+    rows = list(csv.DictReader(MAPPING.read_text(encoding="utf-8").splitlines()))
+    ids = [row["source_id"] for row in rows]
+    assert len(rows) == 167
+    assert len(set(ids)) == 167
+    assert all(
+        row["mapping_state"] in {"MAPPED", "PARTIAL", "UNMAPPED", "UNRESOLVED"} for row in rows
+    )
+
+
+def test_every_mapping_target_is_registered():
+    rows = list(csv.DictReader(MAPPING.read_text(encoding="utf-8").splitlines()))
+    domain_ids = set(yaml.safe_load(DOMAINS.read_text(encoding="utf-8"))["domains"])
+    support_ids = set(
+        yaml.safe_load(CONTRACT.read_text(encoding="utf-8"))["core_support_capabilities"]
+    )
+    for row in rows:
+        targets = [x for x in row["targets"].split(";") if x]
+        assert targets, row["source_id"]
+        for target in targets:
+            assert target in domain_ids or target in support_ids, (row["source_id"], target)
+
+
+def test_partial_mapping_residue_remains_visible():
+    rows = list(csv.DictReader(MAPPING.read_text(encoding="utf-8").splitlines()))
+    partial = [row for row in rows if row["mapping_state"] == "PARTIAL"]
+    assert partial
+    assert len(partial) > 0
+    assert len(rows) == 167
+
+
+def test_direct_benefit_sources_are_not_forced_into_intergovernmental():
+    rows = {
+        row["source_id"]: row
+        for row in csv.DictReader(MAPPING.read_text(encoding="utf-8").splitlines())
+    }
+    expected = {
+        "ssa",
+        "snap_nap",
+        "wic",
+        "va_benefits",
+        "fema_individual_assistance",
+        "medicare_advantage",
+        "medicare_parts",
+        "hud_hcv_section8",
+        "irs_ctc_eitc_pr",
+    }
+    for source_id in expected:
+        assert rows[source_id]["targets"] == "SOCIAL_BENEFITS_AND_HOUSEHOLD_TRANSFERS"
+        assert rows[source_id]["mapping_state"] == "MAPPED"
+
+
+def test_prasa_lineage_conflict_remains_partial():
+    rows = {
+        row["source_id"]: row
+        for row in csv.DictReader(MAPPING.read_text(encoding="utf-8").splitlines())
+    }
+    blocked = {"prasa_completed_projects_ppp", "prasa_consulting_engineer_ppp"}
+    assert {\n        source_id for source_id, row in rows.items() if row["mapping_state"] == "PARTIAL"\n    } == blocked
+
+
+def test_preaward_sam_opportunities_is_not_procurement_event():
+    rows = {
+        row["source_id"]: row
+        for row in csv.DictReader(MAPPING.read_text(encoding="utf-8").splitlines())
+    }
+    row = rows["sam_opportunities"]
+    assert row["target_type"] == "CORE_SUPPORT"
+    assert row["targets"] == "PRE_AWARD_PROCUREMENT_CANDIDATE"
+    assert row["mapping_state"] == "MAPPED"
