@@ -291,7 +291,8 @@
           "scripts/validate_live_fetch_dispatch.py",
           "scripts/check_status_freshness.py",
           "scripts/run_automatable_sources_scoped.py",
-          "moneysweep/orchestrator/cli_legacy.py"
+          "moneysweep/orchestrator/cli_legacy.py",
+          "moneysweep/runtime/credential_registry.py"
         ]
       },
       "tests": {
@@ -299,9 +300,15 @@
           "tests/test_live_fetch_dispatch.py",
           "tests/test_materializer_credential_scope.py",
           "tests/test_status_freshness.py",
-          "tests/test_workflow_static_validation.py"
+          "tests/test_workflow_static_validation.py",
+          "tests/test_credential_registry.py"
         ]
-      }
+      },
+      "candidate_ids": [
+        "python_module:moneysweep/runtime/credential_registry.py",
+        "python_symbol:moneysweep/runtime/credential_registry.py:CredentialSpec",
+        "python_symbol:moneysweep/runtime/credential_registry.py:credential_spec"
+      ]
     },
     {
       "id": "service-health",
