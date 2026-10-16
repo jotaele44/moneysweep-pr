@@ -94,7 +94,8 @@ jobs:
             echo "name_only_identity=DENY"
             echo "stable_identity=UEI_CAGE_EXPLICIT_BINDING_ONLY"
             echo "row_arithmetic=SOURCE_EQUALS_ADMITTED_PLUS_EXCLUDED_PLUS_UNRESOLVED"
-            echo "source_provenance=REQUIRED"\n            echo "rendered_qa=DESKTOP_1440_IPHONE_393_IPHONE_430_PASS"
+            echo "source_provenance=REQUIRED"
+            echo "rendered_qa=DESKTOP_1440_IPHONE_393_IPHONE_430_PASS"
             echo "state=PASS"
           } > successor-v3-receipt.txt
           sha256sum package-lock.json successor-v3-overlay-hashes.txt successor-v3-vitest.log successor-v3-build.log rendered-qa.json rendered-qa-hashes.txt successor-v3-receipt.txt > successor-v3-evidence-hashes.txt
