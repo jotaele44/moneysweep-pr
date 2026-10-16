@@ -19,9 +19,7 @@ def _git_blob_sha1(path: Path) -> str:
 
 def test_grid_v2_profile_template_matches_thehub_authority():
     assert len(THEHUB_AUTHORITY_COMMIT) == 40
-    assert _git_blob_sha1(
-        ROOT / "federation/spatial/pr_grid_v2_profiles.py"
-    ) == PROFILE_GIT_BLOB_SHA1
-    assert _git_blob_sha1(
-        ROOT / "tests/test_pr_grid_v2_profiles.py"
-    ) == PROFILE_TEST_GIT_BLOB_SHA1
+    assert (
+        _git_blob_sha1(ROOT / "federation/spatial/pr_grid_v2_profiles.py") == PROFILE_GIT_BLOB_SHA1
+    )
+    assert _git_blob_sha1(ROOT / "tests/test_pr_grid_v2_profiles.py") == PROFILE_TEST_GIT_BLOB_SHA1
