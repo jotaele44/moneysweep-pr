@@ -136,6 +136,57 @@ def test_run_one_reports_rows_from_producer_dict(tmp_path):
     assert res["rows"] == 7
 
 
+@pytest.mark.parametrize(
+    ("producer_result", "expected_producer_status", "expected_error"),
+    [
+        (
+            {"rows": 7, "errors": ["FY2026: job did not complete"]},
+            "OK",
+            "FY2026: job did not complete",
+        ),
+        (
+            {"rows": 7, "status": "TRUNCATED", "errors": ["page fetch failed"]},
+            "TRUNCATED",
+            "page fetch failed",
+        ),
+        ({"rows": 7, "status": "TRUNCATED", "errors": []}, "TRUNCATED", ""),
+        ({"rows": 7, "status": "OK", "errors": "single failure"}, "OK", "single failure"),
+    ],
+)
+def test_run_one_fails_closed_on_partial_producer_results(
+    monkeypatch,
+    tmp_path,
+    producer_result,
+    expected_producer_status,
+    expected_error,
+):
+    module = types.ModuleType("partial_mod")
+    module.run = lambda root=None: producer_result
+    monkeypatch.setitem(__import__("sys").modules, "scripts.partial_mod", module)
+
+    result = run_one(
+        tmp_path,
+        {"source_id": "partial", "producer_script": "scripts/partial_mod.py"},
+        _NullLogger(),
+    )
+
+    assert result["status"] == "ERROR"
+    assert result["producer_status"] == expected_producer_status
+    assert result["error"] == expected_error
+
+
+def test_main_returns_nonzero_when_materialization_fails(monkeypatch):
+    monkeypatch.setattr(mod, "run", lambda **kwargs: {"status": "ERROR", "ran": []})
+
+    assert mod.main(["--source", "fixture", "--no-require-egress"]) == 1
+
+
+def test_main_preserves_egress_blocked_zero_exit(monkeypatch):
+    monkeypatch.setattr(mod, "run", lambda **kwargs: {"status": "egress_blocked", "ran": []})
+
+    assert mod.main(["--source", "fixture"]) == 0
+
+
 def test_run_one_supports_output_dir_and_live_controls(tmp_path):
     module = types.ModuleType("output_dir_mod")
     calls = []

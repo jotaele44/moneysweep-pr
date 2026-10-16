@@ -13,6 +13,7 @@ on:
       - "tools/derive_certification_truth.py"
       - "tools/run_certification_derivations.py"
       - "tools/run_certification_public_adapters.py"
+      - "tools/keyless_execution_plan.py"
       - "scripts/download_prasa_contracts.py"
       - "scripts/download_cabilderos.py"
       - "reports/source_recovery_matrix.csv"
@@ -42,41 +43,23 @@ jobs:
           import os
           from pathlib import Path
 
-          status = {}
+          from tools.keyless_execution_plan import build_execution_plan
+
+          status_rows = []
           with Path("reports/source_registry_status.csv").open(
               encoding="utf-8-sig", newline=""
           ) as fh:
-              for row in csv.DictReader(fh):
-                  status[row["source_id"]] = row
+              status_rows = list(csv.DictReader(fh))
 
-          keyless = []
-          credential_gated = []
           with Path("reports/source_recovery_matrix.csv").open(
               encoding="utf-8-sig", newline=""
           ) as fh:
-              for row in csv.DictReader(fh):
-                  if row.get("automatable", "").lower() != "true":
-                      continue
-                  sid = row["source_id"]
-                  source = status.get(sid, {})
-                  authentication = source.get("authentication", "")
-                  if authentication == "none":
-                      keyless.append(sid)
-                  else:
-                      credential_gated.append(
-                          {
-                              "source_id": sid,
-                              "authentication": authentication,
-                              "producer_script": source.get("producer_script", ""),
-                          }
-                      )
+              recovery_rows = list(csv.DictReader(fh))
 
-          keyless = sorted(set(keyless))
-          credential_gated = sorted(
-              credential_gated,
-              key=lambda item: item["source_id"],
-          )
-          matrix = json.dumps({"source": keyless}, separators=(",", ":"))
+          plan = build_execution_plan(status_rows, recovery_rows)
+          keyless = plan["keyless"]
+          credential_gated = plan["credential_gated"]
+          matrix = json.dumps({"include": keyless}, separators=(",", ":"))
           Path("credential_gated_automatable.json").write_text(
               json.dumps(
                   {
@@ -98,8 +81,11 @@ jobs:
               out.write(f"credential_count={len(credential_gated)}\n")
           print(f"keyless_automatable={len(keyless)}")
           print(f"credential_gated_automatable={len(credential_gated)}")
-          for sid in keyless:
-              print(f"keyless:{sid}")
+          for item in keyless:
+              print(
+                  "keyless:"
+                  f"{item['source']}:timeout={item['timeout_minutes']}m"
+              )
           for item in credential_gated:
               print(
                   "credential_gated:"
@@ -121,7 +107,7 @@ jobs:
       max-parallel: 20
       matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: ${{ matrix.timeout_minutes }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
