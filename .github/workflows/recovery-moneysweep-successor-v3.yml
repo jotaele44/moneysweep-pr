@@ -65,7 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           cd "$RUNNER_TEMP/recovered"
-          npm install --save-dev --no-audit --no-fund playwright@1.55.0
+          npm install --save-dev --no-audit --no-fund --legacy-peer-deps playwright@1.55.0
           npx playwright install --with-deps chromium
           cp "$GITHUB_WORKSPACE/.recovery/moneysweep-successor-v3/rendered-qa.mjs" rendered-qa.mjs
           npx vite preview --host 127.0.0.1 --port 4173 > rendered-preview.log 2>&1 &
