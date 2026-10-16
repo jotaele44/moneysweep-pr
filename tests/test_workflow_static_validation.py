@@ -34,6 +34,15 @@ def test_source_workflows_require_preflight_default() -> None:
         assert validate_workflow_file(Path(".github/workflows") / name) == []
 
 
+def test_keyless_materialization_uses_per_source_timeout_plan() -> None:
+    path = Path(".github/workflows/certification-keyless-materialization.yml")
+    workflow = yaml.safe_load(path.read_text(encoding="utf-8"))
+    materialize = workflow["jobs"]["materialize"]
+
+    assert materialize["timeout-minutes"] == "${{ matrix.timeout_minutes }}"
+    assert materialize["strategy"]["matrix"] == "${{ fromJSON(needs.prepare.outputs.matrix) }}"
+
+
 def test_rejects_unsupported_expression_helper(tmp_path: Path) -> None:
     workflow = tmp_path / "broken.yml"
     workflow.write_text(
