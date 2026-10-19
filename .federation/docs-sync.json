@@ -1,5 +1,5 @@
 {
-  "_comment": "Documentation-sync policy for moneysweep-pr (thehub-pr ADR 0010). Read by tools/check_docs_sync.py. couplings: when a covered path changes, the doc must change in the same diff, or the commit/PR says 'Docs-Impact: none - <reason>'. Seeded conservatively: each coupling was replayed over this repo's recent history and never fired. Add couplings for docs that enumerate things; do not add ones that fire on routine work.",
+  "_comment": "Documentation-sync policy for moneysweep-pr (thehub-pr ADR 0010). Read by tools/check_docs_sync.py. couplings: when a covered path changes in a way the coupling lists (its `on`: add, delete and rename unless it says otherwise), the doc must change in the same diff, or the commit/PR says 'Docs-Impact: none - <reason>'. Seeded conservatively: each coupling was replayed over this repo's recent history and never fired. Add couplings for docs that enumerate things; do not add ones that fire on routine work.",
   "schema_version": "prii_docs_sync_v1",
   "mode": "enforce",
   "base_branch": "main",
