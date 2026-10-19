@@ -18,7 +18,16 @@ decision instead of a silent omission:
   that no longer exists. Only references *this change* broke count, so the
   legacy backlog never blocks anyone: the rule is "clean what you touch".
 * **R3 manifest hygiene.** The manifest may not rot: unknown keys, missing docs
-  and globs that stopped matching anything are reported.
+  and globs that stopped matching anything are reported. It is judged on the
+  head manifest alone. A glob this change adds that matches nothing fails (a
+  typo would otherwise enforce nothing while looking valid); one that already
+  matched nothing only warns.
+
+A change is judged by the rules it arrived with *and* the rules it edits: the
+couplings and ``mode`` of both manifests count, so it cannot pass by deleting its
+own coupling or by flipping ``mode`` to ``report``. For the same reason an author
+named in ``exempt_authors`` is skipped only when the *base* manifest already lists
+them; read from the head, the key would let a pull request exempt itself.
 
 One script, one verdict, several entry points:
 
@@ -110,6 +119,7 @@ class Manifest:
     base_branch: str
     exempt_docs: tuple[str, ...]
     ignore_refs: tuple[str, ...]
+    # Only the base revision's list is honoured (see _base_exempt_authors).
     exempt_authors: tuple[str, ...]
     couplings: tuple[Coupling, ...]
 
@@ -418,9 +428,12 @@ def _strip_markup(text: str) -> str:
 
 
 def _link_ref(doc: str, target: str) -> str | None:
+    # A bare root-level target with a locator (`README.md:42`) has the shape of a URI
+    # scheme (`mailto:`, `skype:echo`), so it is skipped rather than guessed at: a
+    # missed check costs less than a false alarm. With a slash it is unambiguous.
     if not target or target.startswith(("#", "/")) or _SCHEME.match(target):
         return None
-    target = unquote(target.split("#", 1)[0].split("?", 1)[0])
+    target = _LOCATOR.sub("", unquote(target.split("#", 1)[0].split("?", 1)[0]))
     if not target:
         return None
     resolved = posixpath.normpath(posixpath.join(posixpath.dirname(doc), target))
@@ -491,8 +504,18 @@ def evaluate(
     malformed_waivers: Sequence[str] = (),
     *,
     staged: bool = False,
+    head_manifest: Manifest | None = None,
+    known_old: frozenset[tuple[str, str]] | None = None,
 ) -> Report:
-    """Pure verdict for one change. All git I/O lives in the collectors below."""
+    """Pure verdict for one change. All git I/O lives in the collectors below.
+
+    ``manifest`` is what the change is judged *by* (R1 and R2 use every coupling of
+    base and head). ``head_manifest`` is what it is judged *on* for hygiene (R3):
+    a coupling the change dropped still demands its doc, but it is no longer the
+    head's to keep tidy, so a legitimate retirement or doc rename can pass.
+    ``known_old`` is the ``(doc, glob)`` pairs the base already had; see
+    ``_check_manifest``.
+    """
     report = Report()
     for line in malformed_waivers:
         report.violations.append(
@@ -504,7 +527,15 @@ def evaluate(
                 f"{MIN_REASON_CHARS} characters",
             )
         )
-    _check_manifest(manifest, base, head, report)
+    # A doc renamed in this change is still the doc the coupling means, and it keeps
+    # the history it had under its old name.
+    moved = {c.old_path: c.path for c in changes if c.event == "rename" and c.old_path}
+    came_from = {new: old for old, new in moved.items()}
+    if known_old is not None:
+        # An old dead glob does not become this change's own because its doc was renamed.
+        known_old = frozenset((moved.get(doc, doc), pattern) for doc, pattern in known_old)
+    hygiene = head_manifest if head_manifest is not None else manifest
+    _check_manifest(hygiene, base, head, report, known_old=known_old)
 
     events = events_by_path(changes)
     touched = {
@@ -519,7 +550,7 @@ def evaluate(
             for p, ev in events.items()
             if ev & wanted and matches(p, coupling.covers) and not matches(p, coupling.exclude)
         )
-        if not hits or coupling.doc in touched:
+        if not hits or coupling.doc in touched or moved.get(coupling.doc) in touched:
             continue
         waiver = _waiver_for(waivers, coupling.doc, allow_none=True)
         if waiver is not None:
@@ -555,8 +586,11 @@ def evaluate(
         ]
         if not broken:
             continue
-        old_text = read_base(doc)
-        old_refs = extract_refs(doc, old_text, top) if old_text is not None else set()
+        # A renamed doc is compared with itself under its old name, so references it
+        # already had (and links resolved from its old directory) are not new.
+        old_doc = came_from.get(doc, doc)
+        old_text = read_base(old_doc)
+        old_refs = extract_refs(old_doc, old_text, top) if old_text is not None else set()
         for ref in broken:
             if ref in old_refs and not base.has(ref):
                 continue  # already dangling before this change: not ours to fix here
@@ -578,7 +612,23 @@ def evaluate(
     return report
 
 
-def _check_manifest(manifest: Manifest, base: Tree, head: Tree, report: Report) -> None:
+def _check_manifest(
+    manifest: Manifest,
+    base: Tree,
+    head: Tree,
+    report: Report,
+    *,
+    known_old: frozenset[tuple[str, str]] | None = None,
+) -> None:
+    """Hygiene for the head manifest.
+
+    ``known_old`` holds the ``(doc, glob)`` pairs the base manifest already had. A
+    glob that matches nothing is a violation when this change adds it (a typo that
+    would enforce nothing while the manifest still looks valid) and only a warning
+    when it was already there, because that is not this change's to fix. With no
+    base to compare against (``--validate``, or a base manifest that does not parse)
+    every such glob stays a warning.
+    """
     for coupling in manifest.couplings:
         if coupling.doc not in head.files:
             report.violations.append(
@@ -601,6 +651,16 @@ def _check_manifest(manifest: Manifest, base: Tree, head: Tree, report: Report) 
                         f"(covered by {coupling.doc})",
                         f"update the coupling in {MANIFEST_PATH}, and {coupling.doc} "
                         "if it lists those files",
+                    )
+                )
+            elif known_old is not None and (coupling.doc, pattern) not in known_old:
+                report.violations.append(
+                    Finding(
+                        "manifest",
+                        coupling.doc,
+                        f"'{pattern}' (covered by {coupling.doc}) matches no files, "
+                        "and this change added it",
+                        f"correct the glob or remove it in {MANIFEST_PATH}",
                     )
                 )
             else:
@@ -835,11 +895,16 @@ def _judge(
     staged: bool,
 ) -> tuple[Report, Manifest]:
     base_manifest: Manifest | None = None
+    # No manifest in the base means every glob is this change's own; an old one
+    # that does not parse tells us nothing, so it falls back to warnings.
+    known_old: frozenset[tuple[str, str]] | None = frozenset()
     old = ctx.read_base(manifest_rel)
     if old is not None:
+        known_old = None
         # A broken old manifest must not block fixing it.
         with contextlib.suppress(ManifestError):
             base_manifest = parse_manifest(old)
+            known_old = frozenset((c.doc, p) for c in base_manifest.couplings for p in c.covers)
     manifest = merge_manifests(head_manifest, base_manifest)
     waivers: list[Waiver] = []
     malformed: list[str] = []
@@ -860,8 +925,23 @@ def _judge(
         waivers,
         malformed,
         staged=staged,
+        head_manifest=head_manifest,
+        known_old=known_old,
     )
     return report, manifest
+
+
+def _base_exempt_authors(ctx: Context, manifest_rel: str) -> tuple[str, ...]:
+    """Custom exemptions count only if the base revision already had them.
+
+    Read from the head they would let a pull request exempt itself by naming its
+    own author, which switches the whole gate off for that one change.
+    """
+    old = ctx.read_base(manifest_rel)
+    if old is not None:
+        with contextlib.suppress(ManifestError):
+            return parse_manifest(old).exempt_authors
+    return ()
 
 
 def _hook_blocks_so_far(state_path: Path | None, session: str, key: str) -> int:
@@ -963,7 +1043,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
 
     author = args.author or os.environ.get("PR_AUTHOR", "")
-    if author and author in DEFAULT_EXEMPT_AUTHORS + manifest.exempt_authors:
+    if author and author in DEFAULT_EXEMPT_AUTHORS:
         print(f"docs-sync: skipped (automated author {author})")
         return 0
     if not (args.validate or args.staged or args.base):
@@ -983,6 +1063,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 return 0
         else:
             ctx = collect_range(root, args.base, args.head)
+            if author and author in _base_exempt_authors(ctx, args.manifest):
+                print(f"docs-sync: skipped (author {author} is exempt in the base manifest)")
+                return 0
             if args.pr_body_file:
                 pr_body = Path(args.pr_body_file).read_text(encoding="utf-8", errors="replace")
             else:
