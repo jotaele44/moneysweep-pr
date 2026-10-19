@@ -2,25 +2,25 @@
 Download all non-contract federal awards to/in Puerto Rico via USASpending bulk download.
 
 Uses /api/v2/bulk_download/awards/ which has NO record limit (unlike spending_by_award
-which silently caps at 10,000 records). Each pass submits an async job, polls until
-the ZIP is ready, downloads it, and extracts the CSV.
+which silently caps at 10,000 records). Each pass submits one asynchronous job per
+fiscal year, polls until the ZIP is ready, downloads it, and extracts the CSV.
 
 Covers ALL awarding agencies (no agency filter) across three award type groups:
   grants  (02-05): block grants, formula grants, project grants, cooperative agreements
   direct  (06):    direct payments (specified use)
   loans   (07-08): direct and guaranteed loans
 
-Four passes (single full date range — no time-window splitting needed):
+Four passes, split into restartable fiscal-year windows:
   grants_pop       — place of performance = PR, types 02-05
   grants_recipient — recipient located in PR, types 02-05
   direct_recipient — recipient located in PR, type 06
   loans_recipient  — recipient located in PR, types 07-08
 
 Output:
-  data/staging/raw/grants/grants_pop.csv
-  data/staging/raw/grants/grants_recipient.csv
-  data/staging/raw/grants/direct_recipient.csv
-  data/staging/raw/grants/loans_recipient.csv
+  data/staging/raw/grants/grants_pop_fy<YYYY>.csv
+  data/staging/raw/grants/grants_recipient_fy<YYYY>.csv
+  data/staging/raw/grants/direct_recipient_fy<YYYY>.csv
+  data/staging/raw/grants/loans_recipient_fy<YYYY>.csv
   data/staging/processed/pr_grants_master.csv
 
 Usage:
@@ -32,7 +32,11 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import csv
+import hashlib
 import io
+import json
+import os
 import sys
 import time
 import zipfile
@@ -45,6 +49,11 @@ import requests
 
 from scripts.config import PROJECT_ROOT, setup_logging
 from scripts._download_utils import derive_fiscal_year as _derive_fiscal_year
+from tools.keyless_execution_plan import (
+    GRANTS_PASSES,
+    GRANTS_START_FY,
+    current_fiscal_year,
+)
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -55,18 +64,8 @@ BULK_STATUS_URL = "https://api.usaspending.gov/api/v2/bulk_download/status/"
 
 # API constraint: date_range must be within one year (≤ 365/366 days per job).
 # We use one job per fiscal year (Oct 1 → Sep 30).
-START_FY = 2000  # FY2000 = Oct 1999 - Sep 2000
-
-
-# Dynamically track the current fiscal year so new data is always included
-def _current_fy() -> int:
-    from datetime import date
-
-    d = date.today()
-    return d.year + 1 if d.month >= 10 else d.year
-
-
-END_FY = _current_fy()
+START_FY = GRANTS_START_FY  # FY2000 = Oct 1999 - Sep 2000
+END_FY = current_fiscal_year()
 
 
 def _fy_windows(start_fy: int = START_FY, end_fy: int = END_FY) -> list[dict]:
@@ -98,6 +97,8 @@ PASSES = [
     ("direct_recipient", ["06"], "recipient"),
     ("loans_recipient", ["07", "08"], "recipient"),
 ]
+if tuple(prefix for prefix, _, _ in PASSES) != GRANTS_PASSES:
+    raise RuntimeError("grants execution plan and downloader passes are out of sync")
 
 # Bulk download CSVs use snake_case column names (different from spending_by_award fields)
 BULK_RENAME = {
@@ -149,14 +150,36 @@ def _session() -> requests.Session:
 
 
 def _file_has_data(filepath: Path) -> bool:
-    """Return True if file exists and is a readable CSV (including header-only / 0-row results)."""
+    """Return True for a readable generated CSV with the exact canonical schema."""
     if not filepath.exists():
         return False
     try:
-        pd.read_csv(filepath, dtype=str, nrows=0, low_memory=False)
-        return True
+        header = pd.read_csv(filepath, dtype=str, nrows=0, low_memory=False)
+        return list(header.columns) == MASTER_COLUMNS
     except Exception:
         return False
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _csv_metadata(path: Path) -> tuple[int | None, list[str], str | None]:
+    try:
+        with path.open("r", encoding="utf-8-sig", newline="") as handle:
+            reader = csv.reader(handle, strict=True)
+            try:
+                columns = next(reader)
+            except StopIteration:
+                return None, [], "empty CSV without header"
+            rows = sum(1 for _ in reader)
+    except (OSError, UnicodeDecodeError, csv.Error) as exc:
+        return None, [], f"{type(exc).__name__}: {exc}"
+    return rows, columns, None
 
 
 # ---------------------------------------------------------------------------
@@ -198,12 +221,14 @@ def _submit_bulk_job(
     for attempt in range(MAX_RETRIES):
         try:
             resp = session.post(BULK_DOWNLOAD_URL, json=payload, timeout=60)
-            if 400 <= resp.status_code < 600:
+            if 400 <= resp.status_code < 500:
                 logger.error(f"  Job submission HTTP {resp.status_code}: {resp.text[:300]}")
                 return None
+            if 500 <= resp.status_code < 600:
+                resp.raise_for_status()
             resp.raise_for_status()
             return resp.json()
-        except requests.RequestException as e:
+        except (requests.RequestException, ValueError) as e:
             last_err = e
         if attempt < MAX_RETRIES - 1:
             wait = RETRY_BACKOFF[attempt]
@@ -233,7 +258,7 @@ def _poll_job(
             )
             resp.raise_for_status()
             data = resp.json()
-        except requests.RequestException as e:
+        except (requests.RequestException, ValueError) as e:
             logger.warning(f"  Poll error ({e}) — retrying in {POLL_INTERVAL_S}s")
             time.sleep(POLL_INTERVAL_S)
             elapsed += POLL_INTERVAL_S
@@ -286,14 +311,15 @@ def _download_zip(
         return False
 
 
-def _extract_csv(zip_path: Path, logger) -> pd.DataFrame:
-    """Open ZIP, read all CSVs inside, concatenate into one DataFrame."""
+def _extract_csv(zip_path: Path, logger) -> tuple[pd.DataFrame, str | None]:
+    """Open a ZIP and distinguish valid empty CSVs from extraction failures."""
     try:
         with zipfile.ZipFile(zip_path) as zf:
             csv_names = [n for n in zf.namelist() if n.lower().endswith(".csv")]
             if not csv_names:
-                logger.warning(f"  No CSV files found in {zip_path.name}")
-                return pd.DataFrame()
+                error = f"no CSV files found in {zip_path.name}"
+                logger.error(f"  {error}")
+                return pd.DataFrame(), error
             frames = []
             for name in csv_names:
                 logger.info(f"  Extracting {name}")
@@ -305,10 +331,10 @@ def _extract_csv(zip_path: Path, logger) -> pd.DataFrame:
                     )
                     frames.append(df)
                     logger.info(f"  {name}: {len(df):,} rows, {len(df.columns)} cols")
-            return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+            return pd.concat(frames, ignore_index=True), None
     except Exception as e:
         logger.error(f"  ZIP extraction failed: {e}")
-        return pd.DataFrame()
+        return pd.DataFrame(), f"ZIP extraction failed: {type(e).__name__}: {e}"
 
 
 def _normalize_bulk_df(df: pd.DataFrame, source_file: str) -> pd.DataFrame:
@@ -416,11 +442,15 @@ def _run_one_window(
         result["error"] = "ZIP download failed after 3 attempts"
         return result
 
-    df = _extract_csv(zip_path, logger)
+    df, extraction_error = _extract_csv(zip_path, logger)
     try:
         zip_path.unlink()
     except Exception:
         pass
+
+    if extraction_error is not None:
+        result["error"] = extraction_error
+        return result
 
     if df.empty:
         # Empty is valid (no awards for PR in that FY) — write header-only CSV
@@ -444,13 +474,16 @@ def download_pass(
     force: bool,
     logger,
     fy_start: int | None = None,
+    fy_end: int | None = None,
 ) -> dict:
     """Run all FY windows for one pass. Returns aggregate stats dict."""
-    windows = _fy_windows()
-    if fy_start is not None:
-        windows = [w for w in windows if int(w["label"]) >= fy_start]
+    effective_start = fy_start if fy_start is not None else START_FY
+    effective_end = fy_end if fy_end is not None else END_FY
+    if effective_end < effective_start:
+        raise ValueError("fy_end must be greater than or equal to fy_start")
+    windows = _fy_windows(effective_start, effective_end)
 
-    stats: dict = {"prefix": prefix, "rows": 0, "errors": []}
+    stats: dict = {"prefix": prefix, "rows": 0, "errors": [], "api_calls": 0}
     logger.info(f"  [{prefix}] Running {len(windows)} FY windows (filter={filter_type})")
 
     consecutive_failures = 0
@@ -480,6 +513,8 @@ def download_pass(
         )
         stats["rows"] += result["rows"]
         prev_was_api_call = not result.get("skipped", False)
+        if prev_was_api_call:
+            stats["api_calls"] += 1
         if result["error"]:
             consecutive_failures += 1
             stats["errors"].append(f"FY{result['fy']}: {result['error']}")
@@ -495,9 +530,15 @@ def download_pass(
 # ---------------------------------------------------------------------------
 
 
-def build_master(raw_dir: Path, master_path: Path, logger) -> int:
+def build_master(
+    raw_dir: Path,
+    master_path: Path,
+    logger,
+    *,
+    files: list[Path] | None = None,
+) -> int:
     """Concatenate all raw CSVs, deduplicate by award_id, write master."""
-    files = sorted(raw_dir.glob("*.csv"))
+    files = sorted(files if files is not None else raw_dir.glob("*.csv"))
     if not files:
         logger.warning("  No raw grant files found — master not written")
         return 0
@@ -508,7 +549,7 @@ def build_master(raw_dir: Path, master_path: Path, logger) -> int:
             df = pd.read_csv(f, dtype=str, low_memory=False)
             frames.append(df)
         except Exception as e:
-            logger.warning(f"  Skipping {f.name}: {e}")
+            raise RuntimeError(f"cannot build grants master from {f.name}: {e}") from e
 
     if not frames:
         logger.warning("  No data loaded — master not written")
@@ -519,13 +560,20 @@ def build_master(raw_dir: Path, master_path: Path, logger) -> int:
     logger.info(f"  Combined: {before:,} rows before dedup")
 
     if "award_id" in combined.columns:
-        combined = combined.drop_duplicates(subset=["award_id"], keep="first")
+        identifiers = combined["award_id"].fillna("").astype(str).str.strip()
+        duplicate_identifiers = identifiers.ne("") & identifiers.duplicated(keep="first")
+        combined = combined.loc[~duplicate_identifiers]
         removed = before - len(combined)
         if removed:
             logger.info(f"  Removed {removed:,} duplicate award_id rows")
 
     master_path.parent.mkdir(parents=True, exist_ok=True)
-    combined.to_csv(master_path, index=False, encoding="utf-8")
+    temporary_path = master_path.with_name(f".{master_path.name}.tmp")
+    try:
+        combined.to_csv(temporary_path, index=False, encoding="utf-8")
+        temporary_path.replace(master_path)
+    finally:
+        temporary_path.unlink(missing_ok=True)
     logger.info(f"  Master written: {len(combined):,} rows → {master_path.name}")
     return len(combined)
 
@@ -537,7 +585,26 @@ def build_master(raw_dir: Path, master_path: Path, logger) -> int:
 
 def run(root: Path | None = None) -> dict:
     """Main entry point (no --force). Returns summary dict."""
-    return _run(root=root, force=False, only_pass=None, fy_start=None)
+    return _run(
+        root=root,
+        force=False,
+        only_pass=None,
+        fy_start=_environment_fiscal_year("MONEYSWEEP_GRANTS_START_FY"),
+        fy_end=_environment_fiscal_year("MONEYSWEEP_GRANTS_END_FY"),
+    )
+
+
+def _environment_fiscal_year(name: str) -> int | None:
+    value = os.environ.get(name)
+    if value is None or not value.strip():
+        return None
+    try:
+        fiscal_year = int(value)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be an integer") from exc
+    if fiscal_year < 1900:
+        raise ValueError(f"{name} must be at least 1900")
+    return fiscal_year
 
 
 def _run(
@@ -545,16 +612,36 @@ def _run(
     force: bool = False,
     only_pass: str | None = None,
     fy_start: int | None = None,
+    fy_end: int | None = None,
+    build_master_output: bool = True,
 ) -> dict:
-    if root is None:
-        root = PROJECT_ROOT
+    root = Path(root or PROJECT_ROOT).expanduser().resolve()
 
     raw_dir = root / "data" / "staging" / "raw" / "grants"
     master_path = root / "data" / "staging" / "processed" / "pr_grants_master.csv"
     raw_dir.mkdir(parents=True, exist_ok=True)
 
     logger = setup_logging("download_grants")
-    fy_range = f"FY{fy_start or START_FY}–FY{END_FY}"
+    effective_start = fy_start if fy_start is not None else START_FY
+    effective_end = fy_end if fy_end is not None else END_FY
+    if effective_end < effective_start:
+        return {
+            "schema_version": "moneysweep.grants_download/v2",
+            "only_pass": only_pass,
+            "fy_start": effective_start,
+            "fy_end": effective_end,
+            "raw_rows": 0,
+            "master_rows": 0,
+            "master_path": str(master_path),
+            "master_built": False,
+            "raw_dir": str(raw_dir),
+            "errors": ["fy_end must be greater than or equal to fy_start"],
+            "passes": [],
+            "expected_raw_files": [],
+            "missing_raw_files": [],
+            "raw_files": [],
+        }
+    fy_range = f"FY{effective_start}–FY{effective_end}"
     logger.info(f"Starting PR all-agency awards bulk download ({fy_range})...")
 
     passes = PASSES
@@ -562,49 +649,124 @@ def _run(
         passes = [(p, t, f) for p, t, f in PASSES if p == only_pass]
         if not passes:
             logger.error(f"  Unknown pass '{only_pass}'. Valid: {[p for p, _, _ in PASSES]}")
-            return {"raw_rows": 0, "master_rows": 0, "errors": [f"unknown pass: {only_pass}"]}
+            return {
+                "schema_version": "moneysweep.grants_download/v2",
+                "only_pass": only_pass,
+                "fy_start": effective_start,
+                "fy_end": effective_end,
+                "raw_rows": 0,
+                "master_rows": 0,
+                "master_path": str(master_path),
+                "master_built": False,
+                "raw_dir": str(raw_dir),
+                "errors": [f"unknown pass: {only_pass}"],
+                "passes": [],
+                "expected_raw_files": [],
+                "missing_raw_files": [],
+                "raw_files": [],
+            }
 
-    session = _session()
     all_errors = []
     total_rows = 0
-    pass_stats = []
+    pass_stats: list[dict] = []
+    session = _session()
+    try:
+        for i, (prefix, type_codes, filter_type) in enumerate(passes):
+            if i > 0 and pass_stats[-1].get("api_calls", 0) > 0:
+                logger.info("  Sleeping 10 min between passes to let API recover...")
+                time.sleep(600)
+            logger.info(f"\n[Pass: {prefix}] types={type_codes}, filter={filter_type}")
+            try:
+                stats = download_pass(
+                    session,
+                    prefix,
+                    type_codes,
+                    filter_type,
+                    raw_dir,
+                    force,
+                    logger,
+                    fy_start=fy_start,
+                    fy_end=fy_end,
+                )
+            except Exception as e:
+                logger.error(f"  Unexpected error on {prefix}: {e}")
+                stats = {
+                    "prefix": prefix,
+                    "rows": 0,
+                    "errors": [str(e)],
+                    "api_calls": 0,
+                }
 
-    for i, (prefix, type_codes, filter_type) in enumerate(passes):
-        if i > 0:
-            logger.info("  Sleeping 10 min between passes to let API recover...")
-            time.sleep(600)
-        logger.info(f"\n[Pass: {prefix}] types={type_codes}, filter={filter_type}")
+            total_rows += stats["rows"]
+            all_errors.extend(stats.get("errors", []))
+            pass_stats.append(stats)
+    finally:
+        session.close()
+
+    expected_raw_files = [
+        raw_dir / f"{prefix}_fy{fy}.csv"
+        for prefix, _, _ in passes
+        for fy in range(effective_start, effective_end + 1)
+    ]
+    missing_raw_files = [
+        path.relative_to(root).as_posix() for path in expected_raw_files if not path.is_file()
+    ]
+    raw_files = []
+    for path in expected_raw_files:
+        if not path.is_file():
+            continue
+        digest = _sha256_file(path)
+        rows, columns, metadata_error = _csv_metadata(path)
+        relative = path.relative_to(root).as_posix()
+        if metadata_error is not None:
+            all_errors.append(f"invalid raw output: {relative}: {metadata_error}")
+        elif columns != MASTER_COLUMNS:
+            all_errors.append(f"invalid raw schema: {relative}")
+        raw_files.append(
+            {
+                "path": relative,
+                "sha256": digest,
+                "bytes": path.stat().st_size,
+                "rows": rows,
+                "columns": columns,
+            }
+        )
+    if missing_raw_files:
+        all_errors.extend(f"missing raw output: {path}" for path in missing_raw_files)
+
+    master_rows = 0
+    master_built = False
+    if build_master_output and not all_errors:
+        logger.info("\nBuilding grants master...")
         try:
-            stats = download_pass(
-                session,
-                prefix,
-                type_codes,
-                filter_type,
+            master_rows = build_master(
                 raw_dir,
-                force,
+                master_path,
                 logger,
-                fy_start=fy_start,
+                files=expected_raw_files,
             )
-        except Exception as e:
-            logger.error(f"  Unexpected error on {prefix}: {e}")
-            stats = {"prefix": prefix, "rows": 0, "errors": [str(e)]}
-
-        total_rows += stats["rows"]
-        all_errors.extend(stats.get("errors", []))
-        pass_stats.append(stats)
-
-    session.close()
-
-    logger.info("\nBuilding grants master...")
-    master_rows = build_master(raw_dir, master_path, logger)
+        except (OSError, UnicodeError, ValueError, RuntimeError) as exc:
+            all_errors.append(f"master build failed: {type(exc).__name__}: {exc}")
+        else:
+            master_built = master_path.is_file()
+            if not master_built:
+                all_errors.append("master output was not created")
 
     summary = {
+        "schema_version": "moneysweep.grants_download/v2",
+        "only_pass": only_pass,
+        "fy_start": effective_start,
+        "fy_end": effective_end,
         "raw_rows": total_rows,
         "master_rows": master_rows,
         "master_path": str(master_path),
+        "master_built": master_built,
         "raw_dir": str(raw_dir),
         "errors": all_errors,
         "passes": pass_stats,
+        "expected_raw_files": [path.relative_to(root).as_posix() for path in expected_raw_files],
+        "missing_raw_files": missing_raw_files,
+        "raw_files": raw_files,
     }
 
     logger.info("=" * 60)
@@ -640,14 +802,43 @@ def main() -> int:
         metavar="YEAR",
         help=f"Only download FY >= YEAR (e.g. 2020). Default: {START_FY}",
     )
+    parser.add_argument(
+        "--fy-end",
+        type=int,
+        metavar="YEAR",
+        help=f"Only download FY <= YEAR. Default: {END_FY}",
+    )
+    parser.add_argument(
+        "--skip-master",
+        action="store_true",
+        help="Write fiscal-year raw files without building a partial master.",
+    )
+    parser.add_argument(
+        "--summary-path",
+        type=Path,
+        help="Write the complete execution summary as JSON.",
+    )
     args = parser.parse_args()
 
-    summary = _run(force=args.force, only_pass=args.only_pass, fy_start=args.fy_start)
+    summary = _run(
+        force=args.force,
+        only_pass=args.only_pass,
+        fy_start=args.fy_start,
+        fy_end=args.fy_end,
+        build_master_output=not args.skip_master,
+    )
+    if args.summary_path is not None:
+        args.summary_path.parent.mkdir(parents=True, exist_ok=True)
+        args.summary_path.write_text(
+            json.dumps(summary, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
 
     print("\nGrants bulk download complete.")
     print(f"  Raw rows:    {summary['raw_rows']:,}")
     print(f"  Master rows: {summary['master_rows']:,}")
-    print(f"  Master path: {summary['master_path']}")
+    if summary.get("master_built"):
+        print(f"  Master path: {summary['master_path']}")
     if summary["errors"]:
         print(f"  Errors ({len(summary['errors'])}):")
         for err in summary["errors"]:

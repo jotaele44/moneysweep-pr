@@ -10,3 +10,8 @@ source_overrides:
   official_custodian: Puerto Rico Department of Justice
   legacy_notes_status: SUPERSEDED_BY_EXPLICIT_CUSTODIAN_METADATA
   provenance_basis: Executive Order OE-2019-031 registry custody; legislative chambers may publish supplementary records.
+- source_id: grants_gov
+  endpoint_url: https://api.usaspending.gov/api/v2/bulk_download/awards/
+  upstream_system: USAspending.gov
+  source_identity_status: HISTORICAL_ID_PRESERVED_ENDPOINT_CORRECTED
+  provenance_basis: The historical grants_gov source ID is retained, but scripts/download_grants.py acquires federal assistance awards from the USAspending bulk-download API.

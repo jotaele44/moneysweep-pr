@@ -1,14 +1,20 @@
 from __future__ import annotations
 
 import csv
+from datetime import date
 from pathlib import Path
 
 import pytest
 
 from tools.keyless_execution_plan import (
     DEFAULT_TIMEOUT_MINUTES,
+    GRANTS_PASSES,
+    GRANTS_SHARD_TIMEOUT_MINUTES,
+    GRANTS_SOURCE_ID,
     MAX_TIMEOUT_MINUTES,
+    build_grants_shard_plan,
     build_execution_plan,
+    current_fiscal_year,
     execution_timeout_minutes,
 )
 
@@ -50,6 +56,11 @@ def test_slow_sources_receive_bounded_overrides() -> None:
         {"source": "quick", "timeout_minutes": DEFAULT_TIMEOUT_MINUTES},
         {"source": "rdc_demandas_civiles", "timeout_minutes": 180},
     ]
+    assert plan["standard_keyless"] == [
+        {"source": "quick", "timeout_minutes": DEFAULT_TIMEOUT_MINUTES},
+        {"source": "rdc_demandas_civiles", "timeout_minutes": 180},
+    ]
+    assert plan["grants_shards"] == build_grants_shard_plan()
     assert plan["credential_gated"] == [
         {
             "source_id": "credentialed",
@@ -83,6 +94,45 @@ def test_plan_rejects_duplicate_or_unbound_source_rows() -> None:
         )
 
 
+def test_current_fiscal_year_changes_on_october_boundary() -> None:
+    assert current_fiscal_year(date(2026, 9, 30)) == 2026
+    assert current_fiscal_year(date(2026, 10, 1)) == 2027
+
+
+def test_grants_shard_plan_closes_source_year_arithmetic() -> None:
+    plan = build_grants_shard_plan(start_fy=2000, end_fy=2027, span=7)
+
+    assert len(plan) == 16
+    assert {item["pass_name"] for item in plan} == set(GRANTS_PASSES)
+    assert all(item["timeout_minutes"] == GRANTS_SHARD_TIMEOUT_MINUTES for item in plan)
+    cells = {
+        (item["pass_name"], fiscal_year)
+        for item in plan
+        for fiscal_year in range(item["fy_start"], item["fy_end"] + 1)
+    }
+    assert len(cells) == 4 * 28 == 112
+    assert cells == {
+        (pass_name, fiscal_year) for pass_name in GRANTS_PASSES for fiscal_year in range(2000, 2028)
+    }
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "error"),
+    [
+        ({"start_fy": True}, TypeError),
+        ({"end_fy": 0}, ValueError),
+        ({"start_fy": 2027, "end_fy": 2026}, ValueError),
+        ({"span": 0}, ValueError),
+        ({"span": 1.5}, TypeError),
+    ],
+)
+def test_grants_shard_plan_rejects_invalid_ranges(
+    kwargs: dict[str, object], error: type[Exception]
+) -> None:
+    with pytest.raises(error):
+        build_grants_shard_plan(**kwargs)  # type: ignore[arg-type]
+
+
 def test_repository_plan_partitions_the_full_automatable_denominator() -> None:
     with Path("reports/source_registry_status.csv").open(
         encoding="utf-8-sig", newline=""
@@ -108,6 +158,12 @@ def test_repository_plan_partitions_the_full_automatable_denominator() -> None:
 
     assert planned_ids == automatable_ids
     assert len(planned_ids) == 119
+    assert {item["source"] for item in plan["standard_keyless"]} == (
+        {item["source"] for item in plan["keyless"]} - {GRANTS_SOURCE_ID}
+    )
+    assert len(plan["keyless"]) == 107
+    assert len(plan["standard_keyless"]) == 106
+    assert plan["grants_shards"] == build_grants_shard_plan()
     assert overridden == {
         "grants_gov": MAX_TIMEOUT_MINUTES,
         "rdc_demandas_civiles": 180,
