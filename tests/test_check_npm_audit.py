@@ -94,4 +94,6 @@ def test_committed_allowlist_is_valid_and_unexpired():
 
     allowed, problems = load_allowlist(path, dt.date.today())
     assert problems == []
-    assert allowed
+    # The list may be empty (no known exceptions); what it must never hold is an entry that is
+    # malformed or past its expiry, and load_allowlist reports those as problems.
+    assert isinstance(allowed, dict)
