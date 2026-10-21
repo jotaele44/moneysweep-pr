@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+
 import pytest
 from fastapi import HTTPException
 
