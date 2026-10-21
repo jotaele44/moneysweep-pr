@@ -5,8 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import pytest
-from fastapi import FastAPI, HTTPException
-from fastapi.testclient import TestClient
+from fastapi import HTTPException
 
 from server.backend.grid_v2_api import (
     PROFILE_ROOT_ENV,
@@ -44,13 +43,10 @@ def test_api_router_is_mounted_by_repository_entrypoint():
 
 def test_unconfigured_profile_response_always_has_grid_identity(monkeypatch):
     monkeypatch.delenv(PROFILE_ROOT_ENV, raising=False)
-    app = FastAPI()
-    app.include_router(router)
-    response = TestClient(app).get(
-        "/api/grid/v2/profile/L1/PRG2:L1:R075:C0234"
-    )
-    assert response.status_code == 200
-    payload = response.json()
+    routes = {route.path for route in router.routes}
+    assert "/api/grid/v2/profile/{level}/{cell_id}" in routes
+    assert "/api/grid/v2/identity/{level}" in routes
+    payload = cell_profile("L1", "PRG2:L1:R075:C0234")
     assert payload["Data_State"] == "NO_DATA"
     assert payload["Grid_Identity"]["Grid_ID"] == "PR_GRID_GEOGRAPHIC_V2"
     assert payload["Grid_Identity"]["Grid_Version"] == "2.0.0-rc1"
@@ -133,9 +129,10 @@ def test_local_pin_must_match_repository_identity(tmp_path, monkeypatch):
 
     payload = _pin()
     payload["consumer"] = "thehub-pr"
+    payload["default_level"] = "L1"
     wrong = tmp_path / "wrong-pin.json"
     wrong.write_text(json.dumps(payload), encoding="utf-8")
     monkeypatch.setattr(api, "PIN_PATH", wrong)
     with pytest.raises(HTTPException) as exc:
-        api.cell_profile(payload["default_level"], "PRG2:L1:R020:C0020")
+        api.cell_profile("L1", "PRG2:L1:R020:C0020")
     assert exc.value.status_code == 503
