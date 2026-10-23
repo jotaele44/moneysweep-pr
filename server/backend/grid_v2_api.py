@@ -22,6 +22,7 @@ if str(SPATIAL) not in sys.path:
     sys.path.insert(0, str(SPATIAL))
 
 from pr_grid_v2_runtime import (  # noqa: E402
+    ALLOWED_LEVELS,
     GRID_ID,
     GRID_VERSION,
     GridV2PinError,
@@ -37,13 +38,21 @@ PIN_PATH = SPATIAL / "pr_grid_geographic_v2.pin.json"
 FEDERATION_MANIFEST = ROOT / "federation.json"
 PROFILE_ROOT_ENV = "PRII_GRID_V2_PROFILE_ROOT"
 MAX_PROFILE_BYTES = 25_000_000
+_PROFILE_READ_ERRORS = (
+    OSError,
+    UnicodeDecodeError,
+    json.JSONDecodeError,
+    ValueError,
+    TypeError,
+)
 
 
 def _local_repository() -> str:
     try:
         payload = json.loads(FEDERATION_MANIFEST.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise GridV2PinError(f"cannot read federation repository identity: {exc}") from exc
+        message = f"cannot read federation repository identity: {exc}"
+        raise GridV2PinError(message) from exc
     full_name = payload.get("repository_full_name")
     if not isinstance(full_name, str) or "/" not in full_name:
         raise GridV2PinError("federation.json lacks repository_full_name")
@@ -51,6 +60,14 @@ def _local_repository() -> str:
     if not slug:
         raise GridV2PinError("invalid repository_full_name")
     return slug
+
+
+def _profile_file_stem(level: str) -> str:
+    """Return the allow-listed level constant so request text never reaches a path."""
+    for allowed in ALLOWED_LEVELS:
+        if allowed == level:
+            return allowed
+    raise GridV2PinError(f"unsupported grid level {level!r}")
 
 
 def _validated_pin(*, level: str):
@@ -115,6 +132,7 @@ def cell_profile(level: str, cell_id: str) -> dict[str, Any]:
     """Return one domain-owned Cell_Profile with mandatory immutable grid identity."""
     try:
         selected_level = validate_level(level)
+        file_stem = _profile_file_stem(selected_level)
         validated_cell = validate_cell_id(cell_id, level=selected_level)
         pin = _validated_pin(level=selected_level)
         consumer = pin.consumer
@@ -135,7 +153,7 @@ def cell_profile(level: str, cell_id: str) -> dict[str, Any]:
             storage_state="NOT_CONFIGURED",
         )
 
-    path = Path(root_value) / consumer / f"{selected_level}.jsonl"
+    path = Path(root_value) / consumer / f"{file_stem}.jsonl"
     receipt_path = path.with_suffix(".receipt.json")
     if not path.exists() or not receipt_path.exists():
         return _no_data_response(
@@ -185,7 +203,7 @@ def cell_profile(level: str, cell_id: str) -> dict[str, Any]:
                 cell_id=validated_cell,
             )
             found = dict(row)
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError, TypeError) as exc:
+    except _PROFILE_READ_ERRORS as exc:
         raise HTTPException(503, "profile validation BLOCKED: " + str(exc)) from exc
 
     if found is None:
@@ -207,14 +225,13 @@ def grid_identity_response(level: str) -> dict[str, Any]:
     try:
         selected_level = validate_level(level)
         pin = _validated_pin(level=selected_level)
+        handoff = f"/grid/{GRID_ID}/{GRID_VERSION}/{selected_level}/<Cell_ID>"
         return {
             "Grid_Identity": grid_identity(pin, level=selected_level),
             "Repository": pin.consumer,
             "Geometry_Included": False,
             "Geometry_Authority": "spiderweb-pr",
-            "Handoff_Template": (
-                f"/grid/{GRID_ID}/{GRID_VERSION}/{selected_level}/<Cell_ID>"
-            ),
+            "Handoff_Template": handoff,
         }
     except GridV2PinError as exc:
         raise HTTPException(

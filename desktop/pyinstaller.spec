@@ -96,6 +96,18 @@ for relative in producer_scripts:
         destination = Path(relative).parent.as_posix()
         datas.append((str(source), destination))
 
+# PR Grid V2 Cell_Profile API (server/backend/grid_v2_api.py): it resolves its pin
+# and repository identity relative to the bundle root and imports the shared
+# runtime from federation/spatial via sys.path, which PyInstaller cannot follow.
+datas += [
+    (str(REPO_ROOT / "federation.json"), "."),
+    (
+        str(REPO_ROOT / "federation" / "spatial" / "pr_grid_geographic_v2.pin.json"),
+        "federation/spatial",
+    ),
+]
+GRID_V2_SPATIAL = str(REPO_ROOT / "federation" / "spatial")
+
 hiddenimports = sorted(
     set(
         collect_submodules("moneysweep")
@@ -117,6 +129,8 @@ hiddenimports = sorted(
             "desktop.secrets",
             "server.backend.desktop_app",
             "server.backend.materialization",
+            "server.backend.grid_v2_api",
+            "pr_grid_v2_runtime",
             "prii_desktop",
             "prii_desktop.launcher",
             "prii_desktop.appserver",
@@ -128,7 +142,7 @@ hiddenimports = sorted(
 
 a = Analysis(
     [str(REPO_ROOT / "desktop" / "launch.py")],
-    pathex=[str(REPO_ROOT)],
+    pathex=[str(REPO_ROOT), GRID_V2_SPATIAL],
     datas=datas,
     hiddenimports=hiddenimports,
     noarchive=False,

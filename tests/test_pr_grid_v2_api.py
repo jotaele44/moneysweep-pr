@@ -8,12 +8,13 @@ import json
 import pytest
 from fastapi import HTTPException
 
-from server.backend.grid_v2_api import (
-    PROFILE_ROOT_ENV,
-    ROOT,
-    cell_profile,
-    router,
-)
+# isort: split
+# Consumers classify ``server`` differently (first- vs third-party), and this file
+# must stay byte-identical across them, so keep it in its own import block.
+import server.backend.grid_v2_api as api
+
+PROFILE_ROOT_ENV = api.PROFILE_ROOT_ENV
+ROOT = api.ROOT
 
 
 def _repo_slug() -> str:
@@ -22,11 +23,8 @@ def _repo_slug() -> str:
 
 
 def _pin() -> dict:
-    return json.loads(
-        (ROOT / "federation/spatial/pr_grid_geographic_v2.pin.json").read_text(
-            encoding="utf-8"
-        )
-    )
+    pin_path = ROOT / "federation/spatial/pr_grid_geographic_v2.pin.json"
+    return json.loads(pin_path.read_text(encoding="utf-8"))
 
 
 def test_api_router_is_mounted_by_repository_entrypoint():
@@ -44,10 +42,10 @@ def test_api_router_is_mounted_by_repository_entrypoint():
 
 def test_unconfigured_profile_response_always_has_grid_identity(monkeypatch):
     monkeypatch.delenv(PROFILE_ROOT_ENV, raising=False)
-    routes = {route.path for route in router.routes}
+    routes = {route.path for route in api.router.routes}
     assert "/api/grid/v2/profile/{level}/{cell_id}" in routes
     assert "/api/grid/v2/identity/{level}" in routes
-    payload = cell_profile("L1", "PRG2:L1:R075:C0234")
+    payload = api.cell_profile("L1", "PRG2:L1:R075:C0234")
     assert payload["Data_State"] == "NO_DATA"
     assert payload["Grid_Identity"]["Grid_ID"] == "PR_GRID_GEOGRAPHIC_V2"
     assert payload["Grid_Identity"]["Grid_Version"] == "2.0.0-rc1"
@@ -85,9 +83,7 @@ def test_receipt_verified_profile_is_served(monkeypatch, tmp_path):
         "Coverage_State": "VERIFIED",
         "Record_Count": 0,
         "Geometry_Included": False,
-        "Grid_Deep_Link": (
-            f"/grid/PR_GRID_GEOGRAPHIC_V2/2.0.0-rc1/{level}/{cell}"
-        ),
+        "Grid_Deep_Link": f"/grid/PR_GRID_GEOGRAPHIC_V2/2.0.0-rc1/{level}/{cell}",
     }
 
     directory = tmp_path / consumer
@@ -113,7 +109,7 @@ def test_receipt_verified_profile_is_served(monkeypatch, tmp_path):
     )
 
     monkeypatch.setenv(PROFILE_ROOT_ENV, str(tmp_path))
-    result = cell_profile(level, cell)
+    result = api.cell_profile(level, cell)
     assert result["Grid_Identity"] == identity
     assert result["Data_State"] == "ZERO_RECORDS"
     assert result["Profile_Storage_State"] == "CONFIGURED"
@@ -121,13 +117,25 @@ def test_receipt_verified_profile_is_served(monkeypatch, tmp_path):
 
 def test_wrong_grid_level_fails_closed():
     with pytest.raises(HTTPException) as exc:
-        cell_profile("L4", "PRG2:L1:R075:C0234")
+        api.cell_profile("L4", "PRG2:L1:R075:C0234")
     assert exc.value.status_code == 503
 
 
-def test_local_pin_must_match_repository_identity(tmp_path, monkeypatch):
-    import server.backend.grid_v2_api as api
+@pytest.mark.parametrize("level", ["../L1", "L1/..", "l1", ""])
+def test_untrusted_level_text_never_reaches_profile_path(level, monkeypatch, tmp_path):
+    monkeypatch.setenv(PROFILE_ROOT_ENV, str(tmp_path))
+    with pytest.raises(HTTPException) as exc:
+        api.cell_profile(level, "PRG2:L1:R075:C0234")
+    assert exc.value.status_code == 503
+    assert [api._profile_file_stem(name) for name in ("L0", "L1", "L2", "L3")] == [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+    ]
 
+
+def test_local_pin_must_match_repository_identity(tmp_path, monkeypatch):
     payload = _pin()
     payload["consumer"] = "thehub-pr"
     payload["default_level"] = "L1"
