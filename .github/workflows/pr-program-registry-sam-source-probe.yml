@@ -3,7 +3,9 @@ on:
   pull_request:
     paths:
       - scripts/acquire_sam_public_snapshot.py
+      - scripts/reconcile_sam_public_history.py
       - tests/test_sam_public_snapshot_probe.py
+      - tests/test_sam_public_history.py
       - .github/workflows/pr-program-registry-sam-source-probe.yml
   workflow_dispatch:
 permissions:
@@ -18,11 +20,16 @@ jobs:
         with:
           python-version: '3.11'
       - name: Offline acquisition-contract tests
-        run: python3 -m unittest discover -s tests -p test_sam_public_snapshot_probe.py -v
+        run: python3 -m unittest discover -s tests -p 'test_sam_public_*.py' -v
       - name: Acquire and freeze exact GSA PUBLIC_CURRENT bytes
         id: acquire
         continue-on-error: true
         run: python3 scripts/acquire_sam_public_snapshot.py --outdir outputs/sam_source_probe
+      - name: Reconcile exact August 27 versus current SAM membership
+        id: reconcile
+        continue-on-error: true
+        if: steps.acquire.outcome == 'success'
+        run: python3 scripts/reconcile_sam_public_history.py --outdir outputs/sam_source_probe
       - name: Upload raw source and receipt
         if: always()
         uses: actions/upload-artifact@v4
@@ -32,5 +39,5 @@ jobs:
           if-no-files-found: error
           retention-days: 30
       - name: Fail closed if acquisition or schema checks failed
-        if: steps.acquire.outcome != 'success'
+        if: steps.acquire.outcome != 'success' || steps.reconcile.outcome != 'success'
         run: exit 1
