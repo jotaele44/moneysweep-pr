@@ -1,0 +1,14 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> moneysweep-pr-dashboard@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.11 /workspace/scratch/c3a52f35ef78/moneysweep-pr/dashboard
+
+
+ Test Files  5 passed (5)
+      Tests  77 passed (77)
+   Start at  20:35:52
+   Duration  8.15s (transform 1.82s, setup 2.19s, import 4.34s, tests 2.35s, environment 18.62s)
+
