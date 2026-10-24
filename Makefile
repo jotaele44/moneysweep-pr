@@ -57,9 +57,16 @@ prebuilt-dashboard-check:  ## Fail if the committed dashboard bundle is stale or
 	python3 scripts/build_prebuilt_dashboard.py --check
 
 lock-check:  ## Fail if requirements.lock is stale vs requirements.in (CI: lockfile.yml)
-	uv pip compile requirements.in --universal --python-version $(PYTHON_BASELINE) -o - \
-		| diff -u requirements.lock - \
-		&& echo "requirements.lock is up to date"
+	@set -eu; \
+	tmp_dir=$$(mktemp -d); \
+	trap 'rm -rf "$$tmp_dir"' EXIT HUP INT TERM; \
+	cp requirements.lock "$$tmp_dir/requirements.lock"; \
+	uv pip compile requirements.in --universal --python-version $(PYTHON_BASELINE) \
+		-o "$$tmp_dir/requirements.lock"; \
+	sed '1,2d' requirements.lock > "$$tmp_dir/expected"; \
+	sed '1,2d' "$$tmp_dir/requirements.lock" > "$$tmp_dir/actual"; \
+	diff -u "$$tmp_dir/expected" "$$tmp_dir/actual"; \
+	echo "requirements.lock is up to date"
 
 precommit:  ## Run every pre-commit hook over the whole tree (CI: pre-commit.yml)
 	pre-commit run --all-files
