@@ -183,6 +183,47 @@ skills:
     review_queue_policy: required_for_ambiguity
 
   - schema_version: prii_skill_contract_v1
+    skill_id: moneysweep-ingest-entity-network
+    owner_repo: jotaele44/moneysweep-pr
+    federation_role: public_money_intelligence_node
+    trigger_intents:
+      - "frozen ecosystem/network PDF/ZIP ingestion and MII-style source reconciliation"
+    allowed_modes: [read_only, offline_write]
+    default_mode: read_only
+    command_ids: []
+    local_scripts: [scripts/import_mii_v03_reference.py]
+    reads:
+      - data/reference/entity_network/mii_v0_3/source_manifest.json
+      - data/reference/entity_network/mii_v0_3/coverage_ledger.json
+      - data/reference/entity_network/mii_v0_3/exhaustion_ledger.json
+      - data/reference/entity_network/mii_v0_3/contradictions.json
+      - data/reference/entity_network/mii_v0_3/reconciliation.json
+      - data/reference/entity_network/mii_v0_3/source_bindings.json
+    writes:
+      - data/staging/entity_network/mii_v0_3/
+    outputs:
+      - "frozen source verification, provisional source rows, reconciliation, contradictions, source bindings"
+    stop_conditions:
+      - "source or archive-member hash mismatch"
+      - "parser or denominator drift"
+      - "synthetic inaccessible row requested"
+      - "name-only or source-local evidence promotion requested"
+      - "source-vector scope mismatch"
+    evidence_requirements:
+      - "outer SHA-256 plus archive member path, uncompressed size, and SHA-256"
+      - "source/retained/residue arithmetic and output hashes"
+      - "full contradiction and blocked-scope preservation"
+    boundary_owner: moneysweep-pr
+    forbidden_operations:
+      - "promoting MII names, evidence classes, sectors, or count equality to canonical identity"
+      - "synthesizing missing node or edge rows"
+      - "claiming source exhaustion from registry presence or materialization alone"
+    synthetic_data_policy: reject_in_production
+    provenance_policy: required
+    confidence_policy: required_when_inferred
+    review_queue_policy: required_for_ambiguity
+
+  - schema_version: prii_skill_contract_v1
     skill_id: moneysweep-audit-financial-gaps
     owner_repo: jotaele44/moneysweep-pr
     federation_role: public_money_intelligence_node
