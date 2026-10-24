@@ -17,12 +17,15 @@ edges:
     - moneysweep-resolve-entities
     - moneysweep-process-centinelas-handoff
     - moneysweep-build-federation-export
+    - moneysweep-certify-public-finance-release
   moneysweep-plan-source-updates:
     - moneysweep-recover-source-coverage
     - moneysweep-ingest-manual-source
   moneysweep-build-federation-export:
     - prii-check-producer-contract
     - moneysweep-assess-promotion-readiness
+  moneysweep-assess-promotion-readiness:
+    - moneysweep-certify-public-finance-release
 
 invariants:
   - id: preflight-gates-execution
@@ -34,3 +37,6 @@ invariants:
   - id: promotion-blocked-by-manifest
     rule: "moneysweep-assess-promotion-readiness cannot return pass while federation.json federation_readiness_gate.ready_for_hub_live_execution is false"
     applies_to: [moneysweep-assess-promotion-readiness]
+  - id: final-release-zero-residue
+    rule: "moneysweep-certify-public-finance-release cannot issue full certification while any required production, federation, native, full-SAM, source-revision, or provenance gate is not PASS"
+    applies_to: [moneysweep-certify-public-finance-release]
