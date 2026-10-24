@@ -1,0 +1,36 @@
+name: PR Program Registry - Public SAM Source Probe
+on:
+  pull_request:
+    paths:
+      - scripts/acquire_sam_public_snapshot.py
+      - tests/test_sam_public_snapshot_probe.py
+      - .github/workflows/pr-program-registry-sam-source-probe.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire-sam-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Offline acquisition-contract tests
+        run: python3 -m unittest discover -s tests -p test_sam_public_snapshot_probe.py -v
+      - name: Acquire and freeze exact GSA PUBLIC_CURRENT bytes
+        id: acquire
+        continue-on-error: true
+        run: python3 scripts/acquire_sam_public_snapshot.py --outdir outputs/sam_source_probe
+      - name: Upload raw source and receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sam-source-probe
+          path: outputs/sam_source_probe/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Fail closed if acquisition or schema checks failed
+        if: steps.acquire.outcome != 'success'
+        run: exit 1
