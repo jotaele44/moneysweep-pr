@@ -1,0 +1,34 @@
+{
+  "schema_version": "pr_public_program_federation_candidate_v1",
+  "namespace": "pr_public_program",
+  "historical_seed_sha256": "7244a9b8a18dfc3a07ffb238302d49783984ca7586ad1daf3be736011e97ea6f",
+  "predecessor_checkpoint_sha256": "1135976f996478ca8b9008ff082248f4e478fb35b632395a3be98ef994bd8704",
+  "mode": "CANDIDATE_NOT_IDENTITY",
+  "canonical_promotion_enabled": false,
+  "production_consumer_enabled": false,
+  "unresolved_owner_policy": "REVIEW_NO_DEFAULT",
+  "eligible_activity_policy": "EVIDENCE_REQUIRED",
+  "forbidden_automatic_identity_proofs": [
+    "NAME_ONLY",
+    "NORMALIZED_NAME_ONLY",
+    "COUNT_EQUALITY",
+    "PROXIMITY_ONLY",
+    "SOURCE_ABSENCE"
+  ],
+  "required_proofs": [
+    "frozen_source_bytes",
+    "stable_identifier_or_authoritative_binding",
+    "confirmed_Puerto_Rico_nexus",
+    "adjudicated_type_and_lineage",
+    "singular_domain_custodian",
+    "full_source_denominator",
+    "independent_holdout",
+    "lockstep"
+  ],
+  "source_state": "BLOCKED_UNIVERSE_INCOMPLETE",
+  "certification_state": "NOT_ISSUED",
+  "role": "CANDIDATE_INGEST_PRODUCER",
+  "owner_scope": "PUBLIC_FINANCIAL_PROGRAMS_ONLY",
+  "source_extract_required": "SAM_ALL_PLUS_USASPENDING_PR_AWARD_NEXUS",
+  "may_mint_program_id": false
+}
