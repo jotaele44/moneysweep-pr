@@ -1,0 +1,21 @@
+{
+  "schema": "federation-offline-adapter/v1",
+  "repository": "jotaele44/moneysweep-pr",
+  "frontend": "dashboard",
+  "sharedSourceAuthority": "jotaele44/thehub-pr",
+  "sourceFiles": {
+    "vite-offline.mjs": "70d2d11d1b6893443c3c05c70ce964318b57784078a882b0a7c8bd9bb7893595",
+    "offline-client.js": "67908ab50cc5482520f01349b8eef7f21cafa9e1fbc88b38a4aea565e8bb1a5e",
+    "worker-template.js": "f8374866f8c2b353059a45094af12b0bc56dac74adb1b3c969781e348a96f1c0"
+  },
+  "scope": "HTTP app-shell only; domain data and sync separately qualified",
+  "notPrecached": [
+    ".rsync-tmp/**",
+    "sw.js",
+    "offline-manifest.json",
+    "offline-receipts.json",
+    "*.map"
+  ],
+  "dataGate": "OPEN",
+  "synchronizationGate": "OPEN"
+}

@@ -1,0 +1,7 @@
+viewport 1440
+shell ready 1440
+viewport 393
+shell ready 393
+viewport 430
+shell ready 430
+{"appId":"moneysweep-pr","assets":23,"results":[{"status":"PASS","checks":["evicted-asset-detected","verified-online-repair"]},{"width":1440,"status":"PASS","checks":["cold-reopen","all-shell-assets","local-storage-survival","api-not-cached","offline-api-fails","deep-link-preserved","reconnect"]},{"status":"PASS","checks":["evicted-asset-detected","verified-online-repair"]},{"width":393,"status":"PASS","checks":["cold-reopen","all-shell-assets","local-storage-survival","api-not-cached","offline-api-fails","deep-link-preserved","reconnect"]},{"status":"PASS","checks":["evicted-asset-detected","verified-online-repair"]},{"width":430,"status":"PASS","checks":["cold-reopen","all-shell-assets","local-storage-survival","api-not-cached","offline-api-fails","deep-link-preserved","reconnect"]},{"status":"PASS","checks":["waiting-update-preserves-open-document","successor-cold-offline-launch","old-cache-cleanup","other-app-cache-preserved"]},{"status":"PASS","checks":["corrupt-asset-rejects-install","partial-cache-removed"]}]}
