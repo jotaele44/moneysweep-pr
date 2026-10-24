@@ -1,0 +1,28 @@
+version: "4.0.0-rc1"
+scope_id: "V4_MIGRATION_SCOPE_001"
+source_denominator: 167
+
+inclusion_rule:
+  mapping_state: MAPPED
+  included_count: 165
+
+exclusions:
+  - source_id: prasa_completed_projects_ppp
+    state: BLOCKED
+    reason: "Registered PRASA source is routed through a Ports Authority parser/output; source PDF is not present in the repository."
+    contradiction_id: V01-SOURCE-003
+  - source_id: prasa_consulting_engineer_ppp
+    state: BLOCKED
+    reason: "Registered PRASA source is routed through a Ports Authority parser/output; FY2024 CER_Final.pdf is not present and is not discovered by the current parser."
+    contradiction_id: V01-SOURCE-003
+
+invariants:
+  - "167 = 165 INCLUDED + 2 BLOCKED_EXCLUDED"
+  - "Excluded sources remain in the global source denominator."
+  - "Blocked exclusion is not equivalent to source absence."
+  - "No migration or certification claim may include an excluded source."
+  - "An excluded source may enter scope only after its contradiction is resolved and its mapping passes the same gates."
+
+certification:
+  global_domain_conformance: OPEN
+  bounded_migration_scope: CANDIDATE_PASS_PENDING_TEST_EXECUTION
