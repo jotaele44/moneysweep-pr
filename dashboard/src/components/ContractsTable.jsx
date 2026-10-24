@@ -78,7 +78,7 @@ export default function ContractsTable() {
                   tabIndex={0}
                   onClick={() => setOpen(c)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(c) } }}
-                  className="cursor-pointer border-border hover:bg-muted/50 focus:bg-muted/50 focus:outline-none"
+                  className="cursor-pointer border-border hover:bg-muted/50 focus:bg-muted/50 focus:outline-hidden"
                 >
                   <TableCell className="max-w-[160px] truncate text-xs text-foreground">{c.contractNumber || c.contractId}</TableCell>
                   <TableCell className="max-w-[160px] truncate text-xs text-foreground/80">{c.awardingName || '—'}</TableCell>

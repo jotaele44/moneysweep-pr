@@ -26,6 +26,17 @@ npm run dev
 Open http://localhost:5173. (`VITE_API_BASE` overrides the API base; default
 `http://localhost:8000`.)
 
+## Styling
+
+Tailwind CSS 4, through the `@tailwindcss/vite` plugin. There is no
+`tailwind.config.js` or PostCSS config: the design tokens (colours, radius,
+fonts) and the files Tailwind scans for class names are declared in
+`src/index.css`. Browsers need Safari 16.4, Chrome 111 or Firefox 128 or newer;
+the desktop app's WebView requirements are in `desktop/README.md`.
+
+`npm run build:export` (`VITE_OFFLINE=1`) writes the single-file offline export.
+Its inlining step is `scripts/inline-single-file.mjs`, covered by a unit test.
+
 ## What it shows
 - **Contracts** — joined awarding/contractor names + municipality, filterable by
   agency; detail sheet per contract. *Award amounts are blank in the frozen

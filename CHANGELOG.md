@@ -46,6 +46,24 @@ A bump to the **federation export** version is what the release-tagging workflow
   `package-lock.json` changes only `"dev": true` flags and the root manifest; the
   prebuilt dashboard manifest was regenerated and the bundle assets are
   byte-identical.
+- **Dashboard moves from Tailwind CSS 3 to 4, which empties the npm-audit
+  allow-list.** Tailwind 4 runs as a Vite plugin (`@tailwindcss/vite`), so
+  `postcss`, `autoprefixer`, `tailwind.config.js` and `postcss.config.js` are
+  gone: the design tokens, the files Tailwind scans (the same globs the v3
+  config used) and the class-based dark mode now live in `dashboard/src/index.css`,
+  and `tailwindcss-animate` is replaced by the CSS-only `tw-animate-css`.
+  `vite-plugin-singlefile` is replaced by `dashboard/scripts/inline-single-file.mjs`
+  (its `micromatch` → `braces` dependency has no patched release); the offline
+  export it writes is byte-identical to the old one, and it has its own unit
+  tests. With both gone, `braces` GHSA-vfj7-8cjw-p6xm and `postcss-selector-parser`
+  GHSA-rj75-hqrm-r3gf no longer appear, `dashboard/audit-allowlist.json` is empty,
+  and `npm audit` reports no vulnerabilities at any severity. The prebuilt
+  dashboard bundle was rebuilt. Against the Tailwind 3 build, the shipped bundle
+  served by the real desktop backend shows no pixel, layout or focus-ring
+  difference across all 11 tabs plus hover, sheet, select and keyboard-focus
+  states at 1280×800 and 390×844. **Browser floor:** Tailwind 4 needs
+  Safari/WebKit 16.4, Chrome 111 or Firefox 128; see "WebView requirements" in
+  `desktop/README.md`.
 
 ### Fixed
 - **Cleared the checks #656 merged red.** `mypy` (`audit_asg_emergency_identity_coverage`

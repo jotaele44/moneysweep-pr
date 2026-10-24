@@ -123,6 +123,24 @@ The app then starts one local same-origin FastAPI server on a free loopback port
 and opens the dashboard in a native window. The browser fallback remains
 available through the shared `prii_desktop` launcher.
 
+## WebView requirements
+
+The dashboard is styled with Tailwind CSS 4, which needs a web engine at or above
+Safari/WebKit 16.4, Chrome/Chromium 111 or Firefox 128 (it relies on `@property`,
+`color-mix()` and cascade layers). The native window uses the operating system's
+engine, so the floor applies to the machine, not to the app bundle:
+
+- **macOS** renders in the system WKWebView, which is the system WebKit. macOS 13.3
+  and later include WebKit 16.4; on macOS 11 and 12 (the app declares 11.0 as its
+  minimum) it arrives with Safari updates, so keep Safari current there.
+- **Windows** renders in Microsoft Edge WebView2 (Chromium), whose Evergreen runtime
+  updates itself and is well above the floor.
+- **Linux** renders in whichever WebKitGTK or Qt WebEngine build pywebview finds;
+  check that it meets the floor.
+
+Below the floor the page still loads but styling degrades. For example a
+translucent colour such as `bg-primary/10` falls back to its opaque base colour.
+
 ## Data Sources tab
 
 The standalone desktop composition adds a **Data Sources** dashboard tab.
