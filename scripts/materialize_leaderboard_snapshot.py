@@ -68,7 +68,7 @@ def _git_head() -> str:
 
 
 def _runtime_manifest() -> dict:
-    files = []
+    files: list[dict[str, object]] = []
     for path in RUNTIME_FILES:
         if not path.exists():
             files.append({"path": str(path.relative_to(ROOT)), "state": "MISSING"})

@@ -15,14 +15,14 @@
           "server/backend/materialization_security.py"
         ],
         "endpoints": [
-          "GET /status",
-          "GET /sources",
-          "GET /credentials",
-          "PUT /credentials/{key_name}",
-          "DELETE /credentials/{key_name}",
-          "POST /offline/upload",
-          "POST /offline/{source_id}/run",
-          "POST /api/run"
+          "GET /materialization/status",
+          "GET /materialization/sources",
+          "GET /materialization/credentials",
+          "PUT /materialization/credentials/{key_name}",
+          "DELETE /materialization/credentials/{key_name}",
+          "POST /materialization/offline/upload",
+          "POST /materialization/offline/{source_id}/run",
+          "POST /materialization/api/run"
         ],
         "symbols": [
           "desktop/secrets.py:activated_credentials",
