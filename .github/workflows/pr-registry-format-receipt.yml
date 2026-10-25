@@ -1,0 +1,39 @@
+name: PR Registry Formatting Evidence
+on:
+  pull_request:
+    paths:
+      - scripts/acquire_sam_public_snapshot.py
+      - scripts/reconcile_sam_public_history.py
+      - tests/test_sam_public_snapshot_probe.py
+      - tests/test_sam_public_history.py
+      - .github/workflows/pr-registry-format-receipt.yml
+permissions:
+  contents: read
+jobs:
+  format-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact repository formatter
+        run: python -m pip install ruff==0.16.5
+      - name: Build formatted copies without committing
+        run: |
+          ruff check --fix scripts/acquire_sam_public_snapshot.py scripts/reconcile_sam_public_history.py tests/test_sam_public_snapshot_probe.py tests/test_sam_public_history.py
+          ruff format scripts/acquire_sam_public_snapshot.py scripts/reconcile_sam_public_history.py tests/test_sam_public_snapshot_probe.py tests/test_sam_public_history.py
+          ruff check scripts/acquire_sam_public_snapshot.py scripts/reconcile_sam_public_history.py tests/test_sam_public_snapshot_probe.py tests/test_sam_public_history.py
+          ruff format --check scripts/acquire_sam_public_snapshot.py scripts/reconcile_sam_public_history.py tests/test_sam_public_snapshot_probe.py tests/test_sam_public_history.py
+      - name: Upload exact formatted candidate files
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-registry-formatted-sources
+          path: |
+            scripts/acquire_sam_public_snapshot.py
+            scripts/reconcile_sam_public_history.py
+            tests/test_sam_public_snapshot_probe.py
+            tests/test_sam_public_history.py
+          retention-days: 30
+          if-no-files-found: error
