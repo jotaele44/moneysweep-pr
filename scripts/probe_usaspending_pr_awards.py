@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bounded public USAspending FY2026 PR award-location probe.
+"""Bounded public USAspending FY2026 PR grant-location probe.
 
 This preserves API bytes, does NOT assert completeness, program identity, or
 equivalence of recipient geography and place-of-performance geography.
@@ -42,6 +42,7 @@ def request_body(scope: str) -> bytes:
         "filters": {
             SCOPES[scope]: [{"country": "USA", "state": "PR"}],
             "time_period": PERIOD,
+            "award_type_codes": ["02", "03", "04", "05"],
         },
         "fields": FIELDS,
         "sort": "Award Amount",
@@ -134,7 +135,7 @@ def main(output: Path) -> int:
         "time_period": PERIOD,
         "authority": "USAspending_API_v2",
         "evidence_class": "AWARD_LOCATION_DISCOVERY_NOT_CANONICAL_PR_PROGRAM",
-        "scope": "FY2026_AWARDS_PAGE1_ONLY_NO_SUBAWARDS",
+        "scope": "FY2026_GRANTS_PAGE1_ONLY_NO_SUBAWARDS",
         "source_universe_complete": False,
         "pr_program_identity_complete": False,
         "certification": "WITHHELD",
