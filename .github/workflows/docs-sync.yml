@@ -1,0 +1,62 @@
+name: docs-sync
+
+# Rendered from thehub-pr/federation-templates/baseline/docs-sync.yml.
+# Edit the template there and re-render (tools/render_federation_templates.py);
+# do not hand-edit this file — template-drift.yml fails the build if you do.
+#
+# Fails a pull request that leaves documentation describing this repo untrue: a
+# change to paths a doc is declared to cover without touching that doc, or one
+# that leaves a doc pointing at a path that no longer exists. The rules live in
+# tools/check_docs_sync.py and this repo's .federation/docs-sync.json. It is the
+# same script pre-commit and the Claude Code Stop hook run, so a local pass and a
+# CI pass mean the same thing — which matters because Actions has been down
+# before and "local verification" stood in.
+#
+# No `paths:` filter, on purpose. A check marked required has to report on every
+# PR; skipping it for a docs-only change would leave that PR waiting forever on a
+# status that never arrives.
+#
+# Failing here does not by itself stop a merge. That needs `docs-sync` marked as
+# a required status check in this repo's branch protection or ruleset (ADR 0004
+# calls a gate without one PROVISIONAL). Repo settings are outside what a
+# template can set, so someone with admin rights has to do it once per repo.
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-sync-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs-sync:
+    name: docs-sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # the diff needs the merge base, not just the tip
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Check that documentation still describes the change
+        if: github.event_name == 'pull_request'
+        env:
+          # Through the environment, never interpolated into the script: the PR
+          # description and author are text somebody else controls.
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python tools/check_docs_sync.py --base "$BASE_SHA" --head "$HEAD_SHA"
+
+      - name: Validate the manifest (manual runs)
+        if: github.event_name != 'pull_request'
+        run: python tools/check_docs_sync.py --validate

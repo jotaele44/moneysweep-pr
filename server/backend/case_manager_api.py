@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import ipaddress
 import os
 from pathlib import Path
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from moneysweep.case_manager.ids import deterministic_id
@@ -32,7 +33,22 @@ ROOT = Path(__file__).resolve().parents[2]
 DATABASE_PATH = Path(os.environ.get("MONEYSWEEP_CASE_DB", ROOT / "data" / "case_manager.sqlite3"))
 MIGRATION_PATH = ROOT / "migrations" / "001_case_manager_v1.sql"
 
-router = APIRouter(prefix="/cases", tags=["case-manager"])
+
+def _require_local_request(request: Request) -> None:
+    host = request.client.host if request.client else ""
+    try:
+        allowed = ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        allowed = host == "testclient"
+    if not allowed:
+        raise HTTPException(status_code=403, detail="case manager is local-only")
+
+
+router = APIRouter(
+    prefix="/cases",
+    tags=["case-manager"],
+    dependencies=[Depends(_require_local_request)],
+)
 _repository: SQLiteCaseManagerRepository | None = None
 
 

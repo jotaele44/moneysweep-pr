@@ -112,6 +112,7 @@ def test_unresolved_or_excluded_residue_blocks_certification():
     snapshot = _snapshot()
     snapshot["accounting"]["unresolvedRecords"] = 1
     from server.backend.leaderboard_history import snapshot_sha256
+
     snapshot["snapshotSha256"] = snapshot_sha256(snapshot)
     assert "accounting.unresolvedRecords" in certification_errors(snapshot, _scope())
 
@@ -127,6 +128,7 @@ def test_name_only_identity_and_currency_drift_block_certification():
     snapshot["rows"][0]["entityResolutionState"] = "NAME_ONLY"
     snapshot["rows"][0]["currency"] = "EUR"
     from server.backend.leaderboard_history import snapshot_sha256
+
     snapshot["snapshotSha256"] = snapshot_sha256(snapshot)
     errors = certification_errors(snapshot, _scope())
     assert "row.entityResolutionState" in errors
@@ -138,5 +140,27 @@ def test_category_outside_scope_cannot_be_certified():
     snapshot = _snapshot()
     snapshot["categoryId"] = "contract_award"
     from server.backend.leaderboard_history import snapshot_sha256
+
     snapshot["snapshotSha256"] = snapshot_sha256(snapshot)
     assert "scope.category" in certification_errors(snapshot, _scope())
+
+
+@pytest.mark.unit
+def test_explicit_bounded_source_native_provisional_state_is_certifiable():
+    snapshot = _snapshot()
+    snapshot["certificationState"] = "PROVISIONAL_BOUNDED_SOURCE_NATIVE"
+    from server.backend.leaderboard_history import snapshot_sha256
+
+    snapshot["snapshotSha256"] = snapshot_sha256(snapshot)
+    errors = certification_errors(snapshot, _scope())
+    assert "certificationState.input" not in errors
+
+
+@pytest.mark.unit
+def test_unknown_provisional_variant_fails_closed():
+    snapshot = _snapshot()
+    snapshot["certificationState"] = "PROVISIONAL_UNDECLARED_VARIANT"
+    from server.backend.leaderboard_history import snapshot_sha256
+
+    snapshot["snapshotSha256"] = snapshot_sha256(snapshot)
+    assert "certificationState.input" in certification_errors(snapshot, _scope())

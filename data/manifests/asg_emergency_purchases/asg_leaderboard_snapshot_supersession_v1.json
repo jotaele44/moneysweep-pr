@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "moneysweep.leaderboard-asg-snapshot-supersession/v1",
+  "state": "FROZEN",
+  "terminalProducerCommit": "e963f4258a78c9b30427df7a7e9b4edf83f00692",
+  "terminalSourceSnapshotSha256": "bcbb29172d44d49efc45661acf4669197ebfdad544b9fa03f93b450ec86e2115",
+  "terminalCertifiedSnapshotSha256": "75279050e1fc7fa395ce25004eadd3fab6323a48bb5d3edebef23d36f3c4ea18",
+  "superseded": [
+    {
+      "sourceSnapshotSha256": "0b3bd94d85d48fef9f86270da1d55082be899a4b52f969f03771ff790da856e9",
+      "certifiedSnapshotSha256": "7036027ce580462b49eb2d211729ddd6ef9d2f8d56dde2a7450b19b4b35bc6d7",
+      "state": "SUPERSEDED_MISSING_LIVE_SOURCE_VERSION",
+      "reason": "Ranking evidence remained valid, but sourceVersion was not preserved into the snapshot, so it is not eligible for federation export."
+    },
+    {
+      "sourceSnapshotSha256": "b5e2f65b0cb89944cb7663256f540b166f46af23547afc5721ab2311ab63e242",
+      "certifiedSnapshotSha256": "f0bdc71993ab1fb1c50a2576788a6fb245ad66b30d089e8294872991477b14f5",
+      "state": "SUPERSEDED_PRODUCER_RUNTIME",
+      "reason": "Live sourceVersion was present, but later exporter/provenance contract changes moved the terminal producer code checkpoint."
+    }
+  ],
+  "serializationCorrection": {
+    "state": "PASS",
+    "reason": "Python-generated snapshot JSON was initially reserialized through JavaScript before GitHub commit, collapsing integral float spellings and invalidating semantic snapshot hashes. The terminal files were rehashed against their actual committed JSON representation.",
+    "invalidClaimedSourceSnapshotSha256": "929250f76bdd770f302e8ae6b025105dd28c4c2ad3b164419d05ab317d934e83",
+    "invalidClaimedCertifiedSnapshotSha256": "9e9e2b96bd7b54ce7154eb3607d2ece8eacf30e92482be9deabab48d5d387cb1",
+    "correctedSourceSnapshotSha256": "bcbb29172d44d49efc45661acf4669197ebfdad544b9fa03f93b450ec86e2115",
+    "correctedCertifiedSnapshotSha256": "75279050e1fc7fa395ce25004eadd3fab6323a48bb5d3edebef23d36f3c4ea18"
+  }
+}

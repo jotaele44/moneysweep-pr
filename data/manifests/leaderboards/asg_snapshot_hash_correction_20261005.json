@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "moneysweep.leaderboard-snapshot-hash-correction/v1",
+  "state": "CORRECTED",
+  "artifact": "data/manifests/leaderboards/snapshots/20261005T134917Z_asg_emergency_purchase_source_native.json",
+  "failedClaimedSnapshotSha256": "c35654d056e8537a4ba09fa6bac32e0936ee194861599453cc88ccf946104fd3",
+  "correctedSnapshotSha256": "5c883dd2388febefccaf3ce015ad0c7d2f0006154c0ccec384211e016de9a1f3",
+  "reason": "The first claim was computed from an in-memory representation in which integer-valued metricValue fields were floats. The committed JSON serialized those values as integer tokens; Python json.loads therefore reloads them as ints. The corrected hash is computed from the exact committed JSON value model used by verify_snapshot().",
+  "failedClaimPreservedInGitHistory": true
+}

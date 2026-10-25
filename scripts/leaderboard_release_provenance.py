@@ -14,13 +14,16 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-CERTIFICATION_RUNTIME_FILES = [
+CERTIFICATION_RUNTIME_CORE_FILES = [
     ROOT / "scripts" / "leaderboard_release_provenance.py",
     ROOT / "scripts" / "materialize_leaderboard_snapshot.py",
     ROOT / "scripts" / "certify_leaderboard_snapshot.py",
     ROOT / "scripts" / "materialize_leaderboard_git_snapshot.py",
     ROOT / "scripts" / "finalize_leaderboard_release.py",
     ROOT / "scripts" / "export_leaderboard_package.py",
+]
+CERTIFICATION_RUNTIME_FILES = [
+    *CERTIFICATION_RUNTIME_CORE_FILES,
     ROOT / "schemas" / "leaderboard_export_package.schema.json",
     ROOT / "data" / "manifests" / "leaderboards" / "leaderboard_certification_scope_v1.json",
     ROOT / "data" / "manifests" / "leaderboards" / "debt_history_source_refs_v1.json",
@@ -31,10 +34,13 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def certification_runtime_manifest() -> dict[str, Any]:
+def certification_runtime_manifest(
+    runtime_files: list[Path] | None = None,
+) -> dict[str, Any]:
+    selected = runtime_files if runtime_files is not None else CERTIFICATION_RUNTIME_FILES
     files: list[dict[str, Any]] = []
     state = "FROZEN"
-    for path in CERTIFICATION_RUNTIME_FILES:
+    for path in selected:
         relative = str(path.relative_to(ROOT))
         if not path.exists():
             files.append({"path": relative, "state": "MISSING"})
@@ -60,14 +66,18 @@ def certification_runtime_sha256(manifest: dict[str, Any] | None = None) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
-def validate_certification_runtime(manifest: dict[str, Any]) -> list[str]:
+def validate_certification_runtime(
+    manifest: dict[str, Any],
+    runtime_files: list[Path] | None = None,
+) -> list[str]:
     errors: list[str] = []
     if manifest.get("schemaVersion") != "moneysweep.leaderboard-certification-runtime/v1":
         errors.append("schemaVersion")
     if manifest.get("state") != "FROZEN":
         errors.append("state")
+    selected = runtime_files if runtime_files is not None else CERTIFICATION_RUNTIME_FILES
     files = manifest.get("files")
-    if not isinstance(files, list) or len(files) != len(CERTIFICATION_RUNTIME_FILES):
+    if not isinstance(files, list) or len(files) != len(selected):
         errors.append("files")
         files = files if isinstance(files, list) else []
     seen: set[str] = set()

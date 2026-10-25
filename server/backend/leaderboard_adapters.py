@@ -9,6 +9,7 @@ stable-ID requirements are satisfied; absence remains an explicit OPEN state.
 from __future__ import annotations
 
 import hashlib
+import json
 from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
@@ -20,6 +21,7 @@ from fastapi import HTTPException
 ROOT = Path(__file__).resolve().parents[2]
 CANON = ROOT / "data" / "canonical_v1"
 PROCESSED = ROOT / "data" / "staging" / "processed"
+ASG_EVIDENCE = ROOT / "data" / "manifests" / "asg_emergency_purchases"
 
 
 def _read(path: Path) -> pd.DataFrame:
@@ -50,6 +52,17 @@ def _number(value: object) -> float | None:
     except (TypeError, ValueError):
         return None
     return number if pd.notna(number) else None
+
+
+def _money(value: object) -> float | None:
+    """Parse a source-rendered currency amount without inferring currency."""
+    text = str(value or "").strip().replace(",", "")
+    if not text:
+        return None
+    cleaned = "".join(ch for ch in text if ch.isdigit() or ch in ".-")
+    if cleaned in {"", "-", ".", "-."}:
+        return None
+    return _number(cleaned)
 
 
 def _year(value: object) -> int | None:
@@ -278,6 +291,307 @@ def contract_awards(
             "Canonical contract identities are present, but all in-scope rows lack "
             "award_amount; no financial ranking can be certified from this source."
         )
+    return result
+
+
+def asg_emergency_source_native(
+    _data: dict[str, pd.DataFrame],
+    *,
+    limit: int | None,
+    start_year: int | None,
+    end_year: int | None,
+    municipality: str | None,
+    entity_type: str | None,
+    currency: str | None,
+) -> dict[str, Any]:
+    """Rank only ASG emergency-purchase rows carrying source-native Licitador IDs.
+
+    The full source universe is still part of the accounting denominator. Rows
+    lacking a source-native ID are explicit out-of-scope identity exclusions;
+    they are never name-resolved or silently dropped.
+    """
+    subset_path = ASG_EVIDENCE / "source_native_rows_v1.csv"
+    receipt_path = ASG_EVIDENCE / "materialization_receipt_20261006.json"
+
+    if municipality or entity_type:
+        raise HTTPException(
+            422,
+            "ASG supplier municipality/entity-type filters require an authoritative crosswalk",
+        )
+    if currency and currency.upper() != "USD":
+        return _finalize(
+            category_id="asg_emergency_purchase_source_native",
+            label="ASG emergency purchase cost — source-native Licitador subset",
+            metric_type="ASG_EMERGENCY_PURCHASE_COST",
+            rows=[],
+            accounting=_accounting(0),
+            limit=limit,
+            filters={"startYear": start_year, "endYear": end_year, "currency": currency},
+            manifests=[],
+            methodology={"currency": "ASG rendered purchase costs use the dollar-denominated Costo field"},
+            certification_state="OPEN_NO_MATCHING_CURRENCY",
+            reason="This bounded ASG emergency-purchase plane is denominated in USD.",
+        )
+    if not subset_path.exists() or not receipt_path.exists():
+        return _finalize(
+            category_id="asg_emergency_purchase_source_native",
+            label="ASG emergency purchase cost — source-native Licitador subset",
+            metric_type="ASG_EMERGENCY_PURCHASE_COST",
+            rows=[],
+            accounting=_accounting(0),
+            limit=limit,
+            filters={"startYear": start_year, "endYear": end_year, "currency": "USD"},
+            manifests=[],
+            methodology={"identity": "source-native asg_licitador_id required"},
+            certification_state="OPEN_NOT_MATERIALIZED",
+            reason="ASG source-native subset or authoritative materialization receipt is missing.",
+        )
+
+    subset_manifest = _manifest(subset_path)
+    receipt_manifest = _manifest(receipt_path)
+    # File mtimes are checkout-local metadata, not source identity. Keep ASG
+    # snapshot manifestations byte/hash-stable across environments.
+    subset_manifest.pop("modifiedAt", None)
+    receipt_manifest.pop("modifiedAt", None)
+    try:
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        receipt = {}
+
+    identity = receipt.get("identity") or {}
+    financial = receipt.get("financialValue") or {}
+    frozen = receipt.get("frozenArtifacts") or {}
+    expected_subset = frozen.get("sourceNativeSubset") or {}
+    readiness = receipt.get("readiness") or {}
+    universe_total = int(receipt.get("authoritativeUniverseTotal") or 0)
+    source_native_total = int(identity.get("sourceNativeRows") or 0)
+    name_only_total = int(identity.get("nameOnlyRows") or 0)
+    missing_vendor_total = int(identity.get("missingVendorRows") or 0)
+
+    receipt_valid = all(
+        [
+            receipt.get("schemaVersion") == "moneysweep.asg-emergency-materialization-receipt/v1",
+            receipt.get("state") == "SOURCE_MATERIALIZED",
+            universe_total > 0,
+            int(receipt.get("uniqueControlNumbers") or 0) == universe_total,
+            receipt.get("duplicateControlNumbers") == 0,
+            receipt.get("missingControlNumbers") == 0,
+            source_native_total + name_only_total + missing_vendor_total == universe_total,
+            identity.get("arithmeticClosed") is True,
+            financial.get("invalidAmountRows") == 0,
+            financial.get("sourceNativeInvalidAmountRows") == 0,
+            int(identity.get("distinctSourceNativeIds") or 0)
+            == int(financial.get("boundedEligibleEntityCount") or -1),
+            (identity.get("supplierRegistryCrossCheck") or {}).get("allCandidateIdsMatched")
+            is True,
+            readiness.get("boundedSourceNativeLeaderboardReady") is True,
+            readiness.get("wholeSourceLeaderboardReady") is False,
+            str(expected_subset.get("sha256") or "") == subset_manifest["sha256"],
+        ]
+    )
+    frame = _read(subset_path)
+    if int(expected_subset.get("rows") or -1) != len(frame):
+        receipt_valid = False
+    if len(frame) != source_native_total:
+        receipt_valid = False
+
+    subset_integrity_rows = 0
+    subset_integrity_entities: set[str] = set()
+    subset_integrity_amount = 0.0
+    if receipt_valid:
+        for _, row in frame.iterrows():
+            registration_id = str(row.get("vendor_registration_id") or "").strip()
+            scheme = str(row.get("vendor_identity_scheme") or "").strip()
+            state = str(row.get("vendor_identity_state") or "").strip()
+            amount = _money(row.get("obligation_amount"))
+            if (
+                not registration_id
+                or scheme != "asg_licitador_id"
+                or state != "SOURCE_NATIVE_ASG_LICITADOR_ID"
+                or amount is None
+            ):
+                receipt_valid = False
+                break
+            subset_integrity_rows += 1
+            subset_integrity_entities.add(registration_id)
+            subset_integrity_amount += amount
+
+        if (
+            subset_integrity_rows != int(financial.get("boundedEligibleRows") or -1)
+            or len(subset_integrity_entities)
+            != int(financial.get("boundedEligibleEntityCount") or -1)
+            or round(subset_integrity_amount, 2)
+            != round(float(financial.get("boundedEligibleAmountTotal") or -1), 2)
+        ):
+            receipt_valid = False
+
+    if not receipt_valid:
+        return _finalize(
+            category_id="asg_emergency_purchase_source_native",
+            label="ASG emergency purchase cost — source-native Licitador subset",
+            metric_type="ASG_EMERGENCY_PURCHASE_COST",
+            rows=[],
+            accounting=_accounting(universe_total),
+            limit=limit,
+            filters={"startYear": start_year, "endYear": end_year, "currency": "USD"},
+            manifests=[subset_manifest, receipt_manifest],
+            methodology={"identity": "source-native asg_licitador_id required"},
+            certification_state="OPEN_INVALID_SOURCE_RECEIPT",
+            reason="ASG full-source receipt or source-native subset binding failed validation.",
+        )
+
+    accounting = _accounting(universe_total)
+    accounting["outOfScopeRecords"] = name_only_total + missing_vendor_total
+    totals: dict[str, dict[str, Any]] = {}
+
+    for _, row in frame.iterrows():
+        year = _year(row.get("fiscal_year"))
+        if start_year is not None and (year is None or year < start_year):
+            accounting["outOfScopeRecords"] += 1
+            continue
+        if end_year is not None and (year is None or year > end_year):
+            accounting["outOfScopeRecords"] += 1
+            continue
+
+        registration_id = str(row.get("vendor_registration_id") or "").strip()
+        scheme = str(row.get("vendor_identity_scheme") or "").strip()
+        state = str(row.get("vendor_identity_state") or "").strip()
+        if (
+            not registration_id
+            or scheme != "asg_licitador_id"
+            or state != "SOURCE_NATIVE_ASG_LICITADOR_ID"
+        ):
+            accounting["unresolvedRecords"] += 1
+            continue
+
+        amount = _money(row.get("obligation_amount"))
+        if amount is None:
+            accounting["excludedRecords"] += 1
+            continue
+
+        entity_id = f"asg_licitador_id:{registration_id}"
+        agg = totals.setdefault(
+            registration_id,
+            {
+                "entityId": entity_id,
+                "canonicalEntityId": None,
+                "entityDisplayName": "",
+                "entityType": "asg_supplier",
+                "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+                "metricValue": 0.0,
+                "currency": "USD",
+                "recordCount": 0,
+                "sourceDisplayNames": set(),
+                "controlNumbers": set(),
+                "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+                "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+            },
+        )
+        display = str(row.get("vendor_name") or "").strip()
+        if display:
+            agg["sourceDisplayNames"].add(display)
+        control = str(row.get("control_number") or "").strip()
+        if control:
+            agg["controlNumbers"].add(control)
+        agg["metricValue"] += amount
+        agg["recordCount"] += 1
+        accounting["retainedRecords"] += 1
+
+    rows: list[dict[str, Any]] = []
+    for agg in totals.values():
+        names = sorted(agg.pop("sourceDisplayNames"), key=lambda value: (value.casefold(), value))
+        agg["entityDisplayName"] = names[0] if names else agg["entityId"]
+        agg["sourceDisplayNames"] = names
+        agg["controlNumbers"] = sorted(agg["controlNumbers"])
+        agg["metricValue"] = round(float(agg["metricValue"]), 2)
+        rows.append(agg)
+
+    canonical_source = frozen.get("canonicalParsedCorpus") or {}
+    raw_bundle = frozen.get("rawAndParsedBundle") or {}
+    page_manifest = frozen.get("pageManifest") or {}
+    supplier_verification = frozen.get("supplierRegistryVerification") or {}
+    if (
+        int(canonical_source.get("rows") or 0) != universe_total
+        or not str(canonical_source.get("sha256") or "")
+        or not str(raw_bundle.get("storagePath") or "")
+        or not str(raw_bundle.get("sha256") or "")
+        or not str(page_manifest.get("storagePath") or "")
+        or not str(page_manifest.get("sha256") or "")
+        or not str(supplier_verification.get("storagePath") or "")
+        or not str(supplier_verification.get("sha256") or "")
+    ):
+        return _finalize(
+            category_id="asg_emergency_purchase_source_native",
+            label="ASG emergency purchase cost — source-native Licitador subset",
+            metric_type="ASG_EMERGENCY_PURCHASE_COST",
+            rows=[],
+            accounting=_accounting(universe_total),
+            limit=limit,
+            filters={"startYear": start_year, "endYear": end_year, "currency": "USD"},
+            manifests=[subset_manifest, receipt_manifest],
+            methodology={"identity": "source-native asg_licitador_id required"},
+            certification_state="OPEN_INVALID_SOURCE_RECEIPT",
+            reason="ASG October 6 authoritative corpus or manifestation binding is incomplete.",
+        )
+
+    source_manifestations = [
+        subset_manifest,
+        receipt_manifest,
+        {
+            "path": str(raw_bundle.get("storagePath") or ""),
+            "bytes": int(raw_bundle.get("bytes") or 0),
+            "sha256": str(raw_bundle.get("sha256") or ""),
+            "manifestationType": "FLOOT_OBJECT_STORAGE_AUTHORITATIVE_CORPUS",
+        },
+        {
+            "path": str(page_manifest.get("storagePath") or ""),
+            "bytes": int(page_manifest.get("bytes") or 0),
+            "sha256": str(page_manifest.get("sha256") or ""),
+            "manifestationType": "FLOOT_OBJECT_STORAGE_PAGE_MANIFEST",
+        },
+        {
+            "path": str(supplier_verification.get("storagePath") or ""),
+            "bytes": int(supplier_verification.get("bytes") or 0),
+            "sha256": str(supplier_verification.get("sha256") or ""),
+            "manifestationType": "FLOOT_OBJECT_STORAGE_SUPPLIER_ID_VERIFICATION",
+        },
+    ]
+    result = _finalize(
+        category_id="asg_emergency_purchase_source_native",
+        label="ASG emergency purchase cost — source-native Licitador subset",
+        metric_type="ASG_EMERGENCY_PURCHASE_COST",
+        rows=rows,
+        accounting=accounting,
+        limit=limit,
+        filters={"startYear": start_year, "endYear": end_year, "currency": "USD"},
+        manifests=source_manifestations,
+        methodology={
+            "identity": "explicit source-native ASG Licitador ID only; names are display-only",
+            "aggregation": "ASG emergency-purchase Costo summed by asg_licitador_id",
+            "fullSourceUniverse": universe_total,
+            "eligibleSourceNativeRows": source_native_total,
+            "excludedNameOnlyRows": name_only_total,
+            "excludedMissingVendorRows": missing_vendor_total,
+            "scopeBoundary": "does not claim all ASG emergency purchases or total ASG emergency spending",
+            "completenessOrdering": "numerocontrol",
+            "currency": "USD",
+        },
+        certification_state="PROVISIONAL_BOUNDED_SOURCE_NATIVE",
+        reason=(
+            "Full ASG source coverage is closed, but this ranking is explicitly limited "
+            "to rows carrying a source-native ASG Licitador ID."
+        ),
+    )
+    result["sourceVersion"] = {
+        "type": "LIVE_PORTAL_MATERIALIZATION",
+        "sourceId": "asg_emergency_purchases",
+        "capturedAt": str(receipt.get("observedAt") or ""),
+        "ordering": "numerocontrol",
+        "authoritativeUniverseTotal": universe_total,
+        "sourceSha256": str(canonical_source.get("sha256") or ""),
+        "rawBundleSha256": str(raw_bundle.get("sha256") or ""),
+        "economicActivityInference": False,
+    }
     return result
 
 
@@ -669,6 +983,7 @@ Adapter = Callable[..., dict[str, Any]]
 ADAPTERS: dict[str, Adapter] = {
     "canonical_contracts": contract_awards,
     "canonical_debt": debt_issuance,
+    "asg_emergency_source_native": asg_emergency_source_native,
     "federal_awards_contracts": federal_contract_obligations,
     "federal_awards_grants": federal_grants,
     "federal_awards_assistance": federal_assistance,

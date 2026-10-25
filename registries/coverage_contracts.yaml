@@ -319,7 +319,7 @@ contracts:
 
   # -- ASG (central procurement authority, asg.pr.gov)
   # Both denominators are MEASURED, not estimated: each portal declares its own
-  # size ("Página 1 de 141" / "Página 1 de 47"), scrape_asg_*.declared_page_count()
+  # size (emergency purchases now "Página 1 de 144"; suppliers "Página 1 de 47"), scrape_asg_*.declared_page_count()
   # parses that marker on every run, and the last page was fetched to count its
   # short tail rather than assuming a full page. That is a portal_count
   # denominator in the sense this file requires — explicitly NOT a maximum
@@ -331,17 +331,22 @@ contracts:
     geography_scope: PR
     authoritative_universe_method: portal_count
     authoritative_universe_ref: https://asg.pr.gov/comprasemergencias
-    authoritative_universe_total: 1406
+    authoritative_universe_total: 1431
     uniqueness_key: [control_number]
     minimum_coverage_pct: 95.0
     pagination_required: true
     notes: >-
-      Measured 2026-07-27: 141 declared pages at 10 rows, last page 6 -> 1,406
-      emergency purchase orders. Append-mostly, so the total grows; a shortfall
-      against it means the walk stopped early, not that the corpus shrank.
-      Grain is `contract` rather than `transaction` deliberately — ASG renders
-      no date, so these rows carry no transaction_date and must not be promoted
-      to transaction grain.
+      Authoritative live refresh completed 2026-10-06 using control-number
+      ordering: 144 declared pages, 1,431 raw row manifestations, 1,431 unique
+      control_number values, zero duplicates and zero conflicts; page 144
+      contains one row. A
+      separate -creado manifestation also returned 1,431 rendered rows but only
+      1,319 unique control numbers because 112 exact duplicate manifestations were
+      repeated across 59 groups. That ordering is retained as non-authoritative
+      pagination-drift evidence and is not used for the completeness denominator.
+      Grain is `contract` rather than `transaction` deliberately — ASG renders no
+      date, so these rows carry no transaction_date and must not be promoted to
+      transaction grain.
 
   - source_id: asg_suppliers
     contract_version: 1
