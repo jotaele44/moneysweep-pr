@@ -1,0 +1,35 @@
+name: PR Registry - USAspending Bounded Award Evidence
+on:
+  pull_request:
+    paths:
+      - scripts/probe_usaspending_pr_awards.py
+      - tests/test_usaspending_pr_probe.py
+      - .github/workflows/pr-registry-usaspending-evidence.yml
+permissions:
+  contents: read
+jobs:
+  pr-award-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run negative and positive fixture tests
+        run: python -m unittest discover -s tests -p test_usaspending_pr_probe.py -v
+      - name: Probe USAspending FY2026 recipient and performance PR
+        id: probe
+        continue-on-error: true
+        run: python scripts/probe_usaspending_pr_awards.py outputs/usaspending_pr_probe
+      - name: Upload raw response evidence and fail-closed receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-usaspending-award-probe
+          path: outputs/usaspending_pr_probe/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Require real bounded evidence
+        if: steps.probe.outcome != 'success'
+        run: exit 1
