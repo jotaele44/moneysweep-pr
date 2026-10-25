@@ -1515,8 +1515,8 @@
           "server/backend/materialization.py"
         ],
         "endpoints": [
-          "GET /hud-drgr/audits",
-          "POST /hud-drgr/audits"
+          "GET /materialization/hud-drgr/audits",
+          "POST /materialization/hud-drgr/audits"
         ],
         "symbols": [
           "server/backend/materialization.py:hud_drgr_audits",
@@ -1580,14 +1580,14 @@
           "server/backend/materialization.py"
         ],
         "endpoints": [
-          "GET /status",
-          "GET /sources",
-          "GET /credentials",
-          "PUT /credentials/{key_name}",
-          "DELETE /credentials/{key_name}",
-          "POST /offline/upload",
-          "POST /offline/{source_id}/run",
-          "POST /api/run"
+          "GET /materialization/status",
+          "GET /materialization/sources",
+          "GET /materialization/credentials",
+          "PUT /materialization/credentials/{key_name}",
+          "DELETE /materialization/credentials/{key_name}",
+          "POST /materialization/offline/upload",
+          "POST /materialization/offline/{source_id}/run",
+          "POST /materialization/api/run"
         ]
       },
       "frontend": {
@@ -1639,8 +1639,8 @@
           "server/backend/ownership_api.py"
         ],
         "endpoints": [
-          "GET /status",
-          "GET /{ticker}"
+          "GET /deep-dive/ownership/status",
+          "GET /deep-dive/ownership/{ticker}"
         ],
         "symbols": [
           "server/backend/ownership_api.py:ownership_status",
