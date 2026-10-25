@@ -11,6 +11,7 @@ import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
@@ -143,6 +144,15 @@ def main(output: Path) -> int:
     for scope in SCOPES:
         try:
             receipt["results"][scope] = fetch(scope, output)
+        except HTTPError as exc:
+            error_body = exc.read(4096)
+            receipt["results"][scope] = {
+                "state": "FAILED",
+                "error_class": "HTTPError",
+                "http_status": exc.code,
+                "error_response_sha256": sha256(error_body),
+                "error_body_excerpt": error_body.decode("utf-8", errors="replace")[:2000],
+            }
         except Exception as exc:
             receipt["results"][scope] = {
                 "state": "FAILED",
