@@ -29,6 +29,7 @@ class ProbeTests(unittest.TestCase):
         self.assertNotIn("place_of_performance_locations", recipient["filters"])
         self.assertIn("place_of_performance_locations", performance["filters"])
         self.assertNotIn("recipient_locations", performance["filters"])
+        self.assertEqual(recipient["filters"]["award_type_codes"], ["02", "03", "04", "05"])
         self.assertFalse(recipient["subawards"])
 
     def test_disallow_unknown_scope(self):
