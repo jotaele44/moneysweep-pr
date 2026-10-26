@@ -1,0 +1,35 @@
+name: PR Registry FY2026 Grant Membership Enumeration
+on:
+  pull_request:
+    paths:
+      - scripts/enumerate_usaspending_fy2026_pr_grants.py
+      - tests/test_pr_grant_membership.py
+      - .github/workflows/pr-registry-fy2026-grant-membership.yml
+permissions:
+  contents: read
+jobs:
+  enumerate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run adversarial pagination contract tests
+        run: python -m unittest discover -s tests -p test_pr_grant_membership.py -v
+      - name: Retrieve, hash and reconcile FY2026 PR grant ID membership
+        id: enumerate
+        continue-on-error: true
+        run: python scripts/enumerate_usaspending_fy2026_pr_grants.py outputs/pr_registry_fy2026_grant_membership
+      - name: Preserve all raw pages, original request bytes and fail-closed receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-registry-fy2026-grant-membership
+          path: outputs/pr_registry_fy2026_grant_membership/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Deny incomplete award enumeration
+        if: steps.enumerate.outcome != 'success'
+        run: exit 1
