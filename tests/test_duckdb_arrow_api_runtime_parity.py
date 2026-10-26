@@ -3,6 +3,7 @@
 Validates actual Arrow schema/row equivalence and deterministic Parquet bytes
 without altering the production data store.
 """
+
 import tempfile
 import unittest
 from pathlib import Path
