@@ -7,6 +7,7 @@ import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -52,7 +53,7 @@ def parse_count(data: bytes) -> int:
 
 def run(target: Path) -> int:
     target.mkdir(parents=True, exist_ok=True)
-    receipt = {
+    receipt: dict[str, Any] = {
         "schema_version": "pr_registry_usaspending_fy2026_count_v1",
         "retrieved_utc": datetime.now(timezone.utc).isoformat(),
         "endpoint": API,
