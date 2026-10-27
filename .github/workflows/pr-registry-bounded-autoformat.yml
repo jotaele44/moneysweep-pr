@@ -1,0 +1,42 @@
+name: PR Registry Bounded Source Autoformat
+on:
+  pull_request:
+    paths:
+      - scripts/enumerate_usaspending_fy2026_pr_grants.py
+      - scripts/probe_usaspending_fy2026_pr_count.py
+      - tests/test_pr_grant_membership.py
+      - tests/test_usaspending_fy2026_pr_count.py
+      - .github/workflows/pr-registry-bounded-autoformat.yml
+permissions:
+  contents: write
+jobs:
+  format-reviewed-draft-only:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'audit/pr-program-registry-fy2026-count-20261025'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned repository formatter
+        run: python -m pip install ruff==0.16.5
+      - name: Format only four bounded research candidate files
+        run: |
+          ruff format scripts/enumerate_usaspending_fy2026_pr_grants.py scripts/probe_usaspending_fy2026_pr_count.py tests/test_pr_grant_membership.py tests/test_usaspending_fy2026_pr_count.py
+          ruff check scripts/enumerate_usaspending_fy2026_pr_grants.py scripts/probe_usaspending_fy2026_pr_count.py tests/test_pr_grant_membership.py tests/test_usaspending_fy2026_pr_count.py
+          git diff --check
+      - name: Record formatting commit on exact draft branch only
+        run: |
+          git add -- scripts/enumerate_usaspending_fy2026_pr_grants.py scripts/probe_usaspending_fy2026_pr_count.py tests/test_pr_grant_membership.py tests/test_usaspending_fy2026_pr_count.py
+          if git diff --cached --quiet; then
+            echo "NO_FORMATTING_DIFF"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "style: exact Ruff-format bounded research source files"
+          git push origin "HEAD:refs/heads/audit/pr-program-registry-fy2026-count-20261025"
