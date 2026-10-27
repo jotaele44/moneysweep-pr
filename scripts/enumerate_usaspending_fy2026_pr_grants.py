@@ -14,6 +14,7 @@ import math
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 from urllib.request import Request, urlopen
 
 URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
@@ -180,7 +181,7 @@ def enumerate_scope(scope: str, outdir: Path) -> tuple[dict, dict[str, dict]]:
 
 def run(outdir: Path) -> int:
     outdir.mkdir(parents=True, exist_ok=True)
-    receipt = {
+    receipt: dict[str, Any] = {
         "schema": "pr_program_fy2026_grant_awards_paged_v1",
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "state": "BLOCKED",
