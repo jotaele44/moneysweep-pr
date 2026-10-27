@@ -6,6 +6,7 @@ response/denominator drift, geography mismatch, and terminal-page ambiguity.
 SCOPE: grants 02/03/04/05, FY2026, prime awards, recipient OR performance PR.
 This is not all financial awards, all historical years, or all public programs.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -21,10 +22,18 @@ URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 COUNT_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award_count/"
 PERIOD = {"start_date": "2025-10-01", "end_date": "2026-09-30"}
 CODES = ["02", "03", "04", "05"]
-SCOPES = {"recipient_pr": ("recipient_locations", "Recipient Location"),
-          "performance_pr": ("place_of_performance_locations", "Primary Place of Performance")}
-FIELDS = ["Award ID", "Recipient Name", "Award Amount", "Recipient Location",
-          "Primary Place of Performance", "CFDA Number"]
+SCOPES = {
+    "recipient_pr": ("recipient_locations", "Recipient Location"),
+    "performance_pr": ("place_of_performance_locations", "Primary Place of Performance"),
+}
+FIELDS = [
+    "Award ID",
+    "Recipient Name",
+    "Award Amount",
+    "Recipient Location",
+    "Primary Place of Performance",
+    "CFDA Number",
+]
 LIMIT = 100
 MAX_RECORDS = 9900
 MAX_RESPONSE_BYTES = 10 * 1024 * 1024
@@ -48,10 +57,15 @@ def post_json(url: str, body: dict, path: Path) -> dict:
     raw_body = json.dumps(body, sort_keys=True, separators=(",", ":")).encode()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.with_suffix(".request.json").write_bytes(raw_body)
-    req = Request(url, data=raw_body, headers={
-        "Content-Type": "application/json",
-        "User-Agent": "PR-Registry-Enumerate-Bounded-Awards/1.0",
-    }, method="POST")
+    req = Request(
+        url,
+        data=raw_body,
+        headers={
+            "Content-Type": "application/json",
+            "User-Agent": "PR-Registry-Enumerate-Bounded-Awards/1.0",
+        },
+        method="POST",
+    )
     with urlopen(req, timeout=60) as rsp:
         if rsp.geturl() != url:
             raise ValueError("SOURCE_ENDPOINT_DRIFT")
@@ -132,11 +146,14 @@ def enumerate_scope(scope: str, outdir: Path) -> tuple[dict, dict[str, dict]]:
             if identity in seen:
                 raise ValueError("REPEATED_INTERNAL_ID_ACROSS_PAGES")
             seen[identity] = row
-        page_receipts.append({
-            "page": page, "rows": len(rows),
-            "raw_sha256": digest(filename.read_bytes()),
-            "hasNext": has_next,
-        })
+        page_receipts.append(
+            {
+                "page": page,
+                "rows": len(rows),
+                "raw_sha256": digest(filename.read_bytes()),
+                "hasNext": has_next,
+            }
+        )
         if len(seen) < start and not has_next:
             raise ValueError("FALSE_TERMINAL_PAGE_BEFORE_COUNT")
         if len(seen) > start:
@@ -147,11 +164,20 @@ def enumerate_scope(scope: str, outdir: Path) -> tuple[dict, dict[str, dict]]:
     # false hasNext at 10,000 records with later pages still containing awards.
     sentinel_page = expected_pages + 1
     sentinel_path = folder / f"page_{sentinel_page:04}_sentinel_raw.json"
-    sentinel = post_json(URL, {
-        "filters": filters, "fields": FIELDS, "limit": LIMIT,
-        "order": "desc", "page": sentinel_page, "sort": "Award Amount",
-        "spending_level": "awards", "subawards": False,
-    }, sentinel_path)
+    sentinel = post_json(
+        URL,
+        {
+            "filters": filters,
+            "fields": FIELDS,
+            "limit": LIMIT,
+            "order": "desc",
+            "page": sentinel_page,
+            "sort": "Award Amount",
+            "spending_level": "awards",
+            "subawards": False,
+        },
+        sentinel_path,
+    )
     extra, _ = validate_page(sentinel, sentinel_page, scope)
     if extra:
         raise ValueError("SENTINEL_HAS_ADDITIONAL_AWARDS")
@@ -166,11 +192,14 @@ def enumerate_scope(scope: str, outdir: Path) -> tuple[dict, dict[str, dict]]:
         if cfda:
             bound_numbers[award_id] = str(cfda)
     (folder / "candidate_assistance_listing_numbers.json").write_text(
-        json.dumps(bound_numbers, indent=2, sort_keys=True) + "\n")
+        json.dumps(bound_numbers, indent=2, sort_keys=True) + "\n"
+    )
     return {
-        "count_before": start, "count_after": final,
+        "count_before": start,
+        "count_after": final,
         "raw_pages": expected_pages + 1,
-        "award_ids": len(seen), "geographic_scope": scope,
+        "award_ids": len(seen),
+        "geographic_scope": scope,
         "page_receipts": page_receipts,
         "listing_number_candidates": len(bound_numbers),
         "bound_canonical_pr_programs": 0,
@@ -217,23 +246,35 @@ def run(outdir: Path) -> int:
             "intersection_ids_sha256": digest(("\n".join(sorted(left & right)) + "\n").encode()),
             "never_sum_geo_counts_as_unique_programs": True,
         }
-        (outdir / "cross_geography_set_algebra.json").write_text(json.dumps(
-            membership, indent=2, sort_keys=True) + "\n")
+        (outdir / "cross_geography_set_algebra.json").write_text(
+            json.dumps(membership, indent=2, sort_keys=True) + "\n"
+        )
         receipt["cross_geography"] = membership
         receipt["state"] = "BOUNDED_FY2026_GRANT_MEMBERSHIP_ACQUIRED"
     (outdir / "page_ledger_receipt.json").write_text(
-        json.dumps(receipt, indent=2, sort_keys=True) + "\n")
-    print(json.dumps({
-        "state": receipt["state"],
-        "scopes": {
-            k: {x: v[x] for x in ("status", "award_ids", "count_before") if x in v}
-            for k, v in receipt["scopes"].items()
-        },
-        "cross_geography": receipt.get("cross_geography"),
-    }, sort_keys=True))
+        json.dumps(receipt, indent=2, sort_keys=True) + "\n"
+    )
+    print(
+        json.dumps(
+            {
+                "state": receipt["state"],
+                "scopes": {
+                    k: {x: v[x] for x in ("status", "award_ids", "count_before") if x in v}
+                    for k, v in receipt["scopes"].items()
+                },
+                "cross_geography": receipt.get("cross_geography"),
+            },
+            sort_keys=True,
+        )
+    )
     return 0 if receipt["state"] == "BOUNDED_FY2026_GRANT_MEMBERSHIP_ACQUIRED" else 2
 
 
 if __name__ == "__main__":
-    raise SystemExit(run(Path(sys.argv[1]) if len(sys.argv) > 1 else
-                         Path("outputs/pr_registry_fy2026_grant_membership")))
+    raise SystemExit(
+        run(
+            Path(sys.argv[1])
+            if len(sys.argv) > 1
+            else Path("outputs/pr_registry_fy2026_grant_membership")
+        )
+    )

@@ -1,4 +1,5 @@
 """Offline positive/adversarial USAspending PR FY2026 count contract."""
+
 import importlib.util
 import json
 import unittest
@@ -30,10 +31,14 @@ class CountContractTests(unittest.TestCase):
             module.request_bytes("outside_pr")
 
     def test_zero_is_not_source_failure(self):
-        self.assertEqual(module.parse_count(b'{"spending_level":"awards","results":{"grants":0}}'), 0)
+        self.assertEqual(
+            module.parse_count(b'{"spending_level":"awards","results":{"grants":0}}'), 0
+        )
 
     def test_valid_integer(self):
-        self.assertEqual(module.parse_count(b'{"spending_level":"awards","results":{"grants":251}}'), 251)
+        self.assertEqual(
+            module.parse_count(b'{"spending_level":"awards","results":{"grants":251}}'), 251
+        )
 
     def test_missing_grant_count_denied(self):
         with self.assertRaisesRegex(ValueError, "GRANT_COUNT_INVALID"):

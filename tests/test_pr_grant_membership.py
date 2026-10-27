@@ -1,4 +1,5 @@
 """Offline adversarial suite for bounded grant-award membership pagination."""
+
 import importlib.util
 import unittest
 from pathlib import Path
@@ -45,7 +46,9 @@ class GrantPagingTests(unittest.TestCase):
             p.count_value({"spending_level": "subawards", "results": {"grants": 1}})
 
     def test_valid_awards(self):
-        rows, nxt = p.validate_page(page([item("111"), item("112")], has_next=True), 1, "recipient_pr")
+        rows, nxt = p.validate_page(
+            page([item("111"), item("112")], has_next=True), 1, "recipient_pr"
+        )
         self.assertEqual(len(rows), 2)
         self.assertTrue(nxt)
 
@@ -77,8 +80,11 @@ class GrantPagingTests(unittest.TestCase):
 
     def test_bad_response_denied(self):
         with self.assertRaisesRegex(ValueError, "MALFORMED_AWARD_RESPONSE"):
-            p.validate_page({"results": "fake", "page_metadata": {"page": 1, "hasNext": False}},
-                            1, "recipient_pr")
+            p.validate_page(
+                {"results": "fake", "page_metadata": {"page": 1, "hasNext": False}},
+                1,
+                "recipient_pr",
+            )
 
     def test_safety_ceiling_below_10k(self):
         self.assertLess(p.MAX_RECORDS, 10_000)
