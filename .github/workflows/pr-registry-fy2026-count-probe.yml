@@ -1,0 +1,35 @@
+name: PR Program Registry FY2026 Award Count Probe
+on:
+  pull_request:
+    paths:
+      - scripts/probe_usaspending_fy2026_pr_count.py
+      - tests/test_usaspending_fy2026_pr_count.py
+      - .github/workflows/pr-registry-fy2026-count-probe.yml
+permissions:
+  contents: read
+jobs:
+  bounded-count:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run bounded read-only count contract tests
+        run: python -m unittest discover -s tests -p test_usaspending_fy2026_pr_count.py -v
+      - name: Obtain exact PR grant count source bytes
+        id: count
+        continue-on-error: true
+        run: python scripts/probe_usaspending_fy2026_pr_count.py outputs/pr_registry_fy2026_counts
+      - name: Preserve raw responses and fail-closed receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-fy2026-grant-count-evidence
+          path: outputs/pr_registry_fy2026_counts/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Deny missing count source
+        if: steps.count.outcome != 'success'
+        run: exit 1

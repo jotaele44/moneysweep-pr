@@ -1,0 +1,63 @@
+{
+  "schema_version": "pr_public_program_temporal_identity_review_v1",
+  "record_class": "SOURCE_ADJUDICATION_NOT_CANONICAL_IDENTITY",
+  "as_of_date": "2026-10-27",
+  "exact_primary_assistance_listing": "84.938",
+  "source_reported_names": [
+    "Hurricane Education Recovery",
+    "Disaster Recovery Assistance for Education"
+  ],
+  "distinct_identifier_holdout": "84.938T",
+  "identity_assertions": {
+    "84.938": "IDENTIFIER_AND_HISTORICAL_PUERTO_RICO_ACTIVITY_PRIMARY_SOURCE_CORROBORATED",
+    "84.938T": "EXACT_SEPARATE_IDENTIFIER_REPORTED_BY_UNIVERSITY_AUDIT",
+    "84.938_to_84.938T_equivalence": "NOT_PROVEN_DO_NOT_COLLAPSE",
+    "current_active_listing": "NOT_ESTABLISHED",
+    "award_identity": "UNCHANGED",
+    "new_canonical_program_id": "NOT_AUTHORIZED"
+  },
+  "primary_government_records": [
+    {
+      "authority": "Commonwealth of Puerto Rico Department of Education",
+      "report_year": "2020",
+      "url": "https://hacienda.pr.gov/sites/default/files/puerto_rico_department_of_education_1.pdf",
+      "claim": "Audited major federal programs schedule identifies CFDA 84.938 as Hurricane Education Recovery",
+      "source_page_pdf_index": 71,
+      "source_sha256": null,
+      "source_bytes_acquired": false
+    },
+    {
+      "authority": "University of Puerto Rico",
+      "report_year": "2023",
+      "url": "https://hacienda.pr.gov/sites/default/files/upr_fs_2023.pdf",
+      "claim": "Audited federal awards schedule reports 84.938 and 84.938T under Disaster Recovery Assistance for Education",
+      "source_sha256": null,
+      "source_bytes_acquired": false
+    },
+    {
+      "authority": "University of Puerto Rico",
+      "report_year": "2024",
+      "url": "https://hacienda.pr.gov/sites/default/files/university_of_puerto_rico_3.pdf",
+      "claim": "Audited federal awards schedule lists separate 84.938 and 84.938T lines; 84.938T also in major-program identifier list",
+      "source_page_pdf_index": 144,
+      "source_sha256": null,
+      "source_bytes_acquired": false
+    }
+  ],
+  "frozen_source_crosswalk": {
+    "checkpoint_sha256": "12cf3b20fe10bc1a6aeca6542cf297da0b2b70bb9d6b2582352c6843546d9440",
+    "source_type": "FY2026_PR_GRANT_AWARD_TO_LISTING_LINKS",
+    "crosswalk_state": "84.938_UNLISTED_IN_OCTOBER_SAM_PUBLIC_CURRENT",
+    "absence_interpretation": "NO_HISTORICAL_OR_CURRENT_IDENTITY_NEGATION"
+  },
+  "material_residue": [
+    "Recover original primary-source PDF bytes and independently verify page references and SHA256.",
+    "Recover authentic archived SAM Assistance Listing version with authoritative 84.938 lifecycle.",
+    "Determine exact 84.938 vs 84.938T relation using federal identifier provenance.",
+    "Resolve current SAM public-current omission separately from historical program existence.",
+    "Complete record-level ownership, canonical IDs, full federal source census and independent holdout."
+  ],
+  "production_promotion_enabled": false,
+  "owner_assignment": "REVIEW_REQUIRED",
+  "registry_certification": "WITHHELD"
+}

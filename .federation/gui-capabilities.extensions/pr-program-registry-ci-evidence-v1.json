@@ -1,0 +1,26 @@
+{
+  "extension_id": "public-program-registry-source-research-internal-v1",
+  "capabilities": [
+    {
+      "id": "pr-program-registry-fy2026-source-audit",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "CI-only research acquisition and bounded source-membership proof. These scripts produce immutable, temporary government-source evidence artifacts, do not expose a production application endpoint, do not handle user sessions, and do not promote canonical identities. A separate reviewed GUI consumer and E2E are required before any production user-facing claim; this internal classification does not establish seven-repository GUI parity or registry certification.",
+      "analysis": {
+        "files": [
+          "scripts/enumerate_usaspending_fy2026_pr_grants.py",
+          "scripts/probe_usaspending_fy2026_pr_count.py"
+        ]
+      },
+      "tests": {
+        "contract": [
+          "tests/test_pr_grant_membership.py",
+          "tests/test_usaspending_fy2026_pr_count.py"
+        ]
+      },
+      "production_consumer_enabled": false,
+      "certification": "WITHHELD"
+    }
+  ]
+}
