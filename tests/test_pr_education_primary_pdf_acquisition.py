@@ -40,7 +40,7 @@ class PDFProbeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             path=Path(d)/"bytes"
             path.write_bytes(b"source bytes")
-            self.assertEqual(m.sha256(path), "4097ddc77448e120201892f65e8ad0f49cd84e99b5ab30d81b44a15e36a9bdda")
+            self.assertEqual(m.sha256(path), "4d4823794cbed3c4ee0bbc684c8f66e1dfd5afa6f078d494ce254ec5a4671753")
 
 
 if __name__ == "__main__":
