@@ -4,6 +4,7 @@
 Each HTTPS response is preserved exactly. PDF text is a corroboration aid only.
 Network errors are recorded per source. No official program lifecycle is inferred.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -59,8 +60,13 @@ def fetch_pdf(url: str, destination: Path) -> dict:
             if f.read(5) != b"%PDF-":
                 raise ValueError("NOT_PDF_BYTES")
         os.replace(tmp, destination)
-        return {"state": "SOURCE_PDF_BYTES_ACQUIRED", "original_url": url, "byte_count": n,
-                "sha256": sha256(destination), "file": destination.name}
+        return {
+            "state": "SOURCE_PDF_BYTES_ACQUIRED",
+            "original_url": url,
+            "byte_count": n,
+            "sha256": sha256(destination),
+            "file": destination.name,
+        }
     finally:
         if os.path.exists(tmp):
             os.unlink(tmp)
@@ -71,7 +77,8 @@ def run(folder: Path) -> int:
     receipt: dict[str, Any] = {
         "schema_version": "pr_program_registry_primary_audit_pdf_v1",
         "retrieved_utc": datetime.now(timezone.utc).isoformat(),
-        "sources": {}, "state": "BLOCKED",
+        "sources": {},
+        "state": "BLOCKED",
         "pdf_visual_page_inspection": "INDEPENDENT_REVIEW_REQUIRED",
         "historical_84_938_vs_84_938T_equivalence": "UNADJUDICATED",
         "current_program_active_status": "NOT_ESTABLISHED",
@@ -83,15 +90,21 @@ def run(folder: Path) -> int:
             receipt["sources"][key] = fetch_pdf(url, folder / (key + ".pdf"))
         except Exception as error:
             receipt["sources"][key] = {
-                "state": "FAILED_SOURCE_FETCH", "url": url,
-                "error_type": type(error).__name__, "error_message": str(error)[:500]}
+                "state": "FAILED_SOURCE_FETCH",
+                "url": url,
+                "error_type": type(error).__name__,
+                "error_message": str(error)[:500],
+            }
     if all(x["state"] == "SOURCE_PDF_BYTES_ACQUIRED" for x in receipt["sources"].values()):
         receipt["state"] = "THREE_ORIGINAL_PDFS_FROZEN"
-    (folder / "source_receipt.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
+    (folder / "source_receipt.json").write_text(
+        json.dumps(receipt, indent=2, sort_keys=True) + "\n"
+    )
     print(json.dumps(receipt, indent=2, sort_keys=True))
     return 0 if receipt["state"] == "THREE_ORIGINAL_PDFS_FROZEN" else 2
 
 
 if __name__ == "__main__":
-    raise SystemExit(run(Path(sys.argv[1]) if len(sys.argv)>1 else
-                         Path("outputs/pr_education_primary_pdfs")))
+    raise SystemExit(
+        run(Path(sys.argv[1]) if len(sys.argv) > 1 else Path("outputs/pr_education_primary_pdfs"))
+    )
