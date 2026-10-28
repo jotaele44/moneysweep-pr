@@ -1,0 +1,90 @@
+{
+  "schema": "pr_program_registry_original_audit_evidence_v11",
+  "scope": "84.938_AND_DOCUMENTED_SUFFIXES_2020_2024",
+  "frozen_predecessor_v10_sha256": "c9bf1a959488121f64fdc4b831593b2db44226d780ef631a08b8268d35eca710",
+  "source_provenance": [
+    {
+      "key": "prde_2020",
+      "publisher": "Commonwealth of Puerto Rico Department of Education",
+      "url": "https://hacienda.pr.gov/sites/default/files/puerto_rico_department_of_education_1.pdf",
+      "sha256": "50bd4ca3520dfab322035be8cceaa590e9f0cc8542311a8a0db5e81c68d0c78a",
+      "bytes": 3291801,
+      "pdf_page_zero_index": 55,
+      "audit_fiscal_year_end": "2020-06-30"
+    },
+    {
+      "key": "upr_2023",
+      "publisher": "University of Puerto Rico",
+      "url": "https://hacienda.pr.gov/sites/default/files/upr_fs_2023.pdf",
+      "sha256": "ae47e5c39b9afa63c28f4dee297e176fb5b6b56e27e474f0c1e5a7455288aa0d",
+      "bytes": 2432971,
+      "pdf_page_zero_index": 139,
+      "audit_fiscal_year_end": "2023-06-30"
+    },
+    {
+      "key": "upr_2024",
+      "publisher": "University of Puerto Rico",
+      "url": "https://hacienda.pr.gov/sites/default/files/university_of_puerto_rico_3.pdf",
+      "sha256": "352e3d7c5c40db9fe8513325cfede0f091f7eb606e50895f5df4dcceda8968f3",
+      "bytes": 2457889,
+      "pdf_page_zero_index": 144,
+      "audit_fiscal_year_end": "2024-06-30"
+    }
+  ],
+  "prde_fy2020": {
+    "source": "prde_2020",
+    "title_family": "Hurricane Education Recovery",
+    "exact_suffix_expenditures_usd": {
+      "84.938A": 145142571,
+      "84.938B": 95506,
+      "84.938C": 19120,
+      "84.938G": 736111,
+      "84.938T": 1862576
+    },
+    "reported_total_usd": 147855884,
+    "aggregation_reconciled": true
+  },
+  "upr_fy2023": {
+    "source": "upr_2023",
+    "expenditures_usd": {
+      "84.938": 26260,
+      "84.938T": 279005
+    }
+  },
+  "upr_fy2024": {
+    "source": "upr_2024",
+    "expenditures_usd": {
+      "84.938": 27278,
+      "84.938T": 9013455
+    },
+    "major_program_designation": "84.938T",
+    "major_program_title": "Emergency Assistance to Institutions of Higher Education Program",
+    "major_program_table_page_zero_index": 149
+  },
+  "adjudication": {
+    "source_pdf_bytes_acquired_and_sha256_verified": true,
+    "independent_visual_page_check": "PASS",
+    "pr_historical_award_activity": "SOURCE_SUPPORTED",
+    "umbrella_suffix_relationship": "SOURCE_SUPPORTED_PRDE_AUDIT_PRESENTATION",
+    "federal_program_exact_lifecycle": "OPEN",
+    "84.938_equals_84.938T": "DENY",
+    "2026_active_status": "NOT_ESTABLISHED",
+    "2026_grant_crosswalk_84.938": "CANDIDATE_HISTORICAL_VERSION_REVIEW",
+    "canonical_program_ids_assigned": 0,
+    "domain_owner": "OPEN",
+    "production_consumers_verified": 0,
+    "certification": "WITHHELD"
+  },
+  "source_artifact": {
+    "github_repository": "jotaele44/moneysweep-pr",
+    "github_run_id": 40691257083,
+    "github_artifact_id": 12816658443,
+    "artifact_name": "pr-registry-official-education-audit-pdfs"
+  },
+  "material_open": [
+    "Independently verify Department of Education historical assistance-listing status for each exact suffix and effective period.",
+    "Resolve 2026 award source's 84.938 binding to a specific historical/current version.",
+    "Do not infer same canonical record identity from stem matching, nor infer 2026 Active status from expenditure history.",
+    "Recover all other source-universe and custody evidence before production federation promotion."
+  ]
+}
