@@ -59,9 +59,7 @@ def main() -> int:
                 if value is None
             ]
             if missing:
-                raise ProfileError(
-                    "incremental refresh requires " + ", ".join(missing)
-                )
+                raise ProfileError("incremental refresh requires " + ", ".join(missing))
             profiles, receipt = build_incremental_profiles(
                 pin_path=args.pin,
                 records_path=args.records,
@@ -91,8 +89,7 @@ def main() -> int:
         parser.exit(2, f"FAIL_CLOSED: {exc}\n")
 
     output = "".join(
-        json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n"
-        for row in profiles
+        json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n" for row in profiles
     )
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(output, encoding="utf-8")
