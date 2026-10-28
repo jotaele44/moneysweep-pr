@@ -13,6 +13,7 @@ import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
@@ -67,7 +68,7 @@ def fetch_pdf(url: str, destination: Path) -> dict:
 
 def run(folder: Path) -> int:
     folder.mkdir(parents=True, exist_ok=True)
-    receipt = {
+    receipt: dict[str, Any] = {
         "schema_version": "pr_program_registry_primary_audit_pdf_v1",
         "retrieved_utc": datetime.now(timezone.utc).isoformat(),
         "sources": {}, "state": "BLOCKED",
