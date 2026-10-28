@@ -78,6 +78,10 @@ def _load() -> None:
 
 _load()  # eager load at import → fail fast on missing files / header drift
 
+# Read-only graph adapter: legacy edges remain explicitly UNVERIFIED.
+from server.backend.network_atlas import attach_data  # noqa: E402
+app.include_router(attach_data(DATA))
+
 
 def _num(v):
     """Parse a possibly-blank money string → float or None (never NaN)."""
