@@ -6,10 +6,10 @@ import hashlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-THEHUB_PROFILE_TEMPLATE_COMMIT = "befacc8432f1849a586f036fda8bf133f7374e2d"
-PROFILE_GIT_BLOB_SHA1 = "e245d91a9b5da829d1bbdaec329958c08e057701"
-MATERIALIZER_GIT_BLOB_SHA1 = "33557e2e60b3d0f79545ac5269f82abc0a6b3391"
-PROFILE_TEST_GIT_BLOB_SHA1 = "c2c3e34e0396d8b260fa13df3f6f0902becaa857"
+THEHUB_PROFILE_TEMPLATE_COMMIT = "d7716d00c0ab40a79cee06e192508924ef17d9eb"
+PROFILE_GIT_BLOB_SHA1 = "704ac0dc222b5a980811b84312961f66cc3ee309"
+MATERIALIZER_GIT_BLOB_SHA1 = "66a3c995118353bce0260c874901496b8847acc6"
+PROFILE_TEST_GIT_BLOB_SHA1 = "6eb7c9d4699691b1f1e25f65351441b51a8382fb"
 
 
 def _git_blob_sha1(path: Path) -> str:
@@ -21,14 +21,10 @@ def _git_blob_sha1(path: Path) -> str:
 def test_grid_v2_profile_templates_match_thehub_authority():
     assert len(THEHUB_PROFILE_TEMPLATE_COMMIT) == 40
     assert (
-        _git_blob_sha1(ROOT / "federation/spatial/pr_grid_v2_profiles.py")
-        == PROFILE_GIT_BLOB_SHA1
+        _git_blob_sha1(ROOT / "federation/spatial/pr_grid_v2_profiles.py") == PROFILE_GIT_BLOB_SHA1
     )
     assert (
         _git_blob_sha1(ROOT / "federation/spatial/materialize_pr_grid_v2_profiles.py")
         == MATERIALIZER_GIT_BLOB_SHA1
     )
-    assert (
-        _git_blob_sha1(ROOT / "tests/test_pr_grid_v2_profiles.py")
-        == PROFILE_TEST_GIT_BLOB_SHA1
-    )
+    assert _git_blob_sha1(ROOT / "tests/test_pr_grid_v2_profiles.py") == PROFILE_TEST_GIT_BLOB_SHA1
