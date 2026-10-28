@@ -185,9 +185,7 @@ def test_exact_geometry_bindings_enter_profiles(tmp_path, method, measure_fields
         ),
     ],
 )
-def test_evidence_gated_set_bindings_enter_profiles(
-    tmp_path, method, uncertainty, geometry_state
-):
+def test_evidence_gated_set_bindings_enter_profiles(tmp_path, method, uncertainty, geometry_state):
     args = _inputs(tmp_path)
     base = json.loads(args["bindings_path"].read_text())
     base.update(
@@ -326,7 +324,9 @@ def test_incremental_refresh_recomputes_old_and_new_cells(tmp_path):
     full_profiles, _ = build_profiles(**args)
     previous_profiles = tmp_path / "previous-profiles.jsonl"
     previous_profiles.write_text(
-        "".join(json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n" for row in full_profiles),
+        "".join(
+            json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n" for row in full_profiles
+        ),
         encoding="utf-8",
     )
 
@@ -364,9 +364,10 @@ def test_incremental_refresh_recomputes_old_and_new_cells(tmp_path):
             "PRG2:" + LEVEL + ":R000:C0003",
         ]
     )
-    assert receipt["Rollback_Target_SHA256"] == hashlib.sha256(
-        previous_profiles.read_bytes()
-    ).hexdigest()
+    assert (
+        receipt["Rollback_Target_SHA256"]
+        == hashlib.sha256(previous_profiles.read_bytes()).hexdigest()
+    )
     by_cell = {row["Cell_ID"]: row for row in profiles}
     assert by_cell["PRG2:" + LEVEL + ":R000:C0000"]["Data_State"] == "NO_DATA"
     assert by_cell["PRG2:" + LEVEL + ":R000:C0003"]["Data_State"] == "HAS_RECORDS"
