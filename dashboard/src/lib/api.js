@@ -164,3 +164,5 @@ export const getOwnershipDeepDiveStatus = () => fetchJSON('/deep-dive/ownership/
 })
 export const getOwnershipDeepDive = (ticker = 'BPOP') =>
   fetchJSON(`/deep-dive/ownership/${encodeURIComponent(ticker)}`, null)
+
+export const getResearchLenses = () => fetchJSON('/investigation/lenses')
