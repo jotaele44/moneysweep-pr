@@ -67,3 +67,22 @@ PROFILE TEMPLATE AUTHORITY
 TheHub commit: 0663bfa77740dceff3eb70855f2164112ce47c44
 pr_grid_v2_profiles.py Git blob: c4e174b4626083ef3e1866274e87e8aaea9f81a2
 test_pr_grid_v2_profiles.py Git blob: 3f74d64046ef19b4b8f4718b3a50d5eed902877c
+
+INVESTIGATION LENSES V1 — DEVELOPMENT CHECKPOINT (NOT RELEASE CERTIFIED)
+Scope: MoneySweep only. Full investigation readiness remains UNRESOLVED.
+Read docs/INVESTIGATION_CAPABILITIES_UPGRADE_V1.md before continuing.
+
+Smoke (macOS/Linux with project dependencies installed):
+python -m pytest -o addopts='' tests/test_investigation_lenses.py -q
+python .federation/check_gui_parity_with_extensions.py
+python -m uvicorn server.backend.main:app --host 127.0.0.1 --port 8000
+In a second terminal: cd dashboard && npm ci && npm run dev
+Open the displayed local dashboard and select Research Lenses.
+Windows: use py -m pytest / py -m uvicorn and the same npm commands.
+Integrity: GET /investigation/lenses exposes the exact registry SHA-256 and
+baseline revision. Compare to registry/investigation_lenses_v1.json bytes.
+Failure: missing/corrupt registry returns 503; never reinterpret it as zero
+research results. GUI browser tests require Playwright Chromium; the current
+checkpoint could not download it. Do not mark rendered GUI verification PASS.
+Recovery: revert this development commit to remove the read-only registry view;
+no case database, canonical evidence or acquired source records are changed.

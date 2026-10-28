@@ -1,0 +1,1485 @@
+{
+  "schema_version": "moneysweep.investigation-lenses/v1",
+  "repository": "jotaele44/moneysweep-pr",
+  "source_revision": "81a9190f9c5c0bd1ba8297d0a8b36809439c4977",
+  "lenses": [
+    {
+      "id": "family_lineages",
+      "question": "Who is related to whom through which documented generational path?",
+      "predicates": [
+        "PARENT_OF",
+        "SIBLING_OF",
+        "MARRIED_TO",
+        "ADOPTIVE_PARENT_OF"
+      ],
+      "source_families": [
+        "civil_registers",
+        "parish_registers",
+        "census",
+        "probate"
+      ],
+      "falsification": "Test namesakes, incompatible dates, alternative parents and relationship-degree arithmetic.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "corporate_heritage",
+      "question": "Which legal entities precede or succeed this entity?",
+      "predicates": [
+        "PREDECESSOR_OF",
+        "MERGED_INTO",
+        "SPUN_OFF_FROM",
+        "DISSOLVED_ON"
+      ],
+      "source_families": [
+        "corporate_registries",
+        "merger_filings",
+        "court_orders"
+      ],
+      "falsification": "Distinguish asset purchase from legal succession and test identifier continuity.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "ownership_control",
+      "question": "Who owns or controls an entity during the relevant period?",
+      "predicates": [
+        "OWNS_INTEREST_IN",
+        "CONTROLS",
+        "HAS_VOTING_RIGHTS_IN"
+      ],
+      "source_families": [
+        "ownership_disclosures",
+        "securities_filings",
+        "corporate_registers"
+      ],
+      "falsification": "Test indirect chains, reporting thresholds and ownership versus managerial control.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "institutional_ties",
+      "question": "Which formal institutional roles are documented?",
+      "predicates": [
+        "EMPLOYED_BY",
+        "APPOINTED_TO",
+        "BOARD_MEMBER_OF",
+        "MEMBER_OF"
+      ],
+      "source_families": [
+        "official_rosters",
+        "appointment_records",
+        "institutional_archives"
+      ],
+      "falsification": "Test role dates, honorary versus operational roles and namesake appointments.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "political_connections",
+      "question": "Which campaign, party and political roles are documented?",
+      "predicates": [
+        "CAMPAIGN_ROLE_IN",
+        "PARTY_ROLE_IN",
+        "ENDORSED",
+        "TRANSITION_ROLE_IN"
+      ],
+      "source_families": [
+        "campaign_records",
+        "party_records",
+        "official_statements"
+      ],
+      "falsification": "Distinguish endorsement, party membership, campaign employment and mere proximity.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "lobbying_representation",
+      "question": "Who represented which client on which disclosed issues?",
+      "predicates": [
+        "LOBBIED_FOR",
+        "REGISTERED_WITH",
+        "REPORTED_AGENCY_TARGET"
+      ],
+      "source_families": [
+        "lda_filings",
+        "pr_lobbyist_registry"
+      ],
+      "falsification": "Reconcile amendments and terminations; agency listing does not establish a meeting.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "campaign_finance",
+      "question": "Which political financial events were disclosed?",
+      "predicates": [
+        "DONATED_TO",
+        "DISBURSED_TO",
+        "TRANSFERRED_TO",
+        "INDEPENDENT_EXPENDITURE_FOR"
+      ],
+      "source_families": [
+        "fec_filings",
+        "oce_filings",
+        "cee_filings"
+      ],
+      "falsification": "Reconcile amendments, refunds, recipient IDs and independent versus coordinated spending.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "contracts_procurement",
+      "question": "Which entities contracted for which obligations and services?",
+      "predicates": [
+        "AWARDED_CONTRACT_TO",
+        "SUBCONTRACTED_TO",
+        "AMENDED_CONTRACT"
+      ],
+      "source_families": [
+        "contract_registers",
+        "procurement_files",
+        "payment_records"
+      ],
+      "falsification": "Distinguish ceiling, obligation and payment; detect cancelled and duplicated awards.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "grants_assistance",
+      "question": "Which recipients received which awards and disbursements?",
+      "predicates": [
+        "AWARDED_GRANT_TO",
+        "SUBAWARDED_TO",
+        "DISBURSED_ASSISTANCE_TO"
+      ],
+      "source_families": [
+        "grant_awards",
+        "subaward_filings",
+        "agency_reports"
+      ],
+      "falsification": "Distinguish award from expenditure and reconcile recipient and subrecipient chains.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "financial_relationships",
+      "question": "Which disclosed transactions connect the actors?",
+      "predicates": [
+        "LENT_TO",
+        "COMPENSATED",
+        "INVESTED_IN",
+        "OWES_TO"
+      ],
+      "source_families": [
+        "financial_disclosures",
+        "audited_statements",
+        "transaction_records"
+      ],
+      "falsification": "Test payer/payee direction, period, currency, amendments and gross versus net amounts.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "property_assets",
+      "question": "Who held or transferred which asset and when?",
+      "predicates": [
+        "OWNED_ASSET",
+        "LEASED_FROM",
+        "TRANSFERRED_ASSET_TO",
+        "LIEN_ON"
+      ],
+      "source_families": [
+        "property_registers",
+        "deeds",
+        "lease_records"
+      ],
+      "falsification": "Require authoritative property anchors; shared addresses cannot establish ownership.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "nonprofit_philanthropy",
+      "question": "Which nonprofit governance and funding relationships exist?",
+      "predicates": [
+        "TRUSTEE_OF",
+        "GRANTED_TO",
+        "FISCALLY_SPONSORED",
+        "OFFICER_OF"
+      ],
+      "source_families": [
+        "tax_filings",
+        "charity_registers",
+        "nonprofit_reports"
+      ],
+      "falsification": "Test reporting periods and related organizations; undisclosed donors remain unknown.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "professional_networks",
+      "question": "Which professional collaborations are established?",
+      "predicates": [
+        "PARTNER_OF",
+        "COUNSEL_TO",
+        "CONSULTED_FOR",
+        "COLLABORATED_WITH"
+      ],
+      "source_families": [
+        "professional_registers",
+        "engagement_disclosures",
+        "court_appearances"
+      ],
+      "falsification": "Distinguish shared profession or firm from documented collaboration.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "government_regulatory",
+      "question": "Which offices, regulators and authorities have formal ties?",
+      "predicates": [
+        "HELD_OFFICE_IN",
+        "REGULATED_BY",
+        "PERMITTED_BY",
+        "OVERSEEN_BY"
+      ],
+      "source_families": [
+        "agency_records",
+        "official_gazettes",
+        "permit_dockets"
+      ],
+      "falsification": "Test authority, jurisdiction and effective office dates; former role is historical.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "judicial_administrative",
+      "question": "What procedural roles and determinations are recorded?",
+      "predicates": [
+        "PARTY_TO",
+        "COUNSEL_IN",
+        "SUBJECT_OF_ALLEGATION",
+        "SUBJECT_OF_FINDING"
+      ],
+      "source_families": [
+        "court_dockets",
+        "opinions",
+        "administrative_orders"
+      ],
+      "falsification": "Separate allegation, stipulation, finding, order, appeal and final disposition.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "media_information",
+      "question": "Which media roles, ownership and publication links exist?",
+      "predicates": [
+        "EDITOR_OF",
+        "HOSTED_BY",
+        "PUBLISHED_IN",
+        "SPONSORED_BY"
+      ],
+      "source_families": [
+        "mastheads",
+        "corporate_disclosures",
+        "episode_archives"
+      ],
+      "falsification": "Distinguish guest appearance, employment, ownership and independently documented amplification.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "events_communications",
+      "question": "Which communications and event roles are documented?",
+      "predicates": [
+        "COMMUNICATED_WITH",
+        "MET_WITH",
+        "ATTENDED",
+        "INTRODUCED_TO"
+      ],
+      "source_families": [
+        "public_calendars",
+        "correspondence",
+        "event_programs"
+      ],
+      "falsification": "Attendance is not interaction; test exact dates, participant identity and document context.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "policy_legislative",
+      "question": "Which actors participated in identifiable policy activity?",
+      "predicates": [
+        "TESTIFIED_ON",
+        "ADVOCATED_FOR",
+        "SPONSORED_BILL",
+        "COALITION_MEMBER_OF"
+      ],
+      "source_families": [
+        "legislative_records",
+        "rulemaking_dockets",
+        "testimony"
+      ],
+      "falsification": "Shared policy positions cannot establish coordination; distinguish sponsors and witnesses.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "geographic_relationships",
+      "question": "Which documented places and jurisdictions contextualize an edge?",
+      "predicates": [
+        "LOCATED_IN",
+        "OPERATED_IN",
+        "PROJECT_IN"
+      ],
+      "source_families": [
+        "official_geospatial_records",
+        "project_records",
+        "address_disclosures"
+      ],
+      "falsification": "Location overlap cannot establish identity or contact; preserve CRS and uncertainty.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "historical_development",
+      "question": "How did documented roles and organizations change over time?",
+      "predicates": [
+        "SUCCEEDED_IN_ROLE",
+        "CHANGED_NAME_TO",
+        "ROLE_ENDED_ON"
+      ],
+      "source_families": [
+        "archived_rosters",
+        "historical_registers",
+        "contemporaneous_records"
+      ],
+      "falsification": "Do not substitute publication date for effective date or infer continuity across gaps.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "cross_border_territorial",
+      "question": "Which relationships span jurisdictions and federal-territorial institutions?",
+      "predicates": [
+        "REPRESENTED_BEFORE",
+        "PARTNERED_ACROSS_JURISDICTIONS",
+        "TRANSFERRED_ACROSS_JURISDICTIONS"
+      ],
+      "source_families": [
+        "federal_records",
+        "territorial_records",
+        "intergovernmental_agreements"
+      ],
+      "falsification": "Test jurisdiction, legal entities and aligned dates; shared federal geography is contextual.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "conflicts_disclosures",
+      "question": "Which duties, interests and recusals are established?",
+      "predicates": [
+        "DISCLOSED_INTEREST_IN",
+        "RECUSED_FROM",
+        "SUBJECT_TO_DUTY"
+      ],
+      "source_families": [
+        "ethics_disclosures",
+        "recusal_records",
+        "official_determinations"
+      ],
+      "falsification": "Bind the applicable duty and period; an interest alone does not establish a violation.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "network_structure",
+      "question": "Which independently documented paths and intermediaries exist?",
+      "predicates": [
+        "DERIVED_SHARED_ENTITY",
+        "DERIVED_TEMPORAL_PATH",
+        "DERIVED_INTERSECTION"
+      ],
+      "source_families": [
+        "reviewed_relationship_assertions",
+        "frozen_graph_snapshots"
+      ],
+      "falsification": "Remove disputed edges, test temporal path order and disclose graph sampling sensitivity.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    },
+    {
+      "id": "evidence_counterevidence",
+      "question": "What supports, contradicts or limits each proposition?",
+      "predicates": [
+        "SUPPORTS",
+        "CONTRADICTS",
+        "QUALIFIES",
+        "SUPERSEDES"
+      ],
+      "source_families": [
+        "source_manifestations",
+        "search_ledgers",
+        "acquisition_receipts"
+      ],
+      "falsification": "Test source dependence, missing pages, contrary evidence and bounded non-detection.",
+      "owner": "moneysweep-pr",
+      "implementation_state": "UNATTEMPTED",
+      "source_coverage_state": "UNATTEMPTED",
+      "finding_state": "UNATTEMPTED",
+      "gates": {
+        "scope": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "identity": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "provenance": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "temporal_alignment": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "contradictions": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "falsification": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "persistence_authorization": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "gui": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "export_replay": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        },
+        "recovery": {
+          "state": "UNATTEMPTED",
+          "evidence_refs": []
+        }
+      }
+    }
+  ]
+}

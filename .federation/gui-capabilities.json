@@ -1723,6 +1723,60 @@
         "python_symbol:moneysweep/runtime/source_database.py:materialize_source",
         "python_symbol:moneysweep/runtime/source_database.py:materialize_sources"
       ]
+    },
+    {
+      "id": "investigation-research-lens-registry-v1",
+      "classification": "user",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Read-only development coverage registry. Reports all 24 adopted lenses and explicit unattempted states; does not claim acquisition, case investigation, source completeness or finding certification. Scope is MoneySweep only. Static offline exports hide this live-only view.",
+      "backend": {
+        "files": [
+          "moneysweep/investigation/lenses.py",
+          "moneysweep/investigation/__init__.py",
+          "server/backend/investigation_api.py",
+          "server/backend/main.py"
+        ],
+        "endpoints": [
+          "GET /lenses"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/components/ResearchLenses.jsx",
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/lib/api.js"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_investigation_lenses.py"
+        ],
+        "e2e": [
+          "dashboard/tests/research-lenses.spec.mjs"
+        ],
+        "frontend": [
+          "dashboard/src/components/ResearchLenses.test.jsx"
+        ]
+      },
+      "candidate_ids": [
+        "python_module:moneysweep/investigation/lenses.py",
+        "python_symbol:moneysweep/investigation/lenses.py:validate_registry",
+        "python_symbol:moneysweep/investigation/lenses.py:summarize_registry",
+        "python_module:moneysweep/investigation/__init__.py",
+        "python_module:server/backend/investigation_api.py",
+        "python_symbol:server/backend/investigation_api.py:research_lenses",
+        "backend_endpoint:server/backend/investigation_api.py:GET /lenses"
+      ]
     }
   ],
   "exceptions": [
