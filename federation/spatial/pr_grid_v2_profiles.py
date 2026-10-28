@@ -133,13 +133,9 @@ def _validated_binding_index(
         else:
             expected_uncertainty, expected_geometry_state = SET_PROFILE_POLICIES[str(method)]
             if uncertainty != expected_uncertainty:
-                raise ProfileError(
-                    f"{method} requires Uncertainty_Class={expected_uncertainty}"
-                )
+                raise ProfileError(f"{method} requires Uncertainty_Class={expected_uncertainty}")
             if binding.get("Geometry_State") != expected_geometry_state:
-                raise ProfileError(
-                    f"{method} requires Geometry_State={expected_geometry_state}"
-                )
+                raise ProfileError(f"{method} requires Geometry_State={expected_geometry_state}")
             if binding.get("Confidence") is not None:
                 raise ProfileError(f"{method} requires Confidence=null")
         state = binding.get("Binding_State")
@@ -356,10 +352,7 @@ def compute_impacted_cells(
     if any(not isinstance(rid, str) or not rid for rid in changed):
         raise ProfileError("changed Record_ID values must be non-empty strings")
 
-    impacted = {
-        grid.validate_cell_id(cid, level=level)
-        for cid in changed_coverage_cells
-    }
+    impacted = {grid.validate_cell_id(cid, level=level) for cid in changed_coverage_cells}
     for rows in (old_bindings, new_bindings):
         grouped = _validated_binding_index(
             bindings=rows,
