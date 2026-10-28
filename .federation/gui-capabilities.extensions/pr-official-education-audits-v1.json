@@ -1,0 +1,24 @@
+{
+  "extension_id": "pr-program-registry-official-audit-pdf-research-v1",
+  "capabilities": [
+    {
+      "id": "pr-official-education-pdf-source-retrieval",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Isolated CI research source acquisition for three fixed official public Puerto Rico audit PDF URLs. It produces SHA-256 evidence artifacts only. No backend route, application API, user/operator GUI feature, data mutation, canonical program identity promotion, or production program-registry consumer exists. Future user-facing source browsing needs its own GUI/E2E contract; this classification does not attest production release readiness.",
+      "analysis": {
+        "files": [
+          "scripts/acquire_pr_education_primary_audits.py"
+        ]
+      },
+      "tests": {
+        "contract": [
+          "tests/test_pr_education_primary_pdf_acquisition.py"
+        ]
+      },
+      "production_consumer_enabled": false,
+      "registry_certification": "WITHHELD"
+    }
+  ]
+}

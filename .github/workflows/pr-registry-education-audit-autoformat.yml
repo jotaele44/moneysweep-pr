@@ -1,0 +1,40 @@
+name: PR Registry Official Audit Source Formatter
+on:
+  pull_request:
+    paths:
+      - scripts/acquire_pr_education_primary_audits.py
+      - tests/test_pr_education_primary_pdf_acquisition.py
+      - .github/workflows/pr-registry-education-audit-autoformat.yml
+permissions:
+  contents: write
+jobs:
+  format-exact-draft-only:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'audit/pr-registry-official-education-pdf-bytes-20261028'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned Ruff
+        run: python -m pip install ruff==0.16.5
+      - name: Format only the two source research files
+        run: |
+          ruff format scripts/acquire_pr_education_primary_audits.py tests/test_pr_education_primary_pdf_acquisition.py
+          ruff check scripts/acquire_pr_education_primary_audits.py tests/test_pr_education_primary_pdf_acquisition.py
+          git diff --check
+      - name: Record exact-branch formatting commit
+        run: |
+          git add -- scripts/acquire_pr_education_primary_audits.py tests/test_pr_education_primary_pdf_acquisition.py
+          if git diff --cached --quiet; then
+            echo "NO_SOURCE_STYLE_CHANGE"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "style: exact Ruff formatting of official audit source probe"
+          git push origin "HEAD:refs/heads/audit/pr-registry-official-education-pdf-bytes-20261028"

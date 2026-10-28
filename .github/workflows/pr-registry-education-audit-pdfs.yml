@@ -1,0 +1,35 @@
+name: PR Registry Official Education Audits - Frozen PDF Sources
+on:
+  pull_request:
+    paths:
+      - scripts/acquire_pr_education_primary_audits.py
+      - tests/test_pr_education_primary_pdf_acquisition.py
+      - .github/workflows/pr-registry-education-audit-pdfs.yml
+permissions:
+  contents: read
+jobs:
+  acquire-official-raw-audit-pdfs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Offline source and failure-state tests
+        run: python -m unittest discover -s tests -p test_pr_education_primary_pdf_acquisition.py -v
+      - name: Acquire unchanged official PDF bytes and SHA-256
+        id: acquisition
+        continue-on-error: true
+        run: python scripts/acquire_pr_education_primary_audits.py outputs/pr_education_primary_pdfs
+      - name: Retain all recovered original PDFs and fail-closed receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-registry-official-education-audit-pdfs
+          path: outputs/pr_education_primary_pdfs/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Deny source gate if any official audit is missing
+        if: steps.acquisition.outcome != 'success'
+        run: exit 1
