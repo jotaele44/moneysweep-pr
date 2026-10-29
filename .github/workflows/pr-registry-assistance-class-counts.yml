@@ -1,0 +1,35 @@
+name: PR Registry FY2022-FY2026 Assistance Class Count
+on:
+  pull_request:
+    paths:
+      - research/pr_program_registry/acquire_assistance_class_counts.py
+      - tests/test_pr_program_registry_assistance_counts.py
+      - .github/workflows/pr-registry-assistance-class-counts.yml
+permissions:
+  contents: read
+jobs:
+  source-denominators:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Independent offline source-contract tests
+        run: python -m unittest discover -s tests -p test_pr_program_registry_assistance_counts.py -v
+      - name: Read-only five-year PR assistance-class count acquisition
+        id: acquire
+        continue-on-error: true
+        run: python research/pr_program_registry/acquire_assistance_class_counts.py outputs/pr_registry_fy2022_2026_counts
+      - name: Freeze original responses and fail-closed receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-program-registry-fy2022-2026-assistance-counts
+          path: outputs/pr_registry_fy2022_2026_counts/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Deny incomplete denominator source acquisition
+        if: steps.acquire.outcome != 'success'
+        run: exit 1
