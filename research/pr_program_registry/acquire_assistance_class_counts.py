@@ -4,6 +4,7 @@
 Counts are not award membership, canonical program identity, or PR program census.
 Original API requests and responses are preserved before parsing.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -38,10 +39,12 @@ def request_bytes(year: int, location: str) -> bytes:
         "filters": {
             "award_type_codes": list(CODES),
             LOCATIONS[location]: [{"country": "USA", "state": "PR"}],
-            "time_period": [{
-                "start_date": f"{year - 1}-10-01",
-                "end_date": f"{year}-09-30",
-            }],
+            "time_period": [
+                {
+                    "start_date": f"{year - 1}-10-01",
+                    "end_date": f"{year}-09-30",
+                }
+            ],
         },
         "spending_level": "awards",
         "subawards": False,
@@ -96,8 +99,10 @@ def acquire(target: Path) -> int:
                     ENDPOINT,
                     data=body,
                     method="POST",
-                    headers={"Content-Type": "application/json",
-                             "User-Agent": "PR-Program-Registry-Count-Evidence/1.0"},
+                    headers={
+                        "Content-Type": "application/json",
+                        "User-Agent": "PR-Program-Registry-Count-Evidence/1.0",
+                    },
                 )
                 with urlopen(request, timeout=60) as response:
                     if response.geturl() != ENDPOINT:
@@ -123,21 +128,31 @@ def acquire(target: Path) -> int:
                     "error_type": type(error).__name__,
                     "error_message": message[:1000],
                 }
-    if (len(receipt["results"]) == len(YEARS) * len(LOCATIONS)
-            and all(x["state"] == "COUNT_OBSERVED" for x in receipt["results"].values())):
+    if len(receipt["results"]) == len(YEARS) * len(LOCATIONS) and all(
+        x["state"] == "COUNT_OBSERVED" for x in receipt["results"].values()
+    ):
         receipt["status"] = "BOUNDED_CLASS_COUNT_OBSERVATIONS_PASS"
     (target / "count_receipt.json").write_text(
         json.dumps(receipt, sort_keys=True, indent=2) + "\n", encoding="utf-8"
     )
-    print(json.dumps({"status": receipt["status"], "scopes": {
-        key: val.get("counts", val.get("error_type"))
-        for key, val in receipt["results"].items()
-    }}, sort_keys=True, indent=2))
+    print(
+        json.dumps(
+            {
+                "status": receipt["status"],
+                "scopes": {
+                    key: val.get("counts", val.get("error_type"))
+                    for key, val in receipt["results"].items()
+                },
+            },
+            sort_keys=True,
+            indent=2,
+        )
+    )
     return 0 if receipt["status"] == "BOUNDED_CLASS_COUNT_OBSERVATIONS_PASS" else 2
 
 
 if __name__ == "__main__":
-    output = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(
-        "outputs/pr_registry_fy2022_2026_counts"
+    output = (
+        Path(sys.argv[1]) if len(sys.argv) > 1 else Path("outputs/pr_registry_fy2022_2026_counts")
     )
     raise SystemExit(acquire(output))

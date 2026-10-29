@@ -1,4 +1,5 @@
 """Offline fail-closed regressions for the PR assistance count contract."""
+
 import importlib.util
 import json
 import unittest
@@ -39,9 +40,9 @@ class AssistanceCountTests(unittest.TestCase):
 
     def test_fy_boundary(self):
         a = json.loads(module.request_bytes(2022, "recipient_pr"))
-        self.assertEqual(a["filters"]["time_period"], [
-            {"start_date": "2021-10-01", "end_date": "2022-09-30"}
-        ])
+        self.assertEqual(
+            a["filters"]["time_period"], [{"start_date": "2021-10-01", "end_date": "2022-09-30"}]
+        )
 
     def test_filter_only_public_documented_codes(self):
         a = json.loads(module.request_bytes(2026, "recipient_pr"))
@@ -56,9 +57,9 @@ class AssistanceCountTests(unittest.TestCase):
         self.assertEqual(sum(module.parse_count(valid_response()).values()), 10)
 
     def test_zero_valid(self):
-        self.assertEqual(sum(module.parse_count(valid_response({
-            name: 0 for name in module.GROUPS
-        })).values()), 0)
+        self.assertEqual(
+            sum(module.parse_count(valid_response({name: 0 for name in module.GROUPS})).values()), 0
+        )
 
     def test_negative_denied(self):
         with self.assertRaisesRegex(ValueError, "INVALID_COUNT_loans"):
