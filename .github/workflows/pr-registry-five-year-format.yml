@@ -1,0 +1,40 @@
+name: PR Registry Five-Year Research Format
+on:
+  pull_request:
+    paths:
+      - research/pr_program_registry/acquire_assistance_class_counts.py
+      - tests/test_pr_program_registry_assistance_counts.py
+      - .github/workflows/pr-registry-five-year-format.yml
+permissions:
+  contents: write
+jobs:
+  format-branch-only:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'audit/pr-registry-fy2022-2026-assistance-counts-20261029'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned Ruff
+        run: python -m pip install ruff==0.16.5
+      - name: Reformat and verify only two candidate research files
+        run: |
+          ruff format research/pr_program_registry/acquire_assistance_class_counts.py tests/test_pr_program_registry_assistance_counts.py
+          ruff check research/pr_program_registry/acquire_assistance_class_counts.py tests/test_pr_program_registry_assistance_counts.py
+          git diff --check
+      - name: Commit only formatted candidate source
+        run: |
+          git add -- research/pr_program_registry/acquire_assistance_class_counts.py tests/test_pr_program_registry_assistance_counts.py
+          if git diff --cached --quiet; then
+            echo "FORMAT_ALREADY_EXACT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "style: Ruff-format FY2022-FY2026 bounded assistance source probe"
+          git push origin "HEAD:refs/heads/audit/pr-registry-fy2022-2026-assistance-counts-20261029"
