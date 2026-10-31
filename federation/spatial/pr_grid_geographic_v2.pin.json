@@ -3,7 +3,7 @@
   "consumer": "moneysweep-pr",
   "geometry_authority": "spiderweb-pr",
   "authority_repository": "jotaele44/spiderweb-pr",
-  "authority_commit": "0c66e13d14232c0d7cbcbc179b3655904777dc71",
+  "authority_commit": "b8f5cf303ab7fc2b6ed006edce0fb12e1344a096",
   "authority_manifest_path": "registry/spatial/v2/pr_grid_geographic_v2.manifest.json",
   "grid_id": "PR_GRID_GEOGRAPHIC_V2",
   "grid_version": "2.0.0-rc1",
