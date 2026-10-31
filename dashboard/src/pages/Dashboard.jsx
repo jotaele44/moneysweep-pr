@@ -54,6 +54,7 @@ export default function Dashboard() {
       </header>
 
       <StatsBar />
+        <div data-offline-status-host style={{ padding: "2px 12px", flexShrink: 0 }} />
 
       <div className="zip-money-content min-h-0 flex-1 p-3">
         <Tabs value={tab} onValueChange={setTab} className="flex h-full flex-col">

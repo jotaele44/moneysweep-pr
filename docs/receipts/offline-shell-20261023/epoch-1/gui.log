@@ -1,0 +1,9 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> moneysweep-pr-dashboard@0.1.0 test:gui-parity
+> playwright test -c gui-parity.playwright.config.mjs
+
+[WebServer] /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python: No module named uvicorn
+
+Error: Process from config.webServer was not able to start. Exit code: 1
+

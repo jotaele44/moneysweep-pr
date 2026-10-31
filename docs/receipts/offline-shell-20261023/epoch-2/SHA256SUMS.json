@@ -1,0 +1,17 @@
+{
+  "browser-receipt.json": "149f9ac85f93e570372c7b6afb4ac2db3304f68fe00a35f8c5052844af1433f6",
+  "build-manifest.json": "32d0a315d7107eb7cf517b91ec466a9abdf9812e91b1e5ceaada2f274b9130da",
+  "candidate-receipt.json": "38b961c91582c2b922efe816e64d71815c6a978db2341f7fa3b734f2668941cf",
+  "moneysweep-pr-offline-browser-final.log": "b3fd464766864c4f642939d5bc3464b725b3fd23bcad65220555e401b3e26739",
+  "moneysweep-pr-offline-browser.log": "8cd20c6bd32f167f90f89cd7a0f28a1fa305e90a48e4db35d07d2cf0fe9862d1",
+  "moneysweep-pr-offline-build-final.log": "3ef7c49587a8070daae7cdeab2aba0a4264a9d9468c97494f8c9e427b99416f3",
+  "moneysweep-pr-offline-build.log": "3ef7c49587a8070daae7cdeab2aba0a4264a9d9468c97494f8c9e427b99416f3",
+  "moneysweep-pr-offline-gui.log": "99c8172a2c29489b5ddcb004df8b1bd213ba9fc014d50e6495b4cecd860891c7",
+  "moneysweep-pr-offline-install.log": "ab5b7c9a5c94e72133b7f89ba3d25cfa5db1c046e2f949893600700645ee3316",
+  "moneysweep-pr-offline-lint.log": "377657f6ea4ce69e9242d14a2ee16d7cc603a14fcfc13844f942dc79461fac04",
+  "moneysweep-pr-offline-parity.log": "0809cf3575c1405870fadb7c6081325a26fedf519e262ed80779f433138b3151",
+  "moneysweep-pr-offline-tests.log": "a82fc6553f5bacc47704b0b73f3755f7ea1ef53b33a7794cc44f249663d285af",
+  "offline-1440.png": "23cfc58e997de1a744c5c828462a6a7e8d68631ee7e53e2fd2d9c36089c2583c",
+  "offline-393.png": "de30713424255c7d0ec330703fded6df292a330edc7f24b0d0fdcb5b3682206f",
+  "offline-430.png": "839179ae90681d1927d492c2958427acbb3fa13176db63373e48a057652af0b7"
+}
