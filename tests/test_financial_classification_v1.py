@@ -1,9 +1,12 @@
 """Positive and adversarial regressions for additive financial observations."""
+
 import unittest
-from decimal import Decimal
 
 from moneysweep.financial_classification_v1 import (
-    ObservationError, classify_coverage, make_observation, undisbursed,
+    ObservationError,
+    classify_coverage,
+    make_observation,
+    undisbursed,
 )
 
 SHA = "a" * 64
@@ -11,11 +14,17 @@ SHA = "a" * 64
 
 def obs(measure="OBLIGATED", amount="100.25", **overrides):
     fields = dict(
-        source_id="official:sample", source_record_id="source-row-001",
-        source_sha256=SHA, source_version="2026-11-02",
-        measure_type=measure, amount=amount, currency="USD",
-        period="2026-08-31", accounting_basis="cash",
-        scope_id="award:stable-001", source_field=measure.lower(),
+        source_id="official:sample",
+        source_record_id="source-row-001",
+        source_sha256=SHA,
+        source_version="2026-11-02",
+        measure_type=measure,
+        amount=amount,
+        currency="USD",
+        period="2026-08-31",
+        accounting_basis="cash",
+        scope_id="award:stable-001",
+        source_field=measure.lower(),
         observation_kind="SNAPSHOT",
     )
     fields.update(overrides)
@@ -31,8 +40,9 @@ class FinancialObservationTests(unittest.TestCase):
         self.assertEqual(a["source_sha256"], SHA)
 
     def test_distinct_source_record_not_collapsed_by_name(self):
-        self.assertNotEqual(obs()["observation_id"],
-                            obs(source_record_id="source-row-002")["observation_id"])
+        self.assertNotEqual(
+            obs()["observation_id"], obs(source_record_id="source-row-002")["observation_id"]
+        )
 
     def test_valid_balance(self):
         result = undisbursed(obs(), obs("DISBURSED", "20.10"))
@@ -40,8 +50,9 @@ class FinancialObservationTests(unittest.TestCase):
         self.assertEqual(result["evidence_class"], "COMPUTED")
 
     def test_negative_correction_allowed_in_raw_observation(self):
-        self.assertEqual(obs("DEOBLIGATED", "-2.75",
-                             observation_kind="ACTION")["amount_decimal"], "-2.75")
+        self.assertEqual(
+            obs("DEOBLIGATED", "-2.75", observation_kind="ACTION")["amount_decimal"], "-2.75"
+        )
 
     def test_false_balance_from_negative_result_blocked(self):
         with self.assertRaises(ObservationError):
@@ -73,9 +84,11 @@ class FinancialObservationTests(unittest.TestCase):
         self.assertIsNone(obs(amount=None, applicability="NOT_APPLICABLE")["amount_decimal"])
 
     def test_coverage_denominator_conservation(self):
-        rows = [{"source_record_id": "A", "applicability": "APPLICABLE"},
-                {"source_record_id": "B", "applicability": "UNKNOWN"},
-                {"source_record_id": "C", "applicability": "NOT_APPLICABLE"}]
+        rows = [
+            {"source_record_id": "A", "applicability": "APPLICABLE"},
+            {"source_record_id": "B", "applicability": "UNKNOWN"},
+            {"source_record_id": "C", "applicability": "NOT_APPLICABLE"},
+        ]
         result = classify_coverage(rows, {"A", "B", "C"})
         self.assertEqual(result["total"], 3)
         self.assertEqual(result["unresolved"], 1)
@@ -89,8 +102,10 @@ class FinancialObservationTests(unittest.TestCase):
 
     def test_unknown_not_zero(self):
         self.assertIsNone(obs(amount=None, evidence_class="UNKNOWN")["amount_decimal"])
-        self.assertNotEqual(obs(amount=None, evidence_class="UNKNOWN")["amount_decimal"],
-                            obs(amount=0)["amount_decimal"])
+        self.assertNotEqual(
+            obs(amount=None, evidence_class="UNKNOWN")["amount_decimal"],
+            obs(amount=0)["amount_decimal"],
+        )
 
 
 if __name__ == "__main__":
