@@ -56,9 +56,12 @@ A bump to the **federation export** version is what the release-tagging workflow
   (its `micromatch` → `braces` dependency has no patched release); the offline
   export it writes is byte-identical to the old one, and it has its own unit
   tests. With both gone, `braces` GHSA-vfj7-8cjw-p6xm and `postcss-selector-parser`
-  GHSA-rj75-hqrm-r3gf no longer appear, `dashboard/audit-allowlist.json` is empty,
-  and `npm audit` reports no vulnerabilities at any severity. The prebuilt
-  dashboard bundle was rebuilt. Against the Tailwind 3 build, the shipped bundle
+  GHSA-rj75-hqrm-r3gf no longer appear. Advisories published while this was in
+  review are handled separately: `vite`, `vitest`, `undici` and `zod` are bumped
+  within their ranges (lockfile only), and a new `minimatch` advisory,
+  GHSA-g3hv-75wg-m249, which no eslint release can take the fix for, is the one
+  allow-list entry, expiring 2027-02-02. The prebuilt dashboard bundle was
+  rebuilt. Against the Tailwind 3 build, the shipped bundle
   served by the real desktop backend shows no pixel, layout or focus-ring
   difference across all 11 tabs plus hover, sheet, select and keyboard-focus
   states at 1280×800 and 390×844. **Browser floor:** Tailwind 4 needs
