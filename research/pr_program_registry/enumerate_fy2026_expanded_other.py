@@ -40,14 +40,14 @@ def count(response:dict)->int:
     values=response.get("results")
     if not isinstance(values,dict):raise ValueError("BAD_COUNT_RESPONSE")
     n=values.get("other")
-    if type(n)!=int or n<0:raise ValueError("BAD_OTHER_COUNT")
+    if type(n) is not int or n<0:raise ValueError("BAD_OTHER_COUNT")
     return n
 def page(response:dict,geo:str,pageno:int)->tuple[list[dict],bool]:
     rows=response.get("results")
     meta=response.get("page_metadata")
     if not isinstance(rows,list) or not isinstance(meta,dict):
         raise ValueError("MALFORMED_PAGE")
-    if meta.get("page")!=pageno or type(meta.get("hasNext"))!=bool:
+    if meta.get("page")!=pageno or type(meta.get("hasNext")) is not bool:
         raise ValueError("PAGINATION_DRIFT")
     if len(rows)>LIMIT:raise ValueError("OVERFULL_PAGE")
     ids=set()
