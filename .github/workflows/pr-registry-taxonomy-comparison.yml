@@ -1,0 +1,35 @@
+name: PR Registry Source Award-Type Taxonomy Comparison
+on:
+  pull_request:
+    paths:
+      - research/pr_program_registry/compare_award_type_taxonomies.py
+      - tests/test_pr_registry_award_taxonomy_v13.py
+      - .github/workflows/pr-registry-taxonomy-comparison.yml
+permissions:
+  contents: read
+jobs:
+  compare-taxonomy-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run positive and negative source-taxonomy contract tests
+        run: python -m unittest discover -s tests -p test_pr_registry_award_taxonomy_v13.py -v
+      - name: Acquire exact 20 source responses and preserve original bytes
+        id: acquisition
+        continue-on-error: true
+        run: python research/pr_program_registry/compare_award_type_taxonomies.py outputs/pr_registry_taxonomy_comparison
+      - name: Upload source bytes, SHA receipts and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-registry-legacy-vs-expanded-taxonomy
+          path: outputs/pr_registry_taxonomy_comparison/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Fail closed if any source or monotonicity gate is missing
+        if: steps.acquisition.outcome != 'success'
+        run: exit 1
