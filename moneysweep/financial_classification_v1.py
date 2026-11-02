@@ -3,6 +3,7 @@
 No legacy stream or identifier is modified. This module does not assert
 completeness of any financial source; that requires a separately frozen manifest.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -11,16 +12,35 @@ import re
 from decimal import Decimal, InvalidOperation
 from typing import Mapping
 
-MEASURES = frozenset({
-    "APPROPRIATED", "APPORTIONED", "ALLOTTED", "OBLIGATED",
-    "DEOBLIGATED", "UNOBLIGATED", "DISBURSED", "UNDISBURSED",
-    "OUTLAY", "EXPENDED", "TRANSFERRED", "REPROGRAMMED",
-    "RESCINDED", "REMAINING_AVAILABLE",
-})
-EVIDENCE_CLASSES = frozenset({
-    "FACT", "COMPUTED", "BINDING", "INFERENCE",
-    "ASSUMPTION", "HYPOTHESIS", "UNKNOWN",
-})
+MEASURES = frozenset(
+    {
+        "APPROPRIATED",
+        "APPORTIONED",
+        "ALLOTTED",
+        "OBLIGATED",
+        "DEOBLIGATED",
+        "UNOBLIGATED",
+        "DISBURSED",
+        "UNDISBURSED",
+        "OUTLAY",
+        "EXPENDED",
+        "TRANSFERRED",
+        "REPROGRAMMED",
+        "RESCINDED",
+        "REMAINING_AVAILABLE",
+    }
+)
+EVIDENCE_CLASSES = frozenset(
+    {
+        "FACT",
+        "COMPUTED",
+        "BINDING",
+        "INFERENCE",
+        "ASSUMPTION",
+        "HYPOTHESIS",
+        "UNKNOWN",
+    }
+)
 APPLICABILITY = frozenset({"APPLICABLE", "NOT_APPLICABLE", "UNKNOWN", "UNRESOLVED"})
 ID_PATTERN = re.compile(r"^[a-zA-Z0-9_./:-]+$")
 SHA_PATTERN = re.compile(r"^[0-9a-f]{64}$")
@@ -31,8 +51,9 @@ class ObservationError(ValueError):
 
 
 def canonical_bytes(data: Mapping) -> bytes:
-    return json.dumps(data, sort_keys=True, ensure_ascii=False,
-                      allow_nan=False, separators=(",", ":")).encode("utf-8")
+    return json.dumps(
+        data, sort_keys=True, ensure_ascii=False, allow_nan=False, separators=(",", ":")
+    ).encode("utf-8")
 
 
 def decimal_string(value: object) -> str:
@@ -53,24 +74,35 @@ def _nonempty(value: object, field: str) -> str:
     return value
 
 
-def make_observation(*, source_id: str, source_record_id: str,
-                     source_sha256: str, measure_type: str,
-                     amount: str | int | None, currency: str,
-                     period: str, accounting_basis: str,
-                     scope_id: str, source_field: str,
-                     evidence_class: str = "FACT",
-                     applicability: str = "APPLICABLE",
-                     observation_kind: str = "SNAPSHOT",
-                     source_version: str = "1") -> dict:
+def make_observation(
+    *,
+    source_id: str,
+    source_record_id: str,
+    source_sha256: str,
+    measure_type: str,
+    amount: str | int | None,
+    currency: str,
+    period: str,
+    accounting_basis: str,
+    scope_id: str,
+    source_field: str,
+    evidence_class: str = "FACT",
+    applicability: str = "APPLICABLE",
+    observation_kind: str = "SNAPSHOT",
+    source_version: str = "1",
+) -> dict:
     """Build one observation only from an explicit source-row mapping.
 
     No entity is bound by name; scope_id is a source-native scoped identifier.
     Source record identities and raw SHA are mandatory, including for UNKNOWN.
     """
     for key, value in {
-        "source_id": source_id, "source_record_id": source_record_id,
-        "period": period, "accounting_basis": accounting_basis,
-        "scope_id": scope_id, "source_field": source_field,
+        "source_id": source_id,
+        "source_record_id": source_record_id,
+        "period": period,
+        "accounting_basis": accounting_basis,
+        "scope_id": scope_id,
+        "source_field": source_field,
         "source_version": source_version,
     }.items():
         _nonempty(value, key)
@@ -88,25 +120,30 @@ def make_observation(*, source_id: str, source_record_id: str,
         raise ObservationError("non-applicable or unresolved row cannot carry an amount")
     if amount is None and evidence_class == "COMPUTED":
         raise ObservationError("computed amount is absent")
-    value = decimal_string(amount) if amount is not None else None
+    amount_decimal = decimal_string(amount) if amount is not None else None
     payload = {
-        "source_id": source_id, "source_record_id": source_record_id,
-        "source_sha256": source_sha256, "source_version": source_version,
-        "source_field": source_field, "measure_type": measure_type,
-        "amount_decimal": value, "currency": currency, "period": period,
-        "accounting_basis": accounting_basis, "scope_id": scope_id,
-        "evidence_class": evidence_class, "applicability": applicability,
+        "source_id": source_id,
+        "source_record_id": source_record_id,
+        "source_sha256": source_sha256,
+        "source_version": source_version,
+        "source_field": source_field,
+        "measure_type": measure_type,
+        "amount_decimal": amount_decimal,
+        "currency": currency,
+        "period": period,
+        "accounting_basis": accounting_basis,
+        "scope_id": scope_id,
+        "evidence_class": evidence_class,
+        "applicability": applicability,
         "observation_kind": observation_kind,
     }
-    payload["observation_id"] = "finobs_" + hashlib.sha256(
-        canonical_bytes(payload)).hexdigest()
+    payload["observation_id"] = "finobs_" + hashlib.sha256(canonical_bytes(payload)).hexdigest()
     return payload
 
 
 def undisbursed(obligated: Mapping, disbursed: Mapping) -> dict:
     """Derive only comparable cumulative snapshots; otherwise fail closed."""
-    for observation, expected in ((obligated, "OBLIGATED"),
-                                  (disbursed, "DISBURSED")):
+    for observation, expected in ((obligated, "OBLIGATED"), (disbursed, "DISBURSED")):
         if observation.get("measure_type") != expected:
             raise ObservationError("incorrect measure pair")
         if observation.get("observation_kind") != "SNAPSHOT":
@@ -115,11 +152,18 @@ def undisbursed(obligated: Mapping, disbursed: Mapping) -> dict:
             raise ObservationError("unresolved applicability")
         if observation.get("amount_decimal") is None:
             raise ObservationError("missing amount")
-    keys = ("source_id", "scope_id", "period", "accounting_basis",
-            "currency", "source_sha256", "source_version")
+    keys = (
+        "source_id",
+        "scope_id",
+        "period",
+        "accounting_basis",
+        "currency",
+        "source_sha256",
+        "source_version",
+    )
     if any(obligated.get(k) != disbursed.get(k) for k in keys):
         raise ObservationError("incompatible scope, source, period or basis")
-    if (obligated.get("source_record_id") != disbursed.get("source_record_id")):
+    if obligated.get("source_record_id") != disbursed.get("source_record_id"):
         raise ObservationError("different source rows: no binding established")
     value = Decimal(obligated["amount_decimal"]) - Decimal(disbursed["amount_decimal"])
     if value < 0:
@@ -129,11 +173,15 @@ def undisbursed(obligated: Mapping, disbursed: Mapping) -> dict:
         source_record_id=obligated["source_record_id"],
         source_sha256=obligated["source_sha256"],
         source_version=obligated["source_version"],
-        measure_type="UNDISBURSED", amount=format(value, "f"),
-        currency=obligated["currency"], period=obligated["period"],
+        measure_type="UNDISBURSED",
+        amount=format(value, "f"),
+        currency=obligated["currency"],
+        period=obligated["period"],
         accounting_basis=obligated["accounting_basis"],
-        scope_id=obligated["scope_id"], source_field="computed:obligated-disbursed",
-        evidence_class="COMPUTED", observation_kind="SNAPSHOT",
+        scope_id=obligated["scope_id"],
+        source_field="computed:obligated-disbursed",
+        evidence_class="COMPUTED",
+        observation_kind="SNAPSHOT",
     )
 
 
@@ -154,5 +202,9 @@ def classify_coverage(records: list[Mapping], expected_source_records: set[str])
         tally[state] += 1
     if seen != expected_source_records:
         raise ObservationError("missing source records")
-    return {"total": len(seen), "states": tally, "complete": True,
-            "unresolved": tally["UNKNOWN"] + tally["UNRESOLVED"]}
+    return {
+        "total": len(seen),
+        "states": tally,
+        "complete": True,
+        "unresolved": tally["UNKNOWN"] + tally["UNRESOLVED"],
+    }
