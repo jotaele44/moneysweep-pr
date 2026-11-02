@@ -21,10 +21,10 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install pinned formatter
-        run: python -m pip install ruff==0.16.5
+        run: python -m pip install ruff==0.16.5 autopep8==2.3.2
       - name: Fix candidate lint and format without bypass
         run: |
-          ruff check --select E701,E702,E721 --fix --exit-zero research/pr_program_registry/enumerate_fy2026_expanded_other.py tests/test_pr_registry_fy2026_expanded_other.py
+          autopep8 --in-place --aggressive --aggressive research/pr_program_registry/enumerate_fy2026_expanded_other.py tests/test_pr_registry_fy2026_expanded_other.py
           ruff format research/pr_program_registry/enumerate_fy2026_expanded_other.py tests/test_pr_registry_fy2026_expanded_other.py
           ruff check research/pr_program_registry/enumerate_fy2026_expanded_other.py tests/test_pr_registry_fy2026_expanded_other.py
           git diff --check
