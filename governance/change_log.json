@@ -23,6 +23,18 @@
         "tools/check_docs_sync.py",
         "governance/change_log.json"
       ]
+    },
+    {
+      "date": "2026-10-15",
+      "summary": "Re-pinned PRII_TEMPLATE_REF to thehub-pr 4258c3c, which hardens the shared docs-sync checker (thehub-pr#359): a pull request can no longer exempt itself through exempt_authors, manifest hygiene is judged on the head manifest so retiring a coupling or renaming a coupled doc no longer fails, a glob that matches nothing now fails when the change adds it, and a :symbol or :line locator is dropped from Markdown link targets. The manifest comment now says a coupling fires on its on events, and the hand-kept CONTRIBUTING.md section now says what the gate enforces: the on events, that the reference check reads root Markdown and docs/**, and that a glob a change adds that matches nothing fails. The shared eslint config also picked up one optional glob (src/zip-design, thehub-pr#358); that directory holds no JavaScript here, so lint coverage is unchanged. Tooling and documentation change only: no contract, schema or dependency edge changed.",
+      "files": [
+        ".github/workflows/template-drift.yml",
+        "tools/check_docs_sync.py",
+        "CONTRIBUTING.md",
+        "dashboard/eslint.config.js",
+        ".federation/docs-sync.json",
+        "governance/change_log.json"
+      ]
     }
   ]
 }

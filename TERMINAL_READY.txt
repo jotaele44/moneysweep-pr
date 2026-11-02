@@ -10,17 +10,17 @@ macOS / Linux (from repository root)
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install pytest
-python -m pytest -q tests/test_pr_grid_v2_runtime.py tests/test_pr_grid_v2_profiles.py
+python -m pytest -q tests/test_pr_grid_v2_runtime.py tests/test_pr_grid_v2_profiles.py tests/test_pr_grid_v2_profile_template_authority.py
 python -m compileall federation/spatial/pr_grid_v2_runtime.py federation/spatial/pr_grid_v2_profiles.py federation/spatial/materialize_pr_grid_v2_profiles.py
 
 Windows PowerShell (from repository root)
 py -3 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install pytest
-python -m pytest -q tests/test_pr_grid_v2_runtime.py tests/test_pr_grid_v2_profiles.py
+python -m pytest -q tests/test_pr_grid_v2_runtime.py tests/test_pr_grid_v2_profiles.py tests/test_pr_grid_v2_profile_template_authority.py
 
 REAL MATERIALIZATION — ONLY AFTER INPUT RECEIPT VERIFICATION
-python federation/spatial/materialize_pr_grid_v2_profiles.py --level L1 --records <path-to-domain-record-metadata.jsonl> --bindings <path-to-spiderweb-exact-point-binding-rows.jsonl> --binding-receipt <path-to-spiderweb-binding-receipt.json> --out <path-to-L1.jsonl> --receipt-out <path-to-L1.receipt.json>
+python federation/spatial/materialize_pr_grid_v2_profiles.py --level L1 --records <path-to-domain-record-metadata.jsonl> --bindings <path-to-spiderweb-certified-exact-binding-rows.jsonl> --binding-receipt <path-to-spiderweb-binding-receipt.json> --out <path-to-L1.jsonl> --receipt-out <path-to-L1.receipt.json>
 
 Optional --coverage <verified-coverage-manifest.json> may create true ZERO_RECORDS;
 without verified coverage, an empty cell is NO_DATA. --cell-id adds a
@@ -45,3 +45,25 @@ No record data is included in this build. Passing fixture tests does NOT
 certify any real-world coverage. Missing, wrong-CRS, approximate, V1-only,
 provisional, version-mismatched, or hash-mismatched evidence remains BLOCKED.
 Do not reinterpret V1, recompute geometry, or claim co-location is identity.
+
+
+EXACT BINDING PROFILE ADMISSION
+
+The profile materializer accepts only Spiderweb-certified rows with
+Uncertainty_Class=EXACT and one of:
+COVERS
+INTERSECTS_POSITIVE_AREA
+LINE_POSITIVE_LENGTH
+
+INTERSECTS_POSITIVE_AREA additionally requires positive Overlap_Area_m2 and
+Cell_Coverage_Fraction > 0 and <= 1.
+LINE_POSITIVE_LENGTH additionally requires positive Length_In_Cell_m.
+
+ADMINISTRATIVE_SET, DERIVED_SET, APPROXIMATE, INFERRED, UNKNOWN and all other
+non-exact rows fail closed and cannot enter exact Cell_Profile counts.
+Geometry_Included remains false; canonical geometry stays in spiderweb-pr.
+
+PROFILE TEMPLATE AUTHORITY
+TheHub commit: 0663bfa77740dceff3eb70855f2164112ce47c44
+pr_grid_v2_profiles.py Git blob: c4e174b4626083ef3e1866274e87e8aaea9f81a2
+test_pr_grid_v2_profiles.py Git blob: 3f74d64046ef19b4b8f4718b3a50d5eed902877c

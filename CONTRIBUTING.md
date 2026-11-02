@@ -52,21 +52,31 @@ untrue, update that document in the same change. This is enforced: the `docs-syn
 job, the `docs-sync` pre-commit hook and a Claude Code Stop hook all run
 `tools/check_docs_sync.py`, which checks three things.
 
-1. **Co-change.** `.federation/docs-sync.json` declares which docs cover which paths.
-   Changing a covered path without touching its doc fails, unless a commit message or
-   the PR description carries `Docs-Impact: none - <reason>` (say why no doc needs to
-   change; ten characters minimum, and reviewers will read it).
-2. **References.** A change may not leave a doc pointing at a path that no longer
-   exists. Only references *your change* broke count; older ones are not yours to fix
-   here. A deliberate reference (a generated file, say) goes in `ignore_refs`, or is
-   waived for that one doc with `Docs-Impact: <doc> - <reason>`.
-3. **The manifest itself** must stay valid, and its globs must still match something.
+1. **Co-change.** `.federation/docs-sync.json` declares which docs cover which paths,
+   and which kinds of change count (`on`: add, delete and rename, unless the coupling
+   also lists modify). Making such a change to a covered path without touching its doc
+   fails, unless a commit message or the PR description carries
+   `Docs-Impact: none - <reason>` (say why no doc needs to change; ten characters
+   minimum, and reviewers will read it).
+2. **References.** A change may not leave a Markdown doc (a root `*.md` file or anything
+   under `docs/`) pointing at a path that no longer exists. Only references *your
+   change* broke count; older ones are not yours to fix here. A deliberate reference (a
+   generated file, say) goes in `ignore_refs`, or is waived for that one doc with
+   `Docs-Impact: <doc> - <reason>`. Docs elsewhere in the tree are not read.
+3. **The manifest itself** must stay valid: no unknown keys, every coupling's doc must
+   exist, and its globs must keep matching something. A glob your change adds that
+   matches nothing, or whose last match your change removes, fails; one that already
+   matched nothing only warns.
 
 Snapshots (dated audits, receipts, ADRs, changelogs) describe a moment rather than the
-repo, so they are listed under `exempt_docs` and never forced to change. Setting
-`"mode": "report"` in the manifest prints the same findings without failing the job;
-use it only while triaging a new manifest. A failing job blocks a merge only once
-`docs-sync` is a required status check for `main`, which is a repository setting.
+repo, so they are listed under `exempt_docs` and never forced to change. A change is
+judged by the rules it arrived with as well as the ones it edits, so it cannot pass by
+deleting its own coupling, flipping `"mode"` to `"report"` or naming its own author in
+`exempt_authors` (that list counts only if the base branch already has it; Dependabot
+and the federation bot are always skipped). Setting `"mode": "report"` in the manifest
+prints the same findings without failing the job; use it only while triaging a new
+manifest. A failing job blocks a merge only once `docs-sync` is a required status check
+for `main`, which is a repository setting.
 
 `tools/check_docs_sync.py`, `.github/workflows/docs-sync.yml`, `.claude/settings.json`
 and `CLAUDE.md` are rendered from templates in `thehub-pr` and must not be

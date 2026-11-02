@@ -110,3 +110,92 @@ def test_without_coverage_empty_cells_mean_no_data(tmp_path):
     profiles, _ = build_profiles(**args)
     assert profiles[-1]["Data_State"] == "NO_DATA"
     assert all(p["Data_State"] != "ZERO_RECORDS" for p in profiles)
+
+
+def _replace_binding(args, row):
+    _write(args["bindings_path"], row)
+    raw = args["bindings_path"].read_bytes()
+    receipt = json.loads(args["receipt_path"].read_text())
+    receipt["Binding_Output_SHA256"] = hashlib.sha256(raw).hexdigest()
+    receipt["Binding_Output_Bytes"] = len(raw)
+    receipt["Binding_Row_Count"] = 1
+    _write(args["receipt_path"], receipt)
+
+
+@pytest.mark.parametrize(
+    ("method", "measure_fields"),
+    [
+        (
+            "INTERSECTS_POSITIVE_AREA",
+            {"Overlap_Area_m2": 250000.0, "Cell_Coverage_Fraction": 0.25},
+        ),
+        (
+            "LINE_POSITIVE_LENGTH",
+            {"Length_In_Cell_m": 500.0},
+        ),
+    ],
+)
+def test_exact_geometry_bindings_enter_profiles(tmp_path, method, measure_fields):
+    args = _inputs(tmp_path)
+    base = json.loads(args["bindings_path"].read_text())
+    base["Binding_Method"] = method
+    base["Binding_State"] = "INTERIOR"
+    base.update(measure_fields)
+    _replace_binding(args, base)
+
+    profiles, receipt = build_profiles(**args)
+    assert profiles[0]["Data_State"] == "HAS_RECORDS"
+    assert profiles[0]["Record_Count"] == 1
+    assert profiles[0]["Shared_Boundary_Record_Count"] == 0
+    assert receipt["Migration_Class"] == "SPIDERWEB_CERTIFIED_EXACT_BINDINGS"
+    assert receipt["Accepted_Binding_Methods"] == [
+        "COVERS",
+        "INTERSECTS_POSITIVE_AREA",
+        "LINE_POSITIVE_LENGTH",
+    ]
+
+
+@pytest.mark.parametrize(
+    ("method", "uncertainty"),
+    [
+        ("ADMINISTRATIVE_SET", "ADMINISTRATIVE_ONLY"),
+        ("DERIVED_SET", "DERIVED"),
+    ],
+)
+def test_non_exact_set_bindings_cannot_enter_exact_profiles(tmp_path, method, uncertainty):
+    args = _inputs(tmp_path)
+    base = json.loads(args["bindings_path"].read_text())
+    base["Binding_Method"] = method
+    base["Uncertainty_Class"] = uncertainty
+    base["Binding_State"] = "INTERIOR"
+    _replace_binding(args, base)
+
+    with pytest.raises(ProfileError, match="non-exact"):
+        build_profiles(**args)
+
+
+@pytest.mark.parametrize(
+    ("method", "fields", "message"),
+    [
+        (
+            "INTERSECTS_POSITIVE_AREA",
+            {"Overlap_Area_m2": 0.0, "Cell_Coverage_Fraction": 0.0},
+            "positive-area",
+        ),
+        (
+            "LINE_POSITIVE_LENGTH",
+            {"Length_In_Cell_m": 0.0},
+            "positive-length",
+        ),
+    ],
+)
+def test_zero_measure_exact_geometry_binding_fails_closed(tmp_path, method, fields, message):
+    args = _inputs(tmp_path)
+    base = json.loads(args["bindings_path"].read_text())
+    base["Binding_Method"] = method
+    base["Binding_State"] = "INTERIOR"
+    base.update(fields)
+    _replace_binding(args, base)
+
+    with pytest.raises(ProfileError, match=message):
+        build_profiles(**args)
