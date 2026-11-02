@@ -74,12 +74,14 @@ class TaxonomyTest(unittest.TestCase):
 
     def test_negative_expansion_denied(self):
         v=m.validate_count(response())
-        reduced=dict(v); reduced["grants"]-=1
+        reduced=dict(v)
+        reduced["grants"]-=1
         with self.assertRaisesRegex(ValueError,"EXPANDED_SCOPE_SMALLER"):
             m.compare(v,reduced)
 
     def test_delta_is_not_program_identity(self):
-        a=m.validate_count(response(5));b=m.validate_count(response(8))
+        a=m.validate_count(response(5))
+        b=m.validate_count(response(8))
         x=m.compare(a,b)
         self.assertEqual(x["expanded_minus_legacy"]["grants"],3)
         self.assertEqual(x["candidate_identity_promotions"],0)
