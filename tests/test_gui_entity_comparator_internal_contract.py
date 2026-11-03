@@ -1,4 +1,5 @@
 """Exact-scope contract for pipeline-only entity comparator GUI-parity binding."""
+
 import json
 import unittest
 from pathlib import Path
@@ -13,9 +14,7 @@ class ComparatorBoundaryTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-        cls.matches = [
-            c for c in cls.manifest["capabilities"] if c.get("id") == CID
-        ]
+        cls.matches = [c for c in cls.manifest["capabilities"] if c.get("id") == CID]
 
     def test_one_reviewable_binding(self):
         self.assertEqual(len(self.matches), 1)
@@ -31,9 +30,7 @@ class ComparatorBoundaryTests(unittest.TestCase):
 
     def test_exact_file_and_symbols(self):
         c = self.matches[0]
-        self.assertEqual(
-            c["analysis"]["files"], ["scripts/compare_entity_products.py"]
-        )
+        self.assertEqual(c["analysis"]["files"], ["scripts/compare_entity_products.py"])
         self.assertEqual(
             set(c["analysis"]["symbols"]),
             {
