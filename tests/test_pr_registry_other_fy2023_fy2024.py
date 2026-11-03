@@ -36,6 +36,17 @@ class OtherTests(unittest.TestCase):
                 [{"start_date": f"{year - 1}-10-01", "end_date": f"{year}-09-30"}],
             )
 
+    def test_receipt_schema_matches_fiscal_year(self):
+        for year in (2023, 2024):
+            self.assertEqual(
+                m.receipt_schema(year),
+                f"pr_registry_fy{year}_expanded_other_award_ids_v1",
+            )
+
+    def test_receipt_schema_invalid_year_rejected(self):
+        with self.assertRaisesRegex(ValueError, "UNAUTHORIZED_YEAR"):
+            m.receipt_schema(2025)
+
     def test_out_of_scope_year_denied(self):
         for year in (2022, 2025, 2026):
             with self.assertRaisesRegex(ValueError, "UNAUTHORIZED_YEAR"):
