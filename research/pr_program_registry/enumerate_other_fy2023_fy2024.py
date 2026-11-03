@@ -173,12 +173,18 @@ def acquire_geo(target: Path, geo: str, year: int) -> tuple[dict, set[str]]:
     }, ids
 
 
+def receipt_schema(year: int) -> str:
+    if year not in (2023, 2024):
+        raise ValueError("UNAUTHORIZED_YEAR")
+    return f"pr_registry_fy{year}_expanded_other_award_ids_v1"
+
+
 def run(target: Path, year: int) -> int:
     if year not in (2023, 2024):
         raise ValueError("UNAUTHORIZED_YEAR")
     target.mkdir(parents=True, exist_ok=True)
     result = {
-        "schema": "pr_registry_fy2025_expanded_other_award_ids_v1",
+        "schema": receipt_schema(year),
         "retrieved_utc": datetime.now(timezone.utc).isoformat(),
         "code_set": CODES,
         "scope": f"FY{year}_other_financial_assistance_PR_two_geographies",
