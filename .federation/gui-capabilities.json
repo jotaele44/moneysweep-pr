@@ -1723,6 +1723,27 @@
         "python_symbol:moneysweep/runtime/source_database.py:materialize_source",
         "python_symbol:moneysweep/runtime/source_database.py:materialize_sources"
       ]
+    },
+    {
+      "id": "entity-product-offline-baseline-diagnostic",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Offline-baseline orchestrator imports scripts.compare_entity_products.compare to compare two local staged CSV products and write an internal JSON provenance/duplication report; no HTTP endpoint, frontend route, or operator-facing workflow is introduced. scripts/compare_entity_products.py has an optional standalone CLI for reproducing the same diagnostic. This classification covers ONLY the four enumerated script candidates, not user-facing entity-management or analytics interfaces. Evidence: moneysweep/orchestrator/_offline_baseline_runner.py and tests/test_compare_entity_products.py.",
+      "analysis": {
+        "files": [
+          "scripts/compare_entity_products.py"
+        ],
+        "symbols": [
+          "scripts/compare_entity_products.py:compare",
+          "scripts/compare_entity_products.py:main"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_compare_entity_products.py"
+        ]
+      }
     }
   ],
   "exceptions": [
@@ -1766,19 +1787,6 @@
         "moneysweep/forensics/core.py",
         "moneysweep/forensics/pipeline.py",
         "moneysweep/forensics/seed.py"
-      ]
-    },
-    {
-      "id": "compare-entity-products-terminal-analysis",
-      "reason": "scripts/compare_entity_products.py landed on main (entity-product comparison audit tool) after this PR's baseline was built; it is a terminal-only analysis/diagnostic script with no user-facing GUI surface. Excepted pending either a GUI rendering of its comparison report or its classification as pipeline tooling.",
-      "owner": "jotaele44",
-      "tracking": "https://github.com/jotaele44/moneysweep-pr/pull/449",
-      "expires_on": "2026-11-01",
-      "candidate_ids": [
-        "analysis_module:scripts/compare_entity_products.py",
-        "analysis_symbol:scripts/compare_entity_products.py:compare",
-        "analysis_symbol:scripts/compare_entity_products.py:main",
-        "cli_surface:scripts/compare_entity_products.py"
       ]
     }
   ]
