@@ -30,7 +30,10 @@ class OtherTests(unittest.TestCase):
         self.assertEqual(m.CODES, ["09", "11", "F005", "F008", "F009", "F010"])
 
     def test_exact_fy2025_time_scope(self):
-        self.assertEqual(m.filters("recipient_pr")["time_period"], [{"start_date": "2024-10-01", "end_date": "2025-09-30"}])
+        self.assertEqual(
+            m.filters("recipient_pr")["time_period"],
+            [{"start_date": "2024-10-01", "end_date": "2025-09-30"}],
+        )
 
     def test_geo_independent(self):
         self.assertNotIn("recipient_locations", m.filters("performance_pr"))
