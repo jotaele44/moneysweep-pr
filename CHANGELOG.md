@@ -46,6 +46,23 @@ A bump to the **federation export** version is what the release-tagging workflow
   `package-lock.json` changes only `"dev": true` flags and the root manifest; the
   prebuilt dashboard manifest was regenerated and the bundle assets are
   byte-identical.
+- **The dashboard builds with Tailwind CSS 4, which removes the two advisories the
+  `npm audit` allow-list was tolerating.** `braces` GHSA-vfj7-8cjw-p6xm and
+  `postcss-selector-parser` GHSA-rj75-hqrm-r3gf were reachable only through
+  `tailwindcss@3` and `vite-plugin-singlefile`, so both are replaced: Tailwind 4 runs
+  through `@tailwindcss/vite` (its theme now lives in `dashboard/src/index.css`;
+  `tailwind.config.js`, `postcss.config.js`, `autoprefixer` and the direct `postcss`
+  dependency are gone), and the offline export is inlined by a small in-repo Vite plugin
+  (`dashboard/src/vite-plugins/inline-single-file.js`) that produces a byte-identical
+  `index.html`. `dashboard/audit-allowlist.json` is now empty and
+  `npm audit --audit-level=moderate` reports no vulnerabilities; the gate
+  (`tools/check_npm_audit.py`) is unchanged and now tolerates nothing. The dashboard is
+  meant to look and behave as before: the v4 defaults that differ from v3 (palette, text
+  line-heights, button cursor, placeholder and border colours, browser table and
+  file-input defaults) are pinned to their v3 values, and utilities stay outside a cascade
+  layer so they compete with `federation.css` as they did. The prebuilt desktop bundle was
+  regenerated. Tailwind 4 needs a newer browser engine than 3 did: Safari 16.4, Chrome
+  and Edge 111, Firefox 128.
 
 ### Fixed
 - **Cleared the checks #656 merged red.** `mypy` (`audit_asg_emergency_identity_coverage`
