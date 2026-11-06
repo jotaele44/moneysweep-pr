@@ -16,18 +16,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # main requires an approved pull request and status checks, so receipts
+      # live on the unprotected federation-data/centinelas-handoffs branch.
+      # Restore earlier receipts first so duplicate detection sees them.
+      - name: Restore persisted receipts
+        run: scripts/persist_to_data_branch.sh restore federation-data/centinelas-handoffs data/centinelas_handoffs
       - id: ingest
         env:
           CENTINELAS_CLIENT_PAYLOAD: ${{ toJSON(github.event.client_payload) }}
           EXPECTED_TARGET: moneysweep-pr
         run: python3 scripts/ingest_centinelas_handoff.py
       - name: Persist receipt
+        env:
+          ITEM: ${{ github.event.client_payload.item_id }}
         run: |
           git config user.name centinelas-handoff-bot
           git config user.email actions@users.noreply.github.com
-          git add data/centinelas_handoffs
-          git diff --cached --quiet || git commit -m "data: ingest Centinelas handoff [skip ci]"
-          git push
+          # A plain push to main is always rejected here (GH013). A failed push
+          # fails the job, so the Acknowledge step never runs for a receipt that
+          # was not persisted.
+          scripts/persist_to_data_branch.sh push federation-data/centinelas-handoffs \
+            "data: ingest Centinelas handoff ${ITEM}" \
+            data/centinelas_handoffs
       - name: Acknowledge
         env:
           TOKEN: ${{ secrets.FEDERATION_DISPATCH_TOKEN }}
