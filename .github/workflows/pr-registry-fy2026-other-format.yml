@@ -1,0 +1,41 @@
+name: PR Registry FY2026 Other Source Autoformat
+on:
+  pull_request:
+    paths:
+      - research/pr_program_registry/enumerate_fy2026_expanded_other.py
+      - tests/test_pr_registry_fy2026_expanded_other.py
+      - .github/workflows/pr-registry-fy2026-other-format.yml
+permissions:
+  contents: write
+jobs:
+  format-scope-only:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'audit/pr-registry-expanded-fy2026-other-membership-20261102'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned formatter
+        run: python -m pip install ruff==0.16.5 autopep8==2.3.2
+      - name: Fix candidate lint and format without bypass
+        run: |
+          autopep8 --in-place --aggressive --aggressive research/pr_program_registry/enumerate_fy2026_expanded_other.py tests/test_pr_registry_fy2026_expanded_other.py
+          ruff format research/pr_program_registry/enumerate_fy2026_expanded_other.py tests/test_pr_registry_fy2026_expanded_other.py
+          ruff check research/pr_program_registry/enumerate_fy2026_expanded_other.py tests/test_pr_registry_fy2026_expanded_other.py
+          git diff --check
+      - name: Commit only candidate source changes
+        run: |
+          git add -- research/pr_program_registry/enumerate_fy2026_expanded_other.py tests/test_pr_registry_fy2026_expanded_other.py
+          if git diff --cached --quiet; then
+            echo "ALREADY_FORMATTED"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "style: fix Ruff violations in bounded FY2026 other-assistance adapter"
+          git push origin "HEAD:refs/heads/audit/pr-registry-expanded-fy2026-other-membership-20261102"
