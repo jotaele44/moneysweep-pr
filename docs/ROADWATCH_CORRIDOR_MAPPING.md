@@ -1,6 +1,6 @@
 # RoadWatch Corridor Mapping
 
-**Status:** producers implemented and sources registered; **no data ingested yet** (the manual sources await operator exports, the live-fetch sources await egress, and every row still needs a resolved `Cell_ID` — see §5)
+**Status:** producers implemented and sources registered; **no data ingested yet** (the manual sources await operator exports, the live-fetch sources await egress, and every row still needs a federation-valid spatial binding — exact `Cell_ID` only when Spiderweb's authority transform is VERIFIED; otherwise the full v0.2 uncertainty `Cell_Set` is required — see §5)
 **Version:** v1 · 2026-07-07
 **Schemas:** [`schemas/roadwatch_segment.schema.json`](../schemas/roadwatch_segment.schema.json), [`schemas/roadwatch_corridor_join.schema.json`](../schemas/roadwatch_corridor_join.schema.json)
 **Registry:** promoted into [`registries/source_registry.yaml`](../registries/source_registry.yaml) (the historical overlay definition is retained at [`registries/source_registry_overlays/roadwatch_corridor_mapping.yaml`](../registries/source_registry_overlays/roadwatch_corridor_mapping.yaml), which is no longer authoritative)
@@ -32,12 +32,7 @@ deferred — see §8.
 ### Relationship to the baseline grid and federation boundary
 
 Per [`docs/SPATIAL_OVERLAY_JOIN_RULES.md`](SPATIAL_OVERLAY_JOIN_RULES.md) and
-[`docs/SPATIAL_BASELINE_GRID.md`](SPATIAL_BASELINE_GRID.md), all Puerto Rico
-geography resolves to the canonical **`Cell_ID`** baseline grid
-(`registry/spatial/pr_grid_full_cell_index_saturated.csv`, 98,304 cells) before
-cross-repo promotion. RoadWatch is an **infrastructure (transport) geography**
-overlay in that hierarchy: every segment and every join must carry `Cell_ID`
-(non-empty) to be promotable. The road *segment geometry* itself most naturally
+[`docs/SPATIAL_BASELINE_GRID.md`](SPATIAL_BASELINE_GRID.md), all Puerto Rico geography binds through Spiderweb's canonical spatial authority before cross-repo promotion. While the authority transform is **PROVISIONAL**, RoadWatch must use `record_cell_binding v0.2` fail-closed semantics: `Cell_ID = null`, a complete content-addressed `Cell_Set` (`Cell_Set_ID`, `Cell_Set_SHA256`, full `Member_Cell_IDs`), and `Identity_Default = CANDIDATE_NOT_IDENTITY`. A non-empty exact `Cell_ID` becomes promotable only after the Spiderweb authority transform reaches **VERIFIED**. RoadWatch is an **infrastructure (transport) geography** overlay in that hierarchy; MoneySweep does not recompute or publish canonical geometry. The road *segment geometry* itself most naturally
 originates from the spatial producer (`spiderweb-pr`), and the project↔segment
 correlation is ultimately a Hub concern; this package keeps MoneySweep's
 producer-side responsibility — the funded projects and the candidate ledger — and
@@ -211,16 +206,16 @@ flowchart TD
     D -- no --> H[route_only_promoted:<br/>attach to all segments on route span]
     C --> G
     C --> H
-    G --> I[Compute overlap_pct + Cell_ID]
+    G --> I[Compute overlap_pct + request Spiderweb spatial binding]
     H --> I
-    I --> J{QA gate:<br/>overlap_pct, Cell_ID,<br/>municipality filter}
+    I --> J{QA gate:<br/>overlap_pct, federation-valid binding,<br/>municipality filter}
     J -- pass --> K[roadwatch_corridor_join<br/>review_status = pending]
     J -- fail --> L[geo_reason_code =<br/>unresolved_* -> review]
 ```
 
 **Step 1 — Build the segment network.** Parse the DTOP centerline LRS (HPMS as
 secondary) into `roadwatch_segment` rows with km stationing. Reproject to a
-single CRS (record it in `crs`) and resolve each segment to `Cell_ID`.
+single CRS (record it in `crs`) and request its spatial binding from Spiderweb. While the authority transform is PROVISIONAL, preserve the full uncertainty `Cell_Set` and keep `Cell_ID = null`; do not select a deterministic nearest cell.
 
 **Step 2 — Stage the projects.** Parse STIP/TIP PDFs (Tabula/Camelot) into
 `infrastructure_projects`-shaped rows, capturing `route_id` and km extents where
@@ -237,7 +232,7 @@ copy/paste dependencies.
 - bridge-scoped projects snap to the nearest segment via the NBI point
   (`nbi_structure_point`).
 
-**Step 4 — Measure & resolve.** Compute `overlap_pct`, carry `Cell_ID`, set
+**Step 4 — Measure & resolve.** Compute `overlap_pct`, carry the Spiderweb-issued federation spatial binding (a full uncertainty `Cell_Set` while PROVISIONAL; exact `Cell_ID` only when VERIFIED), set
 `geo_reason_code`. Example measure logic in SQL (PostGIS vocabulary):
 
 ```sql
@@ -256,8 +251,7 @@ JOIN stip_tip_projects p
 ```
 
 **Step 5 — Emit candidates.** Write `roadwatch_corridor_join` rows with
-`review_status = pending`; a valid `Cell_ID` on both sides is required before the
-row is promotable across repos.
+`review_status = pending`; a federation-valid v0.2 spatial binding on both sides is required before the row is promotable across repos. While Spiderweb remains PROVISIONAL, promotion requires the complete uncertainty `Cell_Set` and `Cell_ID = null`; exact-cell promotion is forbidden.
 
 ---
 
@@ -270,7 +264,7 @@ Reuse the `evidence_tier` / `confidence` conventions from
 | Check | Rule |
 |---|---|
 | Overlap | `overlap_pct >= 20` to keep a candidate; `>= 60` eligible for auto-accept review |
-| Cell resolution | `Cell_ID` non-empty on segment and join, else `unresolved_*` → review |
+| Spatial binding | Federation-valid `record_cell_binding v0.2` on segment and join. While Spiderweb is PROVISIONAL: complete uncertainty `Cell_Set`, `Cell_ID = null`; missing/invalid binding → review. Exact `Cell_ID` is permitted only when the authority is VERIFIED. |
 | Municipal filter | Segment `municipality` must be consistent with the project's stated municipio; mismatch → review |
 | Method weighting | `route_km_measure` > `spatial_overlay` > `nbi_structure_point` > `route_only_promoted` |
 
@@ -295,8 +289,8 @@ them.
 | No km on project | Route-only project | `route_only_promoted`, `geo_reason_code = route_only_no_km`, low confidence |
 | CRS mismatch | Geometry offset after join | Reproject in Step 1; record `crs`; `crs_reprojected` |
 | Route id drift | DTOP vs HPMS vs STIP name differently | Maintain a route_id crosswalk; prefer DTOP LRS |
-| Segment crosses cell edge | Ambiguous `Cell_ID` | Treat as many-to-many (`boundary_split_multi_cell`) per join rules |
-| Missing geometry | Cannot resolve `Cell_ID` | `unresolved_no_geometry` → review; not promotable |
+| Segment crosses candidate-cell boundaries | Ambiguous spatial membership | Preserve the complete Spiderweb-issued uncertainty `Cell_Set`; do not choose a nearest/deterministic cell. |
+| Missing geometry | Cannot obtain federation-valid spatial binding | `unresolved_no_geometry` → review; not promotable |
 | STIP PDF parse noise | Wrong km/amount | Keep `raw_text_excerpt`; low `evidence_tier`; review |
 
 ---
