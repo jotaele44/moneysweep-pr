@@ -14,8 +14,8 @@
           "server/backend/main.py"
         ],
         "endpoints": [
-          "GET /status",
-          "GET /{ticker}"
+          "GET /deep-dive/ownership/status",
+          "GET /deep-dive/ownership/{ticker}"
         ]
       },
       "frontend": {
@@ -56,8 +56,8 @@
         "python_module:server/backend/ownership_api.py",
         "python_symbol:server/backend/ownership_api.py:ownership_status",
         "python_symbol:server/backend/ownership_api.py:ownership_deep_dive",
-        "backend_endpoint:server/backend/ownership_api.py:GET /status",
-        "backend_endpoint:server/backend/ownership_api.py:GET /{ticker}"
+        "backend_endpoint:server/backend/ownership_api.py:GET /deep-dive/ownership/status",
+        "backend_endpoint:server/backend/ownership_api.py:GET /deep-dive/ownership/{ticker}"
       ]
     }
   ]
