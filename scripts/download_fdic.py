@@ -122,6 +122,8 @@ INST_OUTPUT_COLUMNS = [
     "institution_category",
     "charter_type",
     "latest_report_date",
+    "origin",
+    "financial_scope",
 ]
 
 FIN_OUTPUT_COLUMNS = [
@@ -143,6 +145,8 @@ FIN_OUTPUT_COLUMNS = [
     "net_chargeoffs",
     "total_equity",
     "total_liabilities",
+    "origin",
+    "financial_scope",
 ]
 
 KNOWN_FDIC_INSTITUTIONS = [
@@ -379,6 +383,8 @@ def _download_institutions(session: requests.Session, logger) -> pd.DataFrame:
     for col in INST_OUTPUT_COLUMNS:
         if col not in df.columns:
             df[col] = ""
+    df["origin"] = "AUTHORITATIVE_API"
+    df["financial_scope"] = "INSTITUTION_WIDE"
     return df[INST_OUTPUT_COLUMNS]
 
 
@@ -433,6 +439,8 @@ def _download_financials(session: requests.Session, certs: list[str], logger) ->
     for col in FIN_OUTPUT_COLUMNS:
         if col not in df.columns:
             df[col] = ""
+    df["origin"] = "AUTHORITATIVE_API"
+    df["financial_scope"] = "INSTITUTION_WIDE"
     return df[FIN_OUTPUT_COLUMNS]
 
 
@@ -465,6 +473,8 @@ def run(root: Path | None = None, force: bool = False) -> dict:
     if not force and inst_raw_path.exists():
         logger.info("  Institution file exists — loading cached")
         df_inst = pd.read_csv(inst_raw_path, dtype=str, low_memory=False)
+        df_inst["origin"] = "AUTHORITATIVE_API"
+        df_inst["financial_scope"] = "INSTITUTION_WIDE"
     else:
         df_inst = _download_institutions(session, logger)
         df_inst.to_csv(inst_raw_path, index=False, encoding="utf-8")
@@ -477,6 +487,8 @@ def run(root: Path | None = None, force: bool = False) -> dict:
     if not force and fin_raw_path.exists():
         logger.info("  Financials file exists — loading cached")
         df_fin = pd.read_csv(fin_raw_path, dtype=str, low_memory=False)
+        df_fin["origin"] = "AUTHORITATIVE_API"
+        df_fin["financial_scope"] = "INSTITUTION_WIDE"
     else:
         df_fin = _download_financials(session, certs, logger)
         df_fin.to_csv(fin_raw_path, index=False, encoding="utf-8")
@@ -490,7 +502,10 @@ def run(root: Path | None = None, force: bool = False) -> dict:
     )
     seed_inst_rows = [s for s in KNOWN_FDIC_INSTITUTIONS if s["cert"] not in known_inst_certs]
     if seed_inst_rows:
-        df_inst = pd.concat([df_inst, pd.DataFrame(seed_inst_rows)], ignore_index=True)
+        seed_inst = pd.DataFrame(seed_inst_rows)
+        seed_inst["origin"] = "FALLBACK_SEED"
+        seed_inst["financial_scope"] = "INSTITUTION_WIDE"
+        df_inst = pd.concat([df_inst, seed_inst], ignore_index=True)
         for col in INST_OUTPUT_COLUMNS:
             if col not in df_inst.columns:
                 df_inst[col] = ""
@@ -500,7 +515,10 @@ def run(root: Path | None = None, force: bool = False) -> dict:
     known_fin_certs = set(df_fin["cert"].dropna().tolist()) if "cert" in df_fin.columns else set()
     seed_fin_rows = [s for s in KNOWN_FDIC_FINANCIALS if s["cert"] not in known_fin_certs]
     if seed_fin_rows:
-        df_fin = pd.concat([df_fin, pd.DataFrame(seed_fin_rows)], ignore_index=True)
+        seed_fin = pd.DataFrame(seed_fin_rows)
+        seed_fin["origin"] = "FALLBACK_SEED"
+        seed_fin["financial_scope"] = "INSTITUTION_WIDE"
+        df_fin = pd.concat([df_fin, seed_fin], ignore_index=True)
         for col in FIN_OUTPUT_COLUMNS:
             if col not in df_fin.columns:
                 df_fin[col] = ""
