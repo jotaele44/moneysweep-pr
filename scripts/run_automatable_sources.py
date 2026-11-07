@@ -40,6 +40,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib
+import inspect
 import json
 import os
 import sys
@@ -57,6 +58,7 @@ from scripts.check_network_egress import run_checks
 from scripts.config import PROJECT_ROOT, setup_logging
 
 ENTRYPOINTS = ("run", "main", "fetch", "download")
+SUCCESS_STATUSES = {"OK", "CACHED"}
 EGRESS_PROBE = ["https://api.usaspending.gov/", "https://datos.estadisticas.pr/"]
 SUMMARY_REL = "data/staging/materialization_run_summary.json"
 RECEIPT_DIR_REL = "receipts/materialization_runs"
@@ -144,6 +146,45 @@ def select_sources(
     return selected
 
 
+def _invoke_entrypoint(fn, root: Path):
+    """Invoke a producer using only explicitly supported execution controls.
+
+    This avoids the old broad TypeError fallback, which could mistake an internal
+    producer bug for an incompatible call signature and then invoke the function
+    a second time with different arguments.
+    """
+    signature = inspect.signature(fn)
+    kwargs: dict[str, Any] = {}
+    supported = {
+        "root": root,
+        "output_dir": root,
+        "live": True,
+        "dry_run": False,
+    }
+    unsupported_required: list[str] = []
+
+    for name, parameter in signature.parameters.items():
+        if name in supported and parameter.kind in {
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            inspect.Parameter.KEYWORD_ONLY,
+        }:
+            kwargs[name] = supported[name]
+            continue
+        if parameter.kind in {
+            inspect.Parameter.VAR_POSITIONAL,
+            inspect.Parameter.VAR_KEYWORD,
+        }:
+            continue
+        if parameter.default is inspect.Parameter.empty:
+            unsupported_required.append(name)
+
+    if unsupported_required:
+        raise TypeError(
+            "unsupported required producer parameters: " + ", ".join(sorted(unsupported_required))
+        )
+    return fn(**kwargs)
+
+
 def run_one(root: Path, src: dict, logger) -> dict:
     sid = src.get("source_id", "")
     producer = src.get("producer_script", "") or ""
@@ -163,14 +204,7 @@ def run_one(root: Path, src: dict, logger) -> dict:
         return result
     t0 = time.time()
     try:
-        res = fn(root=root)
-    except TypeError:
-        try:
-            res = fn()
-        except Exception as exc:
-            result["status"] = "ERROR"
-            result["error"] = f"{type(exc).__name__}: {exc}"
-            return result
+        res = _invoke_entrypoint(fn, root)
     except Exception as exc:
         result["status"] = "ERROR"
         result["error"] = f"{type(exc).__name__}: {exc}"
@@ -178,7 +212,22 @@ def run_one(root: Path, src: dict, logger) -> dict:
     result["seconds"] = round(time.time() - t0, 1)
     if isinstance(res, dict):
         result["rows"] = res.get("rows")
-        result["status"] = res.get("status", "OK")
+        producer_status = str(res.get("status", "OK"))
+        raw_producer_errors = res.get("errors") or []
+        producer_errors = (
+            [raw_producer_errors]
+            if isinstance(raw_producer_errors, str)
+            else list(raw_producer_errors)
+        )
+        result["producer_status"] = producer_status
+        result["producer_errors"] = producer_errors
+        result["status"] = (
+            "ERROR"
+            if producer_errors or producer_status not in SUCCESS_STATUSES
+            else producer_status
+        )
+        if producer_errors:
+            result["error"] = "; ".join(str(error) for error in producer_errors)
     else:
         result["status"] = "OK"
     logger.info(f"  [{sid}] {result['status']} rows={result['rows']}")
@@ -246,12 +295,11 @@ def run(
         # explicit NO_DATA/ERROR state rather than silently omitting the source.
         result["database"] = materialize_source(root, src)
         summary["ran"].append(result)
-    summary["ok_count"] = sum(1 for r in summary["ran"] if r["status"] in ("OK", "CACHED"))
-    error_statuses = {"ERROR", "IMPORT_ERROR", "NO_ENTRYPOINT"}
+    summary["ok_count"] = sum(1 for r in summary["ran"] if r["status"] in SUCCESS_STATUSES)
     summary["error_count"] = sum(
         1
         for r in summary["ran"]
-        if r["status"] in error_statuses or r.get("database", {}).get("status") == "ERROR"
+        if r["status"] not in SUCCESS_STATUSES or r.get("database", {}).get("status") == "ERROR"
     )
     summary["status"] = "ERROR" if summary["error_count"] else "OK"
     _write_summary(root, summary)
@@ -294,7 +342,7 @@ def main(argv: list[str] | None = None) -> int:
         require_egress=not args.no_require_egress,
     )
     print(json.dumps({k: v for k, v in result.items() if k != "ran"}, indent=2))
-    return 0
+    return 1 if result.get("status") == "ERROR" else 0
 
 
 if __name__ == "__main__":

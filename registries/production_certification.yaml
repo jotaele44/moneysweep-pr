@@ -1,0 +1,83 @@
+schema_version: moneysweep.production_certification/v1
+claim: "Production-certified Puerto Rico public-money master dataset"
+
+states:
+  certified: CERTIFIED
+  non_production: NON_PRODUCTION_DIAGNOSTIC
+
+inputs:
+  materialization_readiness: reports/materialization_readiness.json
+  source_registry_status: reports/source_registry_status.csv
+  source_recovery_matrix: reports/source_recovery_matrix.csv
+  completeness_matrix: reports/completeness_matrix.json
+  source_freshness: reports/source_freshness.csv
+  materialization_coverage_audit: reports/materialization_coverage_audit.json
+  entity_review_queue: reports/entity_resolution_review_queue.csv
+  historical_current_status: reports/current_status.json
+  federation_manifest: federation.json
+  canonical_graph_summary: reports/canonical_v1_graph_summary.json
+
+requirements:
+  required_source_count: 16
+  allowed_pipeline_states:
+    - fully_materialized
+    - partially_materialized
+    - not_materialized
+
+gates:
+  - id: G0_SCOPE_FREEZE
+    blocking: true
+    depends_on: []
+  - id: G1_CONTROL_PLANE_RECONCILIATION
+    blocking: true
+    depends_on: [G0_SCOPE_FREEZE]
+  - id: G2_STRICT_PREFLIGHT
+    blocking: true
+    depends_on: [G1_CONTROL_PLANE_RECONCILIATION]
+  - id: G3_REQUIRED_SOURCE_MATERIALIZATION
+    blocking: true
+    depends_on: [G2_STRICT_PREFLIGHT]
+  - id: G4_FULL_SOURCE_CLASSIFICATION
+    blocking: true
+    depends_on: [G1_CONTROL_PLANE_RECONCILIATION]
+  - id: G5_AUTOMATABLE_EXECUTION
+    blocking: true
+    depends_on: [G3_REQUIRED_SOURCE_MATERIALIZATION, G4_FULL_SOURCE_CLASSIFICATION]
+  - id: G6_SOURCE_VALIDATION_AND_COVERAGE_CONTRACTS
+    blocking: true
+    depends_on: [G5_AUTOMATABLE_EXECUTION]
+  - id: G7_ENTITY_RESOLUTION
+    blocking: true
+    depends_on: [G6_SOURCE_VALIDATION_AND_COVERAGE_CONTRACTS]
+  - id: G8_PROVENANCE_AND_LINEAGE
+    blocking: true
+    depends_on: [G7_ENTITY_RESOLUTION]
+  - id: G9_CANONICAL_MASTER_INVARIANTS
+    blocking: true
+    depends_on: [G8_PROVENANCE_AND_LINEAGE]
+  - id: G10_FRESHNESS_AND_UNIVERSE_COMPLETENESS
+    blocking: true
+    depends_on: [G9_CANONICAL_MASTER_INVARIANTS]
+  - id: G11_PRODUCTION_EXPORT_AND_FEDERATION
+    blocking: true
+    depends_on: [G10_FRESHNESS_AND_UNIVERSE_COMPLETENESS]
+  - id: G12_RELEASE_CERTIFICATION
+    blocking: true
+    depends_on:
+      - G0_SCOPE_FREEZE
+      - G1_CONTROL_PLANE_RECONCILIATION
+      - G2_STRICT_PREFLIGHT
+      - G3_REQUIRED_SOURCE_MATERIALIZATION
+      - G4_FULL_SOURCE_CLASSIFICATION
+      - G5_AUTOMATABLE_EXECUTION
+      - G6_SOURCE_VALIDATION_AND_COVERAGE_CONTRACTS
+      - G7_ENTITY_RESOLUTION
+      - G8_PROVENANCE_AND_LINEAGE
+      - G9_CANONICAL_MASTER_INVARIANTS
+      - G10_FRESHNESS_AND_UNIVERSE_COMPLETENESS
+      - G11_PRODUCTION_EXPORT_AND_FEDERATION
+
+promotion_rule:
+  all_blocking_gates_must_pass: true
+  explicit_production_activation_authorization_required: true
+  fail_closed_on_unknown: true
