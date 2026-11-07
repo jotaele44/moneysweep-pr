@@ -9,11 +9,13 @@ from __future__ import annotations
 import stat
 import zipfile
 from pathlib import Path
+from urllib.request import Request
 
 import pytest
 
 from scripts.install_api_keys_from_zip import (
     EDGE_QUOTE_CHARS,
+    _probe,
     diagnostics,
     main,
     read_keys_from_zip,
@@ -102,6 +104,42 @@ def test_diagnostics_never_prints_values():
         assert DUMMY_SAM not in line
         assert DUMMY_HG not in line
         assert "len=" in line and "non_ascii=" in line
+
+
+def test_probe_does_not_log_credentials_or_response_body(monkeypatch, capsys):
+    secret = "synthetic-credential-value"
+
+    class Response:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return None
+
+        def read(self, _limit):
+            return secret.encode()
+
+    captured_request = None
+
+    def fake_urlopen(request: Request, timeout: int):
+        nonlocal captured_request
+        captured_request = request
+        return Response()
+
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+    _probe(
+        "synthetic",
+        f"https://example.test/?api_key={secret}",
+        None,
+    )
+
+    output = capsys.readouterr().out
+    assert captured_request is not None
+    assert secret in captured_request.full_url
+    assert secret not in output
+    assert "result=key_works" in output
 
 
 def test_main_end_to_end(tmp_path, capsys):

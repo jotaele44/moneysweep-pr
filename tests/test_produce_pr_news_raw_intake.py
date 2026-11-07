@@ -1,6 +1,12 @@
 import json
 
-from scripts.produce_pr_news_raw_intake import main_with_args
+from scripts.produce_pr_news_raw_intake import infer_evidence_tier, main_with_args
+
+
+def test_evidence_tier_requires_a_government_url_hostname():
+    assert infer_evidence_tier({"source_url": "https://agency.pr.gov/funding"}) == "T2"
+    assert infer_evidence_tier({"source_url": "https://example.test/?next=.gov"}) == "T4"
+    assert infer_evidence_tier({"source_url": "https://agency.pr.gov.attacker.test"}) == "T4"
 
 
 def test_pr_news_raw_intake_producer_writes_router_ready_jsonl(tmp_path):

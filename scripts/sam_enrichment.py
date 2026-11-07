@@ -721,7 +721,7 @@ def run(
         logger.info(f"  SAM endpoint: {SAM_BASE_URL}")
         logger.info(f"  API residual: {'enabled' if use_api else 'disabled'}")
         if use_api:
-            logger.info(f"  API key:      {api_key[:4]}...")
+            logger.info("  API key:      configured (value redacted)")
         logger.info(
             f"  Master path:  {root / 'data' / 'staging' / 'processed' / 'pr_contracts_master.csv'}"
         )

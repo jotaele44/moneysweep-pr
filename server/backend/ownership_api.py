@@ -39,7 +39,9 @@ def _load() -> tuple[dict[str, object], tuple[dict[str, str], ...]]:
         certification = load_certification(certification_path)
         holdings = load_materialized_holdings(holdings_path)
     except (OSError, ValueError, OwnershipDeepDiveError) as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=503, detail="ownership data is temporarily unavailable"
+        ) from exc
     return certification, holdings
 
 
@@ -62,13 +64,13 @@ def ownership_status() -> dict[str, object]:
             ticker="BPOP",
             cusip="733174700",
         )
-    except (OSError, ValueError, OwnershipDeepDiveError) as exc:
+    except (OSError, ValueError, OwnershipDeepDiveError):
         return {
             "available": False,
             "certificationState": "UNRESOLVED",
             "certifiedIssuer": "BPOP",
             "providerEquivalence": "OPEN",
-            "blocker": str(exc),
+            "blocker": "ownership data could not be resolved",
         }
     # build_ownership_deep_dive() returns dict[str, object], so the nested
     # certification view needs an explicit cast before it can be indexed.
