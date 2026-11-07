@@ -324,6 +324,47 @@ skills:
     review_queue_policy: required_for_ambiguity
 
   - schema_version: prii_skill_contract_v1
+    skill_id: moneysweep-certify-public-finance-release
+    owner_repo: jotaele44/moneysweep-pr
+    federation_role: public_money_intelligence_node
+    trigger_intents:
+      - "final bounded MoneySweep public-finance release certification"
+      - "freeze the final release only after source, rendered, federation, production, native, and full-SAM gates"
+    allowed_modes: [read_only]
+    default_mode: read_only
+    command_ids: []
+    local_scripts: []
+    reads:
+      - reports/materialization_readiness.json
+      - reports/current_status.json
+      - data/exports/canonical_v1_federation/manifest.json
+    outputs:
+      - "release revision, denominators, passed/open gates, manifestations, receipts, contradictions, residue, next safe action"
+    stop_conditions:
+      - "current-head drift from the frozen release"
+      - "full SAM manifestation absent while exhaustive vendor identity is claimed"
+      - "current TheHub persisted consumer receipt absent"
+      - "required production or native/physical-device evidence absent"
+      - "fabricated contradiction, supersession, expected-absence, or zero-result state"
+      - "nonzero material release residue"
+    evidence_requirements:
+      - "exact frozen source revision and data/source hashes"
+      - "data-plane and rendered consumer receipts"
+      - "persisted TheHub package consumer receipt"
+      - "production smoke/log evidence when production is in scope"
+      - "native build plus physical-device evidence when native is in scope"
+      - "full SAM manifestation before exhaustive vendor identity certification"
+    boundary_owner: moneysweep-pr
+    forbidden_operations:
+      - "publishing, merging, package consumption, or native-build execution"
+      - "promoting bounded/AUDIT_ONLY evidence to exhaustive certification"
+      - "issuing full release certification at nonzero material residue"
+    synthetic_data_policy: reject_in_production
+    provenance_policy: required
+    confidence_policy: required_when_inferred
+    review_queue_policy: required_for_ambiguity
+
+  - schema_version: prii_skill_contract_v1
     skill_id: moneysweep-ownership-capital
     owner_repo: jotaele44/moneysweep-pr
     federation_role: public_money_intelligence_node
