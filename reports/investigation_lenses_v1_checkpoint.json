@@ -1,0 +1,64 @@
+{
+  "schema_version": "moneysweep.investigation-checkpoint/v1",
+  "source_revision": "81a9190f9c5c0bd1ba8297d0a8b36809439c4977",
+  "scope": "MoneySweep-only research lens registry vertical slice",
+  "recorded_date": "2026-10-28",
+  "terminal": "OPEN",
+  "production_release": "BLOCKED",
+  "files_sha256": {
+    "registry/investigation_lenses_v1.json": "1ccbf0f91c548a5cfced9e3e20b80a52fda6d792f3f803b04ade998825ea2945",
+    "moneysweep/investigation/lenses.py": "8dc5ac48e017f6e789cea86afc784feb4cd209e67a6272ba381250c7d2b59c6a",
+    "server/backend/investigation_api.py": "272a4c30052017037bd3b31f2b4a6bb0db570a33a830064ddf2df37e09dc384f",
+    "dashboard/src/components/ResearchLenses.jsx": "54b5e35efbfb99ea6105a121865d54bde2e61c2e5a375c967a722488d7ee4c76",
+    "dashboard/src/components/ResearchLenses.test.jsx": "93521af1662d537eade9c28613e6efab2a274201db0d4b05f2994a725265e072",
+    "tests/test_investigation_lenses.py": "9628b4208a14f86e8812ccb228c73cbb70719193354d1a13f37a81fd9cfb7441",
+    "dashboard/tests/research-lenses.spec.mjs": "9cddf566b19ca53c7ce3c7ea9067189c19b8a07c016061df1bab676994bcc07b"
+  },
+  "checks": {
+    "targeted_python": {
+      "state": "PASS",
+      "passed": 66,
+      "failed": 0,
+      "skipped": 0,
+      "command": "python -m pytest -o addopts='' tests/test_investigation_lenses.py tests/test_case_manager_foundation.py tests/test_case_manager_phase1_service.py tests/test_case_manager_auth.py tests/test_case_manager_app_health.py tests/test_resolution_core_contracts.py tests/test_resolution_core_hardening.py -q"
+    },
+    "frontend_unit": {
+      "state": "PASS",
+      "passed": 79,
+      "files": 6,
+      "command": "npm test"
+    },
+    "build": {
+      "state": "PASS",
+      "command": "npm run build"
+    },
+    "lint": {
+      "state": "PASS",
+      "command": "npm run lint"
+    },
+    "capability_manifest": {
+      "state": "PASS",
+      "command": "python .federation/check_gui_parity_with_extensions.py",
+      "new_unmapped": 0,
+      "manifest_issues": 0
+    },
+    "rendered_gui": {
+      "state": "BLOCKED",
+      "command": "npm run test:gui-parity",
+      "runner_passed": 1,
+      "runner_failed": 11,
+      "reason": "Chromium executable absent; playwright install chromium failed on invalid/truncated download archives. Counts do not certify UI behavior."
+    },
+    "full_python_suite": {
+      "state": "UNATTEMPTED"
+    },
+    "packaged_desktop_mobile": {
+      "state": "UNATTEMPTED"
+    }
+  },
+  "environment": {
+    "python": "Python 3.12.14",
+    "node": "v24.22.1"
+  },
+  "remaining": "Full investigation workflow and source coverage remain OPEN; see 35-task backlog."
+}

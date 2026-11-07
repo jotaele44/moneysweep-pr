@@ -13,6 +13,7 @@ import DataSources from '@/components/DataSources'
 import ApiKeysPanel from '@/components/ApiKeysPanel'
 import OwnershipDeepDive from '@/components/OwnershipDeepDive'
 import ProgramTimeline from '@/components/ProgramTimeline'
+import ResearchLenses from '@/components/ResearchLenses'
 import brandMark from "@/assets/icon-64.png?inline";
 
 const PROGRAM_TIMELINE = [
@@ -29,7 +30,7 @@ const OFFLINE = import.meta.env.VITE_OFFLINE === '1'
 
 const TABS = [
   'activity', 'contracts', 'leaderboards', 'entities', 'government-changes', 'graph', 'municipios', 'campaign-finance',
-  ...(OFFLINE ? [] : ['data-sources', 'api-keys']),
+  ...(OFFLINE ? [] : ['data-sources', 'api-keys', 'research-lenses']),
   'ownership',
 ]
 
@@ -58,7 +59,7 @@ export default function Dashboard() {
       <div className="zip-money-content min-h-0 flex-1 p-3">
         <Tabs value={tab} onValueChange={setTab} className="flex h-full flex-col">
           <div className="overflow-x-auto pb-1">
-            <TabsList className={`grid h-auto min-w-[880px] ${OFFLINE ? 'grid-cols-9' : 'grid-cols-11'} bg-card`}>
+            <TabsList className={`grid h-auto min-w-[880px] ${OFFLINE ? 'grid-cols-9' : 'grid-cols-12'} bg-card`}>
               <TabsTrigger value="activity" className={triggerClass}>Activity</TabsTrigger>
               <TabsTrigger value="contracts" className={triggerClass}>Contracts</TabsTrigger>
               <TabsTrigger value="leaderboards" className={triggerClass}>Top Entities</TabsTrigger>
@@ -69,6 +70,7 @@ export default function Dashboard() {
               <TabsTrigger value="campaign-finance" className={triggerClass}>Campaign Finance</TabsTrigger>
               {!OFFLINE && <TabsTrigger value="data-sources" className={triggerClass}>Data Sources</TabsTrigger>}
               {!OFFLINE && <TabsTrigger value="api-keys" className={triggerClass}>API Keys</TabsTrigger>}
+              {!OFFLINE && <TabsTrigger value="research-lenses" className={triggerClass}>Research Lenses</TabsTrigger>}
               <TabsTrigger value="ownership" className={triggerClass}>Ownership</TabsTrigger>
             </TabsList>
           </div>
@@ -83,6 +85,7 @@ export default function Dashboard() {
             <TabsContent value="campaign-finance" className="m-0 h-full"><CampaignFinance /></TabsContent>
             {!OFFLINE && <TabsContent value="data-sources" className="m-0 h-full"><DataSources /></TabsContent>}
             {!OFFLINE && <TabsContent value="api-keys" className="m-0 h-full"><ApiKeysPanel /></TabsContent>}
+            {!OFFLINE && <TabsContent value="research-lenses" className="m-0 h-full"><ResearchLenses /></TabsContent>}
             <TabsContent value="ownership" className="m-0 h-full"><OwnershipDeepDive /></TabsContent>
           </div>
         </Tabs>

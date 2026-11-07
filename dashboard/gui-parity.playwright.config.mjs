@@ -31,6 +31,7 @@ export default defineConfig({
     "campaign-finance.spec.mjs",
     "api-keys.spec.mjs",
     "data-sources.spec.mjs",
+    "research-lenses.spec.mjs",
     "hud-drgr-audit.spec.mjs",
   ],
   fullyParallel: false,
