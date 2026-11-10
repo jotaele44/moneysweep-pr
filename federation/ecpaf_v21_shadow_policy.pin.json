@@ -1,0 +1,14 @@
+{
+  "schema_version": "ecpaf-v2.1-shadow-consumer-pin/1",
+  "consumer_repository": "jotaele44/moneysweep-pr",
+  "authority_repository": "jotaele44/thehub-pr",
+  "authority_commit": "5df6e4ce311d8baf9e149c6f04ce7741b8ae9ea0",
+  "authority_policy_path": "governance/ecpaf/v2.1/policy.json",
+  "authority_policy_sha256": "443c8a838946b95cec31058ed3731b10102d567209cdfcc4b52968bec73f9e20",
+  "authority_policy_revision": "2.1.1",
+  "mode": "SHADOW_ONLY",
+  "read_only": true,
+  "protected_operations_authorized": [],
+  "release_authorized": false,
+  "certification": "WITHHELD"
+}
