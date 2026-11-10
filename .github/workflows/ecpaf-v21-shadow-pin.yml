@@ -5,6 +5,8 @@ on:
       - federation/ecpaf_v21_shadow_policy.pin.json
       - scripts/check_ecpaf_v21_shadow_pin.py
       - tests/test_ecpaf_v21_shadow_pin.py
+      - .federation/gui-capabilities.extensions/ecpaf-v21-shadow-policy-pin.json
+      - federation/ecpaf_v21_shadow_policy.README.md
       - .github/workflows/ecpaf-v21-shadow-pin.yml
   push:
     branches: [main]
@@ -12,6 +14,8 @@ on:
       - federation/ecpaf_v21_shadow_policy.pin.json
       - scripts/check_ecpaf_v21_shadow_pin.py
       - tests/test_ecpaf_v21_shadow_pin.py
+      - .federation/gui-capabilities.extensions/ecpaf-v21-shadow-policy-pin.json
+      - federation/ecpaf_v21_shadow_policy.README.md
       - .github/workflows/ecpaf-v21-shadow-pin.yml
   workflow_dispatch:
 permissions:

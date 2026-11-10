@@ -1,0 +1,21 @@
+{
+  "capabilities": [
+    {
+      "id": "ecpaf-v21-shadow-policy-pin-validator",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Exact-commit, read-only GitHub Actions verifier for TheHub's immutable ECPAF V2.1.1 policy. It neither performs MoneySweep domain analysis nor exposes an operator workflow, changes protected operations, deploys, certifies, or requires a new GUI. Its only consumer is the CI contract gate; classification is limited to the seven identified new candidates.",
+      "candidate_ids": [
+        "analysis_module:scripts/check_ecpaf_v21_shadow_pin.py",
+        "analysis_symbol:scripts/check_ecpaf_v21_shadow_pin.py:PinError",
+        "analysis_symbol:scripts/check_ecpaf_v21_shadow_pin.py:load_object",
+        "analysis_symbol:scripts/check_ecpaf_v21_shadow_pin.py:main",
+        "analysis_symbol:scripts/check_ecpaf_v21_shadow_pin.py:validate_binding",
+        "analysis_symbol:scripts/check_ecpaf_v21_shadow_pin.py:validate_checkout",
+        "cli_surface:scripts/check_ecpaf_v21_shadow_pin.py"
+      ]
+    }
+  ],
+  "exceptions": []
+}
