@@ -69,6 +69,14 @@ A bump to the **federation export** version is what the release-tagging workflow
   `desktop/README.md`.
 
 ### Fixed
+- **The Tailwind 4 upgrade (#678) no longer changes the dashboard's native form controls
+  and table cells.** Tailwind 4's preflight resets `margin` and `padding` on every
+  element, which also removed browser defaults that Tailwind 3 left alone: the Data
+  Sources file picker's button lost its `1px 6px` padding (the file name sat about 6px
+  further left), `<option>` lost its `0 2px 1px` padding, and bare `<td>`/`<th>` lost
+  theirs. `dashboard/src/index.css` hands those back with `revert-layer`; measured in
+  Chrome 156 against the Tailwind 3 bundle, every value is equal again. The prebuilt
+  dashboard bundle was regenerated with `build_prebuilt_dashboard.py --build`.
 - **Cleared the checks #656 merged red.** `mypy` (`audit_asg_emergency_identity_coverage`
   narrowed the optional coverage contract), the `ruff` format gate (eight files) and one
   unused import; `registries/coverage_contracts.yaml` now matches its JSON (the 1,431
