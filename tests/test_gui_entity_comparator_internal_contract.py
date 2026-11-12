@@ -20,15 +20,11 @@ class ComparatorBoundaryTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-        cls.matches = [
-            cap for cap in cls.manifest["capabilities"] if cap.get("id") == CID
-        ]
+        cls.matches = [cap for cap in cls.manifest["capabilities"] if cap.get("id") == CID]
 
     def test_one_reviewable_binding(self):
         self.assertEqual(len(self.matches), 1)
-        self.assertFalse(
-            any(cap.get("id") == LEGACY_CID for cap in self.manifest["capabilities"])
-        )
+        self.assertFalse(any(cap.get("id") == LEGACY_CID for cap in self.manifest["capabilities"]))
 
     def test_internal_only_not_user_surface_waiver(self):
         cap = self.matches[0]
