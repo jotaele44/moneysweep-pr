@@ -1,6 +1,11 @@
 """Positive and adversarial regressions for additive financial observations."""
 
+import copy
+import json
 import unittest
+from pathlib import Path
+
+import pytest
 
 from moneysweep.financial_classification_v1 import (
     ObservationError,
@@ -106,6 +111,24 @@ class FinancialObservationTests(unittest.TestCase):
             obs(amount=None, evidence_class="UNKNOWN")["amount_decimal"],
             obs(amount=0)["amount_decimal"],
         )
+
+    def test_json_schema_conforms_to_factory_and_rejects_computed_null(self):
+        jsonschema = pytest.importorskip("jsonschema")
+        schema_path = Path(__file__).resolve().parents[1] / "schemas" / "financial_observation_v1.schema.json"
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        validator = jsonschema.Draft202012Validator(schema)
+        validator.check_schema(schema)
+        observed = (obs(), obs(amount=None, evidence_class="UNKNOWN"), undisbursed(obs(), obs("DISBURSED", "20.10")))
+        for record in observed:
+            with self.subTest(observation=record["observation_id"]):
+                validator.validate(record)
+        invalid = copy.deepcopy(obs())
+        invalid["evidence_class"] = "COMPUTED"
+        invalid["amount_decimal"] = None
+        with self.assertRaises(jsonschema.ValidationError):
+            validator.validate(invalid)
+        with self.assertRaises(ObservationError):
+            obs(amount=None, evidence_class="COMPUTED")
 
 
 if __name__ == "__main__":
