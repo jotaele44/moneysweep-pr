@@ -1,0 +1,27 @@
+{
+  "extension_id": "financial-flow-compatibility-v1-internal",
+  "capabilities": [
+    {
+      "id": "financial-flow-compatibility-v1-observation-adapter",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Pure, read-only source-binding validation primitive that converts a frozen legacy financial-flow manifestation into independently source-scoped observations. It does not expose a user-facing workflow or execute acquisition, materialization, promotion, reporting, or simulation. Any subsequent human-facing financial-lineage output must receive a separately qualified API/GUI/E2E binding.",
+      "backend": {
+        "files": [
+          "moneysweep/financial_flow_compatibility_v1.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_financial_flow_compatibility_v1.py"
+        ]
+      },
+      "candidate_ids": [
+        "python_module:moneysweep/financial_flow_compatibility_v1.py",
+        "python_symbol:moneysweep/financial_flow_compatibility_v1.py:adapt_legacy_flows"
+      ]
+    }
+  ],
+  "exceptions": []
+}
