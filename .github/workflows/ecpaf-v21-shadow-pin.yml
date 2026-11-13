@@ -1,0 +1,42 @@
+name: ECPAF V2.1 Shadow Policy Pin
+on:
+  pull_request:
+    paths:
+      - federation/ecpaf_v21_shadow_policy.pin.json
+      - scripts/check_ecpaf_v21_shadow_pin.py
+      - tests/test_ecpaf_v21_shadow_pin.py
+      - .federation/gui-capabilities.extensions/ecpaf-v21-shadow-policy-pin.json
+      - federation/ecpaf_v21_shadow_policy.README.md
+      - .github/workflows/ecpaf-v21-shadow-pin.yml
+  push:
+    branches: [main]
+    paths:
+      - federation/ecpaf_v21_shadow_policy.pin.json
+      - scripts/check_ecpaf_v21_shadow_pin.py
+      - tests/test_ecpaf_v21_shadow_pin.py
+      - .federation/gui-capabilities.extensions/ecpaf-v21-shadow-policy-pin.json
+      - federation/ecpaf_v21_shadow_policy.README.md
+      - .github/workflows/ecpaf-v21-shadow-pin.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  shadow-policy-pin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: jotaele44/thehub-pr
+          ref: 5df6e4ce311d8baf9e149c6f04ce7741b8ae9ea0
+          path: _federation/thehub-pr
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Negative contract regression tests
+        run: python -m unittest discover -s tests -p test_ecpaf_v21_shadow_pin.py -v
+      - name: Validate exact TheHub policy and protected-operation boundary
+        run: python scripts/check_ecpaf_v21_shadow_pin.py --authority-root _federation/thehub-pr
