@@ -247,7 +247,19 @@ def resolve_vendor(
 
     if vendor_name in cache:
         cached = cache[vendor_name]
-        if not use_api or cached.get("parent_uei") or cached.get("parent_name"):
+        # A cache entry written before identity_status/binding_basis existed
+        # (e.g. a legacy entity_cache.json) cannot be trusted to reflect current
+        # adjudication. `result` above already seeds identity_status/binding_basis
+        # with their safe defaults, so setdefault() on a legacy entry would be a
+        # silent no-op and the entry would be stuck reporting UNRESOLVED/NONE
+        # forever even when `cached` carries real parent_uei/parent_name data.
+        # Treat that entry as a cache miss instead, so it falls through to the
+        # same full-adjudication path below that a fresh (non-cached) lookup
+        # takes.
+        has_adjudication_fields = "identity_status" in cached
+        if has_adjudication_fields and (
+            not use_api or cached.get("parent_uei") or cached.get("parent_name")
+        ):
             result.update(cached)
             result.setdefault("identity_status", "PROVISIONAL")
             result.setdefault("binding_basis", "AUTHORITATIVE_BINDING")

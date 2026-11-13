@@ -11,7 +11,7 @@ from .case_manager_api import router
 
 app = FastAPI(
     title="MoneySweep Case Manager API",
-    version="0.12.0",
+    version="0.13.0",
     description=(
         "Command-oriented investigative case service. Canonical evidence is read by identifier "
         "only; generic PATCH and DELETE operations are intentionally absent."

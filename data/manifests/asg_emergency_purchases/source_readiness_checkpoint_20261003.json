@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "moneysweep.asg-emergency-source-readiness/v3",
+  "observedAt": "2026-10-03",
+  "state": "EXECUTION_OPEN",
+  "sourceId": "asg_emergency_purchases",
+  "liveSource": {
+    "url": "https://asg.pr.gov/comprasemergencias",
+    "declaredPages": 144,
+    "declaredPagesState": "CONFIRMED_CURRENT_OFFICIAL_INDEX",
+    "pageSizeObserved": 10,
+    "computedUniverseLowerBound": 1431,
+    "computedUniverseUpperBound": 1440,
+    "authoritativeUniverseTotal": null,
+    "lastPageTailMeasured": false,
+    "fullSourceBytesFrozen": false,
+    "exactRowDenominatorState": "OPEN_TERMINAL_TAIL_ONLY"
+  },
+  "identityEvidence": {
+    "scheme": "asg_licitador_id",
+    "currentVisiblePageRows": 10,
+    "currentVisiblePageSourceNativeIdRows": 8,
+    "currentVisiblePageNameOnlyRows": 2,
+    "nameOnlyPromotionAllowed": false
+  },
+  "readiness": {
+    "wholeSource": {
+      "state": "BLOCKED",
+      "reason": "Current source visibly contains name-only vendor rows."
+    },
+    "boundedSourceNativeScope": {
+      "state": "OPEN_PENDING_FULL_MATERIALIZATION",
+      "scopeManifest": "data/manifests/asg_emergency_purchases/source_native_scope_candidate_v1.json",
+      "claimsCompleteASGEmergencyUniverse": false
+    }
+  },
+  "execution": {
+    "isolatedLogicReplay": {
+      "state": "PASS",
+      "testsExecuted": 12,
+      "testsPassed": 12,
+      "receipt": "data/manifests/asg_emergency_purchases/isolated_logic_replay_20261001.json"
+    },
+    "repositoryPytest": {
+      "state": "NOT_EXECUTED",
+      "assertsPass": false
+    },
+    "full144PageMaterialization": {
+      "state": "NOT_EXECUTED",
+      "blockingReason": "NETWORK_CAPABLE_FLOOT_EXECUTION_LANE_DAILY_QUOTA_EXHAUSTED"
+    },
+    "directTerminalPageRetrieval": {
+      "state": "UNAVAILABLE_FROM_CURRENT_RETRIEVAL_SURFACE",
+      "effect": "EXACT_ROW_DENOMINATOR_REMAINS_OPEN"
+    },
+    "githubActions": {
+      "state": "WAIVED_BY_USER",
+      "assertsPass": false
+    }
+  },
+  "integration": {
+    "mainSynced": true,
+    "syncedMainCommit": "ba2479f03654a5a635bd5010ac9d05a9f0402ad3",
+    "syncMergeCommit": "62484b896f2cd6ac2ce5f5215e9d337a6121ae73",
+    "behindMainAtSync": 0,
+    "mergeStrategy": "MERGE_COMMIT_NO_REBASE_NO_FORCE_UPDATE"
+  },
+  "productionEffect": {
+    "productionV1Modified": false,
+    "ontologyExpanded": false,
+    "adapterPromoted": false,
+    "certificationPhraseAuthorized": false
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "dry_run": false,
+  "egress_ok": null,
+  "error_count": 0,
+  "ok_count": 0,
+  "ran": [
+    {
+      "database": {
+        "error": "",
+        "files": 1,
+        "rows": 0,
+        "source": "fec",
+        "status": "NO_DATA"
+      },
+      "error": "",
+      "producer": "scripts/download_fec.py",
+      "rows": 0,
+      "seconds": 2.3,
+      "source": "fec",
+      "status": "EMPTY"
+    }
+  ],
+  "registry_root": "/Users/jotaele/fed-repos/moneysweep-pr",
+  "schema_version": "1.0.0",
+  "selected": [
+    "fec"
+  ],
+  "selected_count": 1,
+  "started_utc": "2026-09-22T02:30:25.384033+00:00",
+  "status": "OK",
+  "workspace_rebind": {
+    "PROJECT_ROOT": "/Users/jotaele/fed-repos/moneysweep-pr"
+  },
+  "workspace_root": "/Users/jotaele/fed-repos/moneysweep-pr"
+}

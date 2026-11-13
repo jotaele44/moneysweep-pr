@@ -77,7 +77,7 @@ export default function EntitiesTable() {
                   tabIndex={0}
                   onClick={() => setOpen(e)}
                   onKeyDown={(ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); setOpen(e) } }}
-                  className="cursor-pointer border-border hover:bg-muted/50 focus:bg-muted/50 focus:outline-none"
+                  className="cursor-pointer border-border hover:bg-muted/50 focus:bg-muted/50 focus:outline-hidden"
                 >
                   <TableCell className="max-w-[220px] truncate text-xs text-foreground">{e.name}</TableCell>
                   <TableCell><Badge variant="outline" className={cn('text-[10px] capitalize', entityTone(e.entityType))}>{e.entityType}</Badge></TableCell>

@@ -1,4 +1,4 @@
-# MoneySweep Case Manager Phase 1 API Contract v0.12
+# MoneySweep Case Manager Phase 1 API Contract v0.13
 
 ## Scope
 
@@ -14,12 +14,50 @@ The database path defaults to `data/case_manager.sqlite3` and may be overridden 
 
 ## Authorization boundary
 
-Clients supply:
+Every `/cases` route requires a credential. Clients supply **one** header:
 
-- `X-Case-Actor` on commands;
-- `X-Case-Clearance: public|internal|restricted` on queries.
+- `X-Case-Token: <token>`
 
-The current policy is a bounded Phase 1 clearance filter, not a replacement for the future authenticated identity provider. Records above the caller clearance are omitted.
+The acting identity and the read clearance are **derived from that token**, not
+from the request. `X-Case-Actor` and `X-Case-Clearance` are no longer read; sending
+them has no effect. This closes two defects in the previous contract, where those
+headers were trusted verbatim and absent headers still authorized: any caller could
+write audit history under any name, and could read restricted records by asserting
+`X-Case-Clearance: restricted`.
+
+Responses:
+
+| Condition | Status |
+|---|---|
+| Caller is not on the loopback interface | `403` |
+| Identity store not configured | `503` |
+| `X-Case-Token` missing or unrecognized | `401` |
+| Token recognized | request proceeds as that identity |
+
+An unconfigured deployment **fails closed** with `503`. It does not fall back to the
+previous permissive behavior — that fallback would leave the defect reachable by
+simply not configuring the service.
+
+### Identity store
+
+`MONEYSWEEP_CASE_IDENTITIES` points at a JSON list; default
+`data/case_manager_identities.json`:
+
+```json
+[{"token_sha256": "<sha256 of the token>", "actor": "analyst@example", "clearance": "internal"}]
+```
+
+Only SHA-256 **hashes** are stored, never raw tokens, so the file at rest holds no
+usable credential (see `docs/SECRET_HANDLING_POLICY.md`). Generate an entry with
+`python -c "import hashlib,secrets; t=secrets.token_urlsafe(32); print(t, hashlib.sha256(t.encode()).hexdigest())"`
+— keep the first value, store the second.
+
+`clearance` is one of `public|internal|restricted`; records above the caller's
+clearance are omitted, as before.
+
+This remains a bounded interim boundary, not the federation-wide authenticated
+identity provider — but it is now an enforced one. See finding D4 in
+`docs/GAP_ANALYSIS_AND_OPTIMIZATION_2026-09.md`.
 
 ## Read endpoints
 

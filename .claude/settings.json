@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/tools/check_docs_sync.py\" --agent-hook",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

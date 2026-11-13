@@ -29,7 +29,7 @@ async function requestJSON(path, options = {}, offlineFallback = null) {
     let detail = ''
     try {
       const body = await res.json()
-      detail = body?.detail ? `: ${body.detail}` : ''
+      detail = body?.detail ? `: ${typeof body.detail === 'string' ? body.detail : JSON.stringify(body.detail)}` : ''
     } catch {
       // Preserve status-only diagnostics when the backend did not return JSON.
     }
@@ -78,6 +78,24 @@ export const getCampaignFinanceEntities = (f = {}) =>
   fetchJSON(`/campaign-finance/entities${qs(f)}`, [])
 export const getCampaignFinanceReports = (f = {}) =>
   fetchJSON(`/campaign-finance/reports${qs(f)}`, [])
+
+export const getLeaderboardCategories = () => fetchJSON('/leaderboards/categories', {
+  schemaVersion: 'moneysweep.financial-category-ontology/v1.1',
+  rankingContractVersion: 'moneysweep.leaderboard/v1.1',
+  rules: {}, categories: [],
+})
+export const getLeaderboardTop = (f = {}) =>
+  fetchJSON(`/leaderboards/top${qs(f)}`, { categoryId: f.category, rows: [], topN: f.limit ?? 25, certificationState: 'OPEN' })
+export const getLeaderboardMovers = (f = {}) =>
+  fetchJSON(`/leaderboards/movers${qs(f)}`, { categoryId: f.category, rows: [], movementState: 'OPEN_NO_PRIOR_SNAPSHOT' })
+export const getLeaderboardHistory = (f = {}) =>
+  fetchJSON(`/leaderboards/history${qs(f)}`, { categoryId: f.category, snapshotCount: 0, snapshots: [] })
+export const getLeaderboardSignals = (f = {}) =>
+  fetchJSON(`/leaderboards/signals${qs(f)}`, { categoryId: f.category, certificationState: 'AUDIT_ONLY', signalCount: 0, signals: [] })
+export const getLeaderboardEntity = (entityId) =>
+  fetchJSON(`/leaderboards/entity/${encodeURIComponent(entityId)}`, {
+    entityId, identityState: 'UNRESOLVED', canonicalEntity: null, datasets: {}, counts: {}, mapHandoff: { state: 'UNRESOLVED' },
+  })
 
 // Desktop data-plane controls. Long materialization calls get an explicit
 // ten-minute client timeout; producer failures remain source-level result rows.

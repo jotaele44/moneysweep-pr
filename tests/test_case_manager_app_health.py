@@ -72,3 +72,14 @@ def test_health_reports_failure_when_the_case_database_is_unreachable():
         response = client.get("/health")
 
     assert response.status_code == 500
+
+
+def test_case_routes_reject_private_network_clients():
+    from starlette.testclient import TestClient
+
+    from server.backend.case_manager_app import app
+
+    with TestClient(app, client=("192.168.1.20", 50000)) as remote_client:
+        response = remote_client.get("/cases")
+
+    assert response.status_code == 403

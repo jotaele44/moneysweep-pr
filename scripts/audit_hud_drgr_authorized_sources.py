@@ -13,11 +13,18 @@ import argparse
 import csv
 import hashlib
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-FINANCIALS = Path("/Users/jotaele/Documents/Financials")
+# Operator-local evidence root. Absolute by nature: these are files on the
+# operator's own machine, not repository content. Overridable so the script
+# is runnable from any checkout -- without the override it resolves nothing
+# outside one specific machine, and every inspected path reports UNRESOLVED.
+FINANCIALS = Path(
+    os.environ.get("MONEYSWEEP_FINANCIALS_ROOT", "/Users/jotaele/Documents/Financials")
+)
 DEFAULT_REPORT_ROOT = Path("reports/live-readiness")
 
 KNOWN_PATHS = [

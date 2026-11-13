@@ -1,0 +1,35 @@
+{
+  "dry_run": false,
+  "egress_ok": null,
+  "error_count": 0,
+  "ok_count": 0,
+  "ran": [
+    {
+      "database": {
+        "error": "",
+        "files": 1,
+        "rows": 0,
+        "source": "municipal_finance",
+        "status": "NO_DATA"
+      },
+      "error": "",
+      "producer": "scripts/download_fac_municipal.py",
+      "rows": 0,
+      "seconds": 0.7,
+      "source": "municipal_finance",
+      "status": "NO_DATA"
+    }
+  ],
+  "registry_root": "/Users/jotaele/fed-repos/moneysweep-pr",
+  "schema_version": "1.0.0",
+  "selected": [
+    "municipal_finance"
+  ],
+  "selected_count": 1,
+  "started_utc": "2026-09-22T02:30:23.016166+00:00",
+  "status": "OK",
+  "workspace_rebind": {
+    "PROJECT_ROOT": "/Users/jotaele/fed-repos/moneysweep-pr"
+  },
+  "workspace_root": "/Users/jotaele/fed-repos/moneysweep-pr"
+}

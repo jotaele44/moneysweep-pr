@@ -31,5 +31,11 @@ REQUIREMENT_FILES = [
     REPO_ROOT / "requirements-desktop.txt",
 ]
 
+# The workspace chosen in Setup & Diagnostics is exported through this variable
+# (read by desktop.workspace.workspace_root), and SETUP_ACTION re-bootstraps the
+# data tree inside that workspace when Save or Repair is pressed.
+DATA_ENV_VAR = "MONEYSWEEP_WORKSPACE_ROOT"
+SETUP_ACTION = "desktop.workspace:bootstrap_workspace"
+
 # Health endpoint used to detect that the backend is up.
 HEALTH_PATH = "/health"

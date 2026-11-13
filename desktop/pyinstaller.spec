@@ -121,6 +121,7 @@ hiddenimports = sorted(
             "prii_desktop.launcher",
             "prii_desktop.appserver",
             "prii_desktop.config",
+            "prii_desktop.setup_center",
         ]
     )
 )

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "moneysweep.asg-emergency-revalidation-receipt/v1",
+  "observedAt": "2026-10-05T13:49:17.183Z",
+  "state": "REVALIDATED",
+  "sourceId": "asg_emergency_purchases",
+  "sourceUrl": "https://www.asg.pr.gov/comprasemergencias",
+  "authoritativeCompletenessOrdering": "numerocontrol",
+  "declaredPages": 144,
+  "pageRowArithmetic": {
+    "fullPages": 143,
+    "rowsPerFullPage": 10,
+    "lastPageRows": 1,
+    "total": 1431
+  },
+  "authoritativeUniverseTotal": 1431,
+  "uniqueControlNumbers": 1431,
+  "duplicateControlNumbers": 0,
+  "unstableOrderingControl": {
+    "ordering": "-creado",
+    "renderedRows": 1431,
+    "uniqueControlNumbers": 1319,
+    "duplicateOccurrences": 112,
+    "duplicateGroups": 59,
+    "state": "REJECTED_FOR_COMPLETENESS_PAGINATION_INSTABILITY"
+  },
+  "identity": {
+    "sourceNativeRows": 21,
+    "nameOnlyRows": 1408,
+    "missingVendorRows": 2,
+    "arithmeticClosed": true,
+    "arithmetic": "1431 = 21 + 1408 + 2",
+    "distinctSourceNativeIds": 10,
+    "supplierRegistryCrossCheck": {
+      "declaredPages": 47,
+      "renderedRows": 4645,
+      "uniqueRegistrationIds": 4644,
+      "allCandidateIdsMatched": true
+    }
+  },
+  "financialValue": {
+    "validAmountRows": 1431,
+    "invalidAmountRows": 0,
+    "sourceNativeInvalidAmountRows": 0,
+    "boundedEligibleRows": 21,
+    "boundedEligibleEntityCount": 10,
+    "boundedEligibleAmountTotal": 4423664.82,
+    "grossDisplayedWholeSourceAmount": 320435174.04,
+    "measure": "ASG_EMERGENCY_PURCHASE_COST",
+    "currency": "USD"
+  },
+  "frozenArtifacts": {
+    "rawAndParsedBundle": {
+      "storagePath": "public/static/asg_emergency_20261005_numerocontrol_bundle.json.gz",
+      "cdnPath": "/_cdn/static/asg_emergency_20261005_numerocontrol_bundle.json.gz",
+      "gzipBytes": 2920891,
+      "gzipSha256": "de52749e1d1329f961acbb006182e48d8c4ff22430fd1cbc26121255d987ad40",
+      "uncompressedBytes": 17644941,
+      "uncompressedSha256": "f83bf874a0d837e71d72135c070e2ac610095a74724bf25a59cecf9c584711e9"
+    },
+    "canonicalParsedCorpus": {
+      "sha256": "c5e6a34a8b5d29b75f739f2e0b3cefdbb98bcf50eb0010cfad246dadf770d139",
+      "rows": 1431
+    },
+    "sourceNativeCandidateSet": {
+      "sha256": "515817535d6ee22410204c8e363c262cf386927b4f3c51b070380b0f3c02daa0",
+      "rows": 21
+    },
+    "sourceNativeSubset": {
+      "path": "data/manifests/asg_emergency_purchases/source_native_rows_v1.csv",
+      "rows": 21,
+      "sha256": "b1b59b7ed2f6ecc15ee00066d7a3e983017d879691c8f785f9da7315f5e229f6"
+    }
+  },
+  "readiness": {
+    "wholeSourceLeaderboardReady": false,
+    "boundedSourceNativeLeaderboardReady": true,
+    "wholeSourceBlockingResidue": [
+      "NAME_ONLY_VENDOR_IDENTITY_RESIDUE",
+      "MISSING_VENDOR_IDENTITY_RESIDUE"
+    ],
+    "boundedSourceNativeBlockingResidue": []
+  },
+  "certificationEffect": "BOUNDED_SOURCE_NATIVE_REVALIDATED"
+}

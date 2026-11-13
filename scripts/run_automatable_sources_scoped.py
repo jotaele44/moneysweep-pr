@@ -54,6 +54,12 @@ def _license_allowed(src: dict) -> bool:
     return os.environ.get(gate, "").strip().lower() in _TRUTHY
 
 
+def _credential_available(name: str | None) -> bool:
+    if not name:
+        return True
+    return bool(os.environ.get(name, "").strip())
+
+
 @contextmanager
 def _source_scoped_environment(
     all_credential_names: set[str],
@@ -156,6 +162,11 @@ def run(
             ran.append(_blocked_result(src, "LICENSE_GATE_BLOCKED"))
             continue
 
+        if not _credential_available(allowed_key):
+            logger.info(f"  [{sid}] MISSING_API_KEY ({allowed_key})")
+            ran.append(_blocked_result(src, "MISSING_API_KEY"))
+            continue
+
         with _source_scoped_environment(credential_names, allowed_key):
             ran.append(base.run_one(root, src, logger))
 
@@ -166,6 +177,7 @@ def run(
         1 for r in ran if r["status"] in ("ERROR", "IMPORT_ERROR", "NO_ENTRYPOINT")
     )
     summary["license_blocked_count"] = sum(1 for r in ran if r["status"] == "LICENSE_GATE_BLOCKED")
+    summary["missing_api_key_count"] = sum(1 for r in ran if r["status"] == "MISSING_API_KEY")
     base._write_summary(root, summary)
     return summary
 

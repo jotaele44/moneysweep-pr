@@ -18,6 +18,8 @@ docs/BUILD_EXECUTION_SEQUENCE.md or the issue it closes. -->
 - [ ] `python -m mypy` clean (pinned version from `requirements-dev.txt`)
 - [ ] `pytest -q` passes (and coverage stays at/above the floor)
 - [ ] `requirements.lock` regenerated if `requirements.in` changed
+- [ ] `python3 tools/check_docs_sync.py --base origin/main` clean — docs that describe
+      this change are updated, or a `Docs-Impact: none - <reason>` line says why not
 
 ## Scope & risk
 

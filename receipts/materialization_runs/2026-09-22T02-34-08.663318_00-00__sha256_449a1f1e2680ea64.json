@@ -1,0 +1,35 @@
+{
+  "dry_run": false,
+  "egress_ok": null,
+  "error_count": 0,
+  "ok_count": 0,
+  "ran": [
+    {
+      "database": {
+        "error": "",
+        "files": 1,
+        "rows": 0,
+        "source": "legislative_canonical_sources",
+        "status": "NO_DATA"
+      },
+      "error": "",
+      "producer": "scripts/fetch_legislative_canonical_sources.py",
+      "rows": 0,
+      "seconds": 0.0,
+      "source": "legislative_canonical_sources",
+      "status": "EMPTY"
+    }
+  ],
+  "registry_root": "/Users/jotaele/fed-repos/moneysweep-pr",
+  "schema_version": "1.0.0",
+  "selected": [
+    "legislative_canonical_sources"
+  ],
+  "selected_count": 1,
+  "started_utc": "2026-09-22T02:34:08.663318+00:00",
+  "status": "OK",
+  "workspace_rebind": {
+    "PROJECT_ROOT": "/Users/jotaele/fed-repos/moneysweep-pr"
+  },
+  "workspace_root": "/Users/jotaele/fed-repos/moneysweep-pr"
+}

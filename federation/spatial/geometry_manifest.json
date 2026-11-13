@@ -6,6 +6,9 @@
   "geometry_version": "pr_grid_geometry_v0_1",
   "grid_version": "pr_grid_full_cell_index_saturated_v1",
   "mirrored_from": "spiderweb-pr",
-  "note": "Geometry bytes stay with the geometry authority. While certification_state is PROVISIONAL a Cell_ID must not be presented as a certified ground location, and no cell-to-source binding may be promoted.",
-  "sha256": "5a84abe39eb80bde21c95698002097cb6ea8fda3c951c71db5c795b02538a422"
+  "note": "Geometry bytes stay with the geometry authority. certification_state is PROVISIONAL: exact Cell_ID ground claims are forbidden; record bindings must preserve the full content-addressed uncertainty Cell_Set until the authority reaches VERIFIED.",
+  "sha256": "5a84abe39eb80bde21c95698002097cb6ea8fda3c951c71db5c795b02538a422",
+  "binding_schema_version": "spiderweb.record_cell_binding.v0.2",
+  "exact_cell_claims_permitted": false,
+  "cell_set_required": true
 }

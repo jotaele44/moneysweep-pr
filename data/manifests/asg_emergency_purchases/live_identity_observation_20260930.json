@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "moneysweep.asg-emergency-live-identity-observation/v1",
+  "state": "BOUNDED_LIVE_OBSERVATION_NOT_MATERIALIZATION",
+  "observedAt": "2026-09-30",
+  "purchaseSurface": {
+    "url": "https://www.asg.pr.gov/comprasemergencias",
+    "declaredPageCount": 144,
+    "priorMeasuredPageCount": 141,
+    "priorMeasuredUniverseTotal": 1406,
+    "currentExactUniverseTotal": null,
+    "denominatorState": "DRIFTED_REFRESH_REQUIRED"
+  },
+  "supplierSurface": {
+    "url": "https://www.asg.pr.gov/suplidores",
+    "declaredPageCount": 47,
+    "identityScheme": "asg_licitador_id"
+  },
+  "verifiedIdentitySamples": [
+    {
+      "purchaseVendorLabel": "Caribbean Composting Inc. (4381)",
+      "purchaseAmount": 47200.0,
+      "registrationId": "4381",
+      "supplierCanonicalDisplay": "CARIBBEAN COMPOSTING INC.",
+      "identityState": "SOURCE_NATIVE_ID_CONFIRMED_ON_OFFICIAL_SUPPLIER_SURFACE"
+    },
+    {
+      "purchaseVendorLabel": "ALL GREEN CLEANING & MAINTENANCE, LLC (13947)",
+      "purchaseAmount": 20624.4,
+      "registrationId": "13947",
+      "supplierCanonicalDisplay": "ALL GREEN CLEANING & MAINTENANCE, LLC",
+      "identityState": "SOURCE_NATIVE_ID_CONFIRMED_ON_OFFICIAL_SUPPLIER_SURFACE"
+    },
+    {
+      "purchaseVendorLabel": "A1 Generator Services Incorporated (28546)",
+      "purchaseAmount": 3125.0,
+      "registrationId": "28546",
+      "supplierCanonicalDisplay": "A1 GENERATOR SERVICES INCORPORATED",
+      "identityState": "SOURCE_NATIVE_ID_CONFIRMED_ON_OFFICIAL_SUPPLIER_SURFACE"
+    }
+  ],
+  "negativeControl": {
+    "examplePurchaseVendorLabel": "Puerto Rico Wire Products, Inc.",
+    "registrationId": null,
+    "identityState": "UNRESOLVED_NAME_ONLY",
+    "rule": "Names are display/discovery fields only and are not promoted to stable identity."
+  },
+  "certificationEffect": {
+    "sourceMaterializationCertified": false,
+    "leaderboardScopeExpanded": false,
+    "reason": "A full refreshed portal walk and frozen exact denominator are still required."
+  }
+}

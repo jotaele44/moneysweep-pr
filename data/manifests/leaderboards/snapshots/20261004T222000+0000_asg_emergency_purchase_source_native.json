@@ -1,0 +1,300 @@
+{
+  "accounting": {
+    "arithmeticClosed": true,
+    "excludedRecords": 0,
+    "inScopeRecords": 21,
+    "inputRecords": 1431,
+    "outOfScopeRecords": 1410,
+    "retainedRecords": 21,
+    "unresolvedRecords": 0
+  },
+  "candidateCount": 10,
+  "capturedAt": "2026-10-04T22:20:00+00:00",
+  "categoryId": "asg_emergency_purchase_source_native",
+  "certificationState": "PROVISIONAL_BOUNDED_SOURCE_NATIVE",
+  "currencies": [
+    "USD"
+  ],
+  "filters": {
+    "currency": "USD",
+    "endYear": null,
+    "startYear": null
+  },
+  "methodology": {
+    "aggregation": "ASG emergency-purchase Costo summed by asg_licitador_id",
+    "completenessOrdering": "-numerocontrol",
+    "currency": "USD",
+    "eligibleSourceNativeRows": 21,
+    "excludedMissingVendorRows": 2,
+    "excludedNameOnlyRows": 1408,
+    "fullSourceUniverse": 1431,
+    "identity": "explicit source-native ASG Licitador ID only; names are display-only",
+    "scopeBoundary": "does not claim all ASG emergency purchases or total ASG emergency spending"
+  },
+  "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+  "rankingVersion": "moneysweep.leaderboard/v1.1",
+  "rows": [
+    {
+      "canonicalEntityId": null,
+      "controlNumbers": [
+        "26-ASG-AAA-0028"
+      ],
+      "currency": "USD",
+      "entityDisplayName": "Sonnell Truck Center LLC",
+      "entityId": "asg_licitador_id:23388",
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "entityType": "asg_supplier",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 1744085,
+      "rank": 1,
+      "recordCount": 1,
+      "sourceDisplayNames": [
+        "Sonnell Truck Center LLC"
+      ]
+    },
+    {
+      "canonicalEntityId": null,
+      "controlNumbers": [
+        "26-ASG-AAA-0008",
+        "26-ASG-AAA-0016"
+      ],
+      "currency": "USD",
+      "entityDisplayName": "Duenas Leasing LLC",
+      "entityId": "asg_licitador_id:56227",
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "entityType": "asg_supplier",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 1474425,
+      "rank": 2,
+      "recordCount": 2,
+      "sourceDisplayNames": [
+        "Duenas Leasing LLC"
+      ]
+    },
+    {
+      "canonicalEntityId": null,
+      "controlNumbers": [
+        "26-ASG-AAA-0007",
+        "26-ASG-AAA-0014",
+        "26-ASG-AAA-0024",
+        "26-ASG-AAA-0025"
+      ],
+      "currency": "USD",
+      "entityDisplayName": "La Casa del Camionero",
+      "entityId": "asg_licitador_id:10329",
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "entityType": "asg_supplier",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 297908.8,
+      "rank": 3,
+      "recordCount": 4,
+      "sourceDisplayNames": [
+        "La Casa del Camionero",
+        "La Casa del Camionero, Inc."
+      ]
+    },
+    {
+      "canonicalEntityId": null,
+      "controlNumbers": [
+        "26-ASG-AAA-0001",
+        "26-ASG-AAA-0002",
+        "26-ASG-AAA-0003",
+        "26-ASG-AAA-0004",
+        "26-ASG-AAA-0005",
+        "26-ASG-AAA-0009",
+        "26-ASG-AAA-0010"
+      ],
+      "currency": "USD",
+      "entityDisplayName": "A1 Generator Services Incorporated",
+      "entityId": "asg_licitador_id:28546",
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "entityType": "asg_supplier",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 293629.35,
+      "rank": 4,
+      "recordCount": 7,
+      "sourceDisplayNames": [
+        "A1 Generator Services Incorporated"
+      ]
+    },
+    {
+      "canonicalEntityId": null,
+      "controlNumbers": [
+        "26-ASG-AAA-0011"
+      ],
+      "currency": "USD",
+      "entityDisplayName": "Autos Vega Inc.",
+      "entityId": "asg_licitador_id:1174",
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "entityType": "asg_supplier",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 278050,
+      "rank": 5,
+      "recordCount": 1,
+      "sourceDisplayNames": [
+        "Autos Vega Inc."
+      ]
+    },
+    {
+      "canonicalEntityId": null,
+      "controlNumbers": [
+        "26-ASG-AAA-0017",
+        "26-ASG-AAA-0029"
+      ],
+      "currency": "USD",
+      "entityDisplayName": "Teselta LLC",
+      "entityId": "asg_licitador_id:303",
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "entityType": "asg_supplier",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 187180,
+      "rank": 6,
+      "recordCount": 2,
+      "sourceDisplayNames": [
+        "Teselta LLC"
+      ]
+    },
+    {
+      "canonicalEntityId": null,
+      "controlNumbers": [
+        "26-ASG-AAA-0027"
+      ],
+      "currency": "USD",
+      "entityDisplayName": "Mendez & Co.",
+      "entityId": "asg_licitador_id:437",
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "entityType": "asg_supplier",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 71003.52,
+      "rank": 7,
+      "recordCount": 1,
+      "sourceDisplayNames": [
+        "Mendez & Co."
+      ]
+    },
+    {
+      "canonicalEntityId": null,
+      "controlNumbers": [
+        "26-ASG-AAA-0033"
+      ],
+      "currency": "USD",
+      "entityDisplayName": "Caribbean Composting Inc.",
+      "entityId": "asg_licitador_id:4381",
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "entityType": "asg_supplier",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 47200,
+      "rank": 8,
+      "recordCount": 1,
+      "sourceDisplayNames": [
+        "Caribbean Composting Inc."
+      ]
+    },
+    {
+      "canonicalEntityId": null,
+      "controlNumbers": [
+        "26-ASG-AAA-0031"
+      ],
+      "currency": "USD",
+      "entityDisplayName": "ALL GREEN CLEANING & MAINTENANCE, LLC",
+      "entityId": "asg_licitador_id:13947",
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "entityType": "asg_supplier",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 20624.4,
+      "rank": 9,
+      "recordCount": 1,
+      "sourceDisplayNames": [
+        "ALL GREEN CLEANING & MAINTENANCE, LLC"
+      ]
+    },
+    {
+      "canonicalEntityId": null,
+      "controlNumbers": [
+        "26-ASG-AAA-0030"
+      ],
+      "currency": "USD",
+      "entityDisplayName": "Almacen El Ahorro LLC",
+      "entityId": "asg_licitador_id:25833",
+      "entityResolutionState": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "entityType": "asg_supplier",
+      "financialValueState": "MEASURED_ASG_EMERGENCY_PURCHASE_COST",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "metricValue": 9558.75,
+      "rank": 10,
+      "recordCount": 1,
+      "sourceDisplayNames": [
+        "Almacen El Ahorro LLC"
+      ]
+    }
+  ],
+  "runtimeManifest": {
+    "files": [
+      {
+        "bytes": 8047,
+        "path": "config/financial_category_ontology.json",
+        "sha256": "d629c73df3bd4d4bb0e335952398c19999c40886601cbce551d440f8c98728fa"
+      },
+      {
+        "bytes": 9145,
+        "path": "server/backend/leaderboards.py",
+        "sha256": "1fdfe50ad0e127cb26662f96b11a957cfe2357e9edc255436bd2b31e489b9e04"
+      },
+      {
+        "bytes": 37553,
+        "path": "server/backend/leaderboard_adapters.py",
+        "sha256": "ab8b00b5cd53a533de06c29042a5de6687d2305a5473a181df33156781bcbc19"
+      },
+      {
+        "bytes": 10681,
+        "path": "server/backend/leaderboard_history.py",
+        "sha256": "9c32c4878742e56f038c39abe15140f5c0057bdea481e5f56dfed712d86247db"
+      },
+      {
+        "bytes": 5939,
+        "path": "server/backend/leaderboard_investigation.py",
+        "sha256": "d5a68c990488436a9c068e0fb61a1f7c7b5efaf2ea312160a583867b063201c1"
+      },
+      {
+        "bytes": 6125,
+        "path": "server/backend/leaderboard_entities.py",
+        "sha256": "7a3b01c880876116333e4f4e57a29374a128a8f488b64115d04d99a1c77bb6f5"
+      }
+    ],
+    "packages": {
+      "fastapi": "0.142.2",
+      "pandas": "3.0.6",
+      "pydantic": "2.13.5"
+    },
+    "platform": "Linux-6.1.166-24.303.amzn2023.aarch64-aarch64-with-glibc2.36",
+    "producerCommit": "15bb189aa0ebdc752af4f5c22f96921263a5c5c9",
+    "python": "3.11.2",
+    "state": "FROZEN"
+  },
+  "schemaVersion": "moneysweep.leaderboard-snapshot/v1.1",
+  "snapshotId": "asg-emergency-source-native:20261004",
+  "snapshotSha256": "0b3bd94d85d48fef9f86270da1d55082be899a4b52f969f03771ff790da856e9",
+  "sourceManifestations": [
+    {
+      "bytes": 4823,
+      "modifiedAt": "2026-10-04T22:17:36+00:00",
+      "path": "data/manifests/asg_emergency_purchases/source_native_rows_v1.csv",
+      "sha256": "b1b59b7ed2f6ecc15ee00066d7a3e983017d879691c8f785f9da7315f5e229f6"
+    },
+    {
+      "bytes": 3470,
+      "modifiedAt": "2026-10-04T22:17:36+00:00",
+      "path": "data/manifests/asg_emergency_purchases/materialization_receipt_20261004.json",
+      "sha256": "1ebfe24ebb8c5c0daac7ce4c95c40508c1d98722b43d0b62c13853f4ab43ee38"
+    }
+  ]
+}

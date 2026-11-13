@@ -66,6 +66,40 @@ def test_run_skips_producers_when_egress_blocked(monkeypatch, tmp_path):
     assert called["n"] == 0  # no producer invoked
 
 
+@pytest.mark.parametrize(
+    ("producer_status", "database_status", "expected_errors"),
+    [
+        ("OK", "IMPORTED", 0),
+        ("ERROR", "IMPORTED", 1),
+        ("OK", "ERROR", 1),
+    ],
+)
+def test_run_reports_producer_and_database_failures(
+    monkeypatch, tmp_path, producer_status, database_status, expected_errors
+):
+    monkeypatch.setattr(
+        mod,
+        "load_source_registry",
+        lambda root: {"sources": [{"source_id": "source_one"}]},
+    )
+    monkeypatch.setattr(
+        mod,
+        "run_one",
+        lambda *args: {"source": "source_one", "status": producer_status},
+    )
+    monkeypatch.setattr(
+        mod,
+        "materialize_source",
+        lambda *args: {"source": "source_one", "status": database_status},
+    )
+    monkeypatch.setattr(mod, "_bind_legacy_config_to_workspace", lambda root: {})
+
+    result = run(root=tmp_path, only=["source_one"], require_egress=False)
+
+    assert result["error_count"] == expected_errors
+    assert result["status"] == ("ERROR" if expected_errors else "OK")
+
+
 def test_run_one_captures_producer_error(tmp_path):
     boom = types.ModuleType("boom_mod")
 

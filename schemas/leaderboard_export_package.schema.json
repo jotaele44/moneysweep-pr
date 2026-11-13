@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prii.local/schemas/moneysweep-leaderboard-export-package-v1.json",
+  "title": "MoneySweep financial leaderboard export package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "producer",
+    "producerCommit",
+    "rankingContractVersion",
+    "ontologyContractVersion",
+    "scopeId",
+    "certification",
+    "certificationRuntimeManifest",
+    "generatedAt",
+    "categories"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "moneysweep.leaderboard-export-package/v1"},
+    "producer": {"const": "moneysweep-pr"},
+    "producerCommit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "rankingContractVersion": {"const": "moneysweep.leaderboard/v1.1"},
+    "ontologyContractVersion": {"const": "moneysweep.financial-category-ontology/v1.1"},
+    "scopeId": {"const": "moneysweep.leaderboard.production-v1"},
+    "generatedAt": {"type": "string", "format": "date-time"},
+    "certification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "receiptSha256", "releaseManifestSha256", "scopeSha256", "certificationRuntimeSha256"],
+      "properties": {
+        "state": {"const": "PASS"},
+        "receiptSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "releaseManifestSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "scopeSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "certificationRuntimeSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "certificationRuntimeManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "state", "files"],
+      "properties": {
+        "schemaVersion": {"const": "moneysweep.leaderboard-certification-runtime/v1"},
+        "state": {"const": "FROZEN"},
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "bytes", "sha256"],
+            "properties": {
+              "path": {"type": "string", "minLength": 1},
+              "bytes": {"type": "integer", "minimum": 0},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        }
+      }
+    },
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "categoryId",
+          "metricType",
+          "snapshotId",
+          "snapshotSha256",
+          "capturedAt",
+          "candidateCount",
+          "accounting",
+          "sourceVersion",
+          "sourceManifestations",
+          "runtimeManifest",
+          "snapshotCertification",
+          "rows"
+        ],
+        "properties": {
+          "categoryId": {"const": "debt_issuance"},
+          "metricType": {"const": "DEBT_ISSUED_PAR"},
+          "snapshotId": {"type": "string", "minLength": 1},
+          "snapshotSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "capturedAt": {"type": "string", "format": "date-time"},
+          "candidateCount": {"type": "integer", "minimum": 1},
+          "accounting": {
+            "type": "object",
+            "required": ["arithmeticClosed", "unresolvedRecords", "excludedRecords"],
+            "properties": {
+              "arithmeticClosed": {"const": true},
+              "unresolvedRecords": {"const": 0},
+              "excludedRecords": {"const": 0}
+            }
+          },
+          "sourceVersion": {
+            "type": "object",
+            "required": ["type", "commit", "committedAt", "economicActivityInference"],
+            "properties": {
+              "type": {"const": "GIT_COMMIT"},
+              "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+              "committedAt": {"type": "string", "format": "date-time"},
+              "economicActivityInference": {"const": false}
+            }
+          },
+          "sourceManifestations": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["path", "sha256"],
+              "properties": {
+                "path": {"type": "string", "minLength": 1},
+                "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+              }
+            }
+          },
+          "runtimeManifest": {
+            "type": "object",
+            "required": ["state", "producerCommit", "files"],
+            "properties": {
+              "state": {"const": "FROZEN"},
+              "producerCommit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+              "files": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": ["path", "sha256"],
+                  "properties": {
+                    "path": {"type": "string", "minLength": 1},
+                    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+                  }
+                }
+              }
+            }
+          },
+          "snapshotCertification": {
+            "type": "object",
+            "required": ["state", "scopeId", "sourceSnapshotSha256", "zeroMaterialUnresolvedResidue"],
+            "properties": {
+              "state": {"const": "PASS"},
+              "scopeId": {"const": "moneysweep.leaderboard.production-v1"},
+              "sourceSnapshotSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "zeroMaterialUnresolvedResidue": {"const": true}
+            }
+          },
+          "rows": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["entityId", "entityDisplayName", "metricValue", "currency", "rank", "entityResolutionState"],
+              "properties": {
+                "entityId": {"type": "string", "minLength": 1},
+                "entityDisplayName": {"type": "string", "minLength": 1},
+                "metricValue": {"type": "number"},
+                "currency": {"const": "USD"},
+                "rank": {"type": "integer", "minimum": 1},
+                "entityResolutionState": {"const": "CANONICAL_V1_ENTITY_ID"}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

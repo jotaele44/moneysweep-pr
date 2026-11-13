@@ -8,6 +8,11 @@ ruff==0.16.5
 mypy==2.3.1
 pytest
 pytest-cov
+# starlette.testclient (used by the API tests) needs httpx2; recent starlette raises
+# at import time without it, and falls back to httpx only with a deprecation warning.
+# Several tests also `importorskip("httpx")`, so keep both installed.
+httpx
+httpx2
 
 # Type stubs. `requests` ships no inline types; mypy emits import-untyped (which
 # ignore_missing_imports does NOT suppress) unless these are installed, so they

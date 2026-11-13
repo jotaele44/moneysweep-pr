@@ -53,4 +53,17 @@ describe('CampaignFinance', () => {
     )).toBeInTheDocument()
     expect(screen.getByText('No campaign-finance contributions are materialized')).toBeInTheDocument()
   })
+
+  it('shows an error banner instead of the empty-state banner when the summary request fails', () => {
+    useCampaignFinanceSummary.mockReturnValue({
+      ...query(undefined),
+      error: new Error('summary → HTTP 500'),
+      isError: true,
+    })
+
+    render(<CampaignFinance />)
+
+    expect(screen.getByText('Campaign-finance summary failed to load')).toBeInTheDocument()
+    expect(screen.queryByText('No campaign-finance datasets are materialized.')).not.toBeInTheDocument()
+  })
 })

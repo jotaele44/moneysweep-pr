@@ -1,0 +1,110 @@
+version: "1.0"
+schema_version: "moneysweep_entity_network_sector_profiles_v1"
+
+sectors:
+  - id: PHARMA_BIOTECH_MEDDEV
+    label: Pharma, Biotech & Medical Devices
+    source_reference: MII_v0.3
+    expected_roles: [manufacturer, medical_device_manufacturer, cdmo, distributor, regulator, facility]
+    high_value_relationships: [PARENT_OF, OWNS, OPERATES, LICENSED_BY, PERMITTED_BY, CONTRACTS_WITH]
+    authoritative_identity_sources: [FDA_FEI, SEC_EDGAR, PR_STATE_REGISTRY, SAM_UEI]
+
+  - id: AEROSPACE_DEFENSE
+    label: Aerospace & Defense
+    source_reference: MII_v0.3
+    expected_roles: [manufacturer, engineering_center, base, unit, airport, contractor]
+    high_value_relationships: [PARENT_OF, OWNS, OPERATES, CONTRACTS_WITH, SUBCONTRACTOR_OF]
+    authoritative_identity_sources: [SAM_UEI, CAGE, SEC_EDGAR, DOD_INSTALLATION_ROSTER]
+
+  - id: ENERGY_FUELS_GRID
+    label: Energy, Fuels & Grid
+    source_reference: MII_v0.3
+    expected_roles: [utility, generator, fuel_supplier, terminal_operator, regulator, contractor]
+    high_value_relationships: [OWNS, OPERATES, SUPPLIED_BY, CONTRACTS_WITH, REGULATED_BY, CONCESSION_FROM]
+    authoritative_identity_sources: [PREB_DOCKET, FOMB_CONTRACT_REVIEW, SAM_UEI, SEC_EDGAR]
+
+  - id: WATER_WASTEWATER_ENVIRONMENT
+    label: Water, Wastewater & Environment
+    source_reference: MII_v0.3
+    expected_roles: [utility, treatment_operator, environmental_contractor, regulator, facility]
+    high_value_relationships: [OWNS, OPERATES, CONTRACTS_WITH, REGULATED_BY, PERMITTED_BY]
+    authoritative_identity_sources: [PRASA_CONTRACT_ROLL, EPA_ECHO, EPA_CONSENT_DECREE, SAM_UEI]
+
+  - id: TRANSPORT_LOGISTICS
+    label: Ports, Airports, Roads & Maritime
+    source_reference: MII_v0.3
+    expected_roles: [authority, concessionaire, carrier, terminal_operator, airport_operator, handler]
+    high_value_relationships: [OWNS, OPERATES, LEASES, CONCESSION_FROM, CONTRACTS_WITH]
+    authoritative_identity_sources: [PRPA_LEASE_ROLL, P3A_PROJECTS, FAA, SAM_UEI]
+
+  - id: TELECOM_CONNECTIVITY
+    label: Telecom, Cables & Space Communications
+    source_reference: MII_v0.3
+    expected_roles: [carrier, cable_owner, landing_station_operator, tower_owner, regulator]
+    high_value_relationships: [OWNS, OPERATES, LEASES, LICENSED_BY, DEPENDENCY_ON]
+    authoritative_identity_sources: [FCC_ULS, FCC_CABLE_LICENSES, PRBIF, SEC_EDGAR]
+
+  - id: INDUSTRIAL_MANUFACTURING_EPC_CONSTRUCTION
+    label: Industrial Manufacturing, EPC & Construction
+    source_reference: MII_v0.3
+    expected_roles: [manufacturer, epc_contractor, construction_contractor, tenant, joint_venture]
+    high_value_relationships: [PARENT_OF, OWNS, CONTRACTS_WITH, PRIME_OF, SUBCONTRACTOR_OF]
+    authoritative_identity_sources: [SAM_UEI, FPDS, PRIDCO_LEASE_ROLL, PR_STATE_REGISTRY]
+
+  - id: GOVERNANCE_PUBLIC_FINANCE_OVERSIGHT
+    label: Governance, Public Finance & Oversight
+    source_reference: MII_v0.3
+    cross_cutting: true
+    expected_roles: [agency, authority, regulator, grantor, creditor, oversight_body]
+    high_value_relationships: [FUNDED_BY, OVERSEEN_BY, REGULATED_BY, CONCESSION_FROM, AWARDS_TO]
+    authoritative_identity_sources: [STATUTE, OFFICIAL_REGISTRY, FOMB, AAFAF, COR3]
+
+  - id: RESEARCH_ACADEMIA_WORKFORCE
+    label: Research, Academia & Workforce
+    source_reference: MII_v0.3
+    cross_cutting: true
+    expected_roles: [university, research_center, laboratory, consortium, workforce_program]
+    high_value_relationships: [FUNDED_BY, PARTNERS_WITH, MEMBER_OF, TRAINS_FOR]
+    authoritative_identity_sources: [NSF_AWARD, NIH_AWARD, UNIVERSITY_DIRECTORY, SAM_UEI]
+
+  - id: HEALTHCARE_PAYERS_PHARMACY
+    label: Healthcare Delivery, Payers & Pharmacy
+    source_reference: MII_v0.3
+    expected_roles: [hospital, health_system, payer, pharmacy, distributor, regulator]
+    high_value_relationships: [PARENT_OF, OWNS, OPERATES, CONTRACTS_WITH, LICENSED_BY]
+    authoritative_identity_sources: [CMS, NPPES, PR_HEALTH_REGISTRY, PR_STATE_REGISTRY]
+
+  - id: BANKING_INSURANCE_PRIVATE_FINANCE
+    label: Banking, Insurance & Private Finance
+    source_reference: MoneySweep_extension
+    expected_roles: [bank, insurer, asset_manager, lender, fund, servicer]
+    high_value_relationships: [PARENT_OF, OWNS, CONTROLS, CONTRACTS_WITH]
+    authoritative_identity_sources: [FDIC, OCIF, SEC_EDGAR, LEI]
+
+  - id: REAL_ESTATE_TOURISM_HOSPITALITY
+    label: Real Estate, Tourism & Hospitality
+    source_reference: MoneySweep_extension
+    expected_roles: [property_owner, developer, hotel_operator, reit, concessionaire, landlord]
+    high_value_relationships: [OWNS, OPERATES, LEASES, CONTRACTS_WITH, CONCESSION_FROM]
+    authoritative_identity_sources: [PR_STATE_REGISTRY, CRIM, PRIDCO_LEASE_ROLL, SEC_EDGAR]
+
+  - id: RETAIL_WHOLESALE_CONSUMER_DISTRIBUTION
+    label: Retail, Wholesale & Consumer Distribution
+    source_reference: MoneySweep_extension
+    expected_roles: [retailer, wholesaler, importer, distributor, franchise_operator]
+    high_value_relationships: [PARENT_OF, OWNS, CONTRACTS_WITH, SUPPLIED_BY]
+    authoritative_identity_sources: [PR_STATE_REGISTRY, SAM_UEI, CBP_IMPORT_RECORD, SEC_EDGAR]
+
+  - id: TECHNOLOGY_IT_BPO_PROFESSIONAL_SERVICES
+    label: Technology, IT/BPO & Professional Services
+    source_reference: MoneySweep_extension
+    expected_roles: [software_vendor, cloud_provider, bpo, consultant, accountant, law_firm, engineer]
+    high_value_relationships: [PARENT_OF, CONTRACTS_WITH, SUBCONTRACTOR_OF, PARTNERS_WITH]
+    authoritative_identity_sources: [SAM_UEI, PR_STATE_REGISTRY, SEC_EDGAR, PROFESSIONAL_LICENSE]
+
+  - id: AGRICULTURE_FOOD_BEVERAGE
+    label: Agriculture, Food & Beverage
+    source_reference: MoneySweep_extension
+    expected_roles: [producer, processor, distributor, importer, cooperative, fishery]
+    high_value_relationships: [PARENT_OF, OWNS, CONTRACTS_WITH, SUPPLIED_BY, LICENSED_BY]
+    authoritative_identity_sources: [USDA, PR_AGRICULTURE, PR_STATE_REGISTRY, SAM_UEI]

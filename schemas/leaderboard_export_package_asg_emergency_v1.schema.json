@@ -1,0 +1,381 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prii.local/schemas/moneysweep-leaderboard-export-package-asg-emergency-v1.json",
+  "title": "MoneySweep ASG emergency source-native leaderboard export package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "producer",
+    "producerCommit",
+    "rankingContractVersion",
+    "ontologyContractVersion",
+    "scopeId",
+    "certification",
+    "certificationRuntimeManifest",
+    "generatedAt",
+    "categories"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "moneysweep.leaderboard-export-package/v1"
+    },
+    "producer": {
+      "const": "moneysweep-pr"
+    },
+    "producerCommit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "rankingContractVersion": {
+      "const": "moneysweep.leaderboard/v1.1"
+    },
+    "ontologyContractVersion": {
+      "const": "moneysweep.financial-category-ontology/v1.1"
+    },
+    "scopeId": {
+      "const": "moneysweep.leaderboard.asg-emergency-source-native-v1"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "certification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "receiptSha256",
+        "releaseManifestSha256",
+        "scopeSha256",
+        "certificationRuntimeSha256"
+      ],
+      "properties": {
+        "state": {
+          "const": "PASS"
+        },
+        "receiptSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "releaseManifestSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "scopeSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "certificationRuntimeSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "certificationRuntimeManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "state",
+        "files"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "moneysweep.leaderboard-certification-runtime/v1"
+        },
+        "state": {
+          "const": "FROZEN"
+        },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "bytes",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "categoryId",
+          "metricType",
+          "snapshotId",
+          "snapshotSha256",
+          "capturedAt",
+          "candidateCount",
+          "accounting",
+          "sourceVersion",
+          "sourceManifestations",
+          "runtimeManifest",
+          "snapshotCertification",
+          "rows"
+        ],
+        "properties": {
+          "categoryId": {
+            "const": "asg_emergency_purchase_source_native"
+          },
+          "metricType": {
+            "const": "ASG_EMERGENCY_PURCHASE_COST"
+          },
+          "snapshotId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "snapshotSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "capturedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "candidateCount": {
+            "const": 10
+          },
+          "accounting": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "inputRecords",
+              "outOfScopeRecords",
+              "retainedRecords",
+              "excludedRecords",
+              "unresolvedRecords",
+              "inScopeRecords",
+              "arithmeticClosed"
+            ],
+            "properties": {
+              "inputRecords": {
+                "const": 1431
+              },
+              "outOfScopeRecords": {
+                "const": 1410
+              },
+              "retainedRecords": {
+                "const": 21
+              },
+              "excludedRecords": {
+                "const": 0
+              },
+              "unresolvedRecords": {
+                "const": 0
+              },
+              "inScopeRecords": {
+                "const": 21
+              },
+              "arithmeticClosed": {
+                "const": true
+              }
+            }
+          },
+          "sourceVersion": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "sourceId",
+              "capturedAt",
+              "ordering",
+              "authoritativeUniverseTotal",
+              "sourceSha256",
+              "rawBundleSha256",
+              "economicActivityInference"
+            ],
+            "properties": {
+              "type": {
+                "const": "LIVE_PORTAL_MATERIALIZATION"
+              },
+              "sourceId": {
+                "const": "asg_emergency_purchases"
+              },
+              "capturedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "ordering": {
+                "const": "-numerocontrol"
+              },
+              "authoritativeUniverseTotal": {
+                "const": 1431
+              },
+              "sourceSha256": {
+                "const": "6c615470f7a658789fd6d46c569c6e603f068732781723fb13087982726db969"
+              },
+              "rawBundleSha256": {
+                "const": "10eadc6520408f5b4ef1679788b8e760e9a01a68d92c67bcee636d8e0b35c6d2"
+              },
+              "economicActivityInference": {
+                "const": false
+              }
+            }
+          },
+          "sourceManifestations": {
+            "type": "array",
+            "minItems": 4,
+            "items": {
+              "type": "object",
+              "required": [
+                "path",
+                "sha256"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "bytes": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "manifestationType": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "runtimeManifest": {
+            "type": "object",
+            "required": [
+              "state",
+              "producerCommit",
+              "files"
+            ],
+            "properties": {
+              "state": {
+                "const": "FROZEN"
+              },
+              "producerCommit": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{40}$"
+              },
+              "files": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "path",
+                    "sha256"
+                  ],
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "snapshotCertification": {
+            "type": "object",
+            "required": [
+              "state",
+              "scopeId",
+              "sourceSnapshotSha256",
+              "zeroMaterialUnresolvedResidue"
+            ],
+            "properties": {
+              "state": {
+                "const": "PASS"
+              },
+              "scopeId": {
+                "const": "moneysweep.leaderboard.asg-emergency-source-native-v1"
+              },
+              "sourceSnapshotSha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "zeroMaterialUnresolvedResidue": {
+                "const": true
+              }
+            }
+          },
+          "rows": {
+            "type": "array",
+            "minItems": 10,
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "required": [
+                "entityId",
+                "canonicalEntityId",
+                "entityDisplayName",
+                "metricValue",
+                "currency",
+                "rank",
+                "entityResolutionState",
+                "recordCount"
+              ],
+              "properties": {
+                "entityId": {
+                  "type": "string",
+                  "pattern": "^asg_licitador_id:[0-9]+$"
+                },
+                "canonicalEntityId": {
+                  "type": "null"
+                },
+                "entityDisplayName": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "metricValue": {
+                  "type": "number"
+                },
+                "currency": {
+                  "const": "USD"
+                },
+                "rank": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "entityResolutionState": {
+                  "const": "SOURCE_NATIVE_ASG_LICITADOR_ID"
+                },
+                "recordCount": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

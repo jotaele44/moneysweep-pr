@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "moneysweep.leaderboard-certification-scope/v1",
+  "scopeId": "moneysweep.leaderboard.asg-source-native-v1",
+  "rankingContractVersion": "moneysweep.leaderboard/v1.1",
+  "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.2",
+  "includedCategories": [
+    {
+      "categoryId": "asg_emergency_purchase_source_native",
+      "metricType": "ASG_EMERGENCY_PURCHASE_COST",
+      "identityNamespace": "SOURCE_NATIVE_ASG_LICITADOR_ID",
+      "currencyUniverse": ["USD"],
+      "requiredAccounting": {
+        "inputRecords": 1431,
+        "outOfScopeRecords": 1410,
+        "retainedRecords": 21,
+        "excludedRecords": 0,
+        "unresolvedRecords": 0,
+        "inScopeRecords": 21,
+        "arithmeticClosed": true
+      },
+      "historyRequired": false,
+      "scopeBoundary": "Ranks only ASG emergency-purchase rows carrying an explicit source-native ASG Licitador ID. The 1,408 name-only and 2 missing-vendor rows remain explicit out-of-scope identity exclusions and are not name-resolved."
+    }
+  ],
+  "excludedCategoryIds": [
+    "contract_award",
+    "debt_issuance",
+    "federal_obligation",
+    "federal_grant",
+    "disaster_assistance",
+    "federal_assistance",
+    "campaign_contribution_received",
+    "campaign_donor_contribution",
+    "government_payment",
+    "procurement",
+    "infrastructure_project",
+    "loan",
+    "guarantee",
+    "subsidy_incentive",
+    "tax_incentive",
+    "lobbying_expenditure",
+    "property_assessment",
+    "legal_judgment",
+    "bankruptcy_claim",
+    "municipal_expenditure",
+    "public_revenue"
+  ],
+  "arithmetic": {
+    "ontologyCategoryCount": 22,
+    "includedCategoryCount": 1,
+    "excludedCategoryCount": 21,
+    "unclassifiedCategoryCount": 0,
+    "closed": true
+  },
+  "ciExecutionPolicy": {
+    "state": "WAIVED_BY_USER",
+    "blocking": false,
+    "assertsPass": false
+  },
+  "rules": {
+    "onlyIncludedCategoriesMayBeCertified": true,
+    "fullSourceUniverseMustRemainInAccounting": true,
+    "nameOnlyRowsMayOnlyBeExplicitOutOfScopeIdentityExclusions": true,
+    "absenceIsNotZero": true,
+    "noNameOnlyIdentity": true,
+    "noCrossMeasureAggregation": true,
+    "currencyPartitionRequired": true,
+    "sourceManifestationsMustBeFrozen": true,
+    "thehubMustNotRecomputeRankings": true,
+    "spiderwebRemainsGeometryAuthority": true
+  }
+}

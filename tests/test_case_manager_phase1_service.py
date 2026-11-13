@@ -77,6 +77,31 @@ def test_visibility_filtering_is_mandatory():
     assert len(queries.list_cases("restricted")) == 2
 
 
+def test_get_case_collection_does_not_leak_existence_of_restricted_case():
+    # A caller must not be able to distinguish "case exists but is restricted"
+    # from "case does not exist" by comparing get_case_collection responses.
+    repository = _repository()
+    commands = CaseCommandService(repository)
+    queries = CaseQueryService(repository)
+    restricted_case = Case(
+        case_id=deterministic_id("case", "restricted-collection"),
+        title="Restricted",
+        case_type="audit",
+        status="open",
+        scope="restricted",
+        visibility="restricted",
+    )
+    commands.create_case(restricted_case, "tester")
+
+    nonexistent_result = queries.get_case_collection(
+        deterministic_id("case", "does-not-exist"), "evidence", "public"
+    )
+    restricted_result = queries.get_case_collection(restricted_case.case_id, "evidence", "public")
+
+    assert nonexistent_result == []
+    assert restricted_result == []
+
+
 def test_reference_integrity_and_no_canonical_mutation_path():
     repository = _repository()
     commands = CaseCommandService(repository)

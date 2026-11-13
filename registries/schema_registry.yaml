@@ -109,6 +109,8 @@ canonical_tables:
         # uniqueness key.
         award_id:          [control_number, numero_control_asg]
         contract_number:   [contract_number, numero_orden_compra]
+        # vendor_registration_id is an ASG Licitador ID. It remains source-native
+        # under the asg_licitador_id namespace and MUST NOT be mapped to recipient_uei.
         recipient_name:    [vendor_name, proveedor]
         obligation_amount: [obligation_amount, costo]
         awarding_agency:   [awarding_agency, agencia]
