@@ -141,6 +141,25 @@
   textarea::placeholder {
     color: #9ca3af;
   }
+
+  /* Tailwind 4's preflight resets `margin`, `padding` and `border` on every element, which also
+     flattened browser defaults that Tailwind 3 left alone: the native file button's padding (the
+     Data Sources file picker's label sat about 6px further left), `<option>` padding and bare
+     table-cell padding. `revert-layer` hands back each browser's own default. */
+  td,
+  th,
+  option {
+    padding: revert-layer;
+  }
+
+  ::file-selector-button {
+    margin: revert-layer;
+    padding: revert-layer;
+    border: revert-layer;
+    border-radius: revert-layer;
+    background-color: revert-layer;
+    color: revert-layer;
+  }
 }
 
 /* Tailwind 4 emits utilities in a cascade layer, so plain CSS such as the federation stylesheet
