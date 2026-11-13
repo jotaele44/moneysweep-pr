@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jotaele44/moneysweep-pr/schemas/financial_observation_v1.schema.json",
+  "title": "MoneySweep financial observation V1 (additive, source-preserving)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "observation_id",
+    "source_id",
+    "source_record_id",
+    "source_sha256",
+    "source_version",
+    "source_field",
+    "measure_type",
+    "amount_decimal",
+    "currency",
+    "period",
+    "accounting_basis",
+    "scope_id",
+    "evidence_class",
+    "applicability",
+    "observation_kind"
+  ],
+  "properties": {
+    "observation_id": {
+      "type": "string",
+      "pattern": "^finobs_[0-9a-f]{64}$"
+    },
+    "source_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_record_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_field": {
+      "type": "string",
+      "minLength": 1
+    },
+    "measure_type": {
+      "enum": [
+        "APPROPRIATED",
+        "APPORTIONED",
+        "ALLOTTED",
+        "OBLIGATED",
+        "DEOBLIGATED",
+        "UNOBLIGATED",
+        "DISBURSED",
+        "UNDISBURSED",
+        "OUTLAY",
+        "EXPENDED",
+        "TRANSFERRED",
+        "REPROGRAMMED",
+        "RESCINDED",
+        "REMAINING_AVAILABLE"
+      ]
+    },
+    "amount_decimal": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^-?[0-9]+(\\.[0-9]+)?$"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "period": {
+      "type": "string",
+      "minLength": 1
+    },
+    "accounting_basis": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_class": {
+      "enum": [
+        "FACT",
+        "COMPUTED",
+        "BINDING",
+        "INFERENCE",
+        "ASSUMPTION",
+        "HYPOTHESIS",
+        "UNKNOWN"
+      ]
+    },
+    "applicability": {
+      "enum": [
+        "APPLICABLE",
+        "NOT_APPLICABLE",
+        "UNKNOWN",
+        "UNRESOLVED"
+      ]
+    },
+    "observation_kind": {
+      "enum": [
+        "SNAPSHOT",
+        "PERIOD_FLOW",
+        "ACTION"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "applicability": {
+            "enum": [
+              "NOT_APPLICABLE",
+              "UNKNOWN",
+              "UNRESOLVED"
+            ]
+          }
+        },
+        "required": [
+          "applicability"
+        ]
+      },
+      "then": {
+        "properties": {
+          "amount_decimal": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "evidence_class": {
+            "const": "COMPUTED"
+          }
+        },
+        "required": [
+          "evidence_class"
+        ]
+      },
+      "then": {
+        "properties": {
+          "amount_decimal": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount_decimal"
+        ]
+      }
+    }
+  ]
+}
