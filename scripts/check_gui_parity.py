@@ -42,9 +42,13 @@ SOURCE_SUFFIXES = {".py", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"}
 FRONTEND_SUFFIXES = {".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"}
 
 ENDPOINT_RE = re.compile(
-    r"@\s*[A-Za-z_][A-Za-z0-9_]*\s*\.\s*"
+    r"@\s*([A-Za-z_][A-Za-z0-9_]*)\s*\.\s*"
     r"(get|post|put|patch|delete)\s*\(\s*[\"']([^\"']+)[\"']",
     re.IGNORECASE,
+)
+ROUTER_PREFIX_RE = re.compile(
+    r"\b([A-Za-z_][A-Za-z0-9_]*)\s*=\s*APIRouter\s*\([^)]*?\bprefix\s*=\s*[\"']([^\"']*)[\"']",
+    re.IGNORECASE | re.DOTALL,
 )
 ROUTE_RES = (
     re.compile(r"<Route\b[^>]*\bpath\s*=\s*[\"']([^\"']+)[\"']", re.DOTALL),
@@ -251,8 +255,15 @@ def _discover_python(
             records.append(_candidate("cli_surface", rel))
 
         if path in backend_files:
+            router_prefixes = {
+                match.group(1): match.group(2).rstrip("/")
+                for match in ROUTER_PREFIX_RE.finditer(text)
+            }
             for match in ENDPOINT_RE.finditer(text):
-                detail = f"{match.group(1).upper()} {match.group(2)}"
+                router_name, verb, route = match.groups()
+                prefix = router_prefixes.get(router_name, "")
+                full_route = f"{prefix}/{route.lstrip('/')}" if prefix else route
+                detail = f"{verb.upper()} {full_route}"
                 records.append(
                     _candidate(
                         "backend_endpoint",
