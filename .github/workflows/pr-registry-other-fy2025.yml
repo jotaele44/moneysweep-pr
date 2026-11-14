@@ -1,0 +1,40 @@
+name: PR Registry FY2025 Expanded Other Awards
+on:
+  pull_request:
+    paths:
+      - research/pr_program_registry/enumerate_fy2025_expanded_other.py
+      - tests/test_pr_registry_fy2025_expanded_other.py
+      - .github/workflows/pr-registry-other-fy2025.yml
+permissions:
+  contents: read
+jobs:
+  bounded-membership:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Strict source and test format
+        run: |
+          python -m pip install ruff==0.16.5
+          ruff check research/pr_program_registry/enumerate_fy2025_expanded_other.py tests/test_pr_registry_fy2025_expanded_other.py
+          ruff format --check research/pr_program_registry/enumerate_fy2025_expanded_other.py tests/test_pr_registry_fy2025_expanded_other.py
+      - name: Positive and negative regression tests
+        run: python -m unittest discover -s tests -p test_pr_registry_fy2025_expanded_other.py -v
+      - name: Acquire original source bytes for two bounded Puerto Rico geographies
+        id: collect
+        continue-on-error: true
+        run: python research/pr_program_registry/enumerate_fy2025_expanded_other.py outputs/pr_registry_other_fy2025
+      - name: Always retain the raw source and fail-closed receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-registry-fy2025-expanded-other-membership
+          path: outputs/pr_registry_other_fy2025/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Fail if the source population did not conserve
+        if: steps.collect.outcome != 'success'
+        run: exit 1
