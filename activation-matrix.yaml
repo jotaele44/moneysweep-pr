@@ -31,6 +31,8 @@ positive:
     expect: moneysweep-build-federation-export
   - prompt: "can we promote usaspending_prime to production"
     expect: moneysweep-assess-promotion-readiness
+  - prompt: "certify the final MoneySweep public-finance release after rendered federation production and native checks"
+    expect: moneysweep-certify-public-finance-release
   - prompt: "does our export manifest still match the Hub contract"
     expect: prii-check-producer-contract
   - prompt: "what is MoneySweep's current status and next command"
