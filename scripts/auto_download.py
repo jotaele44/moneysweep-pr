@@ -132,6 +132,8 @@ def _retry_request(session, method, url, retries=MAX_RETRIES, **kwargs):
             if attempt < retries - 1:
                 wait = RETRY_BACKOFF[attempt] if attempt < len(RETRY_BACKOFF) else 8
                 time.sleep(wait)
+    if last_err is None:
+        raise ValueError("retries must be at least 1")
     raise last_err
 
 
