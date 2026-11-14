@@ -1,0 +1,99 @@
+{
+  "schema_version": "mii_v0_3_exhaustion_ledger_v1",
+  "vectors": [
+    {
+      "vector_id": "MII-SRC-01",
+      "source_family": "SEC EDGAR Exhibit 21 + Form 10-K Item 2 (properties)",
+      "sector_scope": [
+        "PHARMA",
+        "AERODEF",
+        "ENERGY",
+        "TELECOM",
+        "INDUSTRIAL"
+      ],
+      "mii_snapshot_state": "NOT_RUN"
+    },
+    {
+      "vector_id": "MII-SRC-02",
+      "source_family": "FDA Establishment Registration & Listing / FEI",
+      "sector_scope": [
+        "PHARMA"
+      ],
+      "mii_snapshot_state": "NOT_RUN"
+    },
+    {
+      "vector_id": "MII-SRC-03",
+      "source_family": "SAM.gov entity registrations (UEI, CAGE, NAICS, parent/immediate owner)",
+      "sector_scope": [
+        "ALL"
+      ],
+      "mii_snapshot_state": "NOT_RUN"
+    },
+    {
+      "vector_id": "MII-SRC-04",
+      "source_family": "FPDS / USAspending subawards (prime->sub chains)",
+      "sector_scope": [
+        "AERODEF",
+        "INDUSTRIAL",
+        "ENERGY",
+        "WATER"
+      ],
+      "mii_snapshot_state": "PARTIAL_IN_BASE"
+    },
+    {
+      "vector_id": "MII-SRC-05",
+      "source_family": "PR Departamento de Estado corporate registry",
+      "sector_scope": [
+        "ALL"
+      ],
+      "mii_snapshot_state": "NOT_RUN"
+    },
+    {
+      "vector_id": "MII-SRC-06",
+      "source_family": "FOMB contract review letters & PREB dockets",
+      "sector_scope": [
+        "ENERGY",
+        "WATER",
+        "TRANSPORT"
+      ],
+      "mii_snapshot_state": "NOT_RUN"
+    },
+    {
+      "vector_id": "MII-SRC-07",
+      "source_family": "FCC licence/ULS + TeleGeography/FCC cable licences",
+      "sector_scope": [
+        "TELECOM"
+      ],
+      "mii_snapshot_state": "NOT_RUN"
+    },
+    {
+      "vector_id": "MII-SRC-08",
+      "source_family": "PRIDCO property/lease roll, DDEC incentive decrees",
+      "sector_scope": [
+        "PHARMA",
+        "AERODEF",
+        "INDUSTRIAL"
+      ],
+      "mii_snapshot_state": "NOT_RUN"
+    },
+    {
+      "vector_id": "MII-SRC-09",
+      "source_family": "EQB/DRNA/EPA ECHO facility permits",
+      "sector_scope": [
+        "PHARMA",
+        "ENERGY",
+        "WATER",
+        "INDUSTRIAL"
+      ],
+      "mii_snapshot_state": "PARTIAL_IN_BASE"
+    },
+    {
+      "vector_id": "MII-SRC-10",
+      "source_family": "Independent corroboration of every class A/B edge against primary documents",
+      "sector_scope": [
+        "ALL"
+      ],
+      "mii_snapshot_state": "NOT_RUN"
+    }
+  ]
+}

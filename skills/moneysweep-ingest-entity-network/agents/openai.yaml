@@ -1,0 +1,32 @@
+# OpenAI-runtime agent manifest for moneysweep-ingest-entity-network.
+# SKILL.md is canonical; keep fields synced with skill-registry.yaml.
+schema_version: prii_openai_agent_v1
+name: moneysweep-ingest-entity-network
+description: >-
+  Ingests frozen ecosystem/network references as noncanonical source
+  manifestations with byte/member verification, denominator reconciliation,
+  contradiction preservation, source-vector binding, and fail-closed identity
+  boundaries.
+instructions_ref: ../SKILL.md
+owner_repo: jotaele44/moneysweep-pr
+default_mode: read_only
+allowed_modes: [read_only, offline_write]
+command_ids: []
+stop_conditions:
+  - frozen source or archive-member hash mismatch
+  - parser or denominator drift
+  - synthetic inaccessible row requested
+  - name-only or source-local evidence promotion requested
+  - source-vector scope mismatch
+result_envelope:
+  - status
+  - source_hashes
+  - source_counts
+  - retained_counts
+  - residue_counts
+  - candidate_states
+  - contradictions
+  - source_bindings
+  - blockers
+  - artifacts
+  - next_safe_action
