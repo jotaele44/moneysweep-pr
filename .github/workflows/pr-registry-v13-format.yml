@@ -1,0 +1,41 @@
+name: PR Registry V13 Exact Draft Formatter
+on:
+  pull_request:
+    paths:
+      - research/pr_program_registry/compare_award_type_taxonomies.py
+      - tests/test_pr_registry_award_taxonomy_v13.py
+      - .github/workflows/pr-registry-v13-format.yml
+permissions:
+  contents: write
+jobs:
+  format-verified-draft-only:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'audit/pr-registry-v13-expanded-award-code-coverage-20261102'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned Ruff
+        run: python -m pip install ruff==0.16.5
+      - name: Apply only E702 source fixes and formatting
+        run: |
+          ruff check --select E702 --fix research/pr_program_registry/compare_award_type_taxonomies.py tests/test_pr_registry_award_taxonomy_v13.py
+          ruff format research/pr_program_registry/compare_award_type_taxonomies.py tests/test_pr_registry_award_taxonomy_v13.py
+          ruff check research/pr_program_registry/compare_award_type_taxonomies.py tests/test_pr_registry_award_taxonomy_v13.py
+          git diff --check
+      - name: Preserve changes on exact draft branch only
+        run: |
+          git add -- research/pr_program_registry/compare_award_type_taxonomies.py tests/test_pr_registry_award_taxonomy_v13.py
+          if git diff --cached --quiet; then
+            echo "ALREADY_FORMATTED"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "style: pin Ruff formatting for bounded taxonomy source tests"
+          git push origin "HEAD:refs/heads/audit/pr-registry-v13-expanded-award-code-coverage-20261102"
