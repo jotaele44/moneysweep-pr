@@ -1,0 +1,44 @@
+name: PR Registry FY2023 FY2024 Other Award Membership
+on:
+  pull_request:
+    paths:
+      - research/pr_program_registry/enumerate_other_fy2023_fy2024.py
+      - tests/test_pr_registry_other_fy2023_fy2024.py
+      - .github/workflows/pr-registry-other-fy2023-fy2024.yml
+permissions:
+  contents: read
+jobs:
+  bounded-year:
+    strategy:
+      fail-fast: false
+      matrix:
+        fiscal_year: [2023, 2024]
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Strict source and tests formatting
+        run: |
+          python -m pip install ruff==0.16.5
+          ruff check research/pr_program_registry/enumerate_other_fy2023_fy2024.py tests/test_pr_registry_other_fy2023_fy2024.py
+          ruff format --check research/pr_program_registry/enumerate_other_fy2023_fy2024.py tests/test_pr_registry_other_fy2023_fy2024.py
+      - name: Positive and negative regression tests
+        run: python -m unittest discover -s tests -p test_pr_registry_other_fy2023_fy2024.py -v
+      - name: Acquire fiscal-year original source bytes
+        id: collect
+        continue-on-error: true
+        run: python research/pr_program_registry/enumerate_other_fy2023_fy2024.py ${{ matrix.fiscal_year }} outputs/other_fy${{ matrix.fiscal_year }}
+      - name: Preserve original responses and fail-closed receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-registry-other-fy${{ matrix.fiscal_year }}
+          path: outputs/other_fy${{ matrix.fiscal_year }}/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Reject incomplete ID conservation
+        if: steps.collect.outcome != 'success'
+        run: exit 1
