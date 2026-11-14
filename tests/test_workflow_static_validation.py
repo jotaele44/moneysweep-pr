@@ -34,6 +34,59 @@ def test_source_workflows_require_preflight_default() -> None:
         assert validate_workflow_file(Path(".github/workflows") / name) == []
 
 
+def test_keyless_materialization_uses_per_source_timeout_plan() -> None:
+    path = Path(".github/workflows/certification-keyless-materialization.yml")
+    workflow = yaml.safe_load(path.read_text(encoding="utf-8"))
+    materialize = workflow["jobs"]["materialize"]
+    grants_shards = workflow["jobs"]["grants_shards"]
+    grants_finalize = workflow["jobs"]["grants_finalize"]
+    aggregate = workflow["jobs"]["aggregate"]
+
+    assert materialize["timeout-minutes"] == "${{ matrix.timeout_minutes }}"
+    assert materialize["strategy"]["matrix"] == "${{ fromJSON(needs.prepare.outputs.matrix) }}"
+    assert grants_shards["timeout-minutes"] == "${{ matrix.timeout_minutes }}"
+    assert grants_shards["strategy"]["max-parallel"] == 2
+    assert grants_shards["strategy"]["matrix"] == (
+        "${{ fromJSON(needs.prepare.outputs.grants_matrix) }}"
+    )
+    assert "grants_shards" in grants_finalize["needs"]
+    assert "grants_finalize" in aggregate["needs"]
+
+    checkout_ref = "${{ github.event.pull_request.head.sha || github.sha }}"
+    checkout_steps = [
+        step
+        for job in workflow["jobs"].values()
+        for step in job.get("steps", [])
+        if str(step.get("uses", "")).startswith("actions/checkout@")
+    ]
+    assert checkout_steps
+    assert all(step.get("with", {}).get("ref") == checkout_ref for step in checkout_steps)
+
+    shard_runs = "\n".join(
+        str(step.get("run", "")) for step in grants_shards["steps"] if "run" in step
+    )
+    finalize_runs = "\n".join(
+        str(step.get("run", "")) for step in grants_finalize["steps"] if "run" in step
+    )
+    assert "--skip-master" in shard_runs
+    assert "tools.assemble_grants_shards" in finalize_runs
+    finalize_step = next(
+        step for step in grants_finalize["steps"] if step.get("id") == "finalize_grants"
+    )
+    assert finalize_step["env"] == {
+        "MONEYSWEEP_GRANTS_START_FY": "${{ needs.prepare.outputs.grants_start_fy }}",
+        "MONEYSWEEP_GRANTS_END_FY": "${{ needs.prepare.outputs.grants_end_fy }}",
+    }
+    assert any(
+        "steps.run_shard.outcome != 'success'" in str(step.get("if", ""))
+        for step in grants_shards["steps"]
+    )
+    assert any(
+        "steps.finalize_grants.outcome != 'success'" in str(step.get("if", ""))
+        for step in grants_finalize["steps"]
+    )
+
+
 def test_rejects_unsupported_expression_helper(tmp_path: Path) -> None:
     workflow = tmp_path / "broken.yml"
     workflow.write_text(

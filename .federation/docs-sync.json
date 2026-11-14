@@ -20,6 +20,7 @@
     "data/**",
     "outputs/**",
     "reports/*.local.*",
+    "reports/production_activation_receipt.json",
     "desktop/wheelhouse/**",
     "node_modules/**"
   ],

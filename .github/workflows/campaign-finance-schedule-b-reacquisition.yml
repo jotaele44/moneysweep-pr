@@ -1,0 +1,90 @@
+name: Campaign Finance Schedule B Reacquisition
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reacquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      FEC_API_KEY: ${{ secrets.FEC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Require FEC credential
+        run: |
+          test -n "${FEC_API_KEY:-}" || { echo '::error::FEC_API_KEY is not configured'; exit 1; }
+          echo "::add-mask::$FEC_API_KEY"
+      - name: Install dependencies
+        run: |
+          grep -vE '^[[:space:]]*-e[[:space:]]' requirements.txt > /tmp/requirements.txt
+          python -m pip install -r /tmp/requirements.txt
+      - name: Restore certified committee universe
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p data/staging/processed /tmp/candidates
+          url="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts?name=campaign-finance-live-materialization&per_page=100"
+          curl --fail --silent --show-error -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" "$url" > /tmp/artifacts.json
+          found=0
+          while read -r artifact_id; do
+            rm -rf /tmp/candidates/* /tmp/candidate.zip
+            if ! curl --fail --location --retry 3 --retry-all-errors -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}/zip" -o /tmp/candidate.zip; then continue; fi
+            unzip -q /tmp/candidate.zip -d /tmp/candidates
+            candidate=/tmp/candidates/data/staging/processed/pr_fec_committees.csv
+            if [[ -s "$candidate" ]]; then cp "$candidate" data/staging/processed/pr_fec_committees.csv; found=1; break; fi
+          done < <(jq -r '[.artifacts[] | select(.expired == false)] | sort_by(.created_at) | reverse | .[].id' /tmp/artifacts.json)
+          test "$found" = 1 || { echo '::error::No retained certified committee universe is available'; exit 1; }
+      - name: Restore latest Schedule B checkpoints
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          url="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts?name=campaign-finance-schedule-b-reacquisition&per_page=100"
+          artifact_id="$(curl --fail --silent --show-error -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" "$url" | jq -r '[.artifacts[] | select(.expired == false)] | sort_by(.created_at) | reverse | .[0].id // empty')"
+          if [[ -z "$artifact_id" ]]; then exit 0; fi
+          mkdir -p /tmp/checkpoint
+          curl --fail --location --retry 3 --retry-all-errors -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}/zip" -o /tmp/checkpoint.zip
+          unzip -q /tmp/checkpoint.zip -d /tmp/checkpoint
+          [[ -d /tmp/checkpoint/data/checkpoints/campaign_finance/fec_schedule_b ]] && { mkdir -p data/checkpoints/campaign_finance; cp -R /tmp/checkpoint/data/checkpoints/campaign_finance/fec_schedule_b data/checkpoints/campaign_finance/; }
+          [[ -f /tmp/checkpoint/data/manifests/campaign_finance/fec_schedule_b_acquisition.json ]] && { mkdir -p data/manifests/campaign_finance; cp /tmp/checkpoint/data/manifests/campaign_finance/fec_schedule_b_acquisition.json data/manifests/campaign_finance/; }
+      - name: Acquire Schedule B
+        run: python scripts/download_fec_schedule_b_resumable.py --resume
+      - name: Verify receipt and output
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          import pandas as pd
+          manifest_path = Path('data/manifests/campaign_finance/fec_schedule_b_acquisition.json')
+          output = Path('data/staging/processed/pr_fec_disbursements.csv')
+          manifest = json.loads(manifest_path.read_text())
+          rows = len(pd.read_csv(output, low_memory=False))
+          digest = hashlib.sha256(output.read_bytes()).hexdigest()
+          assert manifest['status'] == 'complete'
+          assert manifest['query_scope'] == 'certified_pr_committee_ids'
+          assert manifest['planned_batches'] == manifest['completed_batches']
+          assert rows > 0 and rows == manifest['rows']
+          assert digest == manifest['output_sha256']
+          print(f'Schedule B verified: {rows} rows sha256={digest}')
+          PY
+      - name: Preserve Schedule B evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: campaign-finance-schedule-b-reacquisition
+          retention-days: 30
+          if-no-files-found: error
+          path: |
+            data/checkpoints/campaign_finance/fec_schedule_b/
+            data/manifests/campaign_finance/fec_schedule_b_acquisition.json
+            data/staging/processed/pr_fec_committees.csv
+            data/staging/processed/pr_fec_disbursements.csv

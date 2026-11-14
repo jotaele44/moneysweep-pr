@@ -1,0 +1,26 @@
+{
+  "capabilities": [
+    {
+      "id": "pr-justice-cabilderos-public-acquisition",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Authoritative Puerto Rico Department of Justice lobbyist-registry acquisition is an internal, non-interactive source-materialization capability. It produces immutable raw/processed evidence and a manifest for certification; it is not a separate end-user GUI feature.",
+      "candidate_ids": [
+        "analysis_module:scripts/download_cabilderos.py",
+        "analysis_symbol:scripts/download_cabilderos.py:utc_now",
+        "analysis_symbol:scripts/download_cabilderos.py:sha256_file",
+        "analysis_symbol:scripts/download_cabilderos.py:normalize_header",
+        "analysis_symbol:scripts/download_cabilderos.py:canonical_header",
+        "analysis_symbol:scripts/download_cabilderos.py:cell_text",
+        "analysis_symbol:scripts/download_cabilderos.py:parse_registry_html",
+        "analysis_symbol:scripts/download_cabilderos.py:write_csv",
+        "analysis_symbol:scripts/download_cabilderos.py:write_json",
+        "analysis_symbol:scripts/download_cabilderos.py:run",
+        "analysis_symbol:scripts/download_cabilderos.py:main",
+        "cli_surface:scripts/download_cabilderos.py"
+      ]
+    }
+  ],
+  "exceptions": []
+}

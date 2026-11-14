@@ -46,6 +46,35 @@
   },
   "capabilities": [
     {
+      "id": "pr-grid-v2-runtime-contract",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Fail-closed federation contract utility for validating PR_GRID_GEOGRAPHIC_V2 consumer pins, stamping immutable grid identity, and generating canonical grid deep links. It is an internal runtime/governance primitive, not a standalone operator workflow; user-facing grid identity is surfaced through consuming Cell_Profile/API responses rather than a separate validator GUI.",
+      "analysis": {
+        "files": [
+          "federation/spatial/pr_grid_v2_runtime.py"
+        ],
+        "symbols": [
+          "federation/spatial/pr_grid_v2_runtime.py:GridV2Pin",
+          "federation/spatial/pr_grid_v2_runtime.py:GridV2PinError",
+          "federation/spatial/pr_grid_v2_runtime.py:attach_grid_identity",
+          "federation/spatial/pr_grid_v2_runtime.py:build_grid_deep_link",
+          "federation/spatial/pr_grid_v2_runtime.py:grid_identity",
+          "federation/spatial/pr_grid_v2_runtime.py:load_pin",
+          "federation/spatial/pr_grid_v2_runtime.py:validate_cell_id",
+          "federation/spatial/pr_grid_v2_runtime.py:validate_level",
+          "federation/spatial/pr_grid_v2_runtime.py:validate_pin_payload",
+          "federation/spatial/pr_grid_v2_runtime.py:validate_pin_set"
+        ]
+      },
+      "tests": {
+        "contract": [
+          "tests/test_pr_grid_v2_runtime.py"
+        ]
+      }
+    },
+    {
       "id": "public-money-intelligence-dashboard",
       "classification": "analysis",
       "status": "active",
@@ -94,7 +123,8 @@
           "dashboard/src/components/RelationshipGraph.jsx",
           "dashboard/src/components/MunicipalityAggregates.jsx",
           "dashboard/src/components/StatsBar.jsx",
-          "dashboard/src/components/StatsDistributions.jsx"
+          "dashboard/src/components/StatsDistributions.jsx",
+          "dashboard/src/components/ProgramTimeline.jsx"
         ],
         "discoverability": [
           "dashboard/src/pages/Dashboard.jsx"
@@ -1457,6 +1487,25 @@
       ]
     },
     {
+      "id": "entity-network-kernel-v1",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Additive cross-sector graph semantics, sector profiles, and fail-closed ingestion policy. This slice is backend infrastructure only and exposes no new human-facing workflow.",
+      "backend": {
+        "files": [
+          "moneysweep/entity_network/__init__.py",
+          "moneysweep/entity_network/models.py",
+          "moneysweep/entity_network/policy.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_entity_network_kernel.py"
+        ]
+      }
+    },
+    {
       "id": "hud-drgr-source-audit",
       "classification": "operator",
       "status": "active",
@@ -1676,6 +1725,63 @@
       ]
     },
     {
+      "id": "asg-emergency-purchases-materialization-pipeline",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Resumable, checkpointed ASG emergency-purchases materialization and the identity-coverage audit that certify the ASG source-native leaderboard plane (#656). They are certification and operator plumbing that feed the leaderboard and completeness surfaces already exposed in the dashboard; they are not a separate human-facing workflow.",
+      "analysis": {
+        "files": [
+          "scripts/audit_asg_emergency_identity_coverage.py",
+          "scripts/materialize_asg_emergency_purchases_resumable.py"
+        ],
+        "symbols": [
+          "scripts/audit_asg_emergency_identity_coverage.py:audit",
+          "scripts/audit_asg_emergency_identity_coverage.py:main",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:append_rows",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:atomic_json",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:initial_checkpoint",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:load_checkpoint",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:main",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:page_signature",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:paths",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:promote",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:run",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:sha256",
+          "scripts/materialize_asg_emergency_purchases_resumable.py:utc_now",
+          "scripts/scrape_asg_emergency_purchases.py:split_vendor_identity"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_audit_asg_emergency_identity_coverage.py",
+          "tests/test_materialize_asg_emergency_purchases_resumable.py",
+          "tests/test_scrape_asg_emergency_purchases.py"
+        ]
+      }
+    },
+    {
+      "id": "pr-justice-cabilderos-public-acquisition",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Authoritative Puerto Rico Department of Justice lobbyist-registry acquisition is an internal, non-interactive source-materialization capability. It produces immutable raw/processed evidence and a manifest for certification; it is not a separate end-user GUI feature.",
+      "candidate_ids": [
+        "analysis_module:scripts/download_cabilderos.py",
+        "analysis_symbol:scripts/download_cabilderos.py:utc_now",
+        "analysis_symbol:scripts/download_cabilderos.py:sha256_file",
+        "analysis_symbol:scripts/download_cabilderos.py:normalize_header",
+        "analysis_symbol:scripts/download_cabilderos.py:canonical_header",
+        "analysis_symbol:scripts/download_cabilderos.py:cell_text",
+        "analysis_symbol:scripts/download_cabilderos.py:parse_registry_html",
+        "analysis_symbol:scripts/download_cabilderos.py:write_csv",
+        "analysis_symbol:scripts/download_cabilderos.py:write_json",
+        "analysis_symbol:scripts/download_cabilderos.py:run",
+        "analysis_symbol:scripts/download_cabilderos.py:main",
+        "cli_surface:scripts/download_cabilderos.py"
+      ]
+    },
+    {
       "id": "capital-control-federal-registry-adapter-runtime",
       "classification": "internal",
       "status": "active",
@@ -1794,6 +1900,34 @@
         "python_symbol:moneysweep/capital_control/resolution_core/property_project.py:PropertyProjectBinding",
         "python_symbol:moneysweep/capital_control/resolution_core/property_project.py:SpatialState",
         "python_symbol:moneysweep/capital_control/resolution_core/property_project.py:bind_property_project"
+      ]
+    },
+    {
+      "id": "case-manager-authorization-boundary",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Security infrastructure for the Case Manager service boundary, not a user capability. server/backend/case_manager_auth.py resolves the acting identity and read clearance from a verified credential instead of from client-supplied X-Case-Actor / X-Case-Clearance headers, closing the privilege escalation and audit-trail forgery recorded as finding D4 in docs/GAP_ANALYSIS_AND_OPTIMIZATION_2026-09.md. server/backend/local_request.py is the loopback trust boundary it shares with the API-key store. Neither module has or should have a GUI surface: they are enforcement that runs underneath every /cases route, and AGENTS.md classifies security-sensitive controls as internal while still requiring user-relevant outcomes to surface. The outcomes here are HTTP status codes on the Case Manager API itself (403 off-box, 503 unconfigured, 401 unknown token), which its own consumers receive directly. The Case Manager's absent dashboard workflow is tracked separately by the existing case-manager-phase-1-gui-gap exception; this entry does not widen or substitute for it.",
+      "backend": {
+        "files": [
+          "server/backend/case_manager_auth.py",
+          "server/backend/local_request.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_case_manager_auth.py"
+        ]
+      },
+      "candidate_ids": [
+        "python_module:server/backend/case_manager_auth.py",
+        "python_module:server/backend/local_request.py",
+        "python_symbol:server/backend/case_manager_auth.py:Identity",
+        "python_symbol:server/backend/case_manager_auth.py:configure_identities",
+        "python_symbol:server/backend/case_manager_auth.py:load_identities",
+        "python_symbol:server/backend/case_manager_auth.py:resolve_identity",
+        "python_symbol:server/backend/case_manager_auth.py:token_digest",
+        "python_symbol:server/backend/local_request.py:require_loopback"
       ]
     },
     {
@@ -1928,6 +2062,147 @@
       }
     },
     {
+      "id": "desktop-offline-bootstrap",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "First-run plumbing for the source-checkout desktop wrapper: it installs the committed dashboard bundle instead of requiring Node.js, and reports which prerequisite blocks setup. Both run before any window exists, so their results surface in the launcher's own failure dialog rather than as separate interactive GUI capabilities.",
+      "candidate_ids": [
+        "analysis_module:scripts/build_prebuilt_dashboard.py",
+        "analysis_symbol:scripts/build_prebuilt_dashboard.py:main",
+        "cli_surface:desktop/preflight.py",
+        "cli_surface:scripts/build_prebuilt_dashboard.py",
+        "python_module:desktop/prebuilt.py",
+        "python_module:desktop/preflight.py",
+        "python_module:scripts/build_prebuilt_dashboard.py",
+        "python_symbol:desktop/prebuilt.py:build_manifest",
+        "python_symbol:desktop/prebuilt.py:bundle_file_records",
+        "python_symbol:desktop/prebuilt.py:environment_description",
+        "python_symbol:desktop/prebuilt.py:install_prebuilt_dashboard",
+        "python_symbol:desktop/prebuilt.py:is_stale",
+        "python_symbol:desktop/prebuilt.py:iter_fingerprint_inputs",
+        "python_symbol:desktop/prebuilt.py:load_manifest",
+        "python_symbol:desktop/prebuilt.py:record_source_build",
+        "python_symbol:desktop/prebuilt.py:sha256_file",
+        "python_symbol:desktop/prebuilt.py:source_fingerprint",
+        "python_symbol:desktop/prebuilt.py:verify_bundle_bytes",
+        "python_symbol:desktop/preflight.py:check_checkout_intact",
+        "python_symbol:desktop/preflight.py:check_checkout_writable",
+        "python_symbol:desktop/preflight.py:check_dashboard_bundle",
+        "python_symbol:desktop/preflight.py:check_disk_space",
+        "python_symbol:desktop/preflight.py:check_git_available",
+        "python_symbol:desktop/preflight.py:check_network",
+        "python_symbol:desktop/preflight.py:check_python_version",
+        "python_symbol:desktop/preflight.py:check_venv_available",
+        "python_symbol:desktop/preflight.py:format_text",
+        "python_symbol:desktop/preflight.py:main",
+        "python_symbol:desktop/preflight.py:run_checks",
+        "python_symbol:desktop/preflight.py:setup_is_complete",
+        "python_symbol:desktop/setup.py:clear_macos_quarantine",
+        "python_symbol:desktop/setup.py:has_wheelhouse",
+        "python_symbol:desktop/setup.py:report_blocking_prerequisites",
+        "python_symbol:desktop/setup.py:setup_frontend",
+        "python_symbol:desktop/setup.py:source_build_available",
+        "python_symbol:desktop/setup.py:wheelhouse_dir"
+      ]
+    },
+    {
+      "id": "fec-schedule-b-certified-reacquisition",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Page-resumable FEC Schedule B acquisition is an operator-side evidence/materialization control used to populate the certified campaign-finance corpus. It is intentionally fail-closed, credential-gated, checkpointed, and non-interactive; it does not create a separate end-user dashboard capability.",
+      "candidate_ids": [
+        "analysis_module:scripts/download_fec_schedule_b_resumable.py",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:assemble",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:checkpoint_path",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:committee_ids",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:current_cycle",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:main",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:normalize_rows",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:request_json",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:run",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:sha256_file",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:utc_now",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:valid_checkpoint",
+        "analysis_symbol:scripts/download_fec_schedule_b_resumable.py:write_json",
+        "cli_surface:scripts/download_fec_schedule_b_resumable.py"
+      ]
+    },
+    {
+      "id": "financial-entity-leaderboards",
+      "classification": "analysis",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Diagnostic evidence-preserving financial rankings, frozen history, typed investigation signals and entity neighborhoods. Each measure has an explicit adapter/identity contract; unsupported or unmaterialized categories fail closed. MoneySweep exposes municipality references but does not claim geometry authority. Production federation promotion is separately bounded to a certified debt-issuance scope with exact package-hash trust.",
+      "backend": {
+        "files": [
+          "server/backend/leaderboards.py",
+          "server/backend/leaderboard_adapters.py",
+          "server/backend/leaderboard_history.py",
+          "server/backend/leaderboard_investigation.py",
+          "server/backend/leaderboard_entities.py",
+          "server/backend/main.py",
+          "config/financial_category_ontology.json"
+        ],
+        "endpoints": [
+          "GET /categories",
+          "GET /top",
+          "GET /history",
+          "GET /movers",
+          "GET /signals",
+          "GET /entity/{entity_id}"
+        ]
+      },
+      "analysis": {
+        "files": [
+          "scripts/materialize_leaderboard_snapshot.py",
+          "scripts/materialize_leaderboard_git_snapshot.py",
+          "scripts/certify_leaderboard_snapshot.py",
+          "scripts/finalize_leaderboard_release.py",
+          "scripts/export_leaderboard_package.py",
+          "scripts/leaderboard_release_provenance.py",
+          "data/manifests/leaderboards/leaderboard_certification_scope_v1.json",
+          "data/manifests/leaderboards/debt_history_source_refs_v1.json",
+          "schemas/leaderboard_export_package.schema.json"
+        ]
+      },
+      "frontend": {
+        "routes": [
+          "/"
+        ],
+        "e2e_routes": [
+          "/"
+        ],
+        "components": [
+          "dashboard/src/lib/api.js",
+          "dashboard/src/pages/Dashboard.jsx",
+          "dashboard/src/components/FinancialLeaderboards.jsx"
+        ],
+        "discoverability": [
+          "dashboard/src/pages/Dashboard.jsx"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_leaderboards.py",
+          "tests/test_leaderboard_adapters.py",
+          "tests/test_leaderboard_history.py",
+          "tests/test_leaderboard_git_history.py",
+          "tests/test_leaderboard_debt_history_expected.py",
+          "tests/test_leaderboard_snapshot_certification.py",
+          "tests/test_leaderboard_release_finalizer.py",
+          "tests/test_leaderboard_release_provenance.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ],
+        "e2e": [
+          "dashboard/tests/financial-leaderboards.spec.mjs"
+        ]
+      }
+    },
+    {
       "id": "fomb-source-materialization",
       "classification": "internal",
       "status": "active",
@@ -2004,6 +2279,25 @@
           "tests/test_guide_financial_source_parsers.py"
         ]
       }
+    },
+    {
+      "id": "hacienda-sut-ivu-producer",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Registered source producer for PR Treasury IVU/SUT monthly collections. It fetches the live Hacienda PDFs and materializes data/staging/processed/pr_hacienda_sut_ivu.csv; the resulting rows reach operators through the existing public-money-intelligence-dashboard capability, exactly like every other ingested source, rather than through a surface of their own. Its CLI is an implementation surface for scheduled and operator-initiated materialization, not a user-facing workflow, and it promotes nothing automatically.",
+      "analysis": {
+        "files": [
+          "scripts/download_hacienda_sut_ivu.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_module:scripts/download_hacienda_sut_ivu.py",
+        "analysis_symbol:scripts/download_hacienda_sut_ivu.py:discover_pdf_urls",
+        "analysis_symbol:scripts/download_hacienda_sut_ivu.py:parse_pdf",
+        "analysis_symbol:scripts/download_hacienda_sut_ivu.py:run",
+        "cli_surface:scripts/download_hacienda_sut_ivu.py"
+      ]
     },
     {
       "id": "haf-contract-validation",
@@ -2136,6 +2430,29 @@
         "python_symbol:server/backend/ownership_api.py:ownership_deep_dive",
         "backend_endpoint:server/backend/ownership_api.py:GET /status",
         "backend_endpoint:server/backend/ownership_api.py:GET /{ticker}"
+      ]
+    },
+    {
+      "id": "prasa-official-transition-contract-acquisition",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Authoritative PRASA contract snapshot acquisition from the official Puerto Rico 2024 transition portal is an internal, non-interactive source-materialization capability. It feeds the existing PRASA ingester and emits immutable raw/processed evidence; it is not a separate end-user GUI feature.",
+      "candidate_ids": [
+        "analysis_module:scripts/download_prasa_contracts.py",
+        "analysis_symbol:scripts/download_prasa_contracts.py:utc_now",
+        "analysis_symbol:scripts/download_prasa_contracts.py:sha256_file",
+        "analysis_symbol:scripts/download_prasa_contracts.py:clean_cell",
+        "analysis_symbol:scripts/download_prasa_contracts.py:normalize_header",
+        "analysis_symbol:scripts/download_prasa_contracts.py:canonical_header",
+        "analysis_symbol:scripts/download_prasa_contracts.py:normalize_amount",
+        "analysis_symbol:scripts/download_prasa_contracts.py:parse_extracted_table",
+        "analysis_symbol:scripts/download_prasa_contracts.py:extract_pdf_contracts",
+        "analysis_symbol:scripts/download_prasa_contracts.py:write_csv",
+        "analysis_symbol:scripts/download_prasa_contracts.py:write_json",
+        "analysis_symbol:scripts/download_prasa_contracts.py:run",
+        "analysis_symbol:scripts/download_prasa_contracts.py:main",
+        "cli_surface:scripts/download_prasa_contracts.py"
       ]
     },
     {
