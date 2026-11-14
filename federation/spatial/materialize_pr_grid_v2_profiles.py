@@ -7,7 +7,12 @@ import argparse
 import json
 from pathlib import Path
 
-from pr_grid_v2_profiles import ProfileError, build_profiles, digest
+from pr_grid_v2_profiles import (
+    ProfileError,
+    build_incremental_profiles,
+    build_profiles,
+    digest,
+)
 from pr_grid_v2_runtime import GridV2PinError
 
 
@@ -24,30 +29,79 @@ def main() -> int:
     parser.add_argument("--coverage", type=Path)
     parser.add_argument("--level", choices=("L0", "L1", "L2", "L3"), required=True)
     parser.add_argument("--cell-id", action="append", default=[])
+    parser.add_argument("--previous-bindings", type=Path)
+    parser.add_argument("--previous-binding-receipt", type=Path)
+    parser.add_argument("--previous-profiles", type=Path)
+    parser.add_argument("--changed-record-id", action="append", default=[])
+    parser.add_argument("--changed-coverage-cell", action="append", default=[])
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--receipt-out", type=Path, required=True)
     args = parser.parse_args()
-    try:
-        profiles, receipt = build_profiles(
-            pin_path=args.pin,
-            records_path=args.records,
-            bindings_path=args.bindings,
-            receipt_path=args.binding_receipt,
-            coverage_path=args.coverage,
-            level=args.level,
-            requested_cells=tuple(args.cell_id),
+
+    incremental_requested = any(
+        (
+            args.previous_bindings,
+            args.previous_binding_receipt,
+            args.previous_profiles,
+            args.changed_record_id,
+            args.changed_coverage_cell,
         )
+    )
+    try:
+        if incremental_requested:
+            missing = [
+                name
+                for name, value in (
+                    ("--previous-bindings", args.previous_bindings),
+                    ("--previous-binding-receipt", args.previous_binding_receipt),
+                    ("--previous-profiles", args.previous_profiles),
+                )
+                if value is None
+            ]
+            if missing:
+                raise ProfileError(
+                    "incremental refresh requires " + ", ".join(missing)
+                )
+            profiles, receipt = build_incremental_profiles(
+                pin_path=args.pin,
+                records_path=args.records,
+                bindings_path=args.bindings,
+                receipt_path=args.binding_receipt,
+                previous_bindings_path=args.previous_bindings,
+                previous_receipt_path=args.previous_binding_receipt,
+                previous_profiles_path=args.previous_profiles,
+                coverage_path=args.coverage,
+                level=args.level,
+                changed_record_ids=tuple(args.changed_record_id),
+                changed_coverage_cells=tuple(args.changed_coverage_cell),
+            )
+        else:
+            profiles, receipt = build_profiles(
+                pin_path=args.pin,
+                records_path=args.records,
+                bindings_path=args.bindings,
+                receipt_path=args.binding_receipt,
+                coverage_path=args.coverage,
+                level=args.level,
+                requested_cells=tuple(args.cell_id),
+            )
+            receipt["Refresh_Mode"] = "FULL"
+            receipt["Output_Mode"] = "FULL_SNAPSHOT"
     except (ProfileError, GridV2PinError, OSError, ValueError) as exc:
         parser.exit(2, f"FAIL_CLOSED: {exc}\n")
+
     output = "".join(
-        json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n" for row in profiles
+        json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n"
+        for row in profiles
     )
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(output, encoding="utf-8")
     receipt["Output_SHA256"] = digest(output.encode("utf-8"))
+    receipt["Output_Bytes"] = len(output.encode("utf-8"))
     args.receipt_out.parent.mkdir(parents=True, exist_ok=True)
     args.receipt_out.write_text(
-        json.dumps(receipt, sort_keys=True, indent=2) + "\n", encoding="utf-8"
+        json.dumps(receipt, sort_keys=True, indent=2) + "\n",
+        encoding="utf-8",
     )
     print(json.dumps(receipt, sort_keys=True, indent=2))
     return 0
