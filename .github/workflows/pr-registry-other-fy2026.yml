@@ -1,0 +1,35 @@
+name: PR Registry FY2026 Expanded Other Awards
+on:
+  pull_request:
+    paths:
+      - research/pr_program_registry/enumerate_fy2026_expanded_other.py
+      - tests/test_pr_registry_fy2026_expanded_other.py
+      - .github/workflows/pr-registry-other-fy2026.yml
+permissions:
+  contents: read
+jobs:
+  bounded-membership:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run negative and positive membership contract tests
+        run: python -m unittest discover -s tests -p test_pr_registry_fy2026_expanded_other.py -v
+      - name: Acquire raw FY2026 PR other award pages and receipts
+        id: collect
+        continue-on-error: true
+        run: python research/pr_program_registry/enumerate_fy2026_expanded_other.py outputs/pr_registry_other_fy2026
+      - name: Preserve raw evidence and fail-closed receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-registry-fy2026-expanded-other-membership
+          path: outputs/pr_registry_other_fy2026/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Deny incomplete set
+        if: steps.collect.outcome != 'success'
+        run: exit 1
