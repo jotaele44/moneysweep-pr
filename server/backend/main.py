@@ -280,6 +280,7 @@ def stats():
 from server.backend.api_keys import router as api_keys_router  # noqa: E402
 from server.backend.campaign_finance import router as campaign_finance_router  # noqa: E402
 from server.backend.government_changes import router as government_changes_router  # noqa: E402
+from server.backend.grid_v2_api import router as grid_v2_router  # noqa: E402
 from server.backend.leaderboards import create_router as create_leaderboard_router  # noqa: E402
 from server.backend.ownership_api import router as ownership_router  # noqa: E402
 
@@ -288,3 +289,4 @@ app.include_router(campaign_finance_router)
 app.include_router(government_changes_router)
 app.include_router(create_leaderboard_router(DATA))
 app.include_router(ownership_router)
+app.include_router(grid_v2_router)

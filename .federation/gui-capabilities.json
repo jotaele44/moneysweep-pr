@@ -75,6 +75,34 @@
       }
     },
     {
+      "id": "pr-grid-v2-cell-profile-api",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Read-only, receipt-verified PR Grid V2 Cell_Profile access and immutable grid-identity exposure. It is an internal federation/spatial contract surface, not a separate operator GUI. Canonical cross-domain cell handoff remains TheHub; geometry remains Spiderweb-only.",
+      "backend": {
+        "files": [
+          "server/backend/grid_v2_api.py"
+        ],
+        "endpoints": [
+          "GET /identity/{level}",
+          "GET /profile/{level}/{cell_id}"
+        ],
+        "symbols": [
+          "server/backend/grid_v2_api.py:cell_profile",
+          "server/backend/grid_v2_api.py:grid_identity_response"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_pr_grid_v2_api.py"
+        ],
+        "contract": [
+          "tests/test_gui_parity.py"
+        ]
+      }
+    },
+    {
       "id": "public-money-intelligence-dashboard",
       "classification": "analysis",
       "status": "active",
