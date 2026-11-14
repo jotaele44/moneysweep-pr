@@ -67,3 +67,12 @@ def test_unsupported_level_and_noncanonical_cell_fail_closed():
         grid.validate_level("L4")
     with pytest.raises(grid.GridV2PinError):
         grid.validate_cell_id("R0_C0")
+
+
+def test_previous_authority_epoch_fails_closed(tmp_path):
+    payload = json.loads(PIN_PATH.read_text(encoding="utf-8"))
+    payload["authority_commit"] = "0c66e13d14232c0d7cbcbc179b3655904777dc71"
+    path = tmp_path / "old-epoch.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(grid.GridV2PinError, match="authority_commit"):
+        grid.load_pin(path, expected_consumer="moneysweep-pr")

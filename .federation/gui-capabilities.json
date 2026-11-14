@@ -50,7 +50,7 @@
       "classification": "internal",
       "status": "active",
       "requires_terminal": false,
-      "rationale": "Fail-closed federation contract utility for validating PR_GRID_GEOGRAPHIC_V2 consumer pins, stamping immutable grid identity, and generating canonical grid deep links. It is an internal runtime/governance primitive, not a standalone operator workflow; user-facing grid identity is surfaced through consuming Cell_Profile/API responses rather than a separate validator GUI.",
+      "rationale": "Fail-closed federation contract utility for validating PR_GRID_GEOGRAPHIC_V2 consumer pins, stamping immutable grid identity, and generating canonical grid deep links. It is an internal runtime/governance primitive, not a standalone operator workflow; user-facing grid identity is surfaced through consuming Cell_Profile/API responses rather than a separate validator GUI. The authority epoch is b8f5cf303ab7fc2b6ed006edce0fb12e1344a096; historical receipts retain their original epoch.",
       "analysis": {
         "files": [
           "federation/spatial/pr_grid_v2_runtime.py"

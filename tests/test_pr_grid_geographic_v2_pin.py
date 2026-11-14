@@ -13,7 +13,7 @@ PIN = json.loads(
 def test_pr_grid_v2_pin_is_exact():
     assert PIN["consumer"] == "moneysweep-pr"
     assert PIN["geometry_authority"] == "spiderweb-pr"
-    assert PIN["authority_commit"] == "0c66e13d14232c0d7cbcbc179b3655904777dc71"
+    assert PIN["authority_commit"] == "b8f5cf303ab7fc2b6ed006edce0fb12e1344a096"
     assert PIN["grid_id"] == "PR_GRID_GEOGRAPHIC_V2"
     assert PIN["grid_version"] == "2.0.0-rc1"
     assert PIN["crs"] == "EPSG:6566"
