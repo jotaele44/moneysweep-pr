@@ -61,6 +61,15 @@ what removes the remaining one-time approval.
 | Primary function | Public money, procurement, grants, recovery, influence, fiscal-control, contractor-reference, and disaster-assistance producer |
 | Production stance | Not production-certified master dataset until gates pass |
 
+## Investigation development
+
+The diagnostic dashboard now exposes a read-only **Research Lenses** tab covering
+the 24 adopted investigation lenses, with separate implementation, source and
+finding states. This is a development inventory, not full investigation readiness.
+See [the scoped upgrade backlog](docs/INVESTIGATION_CAPABILITIES_UPGRADE_V1.md).
+All development in this upgrade is confined to MoneySweep unless a concrete
+external dependency is separately identified.
+
 ## Current operating state
 
 moneysweep-pr is **not yet a production-certified master dataset**. The current state is a controlled buildout phase:
