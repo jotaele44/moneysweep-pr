@@ -24,6 +24,95 @@ A bump to the **federation export** version is what the release-tagging workflow
 
 ## [Unreleased]
 
+### Changed
+- **Frontend `npm audit` gate now uses an expiring allow-list instead of failing
+  on advisories that cannot be fixed.** `desktop-build.yml` runs
+  `tools/check_npm_audit.py`, which still fails on any advisory at or above
+  `moderate` that is not listed in `dashboard/audit-allowlist.json`, fails on an
+  expired or reason-less entry, and fails closed if `npm audit` returns no
+  report. Two build-time-only advisories with no usable fix are listed, each
+  with a rationale and an expiry of 2027-01-05: `braces` GHSA-vfj7-8cjw-p6xm (no
+  patched release) and `postcss-selector-parser` GHSA-rj75-hqrm-r3gf (Tailwind 3
+  pins the 6.x line). `source-map-js` is fixed by a lockfile bump to 1.2.2; the
+  prebuilt dashboard bundle manifest was regenerated for the new fingerprint.
+  This unblocks the packaged-app build and its frozen self-test in CI.
+- **`tailwindcss-animate` is now a dashboard `devDependency`.** It is a Tailwind
+  plugin that `tailwind.config.js` loads at build time, but listing it under
+  `dependencies` made npm count `tailwindcss` and its whole transitive tree
+  (including `braces` and `postcss-selector-parser`) as runtime dependencies.
+  `npm audit --omit=dev` now audits the 101 runtime packages and finds none
+  vulnerable, where before it failed on build-time tooling. The frontend gate is
+  unchanged: it still audits the full tree against `dashboard/audit-allowlist.json`.
+  `package-lock.json` changes only `"dev": true` flags and the root manifest; the
+  prebuilt dashboard manifest was regenerated and the bundle assets are
+  byte-identical.
+- **Dashboard moves from Tailwind CSS 3 to 4, which empties the npm-audit
+  allow-list.** Tailwind 4 runs as a Vite plugin (`@tailwindcss/vite`), so
+  `postcss`, `autoprefixer`, `tailwind.config.js` and `postcss.config.js` are
+  gone: the design tokens, the files Tailwind scans (the same globs the v3
+  config used) and the class-based dark mode now live in `dashboard/src/index.css`,
+  and `tailwindcss-animate` is replaced by the CSS-only `tw-animate-css`.
+  `vite-plugin-singlefile` is replaced by `dashboard/scripts/inline-single-file.mjs`
+  (its `micromatch` → `braces` dependency has no patched release); the offline
+  export it writes is byte-identical to the old one, and it has its own unit
+  tests. With both gone, `braces` GHSA-vfj7-8cjw-p6xm and `postcss-selector-parser`
+  GHSA-rj75-hqrm-r3gf no longer appear. Advisories published while this was in
+  review are handled separately: `vite`, `vitest`, `undici` and `zod` are bumped
+  within their ranges (lockfile only), and a new `minimatch` advisory,
+  GHSA-g3hv-75wg-m249, which no eslint release can take the fix for, is the one
+  allow-list entry, expiring 2027-02-02. The prebuilt dashboard bundle was
+  rebuilt. Against the Tailwind 3 build, the shipped bundle
+  served by the real desktop backend shows no pixel, layout or focus-ring
+  difference across all 11 tabs plus hover, sheet, select and keyboard-focus
+  states at 1280×800 and 390×844. **Browser floor:** Tailwind 4 needs
+  Safari/WebKit 16.4, Chrome 111 or Firefox 128; see "WebView requirements" in
+  `desktop/README.md`.
+
+### Fixed
+- **The Tailwind 4 upgrade (#678) no longer changes the dashboard's native form controls
+  and table cells.** Tailwind 4's preflight resets `margin` and `padding` on every
+  element, which also removed browser defaults that Tailwind 3 left alone: the Data
+  Sources file picker's button lost its `1px 6px` padding (the file name sat about 6px
+  further left), `<option>` lost its `0 2px 1px` padding, and bare `<td>`/`<th>` lost
+  theirs. `dashboard/src/index.css` hands those back with `revert-layer`; measured in
+  Chrome 156 against the Tailwind 3 bundle, every value is equal again. The prebuilt
+  dashboard bundle was regenerated with `build_prebuilt_dashboard.py --build`.
+- **Cleared the checks #656 merged red.** `mypy` (`audit_asg_emergency_identity_coverage`
+  narrowed the optional coverage contract), the `ruff` format gate (eight files) and one
+  unused import; `registries/coverage_contracts.yaml` now matches its JSON (the 1,431
+  denominator was on `usaspending_prime`/`usaspending_subawards` instead of
+  `asg_emergency_purchases`) with `reports/completeness_matrix.csv` and
+  `reports/source_registry_status.csv` regenerated from their tools; one ASG note phrase
+  aligned with the test that asserts it (counts unchanged); and the new ASG scripts are
+  classified `internal` in a GUI-parity extension (baseline untouched).
+- **Cleared the CI failures that were already red on `main`** (separate from the
+  desktop Setup fix): two unused imports (`server/backend/case_manager_api.py`,
+  `server/backend/materialization.py`) and five files `ruff format` flagged (the
+  byte-bound leaderboard runtime files stay excluded, as in `lint.yml`); the
+  `httpx2` dependency that recent Starlette needs for `TestClient`, declared in
+  `ci.yml`, `tests.yml` and `requirements-dev.txt` (it made
+  `tests/test_hud_drgr_audit_api.py` fail at collection); that test's client
+  fixture now connects from loopback, as the hardened local-only guard requires;
+  and the committed prebuilt dashboard bundle, regenerated with
+  `scripts/build_prebuilt_dashboard.py --build` on Node 22.22.2.
+- **Desktop Setup & Diagnostics no longer hangs on "Saving configuration and
+  starting the app…".** A backend that failed or was slow to import left the
+  setup page frozen with no error. The visible-error screen with **Try Again**
+  ships in the shared `prii-desktop` runtime (thehub-pr#335); this repo picks it
+  up when the federation template pin in `requirements-desktop.txt` is bumped.
+- **Source launches no longer fail while importing the backend.** Every launcher
+  runs `python desktop/launch.py`, which put `desktop/` first on `sys.path` so
+  `desktop/secrets.py` shadowed the standard-library `secrets` module and
+  starlette raised `cannot import name 'token_hex'`; `desktop/launch.py` now
+  removes its own directory from `sys.path` (regression test in
+  `tests/test_desktop_saved_workspace.py`).
+- **The workspace folder chosen in Setup & Diagnostics is now actually used.**
+  `desktop/config.py` exports it through `MONEYSWEEP_WORKSPACE_ROOT` and
+  re-bootstraps the data tree on Save/Repair (`SETUP_ACTION`), and
+  `desktop/launch.py` applies the saved choice before bootstrapping on later
+  launches (an explicit `MONEYSWEEP_WORKSPACE_ROOT` still wins). Previously the
+  data root stayed in `~/Library/Application Support/PRII-MONEYSWEEP`.
+
 ### Added
 - **Desktop wrapper first run no longer requires Node.js or a browser-download
   repair ritual.** A prebuilt dashboard is committed at

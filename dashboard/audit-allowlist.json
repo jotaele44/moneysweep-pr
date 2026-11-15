@@ -1,0 +1,11 @@
+{
+  "_comment": "Advisories the frontend dependency gate (tools/check_npm_audit.py) tolerates. Every entry needs a rationale and an expiry; an expired entry fails the gate. Remove an entry as soon as a fix exists.",
+  "advisories": [
+    {
+      "id": "GHSA-g3hv-75wg-m249",
+      "package": "minimatch",
+      "reason": "Denial of service via globparts amplification in minimatch before 11.0.1. Reached only through eslint 9 and eslint-plugin-react (minimatch ^3) at lint time, on this repo's own config globs. No eslint release can take the fix: even eslint 10 pins minimatch ^10. Lint-time only; nothing from the chain ships in the bundle or runs in the desktop app.",
+      "expires": "2027-02-02"
+    }
+  ]
+}

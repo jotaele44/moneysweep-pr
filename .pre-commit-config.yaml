@@ -53,7 +53,11 @@ repos:
       - id: ruff-format
         name: ruff format (changed files)
         # The repo-wide reformat landed in Wave C; this keeps changed files
-        # formatted. The CI `ruff format --check .` job is the gating counterpart.
+        # formatted. The CI format gate mirrors this exact frozen-runtime exclusion.
+        # These files are byte-bound into moneysweep.leaderboard.production-v1
+        # and TheHub's exact replay receipt. Reformat only under a new certified
+        # runtime/package/replay revision.
+        exclude: ^(scripts/(leaderboard_release_provenance|materialize_leaderboard_snapshot|certify_leaderboard_snapshot|materialize_leaderboard_git_snapshot|finalize_leaderboard_release|export_leaderboard_package)\.py|server/backend/(leaderboards|leaderboard_adapters|leaderboard_history|leaderboard_investigation|leaderboard_entities)\.py)$
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v2.3.1
@@ -90,3 +94,19 @@ repos:
           # when stubs exist on PyPI), even though per-commit runs that skip that
           # file pass. See .github/workflows/pre-commit.yml.
           - types-requests
+
+  # Documentation must not contradict the change. Local because the script is a
+  # rendered file in this very repo, and because it needs the whole index rather
+  # than the batches of file names pre-commit hands a hook. Stdlib only, so the
+  # hook environment installs nothing. At commit time a missing doc update is a
+  # warning (the message that could waive it is not written yet); a reference the
+  # commit breaks is an error. CI (docs-sync) is the authority on both.
+  - repo: local
+    hooks:
+      - id: docs-sync
+        name: docs-sync (references + co-change, staged)
+        entry: python tools/check_docs_sync.py --staged
+        language: python
+        pass_filenames: false
+        always_run: true
+        verbose: true # co-change findings are warnings here; show them

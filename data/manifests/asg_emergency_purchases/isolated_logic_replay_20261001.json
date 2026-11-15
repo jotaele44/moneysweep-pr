@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "moneysweep.asg-emergency-isolated-logic-replay/v1",
+  "executedAt": "2026-10-01",
+  "state": "PASS",
+  "executionSurface": "LOCAL_CONTAINER_ISOLATED_REPLAY",
+  "repositoryPytestExecuted": false,
+  "githubActions": {
+    "state": "WAIVED_BY_USER",
+    "assertsPass": false
+  },
+  "suites": [
+    {
+      "name": "identity_coverage_adjudicator",
+      "sourcePath": "scripts/audit_asg_emergency_identity_coverage.py",
+      "sourceBlobSha": "1a5413302e6ae2781d7ce87ac11d6973c17af084",
+      "testsExecuted": 7,
+      "testsPassed": 7,
+      "state": "PASS",
+      "coverage": [
+        "missing materialization fail-closed",
+        "explicit name-only exclusion in bounded source-native scope",
+        "unmeasured denominator blocks both scopes",
+        "clean whole-source closure",
+        "below-contract coverage block",
+        "identifier namespace block",
+        "source-native invalid amount block"
+      ]
+    },
+    {
+      "name": "restartable_materializer",
+      "sourcePath": "scripts/materialize_asg_emergency_purchases_resumable.py",
+      "sourceBlobSha": "e752eaed5f6087d0d5c7cb0bdd8165d3ab58ccbe",
+      "testPath": "tests/test_materialize_asg_emergency_purchases_resumable.py",
+      "testBlobSha": "dae606a5c22ed56d02f283a0ebdcb5b98150d727",
+      "testsExecuted": 5,
+      "testsPassed": 5,
+      "state": "PASS",
+      "scraperBoundary": "CONTROLLED_STUB",
+      "coverage": [
+        "partial run never promotes",
+        "resume closes denominator and promotes",
+        "page-count drift blocks",
+        "cross-page duplicate control number blocks promotion",
+        "work-file tamper invalidates resume"
+      ]
+    }
+  ],
+  "aggregate": {
+    "testsExecuted": 12,
+    "testsPassed": 12,
+    "state": "PASS"
+  },
+  "correction": {
+    "state": "FIXED_BEFORE_RECEIPT",
+    "issue": "Initial duplicate-key test used two identical page signatures, so the earlier repeated-page guard prevented the duplicate-promotion gate from being reached.",
+    "fixCommit": "3a5afca19e124697099d3e5684c391bd13dcfb27"
+  },
+  "limitations": [
+    "This is not a full repository pytest run.",
+    "The materializer suite stubs only the HTTP/parser scraper boundary.",
+    "No live 144-page source materialization was executed.",
+    "No claim is made that the ASG leaderboard candidate is certified."
+  ]
+}
