@@ -1,18 +1,35 @@
 # Project Status — moneysweep-pr
 
-**Date:** 2026-07-26  
+**Date:** 2026-11-15  
 **Branch:** `main`  
-**Active vector:** `NATIVE_EXECUTION_MODE`  
+**Active vector:** `REQUIRED_SOURCE_AND_OPERATOR_EVIDENCE_CLOSURE`  
 **Production status:** `NON_PRODUCTION_DIAGNOSTIC`  
-**Latest test baseline:** 2394 passed · 8 skipped · 0 failed · 51.74% coverage (gate: 44%)
+**Latest test baseline:** 3194 passed · 10 skipped · 0 failed · 55.20% coverage (gate: 44%)
 
-> Measured 2026-07-26 by `python -m pytest tests/ -q` on **Python 3.11.15**, using the
-> install from `.github/workflows/tests.yml` (`requirements.txt` + `httpx jsonschema` +
-> `server/backend/requirements.txt`). That workflow pins **Python 3.13**, so treat this as
-> a 3.11 measurement rather than a CI-identical figure. The previous line on this row
-> claimed "481 passed · 1 skipped" and was dated 2026-05-18 — roughly ten weeks and ~1900
-> tests stale. Re-measure this row whenever you edit it, ideally emitted from the test job
-> itself; do not carry it forward by hand.
+> Measured 2026-11-15 by `python -m pytest tests/ -q` on **Python 3.13.18** (the version
+> `.github/workflows/tests.yml` pins), using the install from `requirements-dev.txt` plus
+> `jsonschema` and `server/backend/requirements.txt`, on `main` at `08e1bb2` plus the
+> weekly-cadence fix. Re-measure this row whenever you edit it; do not carry it forward by
+> hand.
+
+## Measured state (2026-11-15)
+
+| Measure | Value | Source |
+|---|---|---|
+| Registered sources | 167 (119 automatable and structurally ready, 48 queued or excluded) | `reports/materialization_readiness.json` |
+| Fully / partially / not materialized | 20 / 3 / 144 | `reports/source_registry_status.csv` |
+| Required sources fully materialized | 12 of 16 | `reports/source_registry_status.csv` |
+| Sources with a recorded scheduled success | 0 of 144 tracked | `reports/source_freshness.csv` |
+| Production blockers | 3 (data layers 3 of ≥ 8; entities 18 of ≥ 100; fixture data detected) | `data/exports/production_status.json` (2026-07-28) |
+
+The current audit and the ordered plan for closing these gaps is
+[`docs/AUDIT_AND_OPTIMIZATION_STRATEGY_2026-11-13.md`](docs/AUDIT_AND_OPTIMIZATION_STRATEGY_2026-11-13.md).
+`reports/current_status.json` is a frozen Wave 0 certification record (2026-07-30 evidence,
+151-source denominator); it is not a live status and must not be read as one.
+
+> **Everything below this line is the 2026-07-26 status, kept for the record.** Its
+> blockers, triage labels and next vectors predate the measurements above; where they
+> disagree, the table above and the strategy document win.
 
 ---
 

@@ -65,12 +65,13 @@ what removes the remaining one-time approval.
 
 moneysweep-pr is **not yet a production-certified master dataset**. The current state is a controlled buildout phase:
 
-- **Source registry:** 164 tracked source definitions (includes SBA disaster-loan sources; counts follow `reports/materialization_readiness.json`).
-- **Automatable sources:** 116 marked ready by the materialization-readiness gate (14 formerly scraper-queued PR-gov sources promoted after confirming real scraping implementations, most recently hacienda_sut_ivu).
+- **Source registry:** 167 tracked source definitions (includes SBA disaster-loan sources; counts follow `reports/materialization_readiness.json`).
+- **Automatable sources:** 119 marked ready by the materialization-readiness gate (14 formerly scraper-queued PR-gov sources promoted after confirming real scraping implementations, most recently hacienda_sut_ivu).
 - **Queued / excluded sources:** 42 manual-export sources, 1 scraper-needed stub (pr_act_154_excise), semantic duplicates, and deferred stubs remain outside the automatable target.
 - **Strict preflight:** required before producer execution or promotion.
 - **Current active work:** Tranche B manual-source ingestion (7 output files seeded; operator must drop source files to populate).
-- **Last recorded full test baseline:** 2018 passed, 6 skipped, 0 failed.
+- **Required sources:** 12 of 16 fully materialized (`reports/source_registry_status.csv`); `hud_drgr_authorized` and the two campaign-finance sources are not materialized, `usaspending_prime` and `prasa` are partial.
+- **Last recorded full test baseline:** 3194 passed, 10 skipped, 0 failed, 55.20% coverage (gate 44%) — measured 2026-11-15 on Python 3.13; see `STATUS.md`.
 
 Source-of-truth status files:
 
@@ -81,6 +82,8 @@ reports/next_actions.md
 reports/materialization_readiness.json
 reports/source_registry_status.csv
 ```
+
+`reports/current_status.json` is a frozen Wave 0 certification record (2026-07-30 evidence); for the measured present state read `STATUS.md` and `reports/source_registry_status.csv`.
 
 New documentation anchors for the SBA recovery source refresh:
 
