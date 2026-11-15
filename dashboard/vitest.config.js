@@ -8,14 +8,15 @@ import react from '@vitejs/plugin-react';
 // landing tests one repo at a time.
 //
 // Deliberately separate from vite.config.js rather than merging it: the build
-// config carries offline-export plumbing (vite-plugin-singlefile) and a dev
+// config carries offline-export plumbing (scripts/inline-single-file.mjs) and a dev
 // server port pinned to the backend's CORS allowlist, none of which a test run
 // needs or should depend on.
 //
 // `include` is narrower than the default on purpose. dashboard/tests/ holds
 // federation-pilot.test.mjs, a `node --test` suite with its own assertion
 // library that `npm run verify:pilot` runs separately — vitest must not collect
-// it. Tests here are co-located with the code they cover.
+// it. Tests here are co-located with the code they cover, which includes the
+// build plugin in scripts/ (its test opts out of jsdom with a docblock).
 //
 // `globals: true` is set for parity with the sibling frontends, but the tests
 // still import describe/it/expect from 'vitest' explicitly. In centinelas that
@@ -33,6 +34,6 @@ export default defineConfig({
     globals: true,
     setupFiles: './src/test/setup.js',
     css: false,
-    include: ['src/**/*.test.{js,jsx}'],
+    include: ['src/**/*.test.{js,jsx}', 'scripts/**/*.test.mjs'],
   },
 });

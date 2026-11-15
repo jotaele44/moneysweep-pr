@@ -36,8 +36,47 @@ A bump to the **federation export** version is what the release-tagging workflow
   pins the 6.x line). `source-map-js` is fixed by a lockfile bump to 1.2.2; the
   prebuilt dashboard bundle manifest was regenerated for the new fingerprint.
   This unblocks the packaged-app build and its frozen self-test in CI.
+- **`tailwindcss-animate` is now a dashboard `devDependency`.** It is a Tailwind
+  plugin that `tailwind.config.js` loads at build time, but listing it under
+  `dependencies` made npm count `tailwindcss` and its whole transitive tree
+  (including `braces` and `postcss-selector-parser`) as runtime dependencies.
+  `npm audit --omit=dev` now audits the 101 runtime packages and finds none
+  vulnerable, where before it failed on build-time tooling. The frontend gate is
+  unchanged: it still audits the full tree against `dashboard/audit-allowlist.json`.
+  `package-lock.json` changes only `"dev": true` flags and the root manifest; the
+  prebuilt dashboard manifest was regenerated and the bundle assets are
+  byte-identical.
+- **Dashboard moves from Tailwind CSS 3 to 4, which empties the npm-audit
+  allow-list.** Tailwind 4 runs as a Vite plugin (`@tailwindcss/vite`), so
+  `postcss`, `autoprefixer`, `tailwind.config.js` and `postcss.config.js` are
+  gone: the design tokens, the files Tailwind scans (the same globs the v3
+  config used) and the class-based dark mode now live in `dashboard/src/index.css`,
+  and `tailwindcss-animate` is replaced by the CSS-only `tw-animate-css`.
+  `vite-plugin-singlefile` is replaced by `dashboard/scripts/inline-single-file.mjs`
+  (its `micromatch` → `braces` dependency has no patched release); the offline
+  export it writes is byte-identical to the old one, and it has its own unit
+  tests. With both gone, `braces` GHSA-vfj7-8cjw-p6xm and `postcss-selector-parser`
+  GHSA-rj75-hqrm-r3gf no longer appear. Advisories published while this was in
+  review are handled separately: `vite`, `vitest`, `undici` and `zod` are bumped
+  within their ranges (lockfile only), and a new `minimatch` advisory,
+  GHSA-g3hv-75wg-m249, which no eslint release can take the fix for, is the one
+  allow-list entry, expiring 2027-02-02. The prebuilt dashboard bundle was
+  rebuilt. Against the Tailwind 3 build, the shipped bundle
+  served by the real desktop backend shows no pixel, layout or focus-ring
+  difference across all 11 tabs plus hover, sheet, select and keyboard-focus
+  states at 1280×800 and 390×844. **Browser floor:** Tailwind 4 needs
+  Safari/WebKit 16.4, Chrome 111 or Firefox 128; see "WebView requirements" in
+  `desktop/README.md`.
 
 ### Fixed
+- **The Tailwind 4 upgrade (#678) no longer changes the dashboard's native form controls
+  and table cells.** Tailwind 4's preflight resets `margin` and `padding` on every
+  element, which also removed browser defaults that Tailwind 3 left alone: the Data
+  Sources file picker's button lost its `1px 6px` padding (the file name sat about 6px
+  further left), `<option>` lost its `0 2px 1px` padding, and bare `<td>`/`<th>` lost
+  theirs. `dashboard/src/index.css` hands those back with `revert-layer`; measured in
+  Chrome 156 against the Tailwind 3 bundle, every value is equal again. The prebuilt
+  dashboard bundle was regenerated with `build_prebuilt_dashboard.py --build`.
 - **Cleared the checks #656 merged red.** `mypy` (`audit_asg_emergency_identity_coverage`
   narrowed the optional coverage contract), the `ruff` format gate (eight files) and one
   unused import; `registries/coverage_contracts.yaml` now matches its JSON (the 1,431
@@ -55,8 +94,7 @@ A bump to the **federation export** version is what the release-tagging workflow
   `tests/test_hud_drgr_audit_api.py` fail at collection); that test's client
   fixture now connects from loopback, as the hardened local-only guard requires;
   and the committed prebuilt dashboard bundle, regenerated with
-  `scripts/build_prebuilt_dashboard.py --build` on Node 22.22.2. The frontend
-  `npm audit` gate is unchanged and still fails on `braces` (see the PR).
+  `scripts/build_prebuilt_dashboard.py --build` on Node 22.22.2.
 - **Desktop Setup & Diagnostics no longer hangs on "Saving configuration and
   starting the app…".** A backend that failed or was slow to import left the
   setup page frozen with no error. The visible-error screen with **Try Again**
