@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "moneysweep.leaderboard-certification/v1",
+  "scope": "bounded ASG source-native financial leaderboard producer plane",
+  "scopeId": "moneysweep.leaderboard.asg-source-native-v1",
+  "rankingContractVersion": "moneysweep.leaderboard/v1.1",
+  "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.2",
+  "state": "OPEN_RUNTIME_SNAPSHOT",
+  "certificationIssued": false,
+  "zeroMaterialUnresolvedResidue": false,
+  "promotionAuthorized": false,
+  "certificationPhraseAuthorized": false,
+  "sourceReadiness": {
+    "state": "PASS",
+    "authoritativeUniverseTotal": 1431,
+    "sourceNativeRows": 21,
+    "outOfScopeIdentityRows": 1410,
+    "candidateEntities": 10,
+    "sourceMaterializationReceipt": "data/manifests/asg_emergency_purchases/materialization_receipt_20261006.json"
+  },
+  "blockingResidue": [
+    {
+      "id": "EXACT_REPOSITORY_RUNTIME_SNAPSHOT",
+      "state": "OPEN",
+      "reason": "The ASG source and identity planes are closed, but the exact current repository checkout has not executed materialize_leaderboard_snapshot.py and certify_leaderboard_snapshot.py for this scope."
+    },
+    {
+      "id": "THEHUB_EXACT_REPLAY",
+      "state": "WAITING_ON_PRODUCER_PACKAGE",
+      "reason": "TheHub replay cannot close before an exact certified producer package exists."
+    }
+  ],
+  "nonBlockingWaivers": [
+    {
+      "id": "GITHUB_ACTIONS_EXECUTION",
+      "state": "WAIVED_BY_USER",
+      "assertsPass": false
+    }
+  ],
+  "note": "This is a blocker receipt, not a PASS certification. It must never be accepted by an exporter or consumer as certified evidence."
+}

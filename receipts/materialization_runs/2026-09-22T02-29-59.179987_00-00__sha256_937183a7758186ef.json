@@ -1,0 +1,35 @@
+{
+  "dry_run": false,
+  "egress_ok": null,
+  "error_count": 0,
+  "ok_count": 0,
+  "ran": [
+    {
+      "database": {
+        "error": "",
+        "files": 0,
+        "rows": 0,
+        "source": "eia_power_sector",
+        "status": "NO_DATA"
+      },
+      "error": "",
+      "producer": "scripts/download_eia.py",
+      "rows": 0,
+      "seconds": 1.3,
+      "source": "eia_power_sector",
+      "status": "PARTIAL_FAILURE"
+    }
+  ],
+  "registry_root": "/Users/jotaele/fed-repos/moneysweep-pr",
+  "schema_version": "1.0.0",
+  "selected": [
+    "eia_power_sector"
+  ],
+  "selected_count": 1,
+  "started_utc": "2026-09-22T02:29:59.179987+00:00",
+  "status": "OK",
+  "workspace_rebind": {
+    "PROJECT_ROOT": "/Users/jotaele/fed-repos/moneysweep-pr"
+  },
+  "workspace_root": "/Users/jotaele/fed-repos/moneysweep-pr"
+}

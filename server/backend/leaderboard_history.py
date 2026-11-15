@@ -57,6 +57,8 @@ def make_snapshot(
         "methodology": ranking.get("methodology") or {},
         "certificationState": ranking.get("certificationState"),
     }
+    if ranking.get("sourceVersion") is not None:
+        snapshot["sourceVersion"] = ranking.get("sourceVersion")
     snapshot["snapshotSha256"] = snapshot_sha256(snapshot)
     return snapshot
 
