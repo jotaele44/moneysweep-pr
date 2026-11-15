@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "moneysweep.asg-emergency-live-index-verification/v2",
+  "state": "CURRENT_INDEXED_VERIFICATION_NOT_SOURCE_MATERIALIZATION",
+  "observedAt": "2026-10-03",
+  "source": {
+    "url": "https://asg.pr.gov/comprasemergencias",
+    "declaredPageCount": 144,
+    "pageSizeObserved": 10,
+    "pageSizeContract": "TEN_ROWS_ON_NONTERMINAL_PAGES",
+    "computedUniverseLowerBound": 1431,
+    "computedUniverseUpperBound": 1440,
+    "exactCurrentRowDenominator": null,
+    "lastPageTailRows": null,
+    "denominatorState": "BOUNDED_EXACT_TAIL_OPEN"
+  },
+  "arithmetic": {
+    "fullPagesBeforeTerminal": 143,
+    "rowsFromFullPages": 1430,
+    "terminalPageMinimumRows": 1,
+    "terminalPageMaximumRows": 10,
+    "formula": "143*10 + terminal_tail",
+    "exactDenominatorRequires": "terminal_tail"
+  },
+  "visiblePageOne": {
+    "observedRows": 10,
+    "sourceNativeVendorIdRows": 8,
+    "nameOnlyVendorRows": 2,
+    "examples": [
+      {
+        "controlNumber": "26-ASG-AAA-0033",
+        "vendorSourceLabel": "Caribbean Composting Inc. (4381)",
+        "amount": 47200.0,
+        "registrationId": "4381"
+      },
+      {
+        "controlNumber": "26-ASG-AAA-0031",
+        "vendorSourceLabel": "ALL GREEN CLEANING & MAINTENANCE, LLC (13947)",
+        "amount": 20624.4,
+        "registrationId": "13947"
+      },
+      {
+        "controlNumber": "26-ASG-AAA-0023",
+        "vendorSourceLabel": "Collores Water Products LLC",
+        "amount": 47642.4,
+        "registrationId": null
+      },
+      {
+        "controlNumber": "26-ASG-AAA-0020",
+        "vendorSourceLabel": "Puerto Rico Wire Products, Inc.",
+        "amount": 662440.0,
+        "registrationId": null
+      }
+    ]
+  },
+  "directTerminalPageRetrieval": {
+    "url": "https://asg.pr.gov/comprasemergencias?order_by=-creado&page=144",
+    "state": "UNAVAILABLE_FROM_CURRENT_RETRIEVAL_SURFACE",
+    "effect": "EXACT_TAIL_REMAINS_OPEN"
+  },
+  "limits": {
+    "rawBytesFrozen": false,
+    "allPagesMaterialized": false,
+    "lastPageTailMeasured": false,
+    "wholeSourceIdentityClosureEstablished": false,
+    "leaderboardCertificationEffect": "NONE"
+  }
+}

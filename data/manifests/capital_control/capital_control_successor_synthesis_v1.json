@@ -98,7 +98,9 @@
       "current_main_blob": "54c65b2c91f0b4ed36859505b49b943b4707da3c",
       "derived_merged_blob": "7b8b8785406a6ef62a49bac106cac702aafce8b4",
       "source_snapshot": "data/manifests/capital_control/source_inputs/pr527/dashboard/src/lib/api.js",
-      "decision": "PRESERVE_CAPITAL_CONTROL_OFFLINE_RESOLUTION_AND_CURRENT_MAIN_DESKTOP_AND_API_CLIENTS"
+      "decision": "PRESERVE_CAPITAL_CONTROL_OFFLINE_RESOLUTION_AND_CURRENT_MAIN_DESKTOP_AND_API_CLIENTS",
+      "current_observed_blob": "de62f2e336f11c6d995e5225d89918cb7cbe65b2",
+      "current_main_relation": "POST_SYNTHESIS_DRIFT_REQUIRES_COMPLETE_RECERTIFICATION"
     },
     "all_other_pr520_paths": "EXACT_BLOB_REUSE",
     "all_other_pr527_paths": "EXACT_BLOB_REUSE",

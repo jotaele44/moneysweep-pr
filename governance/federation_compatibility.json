@@ -17,7 +17,7 @@
     "contract_finance_bundle@1",
     "federation_cell_index@1",
     "cell_domain_summary@1",
-    "record_cell_binding@1",
+    "record_cell_binding@2",
     "cell_profile@1"
   ],
   "watched_paths": [
@@ -28,7 +28,7 @@
     "scripts/build_contract_finance_bundle.py"
   ],
   "spatial_generation": "federation-spatial-index/1",
-  "spatial_note": "Compatible with the federation spatial index generation. This repository consumes the canonical Cell_ID address space and publishes no geometry of its own; its CELL_PROFILE index lands in a later wave.",
+  "spatial_note": "Compatible with federation spatial binding v0.2. While Spiderweb's transform is PROVISIONAL, this repository forbids exact Cell_ID ground claims and preserves full content-addressed uncertainty Cell_Set membership; identity remains CANDIDATE_NOT_IDENTITY.",
   "drift_reconciliation": {
     "cause_pr": 585,
     "cause_commit": "e2ed593",
@@ -37,5 +37,12 @@
     "reviewed_head": "105ab0e6f2ab87aae4bdcda39a988b75390a770b",
     "finding": "COMPATIBLE",
     "rationale": "source_truth metadata only; export contract schemas and generation federation-spatial-index/1 unchanged; all eight attested contracts remain valid"
+  },
+  "spatial_binding_v0_2": {
+    "authority_commit": "bb8463c8d8cf4b54486674ee9b665ce3d2502e8b",
+    "certification_state": "PROVISIONAL",
+    "exact_cell_claims_permitted": false,
+    "cell_set_required": true,
+    "independent_validation_state": "FAIL_KILL_CRITERIA"
   }
 }
