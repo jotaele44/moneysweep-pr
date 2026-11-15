@@ -51,3 +51,28 @@ def test_valid_pass_receipt_is_accepted(tmp_path: Path):
     receipt = _receipt()
     path = _write(tmp_path / "receipt.json", receipt)
     assert load_pass_receipt(path) == receipt
+
+
+@pytest.mark.unit
+def test_asg_export_schema_is_strictly_bounded():
+    root = Path(__file__).resolve().parents[1]
+    schema = json.loads(
+        (root / "schemas/leaderboard_export_package_asg_emergency_v1.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    props = schema["properties"]
+    assert props["scopeId"]["const"] == "moneysweep.leaderboard.asg-emergency-source-native-v1"
+    category = props["categories"]["items"]["properties"]
+    assert category["categoryId"]["const"] == "asg_emergency_purchase_source_native"
+    assert category["metricType"]["const"] == "ASG_EMERGENCY_PURCHASE_COST"
+    accounting = category["accounting"]["properties"]
+    assert accounting["inputRecords"]["const"] == 1431
+    assert accounting["outOfScopeRecords"]["const"] == 1410
+    assert accounting["retainedRecords"]["const"] == 21
+    source = category["sourceVersion"]["properties"]
+    assert source["type"]["const"] == "LIVE_PORTAL_MATERIALIZATION"
+    assert source["ordering"]["const"] == "-numerocontrol"
+    row = category["rows"]["items"]["properties"]
+    assert row["entityResolutionState"]["const"] == "SOURCE_NATIVE_ASG_LICITADOR_ID"
+    assert row["entityId"]["pattern"] == "^asg_licitador_id:[0-9]+$"

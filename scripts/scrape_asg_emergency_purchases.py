@@ -9,12 +9,15 @@ the only page on the ASG site that carries dollar amounts in its markup:
     Número de Control ASG | Número Orden de Compra | Bienes o servicios a
     adquirir | Proveedor | Costo | Agencia
 
-Roughly 1,400 rows over 141 pages, spanning three declared emergencies, which
-the control number encodes as ``<FY>-ASG-<PROGRAMME>-<SEQ>``:
+Historically ~1,400 rows over 141 pages; live verification on 2026-10-01 shows
+144 declared pages. The exact refreshed row denominator remains open until a
+full pull completes. Control numbers encode emergency programmes as
+``<FY>-ASG-<PROGRAMME>-<SEQ>``. Examples include:
 
-    20-ASG-CV19-765   COVID-19            (the bulk of the file)
+    20-ASG-CV19-765   COVID-19
     22-ASG-TTF-296    Tormenta Tropical Fiona
-    26-ASG-EPI-0010   current epidemiological emergency
+    26-ASG-EPI-0010   epidemiological emergency
+    26-ASG-AAA-0033   current 2026 AAA-labelled programme (label unresolved here)
 
 This is deliberately NOT covered by the ``ocpr_contracts`` source. That registry
 is the Comptroller's record of executed *contracts*; emergency purchase orders
@@ -22,11 +25,11 @@ largely bypass it, which is exactly why they are worth holding separately.
 
 Two things about the endpoint shape the scraper:
 
-* Paging is a plain query param (``?page=N&order_by=-creado``), but requesting a
+* Paging is a plain query param (``?page=N&order_by=-numerocontrol``), but requesting a
   page past the end **clamps to the last page** instead of returning an empty
-  one — ``?page=999`` serves the same six rows as ``?page=141``. A
+  one — a request past the end serves the last page again. A
   walk-until-empty loop would never terminate, so the page count is read from
-  the "Página 1 de 141" marker, with a repeated-page check as a backstop in case
+  the "Página 1 de N" marker, with a repeated-page check as a backstop in case
   that marker ever moves.
 * No date column is rendered — and there is no other way to get one. There is no
   JSON API (``/api/comprasemergencias``, ``.json`` and ``?format=json`` all fail),
@@ -101,7 +104,11 @@ EMERGENCY_PURCHASE_COLUMNS = [
     "control_number",
     "contract_number",
     "description",
+    "vendor_source_label",
     "vendor_name",
+    "vendor_registration_id",
+    "vendor_identity_scheme",
+    "vendor_identity_state",
     "obligation_amount",
     "awarding_agency",
     "fiscal_year",
@@ -141,18 +148,19 @@ EMERGENCY_PROGRAMMES = {
 # 26-ASG-EPI-0010 -> ("26", "EPI"). The middle token is always "ASG".
 _CONTROL_RE = re.compile(r"^\s*(\d{2})-ASG-([A-Z0-9]+)-", re.I)
 _PAGE_COUNT_RE = re.compile(r"P[áa]gina\s*\d+\s*de\s*(\d+)", re.I)
+_VENDOR_ID_RE = re.compile(r"^(.*?)\s*\((\d+)\)\s*$")
 
 
 class _RateLimited(Exception):
     """Internal marker so a 429 is retried by with_retry (mirrors base_downloader)."""
 
 
-def _page_url(page: int) -> str:
-    return f"{BASE_URL}?page={page}&order_by=-creado"
+def _page_url(page: int, order_by: str = "-numerocontrol") -> str:
+    return f"{BASE_URL}?page={page}&order_by={order_by}"
 
 
 def declared_page_count(html: str) -> int | None:
-    """Total pages from the "Página 1 de 141" marker, or None if absent."""
+    """Total pages from the live "Página 1 de N" marker, or None if absent."""
     match = _PAGE_COUNT_RE.search(html)
     return int(match.group(1)) if match else None
 
@@ -176,6 +184,23 @@ def _clean(value: Any) -> str:
     return " ".join(str(value).split())
 
 
+def split_vendor_identity(value: object) -> tuple[str, str, str, str]:
+    """Return source label, display name, registration ID and identity state.
+
+    Only an explicit trailing numeric ASG token in the Proveedor cell is
+    promoted to identity. Legacy name-only rows remain unresolved.
+    """
+    source_label = _clean(value)
+    if not source_label:
+        return "", "", "", "UNRESOLVED_MISSING_VENDOR"
+    match = _VENDOR_ID_RE.match(source_label)
+    if not match:
+        return source_label, source_label, "", "UNRESOLVED_NAME_ONLY"
+    name = _clean(match.group(1))
+    registration_id = match.group(2)
+    return source_label, name, registration_id, "SOURCE_NATIVE_ASG_LICITADOR_ID"
+
+
 def _normalize_row(record: dict, creado_rank: int | None = None) -> dict:
     """One raw table row (keyed by its Spanish heading) to a canonical row.
 
@@ -187,6 +212,14 @@ def _normalize_row(record: dict, creado_rank: int | None = None) -> dict:
     row = {col: "" for col in EMERGENCY_PURCHASE_COLUMNS}
     for heading, canonical in COL_MAP.items():
         row[canonical] = _clean(record.get(heading))
+    source_label, vendor_name, registration_id, identity_state = split_vendor_identity(
+        record.get("Proveedor")
+    )
+    row["vendor_source_label"] = source_label
+    row["vendor_name"] = vendor_name
+    row["vendor_registration_id"] = registration_id
+    row["vendor_identity_scheme"] = "asg_licitador_id" if registration_id else ""
+    row["vendor_identity_state"] = identity_state
     row.update(
         {
             "fiscal_year": fiscal_year,
@@ -253,11 +286,16 @@ def parse_records(html: str) -> list[dict]:
     return [r for r in records if _clean(r.get("Número de Control ASG"))]
 
 
-def _fetch_page(session: requests.Session, page: int, logger) -> str | None:
+def _fetch_page(
+    session: requests.Session,
+    page: int,
+    logger,
+    order_by: str = "-numerocontrol",
+) -> str | None:
     """GET one listing page. None on a terminal 4xx or retry exhaustion."""
 
     def _once() -> str | None:
-        resp = session.get(_page_url(page), timeout=HTTP.timeout)
+        resp = session.get(_page_url(page, order_by=order_by), timeout=HTTP.timeout)
         if resp.status_code == 429:
             logger.warning(f"  Rate limited on page {page} — sleeping {HTTP.rate_limit_sleep}s")
             time.sleep(HTTP.rate_limit_sleep)
@@ -364,9 +402,11 @@ def _run(root=None, force: bool = False, max_pages: int | None = None) -> dict:
             "errors": ["No records fetched from asg.pr.gov/comprasemergencias"],
         }
 
-    # Records arrive in -creado order, so enumeration position IS the rank.
+    # Completeness crawls use stable control-number ordering. They therefore
+    # must not manufacture a creation-time rank; creado_rank is reserved for
+    # separately declared recency observations using -creado.
     frame = pd.DataFrame(
-        [_normalize_row(r, creado_rank=i) for i, r in enumerate(raw_records, start=1)],
+        [_normalize_row(r, creado_rank=None) for r in raw_records],
         columns=EMERGENCY_PURCHASE_COLUMNS,
     )
     frame = frame.drop_duplicates(subset=["control_number"])
@@ -394,6 +434,10 @@ def _run(root=None, force: bool = False, max_pages: int | None = None) -> dict:
     logger.info(f"  Total records:  {len(frame):,}")
     logger.info(f"  By emergency:   {frame['emergency_programme_code'].value_counts().to_dict()}")
     logger.info(f"  Unique vendors: {frame['vendor_name'].nunique():,}")
+    logger.info(
+        "  Source-native vendor IDs: "
+        f"{(frame['vendor_registration_id'].astype(str).str.strip() != '').sum():,}"
+    )
     if "obligation_amount_canonical" in frame.columns:
         logger.info(f"  Total value:    ${frame['obligation_amount_canonical'].sum():,.2f}")
 

@@ -23,7 +23,9 @@ def app(tmp_path, monkeypatch):
 
 @pytest.fixture
 def client(app):
-    return TestClient(app)
+    # The materialization router only serves loopback clients (server/backend/
+    # local_request.py); TestClient's default host "testclient" is rejected with 403.
+    return TestClient(app, client=("127.0.0.1", 50000))
 
 
 def test_private_network_client_is_not_local(app):
