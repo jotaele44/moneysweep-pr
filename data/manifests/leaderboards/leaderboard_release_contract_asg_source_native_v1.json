@@ -1,0 +1,59 @@
+{
+  "schema_version": "moneysweep.leaderboard-release-contract/v1",
+  "repository": "jotaele44/moneysweep-pr",
+  "scope": "bounded ASG source-native financial leaderboard producer plane",
+  "certification_scope": "moneysweep.leaderboard.asg-source-native-v1",
+  "ranking_contract": "moneysweep.leaderboard/v1.1",
+  "ontology_contract": "moneysweep.financial-category-ontology/v1.2",
+  "certification_state": "OPEN_RUNTIME_SNAPSHOT",
+  "certification_issued": false,
+  "promotion_authorized": false,
+  "required_gates": [
+    "SOURCE_MATERIALIZATION_CLOSED",
+    "SOURCE_NATIVE_IDENTITY_VERIFIED",
+    "FULL_SOURCE_ACCOUNTING_CLOSED",
+    "EXACT_REPOSITORY_RUNTIME_SNAPSHOT",
+    "SNAPSHOT_HASH_VALID",
+    "CERTIFICATION_SCOPE_CLOSED",
+    "PRODUCER_COMMIT_BOUND",
+    "SOURCE_MANIFESTATION_HASHES_EXPORTED",
+    "THEHUB_EXACT_REPLAY",
+    "ZERO_MATERIAL_UNRESOLVED_RESIDUE_INSIDE_CERTIFIED_SCOPE"
+  ],
+  "closed_gates": [
+    {
+      "id": "SOURCE_MATERIALIZATION_CLOSED",
+      "state": "PASS",
+      "reason": "Authoritative numerocontrol manifestation closes at 144 pages / 1,431 unique control_number rows."
+    },
+    {
+      "id": "SOURCE_NATIVE_IDENTITY_VERIFIED",
+      "state": "PASS",
+      "reason": "All 10 source-native ASG Licitador IDs used by the bounded ranking resolve on the official supplier registry."
+    },
+    {
+      "id": "FULL_SOURCE_ACCOUNTING_CLOSED",
+      "state": "PASS",
+      "reason": "1,431 = 1,410 explicit out-of-scope identity rows + 21 retained source-native rows; excluded=0; unresolved=0 inside the bounded scope."
+    }
+  ],
+  "blockers": [
+    {
+      "id": "EXACT_REPOSITORY_RUNTIME_SNAPSHOT",
+      "state": "OPEN",
+      "reason": "Exact runtime snapshot/certifier execution has not run on the current Git repository head."
+    },
+    {
+      "id": "THEHUB_EXACT_REPLAY",
+      "state": "WAITING_ON_PRODUCER_PACKAGE",
+      "reason": "Cross-repository replay is downstream of producer snapshot/package issuance."
+    }
+  ],
+  "non_blocking_waivers": [
+    {
+      "id": "GITHUB_ACTIONS_EXECUTION",
+      "state": "WAIVED_BY_USER",
+      "asserts_pass": false
+    }
+  ]
+}

@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 
 from desktop.secrets import (
@@ -31,6 +31,7 @@ from desktop.secrets import (
 )
 from desktop.workspace import bootstrap_workspace, resource_root
 from moneysweep.runtime.source_registry import load_source_registry, source_by_id
+from server.backend.local_request import require_loopback
 from server.backend.materialization_security import (
     public_run_summary,
     write_offline_receipt,
@@ -40,7 +41,17 @@ from scripts.run_automatable_sources import (
     select_sources,
 )
 
-router = APIRouter(prefix="/materialization", tags=["materialization"])
+# This router controls the OS credential vault (read presence, write, delete,
+# and activate credentials for real third-party API calls) and accepts
+# arbitrary file uploads. It is mounted directly on the desktop app with no
+# other auth layer, so every route here must be restricted to the loopback
+# interface -- applied once at the router level so no individual handler can
+# be added later without this protection (see server/backend/local_request.py).
+router = APIRouter(
+    prefix="/materialization",
+    tags=["materialization"],
+    dependencies=[Depends(require_loopback)],
+)
 
 
 class ApiRunRequest(BaseModel):
@@ -340,3 +351,64 @@ def run_api_sources(request: ApiRunRequest):
                 require_egress=True,
             )
         )
+
+
+@router.get("/hud-drgr/audits")
+def hud_drgr_audits():
+    """Read preserved receipts only; never re-inspect mutable source files on GET."""
+    from collections import Counter
+
+    roots = {resource_root().resolve(), _workspace().resolve()}
+    results = []
+    for root in sorted(roots):
+        for path in sorted(
+            (root / "reports" / "live-readiness").glob("*/hud_drgr_authorized_pursuit_receipt.json")
+        ):
+            if not _within(root, path):
+                continue
+            raw = path.read_bytes()
+            item = {"path": str(path), "sha256": hashlib.sha256(raw).hexdigest()}
+            try:
+                receipt = json.loads(raw)
+                rows = receipt["records"]
+                counts = Counter(row["classification"] for row in rows)
+                arithmetic = receipt["arithmetic"]
+                valid = (
+                    receipt["receipt_type"] == "moneysweep_hud_drgr_authorized_pursuit"
+                    and receipt["source_id"] == "hud_drgr_authorized"
+                    and isinstance(receipt["generated_at_utc"], str)
+                    and bool(receipt["generated_at_utc"])
+                    and all(isinstance(row["path"], str) and row["classification"] for row in rows)
+                    and arithmetic["total"] == len(rows)
+                    and arithmetic["classified"] == len(rows)
+                    and arithmetic["authorized_candidates"]
+                    == counts.get("FOUND_AUTHORIZED_CANDIDATE", 0)
+                    and dict(counts) == receipt["classification_counts"]
+                )
+                if not valid:
+                    raise ValueError("receipt contract mismatch")
+                item.update(state="VALID_RECEIPT", receipt=receipt, authorization="UNPROVEN")
+            except (ValueError, KeyError, TypeError):
+                item.update(
+                    state="INVALID_RECEIPT", error="Receipt schema or arithmetic is invalid"
+                )
+            results.append(item)
+    return {"audits": results, "source_refresh": False}
+
+
+@router.post("/hud-drgr/audits")
+def create_hud_drgr_audit():
+    """Run the fixed local source audit in a new directory, preserving prior snapshots."""
+    from scripts.audit_hud_drgr_authorized_sources import build_receipt
+
+    directory = (
+        _workspace()
+        / "reports"
+        / "live-readiness"
+        / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "_hud_drgr_" + uuid.uuid4().hex)
+    )
+    try:
+        build_receipt(directory)
+    except Exception as exc:
+        raise HTTPException(500, "Audit failed; prior snapshots remain available") from exc
+    return {"state": "SNAPSHOT_CREATED", "authorization": "UNPROVEN"}

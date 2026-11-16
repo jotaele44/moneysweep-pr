@@ -1,0 +1,405 @@
+{
+  "categories": [
+    {
+      "accounting": {
+        "arithmeticClosed": true,
+        "excludedRecords": 0,
+        "inScopeRecords": 20,
+        "inputRecords": 20,
+        "outOfScopeRecords": 0,
+        "retainedRecords": 20,
+        "unresolvedRecords": 0
+      },
+      "candidateCount": 14,
+      "capturedAt": "2026-09-03T16:35:24Z",
+      "categoryId": "debt_issuance",
+      "metricType": "DEBT_ISSUED_PAR",
+      "rows": [
+        {
+          "canonicalEntityId": "entity_5204a3d8f84bbfcd",
+          "currency": "USD",
+          "debtClasses": [
+            "COFINA"
+          ],
+          "entityDisplayName": "Puerto Rico Sales Tax Financing Corporation",
+          "entityId": "entity_5204a3d8f84bbfcd",
+          "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+          "entityType": "fund",
+          "evidenceCount": 2,
+          "financialValueState": "MEASURED_PAR_AMOUNT",
+          "metricType": "DEBT_ISSUED_PAR",
+          "metricValue": 16314000000.0,
+          "rank": 1,
+          "recordCount": 2
+        },
+        {
+          "canonicalEntityId": "entity_125b538f289a4708",
+          "currency": "USD",
+          "debtClasses": [
+            "GO"
+          ],
+          "entityDisplayName": "Commonwealth of Puerto Rico",
+          "entityId": "entity_125b538f289a4708",
+          "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+          "entityType": "agency",
+          "evidenceCount": 3,
+          "financialValueState": "MEASURED_PAR_AMOUNT",
+          "metricType": "DEBT_ISSUED_PAR",
+          "metricValue": 11800000000.0,
+          "rank": 2,
+          "recordCount": 3
+        },
+        {
+          "canonicalEntityId": "entity_b182f85acf46f69b",
+          "currency": "USD",
+          "debtClasses": [
+            "HTA"
+          ],
+          "entityDisplayName": "Puerto Rico Highways and Transportation Authority",
+          "entityId": "entity_b182f85acf46f69b",
+          "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+          "entityType": "agency",
+          "evidenceCount": 2,
+          "financialValueState": "MEASURED_PAR_AMOUNT",
+          "metricType": "DEBT_ISSUED_PAR",
+          "metricValue": 4108400000.0,
+          "rank": 3,
+          "recordCount": 2
+        },
+        {
+          "canonicalEntityId": "entity_b14376987d82d5ee",
+          "currency": "USD",
+          "debtClasses": [
+            "other"
+          ],
+          "entityDisplayName": "Puerto Rico Public Finance Corporation",
+          "entityId": "entity_b14376987d82d5ee",
+          "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+          "entityType": "fund",
+          "evidenceCount": 1,
+          "financialValueState": "MEASURED_PAR_AMOUNT",
+          "metricType": "DEBT_ISSUED_PAR",
+          "metricValue": 1255000000.0,
+          "rank": 4,
+          "recordCount": 1
+        },
+        {
+          "canonicalEntityId": "entity_6c1d858c1babe390",
+          "currency": "USD",
+          "debtClasses": [
+            "PREPA"
+          ],
+          "entityDisplayName": "Puerto Rico Electric Power Authority",
+          "entityId": "entity_6c1d858c1babe390",
+          "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+          "entityType": "utility",
+          "evidenceCount": 2,
+          "financialValueState": "MEASURED_PAR_AMOUNT",
+          "metricType": "DEBT_ISSUED_PAR",
+          "metricValue": 1193000000.0,
+          "rank": 5,
+          "recordCount": 2
+        },
+        {
+          "canonicalEntityId": "entity_c5fb8a7f44e8ff18",
+          "currency": "USD",
+          "debtClasses": [
+            "PRASA"
+          ],
+          "entityDisplayName": "Puerto Rico Aqueduct and Sewer Authority",
+          "entityId": "entity_c5fb8a7f44e8ff18",
+          "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+          "entityType": "utility",
+          "evidenceCount": 2,
+          "financialValueState": "MEASURED_PAR_AMOUNT",
+          "metricType": "DEBT_ISSUED_PAR",
+          "metricValue": 1150000000.0,
+          "rank": 6,
+          "recordCount": 2
+        },
+        {
+          "canonicalEntityId": "entity_d363e4ddf2ce6a5d",
+          "currency": "USD",
+          "debtClasses": [
+            "other"
+          ],
+          "entityDisplayName": "Government Development Bank for Puerto Rico",
+          "entityId": "entity_d363e4ddf2ce6a5d",
+          "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+          "entityType": "agency",
+          "evidenceCount": 1,
+          "financialValueState": "MEASURED_PAR_AMOUNT",
+          "metricType": "DEBT_ISSUED_PAR",
+          "metricValue": 900000000.0,
+          "rank": 7,
+          "recordCount": 1
+        },
+        {
+          "canonicalEntityId": "entity_7cf79ff780fb8279",
+          "currency": "USD",
+          "debtClasses": [
+            "other"
+          ],
+          "entityDisplayName": "Puerto Rico Infrastructure Financing Authority",
+          "entityId": "entity_7cf79ff780fb8279",
+          "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+          "entityType": "agency",
+          "evidenceCount": 1,
+          "financialValueState": "MEASURED_PAR_AMOUNT",
+          "metricType": "DEBT_ISSUED_PAR",
+          "metricValue": 500000000.0,
+          "rank": 8,
+          "recordCount": 1
+        },
+        {
+          "canonicalEntityId": "entity_2c16f9ae54df7e1e",
+          "currency": "USD",
+          "debtClasses": [
+            "other"
+          ],
+          "entityDisplayName": "Puerto Rico Convention Center District Authority",
+          "entityId": "entity_2c16f9ae54df7e1e",
+          "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+          "entityType": "agency",
+          "evidenceCount": 1,
+          "financialValueState": "MEASURED_PAR_AMOUNT",
+          "metricType": "DEBT_ISSUED_PAR",
+          "metricValue": 469900000.0,
+          "rank": 9,
+          "recordCount": 1
+        },
+        {
+          "canonicalEntityId": "entity_cc41784f4b40b6ff",
+          "currency": "USD",
+          "debtClasses": [
+            "other"
+          ],
+          "entityDisplayName": "University of Puerto Rico",
+          "entityId": "entity_cc41784f4b40b6ff",
+          "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+          "entityType": "agency",
+          "evidenceCount": 1,
+          "financialValueState": "MEASURED_PAR_AMOUNT",
+          "metricType": "DEBT_ISSUED_PAR",
+          "metricValue": 359000000.0,
+          "rank": 10,
+          "recordCount": 1
+        },
+        {
+          "canonicalEntityId": "entity_5f99300da364ea64",
+          "currency": "USD",
+          "debtClasses": [
+            "other"
+          ],
+          "entityDisplayName": "Puerto Rico Industrial Development Company",
+          "entityId": "entity_5f99300da364ea64",
+          "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+          "entityType": "agency",
+          "evidenceCount": 1,
+          "financialValueState": "MEASURED_PAR_AMOUNT",
+          "metricType": "DEBT_ISSUED_PAR",
+          "metricValue": 240000000.0,
+          "rank": 11,
+          "recordCount": 1
+        },
+        {
+          "canonicalEntityId": "entity_efcec09764306ade",
+          "currency": "USD",
+          "debtClasses": [
+            "other"
+          ],
+          "entityDisplayName": "Puerto Rico Ports Authority",
+          "entityId": "entity_efcec09764306ade",
+          "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+          "entityType": "agency",
+          "evidenceCount": 1,
+          "financialValueState": "MEASURED_PAR_AMOUNT",
+          "metricType": "DEBT_ISSUED_PAR",
+          "metricValue": 220000000.0,
+          "rank": 12,
+          "recordCount": 1
+        },
+        {
+          "canonicalEntityId": "entity_c6aa8887d7248228",
+          "currency": "USD",
+          "debtClasses": [
+            "other"
+          ],
+          "entityDisplayName": "Puerto Rico Housing Finance Authority",
+          "entityId": "entity_c6aa8887d7248228",
+          "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+          "entityType": "agency",
+          "evidenceCount": 1,
+          "financialValueState": "MEASURED_PAR_AMOUNT",
+          "metricType": "DEBT_ISSUED_PAR",
+          "metricValue": 180000000.0,
+          "rank": 13,
+          "recordCount": 1
+        },
+        {
+          "canonicalEntityId": "entity_e73c9879d715653a",
+          "currency": "USD",
+          "debtClasses": [
+            "other"
+          ],
+          "entityDisplayName": "Puerto Rico Municipal Finance Agency",
+          "entityId": "entity_e73c9879d715653a",
+          "entityResolutionState": "CANONICAL_V1_ENTITY_ID",
+          "entityType": "agency",
+          "evidenceCount": 1,
+          "financialValueState": "MEASURED_PAR_AMOUNT",
+          "metricType": "DEBT_ISSUED_PAR",
+          "metricValue": 155000000.0,
+          "rank": 14,
+          "recordCount": 1
+        }
+      ],
+      "runtimeManifest": {
+        "files": [
+          {
+            "bytes": 7481,
+            "path": "config/financial_category_ontology.json",
+            "sha256": "e09186e0897c090761df8714d4372c35dd80490ce4e095915d6f790efa9fbb86"
+          },
+          {
+            "bytes": 9145,
+            "path": "server/backend/leaderboards.py",
+            "sha256": "1fdfe50ad0e127cb26662f96b11a957cfe2357e9edc255436bd2b31e489b9e04"
+          },
+          {
+            "bytes": 26453,
+            "path": "server/backend/leaderboard_adapters.py",
+            "sha256": "89e7605e9bd64dc9daed252dd8297f1ba7d80dc4164c2e8aac81d57d1e2a316f"
+          },
+          {
+            "bytes": 10681,
+            "path": "server/backend/leaderboard_history.py",
+            "sha256": "9c32c4878742e56f038c39abe15140f5c0057bdea481e5f56dfed712d86247db"
+          },
+          {
+            "bytes": 5939,
+            "path": "server/backend/leaderboard_investigation.py",
+            "sha256": "d5a68c990488436a9c068e0fb61a1f7c7b5efaf2ea312160a583867b063201c1"
+          },
+          {
+            "bytes": 6125,
+            "path": "server/backend/leaderboard_entities.py",
+            "sha256": "7a3b01c880876116333e4f4e57a29374a128a8f488b64115d04d99a1c77bb6f5"
+          }
+        ],
+        "packages": {
+          "fastapi": "0.128.2",
+          "pandas": "2.2.3",
+          "pydantic": "2.13.4"
+        },
+        "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+        "producerCommit": "6d37d675d49285057ab43c88d294e8a5e8e52beb",
+        "python": "3.13.5",
+        "state": "FROZEN"
+      },
+      "snapshotCertification": {
+        "certifiedAt": "2026-09-30T20:46:34+00:00",
+        "ciExecutionPolicy": {
+          "assertsPass": false,
+          "blocking": false,
+          "state": "WAIVED_BY_USER"
+        },
+        "scopeId": "moneysweep.leaderboard.production-v1",
+        "sourceSnapshotSha256": "11614dacd8769ca9369b6f09da4f6b77b643e03058d22a0a7399ea2bbe8e85f9",
+        "state": "PASS",
+        "zeroMaterialUnresolvedResidue": true
+      },
+      "snapshotId": "debt_issuance:git:1be586b5ae13",
+      "snapshotSha256": "6da3a18c9392d822ec397f75546c1b66b53c0a34b7c304396ed40d7178d452ed",
+      "sourceManifestations": [
+        {
+          "bytes": 5708,
+          "manifestationType": "GIT_COMMIT_BLOB",
+          "path": "data/canonical_v1/debt_instruments.csv",
+          "sha256": "886d9c3dbd87195c412fa945d56bf54d7c2a2fc5bdc800cd30af324c70e78523",
+          "sourceCommit": "1be586b5ae13c30a8e4a6a49bc6ae70dd2ddc5df",
+          "sourceCommittedAt": "2026-09-03T16:35:24+00:00"
+        },
+        {
+          "bytes": 7251,
+          "manifestationType": "GIT_COMMIT_BLOB",
+          "path": "data/canonical_v1/entities.csv",
+          "sha256": "fdb0d63273f19c24341388ab1e36bfc70207408a716863c5f43ea47fbb257807",
+          "sourceCommit": "1be586b5ae13c30a8e4a6a49bc6ae70dd2ddc5df",
+          "sourceCommittedAt": "2026-09-03T16:35:24+00:00"
+        }
+      ],
+      "sourceVersion": {
+        "commit": "1be586b5ae13c30a8e4a6a49bc6ae70dd2ddc5df",
+        "committedAt": "2026-09-03T16:35:24Z",
+        "economicActivityInference": false,
+        "type": "GIT_COMMIT"
+      }
+    }
+  ],
+  "certification": {
+    "certificationRuntimeSha256": "7be78291e4acbb6a44bfd97ab6ec03f58104a414fb31adf18b27a80ed9ad4763",
+    "receiptSha256": "71cb956016f979765e0e23d49bb87daeb9addc656600037a51fa7f21b8a79dc4",
+    "releaseManifestSha256": "ba04992871263e63c1ea5028a5d9e6d2cf75d6dcb18bf2cea64622853f57c64d",
+    "scopeSha256": "b12bfc8911d7c2978edacfc9f9f0ce781d7f890fc385034d7359f36aa4433218",
+    "state": "PASS"
+  },
+  "certificationRuntimeManifest": {
+    "files": [
+      {
+        "bytes": 3278,
+        "path": "scripts/leaderboard_release_provenance.py",
+        "sha256": "c07f938396cdff17ba2672ff83feb8417e1e9a30109cd91e88dad291867c763b"
+      },
+      {
+        "bytes": 5806,
+        "path": "scripts/materialize_leaderboard_snapshot.py",
+        "sha256": "363acca9c4216592c487fe34e26bcfbe43feb7f4da78d19b2da7d59083245760"
+      },
+      {
+        "bytes": 7121,
+        "path": "scripts/certify_leaderboard_snapshot.py",
+        "sha256": "7aa7a075dd46b98d2ea74e366d95586d5a4b87c8c3c6a013ed8fa58a760596ea"
+      },
+      {
+        "bytes": 10443,
+        "path": "scripts/materialize_leaderboard_git_snapshot.py",
+        "sha256": "f817199ee50f18a0805ec1d5bef102d4d6a787b8de6353e8211124165242cf5b"
+      },
+      {
+        "bytes": 20328,
+        "path": "scripts/finalize_leaderboard_release.py",
+        "sha256": "df6c422d154005c3dfcf83bac48e27d2e5c329d52ec3ce4a84bf61538bc435fa"
+      },
+      {
+        "bytes": 9239,
+        "path": "scripts/export_leaderboard_package.py",
+        "sha256": "d7dcea4788047ae78b302cad467b3f9166d7023bafa68747d98df7849dc924c0"
+      },
+      {
+        "bytes": 6447,
+        "path": "schemas/leaderboard_export_package.schema.json",
+        "sha256": "7aae642619947cd7119b8947d65af22fdf2efba936c74f016a5b3f79c1f00f79"
+      },
+      {
+        "bytes": 1845,
+        "path": "data/manifests/leaderboards/leaderboard_certification_scope_v1.json",
+        "sha256": "b12bfc8911d7c2978edacfc9f9f0ce781d7f890fc385034d7359f36aa4433218"
+      },
+      {
+        "bytes": 917,
+        "path": "data/manifests/leaderboards/debt_history_source_refs_v1.json",
+        "sha256": "9a46684387542bd73cea61f7025abddbabd5159a95519129bd92ef20475eb7e7"
+      }
+    ],
+    "schemaVersion": "moneysweep.leaderboard-certification-runtime/v1",
+    "state": "FROZEN"
+  },
+  "generatedAt": "2026-09-30T21:26:00+00:00",
+  "ontologyContractVersion": "moneysweep.financial-category-ontology/v1.1",
+  "producer": "moneysweep-pr",
+  "producerCommit": "6d37d675d49285057ab43c88d294e8a5e8e52beb",
+  "rankingContractVersion": "moneysweep.leaderboard/v1.1",
+  "schemaVersion": "moneysweep.leaderboard-export-package/v1",
+  "scopeId": "moneysweep.leaderboard.production-v1"
+}

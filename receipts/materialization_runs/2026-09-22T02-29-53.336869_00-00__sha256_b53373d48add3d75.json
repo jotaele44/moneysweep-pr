@@ -1,0 +1,35 @@
+{
+  "dry_run": false,
+  "egress_ok": null,
+  "error_count": 0,
+  "ok_count": 1,
+  "ran": [
+    {
+      "database": {
+        "error": "",
+        "files": 0,
+        "rows": 0,
+        "source": "highergov_supplemental",
+        "status": "NO_DATA"
+      },
+      "error": "",
+      "producer": "scripts/fetch_highergov_api.py",
+      "rows": null,
+      "seconds": 2.7,
+      "source": "highergov_supplemental",
+      "status": "OK"
+    }
+  ],
+  "registry_root": "/Users/jotaele/fed-repos/moneysweep-pr",
+  "schema_version": "1.0.0",
+  "selected": [
+    "highergov_supplemental"
+  ],
+  "selected_count": 1,
+  "started_utc": "2026-09-22T02:29:53.336869+00:00",
+  "status": "OK",
+  "workspace_rebind": {
+    "PROJECT_ROOT": "/Users/jotaele/fed-repos/moneysweep-pr"
+  },
+  "workspace_root": "/Users/jotaele/fed-repos/moneysweep-pr"
+}

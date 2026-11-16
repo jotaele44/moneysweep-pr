@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react'
+import { FederationButton, FederationDegradedState } from '@pr-federation/react'
+import { AlertTriangle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Table, TableHeader, TableBody, TableRow, TableCell } from '@/components/ui/table'
 import QueryBoundary from '@/components/QueryBoundary'
@@ -137,7 +139,22 @@ export default function CampaignFinance() {
         <Metric label="CEE + OCE" value={((sourceCounts.cee ?? 0) + (sourceCounts.oce ?? 0)).toLocaleString()} />
         <Metric label="Federal outflows" value={(summary.totalFederalOutflowRows ?? 0).toLocaleString()} />
       </div>
-      {!summaryQuery.isPending && !summary.hasData && (
+      {summaryQuery.isError && (
+        <FederationDegradedState
+          inline
+          role="alert"
+          className="ms-state-banner border-b border-border bg-muted/30 px-3 py-2 text-xs"
+          icon={<AlertTriangle className="h-4 w-4" />}
+          title="Campaign-finance summary failed to load"
+          description={summaryQuery.error?.message}
+          action={
+            <FederationButton variant="secondary" onClick={() => summaryQuery.refetch()}>
+              Retry
+            </FederationButton>
+          }
+        />
+      )}
+      {!summaryQuery.isPending && !summaryQuery.isError && !summary.hasData && (
         <div role="status" className="border-b border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
           {summary.emptyState || 'No campaign-finance datasets are materialized.'}
         </div>

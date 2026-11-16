@@ -235,3 +235,13 @@ python3 scripts/run_sam_pipeline.py --use-api --max-api 100 --circuit-breaker-fa
 
 Parent-entity hierarchy construction is also offline by default; its optional
 USASpending residual is bounded with `scripts/entity_resolution.py --use-api --max-api 100`.
+
+<!-- PROJECT-OPERATING-CONTRACT:START -->
+## Current development and certification contract
+
+MoneySweep remains the federation's public-money producer. The priority is to preserve the closed data-plane regression baseline while completing source materialization, lineage, entity resolution, consumer/UI/native evidence, and additional source verticals without destabilizing already-passed gates.
+
+**Identity and data rules:** source registry membership is not proof of source acquisition or completeness. Preserve raw/normalized/canonical values separately. Never merge entities from name-only, normalization, count equality, proximity, category, or source absence. Maintain complete candidate sets, tie/duplicate/null handling, manual-source staging, row/cardinality conservation, and source→output provenance.
+
+**Release discipline:** retain PASS artifacts after downstream failures, keep OPEN/BLOCKED/PROVISIONAL sources explicit, and freeze material manifestations/hashes. A production-certified master-dataset claim requires declared scope, current materialization evidence, validated stable IDs, closed source/retained/excluded arithmetic, negative regressions, current rendered desktop+iPhone evidence, and zero material unresolved residue inside the claim.
+<!-- PROJECT-OPERATING-CONTRACT:END -->

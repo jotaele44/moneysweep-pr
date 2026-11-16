@@ -202,10 +202,19 @@ def materialize_sec_13f(
             "13F table-entry reconciliation failed: "
             f"primary={declared_entry_total}, parsed={parsed_entry_total}"
         )
-    if parsed_value_total != declared_value_total:
+    # `tableValueTotal` in the primary document is the filer-declared sum of the
+    # information table's raw (unscaled) `value` elements. `_sum_reported_values`
+    # (and each row's `market_value`, see source_adapter.py) applies `value_scale`
+    # to convert those raw units into dollars, so `parsed_value_total` is on the
+    # *scaled* axis while `declared_value_total` stays on the raw axis. Bring
+    # `parsed_value_total` back to the raw axis before comparing, or any filing
+    # with a non-1.0 value_scale (e.g. legacy filings reported in thousands)
+    # fails reconciliation even when it is perfectly valid.
+    declared_axis_parsed_value_total = parsed_value_total / Decimal(str(target.value_scale))
+    if declared_axis_parsed_value_total != declared_value_total:
         raise SECAcquisitionError(
             "13F table-value reconciliation failed: "
-            f"primary={declared_value_total}, parsed={parsed_value_total}"
+            f"primary={declared_value_total}, parsed={declared_axis_parsed_value_total}"
         )
 
     primary_sha256 = hashlib.sha256(primary_bytes).hexdigest()

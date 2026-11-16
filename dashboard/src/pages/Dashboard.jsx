@@ -1,8 +1,10 @@
+import styles from '../zip-design/Overview.module.css'
 import { useSearchParams } from 'react-router-dom'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import StatsBar from '@/components/StatsBar'
 import ContractsTable from '@/components/ContractsTable'
 import EntitiesTable from '@/components/EntitiesTable'
+import FinancialLeaderboards from '@/components/FinancialLeaderboards'
 import RelationshipGraph from '@/components/RelationshipGraph'
 import MunicipalityAggregates from '@/components/MunicipalityAggregates'
 import CampaignFinance from '@/components/CampaignFinance'
@@ -10,14 +12,23 @@ import GovernmentChanges from '@/components/GovernmentChanges'
 import DataSources from '@/components/DataSources'
 import ApiKeysPanel from '@/components/ApiKeysPanel'
 import OwnershipDeepDive from '@/components/OwnershipDeepDive'
+import ProgramTimeline from '@/components/ProgramTimeline'
 import brandMark from "@/assets/icon-64.png?inline";
+
+const PROGRAM_TIMELINE = [
+  { id:'money-ingest', phase:'NOW', title:'Public-money source intake', detail:'Freeze and ingest contract, award, vendor, payment, and entity source manifestations.', category:'Acquisition' },
+  { id:'money-entity', phase:'NEXT', title:'Entity identity resolution', detail:'Bind vendors and recipients using stable IDs and authoritative evidence rather than normalized names alone.', category:'Identity' },
+  { id:'money-contracts', phase:'NEXT', title:'Contract and payment reconciliation', detail:'Close amounts, dates, amendments, and cardinality without synthesizing records through aggregation.', category:'Contracts' },
+  { id:'money-rel', phase:'QUEUED', title:'Relationship analysis', detail:'Explore bounded relationships only after source and entity identity gates pass.', category:'Analysis' },
+  { id:'money-receipt', phase:'BLOCKED', title:'Federation handoff receipts', detail:'Production acknowledgement and final LOCKSTEP receipts wait on upstream producer freshness and credentials.', category:'Federation' },
+]
 
 // API Keys writes to a local backend .env file — no backend exists in the
 // OFFLINE/standalone export, so the tab is hidden entirely there.
 const OFFLINE = import.meta.env.VITE_OFFLINE === '1'
 
 const TABS = [
-  'contracts', 'entities', 'government-changes', 'graph', 'municipios', 'campaign-finance',
+  'activity', 'contracts', 'leaderboards', 'entities', 'government-changes', 'graph', 'municipios', 'campaign-finance',
   ...(OFFLINE ? [] : ['data-sources', 'api-keys']),
   'ownership',
 ]
@@ -33,22 +44,24 @@ export default function Dashboard() {
   const triggerClass = 'min-h-11 text-xs data-[state=active]:glow-border'
 
   return (
-    <div className="flex h-screen flex-col bg-background text-foreground">
-      <header className="panel-glass flex items-center gap-2 border-b border-border px-4 py-2.5">
+    <div className={`zip-surface zip-money ${styles.appShell}`}>
+      <header className={styles.header}>
         <img src={brandMark} alt="" aria-hidden="true" className="h-6 w-6 rounded-md" />
-        <div>
-          <h1 className="text-sm font-semibold leading-none text-foreground">moneysweep-pr</h1>
+        <div className={styles.brandCopy}>
+          <h1 className="text-sm font-semibold leading-none text-foreground">MoneySweep PR</h1>
           <p className="mt-0.5 text-[11px] text-muted-foreground">Puerto Rico public-money contracts, entities, campaign finance &amp; certified ownership</p>
         </div>
       </header>
 
       <StatsBar />
 
-      <div className="min-h-0 flex-1 p-3">
+      <div className="zip-money-content min-h-0 flex-1 p-3">
         <Tabs value={tab} onValueChange={setTab} className="flex h-full flex-col">
           <div className="overflow-x-auto pb-1">
-            <TabsList className={`grid h-auto min-w-[760px] ${OFFLINE ? 'grid-cols-7' : 'grid-cols-9'} bg-card`}>
+            <TabsList className={`grid h-auto min-w-[880px] ${OFFLINE ? 'grid-cols-9' : 'grid-cols-11'} bg-card`}>
+              <TabsTrigger value="activity" className={triggerClass}>Activity</TabsTrigger>
               <TabsTrigger value="contracts" className={triggerClass}>Contracts</TabsTrigger>
+              <TabsTrigger value="leaderboards" className={triggerClass}>Top Entities</TabsTrigger>
               <TabsTrigger value="entities" className={triggerClass}>Entities</TabsTrigger>
               <TabsTrigger value="government-changes" className={triggerClass}>Gov Changes</TabsTrigger>
               <TabsTrigger value="graph" className={triggerClass}>Relationships</TabsTrigger>
@@ -60,7 +73,9 @@ export default function Dashboard() {
             </TabsList>
           </div>
           <div className="mt-2 min-h-0 flex-1 overflow-hidden rounded-lg border border-border bg-background/40">
+            <TabsContent value="activity" className="m-0 h-full overflow-y-auto p-3"><ProgramTimeline producerId="moneysweep-pr" items={PROGRAM_TIMELINE} /></TabsContent>
             <TabsContent value="contracts" className="m-0 h-full"><ContractsTable /></TabsContent>
+            <TabsContent value="leaderboards" className="m-0 h-full"><FinancialLeaderboards /></TabsContent>
             <TabsContent value="entities" className="m-0 h-full"><EntitiesTable /></TabsContent>
             <TabsContent value="government-changes" className="m-0 h-full"><GovernmentChanges /></TabsContent>
             <TabsContent value="graph" className="m-0 h-full"><RelationshipGraph /></TabsContent>
