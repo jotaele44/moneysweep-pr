@@ -35,6 +35,25 @@
         ".federation/docs-sync.json",
         "governance/change_log.json"
       ]
+    },
+    {
+      "date": "2026-11-16",
+      "summary": "Re-pinned PRII_TEMPLATE_REF from thehub-pr 4258c3c to d916664 and re-rendered the five hub-owned files that had fallen behind: the federation export manifest schema (the stream enum gains source_monitors, thehub-pr ADR 0013), the PR grid V2 Cell_Profile module, its materializer and its tests (pr-grid-v2-cell-profile/1.0 to 1.2: ADMINISTRATIVE_SET and DERIVED_SET bindings are now admitted under fixed uncertainty and geometry classes and always counted as non-exact; incremental builds added), and the docs-sync checker. The template-authority lock and TERMINAL_READY.txt carry the new hub commit and blob hashes, and TERMINAL_READY.txt describes the 1.2 admission policy. The export manifest schema is a watched contract surface, so governance/federation_compatibility.json records the review: additive, COMPATIBLE, this repository's export unchanged. Three re-rendered files are formatted at the hub's line length and are excluded from this repository's format gate so they can stay byte-identical to the template. This is the precondition for adopting the hub's canonical GUI parity checker; it does not adopt it.",
+      "files": [
+        ".github/workflows/template-drift.yml",
+        "schemas/federation_export_manifest.schema.json",
+        "federation/spatial/pr_grid_v2_profiles.py",
+        "federation/spatial/materialize_pr_grid_v2_profiles.py",
+        "tests/test_pr_grid_v2_profiles.py",
+        "tools/check_docs_sync.py",
+        "tests/test_pr_grid_v2_profile_template_authority.py",
+        "TERMINAL_READY.txt",
+        "governance/federation_compatibility.json",
+        ".github/workflows/lint.yml",
+        ".pre-commit-config.yaml",
+        "CHANGELOG.md",
+        "governance/change_log.json"
+      ]
     }
   ]
 }

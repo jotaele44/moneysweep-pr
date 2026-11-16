@@ -38,6 +38,18 @@
     "finding": "COMPATIBLE",
     "rationale": "source_truth metadata only; export contract schemas and generation federation-spatial-index/1 unchanged; all eight attested contracts remain valid"
   },
+  "template_rerender_reconciliation": {
+    "cause_change": "Re-render of the hub-owned templates at thehub-pr d916664504404b9deb68a9d3f6c811f86e564938 (template-drift pin moved from 4258c3cf0ffc61a9a02d6a5b87414feca0305298).",
+    "watched_paths_changed": [
+      "schemas/federation_export_manifest.schema.json"
+    ],
+    "schema_change": "The export manifest's stream enum gains one value, source_monitors (thehub-pr ADR 0013). No value is removed or renamed and no other keyword changes.",
+    "reviewed_at": "2026-11-16",
+    "reviewed_head": "3784b21843520c5a98a28bb88fc938b8e913ef21",
+    "finding": "COMPATIBLE",
+    "rationale": "Additive enum value in a hub-owned schema that is rendered identically into every producer. Every manifest valid before remains valid. This repository does not emit a source_monitors stream, so its export is unchanged; tests/test_federation_contract_compat.py passes against the re-rendered schema.",
+    "also_changed_not_watched": "federation/spatial/pr_grid_v2_profiles.py moves from pr-grid-v2-cell-profile/1.0 to 1.2 in the same re-render. Within major version 1: it additionally admits ADMINISTRATIVE_SET and DERIVED_SET bindings under fixed uncertainty and geometry classes, always counted as non-exact, and adds incremental builds. Exact-method admission is unchanged. TERMINAL_READY.txt describes the 1.2 policy."
+  },
   "spatial_binding_v0_2": {
     "authority_commit": "bb8463c8d8cf4b54486674ee9b665ce3d2502e8b",
     "certification_state": "PROVISIONAL",
