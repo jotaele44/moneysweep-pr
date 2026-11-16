@@ -120,10 +120,28 @@ def run(root: Path | None = None, api_key: str | None = None, force: bool = Fals
         session.close()
 
     df = pd.DataFrame(rows, columns=OUTPUT_COLUMNS)
+    if df.empty:
+        # Fail closed: a blocked/failed fetch is indistinguishable from a true
+        # zero-row universe at this layer. Never destroy a prior non-empty
+        # snapshot, and never manufacture a header-only snapshot as evidence.
+        if out_path.exists():
+            existing = pd.read_csv(out_path, dtype=str, low_memory=False)
+            if not existing.empty:
+                logger.warning(
+                    "  NO_DATA_PRESERVED: fetch returned zero rows; preserving "
+                    f"{len(existing):,}-row prior snapshot"
+                )
+                return {
+                    "rows": len(existing),
+                    "path": str(out_path),
+                    "status": "NO_DATA_PRESERVED",
+                }
+        logger.warning("  NO_DATA: fetch returned zero rows; no snapshot written")
+        return {"rows": 0, "path": str(out_path), "status": "NO_DATA"}
+
     df.to_csv(out_path, index=False, encoding="utf-8")
-    status = "OK" if len(df) else "NO_DATA"
-    logger.info(f"  {status}: {len(df):,} single-audit records → {out_path.name}")
-    return {"rows": len(df), "path": str(out_path), "status": status}
+    logger.info(f"  OK: {len(df):,} single-audit records → {out_path.name}")
+    return {"rows": len(df), "path": str(out_path), "status": "OK"}
 
 
 def main() -> int:
