@@ -1,4 +1,5 @@
 {
+  "extension_id": "database-certification-v1",
   "capabilities": [
     {
       "id": "database-certification-operator-workflow",
