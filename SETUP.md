@@ -103,7 +103,7 @@ python -m compileall moneysweep scripts tests
 python -m pytest
 python -m mypy
 ruff check .
-ruff format --check .
+make format-check  # ruff format --check, minus the files FROZEN_RE in lint.yml excludes
 ```
 
 ## 6. Verify lockfile provenance
