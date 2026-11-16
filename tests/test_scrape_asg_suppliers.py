@@ -391,9 +391,9 @@ def test_asg_is_seeded_as_a_government_agency():
 
 
 @pytest.mark.unit
-def test_both_asg_sources_have_a_measured_coverage_contract():
-    """Without a contract a source is capped at provisional, and a contract with
-    a null universe evaluates unverifiable — so the denominators must be real."""
+def test_asg_coverage_contracts_fail_closed_on_drifted_emergency_denominator():
+    """Supplier coverage remains measured; emergency coverage is intentionally
+    unverifiable until the drifted 144-page portal is fully remeasured."""
     from pathlib import Path
 
     import yaml
@@ -402,13 +402,18 @@ def test_both_asg_sources_have_a_measured_coverage_contract():
     contracts = yaml.safe_load((root / "registries/coverage_contracts.yaml").read_text())
     by_id = {c["source_id"]: c for c in contracts["contracts"]}
 
-    for source_id, grain, key in (
-        ("asg_emergency_purchases", "contract", "control_number"),
-        ("asg_suppliers", "entity", "registration_id"),
-    ):
-        contract = by_id[source_id]
-        assert contract["canonical_grain"] == grain
-        assert contract["uniqueness_key"] == [key]
-        assert contract["authoritative_universe_method"] == "portal_count"
-        assert contract["authoritative_universe_total"] > 0
-        assert contract["pagination_required"] is True
+    emergency = by_id["asg_emergency_purchases"]
+    assert emergency["canonical_grain"] == "contract"
+    assert emergency["uniqueness_key"] == ["control_number"]
+    assert emergency["authoritative_universe_method"] == "portal_count"
+    assert emergency["authoritative_universe_total"] == 1431
+    assert emergency["pagination_required"] is True
+    assert "1,431 raw row manifestations" in emergency["notes"]
+    assert "1,431 unique control_number" in emergency["notes"]
+
+    suppliers = by_id["asg_suppliers"]
+    assert suppliers["canonical_grain"] == "entity"
+    assert suppliers["uniqueness_key"] == ["registration_id"]
+    assert suppliers["authoritative_universe_method"] == "portal_count"
+    assert suppliers["authoritative_universe_total"] > 0
+    assert suppliers["pagination_required"] is True

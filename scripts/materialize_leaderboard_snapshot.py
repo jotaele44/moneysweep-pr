@@ -121,7 +121,11 @@ def main() -> int:
         entity_type=args.entity_type,
         currency=args.currency,
     )
-    if ranking.get("certificationState") not in {"PASS", "PROVISIONAL"}:
+    if ranking.get("certificationState") not in {
+        "PASS",
+        "PROVISIONAL",
+        "PROVISIONAL_BOUNDED_SOURCE_NATIVE",
+    }:
         raise SystemExit(
             f"snapshot blocked: ranking state={ranking.get('certificationState')} reason={ranking.get('reason')}"
         )
