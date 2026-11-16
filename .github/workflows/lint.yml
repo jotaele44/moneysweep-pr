@@ -39,5 +39,10 @@ jobs:
           # certified package and TheHub replay. Formatting them requires a new
           # certification/runtime/package/replay revision; lint still covers them.
           FROZEN_RE='^(scripts/(leaderboard_release_provenance|materialize_leaderboard_snapshot|certify_leaderboard_snapshot|materialize_leaderboard_git_snapshot|finalize_leaderboard_release|export_leaderboard_package)\.py|server/backend/(leaderboards|leaderboard_adapters|leaderboard_history|leaderboard_investigation|leaderboard_entities)\.py)$'
-          mapfile -t files < <(git ls-files '*.py' | grep -Ev "$FROZEN_RE")
+          # These three are rendered from thehub-pr's templates and must stay
+          # byte-identical to them (template-drift.yml). The hub formats at its
+          # own line length, so reformatting them here would only trade this
+          # gate for a drift failure. Lint still covers them.
+          RENDERED_RE='^(federation/spatial/(pr_grid_v2_profiles|materialize_pr_grid_v2_profiles)\.py|tests/test_pr_grid_v2_profiles\.py)$'
+          mapfile -t files < <(git ls-files '*.py' | grep -Ev "$FROZEN_RE" | grep -Ev "$RENDERED_RE")
           ruff format --check "${files[@]}"

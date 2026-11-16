@@ -57,7 +57,10 @@ repos:
         # These files are byte-bound into moneysweep.leaderboard.production-v1
         # and TheHub's exact replay receipt. Reformat only under a new certified
         # runtime/package/replay revision.
-        exclude: ^(scripts/(leaderboard_release_provenance|materialize_leaderboard_snapshot|certify_leaderboard_snapshot|materialize_leaderboard_git_snapshot|finalize_leaderboard_release|export_leaderboard_package)\.py|server/backend/(leaderboards|leaderboard_adapters|leaderboard_history|leaderboard_investigation|leaderboard_entities)\.py)$
+        # The last three alternatives are rendered from thehub-pr's templates and
+        # must stay byte-identical to them (template-drift.yml); the hub formats
+        # at its own line length.
+        exclude: ^(federation/spatial/(pr_grid_v2_profiles|materialize_pr_grid_v2_profiles)\.py|tests/test_pr_grid_v2_profiles\.py|scripts/(leaderboard_release_provenance|materialize_leaderboard_snapshot|certify_leaderboard_snapshot|materialize_leaderboard_git_snapshot|finalize_leaderboard_release|export_leaderboard_package)\.py|server/backend/(leaderboards|leaderboard_adapters|leaderboard_history|leaderboard_investigation|leaderboard_entities)\.py)$
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v2.3.1

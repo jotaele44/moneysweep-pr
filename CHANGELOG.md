@@ -25,6 +25,17 @@ A bump to the **federation export** version is what the release-tagging workflow
 ## [Unreleased]
 
 ### Changed
+- **Shared federation templates brought current with the hub.** The
+  template-drift pin moves from thehub-pr `4258c3c` to `d916664`, and the five
+  rendered files that had fallen behind are re-rendered: the federation export
+  manifest schema (the stream list gains `source_monitors`), the PR grid V2
+  Cell_Profile module, its materializer and its tests, and the docs-sync
+  checker. The profile module moves from `pr-grid-v2-cell-profile/1.0` to
+  `1.2`: it now also admits `ADMINISTRATIVE_SET` and `DERIVED_SET` bindings,
+  each only with its required uncertainty class and geometry state and always
+  counted as non-exact, and it can build profiles incrementally. The
+  template-authority lock and `TERMINAL_READY.txt` carry the new hub commit and
+  blob hashes, and `TERMINAL_READY.txt` describes the 1.2 admission policy.
 - **Frontend `npm audit` gate now uses an expiring allow-list instead of failing
   on advisories that cannot be fixed.** `desktop-build.yml` runs
   `tools/check_npm_audit.py`, which still fails on any advisory at or above

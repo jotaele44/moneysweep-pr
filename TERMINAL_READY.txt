@@ -47,23 +47,37 @@ provisional, version-mismatched, or hash-mismatched evidence remains BLOCKED.
 Do not reinterpret V1, recompute geometry, or claim co-location is identity.
 
 
-EXACT BINDING PROFILE ADMISSION
+BINDING PROFILE ADMISSION (pr-grid-v2-cell-profile/1.2)
 
-The profile materializer accepts only Spiderweb-certified rows with
-Uncertainty_Class=EXACT and one of:
+The profile materializer accepts only Spiderweb-certified rows. A row is
+admitted under exactly one of two policies, selected by Binding_Method.
+
+Exact methods require Uncertainty_Class=EXACT:
 COVERS
 INTERSECTS_POSITIVE_AREA
 LINE_POSITIVE_LENGTH
 
-INTERSECTS_POSITIVE_AREA additionally requires positive Overlap_Area_m2 and
-Cell_Coverage_Fraction > 0 and <= 1.
-LINE_POSITIVE_LENGTH additionally requires positive Length_In_Cell_m.
+Set methods are admitted only with the stated class and geometry state, and
+with Confidence=null:
+ADMINISTRATIVE_SET  Uncertainty_Class=ADMINISTRATIVE_ONLY,
+                    Geometry_State=VERIFIED_ADMINISTRATIVE_GEOMETRY
+DERIVED_SET         Uncertainty_Class=DERIVED,
+                    Geometry_State=VERIFIED_DERIVED_GEOMETRY
 
-ADMINISTRATIVE_SET, DERIVED_SET, APPROXIMATE, INFERRED, UNKNOWN and all other
-non-exact rows fail closed and cannot enter exact Cell_Profile counts.
+INTERSECTS_POSITIVE_AREA, ADMINISTRATIVE_SET and DERIVED_SET additionally
+require Binding_State=INTERIOR, positive Overlap_Area_m2 and
+Cell_Coverage_Fraction > 0 and <= 1.
+LINE_POSITIVE_LENGTH additionally requires Binding_State=INTERIOR and
+positive Length_In_Cell_m.
+
+Set-method rows never enter exact counts: each profile reports
+Exact_Record_Count and Non_Exact_Record_Count separately, with per-method
+and per-uncertainty-class counts. APPROXIMATE, INFERRED, UNKNOWN, any other
+binding method, and a set method with any other class or geometry state
+fail closed.
 Geometry_Included remains false; canonical geometry stays in spiderweb-pr.
 
 PROFILE TEMPLATE AUTHORITY
-TheHub commit: 0663bfa77740dceff3eb70855f2164112ce47c44
-pr_grid_v2_profiles.py Git blob: c4e174b4626083ef3e1866274e87e8aaea9f81a2
-test_pr_grid_v2_profiles.py Git blob: 3f74d64046ef19b4b8f4718b3a50d5eed902877c
+TheHub commit: d916664504404b9deb68a9d3f6c811f86e564938
+pr_grid_v2_profiles.py Git blob: e245d91a9b5da829d1bbdaec329958c08e057701
+test_pr_grid_v2_profiles.py Git blob: c2c3e34e0396d8b260fa13df3f6f0902becaa857
