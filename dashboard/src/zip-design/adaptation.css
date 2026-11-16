@@ -1,0 +1,57 @@
+/* Shared interaction safeguards for the archive-derived surfaces. */
+.zip-surface { background: var(--zip-background); color: var(--zip-foreground); }
+.zip-surface :is(a,button,input,select):focus-visible { outline: 2px solid var(--zip-primary); outline-offset: 3px; }
+.zip-surface { min-width: 0; }
+.zip-surface main { min-width: 0; }
+@media (prefers-reduced-motion: reduce) { .zip-surface *, .zip-surface *::before, .zip-surface *::after { scroll-behavior: auto !important; transition-duration: 0s !important; animation-duration: 0s !important; } }
+
+.zip-money { max-width: none; height: 100dvh; display: flex; flex-direction: column; }
+.zip-money-content { overflow: hidden; }
+.zip-money [role="tablist"] { display: flex; width: 100%; min-width: 0; flex-wrap: wrap; gap: 4px; height: auto; background: var(--zip-surface); }
+.zip-money [role="tab"] { flex: 1 0 auto; min-height: 44px; color: var(--zip-muted-foreground); }
+.zip-money [role="tab"][data-state="active"] { color: var(--zip-primary); background: var(--zip-card); box-shadow: inset 0 -2px var(--zip-primary); }
+@media (max-width: 760px) {
+ .zip-money { padding-bottom: env(safe-area-inset-bottom); }
+ .zip-money [role="tablist"] { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+ .zip-money [role="tab"] { padding: 6px 3px; white-space: normal; font-size: 11px; }
+}
+
+/* Explicit conversion from ZIP full colors to the existing HSL-channel contract. */
+:root {
+ --background: 215  30%  6%;
+ --foreground: 194  78%  94%;
+ --card: 214  25%  11%;
+ --card-foreground: 194  72%  92%;
+ --primary: 187  100%  50%;
+ --primary-foreground: 215  32%  7%;
+ --secondary: 214  20%  16%;
+ --secondary-foreground: 194  60%  86%;
+ --muted: 214  20%  14%;
+ --muted-foreground: 211  14%  60%;
+ --accent: 170  100%  39%;
+ --accent-foreground: 215  32%  7%;
+ --border: 211  22%  19%;
+ --popover: 214  24%  12%;
+ --popover-foreground: 194  72%  92%;
+ --input: 211  22%  19%;
+ --ring: 187  100%  50%;
+}
+:root.dark, :root[data-theme="dark"] {
+ --background: 215  30%  6%;
+ --foreground: 194  78%  94%;
+ --card: 214  25%  11%;
+ --card-foreground: 194  72%  92%;
+ --primary: 187  100%  50%;
+ --primary-foreground: 215  32%  7%;
+ --secondary: 214  20%  16%;
+ --secondary-foreground: 194  60%  86%;
+ --muted: 214  20%  14%;
+ --muted-foreground: 211  14%  60%;
+ --accent: 170  100%  39%;
+ --accent-foreground: 215  32%  7%;
+ --border: 211  22%  19%;
+ --popover: 214  24%  12%;
+ --popover-foreground: 194  72%  92%;
+ --input: 211  22%  19%;
+ --ring: 187  100%  50%;
+}

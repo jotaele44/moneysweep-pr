@@ -365,7 +365,7 @@ class ForensicsLedger:
             table = _sql_identifier(table)
             target = output / f"{table}.parquet"
             tmp = target.with_suffix(".parquet.tmp")
-            arrow = self.conn.execute(f"SELECT * FROM {table} ORDER BY ALL").fetch_arrow_table()
+            arrow = self.conn.execute(f"SELECT * FROM {table} ORDER BY ALL").to_arrow_table()
             pq.write_table(arrow, tmp, compression="zstd", use_dictionary=True)
             tmp.replace(target)
             written.append(target)
