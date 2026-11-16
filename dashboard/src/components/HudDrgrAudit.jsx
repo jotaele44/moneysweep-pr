@@ -33,7 +33,7 @@ export default function HudDrgrAudit() {
     {busy && <p role="status">Loading audit results…</p>}
     {error && <p role="alert">{error} — saved results below may be stale. Refresh to retry.</p>}
     {!busy && !error && audits.length === 0 && <p>No saved audit receipts are available.</p>}
-    {audits.map(audit => <details key={audit.path} className="my-3 rounded border border-border p-3 text-xs [overflow-wrap:anywhere]">
+    {audits.map(audit => <details key={audit.path} className="my-3 rounded-sm border border-border p-3 text-xs [overflow-wrap:anywhere]">
       <summary className="cursor-pointer">{audit.receipt?.generated_at_utc || audit.path} · {audit.state}</summary>
       <p className="my-2">Receipt SHA256: {audit.sha256}</p>
       <p>Receipt path: {audit.path}</p>

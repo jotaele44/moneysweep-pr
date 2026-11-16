@@ -11,6 +11,7 @@ from typing import Any
 import pr_grid_v2_runtime as grid
 
 PROFILE_VERSION = "pr-grid-v2-cell-profile/1.0"
+EXACT_PROFILE_METHODS = ("COVERS", "INTERSECTS_POSITIVE_AREA", "LINE_POSITIVE_LENGTH")
 DOMAIN_TYPES = {
     "aguayluz-pr": "water_hydrology",
     "skywatcher-pr": "flight_activity",
@@ -81,7 +82,7 @@ def build_profiles(
         ):
             raise ProfileError("invalid, duplicate or foreign record metadata")
         records[rid] = row
-    grouped: dict[str, dict[str, str]] = defaultdict(dict)
+    grouped: dict[str, dict[str, tuple[str, str]]] = defaultdict(dict)
     for binding in bindings:
         if (
             binding.get("Grid_ID") != grid.GRID_ID
@@ -90,10 +91,37 @@ def build_profiles(
             raise ProfileError("incorrect grid version in binding")
         bound_level = grid.validate_level(binding.get("Grid_Level"))
         grid.validate_cell_id(binding.get("Cell_ID"), level=bound_level)
-        if binding.get("Uncertainty_Class") != "EXACT" or binding.get("Binding_Method") != "COVERS":
-            raise ProfileError("non-exact binding cannot enter exact-point profiles")
-        if binding.get("Binding_State") not in ("INTERIOR", "EDGE_SHARED", "CORNER_SHARED"):
+        if binding.get("Uncertainty_Class") != "EXACT":
+            raise ProfileError("non-exact binding cannot enter exact profiles")
+        method = binding.get("Binding_Method")
+        if method not in EXACT_PROFILE_METHODS:
+            raise ProfileError("unsupported exact binding method")
+        state = binding.get("Binding_State")
+        if state not in ("INTERIOR", "EDGE_SHARED", "CORNER_SHARED"):
             raise ProfileError("unsupported boundary state")
+        if method == "INTERSECTS_POSITIVE_AREA":
+            area = binding.get("Overlap_Area_m2")
+            fraction = binding.get("Cell_Coverage_Fraction")
+            if (
+                state != "INTERIOR"
+                or not isinstance(area, (int, float))
+                or isinstance(area, bool)
+                or area <= 0
+                or not isinstance(fraction, (int, float))
+                or isinstance(fraction, bool)
+                or fraction <= 0
+                or fraction > 1
+            ):
+                raise ProfileError("invalid positive-area exact binding")
+        elif method == "LINE_POSITIVE_LENGTH":
+            length = binding.get("Length_In_Cell_m")
+            if (
+                state != "INTERIOR"
+                or not isinstance(length, (int, float))
+                or isinstance(length, bool)
+                or length <= 0
+            ):
+                raise ProfileError("invalid positive-length exact binding")
         if binding.get("Repository") != pin.consumer:
             continue
         if bound_level != level or binding.get("Record_ID") not in records:
@@ -101,7 +129,7 @@ def build_profiles(
         cid, rid = binding["Cell_ID"], binding["Record_ID"]
         if rid in grouped[cid]:
             raise ProfileError("duplicate record-cell binding")
-        grouped[cid][rid] = binding["Binding_State"]
+        grouped[cid][rid] = (str(state), str(method))
     covered = set()
     if coverage_path:
         coverage = json.loads(coverage_path.read_text(encoding="utf-8"))
@@ -150,7 +178,7 @@ def build_profiles(
                 "Category_Count": len(categories),
                 "Categories": dict(sorted(categories.items())),
                 "Top_Record_IDs": ids[:25],
-                "Shared_Boundary_Record_Count": sum(s != "INTERIOR" for s in assigned.values()),
+                "Shared_Boundary_Record_Count": sum(s != "INTERIOR" for s, _ in assigned.values()),
                 "Identity_Default": "CANDIDATE_NOT_IDENTITY",
                 "Geometry_Included": False,
             }
@@ -165,7 +193,8 @@ def build_profiles(
         "Input_Record_Count": len(records),
         "Profile_Count": len(profiles),
         "Data_State_Counts": dict(sorted(states.items())),
-        "Migration_Class": "RECOMPUTED_FROM_SOURCE_COORDINATE",
+        "Migration_Class": "SPIDERWEB_CERTIFIED_EXACT_BINDINGS",
+        "Accepted_Binding_Methods": list(EXACT_PROFILE_METHODS),
         "Geometry_Copied": False,
         "State": "CANDIDATE_NOT_CANONICAL",
     }
