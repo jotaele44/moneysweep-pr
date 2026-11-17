@@ -21,8 +21,15 @@ from desktop import config  # noqa: E402
 ROOT = Path(config.REPO_ROOT)
 BACKEND = ROOT / "server" / "backend"
 # The desktop app mounts these; case_manager_* is a separate app.
-MOUNTED = ("main.py", "api_keys.py", "campaign_finance.py", "government_changes.py",
-           "leaderboards.py", "ownership_api.py", "materialization.py")
+MOUNTED = (
+    "main.py",
+    "api_keys.py",
+    "campaign_finance.py",
+    "government_changes.py",
+    "leaderboards.py",
+    "ownership_api.py",
+    "materialization.py",
+)
 
 
 def _spec():
