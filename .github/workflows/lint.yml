@@ -38,6 +38,14 @@ jobs:
           # Production-v1 leaderboard runtime bytes are hash-bound into the
           # certified package and TheHub replay. Formatting them requires a new
           # certification/runtime/package/replay revision; lint still covers them.
-          FROZEN_RE='^(scripts/(leaderboard_release_provenance|materialize_leaderboard_snapshot|certify_leaderboard_snapshot|materialize_leaderboard_git_snapshot|finalize_leaderboard_release|export_leaderboard_package)\.py|server/backend/(leaderboards|leaderboard_adapters|leaderboard_history|leaderboard_investigation|leaderboard_entities)\.py)$'
+          # The Grid V2 Cell_Profile files (federation/spatial/pr_grid_v2_profiles.py,
+          # federation/spatial/materialize_pr_grid_v2_profiles.py and
+          # tests/test_pr_grid_v2_profiles.py) are rendered from thehub-pr
+          # federation-templates/spatial/, so their formatting belongs to the hub
+          # template: template-drift.yml fails on any local reformat. They are
+          # excluded here like the certified files; lint still covers them.
+          # Keep this pattern identical to the ruff-format exclude in
+          # .pre-commit-config.yaml (the Makefile's format targets read it from here).
+          FROZEN_RE='^(scripts/(leaderboard_release_provenance|materialize_leaderboard_snapshot|certify_leaderboard_snapshot|materialize_leaderboard_git_snapshot|finalize_leaderboard_release|export_leaderboard_package)\.py|server/backend/(leaderboards|leaderboard_adapters|leaderboard_history|leaderboard_investigation|leaderboard_entities)\.py|federation/spatial/(pr_grid_v2_profiles|materialize_pr_grid_v2_profiles)\.py|tests/test_pr_grid_v2_profiles\.py)$'
           mapfile -t files < <(git ls-files '*.py' | grep -Ev "$FROZEN_RE")
           ruff format --check "${files[@]}"

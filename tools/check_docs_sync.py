@@ -1056,16 +1056,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             _check_manifest(manifest, tree, tree, report)
             print(render_text(report, "enforce"))  # a broken manifest is never report-only
             return 1 if report.violations else 0
-        pr_body = ""
         if args.staged:
             ctx = collect_staged(root)
             if ctx is None:
                 return 0
         else:
             ctx = collect_range(root, args.base, args.head)
-            if author and author in _base_exempt_authors(ctx, args.manifest):
-                print(f"docs-sync: skipped (author {author} is exempt in the base manifest)")
-                return 0
+        # The base side (HEAD for a staged run) is trusted; the change itself is not.
+        if author and author in _base_exempt_authors(ctx, args.manifest):
+            print(f"docs-sync: skipped (author {author} is exempt in the base manifest)")
+            return 0
+        pr_body = ""
+        if not args.staged:
             if args.pr_body_file:
                 pr_body = Path(args.pr_body_file).read_text(encoding="utf-8", errors="replace")
             else:

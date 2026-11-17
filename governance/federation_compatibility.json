@@ -30,13 +30,12 @@
   "spatial_generation": "federation-spatial-index/1",
   "spatial_note": "Compatible with federation spatial binding v0.2. While Spiderweb's transform is PROVISIONAL, this repository forbids exact Cell_ID ground claims and preserves full content-addressed uncertainty Cell_Set membership; identity remains CANDIDATE_NOT_IDENTITY.",
   "drift_reconciliation": {
-    "cause_pr": 585,
-    "cause_commit": "e2ed593",
-    "cause_change": "source_truth count update total_sources 164→167; automatable_total 115→119; automatable_ready 115→119; queued_excluded_total 49’48",
-    "reviewed_at": "2026-09-22",
-    "reviewed_head": "105ab0e6f2ab87aae4bdcda39a988b75390a770b",
+    "cause": "federation template re-pin: PRII_TEMPLATE_REF moves from thehub-pr 4258c3c to d916664, which re-renders schemas/federation_export_manifest.schema.json",
+    "cause_change": "files[].stream enum gains the optional source_monitors value (thehub-pr ADR 0013, recorded in the hub as federation_export_manifest 1.0.0 -> 1.1.0, a MINOR change); no other byte of the schema changed",
+    "reviewed_at": "2026-11-16",
+    "reviewed_head": "c26b5028fd42a653eacb2bca48fd3ec8589d2a0f",
     "finding": "COMPATIBLE",
-    "rationale": "source_truth metadata only; export contract schemas and generation federation-spatial-index/1 unchanged; all eight attested contracts remain valid"
+    "rationale": "additive enum value only: the streams this repo's exporter writes (sources, entities, relationships and the optional funding_awards) are all still allowed, and moneysweep-pr does not emit source_monitors yet; the other watched paths and generation federation-spatial-index/1 are unchanged; all eight attested contracts remain valid. Earlier reviews stay in git history"
   },
   "spatial_binding_v0_2": {
     "authority_commit": "bb8463c8d8cf4b54486674ee9b665ce3d2502e8b",
