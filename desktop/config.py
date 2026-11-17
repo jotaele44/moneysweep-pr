@@ -67,9 +67,7 @@ def _launchpad_status() -> list[dict[str, str]]:
     )
     try:
         production = json.loads(
-            (REPO_ROOT / "data" / "exports" / "production_status.json").read_text(
-                encoding="utf-8"
-            )
+            (REPO_ROOT / "data" / "exports" / "production_status.json").read_text(encoding="utf-8")
         ).get("production_status", "UNKNOWN")
     except (OSError, ValueError):
         production = "UNKNOWN"
@@ -134,8 +132,11 @@ LAUNCHPAD = {
     # The dashboard is one route; its pages are ?tab= values (TABS in
     # dashboard/src/pages/Dashboard.jsx).
     "start_pages": [
-        {"route": "/?tab=contracts", "label": "Contracts",
-         "description": "The default view: contract records."},
+        {
+            "route": "/?tab=contracts",
+            "label": "Contracts",
+            "description": "The default view: contract records.",
+        },
         {"route": "/?tab=activity", "label": "Activity"},
         {"route": "/?tab=leaderboards", "label": "Top Entities"},
         {"route": "/?tab=entities", "label": "Entities"},
@@ -144,10 +145,16 @@ LAUNCHPAD = {
         {"route": "/?tab=municipios", "label": "Municipios"},
         {"route": "/?tab=campaign-finance", "label": "Campaign Finance"},
         {"route": "/?tab=ownership", "label": "Ownership"},
-        {"route": "/?tab=data-sources", "label": "Data Sources",
-         "description": "Load offline files and run API materialization (Operator)."},
-        {"route": "/?tab=api-keys", "label": "API Keys",
-         "description": "Store source API keys (Operator)."},
+        {
+            "route": "/?tab=data-sources",
+            "label": "Data Sources",
+            "description": "Load offline files and run API materialization (Operator).",
+        },
+        {
+            "route": "/?tab=api-keys",
+            "label": "API Keys",
+            "description": "Store source API keys (Operator).",
+        },
     ],
     "guest": {
         "label": "Guest",
