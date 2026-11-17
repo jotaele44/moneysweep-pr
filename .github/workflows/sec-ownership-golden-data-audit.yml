@@ -36,12 +36,16 @@ jobs:
       # certification reuses that immutable payload. Fresh acquisition is reserved
       # for an explicit workflow_dispatch that creates a new versioned snapshot;
       # PR validation must never silently refresh mutable evidence.
-      - name: Restore frozen SEC certification snapshot
+      - name: Restore frozen SEC certification snapshot archive
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: ./.github/actions/restore-sec-snapshot
+        with:
+          token: ${{ github.token }}
+
+      - name: Verify frozen SEC certification snapshot
         id: restore
         if: ${{ github.event_name == 'pull_request' }}
         env:
-          GH_TOKEN: ${{ github.token }}
-          SNAPSHOT_ARTIFACT_ID: "9598537414"
           FREEZE_MANIFEST_SHA256: "3234edd4cfe97535b462b34d89bc1e8175d0d983f4a2976de9a84acfc67d9e27"
           EQUITY_RECEIPT_SHA256: "c4603b9989cb1f5c111a997faa8cd833113a089231c2176c8640c25e9bbc89de"
           COMPANIES_SHA256: "bb749a83b3502e5b1936136af3a4bbec430c10fcf3ff9dd6f3b22e6de5dc752a"
@@ -50,14 +54,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          archive="$RUNNER_TEMP/sec-ownership-bpop-8q-audit.zip"
-          curl --fail --location --retry 3 \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            -o "$archive" \
-            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$SNAPSHOT_ARTIFACT_ID/zip"
-          unzip -q "$archive" -d "$GITHUB_WORKSPACE"
           printf '%s  %s\n' \
             "$FREEZE_MANIFEST_SHA256" data/manifests/capital_control/bpop_8q_freeze_manifest.json \
             "$EQUITY_RECEIPT_SHA256" data/manifests/sec_equity_v2/receipt.json \
