@@ -36,9 +36,9 @@ cd moneysweep-pr
 ```
 
 No sibling checkout is required. `moneysweep-pr` resolves the shared
-`prii-maintenance` package via a pinned `git+https` dependency declared in
-`requirements.txt` — installing it fetches that commit directly, regardless
-of where this clone lives on disk.
+`prii-maintenance` and `prii-export-utils` packages via pinned `git+https`
+dependencies declared in `requirements.txt` — installing them fetches those
+commits directly, regardless of where this clone lives on disk.
 
 ## 2. Create the private environment
 
@@ -171,7 +171,8 @@ checkout, not the distributable app (see `desktop/README.md`). Its first run nee
 
 - **Python 3.11+** — the bootstrap interpreter only; later runs use `.venv`.
 - **Network access, or a wheelhouse** — for the Python packages. Two requirements
-  resolve from `git+https://` URLs, so `git` must also be present. To run entirely
+  (`prii-maintenance`, `prii-export-utils`) resolve from `git+https://` URLs, so
+  `git` must also be present; `prii-desktop` installs from a GitHub archive URL. To run entirely
   offline, follow `docs/DESKTOP_OFFLINE_BOOTSTRAP.md`.
 - **Node.js — not required.** A prebuilt dashboard is committed at
   `desktop/prebuilt-dashboard/`. To build the dashboard from source instead:
@@ -198,7 +199,7 @@ python3 desktop/preflight.py
 | Problem | Resolution |
 |---|---|
 | Python is not 3.11 | Recreate `.venv` with `python3.11 -m venv .venv` |
-| Shared package cannot resolve | Confirm network access to GitHub — the `prii-maintenance` dependency is fetched from a pinned `git+https` URL on install, not a local path |
+| Shared package cannot resolve | Confirm network access to GitHub — the `prii-maintenance` and `prii-export-utils` dependencies are fetched from pinned `git+https` URLs on install, not a local path |
 | `pip` writes outside the repository | Deactivate the global environment, activate `.venv`, and use `python -m pip` |
 | Lockfile drift fails | Run `make lock` under Python 3.11 and review the complete diff |
 | Tests need absent local directories | Run `python scripts/setup_directories.py` |

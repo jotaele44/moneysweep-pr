@@ -183,8 +183,8 @@ git clone https://github.com/jotaele44/moneysweep-pr.git
 cd moneysweep-pr
 python3 -m venv .venv
 source .venv/bin/activate
-# The shared prii-maintenance library resolves via a pinned git+https
-# reference in requirements.txt — no thehub-pr sibling checkout needed:
+# The shared prii-maintenance and prii-export-utils libraries resolve via pinned
+# git+https references in requirements.txt — no thehub-pr sibling checkout needed:
 pip install -r requirements.txt
 python -m pytest tests/ -q
 python3 run_all.py --only-setup --strict-preflight
