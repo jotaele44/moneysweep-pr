@@ -288,3 +288,7 @@ app.include_router(campaign_finance_router)
 app.include_router(government_changes_router)
 app.include_router(create_leaderboard_router(DATA))
 app.include_router(ownership_router)
+
+from server.backend.investigation_api import router as investigation_router  # noqa: E402
+
+app.include_router(investigation_router)
