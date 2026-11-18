@@ -1,4 +1,5 @@
 {
+  "extension_id": "fomb-source-family",
   "capabilities": [
     {
       "id": "fomb-source-materialization",

@@ -25,6 +25,34 @@ A bump to the **federation export** version is what the release-tagging workflow
 ## [Unreleased]
 
 ### Changed
+- **GUI capability parity now runs the hub's canonical checker.**
+  `scripts/check_gui_parity.py`, `tests/test_gui_parity.py`,
+  `docs/GUI_CAPABILITY_PARITY.md` and the `gui-capability-parity.yml` workflow
+  are rendered from thehub-pr's templates (template-drift pin moves from
+  `d916664` to `76d3c08`). The checker merges the extension fragments itself,
+  so the local wrapper `check_gui_parity_with_extensions.py` and the tracked
+  `artifacts/gui-capabilities-merged.json` are removed; CI and contributors run
+  `python3 scripts/check_gui_parity.py`. The thirteen fragments that lacked an
+  `extension_id` now carry one equal to their file name. The manifest names the
+  Playwright config that proves capabilities (`discovery.e2e_config`), and
+  three end-to-end specs that no workflow ran (`org-change-monitor`,
+  `financial-leaderboards`, `ownership-deep-dive`) are now part of
+  `npm run test:gui-parity`. The mocked `zip-design.spec.mjs` is no longer
+  cited as end-to-end proof for six capabilities; `ownership-deep-dive` now
+  cites its own real-backend spec. The parity baseline is unchanged. The README
+  banners no longer call the dashboard a diagnostic-only surface (superseded by
+  thehub-pr ADR 0014).
+- **Shared federation templates brought current with the hub.** The
+  template-drift pin moves from thehub-pr `4258c3c` to `d916664`, and the five
+  rendered files that had fallen behind are re-rendered: the federation export
+  manifest schema (the stream list gains `source_monitors`), the PR grid V2
+  Cell_Profile module, its materializer and its tests, and the docs-sync
+  checker. The profile module moves from `pr-grid-v2-cell-profile/1.0` to
+  `1.2`: it now also admits `ADMINISTRATIVE_SET` and `DERIVED_SET` bindings,
+  each only with its required uncertainty class and geometry state and always
+  counted as non-exact, and it can build profiles incrementally. The
+  template-authority lock and `TERMINAL_READY.txt` carry the new hub commit and
+  blob hashes, and `TERMINAL_READY.txt` describes the 1.2 admission policy.
 - **Frontend `npm audit` gate now uses an expiring allow-list instead of failing
   on advisories that cannot be fixed.** `desktop-build.yml` runs
   `tools/check_npm_audit.py`, which still fails on any advisory at or above
