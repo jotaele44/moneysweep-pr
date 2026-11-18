@@ -16,7 +16,6 @@ import pandas as pd
 from fastapi import APIRouter, HTTPException, Query
 
 from server.backend.leaderboard_adapters import (
-    _competition_ranks,
     contract_awards,
     run_adapter,
 )
