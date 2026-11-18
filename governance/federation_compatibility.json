@@ -30,12 +30,12 @@
   "spatial_generation": "federation-spatial-index/1",
   "spatial_note": "Compatible with federation spatial binding v0.2. While Spiderweb's transform is PROVISIONAL, this repository forbids exact Cell_ID ground claims and preserves full content-addressed uncertainty Cell_Set membership; identity remains CANDIDATE_NOT_IDENTITY.",
   "drift_reconciliation": {
-    "cause": "federation template re-pin: PRII_TEMPLATE_REF moves from thehub-pr 4258c3c to d916664, which re-renders schemas/federation_export_manifest.schema.json",
-    "cause_change": "files[].stream enum gains the optional source_monitors value (thehub-pr ADR 0013, recorded in the hub as federation_export_manifest 1.0.0 -> 1.1.0, a MINOR change); no other byte of the schema changed",
-    "reviewed_at": "2026-11-16",
-    "reviewed_head": "c26b5028fd42a653eacb2bca48fd3ec8589d2a0f",
+    "cause": "source_monitors emitter (thehub-pr ADR 0013): scripts/federation_export.py gains build_source_monitors and writes the optional source_monitors stream",
+    "cause_change": "the exporter now also writes source_monitors.jsonl, one row per source in reports/source_registry_status.csv projected field for field as thehub-pr's ADR 0012 registry reader did (name = source_id, family, cadence, window, declared status, no tier or URL), with last_success_at from data/source_run_state.json receipts only (none exist, so all 167 rows are NOT_RECORDED); requirements.in/requirements.txt/requirements.lock pin prii-export-utils 0.2.0 at thehub-pr 0f62e4b; the committed data/exports/canonical_v1_federation package now lists source_monitors while its sources, entities and relationships files are byte-unchanged",
+    "reviewed_at": "2026-11-17",
+    "reviewed_head": "4157f2b1720e8eb7d3e94b149621759a9c14f7b5",
     "finding": "COMPATIBLE",
-    "rationale": "additive enum value only: the streams this repo's exporter writes (sources, entities, relationships and the optional funding_awards) are all still allowed, and moneysweep-pr does not emit source_monitors yet; the other watched paths and generation federation-spatial-index/1 are unchanged; all eight attested contracts remain valid. Earlier reviews stay in git history"
+    "rationale": "additive optional stream only: export_canonical, canonical_export_dir, hub_callable_commands and federation.json are unchanged, the existing sources/entities/relationships rows and their federation ids are unchanged, and the package adds the source_monitors stream that federation_export_manifest 1.1.0 (still @1) allows; its rows validate against thehub-pr federation_source_monitor 1.0.0, hub validate-package returns VALID for the committed package and a --mode test regeneration, and the stream's ids and fields equal the hub registry reader's 167 rows; generation federation-spatial-index/1 is unchanged; all eight attested contracts remain valid. Earlier reviews stay in git history"
   },
   "spatial_binding_v0_2": {
     "authority_commit": "bb8463c8d8cf4b54486674ee9b665ce3d2502e8b",

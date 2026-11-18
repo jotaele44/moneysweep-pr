@@ -60,6 +60,27 @@
       ]
     },
     {
+      "date": "2026-11-17",
+      "summary": "moneysweep-pr now emits the thehub-pr ADR 0013 source_monitors stream from scripts/federation_export.py: 167 rows projected from reports/source_registry_status.csv exactly as the hub's ADR 0012 registry reader derived them, all NOT_RECORDED because there is no data/source_run_state.json. Pins prii-export-utils 0.2.0 at thehub-pr 0f62e4b in requirements.in, requirements.txt and requirements.lock. Re-exports the committed data/exports/canonical_v1_federation package with only the new stream added (sources, entities and relationships byte-unchanged; the pre-existing entities confidence drift is not carried). Adds the internal GUI capability fragment and tests, names the new pinned package in README.md, SETUP.md and docs/DESKTOP_OFFLINE_BOOTSTRAP.md, and records the compatibility review as COMPATIBLE. Once this lands, the hub can move moneysweep-pr from REGISTRIES to STREAM_PRODUCERS and retire its registry reader.",
+      "files": [
+        "scripts/federation_export.py",
+        "requirements.in",
+        "requirements.txt",
+        "requirements.lock",
+        "tests/test_federation_source_monitors.py",
+        "tests/test_federation_export.py",
+        ".federation/gui-capabilities.extensions/federation-source-monitors-export.json",
+        "data/exports/canonical_v1_federation/manifest.json",
+        "data/exports/canonical_v1_federation/coverage.json",
+        "data/exports/canonical_v1_federation/source_monitors.jsonl",
+        "docs/DESKTOP_OFFLINE_BOOTSTRAP.md",
+        "README.md",
+        "SETUP.md",
+        "governance/federation_compatibility.json",
+        "governance/change_log.json"
+      ]
+    },
+    {
       "date": "2026-11-16",
       "summary": "Adopted the hub's canonical GUI capability parity checker. Re-pinned PRII_TEMPLATE_REF from thehub-pr d916664 to 76d3c08 and rendered the four GUI rule files from the hub's templates: scripts/check_gui_parity.py, tests/test_gui_parity.py, docs/GUI_CAPABILITY_PARITY.md and the gui-capability-parity workflow. The checker merges .federation/gui-capabilities.extensions itself, so the local wrapper .federation/check_gui_parity_with_extensions.py and the tracked artifacts/gui-capabilities-merged.json were removed. Twelve extension fragments gained an extension_id equal to their file name; no capability, exception or classification in any fragment changed. The base manifest gained discovery.e2e_config, stopped citing the mocked zip-design spec as end-to-end proof for six capabilities, and cites ownership-deep-dive.spec.mjs for ownership-deep-dive. Three real-backend specs that no workflow ran were added to the parity Playwright config. The parity baseline was not regenerated: the checker reports the same legacy count and no new findings. AGENTS.md, the pull request template, the README banners and the docs-sync manifest were updated to match. No federation contract surface, schema or export changed. The pin is the last commit of thehub-pr#432, which is on thehub-pr main; it deliberately stops before the hub commit that moves the shared prii-desktop runtime pin to the Launch Pad release, because that desktop upgrade needs its own change and its own frozen-build verification.",
       "files": [
