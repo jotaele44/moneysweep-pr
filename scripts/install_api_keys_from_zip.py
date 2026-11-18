@@ -111,39 +111,37 @@ def diagnostics(keys: dict[str, str]) -> list[str]:
     return lines
 
 
-def _probe(label: str, url: str, headers: dict | None, key_to_redact: str | None):
-    """Single authenticated GET; print only status + sanitized excerpt."""
+def _probe(label: str, url: str, headers: dict | None):
+    """Single authenticated GET; print only status and a non-sensitive result."""
     import urllib.error
     import urllib.request
 
-    safe_url = url.replace(key_to_redact, "<REDACTED>") if key_to_redact else url
-    print(f"  {label}: GET {safe_url[:140]}")
+    # Do not log URLs, bodies, or exception messages: credentials may be encoded
+    # or reflected by an endpoint in forms that a simple string replacement misses.
+    print(f"  {label}: GET (credentials redacted)")
     try:
         req = urllib.request.Request(
             url,
             headers={"User-Agent": "moneysweep-pr-installer/0.1", **(headers or {})},
         )
         with urllib.request.urlopen(req, timeout=20) as resp:
-            body = resp.read(400).decode("utf-8", errors="replace")
-            if key_to_redact:
-                body = body.replace(key_to_redact, "<REDACTED>")
-            print(f"    status={resp.status}  result=key_works  body[:160]={body[:160]!r}")
+            print(f"    status={resp.status}  result=key_works")
     except urllib.error.HTTPError as e:
         try:
-            body = e.read().decode("utf-8", errors="replace")
+            error_body = e.read().decode("utf-8", errors="replace")
         except Exception:
-            body = ""
-        if key_to_redact:
-            body = body.replace(key_to_redact, "<REDACTED>")
-        if "not in allowlist" in body.lower():
+            error_body = ""
+        finally:
+            e.close()
+        if "not in allowlist" in error_body.lower():
             r = "host_blocked"
         elif e.code in (401, 403):
             r = "key_invalid_or_unauthorized"
         else:
             r = f"http_{e.code}"
-        print(f"    status={e.code}  result={r}  body[:160]={body[:160]!r}")
+        print(f"    status={e.code}  result={r}")
     except Exception as e:
-        print(f"    transport_error: {type(e).__name__}: {str(e)[:120]}")
+        print(f"    transport_error: {type(e).__name__}")
 
 
 def probe_keys(keys: dict[str, str]) -> None:
@@ -156,14 +154,13 @@ def probe_keys(keys: dict[str, str]) -> None:
         url = "https://api.sam.gov/entity-information/v3/entities?" + urllib.parse.urlencode(
             {"api_key": sam, "samRegistered": "Yes", "page": "0", "size": "1"}
         )
-        _probe("sam_entities", url, None, sam)
+        _probe("sam_entities", url, None)
     hg = keys.get("HIGHERGOV_API_KEY")
     if hg:
         _probe(
             "highergov_contract",
             f"https://www.highergov.com/api-external/contract/?api_key={hg}&page_size=1",
             None,
-            hg,
         )
     lda = keys.get("LDA_API_KEY")
     if lda:
@@ -171,7 +168,6 @@ def probe_keys(keys: dict[str, str]) -> None:
             "lda_filings",
             "https://lda.senate.gov/api/v1/filings/?page_size=1",
             {"Authorization": f"Token {lda}"},
-            lda,
         )
 
 

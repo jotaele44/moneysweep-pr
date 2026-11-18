@@ -17,6 +17,7 @@ import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Sequence
+from urllib.parse import urlparse
 
 
 DEFAULT_INPUT = Path("data/intake/pr_news/incoming_items_latest.jsonl")
@@ -125,7 +126,11 @@ def infer_evidence_tier(item: Mapping[str, Any]) -> str:
         )
     ):
         return "T2"
-    if ".gov" in url or ".pr.gov" in url:
+    try:
+        hostname = (urlparse(url).hostname or "").lower().rstrip(".")
+    except ValueError:
+        hostname = ""
+    if hostname.endswith(".gov"):
         return "T2"
     return "T4"
 

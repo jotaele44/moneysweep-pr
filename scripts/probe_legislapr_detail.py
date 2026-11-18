@@ -178,6 +178,19 @@ def _absolute_url(base_url: str, href: str) -> str:
     return urljoin(base_url, href)
 
 
+def _host_matches_domain(url: str, domain: str) -> bool:
+    """Match a URL hostname to a domain without accepting lookalike suffixes."""
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme.lower() != "https":
+            return False
+        hostname = (parsed.hostname or "").lower().rstrip(".")
+    except ValueError:
+        return False
+    domain = domain.lower().rstrip(".")
+    return hostname == domain or hostname.endswith(f".{domain}")
+
+
 def _dedupe(values: Iterable[str]) -> list[str]:
     seen: set[str] = set()
     out: list[str] = []
@@ -238,12 +251,13 @@ def parse_legislapr_detail(html: str, source_url: str) -> LegislativeMeasureProb
     embedded_urls = [(url, "") for url in URL_RE.findall(html)]
     all_urls = _dedupe(url for url, _label in [*absolute_links, *embedded_urls])
 
-    openstates_url = next((u for u in all_urls if "openstates.org" in u.lower()), "")
+    openstates_url = next((u for u in all_urls if _host_matches_domain(u, "openstates.org")), "")
     sutra_url = next(
         (
             u
             for u in all_urls
-            if "sutra" in u.lower() or "oslpr.org" in u.lower() or "senado.pr.gov" in u.lower()
+            if _host_matches_domain(u, "oslpr.org")
+            or _host_matches_domain(u, "senado.pr.gov")
         ),
         "",
     )
