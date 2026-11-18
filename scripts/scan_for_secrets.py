@@ -77,8 +77,8 @@ ALLOWED_PATH_FRAGMENTS = (
 
 # Directory names that are pruned entirely before descending — never scanned.
 # This is separate from ALLOWED_PATH_FRAGMENTS: pruned dirs are never even walked,
-# which avoids iterating through .venv (8 k+ files), data/ (858 MB of government
-# datasets), and other large non-source trees on every run.
+# which avoids iterating through virtual environments (8 k+ files), data/ (858 MB
+# of government datasets), and other large non-source trees on every run.
 PRUNE_DIRS = frozenset(
     {
         ".venv",
@@ -152,9 +152,12 @@ def scan(root: Path) -> dict:
     files_scanned = 0
     for dirpath_str, dirnames, filenames in os.walk(root):
         # Prune directories in-place so os.walk never descends into them.
-        # This eliminates traversal of .venv (8 k+ files), .git, node_modules, etc.
-        dirnames[:] = [d for d in dirnames if d not in PRUNE_DIRS]
         dirpath = Path(dirpath_str)
+        dirnames[:] = [
+            dirname
+            for dirname in dirnames
+            if dirname not in PRUNE_DIRS and not (dirpath / dirname / "pyvenv.cfg").is_file()
+        ]
         for fname in filenames:
             p = dirpath / fname
             if _path_allowed(p, root):
