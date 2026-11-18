@@ -1,4 +1,5 @@
 {
+  "extension_id": "federation-source-monitors-export",
   "capabilities": [
     {
       "id": "federation-source-monitors-export",

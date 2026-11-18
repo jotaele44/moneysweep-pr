@@ -32,7 +32,7 @@ A bump to the **federation export** version is what the release-tagging workflow
   `d916664` to `76d3c08`). The checker merges the extension fragments itself,
   so the local wrapper `check_gui_parity_with_extensions.py` and the tracked
   `artifacts/gui-capabilities-merged.json` are removed; CI and contributors run
-  `python3 scripts/check_gui_parity.py`. The twelve fragments that lacked an
+  `python3 scripts/check_gui_parity.py`. The thirteen fragments that lacked an
   `extension_id` now carry one equal to their file name. The manifest names the
   Playwright config that proves capabilities (`discovery.e2e_config`), and
   three end-to-end specs that no workflow ran (`org-change-monitor`,
