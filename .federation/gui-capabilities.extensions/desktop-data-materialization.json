@@ -12,7 +12,8 @@
           "desktop/workspace.py",
           "server/backend/desktop_app.py",
           "server/backend/materialization.py",
-          "server/backend/materialization_security.py"
+          "server/backend/materialization_security.py",
+          "moneysweep/runtime/credential_registry.py"
         ],
         "endpoints": [
           "GET /status",
@@ -44,7 +45,9 @@
           "server/backend/materialization.py:run_offline_source",
           "server/backend/materialization.py:upload_offline_file",
           "server/backend/materialization_security.py:public_run_summary",
-          "server/backend/materialization_security.py:write_offline_receipt"
+          "server/backend/materialization_security.py:write_offline_receipt",
+          "moneysweep/runtime/credential_registry.py:CredentialSpec",
+          "moneysweep/runtime/credential_registry.py:credential_spec"
         ]
       },
       "frontend": {

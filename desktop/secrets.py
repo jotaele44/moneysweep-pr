@@ -14,20 +14,10 @@ from contextlib import contextmanager
 
 import keyring
 
+from moneysweep.runtime.credential_registry import VAULT_CREDENTIAL_NAMES
+
 SERVICE = "pr.prii.moneysweep"
-ALLOWED_KEYS = frozenset(
-    {
-        "CENSUS_API_KEY",
-        "EIA_API_KEY",
-        "FAC_API_KEY",
-        "FEC_API_KEY",
-        "FINANCIALDATA_API_KEY",
-        "FRED_API_KEY",
-        "HIGHERGOV_API_KEY",
-        "OPENSTATES_API_KEY",
-        "SAM_API_KEY",
-    }
-)
+ALLOWED_KEYS = VAULT_CREDENTIAL_NAMES
 
 
 def _validate_name(name: str) -> str:
