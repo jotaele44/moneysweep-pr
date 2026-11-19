@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import QueryBoundary from '@/components/QueryBoundary'
+import { scrollRegion } from '@/lib/scrollRegion'
 
 function ApiKeyRow({ keyInfo }) {
   const queryClient = useQueryClient()
@@ -77,7 +78,7 @@ export default function ApiKeysPanel() {
         data acquisition — the pipeline's existing preflight and pause-lock gates still apply.
         Values are never displayed back once saved.
       </div>
-      <div className="ms-scroll-region min-h-0 flex-1 overflow-auto">
+      <div {...scrollRegion('API keys')} className="ms-scroll-region min-h-0 flex-1 overflow-auto">
         <QueryBoundary query={query} isEmpty={(d) => !d?.length} emptyLabel="No known API keys">
           <Table>
             <TableHeader className="sticky top-0 bg-card">

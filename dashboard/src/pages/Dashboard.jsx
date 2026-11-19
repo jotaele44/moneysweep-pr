@@ -14,6 +14,7 @@ import ApiKeysPanel from '@/components/ApiKeysPanel'
 import OwnershipDeepDive from '@/components/OwnershipDeepDive'
 import ProgramTimeline from '@/components/ProgramTimeline'
 import brandMark from "@/assets/icon-64.png?inline";
+import { scrollRegion } from '@/lib/scrollRegion'
 
 const PROGRAM_TIMELINE = [
   { id:'money-ingest', phase:'NOW', title:'Public-money source intake', detail:'Freeze and ingest contract, award, vendor, payment, and entity source manifestations.', category:'Acquisition' },
@@ -57,7 +58,7 @@ export default function Dashboard() {
 
       <div className="zip-money-content min-h-0 flex-1 p-3">
         <Tabs value={tab} onValueChange={setTab} className="flex h-full flex-col">
-          <div className="overflow-x-auto pb-1">
+          <div {...scrollRegion('Dashboard tabs')} className="overflow-x-auto pb-1">
             <TabsList className={`grid h-auto min-w-[880px] ${OFFLINE ? 'grid-cols-9' : 'grid-cols-11'} bg-card`}>
               <TabsTrigger value="activity" className={triggerClass}>Activity</TabsTrigger>
               <TabsTrigger value="contracts" className={triggerClass}>Contracts</TabsTrigger>
