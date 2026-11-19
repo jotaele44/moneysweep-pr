@@ -6,6 +6,7 @@ import TypeFilterSelect from '@/components/TypeFilterSelect'
 import { edgeTone, fmtMoney } from '@/lib/cs-format'
 import { ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { scrollRegion } from '@/lib/scrollRegion'
 
 export default function RelationshipGraph() {
   const query = useEdges()
@@ -22,9 +23,9 @@ export default function RelationshipGraph() {
     <div className="flex h-full flex-col">
       <div className="ms-filter-bar flex items-center justify-between gap-2 p-2">
         <span className="text-xs text-muted-foreground">{rows.length} relationships</span>
-        <TypeFilterSelect items={edges} field="edgeType" value={type} onChange={setType} width="w-[180px]" />
+        <TypeFilterSelect label="Filter by relationship type" items={edges} field="edgeType" value={type} onChange={setType} width="w-[180px]" />
       </div>
-      <div className="ms-scroll-region min-h-0 flex-1 overflow-auto">
+      <div {...scrollRegion('Relationships table')} className="ms-scroll-region min-h-0 flex-1 overflow-auto">
         <QueryBoundary
           query={query}
           isEmpty={(d) => !d?.length}

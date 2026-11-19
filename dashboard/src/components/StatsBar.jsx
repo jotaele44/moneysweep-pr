@@ -2,6 +2,7 @@ import { useHealth, useStats } from '@/lib/hooks'
 import { Database, FileText, Share2, Users } from 'lucide-react'
 import { FederationStatCard, FederationStatusBadge } from '@pr-federation/react'
 import { amountsUnpopulated, AMOUNTS_NOTE } from '@/lib/cs-format'
+import { scrollRegion } from '@/lib/scrollRegion'
 
 function Kpi({ icon: Icon, label, value }) {
   return (
@@ -25,7 +26,7 @@ export default function StatsBar() {
   const label = connecting ? 'Connecting…' : up ? 'Backend online' : 'Backend down'
 
   return (
-    <div className="panel-glass flex items-center gap-2 overflow-x-auto border-b border-border px-4 py-2">
+    <div {...scrollRegion('Summary statistics')} className="panel-glass flex items-center gap-2 overflow-x-auto border-b border-border px-4 py-2">
       <FederationStatusBadge
         kind="operational"
         status={operationalState}
