@@ -163,7 +163,12 @@ def test_main_end_to_end_writes_valid_package(tmp_path):
     assert rc == 0
     manifest = json.loads((tmp_path / "manifest.json").read_text())
     assert manifest["producer"] == "moneysweep-pr"
-    assert {f["stream"] for f in manifest["files"]} == {"sources", "entities", "relationships"}
+    assert {f["stream"] for f in manifest["files"]} == {
+        "sources",
+        "entities",
+        "relationships",
+        "source_monitors",
+    }
     assert (tmp_path / "coverage.json").exists()
     # Every declared file exists with a matching record count.
     for f in manifest["files"]:

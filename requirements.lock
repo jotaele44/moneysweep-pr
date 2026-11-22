@@ -44,6 +44,8 @@ pluggy==1.6.0
     # via
     #   pytest
     #   pytest-cov
+prii-export-utils @ git+https://github.com/jotaele44/thehub-pr.git@0f62e4bdde10b5ac82787a329d6f15481ab9c7f0#subdirectory=packages/prii_export_utils
+    # via -r requirements.in
 prii-maintenance @ git+https://github.com/jotaele44/thehub-pr.git@f2b81769924689b4d959554928810b1d7b7ef3d6#subdirectory=packages/prii_maintenance
     # via -r requirements.in
 pyarrow==25.0.1

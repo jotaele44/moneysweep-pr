@@ -14,7 +14,8 @@ docs/BUILD_EXECUTION_SEQUENCE.md or the issue it closes. -->
 ## Quality gates
 
 - [ ] `ruff check .` clean
-- [ ] `ruff format --check .` clean
+- [ ] `make format-check` clean (`ruff format --check`, minus the files `FROZEN_RE`
+      in `lint.yml` excludes)
 - [ ] `python -m mypy` clean (pinned version from `requirements-dev.txt`)
 - [ ] `pytest -q` passes (and coverage stays at/above the floor)
 - [ ] `requirements.lock` regenerated if `requirements.in` changed
