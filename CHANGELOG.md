@@ -25,6 +25,16 @@ A bump to the **federation export** version is what the release-tagging workflow
 ## [Unreleased]
 
 ### Changed
+- **Frontend dependency gate: one advisory accepted until 2027-02-18, one stale
+  entry removed.** `dashboard/audit-allowlist.json` now lists
+  GHSA-fc5q-39xc-vjpf (`picomatch`, high, ReDoS through repeated extglobs),
+  published while no patched release exists (`<= 4.0.7` is affected and 4.0.7
+  is the latest). `picomatch` is installed only through `vite`, `vitest` and
+  `tinyglobby`, which use it on this repository's own globs at build and test
+  time; nothing from it ships in the dashboard bundle. Without the entry every
+  pull request that triggers the desktop build failed the gate. The entry for
+  GHSA-g3hv-75wg-m249 (`minimatch`) is removed because `npm audit` no longer
+  reports it. No dependency or lockfile changed.
 - **GUI capability parity now runs the hub's canonical checker.**
   `scripts/check_gui_parity.py`, `tests/test_gui_parity.py`,
   `docs/GUI_CAPABILITY_PARITY.md` and the `gui-capability-parity.yml` workflow
