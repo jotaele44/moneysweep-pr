@@ -7,7 +7,7 @@ import json
 import pytest
 
 from moneysweep.update_controller import cli
-from moneysweep.update_controller.executor import run_source
+from moneysweep.update_controller.executor import run_source, run_source_isolated
 from moneysweep.update_controller.models import FreshnessResult, SourceUpdatePolicy
 from moneysweep.update_controller.policy import canonical_source_ids
 from moneysweep.update_controller.validation import freshness_exit_code
@@ -205,3 +205,45 @@ def test_is_run_failure_classification():
         "FRESHNESS_FAILED",
     ):
         assert cli.is_run_failure(bad) is True, bad
+
+
+def test_controller_crash_is_recorded_against_one_source_only(tmp_path, monkeypatch):
+    """A snapshot error on one source must not abort the rest of the cadence."""
+    from moneysweep.update_controller import executor
+
+    root = _fake_root(tmp_path)
+    (root / "scripts" / "ok.py").write_text(
+        "from pathlib import Path; Path('data/ok.csv').write_text('a\\n1\\n2\\n')\n"
+    )
+    real = executor.snapshot_outputs
+
+    def explode_on_bad(root_, expected):
+        if expected == ["data/bad.csv"]:
+            raise IsADirectoryError("data/bad.csv")
+        return real(root_, expected)
+
+    monkeypatch.setattr(executor, "snapshot_outputs", explode_on_bad)
+    state = {"sources": {}}
+    bad = run_source_isolated(
+        _pol("bad", "scripts/ok.py"),
+        {"source_id": "bad", "expected_outputs": ["data/bad.csv"]},
+        state,
+        root=root,
+        strict=False,
+    )
+    good = run_source_isolated(
+        _pol("good", "scripts/ok.py"),
+        {
+            "source_id": "good",
+            "expected_outputs": ["data/ok.csv"],
+            "validation_threshold": {"min_rows": 1},
+        },
+        state,
+        root=root,
+        strict=False,
+    )
+    assert bad["status"] == "PRODUCER_EXECUTION_FAILED"
+    assert bad["failure_packet"]["suspected_area"] == "update_controller"
+    assert "IsADirectoryError" in bad["failure_packet"]["last_40_lines"][0]
+    assert state["sources"]["bad"]["consecutive_failures"] == 1
+    assert good["status"] == "SUCCESS_WITH_CHANGE"

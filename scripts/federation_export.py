@@ -13,10 +13,18 @@ this adds over ``bridge_canonical_v1_federation.py`` is the Hub-conformant
 ``manifest.json`` (``package_id``/``producer``/``mode``/``federation``/``files``…)
 that ``hub validate-package`` / ``hub aggregate`` require.
 
+The package also carries an optional ``source_monitors`` stream (thehub-pr ADR
+0013): one row per source in ``reports/source_registry_status.csv``, projected
+field for field as thehub-pr's ADR 0012 registry reader did, so the Hub can read
+this producer's monitored sources from the package instead of from the CSV.
+``last_success_at`` comes only from run receipts in ``data/source_run_state.json``;
+without one a row is ``NOT_RECORDED`` with a null time (never inferred from file
+dates or git history).
+
 Why committed rather than generated on demand: moneysweep-pr is
 ``ready_for_hub_live_execution: false``, so the Hub cannot run this export against
 live sources — it discovers, validates, and aggregates the *committed* package.
-``--now`` is threaded through every row + the manifest so the committed package is
+``--now`` is threaded through every row (``source_monitors`` included) + the manifest so the committed package is
 byte-reproducible (pass a fixed timestamp; the default is wall-clock UTC).
 
 CLI::
@@ -29,6 +37,7 @@ CLI::
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import re
@@ -48,6 +57,11 @@ from scripts.bridge_canonical_v1_federation import (  # noqa: E402
     merge_external_sources,
     validate_rows,
 )
+from prii_export_utils import (  # noqa: E402
+    SourceRunState,
+    resolve_last_success,
+    source_monitor_row,
+)
 
 PRODUCER = "moneysweep-pr"
 HUB_PARENT = "thehub-pr"
@@ -61,12 +75,48 @@ STREAM_SCHEMA = {
     "entities": "federation_entity.schema.json",
     "relationships": "federation_relationship.schema.json",
     "funding_awards": "federation_funding_award.schema.json",
+    "source_monitors": "federation_source_monitor.schema.json",
 }
 # The three core streams are always present. ``funding_awards`` is optional — it
 # is appended only when Centinelas pre-official candidates were ingested, so the
-# committed 3-stream package (no candidates) is byte-unchanged.
+# committed package (no candidates) is byte-unchanged. ``source_monitors`` (thehub-pr
+# ADR 0013) is optional too, so callers that build only the core streams are unaffected.
 STREAM_ORDER = ("sources", "entities", "relationships")
-_OPTIONAL_STREAMS = ("funding_awards",)
+_OPTIONAL_STREAMS = ("funding_awards", "source_monitors")
+
+SOURCE_REGISTRY_STATUS = "reports/source_registry_status.csv"
+SOURCE_RUN_STATE = "data/source_run_state.json"
+PRODUCER_SCRIPT = "scripts/federation_export.py"
+_REGISTRY_COLUMNS = ("source_id", "family", "update_cadence", "pipeline_status")
+# Copied verbatim from thehub-pr src/hub/source_monitor.py (_NAMED_CADENCE,
+# _NAMED_STATUS, CADENCE_WINDOW_SECONDS) so stream rows equal the rows the Hub's
+# ADR 0012 registry reader derived from the same CSV. Unlisted values -> "unknown".
+_MONITOR_CADENCE = {
+    "weekly": "weekly",
+    "monthly": "monthly",
+    "quarterly": "quarterly",
+    "yearly": "yearly",
+    "daily": "daily",
+    "hourly": "hourly",
+    "manual": "manual",
+    "ad_hoc": "event",
+    "on_drop": "event",
+    "one_time": "static",
+}
+_MONITOR_STATUS = {
+    "fully_materialized": "active",
+    "partially_materialized": "partial",
+    "not_materialized": "not_active",
+}
+MONITOR_WINDOW_SECONDS = {
+    "realtime": 3600,
+    "hourly": 3600,
+    "daily": 86400,
+    "weekly": 7 * 86400,
+    "monthly": 31 * 86400,
+    "quarterly": 92 * 86400,
+    "yearly": 366 * 86400,
+}
 
 
 def _stream_order(streams: dict) -> tuple[str, ...]:
@@ -101,6 +151,75 @@ def _validate_funding_awards(streams: dict, root: Path) -> list[str]:
             if val is not None and not pat.match(str(val)):
                 errors.append(f"funding_awards[{i}]: {key}={val!r} fails {pat.pattern}")
     return errors
+
+
+def _registry_text(value: str | None) -> str | None:
+    text = (value or "").strip()
+    return text or None
+
+
+def _monitor_cadence(raw: str | None) -> str:
+    return _MONITOR_CADENCE.get((raw or "").strip().lower(), "unknown")
+
+
+def _monitor_status(raw: str | None) -> str:
+    return _MONITOR_STATUS.get((raw or "").strip().lower(), "unknown")
+
+
+def build_source_monitors(root: Path, *, now: str) -> list[dict]:
+    """One ``source_monitors`` row (thehub-pr ADR 0013) per source in
+    ``reports/source_registry_status.csv``, field for field what the Hub's ADR 0012
+    registry reader (``_parse_moneysweep``) derived: name = source_id, family
+    verbatim, cadence/status/window via the Hub's tables, no tier, no URL.
+
+    ``last_success_at`` comes only from a run receipt in ``data/source_run_state.json``
+    (absent today, so every row is NOT_RECORDED with a null time); it is never
+    inferred from file dates or git. Rows are sorted by ``source_ref``."""
+    registry_path = root / SOURCE_REGISTRY_STATUS
+    run_state_path = root / SOURCE_RUN_STATE
+    state = SourceRunState.load(run_state_path)
+    inputs = [SOURCE_REGISTRY_STATUS] + ([SOURCE_RUN_STATE] if run_state_path.exists() else [])
+    lineage = {
+        "producer_script": PRODUCER_SCRIPT,
+        "producer_phase": "SOURCE_MONITOR",
+        "source_inputs": inputs,
+        "extraction_method": "registry_projection",
+    }
+    rows: dict[str, dict] = {}
+    with registry_path.open(newline="", encoding="utf-8") as fh:
+        reader = csv.DictReader(fh)
+        missing = [c for c in _REGISTRY_COLUMNS if c not in (reader.fieldnames or [])]
+        if missing:
+            raise ValueError(f"{SOURCE_REGISTRY_STATUS}: missing columns {missing}")
+        for entry in reader:
+            source_ref = _registry_text(entry.get("source_id"))
+            if not source_ref:
+                raise ValueError(f"{SOURCE_REGISTRY_STATUS}: a row has no source_id")
+            if source_ref in rows:
+                raise ValueError(f"{SOURCE_REGISTRY_STATUS}: duplicate source_id {source_ref!r}")
+            receipt = state.get(source_ref) or {}
+            at, basis = resolve_last_success(receipt, None)
+            cadence = _monitor_cadence(entry.get("update_cadence"))
+            rows[source_ref] = source_monitor_row(
+                producer=PRODUCER,
+                source_ref=source_ref,
+                name=source_ref,
+                declared_status=_monitor_status(entry.get("pipeline_status")),
+                cadence=cadence,
+                cadence_window_seconds=MONITOR_WINDOW_SECONDS.get(cadence),
+                last_success_at=at,
+                last_success_basis=basis,
+                last_attempt_at=receipt.get("last_attempt_at"),
+                last_attempt_status=receipt.get("last_attempt_status"),
+                producer_family=_registry_text(entry.get("family")),
+                evidence_tier=None,
+                source_url=None,
+                registry_path=SOURCE_REGISTRY_STATUS,
+                lineage=lineage,
+                created_at=now,
+                extracted_at=now,
+            )
+    return [rows[k] for k in sorted(rows)]
 
 
 def _sha256(path: Path) -> str:
@@ -218,6 +337,12 @@ def main(argv=None) -> int:
     # Optional: fold in Centinelas pre-official candidates as a funding_awards stream
     # (no-op when exports/centinelas_intake/funding_awards.jsonl is absent).
     merge_centinelas_awards(streams, root, now)
+    # source_monitors (thehub-pr ADR 0013): one row per registered source.
+    try:
+        streams["source_monitors"] = build_source_monitors(root, now=now)
+    except ValueError as exc:
+        print(json.dumps({"ok": False, "errors": [str(exc)]}, indent=2))
+        return 1
     errors = validate_rows(streams, root)
     errors += _validate_funding_awards(streams, root)
     if errors:

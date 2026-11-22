@@ -1,0 +1,20 @@
+{
+  "capabilities": [
+    {
+      "id": "federation-source-monitors-export",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Builds this producer's source_monitors federation export stream (thehub-pr ADR 0013): one row per source in reports/source_registry_status.csv, with its declared status, cadence and family, and when it last succeeded from a run receipt in data/source_run_state.json or reported as not recorded. It exposes no route, endpoint, control or operator workflow of its own; thehub-pr's Source Monitor renders the stream.",
+      "tests": {
+        "contract": [
+          "tests/test_federation_source_monitors.py"
+        ]
+      },
+      "candidate_ids": [
+        "analysis_symbol:scripts/federation_export.py:build_source_monitors"
+      ]
+    }
+  ],
+  "exceptions": []
+}

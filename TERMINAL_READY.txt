@@ -20,11 +20,15 @@ python -m pip install pytest
 python -m pytest -q tests/test_pr_grid_v2_runtime.py tests/test_pr_grid_v2_profiles.py tests/test_pr_grid_v2_profile_template_authority.py
 
 REAL MATERIALIZATION — ONLY AFTER INPUT RECEIPT VERIFICATION
-python federation/spatial/materialize_pr_grid_v2_profiles.py --level L1 --records <path-to-domain-record-metadata.jsonl> --bindings <path-to-spiderweb-certified-exact-binding-rows.jsonl> --binding-receipt <path-to-spiderweb-binding-receipt.json> --out <path-to-L1.jsonl> --receipt-out <path-to-L1.receipt.json>
+python federation/spatial/materialize_pr_grid_v2_profiles.py --level L1 --records <path-to-domain-record-metadata.jsonl> --bindings <path-to-spiderweb-certified-binding-rows.jsonl> --binding-receipt <path-to-spiderweb-binding-receipt.json> --out <path-to-L1.jsonl> --receipt-out <path-to-L1.receipt.json>
 
 Optional --coverage <verified-coverage-manifest.json> may create true ZERO_RECORDS;
 without verified coverage, an empty cell is NO_DATA. --cell-id adds a
 specific requested V2 address with no synthetic count.
+Incremental refresh: add --previous-bindings, --previous-binding-receipt and
+--previous-profiles plus at least one --changed-record-id or
+--changed-coverage-cell. Only the impacted cells are recomputed and the receipt
+says Output_Mode=DELTA_UPSERT; a full run says Output_Mode=FULL_SNAPSHOT.
 Records require Repository, Record_ID, Category. Records do not gain a
 location through this tool. Spiderweb bindings must already exist.
 
@@ -47,10 +51,15 @@ provisional, version-mismatched, or hash-mismatched evidence remains BLOCKED.
 Do not reinterpret V1, recompute geometry, or claim co-location is identity.
 
 
-EXACT BINDING PROFILE ADMISSION
+BINDING PROFILE ADMISSION (Cell_Profile pr-grid-v2-cell-profile/1.2)
 
-The profile materializer accepts only Spiderweb-certified rows with
-Uncertainty_Class=EXACT and one of:
+The profile materializer accepts only Spiderweb-certified rows. The binding
+receipt must name Migration_Provenance_Class RECOMPUTED_FROM_SOURCE_COORDINATE,
+RECOMPUTED_FROM_SOURCE_GEOMETRY or VERIFIED_CROSSWALK (a
+pr-grid-v2-exact-point-binding-receipt/1.0 receipt without one counts as
+RECOMPUTED_FROM_SOURCE_COORDINATE); any other receipt fails closed.
+
+Exact rows require Uncertainty_Class=EXACT and one of:
 COVERS
 INTERSECTS_POSITIVE_AREA
 LINE_POSITIVE_LENGTH
@@ -59,11 +68,27 @@ INTERSECTS_POSITIVE_AREA additionally requires positive Overlap_Area_m2 and
 Cell_Coverage_Fraction > 0 and <= 1.
 LINE_POSITIVE_LENGTH additionally requires positive Length_In_Cell_m.
 
-ADMINISTRATIVE_SET, DERIVED_SET, APPROXIMATE, INFERRED, UNKNOWN and all other
-non-exact rows fail closed and cannot enter exact Cell_Profile counts.
+Evidence-gated set rows are admitted as non-exact:
+ADMINISTRATIVE_SET requires Uncertainty_Class=ADMINISTRATIVE_ONLY and
+Geometry_State=VERIFIED_ADMINISTRATIVE_GEOMETRY.
+DERIVED_SET requires Uncertainty_Class=DERIVED and
+Geometry_State=VERIFIED_DERIVED_GEOMETRY.
+Both also require Confidence=null and the same positive-area evidence as
+INTERSECTS_POSITIVE_AREA. A set row counts toward Record_Count and
+Non_Exact_Record_Count, never Exact_Record_Count; a set row that misses its
+policy fails closed.
+
+APPROXIMATE, INFERRED, UNKNOWN and every other Uncertainty_Class, and every
+other Binding_Method, fail closed.
 Geometry_Included remains false; canonical geometry stays in spiderweb-pr.
 
 PROFILE TEMPLATE AUTHORITY
-TheHub commit: 0663bfa77740dceff3eb70855f2164112ce47c44
-pr_grid_v2_profiles.py Git blob: c4e174b4626083ef3e1866274e87e8aaea9f81a2
-test_pr_grid_v2_profiles.py Git blob: 3f74d64046ef19b4b8f4718b3a50d5eed902877c
+Cell_Profile version: pr-grid-v2-cell-profile/1.2
+TheHub template commit: a68ffed1111285c87f5c0d450858c58fa5884642
+The files are rendered at the TheHub ref that PRII_TEMPLATE_REF in
+.github/workflows/template-drift.yml pins; that workflow fails on any drift.
+pr_grid_v2_profiles.py Git blob: e245d91a9b5da829d1bbdaec329958c08e057701
+materialize_pr_grid_v2_profiles.py Git blob: 33557e2e60b3d0f79545ac5269f82abc0a6b3391
+test_pr_grid_v2_profiles.py Git blob: c2c3e34e0396d8b260fa13df3f6f0902becaa857
+Grid authority (unchanged): spiderweb-pr 0c66e13d14232c0d7cbcbc179b3655904777dc71,
+pinned by federation/spatial/pr_grid_geographic_v2.pin.json.
