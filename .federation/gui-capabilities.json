@@ -304,6 +304,23 @@
       }
     },
     {
+      "id": "entity-product-comparison-audit",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Offline, deterministic comparator of two local entity CSV products. It runs as the entity_product_comparison_v2 stage of the orchestrator's offline baseline runner and writes a JSON audit report, so it is pipeline tooling rather than a human-facing analytical workflow.",
+      "analysis": {
+        "files": [
+          "scripts/compare_entity_products.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_compare_entity_products.py"
+        ]
+      }
+    },
+    {
       "id": "service-health",
       "classification": "internal",
       "status": "active",
@@ -1728,10 +1745,10 @@
   "exceptions": [
     {
       "id": "case-manager-phase-1-gui-gap",
-      "reason": "Case Manager Phase 1 exposes a service boundary but its claim and evidence-relation workflows are not yet available through the shipped dashboard. Keep the ratchet explicit until the complete GUI path is delivered.",
+      "reason": "Case Manager Phase 1 exposes a service boundary but its claim and evidence-relation workflows are not yet available through the shipped dashboard. Renewed 2026-11-15 (opened 2026-09-20). Since it was opened, identity for the service boundary is derived from a verified credential (#601) and the authorization boundary is classified (case-manager-authorization-boundary fragment); no dashboard workflow exists yet. The claim and evidence-relation GUI is to be built on the shared federation shell when this repository adopts the federation GUI template (thehub-pr ADR 0014), not on the current single-page tab console. Keep the ratchet explicit until the complete GUI path is delivered.",
       "owner": "jotaele44",
-      "tracking": "docs/GUI_CAPABILITY_PARITY.md#completion-boundary",
-      "expires_on": "2026-11-19",
+      "tracking": "jotaele44/thehub-pr#56",
+      "expires_on": "2027-01-31",
       "candidate_ids": [
         "backend_endpoint:server/backend/case_manager_api.py:GET /{case_id}",
         "backend_endpoint:server/backend/case_manager_api.py:GET /{case_id}/{collection}",
@@ -1751,10 +1768,10 @@
     },
     {
       "id": "forensics-gui-gap",
-      "reason": "The bounded forensics engine remains an analyst CLI and library pending a discoverable dashboard workflow with evidence, provenance, and safe acquisition controls.",
+      "reason": "The bounded forensics engine remains an analyst CLI and library pending a discoverable dashboard workflow with evidence, provenance, and safe acquisition controls. Renewed 2026-11-15 (opened 2026-09-20). Since it was opened the engine's DuckDB Arrow path was repaired (2026-10-25); no dashboard workflow exists yet. The workflow is scheduled with this repository's adoption of the federation GUI template (thehub-pr ADR 0014), so it is built once on the shared federation shell.",
       "owner": "jotaele44",
-      "tracking": "docs/GUI_CAPABILITY_PARITY.md#completion-boundary",
-      "expires_on": "2026-11-19",
+      "tracking": "jotaele44/thehub-pr#56",
+      "expires_on": "2027-01-31",
       "candidate_ids": [
         "cli_surface:moneysweep/forensics/cli.py"
       ],
@@ -1766,19 +1783,6 @@
         "moneysweep/forensics/core.py",
         "moneysweep/forensics/pipeline.py",
         "moneysweep/forensics/seed.py"
-      ]
-    },
-    {
-      "id": "compare-entity-products-terminal-analysis",
-      "reason": "scripts/compare_entity_products.py landed on main (entity-product comparison audit tool) after this PR's baseline was built; it is a terminal-only analysis/diagnostic script with no user-facing GUI surface. Excepted pending either a GUI rendering of its comparison report or its classification as pipeline tooling.",
-      "owner": "jotaele44",
-      "tracking": "https://github.com/jotaele44/moneysweep-pr/pull/449",
-      "expires_on": "2026-11-01",
-      "candidate_ids": [
-        "analysis_module:scripts/compare_entity_products.py",
-        "analysis_symbol:scripts/compare_entity_products.py:compare",
-        "analysis_symbol:scripts/compare_entity_products.py:main",
-        "cli_surface:scripts/compare_entity_products.py"
       ]
     }
   ]

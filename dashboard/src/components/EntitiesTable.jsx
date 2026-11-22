@@ -15,6 +15,7 @@ import TypeFilterSelect from '@/components/TypeFilterSelect'
 import { entityTone } from '@/lib/cs-format'
 import { useSortable } from '@/lib/use-sortable'
 import { cn } from '@/lib/utils'
+import { scrollRegion } from '@/lib/scrollRegion'
 
 export default function EntitiesTable() {
   const query = useEntities()
@@ -49,9 +50,9 @@ export default function EntitiesTable() {
           aria-label="Search entities"
           className="ms-filter-control h-7 flex-1 bg-background text-xs"
         />
-        <TypeFilterSelect items={entities} field="entityType" value={type} onChange={setType} width="w-[120px]" capitalize />
+        <TypeFilterSelect label="Filter by entity type" items={entities} field="entityType" value={type} onChange={setType} width="w-[120px]" capitalize />
       </div>
-      <div className="ms-scroll-region min-h-0 flex-1 overflow-auto">
+      <div {...scrollRegion('Entities table')} className="ms-scroll-region min-h-0 flex-1 overflow-auto">
         <QueryBoundary
           query={query}
           isEmpty={(d) => !d?.length}
