@@ -25,6 +25,16 @@ A bump to the **federation export** version is what the release-tagging workflow
 ## [Unreleased]
 
 ### Changed
+- **Frontend dependency gate: one advisory accepted until 2027-02-18, one stale
+  entry removed.** `dashboard/audit-allowlist.json` now lists
+  GHSA-fc5q-39xc-vjpf (`picomatch`, high, ReDoS through repeated extglobs),
+  published while no patched release exists (`<= 4.0.7` is affected and 4.0.7
+  is the latest). `picomatch` is installed only through `vite`, `vitest` and
+  `tinyglobby`, which use it on this repository's own globs at build and test
+  time; nothing from it ships in the dashboard bundle. Without the entry every
+  pull request that triggers the desktop build failed the gate. The entry for
+  GHSA-g3hv-75wg-m249 (`minimatch`) is removed because `npm audit` no longer
+  reports it. No dependency or lockfile changed.
 - **Frontend `npm audit` gate now uses an expiring allow-list instead of failing
   on advisories that cannot be fixed.** `desktop-build.yml` runs
   `tools/check_npm_audit.py`, which still fails on any advisory at or above
@@ -69,6 +79,14 @@ A bump to the **federation export** version is what the release-tagging workflow
   `desktop/README.md`.
 
 ### Fixed
+- **The Tailwind 4 upgrade (#678) no longer changes the dashboard's native form controls
+  and table cells.** Tailwind 4's preflight resets `margin` and `padding` on every
+  element, which also removed browser defaults that Tailwind 3 left alone: the Data
+  Sources file picker's button lost its `1px 6px` padding (the file name sat about 6px
+  further left), `<option>` lost its `0 2px 1px` padding, and bare `<td>`/`<th>` lost
+  theirs. `dashboard/src/index.css` hands those back with `revert-layer`; measured in
+  Chrome 156 against the Tailwind 3 bundle, every value is equal again. The prebuilt
+  dashboard bundle was regenerated with `build_prebuilt_dashboard.py --build`.
 - **Cleared the checks #656 merged red.** `mypy` (`audit_asg_emergency_identity_coverage`
   narrowed the optional coverage contract), the `ruff` format gate (eight files) and one
   unused import; `registries/coverage_contracts.yaml` now matches its JSON (the 1,431
