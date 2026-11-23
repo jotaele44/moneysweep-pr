@@ -11,6 +11,7 @@ import {
   useCampaignFinanceSummary,
 } from '@/lib/hooks'
 import { fmtMoney } from '@/lib/cs-format'
+import { scrollRegion } from '@/lib/scrollRegion'
 
 function Metric({ label, value }) {
   return (
@@ -205,7 +206,7 @@ export default function CampaignFinance() {
         </div>
       </div>
 
-      <div className="ms-scroll-region min-h-0 flex-1 overflow-auto">
+      <div {...scrollRegion('Campaign finance records')} className="ms-scroll-region min-h-0 flex-1 overflow-auto">
         {view === 'contributions' && <ContributionsTable query={contributionsQuery} />}
         {view === 'entities' && <EntitiesTable query={entitiesQuery} />}
         {view === 'reports' && <ReportsTable query={reportsQuery} />}

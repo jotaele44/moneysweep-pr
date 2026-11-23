@@ -105,6 +105,31 @@ The frozen build contains:
 
 It must not download or install runtime dependencies on first launch.
 
+## The Launch Pad
+
+`desktop/config.py` declares a **Launch Pad**: a screen the shared desktop
+runtime shows after setup and before MoneySweep starts. On it you choose:
+
+- **Guest or Operator.** Guest is read-only: you can browse every tab, and the
+  app refuses file uploads, materialization and audit runs, and saving or
+  deleting API keys. Operator allows them from this computer and can be
+  protected with a passphrase. Neither mode changes the API's loopback check.
+- **Open on**: any dashboard tab.
+- **Launch option** (Operator only): the financial records folder used by the
+  HUD DRGR source audit (`MONEYSWEEP_FINANCIALS_ROOT`).
+
+It also reports readiness: canonical table counts in the workspace, how many
+materialization runs have left receipts, and the release status. Use the
+**Launch Pad** button beside the gear to come back and change the mode or
+options; the app restarts on the page. `--smoke` and `--selftest` never show it.
+
+Guest mode keeps a shared desktop tidy. It does not stop someone who can already
+run programs under your account.
+
+The Launch Pad appears once `requirements-desktop.txt` pins a `prii-desktop`
+that includes it (0.3.0 or later). With an older runtime the declaration is
+ignored and the app opens directly, as before.
+
 ## First boot
 
 The application bundle is immutable. On startup MoneySweep creates a writable

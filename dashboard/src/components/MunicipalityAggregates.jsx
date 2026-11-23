@@ -7,6 +7,7 @@ import QueryBoundary from '@/components/QueryBoundary'
 import StatsDistributions from '@/components/StatsDistributions'
 import { fmtMoney } from '@/lib/cs-format'
 import { hslVar, chartColor } from '@/lib/theme'
+import { scrollRegion } from '@/lib/scrollRegion'
 
 // Per-municipality contract counts (award totals are null in Tranche A, so the
 // chart plots counts; totals appear in the table when populated).
@@ -23,7 +24,7 @@ export default function MunicipalityAggregates() {
   }), [])
 
   return (
-    <div className="flex h-full flex-col gap-3 overflow-auto p-3">
+    <div {...scrollRegion('Municipality aggregates')} className="flex h-full flex-col gap-3 overflow-auto p-3">
       <StatsDistributions />
       <QueryBoundary query={query} isEmpty={(d) => !d?.length} emptyLabel="No municipio data">
         <div className="rounded-md border border-border bg-card p-3">

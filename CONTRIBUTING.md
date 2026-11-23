@@ -29,7 +29,7 @@ Run these locally before pushing — CI enforces every one:
 | Gate | Command | CI workflow |
 |------|---------|-------------|
 | Lint | `ruff check .` | `lint.yml` |
-| Format | `ruff format --check .` (`ruff format .` to fix) | `lint.yml` |
+| Format | `make format-check` (`make format` to fix): `ruff format --check` on every tracked `.py` file except the ones `FROZEN_RE` in `lint.yml` excludes (the certified leaderboard runtime files and the hub-rendered Grid V2 Cell_Profile files) | `lint.yml` |
 | Types | `python -m mypy` | `mypy.yml` |
 | Tests | `pytest -q` | `ci.yml`, `tests.yml` (3.10–3.12) |
 | Lockfile | `uv pip compile requirements.in --universal --python-version 3.10 -o requirements.lock` (no diff) | `lockfile.yml` |
@@ -41,6 +41,17 @@ Notes:
 - `mypy` checks `moneysweep/` (scripts are followed but not yet reported).
 - `ruff format` is the house style; a `.git-blame-ignore-revs` keeps blame readable
   across the one-time reformat.
+- The format gate skips two groups of files, listed in `FROZEN_RE` in `lint.yml`. The
+  `ruff-format` pre-commit hook excludes the same pattern, and `make format` and
+  `make format-check` read it from `lint.yml`. The production-v1 leaderboard runtime
+  files under `scripts/` and `server/backend/` are byte-bound into the certified
+  package and TheHub's replay receipt, so they change only under a new certified
+  revision. `federation/spatial/pr_grid_v2_profiles.py`,
+  `federation/spatial/materialize_pr_grid_v2_profiles.py` and
+  `tests/test_pr_grid_v2_profiles.py` are rendered from `thehub-pr`
+  `federation-templates/spatial/`, so their formatting belongs to the hub template.
+  `ruff check .` still lints both groups. A bare `ruff format .` rewrites them, so use
+  `make format` instead.
 - `docs-sync` fails its job on a violation, but a failing job blocks a merge only
   once `docs-sync` is a required status check on `main` (a repository setting).
   See *Documentation stays true* below.

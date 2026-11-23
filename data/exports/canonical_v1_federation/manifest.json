@@ -27,9 +27,16 @@
       "schema_id": "federation_relationship.schema.json",
       "sha256": "d10a42852d3cea0e2e82a58f7ffbc9f28020841905d2fbdbc560f20263d412bb",
       "stream": "relationships"
+    },
+    {
+      "filename": "source_monitors.jsonl",
+      "record_count": 167,
+      "schema_id": "federation_source_monitor.schema.json",
+      "sha256": "76259f3046482a87201f5e77c5661e1c2304e885c8838b4bed0c86d8253ae8a5",
+      "stream": "source_monitors"
     }
   ],
   "mode": "test",
-  "package_id": "pkg_9642c2a411343e9c0c20891ac84f4f08",
+  "package_id": "pkg_ddba7bdd2b6e6befe3ae1375fb8901de",
   "producer": "moneysweep-pr"
 }
