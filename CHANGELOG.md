@@ -79,6 +79,22 @@ A bump to the **federation export** version is what the release-tagging workflow
   `desktop/README.md`.
 
 ### Fixed
+- **Campaign Finance no longer reports a missing contribution total as `$0`.** With no
+  campaign-finance dataset materialized (every source absent or empty),
+  `/campaign-finance/summary` returned `totalContributionAmount: 0` because
+  `sum(s["amount"] or 0 ...)` turned each source's `null` into zero, and the dashboard's
+  "Signed amount" tile showed `$0` directly above "No campaign-finance datasets are
+  materialized...". The total is now `null` when no contribution source reports an amount
+  (a source that reports exactly 0 still gives `0`; sources that report an amount are summed
+  as before), the client fallback in `dashboard/src/lib/api.js` is `null`, and the tile
+  renders an em dash. `fmtMoney` also renders a blank string, `NaN` or an infinite value as
+  an em dash instead of `$0` or `$NaN`. That retires the test that pinned `fmtMoney('')` as
+  `$0`: it was a deliberate tripwire for a change in the loader's null handling, and the
+  case is unreachable today because `_num` in `server/backend/main.py` returns `None` for a
+  blank value. Not changed: an unparseable amount inside a present dataset still counts as
+  0 (`_amount()` ends in `fillna(0)`), and a total over some but not all sources still sums
+  only the sources that report an amount. The prebuilt dashboard bundle was regenerated
+  with `build_prebuilt_dashboard.py --build`.
 - **The Tailwind 4 upgrade (#678) no longer changes the dashboard's native form controls
   and table cells.** Tailwind 4's preflight resets `margin` and `padding` on every
   element, which also removed browser defaults that Tailwind 3 left alone: the Data
