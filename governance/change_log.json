@@ -79,6 +79,31 @@
         "governance/federation_compatibility.json",
         "governance/change_log.json"
       ]
+    },
+    {
+      "date": "2026-11-16",
+      "summary": "Adopted the hub's canonical GUI capability parity checker. Re-pinned PRII_TEMPLATE_REF from thehub-pr d916664 to 76d3c08 and rendered the four GUI rule files from the hub's templates: scripts/check_gui_parity.py, tests/test_gui_parity.py, docs/GUI_CAPABILITY_PARITY.md and the gui-capability-parity workflow. The checker merges .federation/gui-capabilities.extensions itself, so the local wrapper .federation/check_gui_parity_with_extensions.py and the tracked artifacts/gui-capabilities-merged.json were removed. Thirteen extension fragments gained an extension_id equal to their file name; no capability, exception or classification in any fragment changed. The base manifest gained discovery.e2e_config, stopped citing the mocked zip-design spec as end-to-end proof for six capabilities, and cites ownership-deep-dive.spec.mjs for ownership-deep-dive. Three real-backend specs that no workflow ran were added to the parity Playwright config. The parity baseline was not regenerated: the checker reports the same legacy count and no new findings. AGENTS.md, the pull request template, the README banners and the docs-sync manifest were updated to match. No federation contract surface, schema or export changed. The pin is the last commit of thehub-pr#432, which is on thehub-pr main; it deliberately stops before the hub commit that moves the shared prii-desktop runtime pin to the Launch Pad release, because that desktop upgrade needs its own change and its own frozen-build verification.",
+      "files": [
+        ".github/workflows/template-drift.yml",
+        ".github/workflows/gui-capability-parity.yml",
+        "scripts/check_gui_parity.py",
+        "tests/test_gui_parity.py",
+        "docs/GUI_CAPABILITY_PARITY.md",
+        ".federation/check_gui_parity_with_extensions.py",
+        "artifacts/gui-capabilities-merged.json",
+        ".federation/gui-capabilities.json",
+        ".federation/gui-capabilities.extensions/",
+        ".federation/docs-sync.json",
+        "dashboard/gui-parity.playwright.config.mjs",
+        "AGENTS.md",
+        ".github/pull_request_template.md",
+        "README.md",
+        "dashboard/README.md",
+        "docs/GUI_AUDIT.md",
+        ".gitignore",
+        "CHANGELOG.md",
+        "governance/change_log.json"
+      ]
     }
   ]
 }

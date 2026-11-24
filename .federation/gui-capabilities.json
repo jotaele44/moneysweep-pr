@@ -35,6 +35,9 @@
     "navigation_files": [
       "dashboard/src/pages/Dashboard.jsx"
     ],
+    "e2e_config": [
+      "dashboard/gui-parity.playwright.config.mjs"
+    ],
     "implicit_routes": [],
     "exclude": [
       "**/tests/**",
@@ -140,8 +143,7 @@
           "tests/test_gui_parity.py"
         ],
         "e2e": [
-          "dashboard/tests/gui-parity.spec.mjs",
-          "dashboard/tests/zip-design.spec.mjs"
+          "dashboard/tests/gui-parity.spec.mjs"
         ]
       }
     },
@@ -192,8 +194,7 @@
           "tests/test_gui_parity.py"
         ],
         "e2e": [
-          "dashboard/tests/org-change-monitor.spec.mjs",
-          "dashboard/tests/zip-design.spec.mjs"
+          "dashboard/tests/org-change-monitor.spec.mjs"
         ]
       },
       "candidate_ids": [
@@ -274,8 +275,7 @@
           "dashboard/src/components/CampaignFinance.test.jsx"
         ],
         "e2e": [
-          "dashboard/tests/gui-parity.spec.mjs",
-          "dashboard/tests/zip-design.spec.mjs"
+          "dashboard/tests/gui-parity.spec.mjs"
         ]
       }
     },
@@ -381,8 +381,7 @@
           "tests/test_gui_parity.py"
         ],
         "e2e": [
-          "dashboard/tests/campaign-finance.spec.mjs",
-          "dashboard/tests/zip-design.spec.mjs"
+          "dashboard/tests/campaign-finance.spec.mjs"
         ]
       },
       "candidate_ids": [
@@ -1452,8 +1451,7 @@
           "tests/test_gui_parity.py"
         ],
         "e2e": [
-          "dashboard/tests/api-keys.spec.mjs",
-          "dashboard/tests/zip-design.spec.mjs"
+          "dashboard/tests/api-keys.spec.mjs"
         ]
       },
       "candidate_ids": [
@@ -1688,7 +1686,7 @@
           "tests/test_gui_parity.py"
         ],
         "e2e": [
-          "dashboard/tests/zip-design.spec.mjs"
+          "dashboard/tests/ownership-deep-dive.spec.mjs"
         ]
       },
       "candidate_ids": [

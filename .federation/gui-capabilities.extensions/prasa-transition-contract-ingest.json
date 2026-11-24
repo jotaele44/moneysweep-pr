@@ -1,4 +1,5 @@
 {
+  "extension_id": "prasa-transition-contract-ingest",
   "capabilities": [
     {
       "id": "prasa-transition-contract-ingest",
