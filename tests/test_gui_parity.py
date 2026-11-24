@@ -128,6 +128,30 @@ export default function Items() {
         }
         self.assertLessEqual(symbol_ids, mapped)
 
+    def test_prefixed_fastapi_router_endpoint_uses_public_path(self) -> None:
+        self._write(
+            "server/backend/leaderboards.py",
+            """
+from fastapi import APIRouter
+router = APIRouter(prefix="/leaderboards", tags=["leaderboards"])
+
+@router.get("/top")
+def top():
+    return []
+""".strip()
+            + "\n",
+        )
+        manifest = self._manifest()
+        candidates = parity.discover_candidates(self.root, manifest)
+        details = {
+            item.get("detail")
+            for item in candidates
+            if item["kind"] == "backend_endpoint"
+            and item["path"] == "server/backend/leaderboards.py"
+        }
+        self.assertIn("GET /leaderboards/top", details)
+        self.assertNotIn("GET /top", details)
+
     def test_backend_without_gui_is_rejected(self) -> None:
         manifest = self._manifest()
         manifest["capabilities"][0]["frontend"] = {}
