@@ -119,6 +119,27 @@ def test_allowlisted_data_manifests_path_skipped(tmp_path):
 
 
 @pytest.mark.unit
+def test_python_virtual_environment_is_pruned_by_marker(tmp_path):
+    _write(tmp_path / ".venv311" / "pyvenv.cfg", "home = /example/python\n")
+    _write(tmp_path / ".venv311" / "site-packages" / "fixture.py", _AKIA + "\n")
+    _write(tmp_path / "module.py", "value = 1\n")
+
+    result = scan(tmp_path)
+
+    assert result == {"findings": [], "files_scanned": 1}
+
+
+@pytest.mark.unit
+def test_similarly_named_non_environment_directory_is_scanned(tmp_path):
+    _write(tmp_path / ".venv311" / "fixture.py", _AKIA + "\n")
+
+    result = scan(tmp_path)
+
+    assert len(result["findings"]) == 1
+    assert result["findings"][0]["file"] == ".venv311/fixture.py"
+
+
+@pytest.mark.unit
 def test_commented_out_secret_is_not_flagged(tmp_path):
     _write(tmp_path / "module.py", "# SAM_API_KEY=" + _SK + "\n")
     result = scan(tmp_path)

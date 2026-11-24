@@ -1,0 +1,396 @@
+name: Certification keyless materialization
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/certification-keyless-materialization.yml"
+      - "scripts/run_automatable_sources.py"
+      - "scripts/download_grants.py"
+      - "tools/write_operator_evidence_receipt.py"
+      - "tools/operator_corpus_common.py"
+      - "tools/build_keyless_source_evidence.py"
+      - "tools/assemble_grants_shards.py"
+      - "tools/assemble_certification_evidence.py"
+      - "tools/build_operator_corpus.py"
+      - "tools/verify_operator_corpus.py"
+      - "tools/derive_certification_truth.py"
+      - "tools/run_certification_derivations.py"
+      - "tools/run_certification_public_adapters.py"
+      - "tools/keyless_execution_plan.py"
+      - "scripts/download_prasa_contracts.py"
+      - "scripts/download_cabilderos.py"
+      - "reports/source_recovery_matrix.csv"
+      - "reports/source_registry_status.csv"
+      - "registries/source_registry.yaml"
+      - "registries/source_registry_extensions/**"
+      - "registries/source_registry_overrides/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      count: ${{ steps.matrix.outputs.count }}
+      grants_matrix: ${{ steps.matrix.outputs.grants_matrix }}
+      grants_count: ${{ steps.matrix.outputs.grants_count }}
+      grants_start_fy: ${{ steps.matrix.outputs.grants_start_fy }}
+      grants_end_fy: ${{ steps.matrix.outputs.grants_end_fy }}
+      credential_count: ${{ steps.matrix.outputs.credential_count }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - id: matrix
+        name: Build automatable execution inventory
+        run: |
+          python - <<'PY'
+          import csv
+          import json
+          import os
+          from pathlib import Path
+
+          from tools.keyless_execution_plan import build_execution_plan
+
+          status_rows = []
+          with Path("reports/source_registry_status.csv").open(
+              encoding="utf-8-sig", newline=""
+          ) as fh:
+              status_rows = list(csv.DictReader(fh))
+
+          with Path("reports/source_recovery_matrix.csv").open(
+              encoding="utf-8-sig", newline=""
+          ) as fh:
+              recovery_rows = list(csv.DictReader(fh))
+
+          plan = build_execution_plan(status_rows, recovery_rows)
+          keyless = plan["keyless"]
+          standard_keyless = plan["standard_keyless"]
+          grants_shards = plan["grants_shards"]
+          credential_gated = plan["credential_gated"]
+          matrix = json.dumps({"include": standard_keyless}, separators=(",", ":"))
+          grants_matrix = json.dumps({"include": grants_shards}, separators=(",", ":"))
+          Path("credential_gated_automatable.json").write_text(
+              json.dumps(
+                  {
+                      "schema_version": "moneysweep.credential_gated_automatable/v1",
+                      "count": len(credential_gated),
+                      "sources": credential_gated,
+                      "execution_authorized": False,
+                      "policy": "Credentials are not discovered or consumed implicitly by certification CI.",
+                  },
+                  indent=2,
+                  sort_keys=True,
+              )
+              + "\n",
+              encoding="utf-8",
+          )
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write(f"matrix={matrix}\n")
+              out.write(f"count={len(standard_keyless)}\n")
+              out.write(f"grants_matrix={grants_matrix}\n")
+              out.write(f"grants_count={len(grants_shards)}\n")
+              out.write(
+                  "grants_start_fy="
+                  f"{min((item['fy_start'] for item in grants_shards), default='')}\n"
+              )
+              out.write(
+                  "grants_end_fy="
+                  f"{max((item['fy_end'] for item in grants_shards), default='')}\n"
+              )
+              out.write(f"credential_count={len(credential_gated)}\n")
+          print(f"keyless_automatable={len(keyless)}")
+          print(f"standard_keyless_automatable={len(standard_keyless)}")
+          print(f"grants_shards={len(grants_shards)}")
+          print(f"credential_gated_automatable={len(credential_gated)}")
+          for item in keyless:
+              print(
+                  "keyless:"
+                  f"{item['source']}:timeout={item['timeout_minutes']}m"
+              )
+          for item in grants_shards:
+              print(
+                  "grants_shard:"
+                  f"{item['shard_id']}:timeout={item['timeout_minutes']}m"
+              )
+          for item in credential_gated:
+              print(
+                  "credential_gated:"
+                  f"{item['source_id']}:{item['authentication']}"
+              )
+          PY
+      - name: Upload credential-gated execution blockers
+        uses: actions/upload-artifact@v4
+        with:
+          name: credential-gated-automatable
+          path: credential_gated_automatable.json
+          if-no-files-found: error
+
+  materialize:
+    needs: prepare
+    if: needs.prepare.outputs.count != '0'
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ matrix.timeout_minutes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run exact keyless source
+        id: run_source
+        continue-on-error: true
+        run: >-
+          python scripts/run_automatable_sources.py
+          --source "${{ matrix.source }}"
+          --no-require-egress
+      - name: Build immutable source evidence
+        if: always()
+        run: >-
+          python -m tools.build_keyless_source_evidence
+          --source-id "${{ matrix.source }}"
+          --step-outcome "${{ steps.run_source.outcome }}"
+          --scope-sha "${{ github.event.pull_request.base.sha || github.sha }}"
+          --implementation-sha "${{ github.event.pull_request.head.sha || github.sha }}"
+      - name: Upload source certification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: keyless-${{ matrix.source }}
+          path: certification_out/${{ matrix.source }}/
+          if-no-files-found: error
+      - name: Enforce source execution outcome
+        if: always() && steps.run_source.outcome != 'success'
+        run: exit 1
+
+  grants_shards:
+    needs: prepare
+    if: needs.prepare.outputs.grants_count != '0'
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: ${{ fromJSON(needs.prepare.outputs.grants_matrix) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ matrix.timeout_minutes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Materialize exact grants shard
+        id: run_shard
+        continue-on-error: true
+        run: >-
+          python scripts/download_grants.py
+          --pass "${{ matrix.pass_name }}"
+          --fy-start "${{ matrix.fy_start }}"
+          --fy-end "${{ matrix.fy_end }}"
+          --skip-master
+          --summary-path "certification_out/grants_shards/${{ matrix.shard_id }}.json"
+      - name: Upload grants shard evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: grants-shard-${{ matrix.shard_id }}
+          path: |
+            data/staging/raw/grants/${{ matrix.pass_name }}_fy*.csv
+            certification_out/grants_shards/${{ matrix.shard_id }}.json
+          if-no-files-found: error
+      - name: Enforce grants shard outcome
+        if: always() && steps.run_shard.outcome != 'success'
+        run: exit 1
+
+  grants_finalize:
+    needs:
+      - prepare
+      - grants_shards
+    if: >-
+      always() &&
+      needs.prepare.result == 'success' &&
+      needs.prepare.outputs.grants_count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Download grants shard artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: grants-shard-*
+          path: build/grants-shards
+          merge-multiple: true
+      - name: Verify, assemble, and materialize grants
+        id: finalize_grants
+        continue-on-error: true
+        env:
+          MONEYSWEEP_GRANTS_START_FY: ${{ needs.prepare.outputs.grants_start_fy }}
+          MONEYSWEEP_GRANTS_END_FY: ${{ needs.prepare.outputs.grants_end_fy }}
+        run: |
+          python -m tools.assemble_grants_shards \
+            --artifacts-root build/grants-shards \
+            --output-dir data/staging/raw/grants \
+            --report reports/grants_shard_assembly.json
+          python scripts/run_automatable_sources.py \
+            --source grants_gov \
+            --no-require-egress
+      - name: Build immutable grants evidence
+        if: always()
+        run: >-
+          python -m tools.build_keyless_source_evidence
+          --source-id grants_gov
+          --step-outcome "${{ steps.finalize_grants.outcome }}"
+          --scope-sha "${{ github.event.pull_request.base.sha || github.sha }}"
+          --implementation-sha "${{ github.event.pull_request.head.sha || github.sha }}"
+      - name: Upload grants certification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: keyless-grants_gov
+          path: certification_out/grants_gov/
+          if-no-files-found: error
+      - name: Upload grants shard assembly report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: grants-shard-assembly
+          path: reports/grants_shard_assembly.json
+          if-no-files-found: warn
+      - name: Enforce grants finalization outcome
+        if: always() && steps.finalize_grants.outcome != 'success'
+        run: exit 1
+
+  aggregate:
+    needs:
+      - prepare
+      - materialize
+      - grants_finalize
+    if: always() && needs.prepare.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Download per-source keyless evidence
+        uses: actions/download-artifact@v4
+        with:
+          pattern: keyless-*
+          path: build/keyless-artifacts
+      - name: Assemble source evidence workspace
+        run: |
+          python -m tools.assemble_certification_evidence \
+            --registry-root . \
+            --artifacts-root build/keyless-artifacts \
+            --workspace-root build/keyless-evidence \
+            --receipts-dir build/keyless-receipts \
+            --output reports/keyless_evidence_assembly.json
+      - name: Acquire bounded public manual-source adapters in shared workspace
+        run: |
+          python -m tools.run_certification_public_adapters \
+            --registry-root . \
+            --workspace build/keyless-evidence \
+            --receipts-dir build/keyless-receipts \
+            --producer-sha "${{ github.event.pull_request.head.sha || github.sha }}" \
+            --output reports/keyless_public_adapters.json
+
+      - name: Run dependency-bearing certification derivations
+        run: |
+          python -m tools.run_certification_derivations \
+            --registry-root . \
+            --workspace build/keyless-evidence \
+            --receipts-dir build/keyless-receipts \
+            --producer-sha "${{ github.event.pull_request.head.sha || github.sha }}" \
+            --output reports/keyless_certification_derivations.json
+
+      - name: Build content-addressed keyless corpus
+        run: |
+          python -m tools.build_operator_corpus \
+            --root . \
+            --evidence-root build/keyless-evidence \
+            --receipts build/keyless-receipts \
+            --corpus-root build/keyless-operator-corpus
+      - name: Verify keyless operator snapshot fail-closed
+        id: verify_corpus
+        continue-on-error: true
+        run: |
+          python -m tools.verify_operator_corpus \
+            --root . \
+            --operator-root build/keyless-evidence \
+            --corpus-root build/keyless-operator-corpus \
+            --output reports/keyless_operator_corpus_verification.json
+      - name: Derive keyless certification truth
+        run: |
+          CORPUS_ID="$(
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          print(
+              json.loads(
+                  Path("build/keyless-operator-corpus/manifest.json").read_text(
+                      encoding="utf-8"
+                  )
+              )["corpus_id"]
+          )
+          PY
+          )"
+          python -m tools.derive_certification_truth \
+            --root . \
+            --evidence-root build/keyless-operator-corpus/mount \
+            --receipts-dir build/keyless-operator-corpus/receipts \
+            --scope-dir build/keyless-certification-scope \
+            --operator-corpus-id "$CORPUS_ID" \
+            --as-of "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      - name: Evaluate G0-G12 against regenerated keyless truth
+        run: |
+          python -m tools.certify_production \
+            --root . \
+            --config registries/production_certification.yaml \
+            --truth-root build/keyless-certification-scope \
+            --scope-sha "${{ github.event.pull_request.head.sha || github.sha }}" \
+            --implementation-sha "${{ github.event.pull_request.head.sha || github.sha }}" \
+            --run-preflight \
+            --output reports/keyless_production_certification.json
+
+      - name: Upload assembled keyless certification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: keyless-certification-evidence
+          path: |
+            reports/keyless_evidence_assembly.json
+            reports/keyless_public_adapters.json
+            reports/keyless_certification_derivations.json
+            reports/keyless_operator_corpus_verification.json
+            reports/keyless_production_certification.json
+            build/keyless-operator-corpus/manifest.json
+            build/keyless-operator-corpus/receipts/
+            build/keyless-certification-scope/
+          if-no-files-found: warn

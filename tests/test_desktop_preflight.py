@@ -50,14 +50,29 @@ def test_repo_checkout_passes_its_own_preflight(monkeypatch) -> None:
     assert _by_id(report, "venv_available")["ok"]
 
 
-def test_node_is_not_required_when_the_prebuilt_bundle_is_present(monkeypatch) -> None:
+def test_node_is_not_required_when_the_prebuilt_bundle_is_present(
+    monkeypatch, tmp_path: Path
+) -> None:
     """The regression test for the dialog that wrongly blamed Node.js."""
     monkeypatch.setattr(preflight.shutil, "which", lambda command: None)
 
-    check = preflight.check_dashboard_bundle(REPO_ROOT)
+    check = preflight.check_dashboard_bundle(tmp_path)
 
     assert check["ok"]
     assert "prebuilt" in check["detail"].lower()
+
+
+def test_existing_source_build_takes_precedence_over_prebuilt_bundle(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setattr(preflight.shutil, "which", lambda command: None)
+    (tmp_path / "dashboard" / "dist").mkdir(parents=True)
+    (tmp_path / "dashboard" / "dist" / "index.html").write_text("built", encoding="utf-8")
+
+    check = preflight.check_dashboard_bundle(tmp_path)
+
+    assert check["ok"]
+    assert check["detail"] == "Dashboard is already built."
 
 
 def test_translocated_checkout_is_named_as_the_cause() -> None:

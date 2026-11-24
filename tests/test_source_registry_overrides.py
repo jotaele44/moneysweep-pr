@@ -38,6 +38,11 @@ def test_wave0_provenance_corrections_are_effective() -> None:
     assert cabilderos["official_custodian"] == "Puerto Rico Department of Justice"
     assert cabilderos["endpoint_url"].startswith("https://www.justicia.pr.gov/")
 
+    grants = source_by_id("grants_gov", ROOT)
+    assert grants is not None
+    assert grants["endpoint_url"] == ("https://api.usaspending.gov/api/v2/bulk_download/awards/")
+    assert grants["source_identity_status"] == ("HISTORICAL_ID_PRESERVED_ENDPOINT_CORRECTED")
+
 
 def test_override_rejects_unknown_source() -> None:
     with pytest.raises(ValueError, match="unknown source"):
