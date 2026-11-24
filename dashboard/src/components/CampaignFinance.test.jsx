@@ -41,7 +41,7 @@ describe('CampaignFinance', () => {
       derived: {},
       hasData: false,
       totalContributionRows: 0,
-      totalContributionAmount: 0,
+      totalContributionAmount: null,
       totalFederalOutflowRows: 0,
       emptyState: 'No campaign-finance datasets are materialized in this repository checkout.',
     }))
@@ -52,6 +52,39 @@ describe('CampaignFinance', () => {
       'No campaign-finance datasets are materialized in this repository checkout.',
     )).toBeInTheDocument()
     expect(screen.getByText('No campaign-finance contributions are materialized')).toBeInTheDocument()
+  })
+
+  it('shows an em dash, not $0, for the signed amount when no source reports one', () => {
+    useCampaignFinanceSummary.mockReturnValue(query({
+      sources: [],
+      derived: {},
+      hasData: false,
+      totalContributionRows: 0,
+      totalContributionAmount: null,
+      totalFederalOutflowRows: 0,
+      emptyState: 'No campaign-finance datasets are materialized in this repository checkout.',
+    }))
+
+    render(<CampaignFinance />)
+
+    const tile = screen.getByText('Signed amount').parentElement
+    expect(tile).toHaveTextContent('—')
+    expect(tile).not.toHaveTextContent('$0')
+  })
+
+  it('still shows a genuine zero total as $0', () => {
+    useCampaignFinanceSummary.mockReturnValue(query({
+      sources: [{ source: 'oce', rows: 1, amount: 0, status: 'available' }],
+      derived: {},
+      hasData: true,
+      totalContributionRows: 1,
+      totalContributionAmount: 0,
+      totalFederalOutflowRows: 0,
+    }))
+
+    render(<CampaignFinance />)
+
+    expect(screen.getByText('Signed amount').parentElement).toHaveTextContent('$0')
   })
 
   it('shows an error banner instead of the empty-state banner when the summary request fails', () => {
