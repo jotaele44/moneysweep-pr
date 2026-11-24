@@ -26,8 +26,8 @@ A bump to the **federation export** version is what the release-tagging workflow
 
 ### Changed
 - **Desktop runtime moves to `prii-desktop` 0.3.0, so the Launch Pad is live.**
-  The template-drift pin moves from thehub-pr `76d3c08` to `91769c8` (main,
-  after thehub-pr#446), and the re-render changes three rendered files.
+  The template-drift pin moves from thehub-pr `76d3c08` to `f620d8d` (main,
+  after thehub-pr#446 and #451), and the re-render changes four rendered files.
   `requirements-desktop.txt` moves `prii-desktop` from `1313c77` (0.2.0) to
   `dc79dc0` (0.3.0), the first runtime that reads the `LAUNCHPAD` declaration
   already in `desktop/config.py`. The desktop window now opens on the Launch
@@ -37,8 +37,13 @@ A bump to the **federation export** version is what the release-tagging workflow
   and `DELETE` with 403 (`desktop/config.py` allows none). `--smoke` and `--selftest`
   never show the page, and a start that sets no mode (tests, `--no-window`
   without `--guest`/`--operator`) is unguarded, as before. `codeql.yml` moves
-  `github/codeql-action` init/analyze from `cdf488f` to `33d7b85`. No Python,
-  dashboard or contract file changed.
+  `github/codeql-action` init/analyze from `cdf488f` to `1bd86f2` (v4.39.4).
+  `.github/dependabot.yml` now excludes the four workflows rendered from the
+  hub (`codeql.yml`, `docs-sync.yml`, `gui-capability-parity.yml`,
+  `secret-scan.yml`) from GitHub Actions updates: their pins move only in the
+  hub templates and arrive in a template sync, because a bump in a rendered
+  copy fails `template-drift.yml`. No Python, dashboard or contract file
+  changed.
 - **Frontend dependency gate: one advisory accepted until 2027-02-18, one stale
   entry removed.** `dashboard/audit-allowlist.json` now lists
   GHSA-fc5q-39xc-vjpf (`picomatch`, high, ReDoS through repeated extglobs),
