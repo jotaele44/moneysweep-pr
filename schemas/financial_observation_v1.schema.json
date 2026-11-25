@@ -137,6 +137,28 @@
           }
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "evidence_class": {
+            "const": "COMPUTED"
+          }
+        },
+        "required": [
+          "evidence_class"
+        ]
+      },
+      "then": {
+        "properties": {
+          "amount_decimal": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount_decimal"
+        ]
+      }
     }
   ]
 }

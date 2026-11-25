@@ -14,11 +14,83 @@ def test_summary_and_contributions_are_graceful_without_files(tmp_path, monkeypa
     api._CACHE.clear()
     summary = api.campaign_finance_summary()
     assert summary["totalContributionRows"] == 0
+    # No source reports an amount, so the total is unknown. It must not be 0:
+    # the dashboard would show a real-looking "$0" for data that does not exist.
+    assert summary["totalContributionAmount"] is None
+    assert all(source["amount"] is None for source in summary["sources"])
     assert summary["hasData"] is False
     assert summary["materializedFileCount"] == 0
     assert summary["emptyState"]
     page = api.campaign_finance_contributions(source="all", limit=100, offset=0)
     assert page == {"rows": [], "total": 0, "limit": 100, "offset": 0}
+
+
+@pytest.mark.unit
+def test_summary_total_is_unknown_when_the_only_sources_are_present_but_empty(
+    tmp_path, monkeypatch
+):
+    # A present-but-empty file is also "no amount": status "empty", amount None.
+    (tmp_path / "pr_fec_contributions.csv").write_text("", encoding="utf-8")
+    monkeypatch.setattr(api, "PROCESSED", tmp_path)
+    api._CACHE.clear()
+
+    summary = api.campaign_finance_summary()
+
+    fec = next(source for source in summary["sources"] if source["source"] == "fec")
+    assert fec["present"] is True
+    assert fec["status"] == "empty"
+    assert fec["amount"] is None
+    assert summary["totalContributionAmount"] is None
+
+
+@pytest.mark.unit
+def test_summary_total_sums_only_the_sources_that_report_an_amount(tmp_path, monkeypatch):
+    # FEC is absent (amount None); OCE reports one. The total is OCE's, not None
+    # and not diluted by a phantom zero from the absent source.
+    pd.DataFrame(
+        [
+            {
+                "donor_name": "DONOR B",
+                "amount": "200",
+                "contribution_date": "2024-02-01",
+                "candidate_or_committee": "COMITE B",
+                "party": "PIP",
+                "cycle": "2024",
+            }
+        ]
+    ).to_csv(tmp_path / "pr_oce_donations.csv", index=False)
+    monkeypatch.setattr(api, "PROCESSED", tmp_path)
+    api._CACHE.clear()
+
+    summary = api.campaign_finance_summary()
+
+    assert summary["totalContributionAmount"] == 200.0
+    assert summary["totalContributionRows"] == 1
+
+
+@pytest.mark.unit
+def test_summary_total_keeps_a_genuine_zero_as_zero(tmp_path, monkeypatch):
+    # A source that reports an amount of exactly 0 is data. It stays 0.0, which is
+    # different from "unknown" (None).
+    pd.DataFrame(
+        [
+            {
+                "donor_name": "DONOR Z",
+                "amount": "0",
+                "contribution_date": "2024-02-01",
+                "candidate_or_committee": "COMITE Z",
+                "party": "PIP",
+                "cycle": "2024",
+            }
+        ]
+    ).to_csv(tmp_path / "pr_oce_donations.csv", index=False)
+    monkeypatch.setattr(api, "PROCESSED", tmp_path)
+    api._CACHE.clear()
+
+    summary = api.campaign_finance_summary()
+
+    assert summary["totalContributionAmount"] == 0.0
+    assert summary["totalContributionAmount"] is not None
 
 
 @pytest.mark.unit

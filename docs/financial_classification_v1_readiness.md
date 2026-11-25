@@ -39,3 +39,12 @@ Applicability matrix unique grain is `source_snapshot × source_record_identity 
 5. Independently review, verify exact-head CI, merge only when approved, replay merged head, obtain TheHub LOCKSTEP, freeze receipts, then promote reusable skill.
 
 **Current certification: WITHHELD.** This branch implements a bounded validation primitive, not a comprehensive historical backfill or completed financial source audit.
+
+
+## Current-head reconciliation — 2026-11-12
+
+The original V1 candidate was reviewed on PR #696 at head `012d2cea3840d3a42e60da4e59c23b1eb98ced60`. The successor candidate is rebased additively onto current default-branch SHA `b0dc1737fb58b4c544c1189a8db7e43338b70188` without changing legacy financial-flow exports. The original historical baseline above is retained as historical evidence and is not rewritten.
+
+This rebase does not close source, row, event, identity, payment-chain, or ultimate-disposition denominators. It does not implement a complete financial-event ledger, simulations, or counterfactual analysis. All such capabilities remain outside V1 and require separately versioned contracts and verification.
+
+PR #696 remains open and draft pending qualification of this successor. No merge, production promotion, or certification is authorized by this rebase.
