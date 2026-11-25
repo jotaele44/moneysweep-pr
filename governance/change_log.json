@@ -79,6 +79,45 @@
         "governance/federation_compatibility.json",
         "governance/change_log.json"
       ]
+    },
+    {
+      "date": "2026-11-16",
+      "summary": "Adopted the hub's canonical GUI capability parity checker. Re-pinned PRII_TEMPLATE_REF from thehub-pr d916664 to 76d3c08 and rendered the four GUI rule files from the hub's templates: scripts/check_gui_parity.py, tests/test_gui_parity.py, docs/GUI_CAPABILITY_PARITY.md and the gui-capability-parity workflow. The checker merges .federation/gui-capabilities.extensions itself, so the local wrapper .federation/check_gui_parity_with_extensions.py and the tracked artifacts/gui-capabilities-merged.json were removed. Thirteen extension fragments gained an extension_id equal to their file name; no capability, exception or classification in any fragment changed. The base manifest gained discovery.e2e_config, stopped citing the mocked zip-design spec as end-to-end proof for six capabilities, and cites ownership-deep-dive.spec.mjs for ownership-deep-dive. Three real-backend specs that no workflow ran were added to the parity Playwright config. The parity baseline was not regenerated: the checker reports the same legacy count and no new findings. AGENTS.md, the pull request template, the README banners and the docs-sync manifest were updated to match. No federation contract surface, schema or export changed. The pin is the last commit of thehub-pr#432, which is on thehub-pr main; it deliberately stops before the hub commit that moves the shared prii-desktop runtime pin to the Launch Pad release, because that desktop upgrade needs its own change and its own frozen-build verification.",
+      "files": [
+        ".github/workflows/template-drift.yml",
+        ".github/workflows/gui-capability-parity.yml",
+        "scripts/check_gui_parity.py",
+        "tests/test_gui_parity.py",
+        "docs/GUI_CAPABILITY_PARITY.md",
+        ".federation/check_gui_parity_with_extensions.py",
+        "artifacts/gui-capabilities-merged.json",
+        ".federation/gui-capabilities.json",
+        ".federation/gui-capabilities.extensions/",
+        ".federation/docs-sync.json",
+        "dashboard/gui-parity.playwright.config.mjs",
+        "AGENTS.md",
+        ".github/pull_request_template.md",
+        "README.md",
+        "dashboard/README.md",
+        "docs/GUI_AUDIT.md",
+        ".gitignore",
+        "CHANGELOG.md",
+        "governance/change_log.json"
+      ]
+    },
+    {
+      "date": "2026-11-24",
+      "summary": "Moved the desktop runtime to prii-desktop 0.3.0, the change the 2026-11-16 re-pin deferred. Re-pinned PRII_TEMPLATE_REF from thehub-pr 76d3c08 to f620d8d (thehub-pr main, after #446 and #451) and re-rendered with render_federation_templates.py --template-ref. Four rendered files change: requirements-desktop.txt moves prii-desktop from 1313c77 (0.2.0) to dc79dc0 (0.3.0); codeql.yml moves github/codeql-action init/analyze from cdf488f to 1bd86f2 (v4.39.4); .github/dependabot.yml excludes the four hub-rendered workflows (codeql, docs-sync, gui-capability-parity, secret-scan) from GitHub Actions updates, so their pins move only in the hub templates; template-drift.yml carries the pin. 0.3.0 is the first runtime that reads the LAUNCHPAD declaration already in desktop/config.py, so the desktop window now opens on the Launch Pad (Guest or Operator, starting tab, the Operator-only MONEYSWEEP_FINANCIALS_ROOT option, readiness rows), and a Guest session answers every POST, PUT, PATCH and DELETE with 403. --smoke and --selftest never show the page. desktop/README.md now states the pinned runtime instead of a condition, and CONTRIBUTING.md says where the rendered workflows' action pins change. Frozen-build verification on Linux (Python 3.13): the desktop-build install set resolves, a console PyInstaller build passes --smoke and --selftest and writes its bootstrap receipt, tests/test_desktop_launchpad.py runs instead of skipping (6 passed), the real Launch Pad page renders with this repository's readiness snapshot, and the GUI parity gate reports no new findings. No Python, dashboard, schema or export file changed.",
+      "files": [
+        ".github/workflows/template-drift.yml",
+        ".github/workflows/codeql.yml",
+        ".github/dependabot.yml",
+        "requirements-desktop.txt",
+        "desktop/README.md",
+        "CONTRIBUTING.md",
+        "CHANGELOG.md",
+        "governance/change_log.json"
+      ]
     }
   ]
 }

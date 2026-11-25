@@ -99,7 +99,11 @@ build if they diverge). `.federation/docs-sync.json` is this repo's own.
 Runtime deps are declared in `requirements.in` and compiled to `requirements.lock`
 by [`uv`](https://github.com/astral-sh/uv). If you change a dependency, edit
 `requirements.in` and regenerate the lock with the command above — the
-`lockfile.yml` check fails on drift. Dependabot proposes weekly updates.
+`lockfile.yml` check fails on drift. Dependabot proposes weekly updates. It
+skips the workflows rendered from `thehub-pr` (`codeql.yml`, `docs-sync.yml`,
+`gui-capability-parity.yml`, `secret-scan.yml`): their action pins change only
+in `thehub-pr/federation-templates/` and arrive here in a template sync pull
+request, because a bump in a rendered copy fails `template-drift.yml`.
 
 ## Tests
 

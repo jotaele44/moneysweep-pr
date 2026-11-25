@@ -25,6 +25,25 @@ A bump to the **federation export** version is what the release-tagging workflow
 ## [Unreleased]
 
 ### Changed
+- **Desktop runtime moves to `prii-desktop` 0.3.0, so the Launch Pad is live.**
+  The template-drift pin moves from thehub-pr `76d3c08` to `f620d8d` (main,
+  after thehub-pr#446 and #451), and the re-render changes four rendered files.
+  `requirements-desktop.txt` moves `prii-desktop` from `1313c77` (0.2.0) to
+  `dc79dc0` (0.3.0), the first runtime that reads the `LAUNCHPAD` declaration
+  already in `desktop/config.py`. The desktop window now opens on the Launch
+  Pad (Guest or Operator, starting tab, the Operator-only financial records
+  folder, readiness) before MoneySweep starts; see `desktop/README.md`. In a
+  Guest session the shared `GuestGuard` answers every `POST`, `PUT`, `PATCH`
+  and `DELETE` with 403 (`desktop/config.py` allows none). `--smoke` and `--selftest`
+  never show the page, and a start that sets no mode (tests, `--no-window`
+  without `--guest`/`--operator`) is unguarded, as before. `codeql.yml` moves
+  `github/codeql-action` init/analyze from `cdf488f` to `1bd86f2` (v4.39.4).
+  `.github/dependabot.yml` now excludes the four workflows rendered from the
+  hub (`codeql.yml`, `docs-sync.yml`, `gui-capability-parity.yml`,
+  `secret-scan.yml`) from GitHub Actions updates: their pins move only in the
+  hub templates and arrive in a template sync, because a bump in a rendered
+  copy fails `template-drift.yml`. No Python, dashboard or contract file
+  changed.
 - **Frontend dependency gate: one advisory accepted until 2027-02-18, one stale
   entry removed.** `dashboard/audit-allowlist.json` now lists
   GHSA-fc5q-39xc-vjpf (`picomatch`, high, ReDoS through repeated extglobs),
@@ -35,6 +54,34 @@ A bump to the **federation export** version is what the release-tagging workflow
   pull request that triggers the desktop build failed the gate. The entry for
   GHSA-g3hv-75wg-m249 (`minimatch`) is removed because `npm audit` no longer
   reports it. No dependency or lockfile changed.
+- **GUI capability parity now runs the hub's canonical checker.**
+  `scripts/check_gui_parity.py`, `tests/test_gui_parity.py`,
+  `docs/GUI_CAPABILITY_PARITY.md` and the `gui-capability-parity.yml` workflow
+  are rendered from thehub-pr's templates (template-drift pin moves from
+  `d916664` to `76d3c08`). The checker merges the extension fragments itself,
+  so the local wrapper `check_gui_parity_with_extensions.py` and the tracked
+  `artifacts/gui-capabilities-merged.json` are removed; CI and contributors run
+  `python3 scripts/check_gui_parity.py`. The thirteen fragments that lacked an
+  `extension_id` now carry one equal to their file name. The manifest names the
+  Playwright config that proves capabilities (`discovery.e2e_config`), and
+  three end-to-end specs that no workflow ran (`org-change-monitor`,
+  `financial-leaderboards`, `ownership-deep-dive`) are now part of
+  `npm run test:gui-parity`. The mocked `zip-design.spec.mjs` is no longer
+  cited as end-to-end proof for six capabilities; `ownership-deep-dive` now
+  cites its own real-backend spec. The parity baseline is unchanged. The README
+  banners no longer call the dashboard a diagnostic-only surface (superseded by
+  thehub-pr ADR 0014).
+- **Shared federation templates brought current with the hub.** The
+  template-drift pin moves from thehub-pr `4258c3c` to `d916664`, and the five
+  rendered files that had fallen behind are re-rendered: the federation export
+  manifest schema (the stream list gains `source_monitors`), the PR grid V2
+  Cell_Profile module, its materializer and its tests, and the docs-sync
+  checker. The profile module moves from `pr-grid-v2-cell-profile/1.0` to
+  `1.2`: it now also admits `ADMINISTRATIVE_SET` and `DERIVED_SET` bindings,
+  each only with its required uncertainty class and geometry state and always
+  counted as non-exact, and it can build profiles incrementally. The
+  template-authority lock and `TERMINAL_READY.txt` carry the new hub commit and
+  blob hashes, and `TERMINAL_READY.txt` describes the 1.2 admission policy.
 - **Frontend `npm audit` gate now uses an expiring allow-list instead of failing
   on advisories that cannot be fixed.** `desktop-build.yml` runs
   `tools/check_npm_audit.py`, which still fails on any advisory at or above
@@ -79,6 +126,22 @@ A bump to the **federation export** version is what the release-tagging workflow
   `desktop/README.md`.
 
 ### Fixed
+- **Campaign Finance no longer reports a missing contribution total as `$0`.** With no
+  campaign-finance dataset materialized (every source absent or empty),
+  `/campaign-finance/summary` returned `totalContributionAmount: 0` because
+  `sum(s["amount"] or 0 ...)` turned each source's `null` into zero, and the dashboard's
+  "Signed amount" tile showed `$0` directly above "No campaign-finance datasets are
+  materialized...". The total is now `null` when no contribution source reports an amount
+  (a source that reports exactly 0 still gives `0`; sources that report an amount are summed
+  as before), the client fallback in `dashboard/src/lib/api.js` is `null`, and the tile
+  renders an em dash. `fmtMoney` also renders a blank string, `NaN` or an infinite value as
+  an em dash instead of `$0` or `$NaN`. That retires the test that pinned `fmtMoney('')` as
+  `$0`: it was a deliberate tripwire for a change in the loader's null handling, and the
+  case is unreachable today because `_num` in `server/backend/main.py` returns `None` for a
+  blank value. Not changed: an unparseable amount inside a present dataset still counts as
+  0 (`_amount()` ends in `fillna(0)`), and a total over some but not all sources still sums
+  only the sources that report an amount. The prebuilt dashboard bundle was regenerated
+  with `build_prebuilt_dashboard.py --build`.
 - **The Tailwind 4 upgrade (#678) no longer changes the dashboard's native form controls
   and table cells.** Tailwind 4's preflight resets `margin` and `padding` on every
   element, which also removed browser defaults that Tailwind 3 left alone: the Data
