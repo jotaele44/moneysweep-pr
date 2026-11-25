@@ -126,9 +126,9 @@ options; the app restarts on the page. `--smoke` and `--selftest` never show it.
 Guest mode keeps a shared desktop tidy. It does not stop someone who can already
 run programs under your account.
 
-The Launch Pad appears once `requirements-desktop.txt` pins a `prii-desktop`
-that includes it (0.3.0 or later). With an older runtime the declaration is
-ignored and the app opens directly, as before.
+`requirements-desktop.txt` pins `prii-desktop` 0.3.0 (thehub-pr `dc79dc0`), the
+first runtime that includes the Launch Pad. An environment that still has an
+older runtime installed ignores the declaration and opens the app directly.
 
 ## First boot
 
