@@ -1,0 +1,32 @@
+{
+  "extension_id": "financial-classification-v1-internal",
+  "capabilities": [
+    {
+      "id": "financial-classification-v1-observation-core",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Source-preserving financial observation primitives used by MoneySweep's ingestion, normalization, and accounting-validation pipelines. This module is a deterministic internal data-contract layer, not a standalone human-facing workflow or an analysis surface. It exposes no API, CLI, GUI control, or direct user workflow. Any future user-facing financial lineage, reconciliation, or simulation capability must be separately registered and wired through the complete backend/API/client/GUI/E2E path; this classification does not exempt those future capabilities.",
+      "backend": {
+        "files": [
+          "moneysweep/financial_classification_v1.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_financial_classification_v1.py"
+        ]
+      },
+      "candidate_ids": [
+        "python_module:moneysweep/financial_classification_v1.py",
+        "python_symbol:moneysweep/financial_classification_v1.py:ObservationError",
+        "python_symbol:moneysweep/financial_classification_v1.py:canonical_bytes",
+        "python_symbol:moneysweep/financial_classification_v1.py:classify_coverage",
+        "python_symbol:moneysweep/financial_classification_v1.py:decimal_string",
+        "python_symbol:moneysweep/financial_classification_v1.py:make_observation",
+        "python_symbol:moneysweep/financial_classification_v1.py:undisbursed"
+      ]
+    }
+  ],
+  "exceptions": []
+}

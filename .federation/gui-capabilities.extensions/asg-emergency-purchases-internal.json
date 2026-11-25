@@ -1,4 +1,5 @@
 {
+  "extension_id": "asg-emergency-purchases-internal",
   "capabilities": [
     {
       "id": "asg-emergency-purchases-materialization-pipeline",

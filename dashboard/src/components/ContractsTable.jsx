@@ -13,6 +13,7 @@ import SortHead from '@/components/SortHead'
 import { FederationStatusBadge } from '@pr-federation/react'
 import { fmtMoney, statusRole } from '@/lib/cs-format'
 import { useSortable } from '@/lib/use-sortable'
+import { scrollRegion } from '@/lib/scrollRegion'
 
 function StatusBadge({ status, className }) {
   return (
@@ -50,7 +51,7 @@ export default function ContractsTable() {
           className="ms-filter-control h-7 w-[240px] bg-background text-xs"
         />
       </div>
-      <div className="ms-scroll-region min-h-0 flex-1 overflow-auto">
+      <div {...scrollRegion('Contracts table')} className="ms-scroll-region min-h-0 flex-1 overflow-auto">
         <QueryBoundary
           query={query}
           isEmpty={(d) => !d?.length}

@@ -11,6 +11,7 @@
   "stream_counts": {
     "entities": 207,
     "relationships": 66,
+    "source_monitors": 167,
     "sources": 4508
   }
 }
