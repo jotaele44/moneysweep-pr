@@ -14,7 +14,8 @@ docs/BUILD_EXECUTION_SEQUENCE.md or the issue it closes. -->
 ## Quality gates
 
 - [ ] `ruff check .` clean
-- [ ] `ruff format --check .` clean
+- [ ] `make format-check` clean (`ruff format --check`, minus the files `FROZEN_RE`
+      in `lint.yml` excludes)
 - [ ] `python -m mypy` clean (pinned version from `requirements-dev.txt`)
 - [ ] `pytest -q` passes (and coverage stays at/above the floor)
 - [ ] `requirements.lock` regenerated if `requirements.in` changed
@@ -40,9 +41,8 @@ docs/BUILD_EXECUTION_SEQUENCE.md or the issue it closes. -->
 - [ ] Analytical/background results expose applicable progress, freshness,
       provenance, errors, and artifact access in the GUI
 - [ ] End-to-end GUI tests were added or updated and
-      `python .federation/check_gui_parity_with_extensions.py` passes (the CI
-      gate — wraps `scripts/check_gui_parity.py` against the manifest merged
-      with `.federation/gui-capabilities.extensions/*.json`)
+      `python3 scripts/check_gui_parity.py` passes (the CI gate; it merges
+      `.federation/gui-capabilities.extensions/*.json` itself)
 - [ ] Any `internal` or `staged` exception includes its rationale, owner,
       tracking reference, and expiry
 

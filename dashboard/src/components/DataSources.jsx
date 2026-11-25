@@ -12,11 +12,12 @@ import {
   saveCredential,
   stageOfflineFile,
 } from '@/lib/api'
+import { scrollRegion } from '@/lib/scrollRegion'
 
 function JsonResult({ value }) {
   if (!value) return null
   return (
-    <pre className="max-h-48 overflow-auto rounded-md border border-border bg-card/60 p-3 text-[11px] leading-relaxed text-muted-foreground">
+    <pre {...scrollRegion('Source details')} className="max-h-48 overflow-auto rounded-md border border-border bg-card/60 p-3 text-[11px] leading-relaxed text-muted-foreground">
       {JSON.stringify(value, null, 2)}
     </pre>
   )
@@ -158,7 +159,7 @@ export default function DataSources() {
   const automatableTotal = readiness.automatable_total ?? apiSources.length
 
   return (
-    <div className="ms-scroll-region h-full overflow-auto p-4">
+    <div {...scrollRegion('Data sources')} className="ms-scroll-region h-full overflow-auto p-4">
       <div className="mx-auto grid max-w-6xl gap-4 lg:grid-cols-2">
         <HudDrgrAudit />
         <section className="rounded-lg border border-border bg-card/50 p-4 lg:col-span-2">

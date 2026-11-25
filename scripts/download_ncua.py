@@ -49,6 +49,8 @@ NCUA_COLUMNS = [
     "city",
     "state",
     "source_doc",
+    "origin",
+    "financial_scope",
 ]
 
 KNOWN_NCUA_DATA = [
@@ -200,6 +202,8 @@ def _fetch_ncua_search_api(session, logger) -> list[dict]:
                 "city": str(cu.get("City", cu.get("city", ""))),
                 "state": "PR",
                 "source_doc": NCUA_SEARCH_API,
+                "origin": "AUTHORITATIVE_API",
+                "financial_scope": "INSTITUTION_WIDE",
             }
         )
     if rows:
@@ -289,6 +293,8 @@ def _fetch_ncua_bulk(session, logger) -> list[dict]:
                                 "city": str(rd.get("CITY", rd.get("city", ""))),
                                 "state": "PR",
                                 "source_doc": url,
+                                "origin": "AUTHORITATIVE_BULK",
+                                "financial_scope": "INSTITUTION_WIDE",
                             }
                         )
                 if rows:
@@ -332,7 +338,12 @@ def run(root: Path | None = None, force: bool = False) -> dict:
     known_cu_numbers = {r.get("cu_number") for r in all_rows}
     for seed in KNOWN_NCUA_DATA:
         if seed["cu_number"] not in known_cu_numbers:
-            all_rows.append(seed)
+            materialized_seed = dict(seed)
+            materialized_seed["origin"] = "FALLBACK_SEED"
+            materialized_seed["financial_scope"] = (
+                "AGGREGATE_STATEWIDE" if seed["cu_number"] == "ALL_PR" else "INSTITUTION_WIDE"
+            )
+            all_rows.append(materialized_seed)
 
     if not all_rows:
         logger.warning(

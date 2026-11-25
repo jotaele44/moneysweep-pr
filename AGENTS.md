@@ -29,19 +29,22 @@ user-relevant outcomes still require a GUI surface.
 
 ## Required change protocol
 
-1. Update `.federation/gui-capabilities.json` in the same change.
+1. Declare the capability in `.federation/gui-capabilities.json`, or in a
+   fragment under `.federation/gui-capabilities.extensions/`, in the same change.
 2. Bind backend endpoints/modules and GUI routes/components bidirectionally.
 3. Make the workflow reachable from visible navigation or a documented
-   contextual GUI path.
-4. Add or update an end-to-end GUI test.
-5. Run:
-   - `python .federation/check_gui_parity_with_extensions.py` (the CI gate;
-     wraps `scripts/check_gui_parity.py` against the manifest merged with
-     `.federation/gui-capabilities.extensions/*.json` — running the bare
-     script skips those extension fragments)
-   - the frontend package's `npm run test:gui-parity`
-6. Never regenerate `.federation/gui-parity-baseline.json` merely to make a gate
+   contextual GUI path. (This repository has not yet adopted the shared shell
+   and its navigation registry; until it does, navigation lives in
+   `dashboard/src/pages/Dashboard.jsx`.)
+4. Add or update an end-to-end GUI test, name it in `tests.e2e`, and list it in
+   `dashboard/gui-parity.playwright.config.mjs`.
+5. Run `python3 scripts/check_gui_parity.py` (the CI gate; it merges the
+   extension fragments itself) and the frontend package's
+   `npm run test:gui-parity`.
+6. Never regenerate `.federation/gui-parity-baseline.json` to make a gate
    pass. Baseline changes require an audited inventory explanation.
+
+The full rules are in `thehub-pr/docs/FEDERATION_GUI_STANDARD.md`.
 
 Pure infrastructure may be classified `internal` with a concrete rationale.
 Phased work must remain unreachable behind a feature flag and carry a tracking
