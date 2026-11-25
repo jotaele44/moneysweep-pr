@@ -1,4 +1,5 @@
 {
+  "extension_id": "ecpaf-v21-shadow-policy-pin",
   "capabilities": [
     {
       "id": "ecpaf-v21-shadow-policy-pin-validator",

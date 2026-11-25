@@ -29,11 +29,19 @@ compileall:  ## Byte-compile moneysweep/scripts/tests (matches ci.yml's compile 
 lint:  ## ruff lint (gating in .github/workflows/lint.yml)
 	ruff check .
 
-format:  ## ruff format — rewrite files in place
-	ruff format .
+# The CI format gate skips every tracked .py file that FROZEN_RE in
+# .github/workflows/lint.yml matches: the certified leaderboard runtime and the
+# Grid V2 Cell_Profile files rendered from thehub-pr. Both format targets read
+# that pattern from lint.yml, so they cannot drift from CI, and stop if it is gone.
+FORMAT_FILES = re="$$(sed -n "s/^ *FROZEN_RE='\(.*\)'$$/\1/p" .github/workflows/lint.yml)"; \
+	test -n "$$re" || { echo "FROZEN_RE not found in .github/workflows/lint.yml" >&2; exit 1; }; \
+	git ls-files '*.py' | grep -Ev "$$re" | tr '\n' '\0'
 
-format-check:  ## ruff format --check (gating; the CI counterpart)
-	ruff format --check .
+format:  ## ruff format — rewrite in place every file the CI format gate checks
+	@$(FORMAT_FILES) | xargs -0 ruff format
+
+format-check:  ## ruff format --check over the same files (gating; the CI counterpart)
+	@$(FORMAT_FILES) | xargs -0 ruff format --check
 
 type:  ## mypy over the configured scope (gating in mypy.yml)
 	$(PYTHON) -m mypy
