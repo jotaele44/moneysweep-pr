@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { getHudDrgrAudits, createHudDrgrAudit } from '@/lib/hudDrgrApi'
+import { scrollRegion } from '@/lib/scrollRegion'
 
 export default function HudDrgrAudit() {
   const [audits, setAudits] = useState([])
@@ -33,7 +34,7 @@ export default function HudDrgrAudit() {
     {busy && <p role="status">Loading audit results…</p>}
     {error && <p role="alert">{error} — saved results below may be stale. Refresh to retry.</p>}
     {!busy && !error && audits.length === 0 && <p>No saved audit receipts are available.</p>}
-    {audits.map(audit => <details key={audit.path} className="my-3 rounded border border-border p-3 text-xs [overflow-wrap:anywhere]">
+    {audits.map(audit => <details key={audit.path} className="my-3 rounded-sm border border-border p-3 text-xs [overflow-wrap:anywhere]">
       <summary className="cursor-pointer">{audit.receipt?.generated_at_utc || audit.path} · {audit.state}</summary>
       <p className="my-2">Receipt SHA256: {audit.sha256}</p>
       <p>Receipt path: {audit.path}</p>
@@ -45,7 +46,7 @@ export default function HudDrgrAudit() {
           <p>{row.path}</p><p>{row.classification} · {row.inclusion_decision}</p>
           <p>Source SHA256: {row.sha256 || 'Unavailable'} · Rows: {row.logical_rows ?? 'Unknown'}</p>
         </div>)}
-        <details><summary className="cursor-pointer">Full receipt metadata</summary><pre className="max-h-64 overflow-auto">{JSON.stringify(audit.receipt, null, 2)}</pre></details>
+        <details><summary className="cursor-pointer">Full receipt metadata</summary><pre {...scrollRegion('Receipt metadata')} className="max-h-64 overflow-auto">{JSON.stringify(audit.receipt, null, 2)}</pre></details>
       </>}
     </details>)}
   </section>

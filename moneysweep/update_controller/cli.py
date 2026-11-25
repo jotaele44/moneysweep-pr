@@ -240,7 +240,7 @@ def cmd_ingest_drops(args: argparse.Namespace) -> int:
 def cmd_run(args: argparse.Namespace) -> int:
     from concurrent.futures import ThreadPoolExecutor
 
-    from moneysweep.update_controller.executor import run_source
+    from moneysweep.update_controller.executor import run_source_isolated
     from moneysweep.update_controller.planner import _dotenv, build_plan
     from moneysweep.update_controller.scheduler import group_wave_by_lane, topological_waves
     from moneysweep.update_controller.state import load_state, write_state
@@ -275,7 +275,7 @@ def cmd_run(args: argparse.Namespace) -> int:
             def run_lane(lane):
                 lane_results = []
                 for item in lane:
-                    result = run_source(
+                    result = run_source_isolated(
                         policies[item.source_id],
                         reg.get(item.source_id, {}),
                         state,

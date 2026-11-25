@@ -1,4 +1,5 @@
 {
+  "extension_id": "haf-contract-validation",
   "capabilities": [
     {
       "id": "haf-contract-validation",
