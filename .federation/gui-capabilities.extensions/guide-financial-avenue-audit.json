@@ -1,4 +1,5 @@
 {
+  "extension_id": "guide-financial-avenue-audit",
   "capabilities": [
     {
       "id": "guide-financial-avenue-audit-pipeline",

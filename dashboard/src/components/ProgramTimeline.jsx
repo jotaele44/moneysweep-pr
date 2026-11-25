@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpDown, CalendarClock, CircleDot, Search } from "lucide-react";
 import { mergeProgramActivity, readLiveProgramActivity } from "./programActivityEvent";
+import { scrollRegion } from '@/lib/scrollRegion'
 
 const PHASE_RANK = { NOW: 0, NEXT: 1, QUEUED: 2, BLOCKED: 3, UNRESOLVED: 4, CONTRADICTED: 4, COMPLETED: 5, SUPERSEDED: 6 };
 
@@ -38,7 +39,7 @@ export default function ProgramTimeline({ items, producerId, title = "Timeline",
           <CalendarClock className="h-5 w-5 text-primary" />
         </div>
         <div className="grid gap-3 border-b border-border p-4">
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div {...scrollRegion('Activity filters')} className="flex gap-2 overflow-x-auto pb-1">
             {["ALL", "NOW", "NEXT", "QUEUED", "BLOCKED"].map((value) => (
               <button key={value} type="button" onClick={() => setFilter(value)} className={`min-h-9 rounded-lg border px-3 font-mono text-[11px] font-semibold ${filter === value ? "border-primary/60 bg-primary/10 text-foreground" : "border-border text-muted-foreground"}`}>{value}</button>
             ))}

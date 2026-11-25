@@ -3,18 +3,18 @@
   "build_env": {
     "VITE_API_BASE": ""
   },
-  "bundle_tree_sha256": "5fe2b7254f86764bd292ae757f6557151523683cad264f7c8bed38cab8744e28",
+  "bundle_tree_sha256": "bb4bc1dbb4295faf7772befbb9ff1d5c3e4a6f02b0b03ac7d89e69980807218b",
   "file_count": 22,
   "files": [
     {
-      "bytes": 89526,
-      "path": "assets/index-BbKYRIvE.css",
-      "sha256": "2fe7396b142d56111e8cf2f9bc36c40fff69c9b0c5d6040853e3efe10455269b"
+      "bytes": 855250,
+      "path": "assets/index-B6jhaiSA.js",
+      "sha256": "53c6b42de105d39741ffb7e2e4dc62678ca0b81663a82da907b5b1ee179591db"
     },
     {
-      "bytes": 853869,
-      "path": "assets/index-xHPKZVps.js",
-      "sha256": "d9e6231aa528a02b7d2d29bce5e0281dd56ca194247accda915358cc24399d6d"
+      "bytes": 89546,
+      "path": "assets/index-itZAwCOc.css",
+      "sha256": "74abaaf16d3e5b0a2f75478f78c041c506bd57f1ac2931761795fccd7da986c7"
     },
     {
       "bytes": 25960,
@@ -114,15 +114,15 @@
     {
       "bytes": 3865,
       "path": "index.html",
-      "sha256": "8e8f7df6ea0a0a7568608b0ac585d2c408989e36c35caf647a7b4f59767ec986"
+      "sha256": "f34a759405d50254f62aea0bd54acd08453c858a0d0dd71843369fdb33ffeb08"
     }
   ],
-  "generated_at": "2026-11-11T19:28:53Z",
+  "generated_at": "2026-11-23T18:07:30Z",
   "generated_by": {
-    "node": "v22.22.2",
-    "npm": "10.9.7"
+    "node": "v22.23.5",
+    "npm": "10.9.9"
   },
   "schema_version": "moneysweep_prebuilt_dashboard_v1",
-  "source_fingerprint": "52a6ac5b6512dec582afc2e7581505543874e68a096e257c3fe84b4641d36e26",
-  "total_bytes": 1653881
+  "source_fingerprint": "5fb75e55b6915acd5a40b1c7ea1bfc80687ac37cc2144e2f0d997ef53890ede8",
+  "total_bytes": 1655282
 }

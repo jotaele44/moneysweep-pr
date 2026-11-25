@@ -6,11 +6,13 @@
 
 The pipeline acquires, normalizes, validates, and cross-links public procurement, infrastructure, lobbying, campaign-finance, debt/fiscal-control, contractor-reference, recovery-assistance, and geospatial records. It exports reviewable records for [`thehub-pr`](https://github.com/jotaele44/thehub-pr), where cross-producer aggregation and correlation occur.
 
-> **Diagnostic-only surface (ADR 0001, Phase 2).** This repo's dashboard is a
-> development and diagnostic tool for this producer only. The supported product
-> surface for the PRII federation is the hub app
-> (`thehub-pr/server/frontend`), which renders this producer's data alongside
-> the other engines. See `thehub-pr/docs/adr/0001-federated-engines-single-hub.md`.
+> **The dashboard is this producer's own application.** Every human-facing
+> capability of this repository must be usable through it and proven by an
+> end-to-end test (`thehub-pr/docs/adr/0014-spoke-guis-are-complete-domain-apps.md`,
+> which supersedes the earlier "diagnostic-only" framing). The hub app
+> (`thehub-pr/server/frontend`) remains the cross-producer surface. The rules
+> are in `thehub-pr/docs/FEDERATION_GUI_STANDARD.md` and
+> [`docs/GUI_CAPABILITY_PARITY.md`](docs/GUI_CAPABILITY_PARITY.md).
 
 ## Desktop app
 
@@ -65,12 +67,13 @@ what removes the remaining one-time approval.
 
 moneysweep-pr is **not yet a production-certified master dataset**. The current state is a controlled buildout phase:
 
-- **Source registry:** 164 tracked source definitions (includes SBA disaster-loan sources; counts follow `reports/materialization_readiness.json`).
-- **Automatable sources:** 116 marked ready by the materialization-readiness gate (14 formerly scraper-queued PR-gov sources promoted after confirming real scraping implementations, most recently hacienda_sut_ivu).
+- **Source registry:** 167 tracked source definitions (includes SBA disaster-loan sources; counts follow `reports/materialization_readiness.json`).
+- **Automatable sources:** 119 marked ready by the materialization-readiness gate (14 formerly scraper-queued PR-gov sources promoted after confirming real scraping implementations, most recently hacienda_sut_ivu).
 - **Queued / excluded sources:** 42 manual-export sources, 1 scraper-needed stub (pr_act_154_excise), semantic duplicates, and deferred stubs remain outside the automatable target.
 - **Strict preflight:** required before producer execution or promotion.
 - **Current active work:** Tranche B manual-source ingestion (7 output files seeded; operator must drop source files to populate).
-- **Last recorded full test baseline:** 2018 passed, 6 skipped, 0 failed.
+- **Required sources:** 12 of 16 fully materialized (`reports/source_registry_status.csv`); `hud_drgr_authorized` and the two campaign-finance sources are not materialized, `usaspending_prime` and `prasa` are partial.
+- **Last recorded full test baseline:** 3194 passed, 10 skipped, 0 failed, 55.20% coverage (gate 44%) — measured 2026-11-15 on Python 3.13; see `STATUS.md`.
 
 Source-of-truth status files:
 
@@ -81,6 +84,8 @@ reports/next_actions.md
 reports/materialization_readiness.json
 reports/source_registry_status.csv
 ```
+
+`reports/current_status.json` is a frozen Wave 0 certification record (2026-07-30 evidence); for the measured present state read `STATUS.md` and `reports/source_registry_status.csv`.
 
 New documentation anchors for the SBA recovery source refresh:
 
@@ -180,8 +185,8 @@ git clone https://github.com/jotaele44/moneysweep-pr.git
 cd moneysweep-pr
 python3 -m venv .venv
 source .venv/bin/activate
-# The shared prii-maintenance library resolves via a pinned git+https
-# reference in requirements.txt — no thehub-pr sibling checkout needed:
+# The shared prii-maintenance and prii-export-utils libraries resolve via pinned
+# git+https references in requirements.txt — no thehub-pr sibling checkout needed:
 pip install -r requirements.txt
 python -m pytest tests/ -q
 python3 run_all.py --only-setup --strict-preflight

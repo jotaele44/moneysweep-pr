@@ -84,24 +84,20 @@ jobs:
         if: ${{ steps.target.outputs.ticker != '' }}
         run: python -m pip install -r requirements.txt
 
-      - name: Restore pinned SEC certification snapshot
+      - name: Restore pinned SEC certification snapshot archive
+        if: ${{ steps.target.outputs.ticker != '' }}
+        uses: ./.github/actions/restore-sec-snapshot
+        with:
+          token: ${{ github.token }}
+
+      - name: Verify pinned SEC certification snapshot
         if: ${{ steps.target.outputs.ticker != '' }}
         env:
-          GH_TOKEN: ${{ github.token }}
-          SNAPSHOT_ARTIFACT_ID: "9598537414"
           FREEZE_MANIFEST_SHA256: "3234edd4cfe97535b462b34d89bc1e8175d0d983f4a2976de9a84acfc67d9e27"
           DENOMINATORS_SHA256: "ac773f11b5fb736c96bf64231207ddb3254cb0d2e07755eecf4a2131001498ec"
         shell: bash
         run: |
           set -euo pipefail
-          archive="$RUNNER_TEMP/sec-ownership-issuer-certification.zip"
-          curl --fail --location --retry 3 \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            -o "$archive" \
-            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$SNAPSHOT_ARTIFACT_ID/zip"
-          unzip -q "$archive" -d "$GITHUB_WORKSPACE"
           printf '%s  %s\n' \
             "$FREEZE_MANIFEST_SHA256" data/manifests/capital_control/bpop_8q_freeze_manifest.json \
             "$DENOMINATORS_SHA256" data/staging/processed/pr_sec_share_denominators_v2.csv \

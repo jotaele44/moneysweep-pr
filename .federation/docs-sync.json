@@ -74,6 +74,16 @@
       ],
       "on": ["delete", "rename"],
       "why": "The quality-gates table names the CI workflow behind each gate, and the notes name the dev pins, the lock files and the pytest markers, all as bare file names that the reference check skips."
+    },
+    {
+      "doc": "docs/GUI_CAPABILITY_PARITY.md",
+      "covers": [
+        ".federation/gui-capabilities.json",
+        ".federation/gui-capabilities.extensions/**",
+        ".federation/gui-parity-baseline.json"
+      ],
+      "on": ["add", "delete", "rename"],
+      "why": "Names the files that make up the GUI capability contract."
     }
   ]
 }
