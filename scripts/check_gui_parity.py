@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """Enforce end-to-end GUI capability parity with a no-new-debt ratchet.
 
+Rendered from thehub-pr/federation-templates/gui/check_gui_parity.py.
+Do not hand-edit - template-drift.yml fails the build if you do. Change the
+template and re-render. The rules this enforces are written down in
+thehub-pr/docs/FEDERATION_GUI_STANDARD.md.
+
 The manifest is the human-reviewed capability contract. Discovery is deliberately
 broad: it inventories production/analysis Python modules and public symbols,
 HTTP endpoints, GUI pages/routes/controls, client API functions, CLI-only
@@ -10,6 +15,12 @@ discoverable outside the route table.
 Existing findings live in a committed baseline. Pull requests may reduce that
 baseline, but any newly discovered unpaired signal fails. Active manifest
 capabilities are validated bidirectionally and must carry an end-to-end GUI test.
+
+Repo-specific expansion goes in extension fragments: every
+``<manifest-stem>.extensions/*.json`` beside the manifest is merged on top of
+it before validation. A fragment may only append capabilities and exceptions;
+it can never redefine a base entry, change discovery, or touch the baseline.
+
 The script is dependency-free and supports Python 3.9+.
 """
 
@@ -38,12 +49,24 @@ REPORT_SCHEMA = "prii.gui-parity-report/v1"
 CLASSIFICATIONS = {"user", "operator", "analysis", "client_only", "internal"}
 STATUSES = {"active", "staged", "legacy"}
 HTTP_VERBS = {"GET", "POST", "PUT", "PATCH", "DELETE"}
+
+# Capability ids the federation hub owns. A repository declares one only when
+# it ships the feature, but may not reuse the id for something else or under a
+# different classification. Mirrors
+# thehub-pr/federation-templates/gui/core-capabilities.json.
+CORE_CAPABILITIES = {
+    "pr-grid-v2-runtime-contract": "internal",
+    "service-health": "internal",
+}
+FRAGMENT_KEYS = {"schema_version", "extension_id", "capabilities", "exceptions"}
+EXPIRY_WARNING_DAYS = 14
+EXPIRY_MAX_DAYS = 90
 SOURCE_SUFFIXES = {".py", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"}
 FRONTEND_SUFFIXES = {".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"}
 
 ENDPOINT_RE = re.compile(
     r"@\s*[A-Za-z_][A-Za-z0-9_]*\s*\.\s*"
-    r"(get|post|put|patch|delete)\s*\(\s*[\"']([^\"']+)[\"']",
+    r"(get|post|put|patch|delete)\s*\(\s*[\"']([^\"']*)[\"']",
     re.IGNORECASE,
 )
 ROUTE_RES = (
@@ -106,11 +129,88 @@ def _write_json(path: Path, value: dict[str, Any]) -> None:
     )
 
 
-def _sha256_json(value: dict[str, Any]) -> str:
-    encoded = json.dumps(
-        value, sort_keys=True, separators=(",", ":"), ensure_ascii=False
-    ).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
+def extensions_dir(manifest_path: Path) -> Path:
+    """``gui-capabilities.json`` -> ``gui-capabilities.extensions/`` beside it."""
+    return manifest_path.with_name(manifest_path.stem + ".extensions")
+
+
+def merge_extensions(
+    manifest: dict[str, Any], manifest_path: Path
+) -> tuple[dict[str, Any], list[str], list[dict[str, str]]]:
+    """Append every extension fragment to a copy of the base manifest.
+
+    Returns ``(merged, fragment_names, issues)``. Fragments are read in sorted
+    filename order so the merged manifest is deterministic. A fragment that
+    breaks a rule is reported and contributes nothing, so one bad file cannot
+    hide the findings of the others.
+    """
+    merged = dict(manifest)
+    capabilities = list(manifest.get("capabilities") or [])
+    exceptions = list(manifest.get("exceptions") or [])
+    base_ids = {
+        str(item.get("id"))
+        for item in [*capabilities, *exceptions]
+        if isinstance(item, dict) and item.get("id")
+    }
+    names: list[str] = []
+    issues: list[dict[str, str]] = []
+    directory = extensions_dir(manifest_path)
+    paths = sorted(directory.glob("*.json")) if directory.is_dir() else []
+
+    for path in paths:
+        name = path.name
+
+        def bad(message: str, _name: str = name) -> None:
+            issues.append(
+                {"code": "INVALID_EXTENSION_FRAGMENT", "message": f"{_name}: {message}"}
+            )
+
+        try:
+            fragment = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            bad(f"unreadable JSON: {exc}")
+            continue
+        if not isinstance(fragment, dict):
+            bad("fragment must be a JSON object")
+            continue
+        before = len(issues)
+        unknown = sorted(set(fragment) - FRAGMENT_KEYS)
+        if unknown:
+            bad(
+                "a fragment may only append capabilities and exceptions; "
+                f"unexpected key(s): {', '.join(unknown)}"
+            )
+        if fragment.get("extension_id") != path.stem:
+            bad(f"extension_id must equal the filename stem {path.stem!r}")
+        if fragment.get("schema_version", MANIFEST_SCHEMA) != MANIFEST_SCHEMA:
+            bad(f"schema_version must be {MANIFEST_SCHEMA!r}")
+        extra_capabilities = fragment.get("capabilities", [])
+        extra_exceptions = fragment.get("exceptions", [])
+        if not isinstance(extra_capabilities, list) or not isinstance(
+            extra_exceptions, list
+        ):
+            bad("capabilities and exceptions must be lists")
+            continue
+        for item in [*extra_capabilities, *extra_exceptions]:
+            if isinstance(item, dict) and str(item.get("id")) in base_ids:
+                issues.append(
+                    {
+                        "code": "EXTENSION_REDEFINES_BASE",
+                        "message": (
+                            f"{name}: {item.get('id')} is already defined in the "
+                            "base manifest; fragments are append-only"
+                        ),
+                    }
+                )
+        if len(issues) > before:
+            continue
+        capabilities.extend(extra_capabilities)
+        exceptions.extend(extra_exceptions)
+        names.append(name)
+
+    merged["capabilities"] = capabilities
+    merged["exceptions"] = exceptions
+    return merged, names, issues
 
 
 def _candidate_id(kind: str, *parts: str) -> str:
@@ -173,11 +273,14 @@ def _iter_files(
     suffixes: set[str],
     excludes: Iterable[str],
 ) -> list[Path]:
+    # Resolve once so relative_to() sees the same form as the resolved paths
+    # below (a symlinked checkout, or macOS tempdirs aliasing /var).
+    repo_root = repo_root.resolve()
     found: set[Path] = set()
     for configured in roots:
         candidate = (repo_root / configured).resolve()
         try:
-            candidate.relative_to(repo_root.resolve())
+            candidate.relative_to(repo_root)
         except ValueError:
             continue
         paths = [candidate] if candidate.is_file() else candidate.rglob("*") if candidate.exists() else []
@@ -192,8 +295,10 @@ def _iter_files(
 
 def _read_text(path: Path) -> str:
     try:
-        return path.read_text(encoding="utf-8")
-    except (OSError, UnicodeDecodeError):
+        size = path.stat().st_size
+        with path.open("rb") as handle:
+            return handle.read(size).decode("utf-8", errors="ignore")
+    except OSError:
         return ""
 
 
@@ -252,7 +357,7 @@ def _discover_python(
 
         if path in backend_files:
             for match in ENDPOINT_RE.finditer(text):
-                detail = f"{match.group(1).upper()} {match.group(2)}"
+                detail = f"{match.group(1).upper()} {match.group(2) or '/'}"
                 records.append(
                     _candidate(
                         "backend_endpoint",
@@ -413,8 +518,6 @@ def _discover_frontend(
 def discover_candidates(
     repo_root: Path, manifest: dict[str, Any]
 ) -> list[dict[str, Any]]:
-    # Resolve once so relative_to() sees the same form as the resolved paths
-    # _iter_files produces (macOS tempdirs alias /var -> /private/var).
     repo_root = repo_root.resolve()
     discovery = manifest.get("discovery", {})
     records = [
@@ -489,6 +592,8 @@ def mapped_candidate_ids(
                         mapped.add(item["id"])
                 elif item["kind"] in {"python_symbol", "analysis_symbol"}:
                     ref = f"{item['path']}:{item.get('symbol', '')}"
+                    # A file bound without a symbol list binds every public
+                    # symbol in it; listing symbols narrows the binding.
                     if ref in symbols or (not symbols and item["path"] in files):
                         mapped.add(item["id"])
 
@@ -528,6 +633,7 @@ def validate_manifest(
     today: date | None = None,
 ) -> list[dict[str, str]]:
     today = today or datetime.now(timezone.utc).date()
+    repo_root = repo_root.resolve()
     issues: list[dict[str, str]] = []
 
     def add(code: str, message: str, capability_id: str = "") -> None:
@@ -544,6 +650,28 @@ def validate_manifest(
             "INVALID_MANIFEST_SCHEMA",
             f"schema_version must be {MANIFEST_SCHEMA!r}",
         )
+
+    discovery = manifest.get("discovery", {})
+    if not isinstance(discovery, dict):
+        discovery = {}
+    for rel in discovery.get("navigation_files", []) or []:
+        if not (repo_root / str(rel)).is_file():
+            add(
+                "MISSING_NAVIGATION_FILE",
+                f"discovery.navigation_files path does not exist: {rel}",
+            )
+    raw_configs = discovery.get("e2e_config", [])
+    e2e_configs = [raw_configs] if isinstance(raw_configs, str) else list(raw_configs or [])
+    e2e_config_text = ""
+    for rel in e2e_configs:
+        config_path = repo_root / str(rel)
+        if not config_path.is_file():
+            add(
+                "MISSING_E2E_CONFIG",
+                f"discovery.e2e_config path does not exist: {rel}",
+            )
+            continue
+        e2e_config_text += _read_text(config_path) + "\n"
 
     ids: set[str] = set()
     endpoint_details = {
@@ -581,6 +709,14 @@ def validate_manifest(
 
         classification = capability.get("classification")
         status = capability.get("status")
+        reserved = CORE_CAPABILITIES.get(capability_id)
+        if reserved is not None and classification != reserved:
+            add(
+                "CORE_CAPABILITY_MISMATCH",
+                f"{capability_id} is a federation core capability and must be "
+                f"classified {reserved!r}",
+                capability_id,
+            )
         if classification not in CLASSIFICATIONS:
             add(
                 "INVALID_CLASSIFICATION",
@@ -666,6 +802,17 @@ def validate_manifest(
                         "active GUI capability requires tests.e2e",
                         capability_id,
                     )
+                # A spec nobody runs proves nothing. When the repository
+                # declares its Playwright config(s), every claimed spec must
+                # be named there.
+                if e2e_configs:
+                    for spec in e2e:
+                        if Path(str(spec)).name not in e2e_config_text:
+                            add(
+                                "E2E_SPEC_NOT_COLLECTED",
+                                f"tests.e2e file is not named in discovery.e2e_config: {spec}",
+                                capability_id,
+                            )
                 e2e_routes = (
                     frontend.get("e2e_routes", [])
                     if isinstance(frontend, dict)
@@ -745,12 +892,19 @@ def validate_manifest(
                         capability_id,
                     )
 
+    exception_ids: set[str] = set()
     for exception in manifest.get("exceptions", []):
         if not isinstance(exception, dict):
             add("INVALID_EXCEPTION", "each exception must be an object")
             continue
-        required = ("id", "reason", "owner", "tracking", "expires_on", "candidate_ids")
+        exception_id = str(exception.get("id", ""))
+        if exception_id and exception_id in exception_ids:
+            add("DUPLICATE_EXCEPTION_ID", exception_id, exception_id)
+        exception_ids.add(exception_id)
+        required = ("id", "reason", "owner", "tracking", "expires_on")
         missing = [field for field in required if not exception.get(field)]
+        if not exception.get("candidate_ids") and not exception.get("candidate_files"):
+            missing.append("candidate_ids or candidate_files")
         if missing:
             add(
                 "INVALID_EXCEPTION",
@@ -780,6 +934,54 @@ def exception_candidate_ids(
     return result
 
 
+def expiry_warnings(
+    manifest: dict[str, Any], *, today: date | None = None
+) -> list[dict[str, str]]:
+    """Non-blocking notices about exception and staged-capability expiry.
+
+    An expiry that lapses fails the gate for every pull request in the
+    repository, including unrelated ones, so it is surfaced ahead of time. An
+    expiry set far in the future is a waiver in all but name.
+    """
+    today = today or datetime.now(timezone.utc).date()
+    warnings: list[dict[str, str]] = []
+    dated = [
+        ("exception", item)
+        for item in manifest.get("exceptions", [])
+        if isinstance(item, dict)
+    ] + [
+        ("staged capability", item)
+        for item in manifest.get("capabilities", [])
+        if isinstance(item, dict) and item.get("status") == "staged"
+    ]
+    for label, item in dated:
+        expiry = _parse_iso_date(item.get("expires_on"))
+        if expiry is None or expiry < today:
+            continue
+        remaining = (expiry - today).days
+        if remaining <= EXPIRY_WARNING_DAYS:
+            warnings.append(
+                {
+                    "code": "PARITY_EXPIRY_IMMINENT",
+                    "message": (
+                        f"{label} {item.get('id')} expires on {expiry.isoformat()} "
+                        f"({remaining} day(s)); the gate fails for every change after that"
+                    ),
+                }
+            )
+        elif remaining > EXPIRY_MAX_DAYS:
+            warnings.append(
+                {
+                    "code": "PARITY_EXPIRY_TOO_FAR",
+                    "message": (
+                        f"{label} {item.get('id')} expires on {expiry.isoformat()}, "
+                        f"more than {EXPIRY_MAX_DAYS} days out"
+                    ),
+                }
+            )
+    return warnings
+
+
 def build_baseline(
     manifest: dict[str, Any], candidates: list[dict[str, Any]]
 ) -> dict[str, Any]:
@@ -788,7 +990,6 @@ def build_baseline(
         "schema_version": BASELINE_SCHEMA,
         "repository": manifest.get("repository"),
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
-        "manifest_sha256": _sha256_json(manifest),
         "candidate_count": len(candidates),
         "signal_counts": dict(sorted(counts.items())),
         "candidates": candidates,
@@ -802,6 +1003,8 @@ def evaluate(
     manifest_issues: list[dict[str, str]],
     *,
     strict: bool = False,
+    warnings: list[dict[str, str]] | None = None,
+    extensions: list[str] | None = None,
 ) -> tuple[dict[str, Any], bool]:
     baseline_candidates = baseline.get("candidates", [])
     baseline_ids: set[str] = set()
@@ -861,6 +1064,8 @@ def evaluate(
         "legacy_findings": legacy_findings,
         "removed_baseline_candidate_ids": removed_ids,
         "manifest_issues": manifest_issues,
+        "extensions": list(extensions or []),
+        "warnings": list(warnings or []),
         "errors": errors,
     }
     return report, not errors
@@ -888,6 +1093,10 @@ def _render_summary(report: dict[str, Any]) -> str:
         lines.extend(["", "### Blocking findings", ""])
         for issue in report["errors"][:50]:
             lines.append(f"- `{issue['code']}` — {issue['message']}")
+    if report.get("warnings"):
+        lines.extend(["", "### Warnings", ""])
+        for issue in report["warnings"]:
+            lines.append(f"- `{issue['code']}` — {issue['message']}")
     if report.get("signal_counts"):
         lines.extend(["", "### Legacy debt by signal", ""])
         for signal, count in report["signal_counts"].items():
@@ -904,6 +1113,8 @@ def _print_console(report: dict[str, Any]) -> None:
         f"mapped={summary['mapped_candidates']} legacy={summary['legacy_gaps']} "
         f"new={summary['new_gaps']} manifest_issues={summary['manifest_issues']}"
     )
+    for issue in report.get("warnings", []):
+        print(f"warning {issue['code']}: {issue['message']}", file=sys.stderr)
     for issue in report.get("errors", [])[:100]:
         print(f"{issue['code']}: {issue['message']}", file=sys.stderr)
 
@@ -940,6 +1151,17 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="repository root (defaults to the parent of scripts/)",
     )
+    parser.add_argument(
+        "--no-extensions",
+        action="store_true",
+        help="validate the base manifest alone, ignoring extension fragments",
+    )
+    parser.add_argument(
+        "--emit-merged",
+        default=None,
+        help="write the base manifest merged with its extension fragments to "
+        "this repository-relative path (for tools that read capabilities)",
+    )
     args = parser.parse_args(argv)
 
     repo_root = (
@@ -952,11 +1174,23 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         manifest = _load_json(manifest_path)
+        fragment_names: list[str] = []
+        fragment_issues: list[dict[str, str]] = []
+        if not args.no_extensions:
+            manifest, fragment_names, fragment_issues = merge_extensions(
+                manifest, manifest_path
+            )
         candidates = discover_candidates(repo_root, manifest)
-        issues = validate_manifest(repo_root, manifest, candidates)
+        issues = [
+            *fragment_issues,
+            *validate_manifest(repo_root, manifest, candidates),
+        ]
     except ValueError as exc:
         print(f"gui-parity: {exc}", file=sys.stderr)
         return 2
+
+    if args.emit_merged:
+        _write_json(repo_root / args.emit_merged, manifest)
 
     if args.write_baseline:
         if issues:
@@ -980,7 +1214,13 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     report, passed = evaluate(
-        manifest, baseline, candidates, issues, strict=args.strict
+        manifest,
+        baseline,
+        candidates,
+        issues,
+        strict=args.strict,
+        warnings=expiry_warnings(manifest),
+        extensions=fragment_names,
     )
     if args.report:
         _write_json(repo_root / args.report, report)
