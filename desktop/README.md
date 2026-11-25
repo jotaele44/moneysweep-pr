@@ -105,6 +105,31 @@ The frozen build contains:
 
 It must not download or install runtime dependencies on first launch.
 
+## The Launch Pad
+
+`desktop/config.py` declares a **Launch Pad**: a screen the shared desktop
+runtime shows after setup and before MoneySweep starts. On it you choose:
+
+- **Guest or Operator.** Guest is read-only: you can browse every tab, and the
+  app refuses file uploads, materialization and audit runs, and saving or
+  deleting API keys. Operator allows them from this computer and can be
+  protected with a passphrase. Neither mode changes the API's loopback check.
+- **Open on**: any dashboard tab.
+- **Launch option** (Operator only): the financial records folder used by the
+  HUD DRGR source audit (`MONEYSWEEP_FINANCIALS_ROOT`).
+
+It also reports readiness: canonical table counts in the workspace, how many
+materialization runs have left receipts, and the release status. Use the
+**Launch Pad** button beside the gear to come back and change the mode or
+options; the app restarts on the page. `--smoke` and `--selftest` never show it.
+
+Guest mode keeps a shared desktop tidy. It does not stop someone who can already
+run programs under your account.
+
+`requirements-desktop.txt` pins `prii-desktop` 0.3.0 (thehub-pr `dc79dc0`), the
+first runtime that includes the Launch Pad. An environment that still has an
+older runtime installed ignores the declaration and opens the app directly.
+
 ## First boot
 
 The application bundle is immutable. On startup MoneySweep creates a writable
@@ -122,6 +147,24 @@ receipt is written to:
 The app then starts one local same-origin FastAPI server on a free loopback port
 and opens the dashboard in a native window. The browser fallback remains
 available through the shared `prii_desktop` launcher.
+
+## WebView requirements
+
+The dashboard is styled with Tailwind CSS 4, which needs a web engine at or above
+Safari/WebKit 16.4, Chrome/Chromium 111 or Firefox 128 (it relies on `@property`,
+`color-mix()` and cascade layers). The native window uses the operating system's
+engine, so the floor applies to the machine, not to the app bundle:
+
+- **macOS** renders in the system WKWebView, which is the system WebKit. macOS 13.3
+  and later include WebKit 16.4; on macOS 11 and 12 (the app declares 11.0 as its
+  minimum) it arrives with Safari updates, so keep Safari current there.
+- **Windows** renders in Microsoft Edge WebView2 (Chromium), whose Evergreen runtime
+  updates itself and is well above the floor.
+- **Linux** renders in whichever WebKitGTK or Qt WebEngine build pywebview finds;
+  check that it meets the floor.
+
+Below the floor the page still loads but styling degrades. For example a
+translucent colour such as `bg-primary/10` falls back to its opaque base colour.
 
 ## Data Sources tab
 

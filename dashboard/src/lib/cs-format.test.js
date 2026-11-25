@@ -43,12 +43,26 @@ describe('fmtMoney', () => {
     expect(fmtMoney(-500)).toBe('-$500');
   });
 
-  it('renders an empty string as $0 — a known sharp edge', () => {
-    // `'' == null` is false, so an empty CSV cell that arrives as '' rather than
-    // null coerces to 0 inside Intl and renders as a real zero-dollar award.
-    // Pinned deliberately: if the loader's null handling ever changes, this test
-    // is where that shows up, rather than in a report someone reads as fact.
-    expect(fmtMoney('')).toBe('$0');
+  it('renders a blank or non-finite value as missing, never as a real zero', () => {
+    // This test used to pin `fmtMoney('') === '$0'` as a known sharp edge: `'' == null`
+    // is false, so an empty CSV cell that arrived as '' rather than null was coerced
+    // to 0 inside Intl and shown as a zero-dollar award. It was a tripwire for a
+    // change in the loader's null handling. The loader already guarantees null for
+    // blank values (`_num` in server/backend/main.py), so the case was unreachable.
+    // The tripwire is retired on purpose: the formatter now refuses the case itself,
+    // so a missing amount is never a zero amount whatever shape the absence takes.
+    expect(fmtMoney('')).toBe('—');
+    expect(fmtMoney('   ')).toBe('—');
+    expect(fmtMoney(NaN)).toBe('—');
+    expect(fmtMoney(Infinity)).toBe('—');
+    expect(fmtMoney(-Infinity)).toBe('—');
+    expect(fmtMoney('not a number')).toBe('—');
+  });
+
+  it('still formats a numeric string as an amount, and a genuine zero as $0', () => {
+    expect(fmtMoney('1234.5')).toBe('$1,235');
+    expect(fmtMoney('0')).toBe('$0');
+    expect(fmtMoney(0)).toBe('$0');
   });
 });
 
