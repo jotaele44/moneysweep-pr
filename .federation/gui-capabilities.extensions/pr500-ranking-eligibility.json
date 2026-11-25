@@ -1,4 +1,5 @@
 {
+  "extension_id": "pr500-ranking-eligibility",
   "capabilities": [
     {
       "id": "pr500-ranking-eligibility-gate",

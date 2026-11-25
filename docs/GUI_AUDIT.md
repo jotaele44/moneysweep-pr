@@ -8,13 +8,14 @@ Scope: `dashboard/` (React/Vite SPA) and its desktop launcher entry points.
 `moneysweep-pr` is the public-money intelligence **producer** for the PRII
 (Puerto Rico Integrated Intelligence) federation — it acquires, normalizes,
 and cross-links public procurement, entity, campaign-finance, and government
-change data into the frozen `data/canonical_v1/*.csv` corpus. Per the repo's
-own README, **the `dashboard/` app audited here is explicitly a
-diagnostic-only surface for this producer** (ADR 0001, Phase 2); the
-federation's supported product surface is the separate `thehub-pr` hub app,
-which renders this producer's data alongside others. That framing matters for
-reading this audit: the dashboard is a read-only, single-producer inspection
-tool, not the federation's end-user product.
+change data into the frozen `data/canonical_v1/*.csv` corpus. When this audit
+was written, the repo's README described **the `dashboard/` app audited here as
+a diagnostic-only surface for this producer** (ADR 0001, Phase 2), with the
+separate `thehub-pr` hub app as the federation's supported product surface.
+That framing matters for reading this audit: it treats the dashboard as a
+read-only, single-producer inspection tool. The framing has since been
+superseded by thehub-pr ADR 0014, under which the dashboard is this producer's
+own complete application; the README now says so.
 
 **Tech stack**
 - React 19 + Vite 6, `react-router-dom` v7 (BrowserRouter in normal builds,
