@@ -67,7 +67,7 @@ export const getGovernmentChangeSummary = () => fetchJSON('/government-changes/s
 })
 
 export const getCampaignFinanceSummary = () => fetchJSON('/campaign-finance/summary', {
-  sources: [], totalContributionRows: 0, totalContributionAmount: 0,
+  sources: [], totalContributionRows: 0, totalContributionAmount: null,
   totalFederalOutflowRows: 0, derived: {}, hasData: false,
   materializedFileCount: 0, updatedAt: null,
   emptyState: 'No campaign-finance datasets are materialized in this repository checkout.',

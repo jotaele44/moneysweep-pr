@@ -1,4 +1,5 @@
 {
+  "extension_id": "dashboard-node-runtime",
   "capabilities": [
     {
       "id": "dashboard-node-runtime-bootstrap",

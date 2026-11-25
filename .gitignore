@@ -153,9 +153,6 @@ reports/source_update_tmp/
 # Contract Forensics V3 runtime reports (seed/pipeline/candidate outputs) — never committed
 reports/forensics/
 
-# Scratch output from .federation/check_gui_parity_with_extensions.py
-artifacts/gui-capabilities-merged.json
-
 # Desktop wrapper (see desktop/README.md)
 dashboard/node_modules/
 dashboard/dist/
@@ -174,10 +171,9 @@ dist-smoke/
 # audit trail — same posture as reports/maintenance/ above).
 reports/local_analysis/
 
-# Merged GUI-capability manifest written on every run of
-# .federation/check_gui_parity_with_extensions.py (see its MERGED constant).
-# Derived from gui-capabilities.json + the extensions fragments, so it is build
-# output, never a source of truth.
+# Build output, never a source of truth: the GUI parity report
+# (scripts/check_gui_parity.py --report) and anything written with
+# --emit-merged land here.
 artifacts/
 
 # Re-block .DS_Store inside the allow-listed data/ subtrees. The top-level

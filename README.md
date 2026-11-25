@@ -6,11 +6,13 @@
 
 The pipeline acquires, normalizes, validates, and cross-links public procurement, infrastructure, lobbying, campaign-finance, debt/fiscal-control, contractor-reference, recovery-assistance, and geospatial records. It exports reviewable records for [`thehub-pr`](https://github.com/jotaele44/thehub-pr), where cross-producer aggregation and correlation occur.
 
-> **Diagnostic-only surface (ADR 0001, Phase 2).** This repo's dashboard is a
-> development and diagnostic tool for this producer only. The supported product
-> surface for the PRII federation is the hub app
-> (`thehub-pr/server/frontend`), which renders this producer's data alongside
-> the other engines. See `thehub-pr/docs/adr/0001-federated-engines-single-hub.md`.
+> **The dashboard is this producer's own application.** Every human-facing
+> capability of this repository must be usable through it and proven by an
+> end-to-end test (`thehub-pr/docs/adr/0014-spoke-guis-are-complete-domain-apps.md`,
+> which supersedes the earlier "diagnostic-only" framing). The hub app
+> (`thehub-pr/server/frontend`) remains the cross-producer surface. The rules
+> are in `thehub-pr/docs/FEDERATION_GUI_STANDARD.md` and
+> [`docs/GUI_CAPABILITY_PARITY.md`](docs/GUI_CAPABILITY_PARITY.md).
 
 ## Desktop app
 
