@@ -1,4 +1,5 @@
 {
+  "extension_id": "desktop-offline-bootstrap",
   "capabilities": [
     {
       "id": "desktop-offline-bootstrap",

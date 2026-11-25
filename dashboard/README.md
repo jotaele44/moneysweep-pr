@@ -1,10 +1,11 @@
 # moneysweep-pr Dashboard
 
-> **Diagnostic-only surface (ADR 0001, Phase 2).** This dashboard is a
-> development and diagnostic tool for this producer only. The supported product
-> surface for the PRII federation is the hub app
-> (`thehub-pr/server/frontend`), which renders this producer's data alongside
-> the other engines. See `thehub-pr/docs/adr/0001-federated-engines-single-hub.md`.
+> **This dashboard is this producer's own application.** Every human-facing
+> capability of the repository must be usable here and proven by an end-to-end
+> test (`thehub-pr/docs/adr/0014-spoke-guis-are-complete-domain-apps.md`, which
+> supersedes the earlier "diagnostic-only" framing). The hub app
+> (`thehub-pr/server/frontend`) remains the cross-producer surface. The rules
+> are in `thehub-pr/docs/FEDERATION_GUI_STANDARD.md`.
 
 Local-only React dashboard for the moneysweep-pr (MoneySweep / Contracts)
 module. Same federation frontend process as the others — Vite + React (JSX) +
@@ -26,6 +27,17 @@ npm run dev
 Open http://localhost:5173. (`VITE_API_BASE` overrides the API base; default
 `http://localhost:8000`.)
 
+## Styling
+
+Tailwind CSS 4, through the `@tailwindcss/vite` plugin. There is no
+`tailwind.config.js` or PostCSS config: the design tokens (colours, radius,
+fonts) and the files Tailwind scans for class names are declared in
+`src/index.css`. Browsers need Safari 16.4, Chrome 111 or Firefox 128 or newer;
+the desktop app's WebView requirements are in `desktop/README.md`.
+
+`npm run build:export` (`VITE_OFFLINE=1`) writes the single-file offline export.
+Its inlining step is `scripts/inline-single-file.mjs`, covered by a unit test.
+
 ## What it shows
 - **Contracts** — joined awarding/contractor names + municipality, filterable by
   agency; detail sheet per contract. *Award amounts are blank in the frozen
@@ -43,8 +55,7 @@ allows `:5173`.
 
 ## API Keys tab — the one deliberate write path
 
-Every other route here is read-only, matching the diagnostic-only framing
-above. `/api-keys` (`server/backend/api_keys.py`) is a single, explicit
+Every other route here is read-only. `/api-keys` (`server/backend/api_keys.py`) is a single, explicit
 exception: it lets an operator set pipeline credentials from the browser
 instead of hand-editing `.env`, backed by the same `scripts/manage_api_keys.py`
 module `scripts/set_api_key.py` (CLI) uses.

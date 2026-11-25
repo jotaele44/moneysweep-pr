@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import QueryBoundary from '@/components/QueryBoundary'
 import { Table, TableHeader, TableBody, TableRow, TableCell } from '@/components/ui/table'
 import { useOwnershipDeepDive, useOwnershipDeepDiveStatus } from '@/lib/hooks'
+import { scrollRegion } from '@/lib/scrollRegion'
 
 function Metric({ label, value }) {
   return (
@@ -82,7 +83,7 @@ export default function OwnershipDeepDive() {
           </div>
         </div>
 
-        <div className="ms-scroll-region min-h-0 flex-1 overflow-auto">
+        <div {...scrollRegion('Ownership records')} className="ms-scroll-region min-h-0 flex-1 overflow-auto">
           <Table>
             <TableHeader className="sticky top-0 bg-card">
               <TableRow className="border-border hover:bg-transparent">

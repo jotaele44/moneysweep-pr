@@ -338,6 +338,53 @@ def run_source(
     return finish(gate_status, exit_code)
 
 
+def run_source_isolated(
+    policy: SourceUpdatePolicy,
+    registry_entry: dict[str, Any],
+    state: dict[str, Any],
+    **kwargs: Any,
+) -> dict[str, Any]:
+    """``run_source`` that turns a controller-side crash into a failed result.
+
+    ``run_source`` already contains producer failures, but an exception raised
+    by the controller itself (snapshotting an output, scanning a dropzone)
+    used to escape the worker and abort every other source in the cadence.
+    Record it against this source only; the batch still exits non-zero.
+    """
+    try:
+        return run_source(policy, registry_entry, state, **kwargs)
+    except Exception as exc:  # noqa: BLE001 - one source must not abort the cadence
+        sid = policy.source_id
+        run_id = _new_run_id()
+        status = ExecutionStatus.PRODUCER_EXECUTION_FAILED.value
+        packet = FailurePacket(
+            command=[sys.executable, policy.runner, *policy.runner_args],
+            exit_code=None,
+            source_id=sid,
+            run_id=run_id,
+            status=status,
+            suspected_area="update_controller",
+            retryable=False,
+            last_40_lines=[f"{type(exc).__name__}: {exc}"[:500]],
+        )
+        if not kwargs.get("dry_run"):
+            append_failure(packet.to_dict(), kwargs.get("root"))
+        row = state.setdefault("sources", {}).setdefault(sid, {})
+        row["last_attempt_at"] = _iso(kwargs.get("now") or _now())
+        row["last_status"] = status
+        row["last_exit_code"] = None
+        row["last_run_id"] = run_id
+        row["consecutive_failures"] = int(row.get("consecutive_failures", 0)) + 1
+        return {
+            "source_id": sid,
+            "run_id": run_id,
+            "status": status,
+            "exit_code": None,
+            "failure_packet": packet.to_dict(),
+            "government_change_monitor": row.get("government_change_monitor"),
+        }
+
+
 def _combined_hash(snapshots: dict[str, Any]) -> str:
     import hashlib
 
