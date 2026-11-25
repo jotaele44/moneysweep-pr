@@ -3,7 +3,14 @@
 import { lookup } from '@/lib/utils'
 
 export function fmtMoney(v) {
+  // A missing amount is never rendered as a zero amount. `null`/`undefined` are the
+  // loader's contract (`_num` in server/backend/main.py); a blank string and a value
+  // that is not a finite number are the same absence in another shape, and Intl
+  // would otherwise turn them into a real-looking "$0" or "$NaN".
   if (v == null) return '—'
+  if (typeof v === 'string' && v.trim() === '') return '—'
+  if (typeof v === 'number' && !Number.isFinite(v)) return '—'
+  if (typeof v === 'string' && !Number.isFinite(Number(v))) return '—'
   try {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v)
   } catch {

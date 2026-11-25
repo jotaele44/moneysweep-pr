@@ -15,6 +15,7 @@ import TypeFilterSelect from '@/components/TypeFilterSelect'
 import { entityTone } from '@/lib/cs-format'
 import { useSortable } from '@/lib/use-sortable'
 import { cn } from '@/lib/utils'
+import { scrollRegion } from '@/lib/scrollRegion'
 
 export default function EntitiesTable() {
   const query = useEntities()
@@ -49,9 +50,9 @@ export default function EntitiesTable() {
           aria-label="Search entities"
           className="ms-filter-control h-7 flex-1 bg-background text-xs"
         />
-        <TypeFilterSelect items={entities} field="entityType" value={type} onChange={setType} width="w-[120px]" capitalize />
+        <TypeFilterSelect label="Filter by entity type" items={entities} field="entityType" value={type} onChange={setType} width="w-[120px]" capitalize />
       </div>
-      <div className="ms-scroll-region min-h-0 flex-1 overflow-auto">
+      <div {...scrollRegion('Entities table')} className="ms-scroll-region min-h-0 flex-1 overflow-auto">
         <QueryBoundary
           query={query}
           isEmpty={(d) => !d?.length}
@@ -77,7 +78,7 @@ export default function EntitiesTable() {
                   tabIndex={0}
                   onClick={() => setOpen(e)}
                   onKeyDown={(ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); setOpen(e) } }}
-                  className="cursor-pointer border-border hover:bg-muted/50 focus:bg-muted/50 focus:outline-none"
+                  className="cursor-pointer border-border hover:bg-muted/50 focus:bg-muted/50 focus:outline-hidden"
                 >
                   <TableCell className="max-w-[220px] truncate text-xs text-foreground">{e.name}</TableCell>
                   <TableCell><Badge variant="outline" className={cn('text-[10px] capitalize', entityTone(e.entityType))}>{e.entityType}</Badge></TableCell>

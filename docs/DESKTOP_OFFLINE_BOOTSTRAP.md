@@ -24,8 +24,9 @@ Deliberate, not an oversight:
 - Wheels are specific to platform, CPU architecture *and* CPython minor version.
   Covering macOS arm64 + macOS x86_64 + Linux + Windows across the supported
   interpreters is roughly 1.5 GB, and it goes stale on every constraint bump.
-- Two requirements resolve from `git+https://` URLs (`prii-maintenance` and
-  `prii-desktop`), so they cannot be served from an ordinary package index at all.
+- Three requirements resolve from GitHub URLs (`prii-maintenance` and
+  `prii-export-utils` from `git+https://` URLs, `prii-desktop` from an archive URL),
+  so they cannot be served from an ordinary package index at all.
 
 A wheel cache the operator creates once is cheaper and always current.
 
@@ -45,7 +46,7 @@ python3 -m pip download \
   -d desktop/wheelhouse
 ```
 
-`pip download` builds wheels for the two `git+https://` requirements as well, so
+`pip download` builds wheels for the three GitHub URL requirements as well, so
 the cache is complete and the target machine needs neither PyPI nor GitHub.
 
 **Copy `desktop/wheelhouse/` into the checkout on the target machine**, then start

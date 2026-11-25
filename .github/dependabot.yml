@@ -6,6 +6,13 @@
 # packages, the dashboard/frontend npm tree, and the actions CI runs. Minor and
 # patch bumps are grouped so the weekly PR volume stays reviewable; majors still
 # arrive as individual PRs since they need a human read.
+#
+# The workflows thehub-pr renders into this repo are excluded from the actions
+# ecosystem below. A pin bumped in a rendered copy diverges from its template
+# and fails template-drift.yml, so those pins move only in the template:
+# thehub-pr's own Dependabot bumps it there, and the change reaches this repo in
+# a template sync PR. thehub-pr renders its own variant of this file,
+# baseline/dependabot.hub.yml, for that.
 version: 2
 updates:
   - package-ecosystem: "pip"
@@ -42,6 +49,10 @@ updates:
 
   - package-ecosystem: "github-actions"
     directory: "/"
+    # Filled in by the renderer from targets.yaml: exactly the workflows it
+    # renders into this repo. template-drift.yml is not one of them (only its
+    # PRII_TEMPLATE_REF is managed), so its actions keep their Dependabot bumps.
+    exclude-paths: [".github/workflows/codeql.yml", ".github/workflows/docs-sync.yml", ".github/workflows/gui-capability-parity.yml", ".github/workflows/secret-scan.yml"]
     schedule:
       interval: "weekly"
       day: "monday"
