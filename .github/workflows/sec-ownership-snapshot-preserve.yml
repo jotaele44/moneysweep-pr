@@ -1,0 +1,66 @@
+name: SEC Ownership Snapshot Preserve
+
+# The SEC ownership certification workflows replay one frozen snapshot, produced
+# by workflow run 32946731464 and stored as Actions artifact 9598537414. Actions
+# artifacts are deleted after 90 days (this one on 2026-11-24). This workflow
+# copies the same bytes, verified against the pinned SHA-256, to a release asset,
+# which does not expire. It is idempotent and never re-acquires data from SEC.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write # required to create the evidence release and upload the asset
+
+concurrency:
+  group: sec-ownership-snapshot-preserve
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  preserve:
+    name: Copy frozen snapshot to a durable release asset
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Preserve snapshot
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SNAPSHOT_ARTIFACT_ID: "9598537414"
+          RELEASE_TAG: "evidence-sec13f-bpop-8q-v1"
+          ASSET_NAME: "sec-ownership-bpop-8q-audit.zip"
+          ARCHIVE_SHA256: "b815af1baf1d80e4230ce5aa2a0fae98dfcdf9ec850ca2d05fa7dc8eaadb9fa6"
+        run: |
+          set -euo pipefail
+          workdir="$RUNNER_TEMP/sec-snapshot"
+          mkdir -p "$workdir"
+          archive="$workdir/$ASSET_NAME"
+
+          if gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+               --pattern "$ASSET_NAME" --dir "$workdir"; then
+            printf '%s  %s\n' "$ARCHIVE_SHA256" "$archive" | sha256sum --check --strict
+            echo "Release $RELEASE_TAG already holds the verified snapshot; nothing to do."
+            exit 0
+          fi
+
+          rm -f "$archive"
+          curl --fail --location --retry 3 \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -o "$archive" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$SNAPSHOT_ARTIFACT_ID/zip"
+          printf '%s  %s\n' "$ARCHIVE_SHA256" "$archive" | sha256sum --check --strict
+
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" --prerelease \
+              --title "Evidence: frozen SEC 13F BPOP 8Q certification snapshot" \
+              --notes "Durable copy of Actions artifact $SNAPSHOT_ARTIFACT_ID (workflow run 32946731464). Archive SHA-256: $ARCHIVE_SHA256. This is frozen certification evidence, not a software or data release, and does not change production status."
+          fi
+          gh release upload "$RELEASE_TAG" "$archive" --repo "$GITHUB_REPOSITORY"
+          echo "Preserved snapshot as $RELEASE_TAG/$ASSET_NAME"

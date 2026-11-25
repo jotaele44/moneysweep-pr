@@ -54,7 +54,7 @@
           "filename": {"type": "string"},
           "stream": {
             "type": "string",
-            "enum": ["sources", "entities", "relationships", "funding_awards", "transactions", "observations", "alerts"]
+            "enum": ["sources", "entities", "relationships", "funding_awards", "transactions", "observations", "alerts", "source_monitors"]
           },
           "record_count": {"type": "integer", "minimum": 0},
           "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
