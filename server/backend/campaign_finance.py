@@ -114,10 +114,14 @@ def campaign_finance_summary():
         PROCESSED / filename for filename in FILES.values() if (PROCESSED / filename).exists()
     ]
     has_data = any(source["rows"] for source in sources) or any(derived.values())
+    # A missing amount is not a zero amount. A source that is absent or empty
+    # reports ``amount: None``; when no contribution source reports one, the total
+    # is unknown (None), never $0. Only sources that report an amount are summed.
+    contribution_amounts = [s["amount"] for s in sources[:3] if s["amount"] is not None]
     return {
         "sources": sources,
         "totalContributionRows": sum(s["rows"] for s in sources[:3]),
-        "totalContributionAmount": sum(s["amount"] or 0 for s in sources[:3]),
+        "totalContributionAmount": sum(contribution_amounts) if contribution_amounts else None,
         "totalFederalOutflowRows": sources[3]["rows"] + sources[4]["rows"],
         "derived": derived,
         "hasData": bool(has_data),

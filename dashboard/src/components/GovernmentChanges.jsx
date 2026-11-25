@@ -3,6 +3,7 @@ import { Table, TableHeader, TableBody, TableRow, TableCell } from '@/components
 import QueryBoundary from '@/components/QueryBoundary'
 import GovernmentChangeCandidates from '@/components/GovernmentChangeCandidates'
 import { useGovernmentChanges, useGovernmentChangeSummary } from '@/lib/hooks'
+import { scrollRegion } from '@/lib/scrollRegion'
 
 export default function GovernmentChanges() {
   const query = useGovernmentChanges()
@@ -21,7 +22,7 @@ export default function GovernmentChanges() {
         {totals && !totals.ledgerPresent && <Badge variant="outline">event ledger not materialized</Badge>}
         {totals && !totals.candidateLedgerPresent && <Badge variant="outline">candidate ledger not materialized</Badge>}
       </div>
-      <div className="ms-scroll-region min-h-0 flex-1 overflow-auto">
+      <div {...scrollRegion('Government changes')} className="ms-scroll-region min-h-0 flex-1 overflow-auto">
         <QueryBoundary query={query} isEmpty={(data) => !data?.length} emptyLabel="No adjudicated government change events are materialized. Absence here is not evidence of no organizational change.">
           <Table>
             <TableHeader className="sticky top-0 bg-card">

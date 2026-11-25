@@ -49,8 +49,10 @@ ignore_errors = true
 
 [tool.ruff]
 # Lint is GATING: .github/workflows/lint.yml runs `ruff check .` and
-# `ruff format --check .` with no continue-on-error (see Makefile's
-# `lint`/`format-check` targets, which mirror it exactly). This comment used
+# `ruff format --check` with no continue-on-error. The format check skips the
+# files its FROZEN_RE matches: the certified leaderboard runtime and the Grid V2
+# Cell_Profile files rendered from thehub-pr (see Makefile's `lint`/`format-check`
+# targets, which mirror it exactly). This comment used
 # to describe that as a future "Wave B, task 13" flip from a non-gating
 # start; that flip has already happened. Keep the rule set here aligned with
 # ruff's defaults so the measured baseline stays stable.

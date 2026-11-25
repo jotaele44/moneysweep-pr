@@ -7,6 +7,7 @@ import {
   getLeaderboardSignals,
   getLeaderboardEntity,
 } from '@/lib/api'
+import { scrollRegion } from '@/lib/scrollRegion'
 
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 
@@ -72,7 +73,7 @@ export default function FinancialLeaderboards() {
   )
 
   return (
-    <div className="h-full overflow-auto p-4">
+    <div {...scrollRegion('Financial leaderboards')} className="h-full overflow-auto p-4">
       <div className="mx-auto max-w-7xl space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -96,7 +97,7 @@ export default function FinancialLeaderboards() {
         {!loading && ranking && <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
           <section className="overflow-hidden rounded-lg border border-border bg-card">
             <div className="border-b border-border px-3 py-2 text-xs text-muted-foreground">Top {ranking.topN} · ties included · {ranking.metricType} · {ranking.candidateCount ?? 0} candidates</div>
-            {ranking.rows?.length ? <div className="overflow-x-auto"><table className="w-full text-left text-xs"><thead className="bg-muted/50 text-muted-foreground"><tr><th className="p-2">Rank</th><th className="p-2">Entity</th><th className="p-2 text-right">Value</th><th className="p-2 text-right">Records</th><th className="p-2">Identity</th><th className="p-2">Inspect</th></tr></thead><tbody>
+            {ranking.rows?.length ? <div {...scrollRegion('Ranking table')} className="overflow-x-auto"><table className="w-full text-left text-xs"><thead className="bg-muted/50 text-muted-foreground"><tr><th className="p-2">Rank</th><th className="p-2">Entity</th><th className="p-2 text-right">Value</th><th className="p-2 text-right">Records</th><th className="p-2">Identity</th><th className="p-2">Inspect</th></tr></thead><tbody>
               {ranking.rows.map((row) => <tr key={`${row.entityId}:${row.currency}`} className="border-t border-border"><td className="p-2 font-mono">#{row.rank}</td><td className="p-2"><div className="font-medium">{row.entityDisplayName}</div><div className="font-mono text-[10px] text-muted-foreground">{row.entityId}</div></td><td className="p-2 text-right tabular-nums">{row.currency === 'USD' ? money.format(row.metricValue) : `${row.metricValue.toLocaleString()} ${row.currency}`}</td><td className="p-2 text-right tabular-nums">{row.recordCount}</td><td className="p-2"><StateBadge state={row.entityResolutionState} /></td><td className="p-2"><button type="button" className="min-h-9 rounded-sm border border-border px-2" onClick={() => setSelectedEntityId(row.entityId)}>Inspect</button></td></tr>)}
             </tbody></table></div> : <div className="p-6 text-sm text-muted-foreground">No certifiable ranking rows for this category. Missing adapters or source manifestations remain explicit rather than becoming false zero rankings.</div>}
           </section>

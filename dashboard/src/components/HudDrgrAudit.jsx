@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { getHudDrgrAudits, createHudDrgrAudit } from '@/lib/hudDrgrApi'
+import { scrollRegion } from '@/lib/scrollRegion'
 
 export default function HudDrgrAudit() {
   const [audits, setAudits] = useState([])
@@ -45,7 +46,7 @@ export default function HudDrgrAudit() {
           <p>{row.path}</p><p>{row.classification} · {row.inclusion_decision}</p>
           <p>Source SHA256: {row.sha256 || 'Unavailable'} · Rows: {row.logical_rows ?? 'Unknown'}</p>
         </div>)}
-        <details><summary className="cursor-pointer">Full receipt metadata</summary><pre className="max-h-64 overflow-auto">{JSON.stringify(audit.receipt, null, 2)}</pre></details>
+        <details><summary className="cursor-pointer">Full receipt metadata</summary><pre {...scrollRegion('Receipt metadata')} className="max-h-64 overflow-auto">{JSON.stringify(audit.receipt, null, 2)}</pre></details>
       </>}
     </details>)}
   </section>
