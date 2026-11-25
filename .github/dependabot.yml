@@ -51,6 +51,19 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    # Held majors. Each one conflicts with a peer the federation has not
+    # migrated: eslint-plugin-react 7 accepts eslint <= 9, @eslint/js 10
+    # requires eslint 10, and react-day-picker 8 accepts date-fns <= 3, so the
+    # update would fail `npm ci`. Held by semver level, not by version range, so
+    # a repository already on a newer major keeps its minor and patch updates.
+    # Remove an entry once its peer supports the new major.
+    ignore:
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "date-fns"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
