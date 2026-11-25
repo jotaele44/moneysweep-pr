@@ -7,16 +7,21 @@
 # patch bumps are grouped so the weekly PR volume stays reviewable; majors still
 # arrive as individual PRs since they need a human read.
 #
-# The workflows thehub-pr renders into this repo are excluded from the actions
-# ecosystem below. A pin bumped in a rendered copy diverges from its template
-# and fails template-drift.yml, so those pins move only in the template:
-# thehub-pr's own Dependabot bumps it there, and the change reaches this repo in
-# a template sync PR. thehub-pr renders its own variant of this file,
-# baseline/dependabot.hub.yml, for that.
+# The files thehub-pr renders into this repo are excluded below: its workflows
+# from the actions ecosystem, and its pip manifests (requirements-desktop.txt in
+# the desktop producers) from the pip ecosystem. A version bumped in a rendered
+# copy diverges from its template and fails template-drift.yml, so those
+# versions move only in the template: thehub-pr's own Dependabot bumps it there,
+# and the change reaches this repo in a template sync PR. thehub-pr renders its
+# own variant of this file, baseline/dependabot.hub.yml, for that.
 version: 2
 updates:
   - package-ecosystem: "pip"
     directory: "/"
+    # Filled in by the renderer from targets.yaml: the rendered files this
+    # ecosystem would read as manifests. Where it renders none, the renderer
+    # leaves this key out, and every manifest here keeps its bumps.
+    exclude-paths: ["requirements-desktop.txt"]
     schedule:
       interval: "weekly"
       day: "monday"
