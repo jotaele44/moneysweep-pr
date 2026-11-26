@@ -63,7 +63,8 @@ No file that existed at the baseline is modified. Capability parity was checked 
 the existing test suite, the lint and type gates and the GUI parity gate on the candidate
 tree (section 9). The candidate's own modules are registered as
 `internal` in `.federation/gui-capabilities.extensions/financial-intelligence-v1-internal.json`
-because no human-facing workflow reads them.
+because no human-facing workflow reads them. `docs/GUI_CAPABILITY_PARITY.md` describes
+fragments by filename pattern and lists none individually, so it is unchanged.
 
 ## 4. The ontology
 
