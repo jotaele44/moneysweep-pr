@@ -1,0 +1,1456 @@
+{
+  "schema_version": "financial_intelligence_ontology_v1",
+  "version": "1.0.0-candidate",
+  "status": "CANDIDATE_NOT_ADOPTED",
+  "certification": "WITHHELD",
+  "production_adoption": "BLOCKED",
+  "baseline": {
+    "repository": "jotaele44/moneysweep-pr",
+    "commit": "d5a443ef6425d09181f1481d14dd2a5d286dc6af",
+    "captured_utc_date": "2026-11-26"
+  },
+  "core_questions": [
+    "Who owns Puerto Rico's economic assets?",
+    "Who finances, operates and controls those assets?",
+    "Where does capital originate, circulate and ultimately accumulate?",
+    "Who benefits from government expenditures, contracts, subsidies and incentives?",
+    "What financial dependencies exist between public, private, domestic and foreign entities?",
+    "How have these relationships changed historically?"
+  ],
+  "foundations": [
+    {
+      "id": "F01",
+      "name": "Identity adjudication",
+      "module": "moneysweep.capital_control.resolution_core",
+      "symbols": [
+        "resolve_candidates",
+        "EvidenceBasis",
+        "CertificationState",
+        "BINDING_BASES",
+        "assert_no_unsafe_many_to_many"
+      ],
+      "role": "The only engine allowed to decide that two source manifestations are the same entity. Candidate sets, contradictions and SUPERSEDED observations are preserved.",
+      "status": "EXISTING_REUSED"
+    },
+    {
+      "id": "F02",
+      "name": "Entity-network kernel",
+      "module": "moneysweep.entity_network",
+      "symbols": [
+        "NodeKind",
+        "RelationshipFamily",
+        "RelationshipAssertion",
+        "MoneyFlowObservation",
+        "SectorMembership",
+        "assert_no_money_flow_as_relationship"
+      ],
+      "role": "Typed non-monetary relationships, N:N sector membership and the boundary that keeps dependency edges from becoming payment evidence.",
+      "status": "EXISTING_REUSED"
+    },
+    {
+      "id": "F03",
+      "name": "Source-preserving financial observation",
+      "module": "moneysweep.financial_classification_v1",
+      "symbols": [
+        "make_observation",
+        "canonical_bytes",
+        "decimal_string",
+        "classify_coverage",
+        "MEASURES"
+      ],
+      "role": "Exact-decimal amounts bound to source row identity, original byte hash, accounting measure, period, basis and currency.",
+      "status": "EXISTING_REUSED"
+    },
+    {
+      "id": "F04",
+      "name": "Legacy flow compatibility",
+      "module": "moneysweep.financial_flow_compatibility_v1",
+      "symbols": [
+        "adapt_legacy_flows"
+      ],
+      "role": "Read-only bridge from legacy random flow_id rows to source-bound observations; unbound rows stay UNRESOLVED.",
+      "status": "EXISTING_REUSED"
+    },
+    {
+      "id": "F05",
+      "name": "Government entity registry",
+      "module": null,
+      "paths": [
+        "config/government_entities/entity_types.yml",
+        "config/government_entities/relationship_types.yml",
+        "config/government_entities/identifier_schemes.yml",
+        "registries/government_entity_registry.json"
+      ],
+      "role": "Type, identifier-scheme and succession vocabulary for Puerto Rico public entities, including predecessor/successor and operator/concessionaire relations.",
+      "status": "EXISTING_REUSED"
+    },
+    {
+      "id": "F06",
+      "name": "Federal financial ontology",
+      "module": null,
+      "paths": [
+        "registries/federal_financial_ontology_v1.json",
+        "schemas/federal_financial_ontology.schema.json"
+      ],
+      "role": "Namespaced program / award / action / subaward / account identifiers for federal money.",
+      "status": "EXISTING_REUSED"
+    },
+    {
+      "id": "F07",
+      "name": "Source registry and readiness ledger",
+      "module": null,
+      "paths": [
+        "registries/source_registry.json",
+        "reports/financial_source_audit.csv",
+        "reports/source_registry_status.csv"
+      ],
+      "role": "The registered source denominator and its materialization state.",
+      "status": "EXISTING_REUSED"
+    },
+    {
+      "id": "F08",
+      "name": "Canonical transaction identity and domain projection",
+      "module": "moneysweep.financial_intelligence.transactions",
+      "symbols": [
+        "make_transaction",
+        "DomainMembership",
+        "project_domains",
+        "unique_total"
+      ],
+      "role": "One identity per underlying transaction, independent of how many domains it appears in.",
+      "status": "NEW_CANDIDATE"
+    },
+    {
+      "id": "F09",
+      "name": "Temporal ownership model",
+      "module": "moneysweep.financial_intelligence.ownership",
+      "symbols": [
+        "OwnershipInterval",
+        "holders_at",
+        "resolve_ultimate_holders"
+      ],
+      "role": "Dated ownership and control intervals with unknown owners preserved and parent kept distinct from beneficial owner.",
+      "status": "NEW_CANDIDATE"
+    },
+    {
+      "id": "F10",
+      "name": "Corporate continuity model",
+      "module": "moneysweep.financial_intelligence.continuity",
+      "symbols": [
+        "ContinuityObservation",
+        "continuity_profile"
+      ],
+      "role": "Seven independent status dimensions; no dimension is inferred from another.",
+      "status": "NEW_CANDIDATE"
+    }
+  ],
+  "domains": [
+    {
+      "id": "MS01",
+      "name": "Political Finance",
+      "coverage": "Campaign contributions, PACs, donors and expenditures",
+      "priority": "EXISTING_SCOPE",
+      "reuses_foundations": [
+        "F01",
+        "F02",
+        "F03",
+        "F08"
+      ],
+      "existing_assets": [
+        "moneysweep/political_finance",
+        "docs/POLITICAL_FINANCE_FLOW_GRAPH.md",
+        "docs/CAMPAIGN_FINANCE.md",
+        "registries/political_finance_sources.yaml"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS02",
+      "name": "Lobbying & Representation",
+      "coverage": "Lobbyists, clients, foreign principals and disclosed activities",
+      "priority": "EXISTING_SCOPE",
+      "reuses_foundations": [
+        "F01",
+        "F02",
+        "F08"
+      ],
+      "existing_assets": [
+        "schemas/lobbying_registry.schema.json",
+        "schemas/canonical_v1/lobbying_records.schema.json"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED",
+      "note": "Foreign principals (FARA) have no registered source; see source gaps."
+    },
+    {
+      "id": "MS03",
+      "name": "Government Procurement",
+      "coverage": "Contracts, amendments, subcontractors and awards",
+      "priority": "P1",
+      "reuses_foundations": [
+        "F01",
+        "F03",
+        "F05",
+        "F06",
+        "F08"
+      ],
+      "existing_assets": [
+        "schemas/forensics/award.schema.json",
+        "schemas/forensics/subaward.schema.json",
+        "schemas/local_contracts.schema.json",
+        "registries/om_contract_taxonomy.yaml"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS04",
+      "name": "Public Expenditures",
+      "coverage": "Government spending, appropriations and disbursements",
+      "priority": "UNASSIGNED",
+      "reuses_foundations": [
+        "F03",
+        "F05",
+        "F06",
+        "F08"
+      ],
+      "existing_assets": [
+        "moneysweep/financial_classification_v1.py",
+        "docs/GOVERNMENT_FLOW_COVERAGE.md"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS05",
+      "name": "Public Revenues",
+      "coverage": "Taxes, fees, tariffs and government income",
+      "priority": "UNASSIGNED",
+      "reuses_foundations": [
+        "F03",
+        "F05",
+        "F08"
+      ],
+      "existing_assets": [
+        "schemas/canonical_v1/revenue_streams.schema.json",
+        "schemas/infrastructure_fiscal_facts.schema.json"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED",
+      "note": "F03 MEASURES covers the spending side only; revenue measures need a separately versioned vocabulary."
+    },
+    {
+      "id": "MS06",
+      "name": "Public Debt",
+      "coverage": "Bonds, creditors, debt restructuring and debt service",
+      "priority": "P2",
+      "reuses_foundations": [
+        "F01",
+        "F03",
+        "F05",
+        "F08",
+        "F09"
+      ],
+      "existing_assets": [
+        "schemas/debt_instrument.schema.json",
+        "schemas/creditor_mapping.schema.json",
+        "schemas/fiscal_control_event.schema.json",
+        "schemas/canonical_v1/debt_instruments.schema.json"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS07",
+      "name": "Corporate Ownership",
+      "coverage": "Parent companies, subsidiaries and beneficial ownership",
+      "priority": "P1",
+      "reuses_foundations": [
+        "F01",
+        "F02",
+        "F09"
+      ],
+      "existing_assets": [
+        "moneysweep/capital_control",
+        "schemas/entity_parent_map.schema.json",
+        "docs/OWNERSHIP_AND_CAPITAL_DEEP_DIVE_V1.md"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED",
+      "note": "Certified scope today is one issuer (BPOP, eight 13F quarters). Nothing else is certified."
+    },
+    {
+      "id": "MS08",
+      "name": "Foreign Connections",
+      "coverage": "Foreign investments, entities and financial relationships",
+      "priority": "P1",
+      "reuses_foundations": [
+        "F01",
+        "F02",
+        "F08",
+        "F09"
+      ],
+      "existing_assets": [],
+      "population_state": "DEFINED_NOT_POPULATED",
+      "note": "Independently accessible category. No dedicated module, schema or certified source exists at baseline."
+    },
+    {
+      "id": "MS09",
+      "name": "US Mainland Connections",
+      "coverage": "External domestic ownership and capital",
+      "priority": "UNASSIGNED",
+      "reuses_foundations": [
+        "F01",
+        "F02",
+        "F08",
+        "F09"
+      ],
+      "existing_assets": [],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS10",
+      "name": "Government-Linked Capital",
+      "coverage": "Sovereign funds, state enterprises and public investment vehicles",
+      "priority": "P1",
+      "reuses_foundations": [
+        "F01",
+        "F05",
+        "F08",
+        "F09"
+      ],
+      "existing_assets": [
+        "registries/government_entity_registry.json"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS11",
+      "name": "Banking & Credit",
+      "coverage": "Financial institutions, lending and credit exposure",
+      "priority": "P3",
+      "reuses_foundations": [
+        "F01",
+        "F03",
+        "F08"
+      ],
+      "existing_assets": [
+        "registries/guide_financial_avenues_v1.yaml"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS12",
+      "name": "Investment Funds",
+      "coverage": "Private equity, hedge funds, pension funds and asset managers",
+      "priority": "P3",
+      "reuses_foundations": [
+        "F01",
+        "F08",
+        "F09"
+      ],
+      "existing_assets": [
+        "moneysweep/capital_control/sec13f.py",
+        "schemas/capital_control_investor.schema.json",
+        "schemas/capital_control_holding_observation.schema.json"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS13",
+      "name": "Tax Incentives",
+      "coverage": "Tax decrees, exemptions, credits and beneficiaries",
+      "priority": "P2",
+      "reuses_foundations": [
+        "F01",
+        "F03",
+        "F08"
+      ],
+      "existing_assets": [
+        "registries/guide_act60_temporal_crosswalk_v1.yaml",
+        "registries/guide_financial_avenues_v1.yaml"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS14",
+      "name": "Subsidies & Grants",
+      "coverage": "Federal and local assistance, grants and beneficiaries",
+      "priority": "P3",
+      "reuses_foundations": [
+        "F01",
+        "F03",
+        "F06",
+        "F08"
+      ],
+      "existing_assets": [
+        "schemas/moneysweep_funding_award.schema.json",
+        "schemas/sba_recovery_loan.schema.json",
+        "registries/federal_financial_ontology_v1.json"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS15",
+      "name": "Real Estate & Land",
+      "coverage": "Property ownership, transactions and investment portfolios",
+      "priority": "P3",
+      "reuses_foundations": [
+        "F01",
+        "F08",
+        "F09"
+      ],
+      "existing_assets": [
+        "schemas/canonical_v1/properties.schema.json",
+        "moneysweep/capital_control/resolution_core/property_project.py"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED",
+      "note": "Parcel selection requires an authoritative property anchor (existing resolution-core gate)."
+    },
+    {
+      "id": "MS16",
+      "name": "Strategic Infrastructure",
+      "coverage": "Financial interests in critical infrastructure",
+      "priority": "P2",
+      "reuses_foundations": [
+        "F01",
+        "F02",
+        "F08",
+        "F09",
+        "F10"
+      ],
+      "existing_assets": [
+        "schemas/infrastructure_projects.schema.json",
+        "schemas/infrastructure_fiscal_facts.schema.json",
+        "docs/prepa_titleiii_entity_graph.md"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED",
+      "note": "Asset identity and geometry are consumed from the owning federation repository, never re-registered here."
+    },
+    {
+      "id": "MS17",
+      "name": "Public-Private Partnerships",
+      "coverage": "Concessions, operating agreements and revenue arrangements",
+      "priority": "P2",
+      "reuses_foundations": [
+        "F01",
+        "F05",
+        "F08",
+        "F09",
+        "F10"
+      ],
+      "existing_assets": [
+        "docs/PPP_REGISTRY.md",
+        "docs/OM_CONTRACT_UNIVERSE.md",
+        "registries/om_contract_taxonomy.yaml"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS18",
+      "name": "International Trade",
+      "coverage": "Imports, exports, trading partners and commodity flows",
+      "priority": "P4",
+      "reuses_foundations": [
+        "F03",
+        "F08"
+      ],
+      "existing_assets": [],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS19",
+      "name": "Economic Dependencies",
+      "coverage": "External suppliers, creditors, operators and concentrated markets",
+      "priority": "P4",
+      "reuses_foundations": [
+        "F02",
+        "F08",
+        "F09"
+      ],
+      "existing_assets": [],
+      "population_state": "DEFINED_NOT_POPULATED",
+      "note": "Derived domain: it is computed from evidenced relationships in other domains and has no native source of its own."
+    },
+    {
+      "id": "MS20",
+      "name": "Financial Compliance",
+      "coverage": "Documented sanctions, enforcement actions and regulatory violations",
+      "priority": "UNASSIGNED",
+      "reuses_foundations": [
+        "F01",
+        "F02",
+        "F08"
+      ],
+      "existing_assets": [
+        "data/watchlists"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED",
+      "note": "Only documented actions with a list or docket identifier. Nationality is never a compliance signal."
+    },
+    {
+      "id": "MS21",
+      "name": "Bankruptcy & Restructuring",
+      "coverage": "Insolvency, creditors, asset transfers and surviving entities",
+      "priority": "P4",
+      "reuses_foundations": [
+        "F01",
+        "F05",
+        "F08",
+        "F09",
+        "F10"
+      ],
+      "existing_assets": [
+        "docs/prepa_titleiii_entity_graph.md",
+        "schemas/creditor_mapping.schema.json",
+        "schemas/fiscal_control_event.schema.json"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS22",
+      "name": "Insurance & Risk Transfer",
+      "coverage": "Insurers, reinsurers, guarantees and financial exposure",
+      "priority": "P5",
+      "reuses_foundations": [
+        "F01",
+        "F08"
+      ],
+      "existing_assets": [],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS23",
+      "name": "Nonprofit & Philanthropic Finance",
+      "coverage": "Foundations, donations, grants and institutional funding",
+      "priority": "UNASSIGNED",
+      "reuses_foundations": [
+        "F01",
+        "F03",
+        "F08"
+      ],
+      "existing_assets": [
+        "docs/NGO_INTEGRATION.md",
+        "docs/nonprofit_layer_legal_scope.md",
+        "config/domains/np_layer.yml"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS24",
+      "name": "Intellectual Property & Royalties",
+      "coverage": "Licensing, patents, royalties and intangible asset ownership",
+      "priority": "P5",
+      "reuses_foundations": [
+        "F01",
+        "F08",
+        "F09"
+      ],
+      "existing_assets": [],
+      "population_state": "DEFINED_NOT_POPULATED"
+    },
+    {
+      "id": "MS25",
+      "name": "Historical Economic Intelligence",
+      "coverage": "Historical ownership, investment and institutional continuity",
+      "priority": "P4",
+      "reuses_foundations": [
+        "F01",
+        "F05",
+        "F09",
+        "F10"
+      ],
+      "existing_assets": [
+        "registries/source_registry_extensions/nara_nextgen.json",
+        "schemas/government_organization_change_events.schema.json"
+      ],
+      "population_state": "DEFINED_NOT_POPULATED"
+    }
+  ],
+  "priority_levels": {
+    "P0": "Unified entity registry, evidence contract, transaction identity",
+    "P1": "Government contracts, corporate ownership, foreign connections, government-linked capital",
+    "P2": "Public debt, strategic infrastructure, concessions, tax incentives",
+    "P3": "Real estate, banking, investment funds, grants",
+    "P4": "Bankruptcy, trade, economic dependencies, historical ownership",
+    "P5": "Insurance, royalties, advanced economic modeling",
+    "EXISTING_SCOPE": "Already inside MoneySweep's scope before this expansion; not re-prioritized here",
+    "UNASSIGNED": "The proposal names no priority for this domain; a decision is open"
+  },
+  "foreign_connection_classes": [
+    {
+      "id": "FC01",
+      "name": "Capital relationships",
+      "coverage": "Investment, lending, financing, guarantees, securities and divestment",
+      "kernel_binding": "MONEY_FLOW"
+    },
+    {
+      "id": "FC02",
+      "name": "Ownership relationships",
+      "coverage": "Beneficial owners, subsidiaries, holding companies, trusts and joint ventures",
+      "kernel_binding": "OWNERSHIP_CONTROL"
+    },
+    {
+      "id": "FC03",
+      "name": "Government relationships",
+      "coverage": "State ownership, sovereign funds, public financing and documented control",
+      "kernel_binding": "OWNERSHIP_CONTROL"
+    },
+    {
+      "id": "FC04",
+      "name": "Operational relationships",
+      "coverage": "Operators, concessionaires, management agreements and strategic suppliers",
+      "kernel_binding": "INFRASTRUCTURE"
+    },
+    {
+      "id": "FC05",
+      "name": "Institutional relationships",
+      "coverage": "Universities, foundations, international organizations and research partnerships",
+      "kernel_binding": "RESEARCH_WORKFORCE"
+    },
+    {
+      "id": "FC06",
+      "name": "Commercial relationships",
+      "coverage": "Trade, licensing, franchises, distribution and procurement",
+      "kernel_binding": "PROCUREMENT"
+    },
+    {
+      "id": "FC07",
+      "name": "Political relationships",
+      "coverage": "Registered representation, lobbying and legally disclosed political activities",
+      "kernel_binding": "GOVERNANCE"
+    },
+    {
+      "id": "FC08",
+      "name": "Historical relationships",
+      "coverage": "Former owners, dissolved companies, nationalizations and asset transfers",
+      "kernel_binding": "IDENTITY_LINEAGE"
+    },
+    {
+      "id": "FC09",
+      "name": "Regulatory relationships",
+      "coverage": "Enforcement actions, sanctions, regulatory approvals and restrictions",
+      "kernel_binding": "REGULATORY"
+    }
+  ],
+  "flow_model": {
+    "note": "The eight flow kinds are not one exclusive list. Three describe where money moves relative to Puerto Rico and exclude one another; five describe what kind of movement it is and can combine with any direction.",
+    "geographic_axis": [
+      {
+        "id": "INBOUND",
+        "examples": "Investments, federal transfers, loans, grants",
+        "rule": "origin outside Puerto Rico, destination inside"
+      },
+      {
+        "id": "OUTBOUND",
+        "examples": "Dividends, royalties, imports, debt payments",
+        "rule": "origin inside Puerto Rico, destination outside"
+      },
+      {
+        "id": "INTERNAL",
+        "examples": "Local transactions, procurement, reinvestment",
+        "rule": "origin and destination both inside Puerto Rico"
+      }
+    ],
+    "geographic_fallbacks": [
+      "UNRESOLVED",
+      "NO_PR_NEXUS"
+    ],
+    "characters": [
+      {
+        "id": "PASS_THROUGH",
+        "examples": "Intermediary transactions and holding structures",
+        "cash_movement": true
+      },
+      {
+        "id": "RETAINED",
+        "examples": "Reinvested profits and locally retained earnings",
+        "cash_movement": true
+      },
+      {
+        "id": "EXTRACTED",
+        "examples": "Distributed profits, interest and management fees",
+        "cash_movement": true
+      },
+      {
+        "id": "NONCASH",
+        "examples": "Asset transfers, equity exchanges and debt conversions",
+        "cash_movement": false
+      },
+      {
+        "id": "CONTINGENT",
+        "examples": "Guarantees, commitments and conditional liabilities",
+        "cash_movement": false
+      }
+    ],
+    "mutually_exclusive_characters": [
+      [
+        "RETAINED",
+        "EXTRACTED"
+      ]
+    ]
+  },
+  "entity_universe": [
+    {
+      "group": "Public entities",
+      "kinds": [
+        {
+          "name": "Governments",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Government agencies",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Public corporations",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Municipalities",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Sovereign wealth funds",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Public pension funds",
+          "node_kind": "ENTITY"
+        }
+      ]
+    },
+    {
+      "group": "Commercial entities",
+      "kinds": [
+        {
+          "name": "Corporations",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "LLCs",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Partnerships",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Subsidiaries",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Holding companies",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Joint ventures",
+          "node_kind": "ENTITY"
+        }
+      ]
+    },
+    {
+      "group": "Financial entities",
+      "kinds": [
+        {
+          "name": "Banks",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Investment funds",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Insurers",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Trusts",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Creditors",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Special-purpose vehicles",
+          "node_kind": "ENTITY"
+        }
+      ]
+    },
+    {
+      "group": "Institutional entities",
+      "kinds": [
+        {
+          "name": "Universities",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Foundations",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Nonprofits",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "International organizations",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Political organizations",
+          "node_kind": "ENTITY"
+        },
+        {
+          "name": "Research institutions",
+          "node_kind": "ENTITY"
+        }
+      ]
+    },
+    {
+      "group": "Natural persons",
+      "kinds": [
+        {
+          "name": "Disclosed beneficial owners",
+          "node_kind": "PERSON"
+        },
+        {
+          "name": "Directors",
+          "node_kind": "PERSON"
+        },
+        {
+          "name": "Executives",
+          "node_kind": "PERSON"
+        },
+        {
+          "name": "Registered lobbyists",
+          "node_kind": "PERSON"
+        },
+        {
+          "name": "Political donors",
+          "node_kind": "PERSON"
+        },
+        {
+          "name": "Authorized representatives",
+          "node_kind": "PERSON"
+        }
+      ],
+      "restriction": "Relevant, lawfully accessible information only. No home address, identity number, family, health or other sensitive personal field is admitted."
+    },
+    {
+      "group": "Economic assets",
+      "kinds": [
+        {
+          "name": "Land and buildings",
+          "node_kind": "ASSET"
+        },
+        {
+          "name": "Infrastructure",
+          "node_kind": "ASSET"
+        },
+        {
+          "name": "Securities",
+          "node_kind": "ASSET"
+        },
+        {
+          "name": "Intellectual property",
+          "node_kind": "ASSET"
+        },
+        {
+          "name": "Concession rights",
+          "node_kind": "ASSET"
+        },
+        {
+          "name": "Financial instruments",
+          "node_kind": "ASSET"
+        }
+      ]
+    }
+  ],
+  "continuity_dimensions": [
+    {
+      "id": "LEGAL",
+      "states": [
+        "ACTIVE",
+        "DISSOLVED",
+        "MERGED",
+        "SUSPENDED"
+      ],
+      "fallback_states": [
+        "UNKNOWN",
+        "CONFLICT"
+      ]
+    },
+    {
+      "id": "FINANCIAL",
+      "states": [
+        "SOLVENT",
+        "INSOLVENT",
+        "BANKRUPT",
+        "RESTRUCTURING"
+      ],
+      "fallback_states": [
+        "UNKNOWN",
+        "CONFLICT"
+      ]
+    },
+    {
+      "id": "OPERATIONAL",
+      "states": [
+        "ACTIVE",
+        "INACTIVE",
+        "PARTIALLY_ACTIVE"
+      ],
+      "fallback_states": [
+        "UNKNOWN",
+        "CONFLICT"
+      ]
+    },
+    {
+      "id": "ASSET_OWNERSHIP",
+      "states": [
+        "RETAINED",
+        "TRANSFERRED",
+        "LIQUIDATED",
+        "UNRESOLVED"
+      ],
+      "fallback_states": [
+        "UNKNOWN",
+        "CONFLICT"
+      ]
+    },
+    {
+      "id": "ASSET_OPERATION",
+      "states": [
+        "OWNER_OPERATED",
+        "LEASED",
+        "CONCESSION_OPERATED",
+        "THIRD_PARTY_OPERATED"
+      ],
+      "fallback_states": [
+        "UNKNOWN",
+        "CONFLICT"
+      ]
+    },
+    {
+      "id": "CORPORATE_CONTROL",
+      "states": [
+        "ORIGINAL",
+        "SUCCESSOR",
+        "TRUSTEE",
+        "CREDITOR",
+        "GOVERNMENT"
+      ],
+      "fallback_states": [
+        "UNKNOWN",
+        "CONFLICT"
+      ]
+    },
+    {
+      "id": "REVENUE",
+      "states": [
+        "ACTIVE",
+        "REDIRECTED",
+        "DISCONTINUED",
+        "UNDISCLOSED"
+      ],
+      "fallback_states": [
+        "UNKNOWN",
+        "CONFLICT"
+      ]
+    }
+  ],
+  "historical_scope": {
+    "baseline_year": 1898,
+    "earlier_evidence": "Admitted only with a recorded justification that it establishes relevant ownership or institutional continuity.",
+    "periods_are_mutually_exclusive": false,
+    "periods": [
+      {
+        "id": "HP1",
+        "start_year": 1898,
+        "end_year": 1940,
+        "name": "Economic transition",
+        "coverage": "US corporate expansion, sugar, banking, land ownership and utility development."
+      },
+      {
+        "id": "HP2",
+        "start_year": 1941,
+        "end_year": 1975,
+        "name": "Industrial transformation",
+        "coverage": "Public corporations, Operation Bootstrap, manufacturing incentives and foreign capital."
+      },
+      {
+        "id": "HP3",
+        "start_year": 1976,
+        "end_year": 1995,
+        "name": "Section 936 era",
+        "coverage": "Tax-driven investment, pharmaceutical expansion and financial institutions."
+      },
+      {
+        "id": "HP4",
+        "start_year": 1996,
+        "end_year": 2005,
+        "name": "Section 936 phaseout",
+        "coverage": "Corporate restructuring, incentive changes and investment transitions."
+      },
+      {
+        "id": "HP5",
+        "start_year": 2006,
+        "end_year": 2015,
+        "name": "Fiscal crisis",
+        "coverage": "Public debt, economic contraction and emerging investment incentives."
+      },
+      {
+        "id": "HP6",
+        "start_year": 2016,
+        "end_year": 2019,
+        "name": "PROMESA and restructuring",
+        "coverage": "Fiscal oversight, bankruptcy, disaster recovery and asset restructuring."
+      },
+      {
+        "id": "HP7",
+        "start_year": 2020,
+        "end_year": null,
+        "name": "Contemporary economic structure",
+        "coverage": "Act 60, infrastructure concessions, federal recovery funds and current investment networks."
+      }
+    ]
+  },
+  "capabilities": [
+    {
+      "id": "CAP01",
+      "name": "Ultimate ownership resolution",
+      "purpose": "Trace ownership through intermediaries",
+      "requires_foundations": [
+        "F01",
+        "F09"
+      ],
+      "state": "CANDIDATE_PRIMITIVE",
+      "guardrail": "Traversal stops at an unresolved holder and reports it; an intermediate holder is never reported as ultimate."
+    },
+    {
+      "id": "CAP02",
+      "name": "Beneficial ownership analysis",
+      "purpose": "Identify documented ultimate beneficiaries",
+      "requires_foundations": [
+        "F01",
+        "F09"
+      ],
+      "state": "CANDIDATE_PRIMITIVE",
+      "guardrail": "Only BENEFICIAL intervals with binding evidence count. A parent company is not a beneficial owner."
+    },
+    {
+      "id": "CAP03",
+      "name": "Capital flow reconstruction",
+      "purpose": "Trace documented movement of money",
+      "requires_foundations": [
+        "F03",
+        "F08"
+      ],
+      "state": "CANDIDATE_PRIMITIVE",
+      "guardrail": "Awards, ceilings and approvals are not cash movements."
+    },
+    {
+      "id": "CAP04",
+      "name": "Ownership concentration",
+      "purpose": "Measure concentration across economic sectors",
+      "requires_foundations": [
+        "F02",
+        "F09"
+      ],
+      "state": "SPECIFIED_NOT_IMPLEMENTED",
+      "guardrail": "Requires a certified sector denominator; a partial corpus yields no concentration figure."
+    },
+    {
+      "id": "CAP05",
+      "name": "Geographic concentration",
+      "purpose": "Identify municipal and regional investment patterns",
+      "requires_foundations": [
+        "F08"
+      ],
+      "state": "SPECIFIED_NOT_IMPLEMENTED",
+      "guardrail": "Headquarters location is not the place of performance."
+    },
+    {
+      "id": "CAP06",
+      "name": "Government exposure",
+      "purpose": "Measure documented government-linked financial interests",
+      "requires_foundations": [
+        "F05",
+        "F09"
+      ],
+      "state": "SPECIFIED_NOT_IMPLEMENTED",
+      "guardrail": "State ownership must be documented per interval; it is never inferred from a name or country."
+    },
+    {
+      "id": "CAP07",
+      "name": "Economic dependency",
+      "purpose": "Identify reliance on external entities",
+      "requires_foundations": [
+        "F02",
+        "F08"
+      ],
+      "state": "SPECIFIED_NOT_IMPLEMENTED",
+      "guardrail": "A dependency edge is not evidence of payment."
+    },
+    {
+      "id": "CAP08",
+      "name": "Contract network analysis",
+      "purpose": "Connect contractors, subcontractors and recipients",
+      "requires_foundations": [
+        "F01",
+        "F06",
+        "F08"
+      ],
+      "state": "PARTIAL_EXISTING",
+      "guardrail": "Correlation is never promoted to causation, coordination, misconduct or proof of control."
+    },
+    {
+      "id": "CAP09",
+      "name": "Corporate genealogy",
+      "purpose": "Reconstruct mergers, acquisitions and successors",
+      "requires_foundations": [
+        "F01",
+        "F05",
+        "F10"
+      ],
+      "state": "PARTIAL_EXISTING",
+      "guardrail": "Possible successors stay possible until a binding record names them."
+    },
+    {
+      "id": "CAP10",
+      "name": "Asset lifecycle tracking",
+      "purpose": "Track ownership and operation over time",
+      "requires_foundations": [
+        "F09",
+        "F10"
+      ],
+      "state": "CANDIDATE_PRIMITIVE",
+      "guardrail": "Continued operation of an asset does not show continued operation of its owner."
+    },
+    {
+      "id": "CAP11",
+      "name": "Political-financial correlation",
+      "purpose": "Examine disclosed financial and political relationships",
+      "requires_foundations": [
+        "F01",
+        "F08"
+      ],
+      "state": "PARTIAL_EXISTING",
+      "guardrail": "Correlation is never promoted to causation, coordination, misconduct or proof of control."
+    },
+    {
+      "id": "CAP12",
+      "name": "Revolving-door analysis",
+      "purpose": "Track documented employment and appointment transitions",
+      "requires_foundations": [
+        "F01",
+        "F02"
+      ],
+      "state": "SPECIFIED_NOT_IMPLEMENTED",
+      "guardrail": "Only documented roles with dates. Name matches alone are not identity."
+    },
+    {
+      "id": "CAP13",
+      "name": "Related-party transactions",
+      "purpose": "Identify disclosed transactions between connected entities",
+      "requires_foundations": [
+        "F02",
+        "F08",
+        "F09"
+      ],
+      "state": "SPECIFIED_NOT_IMPLEMENTED",
+      "guardrail": "The relationship and the transaction are evidenced separately."
+    },
+    {
+      "id": "CAP14",
+      "name": "Offshore network analysis",
+      "purpose": "Trace cross-jurisdictional corporate structures",
+      "requires_foundations": [
+        "F01",
+        "F09"
+      ],
+      "state": "SPECIFIED_NOT_IMPLEMENTED",
+      "guardrail": "A foreign or offshore jurisdiction is a fact about registration, not a risk finding."
+    },
+    {
+      "id": "CAP15",
+      "name": "Bankruptcy asset tracing",
+      "purpose": "Follow assets, creditors and restructuring",
+      "requires_foundations": [
+        "F08",
+        "F09",
+        "F10"
+      ],
+      "state": "SPECIFIED_NOT_IMPLEMENTED",
+      "guardrail": "Unresolved asset ownership stays unresolved."
+    },
+    {
+      "id": "CAP16",
+      "name": "Revenue distribution",
+      "purpose": "Identify documented beneficiaries of economic activity",
+      "requires_foundations": [
+        "F03",
+        "F08"
+      ],
+      "state": "SPECIFIED_NOT_IMPLEMENTED",
+      "guardrail": "Gross revenue is not distributed profit."
+    },
+    {
+      "id": "CAP17",
+      "name": "Public expenditure tracing",
+      "purpose": "Connect government spending to recipients",
+      "requires_foundations": [
+        "F03",
+        "F06",
+        "F08"
+      ],
+      "state": "PARTIAL_EXISTING",
+      "guardrail": "Obligated, disbursed and expended are different measures and are never summed together."
+    },
+    {
+      "id": "CAP18",
+      "name": "Historical comparison",
+      "purpose": "Measure changes across periods",
+      "requires_foundations": [
+        "F09",
+        "F10"
+      ],
+      "state": "SPECIFIED_NOT_IMPLEMENTED",
+      "guardrail": "Periods overlap by design; comparisons state valuation basis and price year."
+    },
+    {
+      "id": "CAP19",
+      "name": "Contradiction detection",
+      "purpose": "Identify conflicting financial and ownership disclosures",
+      "requires_foundations": [
+        "F01",
+        "F09",
+        "F10"
+      ],
+      "state": "PARTIAL_EXISTING",
+      "guardrail": "Both sides of a conflict are preserved; neither is silently chosen."
+    },
+    {
+      "id": "CAP20",
+      "name": "Change detection",
+      "purpose": "Detect new transactions, ownership and institutional changes",
+      "requires_foundations": [
+        "F01",
+        "F08"
+      ],
+      "state": "PARTIAL_EXISTING",
+      "guardrail": "A change in a source is not by itself a change in the world."
+    }
+  ],
+  "infrastructure_classes": [
+    {
+      "id": "INF01",
+      "name": "Power plants",
+      "financial_intelligence": "Ownership, operators, financing",
+      "identity_owner_candidate": "aguayluz-pr",
+      "owner_state": "CANDIDATE_UNRATIFIED"
+    },
+    {
+      "id": "INF02",
+      "name": "Transmission and distribution",
+      "financial_intelligence": "Concessions, contractors, capital expenditures",
+      "identity_owner_candidate": "aguayluz-pr",
+      "owner_state": "CANDIDATE_UNRATIFIED"
+    },
+    {
+      "id": "INF03",
+      "name": "Reservoirs and water systems",
+      "financial_intelligence": "Ownership, rehabilitation funding, contractors",
+      "identity_owner_candidate": "aguayluz-pr",
+      "owner_state": "CANDIDATE_UNRATIFIED"
+    },
+    {
+      "id": "INF04",
+      "name": "Ports and terminals",
+      "financial_intelligence": "Operators, concessions, investors",
+      "identity_owner_candidate": null,
+      "owner_state": "UNASSIGNED"
+    },
+    {
+      "id": "INF05",
+      "name": "Airports",
+      "financial_intelligence": "Lease agreements, operators, financing",
+      "identity_owner_candidate": "spiderweb-pr",
+      "owner_state": "CANDIDATE_UNRATIFIED",
+      "note": "spiderweb-pr publishes airport reference locations; a certified airport identity registry is not established."
+    },
+    {
+      "id": "INF06",
+      "name": "Roads and tollways",
+      "financial_intelligence": "Concessionaires, creditors, revenue",
+      "identity_owner_candidate": null,
+      "owner_state": "UNASSIGNED",
+      "note": "MoneySweep holds road-corridor join inputs (roadwatch) but does not own road identity."
+    },
+    {
+      "id": "INF07",
+      "name": "Submarine cables",
+      "financial_intelligence": "Owners, operators, consortium members",
+      "identity_owner_candidate": null,
+      "owner_state": "UNASSIGNED"
+    },
+    {
+      "id": "INF08",
+      "name": "Telecommunications towers",
+      "financial_intelligence": "Portfolio ownership and lease arrangements",
+      "identity_owner_candidate": null,
+      "owner_state": "UNASSIGNED"
+    },
+    {
+      "id": "INF09",
+      "name": "Fuel terminals",
+      "financial_intelligence": "Ownership, supply agreements and financing",
+      "identity_owner_candidate": null,
+      "owner_state": "UNASSIGNED"
+    },
+    {
+      "id": "INF10",
+      "name": "Industrial parks",
+      "financial_intelligence": "Landowners, tenants and incentives",
+      "identity_owner_candidate": null,
+      "owner_state": "UNASSIGNED"
+    },
+    {
+      "id": "INF11",
+      "name": "Data centers",
+      "financial_intelligence": "Investors, operators and infrastructure dependencies",
+      "identity_owner_candidate": null,
+      "owner_state": "UNASSIGNED"
+    },
+    {
+      "id": "INF12",
+      "name": "Hospitals",
+      "financial_intelligence": "Corporate ownership, financing and acquisitions",
+      "identity_owner_candidate": null,
+      "owner_state": "UNASSIGNED"
+    },
+    {
+      "id": "INF13",
+      "name": "Agricultural land",
+      "financial_intelligence": "Owners, lessees and investment vehicles",
+      "identity_owner_candidate": null,
+      "owner_state": "UNASSIGNED"
+    },
+    {
+      "id": "INF14",
+      "name": "Waste management",
+      "financial_intelligence": "Operators, contracts and ownership",
+      "identity_owner_candidate": "aguayluz-pr",
+      "owner_state": "CANDIDATE_UNRATIFIED",
+      "note": "Ownership is proposed, not accepted (thehub-pr ADR 0013)."
+    }
+  ],
+  "source_authority_hierarchy": [
+    {
+      "rank": 1,
+      "id": "A1_PRIMARY_RECORD",
+      "evidence_tier": "T1",
+      "description": "Source-native official record with a stable identifier: statutory registry entry, regulatory filing, court docket, recorded instrument, signed contract.",
+      "may_establish": [
+        "identity",
+        "ownership",
+        "amount",
+        "date"
+      ]
+    },
+    {
+      "rank": 2,
+      "id": "A2_OFFICIAL_DATASET",
+      "evidence_tier": "T1",
+      "description": "Official government dataset or publication derived from primary records, with row identity.",
+      "may_establish": [
+        "amount",
+        "date",
+        "identity_when_stable_id_present"
+      ]
+    },
+    {
+      "rank": 3,
+      "id": "A3_REGULATED_DISCLOSURE",
+      "evidence_tier": "T2",
+      "description": "Self-disclosure by a regulated entity: audited statements, official statements, annual reports.",
+      "may_establish": [
+        "ownership_as_disclosed",
+        "amount_as_disclosed"
+      ]
+    },
+    {
+      "rank": 4,
+      "id": "A4_OPERATIONAL_RECORD",
+      "evidence_tier": "T2",
+      "description": "Operational or infrastructure documentation from an agency or operator.",
+      "may_establish": [
+        "operation",
+        "date"
+      ]
+    },
+    {
+      "rank": 5,
+      "id": "A5_COMMERCIAL_AGGREGATOR",
+      "evidence_tier": "T4",
+      "description": "Commercial data provider or aggregator.",
+      "may_establish": []
+    },
+    {
+      "rank": 6,
+      "id": "A6_SECONDARY_ANALYSIS",
+      "evidence_tier": "T4",
+      "description": "Press, research and other secondary analysis.",
+      "may_establish": []
+    }
+  ],
+  "source_authority_rules": [
+    "A lower rank never overrides a higher rank; a disagreement is kept as a contradiction.",
+    "Ranks 5 and 6 are discovery leads only. They never establish identity, ownership or an amount.",
+    "Two sources of the same rank that disagree leave the fact UNRESOLVED.",
+    "Absence from a source is not evidence of absence."
+  ],
+  "scope_policy": [
+    {
+      "requirement": "Geographic scope",
+      "policy": "Puerto Rico and demonstrably connected external entities"
+    },
+    {
+      "requirement": "Temporal scope",
+      "policy": "1898-present, with justified earlier evidence"
+    },
+    {
+      "requirement": "Source scope",
+      "policy": "Lawfully accessible financial, corporate and government records"
+    },
+    {
+      "requirement": "Evidence scope",
+      "policy": "Field-level source traceability"
+    },
+    {
+      "requirement": "Identity scope",
+      "policy": "Stable IDs and authoritative bindings"
+    },
+    {
+      "requirement": "Financial scope",
+      "policy": "Disclosed amounts with explicit valuation basis"
+    },
+    {
+      "requirement": "Unknown ownership",
+      "policy": "Preserve as unresolved"
+    },
+    {
+      "requirement": "Confidential transactions",
+      "policy": "Record disclosure limitations"
+    },
+    {
+      "requirement": "Risk classification",
+      "policy": "Independent of nationality"
+    },
+    {
+      "requirement": "Production adoption",
+      "policy": "Blocked until certification and authorization"
+    }
+  ],
+  "prohibitions": [
+    "MoneySweep is not an unrestricted general-purpose surveillance system.",
+    "MoneySweep does not duplicate asset registries owned by other federation repositories.",
+    "Ordinary foreign economic activity is not treated as suspicious.",
+    "Correlation is never automatically promoted to causation, coordination, misconduct or proof of control."
+  ]
+}

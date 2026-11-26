@@ -24,6 +24,15 @@ A bump to the **federation export** version is what the release-tagging workflow
 
 ## [Unreleased]
 
+### Added
+
+- **Financial and economic intelligence scope v1 (candidate, not adopted).** Adds a 25-domain
+  ontology (`registries/financial_intelligence_ontology_v1.json`), an isolated
+  `moneysweep.financial_intelligence` kernel (transaction identity with N:N domain projection,
+  dated ownership, corporate continuity) and a source-level candidate coverage report. No existing
+  stream, schema, identifier, API or view changes; no data is populated; certification is withheld.
+  See `docs/FINANCIAL_ECONOMIC_INTELLIGENCE_SCOPE_V1.md`.
+
 ### Changed
 - **Desktop runtime moves to `prii-desktop` 0.3.0, so the Launch Pad is live.**
   The template-drift pin moves from thehub-pr `76d3c08` to `f620d8d` (main,

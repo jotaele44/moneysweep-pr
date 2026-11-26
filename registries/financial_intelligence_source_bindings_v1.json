@@ -1,0 +1,544 @@
+{
+  "schema_version": "financial_intelligence_source_bindings_v1",
+  "grain": "SOURCE_LEVEL_CANDIDATE",
+  "row_classification": "OPEN",
+  "note": "Each binding says a registered source is a candidate input to a domain. It was assigned from the source's registry identity and family, not from its rows. It certifies no coverage, no materialization and no row-level domain membership.",
+  "denominator": {
+    "path": "reports/financial_source_audit.csv",
+    "sha256": "26693aeb72b98e89fd0e247d19fc62944d78f9079ff1a49c23c42ae0671685d9",
+    "registry_sources": 167,
+    "not_considered_candidates": 5
+  },
+  "bindings": {
+    "aafaf": [
+      "MS06",
+      "MS21"
+    ],
+    "act_toll_revenue": [
+      "MS05"
+    ],
+    "act_tolls_concession": [
+      "MS17"
+    ],
+    "act_transition_contracts": [
+      "MS03"
+    ],
+    "act_transition_ppp": [
+      "MS17"
+    ],
+    "acuden_2024_transition": [
+      "MS03"
+    ],
+    "ases_plan_vital": [
+      "MS04"
+    ],
+    "asg_emergency_purchases": [
+      "MS03"
+    ],
+    "asg_suppliers": [
+      "MS03"
+    ],
+    "bde_loans": [
+      "MS10",
+      "MS11"
+    ],
+    "campaign_finance_entities": [
+      "MS01"
+    ],
+    "campaign_finance_materialization_gate": [
+      "MS01"
+    ],
+    "census_gov_finances": [
+      "MS04",
+      "MS05"
+    ],
+    "chip": [
+      "MS14"
+    ],
+    "cofina": [
+      "MS06",
+      "MS21"
+    ],
+    "compras_pr": [
+      "MS03"
+    ],
+    "congressional_earmarks": [
+      "MS14"
+    ],
+    "contralor_electoral": [
+      "MS01"
+    ],
+    "cor3": [
+      "MS14"
+    ],
+    "crim_property_tax": [
+      "MS05",
+      "MS15"
+    ],
+    "dcaa_active_contractors": [
+      "MS03"
+    ],
+    "ddec_incentives": [
+      "MS13"
+    ],
+    "doe_grants": [
+      "MS14"
+    ],
+    "doj_grants": [
+      "MS14"
+    ],
+    "doj_settlements": [
+      "MS20"
+    ],
+    "dol_whd_osha": [
+      "MS20"
+    ],
+    "donaciones_pr": [
+      "MS01"
+    ],
+    "dot_grants": [
+      "MS14"
+    ],
+    "dtop_centerline_lrs": [
+      "MS16"
+    ],
+    "dtop_road_contracts": [
+      "MS03"
+    ],
+    "dtop_vehicle_fees": [
+      "MS05"
+    ],
+    "ed_grants": [
+      "MS14"
+    ],
+    "eia_power_sector": [
+      "MS16",
+      "MS19"
+    ],
+    "emma_bonds": [
+      "MS06"
+    ],
+    "emma_infra_revenue": [
+      "MS05",
+      "MS06",
+      "MS16"
+    ],
+    "epa_grants": [
+      "MS14"
+    ],
+    "eqb_epa_icis": [
+      "MS20"
+    ],
+    "equitable_sharing": [
+      "MS14"
+    ],
+    "estadisticas_pr_external_trade": [
+      "MS08",
+      "MS18"
+    ],
+    "exim_bank": [
+      "MS08"
+    ],
+    "fcc_usf": [
+      "MS14"
+    ],
+    "fdic": [
+      "MS11"
+    ],
+    "fec": [
+      "MS01"
+    ],
+    "fec_committees": [
+      "MS01"
+    ],
+    "federal_audit_clearinghouse": [
+      "MS04",
+      "MS20"
+    ],
+    "fema_hmgp": [
+      "MS14"
+    ],
+    "fema_individual_assistance": [
+      "MS14"
+    ],
+    "fema_pa_openfema_v2": [
+      "MS14"
+    ],
+    "fhlb": [
+      "MS11"
+    ],
+    "fhwa_hpms_routes": [
+      "MS16"
+    ],
+    "fhwa_nbi_bridges": [
+      "MS16"
+    ],
+    "financialdata_net": [
+      "MS07"
+    ],
+    "follow_the_money": [
+      "MS01"
+    ],
+    "fpds_report_builder": [
+      "MS03"
+    ],
+    "fsrs_subawards": [
+      "MS03"
+    ],
+    "fta_ntd": [
+      "MS16"
+    ],
+    "ftz_board_pr": [
+      "MS08",
+      "MS13",
+      "MS18"
+    ],
+    "gaming_commission": [
+      "MS05"
+    ],
+    "gao_ig_audits": [
+      "MS20"
+    ],
+    "gleif_lei": [
+      "MS07",
+      "MS08"
+    ],
+    "grants_gov": [
+      "MS14"
+    ],
+    "gsa_iolp_real_property": [
+      "MS15"
+    ],
+    "hacienda": [
+      "MS04",
+      "MS05"
+    ],
+    "hacienda_sut_ivu": [
+      "MS05"
+    ],
+    "haf": [
+      "MS14"
+    ],
+    "hhs_grants": [
+      "MS14"
+    ],
+    "highergov_supplemental": [
+      "MS03"
+    ],
+    "hmda_ffiec": [
+      "MS11"
+    ],
+    "hud_cdbg_dr_public": [
+      "MS14"
+    ],
+    "hud_cdbg_mit": [
+      "MS14"
+    ],
+    "hud_drgr_authorized": [
+      "MS14"
+    ],
+    "hud_hcv_section8": [
+      "MS14"
+    ],
+    "irs_ctc_eitc_pr": [
+      "MS14"
+    ],
+    "lda": [
+      "MS02"
+    ],
+    "legislative_fiscal_link_candidates": [
+      "MS04"
+    ],
+    "lihtc": [
+      "MS13",
+      "MS15"
+    ],
+    "loteria_pr": [
+      "MS05"
+    ],
+    "medicaid_fmap": [
+      "MS14"
+    ],
+    "medicare_advantage": [
+      "MS14"
+    ],
+    "medicare_parts": [
+      "MS14"
+    ],
+    "msrb_rtrs_trades": [
+      "MS06"
+    ],
+    "municipal_finance": [
+      "MS04"
+    ],
+    "nara_catalog_aws_open_data": [
+      "MS25"
+    ],
+    "nara_nextgen_catalog_v3": [
+      "MS25"
+    ],
+    "ncua": [
+      "MS11"
+    ],
+    "nfip_claims": [
+      "MS22"
+    ],
+    "ngo_integration_layer": [
+      "MS23"
+    ],
+    "nih_reporter": [
+      "MS14"
+    ],
+    "nmtc": [
+      "MS13"
+    ],
+    "nonprofits_irs990": [
+      "MS23"
+    ],
+    "oatrh_payroll": [
+      "MS04"
+    ],
+    "oce_socrata_live": [
+      "MS01"
+    ],
+    "ocif_guide_financial_classes": [
+      "MS08",
+      "MS11"
+    ],
+    "ocpr_contracts": [
+      "MS03"
+    ],
+    "ocs_insurer_registry": [
+      "MS22"
+    ],
+    "ofac_sdn": [
+      "MS20"
+    ],
+    "oficina_contralor": [
+      "MS03"
+    ],
+    "ogpe_permits": [
+      "MS15"
+    ],
+    "oia_grants": [
+      "MS14"
+    ],
+    "opportunity_zones": [
+      "MS13"
+    ],
+    "p3_authority": [
+      "MS17"
+    ],
+    "ports_airports_contracts": [
+      "MS03"
+    ],
+    "ports_airports_revenue": [
+      "MS05"
+    ],
+    "ports_authority": [
+      "MS16"
+    ],
+    "pr_act_154_excise": [
+      "MS05"
+    ],
+    "pr_act_60_decrees": [
+      "MS13"
+    ],
+    "pr_arbitrios_excise": [
+      "MS05"
+    ],
+    "pr_cabilderos": [
+      "MS02"
+    ],
+    "pr_corporate_registry": [
+      "MS07"
+    ],
+    "pr_fomb": [
+      "MS06",
+      "MS21"
+    ],
+    "pr_fomb_special_reports": [
+      "MS06",
+      "MS21"
+    ],
+    "pr_general_fund_revenues": [
+      "MS05"
+    ],
+    "pr_income_tax_collections": [
+      "MS05"
+    ],
+    "pr_pensions": [
+      "MS04",
+      "MS10",
+      "MS12"
+    ],
+    "pr_ui_trust_fund": [
+      "MS05"
+    ],
+    "prac_pandemic_oversight": [
+      "MS14"
+    ],
+    "prasa": [
+      "MS16"
+    ],
+    "prasa_cer": [
+      "MS16"
+    ],
+    "prasa_cip": [
+      "MS16"
+    ],
+    "prasa_completed_projects": [
+      "MS16"
+    ],
+    "prasa_completed_projects_ppp": [
+      "MS17"
+    ],
+    "prasa_consulting_engineer_ppp": [
+      "MS17"
+    ],
+    "prasa_contracts_master": [
+      "MS03"
+    ],
+    "prasa_rate_revenue": [
+      "MS05"
+    ],
+    "prepa_luma_genera": [
+      "MS16",
+      "MS17"
+    ],
+    "prepa_luma_rate_revenue": [
+      "MS05"
+    ],
+    "promesa_creditors": [
+      "MS06",
+      "MS21"
+    ],
+    "prpha_housing_subsidy": [
+      "MS14"
+    ],
+    "rdc_demandas_civiles": [
+      "MS20"
+    ],
+    "research_grants": [
+      "MS14"
+    ],
+    "roadwatch_corridor_join": [
+      "MS16"
+    ],
+    "rum_cover_over": [
+      "MS05"
+    ],
+    "sam_entities": [
+      "MS07"
+    ],
+    "sam_exclusions": [
+      "MS20"
+    ],
+    "sam_opportunities": [
+      "MS03"
+    ],
+    "sba_disaster_loans_pr": [
+      "MS11",
+      "MS14"
+    ],
+    "sba_loans": [
+      "MS11"
+    ],
+    "sba_ppp": [
+      "MS11"
+    ],
+    "sbir": [
+      "MS14"
+    ],
+    "sec_13f_bpop_8q_certification": [
+      "MS09",
+      "MS12"
+    ],
+    "sec_13f_bpop_golden_freeze": [
+      "MS09",
+      "MS12"
+    ],
+    "sec_13f_nport": [
+      "MS09",
+      "MS12"
+    ],
+    "sec_edgar": [
+      "MS07"
+    ],
+    "sec_equity_identity_v2": [
+      "MS07"
+    ],
+    "sec_holdings_discovery_v2": [
+      "MS09",
+      "MS12"
+    ],
+    "sec_officers": [
+      "MS07"
+    ],
+    "sf133_budget_execution": [
+      "MS04"
+    ],
+    "slfrf": [
+      "MS14"
+    ],
+    "snap_nap": [
+      "MS14"
+    ],
+    "ssa": [
+      "MS14"
+    ],
+    "stip_tip_projects": [
+      "MS16"
+    ],
+    "tourism_room_tax": [
+      "MS05"
+    ],
+    "transit_contracts": [
+      "MS03"
+    ],
+    "transit_fare_revenue": [
+      "MS05"
+    ],
+    "usace_civil_works": [
+      "MS04",
+      "MS16"
+    ],
+    "usace_permits": [
+      "MS16"
+    ],
+    "usaspending_loans": [
+      "MS11"
+    ],
+    "usaspending_prime": [
+      "MS03"
+    ],
+    "usaspending_subawards": [
+      "MS03"
+    ],
+    "usda_farm_subsidies": [
+      "MS14"
+    ],
+    "usda_grants": [
+      "MS14"
+    ],
+    "va_benefits": [
+      "MS14"
+    ],
+    "wic": [
+      "MS14"
+    ],
+    "wioa": [
+      "MS14"
+    ]
+  },
+  "unbound": {
+    "centinelas_pre_official_signals": "Pre-official signal intake from another producer; not a financial record until officialized.",
+    "cms_open_payments": "Industry payments to clinicians; no domain in the 25 covers it without a decision.",
+    "fred_timeseries": "Macroeconomic reference series; context, not an entity-level relationship.",
+    "legislapr_discovery": "Legislative discovery surface; supports fiscal-link candidates but carries no transaction.",
+    "legislapr_sessions": "Legislative session metadata; no transaction.",
+    "legislative_canonical_sources": "Legislative canonical-source registry; no transaction.",
+    "opm_fedscope": "Federal workforce statistics; no domain in the 25 covers it without a decision.",
+    "osl_sutra_crosswalk": "Legislative identifier crosswalk; no transaction."
+  }
+}
