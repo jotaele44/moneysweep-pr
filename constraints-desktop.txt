@@ -16,7 +16,7 @@ packaging==26.2
 pandas==3.0.5
 pdfminer-six==20260107
 pdfplumber==0.11.10
-pillow==12.2.0
+pillow==13.0.0
 pluggy==1.6.0
 pyarrow==25.0.1
 pycparser==3.0
