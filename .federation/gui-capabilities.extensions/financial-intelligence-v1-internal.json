@@ -1,0 +1,84 @@
+{
+  "extension_id": "financial-intelligence-v1-internal",
+  "capabilities": [
+    {
+      "id": "financial-intelligence-v1-candidate-kernel",
+      "classification": "internal",
+      "status": "active",
+      "requires_terminal": false,
+      "rationale": "Candidate, non-adopted classification and conservation primitives for the 25-domain financial-intelligence ontology: structural validation of the ontology registry, deterministic transaction identity with N:N domain projection, temporal ownership intervals, corporate-continuity dimensions, and a source-level candidate coverage projection. Pure functions over in-memory inputs and committed registries; they acquire, materialize, promote and publish nothing, and no export stream or API reads them. Any human-facing financial-intelligence view must receive its own separately qualified API/GUI/E2E binding before adoption.",
+      "backend": {
+        "files": [
+          "moneysweep/financial_intelligence/__init__.py",
+          "moneysweep/financial_intelligence/_common.py",
+          "moneysweep/financial_intelligence/continuity.py",
+          "moneysweep/financial_intelligence/coverage.py",
+          "moneysweep/financial_intelligence/ontology.py",
+          "moneysweep/financial_intelligence/ownership.py",
+          "moneysweep/financial_intelligence/transactions.py"
+        ]
+      },
+      "tests": {
+        "backend": [
+          "tests/test_financial_intelligence_kernel_v1.py",
+          "tests/test_financial_intelligence_ontology_v1.py"
+        ]
+      },
+      "candidate_ids": [
+        "cli_surface:moneysweep/financial_intelligence/coverage.py",
+        "python_module:moneysweep/financial_intelligence/__init__.py",
+        "python_module:moneysweep/financial_intelligence/_common.py",
+        "python_module:moneysweep/financial_intelligence/continuity.py",
+        "python_module:moneysweep/financial_intelligence/coverage.py",
+        "python_module:moneysweep/financial_intelligence/ontology.py",
+        "python_module:moneysweep/financial_intelligence/ownership.py",
+        "python_module:moneysweep/financial_intelligence/transactions.py",
+        "python_symbol:moneysweep/financial_intelligence/_common.py:FinancialIntelligenceError",
+        "python_symbol:moneysweep/financial_intelligence/_common.py:active_on",
+        "python_symbol:moneysweep/financial_intelligence/_common.py:check_interval",
+        "python_symbol:moneysweep/financial_intelligence/_common.py:check_temporal_scope",
+        "python_symbol:moneysweep/financial_intelligence/_common.py:parse_date",
+        "python_symbol:moneysweep/financial_intelligence/_common.py:promotable",
+        "python_symbol:moneysweep/financial_intelligence/_common.py:require_text",
+        "python_symbol:moneysweep/financial_intelligence/continuity.py:ContinuityObservation",
+        "python_symbol:moneysweep/financial_intelligence/continuity.py:DimensionStatus",
+        "python_symbol:moneysweep/financial_intelligence/continuity.py:continuity_profile",
+        "python_symbol:moneysweep/financial_intelligence/coverage.py:build_coverage",
+        "python_symbol:moneysweep/financial_intelligence/coverage.py:load_bindings",
+        "python_symbol:moneysweep/financial_intelligence/coverage.py:main",
+        "python_symbol:moneysweep/financial_intelligence/coverage.py:read_audit_rows",
+        "python_symbol:moneysweep/financial_intelligence/coverage.py:render_markdown",
+        "python_symbol:moneysweep/financial_intelligence/ontology.py:OntologyError",
+        "python_symbol:moneysweep/financial_intelligence/ontology.py:load_ontology",
+        "python_symbol:moneysweep/financial_intelligence/ontology.py:unresolved_foundation_bindings",
+        "python_symbol:moneysweep/financial_intelligence/ontology.py:validate_ontology",
+        "python_symbol:moneysweep/financial_intelligence/ownership.py:HolderPath",
+        "python_symbol:moneysweep/financial_intelligence/ownership.py:InterestKind",
+        "python_symbol:moneysweep/financial_intelligence/ownership.py:OwnershipInterval",
+        "python_symbol:moneysweep/financial_intelligence/ownership.py:Terminal",
+        "python_symbol:moneysweep/financial_intelligence/ownership.py:assert_share_conservation",
+        "python_symbol:moneysweep/financial_intelligence/ownership.py:holders_at",
+        "python_symbol:moneysweep/financial_intelligence/ownership.py:resolve_ultimate_holders",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:Disclosure",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:DomainMembership",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:FlowCharacter",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:FlowCharacterAssertion",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:FlowDirection",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:Transaction",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:TransactionEquivalence",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:canonical_ids",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:character_conflicts",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:domain_rollup",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:geographic_direction",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:index_transactions",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:make_transaction",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:non_cash_ids",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:project_domains",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:transaction_id",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:unique_total",
+        "python_symbol:moneysweep/financial_intelligence/transactions.py:validate_memberships"
+      ]
+    }
+  ],
+  "exceptions": []
+}

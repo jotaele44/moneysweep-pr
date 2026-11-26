@@ -1,0 +1,579 @@
+{
+  "schema_version": "financial_intelligence_domain_coverage_v1",
+  "grain": "SOURCE_LEVEL_CANDIDATE",
+  "row_classification": "OPEN",
+  "certification": "WITHHELD",
+  "denominator": {
+    "audit_rows": 172,
+    "registry_sources": 167,
+    "not_considered_candidates": 5,
+    "bound": 164,
+    "explicitly_unbound": 8,
+    "unclassified": 0,
+    "conserved": true,
+    "audit_sha256": "26693aeb72b98e89fd0e247d19fc62944d78f9079ff1a49c23c42ae0671685d9",
+    "matches_frozen_bindings": true
+  },
+  "unclassified_sources": [],
+  "domains_without_registered_source": [
+    "MS24"
+  ],
+  "domains_without_materializing_source": [
+    "MS04",
+    "MS05",
+    "MS09",
+    "MS10",
+    "MS12",
+    "MS15",
+    "MS16",
+    "MS19",
+    "MS20",
+    "MS21",
+    "MS23",
+    "MS24",
+    "MS25"
+  ],
+  "sources_in_multiple_domains": 25,
+  "domains": {
+    "MS01": {
+      "name": "Political Finance",
+      "priority": "EXISTING_SCOPE",
+      "registered_sources": 8,
+      "materializing_sources": 3,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "queued_manual": 2,
+        "wired_materializing": 2,
+        "wired_needs_key": 1,
+        "wired_offline_ready": 1,
+        "wired_ready_unmaterialized": 2
+      },
+      "sources": [
+        "campaign_finance_entities",
+        "campaign_finance_materialization_gate",
+        "contralor_electoral",
+        "donaciones_pr",
+        "fec",
+        "fec_committees",
+        "follow_the_money",
+        "oce_socrata_live"
+      ]
+    },
+    "MS02": {
+      "name": "Lobbying & Representation",
+      "priority": "EXISTING_SCOPE",
+      "registered_sources": 2,
+      "materializing_sources": 1,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "queued_manual": 1,
+        "wired_materializing": 1
+      },
+      "sources": [
+        "lda",
+        "pr_cabilderos"
+      ]
+    },
+    "MS03": {
+      "name": "Government Procurement",
+      "priority": "P1",
+      "registered_sources": 18,
+      "materializing_sources": 6,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "queued_manual": 4,
+        "wired_materializing": 4,
+        "wired_needs_key": 1,
+        "wired_not_set_to_materialize": 2,
+        "wired_offline_ready": 2,
+        "wired_ready_unmaterialized": 5
+      },
+      "sources": [
+        "act_transition_contracts",
+        "acuden_2024_transition",
+        "asg_emergency_purchases",
+        "asg_suppliers",
+        "compras_pr",
+        "dcaa_active_contractors",
+        "dtop_road_contracts",
+        "fpds_report_builder",
+        "fsrs_subawards",
+        "highergov_supplemental",
+        "ocpr_contracts",
+        "oficina_contralor",
+        "ports_airports_contracts",
+        "prasa_contracts_master",
+        "sam_opportunities",
+        "transit_contracts",
+        "usaspending_prime",
+        "usaspending_subawards"
+      ]
+    },
+    "MS04": {
+      "name": "Public Expenditures",
+      "priority": "UNASSIGNED",
+      "registered_sources": 10,
+      "materializing_sources": 0,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "queued_manual": 2,
+        "wired_needs_key": 3,
+        "wired_ready_unmaterialized": 5
+      },
+      "sources": [
+        "ases_plan_vital",
+        "census_gov_finances",
+        "federal_audit_clearinghouse",
+        "hacienda",
+        "legislative_fiscal_link_candidates",
+        "municipal_finance",
+        "oatrh_payroll",
+        "pr_pensions",
+        "sf133_budget_execution",
+        "usace_civil_works"
+      ]
+    },
+    "MS05": {
+      "name": "Public Revenues",
+      "priority": "UNASSIGNED",
+      "registered_sources": 18,
+      "materializing_sources": 0,
+      "not_considered_candidates": 2,
+      "by_audit_status": {
+        "not_considered": 2,
+        "queued_manual": 10,
+        "queued_scraper": 1,
+        "wired_needs_key": 1,
+        "wired_ready_unmaterialized": 6
+      },
+      "sources": [
+        "act_toll_revenue",
+        "census_gov_finances",
+        "crim_property_tax",
+        "dtop_vehicle_fees",
+        "emma_infra_revenue",
+        "gaming_commission",
+        "hacienda",
+        "hacienda_sut_ivu",
+        "loteria_pr",
+        "ports_airports_revenue",
+        "pr_act_154_excise",
+        "pr_arbitrios_excise",
+        "pr_general_fund_revenues",
+        "pr_income_tax_collections",
+        "pr_ui_trust_fund",
+        "prasa_rate_revenue",
+        "prepa_luma_rate_revenue",
+        "rum_cover_over",
+        "tourism_room_tax",
+        "transit_fare_revenue"
+      ]
+    },
+    "MS06": {
+      "name": "Public Debt",
+      "priority": "P2",
+      "registered_sources": 8,
+      "materializing_sources": 1,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "wired_materializing": 1,
+        "wired_ready_unmaterialized": 7
+      },
+      "sources": [
+        "aafaf",
+        "cofina",
+        "emma_bonds",
+        "emma_infra_revenue",
+        "msrb_rtrs_trades",
+        "pr_fomb",
+        "pr_fomb_special_reports",
+        "promesa_creditors"
+      ]
+    },
+    "MS07": {
+      "name": "Corporate Ownership",
+      "priority": "P1",
+      "registered_sources": 7,
+      "materializing_sources": 1,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "queued_manual": 1,
+        "wired_materializing": 1,
+        "wired_needs_key": 1,
+        "wired_ready_unmaterialized": 4
+      },
+      "sources": [
+        "financialdata_net",
+        "gleif_lei",
+        "pr_corporate_registry",
+        "sam_entities",
+        "sec_edgar",
+        "sec_equity_identity_v2",
+        "sec_officers"
+      ]
+    },
+    "MS08": {
+      "name": "Foreign Connections",
+      "priority": "P1",
+      "registered_sources": 5,
+      "materializing_sources": 2,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "wired_materializing": 2,
+        "wired_ready_unmaterialized": 3
+      },
+      "sources": [
+        "estadisticas_pr_external_trade",
+        "exim_bank",
+        "ftz_board_pr",
+        "gleif_lei",
+        "ocif_guide_financial_classes"
+      ]
+    },
+    "MS09": {
+      "name": "US Mainland Connections",
+      "priority": "UNASSIGNED",
+      "registered_sources": 4,
+      "materializing_sources": 0,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "wired_ready_unmaterialized": 4
+      },
+      "sources": [
+        "sec_13f_bpop_8q_certification",
+        "sec_13f_bpop_golden_freeze",
+        "sec_13f_nport",
+        "sec_holdings_discovery_v2"
+      ]
+    },
+    "MS10": {
+      "name": "Government-Linked Capital",
+      "priority": "P1",
+      "registered_sources": 2,
+      "materializing_sources": 0,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "queued_manual": 1,
+        "wired_ready_unmaterialized": 1
+      },
+      "sources": [
+        "bde_loans",
+        "pr_pensions"
+      ]
+    },
+    "MS11": {
+      "name": "Banking & Credit",
+      "priority": "P3",
+      "registered_sources": 9,
+      "materializing_sources": 1,
+      "not_considered_candidates": 1,
+      "by_audit_status": {
+        "not_considered": 1,
+        "queued_manual": 2,
+        "wired_materializing": 1,
+        "wired_ready_unmaterialized": 6
+      },
+      "sources": [
+        "bde_loans",
+        "fdic",
+        "fhlb",
+        "hmda_ffiec",
+        "ncua",
+        "ocif_guide_financial_classes",
+        "sba_disaster_loans_pr",
+        "sba_loans",
+        "sba_ppp",
+        "usaspending_loans"
+      ]
+    },
+    "MS12": {
+      "name": "Investment Funds",
+      "priority": "P3",
+      "registered_sources": 5,
+      "materializing_sources": 0,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "wired_ready_unmaterialized": 5
+      },
+      "sources": [
+        "pr_pensions",
+        "sec_13f_bpop_8q_certification",
+        "sec_13f_bpop_golden_freeze",
+        "sec_13f_nport",
+        "sec_holdings_discovery_v2"
+      ]
+    },
+    "MS13": {
+      "name": "Tax Incentives",
+      "priority": "P2",
+      "registered_sources": 6,
+      "materializing_sources": 1,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "queued_manual": 1,
+        "wired_materializing": 1,
+        "wired_ready_unmaterialized": 4
+      },
+      "sources": [
+        "ddec_incentives",
+        "ftz_board_pr",
+        "lihtc",
+        "nmtc",
+        "opportunity_zones",
+        "pr_act_60_decrees"
+      ]
+    },
+    "MS14": {
+      "name": "Subsidies & Grants",
+      "priority": "P3",
+      "registered_sources": 38,
+      "materializing_sources": 3,
+      "not_considered_candidates": 1,
+      "by_audit_status": {
+        "not_considered": 1,
+        "queued_manual": 5,
+        "wired_materializing": 3,
+        "wired_not_set_to_materialize": 1,
+        "wired_ready_unmaterialized": 29
+      },
+      "sources": [
+        "chip",
+        "congressional_earmarks",
+        "cor3",
+        "doe_grants",
+        "doj_grants",
+        "dot_grants",
+        "ed_grants",
+        "epa_grants",
+        "equitable_sharing",
+        "fcc_usf",
+        "fema_hmgp",
+        "fema_individual_assistance",
+        "fema_pa_openfema_v2",
+        "grants_gov",
+        "haf",
+        "hhs_grants",
+        "hud_cdbg_dr_public",
+        "hud_cdbg_mit",
+        "hud_drgr_authorized",
+        "hud_hcv_section8",
+        "irs_ctc_eitc_pr",
+        "medicaid_fmap",
+        "medicare_advantage",
+        "medicare_parts",
+        "nih_reporter",
+        "oia_grants",
+        "prac_pandemic_oversight",
+        "prpha_housing_subsidy",
+        "research_grants",
+        "sba_disaster_loans_pr",
+        "sbir",
+        "slfrf",
+        "snap_nap",
+        "ssa",
+        "usda_farm_subsidies",
+        "usda_grants",
+        "va_benefits",
+        "wic",
+        "wioa"
+      ]
+    },
+    "MS15": {
+      "name": "Real Estate & Land",
+      "priority": "P3",
+      "registered_sources": 3,
+      "materializing_sources": 0,
+      "not_considered_candidates": 1,
+      "by_audit_status": {
+        "not_considered": 1,
+        "queued_manual": 2,
+        "wired_ready_unmaterialized": 1
+      },
+      "sources": [
+        "crim_property_tax",
+        "gsa_iolp_real_property",
+        "lihtc",
+        "ogpe_permits"
+      ]
+    },
+    "MS16": {
+      "name": "Strategic Infrastructure",
+      "priority": "P2",
+      "registered_sources": 16,
+      "materializing_sources": 0,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "queued_manual": 7,
+        "wired_needs_key": 1,
+        "wired_ready_unmaterialized": 8
+      },
+      "sources": [
+        "dtop_centerline_lrs",
+        "eia_power_sector",
+        "emma_infra_revenue",
+        "fhwa_hpms_routes",
+        "fhwa_nbi_bridges",
+        "fta_ntd",
+        "ports_authority",
+        "prasa",
+        "prasa_cer",
+        "prasa_cip",
+        "prasa_completed_projects",
+        "prepa_luma_genera",
+        "roadwatch_corridor_join",
+        "stip_tip_projects",
+        "usace_civil_works",
+        "usace_permits"
+      ]
+    },
+    "MS17": {
+      "name": "Public-Private Partnerships",
+      "priority": "P2",
+      "registered_sources": 6,
+      "materializing_sources": 1,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "queued_manual": 3,
+        "wired_materializing": 1,
+        "wired_ready_unmaterialized": 2
+      },
+      "sources": [
+        "act_tolls_concession",
+        "act_transition_ppp",
+        "p3_authority",
+        "prasa_completed_projects_ppp",
+        "prasa_consulting_engineer_ppp",
+        "prepa_luma_genera"
+      ]
+    },
+    "MS18": {
+      "name": "International Trade",
+      "priority": "P4",
+      "registered_sources": 2,
+      "materializing_sources": 1,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "wired_materializing": 1,
+        "wired_ready_unmaterialized": 1
+      },
+      "sources": [
+        "estadisticas_pr_external_trade",
+        "ftz_board_pr"
+      ]
+    },
+    "MS19": {
+      "name": "Economic Dependencies",
+      "priority": "P4",
+      "registered_sources": 1,
+      "materializing_sources": 0,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "wired_needs_key": 1
+      },
+      "sources": [
+        "eia_power_sector"
+      ]
+    },
+    "MS20": {
+      "name": "Financial Compliance",
+      "priority": "UNASSIGNED",
+      "registered_sources": 8,
+      "materializing_sources": 0,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "queued_manual": 1,
+        "wired_needs_key": 2,
+        "wired_ready_unmaterialized": 5
+      },
+      "sources": [
+        "doj_settlements",
+        "dol_whd_osha",
+        "eqb_epa_icis",
+        "federal_audit_clearinghouse",
+        "gao_ig_audits",
+        "ofac_sdn",
+        "rdc_demandas_civiles",
+        "sam_exclusions"
+      ]
+    },
+    "MS21": {
+      "name": "Bankruptcy & Restructuring",
+      "priority": "P4",
+      "registered_sources": 5,
+      "materializing_sources": 0,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "wired_ready_unmaterialized": 5
+      },
+      "sources": [
+        "aafaf",
+        "cofina",
+        "pr_fomb",
+        "pr_fomb_special_reports",
+        "promesa_creditors"
+      ]
+    },
+    "MS22": {
+      "name": "Insurance & Risk Transfer",
+      "priority": "P5",
+      "registered_sources": 2,
+      "materializing_sources": 1,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "wired_materializing": 1,
+        "wired_ready_unmaterialized": 1
+      },
+      "sources": [
+        "nfip_claims",
+        "ocs_insurer_registry"
+      ]
+    },
+    "MS23": {
+      "name": "Nonprofit & Philanthropic Finance",
+      "priority": "UNASSIGNED",
+      "registered_sources": 2,
+      "materializing_sources": 0,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "wired_ready_unmaterialized": 2
+      },
+      "sources": [
+        "ngo_integration_layer",
+        "nonprofits_irs990"
+      ]
+    },
+    "MS24": {
+      "name": "Intellectual Property & Royalties",
+      "priority": "P5",
+      "registered_sources": 0,
+      "materializing_sources": 0,
+      "not_considered_candidates": 0,
+      "by_audit_status": {},
+      "sources": []
+    },
+    "MS25": {
+      "name": "Historical Economic Intelligence",
+      "priority": "P4",
+      "registered_sources": 2,
+      "materializing_sources": 0,
+      "not_considered_candidates": 0,
+      "by_audit_status": {
+        "wired_not_set_to_materialize": 2
+      },
+      "sources": [
+        "nara_catalog_aws_open_data",
+        "nara_nextgen_catalog_v3"
+      ]
+    }
+  },
+  "unbound": {
+    "centinelas_pre_official_signals": "Pre-official signal intake from another producer; not a financial record until officialized.",
+    "cms_open_payments": "Industry payments to clinicians; no domain in the 25 covers it without a decision.",
+    "fred_timeseries": "Macroeconomic reference series; context, not an entity-level relationship.",
+    "legislapr_discovery": "Legislative discovery surface; supports fiscal-link candidates but carries no transaction.",
+    "legislapr_sessions": "Legislative session metadata; no transaction.",
+    "legislative_canonical_sources": "Legislative canonical-source registry; no transaction.",
+    "opm_fedscope": "Federal workforce statistics; no domain in the 25 covers it without a decision.",
+    "osl_sutra_crosswalk": "Legislative identifier crosswalk; no transaction."
+  }
+}
