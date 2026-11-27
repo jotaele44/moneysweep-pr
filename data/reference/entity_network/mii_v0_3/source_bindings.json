@@ -1,0 +1,115 @@
+{
+  "schema_version": "mii_v0_3_source_bindings_v1",
+  "snapshot_main": "d1ee972f57917101bcfe5001982717cb423fb90d",
+  "semantics": "Registry/source binding only. Registration or materialization does not prove MII-source exhaustion or entity identity.",
+  "bindings": [
+    {
+      "vector_id": "MII-SRC-01",
+      "moneysweep_source_ids": [
+        "sec_edgar"
+      ],
+      "binding_state": "REGISTERED_SCOPE_PARTIAL",
+      "observed_pipeline_status": [
+        "not_materialized"
+      ],
+      "gap": "Existing SEC producer is not certified here as an exhaustive Exhibit 21 + Item 2 PR denominator."
+    },
+    {
+      "vector_id": "MII-SRC-02",
+      "moneysweep_source_ids": [],
+      "binding_state": "MISSING_ADAPTER",
+      "observed_pipeline_status": [],
+      "gap": "No FDA Establishment Registration / FEI source adapter identified in the repository."
+    },
+    {
+      "vector_id": "MII-SRC-03",
+      "moneysweep_source_ids": [
+        "sam_entities"
+      ],
+      "binding_state": "REGISTERED",
+      "observed_pipeline_status": [
+        "fully_materialized"
+      ],
+      "gap": "Materialization does not by itself certify complete PR parent/immediate-owner coverage for MII."
+    },
+    {
+      "vector_id": "MII-SRC-04",
+      "moneysweep_source_ids": [
+        "usaspending_subawards",
+        "fpds_report_builder",
+        "fsrs_subawards"
+      ],
+      "binding_state": "MULTI_SOURCE_PARTIAL",
+      "observed_pipeline_status": [
+        "fully_materialized",
+        "not_materialized",
+        "fully_materialized"
+      ],
+      "gap": "FPDS Report Builder remains unmaterialized; source-family semantic overlap must not be double counted."
+    },
+    {
+      "vector_id": "MII-SRC-05",
+      "moneysweep_source_ids": [
+        "pr_corporate_registry"
+      ],
+      "binding_state": "REGISTERED_MANUAL_UNMATERIALIZED",
+      "observed_pipeline_status": [
+        "not_materialized"
+      ],
+      "gap": "Manual PR Department of State corporate-registry export remains absent."
+    },
+    {
+      "vector_id": "MII-SRC-06",
+      "moneysweep_source_ids": [
+        "pr_fomb",
+        "pr_fomb_special_reports"
+      ],
+      "binding_state": "PARTIAL_MISSING_PREB_ADAPTER",
+      "observed_pipeline_status": [
+        "not_materialized",
+        "not_materialized"
+      ],
+      "gap": "FOMB producers exist but are unmaterialized; no dedicated PREB docket adapter was identified."
+    },
+    {
+      "vector_id": "MII-SRC-07",
+      "moneysweep_source_ids": [
+        "fcc_usf"
+      ],
+      "binding_state": "CANDIDATE_NOT_EQUIVALENT",
+      "observed_pipeline_status": [
+        "not_materialized"
+      ],
+      "gap": "FCC USF is not equivalent to FCC ULS/cable-license or TeleGeography cable coverage."
+    },
+    {
+      "vector_id": "MII-SRC-08",
+      "moneysweep_source_ids": [
+        "ddec_incentives"
+      ],
+      "binding_state": "PARTIAL_MISSING_PRIDCO_LEASE_ADAPTER",
+      "observed_pipeline_status": [
+        "not_materialized"
+      ],
+      "gap": "DDEC incentive intake exists; no PRIDCO property/lease-roll adapter was identified."
+    },
+    {
+      "vector_id": "MII-SRC-09",
+      "moneysweep_source_ids": [
+        "eqb_epa_icis"
+      ],
+      "binding_state": "REGISTERED_SCOPE_PARTIAL",
+      "observed_pipeline_status": [
+        "not_materialized"
+      ],
+      "gap": "EPA ECHO/ICIS exists but is not materialized and does not alone cover DRNA/EQB permit universes."
+    },
+    {
+      "vector_id": "MII-SRC-10",
+      "moneysweep_source_ids": [],
+      "binding_state": "REVIEW_GATE_NOT_SINGLE_SOURCE",
+      "observed_pipeline_status": [],
+      "gap": "Primary-document corroboration is a bounded review process, not a single source adapter."
+    }
+  ]
+}
