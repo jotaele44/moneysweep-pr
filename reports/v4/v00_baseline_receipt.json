@@ -1,0 +1,31 @@
+{
+  "version": "v4.0.0-rc1",
+  "phase": "V00",
+  "state": "PROVISIONAL_PASS",
+  "repository": "jotaele44/moneysweep-pr",
+  "default_branch": "main",
+  "baseline_head_sha": "15e8f6f11bea8e4d2ac69eb813afcdbef05ccf33",
+  "baseline_head_verified_against_main": true,
+  "compare_status": "identical",
+  "ahead_by": 0,
+  "behind_by": 0,
+  "branch_created": "chatgpt/moneysweep-v4-rc1-census",
+  "observed_file_sha256_like_blob_ids": {
+    "README.md": "1b453ef2beb3c6c823ed49627355b7a0de1a501f",
+    "pyproject.toml": "e346966fba6cf91aa1aeb3ca06b5aea976dff15b",
+    "registries/source_registry.json": "78cdda5ec411bd16601865591d41e27299f47475",
+    "registries/source_registry.yaml": "d289fc90744e0a7e3f97206c3d4622849a55a4ab",
+    "reports/current_status.json": "e92541b590915ae885d63acd2fdd97cb9fba8d97",
+    "reports/materialization_readiness.json": "df509ff41123b00ac67bf30af4983e36a43416d8",
+    "reports/source_registry_status.csv": "baddc66e7fd0472412bb929b38e8c93b450f30c4"
+  },
+  "connector_boundary": {
+    "recursive_tree_listing_available": false,
+    "local_worktree_status_available": false,
+    "complete_file_hash_manifest_available": false
+  },
+  "unresolved_items": [
+    "Full recursive file denominator and worktree-dirty state require an execution surface that exposes repository tree/worktree state."
+  ],
+  "certification": "PROVISIONAL"
+}
